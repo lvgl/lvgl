@@ -40,24 +40,16 @@ enum {
 };
 typedef uint8_t lv_slider_type_t;
 
-LV_CLASS_DECLARE_START(lv_slider, lv_bar)
+typedef struct {
+    lv_bar_ext_t bar;       /*Add the ancestor's type first*/
+    lv_area_t left_knob_area;                                   \
+    lv_area_t right_knob_area;                                  \
+    int16_t * value_to_set; /* Which bar value to set */        \
+    uint8_t dragging : 1;       /*1: the slider is being dragged*/ \
+    uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
+}lv_slider_ext_t;
 
-#define _lv_slider_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
-
-#define _lv_slider_data                                       \
-  _lv_bar_data                                                \
-  lv_area_t left_knob_area;                                   \
-  lv_area_t right_knob_area;                                  \
-  int16_t * value_to_set; /* Which bar value to set */        \
-  uint8_t dragging : 1;       /*1: the slider is being dragged*/ \
-  uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
-
-#define _lv_slider_class_dsc        \
-  _lv_bar_class_dsc               \
-
-LV_CLASS_DECLARE_END(lv_slider, lv_bar)
-
-extern lv_slider_class_t lv_slider;
+extern const lv_obj_class_t lv_slider;
 
 /**********************
  * GLOBAL PROTOTYPES

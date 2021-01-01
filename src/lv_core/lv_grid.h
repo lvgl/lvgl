@@ -55,7 +55,6 @@ extern "C" {
 
 /* Can't include lv_obj.h because it includes this header file */
 struct _lv_obj_t;
-typedef struct _lv_obj_t lv_obj_t;
 
 typedef struct {
     const lv_coord_t * col_dsc;
@@ -96,16 +95,16 @@ void lv_grid_set_gap(lv_grid_t * grid, lv_coord_t col_gap, uint8_t row_gap);
  * @param obj pointer to an object
  * @param grid the grid to set
  */
-void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid);
+void lv_obj_set_grid(struct _lv_obj_t * obj, const lv_grid_t * grid);
 
 /**
  * Get the grid of an object
  * @param obj pointer to an object
  * @return the grid, NULL if no grid
  */
-const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj);
+const lv_grid_t * lv_obj_get_grid(struct _lv_obj_t * obj);
 
-void lv_obj_set_grid_cell(lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos);
+void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos);
 
 /**
  * Notify all object if a style is modified
@@ -123,9 +122,9 @@ bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
 
 
-void _lv_grid_full_refresh(lv_obj_t * cont);
+void _lv_grid_full_refresh(struct _lv_obj_t * cont);
 
-void lv_grid_item_refr_pos(lv_obj_t * item);
+void lv_grid_item_refr_pos(struct _lv_obj_t * item);
 
 
 /**********************

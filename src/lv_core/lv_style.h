@@ -316,81 +316,78 @@ typedef struct _lv_style_transiton_t{
     uint32_t delay;
 }lv_style_transiton_t;
 
-LV_CLASS_DECLARE_START(lv_style, lv_base);
-
-#define _lv_style_constructor   void (*constructor)(struct _lv_style_t * style)
-
 #if LV_USE_ASSERT_STYLE
 #  define _LV_STYLE_SENTINEL uint32_t sentinel;
 #else
 #  define _LV_STYLE_SENTINEL
 #endif
 
-#define _lv_style_data              \
-  _lv_base_data                     \
-  lv_style_ext_t * ext;         \
-  _LV_STYLE_SENTINEL                \
-    /*32*/ \
-        uint32_t radius :5;  \
-        uint32_t transform_width :5;  \
-        uint32_t transform_height :5;  \
-        uint32_t opa :5;  \
-        uint32_t color_filter_cb :4;  \
-        uint32_t transition :4;  \
-        uint32_t bg_color :4;  \
-        \
-        uint32_t color_filter_opa :5;  \
-        uint32_t bg_opa :5;  \
-        uint32_t border_opa:5;  \
-        uint32_t img_opa:5;  \
-        uint32_t bg_grad_color :4;  \
-        uint32_t border_color:4;  \
-        uint32_t border_width:4;  \
-        \
-        uint32_t pad_top:5;  \
-        uint32_t pad_bottom:5;  \
-        uint32_t pad_left:5;  \
-        uint32_t pad_right:5;  \
-        uint32_t text_color:4;  \
-        uint32_t text_font :4;  \
-        uint32_t line_color :4;  \
-        \
-        uint32_t margin_top:5;  \
-        uint32_t margin_bottom:5;  \
-        uint32_t margin_left:5;  \
-        uint32_t margin_right:5;  \
-        uint32_t outline_color:4;  \
-        uint32_t shadow_color:4;  \
-        uint32_t line_rounded:1;  \
-        uint32_t border_post:1;  \
-        uint32_t clip_corner:1;  \
-        uint32_t has_line_rounded:1; \
-        uint32_t has_clip_corner:1;  \
-        \
-        uint32_t text_opa:5;  \
-        uint32_t line_width :5;  \
-        uint32_t line_opa :5;  \
-        uint32_t outline_width:5;  \
-        uint32_t outline_pad:5;  \
-        uint32_t outline_opa:5;  \
-        uint32_t bg_grad_dir:2;  \
-        \
-        uint32_t shadow_width:5;  \
-        uint32_t shadow_ofs_y:5;  \
-        uint32_t shadow_ofs_x:5;  \
-        uint32_t shadow_spread:5;  \
-        uint32_t shadow_opa:4;  \
-        uint32_t has_bg_grad_dir:1;  \
-        uint32_t has_border_post:1;  \
-        uint32_t dont_index:1;  \
+struct _lv_style_t;
 
-#define _lv_style_class_dsc                                                                     \
-  _lv_base_class_dsc                                                                            \
-  bool (*remove_prop)(struct _lv_style_t * style, lv_style_prop_t prop);                                \
-  void (*set_prop)(struct _lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);   \
-  bool (*get_prop)(const struct _lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value); \
+typedef struct {
+  bool (*remove_prop)(struct _lv_style_t * style, lv_style_prop_t prop);
+  void (*set_prop)(struct _lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
+  bool (*get_prop)(const struct _lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+}lv_style_class_t;
 
-LV_CLASS_DECLARE_END(lv_style, lv_base);
+typedef struct _lv_style_t{
+    lv_style_class_t * class_p;
+    lv_style_ext_t * ext;
+    _LV_STYLE_SENTINEL
+    /*32*/
+    uint32_t radius :5;
+    uint32_t transform_width :5;
+    uint32_t transform_height :5;
+    uint32_t opa :5;
+    uint32_t color_filter_cb :4;
+    uint32_t transition :4;
+    uint32_t bg_color :4;
+
+    uint32_t color_filter_opa :5;
+    uint32_t bg_opa :5;
+    uint32_t border_opa:5;
+    uint32_t img_opa:5;
+    uint32_t bg_grad_color :4;
+    uint32_t border_color:4;
+    uint32_t border_width:4;
+
+    uint32_t pad_top:5;
+    uint32_t pad_bottom:5;
+    uint32_t pad_left:5;
+    uint32_t pad_right:5;
+    uint32_t text_color:4;
+    uint32_t text_font :4;
+    uint32_t line_color :4;
+
+    uint32_t margin_top:5;
+    uint32_t margin_bottom:5;
+    uint32_t margin_left:5;
+    uint32_t margin_right:5;
+    uint32_t outline_color:4;
+    uint32_t shadow_color:4;
+    uint32_t line_rounded:1;
+    uint32_t border_post:1;
+    uint32_t clip_corner:1;
+    uint32_t has_line_rounded:1;
+    uint32_t has_clip_corner:1;
+
+    uint32_t text_opa:5;
+    uint32_t line_width :5;
+    uint32_t line_opa :5;
+    uint32_t outline_width:5;
+    uint32_t outline_pad:5;
+    uint32_t outline_opa:5;
+    uint32_t bg_grad_dir:2;
+
+    uint32_t shadow_width:5;
+    uint32_t shadow_ofs_y:5;
+    uint32_t shadow_ofs_x:5;
+    uint32_t shadow_spread:5;
+    uint32_t shadow_opa:4;
+    uint32_t has_bg_grad_dir:1;
+    uint32_t has_border_post:1;
+    uint32_t dont_index:1;
+} lv_style_t;
 
 extern lv_style_class_t lv_style;
 

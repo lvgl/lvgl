@@ -86,7 +86,13 @@ static void lv_obj_destructor(void * obj);
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static const void * event_act_data;
-lv_obj_class_t lv_obj;
+const lv_obj_class_t lv_obj = {
+    .constructor = lv_obj_constructor,
+    .destructor = lv_obj_destructor,
+    .signal_cb = lv_obj_signal,
+    .design_cb = lv_obj_design,
+    .ext_size = 0,
+};
 
 /**********************
  *      MACROS
@@ -111,6 +117,7 @@ void lv_init(void)
 
     /*Initialize the lv_misc modules*/
     _lv_mem_init();
+
     _lv_timer_core_init();
 
 #if LV_USE_FILESYSTEM
@@ -131,12 +138,6 @@ void lv_init(void)
 #endif
 
     _lv_style_system_init();
-
-    LV_CLASS_INIT(lv_obj, lv_base);
-    lv_obj.constructor = lv_obj_constructor;
-    lv_obj.destructor = lv_obj_destructor;
-    lv_obj.signal_cb = lv_obj_signal;
-    lv_obj.design_cb = lv_obj_design;
 
     _lv_obj_style_init();
 
@@ -217,7 +218,10 @@ void lv_deinit(void)
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_t * obj = lv_class_new(&lv_obj);
+    lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
+    _lv_memset_00(obj, sizeof(lv_obj_t));
+    obj->class_p = &lv_obj;
+
     lv_obj.constructor(obj, parent, copy);
 
     lv_obj_create_finish(obj, parent, copy);
@@ -1401,7 +1405,6 @@ static void obj_del_core(lv_obj_t * obj)
 static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_obj)
-    lv_obj.base_p->constructor(obj);
 
     /*Create a screen*/
     if(parent == NULL) {
@@ -1522,7 +1525,6 @@ static void lv_obj_destructor(void * p)
     lv_obj_remove_all_styles(obj);
     if(obj->spec_attr) lv_mem_free(obj->spec_attr);
 
-    lv_class_destroy(obj);
 }
 
 /**

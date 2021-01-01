@@ -50,8 +50,6 @@ static uint32_t buf_ptr_p = 1;
 
 void _lv_style_system_init(void)
 {
-    LV_CLASS_INIT(lv_style, lv_base);
-    lv_style.constructor = NULL;
     lv_style.remove_prop = remove_prop;
     lv_style.set_prop = set_prop;
     lv_style.get_prop = get_prop;

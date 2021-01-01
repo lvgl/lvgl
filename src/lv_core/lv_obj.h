@@ -194,7 +194,7 @@ typedef uint16_t lv_obj_flag_t;
 
 
 typedef struct {
-    lv_obj_t ** children;       /**< Store the pointer of the children.*/
+    struct _lv_obj_t ** children;       /**< Store the pointer of the children.*/
     uint32_t child_cnt;
 #if LV_USE_GROUP != 0
     void * group_p;
@@ -222,30 +222,32 @@ typedef struct {
 }lv_obj_spec_attr_t;
 
 
-LV_CLASS_DECLARE_START(lv_obj, lv_base)
+#define _lv_obj_constructor
 
-#define _lv_obj_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+typedef struct {
+    void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
+    void (*destructor)(struct _lv_obj_t * obj);
+    lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
+    lv_design_cb_t design_cb; /**< Object type specific design function*/
+    uint32_t ext_size;
+}lv_obj_class_t;
 
-#define _lv_obj_data                 \
-  _lv_base_data                      \
-  struct _lv_obj_t * parent;         \
-  lv_obj_spec_attr_t * spec_attr;    \
-  lv_obj_style_list_t  style_list;   \
-  lv_area_t coords;                  \
-  lv_coord_t x_set;                  \
-  lv_coord_t y_set;                  \
-  lv_coord_t w_set;                  \
-  lv_coord_t h_set;                  \
-  lv_obj_flag_t flags;               \
-  lv_state_t state;
+typedef struct _lv_obj_t{
+    const lv_obj_class_t * class_p;
+    void * ext_attr;
+    struct _lv_obj_t * parent;
+    lv_obj_spec_attr_t * spec_attr;
+    lv_obj_style_list_t  style_list;
+    lv_area_t coords;
+    lv_coord_t x_set;
+    lv_coord_t y_set;
+    lv_coord_t w_set;
+    lv_coord_t h_set;
+    lv_obj_flag_t flags;
+    lv_state_t state;
+}lv_obj_t;
 
-#define _lv_obj_class_dsc        \
-  _lv_base_class_dsc             \
-  lv_signal_cb_t signal_cb; /**< Object type specific signal function*/ \
-  lv_design_cb_t design_cb; /**< Object type specific design function*/
-
-LV_CLASS_DECLARE_END(lv_obj, lv_base)
-extern lv_obj_class_t lv_obj;
+extern const lv_obj_class_t lv_obj;
 
 enum {
     LV_PART_MAIN,

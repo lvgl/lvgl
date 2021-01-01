@@ -163,13 +163,13 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, uint8_t par
  */
 void _lv_obj_refresh_style(struct _lv_obj_t * obj, lv_style_prop_t prop);
 
-lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint32_t part, uint32_t state);
+lv_style_t * lv_obj_get_local_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state);
 /**
  * Remove all transitions from an object
  * @param obj pointer to an object
  */
 void _lv_obj_remove_style_trans(struct _lv_obj_t * obj);
-void lv_obj_set_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t value);
+void lv_obj_set_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t value);
 
 #if LV_USE_ANIMATION
 
