@@ -400,6 +400,20 @@ extern "C" {
 #endif
 #endif
 
+/*------------------
+ * SPRINTF DISABLE FLOAT
+ *-----------------*/
+
+#ifndef LV_SPRINTF_DISABLE_FLOAT
+#ifndef CONFIG_LV_SPRINTF_DISABLE_FLOAT
+#warning "Sprintf disable float"
+#define LV_SPRINTF_DISABLE_FLOAT    0
+#else
+#warning "Sprintf enable float"
+#define LV_SPRINTF_DISABLE_FLOAT    1
+#endif
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
