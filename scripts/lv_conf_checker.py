@@ -99,8 +99,8 @@ for i in fin.read().splitlines():
 
     fout.write(
       f'#ifndef {line}\n'
-      f'#  ifdef CONFIG_{line}\n'
-      f'#    define {line} CONFIG_{line}\n'
+      f'#  ifdef CONFIG_{line.upper()}\n'
+      f'#    define {line} CONFIG_{line.upper()}\n'
       f'#  else\n'
       f'{d}\n'
       f'#  endif\n'
