@@ -181,7 +181,7 @@ enum {
     LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 11),
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 12),
     LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 13),
-    LV_OBJ_FLAG_FOCUS_SCROLL    = (1 << 14), /** Automatically scroll the focused object's ancestors to make the focused object visible*/
+    LV_OBJ_FLAG_SCROLL_ON_FOCUS    = (1 << 14), /** Automatically scroll the focused object's ancestors to make the focused object visible*/
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15),
 };
 typedef uint16_t lv_obj_flag_t;
@@ -192,7 +192,6 @@ typedef uint16_t lv_obj_flag_t;
 #include "lv_obj_style.h"
 #include "lv_obj_draw.h"
 
-
 typedef struct {
     struct _lv_obj_t ** children;       /**< Store the pointer of the children.*/
     uint32_t child_cnt;
@@ -200,11 +199,10 @@ typedef struct {
     void * group_p;
 #endif
 
-    const lv_grid_t * grid;
+    const void * layout_dsc;
 
     lv_event_cb_t event_cb; /**< Event callback function */
 
-    lv_flex_cont_t flex_cont;
     lv_point_t scroll; /**< The current X/Y scroll offset*/
     lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 

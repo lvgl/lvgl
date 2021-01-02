@@ -1474,7 +1474,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
     obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
     obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
-    obj->flags |= LV_OBJ_FLAG_FOCUS_SCROLL;
+    obj->flags |= LV_OBJ_FLAG_SCROLL_ON_FOCUS;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
     obj->style_list.cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID;
@@ -1747,7 +1747,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_FOCUS) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         lv_obj_t * child = obj;
-        while(parent && lv_obj_has_flag(child, LV_OBJ_FLAG_FOCUS_SCROLL)) {
+        while(parent && lv_obj_has_flag(child, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
             lv_obj_scroll_to_view(child, LV_ANIM_ON);
             child = parent;
             parent = lv_obj_get_parent(parent);
@@ -1805,14 +1805,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                     lv_obj_set_size(child, child->w_set, child->h_set);
                 }
             }
-            if(lv_obj_get_grid(obj)) _lv_grid_full_refresh(obj);
-            if(lv_obj_get_flex_dir(obj) != LV_FLEX_DIR_NONE) _lv_flex_refresh(obj);
+            lv_obj_update_layout(obj, NULL);
         }
     }
     else if(sign == LV_SIGNAL_CHILD_CHG) {
-        if(param == NULL || _lv_obj_is_flex_item(param)) {
-            _lv_flex_refresh(obj);
-        }
+        lv_obj_update_layout(obj, param);
 
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
@@ -1835,11 +1832,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         *s = LV_MATH_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        if(_lv_obj_is_grid_item(obj)) lv_grid_item_refr_pos(obj);
-        if(lv_obj_get_grid(obj)) _lv_grid_full_refresh(obj);
-
-        if(_lv_obj_is_flex_item(obj)) _lv_flex_refresh(lv_obj_get_parent(obj));
-        if(lv_obj_get_flex_dir(obj)) _lv_flex_refresh(obj);
+        /* Padding might have changed so the layout should be recalculated
+         * If margin has also changed the parent's layout also needs to be updated but it's done in CHILD_CHG signal*/
+        lv_obj_update_layout(obj, NULL);
 
         /*Reposition non grid objects on by one*/
         uint32_t i;

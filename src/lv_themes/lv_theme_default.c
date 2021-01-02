@@ -595,106 +595,106 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     LV_UNUSED(th);
 
     if(lv_obj_get_parent(obj) == NULL) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->scr);
-        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
-        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->scr);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
         return;
     }
 
     if(lv_obj_check_type(obj, &lv_obj)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
-        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
     }
 #if LV_USE_BTN
     else if(lv_obj_check_type(obj, &lv_btn)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn_color);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->btn_color_checked);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn_color);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->btn_color_checked);
     }
 #endif
 
 #if LV_USE_BAR
     else if(lv_obj_check_type(obj, &lv_bar)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
     }
 #endif
 
 #if LV_USE_SLIDER
     else if(lv_obj_check_type(obj, &lv_slider)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
-        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->grow);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->transition_delayed);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->transition_normal);
     }
 #endif
 
 #if LV_USE_CHECKBOX
     else if(lv_obj_check_type(obj, &lv_checkbox)) {
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->cb_marker);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->cb_marker_checked);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->pressed);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->grow);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->transition_normal);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->cb_marker);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->cb_marker_checked);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->transition_delayed);
     }
 #endif
 
 #if LV_USE_SWITCH
     else if(lv_obj_check_type(obj, &lv_switch)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
     }
 #endif
 
 #if LV_USE_SWITCH
     else if(lv_obj_check_type(obj, &lv_chart)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
-        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
-        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-        lv_obj_add_style(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
 #if LV_USE_ROLLER
     else if(lv_obj_check_type(obj, &lv_roller)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-//        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
-        lv_obj_add_style(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
-//        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
-//        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-//        lv_obj_add_style(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+//        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style_no_refresh(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
+//        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+//        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+//        lv_obj_add_style_no_refresh(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
 
 #if LV_USE_DROPDOWN
     else if(lv_obj_check_type(obj, &lv_dropdown)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
     }
     else if(lv_obj_check_type(obj, &lv_dropdown_list)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_HIGHLIGHT, LV_STATE_PRESSED, &styles->bg_color_gray);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style_no_refresh(obj, LV_PART_HIGHLIGHT, LV_STATE_PRESSED, &styles->bg_color_gray);
     }
 #endif
 

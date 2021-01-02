@@ -26,11 +26,15 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * calc);
-static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc);
-static void item_repos(lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint);
+void grid_update(lv_obj_t * cont, lv_obj_t * item);
+static void full_refresh(lv_obj_t * cont);
+static void item_refr(lv_obj_t * item);
+static void calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
+static void calc_free(_lv_grid_calc_t * calc);
+static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c);
+static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c);
+static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint);
 static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t place, lv_coord_t gap, uint32_t track_num, lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse);
-static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,6 +51,7 @@ static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 void lv_grid_init(lv_grid_t * grid)
 {
     _lv_memset_00(grid,sizeof(lv_grid_t));
+    grid->update_cb = grid_update;
     grid->col_place = LV_GRID_START;
     grid->row_place = LV_GRID_START;
 }
@@ -72,55 +77,79 @@ void lv_grid_set_gap(lv_grid_t * grid, lv_coord_t col_gap, uint8_t row_gap)
     grid->row_gap = row_gap;
 
 }
-/**
- * Set a grid for an object
- * @param obj pointer to an object
- * @param grid the grid to set
- */
-void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->grid = grid;
-
-    _lv_grid_full_refresh(obj);
-}
-
-/**
- * Get the grid of an object
- * @param obj pointer to an object
- * @return the grid, NULL if no grid
- */
-const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(obj->spec_attr) return obj->spec_attr->grid;
-    return NULL;
-}
 
 void lv_obj_set_grid_cell(lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos)
 {
     lv_obj_set_pos(obj, col_pos, row_pos);
 }
 
-/**
- * Notify all object if a style is modified
- * @param grid pointer to a grid. Only the objects with this grid will be notified
- *               (NULL to notify all objects with any grid)
- */
-void lv_obj_report_grid_change(const lv_grid_t * grid)
-{
-    lv_disp_t * d = lv_disp_get_next(NULL);
 
-    while(d) {
-        uint32_t i;
-        for(i = 0; i < d->screen_cnt; i++) {
-            report_grid_change_core(grid, d->screens[i]);
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+void grid_update(lv_obj_t * cont, lv_obj_t * item)
+{
+    if(cont->spec_attr == NULL) return;
+    if(cont->spec_attr->layout_dsc == NULL) return;
+
+    if(item) item_refr(item);
+    else full_refresh(cont);
+}
+
+/**
+ * Refresh the all grid item on a container
+ * @param cont pointer to a grid container object
+ */
+static void full_refresh(lv_obj_t * cont)
+{
+    const lv_grid_t * g = cont->spec_attr->layout_dsc;
+    /*Calculate the grid*/
+    if(g == NULL) return;
+    _lv_grid_calc_t c;
+    calc(cont, &c);
+
+
+    item_repos_hint_t hint;
+    _lv_memset_00(&hint, sizeof(hint));
+
+    /* Calculate the grids absolute x and y coordinates.
+     * It will be used as helper during item repositioning to avoid calculating this value for every children*/
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_PART_MAIN);
+    lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_PART_MAIN);
+    hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
+    hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
+
+    uint32_t i;
+    for(i = 0; i < cont->spec_attr->child_cnt; i++) {
+        lv_obj_t * item = cont->spec_attr->children[i];
+        if(LV_COORD_IS_LAYOUT(item->x_set) && LV_COORD_IS_LAYOUT(item->y_set)) {
+            item_repos(item, &c, &hint);
         }
-        d = lv_disp_get_next(d);
     }
+    calc_free(&c);
+
+    if(cont->w_set == LV_SIZE_AUTO || cont->h_set == LV_SIZE_AUTO) {
+        lv_obj_set_size(cont, cont->w_set, cont->h_set);
+    }
+}
+
+/**
+ * Refresh the position of a grid item
+ * @param item pointer to a grid item
+ */
+static void item_refr(lv_obj_t * item)
+{
+    /*Calculate the grid*/
+    lv_obj_t * cont = lv_obj_get_parent(item);
+    if(cont == NULL) return;
+    _lv_grid_calc_t c;
+    calc(cont, &c);
+
+    item_repos(item, &c, NULL);
+
+    calc_free(&c);
 }
 
 /**
@@ -129,10 +158,9 @@ void lv_obj_report_grid_change(const lv_grid_t * grid)
  * @param calc store the calculated cells sizes here
  * @note `_lv_grid_calc_free(calc_out)` needs to be called when `calc_out` is not needed anymore
  */
-void _lv_grid_calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
+static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 {
-    const lv_grid_t * g = lv_obj_get_grid(cont);
-    if(g == NULL) return;
+    const lv_grid_t * g = cont->spec_attr->layout_dsc;
     if(g->col_dsc == NULL || g->row_dsc == NULL) return;
     if(g->col_dsc_len == 0 || g->row_dsc_len == 0) return;
 
@@ -160,7 +188,7 @@ void _lv_grid_calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
  * Free the a grid calculation's data
  * @param calc pointer to the calculated gtrid cell coordinates
  */
-void _lv_grid_calc_free(_lv_grid_calc_t * calc)
+static void calc_free(_lv_grid_calc_t * calc)
 {
     _lv_mem_buf_release(calc->x);
     _lv_mem_buf_release(calc->y);
@@ -168,149 +196,53 @@ void _lv_grid_calc_free(_lv_grid_calc_t * calc)
     _lv_mem_buf_release(calc->h);
 }
 
-/**
- * Check if the object's grid columns has FR cells or not
- * @param obj pointer to an object
- * @return true: has FR; false: has no FR
- */
-bool _lv_grid_has_fr_col(struct _lv_obj_t * obj)
+static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
-    const lv_grid_t * g = lv_obj_get_grid(obj);
-    if(g->col_dsc == NULL)  return false;
-
-    uint32_t i;
-    for(i = 0; i < g->col_dsc_len; i++) {
-        if(LV_GRID_IS_FR(g->col_dsc[i])) return true;
-    }
-
-    return false;
-}
-
-/**
- * Check if the object's grid rows has FR cells or not
- * @param obj pointer to an object
- * @return true: has FR; false: has no FR
- */
-bool _lv_grid_has_fr_row(struct _lv_obj_t * obj)
-{
-    const lv_grid_t * g = lv_obj_get_grid(obj);
-    if(g == NULL) return false;
-    if(g->row_dsc == NULL)  return false;
-
-    uint32_t i;
-    for(i = 0; i < g->row_dsc_len; i++) {
-        if(LV_GRID_IS_FR(g->row_dsc[i])) return true;
-    }
-
-    return false;
-}
-
-/**
- * Refresh the all grid item on a container
- * @param cont pointer to a grid container object
- */
-void _lv_grid_full_refresh(lv_obj_t * cont)
-{
-    /*Calculate the grid*/
-    if(lv_obj_get_grid(cont) == NULL) return;
-    _lv_grid_calc_t calc;
-    _lv_grid_calc(cont, &calc);
-
-
-    item_repos_hint_t hint;
-    _lv_memset_00(&hint, sizeof(hint));
-
-    /* Calculate the grids absolute x and y coordinates.
-     * It will be used as helper during item repositioning to avoid calculating this value for every children*/
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_PART_MAIN);
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_PART_MAIN);
-    hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
-    hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
-
-    uint32_t i;
-    for(i = 0; i < cont->spec_attr->child_cnt; i++) {
-        lv_obj_t * item = cont->spec_attr->children[i];
-        if(LV_COORD_IS_GRID(item->x_set) && LV_COORD_IS_GRID(item->y_set)) {
-            item_repos(item, &calc, &hint);
-        }
-    }
-    _lv_grid_calc_free(&calc);
-
-    if(cont->w_set == LV_SIZE_AUTO || cont->h_set == LV_SIZE_AUTO) {
-        lv_obj_set_size(cont, cont->w_set, cont->h_set);
-    }
-}
-
-/**
- * Refresh the position of a grid item
- * @param item pointer to a grid item
- */
-void lv_grid_item_refr_pos(lv_obj_t * item)
-{
-    /*Calculate the grid*/
-    lv_obj_t * cont = lv_obj_get_parent(item);
-    if(cont == NULL) return;
-    if(cont->spec_attr == NULL) return;
-    if(cont->spec_attr->grid == NULL) return;
-    _lv_grid_calc_t calc;
-    _lv_grid_calc(cont, &calc);
-
-    item_repos(item, &calc, NULL);
-
-    _lv_grid_calc_free(&calc);
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
-{
-    const lv_grid_t * grid = cont->spec_attr->grid;
+    const lv_grid_t * grid = cont->spec_attr->layout_dsc;
     uint32_t i;
 
     lv_coord_t cont_w = lv_obj_get_width_fit(cont);
 
-    calc->col_num = grid->col_dsc_len;
-    calc->x = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
-    calc->w = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
+    c->col_num = grid->col_dsc_len;
+    c->x = _lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
+    c->w = _lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
 
     uint32_t col_fr_cnt = 0;
     lv_coord_t grid_w = 0;
     bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
 
-    for(i = 0; i < calc->col_num; i++) {
+    for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
         if(LV_GRID_IS_FR(x)) col_fr_cnt += LV_GRID_GET_FR(x);
         else {
-            calc->w[i] = x;
+            c->w[i] = x;
             grid_w += x;
         }
     }
 
-    cont_w -= grid->col_gap * (calc->col_num - 1);
+    cont_w -= grid->col_gap * (c->col_num - 1);
     lv_coord_t free_w = cont_w - grid_w;
 
-    for(i = 0; i < calc->col_num; i++) {
+    for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
         if(LV_GRID_IS_FR(x)) {
-            if(auto_w) calc->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
+            if(auto_w) c->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
             else {
                 lv_coord_t f = LV_GRID_GET_FR(x);
-                calc->w[i] = (free_w * f) / col_fr_cnt;
+                c->w[i] = (free_w * f) / col_fr_cnt;
             }
         }
     }
 }
 
-static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
+static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
-    const lv_grid_t * grid = cont->spec_attr->grid;
+    const lv_grid_t * grid = cont->spec_attr->layout_dsc;
     uint32_t i;
 
-    calc->row_num = grid->row_dsc_len;
-    calc->y = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
-    calc->h = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
+    c->row_num = grid->row_dsc_len;
+    c->y = _lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
+    c->h = _lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
 
     uint32_t row_fr_cnt = 0;
     lv_coord_t grid_h = 0;
@@ -322,7 +254,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
         lv_coord_t x = grid->row_dsc[i];
         if(LV_GRID_IS_FR(x)) row_fr_cnt += LV_GRID_GET_FR(x);
         else {
-            calc->h[i] = x;
+            c->h[i] = x;
             grid_h += x;
         }
     }
@@ -333,10 +265,10 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
     for(i = 0; i < grid->row_dsc_len; i++) {
         lv_coord_t x = grid->row_dsc[i];
         if(LV_GRID_IS_FR(x)) {
-            if(auto_h) calc->h[i] = 0;   /*Fr is considered zero if the obj has auto height*/
+            if(auto_h) c->h[i] = 0;   /*Fr is considered zero if the obj has auto height*/
             else {
                 lv_coord_t f = LV_GRID_GET_FR(x);
-                calc->h[i] = (free_h * f) / row_fr_cnt;
+                c->h[i] = (free_h * f) / row_fr_cnt;
             }
         }
     }
@@ -349,21 +281,21 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
  * @param child_id_ext helper value if the ID of the child is know (order from the oldest) else -1
  * @param grid_abs helper value, the absolute position of the grid, NULL if unknown
  */
-static void item_repos(lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint)
+static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
-    if(_lv_obj_is_grid_item(item) == false) return;
+    if(LV_COORD_IS_LAYOUT(item->x_set) && LV_COORD_IS_LAYOUT(item->y_set)) return;
 
     uint32_t col_pos = LV_GRID_GET_CELL_POS(item->x_set);
     uint32_t col_span = LV_GRID_GET_CELL_SPAN(item->x_set);
     uint32_t row_pos = LV_GRID_GET_CELL_POS(item->y_set);
     uint32_t row_span = LV_GRID_GET_CELL_SPAN(item->y_set);
 
-    lv_coord_t col_x1 = calc->x[col_pos];
-    lv_coord_t col_x2 = calc->x[col_pos + col_span - 1] + calc->w[col_pos + col_span - 1];
+    lv_coord_t col_x1 = c->x[col_pos];
+    lv_coord_t col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
     lv_coord_t col_w = col_x2 - col_x1;
 
-    lv_coord_t row_y1 = calc->y[row_pos];
-    lv_coord_t row_y2 = calc->y[row_pos + row_span - 1] + calc->h[row_pos + row_span - 1];
+    lv_coord_t row_y1 = c->y[row_pos];
+    lv_coord_t row_y2 = c->y[row_pos + row_span - 1] + c->h[row_pos + row_span - 1];
     lv_coord_t row_h = row_y2 - row_y1;
 
     uint8_t x_flag = LV_GRID_GET_CELL_PLACE(item->x_set);
@@ -377,47 +309,50 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_
 
     lv_coord_t x;
     lv_coord_t y;
-    lv_coord_t item_w = lv_obj_get_width(item);
-    lv_coord_t item_h = lv_obj_get_height(item);
+    lv_coord_t item_w = lv_area_get_width(&item->coords);
+    lv_coord_t item_h = lv_area_get_height(&item->coords);
 
     lv_coord_t margin_top = lv_obj_get_style_margin_top(item, LV_PART_MAIN);
     lv_coord_t margin_bottom = lv_obj_get_style_margin_bottom(item, LV_PART_MAIN);
     lv_coord_t margin_left = lv_obj_get_style_margin_left(item, LV_PART_MAIN);
     lv_coord_t margin_right = lv_obj_get_style_margin_right(item, LV_PART_MAIN);
 
+    if(item->w_set == LV_SIZE_LAYOUT) item->w_set = item_w;
+    if(item->h_set == LV_SIZE_LAYOUT) item->h_set = item_h;
+
     switch(x_flag) {
         default:
         case LV_GRID_START:
-            x = calc->x[col_pos] + margin_left;
+            x = c->x[col_pos] + margin_left;
             break;
         case LV_GRID_STRETCH:
-            x = calc->x[col_pos] + margin_left;
+            x = c->x[col_pos] + margin_left;
             item_w = col_w - margin_left - margin_right;
-            item->w_set = LV_SIZE_STRETCH;
+            item->w_set = LV_SIZE_LAYOUT;
             break;
         case LV_GRID_CENTER:
-            x = calc->x[col_pos] + (col_w - (item_w + margin_left - margin_right)) / 2;
+            x = c->x[col_pos] + (col_w - (item_w + margin_left - margin_right)) / 2;
             break;
         case LV_GRID_END:
-            x = calc->x[col_pos] + col_w - lv_obj_get_width(item) - margin_right;
+            x = c->x[col_pos] + col_w - lv_obj_get_width(item) - margin_right;
             break;
     }
 
     switch(y_flag) {
         default:
         case LV_GRID_START:
-            y = calc->y[row_pos] + margin_top;
+            y = c->y[row_pos] + margin_top;
             break;
         case LV_GRID_STRETCH:
-            y = calc->y[row_pos] + margin_top;
+            y = c->y[row_pos] + margin_top;
             item_h = row_h - margin_top - margin_bottom;
-            item->h_set = LV_SIZE_STRETCH;
+            item->h_set = LV_SIZE_LAYOUT;
             break;
         case LV_GRID_CENTER:
-            y = calc->y[row_pos] + (row_h - (item_h + margin_top + margin_bottom)) / 2;
+            y = c->y[row_pos] + (row_h - (item_h + margin_top + margin_bottom)) / 2;
             break;
         case LV_GRID_END:
-            y = calc->y[row_pos] + row_h - lv_obj_get_height(item) - margin_bottom;
+            y = c->y[row_pos] + row_h - lv_obj_get_height(item) - margin_bottom;
             break;
     }
 
@@ -515,23 +450,4 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
 
     /*Return the full size of the grid*/
     return total_gird_size;
-}
-
-
-/**
- * Refresh the grid of all children of an object. (Called recursively)
- * @param grid refresh objects only with this grid.
- * @param obj pointer to an object
- */
-static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj)
-{
-    if(obj->spec_attr) {
-        if(obj->spec_attr->grid == grid || (obj->spec_attr->grid && grid == NULL)) _lv_grid_full_refresh(obj);
-    }
-
-    uint32_t i;
-    for(i = 0; i < obj->spec_attr->child_cnt; i++) {
-        report_grid_change_core(grid, obj->spec_attr->children[i]);
-    }
-
 }

@@ -60,10 +60,12 @@ lv_theme_t * lv_theme_get_act(void)
  */
 void lv_theme_apply(lv_obj_t * obj)
 {
-    lv_obj_remove_all_styles(obj);
+    lv_obj_remove_all_styles_no_refresh(obj);
 
     /*Apply the theme including the base theme(s)*/
     apply_theme(act_theme, obj);
+
+    _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
 /**

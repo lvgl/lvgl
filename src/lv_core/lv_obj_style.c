@@ -47,7 +47,7 @@ typedef enum {
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 #if LV_USE_ANIMATION
-static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_style_trans_t * tr_limit);
+static bool trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_style_trans_t * tr_limit);
 static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
@@ -78,14 +78,7 @@ void _lv_obj_style_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));
 }
 
-/**
- * Add a new style to the style list of an object.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- *             E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param style pointer to a style to add (Only its pointer will be saved)
- */
-void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
+void lv_obj_add_style_no_refresh(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
 {
     if(style == NULL) return;
 
@@ -117,6 +110,18 @@ void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_
     obj->style_list.styles[i].part = part;
     obj->style_list.styles[i].state = state;
 
+}
+
+/**
+ * Add a new style to the style list of an object.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ *             E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param style pointer to a style to add (Only its pointer will be saved)
+ */
+void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
+{
+    lv_obj_add_style_no_refresh(obj, part, state, style);
     _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
@@ -160,6 +165,17 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
     _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
+void lv_obj_remove_all_styles_no_refresh(lv_obj_t * obj)
+{
+#if LV_USE_ANIMATION
+    trans_del(obj, 0xFF, 0xFF, NULL);
+#endif
+
+    lv_mem_free(obj->style_list.styles);
+    obj->style_list.styles = NULL;
+    obj->style_list.style_cnt = 0;
+}
+
 /**
  * Reset a style to the default (empty) state.
  * Release all used memories and cancel pending related transitions.
@@ -170,14 +186,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
  */
 void lv_obj_remove_all_styles(lv_obj_t * obj)
 {
-#if LV_USE_ANIMATION
-    trans_del(obj, 0xFF, 0xFF, NULL);
-#endif
-
-    lv_mem_free(obj->style_list.styles);
-    obj->style_list.styles = NULL;
-    obj->style_list.style_cnt = 0;
-
+    lv_obj_remove_all_styles_no_refresh(obj);
     _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
@@ -800,8 +809,8 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         else list->cache_img_recolor_opa_zero = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_CONTENT_SRC) {
-        if(get_prop_core(obj, part, LV_STYLE_CONTENT_SRC, &v) == false) v.num = 0;
-        if(v.num == 0) list->cache_content_src_zero = 1;
+        if(get_prop_core(obj, part, LV_STYLE_CONTENT_SRC, &v) == false) v.ptr = NULL;
+        if(v.ptr == NULL) list->cache_content_src_zero = 1;
         else list->cache_content_src_zero = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_COLOR_FILTER_CB || prop == LV_STYLE_COLOR_FILTER_OPA) {
@@ -847,7 +856,7 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 
 static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
-    lv_obj_style_list_t * list = &obj->style_list;
+    const lv_obj_style_list_t * list = &obj->style_list;
     if(part != LV_PART_MAIN) return CACHE_NEED_CHECK;
     if(obj->state != list->cache_state) return CACHE_NEED_CHECK;
     if(obj->style_list.skip_trans) return CACHE_NEED_CHECK;
@@ -941,7 +950,7 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_CONTENT_SRC:
-        if(list->cache_shadow_width_zero ) return CACHE_ZERO;
+        if(list->cache_content_src_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_COLOR_FILTER_CB:
@@ -1028,10 +1037,11 @@ static void refresh_children_style(lv_obj_t * obj)
  * @param prop a property or 0xFF to remove all properties
  * @param tr_limit delete transitions only "older" then this. `NULL` is not used
  */
-static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_style_trans_t * tr_limit)
+static bool trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_style_trans_t * tr_limit)
 {
     lv_style_trans_t * tr;
     lv_style_trans_t * tr_prev;
+    bool removed = false;
     tr = _lv_ll_get_tail(&LV_GC_ROOT(_lv_obj_style_trans_ll));
     while(tr != NULL) {
         if(tr == tr_limit) break;
@@ -1049,12 +1059,14 @@ static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_sty
                     lv_anim_del(tr, NULL);
                     _lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
                     lv_mem_free(tr);
+                    removed = true;
                 }
             }
 
         }
         tr = tr_prev;
     }
+    return removed;
 }
 
 static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)

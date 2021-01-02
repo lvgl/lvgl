@@ -5,7 +5,7 @@
  * It's important because the virtual functions should be called from the level of the constructor.
  */
 #define LV_CLASS_CONSTRUCTOR_BEGIN(inst, classname)        \
-  void * _original_class_p = inst->class_p;  \
+  const void * _original_class_p = inst->class_p;  \
   obj->class_p = (void*)&classname;
 
 /**

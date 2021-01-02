@@ -24,9 +24,18 @@ extern "C" {
  **********************/
 struct _lv_obj_t;
 
+typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t * cont, struct _lv_obj_t * item);
+
+typedef union {
+    uint32_t num;
+    const void *  ptr;
+}lv_layout_data_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+void lv_obj_update_layout(struct _lv_obj_t * cont, struct _lv_obj_t * item);
 
 /**
  * Set relative the position of an object (relative to the parent)
@@ -244,15 +253,6 @@ void _lv_obj_move_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool no
  * @param y_diff y coordinate shift
  */
 void _lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
-
-/**
- * Check if an object is valid grid item or not.
- * @param obj pointer to an object to check
- * @return true: grid item; false: not grid item
- */
-bool _lv_obj_is_grid_item(struct _lv_obj_t * obj);
-
-bool _lv_obj_is_flex_item(struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS

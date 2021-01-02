@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_misc/lv_area.h"
+#include "lv_obj_pos.h"
 
 /*********************
  *      DEFINES
@@ -45,9 +45,9 @@ extern "C" {
 #define LV_GRID_GET_CELL_SPAN(c)  (((c) & _LV_GRID_CELL_SPAN_MASK) >> _LV_GRID_CELL_SHIFT)
 #define LV_GRID_GET_CELL_PLACE(c)  ((c) >> (_LV_GRID_CELL_SHIFT * 2) & 0x7)
 
-#define LV_GRID_FR(x)          (_LV_COORD_GRID(x))
-#define LV_GRID_IS_FR(x)       (LV_COORD_IS_GRID(x))
-#define LV_GRID_GET_FR(x)      (LV_COORD_GET_GRID(x))
+#define LV_GRID_FR(x)          (LV_COORD_SET_LAYOUT(x))
+#define LV_GRID_IS_FR(x)       (LV_COORD_IS_LAYOUT(x))
+#define LV_GRID_GET_FR(x)      (_LV_COORD_PLAIN(x))
 
 /**********************
  *      TYPEDEFS
@@ -57,6 +57,7 @@ extern "C" {
 struct _lv_obj_t;
 
 typedef struct {
+    lv_layout_update_cb_t update_cb; /*The first element must be the update callback*/
     const lv_coord_t * col_dsc;
     const lv_coord_t * row_dsc;
     uint8_t col_dsc_len;
@@ -90,20 +91,6 @@ void lv_grid_set_place(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
 
 void lv_grid_set_gap(lv_grid_t * grid, lv_coord_t col_gap, uint8_t row_gap);
 
-/**
- * Set a grid for an object
- * @param obj pointer to an object
- * @param grid the grid to set
- */
-void lv_obj_set_grid(struct _lv_obj_t * obj, const lv_grid_t * grid);
-
-/**
- * Get the grid of an object
- * @param obj pointer to an object
- * @return the grid, NULL if no grid
- */
-const lv_grid_t * lv_obj_get_grid(struct _lv_obj_t * obj);
-
 void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos);
 
 /**
@@ -113,9 +100,6 @@ void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t
  */
 void lv_obj_report_grid_change(const lv_grid_t * grid);
 
-void _lv_grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
-
-void _lv_grid_calc_free(_lv_grid_calc_t * calc);
 
 bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 

@@ -13,16 +13,16 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_misc/lv_area.h"
+#include "lv_obj_pos.h"
 
 /*********************
  *      DEFINES
  *********************/
 
 /** Can be set as width or height (on main axis) to grow the object in order fill the free space*/
-#define LV_FLEX_GROW(grow)    (_LV_COORD_FELX(grow))
+#define LV_FLEX_GROW(grow)    (LV_COORD_SET_LAYOUT(grow))
 
-#define _LV_FLEX_GET_GROW(v) (LV_COORD_IS_FLEX(v) ? LV_COORD_GET_FLEX(v) : 0)
+#define _LV_FLEX_GET_GROW(v) (LV_COORD_IS_LAYOUT(v) ? _LV_COORD_PLAIN(v) : 0)
 
 #define _LV_FLEX_WRAP       (1 << 2)
 #define _LV_FLEX_REVERSE    (1 << 3)
@@ -39,32 +39,33 @@ typedef enum {
     LV_FLEX_PLACE_START,
     LV_FLEX_PLACE_END,
     LV_FLEX_PLACE_CENTER,
-    LV_FLEX_PLACE_STRETCH,
     LV_FLEX_PLACE_SPACE_EVENLY,
     LV_FLEX_PLACE_SPACE_AROUND,
     LV_FLEX_PLACE_SPACE_BETWEEN,
 }lv_flex_place_t;
 
 typedef enum {
-    LV_FLEX_DIR_NONE,
-    LV_FLEX_DIR_ROW                 = 0x01,
-    LV_FLEX_DIR_COLUMN              = 0x02,
-    LV_FLEX_DIR_ROW_WRAP            = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP,
-    LV_FLEX_DIR_ROW_REVERSE         = LV_FLEX_DIR_ROW | _LV_FLEX_REVERSE,
-    LV_FLEX_DIR_ROW_WRAP_REVERSE    = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
-    LV_FLEX_DIR_COLUMN_WRAP         = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP,
-    LV_FLEX_DIR_COLUMN_REVERSE      = LV_FLEX_DIR_COLUMN | _LV_FLEX_REVERSE,
-    LV_FLEX_DIR_COLUMN_WRAP_REVERSE = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
-}lv_flex_dir_t;
+    LV_FLEX_FLOW_ROW                 = 0x01,
+    LV_FLEX_FLOW_COLUMN              = 0x02,
+    LV_FLEX_FLOW_ROW_WRAP            = LV_FLEX_FLOW_ROW | _LV_FLEX_WRAP,
+    LV_FLEX_FLOW_ROW_REVERSE         = LV_FLEX_FLOW_ROW | _LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_ROW_WRAP_REVERSE    = LV_FLEX_FLOW_ROW | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_COLUMN_WRAP         = LV_FLEX_FLOW_COLUMN | _LV_FLEX_WRAP,
+    LV_FLEX_FLOW_COLUMN_REVERSE      = LV_FLEX_FLOW_COLUMN | _LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_COLUMN_WRAP_REVERSE = LV_FLEX_FLOW_COLUMN | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
+}lv_flex_flow_t;
 
 typedef struct {
-    lv_coord_t gap;
-    uint8_t dir        :2;
-    uint8_t wrap       :1;
-    uint8_t rev        :1;
-    uint8_t main_place      :3;
-    uint8_t cross_place      :3;
-}lv_flex_cont_t;
+    lv_layout_update_cb_t update_cb; /*The first element must be the update callback*/
+    lv_coord_t item_gap;
+    lv_coord_t track_gap;
+    uint32_t dir          :2;
+    uint32_t wrap         :1;
+    uint32_t rev          :1;
+    uint32_t item_main_place   :3;
+    uint32_t track_place  :3;
+    uint32_t item_cross_place   :3;
+}lv_flex_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -81,7 +82,7 @@ typedef struct {
  * @param obj pointer to an object
  * @param flex_dir the flex direction, an element of `lv_flex_dir_t`
  */
-void lv_obj_set_flex_dir(struct _lv_obj_t * obj, lv_flex_dir_t flex_dir);
+void lv_obj_set_flex_dir(struct _lv_obj_t * obj, lv_flex_flow_t flex_dir);
 
 /**
  * Set how to place the items and the tracks
@@ -127,7 +128,7 @@ void lv_obj_set_flex_item_place(struct _lv_obj_t * obj, lv_flex_place_t place);
  * @param obj pointer to an object
  * @return the flex direction of `obj`
  */
-lv_flex_dir_t lv_obj_get_flex_dir(const struct _lv_obj_t * obj);
+lv_flex_flow_t lv_obj_get_flex_dir(const struct _lv_obj_t * obj);
 
 /**
  * Get the item placement of a flex container
@@ -157,12 +158,13 @@ lv_coord_t lv_obj_get_flex_gap(const struct _lv_obj_t * obj);
  * @return `LV_FLEX_PLACE_NONE/START/CENTER/END`
  */
 lv_flex_place_t lv_obj_get_flex_self_place(struct _lv_obj_t * obj);
-/**
- * Rearrange the flex items of a flex container
- * @param cont pointer to a flex container object
- */
-void _lv_flex_refresh(struct _lv_obj_t * cont);
 
+/**********************
+ *   GLOBAL VARIABLES
+ **********************/
+extern const lv_flex_t lv_flex_center;
+extern const lv_flex_t lv_flex_stacked;
+extern const lv_flex_t lv_flex_even;
 
 /**********************
  *      MACROS

@@ -16,6 +16,9 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_layout_update_cb_t update_cb;
+}lv_layout_base_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -34,6 +37,24 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
  *   GLOBAL FUNCTIONS
  **********************/
 
+bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent == NULL) return false;
+    if(parent->spec_attr && parent->spec_attr->layout_dsc) return true;
+    else return false;
+}
+
+void lv_obj_update_layout(lv_obj_t * cont, lv_obj_t * item)
+{
+    if(cont->spec_attr == NULL) return;
+    if(cont->spec_attr->layout_dsc == NULL) return;
+
+    const lv_layout_base_t * layout = cont->spec_attr->layout_dsc;
+    if(layout->update_cb == NULL) return;
+    layout->update_cb(cont, item);
+}
+
 /**
  * Set relative the position of an object (relative to the parent)
  * @param obj pointer to an object
@@ -50,37 +71,15 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    if(lv_obj_is_layout_positioned(obj)) {
+        LV_LOG_WARN("Can't set position because the position is set by a layout");
+        return;
+    }
+
     obj->x_set = x;
     obj->y_set = y;
 
-    bool gi = _lv_obj_is_grid_item(obj);
-    bool fi = _lv_obj_is_flex_item(obj);
-
-    /*For consistency set the size to stretched if the objects is stretched on the grid*/
-    if(gi) {
-        if(LV_GRID_GET_CELL_PLACE(obj->x_set) == LV_GRID_STRETCH) obj->w_set = LV_SIZE_STRETCH;
-        if(LV_GRID_GET_CELL_PLACE(obj->y_set) == LV_GRID_STRETCH) obj->h_set = LV_SIZE_STRETCH;
-    }
-
-    /*If not grid or flex item but has grid or flex position set the position to 0*/
-    if(!gi) {
-        if(LV_COORD_IS_GRID(x)) x = 0;
-        if(LV_COORD_IS_GRID(y)) y = 0;
-    }
-
-    if(!fi) {
-        if(LV_COORD_IS_FLEX(x)) x = 0;
-        if(LV_COORD_IS_FLEX(y)) y = 0;
-    }
-
-    /*If the object is on a grid item let the grid to position it. */
-    if(gi) {
-        lv_grid_item_refr_pos(obj);
-    } else if(fi) {
-        _lv_flex_refresh(lv_obj_get_parent(obj));
-    } else {
-        _lv_obj_move_to(obj, x, y, true);
-    }
+    _lv_obj_move_to(obj, x, y, true);
 }
 
 /**
@@ -117,33 +116,12 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    bool gi = _lv_obj_is_grid_item(obj);
-    bool fi = _lv_obj_is_flex_item(obj);
-    bool x_stretch = false;
-    bool y_stretch = false;
 
-    /*Use `LV_SIZE_STRETCH` value if the layout changes the size of the object*/
-    if(gi) {
-        if(LV_GRID_GET_CELL_PLACE(obj->x_set)) x_stretch = true;
-        if(LV_GRID_GET_CELL_PLACE(obj->y_set)) y_stretch = true;
-    }
-    if(fi) {
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent->spec_attr->flex_cont.dir == LV_FLEX_DIR_ROW && LV_COORD_GET_FLEX(obj->y_set) == LV_FLEX_PLACE_STRETCH) y_stretch = true;
-        if(parent->spec_attr->flex_cont.dir == LV_FLEX_DIR_COLUMN && LV_COORD_GET_FLEX(obj->x_set) == LV_FLEX_PLACE_STRETCH) x_stretch = true;
-    }
+    if(obj->w_set == LV_SIZE_LAYOUT && obj->h_set == LV_SIZE_LAYOUT) return;
 
-    if(x_stretch) w = LV_SIZE_STRETCH;
-    if(y_stretch) h = LV_SIZE_STRETCH;
 
-    obj->w_set = w;
-    obj->h_set = h;
-
-    /*If both stretched the size is managed by the grid*/
-    if(x_stretch && y_stretch) return;
-
-    if(x_stretch) w = lv_obj_get_width(obj);
-    if(y_stretch) h = lv_obj_get_height(obj);
+    if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
+    if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
 
     /*Calculate the required auto sizes*/
     bool x_auto = obj->w_set == LV_SIZE_AUTO ? true : false;
@@ -163,10 +141,10 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
-        lv_coord_t cont_w = lv_obj_get_width_fit(parent);
-        lv_coord_t cont_h = lv_obj_get_height_fit(parent);
-        if(pct_w) w = (_LV_COORD_GET_PCT(obj->w_set) * cont_w) / 100;
-        if(pct_h) h = (_LV_COORD_GET_PCT(obj->h_set) * cont_h) / 100;
+        lv_coord_t parent_w = lv_obj_get_width_fit(parent);
+        lv_coord_t parent_h = lv_obj_get_height_fit(parent);
+        if(pct_w) w = (LV_COORD_GET_PCT(obj->w_set) * parent_w) / 100;
+        if(pct_h) h = (LV_COORD_GET_PCT(obj->h_set) * parent_h) / 100;
     }
 
     refr_size(obj, w, h);
@@ -248,6 +226,21 @@ void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
     lv_coord_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 
     lv_obj_set_height(obj, h - mtop - mbottom);
+}
+
+/**
+ * Set a layout for an object
+ * @param obj pointer to an object
+ * @param layout pointer to a layout descriptor to set
+ */
+void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_allocate_spec_attr(obj);
+    obj->spec_attr->layout_dsc = layout;
+
+    lv_obj_update_layout(obj, NULL);
 }
 
 /**
@@ -625,14 +618,6 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
 
         x += pad_left + parent->coords.x1 - lv_obj_get_scroll_x(parent);
         y += pad_top + parent->coords.y1 - lv_obj_get_scroll_y(parent);
-    } else {
-        /*If no parent then it's screen but screen can't be on a grid*/
-        if(LV_COORD_IS_GRID(obj->x_set) || LV_COORD_IS_GRID(obj->x_set)) {
-            obj->x_set = 0;
-            obj->y_set = 0;
-            x = 0;
-            y = 0;
-        }
     }
 
     /*Calculate and set the movement*/
@@ -689,41 +674,6 @@ void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_di
         _lv_obj_move_children_by(child, x_diff, y_diff);
     }
 }
-
-/**
- * Check if an object is valid grid item or not.
- * @param obj pointer to an object to check
- * @return true: grid item; false: not grid item
- */
-bool _lv_obj_is_grid_item(lv_obj_t * obj)
-{
-    lv_obj_t * cont = lv_obj_get_parent(obj);
-    if(cont == NULL) return false;
-    const lv_grid_t * g = lv_obj_get_grid(cont);
-    if(g == NULL) return false;
-    if(g->col_dsc == NULL) return false;
-    if(g->row_dsc == NULL) return false;
-    if(g->row_dsc_len == 0) return false;
-    if(g->col_dsc_len == 0) return false;
-    if(LV_COORD_IS_GRID(obj->x_set) == false || LV_COORD_IS_GRID(obj->y_set) == false) return false;
-    return true;
-}
-
-
-/**
- * Check if an object is valid grid item or not.
- * @param obj pointer to an object to check
- * @return true: grid item; false: not grid item
- */
-bool _lv_obj_is_flex_item(struct _lv_obj_t * obj)
-{
-    lv_obj_t * cont = lv_obj_get_parent(obj);
-    if(cont == NULL) return false;
-    if(lv_obj_get_flex_dir(cont) == LV_FLEX_DIR_NONE) return false;
-    if(LV_COORD_IS_FLEX(obj->x_set) == false || LV_COORD_IS_FLEX(obj->y_set) == false) return false;
-    return true;
-}
-
 
 /**********************
  *   STATIC FUNCTIONS
