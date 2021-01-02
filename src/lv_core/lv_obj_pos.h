@@ -102,22 +102,6 @@ void lv_obj_set_content_width(struct _lv_obj_t * obj, lv_coord_t w);
 void lv_obj_set_content_height(struct _lv_obj_t * obj, lv_coord_t h);
 
 /**
- * Set the width of an object by taking the left and right margin into account.
- * The object width will be `obj_w = w - margin_left - margin_right`
- * @param obj pointer to an object
- * @param w new height including margins in pixels
- */
-void lv_obj_set_width_margin(struct _lv_obj_t * obj, lv_coord_t w);
-
-/**
- * Set the height of an object by taking the top and bottom margin into account.
- * The object height will be `obj_h = h - margin_top - margin_bottom`
- * @param obj pointer to an object
- * @param h new height including margins in pixels
- */
-void lv_obj_set_height_margin(struct _lv_obj_t * obj, lv_coord_t h);
-
-/**
  * Align an object to an other object.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
@@ -190,22 +174,6 @@ lv_coord_t lv_obj_get_width_fit(const struct _lv_obj_t * obj);
  * @return the height which still fits into the container without causing overflow
  */
 lv_coord_t lv_obj_get_height_fit(const struct _lv_obj_t * obj);
-
-/**
- * Get the height of an object by taking the top and bottom margin into account.
- * The returned height will be `obj_h + margin_top + margin_bottom`
- * @param obj pointer to an object
- * @return the height including the margins
- */
-lv_coord_t lv_obj_get_height_margin(const struct _lv_obj_t * obj);
-
-/**
- * Get the width of an object by taking the left and right margin into account.
- * The returned width will be `obj_w + margin_left + margin_right`
- * @param obj pointer to an object
- * @return the height including the margins
- */
-lv_coord_t lv_obj_get_width_margin(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of the virtual content of an object

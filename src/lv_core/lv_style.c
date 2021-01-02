@@ -448,50 +448,6 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->pad_right = 0;
          }
          break;
-     case LV_STYLE_MARGIN_TOP:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->margin_top = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->margin_top = value.num;
-             style->ext->has.margin_top = 1;
-             style->margin_top = 0;
-         }
-         break;
-     case LV_STYLE_MARGIN_BOTTOM:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->margin_bottom = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->margin_bottom = value.num;
-             style->ext->has.margin_bottom = 1;
-             style->margin_bottom = 0;
-         }
-         break;
-     case LV_STYLE_MARGIN_LEFT:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->margin_left = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->margin_left = value.num;
-             style->ext->has.margin_left = 1;
-             style->margin_left = 0;
-         }
-         break;
-     case LV_STYLE_MARGIN_RIGHT:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->margin_right = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->margin_right = value.num;
-             style->ext->has.margin_right = 1;
-             style->margin_right = 0;
-         }
-         break;
 
      case LV_STYLE_BG_COLOR:
          id= style->dont_index ? 0 : alloc_index_color(value);
@@ -727,37 +683,19 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
          }
          break;
      case LV_STYLE_SHADOW_OFS_X:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->shadow_ofs_x = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->shadow_ofs_x = value.num;
-             style->ext->has.shadow_ofs_x = 1;
-             style->shadow_ofs_x = 0;
-         }
+         _alloc_ext(style);
+         style->ext->shadow_ofs_x = value.num;
+         style->ext->has.shadow_ofs_x = 1;
          break;
      case LV_STYLE_SHADOW_OFS_Y:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->shadow_ofs_y = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->shadow_ofs_y = value.num;
-             style->ext->has.shadow_ofs_y = 1;
-             style->shadow_ofs_y = 0;
-         }
+         _alloc_ext(style);
+         style->ext->shadow_ofs_y = value.num;
+         style->ext->has.shadow_ofs_y = 1;
          break;
      case LV_STYLE_SHADOW_SPREAD:
-         id= style->dont_index ? 0 : alloc_index_num(value);
-         if(id > 0) {
-             style->shadow_spread = id;
-         } else {
-             _alloc_ext(style);
-             style->ext->shadow_spread = value.num;
-             style->ext->has.shadow_spread = 1;
-             style->shadow_spread = 0;
-         }
+         _alloc_ext(style);
+         style->ext->shadow_spread = value.num;
+         style->ext->has.shadow_spread = 1;
          break;
      case LV_STYLE_SHADOW_BLEND_MODE:
          _alloc_ext(style);
@@ -924,22 +862,6 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->pad_right) { value->num = buf_num[style->pad_right]; return true; }
           if(style->ext && style->ext->has.pad_top) { value->num = style->ext->pad_right; return true; }
           break;
-      case LV_STYLE_MARGIN_TOP:
-          if(style->margin_top) { value->num = buf_num[style->margin_top]; return true; }
-          if(style->ext && style->ext->has.margin_top) { value->num = style->ext->margin_top; return true; }
-          break;
-      case LV_STYLE_MARGIN_BOTTOM:
-          if(style->margin_bottom) { value->num = buf_num[style->margin_bottom]; return true; }
-          if(style->ext && style->ext->has.margin_top) { value->num = style->ext->margin_bottom; return true; }
-          break;
-      case LV_STYLE_MARGIN_LEFT:
-          if(style->margin_left) { value->num = buf_num[style->margin_left]; return true; }
-          if(style->ext && style->ext->has.margin_top) { value->num = style->ext->margin_left; return true; }
-          break;
-      case LV_STYLE_MARGIN_RIGHT:
-          if(style->margin_right) { value->num = buf_num[style->margin_right]; return true; }
-          if(style->ext && style->ext->has.margin_top) { value->num = style->ext->margin_right; return true; }
-          break;
 
       case LV_STYLE_BG_COLOR:
       case LV_STYLE_BG_COLOR_FILTERED:
@@ -1059,15 +981,12 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->ext && style->ext->has.shadow_width) { value->num = style->ext->shadow_width; return true; }
           break;
       case LV_STYLE_SHADOW_OFS_X:
-          if(style->shadow_ofs_x) { value->num = buf_num[style->shadow_ofs_x]; return true; }
           if(style->ext && style->ext->has.shadow_ofs_x) { value->num = style->ext->shadow_ofs_x; return true; }
           break;
       case LV_STYLE_SHADOW_OFS_Y:
-          if(style->shadow_ofs_y) { value->num = buf_num[style->shadow_ofs_y]; return true; }
           if(style->ext && style->ext->has.shadow_ofs_y) { value->num = style->ext->shadow_ofs_y; return true; }
           break;
       case LV_STYLE_SHADOW_SPREAD:
-          if(style->shadow_spread) { value->num = buf_num[style->shadow_spread]; return true; }
           if(style->ext && style->ext->has.shadow_spread) { value->num = style->ext->shadow_spread; return true; }
           break;
       case LV_STYLE_SHADOW_BLEND_MODE:
@@ -1190,22 +1109,6 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
         style->pad_right = 0;
         if(style->ext) style->ext->has.pad_right = 0;
         break;
-    case LV_STYLE_MARGIN_TOP:
-        style->margin_top = 0;
-        if(style->ext) style->ext->has.margin_top = 0;
-        break;
-    case LV_STYLE_MARGIN_BOTTOM:
-        style->margin_bottom = 0;
-        if(style->ext) style->ext->has.margin_bottom = 0;
-        break;
-    case LV_STYLE_MARGIN_LEFT:
-        style->margin_left = 0;
-        if(style->ext) style->ext->has.margin_left = 0;
-        break;
-    case LV_STYLE_MARGIN_RIGHT:
-        style->margin_right = 0;
-        if(style->ext) style->ext->has.margin_right = 0;
-        break;
 
     case LV_STYLE_BG_COLOR:
         style->bg_color = 0;
@@ -1318,15 +1221,12 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
         if(style->ext) style->ext->has.shadow_width = 0;
         break;
     case LV_STYLE_SHADOW_OFS_X:
-        style->shadow_ofs_x = 0;
         if(style->ext) style->ext->has.shadow_ofs_x = 0;
         break;
     case LV_STYLE_SHADOW_OFS_Y:
-        style->shadow_ofs_y = 0;
         if(style->ext) style->ext->has.shadow_ofs_y = 0;
         break;
     case LV_STYLE_SHADOW_SPREAD:
-        style->shadow_spread = 0;
         if(style->ext) style->ext->has.shadow_spread = 0;
         break;
     case LV_STYLE_SHADOW_BLEND_MODE:

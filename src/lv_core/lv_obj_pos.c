@@ -201,34 +201,6 @@ void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
 }
 
 /**
- * Set the width of an object by taking the left and right margin into account.
- * The object width will be `obj_w = w - margin_left - margin_right`
- * @param obj pointer to an object
- * @param w new height including margins in pixels
- */
-void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
-{
-    lv_coord_t mleft = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
-    lv_coord_t mright = lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
-
-    lv_obj_set_width(obj, w - mleft - mright);
-}
-
-/**
- * Set the height of an object by taking the top and bottom margin into account.
- * The object height will be `obj_h = h - margin_top - margin_bottom`
- * @param obj pointer to an object
- * @param h new height including margins in pixels
- */
-void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
-{
-    lv_coord_t mtop = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
-    lv_coord_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
-
-    lv_obj_set_height(obj, h - mtop - mbottom);
-}
-
-/**
  * Set a layout for an object
  * @param obj pointer to an object
  * @param layout pointer to a layout descriptor to set
@@ -510,35 +482,6 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 
     return lv_obj_get_height(obj) - top - bottom;
 }
-
-/**
- * Get the height of an object by taking the top and bottom margin into account.
- * The returned height will be `obj_h + margin_top + margin_bottom`
- * @param obj pointer to an object
- * @return the height including the margins
- */
-lv_coord_t lv_obj_get_height_margin(const lv_obj_t * obj)
-{
-    lv_coord_t mtop = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
-    lv_coord_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
-
-    return lv_obj_get_height(obj) + mtop + mbottom;
-}
-
-/**
- * Get the width of an object by taking the left and right margin into account.
- * The returned width will be `obj_w + margin_left + margin_right`
- * @param obj pointer to an object
- * @return the height including the margins
- */
-lv_coord_t lv_obj_get_width_margin(const lv_obj_t * obj)
-{
-    lv_coord_t mleft = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
-    lv_coord_t mright = lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
-
-    return lv_obj_get_width(obj) + mleft + mright;
-}
-
 /**
  * Get the width of the virtual content of an object
  * @param obj pointer to an objects

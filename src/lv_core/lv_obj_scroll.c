@@ -130,7 +130,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
-        child_res = LV_MATH_MAX(child_res, child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN));
+        child_res = LV_MATH_MAX(child_res, child->coords.y2);
     }
 
     lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -165,7 +165,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
     lv_coord_t x1 = LV_COORD_MAX;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
        lv_obj_t * child = lv_obj_get_child(obj, i);
-        x1 = LV_MATH_MIN(x1, child->coords.x1 - lv_obj_get_style_margin_left(child, LV_PART_MAIN));
+        x1 = LV_MATH_MIN(x1, child->coords.x1);
 
     }
 
@@ -197,7 +197,7 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
-        child_res = LV_MATH_MAX(child_res, child->coords.x2 + lv_obj_get_style_margin_right(child, LV_PART_MAIN));
+        child_res = LV_MATH_MAX(child_res, child->coords.x2);
     }
 
     lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);

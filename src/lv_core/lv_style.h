@@ -98,10 +98,6 @@ typedef enum {
     LV_STYLE_PAD_BOTTOM     = 21 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_LEFT       = 22 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_RIGHT      = 23 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MARGIN_TOP = 24     | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MARGIN_BOTTOM = 25  | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MARGIN_LEFT = 26    | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MARGIN_RIGHT = 27   | LV_STYLE_PROP_LAYOUT_REFR,
 
     LV_STYLE_BG_COLOR        = 30,
     LV_STYLE_BG_COLOR_FILTERED = 30 | LV_STYLE_PROP_FILTER,
@@ -208,10 +204,6 @@ typedef struct {
     int8_t pad_bottom;
     int8_t pad_left;
     int8_t pad_right;
-    int8_t margin_top;
-    int8_t margin_bottom;
-    int8_t margin_left;
-    int8_t margin_right;
     int8_t border_width;
     uint8_t outline_width;
     uint8_t outline_pad;
@@ -235,7 +227,6 @@ typedef struct {
     uint32_t outline_blend_mode   :2;
     uint32_t shadow_blend_mode   :2;
     uint32_t text_decor :2;
-
 
     uint32_t transform_zoom  :14;
     uint32_t transform_angle :14;
@@ -275,10 +266,6 @@ typedef struct {
         uint32_t pad_bottom:1;
         uint32_t pad_left:1;
         uint32_t pad_right:1;
-        uint32_t margin_top:1;
-        uint32_t margin_bottom:1;
-        uint32_t margin_left:1;
-        uint32_t margin_right:1;
         uint32_t border_width:1;
         uint32_t outline_width:1;
         uint32_t outline_pad:1;
@@ -343,6 +330,7 @@ typedef struct _lv_style_t{
     uint32_t transition :4;
     uint32_t bg_color :4;
 
+    /*32*/
     uint32_t color_filter_opa :5;
     uint32_t bg_opa :5;
     uint32_t border_opa:5;
@@ -351,6 +339,7 @@ typedef struct _lv_style_t{
     uint32_t border_color:4;
     uint32_t border_width:4;
 
+    /*32*/
     uint32_t pad_top:5;
     uint32_t pad_bottom:5;
     uint32_t pad_left:5;
@@ -359,18 +348,7 @@ typedef struct _lv_style_t{
     uint32_t text_font :4;
     uint32_t line_color :4;
 
-    uint32_t margin_top:5;
-    uint32_t margin_bottom:5;
-    uint32_t margin_left:5;
-    uint32_t margin_right:5;
-    uint32_t outline_color:4;
-    uint32_t shadow_color:4;
-    uint32_t line_rounded:1;
-    uint32_t border_post:1;
-    uint32_t clip_corner:1;
-    uint32_t has_line_rounded:1;
-    uint32_t has_clip_corner:1;
-
+    /*32*/
     uint32_t text_opa:5;
     uint32_t line_width :5;
     uint32_t line_opa :5;
@@ -379,11 +357,16 @@ typedef struct _lv_style_t{
     uint32_t outline_opa:5;
     uint32_t bg_grad_dir:2;
 
+    /*25*/
     uint32_t shadow_width:5;
-    uint32_t shadow_ofs_y:5;
-    uint32_t shadow_ofs_x:5;
-    uint32_t shadow_spread:5;
     uint32_t shadow_opa:4;
+    uint32_t outline_color:4;
+    uint32_t shadow_color:4;
+    uint32_t line_rounded:1;
+    uint32_t border_post:1;
+    uint32_t clip_corner:1;
+    uint32_t has_line_rounded:1;
+    uint32_t has_clip_corner:1;
     uint32_t has_bg_grad_dir:1;
     uint32_t has_border_post:1;
     uint32_t dont_index:1;
@@ -465,18 +448,6 @@ static inline void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value) {
 
 static inline void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_PAD_RIGHT, v); }
-
-static inline void lv_style_set_margin_top(lv_style_t * style, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_MARGIN_TOP, v); }
-
-static inline void lv_style_set_margin_bottom(lv_style_t * style, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_MARGIN_BOTTOM, v); }
-
-static inline void lv_style_set_margin_left(lv_style_t * style, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_MARGIN_LEFT, v); }
-
-static inline void lv_style_set_margin_right(lv_style_t * style, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_MARGIN_RIGHT, v); }
 
 static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_COLOR, v); }

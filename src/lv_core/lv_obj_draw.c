@@ -454,8 +454,8 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 
     if(!hor_draw && !ver_draw) return;
 
-    lv_coord_t end_space = lv_obj_get_style_margin_top(obj, LV_PART_SCROLLBAR);
-    lv_coord_t side_space = lv_obj_get_style_margin_right(obj, LV_PART_SCROLLBAR);
+    lv_coord_t end_space = lv_obj_get_style_pad_top(obj, LV_PART_SCROLLBAR);
+    lv_coord_t side_space = lv_obj_get_style_pad_right(obj, LV_PART_SCROLLBAR);
     lv_coord_t tickness = lv_obj_get_style_pad_left(obj, LV_PART_SCROLLBAR);
 
     lv_coord_t obj_h = lv_obj_get_height(obj);

@@ -244,18 +244,6 @@ static inline lv_coord_t lv_obj_get_style_pad_left(const struct _lv_obj_t * obj,
 static inline lv_coord_t lv_obj_get_style_pad_right(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_PAD_RIGHT); return v.num; }
 
-static inline lv_coord_t lv_obj_get_style_margin_top(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_TOP); return v.num; }
-
-static inline lv_coord_t lv_obj_get_style_margin_bottom(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_BOTTOM); return v.num; }
-
-static inline lv_coord_t lv_obj_get_style_margin_left(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_LEFT); return v.num; }
-
-static inline lv_coord_t lv_obj_get_style_margin_right(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_RIGHT); return v.num; }
-
 static inline lv_color_t lv_obj_get_style_bg_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_COLOR); return v.color; }
 

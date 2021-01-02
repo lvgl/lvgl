@@ -312,47 +312,42 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     lv_coord_t item_w = lv_area_get_width(&item->coords);
     lv_coord_t item_h = lv_area_get_height(&item->coords);
 
-    lv_coord_t margin_top = lv_obj_get_style_margin_top(item, LV_PART_MAIN);
-    lv_coord_t margin_bottom = lv_obj_get_style_margin_bottom(item, LV_PART_MAIN);
-    lv_coord_t margin_left = lv_obj_get_style_margin_left(item, LV_PART_MAIN);
-    lv_coord_t margin_right = lv_obj_get_style_margin_right(item, LV_PART_MAIN);
-
     if(item->w_set == LV_SIZE_LAYOUT) item->w_set = item_w;
     if(item->h_set == LV_SIZE_LAYOUT) item->h_set = item_h;
 
     switch(x_flag) {
         default:
         case LV_GRID_START:
-            x = c->x[col_pos] + margin_left;
+            x = c->x[col_pos];
             break;
         case LV_GRID_STRETCH:
-            x = c->x[col_pos] + margin_left;
-            item_w = col_w - margin_left - margin_right;
+            x = c->x[col_pos];
+            item_w = col_w;
             item->w_set = LV_SIZE_LAYOUT;
             break;
         case LV_GRID_CENTER:
-            x = c->x[col_pos] + (col_w - (item_w + margin_left - margin_right)) / 2;
+            x = c->x[col_pos] + (col_w - item_w) / 2;
             break;
         case LV_GRID_END:
-            x = c->x[col_pos] + col_w - lv_obj_get_width(item) - margin_right;
+            x = c->x[col_pos] + col_w - lv_obj_get_width(item);
             break;
     }
 
     switch(y_flag) {
         default:
         case LV_GRID_START:
-            y = c->y[row_pos] + margin_top;
+            y = c->y[row_pos];
             break;
         case LV_GRID_STRETCH:
-            y = c->y[row_pos] + margin_top;
-            item_h = row_h - margin_top - margin_bottom;
+            y = c->y[row_pos];
+            item_h = row_h;
             item->h_set = LV_SIZE_LAYOUT;
             break;
         case LV_GRID_CENTER:
-            y = c->y[row_pos] + (row_h - (item_h + margin_top + margin_bottom)) / 2;
+            y = c->y[row_pos] + (row_h - item_h) / 2;
             break;
         case LV_GRID_END:
-            y = c->y[row_pos] + row_h - lv_obj_get_height(item) - margin_bottom;
+            y = c->y[row_pos] + row_h - lv_obj_get_height(item);
             break;
     }
 

@@ -212,8 +212,8 @@ static void basic_init(void)
     lv_style_set_bg_color(&styles->scrollbar, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_left(&styles->scrollbar, LV_DPX(7));
-    lv_style_set_margin_right(&styles->scrollbar,  LV_DPX(7));
-    lv_style_set_margin_top(&styles->scrollbar,  LV_DPX(7));
+    lv_style_set_pad_right(&styles->scrollbar,  LV_DPX(7));
+    lv_style_set_pad_top(&styles->scrollbar,  LV_DPX(7));
     lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_50);
     lv_style_set_transition(&styles->scrollbar, &trans_slow);
 
@@ -500,17 +500,6 @@ static void textarea_init(void)
 //#endif
 //}
 
-static void tabview_init(void)
-{
-#if LV_USE_TABVIEW != 0
-#endif
-}
-
-static void tileview_init(void)
-{
-#if LV_USE_TILEVIEW != 0
-#endif
-}
 
 static void table_init(void)
 {
@@ -527,11 +516,6 @@ static void table_init(void)
 #endif
 }
 
-static void win_init(void)
-{
-#if LV_USE_WIN != 0
-#endif
-}
 
 /**********************
  *   GLOBAL FUNCTIONS

@@ -620,10 +620,6 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(style->pad_top || (style->ext && style->ext->has.pad_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(style->pad_left || (style->ext && style->ext->has.pad_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(style->pad_right || (style->ext && style->ext->has.pad_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(style->margin_bottom || (style->ext && style->ext->has.margin_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(style->margin_top || (style->ext && style->ext->has.margin_top)) res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(style->margin_left || (style->ext && style->ext->has.margin_left))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(style->margin_right || (style->ext && style->ext->has.margin_right))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
 
             if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
                 if(list->styles[i].part == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
@@ -642,9 +638,9 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(style->outline_pad || (style->ext && style->ext->has.outline_pad)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(style->shadow_width|| (style->ext && style->ext->has.shadow_width)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(style->shadow_opa|| (style->ext && style->ext->has.shadow_opa)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-            else if(style->shadow_ofs_x|| (style->ext && style->ext->has.shadow_ofs_x)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-            else if(style->shadow_ofs_y|| (style->ext && style->ext->has.shadow_ofs_y)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-            else if(style->shadow_spread|| (style->ext && style->ext->has.shadow_spread)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.shadow_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.shadow_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.shadow_spread) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(style->line_width || (style->ext && style->ext->has.line_width)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(style->ext && style->ext->has.content_src) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(style->ext && style->ext->has.content_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
@@ -763,19 +759,6 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
             list->cache_transform_zero = 1;
         } else {
             list->cache_transform_zero = 0;
-        }
-    }   if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_MARGIN_TOP || prop == LV_STYLE_MARGIN_BOTTOM ||
-            prop == LV_STYLE_MARGIN_LEFT || prop == LV_STYLE_MARGIN_RIGHT) {
-        lv_style_value_t vt[4];
-        if(get_prop_core(obj, part, LV_STYLE_MARGIN_TOP, &vt[0]) == false) vt[0].num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_MARGIN_BOTTOM, &vt[1]) == false) vt[1].num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_MARGIN_LEFT, &vt[2]) == false) vt[2].num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_MARGIN_RIGHT, &vt[3]) == false) vt[3].num = 0;
-
-        if(vt[0].num == 0 && vt[1].num == 0 && vt[2].num == 0 && vt[3].num == 0) {
-            list->cache_margin_zero = 1;
-        } else {
-            list->cache_margin_zero = 0;
         }
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_BLEND_MODE) {
@@ -916,13 +899,6 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     case LV_STYLE_TRANSFORM_HEIGHT:
     case LV_STYLE_TRANSFORM_WIDTH:
         if(list->cache_transform_zero ) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
-        break;
-    case LV_STYLE_MARGIN_TOP:
-    case LV_STYLE_MARGIN_BOTTOM:
-    case LV_STYLE_MARGIN_LEFT:
-    case LV_STYLE_MARGIN_RIGHT:
-        if(list->cache_margin_zero) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_BG_BLEND_MODE:
