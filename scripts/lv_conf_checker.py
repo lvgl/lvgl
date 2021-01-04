@@ -93,14 +93,14 @@ for i in fin.read().splitlines():
   
   if r:
     line = re.sub('\(.*?\)', '', r[1], 1)    #remove parentheses from macros
-    
+    line_upper = line.upper();
     dr = re.sub('.*# *define', '', i, 1)
     d = "#    define " + dr
-
+		
     fout.write(
       f'#ifndef {line}\n'
-      f'#  ifdef CONFIG_{line}\n'
-      f'#    define {line} CONFIG_{line}\n'
+      f'#  ifdef CONFIG_{line_upper}\n'
+      f'#    define {line} CONFIG_{line_upper}\n'
       f'#  else\n'
       f'{d}\n'
       f'#  endif\n'
