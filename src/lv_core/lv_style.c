@@ -71,7 +71,7 @@ void lv_style_init(lv_style_t * style)
 
 uint16_t lv_style_register_prop(bool inherit)
 {
-    static uint16_t act_id = (uint16_t)_LV_STYLE_LAST_BUIL_IN_PROP;
+    static uint16_t act_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     act_id++;
     if(inherit) return act_id | LV_STYLE_PROP_INHERIT;
     else return act_id;
@@ -444,9 +444,19 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
          } else {
              _alloc_ext(style);
              style->ext->pad_right = value.num;
-             style->ext->pad_right = 1;
+             style->ext->has.pad_right = 1;
              style->pad_right = 0;
          }
+         break;
+     case LV_STYLE_PAD_ROW:
+         _alloc_ext(style);
+         style->ext->pad_row = value.num;
+         style->ext->has.pad_row = 1;
+         break;
+     case LV_STYLE_PAD_COLUMN:
+         _alloc_ext(style);
+         style->ext->pad_column = value.num;
+         style->ext->has.pad_column = 1;
          break;
 
      case LV_STYLE_BG_COLOR:
@@ -862,6 +872,12 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->pad_right) { value->num = buf_num[style->pad_right]; return true; }
           if(style->ext && style->ext->has.pad_top) { value->num = style->ext->pad_right; return true; }
           break;
+      case LV_STYLE_PAD_ROW:
+          if(style->ext && style->ext->has.pad_row) { value->num = style->ext->pad_row; return true; }
+          break;
+      case LV_STYLE_PAD_COLUMN:
+          if(style->ext && style->ext->has.pad_column) { value->num = style->ext->pad_column; return true; }
+          break;
 
       case LV_STYLE_BG_COLOR:
       case LV_STYLE_BG_COLOR_FILTERED:
@@ -1108,6 +1124,12 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
     case LV_STYLE_PAD_RIGHT:
         style->pad_right = 0;
         if(style->ext) style->ext->has.pad_right = 0;
+        break;
+    case LV_STYLE_PAD_ROW:
+        if(style->ext) style->ext->has.pad_row = 0;
+        break;
+    case LV_STYLE_PAD_COLUMN:
+        if(style->ext) style->ext->has.pad_column = 0;
         break;
 
     case LV_STYLE_BG_COLOR:

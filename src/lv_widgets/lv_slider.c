@@ -68,24 +68,8 @@ const lv_obj_class_t lv_slider = {
  */
 lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("slider create started");
 
-    lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
-    _lv_memset_00(obj, sizeof(lv_obj_t));
-    obj->class_p = &lv_slider;
-
-    if(obj->class_p->ext_size) {
-        obj->ext_attr = lv_mem_alloc(sizeof(lv_slider_ext_t));
-        _lv_memset_00(obj->ext_attr, sizeof(lv_slider_ext_t));
-    }
-
-    lv_slider.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    LV_LOG_INFO("slider created");
-
-    return obj;
+    return lv_obj_create_from_class(&lv_slider, parent, copy);
 }
 
 /*=====================

@@ -218,22 +218,26 @@ void lv_deinit(void)
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
-    _lv_memset_00(obj, sizeof(lv_obj_t));
-    obj->class_p = &lv_obj;
-
-    lv_obj.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    return obj;
+    return lv_obj_create_from_class(&lv_obj, parent, copy);
 }
 
-
-void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_obj_create_from_class(lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy)
 {
+    lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
+    _lv_memset_00(obj, sizeof(lv_obj_t));
+    obj->class_p = class;
+
+    if(obj->class_p->ext_size) {
+        obj->ext_attr = lv_mem_alloc(obj->class_p->ext_size);
+        _lv_memset_00(obj->ext_attr, obj->class_p->ext_size);
+    }
+
+    class->constructor(obj, parent, copy);
+
     if(!copy) lv_theme_apply(obj);
 //    else lv_style_list_copy(&checkbox->style_indic, &checkbox_copy->style_indic);
+
+    return obj;
 }
 
 /**
@@ -1832,8 +1836,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         *s = LV_MATH_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        /* Padding might have changed so the layout should be recalculated
-         * If margin has also changed the parent's layout also needs to be updated but it's done in CHILD_CHG signal*/
+        /* Padding might have changed so the layout should be recalculated*/
         lv_obj_update_layout(obj, NULL);
 
         /*Reposition non grid objects on by one*/

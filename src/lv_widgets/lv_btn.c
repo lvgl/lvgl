@@ -32,12 +32,20 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_btn_destructor(void * obj);
+static void lv_btn_destructor(lv_obj_t * obj);
+static lv_design_res_t lv_btn_design(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_res_t lv_btn_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_btn_class_t lv_btn;
+const lv_obj_class_t lv_btn  = {
+    .constructor = lv_btn_constructor,
+    .destructor = lv_btn_destructor,
+    .signal_cb = lv_btn_signal,
+    .design_cb = lv_btn_design,
+    .ext_size = 0,
+};
 
 
 /**********************
@@ -57,21 +65,8 @@ lv_btn_class_t lv_btn;
  */
 lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-
-
-    if(!lv_btn._inited) {
-         LV_CLASS_INIT(lv_btn, lv_obj);
-         lv_btn.constructor = lv_btn_constructor;
-         lv_btn.destructor = lv_btn_destructor;
-     }
-
-     lv_obj_t * obj = lv_class_new(&lv_btn);
-     lv_btn.constructor(obj, parent, copy);
-
-     lv_obj_create_finish(obj, parent, copy);
-
      LV_LOG_TRACE("button create started");
-     return obj;
+     return lv_obj_create_from_class(&lv_btn, parent, copy);
 }
 
 /*=====================
@@ -91,7 +86,7 @@ static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     LV_LOG_TRACE("lv_btn create started");
 
     LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_btn)
-    lv_btn.base_p->constructor(obj, parent, copy);
+    lv_obj.constructor(obj, parent, copy);
 
     lv_obj_set_size(obj, LV_DPI, LV_DPI / 3);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
@@ -101,7 +96,7 @@ static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     LV_LOG_INFO("btn created");
 }
 
-static void lv_btn_destructor(void * obj)
+static void lv_btn_destructor(lv_obj_t * obj)
 {
 //    lv_bar_t * bar = obj;
 //
@@ -111,7 +106,15 @@ static void lv_btn_destructor(void * obj)
 //    lv_anim_del(&bar->start_value_anim, NULL);
 //#endif
 
-    lv_btn.base_p->destructor(obj);
+//    lv_btn.base_p->destructor(obj);
+}
+static lv_design_res_t lv_btn_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+{
+    return lv_obj.design_cb(obj, clip_area, mode);
 }
 
+static lv_res_t lv_btn_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+{
+    return lv_obj.signal_cb(obj, sign, param);
+}
 #endif

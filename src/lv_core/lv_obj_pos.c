@@ -49,6 +49,7 @@ void lv_obj_update_layout(lv_obj_t * cont, lv_obj_t * item)
 {
     if(cont->spec_attr == NULL) return;
     if(cont->spec_attr->layout_dsc == NULL) return;
+    if(cont->spec_attr->child_cnt == 0) return;
 
     const lv_layout_base_t * layout = cont->spec_attr->layout_dsc;
     if(layout->update_cb == NULL) return;

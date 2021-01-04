@@ -98,6 +98,8 @@ typedef enum {
     LV_STYLE_PAD_BOTTOM     = 21 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_LEFT       = 22 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_RIGHT      = 23 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_PAD_ROW        = 24 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_PAD_COLUMN     = 25 | LV_STYLE_PROP_LAYOUT_REFR,
 
     LV_STYLE_BG_COLOR        = 30,
     LV_STYLE_BG_COLOR_FILTERED = 30 | LV_STYLE_PROP_FILTER,
@@ -162,8 +164,7 @@ typedef enum {
     LV_STYLE_CONTENT_OFS_X = 102 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_CONTENT_OFS_Y = 103 | LV_STYLE_PROP_EXT_DRAW,
 
-
-    _LV_STYLE_LAST_BUIL_IN_PROP,
+    _LV_STYLE_LAST_BUILT_IN_PROP = 128,
 
     LV_STYLE_PROP_ALL = 0xFFFF
 }lv_style_prop_t;
@@ -204,6 +205,8 @@ typedef struct {
     int8_t pad_bottom;
     int8_t pad_left;
     int8_t pad_right;
+    int8_t pad_row;
+    int8_t pad_column;
     int8_t border_width;
     uint8_t outline_width;
     uint8_t outline_pad;
@@ -266,6 +269,8 @@ typedef struct {
         uint32_t pad_bottom:1;
         uint32_t pad_left:1;
         uint32_t pad_right:1;
+        uint32_t pad_row:1;
+        uint32_t pad_column:1;
         uint32_t border_width:1;
         uint32_t outline_width:1;
         uint32_t outline_pad:1;
@@ -448,6 +453,12 @@ static inline void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value) {
 
 static inline void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_PAD_RIGHT, v); }
+
+static inline void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_PAD_ROW, v); }
+
+static inline void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, v); }
 
 static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_COLOR, v); }

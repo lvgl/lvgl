@@ -300,6 +300,9 @@ void lv_deinit(void);
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+
+lv_obj_t * lv_obj_create_from_class(lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy);
+
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete

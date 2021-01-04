@@ -71,13 +71,6 @@ void lv_grid_set_place(lv_grid_t * grid, uint8_t col_place, uint8_t row_place)
     grid->row_place = row_place;
 }
 
-void lv_grid_set_gap(lv_grid_t * grid, lv_coord_t col_gap, uint8_t row_gap)
-{
-    grid->col_gap = col_gap;
-    grid->row_gap = row_gap;
-
-}
-
 void lv_obj_set_grid_cell(lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos)
 {
     lv_obj_set_pos(obj, col_pos, row_pos);
@@ -172,14 +165,17 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     calc_rows(cont, calc_out);
     calc_cols(cont, calc_out);
 
+    lv_coord_t col_gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
+    lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+
     bool rev = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
     lv_coord_t cont_w = lv_obj_get_width_fit(cont);
-    calc_out->grid_w = grid_place(cont_w, auto_w, g->col_place, g->col_gap, calc_out->col_num, calc_out->w, calc_out->x, rev);
+    calc_out->grid_w = grid_place(cont_w, auto_w, g->col_place, col_gap, calc_out->col_num, calc_out->w, calc_out->x, rev);
 
     bool auto_h = cont->h_set == LV_SIZE_AUTO ? true : false;
     lv_coord_t cont_h = lv_obj_get_height_fit(cont);
-    calc_out->grid_h = grid_place(cont_h, auto_h, g->row_place, g->row_gap, calc_out->row_num, calc_out->h, calc_out->y, false);
+    calc_out->grid_h = grid_place(cont_h, auto_h, g->row_place, row_gap, calc_out->row_num, calc_out->h, calc_out->y, false);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -220,7 +216,8 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
         }
     }
 
-    cont_w -= grid->col_gap * (c->col_num - 1);
+    lv_coord_t col_gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
+    cont_w -= col_gap * (c->col_num - 1);
     lv_coord_t free_w = cont_w - grid_w;
 
     for(i = 0; i < c->col_num; i++) {
@@ -259,7 +256,8 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
         }
     }
 
-    lv_coord_t cont_h = lv_obj_get_height_fit(cont) - grid->row_gap * (grid->row_dsc_len - 1);
+    lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+    lv_coord_t cont_h = lv_obj_get_height_fit(cont) - row_gap * (grid->row_dsc_len - 1);
     lv_coord_t free_h = cont_h - grid_h;
 
     for(i = 0; i < grid->row_dsc_len; i++) {

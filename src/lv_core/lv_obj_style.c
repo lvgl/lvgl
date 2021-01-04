@@ -425,7 +425,6 @@ void _lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
     lv_obj_invalidate(obj);
     if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR)) {
         lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL);
-        lv_signal_send(obj->parent, LV_SIGNAL_CHILD_CHG, obj);
         lv_obj_invalidate(obj);
     } else if(prop & LV_STYLE_PROP_EXT_DRAW) {
         _lv_obj_refresh_ext_draw_pad(obj);

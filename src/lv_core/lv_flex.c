@@ -28,8 +28,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void flex_update(lv_obj_t * cont, lv_obj_t * item);
-static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t max_main_size, track_t * t);
-static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, track_t * t);
+static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t item_gap, lv_coord_t max_main_size, track_t * t);
+static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t);
 static void place_content(lv_flex_place_t place, lv_coord_t max_size, lv_coord_t content_size, lv_coord_t item_cnt, lv_coord_t * start_pos, lv_coord_t * gap);
 static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
 
@@ -101,12 +101,6 @@ void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_fle
     flex->item_cross_place = item_cross_place;
 }
 
-void lv_flex_set_gap(lv_flex_t * flex, lv_coord_t main_gap, lv_coord_t cross_gap)
-{
-    flex->item_gap = main_gap;
-    flex->track_gap = cross_gap;
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -118,6 +112,8 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
 
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
+    lv_coord_t track_gap = row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+    lv_coord_t item_gap = !row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
     /*Count the grow units and free space*/
     lv_coord_t max_main_size = (row ? lv_obj_get_width_fit(cont) : lv_obj_get_height_fit(cont));
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
@@ -148,13 +144,13 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
         track_t t;
         while(track_first_item < cont->spec_attr->child_cnt && track_first_item >= 0) {
             /*Search the first item of the next row */
-            next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &t);
-            total_track_cross_size += t.track_cross_size + f->track_gap;
+            next_track_first_item = find_track_end(cont, track_first_item, max_main_size, item_gap, &t);
+            total_track_cross_size += t.track_cross_size + track_gap;
             track_cnt++;
             track_first_item = next_track_first_item;
         }
 
-        if(track_cnt) total_track_cross_size -= f->track_gap;   /*No gap after the last track*/
+        if(track_cnt) total_track_cross_size -= track_gap;   /*No gap after the last track*/
 
         /* Place the tracks to get the start position
          * If the the height of the tracks is larger than the available space
@@ -174,18 +170,18 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     while(track_first_item < cont->spec_attr->child_cnt && track_first_item >= 0) {
         track_t t;
         /*Search the first item of the next row */
-        next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &t);
+        next_track_first_item = find_track_end(cont, track_first_item, max_main_size, item_gap, &t);
 
         if(rtl && !row) {
             *cross_pos -= t.track_cross_size;
         }
-        children_repos(cont, track_first_item, next_track_first_item, abs_x, abs_y, max_main_size, &t);
+        children_repos(cont, track_first_item, next_track_first_item, abs_x, abs_y, max_main_size, item_gap, &t);
         track_first_item = next_track_first_item;
 
         if(rtl && !row) {
-            *cross_pos -= gap + f->track_gap;
+            *cross_pos -= gap + track_gap;
         } else {
-            *cross_pos += t.track_cross_size + gap + f->track_gap;
+            *cross_pos += t.track_cross_size + gap + track_gap;
         }
     }
     LV_ASSERT_MEM_INTEGRITY();
@@ -195,7 +191,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
  *   STATIC FUNCTIONS
  **********************/
 
-static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t max_main_size, track_t * t)
+static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t)
 {
     const lv_flex_t * f = cont->spec_attr->layout_dsc;
 
@@ -219,7 +215,7 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
             grow_sum += _LV_FLEX_GET_GROW(main_size);
             grow_item_cnt++;
         } else {
-            lv_coord_t item_size = get_main_size(item) + f->item_gap;
+            lv_coord_t item_size = get_main_size(item) + item_gap;
             if(f->wrap && t->track_main_size + item_size > max_main_size) break;
             t->track_main_size += item_size;
         }
@@ -230,11 +226,11 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
         t->item_cnt++;
     }
 
-    if(t->track_main_size > 0) t->track_main_size -= f->item_gap; /*There is no gap after the last item*/
+    if(t->track_main_size > 0) t->track_main_size -= item_gap; /*There is no gap after the last item*/
 
     if(grow_item_cnt && grow_sum) {
         lv_coord_t s = max_main_size - t->track_main_size;
-        s -= grow_item_cnt * f->item_gap;
+        s -= grow_item_cnt * item_gap;
         t->grow_unit =  s / grow_sum;
         t->track_main_size = max_main_size;  /*If there is at least one "grow item" the track takes the full space*/
     } else {
@@ -255,7 +251,7 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 }
 
 
-static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, track_t * t)
+static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t)
 {
 
     const lv_flex_t * f = cont->spec_attr->layout_dsc;
@@ -318,7 +314,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
         }
 
         if(!(row && rtl)) {
-            main_pos += area_get_main_size(&item->coords) + f->item_gap + place_gap;
+            main_pos += area_get_main_size(&item->coords) + item_gap + place_gap;
         }
         item = get_next_item(cont, f->rev, &item_first_id);
     }

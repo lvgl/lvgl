@@ -62,8 +62,6 @@ typedef struct {
     const lv_coord_t * row_dsc;
     uint8_t col_dsc_len;
     uint8_t row_dsc_len;
-    lv_coord_t col_gap;
-    lv_coord_t row_gap;
     uint8_t col_place;
     uint8_t row_place;
 }lv_grid_t;

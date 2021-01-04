@@ -57,8 +57,6 @@ typedef enum {
 
 typedef struct {
     lv_layout_update_cb_t update_cb; /*The first element must be the update callback*/
-    lv_coord_t item_gap;
-    lv_coord_t track_gap;
     uint32_t dir          :2;
     uint32_t wrap         :1;
     uint32_t rev          :1;

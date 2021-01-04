@@ -83,7 +83,6 @@ typedef struct {
  **********************/
 #if LV_MEM_CUSTOM == 0
     static uint8_t * work_mem;
-    static lv_mem_ent_t  * last_ent;
 #endif
 
 static uint32_t zero_mem;   /*Give the address of this variable if 0 byte should be allocated*/
@@ -336,21 +335,15 @@ void lv_mem_defrag(void)
     lv_mem_ent_t * e_free;
     lv_mem_ent_t * e_next;
     e_free = ent_get_next(NULL);
-    last_ent = NULL;
 
     while(1) {
         /*Search the next free entry*/
         while(e_free != NULL) {
-            if(e_free->header.s.used != 0) {
-                e_free = ent_get_next(e_free);
-            }
-            else {
-                break;
-            }
+            if(e_free->header.s.used != 0) e_free = ent_get_next(e_free);
+            else break;
         }
 
         if(e_free == NULL) return;
-        if(last_ent == NULL) last_ent = e_free;
 
         /*Joint the following free entries to the free*/
         e_next = ent_get_next(e_free);
@@ -797,8 +790,7 @@ static void * alloc_core(size_t size)
 {
     void * alloc = NULL;
 
-//    lv_mem_ent_t * e = NULL;
-    lv_mem_ent_t * e = last_ent;
+    lv_mem_ent_t * e = NULL;
 
     /* Search for a appropriate entry*/
     if(e == NULL) e = ent_get_next(NULL);
@@ -812,7 +804,6 @@ static void * alloc_core(size_t size)
 
         /* End if the alloc. is successful*/
     } while(alloc == NULL);
-    last_ent = e;
 
     return alloc;
 }

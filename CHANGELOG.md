@@ -14,6 +14,7 @@
 - fix(textarea) buffer overflow in password mode with UTF-8 characters
 - fix(textarea) cursor position after hiding character in password mode
 - fix(linemeter) draw critical lines with correct color
+- fix(lv_conf_internal) be sure Kconfig defines are always uppercase
 
 ## v7.8.1 (Plannad at 15.12.2020)
 

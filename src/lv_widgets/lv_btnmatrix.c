@@ -32,7 +32,6 @@
  **********************/
 static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
 static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_style_list_t * lv_btnmatrix_get_style(lv_obj_t * btnm, uint8_t part);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -98,10 +97,6 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->map_p          = NULL;
     ext->recolor        = 0;
     ext->one_check      = 0;
-    lv_style_list_init(&ext->style_btn);
-    lv_style_list_init(&ext->style_btn2);
-    ext->style_btn.ignore_trans = 1;
-    ext->style_btn2.ignore_trans = 1;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(btnm);
 

@@ -77,20 +77,8 @@ const lv_obj_class_t lv_bar  = {
  */
 lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
-    _lv_memset_00(obj, sizeof(lv_obj_t));
-    obj->class_p = &lv_bar;
 
-    if(obj->class_p->ext_size) {
-        obj->ext_attr = lv_mem_alloc(sizeof(lv_bar_ext_t));
-        _lv_memset_00(obj->ext_attr, sizeof(lv_bar_ext_t));
-    }
-
-    lv_bar.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    return obj;
+    return lv_obj_create_from_class(&lv_bar, parent, copy);
 }
 
 /*=====================

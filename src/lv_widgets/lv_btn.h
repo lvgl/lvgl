@@ -27,19 +27,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-LV_CLASS_DECLARE_START(lv_btn, lv_obj);
+typedef struct {
 
-#define _lv_btn_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+}lv_btn_ext_t;
 
-#define _lv_btn_data             \
-  _lv_obj_data                  \
-
-#define _lv_btn_class_dsc        \
-  _lv_obj_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_btn, lv_obj);
-
-extern lv_btn_class_t lv_btn;
+extern const lv_obj_class_t lv_btn;
 
 
 /**********************
