@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.9.0 
+## v7.9.0 (Plann1d at 05.01.2020
 
 ### New features
 - feat(chart) add lv_chart_remove_series and lv_chart_hide_series
@@ -16,8 +16,9 @@
 - fix(textarea) cursor position after hiding character in password mode
 - fix(linemeter) draw critical lines with correct color
 - fix(layout) stop layout after recursion threshold is reached
+- fix(gauge) fix redraw with image needle
 
-## v7.8.1 (Plannad at 15.12.2020)
+## v7.8.1
 
 ### Bugfixes
 - fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
