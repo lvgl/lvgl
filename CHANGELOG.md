@@ -15,8 +15,10 @@
 - fix(textarea) buffer overflow in password mode with UTF-8 characters
 - fix(textarea) cursor position after hiding character in password mode
 - fix(linemeter) draw critical lines with correct color
+- fix(kconfig) handle disable sprintf float correctly.
 - fix(layout) stop layout after recursion threshold is reached
 - fix(gauge) fix redraw with image needle
+
 
 ## v7.8.1
 
