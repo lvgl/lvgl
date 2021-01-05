@@ -28,7 +28,7 @@
 #define LV_OBJX_NAME "lv_cont"
 
 #ifndef LV_LAYOUT_MAX_RECURSION
-#define LV_LAYOUT_MAX_RECURSION 10
+    #define LV_LAYOUT_MAX_RECURSION 10
 #endif
 
 /**********************
@@ -787,7 +787,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 
         /*Do nothing if the coordinates are not changed*/
         if(cont->coords.x1 != new_area.x1 || cont->coords.y1 != new_area.y1 || cont->coords.x2 != new_area.x2 ||
-        cont->coords.y2 != new_area.y2) {
+           cont->coords.y2 != new_area.y2) {
 
             lv_obj_invalidate(cont);
             lv_area_copy(&cont->coords, &new_area);
@@ -808,7 +808,8 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
                 child_i->signal_cb(child_i, LV_SIGNAL_PARENT_SIZE_CHG, &ori);
             }
         }
-    } else {
+    }
+    else {
         LV_LOG_ERROR("LV_LAYOUT_MAX_RECURSION reached! You may have encountered issue #1539.");
     }
 

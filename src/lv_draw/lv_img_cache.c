@@ -37,14 +37,14 @@
  *  STATIC PROTOTYPES
  **********************/
 #if LV_IMG_CACHE_DEF_SIZE == 0
-static lv_img_cache_entry_t cache_temp;
+    static lv_img_cache_entry_t cache_temp;
 #endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 #if LV_IMG_CACHE_DEF_SIZE
-static uint16_t entry_cnt;
+    static uint16_t entry_cnt;
 #endif
 
 /**********************

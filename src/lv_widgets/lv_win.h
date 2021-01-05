@@ -177,7 +177,7 @@ void lv_win_set_anim_time(lv_obj_t * win, uint16_t anim_time);
 void lv_win_set_drag(lv_obj_t * win, bool en);
 
 /**
- * Set alignment of title text in window header. 
+ * Set alignment of title text in window header.
  * @param win pointer to a window object
  * @param alignment set the type of alignment with LV_TXT_FLAGS
  */
@@ -263,7 +263,7 @@ static inline bool lv_win_get_drag(const lv_obj_t * win)
 }
 
 /**
- * Get the current alignment of title text in window header. 
+ * Get the current alignment of title text in window header.
  * @param win pointer to a window object
  */
 uint8_t lv_win_title_get_alignment(lv_obj_t * win);

@@ -641,7 +641,7 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
             ext->pressed_date.year  = ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0);
             ext->pressed_date.month = ext->showed_date.month == 1 ? 12 : (ext->showed_date.month - 1);
             ext->pressed_date.day   = get_month_length(ext->pressed_date.year, ext->pressed_date.month) -
-                    lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) + 1 + i_pos;
+                                      lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) + 1 + i_pos;
         }
         else if(i_pos < (lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) +
                          get_month_length(ext->showed_date.year, ext->showed_date.month))) {

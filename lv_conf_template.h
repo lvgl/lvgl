@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v7.8.1-dev
+ * Configuration file for v7.9.0
  */
 
 /*
