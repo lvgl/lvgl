@@ -27,14 +27,12 @@ Planned to November/December 2020
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
-- Remove the copy paramter from create functions
-- Style selectors and style-based states See [#1832](https://github.com/lvgl/lvgl/issues/1832)
-- Add Object Orianted system [#1919](https://github.com/lvgl/lvgl/issues/1919)
-
-## v8.1
-- Add radio button widget
+- Make the copy paramter obsolate in create functions
+- Optimize and simplifie styles [#1832](https://github.com/lvgl/lvgl/issues/1832)
+- Use a more generic inheritenace [#1919](https://github.com/lvgl/lvgl/issues/1919)
 
 ## v8.x
+- Add radio button widget
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
 
@@ -47,10 +45,8 @@ Planned to November/December 2020
 - Handle stride. See [#1858](https://github.com/lvgl/lvgl/issues/1858)
 - Make gradients more versatile
 - Make image transformations more versatile
-- Allow snapshoting object to tranfrom them as images
+- Allow snapshoting object to tranfrom them to images
 
-## v10
-- Remove property level states
 
 
 ## Ideas

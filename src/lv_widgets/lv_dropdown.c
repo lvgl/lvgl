@@ -303,7 +303,12 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
 
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
-    size_t ins_len = strlen(option);
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
+    size_t ins_len = strlen(option) + 1;
+#else
+    size_t ins_len = _lv_txt_ap_calc_bytes_cnt(option) + 1;
+#endif
+
     size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
     ext->options        = lv_mem_realloc(ext->options, new_len + 1);
     LV_ASSERT_MEM(ext->options);
@@ -331,9 +336,13 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
     char * ins_buf = _lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
     LV_ASSERT_MEM(ins_buf);
     if(ins_buf == NULL) return;
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
     strcpy(ins_buf, option);
-    if(pos < ext->option_cnt)
-        strcat(ins_buf, "\n");
+#else
+    _lv_txt_ap_proc(option, ins_buf);
+#endif
+    if(pos < ext->option_cnt) strcat(ins_buf, "\n");
+
     _lv_txt_ins(ext->options, _lv_txt_encoded_get_char_id(ext->options, insert_pos), ins_buf);
     _lv_mem_buf_release(ins_buf);
 

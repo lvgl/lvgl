@@ -217,7 +217,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     lv_obj_t * act_scr = lv_scr_act();
 
 
-    if(d->del_prev && act_scr != d->scr_to_load) {
+    if(d->del_prev && act_scr != d->scr_to_load && d->scr_to_load) {
         lv_obj_del(act_scr);
         lv_disp_load_scr(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);

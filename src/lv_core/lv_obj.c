@@ -221,8 +221,9 @@ void lv_init(void)
     _lv_indev_init();
 
     _lv_img_decoder_init();
+#if LV_IMG_CACHE_DEF_SIZE
     lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
-
+#endif
     /*Test if the IDE has UTF-8 encoding*/
     char * txt = "Á";
 
@@ -1656,7 +1657,8 @@ void lv_obj_set_parent_event(lv_obj_t * obj, bool en)
 }
 
 /**
- * Set the base direction of the object
+ * Set the base direction of the object.
+ * @note This only works if LV_USE_BIDI is enabled.
  * @param obj pointer to an object
  * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
  */
