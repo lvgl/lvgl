@@ -404,7 +404,7 @@ extern "C" {
  * SPRINTF DISABLE FLOAT
  *-----------------*/
 
-#if CONFIG_LV_CONF_SKIP || LV_CONF_SKIP
+#if defined(CONFIG_LV_CONF_SKIP) || defined(LV_CONF_SKIP)
 #  ifndef LV_SPRINTF_DISABLE_FLOAT
 #    ifndef CONFIG_LV_SPRINTF_DISABLE_FLOAT
 #      define LV_SPRINTF_DISABLE_FLOAT    0
