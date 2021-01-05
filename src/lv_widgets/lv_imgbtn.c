@@ -460,10 +460,10 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Handle the padding of the background*/
-        lv_style_int_t left = lv_obj_get_style_pad_left(imgbtn, LV_IMGBTN_PART_MAIN);
-        lv_style_int_t right = lv_obj_get_style_pad_right(imgbtn, LV_IMGBTN_PART_MAIN);
-        lv_style_int_t top = lv_obj_get_style_pad_top(imgbtn, LV_IMGBTN_PART_MAIN);
-        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_coord_t left = lv_obj_get_style_pad_left(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_coord_t right = lv_obj_get_style_pad_right(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_coord_t top = lv_obj_get_style_pad_top(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_coord_t bottom = lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
 
         lv_coord_t * s = param;
         *s = LV_MATH_MAX(*s, left);

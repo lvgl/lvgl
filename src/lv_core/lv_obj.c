@@ -221,7 +221,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     return lv_obj_create_from_class(&lv_obj, parent, copy);
 }
 
-lv_obj_t * lv_obj_create_from_class(lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
     _lv_memset_00(obj, sizeof(lv_obj_t));
@@ -1301,7 +1301,7 @@ lv_obj_t * _lv_obj_get_focused_obj(const lv_obj_t * obj)
  * @param obj pointer to an object which type should be get
  * @param buf pointer to an `lv_obj_type_t` buffer to store the types
  */
-bool lv_obj_check_type(const lv_obj_t * obj, void * class_p)
+bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p)
 {
     return obj->class_p == class_p ? true : false;
 }

@@ -202,8 +202,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
         const lv_font_t * font = lv_obj_get_style_text_font(img, LV_IMG_PART_MAIN);
-        lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(img, LV_IMG_PART_MAIN);
-        lv_style_int_t line_space = lv_obj_get_style_text_line_space(img, LV_IMG_PART_MAIN);
+        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(img, LV_IMG_PART_MAIN);
+        lv_coord_t line_space = lv_obj_get_style_text_line_space(img, LV_IMG_PART_MAIN);
         lv_point_t size;
         _lv_txt_get_size(&size, src_img, font, letter_space, line_space,
                          LV_COORD_MAX, LV_TXT_FLAG_NONE);
@@ -274,10 +274,10 @@ void lv_img_set_pivot(lv_obj_t * img, lv_coord_t x, lv_coord_t y)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(ext->pivot.x == x && ext->pivot.y == y) return;
 
-    lv_style_int_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+    lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
     transf_zoom = (transf_zoom * ext->zoom) >> 8;
 
-    lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+    lv_coord_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
     transf_angle += ext->angle;
 
     lv_coord_t w = lv_obj_get_width(img);
@@ -315,10 +315,10 @@ void lv_img_set_angle(lv_obj_t * img, int16_t angle)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(angle == ext->angle) return;
 
-    lv_style_int_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+    lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
     transf_zoom = (transf_zoom * ext->zoom) >> 8;
 
-    lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+    lv_coord_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
 
     lv_coord_t w = lv_obj_get_width(img);
     lv_coord_t h = lv_obj_get_height(img);
@@ -358,9 +358,9 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
 
     if(zoom == 0) zoom = 1;
 
-    lv_style_int_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+    lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
 
-    lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+    lv_coord_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
     transf_angle += ext->angle;
 
     lv_coord_t w = lv_obj_get_width(img);
@@ -755,10 +755,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
 
         lv_coord_t * s = param;
-        lv_style_int_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+        lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         transf_zoom = (transf_zoom * ext->zoom) >> 8;
 
-        lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+        lv_coord_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         transf_angle += ext->angle;
 
         /*If the image has angle provide enough room for the rotated corners */
@@ -775,10 +775,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         }
 
         /*Handle the padding of the background*/
-        lv_style_int_t left = lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
-        lv_style_int_t right = lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
-        lv_style_int_t top = lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
-        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
+        lv_coord_t left = lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
+        lv_coord_t right = lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
+        lv_coord_t top = lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
+        lv_coord_t bottom = lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
 
         *s = LV_MATH_MAX(*s, left);
         *s = LV_MATH_MAX(*s, right);
@@ -787,10 +787,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t * info = param;
-        lv_style_int_t zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+        lv_coord_t zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         zoom = (zoom * ext->zoom) >> 8;
 
-        lv_style_int_t angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+        lv_coord_t angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle += ext->angle;
 
         /* If the object is exactly image sized (not cropped, not mosaic) and transformed

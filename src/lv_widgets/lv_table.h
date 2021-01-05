@@ -28,25 +28,12 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_TABLE_COL_MAX
-#define LV_TABLE_COL_MAX 12
-#endif
-
-/*
-   Maximum allowable value of LV_TABLE_CELL_STYLE_CNT is 16
-   because of restriction of lv_table_cell_format_t.type to no more than
-   4 bits so that lv_table_cell_format_t.s will not exceed 8 bits
-*/
-#ifndef LV_TABLE_CELL_STYLE_CNT
-#  define LV_TABLE_CELL_STYLE_CNT 4
-#endif
-#if (LV_TABLE_CELL_STYLE_CNT > 16)
-#  error "LV_TABLE_CELL_STYLE_CNT cannot exceed 16"
-#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef bool (*lv_table_cell_drawer_cb_t)(lv_obj_t * table, uint32_t row, uint32_t cell, lv_draw_rect_dsc_t * rect_draw_dsc, lv_draw_label_dsc_t * label_draw_dsc, const lv_area_t * draw_area, const lv_area_t * clip_area);
 
 /**
  * Internal table cell format structure.
@@ -57,7 +44,6 @@ typedef union {
     struct {
         uint8_t align : 2;
         uint8_t right_merge : 1;
-        uint8_t type : 4; // upto 16 values
         uint8_t crop : 1;
     } s;
     uint8_t format_byte;
@@ -70,20 +56,11 @@ typedef struct {
     uint16_t row_cnt;
     char ** cell_data;
     lv_coord_t * row_h;
-    lv_style_list_t cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t * col_w;
-    uint16_t cell_types : LV_TABLE_CELL_STYLE_CNT; /*Keep track which cell types exists to avoid dealing with unused ones*/
+    lv_table_cell_drawer_cb_t drawer_cb;
 } lv_table_ext_t;
 
-/*Parts of the table*/
-enum {
-    LV_TABLE_PART_BG,     /* Because of this member, LV_PART.*CELL1 has enum value of 1,        */
-    LV_TABLE_PART_CELL1,  /*   LV_PART.*CELL2 has an enum value of 2 and so on upto the maximum */
-    LV_TABLE_PART_CELL2,  /*   number of styles specified by LV_TABLE_CELL_STYLE_CNT            */
-    LV_TABLE_PART_CELL3,
-    LV_TABLE_PART_CELL4,  /* CELL 5-16 are not needed to be defined, the values in this enum
-                             are there for backward compatibility */
-};
+extern const lv_obj_class_t lv_table;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -152,15 +129,6 @@ void lv_table_set_col_width(lv_obj_t * table, uint16_t col_id, lv_coord_t w);
 void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_label_align_t align);
 
 /**
- * Set the type of a cell.
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @param type 1,2,3 or 4. The cell style will be chosen accordingly.
- */
-void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_t type);
-
-/**
  * Set the cell crop. (Don't adjust the height of the cell according to its content)
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
@@ -177,6 +145,8 @@ void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool c
  * @param en true: merge right; false: don't merge right
  */
 void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col, bool en);
+
+void lv_table_set_cell_drawer(lv_obj_t * obj, lv_table_cell_drawer_cb_t drawer_cb);
 
 /*=====================
  * Getter functions

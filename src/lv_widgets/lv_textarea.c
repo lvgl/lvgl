@@ -1160,7 +1160,7 @@ void lv_textarea_cursor_down(lv_obj_t * ta)
 
     /*Increment the y with one line and keep the valid x*/
 
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
     const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y += font_h + line_space + 1;
@@ -1192,7 +1192,7 @@ void lv_textarea_cursor_up(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, lv_textarea_get_cursor_pos(ta), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
     const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y -= font_h + line_space - 1;
@@ -1277,8 +1277,8 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
             if(ext->one_line) {
-                lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_MAIN);
-                lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_MAIN);
+                lv_coord_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_MAIN);
+                lv_coord_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_MAIN);
                 const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
 
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
@@ -1501,7 +1501,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
 
     uint32_t cur_pos = lv_textarea_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);
@@ -1549,10 +1549,10 @@ static void refr_cursor_area(lv_obj_t * ta)
     ext->cursor.txt_byte_pos = byte_pos;
 
     /*Calculate the cursor according to its type*/
-    lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
-    lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_CURSOR);
-    lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
-    lv_style_int_t right = lv_obj_get_style_pad_right(ta, LV_TEXTAREA_PART_CURSOR);
+    lv_coord_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
+    lv_coord_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_CURSOR);
+    lv_coord_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
+    lv_coord_t right = lv_obj_get_style_pad_right(ta, LV_TEXTAREA_PART_CURSOR);
 
     lv_area_t cur_area;
     cur_area.x1 = letter_pos.x - left;
@@ -1774,8 +1774,8 @@ static void draw_cursor(lv_obj_t * ta, const lv_area_t * clip_area)
     _lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
     if(cur_dsc.bg_opa == LV_OPA_COVER) {
-        lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
-        lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
+        lv_coord_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
+        lv_coord_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
         cur_area.x1 += left;
         cur_area.y1 += top;
 

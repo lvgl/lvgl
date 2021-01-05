@@ -162,6 +162,7 @@ enum {
     LV_STATE_PRESSED  =  0x10,
     LV_STATE_SCROLLED =  0x20,
     LV_STATE_DISABLED =  0x40,
+    LV_STATE_USER     =  0x80,  /** Free to use by the user */
 };
 
 typedef uint8_t lv_state_t;
@@ -176,15 +177,27 @@ enum {
     LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),
     LV_OBJ_FLAG_SCROLL_STOP     = (1 << 7),
     LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8), /** Allow propagating the scroll to a parent */
-    LV_OBJ_FLAG_SNAPABLE        = (1 << 9),
-    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 10),
-    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 11),
-    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 12),
-    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 13),
-    LV_OBJ_FLAG_SCROLL_ON_FOCUS    = (1 << 14), /** Automatically scroll the focused object's ancestors to make the focused object visible*/
+    LV_OBJ_FLAG_SCROLL_ON_FOCUS = (1 << 9), /** Automatically scroll the focused object's ancestors to make the focused object visible*/
+    LV_OBJ_FLAG_SNAPABLE        = (1 << 10),
+    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 11),
+    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 12),
+    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13),
+    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14),
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15),
+    LV_OBJ_FLAG_LAYOUT_1        = (1 << 16), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_2        = (1 << 17), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_3        = (1 << 18), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_4        = (1 << 19), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_WIDGET_1        = (1 << 20), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_2        = (1 << 21), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_3        = (1 << 22), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_4        = (1 << 23), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_USER_1          = (1 << 24), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_2          = (1 << 25), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_3          = (1 << 26), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_4          = (1 << 27), /** Custom flag, free to use by user*/
 };
-typedef uint16_t lv_obj_flag_t;
+typedef uint32_t lv_obj_flag_t;
 
 
 #include "lv_obj_pos.h"
@@ -253,10 +266,27 @@ enum {
     LV_PART_CONTENT,
     LV_PART_INDICATOR,
     LV_PART_KNOB,
+    LV_PART_HIGHLIGHT,
     LV_PART_PLACEHOLDER,
     LV_PART_CURSOR,
-    LV_PART_HIGHLIGHT,
-    LV_PART_MARKER,
+    LV_PART_ITEM,
+
+    LV_PART_CUSTOM_1,
+    LV_PART_CUSTOM_2,
+    LV_PART_CUSTOM_3,
+    LV_PART_CUSTOM_4,
+    LV_PART_CUSTOM_5,
+    LV_PART_CUSTOM_6,
+    LV_PART_CUSTOM_7,
+    LV_PART_CUSTOM_8,
+    LV_PART_CUSTOM_9,
+    LV_PART_CUSTOM_10,
+    LV_PART_CUSTOM_11,
+    LV_PART_CUSTOM_12,
+    LV_PART_CUSTOM_13,
+    LV_PART_CUSTOM_14,
+    LV_PART_CUSTOM_15,
+    LV_PART_CUSTOM_16,
 };
 
 typedef uint8_t lv_part_t;
@@ -301,7 +331,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 
-lv_obj_t * lv_obj_create_from_class(lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
@@ -683,7 +713,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point);
  */
 void * lv_obj_get_ext_attr(const lv_obj_t * obj);
 
-bool lv_obj_check_type(const lv_obj_t * obj, void * class_p);
+bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p);
 
 #if LV_USE_USER_DATA
 /**

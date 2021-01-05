@@ -72,7 +72,7 @@ static void empty_style(void)
     lv_style_list_init(&style_list);
 
     lv_res_t found;
-    lv_style_int_t value;
+    lv_coord_t value;
     lv_opa_t opa;
     const void * ptr;
     lv_color_t color;
@@ -107,7 +107,7 @@ static void add_remove_read_prop(void)
     _lv_style_list_add_style(&style_list, &style);
 
     lv_res_t found;
-    lv_style_int_t value;
+    lv_coord_t value;
     lv_opa_t opa;
     const void * ptr;
     lv_color_t color;
@@ -185,7 +185,7 @@ static void cascade(void)
     _lv_style_list_add_style(&style_list, &style_second);
 
     lv_res_t found;
-    lv_style_int_t value;
+    lv_coord_t value;
     lv_opa_t opa;
     const void * ptr;
     lv_color_t color;
@@ -281,7 +281,7 @@ static void copy(void)
     lv_style_copy(&style_dest, &style_src);
 
     int16_t weight;
-    lv_style_int_t value;
+    lv_coord_t value;
 
     weight = _lv_style_get_int(&style_dest, LV_STYLE_TEXT_LINE_SPACE, &value);
     lv_test_assert_int_eq(0, weight, "Get a copied property from a style");
@@ -336,7 +336,7 @@ static void states(void)
     _lv_style_set_int(&style_first, LV_STYLE_TEXT_LINE_SPACE | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, 7);
 
     lv_res_t found;
-    lv_style_int_t value;
+    lv_coord_t value;
 
     found = _lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'int' property in normal state");

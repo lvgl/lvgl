@@ -42,9 +42,10 @@ enum {
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< Button *can* be toggled. */
     LV_BTNMATRIX_CTRL_CHECKED    = 0x0080, /**< Button is currently toggled (e.g. checked). */
     LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
-    LV_BTNMATRIX_CTRL_TYPE_2 =     0x0200, /**< Render the button with `LV_BTNMATRIX_PART_BTN2` style*/
 };
 typedef uint16_t lv_btnmatrix_ctrl_t;
+
+typedef bool (*lv_btnmatrix_btn_drawer_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area, const lv_area_t * clip_area);
 
 /*Data of button matrix*/
 typedef struct {
@@ -53,6 +54,7 @@ typedef struct {
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
+    lv_btnmatrix_btn_drawer_cb_t custom_drawer_cb;
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNMATRIX_BTN_NONE*/
     uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNMATRIX_BTN_NONE*/
@@ -62,12 +64,8 @@ typedef struct {
     uint8_t align : 2;      /*Align type from 'lv_label_align_t'*/
 } lv_btnmatrix_ext_t;
 
-enum {
-    LV_BTNMATRIX_PART_MAIN,
-    LV_BTNMATRIX_PART_BTN,
-    LV_BTNMATRIX_PART_BTN_2,
-};
-typedef uint8_t lv_btnmatrix_part_t;
+
+extern const lv_obj_class_t lv_btnmatrix;
 
 /**********************
  * GLOBAL PROTOTYPES

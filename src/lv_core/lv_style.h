@@ -646,7 +646,7 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
     lv_style_set_pad_right(style, value);
 }
 
-//static inline void lv_style_set_pad_ver(lv_style_t * style, lv_style_int_t value)
+//static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)
 //{
 //    lv_style_set_pad_top(style, state, value);
 //    lv_style_set_pad_bottom(style, state, value);
@@ -654,7 +654,7 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 
 //
 //static inline void lv_obj_set_style_margin_all(lv_obj_t * obj, uint8_t part, lv_state_t state,
-//                                                     lv_style_int_t value)
+//                                                     lv_coord_t value)
 //{
 //    lv_obj_set_style_local_margin_top(obj, part, state, value);
 //    lv_obj_set_style_local_margin_bottom(obj, part, state, value);
@@ -663,7 +663,7 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 //}
 //
 //
-//static inline void lv_style_set_margin_all(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+//static inline void lv_style_set_margin_all(lv_style_t * style, lv_state_t state, lv_coord_t value)
 //{
 //    lv_style_set_margin_top(style, state, value);
 //    lv_style_set_margin_bottom(style, state, value);
@@ -673,14 +673,14 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 //
 //
 //static inline void lv_obj_set_style_local_margin_hor(lv_obj_t * obj, uint8_t part, lv_state_t state,
-//                                                     lv_style_int_t value)
+//                                                     lv_coord_t value)
 //{
 //    lv_obj_set_style_local_margin_left(obj, part, state, value);
 //    lv_obj_set_style_local_margin_right(obj, part, state, value);
 //}
 //
 //
-//static inline void lv_style_set_margin_hor(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+//static inline void lv_style_set_margin_hor(lv_style_t * style, lv_state_t state, lv_coord_t value)
 //{
 //    lv_style_set_margin_left(style, state, value);
 //    lv_style_set_margin_right(style, state, value);
@@ -688,14 +688,14 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 //
 //
 //static inline void lv_obj_set_style_local_margin_ver(lv_obj_t * obj, uint8_t part, lv_state_t state,
-//                                                     lv_style_int_t value)
+//                                                     lv_coord_t value)
 //{
 //    lv_obj_set_style_local_margin_top(obj, part, state, value);
 //    lv_obj_set_style_local_margin_bottom(obj, part, state, value);
 //}
 //
 //
-//static inline void lv_style_set_margin_ver(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+//static inline void lv_style_set_margin_ver(lv_style_t * style, lv_state_t state, lv_coord_t value)
 //{
 //    lv_style_set_margin_top(style, state, value);
 //    lv_style_set_margin_bottom(style, state, value);

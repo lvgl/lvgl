@@ -308,9 +308,9 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 {
     lv_linemeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
 
-    lv_style_int_t left = lv_obj_get_style_pad_left(lmeter, LV_LINEMETER_PART_MAIN);
-    lv_style_int_t right = lv_obj_get_style_pad_right(lmeter, LV_LINEMETER_PART_MAIN);
-    lv_style_int_t top = lv_obj_get_style_pad_top(lmeter, LV_LINEMETER_PART_MAIN);
+    lv_coord_t left = lv_obj_get_style_pad_left(lmeter, LV_LINEMETER_PART_MAIN);
+    lv_coord_t right = lv_obj_get_style_pad_right(lmeter, LV_LINEMETER_PART_MAIN);
+    lv_coord_t top = lv_obj_get_style_pad_top(lmeter, LV_LINEMETER_PART_MAIN);
 
     lv_coord_t r_out = (lv_obj_get_width(lmeter) - left - right) / 2 ;
     lv_coord_t r_in  = r_out - lv_obj_get_style_scale_width(lmeter, part);
@@ -335,7 +335,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     line_dsc.raw_end = 1;
 #endif
 
-    lv_style_int_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
+    lv_coord_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
 
 #if LV_LINEMETER_PRECISE > 0
     lv_area_t mask_area;
@@ -467,8 +467,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 #endif
 
     if(part == LV_LINEMETER_PART_MAIN && level < ext->line_cnt - 1) {
-        lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
-        lv_style_int_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
+        lv_coord_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
+        lv_coord_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
 
         if(border_width || end_border_width) {
             int16_t end_angle = ((level) * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;

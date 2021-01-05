@@ -124,6 +124,9 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
     if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
 
+    obj->w_set = w;
+    obj->h_set = h;
+
     /*Calculate the required auto sizes*/
     bool x_auto = obj->w_set == LV_SIZE_AUTO ? true : false;
     bool y_auto = obj->h_set == LV_SIZE_AUTO ? true : false;
