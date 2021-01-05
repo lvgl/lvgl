@@ -88,7 +88,7 @@ def lv_examples_release(ver):
     
     com.update_version(ver)
     
-    com.cmd("sed -i -r 's/LV_VERSION_CHECK\([0-9]+, *[0-9]+, *[0-9]+\)/"+ "LV_VERSION_CHECK(" + str(ver[0]) + ", " + str(ver[1]) + ", " + str(ver[2]) + ")/' lv_examples.h")
+    com.cmd("sed -i -r 's/LV_VERSION_CHECK\([0-9]+, *[0-9]+, *[0-9]+\)/"+ "LV_VERSION_CHECK\(" + str(ver[0]) + ", " + str(ver[1]) + ", " + str(ver[2]) + ")/' lv_examples.h")
     
     com.cmd('git commit -am "Release ' + ver_str + '"')
     com.cmd("git tag -a " + ver_str + " -m 'Release " + ver_str + "' ") 
