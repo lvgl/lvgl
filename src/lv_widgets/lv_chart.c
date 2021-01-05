@@ -217,7 +217,7 @@ void lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * series)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
     LV_ASSERT_NULL(series);
-    
+
     if(chart == NULL || series == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(!series->ext_buf_assigned && series->points) lv_mem_free(series->points);
@@ -1180,7 +1180,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
     /*Go through all data lines*/
     _LV_LL_READ_BACK(ext->series_ll, ser) {
-    	if (ser->hidden) continue;
+        if(ser->hidden) continue;
         line_dsc.color = ser->color;
         point_dsc.bg_color = ser->color;
         area_dsc.bg_color = ser->color;
@@ -1317,7 +1317,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
 
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(ext->series_ll, ser) {
-        	if (ser->hidden) continue;
+            if(ser->hidden) continue;
             lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;

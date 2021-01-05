@@ -656,7 +656,7 @@ static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, co
 
 static void draw_cleanup(lv_img_cache_entry_t * cache)
 {
-/*Automatically close images with no caching*/
+    /*Automatically close images with no caching*/
 #if LV_IMG_CACHE_DEF_SIZE == 0
     lv_img_decoder_close(&cache->dec_dsc);
 #else
