@@ -1,5 +1,10 @@
 # Changelog
 
+## v7.9.1 (Planned at 19.01.2020
+
+### Bugfixes
+- fix(cpicker) fix division by zero 
+
 ## v7.9.0 (Plann1d at 05.01.2020
 
 ### New features
