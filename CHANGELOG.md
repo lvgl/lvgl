@@ -4,6 +4,7 @@
 
 ### Bugfixes
 - fix(cpicker) fix division by zero 
+- fix(dropdown) fix selecting options after the last one 
 
 ## v7.9.0 (Plann1d at 05.01.2020
 
