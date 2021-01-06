@@ -579,6 +579,7 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     }
 
     lv_coord_t grad_w = lv_area_get_width(&grad_area);
+    if(grad_w < 1) return;
     uint16_t i_step = LV_MATH_MAX(LV_CPICKER_DEF_QF, 360 / grad_w);
     bg_dsc.radius = 0;
     bg_dsc.border_width = 0;

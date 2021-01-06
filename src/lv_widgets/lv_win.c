@@ -607,7 +607,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
                 txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
                 txt_area.y2 = txt_area.y1 + txt_size.y;
                 break;
-            case LV_TXT_FLAG_FIT || LV_TXT_FLAG_EXPAND:
+            case LV_TXT_FLAG_FIT:
+            case LV_TXT_FLAG_EXPAND:
                 txt_area.x1 = header->coords.x1;
                 txt_area.x2 = header->coords.x2;
                 txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
