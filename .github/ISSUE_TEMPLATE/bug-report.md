@@ -7,23 +7,36 @@ assignees: ''
 
 ---
 
-> # Important: issues that don't use this template will be ignored/closed.
+<!-- 
+IMPORTANT
+Issues that don't use this template will be ignored and closed.
+-->
+
+**Perform all steps below and tick them with [x]**
+- [ ] Update lvgl to the latest version
+- [ ] Reproduce the issue in a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html)
 
 **Describe the bug**
-
-A clear and concise description of what the bug is.
+<!-- 
+A clear and concise description of what the bug is. 
+-->
 
 **To Reproduce**
-
-Please provide a small, independent code sample that can be used to reproduce the issue. Ideally this should work in the PC simulator unless the problem is specific to one platform.
+<!--
+Provide a small, independent code sample that can be used to reproduce the issue. 
+Ideally this should work in the PC simulator unless the problem is specific to a platform.
+Format the code like this:
+```c
+your code here
+```
+-->
 
 **Expected behavior**
+<!-- 
+A clear and concise description of what you expected to happen. 
+-->
 
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
+**Screenshots or video**
+<!--
 If applicable, add screenshots to help explain your problem.
-
-**Additional context**
-
-Add any other context about the problem here.
+-->
