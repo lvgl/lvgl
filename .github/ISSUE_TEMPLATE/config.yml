@@ -5,7 +5,7 @@ contact_links:
     about: Be sure to read to documentation first
   - name: Forum
     url: https://forum.lvgl.io
-    about: For topics like: How-to, Getting started, Feature request
+    about: For topics like How-to, Getting started, Feature request
   - name: CONTIBUTING.md
     url: https://github.com/lvgl/lvgl/blob/master/docs/CONTRIBUTING.md#faq-about-contributing
     about: The basic rules of contributing
