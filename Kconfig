@@ -50,9 +50,11 @@ menu "LVGL configuration"
 
     config LV_COLOR_16_SWAP
         bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
+        depends on LV_COLOR_DEPTH_16
 
     config LV_COLOR_SCREEN_TRANSP
         bool "Enable screen transparency."
+        depends on LV_COLOR_DEPTH_32
         help
             Useful for OSD or other overlapping GUIs.
             Requires `LV_COLOR_DEPTH = 32` colors and the screen's style
@@ -208,6 +210,7 @@ menu "LVGL configuration"
             bool "Enable STM32 DMA2D."
         config LV_GPU_DMA2D_CMSIS_INCLUDE
             string "include path of CMSIS header of target processor"
+            depends on LV_USE_GPU_STM32_DMA2D
             default ""
             help
                 e.g. "stm32f769xx.h" or "stm32f429xx.h"
@@ -215,6 +218,7 @@ menu "LVGL configuration"
             bool "Use PXP for CPU off-load on NXP RTxxx platforms."
         config LV_USE_GPU_NXP_PXP_AUTO_INIT
             bool "Call lv_gpu_nxp_pxp_init() automatically or manually."
+            depends on LV_USE_GPU_NXP_PXP
             help
                 1: Add default bare metal and FreeRTOS interrupt handling
                 routines for PXP (lv_gpu_nxp_pxp_osa.c) and call
@@ -893,16 +897,16 @@ menu "LVGL configuration"
         config LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
             int "Min num chars before break"
             default 3
+            depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
             help
                 Minimum number of characters in a long word to put on a line before a break.
-                Depends on LV_TXT_LINE_BREAK_LONG_LEN
 
         config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
             int "Min num chars after break"
             default 3
+            depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
             help
                 Minimum number of characters in a long word to put on a line after a break.
-                Depends on LV_TXT_LINE_BREAK_LONG_LEN
 
         config LV_TXT_COLOR_CMD
             string "The control character to use for signalling text recoloring"
@@ -976,6 +980,7 @@ menu "LVGL configuration"
            default y if !LV_CONF_MINIMAL
        config LV_CALENDAR_WEEK_STARTS_MONDAY
            bool "Calendar week starts monday."
+           depends on LV_USE_CALENDAR
        config LV_USE_CANVAS
            bool "Canvas. Dependencies: lv_img."
            select LV_USE_IMG
@@ -1033,13 +1038,17 @@ menu "LVGL configuration"
        config LV_LABEL_DEF_SCROLL_SPEED
            int "Hor. or ver. scroll speed [px/sec] in LV_LABEL_LONG_ROLL/ROLL_CIRC mode."
            default 25
+           depends on LV_USE_LABEL
        config LV_LABEL_WAIT_CHAR_COUNT
            int "Waiting period at beginning/end of animation cycle."
            default 3
+           depends on LV_USE_LABEL
        config LV_LABEL_TEXT_SEL
            bool "Enable selecting text of the label."
+           depends on LV_USE_LABEL
        config LV_LABEL_LONG_TXT_HINT
            bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
+           depends on LV_USE_LABEL
        config LV_USE_LED
            bool "LED."
            default y if !LV_CONF_MINIMAL
@@ -1047,10 +1056,12 @@ menu "LVGL configuration"
            int "LED minimal brightness."
            range 0 255
            default 120
+           depends on LV_USE_LED
        config LV_LED_BRIGHT_MAX
            int "LED maximal brightness."
            range 0 255
            default 255
+           depends on LV_USE_LED
        config LV_USE_LINE
            bool "Line."
            default y if !LV_CONF_MINIMAL
@@ -1064,12 +1075,14 @@ menu "LVGL configuration"
        config LV_LIST_DEF_ANIM_TIME
            int "List default animation time of focusing to a list element [ms]. 0: no animation."
            default 100
+           depends on LV_USE_LIST
        config LV_USE_LINEMETER
            bool "Line meter."
            default y if !LV_CONF_MINIMAL
        choice
            prompt "Draw line more precisely at cost of performance."
            default LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
+           depends on LV_USE_LINEMETER
            config LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
                bool "0: No extra precision."
            config LV_LINEMETER_PRECISE_SOME_EXTRA_PRECISION
@@ -1093,6 +1106,7 @@ menu "LVGL configuration"
        config LV_PAGE_DEF_ANIM_TIME
            int "Focus default animation time [ms]. 0: No animation."
            default 100
+           depends on LV_USE_PAGE
        config LV_USE_SPINNER
            bool "Spinner. Dependencies: lv_arc, lv_anim."
            select LV_USE_ARC
@@ -1101,12 +1115,15 @@ menu "LVGL configuration"
        config LV_SPINNER_DEF_ARC_LENGTH
            int "Spinner def. arc length [deg]."
            default 60
+           depends on LV_USE_SPINNER
        config LV_SPINNER_DEF_SPIN_TIME
            int "Spinner def. spin time [ms]."
            default 1000
+           depends on LV_USE_SPINNER
        choice
            prompt "Type of spinner (animation type)."
            default LV_SPINNER_TYPE_SPINNING_ARC
+           depends on LV_USE_SPINNER
            config LV_SPINNER_TYPE_SPINNING_ARC
                bool "0: Spinner type spinning arc."
            config LV_SPINNER_TYPE_FILLSPIN_ARC
@@ -1121,9 +1138,11 @@ menu "LVGL configuration"
        config LV_ROLLER_DEF_ANIM_TIME
            int "Focus animation time [ms]. 0: no animation."
            default 200
+           depends on LV_USE_ROLLER
        config LV_ROLLER_INF_PAGES
            int "Number of extra 'pages' when the controller is infinite."
            default 7
+           depends on LV_USE_ROLLER
        config LV_USE_SLIDER
            bool "Slider. Dependencies: lv_bar."
            select LV_USE_BAR
@@ -1144,9 +1163,11 @@ menu "LVGL configuration"
        config LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
            int "Text area def. cursor blink time [ms]."
            default 400
+           depends on LV_USE_TEXTAREA
        config LV_TEXTAREA_DEF_PWN_SHOW_TIME
            int "Text area def. pwn show time [ms]."
            default 1500
+           depends on LV_USE_TEXTAREA
        config LV_USE_TABLE
            bool "Table. Dependencies: lv_label."
            select LV_USE_LABEL
@@ -1154,9 +1175,11 @@ menu "LVGL configuration"
        config LV_TABLE_COL_MAX
            int "Table col max."
            default 12
+           depends on LV_USE_TABLE
        config LV_TABLE_CELL_STYLE_CNT
            int "Table cell style count."
            default 4
+           depends on LV_USE_TABLE
        config LV_USE_TABVIEW
            bool "Tab. Dependencies: lv_page, lv_btnm."
            select LV_USE_PAGE
@@ -1165,6 +1188,7 @@ menu "LVGL configuration"
        config LV_TABVIEW_DEF_ANIM_TIME
            int "Time of slide animation [ms]. 0: No animation."
            default 300
+           depends on LV_USE_TABVIEW
        config LV_USE_TILEVIEW
            bool "Tileview. Dependencies: lv_page."
            select LV_USE_PAGE
@@ -1172,6 +1196,7 @@ menu "LVGL configuration"
        config LV_TILEVIEW_DEF_ANIM_TIME
            int "Time of slide animation [ms]. 0: No animation."
            default 300
+           depends on LV_USE_TILEVIEW
        config LV_USE_WIN
            bool "Window. Dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page."
            select LV_USE_CONT
