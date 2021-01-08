@@ -1,7 +1,7 @@
 # Kconfig file for LVGL v7.8.1
 
 menu "LVGL configuration"
-    
+
     config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
         bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
         help
@@ -47,7 +47,7 @@ menu "LVGL configuration"
         default 8 if LV_COLOR_DEPTH_8
         default 16 if LV_COLOR_DEPTH_16
         default 32 if LV_COLOR_DEPTH_32
-    
+
     config LV_COLOR_16_SWAP
         bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
 
@@ -95,7 +95,7 @@ menu "LVGL configuration"
             According to the width of the display (hor. res. / dpi) the
             displays fall in 4 categories. This is the upper limit for medium
             displays.
-    
+
     config LV_DISP_LARGE_LIMIT
         int "Large display limit"
         default 70
@@ -103,7 +103,7 @@ menu "LVGL configuration"
             According to the width of the display (hor. res. / dpi) the
             displays fall in 4 categories. This is the upper limit for large
             displays.
-    
+
     menu "Memory manager settings"
     config LV_MEM_CUSTOM
 	    bool
@@ -118,13 +118,13 @@ menu "LVGL configuration"
     config LV_MEM_CUSTOM_ALLOC
         string
         prompt "Wrapper to malloc"
-        default "malloc" 
+        default "malloc"
         depends on LV_MEM_CUSTOM
 
     config LV_MEM_CUSTOM_FREE
         string
         prompt "Wrapper to free"
-        default "free" 
+        default "free"
         depends on LV_MEM_CUSTOM
 
 	config LV_MEM_SIZE_BYTES
@@ -138,7 +138,7 @@ menu "LVGL configuration"
         bool
         prompt "Use the standard memcpy and memset instead of LVGL's own functions"
     endmenu
-    
+
     menu "Indev device settings"
         config LV_INDEV_DEF_READ_PERIOD
             int "Input device read period [ms]."
@@ -163,7 +163,7 @@ menu "LVGL configuration"
             default 3
 
     endmenu
-    
+
     menu "Feature usage"
         config LV_USE_ANIMATION
             bool "Enable the Animations."
@@ -251,7 +251,7 @@ menu "LVGL configuration"
             bool "Use the functions and types from the older (v7) API if possible."
             default y if !LV_CONF_MINIMAL
     endmenu
-    
+
     menu "Image decoder and cache"
         config LV_IMG_CF_INDEXED
             bool "Enable indexed (pallete) images."
@@ -280,7 +280,7 @@ menu "LVGL configuration"
 
     menu "HAL Settings"
         config LV_TICK_CUSTOM
-            bool 
+            bool
             prompt "Use a custom tick source"
 
         config LV_TICK_CUSTOM_INCLUDE
@@ -308,13 +308,13 @@ menu "LVGL configuration"
 
             config LV_LOG_LEVEL_TRACE
                 bool "Trace - Detailed information"
-            config LV_LOG_LEVEL_INFO 
+            config LV_LOG_LEVEL_INFO
                 bool "Info  - Log important events"
-            config LV_LOG_LEVEL_WARN 
+            config LV_LOG_LEVEL_WARN
                 bool "Warn  - Log if something unwanted happened"
             config LV_LOG_LEVEL_ERROR
                 bool "Error - Only critical issues"
-            config LV_LOG_LEVEL_NONE 
+            config LV_LOG_LEVEL_NONE
                 bool "None  - Do not log anything"
         endchoice
 
@@ -330,15 +330,15 @@ menu "LVGL configuration"
         config LV_LOG_PRINTF
             bool "Print the log with 'printf'" if LV_USE_LOG
             help
-                Use printf for log output. 
+                Use printf for log output.
                 If not set the user needs to register a callback with `lv_log_register_print_cb`.
 
     endmenu
-    
+
     menu "Debug Settings"
         config LV_USE_DEBUG
             bool "Enable Debug"
-        
+
         config LV_USE_ASSERT_NULL
             bool "Check if the parameter is NULL. (Quite fast)"
             default y if !LV_CONF_MINIMAL
@@ -349,21 +349,21 @@ menu "LVGL configuration"
 
         config LV_USE_ASSERT_MEM_INTEGRITY
             bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
-            
+
         config LV_USE_ASSERT_STR
             bool "Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)"
-            help 
+            help
                 If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled).
-            
+
         config LV_USE_ASSERT_OBJ
             bool "Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)."
-            help 
+            help
                 If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled)
-            
+
         config LV_USE_ASSERT_STYLE
             bool "Check if the styles are properly initialized. (Fast)"
     endmenu
-    
+
     menu "Font usage"
         config LV_FONT_FMT_TXT_LARGE
             bool "Enable it if you have fonts with a lot of characters."
@@ -378,7 +378,7 @@ menu "LVGL configuration"
                 Set the pixel order of the display.
                 Important only if "subpx fonts" are used.
                 With "normal" font it doesn't matter.
-        
+
         menu "Enable built-in fonts"
             config LV_FONT_MONTSERRAT_8
                 bool "Enable Montserrat 8"
@@ -527,7 +527,7 @@ menu "LVGL configuration"
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
         endchoice
-        
+
         choice LV_FONT_DEFAULT_NORMAL
             prompt "Select theme default normal font"
             default LV_FONT_DEFAULT_NORMAL_MONTSERRAT_16 if !LV_CONF_MINIMAL
@@ -617,7 +617,7 @@ menu "LVGL configuration"
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
         endchoice
-        
+
         choice LV_FONT_DEFAULT_SUBTITLE
             prompt "Select theme default subtitle font"
             default LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_16 if !LV_CONF_MINIMAL
@@ -707,7 +707,7 @@ menu "LVGL configuration"
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
         endchoice
-        
+
         choice LV_FONT_DEFAULT_TITLE
             prompt "Select theme default title font"
             default LV_FONT_DEFAULT_TITLE_MONTSERRAT_16 if !LV_CONF_MINIMAL
@@ -830,7 +830,7 @@ menu "LVGL configuration"
                 bool "Default init for mono theme"
                 select LV_THEME_MONO
         endchoice
-        
+
         config LV_THEME_DEFAULT_COLOR_PRIMARY
             hex "Select theme default primary color"
             range 0x000000 0xFFFFFF
@@ -849,7 +849,7 @@ menu "LVGL configuration"
 
         choice LV_THEME_DEFAULT_FLAG
             depends on LV_THEME_MATERIAL
-            
+
             prompt "Select theme default flag"
             default LV_THEME_DEFAULT_FLAG_LIGHT
             help
@@ -882,39 +882,39 @@ menu "LVGL configuration"
         config LV_TXT_BREAK_CHARS
             string "Can break (wrap) texts on these chars"
             default " ,.;:-_"
-        
+
         config LV_TXT_LINE_BREAK_LONG_LEN
             int "Line break long length"
             default 0
             help
-                If a word is at least this long, will break wherever 'prettiest'. 
+                If a word is at least this long, will break wherever 'prettiest'.
                 To disable, set to a value <= 0.
-        
+
         config LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
             int "Min num chars before break"
             default 3
             help
                 Minimum number of characters in a long word to put on a line before a break.
                 Depends on LV_TXT_LINE_BREAK_LONG_LEN
-                
+
         config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
             int "Min num chars after break"
             default 3
             help
                 Minimum number of characters in a long word to put on a line after a break.
                 Depends on LV_TXT_LINE_BREAK_LONG_LEN
-                        
+
         config LV_TXT_COLOR_CMD
             string "The control character to use for signalling text recoloring"
             default "#"
 
         config LV_USE_BIDI
             bool "Support bidirectional texts"
-            help 
+            help
                 Allows mixing Left-to-Right and Right-to-Left texts.
                 The direction will be processed according to the Unicode Bidirectional Algorithm:
                 https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
-        
+
         choice
             prompt "Set the default BIDI direction"
             default LV_BIDI_DIR_AUTO
@@ -930,7 +930,7 @@ menu "LVGL configuration"
 
         config LV_USE_ARABIC_PERSIAN_CHARS
             bool "Enable Arabic/Persian processing"
-            help 
+            help
                 In these languages characters should be replaced with
                 an other form based on their position in the text.
 
@@ -938,14 +938,14 @@ menu "LVGL configuration"
         bool "Change the built-in (v)snprintf functions"
 
         config LV_SPRINTF_DISABLE_FLOAT
-            bool "Disable float in built-in (v)snprintf functions" if !LV_SPRINTF_CUSTOM 
+            bool "Disable float in built-in (v)snprintf functions" if !LV_SPRINTF_CUSTOM
     endmenu
 
     menu "Widgets"
         config LV_USE_OBJ_REALIGN
             bool "Enable `lv_obj_realign()` based on `lv_obj_align()` parameters."
             default y if !LV_CONF_MINIMAL
-        
+
         choice
             prompt "Enable to make the object clickable on a larger area."
             default LV_USE_EXT_CLICK_AREA_TINY
