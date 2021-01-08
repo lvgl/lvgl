@@ -865,10 +865,8 @@ menu "LVGL configuration"
 
             config LV_THEME_DEFAULT_FLAG_LIGHT
                 bool "Light theme"
-                depends on LV_THEME_MATERIAL
             config LV_THEME_DEFAULT_FLAG_DARK
                 bool "Dark theme"
-                depends on LV_THEME_MATERIAL
         endchoice
 
     endmenu
