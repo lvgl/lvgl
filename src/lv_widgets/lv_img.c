@@ -206,7 +206,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         lv_coord_t line_space = lv_obj_get_style_text_line_space(img, LV_IMG_PART_MAIN);
         lv_point_t size;
         _lv_txt_get_size(&size, src_img, font, letter_space, line_space,
-                         LV_COORD_MAX, LV_TXT_FLAG_NONE);
+                         LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         header.w = size.x;
         header.h = size.y;
     }

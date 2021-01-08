@@ -150,9 +150,9 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 /**
  * Set the align of the roller's options (left or center)
  * @param roller - pointer to a roller object
- * @param align - one of lv_label_align_t values (left, right, center)
+ * @param align - one of lv_text_align_t values (left, right, center)
  */
-void lv_roller_set_label_align(lv_obj_t * obj, lv_label_align_t align)
+void lv_roller_set_label_align(lv_obj_t * obj, lv_text_align_t align)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -317,11 +317,11 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
     }
 }
 /**
- * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
+ * Get the align attribute. Default alignment after _create is LV_TEXT_ALIGN_CENTER
  * @param roller pointer to a roller object
- * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
+ * @return LV_TEXT_ALIGN_LEFT, LV_TEXT_ALIGN_RIGHT or LV_TEXT_ALIGN_CENTER
  */
-lv_label_align_t lv_roller_get_label_align(const lv_obj_t * obj)
+lv_text_align_t lv_roller_get_label_align(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -366,7 +366,7 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
         lv_obj_set_width(obj, LV_SIZE_AUTO);
 
         lv_obj_t * label = lv_roller_label_create(obj, NULL);
-        lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+        lv_label_set_align(label, LV_TEXT_ALIGN_CENTER);
         lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
         lv_roller_set_visible_row_count(obj, 3);
     }
@@ -476,19 +476,19 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
         area_ok = _lv_area_intersect(&mask_sel, clip_area, &rect_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
-            lv_label_align_t label_align = lv_roller_get_label_align(obj);
+            lv_text_align_t label_align = lv_roller_get_label_align(obj);
 
-            if(LV_LABEL_ALIGN_CENTER == label_align) {
-                label_dsc.flag |= LV_TXT_FLAG_CENTER;
+            if(LV_TEXT_ALIGN_CENTER == label_align) {
+                label_dsc.flag |= LV_TEXT_FLAG_CENTER;
             }
-            else if(LV_LABEL_ALIGN_RIGHT == label_align) {
-                label_dsc.flag |= LV_TXT_FLAG_RIGHT;
+            else if(LV_TEXT_ALIGN_RIGHT == label_align) {
+                label_dsc.flag |= LV_TEXT_FLAG_RIGHT;
             }
 
             /*Get the size of the "selected text"*/
             lv_point_t res_p;
             _lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                             lv_obj_get_width(obj), LV_TXT_FLAG_EXPAND);
+                             lv_obj_get_width(obj), LV_TEXT_FLAG_EXPAND);
 
             /*Move the selected label proportionally with the background label*/
             lv_coord_t roller_h = lv_obj_get_height(obj);
@@ -514,7 +514,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
             label_sel_area.x2 = label->coords.x2;
             label_sel_area.y2 = label_sel_area.y1 + res_p.y;
 
-            label_dsc.flag |= LV_TXT_FLAG_EXPAND;
+            label_dsc.flag |= LV_TEXT_FLAG_EXPAND;
             lv_draw_label(&label_sel_area, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
         }
 
@@ -734,15 +734,15 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     anim_en = LV_ANIM_OFF;
 #endif
 
-    lv_label_align_t align = lv_label_get_align(label);
+    lv_text_align_t align = lv_label_get_align(label);
     switch(align) {
-    case LV_LABEL_ALIGN_CENTER:
+    case LV_TEXT_ALIGN_CENTER:
         lv_obj_set_x(label, (lv_obj_get_width_fit(obj) - lv_obj_get_width(label)) / 2);
         break;
-    case LV_LABEL_ALIGN_RIGHT:
+    case LV_TEXT_ALIGN_RIGHT:
         lv_obj_set_x(label, lv_obj_get_width_fit(obj) - lv_obj_get_width(label));
         break;
-    case LV_LABEL_ALIGN_LEFT:
+    case LV_TEXT_ALIGN_LEFT:
         lv_obj_set_x(label, 0);
         break;
     }
@@ -915,7 +915,7 @@ static lv_coord_t get_selected_label_width(const lv_obj_t * obj)
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_HIGHLIGHT);
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
-    _lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TXT_FLAG_NONE);
+    _lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);
     return size.x;
 }
 

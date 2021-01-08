@@ -59,18 +59,18 @@ typedef struct {
 #endif
 
 typedef struct {
+    lv_obj_t obj;
     int16_t cur_value; /*Current value of the bar*/
     int16_t min_value; /*Minimum value of the bar*/
     int16_t max_value; /*Maximum value of the bar*/
     int16_t start_value; /*Start value of the bar*/
     lv_area_t indic_area;   /*Save the indicator area. Might be used by derived types*/
 #if LV_USE_ANIMATION
-    lv_anim_value_t anim_time;
     lv_bar_anim_t cur_value_anim;
     lv_bar_anim_t start_value_anim;
 #endif
     uint8_t type : 2;           /*Type of bar*/
-}lv_bar_ext_t;
+}lv_bar_t;
 
 extern const lv_obj_class_t lv_bar;
 
@@ -122,13 +122,6 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
  */
 void lv_bar_set_type(lv_obj_t * bar, lv_bar_type_t type);
 
-/**
- * Set the animation time of the bar
- * @param bar pointer to a bar object
- * @param anim_time the animation time in milliseconds.
- */
-void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -167,13 +160,6 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar);
  * @return bar type
  */
 lv_bar_type_t lv_bar_get_type(lv_obj_t * bar);
-
-/**
- * Get the animation time of the bar
- * @param bar pointer to a bar object
- * @return the animation time in milliseconds.
- */
-uint16_t lv_bar_get_anim_time(const lv_obj_t * bar);
 
 /**********************
  *      MACROS

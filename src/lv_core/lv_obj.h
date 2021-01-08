@@ -235,17 +235,17 @@ typedef struct {
 
 #define _lv_obj_constructor
 
-typedef struct {
+typedef struct lv_obj_class{
+    const struct lv_obj_class * base_class;
     void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
     void (*destructor)(struct _lv_obj_t * obj);
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
     lv_design_cb_t design_cb; /**< Object type specific design function*/
-    uint32_t ext_size;
+    uint32_t instance_size;
 }lv_obj_class_t;
 
 typedef struct _lv_obj_t{
     const lv_obj_class_t * class_p;
-    void * ext_attr;
     struct _lv_obj_t * parent;
     lv_obj_spec_attr_t * spec_attr;
     lv_obj_style_list_t  style_list;
@@ -269,7 +269,8 @@ enum {
     LV_PART_HIGHLIGHT,
     LV_PART_PLACEHOLDER,
     LV_PART_CURSOR,
-    LV_PART_ITEM,
+    LV_PART_ITEMS,
+    LV_PART_MARKER,
 
     LV_PART_CUSTOM_1,
     LV_PART_CUSTOM_2,

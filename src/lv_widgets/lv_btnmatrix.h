@@ -49,8 +49,7 @@ typedef bool (*lv_btnmatrix_btn_drawer_cb_t)(lv_obj_t * btnm, uint32_t btn_id, c
 
 /*Data of button matrix*/
 typedef struct {
-    /*No inherited ext.*/ /*Ext. of ancestor*/
-    /*New data for this type */
+    lv_obj_t obj;
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
@@ -61,8 +60,7 @@ typedef struct {
     uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE */
     uint8_t recolor : 1;    /*Enable button recoloring*/
     uint8_t one_check : 1;  /*Single button toggled at once*/
-    uint8_t align : 2;      /*Align type from 'lv_label_align_t'*/
-} lv_btnmatrix_ext_t;
+} lv_btnmatrix_t;
 
 
 extern const lv_obj_class_t lv_btnmatrix;
@@ -170,13 +168,6 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
  */
 void lv_btnmatrix_set_one_checked(lv_obj_t * btnm, bool one_chk);
 
-/**
- * Set the align of the texts (left, right or center)
- * @param btnm pointer to a btnmatrix object
- * @param align LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
- */
-void lv_btnmatrix_set_text_align(lv_obj_t * btnm, lv_label_align_t align);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -244,12 +235,6 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ct
  */
 bool lv_btnmatrix_get_one_checked(const lv_obj_t * btnm);
 
-/**
- * Get the align attribute
- * @param  btnm pointer to a btnmatrix object
- * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
- */
-lv_label_align_t lv_btnmatrix_get_align(const lv_obj_t * btnm);
 
 /**********************
  *      MACROS

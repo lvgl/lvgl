@@ -549,7 +549,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
         lv_area_t label_cord;
         lv_point_t label_size;
         _lv_txt_get_size(&label_size, scale_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                         LV_COORD_MAX, LV_TXT_FLAG_NONE);
+                         LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;

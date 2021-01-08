@@ -337,7 +337,7 @@ lv_coord_t _lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
                 lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, part);
                 lv_coord_t line_space = lv_obj_get_style_text_letter_space(obj, part);
                 const lv_font_t * font = lv_obj_get_style_text_font(obj, part);
-                _lv_txt_get_size(&content_size, content_src, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+                _lv_txt_get_size(&content_size, content_src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
             }
         } else {
             content_opa = lv_obj_get_style_img_opa(obj, part);

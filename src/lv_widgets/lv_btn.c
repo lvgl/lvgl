@@ -44,7 +44,8 @@ const lv_obj_class_t lv_btn  = {
     .destructor = lv_btn_destructor,
     .signal_cb = lv_btn_signal,
     .design_cb = lv_btn_design,
-    .ext_size = 0,
+    .instance_size = sizeof(lv_btn_t),
+    .base_class = &lv_obj
 };
 
 

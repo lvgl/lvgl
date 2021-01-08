@@ -91,7 +91,8 @@ const lv_obj_class_t lv_obj = {
     .destructor = lv_obj_destructor,
     .signal_cb = lv_obj_signal,
     .design_cb = lv_obj_design,
-    .ext_size = 0,
+    .instance_size = (sizeof(lv_obj_t)),
+    .base_class = NULL,
 };
 
 /**********************
@@ -223,14 +224,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_t * obj = lv_mem_alloc(sizeof(lv_obj_t));
-    _lv_memset_00(obj, sizeof(lv_obj_t));
+    lv_obj_t * obj = lv_mem_alloc(class->instance_size);
+    _lv_memset_00(obj, class->instance_size);
     obj->class_p = class;
-
-    if(obj->class_p->ext_size) {
-        obj->ext_attr = lv_mem_alloc(obj->class_p->ext_size);
-        _lv_memset_00(obj->ext_attr, obj->class_p->ext_size);
-    }
 
     class->constructor(obj, parent, copy);
 

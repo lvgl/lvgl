@@ -50,28 +50,14 @@ enum {
 };
 typedef uint8_t lv_label_long_mode_t;
 
-/** Label align policy*/
-enum {
-    LV_LABEL_ALIGN_LEFT, /**< Align text to left */
-    LV_LABEL_ALIGN_CENTER, /**< Align text to center */
-    LV_LABEL_ALIGN_RIGHT, /**< Align text to right */
-    LV_LABEL_ALIGN_AUTO, /**< Use LEFT or RIGHT depending on the direction of the text (LTR/RTL)*/
-};
-typedef uint8_t lv_label_align_t;
-
-
-
 typedef struct {
+    lv_obj_t obj;
     char * text;
     union {
         char * tmp_ptr; /* Pointer to the allocated memory containing the character replaced by dots*/
         char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */
     } dot;
     uint32_t dot_end;  /*The real text length, used in dot mode*/
-
-#if LV_USE_ANIMATION
-    uint32_t anim_speed;
-#endif
 
 #if LV_LABEL_LONG_TXT_HINT
     lv_draw_label_hint_t hint;
@@ -84,11 +70,10 @@ typedef struct {
     lv_point_t offset; /*Text draw position offset*/
     lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/
     uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
-    uint8_t align : 2;                  /*Align type from 'lv_label_align_t'*/
     uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/
     uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters */
-}lv_label_ext_t;
+}lv_label_t;
 
 extern const lv_obj_class_t lv_label;
 
@@ -141,25 +126,11 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text);
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 
 /**
- * Set the align of the label (left or center)
- * @param label pointer to a label object
- * @param align 'LV_LABEL_ALIGN_LEFT' or 'LV_LABEL_ALIGN_LEFT'
- */
-void lv_label_set_align(lv_obj_t * label, lv_label_align_t align);
-
-/**
  * Enable the recoloring by in-line commands
  * @param label pointer to a label object
  * @param en true: enable recoloring, false: disable
  */
 void lv_label_set_recolor(lv_obj_t * label, bool en);
-
-/**
- * Set the label's animation speed in LV_LABEL_LONG_SROLL/SROLL_CIRC modes
- * @param label pointer to a label object
- * @param anim_speed speed of animation in px/sec unit
- */
-void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed);
 
 /**
  * @brief Set the selection start index.
@@ -196,9 +167,9 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
 /**
  * Get the align attribute
  * @param label pointer to a label object
- * @return LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER
+ * @return LV_TEXT_ALIGN_LEFT or LV_TEXT_ALIGN_CENTER
  */
-lv_label_align_t lv_label_get_align(const lv_obj_t * label);
+lv_text_align_t lv_label_get_align(const lv_obj_t * label);
 
 /**
  * Get the recoloring attribute

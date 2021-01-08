@@ -124,9 +124,9 @@ void lv_table_set_col_width(lv_obj_t * table, uint16_t col_id, lv_coord_t w);
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
  * @param col id of the column [0 .. col_cnt -1]
- * @param align LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER or LV_LABEL_ALIGN_RIGHT
+ * @param align LV_TEXT_ALIGN_LEFT or LV_TEXT_ALIGN_CENTER or LV_TEXT_ALIGN_RIGHT
  */
-void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_label_align_t align);
+void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_text_align_t align);
 
 /**
  * Set the cell crop. (Don't adjust the height of the cell according to its content)
@@ -184,32 +184,13 @@ uint16_t lv_table_get_col_cnt(lv_obj_t * table);
 lv_coord_t lv_table_get_col_width(lv_obj_t * table, uint16_t col_id);
 
 /**
- * Get the text align of a cell
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @return LV_LABEL_ALIGN_LEFT (default in case of error) or LV_LABEL_ALIGN_CENTER or
- * LV_LABEL_ALIGN_RIGHT
- */
-lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_t col);
-
-/**
- * Get the type of a cell
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @return 1,2,3 or 4
- */
-lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t col);
-
-/**
  * Get the crop property of a cell
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
  * @param col id of the column [0 .. col_cnt -1]
  * @return true: text crop enabled; false: disabled
  */
-lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col);
+bool lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col);
 
 /**
  * Get the cell merge attribute.

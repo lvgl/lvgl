@@ -129,7 +129,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     bool clip_ok = _lv_area_intersect(&clipped_area, coords, mask);
     if(!clip_ok) return;
 
-    if((dsc->flag & LV_TXT_FLAG_EXPAND) == 0) {
+    if((dsc->flag & LV_TEXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);
     }
@@ -194,14 +194,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     }
 
     /*Align to middle*/
-    if(dsc->flag & LV_TXT_FLAG_CENTER) {
+    if(dsc->flag & LV_TEXT_FLAG_CENTER) {
         line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
-    else if(dsc->flag & LV_TXT_FLAG_RIGHT) {
+    else if(dsc->flag & LV_TEXT_FLAG_RIGHT) {
         line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
@@ -267,7 +267,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
             uint32_t letter_next = _lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the re-color command*/
-            if((dsc->flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
                         par_start = i;
@@ -361,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         pos.x = coords->x1;
         /*Align to middle*/
-        if(dsc->flag & LV_TXT_FLAG_CENTER) {
+        if(dsc->flag & LV_TEXT_FLAG_CENTER) {
             line_width =
                 _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
@@ -369,7 +369,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         }
         /*Align to the right*/
-        else if(dsc->flag & LV_TXT_FLAG_RIGHT) {
+        else if(dsc->flag & LV_TEXT_FLAG_RIGHT) {
             line_width =
                 _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
             pos.x += lv_area_get_width(coords) - line_width;

@@ -66,7 +66,7 @@
 #define COLOR_BG_SEC_TEXT       (IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xa5a8ad))
 #define COLOR_BG_SEC_TEXT_DIS   (IS_LIGHT ? lv_color_hex(0xaaaaaa) : lv_color_hex(0xa5a8ad))
 
-#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 85)
+#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 850)
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) ? 0 : LV_DPX(2))
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
@@ -112,8 +112,7 @@ typedef struct {
 
 #if LV_USE_ARC
     lv_style_t arc_indic;
-    lv_style_t arc_bg;
-    lv_style_t arc_knob;
+    lv_style_t arc_indic_primary;
 #endif
 
 
@@ -185,16 +184,18 @@ static bool inited;
 static void basic_init(void)
 {
     const static lv_style_prop_t trans_props[] = {
-            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
-            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
-            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB, 0
+//            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
+            LV_STYLE_TRANSFORM_WIDTH,
+            LV_STYLE_TRANSFORM_HEIGHT,
+//            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB,
+            0
     };
 
     static lv_style_transiton_t trans_delayed;
     lv_style_transition_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, 70);
 
     static lv_style_transiton_t trans_slow;
-    lv_style_transition_init(&trans_slow, trans_props, &lv_anim_path_def, TRANSITION_TIME * 2, 0);
+    lv_style_transition_init(&trans_slow, trans_props, &lv_anim_path_def, TRANSITION_TIME * 4, 0);
 
     static lv_style_transiton_t trans_normal;
     lv_style_transition_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
@@ -213,7 +214,7 @@ static void basic_init(void)
     lv_style_set_pad_left(&styles->scrollbar, LV_DPX(7));
     lv_style_set_pad_right(&styles->scrollbar,  LV_DPX(7));
     lv_style_set_pad_top(&styles->scrollbar,  LV_DPX(7));
-    lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_50);
+    lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_40);
     lv_style_set_transition(&styles->scrollbar, &trans_slow);
 
     style_init_reset(&styles->scrollbar_scrolled);
@@ -288,9 +289,9 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->bg_color_primary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_secondary);
-    lv_style_set_bg_color(&styles->bg_color_primary, theme.color_secondary);
-    lv_style_set_text_color(&styles->bg_color_primary, LV_COLOR_WHITE);
-    lv_style_set_bg_opa(&styles->bg_color_primary, LV_OPA_COVER);
+    lv_style_set_bg_color(&styles->bg_color_secondary, theme.color_secondary);
+    lv_style_set_text_color(&styles->bg_color_secondary, LV_COLOR_WHITE);
+    lv_style_set_bg_opa(&styles->bg_color_secondary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_gray);
     lv_style_set_bg_color(&styles->bg_color_gray, COLOR_GRAY);
@@ -314,6 +315,16 @@ static void basic_init(void)
     lv_style_set_pad_all(&styles->knob, LV_DPX(5));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
 
+#if LV_USE_ARC
+    style_init_reset(&styles->arc_indic);
+    lv_style_set_line_color(&styles->arc_indic, COLOR_GRAY);
+    lv_style_set_line_width(&styles->arc_indic, LV_DPX(15));
+    lv_style_set_line_rounded(&styles->arc_indic, true);
+
+    style_init_reset(&styles->arc_indic_primary);
+    lv_style_set_line_color(&styles->arc_indic_primary, theme.color_primary);
+#endif
+
 #if LV_USE_CHECKBOX
     style_init_reset(&styles->cb_marker);
     lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
@@ -321,7 +332,6 @@ static void basic_init(void)
     lv_style_set_border_color(&styles->cb_marker, theme.color_primary);
     lv_style_set_bg_color(&styles->cb_marker, LV_COLOR_WHITE);
     lv_style_set_bg_opa(&styles->cb_marker, LV_OPA_COVER);
-    lv_style_set_margin_right(&styles->cb_marker,  LV_DPX(6));
     lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
 
     style_init_reset(&styles->cb_marker_checked);
@@ -347,6 +357,12 @@ static void basic_init(void)
 
 
 
+#if LV_USE_TABLE
+    style_init_reset(&styles->table_cell);
+    lv_style_set_border_width(&styles->table_cell, 1);
+    lv_style_set_border_color(&styles->table_cell, CARD_BORDER_COLOR);
+    lv_style_set_border_side(&styles->table_cell, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
+#endif
 }
 
 static void line_init(void)
@@ -407,29 +423,6 @@ static void gauge_init(void)
     lv_style_set_radius(&styles->gauge_needle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_size(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(30));
     lv_style_set_pad_all(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(10));
-#endif
-}
-
-static void arc_init(void)
-{
-#if LV_USE_ARC != 0
-    style_init_reset(&styles->arc_indic);
-    lv_style_set_line_color(&styles->arc_indic, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_line_width(&styles->arc_indic, LV_STATE_DEFAULT, LV_DPX(25));
-    lv_style_set_line_rounded(&styles->arc_indic, LV_STATE_DEFAULT, true);
-
-    style_init_reset(&styles->arc_bg);
-    lv_style_set_line_color(&styles->arc_bg, LV_STATE_DEFAULT, COLOR_GRAY);
-    lv_style_set_line_width(&styles->arc_bg, LV_STATE_DEFAULT, LV_DPX(25));
-    lv_style_set_line_rounded(&styles->arc_bg, LV_STATE_DEFAULT, true);
-
-    style_init_reset(&styles->arc_knob);
-    lv_style_set_radius(&styles->arc_knob, LV_STATE_DEFAULT,   LV_RADIUS_CIRCLE);
-    lv_style_set_pad_top(&styles->arc_knob, LV_STATE_DEFAULT,  LV_DPX(0));
-    lv_style_set_pad_bottom(&styles->arc_knob, LV_STATE_DEFAULT,  LV_DPX(0));
-    lv_style_set_pad_left(&styles->arc_knob, LV_STATE_DEFAULT,    LV_DPX(0));
-    lv_style_set_pad_right(&styles->arc_knob, LV_STATE_DEFAULT,   LV_DPX(0));
-
 #endif
 }
 
@@ -546,7 +539,6 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     line_init();
     linemeter_init();
     gauge_init();
-    arc_init();
     spinner_init();
     chart_init();
     textarea_init();
@@ -593,11 +585,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_btnmatrix)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_gap);
-        lv_obj_add_style_no_refresh(obj, LV_PART_ITEM, LV_STATE_DEFAULT, &styles->btn);
-        lv_obj_add_style_no_refresh(obj, LV_PART_ITEM, LV_STATE_PRESSED, &styles->pressed);
-        lv_obj_add_style_no_refresh(obj, LV_PART_ITEM, LV_STATE_PRESSED, &styles->grow);
-        lv_obj_add_style_no_refresh(obj, LV_PART_ITEM, LV_STATE_DEFAULT, &styles->transition_delayed);
-        lv_obj_add_style_no_refresh(obj, LV_PART_ITEM, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->btn);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->transition_normal);
     }
 #endif
 #if LV_USE_BAR
@@ -629,12 +621,16 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-        lv_obj_add_style_no_refresh(obj, LV_PART_ITEM, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_SCROLLED, &styles->transition_normal);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_white);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->table_cell);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->pad_small);
     }
 #endif
 
 #if LV_USE_CHECKBOX
     else if(lv_obj_check_type(obj, &lv_checkbox)) {
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_gap);
         lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->cb_marker);
         lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
         lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->cb_marker_checked);
@@ -657,7 +653,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_SWITCH
+#if LV_USE_CHART
     else if(lv_obj_check_type(obj, &lv_chart)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
@@ -667,14 +663,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style_no_refresh(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
+
 #if LV_USE_ROLLER
     else if(lv_obj_check_type(obj, &lv_roller)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-//        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
         lv_obj_add_style_no_refresh(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
-//        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
-//        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-//        lv_obj_add_style_no_refresh(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
 
@@ -689,6 +682,15 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
+#if LV_USE_ARC
+    else if(lv_obj_check_type(obj, &lv_arc)) {
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->arc_indic);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->arc_indic);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->arc_indic_primary);
+        lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+    }
+#endif
 //#if LV_USE_BTNMATRIX
 //case LV_THEME_BTNMATRIX:
 //    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
@@ -719,23 +721,6 @@ case LV_THEME_IMGBTN:
 
 #if LV_USE_LINE
 case LV_THEME_LINE:
-    break;
-#endif
-
-#if LV_USE_ARC
-case LV_THEME_ARC:
-    list = _lv_obj_get_style_list(obj, LV_ARC_PART_BG);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->arc_bg);
-    _lv_style_list_add_style(list, &styles->sb);
-
-    list = _lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
-    _lv_style_list_add_style(list, &styles->arc_indic);
-
-    list = _lv_obj_get_style_list(obj, LV_ARC_PART_KNOB);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->bg_click);
-    _lv_style_list_add_style(list, &styles->arc_knob);
     break;
 #endif
 

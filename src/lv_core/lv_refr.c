@@ -281,7 +281,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
-        lv_label_set_align(perf_label, LV_LABEL_ALIGN_RIGHT);
+        lv_label_set_align(perf_label, LV_TEXT_ALIGN_RIGHT);
         lv_obj_set_style_local_bg_opa(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
         lv_obj_set_style_local_bg_color(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
         lv_obj_set_style_local_text_color(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);

@@ -179,12 +179,12 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en);
 
 /**
  * Set the alignment of the text area.
- * In one line mode the text can be scrolled only with `LV_LABEL_ALIGN_LEFT`.
+ * In one line mode the text can be scrolled only with `LV_TEXT_ALIGN_LEFT`.
  * This function should be called if the size of text area changes.
  * @param ta pointer to a text are object
- * @param align the desired alignment from `lv_label_align_t`. (LV_LABEL_ALIGN_LEFT/CENTER/RIGHT)
+ * @param align the desired alignment from `lv_text_align_t`. (LV_TEXT_ALIGN_LEFT/CENTER/RIGHT)
  */
-void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align);
+void lv_textarea_set_text_align(lv_obj_t * ta, lv_text_align_t align);
 
 /**
  * Set a list of characters. Only these characters will be accepted by the text area

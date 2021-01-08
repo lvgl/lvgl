@@ -39,7 +39,7 @@ typedef struct {
     lv_coord_t ofs_x;
     lv_coord_t ofs_y;
     lv_bidi_dir_t bidi_dir;
-    lv_txt_flag_t flag;
+    lv_text_flag_t flag;
     lv_text_decor_t decor;
     lv_blend_mode_t blend_mode;
 } lv_draw_label_dsc_t;

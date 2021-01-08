@@ -94,7 +94,7 @@ static inline bool is_break_char(uint32_t letter);
  * line breaks
  */
 void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                      lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
+                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -102,7 +102,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
     if(text == NULL) return;
     if(font == NULL) return;
 
-    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t line_start     = 0;
     uint32_t new_line_start = 0;
@@ -174,12 +174,12 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  */
 static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
                                      lv_coord_t letter_space, lv_coord_t max_width,
-                                     lv_txt_flag_t flag, uint32_t * word_w_ptr, lv_txt_cmd_state_t * cmd_state, bool force)
+                                     lv_text_flag_t flag, uint32_t * word_w_ptr, lv_text_cmd_state_t * cmd_state, bool force)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
 
-    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t i = 0, i_next = 0, i_next_next = 0;  /* Iterating index into txt */
     uint32_t letter = 0;      /* Letter at i */
@@ -199,7 +199,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         word_len++;
 
         /*Handle the recolor command*/
-        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+        if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
             if(_lv_txt_is_cmd(cmd_state, letter) != false) {
                 i = i_next;
                 i_next = i_next_next;
@@ -294,14 +294,14 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
 uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
-                               lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
+                               lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     /* If max_width doesn't mater simply find the new line character
      * without thinking about word wrapping*/
-    if((flag & LV_TXT_FLAG_EXPAND) || (flag & LV_TXT_FLAG_FIT)) {
+    if((flag & LV_TEXT_FLAG_EXPAND) || (flag & LV_TEXT_FLAG_FIT)) {
         uint32_t i;
         for(i = 0; txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
             /*Just find the new line chars or string ends by incrementing `i`*/
@@ -310,8 +310,8 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         return i;
     }
 
-    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+    if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
     uint32_t i = 0;                                        /* Iterating index into txt */
 
     while(txt[i] != '\0' && max_width > 0) {
@@ -354,20 +354,20 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
  * @return length of a char_num long text
  */
 lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                             lv_txt_flag_t flag)
+                             lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     uint32_t i                   = 0;
     lv_coord_t width             = 0;
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     if(length != 0) {
         while(i < length) {
             uint32_t letter      = _lv_txt_encoded_next(txt, &i);
             uint32_t letter_next = _lv_txt_encoded_next(&txt[i], NULL);
-            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(_lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
@@ -397,30 +397,30 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
  * @return true: the character is part of a command and should not be written,
  *         false: the character should be written
  */
-bool _lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c)
+bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
 {
     bool ret = false;
 
     if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
-        if(*state == LV_TXT_CMD_STATE_WAIT) { /*Start char*/
-            *state = LV_TXT_CMD_STATE_PAR;
+        if(*state == LV_TEXT_CMD_STATE_WAIT) { /*Start char*/
+            *state = LV_TEXT_CMD_STATE_PAR;
             ret    = true;
         }
         /*Other start char in parameter is escaped cmd. char */
-        else if(*state == LV_TXT_CMD_STATE_PAR) {
-            *state = LV_TXT_CMD_STATE_WAIT;
+        else if(*state == LV_TEXT_CMD_STATE_PAR) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
         }
         /*Command end */
-        else if(*state == LV_TXT_CMD_STATE_IN) {
-            *state = LV_TXT_CMD_STATE_WAIT;
+        else if(*state == LV_TEXT_CMD_STATE_IN) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
             ret    = true;
         }
     }
 
     /*Skip the color parameter and wait the space after it*/
-    if(*state == LV_TXT_CMD_STATE_PAR) {
+    if(*state == LV_TEXT_CMD_STATE_PAR) {
         if(c == ' ') {
-            *state = LV_TXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+            *state = LV_TEXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
         }
         ret = true;
     }

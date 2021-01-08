@@ -567,7 +567,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         }
     }
 
-    if(lv_label_get_align(label) == LV_LABEL_ALIGN_RIGHT) {
+    if(lv_label_get_align(label) == LV_TEXT_ALIGN_RIGHT) {
         lv_obj_set_x(label, lv_obj_get_width_fit(dropdown->list) - lv_obj_get_width(label));
     }
 }
@@ -1042,10 +1042,10 @@ static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area,
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
 
-    lv_label_align_t align = lv_label_get_align(label);
+    lv_text_align_t align = lv_label_get_align(label);
 
-    if(align == LV_LABEL_ALIGN_CENTER) label_dsc.flag |= LV_TXT_FLAG_CENTER;
-    else if(align == LV_LABEL_ALIGN_RIGHT) label_dsc.flag |= LV_TXT_FLAG_RIGHT;
+    if(align == LV_TEXT_ALIGN_CENTER) label_dsc.flag |= LV_TEXT_FLAG_CENTER;
+    else if(align == LV_TEXT_ALIGN_RIGHT) label_dsc.flag |= LV_TEXT_FLAG_RIGHT;
 
     lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 

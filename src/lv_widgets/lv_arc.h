@@ -36,45 +36,26 @@ typedef uint8_t lv_arc_type_t;
 
 
 
-LV_CLASS_DECLARE_START(lv_arc, lv_obj);
-
-#define _lv_arc_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
-
-#define _lv_arc_data             \
-  _lv_obj_data                  \
-    uint16_t angle_ofs;    \
-    uint16_t indic_angle_start;   \
-    uint16_t indic_angle_end;     \
-    uint16_t bg_angle_start;    \
-    uint16_t bg_angle_end;      \
-    int16_t value; /*Current value of the arc*/ \
-    int16_t min_value; /*Minimum value of the arc*/ \
-    int16_t max_value; /*Maximum value of the arc*/ \
-    uint16_t dragging    : 1;       \
-    uint16_t type        : 2;       \
-    uint16_t adjustable  : 1;       \
-    uint16_t min_close   : 1;  /*1: the last pressed angle was closer to minimum end*/ \
-    uint16_t chg_rate; /*Drag angle rate of change of the arc (degrees/sec)*/ \
-    uint32_t last_tick; /*Last dragging event timestamp of the arc*/ \
+typedef struct {
+    lv_obj_t obj;
+    uint16_t angle_ofs;
+    uint16_t indic_angle_start;
+    uint16_t indic_angle_end;
+    uint16_t bg_angle_start;
+    uint16_t bg_angle_end;
+    int16_t value; /*Current value of the arc*/
+    int16_t min_value; /*Minimum value of the arc*/
+    int16_t max_value; /*Maximum value of the arc*/
+    uint16_t dragging    : 1;
+    uint16_t type        : 2;
+    uint16_t adjustable  : 1;
+    uint16_t min_close   : 1;  /*1: the last pressed angle was closer to minimum end*/
+    uint16_t chg_rate; /*Drag angle rate of change of the arc (degrees/sec)*/
+    uint32_t last_tick; /*Last dragging event timestamp of the arc*/
     int16_t last_angle; /*Last dragging angle of the arc*/
+}lv_arc_t;
 
-#define _lv_arc_class_dsc        \
-  _lv_obj_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_arc, lv_obj);
-
-extern lv_arc_class_t lv_arc;
-
-
-
-/*Parts of the arc*/
-enum {
-    LV_ARC_PART_BG = LV_OBJ_PART_MAIN,
-    LV_ARC_PART_INDIC,
-    LV_ARC_PART_KNOB,
-    _LV_ARC_PART_VIRTUAL_LAST,
-};
-typedef uint8_t lv_arc_part_t;
+extern const lv_obj_class_t lv_arc;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -72,6 +72,13 @@ enum {
 };
 
 typedef uint8_t lv_text_decor_t;
+/** Label align policy*/
+enum {
+    LV_TEXT_ALIGN_LEFT, /**< Align text to left */
+    LV_TEXT_ALIGN_CENTER, /**< Align text to center */
+    LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
+};
+typedef uint8_t lv_text_align_t;
 
 
 typedef union {
@@ -92,7 +99,8 @@ typedef enum {
     LV_STYLE_OPA = 7 | LV_STYLE_PROP_INHERIT,
     LV_STYLE_COLOR_FILTER_CB = 8,
     LV_STYLE_COLOR_FILTER_OPA = 9,
-    LV_STYLE_TRANSITION = 10,
+    LV_STYLE_ANIM_TIME  = 10,
+    LV_STYLE_TRANSITION = 11,
 
     LV_STYLE_PAD_TOP        = 20 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_BOTTOM     = 21 | LV_STYLE_PROP_LAYOUT_REFR,
@@ -126,7 +134,8 @@ typedef enum {
     LV_STYLE_TEXT_LETTER_SPACE = 53 | LV_STYLE_PROP_INHERIT,
     LV_STYLE_TEXT_LINE_SPACE = 54   | LV_STYLE_PROP_INHERIT,
     LV_STYLE_TEXT_DECOR = 55        | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_BLEND_MODE = 56   | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_ALIGN = 56        | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_BLEND_MODE = 57   | LV_STYLE_PROP_INHERIT,
 
     LV_STYLE_IMG_OPA        = 60,
     LV_STYLE_IMG_BLEND_MODE = 61,
@@ -171,136 +180,6 @@ typedef enum {
 
 struct _lv_style_transiton_t;
 
-typedef struct {
-    lv_color_filter_cb_t color_filter_cb;
-    const struct _lv_style_transiton_t * transition;
-    const char * content_src;
-    const lv_font_t * text_font;
-
-    lv_color_t bg_color;
-    lv_color_t bg_grad_color;
-    lv_color_t border_color;
-    lv_color_t text_color;
-    lv_color_t outline_color;
-    lv_color_t shadow_color;
-    lv_color_t img_recolor;
-    lv_color_t line_color;
-
-    lv_opa_t opa;
-    lv_opa_t color_filter_opa;
-    lv_opa_t bg_opa;
-    lv_opa_t bg_main_stop;
-    lv_opa_t bg_grad_stop;
-    lv_opa_t border_opa;
-    lv_opa_t outline_opa;
-    lv_opa_t img_opa;
-    lv_opa_t img_recolor_opa;
-    lv_opa_t text_opa;
-    lv_opa_t shadow_opa;
-    lv_opa_t line_opa;
-
-    int8_t transform_width;
-    int8_t transform_height;
-    int8_t pad_top;
-    int8_t pad_bottom;
-    int8_t pad_left;
-    int8_t pad_right;
-    int8_t pad_row;
-    int8_t pad_column;
-    int8_t border_width;
-    uint8_t outline_width;
-    uint8_t outline_pad;
-    int8_t shadow_width;
-    int8_t shadow_ofs_x;
-    int8_t shadow_ofs_y;
-    int8_t shadow_spread;
-    int8_t text_letter_space;
-    int8_t text_line_space;
-    uint8_t line_width;
-    uint8_t line_dash_width;
-    uint8_t line_dash_gap;
-    int8_t content_ofs_x;
-    int8_t content_ofs_y;
-
-    uint32_t radius:12;
-    uint32_t content_align :5;
-    uint32_t border_side :5;
-    uint32_t bg_blend_mode   :2;
-    uint32_t border_blend_mode  :2;
-    uint32_t outline_blend_mode   :2;
-    uint32_t shadow_blend_mode   :2;
-    uint32_t text_decor :2;
-
-    uint32_t transform_zoom  :14;
-    uint32_t transform_angle :14;
-    uint32_t text_blend_mode   :2;
-    uint32_t line_blend_mode   :2;
-    uint32_t img_blend_mode   :2;
-
-    struct{
-        uint32_t color_filter_cb:1;
-        uint32_t transition:1;
-        uint32_t content_src:1;
-        uint32_t bg_color:1;
-        uint32_t bg_grad_color:1;
-        uint32_t border_color:1;
-        uint32_t text_color:1;
-        uint32_t outline_color:1;
-        uint32_t shadow_color:1;
-        uint32_t img_recolor:1;
-        uint32_t line_color:1;
-        uint32_t opa:1;
-        uint32_t color_filter_opa:1;
-        uint32_t bg_opa:1;
-        uint32_t bg_main_stop:1;
-        uint32_t bg_grad_stop:1;
-        uint32_t border_opa:1;
-        uint32_t outline_opa:1;
-        uint32_t img_opa:1;
-        uint32_t img_recolor_opa:1;
-        uint32_t text_font:1;
-        uint32_t text_opa:1;
-        uint32_t shadow_opa:1;
-        uint32_t line_opa:1;
-        uint32_t radius:1;
-        uint32_t transform_width:1;
-        uint32_t transform_height:1;
-        uint32_t pad_top:1;
-        uint32_t pad_bottom:1;
-        uint32_t pad_left:1;
-        uint32_t pad_right:1;
-        uint32_t pad_row:1;
-        uint32_t pad_column:1;
-        uint32_t border_width:1;
-        uint32_t outline_width:1;
-        uint32_t outline_pad:1;
-        uint32_t shadow_width:1;
-        uint32_t shadow_ofs_x:1;
-        uint32_t shadow_ofs_y:1;
-        uint32_t shadow_spread:1;
-        uint32_t text_letter_space:1;
-        uint32_t text_line_space:1;
-        uint32_t line_width:1;
-        uint32_t line_dash_width:1;
-        uint32_t line_dash_gap:1;
-        uint32_t content_ofs_x:1;
-        uint32_t content_ofs_y:1;
-        uint32_t transform_zoom:1;
-        uint32_t transform_angle:1;
-        uint32_t bg_blend_mode:1;
-        uint32_t border_blend_mode:1;
-        uint32_t outline_blend_mode:1;
-        uint32_t shadow_blend_mode:1;
-        uint32_t text_decor:1;
-        uint32_t text_blend_mode:1;
-        uint32_t img_blend_mode:1;
-        uint32_t line_blend_mode:1;
-        uint32_t content_align:1;
-        uint32_t border_side:1;
-    }has;
-}lv_style_ext_t;
-
-
 typedef struct _lv_style_transiton_t{
     const lv_style_prop_t * props;
     const lv_anim_path_t * path;
@@ -323,58 +202,21 @@ typedef struct {
 }lv_style_class_t;
 
 typedef struct _lv_style_t{
-    lv_style_class_t * class_p;
-    lv_style_ext_t * ext;
+
     _LV_STYLE_SENTINEL
-    /*32*/
-    uint32_t radius :5;
-    uint32_t transform_width :5;
-    uint32_t transform_height :5;
-    uint32_t opa :5;
-    uint32_t color_filter_cb :4;
-    uint32_t transition :4;
-    uint32_t bg_color :4;
+    union {
+        struct {
+            lv_style_value_t value1;
+        };
+        struct {
+            uint8_t * props_and_values;
+        };
+    };
 
-    /*32*/
-    uint32_t color_filter_opa :5;
-    uint32_t bg_opa :5;
-    uint32_t border_opa:5;
-    uint32_t img_opa:5;
-    uint32_t bg_grad_color :4;
-    uint32_t border_color:4;
-    uint32_t border_width:4;
-
-    /*32*/
-    uint32_t pad_top:5;
-    uint32_t pad_bottom:5;
-    uint32_t pad_left:5;
-    uint32_t pad_right:5;
-    uint32_t text_color:4;
-    uint32_t text_font :4;
-    uint32_t line_color :4;
-
-    /*32*/
-    uint32_t text_opa:5;
-    uint32_t line_width :5;
-    uint32_t line_opa :5;
-    uint32_t outline_width:5;
-    uint32_t outline_pad:5;
-    uint32_t outline_opa:5;
-    uint32_t bg_grad_dir:2;
-
-    /*25*/
-    uint32_t shadow_width:5;
-    uint32_t shadow_opa:4;
-    uint32_t outline_color:4;
-    uint32_t shadow_color:4;
-    uint32_t line_rounded:1;
-    uint32_t border_post:1;
-    uint32_t clip_corner:1;
-    uint32_t has_line_rounded:1;
-    uint32_t has_clip_corner:1;
-    uint32_t has_bg_grad_dir:1;
-    uint32_t has_border_post:1;
-    uint32_t dont_index:1;
+    uint16_t prop1;
+    uint16_t prop_cnt:14;
+    uint16_t allocated:1;
+    uint16_t dont_index:1;
 } lv_style_t;
 
 extern lv_style_class_t lv_style;

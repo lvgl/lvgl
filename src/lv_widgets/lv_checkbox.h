@@ -18,11 +18,6 @@ extern "C" {
 
 #if LV_USE_CHECKBOX != 0
 
-/*Testing of dependencies*/
-#if LV_USE_LABEL == 0
-#error "lv_cb: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -31,22 +26,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-
-LV_CLASS_DECLARE_START(lv_checkbox, lv_obj);
-
-#define _lv_checkbox_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
-
-#define _lv_checkbox_data             \
-  _lv_obj_data                        \
-    char * txt;                       \
+typedef struct {
+    lv_obj_t obj;
+    char * txt;
     uint32_t static_txt :1;
+}lv_checkbox_t;
 
-#define _lv_checkbox_class_dsc        \
-  _lv_obj_class_dsc
-
-LV_CLASS_DECLARE_END(lv_checkbox, lv_obj);
-
-extern lv_checkbox_class_t lv_checkbox;
+extern const lv_obj_class_t lv_checkbox;
 
 /**********************
  * GLOBAL PROTOTYPES

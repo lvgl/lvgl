@@ -101,13 +101,13 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     /*Initialize the format byte*/
     else {
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(table);
-        if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_LABEL_ALIGN_LEFT;
-        else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
+        if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_TEXT_ALIGN_LEFT;
+        else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_TEXT_ALIGN_RIGHT;
         else if(base_dir == LV_BIDI_DIR_AUTO)
 #if LV_USE_BIDI
             format.s.align = _lv_bidi_detect_base_dir(txt);
 #else
-            format.s.align = LV_LABEL_ALIGN_LEFT;
+            format.s.align = LV_TEXT_ALIGN_LEFT;
 #endif
         format.s.right_merge = 0;
         format.s.crop        = 0;
@@ -167,13 +167,13 @@ void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, c
     /*Initialize the format byte*/
     else {
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(table);
-        if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_LABEL_ALIGN_LEFT;
-        else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
+        if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_TEXT_ALIGN_LEFT;
+        else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_TEXT_ALIGN_RIGHT;
         else if(base_dir == LV_BIDI_DIR_AUTO)
 #if LV_USE_BIDI
             format.s.align = _lv_bidi_detect_base_dir(fmt);
 #else
-            format.s.align = LV_LABEL_ALIGN_LEFT;
+            format.s.align = LV_TEXT_ALIGN_LEFT;
 #endif
         format.s.right_merge = 0;
         format.s.crop        = 0;
@@ -318,9 +318,9 @@ void lv_table_set_col_width(lv_obj_t * table, uint16_t col_id, lv_coord_t w)
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
  * @param col id of the column [0 .. col_cnt -1]
- * @param align LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER or LV_LABEL_ALIGN_RIGHT
+ * @param align LV_TEXT_ALIGN_LEFT or LV_TEXT_ALIGN_CENTER or LV_TEXT_ALIGN_RIGHT
  */
-void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_label_align_t align)
+void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_text_align_t align)
 {
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
@@ -503,22 +503,22 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * table, uint16_t col_id)
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
  * @param col id of the column [0 .. col_cnt -1]
- * @return LV_LABEL_ALIGN_LEFT (default in case of error) or LV_LABEL_ALIGN_CENTER or
- * LV_LABEL_ALIGN_RIGHT
+ * @return LV_TEXT_ALIGN_LEFT (default in case of error) or LV_TEXT_ALIGN_CENTER or
+ * LV_TEXT_ALIGN_RIGHT
  */
-lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_t col)
+lv_text_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_t col)
 {
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = table->ext_attr;
     if(row >= ext->row_cnt || col >= ext->col_cnt) {
         LV_LOG_WARN("lv_table_set_cell_align: invalid row or column");
-        return LV_LABEL_ALIGN_LEFT; /*Just return with something*/
+        return LV_TEXT_ALIGN_LEFT; /*Just return with something*/
     }
     uint32_t cell = row * ext->col_cnt + col;
 
     if(ext->cell_data[cell] == NULL)
-        return LV_LABEL_ALIGN_LEFT; /*Just return with something*/
+        return LV_TEXT_ALIGN_LEFT; /*Just return with something*/
     else {
         lv_table_cell_format_t format;
         format.format_byte = ext->cell_data[cell][0];
@@ -533,7 +533,7 @@ lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_
  * @param col id of the column [0 .. col_cnt -1]
  * @return true: text crop enabled; false: disabled
  */
-lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col)
+lv_text_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col)
 {
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
@@ -768,7 +768,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 }
                 else {
                     format.s.right_merge = 0;
-                    format.s.align       = LV_LABEL_ALIGN_LEFT;
+                    format.s.align       = LV_TEXT_ALIGN_LEFT;
                     format.s.crop        = 1;
                 }
 
@@ -842,8 +842,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     txt_area.y2 = cell_area.y2 - cell_bottom;
 
                     /*Align the content to the middle if not cropped*/
-                    if(format.s.crop == 0) txt_flags = LV_TXT_FLAG_NONE;
-                    else txt_flags = LV_TXT_FLAG_EXPAND;
+                    if(format.s.crop == 0) txt_flags = LV_TEXT_FLAG_NONE;
+                    else txt_flags = LV_TEXT_FLAG_EXPAND;
 
                     _lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, label_dsc_base.font,
                                      label_dsc_base.letter_space, label_dsc_base.line_space,
@@ -858,14 +858,14 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
                     switch(format.s.align) {
                         default:
-                        case LV_LABEL_ALIGN_LEFT:
-                            label_dsc_base.flag |= LV_TXT_FLAG_NONE;
+                        case LV_TEXT_ALIGN_LEFT:
+                            label_dsc_base.flag |= LV_TEXT_FLAG_NONE;
                             break;
-                        case LV_LABEL_ALIGN_RIGHT:
-                            label_dsc_base.flag |= LV_TXT_FLAG_RIGHT;
+                        case LV_TEXT_ALIGN_RIGHT:
+                            label_dsc_base.flag |= LV_TEXT_FLAG_RIGHT;
                             break;
-                        case LV_LABEL_ALIGN_CENTER:
-                            label_dsc_base.flag |= LV_TXT_FLAG_CENTER;
+                        case LV_TEXT_ALIGN_CENTER:
+                            label_dsc_base.flag |= LV_TEXT_FLAG_CENTER;
                             break;
                     }
 
@@ -995,7 +995,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_fon
                 txt_w -= cell_left + cell_right;
 
                 _lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, font,
-                                 letter_space, line_space, txt_w, LV_TXT_FLAG_NONE);
+                                 letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
                 h_max = LV_MATH_MAX(txt_size.y + cell_top + cell_bottom, h_max);
                 cell += col_merge;

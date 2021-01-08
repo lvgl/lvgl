@@ -41,13 +41,13 @@ enum {
 typedef uint8_t lv_slider_type_t;
 
 typedef struct {
-    lv_bar_ext_t bar;       /*Add the ancestor's type first*/
+    lv_bar_t bar;       /*Add the ancestor's type first*/
     lv_area_t left_knob_area;
     lv_area_t right_knob_area;
     int16_t * value_to_set; /* Which bar value to set */
     uint8_t dragging : 1;       /*1: the slider is being dragged*/
     uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
-}lv_slider_ext_t;
+}lv_slider_t;
 
 extern const lv_obj_class_t lv_slider;
 
@@ -99,16 +99,6 @@ static inline void lv_slider_set_left_value(lv_obj_t * slider, int16_t left_valu
 static inline void lv_slider_set_range(lv_obj_t * slider, int16_t min, int16_t max)
 {
     lv_bar_set_range(slider, min, max);
-}
-
-/**
- * Set the animation time of the slider
- * @param slider pointer to a bar object
- * @param anim_time the animation time in milliseconds.
- */
-static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time)
-{
-    lv_bar_set_anim_time(slider, anim_time);
 }
 
 /**
@@ -178,15 +168,6 @@ static inline int16_t lv_slider_get_max_value(const lv_obj_t * slider)
  */
 bool lv_slider_is_dragged(const lv_obj_t * slider);
 
-/**
- * Get the animation time of the slider
- * @param slider pointer to a slider object
- * @return the animation time in milliseconds.
- */
-static inline uint16_t lv_slider_get_anim_time(lv_obj_t * slider)
-{
-    return lv_bar_get_anim_time(slider);
-}
 
 /**
  * Get whether the slider is symmetric or not.
@@ -196,12 +177,9 @@ static inline uint16_t lv_slider_get_anim_time(lv_obj_t * slider)
 static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 {
     lv_bar_type_t type = lv_bar_get_type(slider);
-    if(type == LV_BAR_TYPE_SYMMETRICAL)
-        return LV_SLIDER_TYPE_SYMMETRICAL;
-    else if(type == LV_BAR_TYPE_CUSTOM)
-        return LV_SLIDER_TYPE_RANGE;
-    else
-        return LV_SLIDER_TYPE_NORMAL;
+    if(type == LV_BAR_TYPE_SYMMETRICAL) return LV_SLIDER_TYPE_SYMMETRICAL;
+    else if(type == LV_BAR_TYPE_CUSTOM)return LV_SLIDER_TYPE_RANGE;
+    else return LV_SLIDER_TYPE_NORMAL;
 }
 
 /**********************

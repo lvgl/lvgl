@@ -1596,7 +1596,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, uint8_t which_a
                 /* reserve appropriate area */
                 lv_point_t size;
                 _lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                        LV_COORD_MAX, LV_TXT_FLAG_CENTER);
+                        LV_COORD_MAX, LV_TEXT_FLAG_CENTER);
 
                 /* set the area at some distance of the major tick len left of the tick */
                 /* changed to explicit member initialization to allow compilation as c++ */
@@ -1710,7 +1710,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * mask)
                 /* reserve appropriate area */
                 lv_point_t size;
                 _lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                        LV_COORD_MAX, LV_TXT_FLAG_CENTER);
+                        LV_COORD_MAX, LV_TEXT_FLAG_CENTER);
 
                 /* set the area at some distance of the major tick len under of the tick */
                 lv_area_t a = {(p2.x - size.x / 2), (p2.y + label_dist), (p2.x + size.x / 2),

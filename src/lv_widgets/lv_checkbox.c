@@ -27,14 +27,21 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_checkbox_destructor(void * obj);
+static void lv_checkbox_destructor(lv_obj_t * obj);
 static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_checkbox_class_t lv_checkbox;
+const lv_obj_class_t lv_checkbox = {
+    .constructor = lv_checkbox_constructor,
+    .destructor = lv_checkbox_destructor,
+    .signal_cb = lv_checkbox_signal,
+    .design_cb = lv_checkbox_design,
+    .instance_size = sizeof(lv_checkbox_t),
+    .base_class = &lv_obj
+};
 
 /**********************
  *      MACROS
@@ -52,23 +59,7 @@ lv_checkbox_class_t lv_checkbox;
  */
 lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("check box create started");
-
-    if(!lv_checkbox._inited) {
-        LV_CLASS_INIT(lv_checkbox, lv_obj);
-        lv_checkbox.constructor = lv_checkbox_constructor;
-        lv_checkbox.destructor = lv_checkbox_destructor;
-        lv_checkbox.design_cb = lv_checkbox_design;
-        lv_checkbox.signal_cb = lv_checkbox_signal;
-    }
-
-    lv_obj_t * obj = lv_class_new(&lv_checkbox);
-    lv_checkbox.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    LV_LOG_INFO("check box created");
-    return obj;
+    return lv_obj_create_from_class(&lv_checkbox, parent, copy);
 }
 
 /*=====================
@@ -145,7 +136,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
     LV_LOG_TRACE("lv_checkbox create started");
 
     LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_checkbox)
-    lv_checkbox.base_p->constructor(obj, parent, copy);
+    lv_obj.constructor(obj, parent, copy);
 
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
     /*Create the ancestor basic object*/
@@ -159,7 +150,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
         lv_obj_set_size(obj, LV_SIZE_AUTO, LV_SIZE_AUTO);
     }
     else {
-        const lv_checkbox_t * copy_ext = (const lv_checkbox_t *)copy;
+//        const lv_checkbox_t * copy_ext = (const lv_checkbox_t *)copy;
     }
 
 
@@ -167,7 +158,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
     LV_LOG_INFO("lv_checkbox created");
 }
 
-static void lv_checkbox_destructor(void * obj)
+static void lv_checkbox_destructor(lv_obj_t * obj)
 {
 //    lv_checkbox_t * bar = obj;
 //
@@ -179,7 +170,7 @@ static void lv_checkbox_destructor(void * obj)
 
 //    bar->class_p->base_p->destructor(obj);
 }
-
+int cnt = 0;
 /**
  * Handle the drawing related tasks of the check box
  * @param cb pointer to a check box object
@@ -194,10 +185,10 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
 {
     /* A label never covers an area */
     if(mode == LV_DESIGN_COVER_CHK)
-        return lv_checkbox.base_p->design_cb(obj, clip_area, mode);
+        return lv_obj.design_cb(obj, clip_area, mode);
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the background*/
-        lv_checkbox.base_p->design_cb(obj, clip_area, mode);
+        lv_obj.design_cb(obj, clip_area, mode);
 
         lv_checkbox_t * cb = (lv_checkbox_t *) obj;
 
@@ -206,8 +197,7 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
 
         lv_coord_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
         lv_coord_t bg_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-
-        lv_coord_t marker_rightm = lv_obj_get_style_margin_right(obj, LV_PART_MARKER);
+        lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
         lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
         lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
@@ -217,15 +207,24 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
         lv_coord_t tranf_w = lv_obj_get_style_transform_width(obj, LV_PART_MARKER);
         lv_coord_t tranf_h = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
 
+        if(tranf_h == 2) {
+            lv_coord_t tranf_h2 = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
+        }
+        cnt++;
+        if(cnt == 2) {
+            cnt = 100;
+        }
+
         lv_draw_rect_dsc_t marker_dsc;
         lv_draw_rect_dsc_init(&marker_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MARKER, &marker_dsc);
         lv_area_t marker_area;
-        marker_area.x1 = cb->coords.x1 + bg_leftp;
+        marker_area.x1 = obj->coords.x1 + bg_leftp;
         marker_area.x2 = marker_area.x1 + font_h + marker_leftp + marker_rightp - 1;
-        marker_area.y1 = cb->coords.y1 + bg_topp;
+        marker_area.y1 = obj->coords.y1 + bg_topp;
         marker_area.y2 = marker_area.y1 + font_h + marker_topp + marker_bottomp - 1;
 
+        printf("%d, %d\n", tranf_h, 0);
         lv_area_t marker_area_transf;
         lv_area_copy(&marker_area_transf, &marker_area);
         marker_area_transf.x1 -= tranf_w;
@@ -238,7 +237,7 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
         lv_point_t txt_size;
-        _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
         lv_draw_label_dsc_t txt_dsc;
         lv_draw_label_dsc_init(&txt_dsc);
@@ -246,15 +245,15 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
 
         lv_coord_t y_ofs = (lv_area_get_height(&marker_area) - font_h) / 2;
         lv_area_t txt_area;
-        txt_area.x1 = marker_area.x2 + marker_rightm;
+        txt_area.x1 = marker_area.x2 + bg_colp;
         txt_area.x2 = txt_area.x1 + txt_size.x;
-        txt_area.y1 = cb->coords.y1 + bg_topp + y_ofs;
+        txt_area.y1 = obj->coords.y1 + bg_topp + y_ofs;
         txt_area.y2 = txt_area.y1 + txt_size.y;
 
         lv_draw_label(&txt_area, clip_area, &txt_dsc, cb->txt, NULL);
 
     } else {
-        lv_checkbox.base_p->design_cb(obj, clip_area, mode);
+        lv_obj.design_cb(obj, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;
@@ -270,7 +269,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 {
     lv_res_t res;
     /* Include the ancient signal function */
-    res = lv_checkbox.base_p->signal_cb(obj, sign, param);
+    res = lv_obj.signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     if (sign == LV_SIGNAL_GET_SELF_SIZE) {
@@ -283,19 +282,19 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
         lv_point_t txt_size;
-        _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
-        lv_coord_t marker_rightm = lv_obj_get_style_margin_right(obj, LV_PART_MARKER);
-        lv_coord_t marker_bottomm = lv_obj_get_style_margin_bottom(obj, LV_PART_MARKER);
+
+        lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
         lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
         lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
         lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
         lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
         lv_point_t marker_size;
-        marker_size.x = font_h + marker_rightm + marker_leftp + marker_rightp;
-        marker_size.y = font_h + marker_bottomm + marker_topp + marker_bottomp;
+        marker_size.x = font_h + marker_leftp + marker_rightp;
+        marker_size.y = font_h + marker_topp + marker_bottomp;
 
-        p->x = marker_size.x + txt_size.x;
+        p->x = marker_size.x + txt_size.x + bg_colp;
         p->y = LV_MATH_MAX(marker_size.y, txt_size.y);
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {

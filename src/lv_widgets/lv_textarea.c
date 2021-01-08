@@ -696,7 +696,7 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->one_line == en) return;
-    lv_label_align_t old_align = lv_label_get_align(ext->label);
+    lv_text_align_t old_align = lv_label_get_align(ext->label);
 
     if(en) {
         const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
@@ -721,12 +721,12 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
 
 /**
  * Set the alignment of the text area.
- * In one line mode the text can be scrolled only with `LV_LABEL_ALIGN_LEFT`.
+ * In one line mode the text can be scrolled only with `LV_TEXT_ALIGN_LEFT`.
  * This function should be called if the size of text area changes.
  * @param ta pointer to a text are object
- * @param align the desired alignment from `lv_label_align_t`. (LV_LABEL_ALIGN_LEFT/CENTER/RIGHT)
+ * @param align the desired alignment from `lv_text_align_t`. (LV_TEXT_ALIGN_LEFT/CENTER/RIGHT)
  */
-void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
+void lv_textarea_set_text_align(lv_obj_t * ta, lv_text_align_t align)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
@@ -737,7 +737,7 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
     }
     else {
         /*Normal left align. Just let the text expand*/
-        if(align == LV_LABEL_ALIGN_LEFT) {
+        if(align == LV_TEXT_ALIGN_LEFT) {
             lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
             lv_label_set_align(label, align);
         }
@@ -1528,7 +1528,7 @@ static void refr_cursor_area(lv_obj_t * ta)
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
     if(letter_pos.x + ext->label->coords.x1 + letter_w > ext->label->coords.x2 && ext->one_line == 0 &&
-       lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
+       lv_label_get_align(ext->label) != LV_TEXT_ALIGN_RIGHT) {
         letter_pos.x = 0;
         letter_pos.y += letter_h + line_space;
 
@@ -1721,17 +1721,17 @@ static void draw_placeholder(lv_obj_t * ta, const lv_area_t * clip_area)
         lv_draw_label_dsc_init(&ph_dsc);
         lv_obj_init_draw_label_dsc(ta, LV_TEXTAREA_PART_PLACEHOLDER, &ph_dsc);
         switch(lv_label_get_align(ext->label)) {
-        case LV_LABEL_ALIGN_CENTER:
-            ph_dsc.flag |= LV_TXT_FLAG_CENTER;
+        case LV_TEXT_ALIGN_CENTER:
+            ph_dsc.flag |= LV_TEXT_FLAG_CENTER;
             break;
-        case LV_LABEL_ALIGN_RIGHT:
-            ph_dsc.flag |= LV_TXT_FLAG_RIGHT;
+        case LV_TEXT_ALIGN_RIGHT:
+            ph_dsc.flag |= LV_TEXT_FLAG_RIGHT;
             break;
         default:
             break;
         }
 
-        if(ext->one_line) ph_dsc.flag |= LV_TXT_FLAG_EXPAND;
+        if(ext->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
         lv_coord_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_MAIN);
         lv_coord_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_MAIN);

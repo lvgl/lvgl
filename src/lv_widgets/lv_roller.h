@@ -98,9 +98,9 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 /**
  * Set the align of the roller's options (left, right or center[default])
  * @param roller - pointer to a roller object
- * @param align - one of lv_label_align_t values (left, right, center)
+ * @param align - one of lv_text_align_t values (left, right, center)
  */
-void lv_roller_set_label_align(lv_obj_t * roller, lv_label_align_t align);
+void lv_roller_set_label_align(lv_obj_t * roller, lv_text_align_t align);
 
 /**
  * Set the selected option
@@ -150,11 +150,11 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller);
 void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint32_t buf_size);
 
 /**
- * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
+ * Get the align attribute. Default alignment after _create is LV_TEXT_ALIGN_CENTER
  * @param roller pointer to a roller object
- * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
+ * @return LV_TEXT_ALIGN_LEFT, LV_TEXT_ALIGN_RIGHT or LV_TEXT_ALIGN_CENTER
  */
-lv_label_align_t lv_roller_get_label_align(const lv_obj_t * roller);
+lv_text_align_t lv_roller_get_label_align(const lv_obj_t * roller);
 
 /**
  * Get the options of a roller
