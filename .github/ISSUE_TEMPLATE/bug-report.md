@@ -13,6 +13,7 @@ Issues that don't use this template will be ignored and closed.
 -->
 
 **Perform all steps below and tick them with [x]**
+- [ ] Check the related part of the [Documentation](https://docs.lvgl.io/)
 - [ ] Update lvgl to the latest version
 - [ ] Reproduce the issue in a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html)
 
