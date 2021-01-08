@@ -106,8 +106,8 @@ menu "LVGL configuration"
 
     menu "Memory manager settings"
     config LV_MEM_CUSTOM
-	    bool
-	    prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
+        bool
+        prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
 
     config LV_MEM_CUSTOM_INCLUDE
         string
@@ -127,10 +127,10 @@ menu "LVGL configuration"
         default "free"
         depends on LV_MEM_CUSTOM
 
-	config LV_MEM_SIZE_BYTES
-	    int
-	    prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
-	    range 2 128
+    config LV_MEM_SIZE_BYTES
+        int
+        prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
+        range 2 128
         default 32
         depends on !LV_MEM_CUSTOM
 
@@ -797,7 +797,7 @@ menu "LVGL configuration"
     endmenu
 
     menu "Theme usage"
-	menu "Enable theme usage, always enable at least one theme"
+    menu "Enable theme usage, always enable at least one theme"
             config LV_THEME_EMPTY
                 bool "Empty: No theme, you can apply your styles as you need."
                 default y if LV_CONF_MINIMAL
@@ -808,7 +808,7 @@ menu "LVGL configuration"
                 default y if !LV_CONF_MINIMAL
             config LV_THEME_MONO
                 bool "Mono: Mono-color theme for monochrome displays"
-	endmenu
+    endmenu
 
         choice LV_THEME_DEFAULT_INIT
             prompt "Select theme default init"
