@@ -129,7 +129,7 @@ menu "LVGL configuration"
         default "free"
         depends on LV_MEM_CUSTOM
 
-    config LV_MEM_SIZE_BYTES
+    config LV_MEM_SIZE_KILOBYTES
         int
         prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
         range 2 128
