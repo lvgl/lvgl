@@ -82,7 +82,7 @@ for i in fin.read().splitlines():
   if '/*--END OF LV_CONF_H--*/' in i: break
 
   r = re.search(r'^ *# *define ([^\s]+).*$', i)
-  
+
 #ifndef LV_USE_BTN               /*Only if not defined in lv_conf.h*/
 #  ifdef CONFIG_LV_USE_BTN    /*Use KConfig value if set*/
 #    define LV_USE_BTN  CONFIG_LV_USE_BTN
@@ -90,7 +90,7 @@ for i in fin.read().splitlines():
 #    define LV_USE_BTN      1      /*Use default value*/
 #  endif
 #endif
-  
+
   if r:
     line = re.sub('\(.*?\)', '', r[1], 1)    #remove parentheses from macros
     dr = re.sub('.*# *define', '', i, 1)

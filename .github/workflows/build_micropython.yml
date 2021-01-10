@@ -37,6 +37,6 @@ jobs:
         echo "import gc,utime;
         utime.sleep(5);
         gc.collect();
-        utime.sleep(5)" | 
+        utime.sleep(5)" |
         ports/unix/micropython -i lib/lv_bindings/examples/advanced_demo.py
-    
+

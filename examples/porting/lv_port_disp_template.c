@@ -59,16 +59,16 @@ void lv_port_disp_init(void)
      * The buffer has to be greater than 1 display row
      *
      * There are three buffering configurations:
-     * 1. Create ONE buffer with some rows: 
+     * 1. Create ONE buffer with some rows:
      *      LVGL will draw the display's content here and writes it to your display
-     * 
-     * 2. Create TWO buffer with some rows: 
+     *
+     * 2. Create TWO buffer with some rows:
      *      LVGL will draw the display's content to a buffer and writes it your display.
      *      You should use DMA to write the buffer's content to the display.
      *      It will enable LVGL to draw the next part of the screen to the other buffer while
      *      the data is being sent form the first buffer. It makes rendering and flushing parallel.
-     * 
-     * 3. Create TWO screen-sized buffer: 
+     *
+     * 3. Create TWO screen-sized buffer:
      *      Similar to 2) but the buffer have to be screen sized. When LVGL is ready it will give the
      *      whole frame to display. This way you only need to change the frame buffer's address instead of
      *      copying the pixels.

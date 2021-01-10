@@ -14,7 +14,7 @@
 #include "../src/lv_font/lv_font.h"
 #include "../src/lv_font/lv_font_loader.h"
 
-#include "lv_test_font_loader.h" 
+#include "lv_test_font_loader.h"
 
 /*********************
  *      DEFINES

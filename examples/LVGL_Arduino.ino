@@ -40,14 +40,14 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
       data->state = LV_INDEV_STATE_REL;
     } else {
       data->state = LV_INDEV_STATE_PR;
-	    
+	
       /*Set the coordinates*/
       data->point.x = touchX;
       data->point.y = touchY;
-  
+
       Serial.print("Data x");
       Serial.println(touchX);
-      
+
       Serial.print("Data y");
       Serial.println(touchY);
     }
@@ -70,7 +70,7 @@ void setup()
 
     uint16_t calData[5] = { 275, 3620, 264, 3532, 1 };
     tft.setTouch(calData);
-  
+
     lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
 
     /*Initialize the display*/

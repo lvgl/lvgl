@@ -11,7 +11,7 @@ WARNINGS = -Werror -Wall -Wextra \
            -Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
            -Wtype-limits -Wsizeof-pointer-memaccess
 
-#-Wno-unused-value -Wno-unused-parameter 
+#-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -O3 -g0
 
 
@@ -53,10 +53,10 @@ all: default
 %.o: %.c
 	@$(CC)  $(CFLAGS) -c $< -o $@
 	@echo "CC $<"
-    
+
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)
 
-clean: 
+clean:
 	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ)
 
