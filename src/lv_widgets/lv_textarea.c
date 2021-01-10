@@ -425,7 +425,6 @@ void lv_textarea_del_char(lv_obj_t * ta)
     lv_label_set_text(ext->label, label_txt);
     lv_textarea_clear_selection(ta);
 
-
     /*If the textarea became empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
         const char * txt = lv_label_get_text(ext->label);
@@ -503,7 +502,6 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
         lv_label_set_text(ext->label, txt);
         lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
     }
-
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
@@ -1707,7 +1705,6 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
         return true; /*If the accepted char list in not specified the accept the character*/
     }
 }
-
 
 static void refr_cursor_area(lv_obj_t * ta)
 {

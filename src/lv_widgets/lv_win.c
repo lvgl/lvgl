@@ -516,7 +516,6 @@ uint8_t lv_win_title_get_alignment(lv_obj_t * win)
     return ext->title_txt_align;
 }
 
-
 /*=====================
  * Other functions
  *====================*/
@@ -531,7 +530,6 @@ void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
     LV_ASSERT_OBJ(obj, "");
-
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_focus(ext->page, obj, anim_en);

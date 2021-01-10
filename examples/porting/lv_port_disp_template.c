@@ -91,7 +91,6 @@ void lv_port_disp_init(void)
     static lv_color_t draw_buf_3_1[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*An other screen sized buffer*/
     lv_disp_buf_init(&draw_buf_dsc_3, draw_buf_3_1, draw_buf_3_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);   /*Initialize the display buffer*/
 
-
     /*-----------------------------------
      * Register the display in LVGL
      *----------------------------------*/
@@ -156,7 +155,6 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
      * Inform the graphics library that you are ready with the flushing*/
     lv_disp_flush_ready(disp_drv);
 }
-
 
 /*OPTIONAL: GPU INTERFACE*/
 #if LV_USE_GPU

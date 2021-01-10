@@ -78,14 +78,12 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *      MACROS
  **********************/
 
-
 #define FILL_NORMAL_MASK_PX(out_x,  color)                                                          \
     if(*mask_tmp_x) {          \
         if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[out_x] = color;                                 \
         else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
     }                                                                                               \
     mask_tmp_x++;
-
 
 #define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
     if(*mask_tmp_x) {          \
@@ -95,7 +93,6 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
         else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
     }                                                                                                      \
     mask_tmp_x++;
-
 
 #define MAP_NORMAL_MASK_PX(x)                                                          \
     if(*mask_tmp_x) {          \
@@ -116,7 +113,6 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
 
 /**
  * Fill and area in the display buffer.
@@ -251,7 +247,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     }
 #endif
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -392,7 +387,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
             }
 #endif
 
-
 #if LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
                 if(blend_buf[0].full != color.full) lv_color_fill(blend_buf, color, LV_HOR_RES_MAX);
@@ -449,7 +443,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
             return;
         }
 #endif
-
 
         /*Buffer the result color to avoid recalculating the same color*/
         lv_color_t last_dest_color;
@@ -580,7 +573,6 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
 
     /*Create a temp. disp_buf which always point to current line to draw*/
     lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
-
 
     lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
     switch(mode) {
@@ -775,7 +767,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.src_area.x2 = blit.src_area.x1 + draw_area_w;
                 blit.src_area.y2 = blit.src_area.y1 + draw_area_h;
 
-
                 blit.dst = disp_buf;
                 blit.dst_width = lv_area_get_width(disp_area);
                 blit.dst_height = lv_area_get_height(disp_area);
@@ -825,7 +816,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.src_area.y1 = (draw_area->y1 - (map_area->y1 - disp_area->y1));
                 blit.src_area.x2 = blit.src_area.x1 + draw_area_w;
                 blit.src_area.y2 = blit.src_area.y1 + draw_area_h;
-
 
                 blit.dst = disp_buf;
                 blit.dst_width = lv_area_get_width(disp_area);

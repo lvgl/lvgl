@@ -564,7 +564,6 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 
     }
 
-
     if(top_act_scr == NULL) {
         top_act_scr = disp_refr->act_scr;
     }

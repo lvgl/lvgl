@@ -7,7 +7,6 @@ import re
 import subprocess
 import com
 
-
 def make(repo_path, auto_push = False):
         os.chdir("./" + repo_path)
         com.cmd('git checkout master')
@@ -36,7 +35,6 @@ def make(repo_path, auto_push = False):
             for line in f:
                 (key, val) = line.rstrip().split('\t')
                 com.define_set("lv_conf.h", str(key), str(val))
-
 
         if os.path.exists("lv_examples"):
             print("Upadte lv_examples");

@@ -42,8 +42,6 @@ enum {
 
 typedef uint8_t lv_roller_mode_t;
 
-
-
 /*Data of roller*/
 typedef struct {
     lv_page_ext_t page; /*Ext. of ancestor*/
@@ -182,7 +180,6 @@ static inline uint16_t lv_roller_get_anim_time(const lv_obj_t * roller)
 {
     return lv_page_get_anim_time(roller);
 }
-
 
 /**********************
  *      MACROS

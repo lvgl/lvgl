@@ -27,7 +27,6 @@
 - fix(layout) stop layout after recursion threshold is reached
 - fix(gauge) fix redraw with image needle
 
-
 ## v7.8.1
 
 ### Bugfixes
@@ -104,7 +103,6 @@
 - Fix click focus
 - Fix imgbtn image switching with empty style
 - Material theme: do not set the text font to allow easy global font change
-
 
 ## v7.6.0 (22.09.2020)
 
@@ -188,7 +186,6 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - textarea: fix typo in lv_textarea_set_sscrollbar_mode
 - gauge: fix image needle drawing
 - fix using freed memory in _lv_style_list_remove_style
-
 
 ## v7.2.0 (21.07.2020)
 
@@ -293,7 +290,6 @@ The name of the project is changed to LVGL and the new website is on https://lvg
 
 LVGL remains free under the same conditions (MIT license) and a company is created to manage LVGL and offer services.
 
-
 ### New drawing system
 Complete rework of LVGL's draw engine to use "masks" for more advanced and higher quality graphical effects.
 A possible use-case of this system is to remove the overflowing content from the rounded edges.
@@ -306,7 +302,6 @@ The API in this regard remained the same but some new functions were added:
 - `lv_img_set_zoom`: set image object's zoom factor
 - `lv_img_set_angle`: set image object's angle without using canvas
 - `lv_img_set_pivot`: set the pivot point of rotation
-
 
 The new drawing engine brought new drawing features too. They are highlighted in the "style" section.
 

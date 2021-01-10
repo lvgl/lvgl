@@ -299,7 +299,6 @@ void lv_btnmatrix_set_focused_btn(lv_obj_t * btnm, uint16_t id)
     lv_obj_invalidate(btnm);
 }
 
-
 /**
  * Enable recoloring of button's texts
  * @param btnm pointer to button matrix object
@@ -400,7 +399,6 @@ void lv_btnmatrix_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnmatrix_ctrl_t ctrl)
 void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
-
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return;
@@ -570,7 +568,6 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ct
 
     return (ext->ctrl_bits[btn_id] & ctrl) ? true : false;
 }
-
 
 /**
  * Find whether "one check" mode is enabled.
@@ -955,7 +952,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             invalidate_button_area(btnm, ext->btn_id_pr);
             invalidate_button_area(btnm, ext->btn_id_focused);
 
-
             lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) {
                 ext->btn_id_focused = ext->btn_id_pr;
@@ -1150,7 +1146,6 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
 
     /*Do not allocate memory for the same amount of buttons*/
     if(btn_cnt == ext->btn_cnt) return;
-
 
     if(ext->button_areas != NULL) {
         lv_mem_free(ext->button_areas);

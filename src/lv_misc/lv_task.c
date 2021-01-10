@@ -70,7 +70,6 @@ void _lv_task_core_init(void)
 LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
 {
 
-
     LV_LOG_TRACE("lv_task_handler started");
 
     /*Avoid concurrent running of the task handler*/

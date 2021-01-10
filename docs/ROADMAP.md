@@ -47,8 +47,6 @@ Planned to November/December 2020
 - Make image transformations more versatile
 - Allow snapshoting object to tranfrom them to images
 
-
-
 ## Ideas
 - lv_mem_alloc_aligned(size, align)
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)

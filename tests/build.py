@@ -9,7 +9,6 @@ lvgldirname = '"' + lvgldirname + '"'
 base_defines = '"-DLV_CONF_PATH=' + lvgldirname +'/tests/lv_test_conf.h -DLV_BUILD_TEST"'
 optimization = '"-O3 -g0"'
 
-
 def build(name, defines):
   global base_defines, optimization
 
@@ -49,7 +48,6 @@ def build(name, defines):
   print("---------------------------")
   print("Finished")
   print("---------------------------")
-
 
 minimal_monochrome = {
   "LV_DPI":40,
@@ -284,7 +282,6 @@ all_obj_all_features = {
   "LV_USE_WIN":1
 }
 
-
 advanced_features = {
   "LV_DPI":100,
   "LV_MEM_SIZE":4*1024*1024,
@@ -372,12 +369,7 @@ advanced_features = {
   "LV_USE_WIN":1
 }
 
-
 build("Minimal monochrome", minimal_monochrome)
 build("All objects, minimal features", all_obj_minimal_features)
 build("All objects, all common features", all_obj_all_features)
 build("All objects, with advanced features", advanced_features)
-
-
-
-

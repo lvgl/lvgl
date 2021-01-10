@@ -29,7 +29,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Initialize the default
  * @param color_primary the primary color of the theme

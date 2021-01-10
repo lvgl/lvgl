@@ -77,7 +77,6 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
         styles = (theme_styles_t *)LV_GC_ROOT(_lv_theme_empty_styles);
     }
 
-
     theme.color_primary = color_primary;
     theme.color_secondary = color_secondary;
     theme.font_small = font_small;
@@ -93,7 +92,6 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
     theme.apply_cb = theme_apply;
     return &theme;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {

@@ -265,7 +265,6 @@ uint32_t lv_label_get_text_sel_start(const lv_obj_t * label);
  */
 uint32_t lv_label_get_text_sel_end(const lv_obj_t * label);
 
-
 lv_style_list_t * lv_label_get_style(lv_obj_t * label, uint8_t type);
 
 /*=====================

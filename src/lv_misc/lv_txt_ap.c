@@ -12,7 +12,6 @@
 #include "lv_txt_ap.h"
 #include "../lv_draw/lv_draw.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -125,7 +124,6 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
 
     return chars_cnt + 1;
 }
-
 
 void _lv_txt_ap_proc(const char * txt, char * txt_out)
 {

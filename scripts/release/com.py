@@ -108,4 +108,3 @@ def update_version(ver):
         define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver[1]))
         define_set("./lvgl.h", "LVGL_VERSION_PATCH", str(ver[2]))
         define_set("./lvgl.h", "LVGL_VERSION_INFO", "\"" + ver[3] + "\"")
-

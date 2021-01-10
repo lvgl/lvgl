@@ -121,7 +121,6 @@ static inline void lv_imgbtn_set_checkable(lv_obj_t * imgbtn, bool tgl)
     lv_btn_set_checkable(imgbtn, tgl);
 }
 
-
 /*=====================
  * Getter functions
  *====================*/

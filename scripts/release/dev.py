@@ -28,7 +28,6 @@ def docs_update_ver(ver, br):
 
     os.chdir("../")
 
-
 def merge_dev_to_master():
     os.chdir("./lvgl")
     com.cmd("git checkout master")
@@ -42,7 +41,6 @@ def merge_dev_to_master():
     com.cmd("git merge dev -X theirs --no-edit;")
     com.push("origin latest")
     os.chdir("../")
-
 
 def make(mode):
     if(mode == "bugfix"):

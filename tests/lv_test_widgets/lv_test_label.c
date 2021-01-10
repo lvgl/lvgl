@@ -51,7 +51,6 @@ void lv_test_label(void)
 #endif
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

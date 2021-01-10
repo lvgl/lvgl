@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /***************************
  * CURRENT VERSION OF LVGL
  ***************************/
@@ -120,7 +119,6 @@ extern "C" {
  *
  * */
 #define LV_VERSION_CHECK(x,y,z) (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH)))
-
 
 #ifdef __cplusplus
 }

@@ -94,7 +94,6 @@ void setup()
 		lv_ex_btn_1();
 }
 
-
 void loop()
 {
 

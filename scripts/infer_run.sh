@@ -6,5 +6,4 @@
 # | sudo tar -C /opt -xJ && \
 # sudoln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
 
-
 infer run -- make -j8

@@ -104,7 +104,6 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_theme_apply(cont, LV_THEME_CONT);
         }
 
-
     }
     /*Copy an existing object*/
     else {
@@ -291,7 +290,6 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 
     return res;
 }
-
 
 static lv_style_list_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
 {

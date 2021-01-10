@@ -26,7 +26,6 @@ int main(void)
     return 0;
 }
 
-
 #if LV_USE_FILESYSTEM
 static lv_fs_res_t open_cb(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode)
 {
@@ -144,4 +143,3 @@ uint32_t custom_tick_get(void)
 }
 
 #endif
-

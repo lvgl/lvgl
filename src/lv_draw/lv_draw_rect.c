@@ -245,7 +245,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         lv_draw_mask_res_t mask_res = LV_DRAW_MASK_RES_FULL_COVER;
         lv_color_t grad_color = dsc->bg_color;
 
-
         lv_color_t * grad_map = NULL;
         /*In case of horizontal gradient pre-compute a line with a gradient*/
         if(grad_dir == LV_GRAD_DIR_HOR) {
@@ -330,7 +329,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
                 _lv_blend_fill(clip, &fill_area2,
                                grad_color, mask_buf + mask_ofs, mask_res, opa2, dsc->bg_blend_mode);
 
-
             }
             else {
                 if(grad_dir == LV_GRAD_DIR_HOR) {
@@ -362,7 +360,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             fill_area.y1 = coords_bg.y2 - rout;
             if(fill_area.y1 <= fill_area.y2) fill_area.y1 = fill_area.y2 + 1;    /*Avoid overdrawing the last line*/
             fill_area.y2 = coords_bg.y2;
-
 
             _lv_blend_fill(clip, &fill_area,
                            dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
@@ -588,7 +585,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     int32_t r_sh = dsc->radius;
     short_side = LV_MATH_MIN(lv_area_get_width(&sh_rect_area), lv_area_get_height(&sh_rect_area));
     if(r_sh > short_side >> 1) r_sh = short_side >> 1;
-
 
     int32_t corner_size = sw  + r_sh;
 
@@ -915,7 +911,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
             sh_buf_tmp += corner_size;
         }
     }
-
 
     /*Fill the bottom side*/
     a.x1 = sh_area.x1 + corner_size;
@@ -1289,7 +1284,6 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
 }
 #endif
 
-
 #if LV_USE_VALUE_STR
 static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
@@ -1483,7 +1477,6 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
             if(mask_ofs < 0) mask_ofs = 0;
             _lv_blend_fill(clip, &fill_area2, color, mask_buf + mask_ofs, mask_res, opa, blend_mode);
 
-
             fill_area.y1++;
             fill_area.y2++;
         }
@@ -1523,4 +1516,3 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     lv_draw_mask_remove_id(mask_rout_id);
     _lv_mem_buf_release(mask_buf);
 }
-

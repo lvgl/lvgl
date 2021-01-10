@@ -4,7 +4,6 @@
 Generates a checker file for lv_conf.h from lv_conf_template.h define all the not defined values
 '''
 
-
 import sys
 import re
 
@@ -14,7 +13,6 @@ if sys.version_info < (3,6,0):
 
 fin = open("../lv_conf_template.h", "r")
 fout = open("../src/lv_conf_internal.h", "w")
-
 
 fout.write(
 '''/**
@@ -109,7 +107,6 @@ for i in fin.read().splitlines():
     continue   #ignore typedefs to avoide redeclaration
   else:
     fout.write(f'{i}\n')
-
 
 fout.write(
 '''

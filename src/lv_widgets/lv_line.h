@@ -87,7 +87,6 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en);
     lv_line_set_y_invert /*The name was inconsistent. In v.6.0 only `lv_line_set_y_invert`will                         \
 work */
 
-
 /*=====================
  * Getter functions
  *====================*/

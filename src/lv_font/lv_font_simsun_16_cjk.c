@@ -12639,7 +12639,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t gylph_bitmap[] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 };
 
-
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
@@ -13559,8 +13558,6 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
     }
 };
 
-
-
 /*--------------------
  *  ALL CUSTOM DATA
  *--------------------*/
@@ -13577,7 +13574,6 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .kern_classes = 0,
     .bitmap_format = 0
 };
-
 
 /*-----------------
  *  PUBLIC FONT
@@ -13600,4 +13596,3 @@ lv_font_t lv_font_simsun_16_cjk = {
 };
 
 #endif /*#if LV_FONT_SIMSUN_16_CJK*/
-

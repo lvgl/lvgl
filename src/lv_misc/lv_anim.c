@@ -351,7 +351,6 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
     return (lv_anim_value_t)new_value;
 }
 
-
 /**
  * Calculate the current value of an animation with 3 bounces
  * @param a pointer to an animation

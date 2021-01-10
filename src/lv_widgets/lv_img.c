@@ -624,7 +624,6 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             bg_dsc.border_opa = LV_OPA_TRANSP;
         }
 
-
         int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         zoom_final = (zoom_final * ext->zoom) >> 8;
 
@@ -839,7 +838,6 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, top);
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, bottom);
 
-
     }
     else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t * info = param;
@@ -871,7 +869,6 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
 
     return res;
 }
-
 
 static lv_style_list_t * lv_img_get_style(lv_obj_t * img, uint8_t type)
 {

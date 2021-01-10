@@ -149,7 +149,6 @@ lv_res_t lv_indev_finish_drag(lv_indev_t * indev);
  */
 void lv_indev_wait_release(lv_indev_t * indev);
 
-
 /**
  * Gets a pointer to the currently active object in indev proc functions.
  * NULL if no object is currently being handled or if groups aren't used.

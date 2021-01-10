@@ -177,7 +177,6 @@ uint8_t del_prev  :
     uint32_t last_activity_time; /**< Last time there was activity on this display */
 } lv_disp_t;
 
-
 typedef enum {
     LV_DISP_SIZE_SMALL,
     LV_DISP_SIZE_MEDIUM,

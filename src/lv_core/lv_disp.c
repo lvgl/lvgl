@@ -180,7 +180,6 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src)
     _lv_inv_area(disp, &a);
 }
 
-
 /**
  * Opacity of the background
  * @param disp pointer to a display
@@ -215,7 +214,6 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
 {
     lv_disp_t * d = lv_obj_get_disp(new_scr);
     lv_obj_t * act_scr = lv_scr_act();
-
 
     if(d->del_prev && act_scr != d->scr_to_load && d->scr_to_load) {
         lv_obj_del(act_scr);

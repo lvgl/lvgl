@@ -14,12 +14,10 @@ WARNINGS = -Werror -Wall -Wextra \
 #-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -O3 -g0
 
-
 CFLAGS ?= -I$(LVGL_DIR)/ $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
 
 LDFLAGS ?=  -lpng
 BIN ?= demo
-
 
 #Collect the files to compile
 MAINSRC = ./lv_test_main.c
@@ -59,4 +57,3 @@ default: $(AOBJS) $(COBJS) $(MAINOBJ)
 
 clean:
 	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ)
-

@@ -36,7 +36,6 @@ typedef struct {
     uint32_t dummy2;
 }dir_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -156,7 +155,6 @@ static lv_fs_res_t fs_open (lv_fs_drv_t * drv, void * file_p, const char * path,
 
     return res;
 }
-
 
 /**
  * Close an opened file

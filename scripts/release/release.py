@@ -78,7 +78,6 @@ def lvgl_release(ver):
 
     return release_note
 
-
 def lv_examples_release(ver):
     print("Release lv_examples")
 
@@ -159,7 +158,6 @@ def blog_release(ver, release_note):
     com.push('origin master')
 
     os.chdir("../../")
-
 
 def make():
     ver = com.get_lvgl_version("master")

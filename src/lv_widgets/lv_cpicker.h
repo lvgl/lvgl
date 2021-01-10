@@ -40,8 +40,6 @@ enum {
 };
 typedef uint8_t lv_cpicker_color_mode_t;
 
-
-
 /*Data of colorpicker*/
 typedef struct {
     lv_color_hsv_t hsv;
@@ -66,7 +64,6 @@ enum {
     _LV_CPICKER_PART_VIRTUAL_LAST,
     _LV_CPICKER_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
-
 
 /**********************
  * GLOBAL PROTOTYPES

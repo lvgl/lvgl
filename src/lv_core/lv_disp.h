@@ -85,7 +85,6 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
  */
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
-
 /**
  * Set the background color of a display
  * @param disp pointer to a display
@@ -206,7 +205,6 @@ static inline void lv_scr_load(lv_obj_t * scr)
  */
 #define LV_VER_RES lv_disp_get_ver_res(lv_disp_get_default())
 #endif
-
 
 /**
  * Same as Android's DIP. (Different name is chosen to avoid mistype between LV_DPI and LV_DIP)
