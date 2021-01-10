@@ -338,13 +338,8 @@ lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_s
      * styles' data if LVGL is used in a binding (e.g. Micropython)
      * In a general case styles could be simple `static lv_style_t my style` variables or allocated directly into `styles`*/
     if(!inited) {
-#if defined(LV_GC_INCLUDE)
         LV_GC_ROOT(_lv_theme_template_styles) = lv_mem_alloc(sizeof(theme_styles_t));
         styles = (theme_styles_t *)LV_GC_ROOT(_lv_theme_template_styles);
-#else
-        styles = lv_mem_alloc(sizeof(theme_styles_t));
-#endif
-
     }
 
     theme.color_primary = color_primary;
