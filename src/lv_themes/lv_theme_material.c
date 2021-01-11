@@ -875,7 +875,6 @@ static void tabview_win_shared_init(void)
 #endif
 }
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -954,7 +953,6 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 
     return &theme;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
@@ -1187,7 +1185,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 
-
 #if LV_USE_ROLLER
         case LV_THEME_ROLLER:
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
@@ -1210,7 +1207,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_LIST_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->list_bg);
-
 
             list = lv_obj_get_style_list(obj, LV_LIST_PART_SCROLLBAR);
             _lv_style_list_add_style(list, &styles->sb);
@@ -1314,7 +1310,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 
 #endif
-
 
 #if LV_USE_SPINBOX
         case LV_THEME_SPINBOX:

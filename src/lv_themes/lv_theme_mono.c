@@ -173,10 +173,8 @@ static void basic_init(void)
     style_init_reset(&styles->no_radius);
     lv_style_set_radius(&styles->no_radius, LV_STATE_DEFAULT, 0);
 
-
     style_init_reset(&styles->border_none);
     lv_style_set_border_width(&styles->border_none, LV_STATE_DEFAULT, 0);
-
 
     style_init_reset(&styles->fg_color);
     lv_style_set_bg_color(&styles->fg_color, LV_STATE_DEFAULT, FG_COLOR);
@@ -242,14 +240,12 @@ static void btn_init(void)
 #endif
 }
 
-
 static void btnmatrix_init(void)
 {
 #if LV_USE_BTNMATRIX
 
 #endif
 }
-
 
 static void calendar_init(void)
 {
@@ -283,7 +279,6 @@ static void chart_init(void)
 #endif
 }
 
-
 static void cpicker_init(void)
 {
 #if LV_USE_CPICKER
@@ -298,14 +293,12 @@ static void checkbox_init(void)
 #endif
 }
 
-
 static void cont_init(void)
 {
 #if LV_USE_CONT != 0
 
 #endif
 }
-
 
 static void gauge_init(void)
 {
@@ -341,7 +334,6 @@ static void label_init(void)
 
 #endif
 }
-
 
 static void linemeter_init(void)
 {
@@ -393,14 +385,12 @@ static void switch_init(void)
 #endif
 }
 
-
 static void spinbox_init(void)
 {
 #if LV_USE_SPINBOX
 
 #endif
 }
-
 
 static void spinner_init(void)
 {
@@ -492,7 +482,6 @@ static void win_init(void)
 #endif
 }
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -566,7 +555,6 @@ lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secon
 
     return &theme;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
@@ -812,7 +800,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 
-
 #if LV_USE_ROLLER
         case LV_THEME_ROLLER:
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
@@ -825,7 +812,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             _lv_style_list_add_style(list, &styles->no_radius);
             break;
 #endif
-
 
 #if LV_USE_OBJMASK
         case LV_THEME_OBJMASK:
@@ -940,7 +926,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 
-
 #if LV_USE_SPINBOX
         case LV_THEME_SPINBOX:
             list = lv_obj_get_style_list(obj, LV_SPINBOX_PART_BG);
@@ -1019,9 +1004,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
     }
 
-
     lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-
 
 }
 

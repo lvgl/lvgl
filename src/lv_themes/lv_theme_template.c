@@ -57,7 +57,6 @@ static bool inited;
  **********************/
 static void style_init_reset(lv_style_t * style);
 
-
 static void basic_init(void)
 {
     style_init_reset(&styles->bg);
@@ -131,14 +130,12 @@ static void btn_init(void)
 #endif
 }
 
-
 static void btnmatrix_init(void)
 {
 #if LV_USE_BTNMATRIX
 
 #endif
 }
-
 
 static void calendar_init(void)
 {
@@ -154,7 +151,6 @@ static void chart_init(void)
 #endif
 }
 
-
 static void cpicker_init(void)
 {
 #if LV_USE_CPICKER
@@ -169,14 +165,12 @@ static void checkbox_init(void)
 #endif
 }
 
-
 static void cont_init(void)
 {
 #if LV_USE_CONT != 0
 
 #endif
 }
-
 
 static void gauge_init(void)
 {
@@ -198,7 +192,6 @@ static void label_init(void)
 
 #endif
 }
-
 
 static void linemeter_init(void)
 {
@@ -242,14 +235,12 @@ static void switch_init(void)
 #endif
 }
 
-
 static void spinbox_init(void)
 {
 #if LV_USE_SPINBOX
 
 #endif
 }
-
 
 static void spinner_init(void)
 {
@@ -326,7 +317,6 @@ static void win_init(void)
 
 #endif
 }
-
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -406,7 +396,6 @@ lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_s
 
     return &theme;
 }
-
 
 void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
@@ -658,7 +647,6 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 
-
 #if LV_USE_ROLLER
         case LV_THEME_ROLLER:
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
@@ -669,7 +657,6 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             _lv_style_list_add_style(list, &styles->color);
             break;
 #endif
-
 
 #if LV_USE_OBJMASK
         case LV_THEME_OBJMASK:
@@ -781,7 +768,6 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             _lv_style_list_add_style(list, &styles->bg);
             break;
 #endif
-
 
 #if LV_USE_SPINBOX
         case LV_THEME_SPINBOX:

@@ -625,7 +625,6 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
                 }
             }
 
-
             /*There where a previous strong char which can be used*/
             if(bracket_dir != LV_BIDI_DIR_NEUTRAL) break;
 
@@ -635,7 +634,6 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
             break;
         }
     }
-
 
     /*The letter was an opening bracket*/
     if(bracket_left[i] != '\0') {
@@ -659,6 +657,5 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
 
     return LV_BIDI_DIR_NEUTRAL;
 }
-
 
 #endif /*LV_USE_BIDI*/

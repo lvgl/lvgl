@@ -385,7 +385,6 @@ extern "C" {
 #endif
 #endif
 
-
 /*------------------
  * SPINNER DEF ANIM
  *-----------------*/

@@ -14,7 +14,7 @@
 #include "../src/lv_font/lv_font.h"
 #include "../src/lv_font/lv_font_loader.h"
 
-#include "lv_test_font_loader.h" 
+#include "lv_test_font_loader.h"
 
 /*********************
  *      DEFINES
@@ -212,4 +212,3 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
  **********************/
 
 #endif // LV_BUILD_TEST
-

@@ -51,7 +51,6 @@ static lv_signal_cb_t label_signal;
 static lv_signal_cb_t ancestor_page_signal;
 static lv_signal_cb_t ancestor_btn_signal;
 
-
 /**********************
  *      MACROS
  **********************/
@@ -189,10 +188,8 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
         lv_obj_set_width(btn, w);
     }
 
-
     lv_obj_add_protect(btn, LV_PROTECT_PRESS_LOST);
     lv_obj_set_signal_cb(btn, lv_list_btn_signal);
-
 
 #if LV_USE_IMG != 0
     lv_obj_t * img = NULL;

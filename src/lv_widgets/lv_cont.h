@@ -54,7 +54,6 @@ enum {
     LV_LAYOUT_ROW_MID,          /**< Row middle align*/
     LV_LAYOUT_ROW_BOTTOM,       /**< Row bottom align*/
 
-
     /**
      * PRETTY:
      * - Place the object next to each other

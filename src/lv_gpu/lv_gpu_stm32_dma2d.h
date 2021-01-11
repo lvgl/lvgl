@@ -52,7 +52,6 @@ void lv_gpu_stm32_dma2d_init(void);
 void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, lv_coord_t fill_w,
                              lv_coord_t fill_h);
 
-
 /**
  * Fill an area in the buffer with a color but take into account a mask which describes the opacity of each pixel
  * @param buf a buffer which should be filled using a mask
@@ -92,7 +91,6 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
  */
 void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa,
                               lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h);
-
 
 /**
  * Can be used as `gpu_wait_cb` in display driver to

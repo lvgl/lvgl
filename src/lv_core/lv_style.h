@@ -539,7 +539,6 @@ lv_res_t _lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop
  */
 lv_res_t _lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t * res);
 
-
 /**
  * Get an opacity typed property from a style list.
  * It will return the property which match best with given state.
@@ -598,8 +597,6 @@ bool lv_debug_check_style_list(const lv_style_list_t * list);
  *     lv_style_copy(&my_style, &style_to_copy);
  */
 #define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy_p);
-
-
 
 #if LV_USE_DEBUG
 

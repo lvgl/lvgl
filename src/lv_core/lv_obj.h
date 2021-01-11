@@ -56,7 +56,6 @@ extern "C" {
 
 struct _lv_obj_t;
 
-
 /** Design modes */
 enum {
     LV_DESIGN_DRAW_MAIN, /**< Draw the main portion of the object */
@@ -64,7 +63,6 @@ enum {
     LV_DESIGN_COVER_CHK, /**< Check if the object fully covers the 'mask_p' area */
 };
 typedef uint8_t lv_design_mode_t;
-
 
 /** Design results */
 enum {
@@ -288,7 +286,6 @@ typedef struct {
  */
 void lv_init(void);
 
-
 /**
  * Deinit the 'lv' library
  * Currently only implemented when not using custom allocators, or GC is enabled.
@@ -339,7 +336,6 @@ void lv_obj_del_async(struct _lv_obj_t * obj);
  */
 void lv_obj_clean(lv_obj_t * obj);
 
-
 /**
  * Mark an area of an object as invalid.
  * This area will be redrawn by 'lv_refr_task'
@@ -353,7 +349,6 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
  * @param obj pointer to an object
  */
 void lv_obj_invalidate(const lv_obj_t * obj);
-
 
 /**
  * Tell whether an area of an object is visible (even partially) now or not
@@ -512,7 +507,6 @@ void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_
  * @param y_ofs y coordinate offset after alignment
  */
 void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
-
 
 /**
  * Align an object's middle point to an other object horizontally.
@@ -848,7 +842,6 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
  */
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 
-
 /**
  * Send LV_EVENT_REFRESH event to an object
  * @param obj point to an object. (Can NOT be NULL)
@@ -887,7 +880,6 @@ const void * lv_event_get_data(void);
  * @param signal_cb the new signal function
  */
 void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
-
 
 /**
  * Send an event to the object
@@ -1212,7 +1204,6 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
  */
 lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
 
-
 #include "lv_obj_style_dec.h"
 
 /*-----------------
@@ -1275,14 +1266,12 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
 
-
 /**
 * Get the focus parent attribute of an object
 * @param obj pointer to an object
 * @return true: focus parent is enabled
 */
 bool lv_obj_get_focus_parent(const lv_obj_t * obj);
-
 
 /**
  * Get the drag parent attribute of an object
@@ -1314,7 +1303,6 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj);
  * @return false: none of the given bits are set, true: at least one bit is set
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
-
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 
@@ -1489,7 +1477,6 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
  */
 bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
-
 /**********************
  *      MACROS
  **********************/
@@ -1510,7 +1497,6 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
  */
 #define LV_EVENT_CB_DECLARE(name) static void name(lv_obj_t * obj, lv_event_t e)
 
-
 #if LV_USE_DEBUG
 
 # ifndef LV_DEBUG_IS_OBJ
@@ -1518,7 +1504,6 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
                                             lv_debug_check_obj_valid(obj_p) && \
                                             lv_debug_check_obj_type(obj_p, obj_type))
 # endif
-
 
 # if LV_USE_ASSERT_OBJ
 #  ifndef LV_ASSERT_OBJ
@@ -1534,7 +1519,6 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 #else
 # define LV_ASSERT_OBJ(obj, obj_type)
 #endif
-
 
 #ifdef __cplusplus
 } /* extern "C" */

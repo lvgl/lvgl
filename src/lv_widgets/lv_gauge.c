@@ -240,7 +240,6 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int32_t value)
     a.y2 = LV_MATH_MAX(p_mid.y, p_end.y) + needle_w;
     lv_obj_invalidate_area(gauge, &a);
 
-
 }
 
 /**
@@ -389,7 +388,6 @@ lv_coord_t lv_gauge_get_needle_img_pivot_y(lv_obj_t * gauge)
 
     return ext->needle_img_pivot.y;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

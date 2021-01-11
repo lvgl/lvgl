@@ -240,7 +240,6 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
         lv_anim_set_time(&a, ext->anim_time);
 
-
         if(x_coord != x_act) {
             lv_anim_set_values(&a, x_act, x_coord);
             lv_anim_start(&a);

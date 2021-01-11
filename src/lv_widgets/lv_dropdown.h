@@ -134,7 +134,6 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
  */
 void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 
-
 /**
  * Set the direction of the a drop down list
  * @param ddlist pointer to a drop down list object

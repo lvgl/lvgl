@@ -34,7 +34,6 @@
     #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
-
 #if defined(LV_USER_DATA_FREE_INCLUDE)
     #include LV_USER_DATA_FREE_INCLUDE
 #endif /* LV_USE_USER_DATA_FREE */
@@ -341,9 +340,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         }
     }
 
-
     _lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
-
 
     new_obj->ext_draw_pad = 0;
 
@@ -367,7 +364,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #if LV_USE_USER_DATA
     _lv_memset_00(&new_obj->user_data, sizeof(lv_obj_user_data_t));
 #endif
-
 
 #if LV_USE_GROUP
     new_obj->group_p = NULL;
@@ -489,7 +485,6 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         if(!disp) return LV_RES_INV;   /*Shouldn't happen*/
         if(disp->act_scr == obj) act_scr_del = true;
     }
-
 
     obj_del_core(obj);
 
@@ -694,7 +689,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     _lv_ll_chg_list(&obj->parent->child_ll, &parent->child_ll, obj, true);
     obj->parent = parent;
 
-
     if(new_base_dir != LV_BIDI_DIR_RTL) {
         lv_obj_set_pos(obj, old_pos.x, old_pos.y);
     }
@@ -780,7 +774,6 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
         x = x + par->coords.x1;
         y = y + par->coords.y1;
     }
-
 
     /*Calculate and set the movement*/
     lv_point_t diff;
@@ -1055,7 +1048,6 @@ void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, l
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
-
     obj_align_mid_core(obj, base, align, true, true, x_ofs, y_ofs);
 
 #if LV_USE_OBJ_REALIGN
@@ -1085,10 +1077,8 @@ void lv_obj_align_mid_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
-
     obj_align_mid_core(obj, base, align, true, false, x_ofs, 0);
 }
-
 
 /**
  * Align an object's middle point to an other object vertically.
@@ -1106,7 +1096,6 @@ void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     }
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
-
 
     obj_align_mid_core(obj, base, align, false, true, 0, y_ofs);
 }
@@ -1148,7 +1137,6 @@ void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
     LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_USE_OBJ_REALIGN = 0");
 #endif
 }
-
 
 /**
  * Set the size of an extended clickable area
@@ -1751,7 +1739,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     else if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 #else
 
-
     for(part = 0; part < _LV_OBJ_PART_REAL_LAST; part++) {
         lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
         if(style_list == NULL) break;   /*No more style lists*/
@@ -1942,7 +1929,6 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
         }
     }
 }
-
 
 /**
  * Call an event function with an object, event, and data.
@@ -2804,7 +2790,6 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
             }
         }
 
-
         lv_state_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
@@ -3059,7 +3044,6 @@ bool lv_obj_get_parent_event(const lv_obj_t * obj)
     return obj->parent_event == 0 ? false : true;
 }
 
-
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -3281,7 +3265,6 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
     return false;
 #endif
 }
-
 
 /*-------------------
  * OTHER FUNCTIONS
@@ -3959,7 +3942,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
     return LV_DESIGN_RES_OK;
 }
 
-
 /**
  * Get the really focused object by taking `focus_parent` into account.
  * @param obj the start object
@@ -4168,7 +4150,6 @@ static void obj_align_mid_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t
     lv_coord_t obj_w_half = lv_obj_get_width(obj) / 2;
     lv_coord_t obj_h_half = lv_obj_get_height(obj) / 2;
 
-
     switch(align) {
         case LV_ALIGN_CENTER:
             new_x = lv_obj_get_width(base) / 2 - obj_w_half;
@@ -4289,8 +4270,6 @@ static void obj_align_mid_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t
     else if(y_set) lv_obj_set_y(obj, new_y);
 
 }
-
-
 
 #if LV_USE_ANIMATION
 
@@ -4656,7 +4635,6 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
         list->text_space_zero = 0;
     }
 
-
     lv_opa_t bg_opa = lv_obj_get_style_bg_opa(obj, part);
     list->bg_opa_transp    = bg_opa == LV_OPA_TRANSP ? 1 : 0;
     list->bg_opa_cover     = bg_opa == LV_OPA_COVER ? 1 : 0;
@@ -4671,7 +4649,6 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     list->radius_zero    = lv_obj_get_style_radius(obj, part) == 0 ? 1 : 0;
     list->shadow_width_zero    = lv_obj_get_style_shadow_width(obj, part) == 0 ? 1 : 0;
     list->value_txt_str    = lv_obj_get_style_value_str(obj, part) == NULL ? 1 : 0;
-
 
     list->transform_all_zero  = 1;
     if(lv_obj_get_style_transform_angle(obj, part) != 0 ||
@@ -4773,7 +4750,6 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
         list->valid_cache = 0;
     }
 
-
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child) {
         update_style_cache_children(child);
@@ -4798,7 +4774,6 @@ static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot
     lv_obj_init_draw_label_dsc(obj, part, &shot->label);
     lv_obj_init_draw_img_dsc(obj, part, &shot->img);
     lv_obj_init_draw_line_dsc(obj, part, &shot->line);
-
 
     shot->pad_top = lv_obj_get_style_pad_top(obj, part);
     shot->pad_bottom = lv_obj_get_style_pad_bottom(obj, part);
@@ -4831,7 +4806,6 @@ static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot
 static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2)
 {
     if(memcmp(shot1, shot2, sizeof(style_snapshot_t)) == 0) return STYLE_COMPARE_SAME;
-
 
     if(shot1->pad_top != shot2->pad_top) return STYLE_COMPARE_DIFF;
     if(shot1->pad_bottom != shot2->pad_bottom) return STYLE_COMPARE_DIFF;

@@ -147,7 +147,6 @@ uint16_t lv_linemeter_get_scale_angle(const lv_obj_t * lmeter);
  */
 uint16_t lv_linemeter_get_angle_offset(lv_obj_t * lmeter);
 
-
 void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_t part);
 
 /**

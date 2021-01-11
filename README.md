@@ -1,18 +1,18 @@
-<h1 align="center"> LVGL - Light and Versatile Graphics Library</h1> 
+<h1 align="center"> LVGL - Light and Versatile Graphics Library</h1>
 
 <p align="center">
 <img src="https://lvgl.io/assets/images/img_1.png">
 </p>
 
 <p align="center">
-LVGL provides everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint. 
+LVGL provides everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
 </p>
 
 <h4 align="center">
-<a href="https://lvgl.io">Website </a> &middot; 
-<a href="https://lvgl.io/demos">Online demo</a> &middot; 
-<a href="https://lvgl.github.io/lv_examples/">Nightly demos</a> &middot; 
-<a href="https://docs.lvgl.io/">Docs</a> &middot; 
+<a href="https://lvgl.io">Website </a> &middot;
+<a href="https://lvgl.io/demos">Online demo</a> &middot;
+<a href="https://lvgl.github.io/lv_examples/">Nightly demos</a> &middot;
+<a href="https://docs.lvgl.io/">Docs</a> &middot;
 <a href="https://forum.lvgl.io">Forum</a>
 </h4>
 
@@ -53,37 +53,37 @@ Basically, every modern controller (which is able to drive a display) is suitabl
     <td> &gt; 16 MHz </td>
     <td> &gt; 48 MHz</td>
   </tr>
-  
+
   <tr>
     <td> <strong>Flash/ROM</strong></td>
     <td> &gt; 64 kB </td>
     <td> &gt; 180 kB</td>
   </tr>
-  
+
   <tr>
     <td> <strong>Static RAM</strong></td>
     <td> &gt; 2 kB </td>
     <td> &gt; 4 kB</td>
   </tr>
-  
+
   <tr>
     <td> <strong>Stack</strong></td>
     <td> &gt; 2 kB </td>
     <td> &gt; 8 kB</td>
   </tr>
-  
+
   <tr>
     <td> <strong>Heap</strong></td>
     <td> &gt; 2 kB </td>
     <td> &gt; 8 kB</td>
   </tr>
-  
+
   <tr>
     <td> <strong>Display buffer</strong></td>
     <td> &gt; 1 &times; <em>hor. res.</em> pixels </td>
     <td> &gt; 10 &times; <em>hor. res.</em> pixels </td>
   </tr>
-  
+
   <tr>
     <td> <strong>Compiler</strong></td>
     <td colspan="2"> C99 or newer </td>
@@ -114,9 +114,9 @@ This list shows the recommended way of learning the library:
 7. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library (2-3 hours)
 8. Check the documentation of the [Widgets](https://docs.lvgl.io/latest/en/html/widgets/index.html) to see their features and usage
 9. If you have questions go to the [Forum](http://forum.lvgl.io/)
-10. Read the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes) 
+10. Read the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes)
 
-## Examples 
+## Examples
 
 For more examples see the [lv_examples](https://github.com/lvgl/lv_examples) repository.
 

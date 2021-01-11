@@ -810,7 +810,6 @@ static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
     return style_dsc_p;
 }
 
-
 /**
  * Called when a tab button is clicked
  * @param tab_btnm pointer to the tab's button matrix object
@@ -910,7 +909,6 @@ static void refr_indic_size(lv_obj_t * tabview)
     lv_obj_set_width(ext->indic, indic_w);
     lv_obj_set_height(ext->indic, indic_h);
 }
-
 
 static void refr_btns_size(lv_obj_t * tabview)
 {

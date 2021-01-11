@@ -349,7 +349,6 @@
 #  endif
 #endif
 
-
 /* Gesture threshold in pixels */
 #ifndef LV_INDEV_DEF_GESTURE_LIMIT
 #  ifdef CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
@@ -748,7 +747,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #endif   /*LV_TICK_CUSTOM*/
-
 
 /*================
  * Log settings
@@ -1928,7 +1926,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
-
 /*Tab (dependencies: lv_page, lv_btnm)*/
 #ifndef LV_USE_TABVIEW
 #  ifdef CONFIG_LV_USE_TABVIEW
@@ -1989,8 +1986,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #endif
-
-
 
 /*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)

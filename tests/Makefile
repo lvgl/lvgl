@@ -11,15 +11,13 @@ WARNINGS = -Werror -Wall -Wextra \
            -Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
            -Wtype-limits -Wsizeof-pointer-memaccess
 
-#-Wno-unused-value -Wno-unused-parameter 
+#-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -O3 -g0
-
 
 CFLAGS ?= -I$(LVGL_DIR)/ $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
 
 LDFLAGS ?=  -lpng
 BIN ?= demo
-
 
 #Collect the files to compile
 MAINSRC = ./lv_test_main.c
@@ -53,10 +51,9 @@ all: default
 %.o: %.c
 	@$(CC)  $(CFLAGS) -c $< -o $@
 	@echo "CC $<"
-    
+
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)
 
-clean: 
+clean:
 	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ)
-

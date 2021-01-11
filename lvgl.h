@@ -2,14 +2,13 @@
  * @file lvgl.h
  * Include all LittleV GL related headers
  */
- 
+
 #ifndef LVGL_H
 #define LVGL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /***************************
  * CURRENT VERSION OF LVGL
