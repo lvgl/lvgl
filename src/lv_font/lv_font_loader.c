@@ -16,7 +16,6 @@
 
 #if LV_USE_FILESYSTEM
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -61,7 +60,6 @@ typedef struct cmap_table_bin {
     uint8_t padding;
 } cmap_table_bin_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -71,7 +69,6 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
 static int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
-
 
 /**********************
  *      MACROS
@@ -115,7 +112,6 @@ lv_font_t * lv_font_load(const char * font_name)
 
     return font;
 }
-
 
 /**
  * Frees the memory allocated by the `lv_font_load()` function
@@ -184,7 +180,6 @@ void lv_font_free(lv_font_t * font)
         lv_mem_free(font);
     }
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -691,4 +686,3 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 }
 
 #endif /*LV_USE_FILESYSTEM*/
-

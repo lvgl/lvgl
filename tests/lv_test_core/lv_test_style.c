@@ -57,7 +57,6 @@ void lv_test_style(void)
     mem_leak();
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -166,7 +165,6 @@ static void add_remove_read_prop(void)
     _lv_style_list_reset(&style_list);
 }
 
-
 static void cascade(void)
 {
     lv_test_print("");
@@ -236,7 +234,6 @@ static void cascade(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an overwritten 'color' property");
     lv_test_assert_color_eq(LV_COLOR_BLUE, color, "Get the value of an overwritten 'color' property");
 
-
     lv_test_print("Overwrite the properties with the local style");
     _lv_style_list_set_local_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, 20);
     _lv_style_list_set_local_opa(&style_list, LV_STYLE_BG_OPA, LV_OPA_70);
@@ -259,7 +256,6 @@ static void cascade(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get a local 'color' property");
     lv_test_assert_color_eq(LV_COLOR_LIME, color, "Get the value of a local'color' property");
 
-
     /*Clean-up*/
     _lv_style_list_reset(&style_list);
 }
@@ -269,7 +265,6 @@ static void copy(void)
     lv_test_print("");
     lv_test_print("Copy styles and style lists");
     lv_test_print("---------------------------");
-
 
     lv_test_print("Copy a style");
     lv_style_t style_src;
@@ -362,7 +357,6 @@ static void states(void)
     _lv_style_set_opa(&style_first, LV_STYLE_BG_OPA, LV_OPA_50);
     _lv_style_set_opa(&style_first, LV_STYLE_BG_OPA | (LV_STATE_CHECKED | LV_STATE_PRESSED) << LV_STYLE_STATE_POS, LV_OPA_60);
 
-
     lv_opa_t opa;
     found = _lv_style_list_get_opa(&style_list, LV_STYLE_BG_OPA , &opa);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'opa' property in normal state");
@@ -379,7 +373,6 @@ static void states(void)
     found = _lv_style_list_get_opa(&style_list, LV_STYLE_BG_OPA | (LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_HOVERED) << LV_STYLE_STATE_POS, &opa);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'opa' property in checked pressed hovered state");
     lv_test_assert_int_eq(LV_OPA_60, opa, "Get the value of an 'int' in checked pressed hovered state");
-
 
     lv_test_print("Test state precedence in 2 styles");
     _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR, LV_COLOR_YELLOW);
@@ -416,7 +409,6 @@ static void states(void)
     /*Clean-up*/
     _lv_style_list_reset(&style_list);
 }
-
 
 static void mem_leak(void)
 {
@@ -491,7 +483,6 @@ static void mem_leak(void)
     lv_mem_monitor(&mon_end);
     lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 
-
     lv_test_print("Add styles");
     lv_mem_monitor(&mon_start);
     for(i = 0; i < 100; i++) {
@@ -537,7 +528,6 @@ static void mem_leak(void)
          _lv_style_list_remove_style(&style_list, &style2);
          _lv_style_list_add_style(&style_list, &style1);
 
-
          if(i % 2 != 0) _lv_style_list_set_local_color(&style_list, LV_STYLE_LINE_COLOR, LV_COLOR_RED);
 
          _lv_style_list_reset(&style_list);
@@ -550,8 +540,6 @@ static void mem_leak(void)
      lv_mem_defrag();
      lv_mem_monitor(&mon_end);
      lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
-
-
 
     lv_test_print("Complex test");
 
@@ -568,7 +556,6 @@ static void mem_leak(void)
         _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED | LV_STATE_FOCUSED) << LV_STYLE_STATE_POS, LV_COLOR_GREEN);
 
         _lv_style_list_add_style(&style_list, &style1);
-
 
         if(i % 4 == 0) {
             _lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);

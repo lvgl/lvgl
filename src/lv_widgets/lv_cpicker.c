@@ -434,7 +434,6 @@ bool lv_cpicker_get_knob_colored(lv_obj_t * cpicker)
  *   STATIC FUNCTIONS
  **********************/
 
-
 /**
  * Handle the drawing related tasks of the color_picker
  * @param cpicker pointer to an object
@@ -876,7 +875,6 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     return res;
 }
 
-
 /**
  * Get the style_list descriptor of a part of the object
  * @param cpicker pointer the object
@@ -913,7 +911,6 @@ static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
     lv_cpicker_ext_t * ext = (lv_cpicker_ext_t *)lv_obj_get_ext_attr(cpicker);
     if(ext->type == LV_CPICKER_TYPE_RECT)
         return true;
-
 
     /*Valid clicks can be only in the circle*/
     if(_lv_area_is_point_on(&cpicker->coords, p, LV_RADIUS_CIRCLE)) return true;

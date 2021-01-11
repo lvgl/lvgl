@@ -43,7 +43,6 @@ typedef struct {
     uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
 } lv_font_glyph_dsc_t;
 
-
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering. */
 enum {
     LV_FONT_SUBPX_NONE,
@@ -74,7 +73,6 @@ typedef struct _lv_font_struct {
 #if LV_USE_USER_DATA
     lv_font_user_data_t user_data;  /**< Custom user data for font. */
 #endif
-
 
 } lv_font_t;
 

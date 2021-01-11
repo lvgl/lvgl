@@ -2,14 +2,13 @@
  * @file lvgl.h
  * Include all LittleV GL related headers
  */
- 
+
 #ifndef LVGL_H
 #define LVGL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /***************************
  * CURRENT VERSION OF LVGL
@@ -120,7 +119,6 @@ extern "C" {
  *
  * */
 #define LV_VERSION_CHECK(x,y,z) (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH)))
-
 
 #ifdef __cplusplus
 }

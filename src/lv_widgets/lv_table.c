@@ -191,7 +191,6 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     refr_size(table);
 }
 
-
 /**
  * Set the value of a cell.  Memory will be allocated to store the text by the table.
  * @param table pointer to a Table object
@@ -1055,7 +1054,6 @@ static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param
     return res;
 }
 
-
 /**
  * Get the style descriptor of a part of the object
  * @param table pointer the object
@@ -1114,7 +1112,6 @@ static void refr_size(lv_obj_t * table)
         line_space[i] = lv_obj_get_style_text_line_space(table, LV_TABLE_PART_CELL1 + i);
         font[i] = lv_obj_get_style_text_font(table, LV_TABLE_PART_CELL1 + i);
     }
-
 
     for(i = 0; i < ext->row_cnt; i++) {
         ext->row_h[i] = get_row_height(table, i, font, letter_space, line_space,

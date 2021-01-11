@@ -1263,7 +1263,6 @@ static void indev_drag(lv_indev_proc_t * proc)
 
     if(lv_obj_get_drag(drag_obj) == false) return;
 
-
     lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
 
     /*Count the movement by drag*/
@@ -1469,7 +1468,6 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     }
 }
 
-
 /**
  * Get the really dragged object by taking `drag_parent` into account.
  * @param obj the start object
@@ -1485,7 +1483,6 @@ static lv_obj_t * get_dragged_obj(lv_obj_t * obj)
 
     return drag_obj;
 }
-
 
 /**
 * Handle the gesture of indev_proc_p->types.pointer.act_obj
@@ -1504,7 +1501,6 @@ static void indev_gesture(lv_indev_proc_t * proc)
     }
 
     if(gesture_obj == NULL) return;
-
 
     if((LV_MATH_ABS(proc->types.pointer.vect.x) < indev_act->driver.gesture_min_velocity) &&
        (LV_MATH_ABS(proc->types.pointer.vect.y) < indev_act->driver.gesture_min_velocity)) {
@@ -1540,7 +1536,6 @@ static void indev_gesture(lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
     }
 }
-
 
 /**
  * Checks if the reset_query flag has been set. If so, perform necessary global indev cleanup actions

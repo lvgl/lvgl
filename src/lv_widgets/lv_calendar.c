@@ -119,7 +119,6 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->btn_pressing = 0;
 
-
     lv_style_list_init(&ext->style_date_nums);
     lv_style_list_init(&ext->style_day_names);
     lv_style_list_init(&ext->style_header);
@@ -581,7 +580,6 @@ static lv_style_list_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     lv_style_list_t * style_dsc_p;
 
-
     switch(part) {
         case LV_CALENDAR_PART_BG:
             style_dsc_p = &calendar->style_list;
@@ -942,7 +940,6 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
             box_area.x1 = label_area.x1;
             box_area.x2 = label_area.x2;
 
-
             lv_draw_rect(&box_area, clip_area, &rect_dsc);
 
             /*Write the day's number*/
@@ -955,7 +952,6 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
     }
     calendar->state = state_ori;
     _lv_obj_disable_style_caching(calendar, false);
-
 
 }
 
@@ -971,7 +967,6 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
 static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-
 
     if(draw_state == DAY_DRAW_PREV_MONTH) {
         year -= month == 1 ? 1 : 0;
@@ -1005,7 +1000,6 @@ static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int
 static bool is_pressed(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-
 
     if(draw_state == DAY_DRAW_PREV_MONTH) {
         year -= month == 1 ? 1 : 0;

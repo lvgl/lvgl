@@ -794,7 +794,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t gylph_bitmap[] = {
     0xc1, 0x64, 0xa1, 0x0, 0x54, 0x9a, 0x96, 0x0
 };
 
-
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
@@ -902,8 +901,6 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *  CHARACTER MAPPING
  *--------------------*/
 
-
-
 /*Collect the unicode lists and glyph_id offsets*/
 static const lv_font_fmt_txt_cmap_t cmaps[] =
 {
@@ -912,8 +909,6 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
     }
 };
-
-
 
 /*--------------------
  *  ALL CUSTOM DATA
@@ -932,7 +927,6 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .bitmap_format = 1
 };
 
-
 /*-----------------
  *  PUBLIC FONT
  *----------------*/
@@ -950,4 +944,3 @@ lv_font_t font_3 = {
 };
 
 #endif /*#if FONT_3*/
-

@@ -470,7 +470,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     return res;
 }
 
-
 static lv_style_list_t * lv_slider_get_style(lv_obj_t * slider, uint8_t part)
 {
     LV_ASSERT_OBJ(slider, LV_OBJX_NAME);

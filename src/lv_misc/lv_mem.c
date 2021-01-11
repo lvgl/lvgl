@@ -265,7 +265,6 @@ void lv_mem_free(const void * data)
 
     }
 
-
 #endif /*LV_MEM_AUTO_DEFRAG*/
 #else /*Use custom, user defined free function*/
 #if LV_ENABLE_GC == 0
@@ -331,7 +330,6 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
             lv_mem_free(data_p);
         }
     }
-
 
     return new_p;
 }
@@ -521,7 +519,6 @@ void * _lv_mem_buf_get(uint32_t size)
         return LV_GC_ROOT(_lv_mem_buf[i_guess]).p;
     }
 
-
     /*Reallocate a free buffer*/
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0) {
@@ -617,7 +614,6 @@ LV_ATTRIBUTE_FAST_MEM void * _lv_memcpy(void * dst, const void * src, size_t len
         return dst;
     }
 
-
     /*Make the memories aligned*/
     if(d_align) {
         d_align = ALIGN_MASK + 1 - d_align;
@@ -649,7 +645,6 @@ LV_ATTRIBUTE_FAST_MEM void * _lv_memcpy(void * dst, const void * src, size_t len
 
     return dst;
 }
-
 
 /**
  * Same as `memset` but optimized for 4 byte operation.
@@ -696,7 +691,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
         len -= 4;
     }
 
-
     d8 = (uint8_t *)d32;
     while(len) {
         *d8 = v;
@@ -714,7 +708,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
 {
     uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
-
 
     /*Make the address aligned*/
     if(d_align) {
@@ -745,7 +738,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
         len -= 4;
     }
 
-
     d8 = (uint8_t *)d32;
     while(len) {
         *d8 = 0;
@@ -763,7 +755,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
 {
     uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
-
 
     /*Make the address aligned*/
     if(d_align) {
@@ -793,7 +784,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
         SET32(0xFFFFFFFF);
         len -= 4;
     }
-
 
     d8 = (uint8_t *)d32;
     while(len) {

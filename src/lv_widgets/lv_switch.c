@@ -254,7 +254,6 @@ static lv_design_res_t lv_switch_design(lv_obj_t * sw, const lv_area_t * clip_ar
     return LV_DESIGN_RES_OK;
 }
 
-
 /**
  * Signal function of the switch
  * @param sw pointer to a switch object

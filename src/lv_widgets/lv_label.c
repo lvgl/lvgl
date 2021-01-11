@@ -119,7 +119,6 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
 
-
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
 
@@ -611,7 +610,6 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t char_id, lv_point_
     bidi_txt = &txt[line_start];
     visual_byte_pos = byte_id - line_start;
 #endif
-
 
     /*Calculate the x coordinate*/
     lv_coord_t x = _lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
@@ -1182,7 +1180,6 @@ void lv_label_refr_text(lv_obj_t * label)
             }
 
             uint32_t letter_id = lv_label_get_letter_on(label, &p);
-
 
             /*Be sure there is space for the dots*/
             size_t txt_len = strlen(ext->text);

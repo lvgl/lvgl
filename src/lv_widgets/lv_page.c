@@ -155,7 +155,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_page_set_scrollbar_mode(page, copy_ext->scrlbar.mode);
     }
 
-
     scrlbar_refresh(page);
 
     LV_LOG_INFO("page created");
@@ -489,7 +488,6 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     /*if using focus mode, change target to parent*/
     obj = lv_obj_get_focused_obj(obj);
 
-
     /*If obj is higher then the page focus where the "error" is smaller*/
     lv_coord_t obj_y      = obj->coords.y1 - ext->scrl->coords.y1;
     lv_coord_t obj_h      = lv_obj_get_height(obj);
@@ -517,7 +515,6 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
         scrlable_y -= scrl_bottom;
         scrlable_y += page_h - obj_h;
     }
-
 
     /*If obj is wider then the page focus where the "error" is smaller*/
     lv_coord_t obj_x      = obj->coords.x1 - ext->scrl->coords.x1;
@@ -723,7 +720,6 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
 #if LV_USE_ANIMATION
         {
-
 
             if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
                ext->edge_flash.bottom_ip) {

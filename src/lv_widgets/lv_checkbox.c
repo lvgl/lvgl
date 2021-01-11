@@ -160,7 +160,6 @@ void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
 #endif
 }
 
-
 /**
  * Make the check box inactive (disabled)
  * @param cb pointer to a check box object
@@ -269,7 +268,6 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param
 
     return res;
 }
-
 
 static lv_style_list_t * lv_checkbox_get_style(lv_obj_t * cb, uint8_t type)
 {

@@ -208,7 +208,6 @@ lv_obj_t * lv_win_get_content(const lv_obj_t * win);
  */
 lv_coord_t lv_win_get_header_height(const lv_obj_t * win);
 
-
 /**
  * Get the width of the control buttons on the header
  * @param win pointer to a window object

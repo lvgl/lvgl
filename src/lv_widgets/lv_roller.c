@@ -157,7 +157,6 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
     LV_ASSERT_STR(options);
 
-
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_obj_t * label = get_label(roller);
 
@@ -311,7 +310,6 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
     }
 }
 
-
 /**
  * Get the current selected option as a string
  * @param ddlist pointer to ddlist object
@@ -398,7 +396,6 @@ const char * lv_roller_get_options(const lv_obj_t * roller)
 
     return lv_label_get_text(get_label(roller));
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -507,7 +504,6 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
 
     return LV_DESIGN_RES_OK;
 }
-
 
 /**
  * Handle the drawing related tasks of the roller's label
@@ -828,7 +824,6 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area)
     }
 }
 
-
 /**
  * Refresh the position of the roller. It uses the id stored in: ext->ddlist.selected_option_id
  * @param roller pointer to a roller object
@@ -879,7 +874,6 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
 #endif
     }
 }
-
 
 static lv_res_t release_handler(lv_obj_t * roller)
 {
@@ -954,7 +948,6 @@ static void refr_width(lv_obj_t * roller)
             lv_obj_align(label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
             break;
     }
-
 
     if(lv_roller_get_auto_fit(roller) == false) return;
 

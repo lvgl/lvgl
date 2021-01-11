@@ -4,7 +4,7 @@
 
 ### Bugfixes
 - fix(cpicker) fix division by zero 
-- fix(dropdown) fix selecting options after the last one 
+- fix(dropdown) fix selecting options after the last one
 - fix(msgbox) use the animation time provided
 - fix(gpu_nxp_pxp) fix incorrent define name 
 - fix(indev) don't leave edit mode if there is only one object in the group
@@ -17,7 +17,7 @@
 - feat(img_cahce) allow disabling image cacheing
 - calendar: make get_day_of_week() public
 - Added support for Zephyr integration
- 
+
 ### Bugfixes
 - fix(draw_rect) free buffer used for arabic processing
 - fix(win) arabic process the title of the window
@@ -29,7 +29,6 @@
 - fix(layout) stop layout after recursion threshold is reached
 - fix(gauge) fix redraw with image needle
 
-
 ## v7.8.1
 
 ### Bugfixes
@@ -39,7 +38,7 @@
 ## v7.8.0 (01.12.2020)
 
 ### New features
-- make DMA2D non blocking 
+- make DMA2D non blocking
 - add unscii-16 built-in font
 - add KConfig
 - add lv_refr_get_fps_avg()
@@ -56,7 +55,7 @@
 - fix(slider) adjusting the left knob too with encoder
 - fix reference to LV_DRAW_BUF_MAX_NUM in lv_mem.c
 - fix(polygon draw) join adjacent points if they are on the same coordinate
-- fix(linemeter) fix invalidation when setting new value 
+- fix(linemeter) fix invalidation when setting new value
 - fix(table) add missing invalidation when changeing cell type
 - refactor(roller) rename LV_ROLLER_MODE_INIFINITE -> LV_ROLLER_MODE_INFINITE
 
@@ -68,7 +67,7 @@
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
 - fix(theme_material): remove the bottom border from tabview header
 - fix(imgbtn) guess a the closest availabe state with valid src
-- fix(spinbox) update cursor position in lv_spinbox_set_step 
+- fix(spinbox) update cursor position in lv_spinbox_set_step
 
 ## v7.7.1 (03.11.2020)
 ### Bugfixes
@@ -107,14 +106,13 @@
 - Fix imgbtn image switching with empty style
 - Material theme: do not set the text font to allow easy global font change
 
-
 ## v7.6.0 (22.09.2020)
 
 ### New features
 - Check whether any style property has changed on a state change to decide if any redraw is required
 
 ### Bugfixes
-- Fix selection of options with non-ASCII letters in dropdown list 
+- Fix selection of options with non-ASCII letters in dropdown list
 - Fix font loader to support LV_FONT_FMT_TXT_LARGE
 
 ## v7.5.0 (15.09.2020)
@@ -143,7 +141,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Add style caching to reduce acces time of properties with default value
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
-- send gestures even if the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
+- send gestures even if the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function.
 
 ### Bugfixes
 - Fix color bleeding on border drawing
@@ -161,7 +159,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Rename  `lv_chart_clear_serie` to `lv_chart_clear_series` and `lv_obj_align_origo` to `lv_obj_align_mid`
 - Add linemeter's mirror feature again
 - Fix text decor (udnerline strikethrough) with older versions of font converter
-- Fix setting local style property multiple times 
+- Fix setting local style property multiple times
 - Add missing background drawing and radius handling to image button
 - Allow adding extra label to list buttons
 - Fix crash if `lv_table_set_col_cnt` is called before `lv_table_set_row_cnt` for the first time
@@ -191,7 +189,6 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - gauge: fix image needle drawing
 - fix using freed memory in _lv_style_list_remove_style
 
-
 ## v7.2.0 (21.07.2020)
 
 ### New features
@@ -214,7 +211,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 
 ### Bugfixes
 - `tileview` fix navigation when not screen sized
-- Use 14px font by default to for better compatibility with smaller displays 
+- Use 14px font by default to for better compatibility with smaller displays
 - `linemeter` fix conversation of current value to "level"
 - Fix drawing on right border
 - Set the cursor image non clickable by default
@@ -271,7 +268,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 
 ### Bugfixes
 - Make the Microptyhon working by adding the required variables as GC_ROOT
-- Prefix some internal API functions with `_` to reduce the API of LVGL 
+- Prefix some internal API functions with `_` to reduce the API of LVGL
 - Fix built-in SimSun CJK font
 - Fix UTF-8 encoding when `LV_USE_ARABIC_PERSIAN_CHARS` is enabled
 - Fix DMA2D usage when 32 bit images directly blended
@@ -295,30 +292,28 @@ The name of the project is changed to LVGL and the new website is on https://lvg
 
 LVGL remains free under the same conditions (MIT license) and a company is created to manage LVGL and offer services.
 
-
 ### New drawing system
-Complete rework of LVGL's draw engine to use "masks" for more advanced and higher quality graphical effects. 
+Complete rework of LVGL's draw engine to use "masks" for more advanced and higher quality graphical effects.
 A possible use-case of this system is to remove the overflowing content from the rounded edges.
 It also allows drawing perfectly anti-aliased circles, lines, and arcs.
-Internally, the drawings happen by defining masks (such as rounded rectangle, line, angle). 
-When something is drawn the currently active masks can make some pixels transparent. 
-For example, rectangle borders are drawn by using 2 rectangle masks: one mask removes the inner part and another the outer part. 
+Internally, the drawings happen by defining masks (such as rounded rectangle, line, angle).
+When something is drawn the currently active masks can make some pixels transparent.
+For example, rectangle borders are drawn by using 2 rectangle masks: one mask removes the inner part and another the outer part.
 
 The API in this regard remained the same but some new functions were added:
 - `lv_img_set_zoom`: set image object's zoom factor
 - `lv_img_set_angle`: set image object's angle without using canvas
 - `lv_img_set_pivot`: set the pivot point of rotation
 
-
 The new drawing engine brought new drawing features too. They are highlighted in the "style" section.
 
 ### New style system
-The old style system is replaced with a new more flexible and lightweighted one. 
-It uses an approach similar to CSS: support cascading styles, inheriting properties and local style properties per object. 
-As part of these updates, a lot of objects were reworked and the APIs have been changed. 
+The old style system is replaced with a new more flexible and lightweighted one.
+It uses an approach similar to CSS: support cascading styles, inheriting properties and local style properties per object.
+As part of these updates, a lot of objects were reworked and the APIs have been changed.
 
 - more shadows options: *offset* and *spread*
-- gradient stop position to shift the gradient area and horizontal gradient 
+- gradient stop position to shift the gradient area and horizontal gradient
 - `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE` blending modes
 - *clip corner*: crop the content on the rounded corners
 - *text underline* and *strikethrough*
@@ -362,16 +357,16 @@ The following object types are renamed:
 - `linemeter`, `gauge`: can have background if the related style properties are set. Padding makes the scale/lines smaller. scale_border_width and scale_end_border_width allow to draw an arc on the outer part of the scale lines.
 - `gauge`: `lv_gauge_set_needle_img` allows use image as needle
 - `canvas`: allow drawing to true color alpha and alpha only canvas, add `lv_canvas_blur_hor/ver` and rename `lv_canvas_rotate` to `lv_canvas_transform`
-- `textarea`: If available in the font use bullet (`U+2022`) character in text area password 
+- `textarea`: If available in the font use bullet (`U+2022`) character in text area password
 
 ### New object types
-- `lv_objmask`: masks can be added to it. The children will be masked accordingly. 
+- `lv_objmask`: masks can be added to it. The children will be masked accordingly.
 
 ### Others
 - Change the built-in fonts to [Montserrat](https://fonts.google.com/specimen/Montserrat) and add built-in fonts from 12 px to 48 px for every 2nd size.
 - Add example CJK and Arabic/Persian/Hebrew built-in font
 - Add ° and "bullet" to the built-in fonts
-- Add Arabic/Persian script support: change the character according to its position in the text. 
+- Add Arabic/Persian script support: change the character according to its position in the text.
 - Add `playback_time` to animations.
 - Add `repeat_count` to animations instead of the current "repeat forever".
 - Replace `LV_LAYOUT_PRETTY` with `LV_LAYOUT_PRETTY_TOP/MID/BOTTOM`
@@ -388,4 +383,4 @@ The following object types are renamed:
 - First and foremost, create a new `lv_conf.h` based on `lv_conf_template.h`.
 - To try the new version it suggested using a simulator project and see the examples.
 - If you have a running project, the most difficult part of the migration is updating to the new style system. Unfortunately, there is no better way than manually updating to the new format.
-- The other parts are mainly minor renames and refactoring as described above. 
+- The other parts are mainly minor renames and refactoring as described above.

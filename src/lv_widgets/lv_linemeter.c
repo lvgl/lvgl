@@ -349,7 +349,6 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, 0);
 #endif
 
-
 #if LV_LINEMETER_PRECISE > 1
     mask_area.x1 = x_ofs - r_out;
     mask_area.x2 = x_ofs + r_out - 1;
@@ -489,7 +488,6 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
             }
         }
     }
-
 
 }
 

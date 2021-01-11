@@ -1117,7 +1117,6 @@ static lv_res_t lv_dropdown_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, 
     return res;
 }
 
-
 /**
  * Get the style descriptor of a part of the object
  * @param page pointer the object
@@ -1186,8 +1185,6 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
     page->state = state_orig;
     _lv_obj_disable_style_caching(ddlist, false);
 }
-
-
 
 static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
@@ -1338,8 +1335,6 @@ static void position_to_selected(lv_obj_t * ddlist)
     lv_obj_set_y(scrl, -line_y1 + (h - font_h) / 2);
     lv_obj_invalidate(ext->page);
 }
-
-
 
 static lv_obj_t * get_label(const lv_obj_t * ddlist)
 {

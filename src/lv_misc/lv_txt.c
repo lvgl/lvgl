@@ -234,7 +234,6 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /* Update the output width */
         if(word_w_ptr != NULL && break_index == NO_BREAK_FOUND) *word_w_ptr = cur_w;
 
-
         i = i_next;
         i_next = i_next_next;
         letter = letter_next;

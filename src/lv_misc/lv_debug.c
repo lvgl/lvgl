@@ -135,6 +135,4 @@ void lv_debug_log_error(const char * msg, uint64_t value)
  *   STATIC FUNCTIONS
  **********************/
 
-
 #endif /*LV_USE_DEBUG*/
-

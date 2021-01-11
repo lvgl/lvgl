@@ -333,7 +333,6 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     disp_drv->buffer->flushing_last = 0;
 }
 
-
 /**
  * Tell if it's the last area of the refreshing process.
  * Can be called from `flush_cb` to execute some special display refreshing if needed when all areas area flushed.
