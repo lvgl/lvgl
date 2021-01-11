@@ -5,7 +5,8 @@
 ### Bugfixes
 - fix(cpicker) fix division by zero 
 - fix(dropdown) fix selecting options after the last one 
-* fix(msgbox) use the animation time provided
+- fix(msgbox) use the animation time provided
+- fix(gpu_nxp_pxp) fix incorrent define name 
 
 ## v7.9.0 (Plann1d at 05.01.2020
 
