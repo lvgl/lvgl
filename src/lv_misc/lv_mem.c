@@ -122,14 +122,13 @@ void _lv_mem_init(void)
     /*Allocate a large array to store the dynamically allocated data*/
     static LV_MEM_ATTR MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
     work_mem = (uint8_t *)work_mem_int;
-    mem_max_size = 0;
 #else
     work_mem = (uint8_t *)LV_MEM_ADR;
 #endif
 
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
-    /*The total mem size id reduced by the first header and the close patterns */
+    /*The total mem size reduced by the first header and the close patterns */
     full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
@@ -141,10 +140,9 @@ void _lv_mem_init(void)
 void _lv_mem_deinit(void)
 {
 #if LV_MEM_CUSTOM == 0
-    _lv_memset_00(work_mem, (LV_MEM_SIZE / sizeof(MEM_UNIT)) * sizeof(MEM_UNIT));
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
-    /*The total mem size id reduced by the first header and the close patterns */
+    /*The total mem size reduced by the first header and the close patterns */
     full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
@@ -260,7 +258,6 @@ void lv_mem_free(const void * data)
         lv_mem_defrag();
 
     }
-
 #endif /*LV_MEM_AUTO_DEFRAG*/
 #else /*Use custom, user defined free function*/
 #if LV_ENABLE_GC == 0
@@ -315,10 +312,10 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
     if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
-        if(old_size != 0) {
+        if(old_size != 0 && new_size != 0) {
             _lv_memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
-            lv_mem_free(data_p);
         }
+        lv_mem_free(data_p);
     }
 
     return new_p;
@@ -409,9 +406,8 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     _lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
 #if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
-    e = NULL;
 
-    e = ent_get_next(e);
+    e = ent_get_next(NULL);
 
     while(e != NULL) {
         if(e->header.s.used == 0) {
@@ -429,13 +425,13 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     }
     mon_p->total_size = LV_MEM_SIZE;
     mon_p->max_used = mem_max_size;
-    mon_p->used_pct   = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
     if(mon_p->free_size > 0) {
-        mon_p->frag_pct   = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
-        mon_p->frag_pct   = 100 - mon_p->frag_pct;
+        mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
+        mon_p->frag_pct = 100 - mon_p->frag_pct;
     }
     else {
-        mon_p->frag_pct   = 0; /*no fragmentation if all the RAM is used*/
+        mon_p->frag_pct = 0; /*no fragmentation if all the RAM is used*/
     }
 #endif
 }
@@ -830,10 +826,10 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
         lv_mem_ent_t * after_new_e   = (lv_mem_ent_t *)&e_data[size];
         after_new_e->header.s.used   = 0;
         after_new_e->header.s.d_size = (uint32_t)e->header.s.d_size - size - sizeof(lv_mem_header_t);
-    }
 
-    /* Set the new size for the original entry */
-    e->header.s.d_size = (uint32_t)size;
+        /* Set the new size for the original entry */
+        e->header.s.d_size = (uint32_t)size;
+    }
 }
 
 #endif
