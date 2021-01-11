@@ -6,6 +6,7 @@
 - fix(cpicker) fix division by zero 
 - fix(dropdown) fix selecting options after the last one 
 * fix(msgbox) use the animation time provided
+- fix(indev) don't leave edit mode if there is only one object in the group
 
 ## v7.9.0 (Plann1d at 05.01.2020
 
