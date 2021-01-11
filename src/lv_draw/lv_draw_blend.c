@@ -70,7 +70,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_GPU || LV_USE_GPU_STM32_DMA2D
+#if (LV_USE_GPU || LV_USE_GPU_STM32_DMA2D) && (LV_USE_GPU_NXP_PXP == 0) && (LV_USE_GPU_NXP_VG_LITE == 0)
     LV_ATTRIBUTE_DMA static lv_color_t blend_buf[LV_HOR_RES_MAX];
 #endif
 
@@ -336,12 +336,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         if(opa > LV_OPA_MAX) {
-#if LV_USE_GPU
-            if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
-                disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
-                return;
-            }
-#elif LV_USE_GPU_NXP_PXP
+#if LV_USE_GPU_NXP_PXP
             if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_FILL_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
                 return;
@@ -356,6 +351,11 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 #elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
                 lv_gpu_stm32_dma2d_fill(disp_buf_first, disp_w, color, draw_area_w, draw_area_h);
+                return;
+            }
+#elif LV_USE_GPU
+            if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
+                disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
 #endif
