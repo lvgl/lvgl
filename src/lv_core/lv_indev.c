@@ -669,7 +669,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 /*On enter long press toggle edit mode.*/
                 if(editable) {
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
-                    if(_lv_ll_is_empty(&g->obj_ll) == false && _lv_ll_get_len(&g->obj_ll) > 1 ) {
+                    if (_lv_ll_get_len(&g->obj_ll) > 1 ) {
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                     }
                 }
@@ -735,7 +735,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             /*An object is being edited and the button is released. */
             else if(g->editing) {
                 /*Ignore long pressed enter release because it comes from mode switch*/
-                if(!i->proc.long_pr_sent || _lv_ll_is_empty(&g->obj_ll) || _lv_ll_get_len(&g->obj_ll) <= 1) {
+                if(!i->proc.long_pr_sent || _lv_ll_get_len(&g->obj_ll) <= 1) {
                     indev_obj_act->signal_cb(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
                     if(indev_reset_check(&i->proc)) return;
 
