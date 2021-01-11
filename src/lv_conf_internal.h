@@ -602,7 +602,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * (I.e. no new image decoder is added)
  * With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  * However the opened images might consume additional RAM.
- * LV_IMG_CACHE_DEF_SIZE must be >= 1 */
+ * Set it to 0 to disable caching */
 #ifndef LV_IMG_CACHE_DEF_SIZE
 #  ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
 #    define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
@@ -1373,15 +1373,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #ifndef lv_snprintf
-#  ifdef CONFIG_lv_snprintf
-#    define lv_snprintf CONFIG_lv_snprintf
+#  ifdef CONFIG_LV_SNPRINTF
+#    define lv_snprintf CONFIG_LV_SNPRINTF
 #  else
 #    define  lv_snprintf     snprintf
 #  endif
 #endif
 #ifndef lv_vsnprintf
-#  ifdef CONFIG_lv_vsnprintf
-#    define lv_vsnprintf CONFIG_lv_vsnprintf
+#  ifdef CONFIG_LV_VSNPRINTF
+#    define lv_vsnprintf CONFIG_LV_VSNPRINTF
 #  else
 #    define  lv_vsnprintf    vsnprintf
 #  endif

@@ -197,15 +197,9 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int32_t value)
     int32_t old_value = ext->values[needle_id];
     ext->values[needle_id] = value;
 
-    //    lv_obj_invalidate(gauge);
-
-    lv_style_int_t pad = lv_obj_get_style_pad_inner(gauge, LV_GAUGE_PART_NEEDLE);
-    lv_style_int_t left = lv_obj_get_style_pad_left(gauge, LV_GAUGE_PART_MAIN);
-    lv_style_int_t right = lv_obj_get_style_pad_right(gauge, LV_GAUGE_PART_MAIN);
-    lv_style_int_t top = lv_obj_get_style_pad_top(gauge, LV_GAUGE_PART_MAIN);
-    lv_coord_t r      = (lv_obj_get_width(gauge) - left - right) / 2 - pad;
-    lv_coord_t x_ofs  = gauge->coords.x1 + r + left + pad;
-    lv_coord_t y_ofs  = gauge->coords.y1 + r + top + pad;
+    lv_coord_t r      = lv_obj_get_width(gauge) / 2;
+    lv_coord_t x_ofs  = gauge->coords.x1 + r;
+    lv_coord_t y_ofs  = gauge->coords.y1 + r;
     uint16_t angle    = lv_linemeter_get_scale_angle(gauge);
     int16_t angle_ofs = 90 + (360 - angle) / 2 + lv_gauge_get_angle_offset(gauge);
     lv_point_t p_mid;

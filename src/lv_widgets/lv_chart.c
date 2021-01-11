@@ -195,6 +195,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 
     ser->start_point = 0;
     ser->ext_buf_assigned = false;
+    ser->hidden = 0;
     ser->y_axis = LV_CHART_AXIS_PRIMARY_Y;
 
     uint16_t i;
@@ -207,6 +208,33 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     return ser;
 }
 
+/**
+ * Deallocate and remove a data series from a chart
+ * @param chart pointer to a chart object
+ * @param series pointer to a data series on 'chart'
+ */
+void lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * series)
+{
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(series);
+
+    if(chart == NULL || series == NULL) return;
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(!series->ext_buf_assigned && series->points) lv_mem_free(series->points);
+
+    _lv_ll_remove(&ext->series_ll, series);
+    lv_mem_free(series);
+
+    return;
+}
+
+/**
+ * Add a cursor with a given color
+ * @param chart pointer to chart object
+ * @param color color of the cursor
+ * @param dir direction of the cursor. `LV_CHART_CURSOR_RIGHT/LEFT/TOP/DOWN`. OR-ed values are possible
+ * @return pointer to the created cursor
+ */
 lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axes)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
@@ -245,6 +273,22 @@ void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
 
     series->start_point = 0;
 }
+
+/**
+ * Hide/Unhide a single series of a chart.
+ * @param chart pointer to a chart object.
+ * @param series pointer to a series object
+ * @param hide true: hide the series
+ */
+void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
+{
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(series);
+
+    series->hidden = hide ? 1 : 0;
+    lv_chart_refresh(chart);
+}
+
 
 /*=====================
  * Setter functions
@@ -289,7 +333,7 @@ void lv_chart_set_y_range(lv_obj_t * chart, lv_chart_axis_t axis, lv_coord_t ymi
     if(ext->ymin[axis] == ymin && ext->ymax[axis] == ymax) return;
 
     ext->ymin[axis] = ymin;
-    ext->ymax[axis] = ymax;
+    ext->ymax[axis] = (ymax == ymin ? ymax + 1 : ymax);
 
     lv_chart_refresh(chart);
 }
@@ -665,6 +709,7 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
     cursor->point.y = point->y;
     lv_chart_refresh(chart);
 }
+
 
 /*=====================
  * Getter functions
@@ -1135,6 +1180,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
     /*Go through all data lines*/
     _LV_LL_READ_BACK(ext->series_ll, ser) {
+        if(ser->hidden) continue;
         line_dsc.color = ser->color;
         point_dsc.bg_color = ser->color;
         area_dsc.bg_color = ser->color;
@@ -1148,7 +1194,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
         lv_coord_t p_act = start_point;
         lv_coord_t p_prev = start_point;
         int32_t y_tmp = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin[ser->y_axis]) * h;
-        y_tmp  = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
+        y_tmp = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
         p2.y   = h - y_tmp + y_ofs;
 
         for(i = 0; i < ext->point_cnt; i++) {
@@ -1271,6 +1317,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
 
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(ext->series_ll, ser) {
+            if(ser->hidden) continue;
             lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;

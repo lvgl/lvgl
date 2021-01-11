@@ -1,29 +1,43 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a bug report to help us improve
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-> # Important: issues that don't use this template will be ignored/closed.
+<!-- 
+IMPORTANT
+Issues that don't use this template will be ignored and closed.
+-->
 
-**Describe the bug**
+### Perform all steps below and tick them with [x]
+- [ ] Check the related part of the [Documentation](https://docs.lvgl.io/)
+- [ ] Update lvgl to the latest version
+- [ ] Reproduce the issue in a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html)
 
-A clear and concise description of what the bug is.
+### Describe the bug
+<!-- 
+A clear and concise description of what the bug is. 
+-->
 
-**To Reproduce**
+### To Reproduce
+<!--
+Provide a small, independent code sample that can be used to reproduce the issue. 
+Ideally this should work in the PC simulator unless the problem is specific to a platform.
+Format the code like this:
+```c
+your code here
+```
+-->
 
-Please provide a small, independent code sample that can be used to reproduce the issue. Ideally this should work in the PC simulator unless the problem is specific to one platform.
+### Expected behavior
+<!-- 
+A clear and concise description of what you expected to happen. 
+-->
 
-**Expected behavior**
-
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
+### Screenshots or video
+<!--
 If applicable, add screenshots to help explain your problem.
-
-**Additional context**
-
-Add any other context about the problem here.
+-->

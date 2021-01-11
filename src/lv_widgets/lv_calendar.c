@@ -44,7 +44,6 @@ static lv_coord_t get_day_names_height(lv_obj_t * calendar);
 static void draw_header(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area);
-static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day);
 static bool is_pressed(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day);
 static const char * get_day_name(lv_obj_t * calendar, uint8_t day);
@@ -365,6 +364,27 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
     return ext->month_names;
 }
 
+/**
+ * Get the day of the week
+ * @param year a year
+ * @param month a  month (1..12)
+ * @param day a day (1..31)
+ * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
+ */
+uint8_t lv_calendar_get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
+{
+    uint32_t a = month < 3 ? 1 : 0;
+    uint32_t b = year - a;
+
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
+    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
+#else
+    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
+#endif
+
+    return day_of_week;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -617,22 +637,22 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
         uint8_t i_pos           = 0;
         i_pos                   = (y_pos * 7) + x_pos;
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        if(i_pos < get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1)) {
+        if(i_pos < lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1)) {
             ext->pressed_date.year  = ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0);
             ext->pressed_date.month = ext->showed_date.month == 1 ? 12 : (ext->showed_date.month - 1);
             ext->pressed_date.day   = get_month_length(ext->pressed_date.year, ext->pressed_date.month) -
-                                      get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) + 1 + i_pos;
+                                      lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) + 1 + i_pos;
         }
-        else if(i_pos < (get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) +
+        else if(i_pos < (lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) +
                          get_month_length(ext->showed_date.year, ext->showed_date.month))) {
             ext->pressed_date.year  = ext->showed_date.year;
             ext->pressed_date.month = ext->showed_date.month;
-            ext->pressed_date.day   = i_pos + 1 - get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
+            ext->pressed_date.day   = i_pos + 1 - lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
         }
         else if(i_pos < 42) {
             ext->pressed_date.year  = ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0);
             ext->pressed_date.month = ext->showed_date.month == 12 ? 1 : (ext->showed_date.month + 1);
-            ext->pressed_date.day   = i_pos + 1 - get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) -
+            ext->pressed_date.day   = i_pos + 1 - lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) -
                                       get_month_length(ext->showed_date.year, ext->showed_date.month);
         }
         return true;
@@ -826,7 +846,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
     lv_coord_t box_h      = (days_h - 5 * date_inner) / 6;
     lv_coord_t box_size = LV_MATH_MIN(box_w, box_h);
 
-    uint8_t month_start_day = get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
+    uint8_t month_start_day = lv_calendar_get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
 
     day_draw_state_t draw_state;
 
@@ -1065,27 +1085,6 @@ static uint8_t get_month_length(int32_t year, int32_t month)
 static uint8_t is_leap_year(uint32_t year)
 {
     return (year % 4) || ((year % 100 == 0) && (year % 400)) ? 0 : 1;
-}
-
-/**
- * Get the day of the week
- * @param year a year
- * @param month a  month
- * @param day a day
- * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
- */
-static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
-{
-    uint32_t a = month < 3 ? 1 : 0;
-    uint32_t b = year - a;
-
-#if LV_CALENDAR_WEEK_STARTS_MONDAY
-    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
-#else
-    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
-#endif
-
-    return day_of_week;
 }
 
 #endif

@@ -241,7 +241,6 @@ void lv_msgbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 
 #if LV_USE_ANIMATION
     lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    anim_time           = 0;
     ext->anim_time      = anim_time;
 #else
     (void)mbox;

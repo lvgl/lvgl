@@ -775,6 +775,7 @@ void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
 /**
  * Set the base direction of the object
+ * @note This only works if LV_USE_BIDI is enabled.
  * @param obj pointer to an object
  * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
  */
