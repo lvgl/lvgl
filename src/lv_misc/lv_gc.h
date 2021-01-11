@@ -28,7 +28,7 @@ extern "C" {
 #define LV_ITERATE_ROOTS(f) \
     f(lv_ll_t, _lv_task_ll)  /*Linked list to store the lv_tasks*/ \
     f(lv_ll_t, _lv_disp_ll)  /*Linked list of screens*/            \
-    f(lv_ll_t, _lv_indev_ll) /*Linked list of screens*/            \
+    f(lv_ll_t, _lv_indev_ll) /*Linked list of input device*/       \
     f(lv_ll_t, _lv_drv_ll)                                         \
     f(lv_ll_t, _lv_file_ll)                                        \
     f(lv_ll_t, _lv_anim_ll)                                        \
