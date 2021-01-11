@@ -44,11 +44,11 @@
 
 #if LV_ENABLE_GC == 0 /*gc custom allocations must not include header*/
 
-/*The size of this union must be 4 bytes (uint32_t)*/
+/*The size of this union must be 4/8 bytes (uint32_t/uint64_t)*/
 typedef union {
     struct {
         MEM_UNIT used : 1;    /* 1: if the entry is used*/
-        MEM_UNIT d_size : 31; /* Size off the data (1 means 4 bytes)*/
+        MEM_UNIT d_size : 31; /* Size of the data*/
     } s;
     MEM_UNIT header; /* The header (used + d_size)*/
 } lv_mem_header_t;
@@ -159,13 +159,8 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
-#ifdef LV_ARCH_64
-    /*Round the size up to 8*/
-    size = (size + 7) & (~0x7);
-#else
-    /*Round the size up to 4*/
-    size = (size + 3) & (~0x3);
-#endif
+    /*Round the size up to ALIGN_MASK*/
+    size = (size + ALIGN_MASK) & (~ALIGN_MASK);
     void * alloc = NULL;
 
 #if LV_MEM_CUSTOM == 0
@@ -287,14 +282,8 @@ void lv_mem_free(const void * data)
 
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
-
-#ifdef LV_ARCH_64
-    /*Round the size up to 8*/
-    new_size = (new_size + 7) & (~0x7);
-#else
-    /*Round the size up to 4*/
-    new_size = (new_size + 3) & (~0x3);
-#endif
+    /*Round the size up to ALIGN_MASK*/
+    new_size = (new_size + ALIGN_MASK) & (~ALIGN_MASK);
 
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
@@ -851,14 +840,8 @@ static void * ent_alloc(lv_mem_ent_t * e, size_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, size_t size)
 {
-
-#ifdef LV_ARCH_64
-    /*Round the size up to 8*/
-    size = (size + 7) & (~0x7);
-#else
-    /*Round the size up to 4*/
-    size = (size + 3) & (~0x3);
-#endif
+    /*Round the size up to ALIGN_MASK*/
+    size = (size + ALIGN_MASK) & (~ALIGN_MASK);
 
     /*Don't let empty space only for a header without data*/
     if(e->header.s.d_size == size + sizeof(lv_mem_header_t)) {
