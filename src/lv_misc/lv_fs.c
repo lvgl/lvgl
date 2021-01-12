@@ -366,6 +366,13 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         return LV_FS_RES_NOT_EX;
     }
 
+    if(rddir_p->drv->ready_cb != NULL) {
+        if(rddir_p->drv->ready_cb(rddir_p->drv) == false) {
+            rddir_p->drv = NULL;
+            return LV_FS_RES_HW_ERR;
+        }
+    }
+
     rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
     LV_ASSERT_MEM(rddir_p->dir_d);
     if(rddir_p->dir_d == NULL) {
@@ -448,6 +455,12 @@ lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
 
     if(drv == NULL) {
         return LV_FS_RES_INV_PARAM;
+    }
+
+    if(drv->ready_cb != NULL) {
+        if(drv->ready_cb(drv) == false) {
+            return LV_FS_RES_HW_ERR;
+        }
     }
 
     lv_fs_res_t res;
