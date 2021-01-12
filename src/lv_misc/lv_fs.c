@@ -107,15 +107,15 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         }
     }
 
+    if(file_p->drv->open_cb == NULL) {
+        return LV_FS_RES_NOT_IMP;
+    }
+
     file_p->file_d = lv_mem_alloc(file_p->drv->file_size);
     LV_ASSERT_MEM(file_p->file_d);
     if(file_p->file_d == NULL) {
         file_p->drv = NULL;
         return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
-    }
-
-    if(file_p->drv->open_cb == NULL) {
-        return LV_FS_RES_NOT_IMP;
     }
 
     const char * real_path = lv_fs_get_real_path(path);
@@ -373,6 +373,10 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         }
     }
 
+    if(rddir_p->drv->dir_open_cb == NULL) {
+        return LV_FS_RES_NOT_IMP;
+    }
+
     rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
     LV_ASSERT_MEM(rddir_p->dir_d);
     if(rddir_p->dir_d == NULL) {
@@ -380,13 +384,15 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
     }
 
-    if(rddir_p->drv->dir_open_cb == NULL) {
-        return LV_FS_RES_NOT_IMP;
-    }
-
     const char * real_path = lv_fs_get_real_path(path);
 
     lv_fs_res_t res = rddir_p->drv->dir_open_cb(rddir_p->drv, rddir_p->dir_d, real_path);
+
+    if(res != LV_FS_RES_OK) {
+        lv_mem_free(rddir_p->dir_d);
+        rddir_p->dir_d = NULL;
+        rddir_p->drv   = NULL;
+    }
 
     return res;
 }
