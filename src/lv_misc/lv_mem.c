@@ -16,10 +16,6 @@
     #include LV_MEM_CUSTOM_INCLUDE
 #endif
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
