@@ -100,10 +100,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
 
 static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_slider)
-
-    lv_bar.constructor(obj, parent, copy);
-
+    lv_obj_construct_base(obj, parent, copy);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     /*Initialize the allocated 'slider' */
@@ -123,7 +120,6 @@ static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
         lv_area_copy(&slider->right_knob_area, &copy_slider->right_knob_area);
     }
 
-    LV_CLASS_CONSTRUCTOR_END(obj, lv_slider)
 }
 
 static void lv_slider_destructor(lv_obj_t * obj)

@@ -61,6 +61,7 @@ extern "C" {
 #include "src/lv_widgets/lv_canvas.h"
 #include "src/lv_widgets/lv_objmask.h"
 #include "src/lv_widgets/lv_gauge.h"
+#include "src/lv_widgets/lv_linemeter.h"
 #include "src/lv_widgets/lv_switch.h"
 #include "src/lv_widgets/lv_arc.h"
 

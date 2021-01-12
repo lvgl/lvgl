@@ -31,8 +31,7 @@ extern "C" {
  **********************/
 /*Data of image*/
 typedef struct {
-    /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
-    /*New data for this type */
+    lv_obj_t obj;
     const void * src; /*Image source: Pointer to an array or a file or a symbol*/
     lv_point_t offset;
     lv_coord_t w;          /*Width of the image (Handled by the library)*/
@@ -43,13 +42,9 @@ typedef struct {
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
-} lv_img_ext_t;
+} lv_img_t;
 
-/*Image parts*/
-enum {
-    LV_IMG_PART_MAIN,
-};
-typedef uint8_t lv_img_part_t;
+extern const lv_obj_class_t lv_img;
 
 /**********************
  * GLOBAL PROTOTYPES

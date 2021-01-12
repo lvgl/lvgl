@@ -36,40 +36,17 @@ enum {
 
 typedef uint8_t lv_roller_mode_t;
 
-LV_CLASS_DECLARE_START(lv_roller, lv_obj);
+typedef struct {
+  lv_obj_t obj;
+  uint16_t option_cnt;          /*Number of options*/
+  uint16_t sel_opt_id;          /*Index of the current option*/
+  uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
+  lv_roller_mode_t mode : 1;
+  uint32_t moved : 1;
+}lv_roller_t;
 
-#define _lv_roller_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+extern const lv_obj_class_t lv_roller;
 
-#define _lv_roller_data             \
-  _lv_obj_data                  \
-  uint16_t option_cnt;          /*Number of options*/       \
-  uint16_t sel_opt_id;          /*Index of the current option*/ \
-  uint16_t sel_opt_id_ori;      /*Store the original index on focus*/   \
-  uint32_t anim_time;           \
-  lv_roller_mode_t mode : 1;    \
-  uint32_t moved : 1;   \
-
-#define _lv_roller_class_dsc        \
-  _lv_obj_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_roller, lv_obj);
-
-extern lv_roller_class_t lv_roller;
-
-
-LV_CLASS_DECLARE_START(lv_roller_label, lv_label);
-
-#define _lv_roller_label_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
-
-#define _lv_roller_label_data             \
-  _lv_label_data                  \
-
-#define _lv_roller_label_class_dsc        \
-  _lv_label_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_roller_label, lv_label);
-
-extern lv_roller_label_class_t lv_roller_label;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -96,13 +73,6 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mode_t mode);
 
 /**
- * Set the align of the roller's options (left, right or center[default])
- * @param roller - pointer to a roller object
- * @param align - one of lv_text_align_t values (left, right, center)
- */
-void lv_roller_set_label_align(lv_obj_t * roller, lv_text_align_t align);
-
-/**
  * Set the selected option
  * @param roller pointer to a roller object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
@@ -116,13 +86,6 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
  * @param row_cnt number of desired visible rows
  */
 void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt);
-
-/**
- * Get the animation time of the roller
- * @param roller pointer to a roller object
- * @param the animation time in milliseconds
- */
-void lv_roller_set_anim_time(lv_obj_t * roller, uint32_t anim_time);
 
 /*=====================
  * Getter functions
@@ -150,25 +113,11 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller);
 void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint32_t buf_size);
 
 /**
- * Get the align attribute. Default alignment after _create is LV_TEXT_ALIGN_CENTER
- * @param roller pointer to a roller object
- * @return LV_TEXT_ALIGN_LEFT, LV_TEXT_ALIGN_RIGHT or LV_TEXT_ALIGN_CENTER
- */
-lv_text_align_t lv_roller_get_label_align(const lv_obj_t * roller);
-
-/**
  * Get the options of a roller
  * @param roller pointer to roller object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
 const char * lv_roller_get_options(const lv_obj_t * roller);
-
-/**
- * Get the animation time of the roller
- * @param roller pointer to a roller object
- * @return the animation time in milliseconds
- */
-uint32_t lv_roller_get_anim_time(lv_obj_t * roller);
 
 /**********************
  *      MACROS

@@ -29,17 +29,13 @@ extern "C" {
 
 /*Data of line*/
 typedef struct {
-    /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
+    lv_obj_t obj;
     const lv_point_t * point_array;                    /*Pointer to an array with the points of the line*/
     uint16_t point_num;                                /*Number of points in 'point_array' */
     uint8_t y_inv : 1;                                 /*1: y == 0 will be on the bottom*/
-} lv_line_ext_t;
+} lv_line_t;
 
-/*Styles*/
-enum {
-    LV_LINE_PART_MAIN,
-};
-typedef uint8_t lv_line_style_t;
+extern const lv_obj_class_t lv_line;
 
 /**********************
  * GLOBAL PROTOTYPES

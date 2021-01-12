@@ -53,7 +53,7 @@ static void lv_bar_anim_ready(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_bar  = {
+const lv_obj_class_t lv_bar = {
     .constructor = lv_bar_constructor,
     .destructor = lv_bar_destructor,
     .signal_cb = lv_bar_signal,
@@ -265,8 +265,7 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 {
     LV_LOG_TRACE("lv_bar create started");
 
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_bar)
-    lv_obj.constructor(obj, parent, copy);
+    lv_obj_construct_base(obj, parent, copy);
 
     lv_bar_t * bar = (lv_bar_t *)obj;
     bar->min_value = 0;
@@ -295,7 +294,6 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 
        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
    }
-   LV_CLASS_CONSTRUCTOR_END(obj, lv_bar)
    LV_LOG_INFO("bar created");
 }
 

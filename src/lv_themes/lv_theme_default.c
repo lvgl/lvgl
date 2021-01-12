@@ -104,11 +104,12 @@ typedef struct {
     lv_style_t grow;
     lv_style_t transition_delayed;
     lv_style_t transition_normal;
+    lv_style_t anim;
+    lv_style_t line_dashed;
 
     /*Parts*/
     lv_style_t knob;
     lv_style_t indic;
-
 
 #if LV_USE_ARC
     lv_style_t arc_indic;
@@ -121,7 +122,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CHART
-    lv_style_t chart_bg, chart_series;
+    lv_style_t chart_series, chart_ticks;
 #endif
 
 #if LV_USE_CHECKBOX
@@ -184,10 +185,10 @@ static bool inited;
 static void basic_init(void)
 {
     const static lv_style_prop_t trans_props[] = {
-//            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
+            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
             LV_STYLE_TRANSFORM_WIDTH,
             LV_STYLE_TRANSFORM_HEIGHT,
-//            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB,
+            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB,
             0
     };
 
@@ -234,6 +235,8 @@ static void basic_init(void)
     lv_style_set_border_post(&styles->card, true);
     lv_style_set_text_color(&styles->card, CARD_TEXT_COLOR);
     lv_style_set_pad_all(&styles->card, PAD_DEF);
+    lv_style_set_line_color(&styles->card, COLOR_GRAY);
+    lv_style_set_line_width(&styles->card, LV_DPX(1));
 
     style_init_reset(&styles->focus_border);
     lv_style_set_border_color(&styles->focus_border, theme.color_primary);
@@ -315,6 +318,13 @@ static void basic_init(void)
     lv_style_set_pad_all(&styles->knob, LV_DPX(5));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
 
+    style_init_reset(&styles->anim);
+    lv_style_set_anim_time(&styles->anim, 200);
+
+    style_init_reset(&styles->line_dashed);
+    lv_style_set_line_dash_width(&styles->line_dashed, LV_DPX(10));
+    lv_style_set_line_dash_gap(&styles->line_dashed, LV_DPX(10));
+
 #if LV_USE_ARC
     style_init_reset(&styles->arc_indic);
     lv_style_set_line_color(&styles->arc_indic, COLOR_GRAY);
@@ -341,18 +351,14 @@ static void basic_init(void)
 #endif
 
 #if LV_USE_CHART
-    style_init_reset(&styles->chart_bg);
-    lv_style_set_line_width(&styles->chart_bg, LV_DPX(1));
-    lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
-    lv_style_set_line_dash_gap(&styles->chart_bg, LV_DPX(10));
-    lv_style_set_line_color(&styles->chart_bg, LV_COLOR_RED);//CARD_BORDER_COLOR);
-    lv_style_set_text_color(&styles->chart_bg, LV_COLOR_RED);//CARD_BORDER_COLOR);
-
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
-//    lv_style_set_size(&styles->chart_series, LV_DPX(4));
-    lv_style_set_pad_all(&styles->chart_series, LV_DPX(2));     /*Space between columns*/
     lv_style_set_radius(&styles->chart_series, LV_DPX(1));
+
+    style_init_reset(&styles->chart_ticks);
+    lv_style_set_line_width(&styles->chart_ticks, LV_DPX(1));
+    lv_style_set_line_color(&styles->chart_ticks, COLOR_GRAY);
+
 #endif
 
 
@@ -364,78 +370,60 @@ static void basic_init(void)
     lv_style_set_border_side(&styles->table_cell, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
 #endif
 }
-
-static void line_init(void)
-{
-#if LV_USE_LINE != 0
-
-#endif
-}
-
-static void linemeter_init(void)
-{
-#if LV_USE_LINEMETER != 0
-    style_init_reset(&styles->lmeter);
-    lv_style_set_radius(&styles->lmeter, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_left(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_pad_right(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_pad_top(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_scale_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(25));
-
-    lv_style_set_line_color(&styles->lmeter, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_scale_grad_color(&styles->lmeter, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_scale_end_color(&styles->lmeter, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-    lv_style_set_line_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_scale_end_line_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(7));
-#endif
-}
-
-static void gauge_init(void)
-{
-#if LV_USE_GAUGE != 0
-    style_init_reset(&styles->gauge_main);
-    lv_style_set_line_color(&styles->gauge_main, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-    lv_style_set_scale_grad_color(&styles->gauge_main, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-    lv_style_set_scale_end_color(&styles->gauge_main, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_line_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(5));
-    lv_style_set_scale_end_line_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_scale_end_border_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(8));
-    lv_style_set_pad_left(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_pad_right(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_pad_top(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_pad_all(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_scale_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_radius(&styles->gauge_main, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-
-    style_init_reset(&styles->gauge_strong);
-    lv_style_set_line_color(&styles->gauge_strong, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-    lv_style_set_scale_grad_color(&styles->gauge_strong, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-    lv_style_set_scale_end_color(&styles->gauge_strong, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_line_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(8));
-    lv_style_set_scale_end_line_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(8));
-    lv_style_set_scale_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(25));
-
-    style_init_reset(&styles->gauge_needle);
-    lv_style_set_line_color(&styles->gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
-    lv_style_set_line_width(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(8));
-    lv_style_set_bg_opa(&styles->gauge_needle, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
-    lv_style_set_radius(&styles->gauge_needle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_size(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(30));
-    lv_style_set_pad_all(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(10));
-#endif
-}
-
-static void spinner_init(void)
-{
-#if LV_USE_SPINNER != 0
-#endif
-}
-
-static void chart_init(void)
-{
-
-}
+//
+//static void linemeter_init(void)
+//{
+//#if LV_USE_LINEMETER != 0
+//    style_init_reset(&styles->lmeter);
+//    lv_style_set_radius(&styles->lmeter, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
+//    lv_style_set_pad_left(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_pad_right(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_pad_top(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_scale_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(25));
+//
+//    lv_style_set_line_color(&styles->lmeter, LV_STATE_DEFAULT, theme.color_primary);
+//    lv_style_set_scale_grad_color(&styles->lmeter, LV_STATE_DEFAULT, theme.color_primary);
+//    lv_style_set_scale_end_color(&styles->lmeter, LV_STATE_DEFAULT, lv_color_hex3(0x888));
+//    lv_style_set_line_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(10));
+//    lv_style_set_scale_end_line_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(7));
+//#endif
+//}
+//
+//static void gauge_init(void)
+//{
+//#if LV_USE_GAUGE != 0
+//    style_init_reset(&styles->gauge_main);
+//    lv_style_set_line_color(&styles->gauge_main, LV_STATE_DEFAULT, lv_color_hex3(0x888));
+//    lv_style_set_scale_grad_color(&styles->gauge_main, LV_STATE_DEFAULT, lv_color_hex3(0x888));
+//    lv_style_set_scale_end_color(&styles->gauge_main, LV_STATE_DEFAULT, theme.color_primary);
+//    lv_style_set_line_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(5));
+//    lv_style_set_scale_end_line_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(4));
+//    lv_style_set_scale_end_border_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(8));
+//    lv_style_set_pad_left(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_pad_right(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_pad_top(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_pad_all(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_scale_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(15));
+//    lv_style_set_radius(&styles->gauge_main, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
+//
+//    style_init_reset(&styles->gauge_strong);
+//    lv_style_set_line_color(&styles->gauge_strong, LV_STATE_DEFAULT, lv_color_hex3(0x888));
+//    lv_style_set_scale_grad_color(&styles->gauge_strong, LV_STATE_DEFAULT, lv_color_hex3(0x888));
+//    lv_style_set_scale_end_color(&styles->gauge_strong, LV_STATE_DEFAULT, theme.color_primary);
+//    lv_style_set_line_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(8));
+//    lv_style_set_scale_end_line_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(8));
+//    lv_style_set_scale_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(25));
+//
+//    style_init_reset(&styles->gauge_needle);
+//    lv_style_set_line_color(&styles->gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
+//    lv_style_set_line_width(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(8));
+//    lv_style_set_bg_opa(&styles->gauge_needle, LV_STATE_DEFAULT, LV_OPA_COVER);
+//    lv_style_set_bg_color(&styles->gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
+//    lv_style_set_radius(&styles->gauge_needle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
+//    lv_style_set_size(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(30));
+//    lv_style_set_pad_all(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(10));
+//#endif
+//}
 
 static void textarea_init(void)
 {
@@ -536,11 +524,6 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     theme.flags = flags;
 
     basic_init();
-    line_init();
-    linemeter_init();
-    gauge_init();
-    spinner_init();
-    chart_init();
     textarea_init();
 
     theme.apply_cb = theme_apply;
@@ -656,17 +639,20 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_CHART
     else if(lv_obj_check_type(obj, &lv_chart)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->line_dashed);
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
         lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-        lv_obj_add_style_no_refresh(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
+        lv_obj_add_style_no_refresh(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->chart_series);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->pad_small);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->chart_ticks);
     }
 #endif
 
 #if LV_USE_ROLLER
     else if(lv_obj_check_type(obj, &lv_roller)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->anim);
         lv_obj_add_style_no_refresh(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
     }
 #endif
@@ -691,38 +677,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style_no_refresh(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
     }
 #endif
-//#if LV_USE_BTNMATRIX
-//case LV_THEME_BTNMATRIX:
-//    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
-//    _lv_style_list_add_style(list, &styles->card);
-//    _lv_style_list_add_style(list, &styles->pad_small);
-//
-//    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);
-//    _lv_style_list_add_style(list, &styles->card);
-//    _lv_style_list_add_style(list, &styles->bg_click);
-//    _lv_style_list_add_style(list, &styles->btnmatrix_btn);
-//
-//    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN_2);
-//    _lv_style_list_add_style(list, &styles->card);
-//    _lv_style_list_add_style(list, &styles->bg_click);
-//    _lv_style_list_add_style(list, &styles->btnmatrix_btn);
-//    break;
-//#endif
 
-#if LV_USE_IMG
-case LV_THEME_IMAGE:
-    break;
-#endif
-
-#if LV_USE_IMGBTN
-case LV_THEME_IMGBTN:
-    break;
-#endif
-
-#if LV_USE_LINE
-case LV_THEME_LINE:
-    break;
-#endif
+    else if(lv_obj_check_type(obj, &lv_img)) {
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+    }
 
 #if LV_USE_OBJMASK
 case LV_THEME_OBJMASK:
@@ -730,41 +688,6 @@ case LV_THEME_OBJMASK:
     break;
 #endif
 
-//#if LV_USE_DROPDOWN
-//case LV_THEME_DROPDOWN:
-//    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
-//    _lv_style_list_add_style(list, &styles->card);
-//    _lv_style_list_add_style(list, &styles->bg_click);
-//    _lv_style_list_add_style(list, &styles->pad_small);
-//
-//    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
-//    _lv_style_list_add_style(list, &styles->card);
-//    _lv_style_list_add_style(list, &styles->ddlist_page);
-//    _lv_style_list_add_style(list, &styles->sb);
-//
-//    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
-//    _lv_style_list_add_style(list, &styles->ddlist_sel);
-//    break;
-//#endif
-
-//#if LV_USE_CHART
-//case LV_THEME_CHART:
-//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_BG);
-//    _lv_style_list_add_style(list, &styles->card);
-//    _lv_style_list_add_style(list, &styles->chart_bg);
-//    _lv_style_list_add_style(list, &styles->pad_small);
-//
-//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES_BG);
-//    _lv_style_list_add_style(list, &styles->pad_small);
-//    _lv_style_list_add_style(list, &styles->chart_series_bg);
-//
-//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_CURSOR);
-//    _lv_style_list_add_style(list, &styles->chart_series_bg);
-//
-//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
-//    _lv_style_list_add_style(list, &styles->chart_series);
-//    break;
-//#endif
 
 #if LV_USE_TEXTAREA
 case LV_THEME_TEXTAREA:
@@ -782,26 +705,27 @@ case LV_THEME_TEXTAREA:
 
 #endif
 
-#if LV_USE_LINEMETER
-case LV_THEME_LINEMETER:
-    list = _lv_obj_get_style_list(obj, LV_LINEMETER_PART_MAIN);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->lmeter);
-    break;
-#endif
-#if LV_USE_GAUGE
-case LV_THEME_GAUGE:
-    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->gauge_main);
-
-    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
-    _lv_style_list_add_style(list, &styles->gauge_strong);
-
-    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_NEEDLE);
-    _lv_style_list_add_style(list, &styles->gauge_needle);
-    break;
-#endif
+//#if LV_USE_LINEMETER
+//case LV_THEME_LINEMETER:
+//    list = _lv_obj_get_style_list(obj, LV_LINEMETER_PART_MAIN);
+//    _lv_style_list_add_style(list, &styles->card);
+//    _lv_style_list_add_style(list, &styles->lmeter);
+//    break;
+//#endif
+//
+//#if LV_USE_GAUGE
+//case LV_THEME_GAUGE:
+//    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
+//    _lv_style_list_add_style(list, &styles->card);
+//    _lv_style_list_add_style(list, &styles->gauge_main);
+//
+//    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
+//    _lv_style_list_add_style(list, &styles->gauge_strong);
+//
+//    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_NEEDLE);
+//    _lv_style_list_add_style(list, &styles->gauge_needle);
+//    break;
+//#endif
 }
 
 /**********************

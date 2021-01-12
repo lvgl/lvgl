@@ -418,8 +418,7 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 {
     LV_LOG_TRACE("lv_arc create started");
 
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_arc)
-    lv_obj.constructor(obj, parent, copy);
+    lv_obj_construct_base(obj, parent, copy);
 
     lv_arc_t * arc = (lv_arc_t *)obj;
     LV_LOG_TRACE("arc create started");
@@ -469,11 +468,6 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
        arc->last_angle = copy_arc->last_angle;
     }
 
-    LV_LOG_INFO("arc created");
-
-
-   LV_CLASS_CONSTRUCTOR_END(obj, lv_arc)
-   LV_LOG_INFO("arc created");
 }
 
 static void lv_arc_destructor(lv_obj_t * obj)

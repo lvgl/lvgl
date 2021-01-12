@@ -135,8 +135,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 {
     LV_LOG_TRACE("lv_checkbox create started");
 
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_checkbox)
-    lv_obj.constructor(obj, parent, copy);
+    lv_obj_construct_base(obj, parent, copy);
 
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
     /*Create the ancestor basic object*/
@@ -153,8 +152,6 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 //        const lv_checkbox_t * copy_ext = (const lv_checkbox_t *)copy;
     }
 
-
-    LV_CLASS_CONSTRUCTOR_END(obj, lv_checkbox)
     LV_LOG_INFO("lv_checkbox created");
 }
 
@@ -170,7 +167,7 @@ static void lv_checkbox_destructor(lv_obj_t * obj)
 
 //    bar->class_p->base_p->destructor(obj);
 }
-int cnt = 0;
+
 /**
  * Handle the drawing related tasks of the check box
  * @param cb pointer to a check box object
@@ -204,16 +201,8 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
         lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
         lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
 
-        lv_coord_t tranf_w = lv_obj_get_style_transform_width(obj, LV_PART_MARKER);
-        lv_coord_t tranf_h = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
-
-        if(tranf_h == 2) {
-            lv_coord_t tranf_h2 = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
-        }
-        cnt++;
-        if(cnt == 2) {
-            cnt = 100;
-        }
+        lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MARKER);
+        lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
 
         lv_draw_rect_dsc_t marker_dsc;
         lv_draw_rect_dsc_init(&marker_dsc);
@@ -224,13 +213,12 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
         marker_area.y1 = obj->coords.y1 + bg_topp;
         marker_area.y2 = marker_area.y1 + font_h + marker_topp + marker_bottomp - 1;
 
-        printf("%d, %d\n", tranf_h, 0);
         lv_area_t marker_area_transf;
         lv_area_copy(&marker_area_transf, &marker_area);
-        marker_area_transf.x1 -= tranf_w;
-        marker_area_transf.x2 += tranf_w;
-        marker_area_transf.y1 -= tranf_h;
-        marker_area_transf.y2 += tranf_h;
+        marker_area_transf.x1 -= transf_w;
+        marker_area_transf.x2 += transf_w;
+        marker_area_transf.y1 -= transf_h;
+        marker_area_transf.y2 += transf_h;
         lv_draw_rect(&marker_area_transf, clip_area, &marker_dsc);
 
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);

@@ -77,6 +77,7 @@ enum {
     LV_TEXT_ALIGN_LEFT, /**< Align text to left */
     LV_TEXT_ALIGN_CENTER, /**< Align text to center */
     LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
+    LV_TEXT_ALIGN_AUTO, /**<  */
 };
 typedef uint8_t lv_text_align_t;
 
@@ -259,6 +260,9 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop);
 
 static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_RADIUS, v); }
+
+static inline void lv_style_set_anim_time(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v); }
 
 static inline void lv_style_set_clip_corner(lv_style_t * style, bool value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, v); }

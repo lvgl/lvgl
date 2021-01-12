@@ -215,9 +215,24 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
 
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
-#if LV_USE_BIDI
+#if LV_USE_BIDI == 0
     draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
 #endif
+
+    lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
+    switch (align) {
+        case LV_TEXT_ALIGN_CENTER:
+            draw_dsc->flag |= LV_TEXT_FLAG_CENTER;
+            break;
+        case LV_TEXT_ALIGN_RIGHT:
+            draw_dsc->flag |= LV_TEXT_FLAG_RIGHT;
+            break;
+        case LV_TEXT_ALIGN_AUTO:
+            draw_dsc->flag |= draw_dsc->bidi_dir == LV_BIDI_DIR_RTL ? LV_TEXT_FLAG_RIGHT : LV_TEXT_FLAG_CENTER;
+            break;
+    }
+
+
 }
 
 /**

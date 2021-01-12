@@ -400,7 +400,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
         line_start = new_line_start;
     }
 
-    /*If the last character is line break then go to the nlabel line*/
+    /*If the last character is line break then go to the next line*/
     if(byte_id > 0) {
         if((txt[byte_id - 1] == '\n' || txt[byte_id - 1] == '\r') && txt[byte_id] == '\0') {
             y += letter_height + line_space;
@@ -548,8 +548,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
             /* Get the current letter.*/
             uint32_t letter = _lv_txt_encoded_next(bidi_txt, &i);
 
-            /*Get the nlabel letter too for kerning*/
-            uint32_t letter_nlabel = _lv_txt_encoded_next(&bidi_txt[i], NULL);
+            /*Get the next letter too for kerning*/
+            uint32_t letter_next = _lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
@@ -558,9 +558,9 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
                 }
             }
 
-            lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_nlabel);
+            lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
-            /*Finish if the x position or the last char of the nlabel line is reached*/
+            /*Finish if the x position or the last char of the next line is reached*/
             if(pos.x < x + gw || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
                 i = i_act;
                 break;
@@ -634,91 +634,91 @@ uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
  * @param pos Point to check for character under
  * @return whether a character is drawn under the point
  */
-//bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
-//{
-//    LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-//    LV_ASSERT_NULL(pos);
-//
-//    lv_area_t txt_coords;
-//    get_txt_coords(label, &txt_coords);
-//    const char * txt         = lv_label_get_text(obj);
-//    lv_label_label_t * label     = lv_obj_get_label_attr(label);
-//    uint32_t line_start      = 0;
-//    uint32_t new_line_start  = 0;
-//    lv_coord_t max_w         = lv_area_get_width(&txt_coords);
-//    const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-//    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-//    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-//    lv_coord_t letter_height    = lv_font_get_line_height(font);
-//    lv_coord_t y             = 0;
-//    lv_text_flag_t flag       = LV_TEXT_FLAG_NONE;
-//    lv_text_align_t align = lv_label_get_align(label);
-//
-//    if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
-//    if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-//    if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
-//    if(align == LV_TEXT_ALIGN_CENTER) flag |= LV_TEXT_FLAG_CENTER;
-//
-//    /*Search the line of the index letter */;
-//    while(txt[line_start] != '\0') {
-//        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
-//
-//        if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
-//        y += letter_height + line_space;
-//
-//        line_start = new_line_start;
-//    }
-//
-//    /*Calculate the x coordinate*/
-//    lv_coord_t x      = 0;
-//    lv_coord_t last_x = 0;
-//    if(align == LV_TEXT_ALIGN_CENTER) {
-//        lv_coord_t line_w;
-//        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
-//        x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
-//    }
-//    else if(align == LV_TEXT_ALIGN_RIGHT) {
-//        lv_coord_t line_w;
-//        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
-//        x += lv_area_get_width(&txt_coords) - line_w;
-//    }
-//
-//    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
-//
-//    uint32_t i           = line_start;
-//    uint32_t i_current   = i;
-//    uint32_t letter      = '\0';
-//    uint32_t letter_nlabel = '\0';
-//
-//    if(new_line_start > 0) {
-//        while(i <= new_line_start - 1) {
-//            /* Get the current letter
-//             * Be careful 'i' already points to the nlabel character */
-//            letter = _lv_txt_encoded_next(txt, &i);
-//
-//            /*Get the nlabel letter for kerning*/
-//            letter_nlabel = _lv_txt_encoded_next(&txt[i], NULL);
-//
-//            /*Handle the recolor command*/
-//            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
-//                if(_lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-//                    continue; /*Skip the letter is it is part of a command*/
-//                }
-//            }
-//            last_x = x;
-//            x += lv_font_get_glyph_width(font, letter, letter_nlabel);
-//            if(pos->x < x) {
-//                i = i_current;
-//                break;
-//            }
-//            x += letter_space;
-//            i_current = i;
-//        }
-//    }
-//
-//    int32_t max_diff = lv_font_get_glyph_width(font, letter, letter_nlabel) + letter_space + 1;
-//    return (pos->x >= (last_x - letter_space) && pos->x <= (last_x + max_diff));
-//}
+bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_NULL(pos);
+
+    lv_area_t txt_coords;
+    get_txt_coords(obj, &txt_coords);
+    const char * txt         = lv_label_get_text(obj);
+    lv_label_t * label     = (lv_label_t*)obj;
+    uint32_t line_start      = 0;
+    uint32_t new_line_start  = 0;
+    lv_coord_t max_w         = lv_area_get_width(&txt_coords);
+    const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    lv_coord_t letter_height    = lv_font_get_line_height(font);
+    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
+    lv_coord_t y             = 0;
+    lv_text_flag_t flag       = LV_TEXT_FLAG_NONE;
+
+    if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
+    if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
+    if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
+    if(align == LV_TEXT_ALIGN_CENTER) flag |= LV_TEXT_FLAG_CENTER;
+
+    /*Search the line of the index letter */;
+    while(txt[line_start] != '\0') {
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+
+        if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
+        y += letter_height + line_space;
+
+        line_start = new_line_start;
+    }
+
+    /*Calculate the x coordinate*/
+    lv_coord_t x      = 0;
+    lv_coord_t last_x = 0;
+    if(align == LV_TEXT_ALIGN_CENTER) {
+        lv_coord_t line_w;
+        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
+    }
+    else if(align == LV_TEXT_ALIGN_RIGHT) {
+        lv_coord_t line_w;
+        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        x += lv_area_get_width(&txt_coords) - line_w;
+    }
+
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
+    uint32_t i           = line_start;
+    uint32_t i_current   = i;
+    uint32_t letter      = '\0';
+    uint32_t letter_next = '\0';
+
+    if(new_line_start > 0) {
+        while(i <= new_line_start - 1) {
+            /* Get the current letter
+             * Be careful 'i' already points to the next character */
+            letter = _lv_txt_encoded_next(txt, &i);
+
+            /*Get the next letter for kerning*/
+            letter_next = _lv_txt_encoded_next(&txt[i], NULL);
+
+            /*Handle the recolor command*/
+            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+                if(_lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+                    continue; /*Skip the letter is it is part of a command*/
+                }
+            }
+            last_x = x;
+            x += lv_font_get_glyph_width(font, letter, letter_next);
+            if(pos->x < x) {
+                i = i_current;
+                break;
+            }
+            x += letter_space;
+            i_current = i;
+        }
+    }
+
+    int32_t max_diff = lv_font_get_glyph_width(font, letter, letter_next) + letter_space + 1;
+    return (pos->x >= (last_x - letter_space) && pos->x <= (last_x + max_diff));
+}
 
 /*=====================
  * Other functions
@@ -1040,8 +1040,7 @@ static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 {
     LV_LOG_TRACE("label create started");
 
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_label)
-    lv_obj.constructor(obj, parent, copy);
+    lv_obj_construct_base(obj, parent, copy);
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -1069,8 +1068,6 @@ static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_label_set_long_mode(obj, LV_LABEL_LONG_EXPAND);
     lv_label_set_text(obj, "Text");
-
-    LV_CLASS_CONSTRUCTOR_END(obj, lv_label)
 
     LV_LOG_INFO("label created");
 }

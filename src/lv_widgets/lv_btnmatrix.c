@@ -498,12 +498,7 @@ bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
 
 static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("lv_bar create started");
-
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_btnmatrix)
-    lv_obj.constructor(obj, parent, copy);
-
-    LV_LOG_TRACE("button matrix create started");
+    lv_obj_construct_base(obj, parent, copy);
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     btnm->btn_cnt        = 0;
@@ -529,7 +524,6 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv
     }
 
 
-    LV_CLASS_CONSTRUCTOR_END(obj, lv_bar)
     LV_LOG_INFO("button matrix created");
 }
 

@@ -236,6 +236,20 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * par
     return obj;
 }
 
+
+void lv_obj_construct_base(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    const lv_obj_class_t * original_class_p = obj->class_p;
+
+    /*Don't let the descendant methods to run during constructing the ancestor type*/
+    obj->class_p = obj->class_p->base_class;
+
+    obj->class_p->constructor(obj, parent, copy);
+
+    /*Restore the original class*/
+    obj->class_p = original_class_p;
+
+}
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete
@@ -1404,8 +1418,6 @@ static void obj_del_core(lv_obj_t * obj)
 
 static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_obj)
-
     /*Create a screen*/
     if(parent == NULL) {
         LV_LOG_TRACE("Screen create started");
@@ -1513,8 +1525,6 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
         /*Invalidate the area if not screen created*/
         lv_obj_invalidate(obj);
     }
-
-    LV_CLASS_CONSTRUCTOR_END(obj, lv_obj)
 
     LV_LOG_INFO("Object create ready");
 }

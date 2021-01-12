@@ -266,11 +266,11 @@ enum {
     LV_PART_CONTENT,
     LV_PART_INDICATOR,
     LV_PART_KNOB,
-    LV_PART_HIGHLIGHT,
+    LV_PART_HIGHLIGHT,  //selected?
     LV_PART_PLACEHOLDER,
-    LV_PART_CURSOR,
     LV_PART_ITEMS,
     LV_PART_MARKER,
+    LV_PART_CURSOR,  //combine with marker?
 
     LV_PART_CUSTOM_1,
     LV_PART_CUSTOM_2,
@@ -330,10 +330,9 @@ void lv_deinit(void);
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 
-void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-
 lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy);
 
+void lv_obj_construct_base(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete

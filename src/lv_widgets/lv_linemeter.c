@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_linemeter.h"
-#if LV_USE_LINEMETER != 0
+#if LV_USE_METER != 0
 
 #include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
@@ -27,13 +27,25 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_design_res_t lv_linemeter_design(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_res_t lv_linemeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
+static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_meter_destructor(lv_obj_t * obj);
+static lv_design_res_t lv_meter_design(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_res_t lv_meter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
+static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
+static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
+static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_cb_t ancestor_signal;
+const lv_obj_class_t lv_meter = {
+    .constructor = lv_meter_constructor,
+    .destructor = lv_meter_destructor,
+    .signal_cb = lv_meter_signal,
+    .design_cb = lv_meter_design,
+    .instance_size = sizeof(lv_meter_t),
+    .base_class = &lv_obj
+};
 
 /**********************
  *      MACROS
@@ -50,59 +62,9 @@ static lv_signal_cb_t ancestor_signal;
  * it
  * @return pointer to the created line meter
  */
-lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_meter_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("line meter create started");
-
-    /*Create the ancestor of line meter*/
-    lv_obj_t * linemeter = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(linemeter);
-    if(linemeter == NULL) return NULL;
-
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(linemeter);
-
-    /*Allocate the line meter type specific extended data*/
-    lv_linemeter_ext_t * ext = lv_obj_allocate_ext_attr(linemeter, sizeof(lv_linemeter_ext_t));
-    LV_ASSERT_MEM(ext);
-    if(ext == NULL) {
-        lv_obj_del(linemeter);
-        return NULL;
-    }
-
-    /*Initialize the allocated 'ext' */
-    ext->min_value   = 0;
-    ext->max_value   = 100;
-    ext->cur_value   = 0;
-    ext->line_cnt    = 18;
-    ext->scale_angle = 240;
-    ext->angle_ofs = 0;
-    ext->mirrored = 0;
-
-    /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(linemeter, lv_linemeter_signal);
-    lv_obj_set_design_cb(linemeter, lv_linemeter_design);
-
-    /*Init the new line meter line meter*/
-    if(copy == NULL) {
-        lv_obj_set_size(linemeter, 3 * LV_DPI / 2, 3 * LV_DPI / 2);
-        lv_theme_apply(linemeter, LV_THEME_LINEMETER);
-    }
-    /*Copy an existing line meter*/
-    else {
-        lv_linemeter_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->scale_angle           = copy_ext->scale_angle;
-        ext->line_cnt              = copy_ext->line_cnt;
-        ext->min_value             = copy_ext->min_value;
-        ext->max_value             = copy_ext->max_value;
-        ext->cur_value             = copy_ext->cur_value;
-
-        /*Refresh the style with new signal function*/
-        _lv_obj_refresh_style(linemeter, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-    }
-
-    LV_LOG_INFO("line meter created");
-
-    return linemeter;
+    return lv_obj_create_from_class(&lv_meter, parent, copy);
 }
 
 /*=====================
@@ -114,26 +76,44 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param lmeter pointer to a line meter object
  * @param value new value
  */
-void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
+lv_meter_indicator_t * lv_meter_add_indicator(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->cur_value == value) return;
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indic_ll);
 
-    int32_t old_value = ext->cur_value;
+    indic->color = LV_COLOR_RED;
+    indic->img_src = NULL;
+    indic->value = 40;
+    indic->type = LV_METER_INDICATOR_TYPE_NEEDLE | LV_METER_INDICATOR_TYPE_ARC |  LV_METER_INDICATOR_TYPE_SCALE;
 
-    ext->cur_value = value > ext->max_value ? ext->max_value : value;
-    ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
+    return indic;
 
-    int16_t level_old =
-        (int32_t)((int32_t)(old_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
-    int16_t level_new =
-        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
+}
 
-    if(level_new == level_old) return;
+lv_meter_segment_t * lv_meter_add_segment(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_invalidate(lmeter);
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    lv_meter_segment_t * seg = _lv_ll_ins_head(&meter->segment_ll);
+
+    seg->color = LV_COLOR_BLUE;
+    seg->start_value = 20;
+    seg->end_value = 80;
+    seg->type = LV_METER_SEGMENT_TYPE_SCALE;
+    seg->width = 5;
+    return seg;
+
+}
+void lv_meter_set_value(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    indic->value = value;
+
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -142,24 +122,16 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
  * @param min minimum value
  * @param max maximum value
  */
-void lv_linemeter_set_range(lv_obj_t * lmeter, int32_t min, int32_t max)
+void lv_linemeter_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->min_value == min && ext->max_value == max) return;
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    if(meter->min_value == min && meter->max_value == max) return;
 
-    ext->max_value = max;
-    ext->min_value = min;
-    if(ext->cur_value > max) {
-        ext->cur_value = max;
-        lv_linemeter_set_value(lmeter, ext->cur_value);
-    }
-    if(ext->cur_value < min) {
-        ext->cur_value = min;
-        lv_linemeter_set_value(lmeter, ext->cur_value);
-    }
-    lv_obj_invalidate(lmeter);
+    meter->max_value = max;
+    meter->min_value = min;
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -168,17 +140,17 @@ void lv_linemeter_set_range(lv_obj_t * lmeter, int32_t min, int32_t max)
  * @param angle angle of the scale (0..360)
  * @param line_cnt number of lines
  */
-void lv_linemeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint16_t line_cnt)
+void lv_linemeter_set_scale(lv_obj_t * obj, uint16_t angle, uint16_t line_cnt)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_meter_t * meter = (lv_meter_t *) obj;
 
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->scale_angle == angle && ext->line_cnt == line_cnt) return;
+    if(meter->scale_angle == angle && meter->line_cnt == line_cnt) return;
 
-    ext->scale_angle = angle;
-    ext->line_cnt    = line_cnt;
+    meter->scale_angle = angle;
+    meter->line_cnt    = line_cnt;
 
-    lv_obj_invalidate(lmeter);
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -186,29 +158,14 @@ void lv_linemeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint16_t line_cnt
  * @param lmeter pointer to a line meter object
  * @param angle angle where the meter will be facing (with its center)
  */
-void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
+void lv_linemeter_set_angle_offset(lv_obj_t * obj, uint16_t angle)
 {
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->angle_ofs == angle) return;
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    if(meter->angle_ofs == angle) return;
 
-    ext->angle_ofs = angle;
+    meter->angle_ofs = angle;
 
-    lv_obj_invalidate(lmeter);
-}
-
-/**
- * Set the orientation of the meter growth, clockwise or counterclockwise (mirrored)
- * @param lmeter pointer to a line meter object
- * @param mirror mirror setting
- */
-void lv_linemeter_set_mirror(lv_obj_t * lmeter, bool mirror)
-{
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->mirrored == mirror) return;
-
-    ext->mirrored = mirror;
-
-    lv_obj_invalidate(lmeter);
+    lv_obj_invalidate(obj);
 }
 
 /*=====================
@@ -220,12 +177,11 @@ void lv_linemeter_set_mirror(lv_obj_t * lmeter, bool mirror)
  * @param lmeter pointer to a line meter object
  * @return the value of the line meter
  */
-int32_t lv_linemeter_get_value(const lv_obj_t * lmeter)
+int32_t lv_meter_get_value(const lv_obj_t * obj, const lv_meter_indicator_t * indic)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->cur_value;
+    return indic->value;
 }
 
 /**
@@ -233,12 +189,11 @@ int32_t lv_linemeter_get_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the minimum value of the line meter
  */
-int32_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
+int32_t lv_meter_get_min_value(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
-
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->min_value;
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    return meter->min_value;
 }
 
 /**
@@ -246,12 +201,11 @@ int32_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the maximum value of the line meter
  */
-int32_t lv_linemeter_get_max_value(const lv_obj_t * lmeter)
+int32_t lv_meter_get_max_value(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
-
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->max_value;
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    return meter->max_value;
 }
 
 /**
@@ -259,12 +213,11 @@ int32_t lv_linemeter_get_max_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return number of the scale units
  */
-uint16_t lv_linemeter_get_line_count(const lv_obj_t * lmeter)
+uint16_t lv_linemeter_get_line_count(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
-
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->line_cnt;
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    return meter->line_cnt;
 }
 
 /**
@@ -272,12 +225,11 @@ uint16_t lv_linemeter_get_line_count(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return angle_ofs of the scale
  */
-uint16_t lv_linemeter_get_scale_angle(const lv_obj_t * lmeter)
+uint16_t lv_linemeter_get_scale_angle(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
-
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->scale_angle;
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    return meter->scale_angle;
 }
 
 /**
@@ -285,218 +237,57 @@ uint16_t lv_linemeter_get_scale_angle(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return angle offset (0..360)
  */
-uint16_t lv_linemeter_get_angle_offset(lv_obj_t * lmeter)
+uint16_t lv_linemeter_get_angle_offset(lv_obj_t * obj)
 {
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-
-    return ext->angle_ofs;
-}
-
-/**
- * get the mirror setting for the line meter
- * @param lmeter pointer to a line meter object
- * @return mirror (true or false)
- */
-bool lv_linemeter_get_mirror(lv_obj_t * lmeter)
-{
-    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-
-    return ext->mirrored;
-}
-
-void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_t part)
-{
-    lv_linemeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
-
-    lv_coord_t left = lv_obj_get_style_pad_left(lmeter, LV_LINEMETER_PART_MAIN);
-    lv_coord_t right = lv_obj_get_style_pad_right(lmeter, LV_LINEMETER_PART_MAIN);
-    lv_coord_t top = lv_obj_get_style_pad_top(lmeter, LV_LINEMETER_PART_MAIN);
-
-    lv_coord_t r_out = (lv_obj_get_width(lmeter) - left - right) / 2 ;
-    lv_coord_t r_in  = r_out - lv_obj_get_style_scale_width(lmeter, part);
-    if(r_in < 1) r_in = 1;
-
-    lv_coord_t x_ofs  = lmeter->coords.x1 + r_out + left;
-    lv_coord_t y_ofs  = lmeter->coords.y1 + r_out + top;
-    int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
-    int16_t level = ext->mirrored ?
-                    (int32_t)((int32_t)(ext->max_value - ext->cur_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value) :
-                    (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
-    uint8_t i;
-
-    lv_color_t main_color = lv_obj_get_style_line_color(lmeter, part);
-    lv_color_t grad_color = lv_obj_get_style_scale_grad_color(lmeter, part);
-    lv_color_t end_color = lv_obj_get_style_scale_end_color(lmeter, part);
-
-    lv_draw_line_dsc_t line_dsc;
-    lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(lmeter, part, &line_dsc);
-#if LV_LINEMETER_PRECISE == 2
-    line_dsc.raw_end = 1;
-#endif
-
-    lv_coord_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
-
-#if LV_LINEMETER_PRECISE > 0
-    lv_area_t mask_area;
-    mask_area.x1 = x_ofs - r_in;
-    mask_area.x2 = x_ofs + r_in - 1;
-    mask_area.y1 = y_ofs - r_in;
-    mask_area.y2 = y_ofs + r_in - 1;
-
-    lv_draw_mask_radius_param_t mask_in_param;
-    lv_draw_mask_radius_init(&mask_in_param, &mask_area, LV_RADIUS_CIRCLE, true);
-    int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, 0);
-#endif
-
-
-#if LV_LINEMETER_PRECISE > 1
-    mask_area.x1 = x_ofs - r_out;
-    mask_area.x2 = x_ofs + r_out - 1;
-    mask_area.y1 = y_ofs - r_out;
-    mask_area.y2 = y_ofs + r_out - 1;
-    lv_draw_mask_radius_param_t mask_out_param;
-    lv_draw_mask_radius_init(&mask_out_param, &mask_area, LV_RADIUS_CIRCLE, false);
-    int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
-    /*In calculation use a larger radius to avoid rounding errors */
-    lv_coord_t r_out_extra = r_out + LV_DPI;
-#else
-    lv_coord_t r_out_extra = r_out;
-#endif
-
-    for(i = 0; i < ext->line_cnt; i++) {
-        /* `* 256` for extra precision*/
-        int32_t angle_upscale = (i * ext->scale_angle * 256) / (ext->line_cnt - 1);
-        int32_t angle_normal = angle_upscale >> 8;
-
-        int32_t angle_low = (angle_upscale >> 8);
-        int32_t angle_high = angle_low + 1;
-        int32_t angle_rem = angle_upscale & 0xFF;
-
-        /*Interpolate sine and cos*/
-        int32_t sin_low = _lv_trigo_sin(angle_low + angle_ofs);
-        int32_t sin_high = _lv_trigo_sin(angle_high + angle_ofs);
-        int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
-
-        int32_t cos_low = _lv_trigo_sin(angle_low + 90 + angle_ofs);
-        int32_t cos_high = _lv_trigo_sin(angle_high + 90 + angle_ofs);
-        int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
-
-        /*Use the interpolated values to get x and y coordinates*/
-        int32_t y_out_extra = (int32_t)((int32_t)sin_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
-        int32_t x_out_extra = (int32_t)((int32_t)cos_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
-
-        /*Rounding*/
-        if(x_out_extra > 0) x_out_extra = (x_out_extra + 127) >> 8;
-        else x_out_extra = (x_out_extra - 127) >> 8;
-
-        if(y_out_extra > 0) y_out_extra = (y_out_extra + 127) >> 8;
-        else y_out_extra = (y_out_extra - 127) >> 8;
-
-        x_out_extra += x_ofs;
-        y_out_extra += y_ofs;
-
-        /*With no extra precision use the coordinates on the inner radius*/
-#if LV_LINEMETER_PRECISE == 0
-        /*Use the interpolated values to get x and y coordinates*/
-        int32_t y_in_extra = (int32_t)((int32_t)sin_mid * r_in) >> (LV_TRIGO_SHIFT - 8);
-        int32_t x_in_extra = (int32_t)((int32_t)cos_mid * r_in) >> (LV_TRIGO_SHIFT - 8);
-
-        /*Rounding*/
-        if(x_in_extra > 0) x_in_extra = (x_in_extra + 127) >> 8;
-        else x_in_extra = (x_in_extra - 127) >> 8;
-
-        if(y_in_extra > 0) y_in_extra = (y_in_extra + 127) >> 8;
-        else y_in_extra = (y_in_extra - 127) >> 8;
-
-        x_in_extra += x_ofs;
-        y_in_extra += y_ofs;
-#else
-        int32_t x_in_extra = x_ofs;
-        int32_t y_in_extra = y_ofs;
-#endif
-
-        /*Use smaller clip area only around the visible line*/
-        int32_t y_in  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
-        int32_t x_in  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
-
-        x_in += x_ofs;
-        y_in += y_ofs;
-
-        int32_t y_out  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
-        int32_t x_out  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
-
-        x_out += x_ofs;
-        y_out += y_ofs;
-
-        lv_area_t clip_sub;
-        clip_sub.x1 = LV_MATH_MIN(x_in, x_out) - line_dsc.width;
-        clip_sub.x2 = LV_MATH_MAX(x_in, x_out) + line_dsc.width;
-        clip_sub.y1 = LV_MATH_MIN(y_in, y_out) - line_dsc.width;
-        clip_sub.y2 = LV_MATH_MAX(y_in, y_out) + line_dsc.width;
-
-        if(_lv_area_intersect(&clip_sub, &clip_sub, clip_area) == false) continue;
-
-        lv_point_t p1;
-        lv_point_t p2;
-
-        p2.x = x_in_extra;
-        p2.y = y_in_extra;
-
-        p1.x = x_out_extra;
-        p1.y = y_out_extra;
-
-        /* Set the color of the lines */
-        if((!ext->mirrored && i >= level) || (ext->mirrored && i <= level)) {
-            line_dsc.color = end_color;
-            line_dsc.width = end_line_width;
-        }
-        else {
-            line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
-        }
-
-        lv_draw_line(&p1, &p2, &clip_sub, &line_dsc);
-    }
-
-#if LV_LINEMETER_PRECISE > 0
-    lv_draw_mask_remove_id(mask_in_id);
-#endif
-
-#if LV_LINEMETER_PRECISE > 1
-    lv_draw_mask_remove_id(mask_out_id);
-#endif
-
-    if(part == LV_LINEMETER_PART_MAIN && level < ext->line_cnt - 1) {
-        lv_coord_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
-        lv_coord_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
-
-        if(border_width || end_border_width) {
-            int16_t end_angle = ((level) * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
-            lv_draw_line_dsc_t arc_dsc;
-            lv_draw_line_dsc_init(&arc_dsc);
-            lv_obj_init_draw_line_dsc(lmeter, part, &arc_dsc);
-
-            if(border_width) {
-                arc_dsc.width = border_width;
-                arc_dsc.color = main_color;
-                lv_draw_arc(x_ofs, y_ofs, r_out, angle_ofs, end_angle, clip_area, &arc_dsc);
-            }
-
-            if(end_border_width) {
-                arc_dsc.width = end_border_width;
-                arc_dsc.color = end_color;
-                lv_draw_arc(x_ofs, y_ofs, r_out, end_angle, (angle_ofs + ext->scale_angle) % 360, clip_area, &arc_dsc);
-            }
-        }
-    }
-
-
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_meter_t * meter = (lv_meter_t *) obj;
+    return meter->angle_ofs;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    LV_LOG_TRACE("line meter create started");
+    lv_obj_construct_base(obj, parent, copy);
+
+
+    lv_meter_t * meter = (lv_meter_t *) obj;
+
+    /*Initialize the allocated 'ext' */
+    meter->min_value   = 0;
+    meter->max_value   = 100;
+    meter->scale_angle = 240;
+    meter->angle_ofs = 0;
+    meter->line_cnt = 26;
+    meter->marker_nth = 5;
+    meter->indicator_stacked = 0;
+    _lv_ll_init(&meter->indic_ll, sizeof(lv_meter_indicator_t));
+    _lv_ll_init(&meter->segment_ll, sizeof(lv_meter_segment_t));
+
+    /*Init the new line meter line meter*/
+    if(copy == NULL) {
+        lv_obj_set_size(obj, 3 * LV_DPI / 2, 3 * LV_DPI / 2);
+    }
+    /*Copy an existing line meter*/
+    else {
+//        lv_linemeter_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+//        meter->scale_angle           = copy_meter->scale_angle;
+//        meter->line_cnt              = copy_meter->line_cnt;
+//        meter->min_value             = copy_meter->min_value;
+//        meter->max_value             = copy_meter->max_value;
+//        meter->cur_value             = copy_meter->cur_value;
+    }
+
+    LV_LOG_INFO("line meter created");
+}
+
+static void lv_meter_destructor(lv_obj_t * obj)
+{
+
+}
 /**
  * Handle the drawing related tasks of the line meters
  * @param lmeter pointer to an object
@@ -507,22 +298,30 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return an element of `lv_design_res_t`
  */
-static lv_design_res_t lv_linemeter_design(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_design_res_t lv_meter_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-        return LV_DESIGN_RES_NOT_COVER;
+        return lv_obj.design_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_draw_rect_dsc_t bg_dsc;
-        lv_draw_rect_dsc_init(&bg_dsc);
-        lv_obj_init_draw_rect_dsc(lmeter, LV_LINEMETER_PART_MAIN, &bg_dsc);
-        lv_draw_rect(&lmeter->coords, clip_area, &bg_dsc);
-        lv_linemeter_draw_scale(lmeter, clip_area, LV_LINEMETER_PART_MAIN);
+        lv_obj.design_cb(obj, clip_area, mode);
+
+        lv_area_t scale_area;
+        lv_obj_get_coords(obj, &scale_area);
+        scale_area.x1 += lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        scale_area.y1 += lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        scale_area.x2 -= lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        scale_area.y2 -= lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+        draw_arcs(obj, clip_area, &scale_area);
+        draw_lines_and_labels(obj, clip_area, &scale_area);
+        draw_needles(obj, clip_area, &scale_area);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
+        lv_obj.design_cb(obj, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;
@@ -535,19 +334,267 @@ static lv_design_res_t lv_linemeter_design(lv_obj_t * lmeter, const lv_area_t * 
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_linemeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param)
+static lv_res_t lv_meter_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = ancestor_signal(lmeter, sign, param);
+    res = lv_obj.signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-
-    if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
+//    if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+//
+//    if(sign == LV_SIGNAL_CLEANUP) {
+//        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+//    }
 
     return res;
 }
+
+
+static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+{
+    lv_meter_t * meter    = (lv_meter_t *)obj;
+
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
+    line_dsc.width = 5;
+
+    int16_t angle_ofs = meter->angle_ofs + 90 + (360 - meter->scale_angle) / 2;
+
+    lv_coord_t r_out = lv_area_get_width(scale_area) / 2 ;
+    lv_point_t scale_center;
+    scale_center.x = scale_area->x1 + r_out;
+    scale_center.y = scale_area->y1 + r_out;
+
+    /*Draw the segments first*/
+    lv_meter_segment_t * seg;
+    _LV_LL_READ(&meter->segment_ll, seg) {
+        if(seg->type != LV_METER_SEGMENT_TYPE_ARC) continue;
+        int32_t start_angle = _lv_map(seg->start_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+        int32_t end_angle = _lv_map(seg->end_value, meter->min_value, meter->max_value, 0, meter->scale_angle) +  angle_ofs;
+
+        line_dsc.color = seg->color;
+        line_dsc.width = seg->width;
+        lv_draw_arc(scale_center.x, scale_center.y, r_out, start_angle, end_angle, clip_area, &line_dsc);
+    }
+
+    lv_meter_indicator_t * indic;
+    int32_t value = 0;
+    if(meter->indicator_stacked) {
+        _LV_LL_READ_BACK(&meter->indic_ll, indic) {
+            if((indic->type & LV_METER_INDICATOR_TYPE_ARC) == false) continue;
+
+            int32_t start_angle = _lv_map(value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+            value += indic->value;
+            int32_t end_angle = _lv_map(value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+            line_dsc.color = indic->color;
+            line_dsc.width = 20;
+            lv_draw_arc(scale_center.x, scale_center.y, r_out, start_angle, end_angle, clip_area, &line_dsc);
+            r_out-=10;
+        }
+    } else {
+        _LV_LL_READ(&meter->indic_ll, indic) {
+            if((indic->type & LV_METER_INDICATOR_TYPE_ARC) == false) continue;
+
+            int32_t end_angle = _lv_map(indic->value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+            line_dsc.color = indic->color;
+            line_dsc.width = 10;
+            lv_draw_arc(scale_center.x, scale_center.y, r_out, angle_ofs, end_angle, clip_area, &line_dsc);
+            r_out-=10;
+        }
+    }
+}
+
+static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+{
+    lv_meter_t * meter    = (lv_meter_t *)obj;
+
+    lv_coord_t sub_tick_len = 10;
+    lv_coord_t major_tick_len = 20;
+
+    lv_coord_t r_out = lv_area_get_width(scale_area) / 2 ;
+    lv_coord_t r_in_sub = r_out - sub_tick_len;
+    lv_coord_t r_in_marker = r_out - major_tick_len;
+    if(r_in_marker < 1) r_in_marker = 1;
+    if(r_in_sub < 1) r_in_sub = 1;
+
+    lv_point_t scale_center;
+    scale_center.x = scale_area->x1 + r_out;
+    scale_center.y = scale_area->y1 + r_out;
+
+    int16_t angle_ofs = meter->angle_ofs + 90 + (360 - meter->scale_angle) / 2;
+    uint8_t i;
+
+    lv_draw_line_dsc_t line_sub_dsc;
+    lv_draw_line_dsc_init(&line_sub_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_sub_dsc);
+    line_sub_dsc.width = 2;
+
+    lv_draw_line_dsc_t line_marker_dsc;
+    lv_draw_line_dsc_init(&line_marker_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_MARKER, &line_marker_dsc);
+    line_marker_dsc.width = 5;
+
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_MARKER, &label_dsc);
+
+    uint32_t sub_cnt = meter->marker_nth - 1;
+    bool marker;
+    for(i = 0; i < meter->line_cnt; i++) {
+        if(sub_cnt == meter->marker_nth - 1) {
+            sub_cnt = 0;
+            marker = true;
+        } else {
+            sub_cnt++;
+            marker = false;
+        }
+
+        /* `* 256` for extra precision*/
+        int32_t angle_upscale = ((i * meter->scale_angle) << 8) / (meter->line_cnt - 1);
+
+        int32_t angle_low = (angle_upscale >> 8);
+        int32_t angle_high = angle_low + 1;
+        int32_t angle_rem = angle_upscale & 0xFF;
+
+        /*Interpolate sine and cos*/
+        int32_t sin_low = _lv_trigo_sin(angle_low + angle_ofs);
+        int32_t sin_high = _lv_trigo_sin(angle_high + angle_ofs);
+        int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
+
+        int32_t cos_low = _lv_trigo_cos(angle_low + angle_ofs);
+        int32_t cos_high = _lv_trigo_cos(angle_high + angle_ofs);
+        int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
+
+        lv_point_t p_inner;
+        lv_point_t p_outer;
+        /*Use the interpolated values to get the outer x and y coordinates*/
+        p_outer.x = (int32_t)(((int32_t)cos_mid * r_out + 127) >> (LV_TRIGO_SHIFT)) + scale_center.y;
+        p_outer.y = (int32_t)(((int32_t)sin_mid * r_out + 127) >> (LV_TRIGO_SHIFT)) + scale_center.x;
+
+        /*Use the interpolated values to get the inner x and y coordinates*/
+        uint32_t r_in = marker ? r_in_marker : r_in_sub;
+        p_inner.x = (int32_t)(((int32_t)cos_mid * r_in + 127) >> (LV_TRIGO_SHIFT)) + scale_center.y;
+        p_inner.y = (int32_t)(((int32_t)sin_mid * r_in + 127) >> (LV_TRIGO_SHIFT)) + scale_center.x;
+
+        lv_draw_line_dsc_t * line_dsc_act;
+        line_dsc_act = marker ? &line_marker_dsc : &line_sub_dsc;
+
+        int32_t value_of_line = _lv_map(i, 0, meter->line_cnt - 1, meter->min_value, meter->max_value);
+        lv_color_t line_color = line_dsc_act->color;
+
+        lv_meter_segment_t * seg;
+        _LV_LL_READ(&meter->segment_ll, seg) {
+            if((seg->type & LV_METER_SEGMENT_TYPE_SCALE) == false) continue;
+            if(value_of_line >= seg->start_value && value_of_line <= seg->end_value) line_color = seg->color;
+        }
+        lv_meter_indicator_t * indic;
+        if(!meter->indicator_stacked) {
+            _LV_LL_READ(&meter->indic_ll, indic) {
+                if((indic->type & LV_METER_INDICATOR_TYPE_SCALE) == false) continue;
+                if(value_of_line <= indic->value) line_color = indic->color;
+            }
+        } else {
+            int32_t last_value = meter->min_value;
+            _LV_LL_READ_BACK(&meter->indic_ll, indic) {
+                if((indic->type & LV_METER_INDICATOR_TYPE_SCALE) == false) continue;
+                if(value_of_line >= last_value &&  value_of_line <= last_value + indic->value) {
+                    line_color = indic->color;
+                    break;
+                }
+                last_value += indic->value;
+            }
+        }
+
+        lv_color_t line_color_ori = line_dsc_act->color;
+        line_dsc_act->color = line_color;
+        lv_draw_line(&p_inner, &p_outer, clip_area, line_dsc_act);
+        line_dsc_act->color = line_color_ori;
+
+        /*Draw the text*/
+        if(marker) {
+            uint32_t r_text = r_in_marker - 10;
+            lv_point_t p;
+            p.x = (int32_t)(((int32_t)cos_mid * r_text + 127) >> (LV_TRIGO_SHIFT)) + scale_center.y;
+            p.y = (int32_t)(((int32_t)sin_mid * r_text + 127) >> (LV_TRIGO_SHIFT)) + scale_center.x;
+
+            char buf[32];
+            lv_snprintf(buf, sizeof(buf), "%d", value_of_line);
+
+            lv_point_t label_size;
+            _lv_txt_get_size(&label_size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                    LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+            lv_area_t label_cord;
+            label_cord.x1 = p.x - label_size.x / 2;
+            label_cord.y1 = p.y - label_size.y / 2;
+            label_cord.x2 = label_cord.x1 + label_size.x;
+            label_cord.y2 = label_cord.y1 + label_size.y;
+
+            lv_draw_label(&label_cord, clip_area, &label_dsc, buf, NULL);
+        }
+    }
+}
+
+
+static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+{
+    lv_meter_t * meter    = (lv_meter_t *)obj;
+
+    lv_coord_t r_out = lv_area_get_width(scale_area) / 2 ;
+
+    lv_point_t scale_center;
+    scale_center.x = scale_area->x1 + r_out;
+    scale_center.y = scale_area->y1 + r_out;
+
+    int16_t angle_ofs = meter->angle_ofs + 90 + (360 - meter->scale_angle) / 2;
+
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
+    line_dsc.width = 2;
+
+    lv_draw_img_dsc_t img_dsc;
+    lv_draw_img_dsc_init(&img_dsc);
+    lv_obj_init_draw_img_dsc(obj, LV_PART_INDICATOR, &img_dsc);
+
+    lv_meter_indicator_t * indic;
+    int32_t value = 0;
+    _LV_LL_READ_BACK(&meter->indic_ll, indic) {
+        if((indic->type & LV_METER_INDICATOR_TYPE_NEEDLE) == false) continue;
+
+        if(meter->indicator_stacked) value += indic->value;
+        else value = indic->value;
+
+        int32_t angle = _lv_map(value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+
+        /*Draw a line*/
+        if(indic->img_src == NULL) {
+            lv_point_t p_end;
+            p_end.y = (_lv_trigo_sin(angle) * r_out) / LV_TRIGO_SIN_MAX + scale_center.x;
+            p_end.x = (_lv_trigo_sin(angle + 90) * r_out) / LV_TRIGO_SIN_MAX + scale_center.y;
+            lv_draw_line(&scale_center, &p_end, clip_area, &line_dsc);
+        }
+        /*Draw an image*/
+        else {
+            lv_img_header_t info;
+            lv_img_decoder_get_info(indic->img_src, &info);
+            lv_area_t a;
+            a.x1 = scale_center.x - indic->img_pivot.x;
+            a.y1 = scale_center.y - indic->img_pivot.y;
+            a.x2 = a.x1 + info.w - 1;
+            a.y2 = a.y1 + info.h - 1;
+
+            img_dsc.recolor_opa = indic->img_recolor_opa;
+            img_dsc.recolor = indic->color;
+
+            angle = angle * 10;
+            if(angle > 3600) angle -= 3600;
+            img_dsc.angle = angle;
+            lv_draw_img(&a, clip_area, indic->img_src, &img_dsc);
+        }
+    }
+}
+
 #endif

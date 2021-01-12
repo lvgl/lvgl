@@ -42,7 +42,6 @@ typedef bool (*lv_table_cell_drawer_cb_t)(lv_obj_t * table, uint32_t row, uint32
  */
 typedef union {
     struct {
-        uint8_t align : 2;
         uint8_t right_merge : 1;
         uint8_t crop : 1;
     } s;
@@ -58,7 +57,7 @@ typedef struct {
     lv_coord_t * row_h;
     lv_coord_t * col_w;
     lv_table_cell_drawer_cb_t drawer_cb;
-} lv_table_ext_t;
+} lv_table_t;
 
 extern const lv_obj_class_t lv_table;
 
@@ -118,15 +117,6 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt);
  * @param w width of the column
  */
 void lv_table_set_col_width(lv_obj_t * table, uint16_t col_id, lv_coord_t w);
-
-/**
- * Set the text align in a cell
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @param align LV_TEXT_ALIGN_LEFT or LV_TEXT_ALIGN_CENTER or LV_TEXT_ALIGN_RIGHT
- */
-void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_text_align_t align);
 
 /**
  * Set the cell crop. (Don't adjust the height of the cell according to its content)

@@ -29,13 +29,22 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
+static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_line_destructor(lv_obj_t * obj);
+static lv_design_res_t lv_line_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_cb_t ancestor_signal;
+const lv_obj_class_t lv_line = {
+    .constructor = lv_line_constructor,
+    .destructor = lv_line_destructor,
+    .signal_cb = lv_line_signal,
+    .design_cb = lv_line_design,
+    .instance_size = sizeof(lv_line_t),
+    .base_class = &lv_obj
+};
 
 /**********************
  *      MACROS
@@ -50,52 +59,9 @@ static lv_signal_cb_t ancestor_signal;
  * @param par pointer to an object, it will be the parent of the new line
  * @return pointer to the created line
  */
-lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_line_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("line create started");
-
-    /*Create a basic object*/
-    lv_obj_t * line = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(line);
-    if(line == NULL) return NULL;
-
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(line);
-
-    /*Extend the basic object to line object*/
-    lv_line_ext_t * ext = lv_obj_allocate_ext_attr(line, sizeof(lv_line_ext_t));
-    LV_ASSERT_MEM(ext);
-    if(ext == NULL) {
-        lv_obj_del(line);
-        return NULL;
-    }
-
-    ext->point_num   = 0;
-    ext->point_array = NULL;
-    ext->y_inv       = 0;
-
-    lv_obj_set_design_cb(line, lv_line_design);
-    lv_obj_set_signal_cb(line, lv_line_signal);
-
-    /*Init the new line*/
-    if(copy == NULL) {
-        lv_obj_set_size(line, LV_SIZE_AUTO, LV_SIZE_AUTO);
-        lv_obj_clear_flag(line, LV_OBJ_FLAG_CLICKABLE);
-
-        lv_theme_apply(line, LV_THEME_LINE);
-    }
-    /*Copy an existing object*/
-    else {
-        lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_line_set_y_invert(line, lv_line_get_y_invert(copy));
-        lv_line_set_points(line, copy_ext->point_array, copy_ext->point_num);
-
-        /*Refresh the style with new signal function*/
-        _lv_obj_refresh_style(line, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-    }
-
-    LV_LOG_INFO("line created");
-
-    return line;
+    return lv_obj_create_from_class(&lv_line, parent, copy);
 }
 
 /*=====================
@@ -109,17 +75,17 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
  * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
-void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t point_num)
+void lv_line_set_points(lv_obj_t * obj, const lv_point_t point_a[], uint16_t point_num)
 {
-    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
-    ext->point_array    = point_a;
-    ext->point_num      = point_num;
+    lv_line_t * line = (lv_line_t *) obj;
+    line->point_array    = point_a;
+    line->point_num      = point_num;
 
-    _lv_obj_handle_self_size_chg(line);
+    _lv_obj_handle_self_size_chg(obj);
 
-    lv_obj_invalidate(line);
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -129,16 +95,16 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t po
  * @param line pointer to a line object
  * @param en true: enable the y inversion, false:disable the y inversion
  */
-void lv_line_set_y_invert(lv_obj_t * line, bool en)
+void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
-    if(ext->y_inv == en) return;
+    lv_line_t * line = (lv_line_t *) obj;
+    if(line->y_inv == en) return;
 
-    ext->y_inv = en == false ? 0 : 1;
+    line->y_inv = en == false ? 0 : 1;
 
-    lv_obj_invalidate(line);
+    lv_obj_invalidate(obj);
 }
 
 /*=====================
@@ -150,19 +116,52 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en)
  * @param line pointer to a line object
  * @return true: y inversion is enabled, false: disabled
  */
-bool lv_line_get_y_invert(const lv_obj_t * line)
+bool lv_line_get_y_invert(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
+    lv_line_t * line = (lv_line_t *) obj;
 
-    return ext->y_inv == 0 ? false : true;
+    return line->y_inv == 0 ? false : true;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    LV_LOG_TRACE("line create started");
+
+    lv_obj_construct_base(obj, parent, copy);
+    /*Create a basic object*/
+    lv_line_t * line = (lv_line_t *) obj;
+
+    line->point_num   = 0;
+    line->point_array = NULL;
+    line->y_inv       = 0;
+
+
+    /*Init the new line*/
+    if(copy == NULL) {
+        lv_obj_set_size(obj, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    }
+    /*Copy an existing object*/
+    else {
+        lv_line_t * copy_line = (lv_line_t *) copy;
+        lv_line_set_y_invert(obj, lv_line_get_y_invert(copy));
+        lv_line_set_points(obj, copy_line->point_array, copy_line->point_num);
+
+    }
+
+    LV_LOG_INFO("line created");
+}
+
+static void lv_line_destructor(lv_obj_t * obj)
+{
+
+}
 /**
  * Handle the drawing related tasks of the lines
  * @param line pointer to an object
@@ -173,47 +172,49 @@ bool lv_line_get_y_invert(const lv_obj_t * line)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return an element of `lv_design_res_t`
  */
-static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_design_res_t lv_line_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*A line never covers an area*/
     if(mode == LV_DESIGN_COVER_CHK)
         return LV_DESIGN_RES_NOT_COVER;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
+        lv_obj.design_cb(obj, clip_area, mode);
+        lv_line_t * line = (lv_line_t *) obj;
 
-        if(ext->point_num == 0 || ext->point_array == NULL) return false;
+        if(line->point_num == 0 || line->point_array == NULL) return false;
 
         lv_area_t area;
-        lv_obj_get_coords(line, &area);
-        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(line);
-        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(line);
+        lv_obj_get_coords(obj, &area);
+        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
+        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
         lv_point_t p1;
         lv_point_t p2;
-        lv_coord_t h = lv_obj_get_height(line);
+        lv_coord_t h = lv_obj_get_height(obj);
         uint16_t i;
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
-        lv_obj_init_draw_line_dsc(line, LV_LINE_PART_MAIN, &line_dsc);
+        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /*Read all points and draw the lines*/
-        for(i = 0; i < ext->point_num - 1; i++) {
+        for(i = 0; i < line->point_num - 1; i++) {
 
-            p1.x = ext->point_array[i].x + x_ofs;
-            p2.x = ext->point_array[i + 1].x + x_ofs;
+            p1.x = line->point_array[i].x + x_ofs;
+            p2.x = line->point_array[i + 1].x + x_ofs;
 
-            if(ext->y_inv == 0) {
-                p1.y = ext->point_array[i].y + y_ofs;
-                p2.y = ext->point_array[i + 1].y + y_ofs;
+            if(line->y_inv == 0) {
+                p1.y = line->point_array[i].y + y_ofs;
+                p2.y = line->point_array[i + 1].y + y_ofs;
             }
             else {
-                p1.y = h - ext->point_array[i].y + y_ofs;
-                p2.y = h - ext->point_array[i + 1].y + y_ofs;
+                p1.y = h - line->point_array[i].y + y_ofs;
+                p2.y = h - line->point_array[i + 1].y + y_ofs;
             }
             lv_draw_line(&p1, &p2, clip_area, &line_dsc);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
-
+    } else if (mode == LV_DESIGN_DRAW_POST) {
+        lv_obj.design_cb(obj, clip_area, mode);
     }
     return LV_DESIGN_RES_OK;
 }
@@ -224,36 +225,34 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
  * @param sign a signal type from lv_signal_t enum
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
+static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = ancestor_signal(line, sign, param);
+    res = lv_obj.signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) {
-        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-    }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*The corner of the skew lines is out of the intended area*/
-        lv_coord_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
+        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
         lv_coord_t * s = param;
         if(*s < line_width) *s = line_width;
     }
     else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
+        lv_line_t * line = (lv_line_t *) obj;
 
         lv_point_t * p = param;
         lv_coord_t w = 0;
         lv_coord_t h = 0;
-        if(ext->point_num > 0) {
+        if(line->point_num > 0) {
             uint16_t i;
-            for(i = 0; i < ext->point_num; i++) {
-                w = LV_MATH_MAX(ext->point_array[i].x, w);
-                h = LV_MATH_MAX(ext->point_array[i].y, h);
+            for(i = 0; i < line->point_num; i++) {
+                w = LV_MATH_MAX(line->point_array[i].x, w);
+                h = LV_MATH_MAX(line->point_array[i].y, h);
             }
 
-            lv_coord_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
+            lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
             w += line_width;
             h += line_width;
             p->x = w;

@@ -34,10 +34,11 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_roller_destructor(void * obj);
-static lv_obj_t * lv_roller_label_create(lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_roller_destructor(lv_obj_t * obj);
 static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode);
+static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_roller_label_destructor(lv_obj_t * obj);
 static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
@@ -52,8 +53,23 @@ static lv_coord_t get_selected_label_width(const lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_roller_class_t lv_roller;
-lv_roller_label_class_t lv_roller_label;
+const lv_obj_class_t lv_roller = {
+        .constructor = lv_roller_constructor,
+        .destructor = lv_roller_destructor,
+        .signal_cb = lv_roller_signal,
+        .design_cb = lv_roller_design,
+        .instance_size = sizeof(lv_roller_t),
+        .base_class = &lv_obj
+};
+
+const lv_obj_class_t lv_roller_label  = {
+        .constructor = lv_roller_label_constructor,
+        .destructor = lv_roller_label_destructor,
+        .signal_cb = lv_roller_label_signal,
+        .design_cb = lv_roller_label_design,
+        .instance_size = sizeof(lv_label_t),
+        .base_class = &lv_label
+    };;
 
 /**********************
  *      MACROS
@@ -71,20 +87,7 @@ lv_roller_label_class_t lv_roller_label;
  */
 lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    if(!lv_roller._inited) {
-        LV_CLASS_INIT(lv_roller, lv_obj);
-        lv_roller.constructor = lv_roller_constructor;
-        lv_roller.destructor = lv_roller_destructor;
-        lv_roller.design_cb = lv_roller_design;
-        lv_roller.signal_cb = lv_roller_signal;
-    }
-
-    lv_obj_t * obj = lv_class_new(&lv_roller);
-    lv_roller.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    return obj;
+    return lv_obj_create_from_class(&lv_roller, parent, copy);
 }
 
 /*=====================
@@ -148,21 +151,6 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 }
 
 /**
- * Set the align of the roller's options (left or center)
- * @param roller - pointer to a roller object
- * @param align - one of lv_text_align_t values (left, right, center)
- */
-void lv_roller_set_label_align(lv_obj_t * obj, lv_text_align_t align)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * label = get_label(obj);
-    if(label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
-
-    lv_label_set_align(label, align);
-}
-
-/**
  * Set the selected option
  * @param roller pointer to a roller object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
@@ -215,17 +203,6 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_obj_set_height(obj, (lv_font_get_line_height(font) + line_space) * row_cnt);
-}
-
-/**
- * Get the animation time of the roller
- * @param roller pointer to a roller object
- * @param the animation time in milliseconds
- */
-void lv_roller_set_anim_time(lv_obj_t * obj, uint32_t anim_time)
-{
-    lv_roller_t * roller = (lv_roller_t*)obj;
-    roller->anim_time = anim_time;
 }
 
 /*=====================
@@ -316,29 +293,6 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
         return roller->option_cnt;
     }
 }
-/**
- * Get the align attribute. Default alignment after _create is LV_TEXT_ALIGN_CENTER
- * @param roller pointer to a roller object
- * @return LV_TEXT_ALIGN_LEFT, LV_TEXT_ALIGN_RIGHT or LV_TEXT_ALIGN_CENTER
- */
-lv_text_align_t lv_roller_get_label_align(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return lv_label_get_align(get_label(obj));
-}
-
-
-/**
- * Get the animation time of the roller
- * @param roller pointer to a roller object
- * @return the animation time in milliseconds
- */
-uint32_t lv_roller_get_anim_time(lv_obj_t * obj)
-{
-    lv_roller_t * roller = (lv_roller_t*)obj;
-    return roller->anim_time;
-}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -348,8 +302,7 @@ uint32_t lv_roller_get_anim_time(lv_obj_t * obj)
 static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
 
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_roller)
-    lv_roller.base_p->constructor(obj, parent, copy);
+    lv_obj_construct_base(obj, parent, copy);
 
     lv_roller_t * roller = (lv_roller_t*)obj;
 
@@ -362,16 +315,14 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
     if(copy == NULL) {
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
-        roller->anim_time = LV_ROLLER_DEF_ANIM_TIME;
         lv_obj_set_width(obj, LV_SIZE_AUTO);
 
-        lv_obj_t * label = lv_roller_label_create(obj, NULL);
-        lv_label_set_align(label, LV_TEXT_ALIGN_CENTER);
+        lv_obj_create_from_class(&lv_roller_label, obj, NULL);
         lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
         lv_roller_set_visible_row_count(obj, 3);
     }
     else {
-        lv_roller_label_create(obj, get_label(copy));
+        lv_obj_create_from_class(&lv_roller_label, obj, NULL);
         lv_roller_t * copy_roller = (lv_roller_t *) copy;
         roller->mode = copy_roller->mode;
         roller->option_cnt = copy_roller->option_cnt;
@@ -381,10 +332,9 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 
     LV_LOG_INFO("roller created");
 
-    LV_CLASS_CONSTRUCTOR_END(obj, lv_roller)
 }
 
-static void lv_roller_destructor(void * obj)
+static void lv_roller_destructor(lv_obj_t * obj)
 {
 //    lv_bar_t * bar = obj;
 //
@@ -394,30 +344,14 @@ static void lv_roller_destructor(void * obj)
 //    bar->class_p->base_p->destructor(obj);
 }
 
-/**
- * Create a roller object
- * @param par pointer to an object, it will be the parent of the new roller
- * @param copy pointer to a roller object, if not NULL then the new object will be copied from it
- * @return pointer to the created roller
- */
-static lv_obj_t * lv_roller_label_create(lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    if(!lv_roller_label._inited) {
-        LV_CLASS_INIT(lv_roller_label, lv_label);
-        lv_roller_label.constructor = lv_label.constructor;
-        lv_roller_label.destructor = lv_label.destructor;
-        lv_roller_label.design_cb = lv_roller_label_design;
-        lv_roller_label.signal_cb = lv_roller_label_signal;
-    }
-
-    lv_obj_t * obj = lv_class_new(&lv_roller_label);
-    lv_roller_label.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    return obj;
+    lv_label.constructor(obj, parent, copy);
 }
-
+static void lv_roller_label_destructor(lv_obj_t * obj)
+{
+    lv_label.destructor(obj);
+}
 /**
  * Handle the drawing related tasks of the rollers
  * @param roller pointer to an object
@@ -430,8 +364,6 @@ static lv_obj_t * lv_roller_label_create(lv_obj_t * parent, const lv_obj_t * cop
  */
 static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
-    lv_roller_t * roller = (lv_roller_t*)obj;
-
     if(mode == LV_DESIGN_COVER_CHK) {
         return lv_obj.design_cb(obj, clip_area, mode);
     }
@@ -467,16 +399,16 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
 
         /*Redraw the text on the selected area*/
         lv_area_t rect_area;
-        rect_area.y1 = roller->coords.y1 + (lv_obj_get_height(obj) - bg_font_h - label_dsc.line_space) / 2;
+        rect_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - bg_font_h - label_dsc.line_space) / 2;
         rect_area.y2 = rect_area.y1 + bg_font_h + label_dsc.line_space - 1;
-        rect_area.x1 = roller->coords.x1;
-        rect_area.x2 = roller->coords.x2;
+        rect_area.x1 = obj->coords.x1;
+        rect_area.x2 = obj->coords.x2;
         lv_area_t mask_sel;
         bool area_ok;
         area_ok = _lv_area_intersect(&mask_sel, clip_area, &rect_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
-            lv_text_align_t label_align = lv_roller_get_label_align(obj);
+            lv_text_align_t label_align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
 
             if(LV_TEXT_ALIGN_CENTER == label_align) {
                 label_dsc.flag |= LV_TEXT_FLAG_CENTER;
@@ -493,7 +425,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
             /*Move the selected label proportionally with the background label*/
             lv_coord_t roller_h = lv_obj_get_height(obj);
             int32_t label_y_prop = label->coords.y1 - (roller_h / 2 +
-                                                       roller->coords.y1); /*label offset from the middle line of the roller*/
+                    obj->coords.y1); /*label offset from the middle line of the roller*/
             label_y_prop = (label_y_prop << 14) / lv_obj_get_height(
                                label); /*Proportional position from the middle line (upscaled)*/
 
@@ -503,7 +435,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
 
             /*Apply the proportional position to the selected text*/
             res_p.y -= corr;
-            int32_t label_sel_y = roller_h / 2 + roller->coords.y1;
+            int32_t label_sel_y = roller_h / 2 + obj->coords.y1;
             label_sel_y += (label_y_prop * res_p.y) >> 14;
             label_sel_y -= corr;
 
@@ -734,7 +666,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     anim_en = LV_ANIM_OFF;
 #endif
 
-    lv_text_align_t align = lv_label_get_align(label);
+    lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
     switch(align) {
     case LV_TEXT_ALIGN_CENTER:
         lv_obj_set_x(label, (lv_obj_get_width_fit(obj) - lv_obj_get_width(label)) / 2);
@@ -753,7 +685,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_coord_t h                   = lv_obj_get_height_fit(obj);
-    uint16_t anim_time             = lv_roller_get_anim_time(obj);
+    uint16_t anim_time             = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
     /* Normally the animation's `end_cb` sets correct position of the roller if infinite.
      * But without animations do it manually*/
@@ -848,7 +780,7 @@ static lv_res_t release_handler(lv_obj_t * obj)
             lv_coord_t font_h              = lv_font_get_line_height(font);
 
             lv_coord_t label_unit = font_h + line_space;
-            lv_coord_t mid        = roller->coords.y1 + (roller->coords.y2 - roller->coords.y1) / 2;
+            lv_coord_t mid        = obj->coords.y1 + (obj->coords.y2 - obj->coords.y1) / 2;
             lv_coord_t label_y1 = label->coords.y1 + _lv_scroll_throw_predict(indev, LV_DIR_VER);
             int32_t id = (mid - label_y1) / label_unit;
 
