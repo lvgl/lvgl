@@ -431,14 +431,11 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
         return LV_FS_RES_INV_PARAM;
     }
 
-    lv_fs_res_t res;
-
     if(rddir_p->drv->dir_close_cb == NULL) {
-        res = LV_FS_RES_NOT_IMP;
+        reurn LV_FS_RES_NOT_IMP;
     }
-    else {
-        res = rddir_p->drv->dir_close_cb(rddir_p->drv, rddir_p->dir_d);
-    }
+
+    lv_fs_res_t res = rddir_p->drv->dir_close_cb(rddir_p->drv, rddir_p->dir_d);
 
     lv_mem_free(rddir_p->dir_d); /*Clean up*/
     rddir_p->dir_d = NULL;
