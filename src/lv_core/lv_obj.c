@@ -30,10 +30,6 @@
     #include "../lv_gpu/lv_gpu_nxp_pxp_osa.h"
 #endif
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 #if defined(LV_USER_DATA_FREE_INCLUDE)
     #include LV_USER_DATA_FREE_INCLUDE
 #endif /* LV_USE_USER_DATA_FREE */

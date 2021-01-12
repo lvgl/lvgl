@@ -19,10 +19,6 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/

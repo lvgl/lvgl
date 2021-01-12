@@ -52,6 +52,7 @@ extern "C" {
 #if LV_MEM_CUSTOM != 1
 #error "GC requires CUSTOM_MEM"
 #endif /* LV_MEM_CUSTOM */
+#include LV_GC_INCLUDE
 #else  /* LV_ENABLE_GC */
 #define LV_GC_ROOT(x) x
 #define LV_EXTERN_ROOT(root_type, root_name) extern root_type root_name;
