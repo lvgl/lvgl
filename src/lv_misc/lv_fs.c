@@ -284,7 +284,7 @@ lv_fs_res_t lv_fs_trunc(lv_fs_file_t * file_p)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->tell_cb == NULL) {
+    if(file_p->drv->trunc_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
