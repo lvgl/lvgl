@@ -16,10 +16,6 @@
 #include "../lv_misc/lv_utils.h"
 #include "../lv_misc/lv_mem.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/

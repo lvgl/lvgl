@@ -16,10 +16,6 @@
     #include LV_MEM_CUSTOM_INCLUDE
 #endif
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -44,11 +40,11 @@
 
 #if LV_ENABLE_GC == 0 /*gc custom allocations must not include header*/
 
-/*The size of this union must be 4 bytes (uint32_t)*/
+/*The size of this union must be 4/8 bytes (uint32_t/uint64_t)*/
 typedef union {
     struct {
         MEM_UNIT used : 1;    /* 1: if the entry is used*/
-        MEM_UNIT d_size : 31; /* Size off the data (1 means 4 bytes)*/
+        MEM_UNIT d_size : 31; /* Size of the data*/
     } s;
     MEM_UNIT header; /* The header (used + d_size)*/
 } lv_mem_header_t;
@@ -104,6 +100,7 @@ static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_
 #define COPY32 *d32 = *s32; d32++; s32++;
 #define COPY8 *d8 = *s8; d8++; s8++;
 #define SET32(x) *d32 = x; d32++;
+#define SET8(x) *d8 = x; d8++;
 #define REPEAT8(expr) expr expr expr expr expr expr expr expr
 
 /**********************
@@ -121,14 +118,13 @@ void _lv_mem_init(void)
     /*Allocate a large array to store the dynamically allocated data*/
     static LV_MEM_ATTR MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
     work_mem = (uint8_t *)work_mem_int;
-    mem_max_size = 0;
 #else
     work_mem = (uint8_t *)LV_MEM_ADR;
 #endif
 
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
-    /*The total mem size id reduced by the first header and the close patterns */
+    /*The total mem size reduced by the first header and the close patterns */
     full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
@@ -140,10 +136,9 @@ void _lv_mem_init(void)
 void _lv_mem_deinit(void)
 {
 #if LV_MEM_CUSTOM == 0
-    _lv_memset_00(work_mem, (LV_MEM_SIZE / sizeof(MEM_UNIT)) * sizeof(MEM_UNIT));
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
-    /*The total mem size id reduced by the first header and the close patterns */
+    /*The total mem size reduced by the first header and the close patterns */
     full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
@@ -159,13 +154,8 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
-#ifdef LV_ARCH_64
-    /*Round the size up to 8*/
-    size = (size + 7) & (~0x7);
-#else
-    /*Round the size up to 4*/
-    size = (size + 3) & (~0x3);
-#endif
+    /*Round the size up to ALIGN_MASK*/
+    size = (size + ALIGN_MASK) & (~ALIGN_MASK);
     void * alloc = NULL;
 
 #if LV_MEM_CUSTOM == 0
@@ -264,7 +254,6 @@ void lv_mem_free(const void * data)
         lv_mem_defrag();
 
     }
-
 #endif /*LV_MEM_AUTO_DEFRAG*/
 #else /*Use custom, user defined free function*/
 #if LV_ENABLE_GC == 0
@@ -287,14 +276,8 @@ void lv_mem_free(const void * data)
 
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
-
-#ifdef LV_ARCH_64
-    /*Round the size up to 8*/
-    new_size = (new_size + 7) & (~0x7);
-#else
-    /*Round the size up to 4*/
-    new_size = (new_size + 3) & (~0x3);
-#endif
+    /*Round the size up to ALIGN_MASK*/
+    new_size = (new_size + ALIGN_MASK) & (~ALIGN_MASK);
 
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
@@ -325,10 +308,10 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
     if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
-        if(old_size != 0) {
+        if(old_size != 0 && new_size != 0) {
             _lv_memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
-            lv_mem_free(data_p);
         }
+        lv_mem_free(data_p);
     }
 
     return new_p;
@@ -419,9 +402,8 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     _lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
 #if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
-    e = NULL;
 
-    e = ent_get_next(e);
+    e = ent_get_next(NULL);
 
     while(e != NULL) {
         if(e->header.s.used == 0) {
@@ -439,13 +421,13 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     }
     mon_p->total_size = LV_MEM_SIZE;
     mon_p->max_used = mem_max_size;
-    mon_p->used_pct   = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
     if(mon_p->free_size > 0) {
-        mon_p->frag_pct   = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
-        mon_p->frag_pct   = 100 - mon_p->frag_pct;
+        mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
+        mon_p->frag_pct = 100 - mon_p->frag_pct;
     }
     else {
-        mon_p->frag_pct   = 0; /*no fragmentation if all the RAM is used*/
+        mon_p->frag_pct = 0; /*no fragmentation if all the RAM is used*/
     }
 #endif
 }
@@ -522,14 +504,16 @@ void * _lv_mem_buf_get(uint32_t size)
     /*Reallocate a free buffer*/
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0) {
+            /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
+            void * buf = lv_mem_realloc(LV_GC_ROOT(_lv_mem_buf[i]).p, size);
+            if(buf == NULL) {
+                LV_DEBUG_ASSERT(false, "Out of memory, can't allocate a new buffer (increase your LV_MEM_SIZE/heap size)", 0x00);
+                return NULL;
+            }
             LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
             LV_GC_ROOT(_lv_mem_buf[i]).size = size;
-            /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
-            LV_GC_ROOT(_lv_mem_buf[i]).p = lv_mem_realloc(LV_GC_ROOT(_lv_mem_buf[i]).p, size);
-            if(LV_GC_ROOT(_lv_mem_buf[i]).p == NULL) {
-                LV_DEBUG_ASSERT(false, "Out of memory, can't allocate a new  buffer (increase your LV_MEM_SIZE/heap size", 0x00);
-            }
-            return  LV_GC_ROOT(_lv_mem_buf[i]).p;
+            LV_GC_ROOT(_lv_mem_buf[i]).p    = buf;
+            return LV_GC_ROOT(_lv_mem_buf[i]).p;
         }
     }
 
@@ -663,8 +647,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
     if(d_align) {
         d_align = ALIGN_MASK + 1 - d_align;
         while(d_align && len) {
-            *d8 = v;
-            d8++;
+            SET8(v);
             len--;
             d_align--;
         }
@@ -675,14 +658,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
     uint32_t * d32 = (uint32_t *)d8;
 
     while(len > 32) {
-        SET32(v32);
-        SET32(v32);
-        SET32(v32);
-        SET32(v32);
-        SET32(v32);
-        SET32(v32);
-        SET32(v32);
-        SET32(v32);
+        REPEAT8(SET32(v32));
         len -= 32;
     }
 
@@ -693,8 +669,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
 
     d8 = (uint8_t *)d32;
     while(len) {
-        *d8 = v;
-        d8++;
+        SET8(v);
         len--;
     }
 }
@@ -713,8 +688,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
     if(d_align) {
         d_align = ALIGN_MASK + 1 - d_align;
         while(d_align && len) {
-            *d8 = 0x00;
-            d8++;
+            SET8(0);
             len--;
             d_align--;
         }
@@ -722,14 +696,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
 
     uint32_t * d32 = (uint32_t *)d8;
     while(len > 32) {
-        SET32(0);
-        SET32(0);
-        SET32(0);
-        SET32(0);
-        SET32(0);
-        SET32(0);
-        SET32(0);
-        SET32(0);
+        REPEAT8(SET32(0));
         len -= 32;
     }
 
@@ -740,8 +707,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
 
     d8 = (uint8_t *)d32;
     while(len) {
-        *d8 = 0;
-        d8++;
+        SET8(0);
         len--;
     }
 }
@@ -760,8 +726,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
     if(d_align) {
         d_align = ALIGN_MASK + 1 - d_align;
         while(d_align && len) {
-            *d8 = 0xFF;
-            d8++;
+            SET8(0xFF);
             len--;
             d_align--;
         }
@@ -769,14 +734,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
 
     uint32_t * d32 = (uint32_t *)d8;
     while(len > 32) {
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
-        SET32(0xFFFFFFFF);
+        REPEAT8(SET32(0xFFFFFFFF));
         len -= 32;
     }
 
@@ -787,8 +745,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
 
     d8 = (uint8_t *)d32;
     while(len) {
-        *d8 = 0xFF;
-        d8++;
+        SET8(0xFF);
         len--;
     }
 }
@@ -851,14 +808,8 @@ static void * ent_alloc(lv_mem_ent_t * e, size_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, size_t size)
 {
-
-#ifdef LV_ARCH_64
-    /*Round the size up to 8*/
-    size = (size + 7) & (~0x7);
-#else
-    /*Round the size up to 4*/
-    size = (size + 3) & (~0x3);
-#endif
+    /*Round the size up to ALIGN_MASK*/
+    size = (size + ALIGN_MASK) & (~ALIGN_MASK);
 
     /*Don't let empty space only for a header without data*/
     if(e->header.s.d_size == size + sizeof(lv_mem_header_t)) {
@@ -871,10 +822,10 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
         lv_mem_ent_t * after_new_e   = (lv_mem_ent_t *)&e_data[size];
         after_new_e->header.s.used   = 0;
         after_new_e->header.s.d_size = (uint32_t)e->header.s.d_size - size - sizeof(lv_mem_header_t);
-    }
 
-    /* Set the new size for the original entry */
-    e->header.s.d_size = (uint32_t)size;
+        /* Set the new size for the original entry */
+        e->header.s.d_size = (uint32_t)size;
+    }
 }
 
 #endif

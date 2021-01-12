@@ -1,5 +1,5 @@
 /**
- * @file lv_ll.c
+ * @file lv_ll.h
  * Handle linked lists. The nodes are dynamically allocated by the 'lv_mem' module.
  */
 

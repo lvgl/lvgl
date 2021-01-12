@@ -30,8 +30,8 @@ extern "C" {
  *******************/
 
 #ifndef LV_MEM_SIZE
-#if defined (CONFIG_LV_MEM_SIZE_BYTES)
-#define CONFIG_LV_MEM_SIZE    (CONFIG_LV_MEM_SIZE_BYTES * 1024U)
+#if defined (CONFIG_LV_MEM_SIZE_KILOBYTES)
+#define CONFIG_LV_MEM_SIZE    (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
 #endif
 #endif
 

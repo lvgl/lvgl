@@ -17,6 +17,11 @@
  *      TYPEDEFS
  **********************/
 
+typedef struct _lv_async_info_t {
+    lv_async_cb_t cb;
+    void * user_data;
+} lv_async_info_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -55,8 +60,6 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
     info->cb = async_xcb;
     info->user_data = user_data;
 
-    /* Set the task's user data */
-    task->user_data = info;
     lv_task_set_repeat_count(task, 1);
     return LV_RES_OK;
 }
