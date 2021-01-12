@@ -64,4 +64,4 @@ int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va);
 }
 #endif
 
-#endif  // _PRINTF_H_
+#endif  // _LV_PRINTF_H_
