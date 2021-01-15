@@ -398,8 +398,8 @@ static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
     lv_coord_t px = p->x - cx;
     lv_coord_t py = p->y - cy;
 
-    int32_t r_sqrd = r * r;
-    int32_t dist = (px * px) + (py * py);
+    uint32_t r_sqrd = r * r;
+    uint32_t dist = (px * px) + (py * py);
 
     if(dist <= r_sqrd)
         return true;
