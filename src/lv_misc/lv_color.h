@@ -128,14 +128,20 @@ enum {
 # define LV_COLOR_GET_A8(c) 0xFF
 
 # define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)(v) & 0x1FU
+#if LV_COLOR_16_SWAP == 0
 # define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)(v) & 0x3FU
-# define LV_COLOR_SET_G16_SWAP(c, v) {(c).ch.green_h = (uint8_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint8_t)((v) & 0x7);}
+#else
+# define LV_COLOR_SET_G16(c, v) {(c).ch.green_h = (uint8_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint8_t)((v) & 0x7);}
+#endif
 # define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)(v) & 0x1FU
 # define LV_COLOR_SET_A16(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R16(c) (c).ch.red
+#if LV_COLOR_16_SWAP == 0
 # define LV_COLOR_GET_G16(c) (c).ch.green
-# define LV_COLOR_GET_G16_SWAP(c) (((c).ch.green_h << 3) + (c).ch.green_l)
+#else
+# define LV_COLOR_GET_G16(c) (((c).ch.green_h << 3) + (c).ch.green_l)
+#endif
 # define LV_COLOR_GET_B16(c) (c).ch.blue
 # define LV_COLOR_GET_A16(c) 0xFF
 
@@ -177,22 +183,14 @@ enum {
 
 #elif LV_COLOR_DEPTH == 16
 # define LV_COLOR_SET_R(c, v) LV_COLOR_SET_R16(c,v)
-# if LV_COLOR_16_SWAP == 0
-#   define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G16(c,v)
-# else
-#   define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G16_SWAP(c,v)
-# endif
+# define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G16(c,v)
 # define LV_COLOR_SET_B(c, v) LV_COLOR_SET_B16(c,v)
 # define LV_COLOR_SET_A(c, v) LV_COLOR_SET_A16(c,v)
 
 # define LV_COLOR_GET_R(c) LV_COLOR_GET_R16(c)
-# if LV_COLOR_16_SWAP == 0
-#   define LV_COLOR_GET_G(c) LV_COLOR_GET_G16(c)
-# else
-#   define LV_COLOR_GET_G(c) LV_COLOR_GET_G16_SWAP(c)
-# endif
-# define LV_COLOR_GET_B(c)   LV_COLOR_GET_B16(c)
-# define LV_COLOR_GET_A(c)   LV_COLOR_GET_A16(c)
+# define LV_COLOR_GET_G(c) LV_COLOR_GET_G16(c)
+# define LV_COLOR_GET_B(c) LV_COLOR_GET_B16(c)
+# define LV_COLOR_GET_A(c) LV_COLOR_GET_A16(c)
 
 #elif LV_COLOR_DEPTH == 32
 # define LV_COLOR_SET_R(c, v) LV_COLOR_SET_R32(c,v)
@@ -368,11 +366,7 @@ static inline uint16_t lv_color_to16(lv_color_t color)
 #elif LV_COLOR_DEPTH == 8
     lv_color16_t ret;
     LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) * 4);  /*(2^5 - 1)/(2^3 - 1) = 31/7 = 4*/
-#if LV_COLOR_16_SWAP == 0
-    LV_COLOR_SET_G16(ret,  LV_COLOR_GET_G(color) * 9); /*(2^6 - 1)/(2^3 - 1) = 63/7 = 9*/
-#else
-    LV_COLOR_SET_G16_SWAP(ret, (LV_COLOR_GET_G(color) * 9)); /*(2^6 - 1)/(2^3 - 1) = 63/7 = 9*/
-#endif
+    LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) * 9);  /*(2^6 - 1)/(2^3 - 1) = 63/7 = 9*/
     LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) * 10); /*(2^5 - 1)/(2^2 - 1) = 31/3 = 10*/
     return ret.full;
 #elif LV_COLOR_DEPTH == 16
@@ -380,12 +374,7 @@ static inline uint16_t lv_color_to16(lv_color_t color)
 #elif LV_COLOR_DEPTH == 32
     lv_color16_t ret;
     LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) >> 3); /* 8 - 5  = 3*/
-
-#if LV_COLOR_16_SWAP == 0
     LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) >> 2); /* 8 - 6  = 2*/
-#else
-    LV_COLOR_SET_G16_SWAP(ret, ret.ch.green_h = (LV_COLOR_GET_G(color) >> 2); /*(2^6 - 1)/(2^3 - 1) = 63/7 = 9*/
-#endif
     LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) >> 3); /* 8 - 5  = 3*/
     return ret.full;
 #endif
