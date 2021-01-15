@@ -110,12 +110,12 @@ enum {
 # define LV_COLOR_SET_R1(c, v) (c).ch.red = (uint8_t)((v) & 0x1)
 # define LV_COLOR_SET_G1(c, v) (c).ch.green = (uint8_t)((v) & 0x1)
 # define LV_COLOR_SET_B1(c, v) (c).ch.blue = (uint8_t)((v) & 0x1)
-# define LV_COLOR_SET_A1(c, v)
+# define LV_COLOR_SET_A1(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R1(c) (c).ch.red
 # define LV_COLOR_GET_G1(c) (c).ch.green
 # define LV_COLOR_GET_B1(c) (c).ch.blue
-# define LV_COLOR_GET_A1(c) 1
+# define LV_COLOR_GET_A1(c) 0xFF
 
 # define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)((v) & 0x7U)
 # define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)((v) & 0x7U)
