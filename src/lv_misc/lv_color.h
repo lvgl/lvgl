@@ -117,9 +117,9 @@ enum {
 # define LV_COLOR_GET_B1(c) (c).ch.blue
 # define LV_COLOR_GET_A1(c) 1
 
-# define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)(v) & 0x7U
-# define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)(v) & 0x7U
-# define LV_COLOR_SET_B8(c, v) (c).ch.blue = (uint8_t)(v) & 0x3U
+# define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)((v) & 0x7U)
+# define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)((v) & 0x7U)
+# define LV_COLOR_SET_B8(c, v) (c).ch.blue = (uint8_t)((v) & 0x3U)
 # define LV_COLOR_SET_A8(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R8(c) (c).ch.red
@@ -127,13 +127,13 @@ enum {
 # define LV_COLOR_GET_B8(c) (c).ch.blue
 # define LV_COLOR_GET_A8(c) 0xFF
 
-# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)(v) & 0x1FU
+# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)((v) & 0x1FU)
 #if LV_COLOR_16_SWAP == 0
-# define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)(v) & 0x3FU
+# define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)((v) & 0x3FU)
 #else
 # define LV_COLOR_SET_G16(c, v) {(c).ch.green_h = (uint8_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint8_t)((v) & 0x7);}
 #endif
-# define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)(v) & 0x1FU
+# define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)((v) & 0x1FU)
 # define LV_COLOR_SET_A16(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R16(c) (c).ch.red
@@ -145,10 +145,10 @@ enum {
 # define LV_COLOR_GET_B16(c) (c).ch.blue
 # define LV_COLOR_GET_A16(c) 0xFF
 
-# define LV_COLOR_SET_R32(c, v) (c).ch.red = (uint32_t)((v) & 0xFF)
-# define LV_COLOR_SET_G32(c, v) (c).ch.green = (uint32_t)((v) & 0xFF)
-# define LV_COLOR_SET_B32(c, v) (c).ch.blue = (uint32_t)((v) & 0xFF)
-# define LV_COLOR_SET_A32(c, v) (c).ch.alpha = (uint32_t)((v) & 0xFF)
+# define LV_COLOR_SET_R32(c, v) (c).ch.red = (uint8_t)((v) & 0xFF)
+# define LV_COLOR_SET_G32(c, v) (c).ch.green = (uint8_t)((v) & 0xFF)
+# define LV_COLOR_SET_B32(c, v) (c).ch.blue = (uint8_t)((v) & 0xFF)
+# define LV_COLOR_SET_A32(c, v) (c).ch.alpha = (uint8_t)((v) & 0xFF)
 
 # define LV_COLOR_GET_R32(c) (c).ch.red
 # define LV_COLOR_GET_G32(c) (c).ch.green
@@ -494,9 +494,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * p
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
-    LV_COLOR_SET_R(ret, LV_MATH_UDIV255((uint16_t) premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_G(ret, LV_MATH_UDIV255((uint16_t) premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_B(ret, LV_MATH_UDIV255((uint16_t) premult_c1[2] + LV_COLOR_GET_B(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
+    LV_COLOR_SET_R(ret, LV_MATH_UDIV255(premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
+    LV_COLOR_SET_G(ret, LV_MATH_UDIV255(premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
+    LV_COLOR_SET_B(ret, LV_MATH_UDIV255(premult_c1[2] + LV_COLOR_GET_B(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
 #else
     /*LV_COLOR_DEPTH == 1*/
@@ -622,9 +622,9 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}})
 #elif LV_COLOR_DEPTH == 16
 #if LV_COLOR_16_SWAP == 0
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint16_t)((b8 >> 3) & 0x1FU), (uint16_t)((g8 >> 2) & 0x3FU), (uint16_t)((r8 >> 3) & 0x1FU)}})
+#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x3FU), (uint8_t)((r8 >> 3) & 0x1FU)}})
 #else
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint16_t)((g8 >> 5) & 0x7U), (uint16_t)((r8 >> 3) & 0x1FU), (uint16_t)((b8 >> 3) & 0x1FU), (uint16_t)((g8 >> 2) & 0x7U)}})
+#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 3) & 0x1FU), (uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x7U)}})
 #endif
 #elif LV_COLOR_DEPTH == 32
 #define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{b8, g8, r8, 0xff}}) /*Fix 0xff alpha*/
