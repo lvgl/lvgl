@@ -239,7 +239,8 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coo
         is_in = true;
     }
 
-    if(radius == 0) return is_in;
+    if (!is_in) return false;
+    if(radius == 0) return true;
 
     /*Check if the corner points are inside the radius or not*/
     lv_point_t p;
