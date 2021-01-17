@@ -141,7 +141,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Add style caching to reduce acces time of properties with default value
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
-- send gestures even if the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function.
+- send gestures even if the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function.
 
 ### Bugfixes
 - Fix color bleeding on border drawing
@@ -225,7 +225,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Add lv_btnmatrix_set/get_align capability
 - DMA2D: Remove dependency on ST CubeMX HAL
 - Added `max_used` propriety to `lv_mem_monitor_t` struct
-- In `lv_init` test if the the strings are UTF-8 encoded.
+- In `lv_init` test if the strings are UTF-8 encoded.
 - Add `user_data` to themes
 - Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
 - Add inline function lv_checkbox_get_state(const lv_obj_t * cb) to extend the checkbox functionality.

@@ -121,7 +121,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
             size_res->y += line_space;
         }
 
-        /*Calculate the the longest line*/
+        /*Calculate the longest line*/
         lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
                                                        flag);
 

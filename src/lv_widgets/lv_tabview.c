@@ -223,7 +223,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
 
     /*Extend the button matrix map with the new name*/
     char * name_dm;
-    name_dm = lv_mem_alloc(strlen(name) + 1); /*+1 for the the closing '\0' */
+    name_dm = lv_mem_alloc(strlen(name) + 1); /*+1 for the closing '\0' */
     LV_ASSERT_MEM(name_dm);
     if(name_dm == NULL) return NULL;
     strcpy(name_dm, name);

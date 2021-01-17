@@ -476,7 +476,7 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * btnm)
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
+ * Useful in the `event_cb` to get the text of the button, check if hidden etc.
  * @param btnm pointer to button matrix object
  * @return index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
@@ -490,7 +490,7 @@ uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * btnm)
 
 /**
  * Get the text of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb`
+ * Useful in the `event_cb`
  * @param btnm pointer to button matrix object
  * @return text of the last released button (NULL: if unset)
  */
@@ -1037,7 +1037,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
         else if(c == LV_KEY_DOWN) {
             lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
-            /*Find the area below the the current*/
+            /*Find the area below the current*/
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 ext->btn_id_focused = 0;
             }
@@ -1063,7 +1063,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
         else if(c == LV_KEY_UP) {
             lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
-            /*Find the area below the the current*/
+            /*Find the area below the current*/
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 ext->btn_id_focused = 0;
             }

@@ -2388,7 +2388,7 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
  * Set that width reduced by the left and right padding of the parent.
  * @param obj pointer to an object
  * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
+ * If 1 the width will be set the parent's width
  * If 2 only half parent width - inner padding of the parent
  * If 3 only third parent width - 2 * inner padding of the parent
  * @param span how many columns are combined
@@ -2409,7 +2409,7 @@ lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
  * Get that height reduced by the top and bottom padding of the parent.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
+ * If 1 the height will be set the parent's height
  * If 2 only half parent height - inner padding of the parent
  * If 3 only third parent height - 2 * inner padding of the parent
  * @param span how many rows are combined

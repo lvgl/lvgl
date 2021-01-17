@@ -215,7 +215,7 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
 }
 
 /**
- * Set the the highlighted dates
+ * Set the highlighted dates
  * @param calendar pointer to a calendar object
  * @param highlighted pointer to an `lv_calendar_date_t` array containing the dates. ONLY A POINTER
  * WILL BE SAVED! CAN'T BE LOCAL ARRAY.
@@ -298,7 +298,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
 }
 
 /**
- * Get the the pressed date.
+ * Get the pressed date.
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
  * `NULL` if not date pressed (e.g. the header)
@@ -312,7 +312,7 @@ lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
 }
 
 /**
- * Get the the highlighted dates
+ * Get the highlighted dates
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */

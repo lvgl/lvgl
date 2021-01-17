@@ -597,7 +597,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     /* Save the last keys before anything else.
-     * They need to be already saved if the the function returns for any reason*/
+     * They need to be already saved if the function returns for any reason*/
     lv_indev_state_t last_state     = i->proc.types.keypad.last_state;
     i->proc.types.keypad.last_state = data->state;
     i->proc.types.keypad.last_key   = data->key;

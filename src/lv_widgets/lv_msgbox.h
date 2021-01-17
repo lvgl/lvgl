@@ -146,7 +146,7 @@ const char * lv_msgbox_get_text(const lv_obj_t * mbox);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb`.
+ * Useful in the `event_cb`.
  * @param mbox pointer to message box object
  * @return index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
@@ -154,7 +154,7 @@ uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox);
 
 /**
  * Get the text of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb`.
+ * Useful in the `event_cb`.
  * @param mbox pointer to message box object
  * @return text of the last released button (NULL: if unset)
  */

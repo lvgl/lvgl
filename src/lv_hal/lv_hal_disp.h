@@ -78,7 +78,7 @@ typedef struct _disp_drv_t {
     uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
 
 #if LV_COLOR_SCREEN_TRANSP
-    /**Handle if the the screen doesn't have a solid (opa == LV_OPA_COVER) background.
+    /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
      * Use only if required because it's slower.*/
     uint32_t screen_transp : 1;
 #endif
