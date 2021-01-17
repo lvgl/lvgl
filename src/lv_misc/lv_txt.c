@@ -225,7 +225,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /*Check for new line chars and breakchars*/
         if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
             /* Update the output width on the first character if it fits.
-             * Must do this here incase first letter is a break character. */
+             * Must do this here in case first letter is a break character. */
             if(i == 0 && break_index == NO_BREAK_FOUND && word_w_ptr != NULL) *word_w_ptr = cur_w;
             word_len--;
             break;

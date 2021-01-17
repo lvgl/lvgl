@@ -747,15 +747,15 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
         if(tab_page == NULL) return LV_RES_OK;
         lv_coord_t page_x1  = tab_page->coords.x1 - tabview->coords.x1 + x_predict;
         lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabview);
-        lv_coord_t treshold = lv_obj_get_width(tabview) / 2;
+        lv_coord_t threshold = lv_obj_get_width(tabview) / 2;
 
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(tabview);
         int16_t tab_cur = ext->tab_cur;
-        if(page_x1 > treshold) {
+        if(page_x1 > threshold) {
             if(base_dir != LV_BIDI_DIR_RTL) tab_cur--;
             else tab_cur ++;
         }
-        else if(page_x2 < treshold) {
+        else if(page_x2 < threshold) {
             if(base_dir != LV_BIDI_DIR_RTL) tab_cur++;
             else tab_cur --;
         }

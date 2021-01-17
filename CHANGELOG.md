@@ -3,10 +3,10 @@
 ## v7.9.1 (Planned at 19.01.2020
 
 ### Bugfixes
-- fix(cpicker) fix division by zero 
+- fix(cpicker) fix division by zero
 - fix(dropdown) fix selecting options after the last one
 - fix(msgbox) use the animation time provided
-- fix(gpu_nxp_pxp) fix incorrent define name 
+- fix(gpu_nxp_pxp) fix incorrect define name
 - fix(indev) don't leave edit mode if there is only one object in the group
 
 
@@ -14,7 +14,7 @@
 
 ### New features
 - feat(chart) add lv_chart_remove_series and lv_chart_hide_series
-- feat(img_cahce) allow disabling image cacheing
+- feat(img_cahce) allow disabling image caching
 - calendar: make get_day_of_week() public
 - Added support for Zephyr integration
 
@@ -56,7 +56,7 @@
 - fix reference to LV_DRAW_BUF_MAX_NUM in lv_mem.c
 - fix(polygon draw) join adjacent points if they are on the same coordinate
 - fix(linemeter) fix invalidation when setting new value
-- fix(table) add missing invalidation when changeing cell type
+- fix(table) add missing invalidation when changing cell type
 - refactor(roller) rename LV_ROLLER_MODE_INIFINITE -> LV_ROLLER_MODE_INFINITE
 
 ## v7.7.2 (17.11.2020)
@@ -66,7 +66,7 @@
 - fix(arc) fix and improve arc dragging
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
 - fix(theme_material): remove the bottom border from tabview header
-- fix(imgbtn) guess a the closest availabe state with valid src
+- fix(imgbtn) guess a the closest available state with valid src
 - fix(spinbox) update cursor position in lv_spinbox_set_step
 
 ## v7.7.1 (03.11.2020)
@@ -83,7 +83,7 @@
 - Allow max. 16 cell types for table
 - Add `lv_table_set_text_fmt()`
 - Use margin on calendar header to set distances and padding to the size of the header
-- Add `text_sel_bg` style proeprty
+- Add `text_sel_bg` style property
 
 ### Bugfixes
 - Theme update to support text selection background
@@ -123,7 +123,7 @@
 - Add 10px and 8ox built in fonts
 
 ### Bugfixes
-- Fix unexpeted DEFOCUS on lv_page when clicking to bg after the scrollable
+- Fix unexpected DEFOCUS on lv_page when clicking to bg after the scrollable
 - Fix `lv_obj_del` and `lv_obj_clean` if the children list changed during deletion.
 - Adjust button matrix button width to include padding when spanning multiple units.
 - Add rounding to btnmatrix line height calculation
@@ -138,10 +138,10 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 ### New features
 - Add `lv_font_load()` function - Loads a `lv_font_t` object from a binary font file
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
-- Add style caching to reduce acces time of properties with default value
+- Add style caching to reduce access time of properties with default value
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
-- send gestures even if the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function.
+- send gestures event if the object was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function.
 
 ### Bugfixes
 - Fix color bleeding on border drawing
@@ -279,7 +279,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Remove memcpy from `lv_ll` (caused issues with some optimization settings)
 - `lv_chart` fix X tick drawing
 - Fix vertical dashed line drawing
-- Some additonal minor fixes and formattings
+- Some additional minor fixes and formattings
 
 ## v7.0.0 (18.05.2020)
 

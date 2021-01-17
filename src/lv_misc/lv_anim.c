@@ -456,7 +456,7 @@ static void anim_task(lv_task_t * param)
         anim_list_changed = false;
 
         if(!a->has_run) {
-            a->has_run = 1; /*The list readying might be reseted so need to know which anim has run already*/
+            a->has_run = 1; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;

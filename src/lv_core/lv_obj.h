@@ -577,7 +577,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
  * Release all used memories and cancel pending related transitions.
  * Typically used in `LV_SIGN_CLEAN_UP.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
@@ -587,7 +587,7 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
  * Release all used memories and cancel pending related transitions.
  * Also notifies the object about the style change.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
@@ -676,7 +676,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
 bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**
- * Enable/disable the use of style cahche for an object
+ * Enable/disable the use of style cache for an object
  * @param obj pointer to an object
  * @param dis true: disable; false: enable (re-enable)
  */
