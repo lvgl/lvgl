@@ -451,7 +451,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mas
                     int32_t k = - abs_x;
                     if(k < 0) return LV_DRAW_MASK_RES_TRANSP;
                     if(k >= 0 && k < len) _lv_memset_00(&mask_buf[k], len - k);
-                    return  LV_DRAW_MASK_RES_CHANGED;
+                    return LV_DRAW_MASK_RES_CHANGED;
                 }
             }
             else {
@@ -461,7 +461,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mas
                     if(k < 0) k = 0;
                     if(k >= len) return LV_DRAW_MASK_RES_TRANSP;
                     else if(k >= 0 && k < len) _lv_memset_00(&mask_buf[0], k);
-                    return  LV_DRAW_MASK_RES_CHANGED;
+                    return LV_DRAW_MASK_RES_CHANGED;
                 }
             }
         }

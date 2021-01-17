@@ -738,7 +738,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos_in)
             lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Finish if the x position or the last char of the next line is reached*/
-            if(pos.x < x + gw || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
+            if(pos.x < x + gw || i + line_start == new_line_start || txt[i_act + line_start] == '\0') {
                 i = i_act;
                 break;
             }
@@ -765,7 +765,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos_in)
     logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif
 
-    return  logical_pos + _lv_txt_encoded_get_char_id(txt, line_start);
+    return logical_pos + _lv_txt_encoded_get_char_id(txt, line_start);
 }
 
 /**

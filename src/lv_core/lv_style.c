@@ -93,7 +93,7 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 /**
  * Remove a property from a style
  * @param style pointer to a style
- * @param prop  a style property ORed with a state.
+ * @param prop a style property ORed with a state.
  * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
  * @return true: the property was found and removed; false: the property wasn't found
  */
@@ -188,7 +188,7 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
 
 /**
  * Add a style to a style list.
- * Only the the style pointer will be saved so the shouldn't be a local variable.
+ * Only the style pointer will be saved so the shouldn't be a local variable.
  * (It should be static, global or dynamically allocated)
  * @param list pointer to a style list
  * @param style pointer to a style to add

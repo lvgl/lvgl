@@ -383,7 +383,7 @@ lv_coord_t lv_page_get_height_fit(lv_obj_t * page)
  * Take into account the paddings of the background and scrollable too.
  * @param page pointer to an object
  * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
+ * If 1 the width will be set the parent's width
  * If 2 only half parent width - inner padding of the parent
  * If 3 only third parent width - 2 * inner padding of the parent
  * @param span how many columns are combined
@@ -406,7 +406,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
  * Take into account the paddings of the background and scrollable too.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
+ * If 1 the height will be set the parent's height
  * If 2 only half parent height - inner padding of the parent
  * If 3 only third parent height - 2 * inner padding of the parent
  * @param span how many rows are combined
@@ -536,7 +536,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
         scrlable_x = -(obj_x - scrl_left - bg_left);
         scrlable_x += scrl_left;
     }
-    /*Out of the page on the rigth*/
+    /*Out of the page on the right*/
     else if((obj_w <= page_w && right_err > 0) || (obj_w > page_w && left_err >= right_err)) {
         /*Calculate a new position and let some space on the side*/
         scrlable_x = -(obj_x + scrl_right + bg_right);

@@ -43,9 +43,9 @@ extern "C" {
 
 #define LV_MAX_ANCESTOR_NUM 8
 
-#define LV_EXT_CLICK_AREA_OFF   0
-#define LV_EXT_CLICK_AREA_TINY  1
-#define LV_EXT_CLICK_AREA_FULL  2
+#define LV_EXT_CLICK_AREA_OFF  0
+#define LV_EXT_CLICK_AREA_TINY 1
+#define LV_EXT_CLICK_AREA_FULL 2
 
 #define _LV_OBJ_PART_VIRTUAL_FIRST 0x01
 #define _LV_OBJ_PART_REAL_FIRST    0x40
@@ -203,7 +203,7 @@ typedef struct _lv_obj_t {
     lv_design_cb_t design_cb; /**< Object type specific design function*/
 
     void * ext_attr;            /**< Object type specific extended data*/
-    lv_style_list_t  style_list;
+    lv_style_list_t style_list;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad_hor; /**< Extra click padding in horizontal direction */
@@ -577,7 +577,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
  * Release all used memories and cancel pending related transitions.
  * Typically used in `LV_SIGN_CLEAN_UP.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
@@ -587,7 +587,7 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
  * Release all used memories and cancel pending related transitions.
  * Also notifies the object about the style change.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
@@ -676,7 +676,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
 bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**
- * Enable/disable the use of style cahche for an object
+ * Enable/disable the use of style cache for an object
  * @param obj pointer to an object
  * @param dis true: disable; false: enable (re-enable)
  */
@@ -1055,7 +1055,7 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj);
  * Take paddings into account.
  * @param obj pointer to an object
  * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
+ * If 1 the width will be set the parent's width
  * If 2 only half parent width - inner padding of the parent
  * If 3 only third parent width - 2 * inner padding of the parent
  * @param span how many columns are combined
@@ -1068,7 +1068,7 @@ lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
  * Take paddings into account.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
+ * If 1 the height will be set the parent's height
  * If 2 only half parent height - inner padding of the parent
  * If 3 only third parent height - 2 * inner padding of the parent
  * @param span how many rows are combined
@@ -1079,7 +1079,7 @@ lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
 /**
  * Get the automatic realign property of the object.
  * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
+ * @return true: auto realign is enabled; false: auto realign is disabled
  */
 bool lv_obj_get_auto_realign(const lv_obj_t * obj);
 

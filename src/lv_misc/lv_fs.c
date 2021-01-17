@@ -134,7 +134,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 /**
  * Close an already opened file
  * @param file_p pointer to a lv_fs_file_t variable
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 {
@@ -158,7 +158,7 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 /**
  * Delete a file
  * @param path path of the file to delete
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_remove(const char * path)
 {

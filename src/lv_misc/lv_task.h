@@ -80,7 +80,7 @@ void _lv_task_core_init(void);
 //! @cond Doxygen_Suppress
 
 /**
- * Call it  periodically to handle lv_tasks.
+ * Call it periodically to handle lv_tasks.
  * @return time till it needs to be run next (in ms)
  */
 LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void);
@@ -154,7 +154,7 @@ void lv_task_set_repeat_count(lv_task_t * task, int32_t repeat_count);
 void lv_task_reset(lv_task_t * task);
 
 /**
- * Enable or disable the whole  lv_task handling
+ * Enable or disable the whole lv_task handling
  * @param en: true: lv_task handling is running, false: lv_task handling is suspended
  */
 void lv_task_enable(bool en);

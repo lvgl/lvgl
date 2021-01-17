@@ -14,7 +14,7 @@ def cmd(c, ask_on_err = True):
   if r:
     print("### Error: " + str(r))
     if ask_on_err:
-        input("Press Enter to continue exectution...")
+        input("Press Enter to continue execution...")
 
 def define_set(fn, name, value):
     print("In " + fn + " set " + name + " to " + value)

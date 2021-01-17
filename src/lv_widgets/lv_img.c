@@ -11,7 +11,7 @@
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
-    #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+    #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_misc/lv_debug.h"

@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_CONT == 0
-#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
+#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT 1)"
 #endif
 
 #include "lv_cont.h"

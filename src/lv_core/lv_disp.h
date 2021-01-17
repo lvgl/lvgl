@@ -73,7 +73,7 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
 /**
  * Return with the sys. layer. (Same on every screen and it is above the normal screen and the top
  * layer)
- * @param disp pointer to display which sys. layer  should be get. (NULL to use the default screen)
+ * @param disp pointer to display which sys. layer should be get. (NULL to use the default screen)
  * @return pointer to the sys layer object  (transparent screen sized lv_obj)
  */
 lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
@@ -161,7 +161,7 @@ static inline lv_obj_t * lv_scr_act(void)
 }
 
 /**
- * Get the top layer  of the default display
+ * Get the top layer of the default display
  * @return pointer to the top layer
  */
 static inline lv_obj_t * lv_layer_top(void)
@@ -171,7 +171,7 @@ static inline lv_obj_t * lv_layer_top(void)
 
 /**
  * Get the active screen of the default display
- * @return  pointer to the sys layer
+ * @return pointer to the sys layer
  */
 static inline lv_obj_t * lv_layer_sys(void)
 {

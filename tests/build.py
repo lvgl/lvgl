@@ -34,7 +34,7 @@ def build(name, defines):
   print("---------------------------")
   ret = os.system(cmd)
   if(ret != 0):
-    print("BUILD ERROR! (error code  " + str(ret) + ")")
+    print("BUILD ERROR! (error code " + str(ret) + ")")
     exit(1)
 
   print("---------------------------")
@@ -42,7 +42,7 @@ def build(name, defines):
   print("---------------------------")
   ret = os.system("./test.bin")
   if(ret != 0):
-    print("RUN ERROR! (error code  " + str(ret) + ")")
+    print("RUN ERROR! (error code " + str(ret) + ")")
     exit(1)
 
   print("---------------------------")

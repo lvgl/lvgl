@@ -385,7 +385,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     lv_style_list_init(&new_obj->style_list);
     if(copy == NULL) {
         if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
-        else  lv_theme_apply(new_obj, LV_THEME_SCR);
+        else lv_theme_apply(new_obj, LV_THEME_SCR);
     }
     else {
         lv_style_list_copy(&new_obj->style_list, &copy->style_list);
@@ -1222,7 +1222,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
  * Release all used memories and cancel pending related transitions.
  * Typically used in `LV_SIGN_CLEAN_UP.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part)
@@ -1244,7 +1244,7 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part)
  * Release all used memories and cancel pending related transitions.
  * Also notifies the object about the style change.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part)
@@ -2388,7 +2388,7 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
  * Set that width reduced by the left and right padding of the parent.
  * @param obj pointer to an object
  * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
+ * If 1 the width will be set the parent's width
  * If 2 only half parent width - inner padding of the parent
  * If 3 only third parent width - 2 * inner padding of the parent
  * @param span how many columns are combined
@@ -2409,7 +2409,7 @@ lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
  * Get that height reduced by the top and bottom padding of the parent.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
+ * If 1 the height will be set the parent's height
  * If 2 only half parent height - inner padding of the parent
  * If 3 only third parent height - 2 * inner padding of the parent
  * @param span how many rows are combined
@@ -2429,7 +2429,7 @@ lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
 /**
  * Get the automatic realign property of the object.
  * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
+ * @return true: auto realign is enabled; false: auto realign is disabled
  */
 bool lv_obj_get_auto_realign(const lv_obj_t * obj)
 {
@@ -3860,7 +3860,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         if(lv_obj_get_style_border_blend_mode(obj, LV_OBJ_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
         if(lv_obj_get_style_opa_scale(obj, LV_OBJ_PART_MAIN) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
 
-        return  LV_DESIGN_RES_COVER;
+        return LV_DESIGN_RES_COVER;
 
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {

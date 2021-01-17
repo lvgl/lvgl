@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_BTN == 0
-#error "lv_imgbtn: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
+#error "lv_imgbtn: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -127,7 +127,7 @@ static inline void lv_imgbtn_set_checkable(lv_obj_t * imgbtn, bool tgl)
 
 #if LV_IMGBTN_TILED == 0
 /**
- * Get the images in a  given state
+ * Get the images in a given state
  * @param imgbtn pointer to an image button object
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to an image source (a C array or path to a file)

@@ -258,7 +258,7 @@ menu "LVGL configuration"
 
     menu "Image decoder and cache"
         config LV_IMG_CF_INDEXED
-            bool "Enable indexed (pallete) images."
+            bool "Enable indexed (palette) images."
             default y if !LV_CONF_MINIMAL
         config LV_IMG_CF_ALPHA
             bool "Enable alpha indexed images."

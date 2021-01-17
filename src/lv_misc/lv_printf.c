@@ -68,13 +68,13 @@
 // define the default floating point precision
 // default: 6 digits
 #ifndef PRINTF_DEFAULT_FLOAT_PRECISION
-    #define PRINTF_DEFAULT_FLOAT_PRECISION  6U
+    #define PRINTF_DEFAULT_FLOAT_PRECISION 6U
 #endif
 
 // define the largest float suitable to print with %f
 // default: 1e9
 #ifndef PRINTF_MAX_FLOAT
-    #define PRINTF_MAX_FLOAT  1e9
+    #define PRINTF_MAX_FLOAT 1e9
 #endif
 
 // support for the long long types (%llu or %p)
