@@ -193,6 +193,21 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
  */
 lv_task_t * lv_task_create_basic(void)
 {
+    return lv_task_create(NULL, DEF_PERIOD, DEF_PRIO, NULL);
+}
+
+/**
+ * Create a new lv_task
+ * @param task_xcb a callback which is the task itself. It will be called periodically.
+ *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                  the `func_name(object, callback, ...)` convention)
+ * @param period call period in ms unit
+ * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
+ * @param user_data custom parameter
+ * @return pointer to the new task
+ */
+lv_task_t * lv_task_create(lv_task_cb_t task_xcb, uint32_t period, lv_task_prio_t prio, void * user_data)
+{
     lv_task_t * new_task = NULL;
     lv_task_t * tmp;
 
@@ -208,7 +223,7 @@ lv_task_t * lv_task_create_basic(void)
     /*Insert the new task to proper place according to its priority*/
     else {
         do {
-            if(tmp->prio <= DEF_PRIO) {
+            if(tmp->prio <= prio) {
                 new_task = _lv_ll_ins_prev(&LV_GC_ROOT(_lv_task_ll), tmp);
                 LV_ASSERT_MEM(new_task);
                 if(new_task == NULL) return NULL;
@@ -226,40 +241,16 @@ lv_task_t * lv_task_create_basic(void)
     }
     task_list_changed = true;
 
-    new_task->period  = DEF_PERIOD;
-    new_task->task_cb = NULL;
-    new_task->prio    = DEF_PRIO;
+    new_task->period  = period;
+    new_task->task_cb = task_xcb;
+    new_task->prio    = prio;
 
     new_task->repeat_count = -1;
     new_task->last_run = lv_tick_get();
 
-    new_task->user_data = NULL;
+    new_task->user_data = user_data;
 
     task_created = true;
-
-    return new_task;
-}
-
-/**
- * Create a new lv_task
- * @param task_xcb a callback which is the task itself. It will be called periodically.
- *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
- *                  the `func_name(object, callback, ...)` convention)
- * @param period call period in ms unit
- * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param user_data custom parameter
- * @return pointer to the new task
- */
-lv_task_t * lv_task_create(lv_task_cb_t task_xcb, uint32_t period, lv_task_prio_t prio, void * user_data)
-{
-    lv_task_t * new_task = lv_task_create_basic();
-    LV_ASSERT_MEM(new_task);
-    if(new_task == NULL) return NULL;
-
-    lv_task_set_cb(new_task, task_xcb);
-    lv_task_set_period(new_task, period);
-    lv_task_set_prio(new_task, prio);
-    new_task->user_data = user_data;
 
     return new_task;
 }
