@@ -72,17 +72,15 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
     if(already_running) return 1;
     already_running = true;
 
-    static uint32_t idle_period_start = 0;
-    static uint32_t handler_start     = 0;
-    static uint32_t busy_time         = 0;
-    static uint32_t time_till_next;
-
     if(lv_task_run == false) {
         already_running = false; /*Release mutex*/
         return 1;
     }
 
-    handler_start = lv_tick_get();
+    static uint32_t idle_period_start = 0;
+    static uint32_t busy_time         = 0;
+
+    uint32_t handler_start = lv_tick_get();
 
     /* Run all task from the highest to the lowest priority
      * If a lower priority task is executed check task again from the highest priority
@@ -159,26 +157,23 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
         }
     } while(!end_flag);
 
+    uint32_t time_till_next = LV_NO_TASK_READY;
+    next = _lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+    while(next && next->prio != LV_TASK_PRIO_OFF) {
+        uint32_t delay = lv_task_time_remaining(next);
+        if(delay < time_till_next)
+            time_till_next = delay;
+
+        next = _lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
+    }
+
     busy_time += lv_tick_elaps(handler_start);
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
     if(idle_period_time >= IDLE_MEAS_PERIOD) {
-
-        idle_last         = (busy_time * 100) / IDLE_MEAS_PERIOD;  /*Calculate the busy percentage*/
+        idle_last         = (busy_time * 100) / idle_period_time;  /*Calculate the busy percentage*/
         idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
         busy_time         = 0;
         idle_period_start = lv_tick_get();
-    }
-
-    time_till_next = LV_NO_TASK_READY;
-    next = _lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
-    while(next) {
-        if(next->prio != LV_TASK_PRIO_OFF) {
-            uint32_t delay = lv_task_time_remaining(next);
-            if(delay < time_till_next)
-                time_till_next = delay;
-        }
-
-        next = _lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
     }
 
     already_running = false; /*Release the mutex*/
