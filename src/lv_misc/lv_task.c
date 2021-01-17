@@ -64,7 +64,6 @@ void _lv_task_core_init(void)
  */
 LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
 {
-
     LV_LOG_TRACE("lv_task_handler started");
 
     /*Avoid concurrent running of the task handler*/
@@ -92,6 +91,7 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
         end_flag                 = true;
         task_deleted             = false;
         task_created             = false;
+        task_list_changed        = false;
         LV_GC_ROOT(_lv_task_act) = _lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
         while(LV_GC_ROOT(_lv_task_act)) {
             /* The task might be deleted if it runs only once ('once = 1')
@@ -149,7 +149,6 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
             if(task_list_changed) {
                 task_interrupter = NULL;
                 end_flag = false;
-                task_list_changed = false;
                 break;
             }
 
@@ -384,8 +383,6 @@ static bool lv_task_exec(lv_task_t * task)
 
     if(lv_task_time_remaining(task) == 0) {
         task->last_run = lv_tick_get();
-        task_deleted   = false;
-        task_created   = false;
         if(task->task_cb) task->task_cb(task);
 
         /*Delete if it was a one shot lv_task*/
