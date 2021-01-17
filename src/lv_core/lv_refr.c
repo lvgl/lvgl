@@ -406,7 +406,7 @@ static void lv_refr_areas(void)
 
 /**
  * Refresh an area if there is Virtual Display Buffer
- * @param area_p  pointer to an area to refresh
+ * @param area_p pointer to an area to refresh
  */
 static void lv_refr_area(const lv_area_t * area_p)
 {

@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_PAGE == 0
-#error "lv_ddlist: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
+#error "lv_ddlist: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1)"
 #endif
 
 #if LV_USE_LABEL == 0
-#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_widgets/lv_page.h"
@@ -123,7 +123,7 @@ void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options);
  * Add an options to a drop down list from a string.  Only works for dynamic options.
  * @param ddlist pointer to drop down list object
  * @param option a string without '\n'. E.g. "Four"
- * @param pos  the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
+ * @param pos the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
 void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos);
 

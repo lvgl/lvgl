@@ -80,7 +80,7 @@ void lv_port_fs_init(void)
     fs_init();
 
     /*---------------------------------------------------
-     * Register the file system interface  in LVGL
+     * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
     /* Add a simple drive to open images */
@@ -262,7 +262,7 @@ static lv_fs_res_t fs_tell (lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  * Delete a file
  * @param drv pointer to a driver where this function belongs
  * @param path path of the file to delete
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 static lv_fs_res_t fs_remove (lv_fs_drv_t * drv, const char *path)
 {

@@ -88,7 +88,7 @@ void lv_anim_init(lv_anim_t * a)
 void lv_anim_start(lv_anim_t * a)
 {
     LV_LOG_TRACE("animation create started")
-    /* Do not let two animations for the  same 'var' with the same 'fp'*/
+    /* Do not let two animations for the same 'var' with the same 'fp'*/
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*If the list is empty the anim task was suspended and it's last run measure is invalid*/

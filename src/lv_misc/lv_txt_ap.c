@@ -114,7 +114,7 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
             chars_cnt++;
         else if(ch_enc < 0x0800)
             chars_cnt += 2;
-        else  if(ch_enc < 0x010000)
+        else if(ch_enc < 0x010000)
             chars_cnt += 3;
         else
             chars_cnt += 4;

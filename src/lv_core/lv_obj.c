@@ -385,7 +385,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     lv_style_list_init(&new_obj->style_list);
     if(copy == NULL) {
         if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
-        else  lv_theme_apply(new_obj, LV_THEME_SCR);
+        else lv_theme_apply(new_obj, LV_THEME_SCR);
     }
     else {
         lv_style_list_copy(&new_obj->style_list, &copy->style_list);
@@ -2429,7 +2429,7 @@ lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
 /**
  * Get the automatic realign property of the object.
  * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
+ * @return true: auto realign is enabled; false: auto realign is disabled
  */
 bool lv_obj_get_auto_realign(const lv_obj_t * obj)
 {
@@ -3860,7 +3860,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         if(lv_obj_get_style_border_blend_mode(obj, LV_OBJ_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
         if(lv_obj_get_style_opa_scale(obj, LV_OBJ_PART_MAIN) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
 
-        return  LV_DESIGN_RES_COVER;
+        return LV_DESIGN_RES_COVER;
 
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {

@@ -268,7 +268,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
  *                 the number and order of the individual buttons (i.e. excludes
  *                 newline entries).
  *                 An element of the map should look like e.g.:
- *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT |  LV_BTNMATRIX_CTRL_TGL_ENABLE`
+ *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_TGL_ENABLE`
  */
 void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_map[])
 {
@@ -478,7 +478,7 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * btnm)
  * Get the index of the lastly "activated" button by the user (pressed, released etc)
  * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
  * @param btnm pointer to button matrix object
- * @return  index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
+ * @return index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
 uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * btnm)
 {
@@ -511,7 +511,7 @@ const char * lv_btnmatrix_get_active_btn_text(const lv_obj_t * btnm)
  * Get the pressed button's index.
  * The button be really pressed by the user or manually set to pressed with `lv_btnmatrix_set_pressed`
  * @param btnm pointer to button matrix object
- * @return  index of the pressed button (LV_BTNMATRIX_BTN_NONE: if unset)
+ * @return index of the pressed button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
 uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm)
 {
@@ -526,7 +526,7 @@ uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm)
  * @param btnm pointer to button matrix object
  * @param btn_id the index a button not counting new line characters. (The return value of
  * lv_btnmatrix_get_pressed/released)
- * @return  text of btn_index` button
+ * @return text of btn_index` button
  */
 const char * lv_btnmatrix_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
 {

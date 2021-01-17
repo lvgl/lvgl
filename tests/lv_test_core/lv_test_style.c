@@ -414,7 +414,7 @@ static void mem_leak(void)
 {
 
     lv_test_print("");
-    lv_test_print("Test style  set, add, remove memory leak");
+    lv_test_print("Test style set, add, remove memory leak");
     lv_test_print("----------------------------------------");
 
     lv_mem_monitor_t mon_start;

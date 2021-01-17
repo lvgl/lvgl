@@ -60,7 +60,7 @@ void _lv_task_core_init(void)
 }
 
 /**
- * Call it  periodically to handle lv_tasks.
+ * Call it periodically to handle lv_tasks.
  * @return the time after which it must be called again
  */
 LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)

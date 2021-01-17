@@ -680,7 +680,7 @@ static void page_init(void)
     lv_style_set_pad_right(&styles->sb, LV_STATE_DEFAULT,  LV_DPX(7));
     lv_style_set_pad_bottom(&styles->sb, LV_STATE_DEFAULT,  LV_DPX(7));
 
-#if  LV_USE_ANIMATION
+#if LV_USE_ANIMATION
     style_init_reset(&styles->edge_flash);
     lv_style_set_bg_opa(&styles->edge_flash, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->edge_flash, LV_STATE_DEFAULT,  lv_color_hex3(0x888));

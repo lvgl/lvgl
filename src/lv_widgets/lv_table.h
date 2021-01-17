@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
-#error "lv_table: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_table: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"

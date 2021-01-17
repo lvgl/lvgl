@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_PAGE == 0
-#error "lv_ta: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
+#error "lv_ta: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1)"
 #endif
 
 #if LV_USE_LABEL == 0
-#error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -197,14 +197,14 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align);
 
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @param list list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
  */
 void lv_textarea_set_accepted_chars(lv_obj_t * ta, const char * list);
 
 /**
  * Set max length of a Text Area.
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @param num the maximal number of characters can be added (`lv_textarea_set_text` ignores it)
  */
 void lv_textarea_set_max_length(lv_obj_t * ta, uint32_t num);
@@ -333,14 +333,14 @@ bool lv_textarea_get_one_line(const lv_obj_t * ta);
 
 /**
  * Get a list of accepted characters.
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @return list of accented characters.
  */
 const char * lv_textarea_get_accepted_chars(lv_obj_t * ta);
 
 /**
  * Get max length of a Text Area.
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @return the maximal number of characters to be add
  */
 uint32_t lv_textarea_get_max_length(lv_obj_t * ta);
