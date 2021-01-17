@@ -1,6 +1,6 @@
 /**
  * @file lv_task.c
- * An 'lv_task'  is a void (*fp) (void* param) type function which will be called periodically.
+ * An 'lv_task' is a void (*fp) (struct _lv_task_t* param) type function which will be called periodically.
  * A priority (5 levels + disable) can be assigned to lv_tasks.
  */
 
@@ -54,7 +54,6 @@ void _lv_task_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_task_ll), sizeof(lv_task_t));
 
-    task_list_changed = false;
     /*Initially enable the lv_task handling*/
     lv_task_enable(true);
 }
@@ -102,7 +101,7 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
             next = _lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), LV_GC_ROOT(_lv_task_act));
 
             /*We reach priority of the turned off task. There is nothing more to do.*/
-            if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio == LV_TASK_PRIO_OFF) {
+            if(LV_GC_ROOT(_lv_task_act)->prio == LV_TASK_PRIO_OFF) {
                 break;
             }
 
@@ -115,12 +114,12 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
             }
 
             /*Just try to run the tasks with highest priority.*/
-            if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio == LV_TASK_PRIO_HIGHEST) {
+            if(LV_GC_ROOT(_lv_task_act)->prio == LV_TASK_PRIO_HIGHEST) {
                 lv_task_exec(LV_GC_ROOT(_lv_task_act));
             }
             /*Tasks with higher priority than the interrupted shall be run in every case*/
             else if(task_interrupter) {
-                if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio > task_interrupter->prio) {
+                if(LV_GC_ROOT(_lv_task_act)->prio > task_interrupter->prio) {
                     if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
                         if(!task_created && !task_deleted) {
                             /*Check all tasks again from the highest priority */
@@ -164,8 +163,8 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
     if(idle_period_time >= IDLE_MEAS_PERIOD) {
 
-        idle_last         = (uint32_t)((uint32_t)busy_time * 100) / IDLE_MEAS_PERIOD; /*Calculate the busy percentage*/
-        idle_last         = idle_last > 100 ? 0 : 100 - idle_last;                    /*But we need idle time*/
+        idle_last         = (busy_time * 100) / IDLE_MEAS_PERIOD;  /*Calculate the busy percentage*/
+        idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
         busy_time         = 0;
         idle_period_start = lv_tick_get();
     }
