@@ -108,7 +108,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
 
 #else /*LV_USE_LOG*/
 
-/*Do nothing if `LV_USE_LOG  0`*/
+/*Do nothing if `LV_USE_LOG 0`*/
 #define _lv_log_add(level, file, line, ...)
 #define LV_LOG_TRACE(...)
 #define LV_LOG_INFO(...)

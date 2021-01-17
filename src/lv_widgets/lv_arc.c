@@ -173,7 +173,7 @@ void lv_arc_set_start_angle(lv_obj_t * arc, uint16_t start)
                      LV_ARC_PART_INDIC);
     }
     /*Only a smaller incremental move*/
-    else  if(ext->arc_angle_start < ext->arc_angle_end && start < ext->arc_angle_end) {
+    else if(ext->arc_angle_start < ext->arc_angle_end && start < ext->arc_angle_end) {
         inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_start, start), LV_MATH_MAX(ext->arc_angle_start, start),
                      LV_ARC_PART_INDIC);
     }
@@ -207,7 +207,7 @@ void lv_arc_set_end_angle(lv_obj_t * arc, uint16_t end)
         inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_end, end), LV_MATH_MAX(ext->arc_angle_end, end), LV_ARC_PART_INDIC);
     }
     /*Only a smaller incremental move*/
-    else  if(ext->arc_angle_end < ext->arc_angle_start && end < ext->arc_angle_start) {
+    else if(ext->arc_angle_end < ext->arc_angle_start && end < ext->arc_angle_start) {
         inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_end, end), LV_MATH_MAX(ext->arc_angle_end, end), LV_ARC_PART_INDIC);
     }
     /*Crossing the end angle makes the whole arc change*/
@@ -263,7 +263,7 @@ void lv_arc_set_bg_start_angle(lv_obj_t * arc, uint16_t start)
         inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_start, start), LV_MATH_MAX(ext->bg_angle_start, start), LV_ARC_PART_BG);
     }
     /*Only a smaller incremental move*/
-    else  if(ext->bg_angle_start < ext->bg_angle_end && start < ext->bg_angle_end) {
+    else if(ext->bg_angle_start < ext->bg_angle_end && start < ext->bg_angle_end) {
         inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_start, start), LV_MATH_MAX(ext->bg_angle_start, start), LV_ARC_PART_BG);
     }
     /*Crossing the start angle makes the whole arc change*/
@@ -298,7 +298,7 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end)
         inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_end, end), LV_MATH_MAX(ext->bg_angle_end, end), LV_ARC_PART_BG);
     }
     /*Only a smaller incremental move*/
-    else  if(ext->bg_angle_end < ext->bg_angle_start && end < ext->bg_angle_start) {
+    else if(ext->bg_angle_end < ext->bg_angle_start && end < ext->bg_angle_start) {
         inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_end, end), LV_MATH_MAX(ext->bg_angle_end, end), LV_ARC_PART_BG);
     }
     /*Crossing the end angle makes the whole arc change*/

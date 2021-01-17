@@ -211,7 +211,7 @@ void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_width, const lv_
  *
  * By default, image is copied directly, with optional opacity configured by \p opa.
  * Color keying can be enabled by calling lv_gpu_nxp_pxp_enable_color_key() before calling this function.
- * Recoloring can be enabled by calling  lv_gpu_nxp_pxp_enable_recolor() before calling this function.
+ * Recoloring can be enabled by calling lv_gpu_nxp_pxp_enable_recolor() before calling this function.
  * Note that color keying and recoloring at the same time is not supported and black rectangle is rendered.
  *
  * @param[in/out] dest destination buffer

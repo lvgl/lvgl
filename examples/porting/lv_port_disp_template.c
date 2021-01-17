@@ -55,7 +55,7 @@ void lv_port_disp_init(void)
      *----------------------------*/
 
     /* LVGL requires a buffer where it internally draws the widgets.
-     * Later this buffer will passed your display drivers `flush_cb` to copy its content to your dispay.
+     * Later this buffer will passed your display drivers `flush_cb` to copy its content to your display.
      * The buffer has to be greater than 1 display row
      *
      * There are three buffering configurations:

@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_SLIDER == 0
-#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1)"
+#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -91,7 +91,7 @@ bool lv_switch_toggle(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Set the animation time of the switch
- * @param sw pointer to a  switch object
+ * @param sw pointer to a switch object
  * @param anim_time animation time
  * @return style pointer to a style
  */
@@ -116,7 +116,7 @@ static inline bool lv_switch_get_state(const lv_obj_t * sw)
 
 /**
  * Get the animation time of the switch
- * @param sw pointer to a  switch object
+ * @param sw pointer to a switch object
  * @return style pointer to a style
  */
 static inline uint16_t lv_switch_get_anim_time(const lv_obj_t * sw)

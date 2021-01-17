@@ -329,7 +329,7 @@ bool lv_keyboard_get_cursor_manage(const lv_obj_t * kb)
  * Default keyboard event to add characters to the Text area and change the map.
  * If a custom `event_cb` is added to the keyboard this function be called from it to handle the
  * button clicks
- * @param kb pointer to a  keyboard
+ * @param kb pointer to a keyboard
  * @param event the triggering event
  */
 void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event)
@@ -372,7 +372,7 @@ void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event)
             if(res != LV_RES_OK) return;
         }
         else {
-            lv_keyboard_set_textarea(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
+            lv_keyboard_set_textarea(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
             lv_obj_del(kb);
             return;
         }
