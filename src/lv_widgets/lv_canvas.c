@@ -54,7 +54,7 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
-static lv_design_cb_t ancestor_design;
+static lv_drawer_cb_t ancestor_drawer;
 
 /**********************
  *      MACROS
@@ -88,7 +88,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_canvas);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_canvas);
+    if(ancestor_drawer == NULL) ancestor_drawer = lv_obj_get_drawer_cb(new_canvas);
 
     /*Initialize the allocated 'ext' */
     ext->dsc.header.always_zero = 0;
@@ -100,7 +100,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_img_set_src(new_canvas, &ext->dsc);
 
-    /*The signal and design functions are not copied so set them here*/
+    /*The signal and drawer functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_canvas, lv_canvas_signal);
 
     /*Init the new canvas canvas*/

@@ -38,7 +38,6 @@ typedef enum {
     CACHE_UNSET = 2,
     CACHE_255 = 3,
     CACHE_NEED_CHECK = 4,
-    CACHE_INDEX = 5,
 }cache_t;
 
 /**********************
@@ -289,35 +288,23 @@ static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, 
 }
 static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_style_value_t * v)
 {
-//    cache_t cache_res = read_cache(obj, part, prop);
-//    switch(cache_res) {
-//    case CACHE_ZERO:
-//        v->ptr = 0;
-//        return true;
-//    case CACHE_TRUE:
-//        v->num = 1;
-//        return true;
-//    case CACHE_255:
-//        v->num = 255;
-//        return true;
-//    case CACHE_UNSET:
-//        return false;
-//    case CACHE_NEED_CHECK:
-//        break;
-//
-//    default: /*CACHE_INDEX*/
-//        cache_res -= CACHE_INDEX;
-//        if(cache_res) {
-//            if(prop == LV_STYLE_BG_COLOR || prop == LV_STYLE_TEXT_COLOR) {
-//                v->color = lv_style_get_indexed_color(cache_res);
-//            } else {
-//                v->num = lv_style_get_indexed_num(cache_res);
-//            }
-//            return true;
-//        }
-//        break;
-//    }
+    cache_t cache_res = read_cache(obj, part, prop);
+    switch(cache_res) {
+    case CACHE_ZERO:
+        v->ptr = 0;
+        return true;
+    case CACHE_TRUE:
+        v->num = 1;
+        return true;
+    case CACHE_255:
+        v->num = 255;
+        return true;
+    case CACHE_UNSET:
+        return false;
+    case CACHE_NEED_CHECK:
+        break;
 
+    }
 
     int32_t weight = -1;
     lv_state_t state = obj->state;
@@ -476,7 +463,6 @@ lv_obj_style_t * _get_trans_style(lv_obj_t * obj, uint32_t part)
     _lv_memset_00(&obj->style_list.styles[0], sizeof(lv_obj_style_t));
     obj->style_list.styles[0].style = lv_mem_alloc(sizeof(lv_style_t));
     lv_style_init(obj->style_list.styles[0].style);
-    obj->style_list.styles[0].style->dont_index = 1;
     obj->style_list.styles[0].is_trans = 1;
     obj->style_list.styles[0].part = part;
     return &obj->style_list.styles[0];
@@ -675,78 +661,46 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         if(get_prop_core(obj, part, LV_STYLE_OPA, &v)) list->cache_opa_set = 1;
         else list->cache_opa_set = 0;
     }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_LETTER_SPACE) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_LETTER_SPACE, &v)) list->cache_letter_space_set = 1;
-        else list->cache_letter_space_set = 0;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_LINE_SPACE) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_LINE_SPACE, &v)) list->cache_line_space_set = 1;
-        else list->cache_line_space_set = 0;
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_LETTER_SPACE || prop == LV_STYLE_TEXT_LINE_SPACE
+       || prop == LV_STYLE_TEXT_DECOR || prop == LV_STYLE_TEXT_ALIGN)
+    {
+        lv_style_value_t va[4];
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_LETTER_SPACE, &va[0]) == false) va[0].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_LINE_SPACE, &va[1]) == false) va[1].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_DECOR, &va[2]) == false) va[2].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_ALIGN, &va[3]) == false) va[3].num = 0;
+        if(va[0].num || va[1].num || va[2].num || va[3].num) list->cache_text_extra_zero = 0;
+        else list->cache_text_extra_zero = 1;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_OPA) {
         if(get_prop_core(obj, part, LV_STYLE_TEXT_OPA, &v)) list->cache_text_opa_set = 1;
         else list->cache_text_opa_set = 0;
     }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_DECOR) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_DECOR, &v)) list->cache_text_decor_set = 1;
-        else list->cache_text_decor_set = 0;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_BLEND_MODE) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_BLEND_MODE, &v)) list->cache_text_blend_mode_set = 1;
-        else list->cache_text_decor_set = 0;
-    }
 
     /*Indexed*/
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_RADIUS) {
         if(get_prop_core(obj, part, LV_STYLE_RADIUS, &v) == 0) v.num = 0;
-        uint32_t id = lv_style_find_index_num(v);
-        list->cache_radius = id;
+        list->cache_radius_zero = v.num ? 0 : 1;
     }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_PAD_LEFT || prop == LV_STYLE_PAD_RIGHT) {
-        lv_style_value_t vl;
-        lv_style_value_t vr;
-        if(get_prop_core(obj, part, LV_STYLE_PAD_LEFT, &vl) == 0) vl.num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_PAD_RIGHT, &vr) == 0) vr.num = 0;
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_PAD_LEFT || prop == LV_STYLE_PAD_RIGHT || prop == LV_STYLE_PAD_TOP || prop == LV_STYLE_PAD_BOTTOM) {
+        lv_style_value_t va[4];
+        if(get_prop_core(obj, part, LV_STYLE_PAD_LEFT, &va[0]) == 0) va[0].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_RIGHT, &va[1]) == 0) va[1].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_TOP, &va[2]) == 0) va[2].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_BOTTOM, &va[3]) == 0) va[3].num = 0;
 
-        if(vl.num == vr.num) {
-            uint32_t id = lv_style_find_index_num(vl);
-            list->cache_pad_hor = id;
-        } else {
-            list->cache_pad_hor = 0;
-        }
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_PAD_TOP || prop == LV_STYLE_PAD_BOTTOM) {
-        lv_style_value_t vt;
-        lv_style_value_t vb;
-        if(get_prop_core(obj, part, LV_STYLE_PAD_TOP, &vt) == 0) vt.num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_PAD_BOTTOM, &vb) == 0) vb.num = 0;
-
-        if(vt.num == vb.num) {
-            uint32_t id = lv_style_find_index_num(vt);
-            list->cache_pad_ver = id;
-        } else {
-            list->cache_pad_ver = 0;
-        }
+        if(va[0].num || va[1].num || va[2].num || va[3].num) list->cache_pad_zero = 0;
+        else list->cache_pad_zero = 1;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_WIDTH) {
         if(get_prop_core(obj, part, LV_STYLE_BORDER_WIDTH, &v) == 0) v.num = 0;
-        uint32_t id = lv_style_find_index_num(v);
-        list->cache_border_width = id;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_COLOR_FILTERED) {
-        if(get_prop_core(obj, part, LV_STYLE_BG_COLOR_FILTERED, &v) == 0) {
-            list->cache_bg_color_filtered = 0;
-        } else {
-            uint32_t id = lv_style_find_index_color(v);
-            list->cache_bg_color_filtered = id;
-        }
+        list->cache_border_width_zero = v.num ? 0 : 1;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_COLOR_FILTERED) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_COLOR_FILTERED, &v) == 0) {
-            list->cache_text_color_filtered = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_COLOR_FILTERED, &v)) {
+            list->cache_text_color_set = 1;
         } else {
-            uint32_t id = lv_style_find_index_color(v);
-            list->cache_text_color_filtered = id;
+            list->cache_text_color_set = 0;
         }
     }
 
@@ -765,20 +719,22 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
             list->cache_transform_zero = 0;
         }
     }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_BLEND_MODE) {
-        if(get_prop_core(obj, part, LV_STYLE_BG_BLEND_MODE, &v) == false) v.num = 0;
-        if(v.num == 0) list->cache_bg_blend_mode_zero = 1;
-        else list->cache_bg_blend_mode_zero = 0;
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_BLEND_MODE || prop == LV_STYLE_TEXT_BLEND_MODE || prop == LV_STYLE_BORDER_BLEND_MODE) {
+        lv_style_value_t va[5];
+        if(get_prop_core(obj, part, LV_STYLE_BG_BLEND_MODE, &va[0]) == false) va[0].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_BORDER_BLEND_MODE, &va[1]) == false) va[1].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_SHADOW_BLEND_MODE, &va[1]) == false) va[2].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_OUTLINE_BLEND_MODE, &va[1]) == false) va[3].num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_BLEND_MODE, &va[2]) == false) va[4].num = 0;
+
+        if(va[0].num || va[1].num || va[2].num || va[3].num || va[4].num) list->cache_blend_mode_zero = 1;
+        else list->cache_blend_mode_zero = 0;
     }
+
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_GRAD_DIR) {
         if(get_prop_core(obj, part, LV_STYLE_BG_GRAD_DIR, &v) == false) v.num = 0;
         if(v.num == 0) list->cache_bg_grad_dir_zero = 1;
         else list->cache_bg_grad_dir_zero = 0;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_BLEND_MODE) {
-        if(get_prop_core(obj, part, LV_STYLE_BORDER_BLEND_MODE, &v) == false) v.num = 0;
-        if(v.num == 0) list->cache_border_blend_mode_zero = 1;
-        else list->cache_border_blend_mode_zero = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_OUTLINE_WIDTH) {
         if(get_prop_core(obj, part, LV_STYLE_OUTLINE_WIDTH, &v) == false) v.num = 0;
@@ -806,6 +762,12 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_OPA, &vf[1]) == false) vf[1].num = 0;
         if(vf[0].func == NULL || vf[1].num == 0) list->cache_filter_zero = 1;
         else list->cache_filter_zero = 0;
+    }
+
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_DRAWER) {
+        if(get_prop_core(obj, part, LV_STYLE_DRAWER, &v) == false) v.ptr = NULL;
+        if(v.ptr == NULL) list->cache_drawer_zero = 1;
+        else list->cache_drawer_zero = 0;
     }
 
     /*1 or 0*/
@@ -849,55 +811,49 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     if(obj->style_list.skip_trans) return CACHE_NEED_CHECK;
 
     switch(prop) {
-    /*Unset or Needs check*/
+
+    case LV_STYLE_BG_BLEND_MODE:
+    case LV_STYLE_BORDER_BLEND_MODE:
+    case LV_STYLE_SHADOW_BLEND_MODE:
+    case LV_STYLE_OUTLINE_BLEND_MODE:
+        if(list->cache_blend_mode_zero ) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
+        break;
+
+    case LV_STYLE_TEXT_BLEND_MODE:
+        if(list->cache_blend_mode_zero ) return CACHE_UNSET;
+        else return CACHE_NEED_CHECK;
+        break;
+
     case LV_STYLE_OPA:
         if(list->cache_opa_set) return CACHE_NEED_CHECK;
         else return CACHE_UNSET;
         break;
     case LV_STYLE_TEXT_LETTER_SPACE:
-        if(list->cache_letter_space_set) return CACHE_NEED_CHECK;
-        else return CACHE_UNSET;
-        break;
     case LV_STYLE_TEXT_LINE_SPACE:
-        if(list->cache_line_space_set) return CACHE_NEED_CHECK;
-        else return CACHE_UNSET;
-        break;
+    case LV_STYLE_TEXT_DECOR:
+    case LV_STYLE_TEXT_ALIGN:
+        if(list->cache_text_extra_zero) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
     case LV_STYLE_TEXT_OPA:
         if(list->cache_text_opa_set) return CACHE_NEED_CHECK;
         else return CACHE_UNSET;
         break;
-    case LV_STYLE_TEXT_DECOR:
-        if(list->cache_text_decor_set) return CACHE_NEED_CHECK;
-        else return CACHE_UNSET;
-        break;
-    case LV_STYLE_TEXT_BLEND_MODE:
-        if(list->cache_text_blend_mode_set) return CACHE_NEED_CHECK;
-        else return CACHE_UNSET;
-        break;
 
-    /*Indexed*/
     case LV_STYLE_RADIUS:
-        return CACHE_INDEX + list->cache_radius;
-        break;
+        if(list->cache_radius_zero) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
     case LV_STYLE_PAD_LEFT:
     case LV_STYLE_PAD_RIGHT:
-        return CACHE_INDEX + list->cache_pad_hor;
-        break;
     case LV_STYLE_PAD_TOP:
     case LV_STYLE_PAD_BOTTOM:
-        return CACHE_INDEX + list->cache_pad_ver;
+        if(list->cache_pad_zero) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_BORDER_WIDTH:
-        return CACHE_INDEX + list->cache_border_width;
-        break;
-    case LV_STYLE_BG_COLOR_FILTERED:
-        return CACHE_INDEX + list->cache_bg_color_filtered;
-        break;
-    case LV_STYLE_TEXT_COLOR_FILTERED:
-        return CACHE_INDEX + list->cache_text_color_filtered;
-        break;
+        if(list->cache_border_width_zero) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
 
-    /*Zero or Needs check*/
     case LV_STYLE_TRANSFORM_ANGLE:
     case LV_STYLE_TRANSFORM_ZOOM:
     case LV_STYLE_TRANSFORM_HEIGHT:
@@ -905,16 +861,8 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         if(list->cache_transform_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
-    case LV_STYLE_BG_BLEND_MODE:
-        if(list->cache_bg_blend_mode_zero ) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
-        break;
     case LV_STYLE_BG_GRAD_DIR:
         if(list->cache_bg_grad_dir_zero ) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
-        break;
-    case LV_STYLE_BORDER_BLEND_MODE:
-        if(list->cache_border_blend_mode_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_OUTLINE_WIDTH:
@@ -936,6 +884,11 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     case LV_STYLE_COLOR_FILTER_CB:
     case LV_STYLE_COLOR_FILTER_OPA:
         if(list->cache_filter_zero ) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
+        break;
+
+    case LV_STYLE_DRAWER:
+        if(list->cache_drawer_zero) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
 

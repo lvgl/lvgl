@@ -72,6 +72,13 @@ void lv_obj_init_draw_img_dsc(struct _lv_obj_t * obj, uint8_t part, lv_draw_img_
  */
 void lv_obj_init_draw_line_dsc(struct _lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc);
 
+
+lv_drawer_res_t lv_drawer_part_before(struct _lv_obj_t * obj, uint8_t part, const lv_area_t * clip_area, void * param);
+
+lv_drawer_res_t lv_drawer_part_after(struct _lv_obj_t * obj, uint8_t part, const lv_area_t * clip_area, void * param);
+
+void lv_drawer_section(struct _lv_obj_t * obj, lv_drawer_mode_t mode, const lv_area_t * clip_area, bool rev);
+
 /**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
  * @param obj pointer to an object
@@ -90,7 +97,7 @@ void _lv_obj_refresh_ext_draw_pad(struct _lv_obj_t * obj);
 /**
  * Draw scrollbars on an object is required
  * @param obj pointer to an object
- * @param clip_area the clip area coming from the design function
+ * @param clip_area the clip area coming from the drawer function
  */
 void _lv_obj_draw_scrollbar(struct _lv_obj_t * obj, const lv_area_t * clip_area);
 

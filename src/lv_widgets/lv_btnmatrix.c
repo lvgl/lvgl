@@ -34,7 +34,7 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv
 static void lv_btnmatrix_destructor(lv_obj_t * obj);
 
 static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
-static lv_design_res_t lv_btnmatrix_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_btnmatrix_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -57,7 +57,7 @@ const lv_obj_class_t lv_btnmatrix = {
         .constructor = lv_btnmatrix_constructor,
         .destructor = lv_btnmatrix_destructor,
         .signal_cb = lv_btnmatrix_signal,
-        .design_cb = lv_btnmatrix_design,
+        .drawer_cb = lv_btnmatrix_drawer,
         .instance_size = sizeof(lv_btnmatrix_t),
         .base_class = &lv_obj
     };
@@ -537,23 +537,23 @@ static void lv_btnmatrix_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the button matrix
  * @param obj pointer to a button matrix object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_btnmatrix_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_btnmatrix_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_obj.design_cb(obj, clip_area, mode);
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        return lv_obj.drawer_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
 
         lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-        if(btnm->btn_cnt == 0) return LV_DESIGN_RES_OK;
+        if(btnm->btn_cnt == 0) return LV_DRAWER_RES_OK;
 
         obj->style_list.skip_trans = 1;
 
@@ -701,10 +701,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * obj, const lv_area_t * cli
         _lv_mem_buf_release(txt_ap);
 #endif
     }
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
     }
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**

@@ -20,7 +20,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJ_STYLE_CACHE_STATE_INVALID    0x3ff
+#define LV_OBJ_STYLE_CACHE_STATE_INVALID    0x1ff
 
 /**********************
  *      TYPEDEFS
@@ -47,45 +47,37 @@ typedef struct {
     lv_obj_style_t * styles;
     uint32_t style_cnt  :6;
     uint32_t skip_trans :1;
-    uint32_t cache_state :10;
+    uint32_t cache_state :9;
 
-    /*Unset or Needs check*/
     uint32_t cache_opa_set :1;
-    uint32_t cache_letter_space_set :1;
-    uint32_t cache_line_space_set:1;
-    uint32_t cache_text_font:1;
-    uint32_t cache_text_opa_set:1;
-    uint32_t cache_text_decor_set:1;
-    uint32_t cache_text_blend_mode_set:1;
-
-    /*Indexed*/
-    uint32_t cache_radius:5;
-    uint32_t cache_pad_hor:5;
-    uint32_t cache_pad_ver:5;
-    uint32_t cache_border_width:5;
-    uint32_t cache_text_color_filtered:4;
-    uint32_t cache_bg_color_filtered:4;
-
-    /*Zero or Needs check*/
+    uint32_t cache_radius_zero:1;
+    uint32_t cache_pad_zero:1;
     uint32_t cache_transform_zero:1;
-    uint32_t cache_margin_zero:1;
-    uint32_t cache_bg_blend_mode_zero:1;
-    uint32_t cache_bg_grad_dir_zero:1;
-    uint32_t cache_border_blend_mode_zero:1;
-    uint32_t cache_outline_width_zero:1;
-    uint32_t cache_shadow_width_zero:1;
-    uint32_t cache_img_recolor_opa_zero:1;
-    uint32_t cache_content_src_zero:1;
+    uint32_t cache_blend_mode_zero:1;
     uint32_t cache_filter_zero:1;
-
-    /*1 or 0*/
-    uint32_t cache_border_post_enable:1;
+    uint32_t cache_drawer_zero:1;
     uint32_t cache_clip_corner_enable:1;
 
-    /*255 or Needs check*/
     uint32_t cache_bg_opa_cover:1;
+    uint32_t cache_bg_grad_dir_zero:1;
+
+    uint32_t cache_border_width_zero:1;
     uint32_t cache_border_opa_cover:1;
+    uint32_t cache_border_post_enable:1;
+
+    uint32_t cache_text_font_set:1;
+    uint32_t cache_text_opa_set:1;
+    uint32_t cache_text_color_set:1;
+    uint32_t cache_text_extra_zero :1;   /*no align,  letter or line space*/
+
     uint32_t cache_img_opa_cover:1;
+    uint32_t cache_img_recolor_opa_zero:1;
+
+    uint32_t cache_outline_width_zero:1;
+
+    uint32_t cache_shadow_width_zero:1;
+
+    uint32_t cache_content_src_zero:1;
 }lv_obj_style_list_t;
 
 /**********************
@@ -424,6 +416,8 @@ static inline lv_coord_t lv_obj_get_style_content_ofs_y(const struct _lv_obj_t *
 static inline const lv_style_transiton_t * lv_obj_get_style_transition(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION); return v.ptr; }
 
+static inline lv_coord_t lv_obj_get_style_size(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_SIZE); return v.num; }
 
 /**********************
  *      MACROS

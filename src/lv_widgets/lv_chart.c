@@ -39,7 +39,7 @@
  **********************/
 static void lv_chart_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_chart_destructor(lv_obj_t * obj);
-static lv_design_res_t lv_chart_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_chart_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 static void draw_div_lines(lv_obj_t * obj , const lv_area_t * mask);
@@ -57,7 +57,7 @@ const lv_obj_class_t lv_chart = {
     .constructor = lv_chart_constructor,
     .destructor = lv_chart_destructor,
     .signal_cb = lv_chart_signal,
-    .design_cb = lv_chart_design,
+    .drawer_cb = lv_chart_drawer,
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj
 };
@@ -813,19 +813,19 @@ static void lv_chart_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the chart backgrounds
  * @param chart pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_chart_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_chart_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_obj.design_cb(obj, clip_area, mode);
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        return lv_obj.drawer_cb(obj, clip_area, mode);
     }
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
 
         draw_div_lines(obj, clip_area);
         draw_axes(obj, clip_area);
@@ -835,10 +835,10 @@ static lv_design_res_t lv_chart_design(lv_obj_t * obj, const lv_area_t * clip_ar
         if(chart->type & LV_CHART_TYPE_COLUMN) draw_series_column(obj, clip_area);
         draw_cursors(obj, clip_area);
     }
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
     }
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**
@@ -870,7 +870,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 /**
  * Draw the division lines on chart background
  * @param chart pointer to chart object
- * @param clip_area mask, inherited from the design function
+ * @param clip_area mask, inherited from the drawer function
  */
 static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
 {
@@ -1072,7 +1072,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
 /**
  * Draw the data lines as columns on a chart
  * @param chart pointer to chart object
- * @param mask mask, inherited from the design function
+ * @param mask mask, inherited from the drawer function
  */
 static void draw_series_column(lv_obj_t * obj, const lv_area_t * clip_area)
 {
@@ -1441,7 +1441,7 @@ static void invalidate_lines(lv_obj_t * obj, uint16_t i)
 /**
  * invalid area of the new column data lines on a chart
  * @param chart pointer to chart object
- * @param mask mask, inherited from the design function
+ * @param mask mask, inherited from the drawer function
  */
 static void invalidate_columns(lv_obj_t * obj, uint16_t i)
 {

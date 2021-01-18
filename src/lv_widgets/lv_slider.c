@@ -35,10 +35,10 @@
  **********************/
 static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_slider_destructor(lv_obj_t * obj);
-static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
-static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
-static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area);
+static lv_drawer_res_t lv_slider_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
+static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,7 +47,7 @@ const lv_obj_class_t lv_slider = {
     .constructor = lv_slider_constructor,
     .destructor = lv_slider_destructor,
     .signal_cb = lv_slider_signal,
-    .design_cb = lv_slider_design,
+    .drawer_cb = lv_slider_drawer,
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar
 };
@@ -135,89 +135,33 @@ static void lv_slider_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the sliders
  * @param slider pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_slider_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_slider_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return LV_DESIGN_RES_NOT_COVER;
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        return LV_DRAWER_RES_NOT_COVER;
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        /* The ancestor design function will draw the background and the indicator.
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+        /* The ancestor drawer function will draw the background and the indicator.
          * It also sets slider->bar.indic_area*/
-        lv_bar.design_cb(obj, clip_area, mode);
+        lv_bar.drawer_cb(obj, clip_area, mode);
 
-        lv_slider_t * slider = (lv_slider_t *)obj;
-        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+        draw_knob(obj, clip_area);
 
-        lv_coord_t objw = lv_obj_get_width(obj);
-        lv_coord_t objh = lv_obj_get_height(obj);
-        bool hor = objw >= objh ? true : false;
-        lv_coord_t knob_size = hor ? objh : objw;
-        bool sym = false;
-        if(slider->bar.type == LV_BAR_TYPE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) sym = true;
-
-        lv_area_t knob_area;
-
-        /*Horizontal*/
-        if(hor) {
-            if(!sym) {
-                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BIDI_DIR_RTL, slider->bar.indic_area);
-            }
-            else {
-                if(slider->bar.cur_value >= 0) {
-                    knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BIDI_DIR_RTL, slider->bar.indic_area);
-                }
-                else {
-                    knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
-                }
-            }
-        }
-        /*Vertical*/
-        else {
-            if(!sym) {
-                knob_area.y1 = slider->bar.indic_area.y1;
-            }
-            else {
-                if(slider->bar.cur_value >= 0) {
-                    knob_area.y1 = slider->bar.indic_area.y1;
-                }
-                else {
-                    knob_area.y1 = slider->bar.indic_area.y2;
-                }
-            }
-        }
-        lv_slider_position_knob(obj, &knob_area, knob_size, hor);
-
-        lv_area_copy(&slider->right_knob_area, &knob_area);
-        lv_slider_draw_knob(obj, &knob_area, clip_area);
-
-        if(lv_slider_get_type(obj) == LV_SLIDER_TYPE_RANGE) {
-            /* Draw a second knob for the start_value side */
-            if(hor) {
-                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
-            }
-            else {
-                knob_area.y1 = slider->bar.indic_area.y2;
-            }
-            lv_slider_position_knob(obj, &knob_area, knob_size, hor);
-
-            lv_area_copy(&slider->left_knob_area, &knob_area);
-            lv_slider_draw_knob(obj, &knob_area, clip_area);
-        }
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        return lv_bar.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
+        return lv_bar.drawer_cb(obj, clip_area, mode);
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**
@@ -445,7 +389,79 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-static void lv_slider_position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor)
+void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
+{
+    lv_drawer_res_t res;
+    res = lv_drawer_part_before(obj, LV_PART_KNOB, clip_area, &obj->coords);
+    if(res != LV_DRAWER_RES_OK) return;
+
+    lv_slider_t * slider = (lv_slider_t *)obj;
+    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+
+    lv_coord_t objw = lv_obj_get_width(obj);
+    lv_coord_t objh = lv_obj_get_height(obj);
+    bool hor = objw >= objh ? true : false;
+    lv_coord_t knob_size = hor ? objh : objw;
+    bool sym = false;
+    if(slider->bar.type == LV_BAR_TYPE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) sym = true;
+
+    lv_area_t knob_area;
+
+    /*Horizontal*/
+    if(hor) {
+        if(!sym) {
+            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BIDI_DIR_RTL, slider->bar.indic_area);
+        }
+        else {
+            if(slider->bar.cur_value >= 0) {
+                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BIDI_DIR_RTL, slider->bar.indic_area);
+            }
+            else {
+                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
+            }
+        }
+    }
+    /*Vertical*/
+    else {
+        if(!sym) {
+            knob_area.y1 = slider->bar.indic_area.y1;
+        }
+        else {
+            if(slider->bar.cur_value >= 0) {
+                knob_area.y1 = slider->bar.indic_area.y1;
+            }
+            else {
+                knob_area.y1 = slider->bar.indic_area.y2;
+            }
+        }
+    }
+
+    lv_draw_rect_dsc_t knob_rect_dsc;
+    lv_draw_rect_dsc_init(&knob_rect_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
+
+    position_knob(obj, &knob_area, knob_size, hor);
+    lv_area_copy(&slider->right_knob_area, &knob_area);
+    lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+
+    if(lv_slider_get_type(obj) == LV_SLIDER_TYPE_RANGE) {
+        /* Draw a second knob for the start_value side */
+        if(hor) {
+            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
+        }
+        else {
+            knob_area.y1 = slider->bar.indic_area.y2;
+        }
+        position_knob(obj, &knob_area, knob_size, hor);
+
+        lv_area_copy(&slider->left_knob_area, &knob_area);
+        lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
+    }
+
+    lv_drawer_part_after(obj, LV_PART_KNOB, clip_area, &obj->coords);
+}
+
+static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor)
 {
 
     if(hor) {
@@ -476,12 +492,4 @@ static void lv_slider_position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_co
     knob_area->y2 += knob_bottom + transf_h;
 }
 
-static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area)
-{
-    lv_draw_rect_dsc_t knob_rect_dsc;
-    lv_draw_rect_dsc_init(&knob_rect_dsc);
-    lv_obj_init_draw_rect_dsc(slider, LV_PART_KNOB, &knob_rect_dsc);
-
-    lv_draw_rect(knob_area, clip_area, &knob_rect_dsc);
-}
 #endif

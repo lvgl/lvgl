@@ -35,8 +35,8 @@
  **********************/
 static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_roller_destructor(lv_obj_t * obj);
-static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_roller_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_drawer_res_t lv_roller_label_drawer(lv_obj_t * label, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_roller_label_destructor(lv_obj_t * obj);
 static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -57,7 +57,7 @@ const lv_obj_class_t lv_roller = {
         .constructor = lv_roller_constructor,
         .destructor = lv_roller_destructor,
         .signal_cb = lv_roller_signal,
-        .design_cb = lv_roller_design,
+        .drawer_cb = lv_roller_drawer,
         .instance_size = sizeof(lv_roller_t),
         .base_class = &lv_obj
 };
@@ -66,7 +66,7 @@ const lv_obj_class_t lv_roller_label  = {
         .constructor = lv_roller_label_constructor,
         .destructor = lv_roller_label_destructor,
         .signal_cb = lv_roller_label_signal,
-        .design_cb = lv_roller_label_design,
+        .drawer_cb = lv_roller_label_drawer,
         .instance_size = sizeof(lv_label_t),
         .base_class = &lv_label
     };;
@@ -356,20 +356,20 @@ static void lv_roller_label_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the rollers
  * @param roller pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after all children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after all children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_roller_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_obj.design_cb(obj, clip_area, mode);
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        return lv_obj.drawer_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
 
         /*Draw the selected rectangle*/
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
@@ -390,7 +390,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
         lv_draw_rect(&rect_area, clip_area, &sel_dsc);
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
         lv_obj_init_draw_label_dsc(obj, LV_PART_HIGHLIGHT, &label_dsc);
@@ -450,10 +450,10 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
             lv_draw_label(&label_sel_area, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
         }
 
-        lv_obj.design_cb(obj, clip_area, mode);
+        lv_obj.drawer_cb(obj, clip_area, mode);
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 
@@ -461,19 +461,19 @@ static lv_design_res_t lv_roller_design(lv_obj_t * obj, const lv_area_t * clip_a
  * Handle the drawing related tasks of the roller's label
  * @param roller pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after all children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after all children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_roller_label_drawer(lv_obj_t * label, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_label.design_cb(label, clip_area, mode);
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        return lv_label.drawer_cb(label, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
         /* Split the drawing of the label into  an upper (above the selected area)
          * and a lower (below the selected area)*/
         lv_obj_t * roller = lv_obj_get_parent(label);
@@ -497,7 +497,7 @@ static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t 
         clip2.x2 = label->coords.x2;
         clip2.y2 = rect_area.y1;
         if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
-            lv_label.design_cb(label, &clip2, mode);
+            lv_label.drawer_cb(label, &clip2, mode);
         }
 
         clip2.x1 = label->coords.x1;
@@ -505,11 +505,11 @@ static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t 
         clip2.x2 = label->coords.x2;
         clip2.y2 = label->coords.y2;
         if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
-            lv_label.design_cb(label, &clip2, mode);
+            lv_label.drawer_cb(label, &clip2, mode);
         }
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**

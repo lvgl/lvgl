@@ -28,17 +28,10 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-lv_style_class_t lv_style;
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static int16_t buf_num[32];
-static const void * buf_ptr[16];
-static lv_color_t buf_color[16];
-static uint32_t buf_num_p = 1;
-static uint32_t buf_color_p = 1;
-static uint32_t buf_ptr_p = 1;
 
 /**********************
  *      MACROS
@@ -50,9 +43,6 @@ static uint32_t buf_ptr_p = 1;
 
 void _lv_style_system_init(void)
 {
-    lv_style.remove_prop = remove_prop;
-    lv_style.set_prop = set_prop;
-    lv_style.get_prop = get_prop;
 }
 
 /**
@@ -147,6 +137,9 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_TEXT_FONT:
             value.ptr = LV_THEME_DEFAULT_FONT_NORMAL;
             break;
+        case LV_STYLE_SIZE:
+            value.num = 10;
+            break;
         default:
             value.ptr = NULL;
             value.num = 0;
@@ -155,50 +148,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 
     return value;
 }
-
-uint32_t lv_style_find_index_num(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_num_p; i++) {
-        if(v.num == buf_num[i])  return i;
-    }
-    return 0;
-}
-
-uint32_t lv_style_find_index_color(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_color_p; i++) {
-        if(v.color.full == buf_color[i].full)  return i;
-    }
-    return 0;
-}
-
-uint32_t lv_style_find_index_ptr(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_ptr_p; i++) {
-        if(v.ptr == buf_ptr[i])  return i;
-    }
-    return 0;
-}
-
-int32_t lv_style_get_indexed_num(uint32_t id)
-{
-    return buf_num[id];
-}
-
-
-lv_color_t lv_style_get_indexed_color(uint32_t id)
-{
-    return buf_color[id];
-}
-
-const void * lv_style_get_indexed_ptr(uint32_t id)
-{
-    return buf_ptr[id];
-}
-
 
 
 /**
@@ -238,49 +187,6 @@ bool lv_style_is_empty(const lv_style_t * style)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static int32_t alloc_index_num(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_num_p; i++) {
-        if(v.num == buf_num[i])  return i;
-    }
-    if(buf_num_p < 32) {
-        buf_num[buf_num_p] = v.num;
-        buf_num_p++;
-        return buf_num_p - 1;
-    }
-    return 0;
-}
-
-static int32_t alloc_index_ptr(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_ptr_p; i++) {
-        if(v.ptr == buf_ptr[i])  return i;
-    }
-    if(buf_ptr_p < 16) {
-        buf_ptr[buf_ptr_p] = v.ptr;
-        buf_ptr_p++;
-        return buf_ptr_p - 1;
-    }
-    return 0;
-}
-
-static int32_t alloc_index_color(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_color_p; i++) {
-        if(v.color.full == buf_color[i].full)  return i;
-    }
-    if(buf_color_p) {
-        buf_color[buf_color_p].full = v.color.full;
-        buf_color_p++;
-        return buf_color_p - 1;
-    }
-    return 0;
-}
-
 
 static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {

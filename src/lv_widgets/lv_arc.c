@@ -31,7 +31,7 @@
 
 static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_arc_destructor(lv_obj_t * obj);
-static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_arc_drawer(lv_obj_t * arc, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
 static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
@@ -45,7 +45,7 @@ const lv_obj_class_t lv_arc  = {
     .constructor = lv_arc_constructor,
     .destructor = lv_arc_destructor,
     .signal_cb = lv_arc_signal,
-    .design_cb = lv_arc_design,
+    .drawer_cb = lv_arc_drawer,
     .instance_size = sizeof(lv_arc_t),
     .base_class = &lv_obj
 };
@@ -488,20 +488,20 @@ static void lv_arc_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the arcs
  * @param arc pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_arc_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_arc_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_obj.design_cb(obj, clip_area, mode);
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        return lv_obj.drawer_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
         LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
         lv_arc_t * arc = (lv_arc_t *)obj;
 
@@ -556,10 +556,10 @@ static lv_design_res_t lv_arc_design(lv_obj_t * obj, const lv_area_t * clip_area
 
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**

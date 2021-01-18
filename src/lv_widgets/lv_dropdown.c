@@ -42,8 +42,8 @@
  **********************/
 static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_dropdown_destructor(void * obj);
-static lv_design_res_t lv_dropdown_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_design_res_t lv_dropdown_list_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_dropdown_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_drawer_res_t lv_dropdown_list_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
@@ -82,7 +82,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_CLASS_INIT(lv_dropdown, lv_obj);
         lv_dropdown.constructor = lv_dropdown_constructor;
         lv_dropdown.destructor = lv_dropdown_destructor;
-        lv_dropdown.design_cb = lv_dropdown_design;
+        lv_dropdown.drawer_cb = lv_dropdown_drawer;
         lv_dropdown.signal_cb = lv_dropdown_signal;
     }
 
@@ -601,7 +601,7 @@ lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_CLASS_INIT(lv_dropdown_list, lv_obj);
         lv_dropdown_list.constructor = lv_obj.constructor;
         lv_dropdown_list.destructor = lv_obj.destructor;
-        lv_dropdown_list.design_cb = lv_dropdown_list_design;
+        lv_dropdown_list.drawer_cb = lv_dropdown_list_drawer;
         lv_dropdown_list.signal_cb = lv_dropdown_list_signal;
     }
 
@@ -681,21 +681,21 @@ static void lv_dropdown_destructor(void * obj)
  * Handle the drawing related tasks of the drop down list
  * @param ddlist pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_dropdown_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_dropdown_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_obj.design_cb(obj, clip_area, mode);
+    if(mode == LV_DRAWER_COVER_CHK) {
+        return lv_obj.drawer_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_DRAW_MAIN) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
 
         lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -770,32 +770,32 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * obj, const lv_area_t * clip
         }
 
     }
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_DRAW_POST) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**
  * Handle the drawing related tasks of the drop down list's list
  * @param list pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_dropdown_list_design(lv_obj_t * list_obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_dropdown_list_drawer(lv_obj_t * list_obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return lv_obj.design_cb(list_obj, clip_area, mode);
+    if(mode == LV_DRAWER_COVER_CHK) {
+        return lv_obj.drawer_cb(list_obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_obj.design_cb(list_obj, clip_area, mode);
+    else if(mode == LV_DRAWER_DRAW_MAIN) {
+        lv_obj.drawer_cb(list_obj, clip_area, mode);
 
         lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
         lv_obj_t * dropdown_obj = list->dropdown;
@@ -818,8 +818,8 @@ static lv_design_res_t lv_dropdown_list_design(lv_obj_t * list_obj, const lv_are
         }
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_obj.design_cb(list_obj, clip_area, mode);
+    else if(mode == LV_DRAWER_DRAW_POST) {
+        lv_obj.drawer_cb(list_obj, clip_area, mode);
 
         lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
         lv_obj_t * dropdown_obj = list->dropdown;
@@ -842,7 +842,7 @@ static lv_design_res_t lv_dropdown_list_design(lv_obj_t * list_obj, const lv_are
         }
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**

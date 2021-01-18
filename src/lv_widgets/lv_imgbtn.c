@@ -27,7 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_imgbtn_drawer(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * param);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
@@ -37,7 +37,7 @@ lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
-static lv_design_cb_t ancestor_design;
+static lv_drawer_cb_t ancestor_drawer;
 
 /**********************
  *      MACROS
@@ -72,7 +72,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(imgbtn);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(imgbtn);
+    if(ancestor_drawer == NULL) ancestor_drawer = lv_obj_get_drawer_cb(imgbtn);
 
     /*Initialize the allocated 'ext' */
     _lv_memset_00((void *)ext->img_src_mid, sizeof(ext->img_src_mid));
@@ -84,9 +84,9 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->act_cf = LV_IMG_CF_UNKNOWN;
 
-    /*The signal and design functions are not copied so set them here*/
+    /*The signal and drawer functions are not copied so set them here*/
     lv_obj_set_signal_cb(imgbtn, lv_imgbtn_signal);
-    lv_obj_set_design_cb(imgbtn, lv_imgbtn_design);
+    lv_obj_set_drawer_cb(imgbtn, lv_imgbtn_drawer);
 
     /*Init the new image button image button*/
     if(copy == NULL) {
@@ -255,26 +255,26 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_imgbtn_state_t state)
  * Handle the drawing related tasks of the image buttons
  * @param imgbtn pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_imgbtn_drawer(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
+    if(mode == LV_DRAWER_COVER_CHK) {
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
-        lv_design_res_t cover = LV_DESIGN_RES_NOT_COVER;
+        lv_drawer_res_t cover = LV_DRAWER_RES_NOT_COVER;
         if(ext->act_cf == LV_IMG_CF_TRUE_COLOR || ext->act_cf == LV_IMG_CF_RAW) {
-            cover = _lv_area_is_in(clip_area, &imgbtn->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
+            cover = _lv_area_is_in(clip_area, &imgbtn->coords, 0) ? LV_DRAWER_RES_COVER : LV_DRAWER_RES_NOT_COVER;
         }
 
         return cover;
     }
     /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
+    else if(mode == LV_DRAWER_DRAW_MAIN) {
         lv_area_t img_coords;
 
         lv_obj_get_coords(imgbtn, &img_coords);
@@ -331,8 +331,8 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
 #if LV_IMGBTN_TILED
             const void * src = ext->img_src_left[state];
             if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
-                LV_LOG_WARN("lv_imgbtn_design: SYMBOLS are not supported in tiled mode")
-                return LV_DESIGN_RES_OK;
+                LV_LOG_WARN("lv_imgbtn_drawer: SYMBOLS are not supported in tiled mode")
+                return LV_DRAWER_RES_OK;
             }
 
             lv_coord_t w = lv_obj_get_style_transform_width(imgbtn, LV_OBJ_PART_MAIN);
@@ -406,7 +406,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
         }
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
+    else if(mode == LV_DRAWER_DRAW_POST) {
         if(lv_obj_get_style_clip_corner(imgbtn, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(imgbtn + 8);
             _lv_mem_buf_release(param);
@@ -433,7 +433,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
         }
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 /**

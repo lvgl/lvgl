@@ -38,7 +38,7 @@
  **********************/
 static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_bar_destructor(lv_obj_t * obj);
-static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_bar_drawer(lv_obj_t * bar, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 
@@ -57,7 +57,7 @@ const lv_obj_class_t lv_bar = {
     .constructor = lv_bar_constructor,
     .destructor = lv_bar_destructor,
     .signal_cb = lv_bar_signal,
-    .design_cb = lv_bar_design,
+    .drawer_cb = lv_bar_drawer,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj
 };
@@ -314,42 +314,35 @@ static void lv_bar_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the bars
  * @param bar pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_bar_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_bar_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
-    if(mode == LV_DESIGN_COVER_CHK) {
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
         /*Return false if the object is not covers the mask area*/
-        return lv_obj.design_cb(obj, clip_area, mode);
+        return lv_obj.drawer_cb(obj, clip_area, mode);
     }
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        //Draw the background
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+        /*Draw the background*/
+        lv_obj.drawer_cb(obj, clip_area, mode);
         draw_indic(obj, clip_area);
-
-        /*Get the value and draw it after the indicator*/
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-        draw_dsc.bg_opa = LV_OPA_TRANSP;
-        draw_dsc.border_opa = LV_OPA_TRANSP;
-        draw_dsc.shadow_opa = LV_OPA_TRANSP;
-        draw_dsc.content_opa = LV_OPA_TRANSP;
-        draw_dsc.outline_opa = LV_OPA_TRANSP;
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
-        lv_draw_rect(&obj->coords, clip_area, &draw_dsc);
     }
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_obj.design_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
+        lv_obj.drawer_cb(obj, clip_area, mode);
     }
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 {
+    lv_drawer_res_t res;
+    res = lv_drawer_part_before(obj, LV_PART_INDICATOR, clip_area, &obj->coords);
+    if(res != LV_DRAWER_RES_OK) return;
+
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
@@ -561,6 +554,8 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
+    lv_drawer_part_after(obj, LV_PART_INDICATOR, clip_area, &obj->coords);
+
 }
 
 /**
@@ -620,8 +615,6 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_
         lv_obj_invalidate((lv_obj_t*)obj);
     }
     else {
-        lv_bar_t * bar = (lv_bar_t *)obj;
-
         /*No animation in progress -> simply set the values*/
         if(anim_info->anim_state == LV_BAR_ANIM_STATE_INV) {
             anim_info->anim_start = *value_ptr;

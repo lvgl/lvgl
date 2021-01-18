@@ -57,29 +57,11 @@ extern "C" {
 
 struct _lv_obj_t;
 
-/** Design modes */
-enum {
-    LV_DESIGN_DRAW_MAIN, /**< Draw the main portion of the object */
-    LV_DESIGN_DRAW_POST, /**< Draw extras on the object */
-    LV_DESIGN_COVER_CHK, /**< Check if the object fully covers the 'mask_p' area */
-};
-typedef uint8_t lv_design_mode_t;
-
-
-/** Design results */
-enum {
-    LV_DESIGN_RES_OK,          /**< Draw ready */
-    LV_DESIGN_RES_COVER,       /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is fully covered*/
-    LV_DESIGN_RES_NOT_COVER,   /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is not covered*/
-    LV_DESIGN_RES_MASKED,      /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is masked out (children also not cover)*/
-};
-typedef uint8_t lv_design_res_t;
-
 /**
- * The design callback is used to draw the object on the screen.
+ * The drawer callback is used to draw the object on the screen.
  * It accepts the object, a mask area, and the mode in which to draw the object.
  */
-typedef lv_design_res_t (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+typedef lv_drawer_res_t (*lv_main_drawer_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 
 enum {
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
@@ -240,7 +222,7 @@ typedef struct lv_obj_class{
     void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
     void (*destructor)(struct _lv_obj_t * obj);
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
-    lv_design_cb_t design_cb; /**< Object type specific design function*/
+    lv_main_drawer_cb_t drawer_cb; /**< Object type specific drawer function*/
     uint32_t instance_size;
 }lv_obj_class_t;
 
@@ -263,7 +245,6 @@ extern const lv_obj_class_t lv_obj;
 enum {
     LV_PART_MAIN,
     LV_PART_SCROLLBAR,
-    LV_PART_CONTENT,
     LV_PART_INDICATOR,
     LV_PART_KNOB,
     LV_PART_HIGHLIGHT,  //selected?
@@ -553,11 +534,11 @@ void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
 lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
 
 /**
- * Set a new design function for an object
+ * Set a new drawer function for an object
  * @param obj pointer to an object
- * @param design_cb the new design function
+ * @param drawer_cb the new drawer function
  */
-void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
+void lv_obj_set_drawer_cb(lv_obj_t * obj, lv_main_drawer_cb_t drawer_cb);
 
 /*----------------
  * Other set
@@ -680,11 +661,11 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
 lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj);
 
 /**
- * Get the design function of an object
+ * Get the drawer function of an object
  * @param obj pointer to an object
- * @return the design function
+ * @return the drawer function
  */
-lv_design_cb_t lv_obj_get_design_cb(const lv_obj_t * obj);
+lv_main_drawer_cb_t lv_obj_get_drawer_cb(const lv_obj_t * obj);
 
 /**
  * Get the event function of an object

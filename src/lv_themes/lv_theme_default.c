@@ -66,7 +66,7 @@
 #define COLOR_BG_SEC_TEXT       (IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xa5a8ad))
 #define COLOR_BG_SEC_TEXT_DIS   (IS_LIGHT ? lv_color_hex(0xaaaaaa) : lv_color_hex(0xa5a8ad))
 
-#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 850)
+#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 85)
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) ? 0 : LV_DPX(2))
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
@@ -133,25 +133,17 @@ typedef struct {
     lv_style_t ddlist_page, ddlist_sel;
 #endif
 
-#if LV_USE_GAUGE
-    lv_style_t gauge_main, gauge_strong, gauge_needle;
-#endif
-
-#if LV_USE_LINEMETER
-    lv_style_t lmeter;
-#endif
-
 //#if LV_USE_ROLLER
 //    lv_style_t roller_bg, roller_sel;
 //#endif
 
 
-#if LV_USE_SWITCH
-    lv_style_t sw_knob;
-#endif
-
 #if LV_USE_TABLE
     lv_style_t table_cell;
+#endif
+
+#if LV_USE_METER
+    lv_style_t meter_marker, meter_indic;
 #endif
 
 #if LV_USE_TEXTAREA
@@ -363,11 +355,18 @@ static void basic_init(void)
 
 
 
-#if LV_USE_TABLE
-    style_init_reset(&styles->table_cell);
-    lv_style_set_border_width(&styles->table_cell, 1);
-    lv_style_set_border_color(&styles->table_cell, CARD_BORDER_COLOR);
-    lv_style_set_border_side(&styles->table_cell, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
+#if LV_USE_METER
+    style_init_reset(&styles->meter_marker);
+    lv_style_set_line_width(&styles->meter_marker, LV_DPX(5));
+    lv_style_set_line_color(&styles->meter_marker, CARD_TEXT_COLOR);
+    lv_style_set_size(&styles->meter_marker, LV_DPX(20));
+    lv_style_set_pad_left(&styles->meter_marker, LV_DPX(15));
+
+    style_init_reset(&styles->meter_indic);
+    lv_style_set_radius(&styles->meter_indic, LV_RADIUS_CIRCLE);
+    lv_style_set_bg_color(&styles->meter_indic, CARD_TEXT_COLOR);
+    lv_style_set_bg_opa(&styles->meter_indic, LV_OPA_COVER);
+    lv_style_set_size(&styles->meter_indic, LV_DPX(15));
 #endif
 }
 //
@@ -678,14 +677,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-    else if(lv_obj_check_type(obj, &lv_img)) {
+#if LV_USE_METER
+    else if(lv_obj_check_type(obj, &lv_meter)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->meter_marker);
+        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->meter_indic);
     }
-
-#if LV_USE_OBJMASK
-case LV_THEME_OBJMASK:
-    list = _lv_obj_get_style_list(obj, LV_OBJMASK_PART_MAIN);
-    break;
 #endif
 
 

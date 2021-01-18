@@ -70,7 +70,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
@@ -90,7 +90,7 @@ const lv_obj_class_t lv_obj = {
     .constructor = lv_obj_constructor,
     .destructor = lv_obj_destructor,
     .signal_cb = lv_obj_signal,
-    .design_cb = lv_obj_design,
+    .drawer_cb = lv_obj_drawer,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
 };
@@ -1541,15 +1541,15 @@ static void lv_obj_destructor(void * p)
  * Handle the drawing related tasks of the base objects.
  * @param obj pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- * @param return an element of `lv_design_res_t`
+ *             LV_DRAWER_DRAW: draw the object (always return 'true')
+ * @param return an element of `lv_drawer_res_t`
  */
-static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
 {
-    if(mode == LV_DESIGN_COVER_CHK) {
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DESIGN_RES_MASKED;
+    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DRAWER_RES_MASKED;
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
@@ -1562,18 +1562,18 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         coords.y1 -= h;
         coords.y2 += h;
 
-        if(_lv_area_is_in(clip_area, &coords, r) == false) return LV_DESIGN_RES_NOT_COVER;
+        if(_lv_area_is_in(clip_area, &coords, r) == false) return LV_DRAWER_RES_NOT_COVER;
 
-        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
+        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAWER_RES_NOT_COVER;
 
-        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
-        if(lv_obj_get_style_border_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
-        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
+        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAWER_RES_NOT_COVER;
+        if(lv_obj_get_style_border_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAWER_RES_NOT_COVER;
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAWER_RES_NOT_COVER;
 
-        return  LV_DESIGN_RES_COVER;
+        return  LV_DRAWER_RES_COVER;
 
     }
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
+    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -1582,6 +1582,10 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         }
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
+
+        lv_drawer_res_t res;
+        res = lv_drawer_part_before(obj, LV_PART_MAIN, clip_area, &obj->coords);
+        if(res != LV_DRAWER_RES_OK) return res;
 
         lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
         lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
@@ -1594,16 +1598,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
         lv_draw_rect(&coords, clip_area, &draw_dsc);
 
-
-        /*Draw the content*/
-//        lv_draw_rect_dsc_init(&draw_dsc);
-//        draw_dsc.bg_opa = LV_OPA_TRANSP;
-//        draw_dsc.border_opa = LV_OPA_TRANSP;
-//        draw_dsc.outline_opa = LV_OPA_TRANSP;
-//        draw_dsc.shadow_opa = LV_OPA_TRANSP;
-//        lv_obj_init_draw_rect_dsc(obj, LV_PART_CONTENT, &draw_dsc);
-//        lv_draw_rect(&coords, clip_area, &draw_dsc);
-
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
             lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
@@ -1611,8 +1605,10 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
         }
+
+        res = lv_drawer_part_after(obj, LV_PART_MAIN, clip_area, &obj->coords);
     }
-    else if(mode == LV_DESIGN_DRAW_POST) {
+    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
         _lv_obj_draw_scrollbar(obj, clip_area);
 
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
@@ -1685,7 +1681,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 #endif
     }
 
-    return LV_DESIGN_RES_OK;
+    return LV_DRAWER_RES_OK;
 }
 
 static void base_dir_refr_children(lv_obj_t * obj)
@@ -1837,8 +1833,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t * s = param;
         lv_coord_t d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MAIN);
-        *s = LV_MATH_MAX(*s, d);
-        d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_CONTENT);
         *s = LV_MATH_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {

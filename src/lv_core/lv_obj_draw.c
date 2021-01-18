@@ -397,6 +397,85 @@ lv_coord_t _lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
     return s;
 }
 
+lv_drawer_res_t lv_drawer_part_before(lv_obj_t * obj, uint8_t part, const lv_area_t * clip_area, void * param)
+{
+    lv_obj_style_list_t * list = &obj->style_list;
+    if(list->cache_drawer_zero) return LV_DRAWER_RES_OK;
+    if(list->style_cnt == 0) return LV_DRAWER_RES_OK;
+
+    lv_drawer_res_t res = LV_DRAWER_RES_OK;
+    int32_t i;
+    for(i = 0; i < list->style_cnt; i++) {
+        const lv_obj_style_t * style = &obj->style_list.styles[i];
+        if(style->is_trans) continue;
+        if(style->state & ~(obj->state)) continue;
+
+        lv_style_value_t v;
+        if(lv_style_get_prop(style->style, LV_STYLE_DRAWER, &v) == false) continue;
+        const lv_drawer_t * d = v.ptr;
+
+        if(d->drawer_cb == NULL) continue;
+
+        lv_drawer_res_t sub_res = d->drawer_cb(d, obj, LV_DRAWER_MODE_PART_BEFORE, clip_area, param);
+        if(sub_res == LV_DRAWER_RES_STOP) res = LV_DRAWER_RES_STOP;
+    }
+
+    return res;
+}
+
+lv_drawer_res_t lv_drawer_part_after(lv_obj_t * obj, uint8_t part, const lv_area_t * clip_area, void * param)
+{
+    lv_obj_style_list_t * list = &obj->style_list;
+    if(list->cache_drawer_zero) return LV_DRAWER_RES_OK;
+    if(list->style_cnt == 0) return LV_DRAWER_RES_OK;
+
+    lv_drawer_res_t res = LV_DRAWER_RES_STOP;
+    int32_t i;
+    for(i = list->style_cnt - 1; i  >= 0; i--) {
+        const lv_obj_style_t * style = &obj->style_list.styles[i];
+        if(style->is_trans) continue;
+        if(style->part != part) continue;
+        if(style->state & ~(obj->state)) continue;
+
+        lv_style_value_t v;
+        if(lv_style_get_prop(style->style, LV_STYLE_DRAWER, &v) == false) continue;
+        const lv_drawer_t * d = v.ptr;
+
+        if(d->drawer_cb == NULL) continue;
+
+        lv_drawer_res_t sub_res = d->drawer_cb(d, obj, LV_DRAWER_MODE_PART_AFTER, clip_area, param);
+        if(sub_res == LV_DRAWER_RES_OK) res = LV_DRAWER_RES_OK;
+    }
+
+    return res;
+}
+
+void lv_drawer_section(lv_obj_t * obj, lv_drawer_mode_t mode, const lv_area_t * clip_area, bool rev)
+{
+    lv_obj_style_list_t * list = &obj->style_list;
+    if(list->cache_drawer_zero) return;
+    if(list->style_cnt == 0) return;
+
+    int32_t i;
+    int32_t start = rev ? list->style_cnt - 1 : 0;
+    int32_t end = rev ? 0 : list->style_cnt - 1;
+    int32_t step = rev ? -1 : 1;
+    for(i = start; i  != end; i += step) {
+        const lv_obj_style_t * style = &obj->style_list.styles[i];
+        if(style->is_trans) continue;
+        if(style->part != LV_PART_MAIN) continue;
+        if(style->state & ~(obj->state)) continue;
+
+        lv_style_value_t v;
+        if(lv_style_get_prop(style->style, LV_STYLE_DRAWER, &v) == false) continue;
+        const lv_drawer_t * d = v.ptr;
+
+        if(d->drawer_cb == NULL) continue;
+
+        d->drawer_cb(d, obj, mode, clip_area, NULL);
+    }
+}
+
 /**
  * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object to refresh the extended draw area.
  * The result will be written into `obj->ext_draw_pad`
@@ -424,7 +503,7 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
 /**
  * Draw scrollbars on an object is required
  * @param obj pointer to an object
- * @param clip_area the clip area coming from the design function
+ * @param clip_area the clip area coming from the drawer function
  */
 void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {

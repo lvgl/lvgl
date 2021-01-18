@@ -20,9 +20,7 @@ extern "C" {
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_debug.h"
-#include "../lv_misc/lv_class.h"
 #include "../lv_draw/lv_draw_blend.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -82,6 +80,44 @@ enum {
 typedef uint8_t lv_text_align_t;
 
 
+/** Design modes */
+enum {
+    LV_DRAWER_MODE_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
+    LV_DRAWER_MODE_REFER_EXT_SIZE,       /**< Draw extras on the object */
+
+    LV_DRAWER_MODE_START_MAIN,
+    LV_DRAWER_MODE_START_CHILDREN,
+    LV_DRAWER_MODE_MAIN_DRAW,            /**< Draw the main portion of the object */
+    LV_DRAWER_MODE_POST_DRAW,            /**< Draw extras on the object */
+    LV_DRAWER_MODE_FINISH,
+
+    LV_DRAWER_MODE_PART_BEFORE,
+    LV_DRAWER_MODE_PART_AFTER,
+};
+typedef uint8_t lv_drawer_mode_t;
+
+
+/** Design results */
+enum {
+    LV_DRAWER_RES_OK,          /**< Draw ready */
+    LV_DRAWER_RES_COVER,       /**< Returned on `LV_DRAWER_COVER_CHK` if the areas is fully covered*/
+    LV_DRAWER_RES_NOT_COVER,   /**< Returned on `LV_DRAWER_COVER_CHK` if the areas is not covered*/
+    LV_DRAWER_RES_MASKED,      /**< Returned on `LV_DRAWER_COVER_CHK` if the areas is masked out (children also not cover)*/
+    LV_DRAWER_RES_STOP,
+};
+typedef uint8_t lv_drawer_res_t;
+
+struct _lv_obj_t;
+
+struct lv_drawer;
+
+typedef lv_drawer_res_t (*lv_drawer_cb_t)(const struct lv_drawer * drawer, struct _lv_obj_t * obj, lv_drawer_mode_t mode, const lv_area_t * clip_area, void * param);
+
+typedef struct lv_drawer {
+    lv_drawer_cb_t drawer_cb;
+    void * user_data;
+}lv_drawer_t;
+
 typedef union {
     int32_t num;
     const void * ptr;
@@ -102,6 +138,8 @@ typedef enum {
     LV_STYLE_COLOR_FILTER_OPA = 9,
     LV_STYLE_ANIM_TIME  = 10,
     LV_STYLE_TRANSITION = 11,
+    LV_STYLE_SIZE = 12,
+    LV_STYLE_DRAWER = 13,
 
     LV_STYLE_PAD_TOP        = 20 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_BOTTOM     = 21 | LV_STYLE_PROP_LAYOUT_REFR,
@@ -144,7 +182,7 @@ typedef enum {
     LV_STYLE_IMG_RECOLOR_FILTERED = 62 | LV_STYLE_PROP_FILTER,
     LV_STYLE_IMG_RECOLOR_OPA = 63,
 
-    LV_STYLE_OUTLINE_WIDTH = 71   | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_OUTLINE_WIDTH = 71 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_OUTLINE_COLOR = 72,
     LV_STYLE_OUTLINE_COLOR_FILTERED = 72 | LV_STYLE_PROP_FILTER,
     LV_STYLE_OUTLINE_OPA = 73     | LV_STYLE_PROP_EXT_DRAW,
@@ -196,12 +234,6 @@ typedef struct _lv_style_transiton_t{
 
 struct _lv_style_t;
 
-typedef struct {
-  bool (*remove_prop)(struct _lv_style_t * style, lv_style_prop_t prop);
-  void (*set_prop)(struct _lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
-  bool (*get_prop)(const struct _lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
-}lv_style_class_t;
-
 typedef struct _lv_style_t{
 
     _LV_STYLE_SENTINEL
@@ -217,10 +249,7 @@ typedef struct _lv_style_t{
     uint16_t prop1;
     uint16_t prop_cnt:14;
     uint16_t allocated:1;
-    uint16_t dont_index:1;
 } lv_style_t;
-
-extern lv_style_class_t lv_style;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -471,6 +500,8 @@ static inline void lv_style_set_content_ofs_y(lv_style_t * style, lv_coord_t val
 static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transiton_t * value) {
   lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION, v); }
 
+static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SIZE, v); }
 
 static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)
 {

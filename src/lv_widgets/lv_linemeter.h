@@ -39,28 +39,25 @@ typedef enum {
 }lv_meter_segment_type_t;
 
 typedef struct {
-    lv_color_t color;
-    void * img_src;
-    int32_t value;
-    lv_meter_indicator_type_t type;
-    lv_point_t img_pivot;
-    lv_opa_t img_recolor_opa;
-}lv_meter_indicator_t;
-
-
-typedef struct {
-    lv_color_t color;
     int32_t start_value;
     int32_t end_value;
-    int32_t width;
-    lv_meter_segment_type_t type;
-}lv_meter_segment_t;
+    lv_meter_indicator_type_t type;
+    lv_coord_t r_mod;
+    lv_color_t color;
+    lv_opa_t opa;
+    lv_coord_t width;
 
+    lv_color_t grad_color;
+    const void * img_src;
+    lv_opa_t recolor_opa;
+    lv_point_t img_pivot;
+    lv_point_t arc_ofs;
+    uint8_t scale_color_local:1;
+}lv_meter_indicator_t;
 
 /*Data of line meter*/
 typedef struct {
     lv_obj_t obj;
-    lv_ll_t segment_ll;
     lv_ll_t indic_ll;
     uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
     uint16_t angle_ofs;
@@ -68,8 +65,9 @@ typedef struct {
     uint16_t marker_nth;  /*Every Nth line should be marker */
     int32_t min_value;
     int32_t max_value;
-    uint8_t indicator_stacked:1;
 } lv_meter_t;
+
+extern const lv_obj_class_t lv_meter;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -94,8 +92,6 @@ lv_obj_t * lv_meter_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param value new value
  */
 lv_meter_indicator_t * lv_meter_add_indicator(lv_obj_t * obj);
-
-lv_meter_segment_t * lv_meter_add_segment(lv_obj_t * obj);
 
 void lv_meter_set_value(lv_obj_t * meter, lv_meter_indicator_t * indic, int32_t value);
 

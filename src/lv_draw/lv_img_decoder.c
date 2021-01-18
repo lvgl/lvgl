@@ -298,7 +298,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
          * function*/
         header->w = 1;
         header->h = 1;
-        /* Symbols always have transparent parts. Important because of cover check in the design
+        /* Symbols always have transparent parts. Important because of cover check in the drawer
          * function. The actual value doesn't matter because lv_draw_label will draw it*/
         header->cf = LV_IMG_CF_ALPHA_1BIT;
     }

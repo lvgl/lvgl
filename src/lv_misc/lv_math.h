@@ -122,7 +122,7 @@ int16_t _lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min, int32_t 
 #define LV_MATH_MAX3(a, b, c) (LV_MATH_MAX(LV_MATH_MAX(a,b), c))
 #define LV_MATH_MAX4(a, b, c, d) (LV_MATH_MAX(LV_MATH_MAX(a,b), LV_MATH_MAX(c,d)))
 
-#define LV_CLAMP(min, val, max) ((val) = LV_MATH_MAX(min, LV_MATH_MIN(val, max)))
+#define LV_CLAMP(min, val, max) (LV_MATH_MAX(min, (LV_MATH_MIN(val, max))))
 
 #define LV_MATH_ABS(x) ((x) > 0 ? (x) : (-(x)))
 
