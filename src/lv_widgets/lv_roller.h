@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_PAGE == 0
-#error "lv_roller: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1) "
+#error "lv_roller: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -41,8 +41,6 @@ enum {
 };
 
 typedef uint8_t lv_roller_mode_t;
-
-
 
 /*Data of roller*/
 typedef struct {
@@ -182,7 +180,6 @@ static inline uint16_t lv_roller_get_anim_time(const lv_obj_t * roller)
 {
     return lv_page_get_anim_time(roller);
 }
-
 
 /**********************
  *      MACROS

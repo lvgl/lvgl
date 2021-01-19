@@ -35,8 +35,6 @@ static const int16_t sin0_90_table[] = {
     32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767
 };
 
-
-
 /**********************
  *      MACROS
  **********************/
@@ -85,7 +83,7 @@ LV_ATTRIBUTE_FAST_MEM int16_t _lv_trigo_sin(int16_t angle)
  * @param u3 end values in range of [0..LV_BEZIER_VAL_MAX]
  * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
  */
-int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
+uint32_t _lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3)
 {
     uint32_t t_rem  = 1024 - t;
     uint32_t t_rem2 = (t_rem * t_rem) >> 10;
@@ -93,10 +91,10 @@ int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
     uint32_t t2     = (t * t) >> 10;
     uint32_t t3     = (t2 * t) >> 10;
 
-    uint32_t v1 = ((uint32_t)t_rem3 * u0) >> 10;
-    uint32_t v2 = ((uint32_t)3 * t_rem2 * t * u1) >> 20;
-    uint32_t v3 = ((uint32_t)3 * t_rem * t2 * u2) >> 20;
-    uint32_t v4 = ((uint32_t)t3 * u3) >> 10;
+    uint32_t v1 = (t_rem3 * u0) >> 10;
+    uint32_t v2 = (3 * t_rem2 * t * u1) >> 20;
+    uint32_t v3 = (3 * t_rem * t2 * u2) >> 20;
+    uint32_t v4 = (t3 * u3) >> 10;
 
     return v1 + v2 + v3 + v4;
 }
@@ -120,12 +118,12 @@ LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask
     // http://ww1.microchip.com/...en/AppNotes/91040a.pdf
     do {
         trial = root + mask;
-        if((uint32_t)trial * trial <= x) root = trial;
+        if(trial * trial <= x) root = trial;
         mask = mask >> 1;
     } while(mask);
 
-    q->i = (uint32_t) root >> 4;
-    q->f = (uint32_t)(root & 0xf) << 4;
+    q->i = root >> 4;
+    q->f = (root & 0xf) << 4;
 }
 
 /**
@@ -240,7 +238,7 @@ int64_t _lv_pow(int64_t base, int8_t exp)
  * @param max_out max output range
  * @return the mapped number
  */
-int16_t _lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
+int32_t _lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
 {
     if(x <= min_in) return min_out;
     if(x >= max_in) return max_out;

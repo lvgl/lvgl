@@ -43,9 +43,9 @@ extern "C" {
 
 #define LV_MAX_ANCESTOR_NUM 8
 
-#define LV_EXT_CLICK_AREA_OFF   0
-#define LV_EXT_CLICK_AREA_TINY  1
-#define LV_EXT_CLICK_AREA_FULL  2
+#define LV_EXT_CLICK_AREA_OFF  0
+#define LV_EXT_CLICK_AREA_TINY 1
+#define LV_EXT_CLICK_AREA_FULL 2
 
 #define _LV_OBJ_PART_VIRTUAL_FIRST 0x01
 #define _LV_OBJ_PART_REAL_FIRST    0x40
@@ -56,7 +56,6 @@ extern "C" {
 
 struct _lv_obj_t;
 
-
 /** Design modes */
 enum {
     LV_DESIGN_DRAW_MAIN, /**< Draw the main portion of the object */
@@ -64,7 +63,6 @@ enum {
     LV_DESIGN_COVER_CHK, /**< Check if the object fully covers the 'mask_p' area */
 };
 typedef uint8_t lv_design_mode_t;
-
 
 /** Design results */
 enum {
@@ -205,7 +203,7 @@ typedef struct _lv_obj_t {
     lv_design_cb_t design_cb; /**< Object type specific design function*/
 
     void * ext_attr;            /**< Object type specific extended data*/
-    lv_style_list_t  style_list;
+    lv_style_list_t style_list;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad_hor; /**< Extra click padding in horizontal direction */
@@ -288,7 +286,6 @@ typedef struct {
  */
 void lv_init(void);
 
-
 /**
  * Deinit the 'lv' library
  * Currently only implemented when not using custom allocators, or GC is enabled.
@@ -339,7 +336,6 @@ void lv_obj_del_async(struct _lv_obj_t * obj);
  */
 void lv_obj_clean(lv_obj_t * obj);
 
-
 /**
  * Mark an area of an object as invalid.
  * This area will be redrawn by 'lv_refr_task'
@@ -353,7 +349,6 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
  * @param obj pointer to an object
  */
 void lv_obj_invalidate(const lv_obj_t * obj);
-
 
 /**
  * Tell whether an area of an object is visible (even partially) now or not
@@ -513,7 +508,6 @@ void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_
  */
 void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
-
 /**
  * Align an object's middle point to an other object horizontally.
  * @param obj pointer to an object to align
@@ -583,7 +577,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
  * Release all used memories and cancel pending related transitions.
  * Typically used in `LV_SIGN_CLEAN_UP.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
@@ -593,7 +587,7 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
  * Release all used memories and cancel pending related transitions.
  * Also notifies the object about the style change.
  * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
+ * @param part the part of the object which style list should be reset.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
@@ -682,7 +676,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
 bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**
- * Enable/disable the use of style cahche for an object
+ * Enable/disable the use of style cache for an object
  * @param obj pointer to an object
  * @param dis true: disable; false: enable (re-enable)
  */
@@ -848,7 +842,6 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
  */
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 
-
 /**
  * Send LV_EVENT_REFRESH event to an object
  * @param obj point to an object. (Can NOT be NULL)
@@ -887,7 +880,6 @@ const void * lv_event_get_data(void);
  * @param signal_cb the new signal function
  */
 void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
-
 
 /**
  * Send an event to the object
@@ -1063,7 +1055,7 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj);
  * Take paddings into account.
  * @param obj pointer to an object
  * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
+ * If 1 the width will be set the parent's width
  * If 2 only half parent width - inner padding of the parent
  * If 3 only third parent width - 2 * inner padding of the parent
  * @param span how many columns are combined
@@ -1076,7 +1068,7 @@ lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
  * Take paddings into account.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
+ * If 1 the height will be set the parent's height
  * If 2 only half parent height - inner padding of the parent
  * If 3 only third parent height - 2 * inner padding of the parent
  * @param span how many rows are combined
@@ -1087,7 +1079,7 @@ lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
 /**
  * Get the automatic realign property of the object.
  * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
+ * @return true: auto realign is enabled; false: auto realign is disabled
  */
 bool lv_obj_get_auto_realign(const lv_obj_t * obj);
 
@@ -1212,7 +1204,6 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
  */
 lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
 
-
 #include "lv_obj_style_dec.h"
 
 /*-----------------
@@ -1275,14 +1266,12 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
 
-
 /**
 * Get the focus parent attribute of an object
 * @param obj pointer to an object
 * @return true: focus parent is enabled
 */
 bool lv_obj_get_focus_parent(const lv_obj_t * obj);
-
 
 /**
  * Get the drag parent attribute of an object
@@ -1314,7 +1303,6 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj);
  * @return false: none of the given bits are set, true: at least one bit is set
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
-
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 
@@ -1489,7 +1477,6 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
  */
 bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
-
 /**********************
  *      MACROS
  **********************/
@@ -1510,7 +1497,6 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
  */
 #define LV_EVENT_CB_DECLARE(name) static void name(lv_obj_t * obj, lv_event_t e)
 
-
 #if LV_USE_DEBUG
 
 # ifndef LV_DEBUG_IS_OBJ
@@ -1518,7 +1504,6 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
                                             lv_debug_check_obj_valid(obj_p) && \
                                             lv_debug_check_obj_type(obj_p, obj_type))
 # endif
-
 
 # if LV_USE_ASSERT_OBJ
 #  ifndef LV_ASSERT_OBJ
@@ -1534,7 +1519,6 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 #else
 # define LV_ASSERT_OBJ(obj, obj_type)
 #endif
-
 
 #ifdef __cplusplus
 } /* extern "C" */

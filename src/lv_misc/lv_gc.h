@@ -28,7 +28,7 @@ extern "C" {
 #define LV_ITERATE_ROOTS(f) \
     f(lv_ll_t, _lv_task_ll)  /*Linked list to store the lv_tasks*/ \
     f(lv_ll_t, _lv_disp_ll)  /*Linked list of screens*/            \
-    f(lv_ll_t, _lv_indev_ll) /*Linked list of screens*/            \
+    f(lv_ll_t, _lv_indev_ll) /*Linked list of input device*/       \
     f(lv_ll_t, _lv_drv_ll)                                         \
     f(lv_ll_t, _lv_file_ll)                                        \
     f(lv_ll_t, _lv_anim_ll)                                        \
@@ -45,7 +45,6 @@ extern "C" {
     f(void * , _lv_theme_empty_styles)                             \
     f(uint8_t *, _lv_font_decompr_buf)                             \
 
-
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
 
@@ -53,6 +52,7 @@ extern "C" {
 #if LV_MEM_CUSTOM != 1
 #error "GC requires CUSTOM_MEM"
 #endif /* LV_MEM_CUSTOM */
+#include LV_GC_INCLUDE
 #else  /* LV_ENABLE_GC */
 #define LV_GC_ROOT(x) x
 #define LV_EXTERN_ROOT(root_type, root_name) extern root_type root_name;

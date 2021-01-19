@@ -34,7 +34,6 @@ extern "C" {
  *      MACROS
  **********************/
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

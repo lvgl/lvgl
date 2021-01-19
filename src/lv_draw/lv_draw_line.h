@@ -51,7 +51,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
 
-
 //! @endcond
 
 /**********************

@@ -70,7 +70,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_GPU || LV_USE_GPU_STM32_DMA2D
+#if (LV_USE_GPU || LV_USE_GPU_STM32_DMA2D) && (LV_USE_GPU_NXP_PXP == 0) && (LV_USE_GPU_NXP_VG_LITE == 0)
     LV_ATTRIBUTE_DMA static lv_color_t blend_buf[LV_HOR_RES_MAX];
 #endif
 
@@ -78,14 +78,12 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *      MACROS
  **********************/
 
-
 #define FILL_NORMAL_MASK_PX(out_x,  color)                                                          \
     if(*mask_tmp_x) {          \
         if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[out_x] = color;                                 \
         else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
     }                                                                                               \
     mask_tmp_x++;
-
 
 #define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
     if(*mask_tmp_x) {          \
@@ -95,7 +93,6 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
         else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
     }                                                                                                      \
     mask_tmp_x++;
-
 
 #define MAP_NORMAL_MASK_PX(x)                                                          \
     if(*mask_tmp_x) {          \
@@ -116,7 +113,6 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
 
 /**
  * Fill and area in the display buffer.
@@ -195,7 +191,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
  * @param mask_res LV_MASK_RES_COVER: the mask has only 0xff values (no mask),
  *                 LV_MASK_RES_TRANSP: the mask has only 0x00 values (full transparent),
  *                 LV_MASK_RES_CHANGED: the mask has mixed values
- * @param opa  overall opacity in 0x00..0xff range
+ * @param opa overall opacity in 0x00..0xff range
  * @param mode blend mode from `lv_blend_mode_t`
  */
 LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area,
@@ -251,7 +247,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     }
 #endif
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -336,12 +331,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         if(opa > LV_OPA_MAX) {
-#if LV_USE_GPU
-            if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
-                disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
-                return;
-            }
-#elif LV_USE_GPU_NXP_PXP
+#if LV_USE_GPU_NXP_PXP
             if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_FILL_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
                 return;
@@ -356,6 +346,11 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 #elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
                 lv_gpu_stm32_dma2d_fill(disp_buf_first, disp_w, color, draw_area_w, draw_area_h);
+                return;
+            }
+#elif LV_USE_GPU
+            if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
+                disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
 #endif
@@ -391,7 +386,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 return;
             }
 #endif
-
 
 #if LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
@@ -449,7 +443,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
             return;
         }
 #endif
-
 
         /*Buffer the result color to avoid recalculating the same color*/
         lv_color_t last_dest_color;
@@ -580,7 +573,6 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
 
     /*Create a temp. disp_buf which always point to current line to draw*/
     lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
-
 
     lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
     switch(mode) {
@@ -757,7 +749,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_NXP_PXP
-            if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
+            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
                 return;
             }
@@ -774,7 +766,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.src_area.y1 = (draw_area->y1 - (map_area->y1 - disp_area->y1));
                 blit.src_area.x2 = blit.src_area.x1 + draw_area_w;
                 blit.src_area.y2 = blit.src_area.y1 + draw_area_h;
-
 
                 blit.dst = disp_buf;
                 blit.dst_width = lv_area_get_width(disp_area);
@@ -825,7 +816,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.src_area.y1 = (draw_area->y1 - (map_area->y1 - disp_area->y1));
                 blit.src_area.x2 = blit.src_area.x1 + draw_area_w;
                 blit.src_area.y2 = blit.src_area.y1 + draw_area_h;
-
 
                 blit.dst = disp_buf;
                 blit.dst_width = lv_area_get_width(disp_area);

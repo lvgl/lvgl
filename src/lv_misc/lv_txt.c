@@ -121,7 +121,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
             size_res->y += line_space;
         }
 
-        /*Calculate the the longest line*/
+        /*Calculate the longest line*/
         lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
                                                        flag);
 
@@ -225,7 +225,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /*Check for new line chars and breakchars*/
         if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
             /* Update the output width on the first character if it fits.
-             * Must do this here incase first letter is a break character. */
+             * Must do this here in case first letter is a break character. */
             if(i == 0 && break_index == NO_BREAK_FOUND && word_w_ptr != NULL) *word_w_ptr = cur_w;
             word_len--;
             break;
@@ -233,7 +233,6 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
         /* Update the output width */
         if(word_w_ptr != NULL && break_index == NO_BREAK_FOUND) *word_w_ptr = cur_w;
-
 
         i = i_next;
         i_next = i_next_next;
@@ -582,7 +581,7 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
 
 /**
  * Convert a wide character, e.g. 'Á' little endian to be UTF-8 compatible
- * @param c a wide character or a  Little endian number
+ * @param c a wide character or a Little endian number
  * @return `c` in big endian
  */
 static uint32_t lv_txt_utf8_conv_wc(uint32_t c)

@@ -439,7 +439,7 @@ lv_coord_t lv_win_get_btn_width(lv_obj_t * win)
 }
 
 /**
- * Get the pointer of a widow from one of  its control button.
+ * Get the pointer of a widow from one of its control button.
  * It is useful in the action of the control buttons where only button is known.
  * @param ctrl_btn pointer to a control button of a window
  * @return pointer to the window of 'ctrl_btn'
@@ -516,7 +516,6 @@ uint8_t lv_win_title_get_alignment(lv_obj_t * win)
     return ext->title_txt_align;
 }
 
-
 /*=====================
  * Other functions
  *====================*/
@@ -531,7 +530,6 @@ void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
     LV_ASSERT_OBJ(obj, "");
-
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_focus(ext->page, obj, anim_en);
@@ -607,7 +605,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
                 txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
                 txt_area.y2 = txt_area.y1 + txt_size.y;
                 break;
-            case LV_TXT_FLAG_FIT || LV_TXT_FLAG_EXPAND:
+            case LV_TXT_FLAG_FIT:
+            case LV_TXT_FLAG_EXPAND:
                 txt_area.x1 = header->coords.x1;
                 txt_area.x2 = header->coords.x2;
                 txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;

@@ -12,10 +12,6 @@
 
 #include "../lv_misc/lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -684,7 +680,7 @@ static void page_init(void)
     lv_style_set_pad_right(&styles->sb, LV_STATE_DEFAULT,  LV_DPX(7));
     lv_style_set_pad_bottom(&styles->sb, LV_STATE_DEFAULT,  LV_DPX(7));
 
-#if  LV_USE_ANIMATION
+#if LV_USE_ANIMATION
     style_init_reset(&styles->edge_flash);
     lv_style_set_bg_opa(&styles->edge_flash, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->edge_flash, LV_STATE_DEFAULT,  lv_color_hex3(0x888));
@@ -875,7 +871,6 @@ static void tabview_win_shared_init(void)
 #endif
 }
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -954,7 +949,6 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 
     return &theme;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
@@ -1187,7 +1181,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 
-
 #if LV_USE_ROLLER
         case LV_THEME_ROLLER:
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
@@ -1210,7 +1203,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_LIST_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->list_bg);
-
 
             list = lv_obj_get_style_list(obj, LV_LIST_PART_SCROLLBAR);
             _lv_style_list_add_style(list, &styles->sb);
@@ -1314,7 +1306,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 
 #endif
-
 
 #if LV_USE_SPINBOX
         case LV_THEME_SPINBOX:

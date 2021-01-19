@@ -83,7 +83,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
     else if(point1->x == point2->x) draw_line_ver(point1, point2, &clip_line, dsc);
     else draw_line_skew(point1, point2, &clip_line, dsc);
 
-
     if(dsc->round_end || dsc->round_start) {
         lv_draw_rect_dsc_t cir_dsc;
         lv_draw_rect_dsc_init(&cir_dsc);
@@ -217,7 +216,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
     }
 }
 
-
 LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
                                                 const lv_draw_line_dsc_t * dsc)
@@ -311,7 +309,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
         _lv_mem_buf_release(mask_buf);
     }
 }
-
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
                                                  const lv_area_t * clip,

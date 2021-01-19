@@ -73,7 +73,7 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
 /**
  * Return with the sys. layer. (Same on every screen and it is above the normal screen and the top
  * layer)
- * @param disp pointer to display which sys. layer  should be get. (NULL to use the default screen)
+ * @param disp pointer to display which sys. layer should be get. (NULL to use the default screen)
  * @return pointer to the sys layer object  (transparent screen sized lv_obj)
  */
 lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
@@ -84,7 +84,6 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
  * @param scr pointer to a screen object to assign
  */
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
-
 
 /**
  * Set the background color of a display
@@ -162,7 +161,7 @@ static inline lv_obj_t * lv_scr_act(void)
 }
 
 /**
- * Get the top layer  of the default display
+ * Get the top layer of the default display
  * @return pointer to the top layer
  */
 static inline lv_obj_t * lv_layer_top(void)
@@ -172,7 +171,7 @@ static inline lv_obj_t * lv_layer_top(void)
 
 /**
  * Get the active screen of the default display
- * @return  pointer to the sys layer
+ * @return pointer to the sys layer
  */
 static inline lv_obj_t * lv_layer_sys(void)
 {
@@ -206,7 +205,6 @@ static inline void lv_scr_load(lv_obj_t * scr)
  */
 #define LV_VER_RES lv_disp_get_ver_res(lv_disp_get_default())
 #endif
-
 
 /**
  * Same as Android's DIP. (Different name is chosen to avoid mistype between LV_DPI and LV_DIP)

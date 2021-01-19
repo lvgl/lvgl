@@ -13,9 +13,6 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_misc/lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
 /*********************
  *      DEFINES
  *********************/

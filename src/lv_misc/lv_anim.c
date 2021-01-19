@@ -17,10 +17,6 @@
 #include "lv_math.h"
 #include "lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -92,7 +88,7 @@ void lv_anim_init(lv_anim_t * a)
 void lv_anim_start(lv_anim_t * a)
 {
     LV_LOG_TRACE("animation create started")
-    /* Do not let two animations for the  same 'var' with the same 'fp'*/
+    /* Do not let two animations for the same 'var' with the same 'fp'*/
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*If the list is empty the anim task was suspended and it's last run measure is invalid*/
@@ -351,7 +347,6 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
     return (lv_anim_value_t)new_value;
 }
 
-
 /**
  * Calculate the current value of an animation with 3 bounces
  * @param a pointer to an animation
@@ -461,7 +456,7 @@ static void anim_task(lv_task_t * param)
         anim_list_changed = false;
 
         if(!a->has_run) {
-            a->has_run = 1; /*The list readying might be reseted so need to know which anim has run already*/
+            a->has_run = 1; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;

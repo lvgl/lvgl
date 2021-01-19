@@ -102,7 +102,7 @@ void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
 void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed);
 
 /**
- * Set the the highlighted dates
+ * Set the highlighted dates
  * @param calendar pointer to a calendar object
  * @param highlighted pointer to an `lv_calendar_date_t` array containing the dates. ONLY A POINTER
  * WILL BE SAVED! CAN'T BE LOCAL ARRAY.
@@ -147,7 +147,7 @@ lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar);
 lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 
 /**
- * Get the the pressed date.
+ * Get the pressed date.
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
  *         `NULL` if not date pressed (e.g. the header)
@@ -155,7 +155,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar);
 
 /**
- * Get the the highlighted dates
+ * Get the highlighted dates
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */
@@ -185,7 +185,7 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar);
 /**
  * Get the day of the week
  * @param year a year
- * @param month a  month (1..12)
+ * @param month a month (1..12)
  * @param day a day (1..31)
  * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
  */

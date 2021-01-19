@@ -45,7 +45,6 @@ typedef struct {
 #endif
 } lv_font_fmt_txt_glyph_dsc_t;
 
-
 /** Format of font character map. */
 enum {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
@@ -55,7 +54,6 @@ enum {
 };
 
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
-
 
 /* Map codepoints to a `glyph_dsc`s
  * Several formats are supported to optimize memory usage
@@ -117,7 +115,7 @@ typedef struct {
 typedef struct {
     /*To get a kern value of two code points:
        1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
-       2  for(i = 0; i < pair_cnt * 2; i+2)
+       2. for(i = 0; i < pair_cnt * 2; i+2)
              if(gylph_ids[i] == glyph_id_left &&
                 gylph_ids[i+1] == glyph_id_right)
                  return values[i / 2];
@@ -132,7 +130,7 @@ typedef struct {
 typedef struct {
     /*To get a kern value of two code points:
           1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
-          2  Get the class of the left and right glyphs as `left_class` and `right_class`
+          2. Get the class of the left and right glyphs as `left_class` and `right_class`
               left_class = left_class_mapping[glyph_id_left];
               right_class = right_class_mapping[glyph_id_right];
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (right_class-1)]
@@ -145,14 +143,12 @@ typedef struct {
     uint8_t right_class_cnt;
 } lv_font_fmt_txt_kern_classes_t;
 
-
 /** Bitmap formats*/
 typedef enum {
     LV_FONT_FMT_TXT_PLAIN      = 0,
     LV_FONT_FMT_TXT_COMPRESSED = 1,
     LV_FONT_FMT_TXT_COMPRESSED_NO_PREFILTER = 1,
 } lv_font_fmt_txt_bitmap_format_t;
-
 
 /*Describe store additional data for fonts */
 typedef struct {

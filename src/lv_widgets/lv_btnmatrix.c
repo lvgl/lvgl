@@ -268,7 +268,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
  *                 the number and order of the individual buttons (i.e. excludes
  *                 newline entries).
  *                 An element of the map should look like e.g.:
- *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT |  LV_BTNMATRIX_CTRL_TGL_ENABLE`
+ *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_TGL_ENABLE`
  */
 void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_map[])
 {
@@ -298,7 +298,6 @@ void lv_btnmatrix_set_focused_btn(lv_obj_t * btnm, uint16_t id)
     ext->btn_id_focused = id;
     lv_obj_invalidate(btnm);
 }
-
 
 /**
  * Enable recoloring of button's texts
@@ -401,7 +400,6 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
-
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return;
     ext->ctrl_bits[btn_id] &= (~LV_BTNMATRIX_WIDTH_MASK);
@@ -478,9 +476,9 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * btnm)
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
+ * Useful in the `event_cb` to get the text of the button, check if hidden etc.
  * @param btnm pointer to button matrix object
- * @return  index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
+ * @return index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
 uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * btnm)
 {
@@ -492,7 +490,7 @@ uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * btnm)
 
 /**
  * Get the text of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb`
+ * Useful in the `event_cb`
  * @param btnm pointer to button matrix object
  * @return text of the last released button (NULL: if unset)
  */
@@ -513,7 +511,7 @@ const char * lv_btnmatrix_get_active_btn_text(const lv_obj_t * btnm)
  * Get the pressed button's index.
  * The button be really pressed by the user or manually set to pressed with `lv_btnmatrix_set_pressed`
  * @param btnm pointer to button matrix object
- * @return  index of the pressed button (LV_BTNMATRIX_BTN_NONE: if unset)
+ * @return index of the pressed button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
 uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm)
 {
@@ -528,7 +526,7 @@ uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm)
  * @param btnm pointer to button matrix object
  * @param btn_id the index a button not counting new line characters. (The return value of
  * lv_btnmatrix_get_pressed/released)
- * @return  text of btn_index` button
+ * @return text of btn_index` button
  */
 const char * lv_btnmatrix_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
 {
@@ -570,7 +568,6 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ct
 
     return (ext->ctrl_bits[btn_id] & ctrl) ? true : false;
 }
-
 
 /**
  * Find whether "one check" mode is enabled.
@@ -955,7 +952,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             invalidate_button_area(btnm, ext->btn_id_pr);
             invalidate_button_area(btnm, ext->btn_id_focused);
 
-
             lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) {
                 ext->btn_id_focused = ext->btn_id_pr;
@@ -1041,7 +1037,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
         else if(c == LV_KEY_DOWN) {
             lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
-            /*Find the area below the the current*/
+            /*Find the area below the current*/
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 ext->btn_id_focused = 0;
             }
@@ -1067,7 +1063,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
         else if(c == LV_KEY_UP) {
             lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
-            /*Find the area below the the current*/
+            /*Find the area below the current*/
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 ext->btn_id_focused = 0;
             }
@@ -1150,7 +1146,6 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
 
     /*Do not allocate memory for the same amount of buttons*/
     if(btn_cnt == ext->btn_cnt) return;
-
 
     if(ext->button_areas != NULL) {
         lv_mem_free(ext->button_areas);

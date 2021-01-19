@@ -12,7 +12,6 @@
 #include "lv_imgbtn.h"
 #include "lv_label.h"
 
-
 #if LV_USE_IMGBTN != 0
 
 /*********************
@@ -196,7 +195,7 @@ void lv_imgbtn_toggle(lv_obj_t * imgbtn)
  *====================*/
 
 /**
- * Get the images in a  given state
+ * Get the images in a given state
  * @param imgbtn pointer to an image button object
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to an image source (a C array or path to a file)
@@ -522,7 +521,7 @@ static void refr_img(lv_obj_t * imgbtn)
     if(info_res == LV_RES_OK) {
         ext->act_cf = header.cf;
         if(ext->tiled) lv_obj_set_height(imgbtn, header.h); /*Keep the sure defined width*/
-        else  lv_obj_set_size(imgbtn, header.w, header.h);
+        else lv_obj_set_size(imgbtn, header.w, header.h);
     }
     else {
         ext->act_cf = LV_IMG_CF_UNKNOWN;

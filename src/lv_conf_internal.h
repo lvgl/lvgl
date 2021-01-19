@@ -349,7 +349,6 @@
 #  endif
 #endif
 
-
 /* Gesture threshold in pixels */
 #ifndef LV_INDEV_DEF_GESTURE_LIMIT
 #  ifdef CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
@@ -797,7 +796,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * If an invalid parameter is found an error log message is printed and
  * the MCU halts at the error. (`LV_USE_LOG` should be enabled)
  * If you are debugging the MCU you can pause
- * the debugger to see exactly where  the issue is.
+ * the debugger to see exactly where the issue is.
  *
  * The behavior of asserts can be overwritten by redefining them here.
  * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
@@ -874,7 +873,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *    FONT USAGE
  *===================*/
 
-/* The built-in fonts contains the ASCII range and some Symbols with  4 bit-per-pixel.
+/* The built-in fonts contains the ASCII range and some Symbols with 4 bit-per-pixel.
  * The symbols are available via `LV_SYMBOL_...` defines
  * More info about fonts: https://docs.lvgl.io/v7/en/html/overview/font.html
  * To create a new font go to: https://lvgl.com/ttf-font-to-c-array
@@ -1927,7 +1926,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #endif
-
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
 #ifndef LV_USE_TABVIEW

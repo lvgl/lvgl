@@ -313,7 +313,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
                 return LV_RES_INV;
             }
 
-
             lv_draw_map(&line, &mask_line, buf, draw_dsc, chroma_keyed, alpha_byte);
             line.y1++;
             line.y2++;
@@ -512,7 +511,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             mask_res = (alpha_byte || chroma_key || draw_dsc->angle ||
                         draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
-
             /*Prepare the `mask_buf`if there are other masks*/
             if(other_mask_cnt) {
                 _lv_memset_ff(mask_buf, mask_buf_size);
@@ -531,7 +529,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 int32_t rot_x = disp_area->x1 + draw_area.x1 - map_area->x1;
 #endif
                 for(x = 0; x < draw_area_w; x++, map_px += px_size_byte, px_i++) {
-
 
 #if LV_USE_IMG_TRANSFORM
                     if(transform) {
@@ -556,7 +553,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                             lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                             mask_buf[px_i] = px_opa;
                             if(px_opa == 0) {
-#if  LV_COLOR_DEPTH == 32
+#if LV_COLOR_DEPTH == 32
                                 map2[px_i].full = 0;
 #endif
                                 continue;
@@ -579,7 +576,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         if(chroma_key) {
                             if(c.full == chroma_keyed_color.full) {
                                 mask_buf[px_i] = LV_OPA_TRANSP;
-#if  LV_COLOR_DEPTH == 32
+#if LV_COLOR_DEPTH == 32
                                 map2[px_i].full = 0;
 #endif
                                 continue;
@@ -663,4 +660,3 @@ static void draw_cleanup(lv_img_cache_entry_t * cache)
     LV_UNUSED(cache);
 #endif
 }
-

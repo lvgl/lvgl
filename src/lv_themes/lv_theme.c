@@ -357,14 +357,12 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 
-
 #if LV_USE_ROLLER
         case LV_THEME_ROLLER:
             lv_obj_clean_style_list(obj, LV_ROLLER_PART_BG);
             lv_obj_clean_style_list(obj, LV_ROLLER_PART_SELECTED);
             break;
 #endif
-
 
 #if LV_USE_OBJMASK
         case LV_THEME_OBJMASK:
@@ -431,7 +429,6 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
             lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_SCROLLBAR);
             break;
 #endif
-
 
 #if LV_USE_SPINBOX
         case LV_THEME_SPINBOX:

@@ -19,19 +19,19 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_BTN == 0
-#error "lv_win: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
+#error "lv_win: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN 1)"
 #endif
 
 #if LV_USE_LABEL == 0
-#error "lv_win: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_win: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #if LV_USE_IMG == 0
-#error "lv_win: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG  1) "
+#error "lv_win: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG 1)"
 #endif
 
 #if LV_USE_PAGE == 0
-#error "lv_win: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
+#error "lv_win: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -208,7 +208,6 @@ lv_obj_t * lv_win_get_content(const lv_obj_t * win);
  */
 lv_coord_t lv_win_get_header_height(const lv_obj_t * win);
 
-
 /**
  * Get the width of the control buttons on the header
  * @param win pointer to a window object
@@ -217,7 +216,7 @@ lv_coord_t lv_win_get_header_height(const lv_obj_t * win);
 lv_coord_t lv_win_get_btn_width(lv_obj_t * win);
 
 /**
- * Get the pointer of a widow from one of  its control button.
+ * Get the pointer of a widow from one of its control button.
  * It is useful in the action of the control buttons where only button is known.
  * @param ctrl_btn pointer to a control button of a window
  * @return pointer to the window of 'ctrl_btn'

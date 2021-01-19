@@ -425,7 +425,6 @@ void lv_textarea_del_char(lv_obj_t * ta)
     lv_label_set_text(ext->label, label_txt);
     lv_textarea_clear_selection(ta);
 
-
     /*If the textarea became empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
         const char * txt = lv_label_get_text(ext->label);
@@ -503,7 +502,6 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
         lv_label_set_text(ext->label, txt);
         lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
     }
-
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
@@ -690,7 +688,7 @@ void lv_textarea_set_cursor_hidden(lv_obj_t * ta, bool hide)
 }
 
 /**
- * Enable/Disable the positioning of the the cursor by clicking the text on the text area.
+ * Enable/Disable the positioning of the cursor by clicking the text on the text area.
  * @param ta pointer to a text area object
  * @param en true: enable click positions; false: disable
  */
@@ -818,7 +816,7 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
 
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @param list list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
  */
 void lv_textarea_set_accepted_chars(lv_obj_t * ta, const char * list)
@@ -832,7 +830,7 @@ void lv_textarea_set_accepted_chars(lv_obj_t * ta, const char * list)
 
 /**
  * Set max length of a Text Area.
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @param num the maximal number of characters can be added (`lv_textarea_set_text` ignores it)
  */
 void lv_textarea_set_max_length(lv_obj_t * ta, uint32_t num)
@@ -1060,7 +1058,7 @@ bool lv_textarea_get_one_line(const lv_obj_t * ta)
 
 /**
  * Get a list of accepted characters.
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @return list of accented characters.
  */
 const char * lv_textarea_get_accepted_chars(lv_obj_t * ta)
@@ -1074,7 +1072,7 @@ const char * lv_textarea_get_accepted_chars(lv_obj_t * ta)
 
 /**
  * Set max length of a Text Area.
- * @param ta pointer to  Text Area
+ * @param ta pointer to Text Area
  * @return the maximal number of characters to be add
  */
 uint32_t lv_textarea_get_max_length(lv_obj_t * ta)
@@ -1303,7 +1301,7 @@ static lv_design_res_t lv_textarea_design(lv_obj_t * ta, const lv_area_t * clip_
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
  * @param scrl pointer to the scrollable part of the Text area
- * @param clip_area  the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW_MAIN: draw the object (always return 'true')
@@ -1707,7 +1705,6 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
         return true; /*If the accepted char list in not specified the accept the character*/
     }
 }
-
 
 static void refr_cursor_area(lv_obj_t * ta)
 {

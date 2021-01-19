@@ -104,7 +104,6 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_theme_apply(cont, LV_THEME_CONT);
         }
 
-
     }
     /*Copy an existing object*/
     else {
@@ -291,7 +290,6 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 
     return res;
 }
-
 
 static lv_style_list_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
 {
@@ -510,7 +508,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
     lv_coord_t pright         =  lv_obj_get_style_pad_right(cont, LV_CONT_PART_MAIN);
     lv_coord_t pinner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
 
-    child_rc = child_rs; /*Initially the the row starter and closer is the same*/
+    child_rc = child_rs; /*Initially the row starter and closer is the same*/
     while(child_rs != NULL) {
         lv_coord_t h_row = 0;
         lv_coord_t w_row = pleft + pright; /*The width is at least the left+right pad*/

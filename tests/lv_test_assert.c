@@ -24,7 +24,6 @@
 #define PNG_DEBUG 3
 #include <png.h>
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -65,7 +64,6 @@ static void png_release(png_img_t * p);
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 void lv_test_print(const char * s, ...)
 {
     va_list args;
@@ -74,7 +72,6 @@ void lv_test_print(const char * s, ...)
     fprintf(stdout, "\n");
     va_end(args);
 }
-
 
 void lv_test_exit(const char * s, ...)
 {
@@ -86,7 +83,6 @@ void lv_test_exit(const char * s, ...)
 
     exit(1);
 }
-
 
 void lv_test_error(const char * s, ...)
 {
@@ -134,7 +130,6 @@ void lv_test_assert_int_lt(int32_t n_ref, int32_t n_act, const char * s)
     }
 }
 
-
 void lv_test_assert_str_eq(const char * s_ref, const char * s_act, const char * s)
 {
     if(strcmp(s_ref, s_act) != 0) {
@@ -144,7 +139,6 @@ void lv_test_assert_str_eq(const char * s_ref, const char * s_act, const char * 
     }
 }
 
-
 void lv_test_assert_array_eq(const uint8_t *p_ref, const uint8_t *p_act, int32_t size, const char * s)
 {
     if(memcmp(p_ref, p_act, size) != 0) {
@@ -153,7 +147,6 @@ void lv_test_assert_array_eq(const uint8_t *p_ref, const uint8_t *p_act, int32_t
         lv_test_print("   PASS: %s. (Expected: all %d bytes should be equal)", s, size);
     }
 }
-
 
 void lv_test_assert_ptr_eq(const void * p_ref, const void * p_act, const char * s)
 {
@@ -281,7 +274,6 @@ static void read_png_file(png_img_t * p, const char* file_name)
     p->number_of_passes = png_set_interlace_handling(p->png_ptr);
     png_read_update_info(p->png_ptr, p->info_ptr);
 
-
     /* read file */
     if (setjmp(png_jmpbuf(p->png_ptr)))
         lv_test_exit("[read_png_file] Error during read_image");
@@ -382,4 +374,3 @@ static void png_release(png_img_t * p)
 //    }
 //}
 #endif
-

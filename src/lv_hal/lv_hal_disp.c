@@ -19,10 +19,6 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -332,7 +328,6 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     disp_drv->buffer->flushing = 0;
     disp_drv->buffer->flushing_last = 0;
 }
-
 
 /**
  * Tell if it's the last area of the refreshing process.

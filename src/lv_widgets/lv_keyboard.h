@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_BTNMATRIX == 0
-#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
+#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX 1)"
 #endif
 
 #if LV_USE_TEXTAREA == 0
-#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (LV_USE_TEXTAREA 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -162,7 +162,7 @@ static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
  * Default keyboard event to add characters to the Text area and change the map.
  * If a custom `event_cb` is added to the keyboard this function be called from it to handle the
  * button clicks
- * @param kb pointer to a  keyboard
+ * @param kb pointer to a keyboard
  * @param event the triggering event
  */
 void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);

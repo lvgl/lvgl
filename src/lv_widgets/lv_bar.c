@@ -23,7 +23,7 @@
  *********************/
 #define LV_OBJX_NAME "lv_bar"
 
-#define LV_BAR_SIZE_MIN  4   /*hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
+#define LV_BAR_SIZE_MIN 4 /*hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
 
 #if LV_USE_ANIMATION
     #define LV_BAR_IS_ANIMATING(anim_struct) (((anim_struct).anim_state) != LV_BAR_ANIM_STATE_INV)
@@ -109,8 +109,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_signal_cb(bar, lv_bar_signal);
     lv_obj_set_design_cb(bar, lv_bar_design);
 
-
-    /*Init the new  bar object*/
+    /*Init the new bar object*/
     if(copy == NULL) {
 
         lv_obj_set_click(bar, false);
@@ -161,7 +160,6 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
     new_value = value > ext->max_value ? ext->max_value : new_value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
     new_value = new_value < ext->start_value ? ext->start_value : new_value;
-
 
     if(ext->cur_value == new_value) return;
 #if LV_USE_ANIMATION == 0
@@ -354,7 +352,6 @@ uint16_t lv_bar_get_anim_time(const lv_obj_t * bar)
     return 0;
 #endif
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

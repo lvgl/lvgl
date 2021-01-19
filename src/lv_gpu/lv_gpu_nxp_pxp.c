@@ -27,7 +27,6 @@
  *
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -59,7 +58,6 @@
 #else
     #error Only 16bit color depth is supported. Set LV_COLOR_DEPTH to 16.
 #endif
-
 
 /**********************
  *      TYPEDEFS
@@ -135,7 +133,6 @@ void lv_gpu_nxp_pxp_deinit(void)
     PXP_DisableInterrupts(PXP, kPXP_CompleteInterruptEnable);
     PXP_Deinit(LV_GPU_NXP_PXP_ID);
 }
-
 
 /**
  * Fill area, with optional opacity.
@@ -214,7 +211,7 @@ void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_width, const lv_
  *
  * By default, image is copied directly, with optional opacity configured by \p opa.
  * Color keying can be enabled by calling lv_gpu_nxp_pxp_enable_color_key() before calling this function.
- * Recoloring can be enabled by calling  lv_gpu_nxp_pxp_enable_recolor() before calling this function.
+ * Recoloring can be enabled by calling lv_gpu_nxp_pxp_enable_recolor() before calling this function.
  * Note that color keying and recoloring at the same time is not supported and black rectangle is rendered.
  *
  * @param[in/out] dest destination buffer
@@ -282,7 +279,6 @@ void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_colo
         PXP_SetAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, colorKey, colorKey);
     }
     PXP_EnableAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, colorKeyEnabled);
-
 
     /* Output buffer. */
     outputBufferConfig.pixelFormat    = (pxp_output_pixel_format_t)PXP_OUT_PIXEL_FORMAT;

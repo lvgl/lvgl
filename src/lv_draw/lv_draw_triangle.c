@@ -125,7 +125,6 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     i_next_right = y_min_i + 1;
     if(i_next_right > point_cnt - 1) i_next_right = 0;
 
-
     /* Check if the order of points is inverted or not.
      * The normal case is when the left point is on `y_min_i - 1`
      * Explanation:

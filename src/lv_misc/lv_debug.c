@@ -17,11 +17,11 @@
  *      DEFINES
  *********************/
 #ifndef LV_DEBUG_STR_MAX_LENGTH
-    #define LV_DEBUG_STR_MAX_LENGTH  (1024 * 8)
+    #define LV_DEBUG_STR_MAX_LENGTH (1024 * 8)
 #endif
 
 #ifndef LV_DEBUG_STR_MAX_REPEAT
-    #define LV_DEBUG_STR_MAX_REPEAT  8
+    #define LV_DEBUG_STR_MAX_REPEAT 8
 #endif
 /**********************
  *      TYPEDEFS
@@ -135,6 +135,4 @@ void lv_debug_log_error(const char * msg, uint64_t value)
  *   STATIC FUNCTIONS
  **********************/
 
-
 #endif /*LV_USE_DEBUG*/
-

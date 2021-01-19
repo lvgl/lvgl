@@ -119,7 +119,6 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
 
-
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
 
@@ -612,7 +611,6 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t char_id, lv_point_
     visual_byte_pos = byte_id - line_start;
 #endif
 
-
     /*Calculate the x coordinate*/
     lv_coord_t x = _lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
     if(char_id != line_start) x += letter_space;
@@ -740,7 +738,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos_in)
             lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Finish if the x position or the last char of the next line is reached*/
-            if(pos.x < x + gw || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
+            if(pos.x < x + gw || i + line_start == new_line_start || txt[i_act + line_start] == '\0') {
                 i = i_act;
                 break;
             }
@@ -767,7 +765,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos_in)
     logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif
 
-    return  logical_pos + _lv_txt_encoded_get_char_id(txt, line_start);
+    return logical_pos + _lv_txt_encoded_get_char_id(txt, line_start);
 }
 
 /**
@@ -1182,7 +1180,6 @@ void lv_label_refr_text(lv_obj_t * label)
             }
 
             uint32_t letter_id = lv_label_get_letter_on(label, &p);
-
 
             /*Be sure there is space for the dots*/
             size_t txt_len = strlen(ext->text);

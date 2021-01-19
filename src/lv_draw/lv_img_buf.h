@@ -17,7 +17,6 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -101,7 +100,6 @@ enum {
 };
 typedef uint8_t lv_img_cf_t;
 
-
 /**
  * LVGL image header
  */
@@ -113,13 +111,12 @@ typedef uint8_t lv_img_cf_t;
 #if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
 
-    uint32_t h : 11; /*Height of     the image map*/
+    uint32_t h : 11; /*Height of the image map*/
     uint32_t w : 11; /*Width of the image map*/
     uint32_t reserved : 2; /*Reserved to be used later*/
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
     uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
-
 
 } lv_img_header_t;
 #else
@@ -132,7 +129,7 @@ typedef struct {
     uint32_t reserved : 2; /*Reserved to be used later*/
 
     uint32_t w : 11; /*Width of the image map*/
-    uint32_t h : 11; /*Height of     the image map*/
+    uint32_t h : 11; /*Height of the image map*/
 } lv_img_header_t;
 #endif
 
@@ -162,7 +159,6 @@ typedef struct {
         lv_color_t color;
         lv_opa_t opa;
     } res;
-
 
     struct {
         lv_img_dsc_t img_dsc;
@@ -269,7 +265,6 @@ void lv_img_buf_free(lv_img_dsc_t * dsc);
  */
 uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
-
 #if LV_USE_IMG_TRANSFORM
 /**
  * Initialize a descriptor to rotate an image
@@ -282,7 +277,6 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc);
  * @param dsc pointer to the transformation descriptor
  */
 bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc);
-
 
 /**
  * Get which color and opa would come to a pixel if it were rotated

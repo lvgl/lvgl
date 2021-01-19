@@ -12,7 +12,6 @@
 #include "lv_txt_ap.h"
 #include "../lv_draw/lv_draw.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -115,7 +114,7 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
             chars_cnt++;
         else if(ch_enc < 0x0800)
             chars_cnt += 2;
-        else  if(ch_enc < 0x010000)
+        else if(ch_enc < 0x010000)
             chars_cnt += 3;
         else
             chars_cnt += 4;
@@ -125,7 +124,6 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
 
     return chars_cnt + 1;
 }
-
 
 void _lv_txt_ap_proc(const char * txt, char * txt_out)
 {
@@ -212,7 +210,7 @@ static uint32_t lv_ap_get_char_index(uint16_t c)
         if(c == (ap_chars_map[i].char_offset + LV_AP_ALPHABET_BASE_CODE))
             return i;
         else if(c == ap_chars_map[i].char_end_form                                                  //is it an End form
-                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_begining_form_offset)     //is it a Begining form
+                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_begining_form_offset)     //is it a Beginning form
                 || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_middle_form_offset)       //is it a middle form
                 || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_isolated_form_offset)) {  //is it an isolated form
             return i;

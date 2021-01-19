@@ -36,7 +36,6 @@ enum {
 
 typedef uint8_t lv_draw_mask_res_t;
 
-
 enum {
     LV_DRAW_MASK_TYPE_LINE,
     LV_DRAW_MASK_TYPE_ANGLE,
@@ -101,7 +100,6 @@ typedef struct {
 
     /*1: It's a flat line? (Near to horizontal)*/
     uint8_t flat : 1;
-
 
     /* Invert the mask. The default is: Keep the left part.
      * It is used to select left/right/top/bottom*/
@@ -181,7 +179,6 @@ typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
  */
 int16_t lv_draw_mask_add(void * param, void * custom_id);
 
-
 //! @cond Doxygen_Suppress
 
 /**
@@ -197,7 +194,6 @@ int16_t lv_draw_mask_add(void * param, void * custom_id);
  */
 LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
                                                             lv_coord_t len);
-
 
 //! @endcond
 
@@ -224,7 +220,6 @@ void * lv_draw_mask_remove_custom(void * custom_id);
  * @return number of active masks
  */
 LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void);
-
 
 //! @endcond
 
