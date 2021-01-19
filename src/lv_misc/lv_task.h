@@ -1,6 +1,6 @@
 /**
- * @file lv_task.c
- * An 'lv_task'  is a void (*fp) (void* param) type function which will be called periodically.
+ * @file lv_task.h
+ * An 'lv_task' is a void (*fp) (struct _lv_task_t* param) type function which will be called periodically.
  * A priority (5 levels + disable) can be assigned to lv_tasks.
  */
 
@@ -36,7 +36,7 @@ extern "C" {
 struct _lv_task_t;
 
 /**
- * Tasks execute this type type of functions.
+ * Tasks execute this type of functions.
  */
 typedef void (*lv_task_cb_t)(struct _lv_task_t *);
 
