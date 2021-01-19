@@ -669,7 +669,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 /*On enter long press toggle edit mode.*/
                 if(editable) {
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
-                    if (_lv_ll_get_len(&g->obj_ll) > 1 ) {
+                    if(_lv_ll_get_len(&g->obj_ll) > 1) {
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                     }
                 }
