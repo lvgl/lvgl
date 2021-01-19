@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.9.1 (Planned at 19.01.2020
+## v7.9.1 (Planned at 19.01.2020)
 
 ### Bugfixes
 - fix(cpicker) fix division by zero
