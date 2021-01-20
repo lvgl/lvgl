@@ -8,6 +8,7 @@
 - fix(msgbox) use the animation time provided
 - fix(gpu_nxp_pxp) fix incorrect define name
 - fix(indev) don't leave edit mode if there is only one object in the group
+- fix(draw_rect) fix draw pattern stack-use-after-scope error
 
 
 ## v7.9.0
