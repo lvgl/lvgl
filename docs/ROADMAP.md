@@ -50,6 +50,7 @@ Planned to November/December 2020
 - Allow snapshoting object to tranfrom them to images
 
 ## Ideas
+- Use [generate-changelog](https://github.com/lob/generate-changelog) to automatically generate changelog
 - lv_mem_alloc_aligned(size, align)
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
