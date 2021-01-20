@@ -35,6 +35,8 @@ Planned to November/December 2020
 - Add radio button widget
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
+- chart: pre-delete `X` pint after the lastly set
+- chart: autoscroll to the right
 
 ## v9
 - Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).
