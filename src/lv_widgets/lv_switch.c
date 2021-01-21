@@ -37,7 +37,7 @@
 static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_switch_destructor(void * obj);
 static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
-static lv_drawer_res_t lv_switch_drawer(lv_obj_t * sw, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 /**********************
  *  STATIC VARIABLES
@@ -65,7 +65,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_CLASS_INIT(lv_switch, lv_obj);
         lv_switch.constructor = lv_switch_constructor;
         lv_switch.destructor = lv_switch_destructor;
-        lv_switch.drawer_cb = lv_switch_drawer;
+        lv_switch.draw_cb = lv_switch_draw;
         lv_switch.signal_cb = lv_switch_signal;
     }
 
@@ -115,23 +115,23 @@ static void lv_switch_destructor(void * obj)
  * Handle the drawing related tasks of the sliders
  * @param slider pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_switch_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAWER_COVER_CHK) {
-        return LV_DRAWER_RES_NOT_COVER;
+    if(mode == LV_DRAW_COVER_CHK) {
+        return LV_DRAW_RES_NOT_COVER;
     }
     /*Draw the object*/
-    else if(mode == LV_DRAWER_DRAW_MAIN) {
+    else if(mode == LV_DRAW_DRAW_MAIN) {
 
-        /*The ancestor drawer function will draw the background.*/
-        lv_switch.base_p->drawer_cb(obj, clip_area, mode);
+        /*The ancestor draw function will draw the background.*/
+        lv_switch.base_p->draw_cb(obj, clip_area, mode);
 
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
 
@@ -197,11 +197,11 @@ static lv_drawer_res_t lv_switch_drawer(lv_obj_t * obj, const lv_area_t * clip_a
 
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAWER_DRAW_POST) {
-        return lv_switch.base_p->drawer_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_DRAW_POST) {
+        return lv_switch.base_p->draw_cb(obj, clip_area, mode);
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 

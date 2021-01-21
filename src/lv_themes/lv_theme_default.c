@@ -116,11 +116,6 @@ typedef struct {
     lv_style_t arc_indic_primary;
 #endif
 
-
-#if LV_USE_BTNMATRIX
-    lv_style_t btnmatrix_btn;
-#endif
-
 #if LV_USE_CHART
     lv_style_t chart_series, chart_ticks;
 #endif
@@ -187,9 +182,6 @@ static void basic_init(void)
     static lv_style_transiton_t trans_delayed;
     lv_style_transition_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, 70);
 
-    static lv_style_transiton_t trans_slow;
-    lv_style_transition_init(&trans_slow, trans_props, &lv_anim_path_def, TRANSITION_TIME * 4, 0);
-
     static lv_style_transiton_t trans_normal;
     lv_style_transition_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
 
@@ -208,7 +200,7 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->scrollbar,  LV_DPX(7));
     lv_style_set_pad_top(&styles->scrollbar,  LV_DPX(7));
     lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_40);
-    lv_style_set_transition(&styles->scrollbar, &trans_slow);
+    lv_style_set_transition(&styles->scrollbar, &trans_normal);
 
     style_init_reset(&styles->scrollbar_scrolled);
     lv_style_set_bg_opa(&styles->scrollbar_scrolled,  LV_OPA_COVER);
@@ -217,6 +209,9 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, COLOR_SCR);
     lv_style_set_text_color(&styles->scr, COLOR_SCR_TEXT);
+    lv_style_set_pad_all(&styles->scr, PAD_DEF);
+    lv_style_set_pad_row(&styles->scr, PAD_DEF);
+    lv_style_set_pad_column(&styles->scr, PAD_DEF);
 
     style_init_reset(&styles->card);
     lv_style_set_radius(&styles->card, RADIUS_DEFAULT);
@@ -227,6 +222,8 @@ static void basic_init(void)
     lv_style_set_border_post(&styles->card, true);
     lv_style_set_text_color(&styles->card, CARD_TEXT_COLOR);
     lv_style_set_pad_all(&styles->card, PAD_DEF);
+    lv_style_set_pad_row(&styles->card, PAD_DEF);
+    lv_style_set_pad_column(&styles->card, PAD_DEF);
     lv_style_set_line_color(&styles->card, COLOR_GRAY);
     lv_style_set_line_width(&styles->card, LV_DPX(1));
 
@@ -368,6 +365,13 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->meter_indic, LV_OPA_COVER);
     lv_style_set_size(&styles->meter_indic, LV_DPX(15));
 #endif
+
+
+#if LV_USE_TABLE
+    style_init_reset(&styles->table_cell);
+    lv_style_set_border_width(&styles->table_cell, LV_DPX(1));
+    lv_style_set_border_color(&styles->table_cell, CARD_BORDER_COLOR);
+#endif
 }
 //
 //static void linemeter_init(void)
@@ -388,41 +392,6 @@ static void basic_init(void)
 //#endif
 //}
 //
-//static void gauge_init(void)
-//{
-//#if LV_USE_GAUGE != 0
-//    style_init_reset(&styles->gauge_main);
-//    lv_style_set_line_color(&styles->gauge_main, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-//    lv_style_set_scale_grad_color(&styles->gauge_main, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-//    lv_style_set_scale_end_color(&styles->gauge_main, LV_STATE_DEFAULT, theme.color_primary);
-//    lv_style_set_line_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(5));
-//    lv_style_set_scale_end_line_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(4));
-//    lv_style_set_scale_end_border_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(8));
-//    lv_style_set_pad_left(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_pad_right(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_pad_top(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_pad_all(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_scale_width(&styles->gauge_main, LV_STATE_DEFAULT, LV_DPX(15));
-//    lv_style_set_radius(&styles->gauge_main, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-//
-//    style_init_reset(&styles->gauge_strong);
-//    lv_style_set_line_color(&styles->gauge_strong, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-//    lv_style_set_scale_grad_color(&styles->gauge_strong, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-//    lv_style_set_scale_end_color(&styles->gauge_strong, LV_STATE_DEFAULT, theme.color_primary);
-//    lv_style_set_line_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(8));
-//    lv_style_set_scale_end_line_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(8));
-//    lv_style_set_scale_width(&styles->gauge_strong, LV_STATE_DEFAULT, LV_DPX(25));
-//
-//    style_init_reset(&styles->gauge_needle);
-//    lv_style_set_line_color(&styles->gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
-//    lv_style_set_line_width(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(8));
-//    lv_style_set_bg_opa(&styles->gauge_needle, LV_STATE_DEFAULT, LV_OPA_COVER);
-//    lv_style_set_bg_color(&styles->gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
-//    lv_style_set_radius(&styles->gauge_needle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-//    lv_style_set_size(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(30));
-//    lv_style_set_pad_all(&styles->gauge_needle, LV_STATE_DEFAULT, LV_DPX(10));
-//#endif
-//}
 
 static void textarea_init(void)
 {
@@ -469,21 +438,6 @@ static void textarea_init(void)
 //#endif
 //}
 
-
-//static void table_init(void)
-//{
-//#if LV_USE_TABLE != 0
-//    style_init_reset(&styles->table_cell);
-//    lv_style_set_border_color(&styles->table_cell, LV_STATE_DEFAULT, CARD_BORDER_COLOR);
-//    lv_style_set_border_width(&styles->table_cell, LV_STATE_DEFAULT, 1);
-//    lv_style_set_border_side(&styles->table_cell, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
-//    lv_style_set_pad_left(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-//    lv_style_set_pad_right(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-//    lv_style_set_pad_top(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-//    lv_style_set_pad_bottom(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-//
-//#endif
-//}
 
 
 /**********************

@@ -33,7 +33,7 @@
  **********************/
 static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_btn_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_btn_drawer(lv_obj_t * bar, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_btn_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_btn_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
 /**********************
@@ -43,7 +43,7 @@ const lv_obj_class_t lv_btn  = {
     .constructor = lv_btn_constructor,
     .destructor = lv_btn_destructor,
     .signal_cb = lv_btn_signal,
-    .drawer_cb = lv_btn_drawer,
+    .draw_cb = lv_btn_draw,
     .instance_size = sizeof(lv_btn_t),
     .base_class = &lv_obj
 };
@@ -106,9 +106,9 @@ static void lv_btn_destructor(lv_obj_t * obj)
 
 //    lv_btn.base_p->destructor(obj);
 }
-static lv_drawer_res_t lv_btn_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_btn_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
-    return lv_obj.drawer_cb(obj, clip_area, mode);
+    return lv_obj.draw_cb(obj, clip_area, mode);
 }
 
 static lv_res_t lv_btn_signal(lv_obj_t * obj, lv_signal_t sign, void * param)

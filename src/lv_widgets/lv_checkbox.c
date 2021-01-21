@@ -28,7 +28,7 @@
  **********************/
 static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_checkbox_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_checkbox_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
@@ -38,7 +38,7 @@ const lv_obj_class_t lv_checkbox = {
     .constructor = lv_checkbox_constructor,
     .destructor = lv_checkbox_destructor,
     .signal_cb = lv_checkbox_signal,
-    .drawer_cb = lv_checkbox_drawer,
+    .draw_cb = lv_checkbox_draw,
     .instance_size = sizeof(lv_checkbox_t),
     .base_class = &lv_obj
 };
@@ -172,20 +172,20 @@ static void lv_checkbox_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the check box
  * @param cb pointer to a check box object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_checkbox_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /* A label never covers an area */
-    if(mode == LV_DRAWER_MODE_COVER_CHECK)
-        return lv_obj.drawer_cb(obj, clip_area, mode);
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+    if(mode == LV_DRAW_MODE_COVER_CHECK)
+        return lv_obj.draw_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*Draw the background*/
-        lv_obj.drawer_cb(obj, clip_area, mode);
+        lv_obj.draw_cb(obj, clip_area, mode);
 
         lv_checkbox_t * cb = (lv_checkbox_t *) obj;
 
@@ -241,10 +241,10 @@ static lv_drawer_res_t lv_checkbox_drawer(lv_obj_t * obj, const lv_area_t * clip
         lv_draw_label(&txt_area, clip_area, &txt_dsc, cb->txt, NULL);
 
     } else {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+        lv_obj.draw_cb(obj, clip_area, mode);
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 /**
  * Signal function of the check box

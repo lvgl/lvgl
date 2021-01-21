@@ -33,7 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_table_cell_drawer_cb_t)(lv_obj_t * table, uint32_t row, uint32_t cell, lv_draw_rect_dsc_t * rect_draw_dsc, lv_draw_label_dsc_t * label_draw_dsc, const lv_area_t * draw_area, const lv_area_t * clip_area);
+typedef bool (*lv_table_cell_draw_cb_t)(lv_obj_t * table, uint32_t row, uint32_t cell, lv_draw_rect_dsc_t * rect_draw_dsc, lv_draw_label_dsc_t * label_draw_dsc, const lv_area_t * draw_area, const lv_area_t * clip_area);
 
 /**
  * Internal table cell format structure.
@@ -50,13 +50,12 @@ typedef union {
 
 /*Data of table*/
 typedef struct {
-    /*New data for this type */
+    lv_obj_t obj;
     uint16_t col_cnt;
     uint16_t row_cnt;
     char ** cell_data;
     lv_coord_t * row_h;
     lv_coord_t * col_w;
-    lv_table_cell_drawer_cb_t drawer_cb;
 } lv_table_t;
 
 extern const lv_obj_class_t lv_table;
@@ -135,8 +134,6 @@ void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool c
  * @param en true: merge right; false: don't merge right
  */
 void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col, bool en);
-
-void lv_table_set_cell_drawer(lv_obj_t * obj, lv_table_cell_drawer_cb_t drawer_cb);
 
 /*=====================
  * Getter functions

@@ -1,10 +1,10 @@
 /**
- * @file lv_linemeter.h
+ * @file lv_meter.h
  *
  */
 
-#ifndef LV_LINEMETER_H
-#define LV_LINEMETER_H
+#ifndef LV_METER_H
+#define LV_METER_H
 
 #ifdef __cplusplus
 extern "C" {

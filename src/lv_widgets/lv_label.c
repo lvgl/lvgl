@@ -37,7 +37,7 @@
 static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_label_destructor(lv_obj_t * obj);
 static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
-static lv_drawer_res_t lv_label_drawer(lv_obj_t * label, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_label_revert_dots(lv_obj_t * label);
 
 #if LV_USE_ANIMATION
@@ -57,7 +57,7 @@ const lv_obj_class_t lv_label = {
     .constructor = lv_label_constructor,
     .destructor = lv_label_destructor,
     .signal_cb = lv_label_signal,
-    .drawer_cb = lv_label_drawer,
+    .draw_cb = lv_label_draw,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj
 };
@@ -1092,20 +1092,20 @@ static void lv_label_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the labels
  * @param label pointer to a label object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_label_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /* A label never covers an area */
-    if(mode == LV_DRAWER_MODE_COVER_CHECK)
-        return LV_DRAWER_RES_NOT_COVER;
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+    if(mode == LV_DRAW_MODE_COVER_CHECK)
+        return LV_DRAW_RES_NOT_COVER;
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
 
-        lv_obj.drawer_cb(obj, clip_area, mode);
+        lv_obj.draw_cb(obj, clip_area, mode);
 
         lv_label_t * label = (lv_label_t *)obj;
         lv_area_t txt_coords;
@@ -1113,7 +1113,7 @@ static lv_drawer_res_t lv_label_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
 
         lv_area_t txt_clip;
         bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
-        if(!is_common) return LV_DRAWER_RES_OK;
+        if(!is_common) return LV_DRAW_RES_OK;
 
         lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
         lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
@@ -1184,11 +1184,11 @@ static lv_drawer_res_t lv_label_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
                 lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
             }
         }
-    } else if(mode == LV_DRAWER_MODE_POST_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    } else if(mode == LV_DRAW_MODE_POST_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 /**

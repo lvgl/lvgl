@@ -57,11 +57,6 @@ extern "C" {
 
 struct _lv_obj_t;
 
-/**
- * The drawer callback is used to draw the object on the screen.
- * It accepts the object, a mask area, and the mode in which to draw the object.
- */
-typedef lv_drawer_res_t (*lv_main_drawer_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
 
 enum {
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
@@ -87,6 +82,17 @@ enum {
     LV_EVENT_APPLY,  /**< "Ok", "Apply" or similar specific button has clicked*/
     LV_EVENT_CANCEL, /**< "Close", "Cancel" or similar specific button has clicked*/
     LV_EVENT_DELETE, /**< Object is being deleted */
+
+    LV_EVENT_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
+    LV_EVENT_REFR_EXT_SIZE,   /**< Draw extras on the object */
+
+    LV_EVENT_DRAW_MAIN_BEGIN,
+    LV_EVENT_DRAW_MAIN_FINISH,
+    LV_EVENT_DRAW_POST_BEGIN,
+    LV_EVENT_DRAW_POST_END,
+    LV_EVENT_DRAW_PART_BEGIN,
+    LV_EVENT_DRAW_PART_END,
+
     _LV_EVENT_LAST /** Number of events*/
 };
 typedef uint8_t lv_event_t; /**< Type of event being sent to the object. */
@@ -181,7 +187,6 @@ enum {
 };
 typedef uint32_t lv_obj_flag_t;
 
-
 #include "lv_obj_pos.h"
 #include "lv_obj_scroll.h"
 #include "lv_obj_style.h"
@@ -222,7 +227,7 @@ typedef struct lv_obj_class{
     void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
     void (*destructor)(struct _lv_obj_t * obj);
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
-    lv_main_drawer_cb_t drawer_cb; /**< Object type specific drawer function*/
+    lv_draw_cb_t draw_cb; /**< Object type specific draw function*/
     uint32_t instance_size;
 }lv_obj_class_t;
 
@@ -515,15 +520,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
  * Get the `data` parameter of the current event
  * @return the `data` parameter
  */
-const void * lv_event_get_data(void);
-
-/**
- * Set the a signal function of an object. Used internally by the library.
- * Always call the previous signal function in the new.
- * @param obj pointer to an object
- * @param signal_cb the new signal function
- */
-void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
+void * lv_event_get_data(void);
 
 /**
  * Send an event to the object
@@ -532,13 +529,6 @@ void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
  * @return LV_RES_OK or LV_RES_INV
  */
 lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
-
-/**
- * Set a new drawer function for an object
- * @param obj pointer to an object
- * @param drawer_cb the new drawer function
- */
-void lv_obj_set_drawer_cb(lv_obj_t * obj, lv_main_drawer_cb_t drawer_cb);
 
 /*----------------
  * Other set
@@ -661,11 +651,11 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
 lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj);
 
 /**
- * Get the drawer function of an object
+ * Get the draw function of an object
  * @param obj pointer to an object
- * @return the drawer function
+ * @return the draw function
  */
-lv_main_drawer_cb_t lv_obj_get_drawer_cb(const lv_obj_t * obj);
+lv_draw_cb_t lv_obj_get_draw_cb(const lv_obj_t * obj);
 
 /**
  * Get the event function of an object

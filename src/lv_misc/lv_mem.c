@@ -10,6 +10,7 @@
 #include "lv_mem.h"
 #include "lv_math.h"
 #include "lv_gc.h"
+#include "lv_debug.h"
 #include <string.h>
 
 #if LV_MEM_CUSTOM != 0

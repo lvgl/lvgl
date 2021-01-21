@@ -32,7 +32,7 @@
  **********************/
 static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_table_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
@@ -46,7 +46,7 @@ const lv_obj_class_t lv_table  = {
     .constructor = lv_table_constructor,
     .destructor = lv_table_destructor,
     .signal_cb = lv_table_signal,
-    .drawer_cb = lv_table_drawer,
+    .draw_cb = lv_table_draw,
     .base_class = &lv_obj,
     .instance_size = sizeof(lv_table_t),
 };
@@ -365,14 +365,6 @@ void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, b
     refr_size(obj) ;
 }
 
-void lv_table_set_cell_drawer(lv_obj_t * obj, lv_table_cell_drawer_cb_t drawer_cb)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_table_t * table = (lv_table_t *) obj;
-    table->drawer_cb = drawer_cb;
-    lv_obj_invalidate(obj);
-}
 
 /*=====================
  * Getter functions
@@ -617,22 +609,22 @@ static void lv_table_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the tables
  * @param table pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
-        return lv_obj.drawer_cb(obj, clip_area, mode);
+    if(mode == LV_DRAW_MODE_COVER_CHECK) {
+        return lv_obj.draw_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*Draw the background*/
-        lv_obj.drawer_cb(obj, clip_area, mode);
+        lv_obj.draw_cb(obj, clip_area, mode);
 
         lv_table_t * table = (lv_table_t *) obj;
 
@@ -652,12 +644,12 @@ static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
         lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
         lv_draw_rect_dsc_t rect_dsc_base;
-        lv_draw_rect_dsc_t rect_dsc_drawer; /*Passed to the drawer_cb to modify it*/
+        lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the draw_cb to modify it*/
         lv_draw_rect_dsc_init(&rect_dsc_base);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_base);
 
         lv_draw_label_dsc_t label_dsc_base;
-        lv_draw_label_dsc_t label_dsc_drawer;  /*Passed to the drawer_cb to modify it*/
+        lv_draw_label_dsc_t label_dsc_act;  /*Passed to the draw_cb to modify it*/
         lv_draw_label_dsc_init(&label_dsc_base);
         lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_base);
 
@@ -669,13 +661,20 @@ static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
         lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
         bool rtl = lv_obj_get_base_dir(obj)  == LV_BIDI_DIR_RTL ? true : false;
 
+        /*Handle custom drawer*/
+        lv_obj_draw_hook_dsc_t hook_dsc;
+        lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+        hook_dsc.part = LV_PART_ITEMS;
+        hook_dsc.rect_dsc = &rect_dsc_act;
+        hook_dsc.label_dsc = &label_dsc_act;
+
         for(row = 0; row < table->row_cnt; row++) {
             lv_coord_t h_row = table->row_h[row];
 
             cell_area.y1 = cell_area.y2 + 1;
             cell_area.y2 = cell_area.y1 + h_row - 1;
 
-            if(cell_area.y1 > clip_area->y2) return LV_DRAWER_RES_OK;
+            if(cell_area.y1 > clip_area->y2) return LV_DRAW_RES_OK;
 
             if(rtl) cell_area.x1 = obj->coords.x2 - bg_right - 1 - scroll_x;
             else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x;
@@ -735,23 +734,16 @@ static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
                 }
                 if((rect_dsc_base.border_side & LV_BORDER_SIDE_BOTTOM) &&
                    cell_area_border.y2 < obj->coords.y2 - bg_bottom - 1) {
-                    cell_area_border.y2 += rect_dsc_base.border_width / 2 + (rect_dsc_base.border_width & 0x1);
+                   cell_area_border.y2 += rect_dsc_base.border_width / 2 + (rect_dsc_base.border_width & 0x1);
                 }
 
-                lv_draw_rect_dsc_t * rect_dsc_act = &rect_dsc_base;
-                lv_draw_label_dsc_t * label_dsc_act = &label_dsc_base;
+                _lv_memcpy(&rect_dsc_act, &rect_dsc_base, sizeof(lv_draw_rect_dsc_t));
+                _lv_memcpy(&label_dsc_act, &label_dsc_base, sizeof(lv_draw_label_dsc_t));
+                hook_dsc.draw_area = &cell_area_border;
+                hook_dsc.id = row * table->col_cnt + col;
+                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
-                if(table->drawer_cb) {
-                    _lv_memcpy(&rect_dsc_drawer, &rect_dsc_base, sizeof(lv_draw_rect_dsc_t));
-                    _lv_memcpy(&label_dsc_drawer, &label_dsc_base, sizeof(lv_draw_label_dsc_t));
-                    bool drawn = table->drawer_cb(obj, row, col, &rect_dsc_drawer, &label_dsc_drawer, &cell_area_border, clip_area);
-                    if(drawn) continue;
-
-                    rect_dsc_act = &rect_dsc_drawer;
-                    label_dsc_act = &label_dsc_drawer;
-                }
-
-                lv_draw_rect(&cell_area_border, clip_area, rect_dsc_act);
+                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc_act);
 
                 if(table->cell_data[cell]) {
                     txt_area.x1 = cell_area.x1 + cell_left;
@@ -778,9 +770,11 @@ static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
                     bool label_mask_ok;
                     label_mask_ok = _lv_area_intersect(&label_mask, clip_area, &cell_area);
                     if(label_mask_ok) {
-                        lv_draw_label(&txt_area, &label_mask, label_dsc_act, table->cell_data[cell] + 1, NULL);
+                        lv_draw_label(&txt_area, &label_mask, &label_dsc_act, table->cell_data[cell] + 1, NULL);
                     }
                 }
+
+                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
 
                 cell += col_merge + 1;
                 col += col_merge;
@@ -788,11 +782,11 @@ static lv_drawer_res_t lv_table_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
         }
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_MODE_POST_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 /**

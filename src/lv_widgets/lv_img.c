@@ -36,7 +36,7 @@
  **********************/
 static void lv_img_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_img_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
@@ -46,7 +46,7 @@ const lv_obj_class_t lv_img = {
          .constructor = lv_img_constructor,
          .destructor = lv_img_destructor,
          .signal_cb = lv_img_signal,
-         .drawer_cb = lv_img_drawer,
+         .draw_cb = lv_img_draw,
          .instance_size = sizeof(lv_img_t),
          .base_class = &lv_obj
      };
@@ -506,36 +506,36 @@ static void lv_img_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the images
  * @param img pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     lv_img_t * img = (lv_img_t *)obj;
-    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DRAWER_RES_MASKED;
+    if(mode == LV_DRAW_MODE_COVER_CHECK) {
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DRAW_RES_MASKED;
 
-        if(img->src_type == LV_IMG_SRC_UNKNOWN || img->src_type == LV_IMG_SRC_SYMBOL) return LV_DRAWER_RES_NOT_COVER;
+        if(img->src_type == LV_IMG_SRC_UNKNOWN || img->src_type == LV_IMG_SRC_SYMBOL) return LV_DRAW_RES_NOT_COVER;
 
         /*Non true color format might have "holes"*/
-        if(img->cf != LV_IMG_CF_TRUE_COLOR && img->cf != LV_IMG_CF_RAW) return LV_DRAWER_RES_NOT_COVER;
+        if(img->cf != LV_IMG_CF_TRUE_COLOR && img->cf != LV_IMG_CF_RAW) return LV_DRAW_RES_NOT_COVER;
 
         /*With not LV_OPA_COVER images can't cover an area */
-        if(lv_obj_get_style_img_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) return LV_DRAWER_RES_NOT_COVER;
+        if(lv_obj_get_style_img_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) return LV_DRAW_RES_NOT_COVER;
 
         int32_t angle_final = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
         angle_final += img->angle;
 
-        if(angle_final != 0) return LV_DRAWER_RES_NOT_COVER;
+        if(angle_final != 0) return LV_DRAW_RES_NOT_COVER;
 
         int32_t zoom_final = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
         zoom_final = (zoom_final * img->zoom) >> 8;
 
         if(zoom_final == LV_IMG_ZOOM_NONE) {
-            if(_lv_area_is_in(clip_area, &obj->coords, 0) == false) return LV_DRAWER_RES_NOT_COVER;
+            if(_lv_area_is_in(clip_area, &obj->coords, 0) == false) return LV_DRAW_RES_NOT_COVER;
         }
         else {
             lv_area_t a;
@@ -545,15 +545,15 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
             a.x2 += obj->coords.x1;
             a.y2 += obj->coords.y1;
 
-            if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DRAWER_RES_NOT_COVER;
+            if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DRAW_RES_NOT_COVER;
         }
 
 #if LV_USE_BLEND_MODES
-        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAWER_RES_NOT_COVER;
-        if(lv_obj_get_style_img_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAWER_RES_NOT_COVER;
+        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_img_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
 #endif
 
-        return LV_DRAWER_RES_COVER;
+        return LV_DRAW_RES_COVER;
     }
 
     int32_t zoom_final = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
@@ -579,14 +579,14 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
     lv_area_copy(&ori_coords, &obj->coords);
     lv_area_copy(&obj->coords, &bg_coords);
 
-    lv_obj.drawer_cb(obj, clip_area, mode);
+    lv_obj.draw_cb(obj, clip_area, mode);
     lv_area_copy(&obj->coords, &ori_coords);
 
-   if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+   if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         if(img->h == 0 || img->w == 0) return true;
 
 
-        if(zoom_final == 0) return LV_DRAWER_RES_OK;
+        if(zoom_final == 0) return LV_DRAW_RES_OK;
 
         lv_area_t img_coords;
         lv_area_copy(&img_coords, &bg_coords);
@@ -596,7 +596,7 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
         img_coords.y2 -= lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
         if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_VARIABLE) {
-            LV_LOG_TRACE("lv_img_drawer: start to draw image");
+            LV_LOG_TRACE("lv_img_draw: start to draw image");
 
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
@@ -609,9 +609,9 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
             img_dsc.antialias = img->antialias;
 
             lv_coord_t zoomed_src_w = (int32_t)((int32_t)img->w * zoom_final) >> 8;
-            if(zoomed_src_w <= 0) return LV_DRAWER_RES_OK;
+            if(zoomed_src_w <= 0) return LV_DRAW_RES_OK;
             lv_coord_t zoomed_src_h = (int32_t)((int32_t)img->h * zoom_final) >> 8;
-            if(zoomed_src_h <= 0) return LV_DRAWER_RES_OK;
+            if(zoomed_src_h <= 0) return LV_DRAW_RES_OK;
             lv_area_t zoomed_coords;
             lv_area_copy(&zoomed_coords, &img_coords);
             lv_coord_t img_w = lv_area_get_width(&img_coords);
@@ -633,7 +633,7 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
             clip_real.y1 += img_coords.y1;
             clip_real.y2 += img_coords.y1;
 
-            if(_lv_area_intersect(&clip_real, &clip_real, clip_area) == false) return LV_DRAWER_RES_OK;
+            if(_lv_area_intersect(&clip_real, &clip_real, clip_area) == false) return LV_DRAW_RES_OK;
 
             lv_area_t coords_tmp;
             coords_tmp.y1 = zoomed_coords.y1;
@@ -648,7 +648,7 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
             }
         }
         else if(img->src_type == LV_IMG_SRC_SYMBOL) {
-            LV_LOG_TRACE("lv_img_drawer: start to draw symbol");
+            LV_LOG_TRACE("lv_img_draw: start to draw symbol");
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
@@ -657,13 +657,13 @@ static lv_drawer_res_t lv_img_drawer(lv_obj_t * obj, const lv_area_t * clip_area
             lv_draw_label(&obj->coords, clip_area, &label_dsc, img->src, NULL);
         }
         else {
-            /*Trigger the error handler of image drawer*/
-            LV_LOG_WARN("lv_img_drawer: image source type is unknown");
+            /*Trigger the error handler of image draw*/
+            LV_LOG_WARN("lv_img_draw: image source type is unknown");
             lv_draw_img(&obj->coords, clip_area, NULL, NULL);
         }
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 /**

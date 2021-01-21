@@ -110,7 +110,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param dsc pointer to draw descriptor
  * @param txt `\0` terminated text to write
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
- * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
+ * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
                                          const lv_draw_label_dsc_t * dsc,

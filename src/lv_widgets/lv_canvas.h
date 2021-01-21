@@ -30,16 +30,9 @@ extern "C" {
  **********************/
 /*Data of canvas*/
 typedef struct {
-    lv_img_ext_t img; /*Ext. of ancestor*/
-    /*New data for this type */
+    lv_img_t img;
     lv_img_dsc_t dsc;
-} lv_canvas_ext_t;
-
-/*Canvas part*/
-enum {
-    LV_CANVAS_PART_MAIN,
-};
-typedef uint8_t lv_canvas_part_t;
+} lv_canvas_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -197,8 +190,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param align align of the text (`LV_TEXT_ALIGN_LEFT/RIGHT/CENTER`)
  */
 void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
-                         lv_draw_label_dsc_t * label_draw_dsc,
-                         const char * txt, lv_text_align_t align);
+                         lv_draw_label_dsc_t * label_draw_dsc, const char * txt);
 
 /**
  * Draw an image on the canvas

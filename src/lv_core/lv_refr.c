@@ -594,12 +594,12 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     /*If this object is fully cover the draw area check the children too */
     if(_lv_area_is_in(area_p, &obj->coords, 0) && lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == false) {
-        lv_drawer_res_t drawer_res = obj->class_p->drawer_cb(obj, area_p, LV_DRAWER_MODE_COVER_CHECK);
-        if(drawer_res == LV_DRAWER_RES_MASKED) return NULL;
+        lv_draw_res_t draw_res = obj->class_p->draw_cb(obj, area_p, LV_DRAW_MODE_COVER_CHECK);
+        if(draw_res == LV_DRAW_RES_MASKED) return NULL;
 
 #if LV_USE_OPA_SCALE
-        if(drawer_res == LV_DRAWER_RES_COVER && lv_obj_get_style_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) {
-            drawer_res = LV_DRAWER_RES_NOT_COVER;
+        if(draw_res == LV_DRAW_RES_COVER && lv_obj_get_style_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) {
+            draw_res = LV_DRAW_RES_NOT_COVER;
         }
 #endif
 
@@ -616,7 +616,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
         /*If no better children use this object*/
         if(found_p == NULL) {
-            if(drawer_res == LV_DRAWER_RES_COVER) {
+            if(draw_res == LV_DRAW_RES_COVER) {
                 found_p = obj;
             }
         }
@@ -661,10 +661,10 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
             }
         }
 
-        /*Call the post draw drawer function of the parents of the to object*/
-        lv_drawer_section(par, LV_DRAWER_MODE_FINISH, mask_p, false);
-        par->class_p->drawer_cb(par, mask_p, LV_DRAWER_MODE_POST_DRAW);
-        lv_drawer_section(par, LV_DRAWER_MODE_FINISH, mask_p, true);
+        /*Call the post draw draw function of the parents of the to object*/
+        lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, NULL);
+        par->class_p->draw_cb(par, mask_p, LV_DRAW_MODE_POST_DRAW);
+        lv_event_send(par, LV_EVENT_DRAW_POST_END, NULL);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/
@@ -701,8 +701,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
         /* Redraw the object */
-        lv_drawer_section(obj, LV_DRAWER_MODE_FINISH, &obj_ext_mask, false);
-        obj->class_p->drawer_cb(obj, &obj_ext_mask, LV_DRAWER_MODE_MAIN_DRAW);
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, NULL);
+        obj->class_p->draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_MAIN_DRAW);
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, NULL);
 
 #if MASK_AREA_DEBUG
         static lv_color_t debug_color = LV_COLOR_RED;
@@ -748,10 +749,10 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             }
         }
 
-        /* If all the children are redrawn make 'post draw' drawer */
-        lv_drawer_section(obj, LV_DRAWER_MODE_FINISH, &obj_ext_mask, false);
-        obj->class_p->drawer_cb(obj, &obj_ext_mask, LV_DRAWER_MODE_POST_DRAW);
-        lv_drawer_section(obj, LV_DRAWER_MODE_FINISH, &obj_ext_mask, true);
+        /* If all the children are redrawn make 'post draw' draw */
+        lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, NULL);
+        obj->class_p->draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_POST_DRAW);
+        lv_event_send(obj, LV_EVENT_DRAW_POST_END, NULL);
     }
 }
 

@@ -45,7 +45,7 @@ enum {
 };
 typedef uint16_t lv_btnmatrix_ctrl_t;
 
-typedef bool (*lv_btnmatrix_btn_drawer_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area, const lv_area_t * clip_area);
+typedef bool (*lv_btnmatrix_btn_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area, const lv_area_t * clip_area);
 
 /*Data of button matrix*/
 typedef struct {
@@ -53,7 +53,7 @@ typedef struct {
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    lv_btnmatrix_btn_drawer_cb_t custom_drawer_cb;
+    lv_btnmatrix_btn_draw_cb_t custom_draw_cb;
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNMATRIX_BTN_NONE*/
     uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNMATRIX_BTN_NONE*/

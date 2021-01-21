@@ -38,7 +38,7 @@
  **********************/
 static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_bar_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_bar_drawer(lv_obj_t * bar, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_bar_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 
@@ -57,7 +57,7 @@ const lv_obj_class_t lv_bar = {
     .constructor = lv_bar_constructor,
     .destructor = lv_bar_destructor,
     .signal_cb = lv_bar_signal,
-    .drawer_cb = lv_bar_drawer,
+    .draw_cb = lv_bar_draw,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj
 };
@@ -314,35 +314,31 @@ static void lv_bar_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the bars
  * @param bar pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_bar_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_bar_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
-    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
+    if(mode == LV_DRAW_MODE_COVER_CHECK) {
         /*Return false if the object is not covers the mask area*/
-        return lv_obj.drawer_cb(obj, clip_area, mode);
+        return lv_obj.draw_cb(obj, clip_area, mode);
     }
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*Draw the background*/
-        lv_obj.drawer_cb(obj, clip_area, mode);
+        lv_obj.draw_cb(obj, clip_area, mode);
         draw_indic(obj, clip_area);
     }
-    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_MODE_POST_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
     }
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 {
-    lv_drawer_res_t res;
-    res = lv_drawer_part_before(obj, LV_PART_INDICATOR, clip_area, &obj->coords);
-    if(res != LV_DRAWER_RES_OK) return;
-
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
@@ -485,6 +481,17 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_rect_dsc_init(&draw_indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
 
+    lv_area_t indic_area;
+    lv_area_copy(&indic_area, &bar->indic_area);
+
+    /*Handle custom drawer*/
+    lv_obj_draw_hook_dsc_t hook_dsc;
+    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+    hook_dsc.draw_area = &indic_area;
+    hook_dsc.part = LV_PART_INDICATOR;
+    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+
+
     /* Draw only the shadow if the indicator is long enough.
      * The radius of the bg and the indicator can make a strange shape where
      * it'd be very difficult to draw shadow. */
@@ -554,7 +561,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
-    lv_drawer_part_after(obj, LV_PART_INDICATOR, clip_area, &obj->coords);
+    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
 
 }
 

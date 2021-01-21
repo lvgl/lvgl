@@ -32,14 +32,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_drawer_res_t lv_templ_drawer(lv_obj_t * templ, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_templ_draw(lv_obj_t * templ, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
-static lv_drawer_cb_t ancestor_drawer;
+static lv_draw_cb_t ancestor_draw;
 
 /**********************
  *      MACROS
@@ -74,14 +74,14 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_templ);
-    if(ancestor_drawer == NULL) ancestor_drawer = lv_obj_get_drawer_cb(new_templ);
+    if(ancestor_draw == NULL) ancestor_draw = lv_obj_get_draw_cb(new_templ);
 
     /*Initialize the allocated 'ext' */
     ext->xyz = 0;
 
-    /*The signal and drawer functions are not copied so set them here*/
+    /*The signal and draw functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_templ, lv_templ_signal);
-    lv_obj_set_drawer_cb(new_templ, lv_templ_drawer);
+    lv_obj_set_draw_cb(new_templ, lv_templ_draw);
 
     /*Init the new template template*/
     if(copy == NULL) {
@@ -185,27 +185,27 @@ lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
  * Handle the drawing related tasks of the templates
  * @param templ pointer to an object
  * @param mask the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_templ_drawer(lv_obj_t * templ, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_templ_draw(lv_obj_t * templ, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAWER_COVER_CHK) {
-        return LV_DRAWER_RES_NOT_COVER;
+    if(mode == LV_DRAW_COVER_CHK) {
+        return LV_DRAW_RES_NOT_COVER;
     }
     /*Draw the object*/
-    else if(mode == LV_DRAWER_DRAW_MAIN) {
+    else if(mode == LV_DRAW_DRAW_MAIN) {
 
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAWER_DRAW_POST) {
+    else if(mode == LV_DRAW_DRAW_POST) {
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 /**

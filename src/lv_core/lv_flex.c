@@ -41,7 +41,8 @@ const lv_flex_t lv_flex_center = {
         .item_main_place = LV_FLEX_PLACE_CENTER,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
         .track_place = LV_FLEX_PLACE_CENTER,
-        .dir = LV_FLEX_FLOW_COLUMN
+        .dir = LV_FLEX_FLOW_ROW,
+        .wrap = 1
 };
 
 const lv_flex_t lv_flex_stacked = {

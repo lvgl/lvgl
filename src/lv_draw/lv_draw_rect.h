@@ -13,15 +13,41 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_style.h"
+#include "lv_draw_blend.h"
+#include "../lv_font/lv_font.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_RADIUS_CIRCLE 0x7FFF /**< A very big radius to always draw as circle*/
+LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
+
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+/*Border types (Use 'OR'ed values)*/
+enum {
+    LV_BORDER_SIDE_NONE     = 0x00,
+    LV_BORDER_SIDE_BOTTOM   = 0x01,
+    LV_BORDER_SIDE_TOP      = 0x02,
+    LV_BORDER_SIDE_LEFT     = 0x04,
+    LV_BORDER_SIDE_RIGHT    = 0x08,
+    LV_BORDER_SIDE_FULL     = 0x0F,
+    LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
+    _LV_BORDER_SIDE_LAST
+};
+typedef uint8_t lv_border_side_t;
+
+enum {
+    LV_GRAD_DIR_NONE,
+    LV_GRAD_DIR_VER,
+    LV_GRAD_DIR_HOR,
+    _LV_GRAD_DIR_LAST
+};
+
+typedef uint8_t lv_grad_dir_t;
 
 typedef struct {
     lv_coord_t radius;
@@ -96,7 +122,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_dra
  * @param mask the pixel will be drawn only in this mask
  * @param style pointer to a style
  */
-void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_style_t * style);
+//void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_style_t * style);
 
 /**********************
  *      MACROS

@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linemeter.h"
+#include <lvgl/src/lv_widgets/lv_meter.h>
 #if LV_USE_METER != 0
 
 #include "../lv_misc/lv_debug.h"
@@ -30,7 +30,7 @@
  **********************/
 static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_meter_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_meter_drawer(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_meter_draw(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_meter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -43,7 +43,7 @@ const lv_obj_class_t lv_meter = {
     .constructor = lv_meter_constructor,
     .destructor = lv_meter_destructor,
     .signal_cb = lv_meter_signal,
-    .drawer_cb = lv_meter_drawer,
+    .draw_cb = lv_meter_draw,
     .instance_size = sizeof(lv_meter_t),
     .base_class = &lv_obj
 };
@@ -356,21 +356,21 @@ static void lv_meter_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the line meters
  * @param lmeter pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_meter_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_meter_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
-        return lv_obj.drawer_cb(obj, clip_area, mode);
+    if(mode == LV_DRAW_MODE_COVER_CHECK) {
+        return lv_obj.draw_cb(obj, clip_area, mode);
     }
     /*Draw the object*/
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
 
         lv_area_t scale_area;
         lv_obj_get_coords(obj, &scale_area);
@@ -384,11 +384,11 @@ static lv_drawer_res_t lv_meter_drawer(lv_obj_t * obj, const lv_area_t * clip_ar
         draw_needles(obj, clip_area, &scale_area);
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_MODE_POST_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 /**

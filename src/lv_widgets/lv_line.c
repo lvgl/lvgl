@@ -31,7 +31,7 @@
  **********************/
 static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_line_destructor(lv_obj_t * obj);
-static lv_drawer_res_t lv_line_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
@@ -41,7 +41,7 @@ const lv_obj_class_t lv_line = {
     .constructor = lv_line_constructor,
     .destructor = lv_line_destructor,
     .signal_cb = lv_line_signal,
-    .drawer_cb = lv_line_drawer,
+    .draw_cb = lv_line_draw,
     .instance_size = sizeof(lv_line_t),
     .base_class = &lv_obj
 };
@@ -166,19 +166,19 @@ static void lv_line_destructor(lv_obj_t * obj)
  * Handle the drawing related tasks of the lines
  * @param line pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- *             LV_DRAWER_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_line_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*A line never covers an area*/
-    if(mode == LV_DRAWER_MODE_COVER_CHECK)
-        return LV_DRAWER_RES_NOT_COVER;
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    if(mode == LV_DRAW_MODE_COVER_CHECK)
+        return LV_DRAW_RES_NOT_COVER;
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
         lv_line_t * line = (lv_line_t *) obj;
 
         if(line->point_num == 0 || line->point_array == NULL) return false;
@@ -213,10 +213,10 @@ static lv_drawer_res_t lv_line_drawer(lv_obj_t * obj, const lv_area_t * clip_are
             lv_draw_line(&p1, &p2, clip_area, &line_dsc);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
-    } else if (mode == LV_DRAWER_MODE_POST_DRAW) {
-        lv_obj.drawer_cb(obj, clip_area, mode);
+    } else if (mode == LV_DRAW_MODE_POST_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
     }
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 /**

@@ -28,6 +28,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_canvas_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_canvas_destructor(lv_obj_t * obj);
+static lv_draw_res_t lv_canvas_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * param);
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
@@ -53,8 +56,14 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_cb_t ancestor_signal;
-static lv_drawer_cb_t ancestor_drawer;
+const lv_obj_class_t lv_canvas = {
+    .constructor = lv_canvas_constructor,
+    .destructor = lv_canvas_destructor,
+    .signal_cb = lv_canvas_signal,
+    .draw_cb = lv_canvas_draw,
+    .instance_size = sizeof(lv_canvas_t),
+    .base_class = &lv_img
+};
 
 /**********************
  *      MACROS
@@ -70,52 +79,9 @@ static lv_drawer_cb_t ancestor_drawer;
  * @param copy pointer to a canvas object, if not NULL then the new object will be copied from it
  * @return pointer to the created canvas
  */
-lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_canvas_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("canvas create started");
-
-    /*Create the ancestor of canvas*/
-    lv_obj_t * new_canvas = lv_img_create(par, copy);
-    LV_ASSERT_MEM(new_canvas);
-    if(new_canvas == NULL) return NULL;
-
-    /*Allocate the canvas type specific extended data*/
-    lv_canvas_ext_t * ext = lv_obj_allocate_ext_attr(new_canvas, sizeof(lv_canvas_ext_t));
-    LV_ASSERT_MEM(ext);
-    if(ext == NULL) {
-        lv_obj_del(new_canvas);
-        return NULL;
-    }
-
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_canvas);
-    if(ancestor_drawer == NULL) ancestor_drawer = lv_obj_get_drawer_cb(new_canvas);
-
-    /*Initialize the allocated 'ext' */
-    ext->dsc.header.always_zero = 0;
-    ext->dsc.header.cf          = LV_IMG_CF_TRUE_COLOR;
-    ext->dsc.header.h           = 0;
-    ext->dsc.header.w           = 0;
-    ext->dsc.data_size          = 0;
-    ext->dsc.data               = NULL;
-
-    lv_img_set_src(new_canvas, &ext->dsc);
-
-    /*The signal and drawer functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_canvas, lv_canvas_signal);
-
-    /*Init the new canvas canvas*/
-    if(copy == NULL) {
-        lv_theme_apply(new_canvas, LV_THEME_CANVAS);
-    }
-    /*Copy an existing canvas*/
-    else {
-        /*Do not copy the image data because each canvas needs it's own buffer*/
-
-    }
-
-    LV_LOG_INFO("canvas created");
-
-    return new_canvas;
+    return lv_obj_create_from_class(&lv_canvas, parent, copy);
 }
 
 /*=====================
@@ -136,19 +102,19 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
  *      LV_IMG_CF_TRUE_COLOR, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, LV_IMG_CF_INDEXES_1/2/4/8BIT
  *
  */
-void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
+void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     LV_ASSERT_NULL(buf);
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
-    ext->dsc.header.cf = cf;
-    ext->dsc.header.w  = w;
-    ext->dsc.header.h  = h;
-    ext->dsc.data      = buf;
+    canvas->dsc.header.cf = cf;
+    canvas->dsc.header.w  = w;
+    canvas->dsc.header.h  = h;
+    canvas->dsc.data      = buf;
 
-    lv_img_set_src(canvas, &ext->dsc);
+    lv_img_set_src(obj, &canvas->dsc);
 }
 
 /**
@@ -158,14 +124,14 @@ void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_
  * @param y x coordinate of the point to set
  * @param c color of the point
  */
-void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c)
+void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t c)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
-    lv_img_buf_set_px_color(&ext->dsc, x, y, c);
-    lv_obj_invalidate(canvas);
+    lv_img_buf_set_px_color(&canvas->dsc, x, y, c);
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -178,14 +144,14 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  *   - for `LV_IMG_CF_INDEXED8`: 0..255
  * @param c the color to set
  */
-void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c)
+void lv_canvas_set_palette(lv_obj_t * obj, uint8_t id, lv_color_t c)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
-    lv_img_buf_set_palette(&ext->dsc, id, c);
-    lv_obj_invalidate(canvas);
+    lv_img_buf_set_palette(&canvas->dsc, id, c);
+    lv_obj_invalidate(obj);
 }
 
 /*=====================
@@ -199,14 +165,14 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c)
  * @param y x coordinate of the point to set
  * @return color of the point
  */
-lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
+lv_color_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_canvas_ext_t * ext    = lv_obj_get_ext_attr(canvas);
-    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
+    lv_color_t color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
 
-    return lv_img_buf_get_px_color(&ext->dsc, x, y, color);
+    return lv_img_buf_get_px_color(&canvas->dsc, x, y, color);
 }
 
 /**
@@ -214,13 +180,12 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
  * @param canvas pointer to a canvas object
  * @return pointer to the image descriptor.
  */
-lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas)
+lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-
-    return &ext->dsc;
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
+    return &canvas->dsc;
 }
 
 /*=====================
@@ -237,24 +202,25 @@ lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas)
  * @param x left side of the destination position
  * @param y top side of the destination position
  */
-void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h)
+void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     LV_ASSERT_NULL(to_copy);
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    if(x + w >= (lv_coord_t)ext->dsc.header.w || y + h >= (lv_coord_t)ext->dsc.header.h) {
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
+
+    if(x + w >= (lv_coord_t)canvas->dsc.header.w || y + h >= (lv_coord_t)canvas->dsc.header.h) {
         LV_LOG_WARN("lv_canvas_copy_buf: x or y out of the canvas");
         return;
     }
 
-    uint32_t px_size   = lv_img_cf_get_px_size(ext->dsc.header.cf) >> 3;
-    uint32_t px        = ext->dsc.header.w * y * px_size + x * px_size;
+    uint32_t px_size   = lv_img_cf_get_px_size(canvas->dsc.header.cf) >> 3;
+    uint32_t px        = canvas->dsc.header.w * y * px_size + x * px_size;
     uint8_t * to_copy8 = (uint8_t *)to_copy;
     lv_coord_t i;
     for(i = 0; i < h; i++) {
-        _lv_memcpy((void *)&ext->dsc.data[px], to_copy8, w * px_size);
-        px += ext->dsc.header.w * px_size;
+        _lv_memcpy((void *)&canvas->dsc.data[px], to_copy8, w * px_size);
+        px += canvas->dsc.header.w * px_size;
         to_copy8 += w * px_size;
     }
 }
@@ -274,19 +240,19 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
  *                Set to `source height / 2` to rotate around the center
  * @param antialias apply anti-aliasing during the transformation. Looks better but slower.
  */
-void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, uint16_t zoom, lv_coord_t offset_x,
+void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * img, int16_t angle, uint16_t zoom, lv_coord_t offset_x,
                          lv_coord_t offset_y,
                          int32_t pivot_x, int32_t pivot_y, bool antialias)
 {
 #if LV_USE_IMG_TRANSFORM
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     LV_ASSERT_NULL(img);
 
-    lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
-    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
+    lv_color_t color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
 
-    int32_t dest_width  = ext_dst->dsc.header.w;
-    int32_t dest_height = ext_dst->dsc.header.h;
+    int32_t dest_width  = canvas->dsc.header.w;
+    int32_t dest_height = canvas->dsc.header.h;
 
     int32_t x;
     int32_t y;
@@ -315,30 +281,30 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
             if(x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height) {
                 /*If the image has no alpha channel just simple set the result color on the canvas*/
                 if(lv_img_cf_has_alpha(img->header.cf) == false) {
-                    lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res.color);
+                    lv_img_buf_set_px_color(&canvas->dsc, x + offset_x, y + offset_y, dsc.res.color);
                 }
                 else {
-                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.cfg.color);
+                    lv_color_t bg_color = lv_img_buf_get_px_color(&canvas->dsc, x + offset_x, y + offset_y, dsc.cfg.color);
 
                     /*If the canvas has no alpha but the image has mix the image's color with
                      * canvas*/
-                    if(lv_img_cf_has_alpha(ext_dst->dsc.header.cf) == false) {
+                    if(lv_img_cf_has_alpha(canvas->dsc.header.cf) == false) {
                         if(dsc.res.opa < LV_OPA_MAX) dsc.res.color = lv_color_mix(dsc.res.color, bg_color, dsc.res.opa);
-                        lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res.color);
+                        lv_img_buf_set_px_color(&canvas->dsc, x + offset_x, y + offset_y, dsc.res.color);
                     }
                     /*Both the image and canvas has alpha channel. Some extra calculation is
                        required*/
                     else {
-                        lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y);
+                        lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&canvas->dsc, x + offset_x, y + offset_y);
                         /* Pick the foreground if it's fully opaque or the Background is fully
                          * transparent*/
                         if(dsc.res.opa >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
-                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res.color);
-                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res.opa);
+                            lv_img_buf_set_px_color(&canvas->dsc, x + offset_x, y + offset_y, dsc.res.color);
+                            lv_img_buf_set_px_alpha(&canvas->dsc, x + offset_x, y + offset_y, dsc.res.opa);
                         }
                         /*Opaque background: use simple mix*/
                         else if(bg_opa >= LV_OPA_MAX) {
-                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
+                            lv_img_buf_set_px_color(&canvas->dsc, x + offset_x, y + offset_y,
                                                     lv_color_mix(dsc.res.color, bg_color, dsc.res.opa));
                         }
                         /*Both colors have alpha. Expensive calculation need to be applied*/
@@ -352,9 +318,9 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
                             }
                             lv_opa_t ratio = (uint16_t)((uint16_t)dsc.res.opa * 255) / opa_res_2;
 
-                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
+                            lv_img_buf_set_px_color(&canvas->dsc, x + offset_x, y + offset_y,
                                                     lv_color_mix(dsc.res.color, bg_color, ratio));
-                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res_2);
+                            lv_img_buf_set_px_alpha(&canvas->dsc, x + offset_x, y + offset_y, opa_res_2);
                         }
                     }
                 }
@@ -362,7 +328,7 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
         }
     }
 
-    lv_obj_invalidate(canvas);
+    lv_obj_invalidate(obj);
 #else
     LV_UNUSED(canvas);
     LV_UNUSED(img);
@@ -384,47 +350,47 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
  * @param area the area to blur. If `NULL` the whole canvas will be blurred.
  * @param r radius of the blur
  */
-void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
+void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     if(r == 0) return;
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
     lv_area_t a;
     if(area) {
         lv_area_copy(&a, area);
         if(a.x1 < 0) a.x1 = 0;
         if(a.y1 < 0) a.y1 = 0;
-        if(a.x2 > ext->dsc.header.w - 1) a.x2 = ext->dsc.header.w - 1;
-        if(a.y2 > ext->dsc.header.h - 1) a.y2 = ext->dsc.header.h - 1;
+        if(a.x2 > canvas->dsc.header.w - 1) a.x2 = canvas->dsc.header.w - 1;
+        if(a.y2 > canvas->dsc.header.h - 1) a.y2 = canvas->dsc.header.h - 1;
     }
     else {
         a.x1 = 0;
         a.y1 = 0;
-        a.x2 = ext->dsc.header.w - 1;
-        a.y2 = ext->dsc.header.h - 1;
+        a.x2 = canvas->dsc.header.w - 1;
+        a.y2 = canvas->dsc.header.h - 1;
     }
 
-    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
+    lv_color_t color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
 
     uint16_t r_back = r / 2;
     uint16_t r_front = r / 2;
 
     if((r & 0x1) == 0) r_back--;
 
-    bool has_alpha = lv_img_cf_has_alpha(ext->dsc.header.cf);
+    bool has_alpha = lv_img_cf_has_alpha(canvas->dsc.header.cf);
 
-    lv_coord_t line_w = lv_img_buf_get_img_size(ext->dsc.header.w, 1, ext->dsc.header.cf);
+    lv_coord_t line_w = lv_img_buf_get_img_size(canvas->dsc.header.w, 1, canvas->dsc.header.cf);
     uint8_t * line_buf = _lv_mem_buf_get(line_w);
 
     lv_img_dsc_t line_img;
     line_img.data = line_buf;
     line_img.header.always_zero = 0;
-    line_img.header.w = ext->dsc.header.w;
+    line_img.header.w = canvas->dsc.header.w;
     line_img.header.h = 1;
-    line_img.header.cf = ext->dsc.header.cf;
+    line_img.header.cf = canvas->dsc.header.cf;
 
     lv_coord_t x;
     lv_coord_t y;
@@ -438,12 +404,12 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         lv_color_t c;
         lv_opa_t opa = LV_OPA_TRANSP;
-        _lv_memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
+        _lv_memcpy(line_buf, &canvas->dsc.data[y * line_w], line_w);
 
 
         for(x = a.x1 - r_back; x <= a.x1 + r_front; x++) {
             x_safe = x < 0 ? 0 : x;
-            x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
+            x_safe = x_safe > canvas->dsc.header.w - 1 ? canvas->dsc.header.w - 1 : x_safe;
 
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, color);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
@@ -475,9 +441,9 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
                 c.ch.blue = bsum / r;
                 if(has_alpha) opa = asum / r;
 
-                lv_img_buf_set_px_color(&ext->dsc, x, y, c);
+                lv_img_buf_set_px_color(&canvas->dsc, x, y, c);
             }
-            if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
+            if(has_alpha) lv_img_buf_set_px_alpha(&canvas->dsc, x, y, opa);
 
             x_safe = x - r_back;
             x_safe = x_safe < 0 ? 0 : x_safe;
@@ -494,7 +460,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             if(has_alpha) asum -= opa;
 
             x_safe = x + 1 + r_front;
-            x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
+            x_safe = x_safe > canvas->dsc.header.w - 1 ? canvas->dsc.header.w - 1 : x_safe;
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
@@ -508,7 +474,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             if(has_alpha) asum += opa;
         }
     }
-    lv_obj_invalidate(canvas);
+    lv_obj_invalidate(obj);
 
     _lv_mem_buf_release(line_buf);
 }
@@ -520,46 +486,46 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
  * @param area the area to blur. If `NULL` the whole canvas will be blurred.
  * @param r radius of the blur
  */
-void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
+void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 {
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     if(r == 0) return;
 
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
     lv_area_t a;
     if(area) {
         lv_area_copy(&a, area);
         if(a.x1 < 0) a.x1 = 0;
         if(a.y1 < 0) a.y1 = 0;
-        if(a.x2 > ext->dsc.header.w - 1) a.x2 = ext->dsc.header.w - 1;
-        if(a.y2 > ext->dsc.header.h - 1) a.y2 = ext->dsc.header.h - 1;
+        if(a.x2 > canvas->dsc.header.w - 1) a.x2 = canvas->dsc.header.w - 1;
+        if(a.y2 > canvas->dsc.header.h - 1) a.y2 = canvas->dsc.header.h - 1;
     }
     else {
         a.x1 = 0;
         a.y1 = 0;
-        a.x2 = ext->dsc.header.w - 1;
-        a.y2 = ext->dsc.header.h - 1;
+        a.x2 = canvas->dsc.header.w - 1;
+        a.y2 = canvas->dsc.header.h - 1;
     }
 
-    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
+    lv_color_t color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
 
     uint16_t r_back = r / 2;
     uint16_t r_front = r / 2;
 
     if((r & 0x1) == 0) r_back--;
 
-    bool has_alpha = lv_img_cf_has_alpha(ext->dsc.header.cf);
-    lv_coord_t col_w = lv_img_buf_get_img_size(1, ext->dsc.header.h, ext->dsc.header.cf);
+    bool has_alpha = lv_img_cf_has_alpha(canvas->dsc.header.cf);
+    lv_coord_t col_w = lv_img_buf_get_img_size(1, canvas->dsc.header.h, canvas->dsc.header.cf);
     uint8_t * col_buf = _lv_mem_buf_get(col_w);
     lv_img_dsc_t line_img;
 
     line_img.data = col_buf;
     line_img.header.always_zero = 0;
     line_img.header.w = 1;
-    line_img.header.h = ext->dsc.header.h;
-    line_img.header.cf = ext->dsc.header.cf;
+    line_img.header.h = canvas->dsc.header.h;
+    line_img.header.cf = canvas->dsc.header.cf;
 
     lv_coord_t x;
     lv_coord_t y;
@@ -576,10 +542,10 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         for(y = a.y1 - r_back; y <= a.y1 + r_front; y++) {
             y_safe = y < 0 ? 0 : y;
-            y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
+            y_safe = y_safe > canvas->dsc.header.h - 1 ? canvas->dsc.header.h - 1 : y_safe;
 
-            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, color);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe);
+            c = lv_img_buf_get_px_color(&canvas->dsc, x, y_safe, color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&canvas->dsc, x, y_safe);
 
             lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
             if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
@@ -610,9 +576,9 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
                 c.ch.blue = bsum / r;
                 if(has_alpha) opa = asum / r;
 
-                lv_img_buf_set_px_color(&ext->dsc, x, y, c);
+                lv_img_buf_set_px_color(&canvas->dsc, x, y, c);
             }
-            if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
+            if(has_alpha) lv_img_buf_set_px_alpha(&canvas->dsc, x, y, opa);
 
             y_safe = y - r_back;
             y_safe = y_safe < 0 ? 0 : y_safe;
@@ -629,10 +595,10 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             if(has_alpha) asum -= opa;
 
             y_safe = y + 1 + r_front;
-            y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
+            y_safe = y_safe > canvas->dsc.header.h - 1 ? canvas->dsc.header.h - 1 : y_safe;
 
-            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, color);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe);
+            c = lv_img_buf_get_px_color(&canvas->dsc, x, y_safe, color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&canvas->dsc, x, y_safe);
 
             lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
             if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
@@ -648,7 +614,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         }
     }
 
-    lv_obj_invalidate(canvas);
+    lv_obj_invalidate(obj);
 
     _lv_mem_buf_release(col_buf);
 }
@@ -766,11 +732,9 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param max_w max width of the text. The text will be wrapped to fit into this size
  * @param label_draw_dsc pointer to a valid label descriptor `lv_draw_label_dsc_t`
  * @param txt text to display
- * @param align align of the text (`LV_TEXT_ALIGN_LEFT/RIGHT/CENTER`)
  */
 void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
-                         lv_draw_label_dsc_t * label_draw_dsc,
-                         const char * txt, lv_text_align_t align)
+                         lv_draw_label_dsc_t * label_draw_dsc, const char * txt)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
@@ -812,24 +776,6 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
-
-    lv_txt_flag_t flag;
-    switch(align) {
-        case LV_TEXT_ALIGN_LEFT:
-            flag = LV_TEXT_FLAG_NONE;
-            break;
-        case LV_TEXT_ALIGN_RIGHT:
-            flag = LV_TEXT_FLAG_RIGHT;
-            break;
-        case LV_TEXT_ALIGN_CENTER:
-            flag = LV_TEXT_FLAG_CENTER;
-            break;
-        default:
-            flag = LV_TEXT_FLAG_NONE;
-            break;
-    }
-
-    label_draw_dsc->flag = flag;
 
     lv_draw_label(&coords, &mask, label_draw_dsc, txt, NULL);
 
@@ -1094,6 +1040,44 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
  *   STATIC FUNCTIONS
  **********************/
 
+static void lv_canvas_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+   LV_LOG_TRACE("canvas create started");
+
+   lv_canvas_t * canvas = (lv_canvas_t *) obj;
+
+   /*Initialize the allocated 'ext' */
+   canvas->dsc.header.always_zero = 0;
+   canvas->dsc.header.cf          = LV_IMG_CF_TRUE_COLOR;
+   canvas->dsc.header.h           = 0;
+   canvas->dsc.header.w           = 0;
+   canvas->dsc.data_size          = 0;
+   canvas->dsc.data               = NULL;
+
+   lv_img_set_src(obj, &canvas->dsc);
+
+   LV_LOG_INFO("canvas created");
+}
+
+static void lv_canvas_destructor(lv_obj_t * obj)
+{
+
+}
+
+/**
+ * Handle the drawing related tasks of the bars
+ * @param canvas pointer to an object
+ * @param clip_area the object will be drawn only in this area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
+ */
+static lv_draw_res_t lv_canvas_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+{
+    return lv_img.draw_cb(obj, clip_area, mode);
+}
 /**
  * Signal function of the canvas
  * @param canvas pointer to a canvas object
@@ -1103,19 +1087,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
  */
 static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * param)
 {
-    lv_res_t res;
-
-    /* Include the ancient signal function */
-    res = ancestor_signal(canvas, sign, param);
-    if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) {
-        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-    }
-    else if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-
-    return res;
+    return lv_img.signal_cb(canvas, sign, param);
 }
 
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)

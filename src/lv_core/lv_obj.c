@@ -70,7 +70,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode);
+static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
@@ -78,7 +78,7 @@ static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_obj_destructor(void * obj);
+static void lv_obj_destructor(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -90,7 +90,7 @@ const lv_obj_class_t lv_obj = {
     .constructor = lv_obj_constructor,
     .destructor = lv_obj_destructor,
     .signal_cb = lv_obj_signal,
-    .drawer_cb = lv_obj_drawer,
+    .draw_cb = lv_obj_draw,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
 };
@@ -797,6 +797,10 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    /*Nothing to do if no event function and not bubbled*/
+    if(lv_obj_get_event_cb(obj) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
+        return LV_RES_OK;
+    }
     lv_res_t res;
     res = lv_event_send_func(lv_obj_get_event_cb(obj), obj, event, data);
     return res;
@@ -857,13 +861,11 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
  */
 lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
-    if(obj != NULL) {
-        LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    }
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     /* Build a simple linked list from the objects used in the events
      * It's important to know if an this object was deleted by a nested event
-     * called from this `even_cb`. */
+     * called from this `event_cb`. */
     lv_event_temp_data_t event_temp_data;
     event_temp_data.obj     = obj;
     event_temp_data.deleted = false;
@@ -875,7 +877,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
     event_temp_data_head = &event_temp_data;
 
     const void * event_act_data_save = event_act_data;
-    event_act_data                   = data;
+    event_act_data = data;
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
@@ -892,17 +894,13 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
 
-    if(event_temp_data.deleted) {
-        return LV_RES_INV;
-    }
+    if(event_temp_data.deleted) return LV_RES_INV;
 
     if(obj) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
 
             lv_res_t res = lv_event_send(obj->parent, event, data);
-            if(res != LV_RES_OK) {
-                return LV_RES_INV;
-            }
+            if(res != LV_RES_OK) return LV_RES_INV;
         }
     }
 
@@ -913,7 +911,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
  * Get the `data` parameter of the current event
  * @return the `data` parameter
  */
-const void * lv_event_get_data(void)
+void * lv_event_get_data(void)
 {
     return event_act_data;
 }
@@ -1529,7 +1527,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     LV_LOG_INFO("Object create ready");
 }
 
-static void lv_obj_destructor(void * p)
+static void lv_obj_destructor(lv_obj_t * p)
 {
     lv_obj_t * obj = p;
     lv_obj_remove_all_styles(obj);
@@ -1541,15 +1539,15 @@ static void lv_obj_destructor(void * p)
  * Handle the drawing related tasks of the base objects.
  * @param obj pointer to an object
  * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAWER_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
- *             LV_DRAWER_DRAW: draw the object (always return 'true')
- * @param return an element of `lv_drawer_res_t`
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ * @param return an element of `lv_draw_res_t`
  */
-static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area, lv_drawer_mode_t mode)
+static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
-    if(mode == LV_DRAWER_MODE_COVER_CHECK) {
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DRAWER_RES_MASKED;
+    if(mode == LV_DRAW_MODE_COVER_CHECK) {
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DRAW_RES_MASKED;
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
@@ -1562,18 +1560,18 @@ static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area
         coords.y1 -= h;
         coords.y2 += h;
 
-        if(_lv_area_is_in(clip_area, &coords, r) == false) return LV_DRAWER_RES_NOT_COVER;
+        if(_lv_area_is_in(clip_area, &coords, r) == false) return LV_DRAW_RES_NOT_COVER;
 
-        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAWER_RES_NOT_COVER;
+        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
 
-        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAWER_RES_NOT_COVER;
-        if(lv_obj_get_style_border_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAWER_RES_NOT_COVER;
-        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAWER_RES_NOT_COVER;
+        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_border_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
 
-        return  LV_DRAWER_RES_COVER;
+        return  LV_DRAW_RES_COVER;
 
     }
-    else if(mode == LV_DRAWER_MODE_MAIN_DRAW) {
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -1583,10 +1581,6 @@ static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-        lv_drawer_res_t res;
-        res = lv_drawer_part_before(obj, LV_PART_MAIN, clip_area, &obj->coords);
-        if(res != LV_DRAWER_RES_OK) return res;
-
         lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
         lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
@@ -1595,6 +1589,12 @@ static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area
         coords.x2 += w;
         coords.y1 -= h;
         coords.y2 += h;
+
+        lv_obj_draw_hook_dsc_t hook_dsc;
+        lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+        hook_dsc.draw_area = &coords;
+        hook_dsc.part = LV_PART_MAIN;
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
         lv_draw_rect(&coords, clip_area, &draw_dsc);
 
@@ -1606,9 +1606,9 @@ static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area
             lv_draw_mask_add(mp, obj + 8);
         }
 
-        res = lv_drawer_part_after(obj, LV_PART_MAIN, clip_area, &obj->coords);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
     }
-    else if(mode == LV_DRAWER_MODE_POST_DRAW) {
+    else if(mode == LV_DRAW_MODE_POST_DRAW) {
         _lv_obj_draw_scrollbar(obj, clip_area);
 
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
@@ -1681,7 +1681,7 @@ static lv_drawer_res_t lv_obj_drawer(lv_obj_t * obj, const lv_area_t * clip_area
 #endif
     }
 
-    return LV_DRAWER_RES_OK;
+    return LV_DRAW_RES_OK;
 }
 
 static void base_dir_refr_children(lv_obj_t * obj)

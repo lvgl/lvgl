@@ -55,7 +55,6 @@ typedef struct {
     uint32_t cache_transform_zero:1;
     uint32_t cache_blend_mode_zero:1;
     uint32_t cache_filter_zero:1;
-    uint32_t cache_drawer_zero:1;
     uint32_t cache_clip_corner_enable:1;
 
     uint32_t cache_bg_opa_cover:1;

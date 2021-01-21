@@ -346,25 +346,13 @@ lv_coord_t _lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
     if(content_src) {
         lv_opa_t content_opa;
         lv_point_t content_size;
-        if(lv_img_src_get_type(content_src) == LV_IMG_SRC_SYMBOL) {
-            content_opa = lv_obj_get_style_text_opa(obj, part);
-            if(content_opa > 0) {
-                lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, part);
-                lv_coord_t line_space = lv_obj_get_style_text_letter_space(obj, part);
-                const lv_font_t * font = lv_obj_get_style_text_font(obj, part);
-                _lv_txt_get_size(&content_size, content_src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-            }
-        } else {
-            content_opa = lv_obj_get_style_img_opa(obj, part);
-                if(content_opa > 0) {
-                lv_img_header_t header;
-                lv_img_decoder_get_info(content_src, &header);
-                content_size.x = header.w;
-                content_size.y = header.h;
-            }
-        }
-
+        content_opa = lv_obj_get_style_text_opa(obj, part);
         if(content_opa > 0) {
+            lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, part);
+            lv_coord_t line_space = lv_obj_get_style_text_letter_space(obj, part);
+            const lv_font_t * font = lv_obj_get_style_text_font(obj, part);
+            _lv_txt_get_size(&content_size, content_src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
             lv_area_t content_area;
             content_area.x1 = 0;
             content_area.y1 = 0;
@@ -397,83 +385,10 @@ lv_coord_t _lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
     return s;
 }
 
-lv_drawer_res_t lv_drawer_part_before(lv_obj_t * obj, uint8_t part, const lv_area_t * clip_area, void * param)
+void lv_obj_draw_hook_dsc_init(lv_obj_draw_hook_dsc_t * hook_dsc, const lv_area_t * clip_area)
 {
-    lv_obj_style_list_t * list = &obj->style_list;
-    if(list->cache_drawer_zero) return LV_DRAWER_RES_OK;
-    if(list->style_cnt == 0) return LV_DRAWER_RES_OK;
-
-    lv_drawer_res_t res = LV_DRAWER_RES_OK;
-    int32_t i;
-    for(i = 0; i < list->style_cnt; i++) {
-        const lv_obj_style_t * style = &obj->style_list.styles[i];
-        if(style->is_trans) continue;
-        if(style->state & ~(obj->state)) continue;
-
-        lv_style_value_t v;
-        if(lv_style_get_prop(style->style, LV_STYLE_DRAWER, &v) == false) continue;
-        const lv_drawer_t * d = v.ptr;
-
-        if(d->drawer_cb == NULL) continue;
-
-        lv_drawer_res_t sub_res = d->drawer_cb(d, obj, LV_DRAWER_MODE_PART_BEFORE, clip_area, param);
-        if(sub_res == LV_DRAWER_RES_STOP) res = LV_DRAWER_RES_STOP;
-    }
-
-    return res;
-}
-
-lv_drawer_res_t lv_drawer_part_after(lv_obj_t * obj, uint8_t part, const lv_area_t * clip_area, void * param)
-{
-    lv_obj_style_list_t * list = &obj->style_list;
-    if(list->cache_drawer_zero) return LV_DRAWER_RES_OK;
-    if(list->style_cnt == 0) return LV_DRAWER_RES_OK;
-
-    lv_drawer_res_t res = LV_DRAWER_RES_STOP;
-    int32_t i;
-    for(i = list->style_cnt - 1; i  >= 0; i--) {
-        const lv_obj_style_t * style = &obj->style_list.styles[i];
-        if(style->is_trans) continue;
-        if(style->part != part) continue;
-        if(style->state & ~(obj->state)) continue;
-
-        lv_style_value_t v;
-        if(lv_style_get_prop(style->style, LV_STYLE_DRAWER, &v) == false) continue;
-        const lv_drawer_t * d = v.ptr;
-
-        if(d->drawer_cb == NULL) continue;
-
-        lv_drawer_res_t sub_res = d->drawer_cb(d, obj, LV_DRAWER_MODE_PART_AFTER, clip_area, param);
-        if(sub_res == LV_DRAWER_RES_OK) res = LV_DRAWER_RES_OK;
-    }
-
-    return res;
-}
-
-void lv_drawer_section(lv_obj_t * obj, lv_drawer_mode_t mode, const lv_area_t * clip_area, bool rev)
-{
-    lv_obj_style_list_t * list = &obj->style_list;
-    if(list->cache_drawer_zero) return;
-    if(list->style_cnt == 0) return;
-
-    int32_t i;
-    int32_t start = rev ? list->style_cnt - 1 : 0;
-    int32_t end = rev ? 0 : list->style_cnt - 1;
-    int32_t step = rev ? -1 : 1;
-    for(i = start; i  != end; i += step) {
-        const lv_obj_style_t * style = &obj->style_list.styles[i];
-        if(style->is_trans) continue;
-        if(style->part != LV_PART_MAIN) continue;
-        if(style->state & ~(obj->state)) continue;
-
-        lv_style_value_t v;
-        if(lv_style_get_prop(style->style, LV_STYLE_DRAWER, &v) == false) continue;
-        const lv_drawer_t * d = v.ptr;
-
-        if(d->drawer_cb == NULL) continue;
-
-        d->drawer_cb(d, obj, mode, clip_area, NULL);
-    }
+    _lv_memset_00(hook_dsc, sizeof(lv_obj_draw_hook_dsc_t));
+    hook_dsc->clip_area = clip_area;
 }
 
 /**
@@ -503,7 +418,7 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
 /**
  * Draw scrollbars on an object is required
  * @param obj pointer to an object
- * @param clip_area the clip area coming from the drawer function
+ * @param clip_area the clip area coming from the draw function
  */
 void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_style.h"
+#include "lv_draw_blend.h"
 
 /*********************
  *      DEFINES

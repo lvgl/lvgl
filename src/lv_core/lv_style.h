@@ -21,12 +21,14 @@ extern "C" {
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw_blend.h"
+#include "../lv_draw/lv_draw_rect.h"
+#include "../lv_draw/lv_draw_line.h"
+#include "../lv_draw/lv_draw_label.h"
+#include "../lv_draw/lv_draw_img.h"
+
 /*********************
  *      DEFINES
  *********************/
-
-#define LV_RADIUS_CIRCLE (0x7F) /**< A very big radius to always draw as circle*/
-LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define LV_DEBUG_STYLE_SENTINEL_VALUE       0xAABBCCDD
 
@@ -39,84 +41,6 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
  *      TYPEDEFS
  **********************/
 
-/*Border types (Use 'OR'ed values)*/
-enum {
-    LV_BORDER_SIDE_NONE     = 0x00,
-    LV_BORDER_SIDE_BOTTOM   = 0x01,
-    LV_BORDER_SIDE_TOP      = 0x02,
-    LV_BORDER_SIDE_LEFT     = 0x04,
-    LV_BORDER_SIDE_RIGHT    = 0x08,
-    LV_BORDER_SIDE_FULL     = 0x0F,
-    LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
-    _LV_BORDER_SIDE_LAST
-};
-typedef uint8_t lv_border_side_t;
-
-enum {
-    LV_GRAD_DIR_NONE,
-    LV_GRAD_DIR_VER,
-    LV_GRAD_DIR_HOR,
-    _LV_GRAD_DIR_LAST
-};
-
-typedef uint8_t lv_grad_dir_t;
-
-/*Text decorations (Use 'OR'ed values)*/
-enum {
-    LV_TEXT_DECOR_NONE          = 0x00,
-    LV_TEXT_DECOR_UNDERLINE     = 0x01,
-    LV_TEXT_DECOR_STRIKETHROUGH = 0x02,
-    _LV_TEXT_DECOR_LAST
-};
-
-typedef uint8_t lv_text_decor_t;
-/** Label align policy*/
-enum {
-    LV_TEXT_ALIGN_LEFT, /**< Align text to left */
-    LV_TEXT_ALIGN_CENTER, /**< Align text to center */
-    LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
-    LV_TEXT_ALIGN_AUTO, /**<  */
-};
-typedef uint8_t lv_text_align_t;
-
-
-/** Design modes */
-enum {
-    LV_DRAWER_MODE_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_DRAWER_MODE_REFER_EXT_SIZE,       /**< Draw extras on the object */
-
-    LV_DRAWER_MODE_START_MAIN,
-    LV_DRAWER_MODE_START_CHILDREN,
-    LV_DRAWER_MODE_MAIN_DRAW,            /**< Draw the main portion of the object */
-    LV_DRAWER_MODE_POST_DRAW,            /**< Draw extras on the object */
-    LV_DRAWER_MODE_FINISH,
-
-    LV_DRAWER_MODE_PART_BEFORE,
-    LV_DRAWER_MODE_PART_AFTER,
-};
-typedef uint8_t lv_drawer_mode_t;
-
-
-/** Design results */
-enum {
-    LV_DRAWER_RES_OK,          /**< Draw ready */
-    LV_DRAWER_RES_COVER,       /**< Returned on `LV_DRAWER_COVER_CHK` if the areas is fully covered*/
-    LV_DRAWER_RES_NOT_COVER,   /**< Returned on `LV_DRAWER_COVER_CHK` if the areas is not covered*/
-    LV_DRAWER_RES_MASKED,      /**< Returned on `LV_DRAWER_COVER_CHK` if the areas is masked out (children also not cover)*/
-    LV_DRAWER_RES_STOP,
-};
-typedef uint8_t lv_drawer_res_t;
-
-struct _lv_obj_t;
-
-struct lv_drawer;
-
-typedef lv_drawer_res_t (*lv_drawer_cb_t)(const struct lv_drawer * drawer, struct _lv_obj_t * obj, lv_drawer_mode_t mode, const lv_area_t * clip_area, void * param);
-
-typedef struct lv_drawer {
-    lv_drawer_cb_t drawer_cb;
-    void * user_data;
-}lv_drawer_t;
 
 typedef union {
     int32_t num;
@@ -139,7 +63,6 @@ typedef enum {
     LV_STYLE_ANIM_TIME  = 10,
     LV_STYLE_TRANSITION = 11,
     LV_STYLE_SIZE = 12,
-    LV_STYLE_DRAWER = 13,
 
     LV_STYLE_PAD_TOP        = 20 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_BOTTOM     = 21 | LV_STYLE_PROP_LAYOUT_REFR,

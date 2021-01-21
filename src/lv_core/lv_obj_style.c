@@ -764,12 +764,6 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         else list->cache_filter_zero = 0;
     }
 
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_DRAWER) {
-        if(get_prop_core(obj, part, LV_STYLE_DRAWER, &v) == false) v.ptr = NULL;
-        if(v.ptr == NULL) list->cache_drawer_zero = 1;
-        else list->cache_drawer_zero = 0;
-    }
-
     /*1 or 0*/
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_POST) {
         if(get_prop_core(obj, part, LV_STYLE_BORDER_POST, &v) == false) v.num = 0;
@@ -884,11 +878,6 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     case LV_STYLE_COLOR_FILTER_CB:
     case LV_STYLE_COLOR_FILTER_OPA:
         if(list->cache_filter_zero ) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
-        break;
-
-    case LV_STYLE_DRAWER:
-        if(list->cache_drawer_zero) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
 
