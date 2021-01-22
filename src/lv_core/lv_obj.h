@@ -225,6 +225,7 @@ typedef struct _lv_obj_t {
     uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
     uint8_t gesture_parent  : 1; /**< 1: Parent will be gesture instead*/
     uint8_t focus_parent    : 1; /**< 1: Parent will be focused instead*/
+    uint8_t disabled_noevent: 1; /**< 1: Don't pass events if it is disabled*/
 
     lv_drag_dir_t drag_dir  : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
@@ -706,6 +707,13 @@ void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
  * @param en true: make the object clickable
  */
 void lv_obj_set_click(lv_obj_t * obj, bool en);
+
+/**
+ * Enable or disable the passing of event of an object if it is disabled
+ * @param obj pointer to an object
+ * @param en true: make the object does not pass events if it is disabled
+ */
+void lv_obj_set_disabled_noevent(lv_obj_t * obj, bool en);
 
 /**
  * Enable to bring this object to the foreground if it
@@ -1230,6 +1238,13 @@ bool lv_obj_get_adv_hittest(const lv_obj_t * obj);
  * @return true: the object is clickable
  */
 bool lv_obj_get_click(const lv_obj_t * obj);
+
+/**
+ * Get the passing event of an object if it is disabled
+ * @param obj pointer to an object
+ * @param true: the object does not pass events if it is disabled
+ */
+bool lv_obj_get_disabled_noevent(lv_obj_t * obj, bool en);
 
 /**
  * Get the top enable attribute of an object
