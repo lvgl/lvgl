@@ -2964,7 +2964,7 @@ bool lv_obj_get_click(const lv_obj_t * obj)
     return obj->click == 0 ? false : true;
 }
 
-**
+/**
  * Get the passing of event of an object if it is disabled
  * @param obj pointer to an object
  * @param true: the object does not pass events if it is disabled
