@@ -378,6 +378,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->parent_event = 0;
     new_obj->gesture_parent = parent ? 1 : 0;
     new_obj->focus_parent  = 0;
+    new_obj->disabled_noevent = 1;
     new_obj->state = LV_STATE_DEFAULT;
 
     new_obj->ext_attr = NULL;
@@ -432,6 +433,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->hidden       = copy->hidden;
         new_obj->top          = copy->top;
         new_obj->parent_event = copy->parent_event;
+        new_obj->disabled_noevent = copy->disabled_noevent;
 
         new_obj->protect      = copy->protect;
         new_obj->gesture_parent = copy->gesture_parent;
@@ -1525,6 +1527,18 @@ void lv_obj_set_click(lv_obj_t * obj, bool en)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     obj->click = (en == true ? 1 : 0);
+}
+
+/**
+ * Enable or disable the passing of event of an object if it is disabled
+ * @param obj pointer to an object
+ * @param en true: make the object does not pass events if it is disabled
+ */
+void lv_obj_set_disabled_noevent(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->disabled_noevent = (en == true ? 1 : 0);
 }
 
 /**
@@ -2948,6 +2962,18 @@ bool lv_obj_get_click(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     return obj->click == 0 ? false : true;
+}
+
+**
+ * Get the passing of event of an object if it is disabled
+ * @param obj pointer to an object
+ * @param true: the object does not pass events if it is disabled
+ */
+bool lv_obj_get_disabled_noevent(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->disabled_noevent == 0 ? false : true;
 }
 
 /**
