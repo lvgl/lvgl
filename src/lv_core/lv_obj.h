@@ -1244,7 +1244,7 @@ bool lv_obj_get_click(const lv_obj_t * obj);
  * @param obj pointer to an object
  * @param true: the object does not pass events if it is disabled
  */
-bool lv_obj_get_disabled_noevent(lv_obj_t * obj, bool en);
+bool lv_obj_get_disabled_noevent(lv_obj_t * obj);
 
 /**
  * Get the top enable attribute of an object
