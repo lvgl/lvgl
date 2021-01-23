@@ -211,7 +211,6 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, COLOR_SCR);
     lv_style_set_text_color(&styles->scr, COLOR_SCR_TEXT);
-    lv_style_set_pad_all(&styles->scr, PAD_DEF);
     lv_style_set_pad_row(&styles->scr, PAD_DEF);
     lv_style_set_pad_column(&styles->scr, PAD_DEF);
 
@@ -352,13 +351,12 @@ static void basic_init(void)
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
     lv_style_set_radius(&styles->chart_series, LV_DPX(1));
+    lv_style_set_size(&styles->chart_series, LV_DPX(5));
 
     style_init_reset(&styles->chart_ticks);
     lv_style_set_line_width(&styles->chart_ticks, LV_DPX(1));
     lv_style_set_line_color(&styles->chart_ticks, COLOR_GRAY);
-
 #endif
-
 
 
 #if LV_USE_METER
@@ -381,41 +379,20 @@ static void basic_init(void)
     lv_style_set_border_width(&styles->table_cell, LV_DPX(1));
     lv_style_set_border_color(&styles->table_cell, CARD_BORDER_COLOR);
 #endif
-}
-//
-//static void linemeter_init(void)
-//{
-//#if LV_USE_LINEMETER != 0
-//    style_init_reset(&styles->lmeter);
-//    lv_style_set_radius(&styles->lmeter, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-//    lv_style_set_pad_left(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_pad_right(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_pad_top(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(20));
-//    lv_style_set_scale_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(25));
-//
-//    lv_style_set_line_color(&styles->lmeter, LV_STATE_DEFAULT, theme.color_primary);
-//    lv_style_set_scale_grad_color(&styles->lmeter, LV_STATE_DEFAULT, theme.color_primary);
-//    lv_style_set_scale_end_color(&styles->lmeter, LV_STATE_DEFAULT, lv_color_hex3(0x888));
-//    lv_style_set_line_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(10));
-//    lv_style_set_scale_end_line_width(&styles->lmeter, LV_STATE_DEFAULT, LV_DPX(7));
-//#endif
-//}
-//
 
-static void textarea_init(void)
-{
 #if LV_USE_TEXTAREA
     style_init_reset(&styles->ta_cursor);
-    lv_style_set_border_color(&styles->ta_cursor, LV_STATE_DEFAULT, COLOR_BG_SEC_TEXT);
-    lv_style_set_border_width(&styles->ta_cursor, LV_STATE_DEFAULT, LV_DPX(2));
-    lv_style_set_pad_left(&styles->ta_cursor, LV_STATE_DEFAULT, LV_DPX(1));
-    lv_style_set_border_side(&styles->ta_cursor, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT);
+    lv_style_set_border_color(&styles->ta_cursor, COLOR_BG_SEC_TEXT);
+    lv_style_set_border_width(&styles->ta_cursor, LV_DPX(2));
+    lv_style_set_pad_left(&styles->ta_cursor, LV_DPX(1));
+    lv_style_set_border_side(&styles->ta_cursor, LV_BORDER_SIDE_LEFT);
+    lv_style_set_anim_time(&styles->ta_cursor, 400);
 
     style_init_reset(&styles->ta_placeholder);
-    lv_style_set_text_color(&styles->ta_placeholder, LV_STATE_DEFAULT,
-            IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
+    lv_style_set_text_color(&styles->ta_placeholder, IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 #endif
 }
+
 //
 //static void ddlist_init(void)
 //{
@@ -486,7 +463,6 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     theme.flags = flags;
 
     basic_init();
-    textarea_init();
 
     theme.apply_cb = theme_apply;
 
@@ -646,25 +622,16 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_meter)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->meter_marker);
-        lv_obj_add_style_no_refresh(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->meter_indic);
     }
 #endif
 
-
 #if LV_USE_TEXTAREA
-case LV_THEME_TEXTAREA:
-    list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_MAIN);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->pad_small);
-    _lv_style_list_add_style(list, &styles->sb);
-
-    list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
-    _lv_style_list_add_style(list, &styles->ta_placeholder);
-
-    list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
-    _lv_style_list_add_style(list, &styles->ta_cursor);
-    break;
-
+    else if(lv_obj_check_type(obj, &lv_textarea)) {
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+        lv_obj_add_style_no_refresh(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->ta_cursor);
+    }
 #endif
 
 //#if LV_USE_LINEMETER

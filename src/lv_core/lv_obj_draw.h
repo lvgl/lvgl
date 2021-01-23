@@ -41,6 +41,7 @@ typedef struct
     lv_draw_line_dsc_t * line_dsc;
     lv_draw_img_dsc_t *  img_dsc;
     lv_draw_arc_dsc_t *  arc_dsc;
+    char text[16];
     const lv_area_t * draw_area;
     const lv_point_t * p1;
     const lv_point_t * p2;

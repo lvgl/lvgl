@@ -88,10 +88,15 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);
-    cir_dsc.bg_opa = dsc->opa;
-    cir_dsc.bg_color = dsc->color;
     cir_dsc.blend_mode = dsc->blend_mode;
-    cir_dsc.bg_img_src = dsc->bg_img_src;
+    if(dsc->bg_img_src) {
+        cir_dsc.bg_opa = LV_OPA_TRANSP;
+        cir_dsc.bg_img_src = dsc->bg_img_src;
+        cir_dsc.bg_img_opa = dsc->opa;
+    } else {
+        cir_dsc.bg_opa = dsc->opa;
+        cir_dsc.bg_color = dsc->color;
+    }
 
     lv_area_t area_out;
     area_out.x1 = center_x - radius;

@@ -165,13 +165,6 @@ char * lv_label_get_text(const lv_obj_t * label);
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
 
 /**
- * Get the align attribute
- * @param label pointer to a label object
- * @return LV_TEXT_ALIGN_LEFT or LV_TEXT_ALIGN_CENTER
- */
-lv_text_align_t lv_label_get_align(const lv_obj_t * label);
-
-/**
  * Get the recoloring attribute
  * @param label pointer to a label object
  * @return true: recoloring is enabled, false: disable

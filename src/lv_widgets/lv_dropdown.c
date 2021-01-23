@@ -503,10 +503,11 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
 
+    lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
+
     lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
-
     /*Set smaller width to the width of the button*/
     if(lv_obj_get_width(dropdown->list) <= lv_obj_get_width(dropdown_obj) &&
        (dropdown->dir == LV_DIR_TOP || dropdown->dir == LV_DIR_BOTTOM)) {
@@ -594,6 +595,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
  */
 void lv_dropdown_close(lv_obj_t * obj)
 {
+    lv_obj_clear_state(obj, LV_STATE_CHECKED);
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
@@ -641,7 +643,6 @@ static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
     ((lv_dropdown_list_t*)list_obj)->dropdown = (lv_obj_t *) dropdown;
     dropdown->list = list_obj;
     lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
 
     if(copy == NULL) {
         lv_obj_set_width(obj, LV_DPX(150));
@@ -751,6 +752,7 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
                 symbol_area.x1 = obj->coords.x2 - right - symbol_w;
                 symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
             }
+
             if(symbol_type == LV_IMG_SRC_SYMBOL) {
                 lv_draw_label(&symbol_area, clip_area, &label_dsc, dropdown->symbol, NULL);
             } else {
@@ -762,47 +764,31 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
                 img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
                 lv_draw_img(&symbol_area, clip_area, dropdown->symbol, &img_dsc);
             }
-        }
 
-//        txt = rev ? dropdown->symbol : opt_txt;
-//        if(txt) {
-//            _lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-//                             label_dsc.flag);
-//
-//            txt_area.y1 = obj->coords.y1 + top;
-//            txt_area.y2 = txt_area.y1 + txt_size.y;
-//
-//            /*Center align the text if no symbol*/
-//            if(dropdown->symbol == NULL && txt == opt_txt) {
-//                txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - txt_size.x) / 2;
-//                txt_area.x2 = txt_area.x1 + txt_size.x;
-//            }
-//            else {
-//                txt_area.x1 = obj->coords.x1 + left;
-//                txt_area.x2 = txt_area.x1 + txt_size.x;
-//            }
-//            lv_draw_label(&txt_area, clip_area, &label_dsc, txt, NULL);
-//        }
-//
-//        txt = rev ? opt_txt : dropdown->symbol;
-//        if(txt) {
-//            _lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-//                             label_dsc.flag);
-//            txt_area.y1 = obj->coords.y1 + top;
-//            txt_area.y2 = txt_area.y1 + txt_size.y;
-//
-//            /*Center align the text if no symbol*/
-//            if(dropdown->symbol == NULL && txt == opt_txt) {
-//                txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - txt_size.x) / 2;
-//                txt_area.x2 = txt_area.x1 + txt_size.x;
-//            }
-//            else {
-//                txt_area.x1 = obj->coords.x2 - right - txt_size.x;
-//                txt_area.x2 = txt_area.x1 + txt_size.x;
-//            }
-//
-//            lv_draw_label(&txt_area, clip_area, &label_dsc, txt, NULL);
-//        }
+            lv_point_t size;
+            _lv_txt_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                    label_dsc.flag);
+
+            lv_area_t txt_area;
+            txt_area.y1 = obj->coords.y1 + top;
+            txt_area.y2 = txt_area.y1 + size.y;
+            /*Center align the text if no symbol*/
+            if(dropdown->symbol == NULL) {
+                txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - size.x) / 2;
+                txt_area.x2 = txt_area.x1 + size.x;
+            }
+            else {
+                /*Text to the right*/
+                if(symbol_to_left) {
+                    txt_area.x1 = obj->coords.x2 - right - size.x;
+                    txt_area.x2 = txt_area.x1 + size.x;
+                } else {
+                    txt_area.x1 = obj->coords.x1 + left;
+                    txt_area.x2 = txt_area.x1 + size.x;
+                }
+            }
+            lv_draw_label(&txt_area, clip_area, &label_dsc, opt_txt, NULL);
+        }
 
         if(dropdown->text == NULL) {
             lv_mem_buf_release((char *)opt_txt);

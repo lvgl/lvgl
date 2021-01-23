@@ -13,6 +13,7 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_disp.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_themes/lv_theme.h"
 
@@ -1203,7 +1204,7 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
 
 }
 
-static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, lv_chart_axis_t axis)
+static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_axis_t axis)
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -1216,7 +1217,6 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, lv_chart_axis_t
     lv_coord_t x_ofs;
     lv_coord_t y_ofs = obj->coords.y1;
     lv_coord_t h     = (lv_obj_get_height(obj) * chart->y_zoom) >> 8;
-    char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
 
     /* chose correct side of the chart */
     lv_coord_t major_tick_len;
@@ -1237,6 +1237,11 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, lv_chart_axis_t
         minor_tick_len *= -1;
     }
 
+    lv_obj_draw_hook_dsc_t hook_dsc;
+    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+    hook_dsc.id = axis;
+    hook_dsc.part = LV_PART_MARKER;
+
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MARKER, &line_dsc);
@@ -1252,8 +1257,8 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, lv_chart_axis_t
         /* draw a line at moving y position */
         p2.y = p1.y = y_ofs + (int32_t)((int32_t)(h - line_dsc.width) * i) / total_tick_num;
 
-        if(p2.y - label_dsc.font->line_height > mask->y2) return;
-        if(p2.y + label_dsc.font->line_height < mask->y1) continue;
+        if(p2.y - label_dsc.font->line_height > clip_area->y2) return;
+        if(p2.y + label_dsc.font->line_height < clip_area->y1) continue;
 
         /* first point of the tick */
         p1.x = x_ofs;
@@ -1269,15 +1274,18 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, lv_chart_axis_t
         if(major) p2.x = p1.x - major_tick_len; /* major tick */
         else p2.x = p1.x - minor_tick_len; /* minor tick */
 
-        lv_draw_line(&p1, &p2, mask, &line_dsc);
+        lv_draw_line(&p1, &p2, clip_area, &line_dsc);
 
         /* add text only to major tick */
         if(!major) continue;
-        chart->tick_label_cb(obj, axis, i / sub_tick_cnt, buf, sizeof(buf));
+
+        int32_t tick_value = chart->ymax[axis] - lv_map(i, 0, total_tick_num, chart->ymin[axis], chart->ymax[axis]);
+        lv_snprintf(hook_dsc.text, sizeof(hook_dsc.text), "%d", tick_value);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
         /* reserve appropriate area */
         lv_point_t size;
-        _lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+        _lv_txt_get_size(&size, hook_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                           LV_COORD_MAX, LV_TEXT_FLAG_CENTER);
 
         /* set the area at some distance of the major tick len left of the tick */
@@ -1294,16 +1302,16 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * mask, lv_chart_axis_t
             a.x2 = p2.x + size.x + label_gap;
         }
 
-        lv_draw_label(&a, mask, &label_dsc, buf, NULL);
+        lv_draw_label(&a, clip_area, &label_dsc, hook_dsc.text, NULL);
     }
 }
 
-static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * mask)
+static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area)
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     lv_area_t series_mask;
-    bool mask_ret = _lv_area_intersect(&series_mask, &obj->coords, mask);
+    bool mask_ret = _lv_area_intersect(&series_mask, &obj->coords, clip_area);
     if(mask_ret == false) return;
 
     uint32_t i;
@@ -1324,14 +1332,20 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * mask)
     lv_coord_t minor_tick_len = major_tick_len / 2;
     lv_coord_t label_gap = TICK_LABEL_GAP;
 
-    if(h + y_ofs > mask->y2) return;
-    if(h + y_ofs + label_gap  + label_dsc.font->line_height + major_tick_len < mask->y1) return;
+    if(h + y_ofs > clip_area->y2) return;
+    if(h + y_ofs + label_gap  + label_dsc.font->line_height + major_tick_len < clip_area->y1) return;
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MARKER, &line_dsc);
     line_dsc.dash_gap = 0;
     line_dsc.dash_width = 0;
+
+    lv_obj_draw_hook_dsc_t hook_dsc;
+    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+    hook_dsc.id = LV_CHART_AXIS_X;
+    hook_dsc.part = LV_PART_MARKER;
+
 
     /* The columns don't start at the most right position
      * so change the width and offset accordingly. */
@@ -1343,7 +1357,6 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * mask)
     }
 
     p1.y = h + y_ofs;
-    char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
     uint32_t total_tick_num = major_tick_cnt * sub_tick_cnt;
     for(i = 0; i <= total_tick_num; i++) { /* one extra loop - it may not exist in the list, empty label */
         bool major = false;
@@ -1354,15 +1367,17 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * mask)
         if(p1.x > series_mask.x2) return;
 
         p2.y = p1.y + (major ? major_tick_len : minor_tick_len);
-        lv_draw_line(&p1, &p2, mask, &line_dsc);
+        lv_draw_line(&p1, &p2, clip_area, &line_dsc);
 
             /* add text only to major tick */
         if(!major) continue;
-        chart->tick_label_cb(obj, LV_CHART_AXIS_X, i / sub_tick_cnt, buf, sizeof(buf));
+
+        lv_snprintf(hook_dsc.text, sizeof(hook_dsc.text), "%d", i / sub_tick_cnt);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc.text);
 
         /* reserve appropriate area */
         lv_point_t size;
-        _lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+        _lv_txt_get_size(&size, hook_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                 LV_COORD_MAX, LV_TEXT_FLAG_CENTER);
 
         /* set the area at some distance of the major tick len under of the tick */
@@ -1371,7 +1386,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * mask)
         a.x2 = (p2.x + size.x / 2),
         a.y1 = p2.y + label_gap;
         a.y2 = (a.y1 + size.y);
-        lv_draw_label(&a, mask, &label_dsc, buf, NULL);
+        lv_draw_label(&a, clip_area, &label_dsc, hook_dsc.text, NULL);
     }
 }
 

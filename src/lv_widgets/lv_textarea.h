@@ -38,25 +38,21 @@ LV_EXPORT_CONST_INT(LV_TEXTAREA_CURSOR_LAST);
 
 /*Data of text area*/
 typedef struct {
-    /*New data for this type */
+    lv_obj_t obj;
     lv_obj_t * label;            /*Label of the text area*/
     char * placeholder_txt;      /*Place holder label. only visible if text is an empty string*/
-    lv_style_list_t style_placeholder;
     char * pwd_tmp;              /*Used to store the original text in password mode*/
     const char * accepted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct {
-        lv_style_list_t style;  /* Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;        /* Used when stepping up/down to a shorter line.
                                     * (Used by the library)*/
         uint32_t pos;              /* The current cursor position
                                     * (0: before 1st letter; 1: before 2nd letter ...)*/
-        uint16_t blink_time;       /*Blink period*/
         lv_area_t area;            /* Cursor area relative to the Text Area*/
         uint32_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
-        uint8_t state : 1;         /*Cursor is visible now or not (Handled by the library)*/
-        uint8_t hidden : 1;        /*Cursor is hidden by he user */
+        uint8_t show : 1;         /*Cursor is visible now or not (Handled by the library)*/
         uint8_t click_pos : 1;     /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
@@ -67,17 +63,9 @@ typedef struct {
 #endif
     uint8_t pwd_mode : 1; /*Replace characters with '*' */
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
-} lv_textarea_ext_t;
+} lv_textarea_t;
 
-/** Possible text areas styles. */
-enum {
-    LV_TEXTAREA_PART_MAIN,        /**< Text area background style */
-    LV_TEXTAREA_PART_CURSOR,      /**< Cursor style */
-    LV_TEXTAREA_PART_PLACEHOLDER, /**< Placeholder style */
-    _LV_TEXTAREA_PART_VIRTUAL_LAST,
-};
-
-typedef uint8_t lv_textarea_style_t;
+extern const lv_obj_class_t lv_textarea;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -178,15 +166,6 @@ void lv_textarea_set_pwd_mode(lv_obj_t * ta, bool en);
 void lv_textarea_set_one_line(lv_obj_t * ta, bool en);
 
 /**
- * Set the alignment of the text area.
- * In one line mode the text can be scrolled only with `LV_TEXT_ALIGN_LEFT`.
- * This function should be called if the size of text area changes.
- * @param ta pointer to a text are object
- * @param align the desired alignment from `lv_text_align_t`. (LV_TEXT_ALIGN_LEFT/CENTER/RIGHT)
- */
-void lv_textarea_set_text_align(lv_obj_t * ta, lv_text_align_t align);
-
-/**
  * Set a list of characters. Only these characters will be accepted by the text area
  * @param ta pointer to  Text Area
  * @param list list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
@@ -223,13 +202,6 @@ void lv_textarea_set_text_sel(lv_obj_t * ta, bool en);
  * @param time show time in milliseconds. 0: hide immediately.
  */
 void lv_textarea_set_pwd_show_time(lv_obj_t * ta, uint16_t time);
-
-/**
- * Set cursor blink animation time
- * @param ta pointer to Text area
- * @param time blink period. 0: disable blinking
- */
-void lv_textarea_set_cursor_blink_time(lv_obj_t * ta, uint16_t time);
 
 /*=====================
  * Getter functions
@@ -325,13 +297,6 @@ bool lv_textarea_get_text_sel_en(lv_obj_t * ta);
  * @return show time in milliseconds. 0: hide immediately.
  */
 uint16_t lv_textarea_get_pwd_show_time(lv_obj_t * ta);
-
-/**
- * Set cursor blink animation time
- * @param ta pointer to Text area
- * @return time blink period. 0: disable blinking
- */
-uint16_t lv_textarea_get_cursor_blink_time(lv_obj_t * ta);
 
 /*=====================
  * Other functions

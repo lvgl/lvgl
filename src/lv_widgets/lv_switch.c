@@ -35,14 +35,21 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_switch_destructor(void * obj);
+static void lv_switch_destructor(lv_obj_t * obj);
 static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_switch_class_t lv_switch;
+const lv_obj_class_t lv_switch = {
+    .constructor = lv_switch_constructor,
+    .destructor = lv_switch_destructor,
+    .signal_cb = lv_switch_signal,
+    .draw_cb = lv_switch_draw,
+    .instance_size = sizeof(lv_switch_t),
+    .base_class = &lv_obj
+};
 
 /**********************
  *      MACROS
@@ -61,22 +68,8 @@ lv_switch_class_t lv_switch;
  */
 lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    if(!lv_switch._inited) {
-        LV_CLASS_INIT(lv_switch, lv_obj);
-        lv_switch.constructor = lv_switch_constructor;
-        lv_switch.destructor = lv_switch_destructor;
-        lv_switch.draw_cb = lv_switch_draw;
-        lv_switch.signal_cb = lv_switch_signal;
-    }
-
-    lv_obj_t * obj = lv_class_new(&lv_switch);
-    lv_switch.constructor(obj, parent, copy);
-
-    lv_obj_create_finish(obj, parent, copy);
-
-    return obj;
+    return lv_obj_create_from_class(&lv_switch, parent, copy);
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -86,10 +79,7 @@ static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 {
     LV_LOG_TRACE("switch create started");
 
-    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_switch)
-    lv_switch.base_p->constructor(obj, parent, copy);
-
-    lv_switch_t * sw = (lv_switch_t *) obj;
+    lv_obj_construct_base(obj, parent, copy);
 
    if(copy == NULL) {
        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
@@ -97,11 +87,10 @@ static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
        lv_obj_set_size(obj, LV_DPX(60), LV_DPX(35));
    }
 
-   LV_CLASS_CONSTRUCTOR_END(obj, lv_switch)
    LV_LOG_INFO("switch created");
 }
 
-static void lv_switch_destructor(void * obj)
+static void lv_switch_destructor(lv_obj_t * obj)
 {
 //    lv_bar_t * bar = obj;
 //
@@ -124,18 +113,15 @@ static void lv_switch_destructor(void * obj)
 static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_COVER_CHK) {
+    if(mode == LV_DRAW_MODE_COVER_CHECK) {
         return LV_DRAW_RES_NOT_COVER;
     }
     /*Draw the object*/
-    else if(mode == LV_DRAW_DRAW_MAIN) {
-
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*The ancestor draw function will draw the background.*/
-        lv_switch.base_p->draw_cb(obj, clip_area, mode);
+        lv_obj.draw_cb(obj, clip_area, mode);
 
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
-
-        lv_switch_t * sw = (lv_switch_t *)obj;
 
         /*Calculate the indicator area*/
         lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -148,7 +134,7 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area,
         if(chk) {
             /*Respect the background's padding*/
             lv_area_t indic_area;
-            lv_area_copy(&indic_area, &sw->coords);
+            lv_area_copy(&indic_area, &obj->coords);
             indic_area.x1 += bg_left;
             indic_area.x2 -= bg_right;
             indic_area.y1 += bg_top;
@@ -167,16 +153,16 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area,
 
         /*Left*/
         if((base_dir != LV_BIDI_DIR_RTL && !chk) || (base_dir == LV_BIDI_DIR_RTL && chk)) {
-            knob_area.x1 = sw->coords.x1 + bg_left;
+            knob_area.x1 = obj->coords.x1 + bg_left;
             knob_area.x2 = knob_area.x1 + knob_size;
         }
         else {
-            knob_area.x2 = sw->coords.x2 - bg_right;
+            knob_area.x2 = obj->coords.x2 - bg_right;
             knob_area.x1 = knob_area.x2 - knob_size;
         }
 
-        knob_area.y1 = sw->coords.y1 + bg_top;
-        knob_area.y2 = sw->coords.y2 - bg_bottom;
+        knob_area.y1 = obj->coords.y1 + bg_top;
+        knob_area.y2 = obj->coords.y2 - bg_bottom;
 
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
@@ -197,8 +183,8 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area,
 
     }
     /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_DRAW_POST) {
-        return lv_switch.base_p->draw_cb(obj, clip_area, mode);
+    else if(mode == LV_DRAW_MODE_POST_DRAW) {
+        return lv_obj.draw_cb(obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
@@ -217,7 +203,7 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_switch.base_p->signal_cb(obj, sign, param);
+    res = lv_obj.signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
 

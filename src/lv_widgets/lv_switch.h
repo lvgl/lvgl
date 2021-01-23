@@ -32,19 +32,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-LV_CLASS_DECLARE_START(lv_switch, lv_obj);
+typedef struct {
+    lv_obj_t obj;
+}lv_switch_t;
 
-#define _lv_switch_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
 
-#define _lv_switch_data             \
-  _lv_obj_data
-
-#define _lv_switch_class_dsc        \
-  _lv_obj_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_switch, lv_obj);
-
-extern lv_switch_class_t lv_switch;
+extern const lv_obj_class_t lv_switch;
 
 /**********************
  * GLOBAL PROTOTYPES
