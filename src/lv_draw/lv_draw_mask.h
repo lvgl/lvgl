@@ -16,6 +16,7 @@ extern "C" {
 #include <stdbool.h>
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES

@@ -200,7 +200,7 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * obj, const lv_btnmatrix_ctrl_t ctrl_ma
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-    _lv_memcpy(btnm->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * btnm->btn_cnt);
+    lv_memcpy(btnm->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * btnm->btn_cnt);
 
     lv_btnmatrix_set_map(obj, btnm->map_p);
 }
@@ -591,7 +591,7 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         const size_t txt_ap_size = 256 ;
-        char * txt_ap = _lv_mem_buf_get(txt_ap_size);
+        char * txt_ap = lv_mem_buf_get(txt_ap_size);
 #endif
 
         lv_obj_draw_hook_dsc_t hook_dsc;
@@ -636,8 +636,8 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
 
             /*Set up the draw descriptors*/
             if(btn_state == LV_STATE_DEFAULT) {
-                _lv_memcpy(&draw_rect_dsc_act, &draw_rect_def_default, sizeof(lv_draw_rect_dsc_t));
-                _lv_memcpy(&draw_label_dsc_act, &draw_label_def_default, sizeof(lv_draw_label_dsc_t));
+                lv_memcpy(&draw_rect_dsc_act, &draw_rect_def_default, sizeof(lv_draw_rect_dsc_t));
+                lv_memcpy(&draw_label_dsc_act, &draw_label_def_default, sizeof(lv_draw_label_dsc_t));
             }
             /*In other cases get the styles directly without caching them*/
             else {
@@ -698,7 +698,7 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
 
         obj->style_list.skip_trans = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        _lv_mem_buf_release(txt_ap);
+        lv_mem_buf_release(txt_ap);
 #endif
     }
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
@@ -921,7 +921,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             lv_obj_invalidate(obj);
         }
         else if(c == LV_KEY_DOWN) {
-            lv_coord_t col_gap = LV_MATH_MAX(lv_obj_get_style_margin_left(obj, LV_BTNMATRIX_PART_BTN), lv_obj_get_style_margin_right(obj, LV_BTNMATRIX_PART_BTN));
+            lv_coord_t col_gap = LV_MAX(lv_obj_get_style_margin_left(obj, LV_BTNMATRIX_PART_BTN), lv_obj_get_style_margin_right(obj, LV_BTNMATRIX_PART_BTN));
 
             /*Find the area below the the current*/
             if(btnm->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
@@ -948,7 +948,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             lv_obj_invalidate(obj);
         }
         else if(c == LV_KEY_UP) {
-            lv_coord_t col_gap = LV_MATH_MAX(lv_obj_get_style_margin_left(obj, LV_BTNMATRIX_PART_BTN), lv_obj_get_style_margin_right(obj, LV_BTNMATRIX_PART_BTN));
+            lv_coord_t col_gap = LV_MAX(lv_obj_get_style_margin_left(obj, LV_BTNMATRIX_PART_BTN), lv_obj_get_style_margin_right(obj, LV_BTNMATRIX_PART_BTN));
             /*Find the area below the the current*/
             if(btnm->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_focused = 0;
@@ -1021,7 +1021,7 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** 
     LV_ASSERT_MEM(btnm->ctrl_bits);
     if(btnm->button_areas == NULL || btnm->ctrl_bits == NULL) btn_cnt = 0;
 
-    _lv_memset_00(btnm->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
+    lv_memset_00(btnm->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
 
     btnm->btn_cnt = btn_cnt;
 }
@@ -1094,25 +1094,25 @@ static uint16_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
     prow = (prow / 2) + 1 + (prow & 1);
     pcol = (pcol / 2) + 1 + (pcol & 1);
 
-    prow = LV_MATH_MIN(prow, BTN_EXTRA_CLICK_AREA_MAX);
-    pcol = LV_MATH_MIN(pcol, BTN_EXTRA_CLICK_AREA_MAX);
-    pright = LV_MATH_MIN(pright, BTN_EXTRA_CLICK_AREA_MAX);
-    ptop = LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
-    pbottom = LV_MATH_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX);
+    prow = LV_MIN(prow, BTN_EXTRA_CLICK_AREA_MAX);
+    pcol = LV_MIN(pcol, BTN_EXTRA_CLICK_AREA_MAX);
+    pright = LV_MIN(pright, BTN_EXTRA_CLICK_AREA_MAX);
+    ptop = LV_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
+    pbottom = LV_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX);
 
     for(i = 0; i < btnm->btn_cnt; i++) {
         lv_area_copy(&btn_area, &btnm->button_areas[i]);
-        if(btn_area.x1 <= pleft) btn_area.x1 += obj_cords.x1 - LV_MATH_MIN(pleft, BTN_EXTRA_CLICK_AREA_MAX);
+        if(btn_area.x1 <= pleft) btn_area.x1 += obj_cords.x1 - LV_MIN(pleft, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.x1 += obj_cords.x1 - pcol;
 
-        if(btn_area.y1 <= ptop) btn_area.y1 += obj_cords.y1 - LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
+        if(btn_area.y1 <= ptop) btn_area.y1 += obj_cords.y1 - LV_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.y1 += obj_cords.y1 - prow;
 
-        if(btn_area.x2 >= w - pright - 2) btn_area.x2 += obj_cords.x1 + LV_MATH_MIN(pright,
+        if(btn_area.x2 >= w - pright - 2) btn_area.x2 += obj_cords.x1 + LV_MIN(pright,
                                                                                          BTN_EXTRA_CLICK_AREA_MAX);  /*-2 for rounding error*/
         else btn_area.x2 += obj_cords.x1 + pcol;
 
-        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 += obj_cords.y1 + LV_MATH_MIN(pbottom,
+        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 += obj_cords.y1 + LV_MIN(pbottom,
                                                                                           BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
         else btn_area.y2 += obj_cords.y1 + prow;
 

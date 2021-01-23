@@ -83,6 +83,7 @@ typedef struct {
     lv_coord_t ymin[2];
     lv_coord_t ymax[2];
     lv_coord_t ext_size;
+    int32_t pressed_point_id;
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint8_t sub_tick_cnt[_LV_CHART_AXIS_LAST];

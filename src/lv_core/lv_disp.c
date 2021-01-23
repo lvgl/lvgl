@@ -318,7 +318,7 @@ uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp)
     d          = lv_disp_get_next(NULL);
     while(d) {
         uint32_t elaps = lv_tick_elaps(d->last_activity_time);
-        t = LV_MATH_MIN(t, elaps);
+        t = LV_MIN(t, elaps);
         d = lv_disp_get_next(d);
     }
 

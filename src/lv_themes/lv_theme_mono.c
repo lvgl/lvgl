@@ -101,8 +101,8 @@ static bool inited;
 #define COLOR_INV(c)    ((c).ch.red == 0 ? LV_COLOR_WHITE : LV_COLOR_BLACK)
 #define BG_COLOR        theme.color_primary.ch.red == 0 ? LV_COLOR_WHITE : LV_COLOR_BLACK
 #define FG_COLOR        COLOR_INV(BG_COLOR)
-#define RADIUS          (LV_MATH_MAX(LV_DPI / 30, 2))
-#define BORDER_WIDTH    (LV_MATH_MAX(LV_DPI / 60, 1))
+#define RADIUS          (LV_MAX(LV_DPI / 30, 2))
+#define BORDER_WIDTH    (LV_MAX(LV_DPI / 60, 1))
 
 /**********************
  *   STATIC FUNCTIONS
@@ -127,8 +127,8 @@ static void basic_init(void)
     lv_style_set_border_width(&styles->bg, LV_STATE_FOCUSED, BORDER_WIDTH * 2);
     lv_style_set_border_width(&styles->bg, LV_STATE_FOCUSED | LV_STATE_EDITED, BORDER_WIDTH * 3);
     lv_style_set_border_color(&styles->bg, LV_STATE_DEFAULT, FG_COLOR);
-    lv_style_set_line_width(&styles->bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
-    lv_style_set_scale_end_line_width(&styles->bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
+    lv_style_set_line_width(&styles->bg, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 100, 1));
+    lv_style_set_scale_end_line_width(&styles->bg, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 100, 1));
     lv_style_set_line_color(&styles->bg, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_scale_grad_color(&styles->bg, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_scale_end_color(&styles->bg, LV_STATE_DEFAULT, FG_COLOR);
@@ -211,11 +211,11 @@ static void arc_init(void)
 {
 #if LV_USE_ARC != 0
     style_init_reset(&styles->arc_bg);
-    lv_style_set_line_width(&styles->arc_bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
+    lv_style_set_line_width(&styles->arc_bg, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 100, 1));
     lv_style_set_line_color(&styles->arc_bg, LV_STATE_DEFAULT, FG_COLOR);
 
     style_init_reset(&styles->arc_indic);
-    lv_style_set_line_width(&styles->arc_indic, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 10, 3));
+    lv_style_set_line_width(&styles->arc_indic, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 10, 3));
     lv_style_set_line_color(&styles->arc_indic, LV_STATE_DEFAULT, FG_COLOR);
 #endif
 }
@@ -248,7 +248,7 @@ static void chart_init(void)
     style_init_reset(&styles->chart_series);
     lv_style_set_size(&styles->chart_series, LV_STATE_DEFAULT, 0);
     lv_style_set_bg_opa(&styles->chart_series, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_style_set_line_width(&styles->chart_series, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 50, 1));
+    lv_style_set_line_width(&styles->chart_series, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 50, 1));
 
 #endif
 }
@@ -264,19 +264,19 @@ static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
     style_init_reset(&styles->gauge_needle);
-    lv_style_set_line_width(&styles->gauge_needle, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 30, 2));
+    lv_style_set_line_width(&styles->gauge_needle, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 30, 2));
     lv_style_set_line_color(&styles->gauge_needle, LV_STATE_DEFAULT, FG_COLOR);
-    lv_style_set_size(&styles->gauge_needle, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 10, 4));
+    lv_style_set_size(&styles->gauge_needle, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 10, 4));
     lv_style_set_bg_opa(&styles->gauge_needle, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->gauge_needle, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_radius(&styles->gauge_needle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
 
     style_init_reset(&styles->gauge_major);
-    lv_style_set_line_width(&styles->gauge_major, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 25, 2));
+    lv_style_set_line_width(&styles->gauge_major, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 25, 2));
     lv_style_set_line_color(&styles->gauge_major, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_scale_end_color(&styles->gauge_major, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_scale_grad_color(&styles->gauge_major, LV_STATE_DEFAULT, FG_COLOR);
-    lv_style_set_scale_end_line_width(&styles->gauge_major, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 25, 2));
+    lv_style_set_scale_end_line_width(&styles->gauge_major, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 25, 2));
 
 #endif
 }
@@ -300,8 +300,8 @@ static void linemeter_init(void)
 {
 #if LV_USE_LINEMETER != 0
     style_init_reset(&styles->linemeter);
-    lv_style_set_line_width(&styles->linemeter, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 25, 2));
-    lv_style_set_scale_end_line_width(&styles->linemeter, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 70, 1));
+    lv_style_set_line_width(&styles->linemeter, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 25, 2));
+    lv_style_set_scale_end_line_width(&styles->linemeter, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 70, 1));
 #endif
 }
 
@@ -331,7 +331,7 @@ static void textarea_init(void)
 #if LV_USE_TEXTAREA
     style_init_reset(&styles->ta_cursor);
     lv_style_set_bg_opa(&styles->ta_cursor, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_style_set_border_width(&styles->ta_cursor, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
+    lv_style_set_border_width(&styles->ta_cursor, LV_STATE_DEFAULT, LV_MAX(LV_DPI / 100, 1));
     lv_style_set_border_side(&styles->ta_cursor, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT);
     lv_style_set_border_color(&styles->ta_cursor, LV_STATE_DEFAULT, FG_COLOR);
 

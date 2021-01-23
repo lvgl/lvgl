@@ -257,23 +257,6 @@ enum {
     LV_PART_ITEMS,
     LV_PART_MARKER,
     LV_PART_CURSOR,  //combine with marker?
-
-    LV_PART_CUSTOM_1,
-    LV_PART_CUSTOM_2,
-    LV_PART_CUSTOM_3,
-    LV_PART_CUSTOM_4,
-    LV_PART_CUSTOM_5,
-    LV_PART_CUSTOM_6,
-    LV_PART_CUSTOM_7,
-    LV_PART_CUSTOM_8,
-    LV_PART_CUSTOM_9,
-    LV_PART_CUSTOM_10,
-    LV_PART_CUSTOM_11,
-    LV_PART_CUSTOM_12,
-    LV_PART_CUSTOM_13,
-    LV_PART_CUSTOM_14,
-    LV_PART_CUSTOM_15,
-    LV_PART_CUSTOM_16,
 };
 
 typedef uint8_t lv_part_t;

@@ -56,7 +56,7 @@ static void draw_cleanup(lv_img_cache_entry_t * cache);
 
 void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
 {
-    _lv_memset_00(dsc, sizeof(lv_draw_img_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_img_dsc_t));
     dsc->recolor = LV_COLOR_BLACK;
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_IMG_ZOOM_NONE;
@@ -289,7 +289,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 
         int32_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = _lv_mem_buf_get(lv_area_get_width(&mask_com) *
+        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) *
                                          LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
@@ -308,7 +308,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
             if(read_res != LV_RES_OK) {
                 lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
-                _lv_mem_buf_release(buf);
+                lv_mem_buf_release(buf);
                 draw_cleanup(cdsc);
                 return LV_RES_INV;
             }
@@ -319,7 +319,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
             line.y2++;
             y++;
         }
-        _lv_mem_buf_release(buf);
+        lv_mem_buf_release(buf);
     }
 
     draw_cleanup(cdsc);
@@ -426,8 +426,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 #endif
             uint32_t hor_res = (uint32_t) lv_disp_get_hor_res(disp);
             uint32_t mask_buf_size = lv_area_get_size(&draw_area) > (uint32_t) hor_res ? hor_res : lv_area_get_size(&draw_area);
-            lv_color_t * map2 = _lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
-            lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
+            lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+            lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
             int32_t x;
             int32_t y;
@@ -469,20 +469,20 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 _lv_blend_map(clip_area, &blend_area, map2, mask_buf, LV_DRAW_MASK_RES_CHANGED, draw_dsc->opa, draw_dsc->blend_mode);
             }
 
-            _lv_mem_buf_release(mask_buf);
-            _lv_mem_buf_release(map2);
+            lv_mem_buf_release(mask_buf);
+            lv_mem_buf_release(map2);
         }
         /*Most complicated case: transform or other mask or chroma keyed*/
         else {
             /*Build the image and a mask line-by-line*/
             uint32_t hor_res = (uint32_t) lv_disp_get_hor_res(disp);
             uint32_t mask_buf_size = lv_area_get_size(&draw_area) > hor_res ? hor_res : lv_area_get_size(&draw_area);
-            lv_color_t * map2 = _lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
-            lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
+            lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+            lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
 #if LV_USE_IMG_TRANSFORM
             lv_img_transform_dsc_t trans_dsc;
-            _lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
+            lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
             if(transform) {
                 lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
                 if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
@@ -515,7 +515,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
             /*Prepare the `mask_buf`if there are other masks*/
             if(other_mask_cnt) {
-                _lv_memset_ff(mask_buf, mask_buf_size);
+                lv_memset_ff(mask_buf, mask_buf_size);
             }
 
             int32_t x;
@@ -600,7 +600,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                     mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1,
                                                       lv_area_get_width(&draw_area));
                     if(mask_res_sub == LV_DRAW_MASK_RES_TRANSP) {
-                        _lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));
+                        lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));
                         mask_res = LV_DRAW_MASK_RES_CHANGED;
                     }
                     else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
@@ -625,7 +625,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
                     /*Prepare the `mask_buf`if there are other masks*/
                     if(other_mask_cnt) {
-                        _lv_memset_ff(mask_buf, mask_buf_size);
+                        lv_memset_ff(mask_buf, mask_buf_size);
                     }
                 }
             }
@@ -636,8 +636,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 _lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, draw_dsc->opa, draw_dsc->blend_mode);
             }
 
-            _lv_mem_buf_release(mask_buf);
-            _lv_mem_buf_release(map2);
+            lv_mem_buf_release(mask_buf);
+            lv_mem_buf_release(map2);
         }
     }
 }

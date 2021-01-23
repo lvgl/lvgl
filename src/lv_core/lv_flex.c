@@ -80,7 +80,7 @@ const lv_flex_t lv_flex_even = {
 
 void lv_flex_init(lv_flex_t * flex)
 {
-    _lv_memset_00(flex, sizeof(lv_flex_t));
+    lv_memset_00(flex, sizeof(lv_flex_t));
     flex->update_cb = flex_update;
     flex->dir = LV_FLEX_FLOW_ROW;
     flex->item_main_place = LV_FLEX_PLACE_START;
@@ -197,6 +197,11 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
     const lv_flex_t * f = cont->spec_attr->layout_dsc;
 
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
+    bool wrap = f->wrap;
+    /*Can't wrap if the size if auto (i.e. the size depends on the children)*/
+    if(wrap && ((row && cont->w_set == LV_SIZE_AUTO) || (!row && cont->h_set == LV_SIZE_AUTO))) {
+        wrap = false;
+    }
     lv_coord_t(*get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width : lv_obj_get_height);
     lv_coord_t(*get_cross_size)(const lv_obj_t *) = (!row ? lv_obj_get_width : lv_obj_get_height);
 
@@ -217,10 +222,10 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
             grow_item_cnt++;
         } else {
             lv_coord_t item_size = get_main_size(item) + item_gap;
-            if(f->wrap && t->track_main_size + item_size > max_main_size) break;
+            if(wrap && t->track_main_size + item_size > max_main_size) break;
             t->track_main_size += item_size;
         }
-        t->track_cross_size = LV_MATH_MAX(get_cross_size(item), t->track_cross_size);
+        t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
 
         item_id += f->rev ? -1 : +1;
         item = lv_obj_get_child(cont, item_id);

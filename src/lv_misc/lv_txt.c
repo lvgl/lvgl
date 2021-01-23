@@ -11,6 +11,7 @@
 #include "lv_txt_ap.h"
 #include "lv_math.h"
 #include "lv_log.h"
+#include "lv_mem.h"
 #include "lv_debug.h"
 
 /*********************
@@ -125,7 +126,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
         lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
                                                        flag);
 
-        size_res->x = LV_MATH_MAX(act_line_length, size_res->x);
+        size_res->x = LV_MAX(act_line_length, size_res->x);
         line_start  = new_line_start;
     }
 
@@ -451,7 +452,7 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     }
 
     /* Copy the text into the new space*/
-    _lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
+    lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
 }
 
 /**
@@ -492,7 +493,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     char * text = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = _lv_mem_buf_get(len + 1);
+    char * raw_txt = lv_mem_buf_get(len + 1);
     LV_ASSERT_MEM(raw_txt);
     if(raw_txt == NULL) {
         return NULL;
@@ -509,7 +510,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     }
     _lv_txt_ap_proc(raw_txt, text);
 
-    _lv_mem_buf_release(raw_txt);
+    lv_mem_buf_release(raw_txt);
 #else
     text = lv_mem_alloc(len + 1);
     LV_ASSERT_MEM(text);
@@ -592,7 +593,7 @@ static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
     if((c & 0x80) != 0) {
         uint32_t swapped;
         uint8_t c8[4];
-        _lv_memcpy_small(c8, &c, 4);
+        lv_memcpy_small(c8, &c, 4);
         swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
         uint8_t i;
         for(i = 0; i < 4; i++) {

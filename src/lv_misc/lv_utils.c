@@ -54,7 +54,7 @@ char * _lv_utils_num_to_str(int32_t num, char * buf)
     int8_t i          = 0;
     if(num < 0) {
         buf[digitCount++] = '-';
-        num               = LV_MATH_ABS(num);
+        num               = LV_ABS(num);
         ++i;
     }
     while(num) {

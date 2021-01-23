@@ -225,7 +225,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
 #if LV_USE_GPU_STM32_DMA2D
                 LV_UNUSED(copy_buf);
 #else
-                copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
+                copy_buf = lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
 #endif
 
                 uint8_t * buf_act = (uint8_t *)vdb->buf_act;
@@ -250,21 +250,21 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
                         for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
                             /* The frame buffer is probably in an external RAM where sequential access is much faster.
                              * So first copy a line into a buffer and write it back the ext. RAM */
-                            _lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
-                            _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
+                            lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
+                            lv_memcpy(buf_act + start_offs, copy_buf, line_length);
                             start_offs += hres * sizeof(lv_color_t);
                         }
 #endif
                     }
                 }
 
-                if(copy_buf) _lv_mem_buf_release(copy_buf);
+                if(copy_buf) lv_mem_buf_release(copy_buf);
             }
         } /*End of true double buffer handling*/
 
         /*Clean up*/
-        _lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
-        _lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
+        lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
+        lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
         elaps = lv_tick_elaps(start);
@@ -274,7 +274,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
         }
     }
 
-    _lv_mem_buf_free_all();
+    lv_mem_buf_free_all();
     _lv_font_clean_up_fmt_txt();
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL

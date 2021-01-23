@@ -125,7 +125,7 @@ typedef struct {
 #endif
 
 #if LV_USE_DROPDOWN
-    lv_style_t ddlist_page, ddlist_sel;
+    lv_style_t ddlist_flip;
 #endif
 
 //#if LV_USE_ROLLER
@@ -175,14 +175,16 @@ static void basic_init(void)
             LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
             LV_STYLE_TRANSFORM_WIDTH,
             LV_STYLE_TRANSFORM_HEIGHT,
+            LV_STYLE_TRANSFORM_ZOOM,
+            LV_STYLE_TRANSFORM_ANGLE,
             LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB,
             0
     };
 
-    static lv_style_transiton_t trans_delayed;
+    static lv_style_transition_t trans_delayed;
     lv_style_transition_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, 70);
 
-    static lv_style_transiton_t trans_normal;
+    static lv_style_transition_t trans_normal;
     lv_style_transition_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
 
     style_init_reset(&styles->transition_delayed);
@@ -299,7 +301,7 @@ static void basic_init(void)
 
     style_init_reset(&styles->grow);
     lv_style_set_transform_width(&styles->grow, LV_DPX(3));
-    lv_style_set_transform_height(&styles->grow, LV_DPX(3));
+    lv_style_set_transform_angle(&styles->grow, LV_DPX(3));
 
     style_init_reset(&styles->knob);
     lv_style_set_bg_color(&styles->knob, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
@@ -322,6 +324,13 @@ static void basic_init(void)
 
     style_init_reset(&styles->arc_indic_primary);
     lv_style_set_line_color(&styles->arc_indic_primary, theme.color_primary);
+    LV_IMG_DECLARE(asd);
+    lv_style_set_bg_img_src(&styles->arc_indic_primary, &asd);
+#endif
+
+#if LV_USE_DROPDOWN
+    style_init_reset(&styles->ddlist_flip);
+    lv_style_set_transform_angle(&styles->ddlist_flip, 1800);
 #endif
 
 #if LV_USE_CHECKBOX
@@ -334,7 +343,7 @@ static void basic_init(void)
     lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
 
     style_init_reset(&styles->cb_marker_checked);
-    lv_style_set_content_src(&styles->cb_marker_checked, LV_SYMBOL_OK);
+    lv_style_set_content_text(&styles->cb_marker_checked, LV_SYMBOL_OK);
     lv_style_set_text_color(&styles->cb_marker_checked, LV_COLOR_WHITE);
     lv_style_set_text_font(&styles->cb_marker_checked, theme.font_small);
 #endif
@@ -613,6 +622,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_DROPDOWN
     else if(lv_obj_check_type(obj, &lv_dropdown)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->ddlist_flip);
+        lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_normal);
     }
     else if(lv_obj_check_type(obj, &lv_dropdown_list)) {
         lv_obj_add_style_no_refresh(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);

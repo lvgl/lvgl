@@ -454,7 +454,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     pos->y = y;
 
 #if LV_USE_BIDI
-    if(mutable_bidi_txt) _lv_mem_buf_release(mutable_bidi_txt);
+    if(mutable_bidi_txt) lv_mem_buf_release(mutable_bidi_txt);
 #endif
 }
 
@@ -517,7 +517,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     }
 
 #if LV_USE_BIDI
-    bidi_txt = _lv_mem_buf_get(new_line_start - line_start + 1);
+    bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
     uint32_t txt_len = new_line_start - line_start;
     if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
     _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
@@ -582,7 +582,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
         logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL,
                                                txt_len, lv_obj_get_base_dir(label), cid, &is_rtl);
         if(is_rtl) logical_pos++;
-        _lv_mem_buf_release(bidi_txt);
+        lv_mem_buf_release(bidi_txt);
     }
 #else
     logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
@@ -756,14 +756,14 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
     }
 
 #if LV_USE_BIDI
-    char * bidi_buf = _lv_mem_buf_get(ins_len + 1);
+    char * bidi_buf = lv_mem_buf_get(ins_len + 1);
     LV_ASSERT_MEM(bidi_buf);
     if(bidi_buf == NULL) return;
 
     _lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
     _lv_txt_ins(label->text, pos, bidi_buf);
 
-    _lv_mem_buf_release(bidi_buf);
+    lv_mem_buf_release(bidi_buf);
 #else
     _lv_txt_ins(label->text, pos, txt);
 #endif
@@ -1286,14 +1286,14 @@ static bool lv_label_set_dot_tmp(lv_obj_t * obj, char * data, uint32_t len)
             LV_LOG_ERROR("Failed to allocate memory for dot_tmp_ptr");
             return false;
         }
-        _lv_memcpy(label->dot.tmp_ptr, data, len);
+        lv_memcpy(label->dot.tmp_ptr, data, len);
         label->dot.tmp_ptr[len] = '\0';
         label->dot_tmp_alloc    = true;
     }
     else {
         /* Characters can be directly stored in object */
         label->dot_tmp_alloc = false;
-        _lv_memcpy(label->dot.tmp, data, len);
+        lv_memcpy(label->dot.tmp, data, len);
     }
     return true;
 }

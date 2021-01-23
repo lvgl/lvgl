@@ -37,7 +37,7 @@ extern "C" {
     f(lv_ll_t, _lv_obj_style_trans_ll)                             \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
     f(lv_timer_t*, _lv_timer_act)                                      \
-    f(lv_mem_buf_arr_t , _lv_mem_buf)                              \
+    f(lv_mem_buf_arr_t , lv_mem_buf)                              \
     f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)              \
     f(void * , _lv_theme_material_styles)                          \
     f(void * , _lv_theme_mono_styles)                              \

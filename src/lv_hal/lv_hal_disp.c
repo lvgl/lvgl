@@ -56,7 +56,7 @@ static lv_disp_t * disp_def;
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
-    _lv_memset_00(driver, sizeof(lv_disp_drv_t));
+    lv_memset_00(driver, sizeof(lv_disp_drv_t));
 
     driver->flush_cb         = NULL;
     driver->hor_res          = LV_HOR_RES_MAX;
@@ -103,7 +103,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
  */
 void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt)
 {
-    _lv_memset_00(disp_buf, sizeof(lv_disp_buf_t));
+    lv_memset_00(disp_buf, sizeof(lv_disp_buf_t));
 
     disp_buf->buf1    = buf1;
     disp_buf->buf2    = buf2;
@@ -125,8 +125,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
         return NULL;
     }
 
-    _lv_memset_00(disp, sizeof(lv_disp_t));
-    _lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
+    lv_memset_00(disp, sizeof(lv_disp_t));
+    lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
 
     disp->last_activity_time = 0;
 
@@ -327,7 +327,7 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
     if(disp_drv->screen_transp) {
-        _lv_memset_00(disp_drv->buffer->buf_act, disp_drv->buffer->size * sizeof(lv_color32_t));
+        lv_memset_00(disp_drv->buffer->buf_act, disp_drv->buffer->size * sizeof(lv_color32_t));
     }
 #endif
 

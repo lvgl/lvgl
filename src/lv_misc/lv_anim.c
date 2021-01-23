@@ -76,11 +76,11 @@ void _lv_anim_core_init(void)
  */
 void lv_anim_init(lv_anim_t * a)
 {
-    _lv_memset_00(a, sizeof(lv_anim_t));
+    lv_memset_00(a, sizeof(lv_anim_t));
     a->time    = 500;
     a->start   = 0;
     a->end     = 100;
-    _lv_memcpy_small(&a->path, &lv_anim_path_def, sizeof(lv_anim_path_cb_t));
+    lv_memcpy_small(&a->path, &lv_anim_path_def, sizeof(lv_anim_path_cb_t));
     a->repeat_cnt = 1;
     a->early_apply = 1;
 }
@@ -106,7 +106,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*Initialize the animation descriptor*/
     a->time_orig = a->time;
-    _lv_memcpy(new_anim, a, sizeof(lv_anim_t));
+    lv_memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
     if(new_anim->early_apply) {
@@ -118,6 +118,27 @@ void lv_anim_start(lv_anim_t * a)
     anim_mark_list_change();
 
     LV_LOG_TRACE("animation created")
+}
+
+/**
+ * Initialize an animation path
+ * @param path pointer to path
+ */
+void lv_anim_path_init(lv_anim_path_t * path)
+{
+    lv_memset_00(path, sizeof(lv_anim_path_t));
+}
+
+
+/**
+ * Set the path (curve) of the animation.
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param path_cb a function the get the current value of the animation.
+ *                The built in functions starts with `lv_anim_path_...`
+ */
+void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path)
+{
+    lv_memcpy_small(&a->path, path, sizeof(lv_anim_path_t));
 }
 
 /**
@@ -192,7 +213,7 @@ uint16_t lv_anim_count_running(void)
  */
 uint16_t lv_anim_speed_to_time(uint16_t speed, lv_anim_value_t start, lv_anim_value_t end)
 {
-    int32_t d     = LV_MATH_ABS((int32_t)start - end);
+    int32_t d     = LV_ABS((int32_t)start - end);
     uint32_t time = (int32_t)((int32_t)(d * 1000) / speed);
 
     if(time > UINT16_MAX) time = UINT16_MAX;
@@ -259,7 +280,7 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 0, 580, 1024);
+    int32_t step = lv_bezier3(t, 0, 0, 580, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -286,7 +307,7 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 420, 1000, 1024);
+    int32_t step = lv_bezier3(t, 0, 420, 1000, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -313,7 +334,7 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 64, 1024 - 64, 1024);
+    int32_t step = lv_bezier3(t, 0, 64, 1024 - 64, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -340,7 +361,7 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 1000, 1300, 1024);
+    int32_t step = lv_bezier3(t, 0, 1000, 1300, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -405,7 +426,7 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
     if(t > 1024) t = 1024;
     if(t < 0) t = 0;
 
-    int32_t step = _lv_bezier3(t, 1024, 800, 500, 0);
+    int32_t step = lv_bezier3(t, 1024, 800, 500, 0);
 
     int32_t new_value;
     new_value = (int32_t)step * diff;
@@ -520,7 +541,7 @@ static bool anim_ready_handler(lv_anim_t * a)
         /*Create copy from the animation and delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
         lv_anim_t a_tmp;
-        _lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
+        lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
         _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
         /*Flag that the list has changed */

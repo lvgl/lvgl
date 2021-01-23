@@ -115,7 +115,7 @@ static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_
 /**
  * Initialize the dyn_mem module (work memory and other variables)
  */
-void _lv_mem_init(void)
+void lv_mem_init(void)
 {
 #if LV_MEM_CUSTOM == 0
 
@@ -139,10 +139,10 @@ void _lv_mem_init(void)
  * Clean up the memory buffer which frees all the allocated memories.
  * @note It work only if `LV_MEM_CUSTOM == 0`
  */
-void _lv_mem_deinit(void)
+void lv_mem_deinit(void)
 {
 #if LV_MEM_CUSTOM == 0
-    _lv_memset_00(work_mem, (LV_MEM_SIZE / sizeof(MEM_UNIT)) * sizeof(MEM_UNIT));
+    lv_memset_00(work_mem, (LV_MEM_SIZE / sizeof(MEM_UNIT)) * sizeof(MEM_UNIT));
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
@@ -195,7 +195,7 @@ void * lv_mem_alloc(size_t size)
 #endif                /* LV_MEM_CUSTOM */
 
 #if LV_MEM_ADD_JUNK
-    if(alloc != NULL) _lv_memset(alloc, 0xaa, size);
+    if(alloc != NULL) lv_memset(alloc, 0xaa, size);
 #endif
 
     if(alloc == NULL) {
@@ -233,7 +233,7 @@ void lv_mem_free(const void * data)
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
 #  if LV_MEM_ADD_JUNK
-    _lv_memset((void *)data, 0xbb, _lv_mem_get_size(data));
+    lv_memset((void *)data, 0xbb, lv_mem_get_size(data));
 #  endif
 #endif
 
@@ -285,7 +285,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
         }
     }
 
-    uint32_t old_size = _lv_mem_get_size(data_p);
+    uint32_t old_size = lv_mem_get_size(data_p);
     if(old_size == new_size) return data_p; /*Also avoid reallocating the same memory*/
 
 #if LV_MEM_CUSTOM == 0
@@ -307,7 +307,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
         if(old_size != 0) {
-            _lv_memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
+            lv_memcpy(new_p, data_p, LV_MIN(new_size, old_size));
             lv_mem_free(data_p);
         }
     }
@@ -394,7 +394,7 @@ lv_res_t lv_mem_test(void)
 void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/
-    _lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+    lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
 #if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
     e = NULL;
@@ -436,7 +436,7 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 
 #if LV_ENABLE_GC == 0
 
-uint32_t _lv_mem_get_size(const void * data)
+uint32_t lv_mem_get_size(const void * data)
 {
     if(data == NULL) return 0;
     if(data == &zero_mem) return 0;
@@ -448,7 +448,7 @@ uint32_t _lv_mem_get_size(const void * data)
 
 #else /* LV_ENABLE_GC */
 
-uint32_t _lv_mem_get_size(const void * data)
+uint32_t lv_mem_get_size(const void * data)
 {
     return LV_MEM_CUSTOM_GET_SIZE(data);
 }
@@ -459,7 +459,7 @@ uint32_t _lv_mem_get_size(const void * data)
  * Get a temporal buffer with the given size.
  * @param size the required size
  */
-void * _lv_mem_buf_get(uint32_t size)
+void * lv_mem_buf_get(uint32_t size)
 {
     if(size == 0) return NULL;
 
@@ -477,38 +477,38 @@ void * _lv_mem_buf_get(uint32_t size)
     /*Try to find a free buffer with suitable size */
     int8_t i_guess = -1;
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0 && LV_GC_ROOT(_lv_mem_buf[i]).size >= size) {
-            if(LV_GC_ROOT(_lv_mem_buf[i]).size == size) {
-                LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
-                return LV_GC_ROOT(_lv_mem_buf[i]).p;
+        if(LV_GC_ROOT(lv_mem_buf[i]).used == 0 && LV_GC_ROOT(lv_mem_buf[i]).size >= size) {
+            if(LV_GC_ROOT(lv_mem_buf[i]).size == size) {
+                LV_GC_ROOT(lv_mem_buf[i]).used = 1;
+                return LV_GC_ROOT(lv_mem_buf[i]).p;
             }
             else if(i_guess < 0) {
                 i_guess = i;
             }
             /*If size of `i` is closer to `size` prefer it*/
-            else if(LV_GC_ROOT(_lv_mem_buf[i]).size < LV_GC_ROOT(_lv_mem_buf[i_guess]).size) {
+            else if(LV_GC_ROOT(lv_mem_buf[i]).size < LV_GC_ROOT(lv_mem_buf[i_guess]).size) {
                 i_guess = i;
             }
         }
     }
 
     if(i_guess >= 0) {
-        LV_GC_ROOT(_lv_mem_buf[i_guess]).used = 1;
-        return LV_GC_ROOT(_lv_mem_buf[i_guess]).p;
+        LV_GC_ROOT(lv_mem_buf[i_guess]).used = 1;
+        return LV_GC_ROOT(lv_mem_buf[i_guess]).p;
     }
 
 
     /*Reallocate a free buffer*/
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0) {
-            LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
-            LV_GC_ROOT(_lv_mem_buf[i]).size = size;
+        if(LV_GC_ROOT(lv_mem_buf[i]).used == 0) {
+            LV_GC_ROOT(lv_mem_buf[i]).used = 1;
+            LV_GC_ROOT(lv_mem_buf[i]).size = size;
             /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
-            LV_GC_ROOT(_lv_mem_buf[i]).p = lv_mem_realloc(LV_GC_ROOT(_lv_mem_buf[i]).p, size);
-            if(LV_GC_ROOT(_lv_mem_buf[i]).p == NULL) {
+            LV_GC_ROOT(lv_mem_buf[i]).p = lv_mem_realloc(LV_GC_ROOT(lv_mem_buf[i]).p, size);
+            if(LV_GC_ROOT(lv_mem_buf[i]).p == NULL) {
                 LV_DEBUG_ASSERT(false, "Out of memory, can't allocate a new  buffer (increase your LV_MEM_SIZE/heap size", 0x00);
             }
-            return  LV_GC_ROOT(_lv_mem_buf[i]).p;
+            return  LV_GC_ROOT(lv_mem_buf[i]).p;
         }
     }
 
@@ -520,7 +520,7 @@ void * _lv_mem_buf_get(uint32_t size)
  * Release a memory buffer
  * @param p buffer to release
  */
-void _lv_mem_buf_release(void * p)
+void lv_mem_buf_release(void * p)
 {
     uint8_t i;
 
@@ -533,8 +533,8 @@ void _lv_mem_buf_release(void * p)
     }
 
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_mem_buf[i]).p == p) {
-            LV_GC_ROOT(_lv_mem_buf[i]).used = 0;
+        if(LV_GC_ROOT(lv_mem_buf[i]).p == p) {
+            LV_GC_ROOT(lv_mem_buf[i]).used = 0;
             return;
         }
     }
@@ -545,7 +545,7 @@ void _lv_mem_buf_release(void * p)
 /**
  * Free all memory buffers
  */
-void _lv_mem_buf_free_all(void)
+void lv_mem_buf_free_all(void)
 {
     uint8_t i;
     for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
@@ -553,11 +553,11 @@ void _lv_mem_buf_free_all(void)
     }
 
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_mem_buf[i]).p) {
-            lv_mem_free(LV_GC_ROOT(_lv_mem_buf[i]).p);
-            LV_GC_ROOT(_lv_mem_buf[i]).p = NULL;
-            LV_GC_ROOT(_lv_mem_buf[i]).used = 0;
-            LV_GC_ROOT(_lv_mem_buf[i]).size = 0;
+        if(LV_GC_ROOT(lv_mem_buf[i]).p) {
+            lv_mem_free(LV_GC_ROOT(lv_mem_buf[i]).p);
+            LV_GC_ROOT(lv_mem_buf[i]).p = NULL;
+            LV_GC_ROOT(lv_mem_buf[i]).used = 0;
+            LV_GC_ROOT(lv_mem_buf[i]).size = 0;
         }
     }
 }
@@ -569,7 +569,7 @@ void _lv_mem_buf_free_all(void)
  * @param src pointer to the source buffer
  * @param len number of byte to copy
  */
-LV_ATTRIBUTE_FAST_MEM void * _lv_memcpy(void * dst, const void * src, size_t len)
+LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
 {
     uint8_t * d8 = dst;
     const uint8_t * s8 = src;
@@ -633,7 +633,7 @@ LV_ATTRIBUTE_FAST_MEM void * _lv_memcpy(void * dst, const void * src, size_t len
  * @param v value to set [0..255]
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
+LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
 {
 
     uint8_t * d8 = (uint8_t *) dst;
@@ -686,7 +686,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
+LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len)
 {
     uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
@@ -735,7 +735,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
+LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len)
 {
     uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;

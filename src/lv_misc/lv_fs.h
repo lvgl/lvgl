@@ -19,7 +19,6 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "lv_mem.h"
 
 /*********************
  *      DEFINES

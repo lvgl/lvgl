@@ -219,8 +219,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 }
                 else {
                     /* Calculate the distance from each knob */
-                    dist_left = LV_MATH_ABS((slider->left_knob_area.x1 + (slider->left_knob_area.x2 - slider->left_knob_area.x1) / 2) - p.x);
-                    dist_right = LV_MATH_ABS((slider->right_knob_area.x1 + (slider->right_knob_area.x2 - slider->right_knob_area.x1) / 2) - p.x);
+                    dist_left = LV_ABS((slider->left_knob_area.x1 + (slider->left_knob_area.x2 - slider->left_knob_area.x1) / 2) - p.x);
+                    dist_right = LV_ABS((slider->right_knob_area.x1 + (slider->right_knob_area.x2 - slider->right_knob_area.x1) / 2) - p.x);
 
                     /* Use whichever one is closer */
                     if(dist_right < dist_left)slider->value_to_set = &slider->bar.cur_value;
@@ -236,8 +236,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 }
                 else {
                     /* Calculate the distance from each knob */
-                    dist_left = LV_MATH_ABS((slider->left_knob_area.y1 + (slider->left_knob_area.y2 - slider->left_knob_area.y1) / 2) - p.y);
-                    dist_right = LV_MATH_ABS((slider->right_knob_area.y1 + (slider->right_knob_area.y2 - slider->right_knob_area.y1) / 2) - p.y);
+                    dist_left = LV_ABS((slider->left_knob_area.y1 + (slider->left_knob_area.y2 - slider->left_knob_area.y1) / 2) - p.y);
+                    dist_right = LV_ABS((slider->right_knob_area.y1 + (slider->right_knob_area.y2 - slider->right_knob_area.y1) / 2) - p.y);
 
                     /* Use whichever one is closer */
                     if(dist_right < dist_left)slider->value_to_set = &slider->bar.cur_value;
@@ -348,15 +348,15 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /* The smaller size is the knob diameter*/
         lv_coord_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
         lv_coord_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
-        knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom, knob_top));
+        lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
+        knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
         knob_size += _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_KNOB);
 
         /*Indic. size is handled by bar*/
         lv_coord_t * s = param;
-        *s  = LV_MATH_MAX(*s, knob_size);
+        *s  = LV_MAX(*s, knob_size);
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
@@ -440,15 +440,7 @@ void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
     /*Handle custom drawer*/
-    lv_obj_draw_hook_dsc_t hook_dsc;
-    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
-    hook_dsc.draw_area = &slider->right_knob_area;
-    hook_dsc.part = LV_PART_KNOB;
-    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
-
     lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
-
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
 
     if(lv_slider_get_type(obj) == LV_SLIDER_TYPE_RANGE) {
         /* Draw a second knob for the start_value side */
@@ -462,12 +454,8 @@ void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
 
         lv_area_copy(&slider->left_knob_area, &knob_area);
 
-        hook_dsc.draw_area = &slider->left_knob_area;
-        hook_dsc.id = 1;
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
         /*Draw the knob if the custom drawer allows it*/
         lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
     }
 
 }

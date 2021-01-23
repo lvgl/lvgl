@@ -9,11 +9,6 @@
 #include "lv_img.h"
 #if LV_USE_IMG != 0
 
-/*Testing of dependencies*/
-#if LV_USE_LABEL == 0
-    #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
-#endif
-
 #include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_img_decoder.h"
@@ -549,8 +544,7 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         }
 
 #if LV_USE_BLEND_MODES
-        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
-        if(lv_obj_get_style_img_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
 #endif
 
         return LV_DRAW_RES_COVER;
@@ -705,10 +699,10 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_coord_t h = lv_obj_get_height(obj);
             _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, transf_zoom, &img->pivot);
             lv_coord_t pad_ori = *s;
-            *s = LV_MATH_MAX(*s, pad_ori - a.x1);
-            *s = LV_MATH_MAX(*s, pad_ori - a.y1);
-            *s = LV_MATH_MAX(*s, pad_ori + a.x2 - w);
-            *s = LV_MATH_MAX(*s, pad_ori + a.y2 - h);
+            *s = LV_MAX(*s, pad_ori - a.x1);
+            *s = LV_MAX(*s, pad_ori - a.y1);
+            *s = LV_MAX(*s, pad_ori + a.x2 - w);
+            *s = LV_MAX(*s, pad_ori + a.y2 - h);
         }
 
         /*Handle the padding of the background*/
@@ -717,10 +711,10 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
         lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
-        *s = LV_MATH_MAX(*s, left);
-        *s = LV_MATH_MAX(*s, right);
-        *s = LV_MATH_MAX(*s, top);
-        *s = LV_MATH_MAX(*s, bottom);
+        *s = LV_MAX(*s, left);
+        *s = LV_MAX(*s, right);
+        *s = LV_MAX(*s, top);
+        *s = LV_MAX(*s, bottom);
     }
     else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t * info = param;

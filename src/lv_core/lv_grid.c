@@ -50,7 +50,7 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
 
 void lv_grid_init(lv_grid_t * grid)
 {
-    _lv_memset_00(grid,sizeof(lv_grid_t));
+    lv_memset_00(grid,sizeof(lv_grid_t));
     grid->update_cb = grid_update;
     grid->col_place = LV_GRID_START;
     grid->row_place = LV_GRID_START;
@@ -105,7 +105,7 @@ static void full_refresh(lv_obj_t * cont)
 
 
     item_repos_hint_t hint;
-    _lv_memset_00(&hint, sizeof(hint));
+    lv_memset_00(&hint, sizeof(hint));
 
     /* Calculate the grids absolute x and y coordinates.
      * It will be used as helper during item repositioning to avoid calculating this value for every children*/
@@ -158,7 +158,7 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     if(g->col_dsc_len == 0 || g->row_dsc_len == 0) return;
 
     if(lv_obj_get_child(cont, 0) == NULL) {
-        _lv_memset_00(calc_out, sizeof(_lv_grid_calc_t));
+        lv_memset_00(calc_out, sizeof(_lv_grid_calc_t));
         return;
     }
 
@@ -186,10 +186,10 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
  */
 static void calc_free(_lv_grid_calc_t * calc)
 {
-    _lv_mem_buf_release(calc->x);
-    _lv_mem_buf_release(calc->y);
-    _lv_mem_buf_release(calc->w);
-    _lv_mem_buf_release(calc->h);
+    lv_mem_buf_release(calc->x);
+    lv_mem_buf_release(calc->y);
+    lv_mem_buf_release(calc->w);
+    lv_mem_buf_release(calc->h);
 }
 
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
@@ -200,8 +200,8 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     lv_coord_t cont_w = lv_obj_get_width_fit(cont);
 
     c->col_num = grid->col_dsc_len;
-    c->x = _lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
-    c->w = _lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
+    c->x = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
+    c->w = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
 
     uint32_t col_fr_cnt = 0;
     lv_coord_t grid_w = 0;
@@ -238,8 +238,8 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     uint32_t i;
 
     c->row_num = grid->row_dsc_len;
-    c->y = _lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
-    c->h = _lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
+    c->y = lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
+    c->h = lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
 
     uint32_t row_fr_cnt = 0;
     lv_coord_t grid_h = 0;

@@ -75,10 +75,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_draw == NULL) ancestor_draw = lv_obj_get_draw_cb(imgbtn);
 
     /*Initialize the allocated 'ext' */
-    _lv_memset_00((void *)ext->img_src_mid, sizeof(ext->img_src_mid));
+    lv_memset_00((void *)ext->img_src_mid, sizeof(ext->img_src_mid));
 #if LV_IMGBTN_TILED
-    _lv_memset_00(ext->img_src_left, sizeof(ext->img_src_left));
-    _lv_memset_00(ext->img_src_right, sizeof(ext->img_src_right));
+    lv_memset_00(ext->img_src_left, sizeof(ext->img_src_left));
+    lv_memset_00(ext->img_src_right, sizeof(ext->img_src_right));
 #endif
     ext->tiled = 0;
 
@@ -95,10 +95,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing image button*/
     else {
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        _lv_memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
+        lv_memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
 #if LV_IMGBTN_TILED
-        _lv_memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
-        _lv_memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
+        lv_memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
+        lv_memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
 #endif
         ext->tiled = copy_ext->tiled;
         /*Refresh the style with new signal function*/
@@ -298,7 +298,7 @@ static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * imgbtn, const lv_area_t * clip_ar
         lv_draw_rect(&bg_coords, clip_area, &bg_dsc);
 
         if(lv_obj_get_style_clip_corner(imgbtn, LV_OBJ_PART_MAIN)) {
-            lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
             lv_coord_t r = lv_obj_get_style_radius(imgbtn, LV_OBJ_PART_MAIN);
 
@@ -409,7 +409,7 @@ static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * imgbtn, const lv_area_t * clip_ar
     else if(mode == LV_DRAW_DRAW_POST) {
         if(lv_obj_get_style_clip_corner(imgbtn, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(imgbtn + 8);
-            _lv_mem_buf_release(param);
+            lv_mem_buf_release(param);
         }
 
         lv_draw_rect_dsc_t draw_dsc;
@@ -466,10 +466,10 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
         lv_coord_t bottom = lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
 
         lv_coord_t * s = param;
-        *s = LV_MATH_MAX(*s, left);
-        *s = LV_MATH_MAX(*s, right);
-        *s = LV_MATH_MAX(*s, top);
-        *s = LV_MATH_MAX(*s, bottom);
+        *s = LV_MAX(*s, left);
+        *s = LV_MAX(*s, right);
+        *s = LV_MAX(*s, top);
+        *s = LV_MAX(*s, bottom);
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         refr_img(imgbtn);

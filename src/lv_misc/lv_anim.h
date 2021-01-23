@@ -18,7 +18,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -197,10 +196,7 @@ static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec
  * @param path_cb a function the get the current value of the animation.
  *                The built in functions starts with `lv_anim_path_...`
  */
-static inline void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path)
-{
-    _lv_memcpy_small(&a->path, path, sizeof(lv_anim_path_t));
-}
+void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path);
 
 
 /**
@@ -273,10 +269,7 @@ void lv_anim_start(lv_anim_t * a);
  * Initialize an animation path
  * @param path pointer to path
  */
-static inline void lv_anim_path_init(lv_anim_path_t * path)
-{
-    _lv_memset_00(path, sizeof(lv_anim_path_t));
-}
+void lv_anim_path_init(lv_anim_path_t * path);
 
 /**
  * Set a callback for a path

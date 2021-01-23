@@ -48,7 +48,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
-    _lv_memset_00(dsc, sizeof(lv_draw_line_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
     dsc->color = LV_COLOR_BLACK;
@@ -70,10 +70,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
     if(point1->x == point2->x && point1->y == point2->y) return;
 
     lv_area_t clip_line;
-    clip_line.x1 = LV_MATH_MIN(point1->x, point2->x) - dsc->width / 2;
-    clip_line.x2 = LV_MATH_MAX(point1->x, point2->x) + dsc->width / 2;
-    clip_line.y1 = LV_MATH_MIN(point1->y, point2->y) - dsc->width / 2;
-    clip_line.y2 = LV_MATH_MAX(point1->y, point2->y) + dsc->width / 2;
+    clip_line.x1 = LV_MIN(point1->x, point2->x) - dsc->width / 2;
+    clip_line.x2 = LV_MAX(point1->x, point2->x) + dsc->width / 2;
+    clip_line.y1 = LV_MIN(point1->y, point2->y) - dsc->width / 2;
+    clip_line.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
     bool is_common;
     is_common = _lv_area_intersect(&clip_line, &clip_line, clip);
@@ -139,8 +139,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
     else if(dashed) simple_mode = false;
 
     lv_area_t draw_area;
-    draw_area.x1 = LV_MATH_MIN(point1->x, point2->x);
-    draw_area.x2 = LV_MATH_MAX(point1->x, point2->x)  - 1;
+    draw_area.x1 = LV_MIN(point1->x, point2->x);
+    draw_area.x2 = LV_MAX(point1->x, point2->x)  - 1;
     draw_area.y1 = point1->y - w_half1;
     draw_area.y2 = point1->y + w_half0;
 
@@ -178,10 +178,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
             dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
         }
 
-        lv_opa_t * mask_buf = _lv_mem_buf_get(draw_area_w);
+        lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            _lv_memset_ff(mask_buf, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             if(dashed) {
@@ -213,7 +213,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
             fill_area.y1++;
             fill_area.y2++;
         }
-        _lv_mem_buf_release(mask_buf);
+        lv_mem_buf_release(mask_buf);
     }
 }
 
@@ -242,8 +242,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
     lv_area_t draw_area;
     draw_area.x1 = point1->x - w_half1;
     draw_area.x2 = point1->x + w_half0;
-    draw_area.y1 = LV_MATH_MIN(point1->y, point2->y);
-    draw_area.y2 = LV_MATH_MAX(point1->y, point2->y) - 1;
+    draw_area.y1 = LV_MIN(point1->y, point2->y);
+    draw_area.y2 = LV_MAX(point1->y, point2->y) - 1;
 
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {
@@ -274,7 +274,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
         fill_area.y1 = draw_area.y1 + disp_area->y1;
         fill_area.y2 = fill_area.y1;
 
-        lv_opa_t * mask_buf = _lv_mem_buf_get(draw_area_w);
+        lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
         lv_coord_t dash_start = 0;
         if(dashed) {
@@ -285,7 +285,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            _lv_memset_ff(mask_buf, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             if(dashed) {
@@ -308,7 +308,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
             fill_area.y1++;
             fill_area.y2++;
         }
-        _lv_mem_buf_release(mask_buf);
+        lv_mem_buf_release(mask_buf);
     }
 }
 
@@ -335,7 +335,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     int32_t xdiff = p2.x - p1.x;
     int32_t ydiff = p2.y - p1.y;
-    bool flat = LV_MATH_ABS(xdiff) > LV_MATH_ABS(ydiff) ? true : false;
+    bool flat = LV_ABS(xdiff) > LV_ABS(ydiff) ? true : false;
 
     static const uint8_t wcorr[] = {
         128, 128, 128, 129, 129, 130, 130, 131,
@@ -347,18 +347,18 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     int32_t w = dsc->width;
     int32_t wcorr_i = 0;
-    if(flat) wcorr_i = (LV_MATH_ABS(ydiff) << 5) / LV_MATH_ABS(xdiff);
-    else wcorr_i = (LV_MATH_ABS(xdiff) << 5) / LV_MATH_ABS(ydiff);
+    if(flat) wcorr_i = (LV_ABS(ydiff) << 5) / LV_ABS(xdiff);
+    else wcorr_i = (LV_ABS(xdiff) << 5) / LV_ABS(ydiff);
 
     w = (w * wcorr[wcorr_i] + 63) >> 7;     /*+ 63 for rounding*/
     int32_t w_half0 = w >> 1;
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
     lv_area_t draw_area;
-    draw_area.x1 = LV_MATH_MIN(p1.x, p2.x) - w;
-    draw_area.x2 = LV_MATH_MAX(p1.x, p2.x) + w;
-    draw_area.y1 = LV_MATH_MIN(p1.y, p2.y) - w;
-    draw_area.y2 = LV_MATH_MAX(p1.y, p2.y) + w;
+    draw_area.x1 = LV_MIN(p1.x, p2.x) - w;
+    draw_area.x2 = LV_MAX(p1.x, p2.x) + w;
+    draw_area.y1 = LV_MIN(p1.y, p2.y) - w;
+    draw_area.y2 = LV_MAX(p1.y, p2.y) + w;
 
     /* Get the union of `coords` and `clip`*/
     /* `clip` is already truncated to the `vdb` size
@@ -425,8 +425,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     /*Draw the background line by line*/
     int32_t h;
     uint32_t hor_res = (uint32_t)lv_disp_get_hor_res(disp);
-    size_t mask_buf_size = LV_MATH_MIN(lv_area_get_size(&draw_area), hor_res);
-    lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
+    size_t mask_buf_size = LV_MIN(lv_area_get_size(&draw_area), hor_res);
+    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
     lv_area_t fill_area;
     fill_area.x1 = draw_area.x1 + disp_area->x1;
@@ -438,13 +438,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     uint32_t mask_p = 0;
 
-    _lv_memset_ff(mask_buf, mask_buf_size);
+    lv_memset_ff(mask_buf, mask_buf_size);
     /*Fill the first row with 'color'*/
     for(h = draw_area.y1 + disp_area->y1; h <= draw_area.y2 + disp_area->y1; h++) {
 
         lv_draw_mask_res_t mask_res = lv_draw_mask_apply(&mask_buf[mask_p], x, h, draw_area_w);
         if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
-            _lv_memset_00(&mask_buf[mask_p], draw_area_w);
+            lv_memset_00(&mask_buf[mask_p], draw_area_w);
         }
 
         mask_p += draw_area_w;
@@ -459,7 +459,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
             mask_p = 0;
-            _lv_memset_ff(mask_buf, mask_buf_size);
+            lv_memset_ff(mask_buf, mask_buf_size);
         }
     }
 
@@ -472,7 +472,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     }
 
-    _lv_mem_buf_release(mask_buf);
+    lv_mem_buf_release(mask_buf);
 
     lv_draw_mask_remove_id(mask_left_id);
     lv_draw_mask_remove_id(mask_right_id);

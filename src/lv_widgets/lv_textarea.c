@@ -162,12 +162,12 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         if(copy_ext->pwd_tmp) {
-            uint32_t len = _lv_mem_get_size(copy_ext->pwd_tmp);
+            uint32_t len = lv_mem_get_size(copy_ext->pwd_tmp);
             ext->pwd_tmp = lv_mem_alloc(len);
             LV_ASSERT_MEM(ext->pwd_tmp);
             if(ext->pwd_tmp == NULL) return NULL;
 
-            _lv_memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
+            lv_memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
         }
 
         if(copy_ext->one_line) lv_textarea_set_one_line(ta, true);
@@ -1447,16 +1447,16 @@ static void pwd_char_hider(lv_obj_t * ta)
         else bullet = "*";
 
         size_t bullet_len = strlen(bullet);
-        char * txt_tmp = _lv_mem_buf_get(enc_len * bullet_len + 1);
+        char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
         int32_t i;
         for(i = 0; i < enc_len; i++) {
-            _lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
+            lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
         }
 
         txt_tmp[i * bullet_len] = '\0';
 
         lv_label_set_text(ext->label, txt_tmp);
-        _lv_mem_buf_release(txt_tmp);
+        lv_mem_buf_release(txt_tmp);
         refr_cursor_area(ta);
     }
 }
@@ -1771,7 +1771,7 @@ static void draw_cursor(lv_obj_t * ta, const lv_area_t * clip_area)
     lv_draw_rect(&cur_area, clip_area, &cur_dsc);
 
     char letter_buf[8] = {0};
-    _lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
+    lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
     if(cur_dsc.bg_opa == LV_OPA_COVER) {
         lv_coord_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);

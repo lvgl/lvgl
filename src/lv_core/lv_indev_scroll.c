@@ -268,7 +268,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
         /*Decide if it's a horizontal or vertical scroll*/
         bool hor_en = false;
         bool ver_en = false;
-        if(LV_MATH_ABS(proc->types.pointer.scroll_sum.x) > LV_MATH_ABS(proc->types.pointer.scroll_sum.y)) {
+        if(LV_ABS(proc->types.pointer.scroll_sum.x) > LV_ABS(proc->types.pointer.scroll_sum.y)) {
             hor_en = true;
         }
         else {
@@ -436,7 +436,7 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
             x_child += ofs;
             if(x_child >= min && x_child <= max) {
                 lv_coord_t x = x_child -  x_parent;
-                if(LV_MATH_ABS(x) < LV_MATH_ABS(dist)) dist = x;
+                if(LV_ABS(x) < LV_ABS(dist)) dist = x;
             }
         }
     }
@@ -483,7 +483,7 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
             y_child += ofs;
             if(y_child >= min && y_child <= max) {
                 lv_coord_t y = y_child -  y_parent;
-                if(LV_MATH_ABS(y) < LV_MATH_ABS(dist)) dist = y;
+                if(LV_ABS(y) < LV_ABS(dist)) dist = y;
             }
         }
     }

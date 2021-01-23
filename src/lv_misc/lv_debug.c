@@ -99,7 +99,7 @@ void lv_debug_log_error(const char * msg, uint64_t value)
         char * bufp = buf;
 
         /*Add the function name*/
-        _lv_memcpy(bufp, msg, msg_len);
+        lv_memcpy(bufp, msg, msg_len);
         bufp += msg_len;
 
         /*Add value in hey*/

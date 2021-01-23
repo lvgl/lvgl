@@ -76,7 +76,7 @@ void lv_theme_apply(lv_obj_t * obj)
  */
 void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy)
 {
-    _lv_memset_00(theme, sizeof(lv_theme_t));
+    lv_memset_00(theme, sizeof(lv_theme_t));
 
     if(copy) {
         theme->font_small = copy->font_small;

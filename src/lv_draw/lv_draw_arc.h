@@ -22,10 +22,21 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_color_t color;
+    lv_coord_t width;
+    const void * bg_img_src;
+    lv_opa_t opa;
+    lv_blend_mode_t blend_mode  : 2;
+    uint8_t rounded : 1;
+} lv_draw_arc_dsc_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+LV_ATTRIBUTE_FAST_MEM void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc);
 
 /**
  * Draw an arc. (Can draw pie too with great thickness.)
@@ -39,7 +50,7 @@ extern "C" {
  * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
-                 const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc);
+                 const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
 
 /**********************
  *      MACROS

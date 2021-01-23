@@ -83,7 +83,7 @@ lv_meter_indicator_t * lv_meter_add_indicator(lv_obj_t * obj)
 
     lv_meter_t * meter = (lv_meter_t *) obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indic_ll);
-    _lv_memset_00(indic, sizeof(lv_meter_indicator_t));
+    lv_memset_00(indic, sizeof(lv_meter_indicator_t));
     indic->start_value = meter->min_value;
     indic->end_value = meter->min_value;
     indic->type = LV_METER_INDICATOR_TYPE_NEEDLE;
@@ -438,8 +438,8 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
         line_dsc.width = indic->width;
         line_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
 
-        int32_t start_angle = _lv_map(indic->start_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
-        int32_t end_angle = _lv_map(indic->end_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+        int32_t start_angle = lv_map(indic->start_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+        int32_t end_angle = lv_map(indic->end_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
         lv_draw_arc(scale_center.x + indic->arc_ofs.x, scale_center.y + indic->arc_ofs.y, r_out + indic->r_mod, start_angle, end_angle, clip_area, &line_dsc);
     }
 }
@@ -496,12 +496,12 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
         int32_t angle_rem = angle_upscale & 0xFF;
 
         /*Interpolate sine and cos*/
-        int32_t sin_low = _lv_trigo_sin(angle_low + angle_ofs);
-        int32_t sin_high = _lv_trigo_sin(angle_high + angle_ofs);
+        int32_t sin_low = lv_trigo_sin(angle_low + angle_ofs);
+        int32_t sin_high = lv_trigo_sin(angle_high + angle_ofs);
         int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
 
-        int32_t cos_low = _lv_trigo_cos(angle_low + angle_ofs);
-        int32_t cos_high = _lv_trigo_cos(angle_high + angle_ofs);
+        int32_t cos_low = lv_trigo_cos(angle_low + angle_ofs);
+        int32_t cos_high = lv_trigo_cos(angle_high + angle_ofs);
         int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
         lv_point_t p_inner;
@@ -518,7 +518,7 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
         lv_draw_line_dsc_t * line_dsc_act;
         line_dsc_act = marker ? &line_marker_dsc : &line_sub_dsc;
 
-        int32_t value_of_line = _lv_map(i, 0, meter->line_cnt - 1, meter->min_value, meter->max_value);
+        int32_t value_of_line = lv_map(i, 0, meter->line_cnt - 1, meter->min_value, meter->max_value);
 
         lv_color_t line_color = line_dsc_act->color;
         lv_color_t line_color_ori = line_dsc_act->color;
@@ -540,9 +540,9 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 } else {
                     lv_opa_t ratio;
                     if(indic->scale_color_local) {
-                        ratio = _lv_map(value_of_line, indic->start_value, indic->end_value, LV_OPA_TRANSP, LV_OPA_COVER);
+                        ratio = lv_map(value_of_line, indic->start_value, indic->end_value, LV_OPA_TRANSP, LV_OPA_COVER);
                     } else {
-                        ratio = _lv_map(value_of_line, meter->min_value, meter->max_value, LV_OPA_TRANSP, LV_OPA_COVER);
+                        ratio = lv_map(value_of_line, meter->min_value, meter->max_value, LV_OPA_TRANSP, LV_OPA_COVER);
                     }
                     line_color = lv_color_mix(indic->grad_color, indic->color, ratio);
                 }
@@ -608,13 +608,13 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
     _LV_LL_READ_BACK(&meter->indic_ll, indic) {
         if((indic->type & LV_METER_INDICATOR_TYPE_NEEDLE) == false) continue;
 
-        int32_t angle = _lv_map(indic->end_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
+        int32_t angle = lv_map(indic->end_value, meter->min_value, meter->max_value, 0, meter->scale_angle) + angle_ofs;
 
         /*Draw a line*/
         if(indic->img_src == NULL) {
             lv_point_t p_end;
-            p_end.y = (_lv_trigo_sin(angle) * (r_out + indic->r_mod)) / LV_TRIGO_SIN_MAX + scale_center.x;
-            p_end.x = (_lv_trigo_cos(angle) * (r_out + indic->r_mod)) / LV_TRIGO_SIN_MAX + scale_center.y;
+            p_end.y = (lv_trigo_sin(angle) * (r_out + indic->r_mod)) / LV_TRIGO_SIN_MAX + scale_center.x;
+            p_end.x = (lv_trigo_cos(angle) * (r_out + indic->r_mod)) / LV_TRIGO_SIN_MAX + scale_center.y;
             line_dsc.color = indic->color;
             line_dsc.width = indic->width;
             line_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;

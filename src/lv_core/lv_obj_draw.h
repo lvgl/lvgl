@@ -40,7 +40,11 @@ typedef struct
     lv_draw_label_dsc_t * label_dsc;
     lv_draw_line_dsc_t * line_dsc;
     lv_draw_img_dsc_t *  img_dsc;
+    lv_draw_arc_dsc_t *  arc_dsc;
     const lv_area_t * draw_area;
+    const lv_point_t * p1;
+    const lv_point_t * p2;
+    const lv_coord_t * radius;
     const lv_area_t * clip_area;
     uint32_t id;
     uint8_t part;
@@ -105,6 +109,7 @@ void lv_obj_init_draw_img_dsc(struct _lv_obj_t * obj, uint8_t part, lv_draw_img_
  */
 void lv_obj_init_draw_line_dsc(struct _lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc);
 
+void lv_obj_init_draw_arc_dsc(struct _lv_obj_t * obj, uint8_t part, lv_draw_arc_dsc_t * draw_dsc);
 
 bool lv_obj_draw_has_custom(const struct _lv_obj_t * obj, uint8_t part);
 

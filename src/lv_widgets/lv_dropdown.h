@@ -34,45 +34,28 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-LV_CLASS_DECLARE_START(lv_dropdown, lv_obj);
+typedef struct {
+    lv_obj_t obj;
+    lv_obj_t * list;             /*The dropped down list*/
+    const char * text;           /*Text to display on the ddlist's button*/
+    const void * symbol;         /*Arrow or other icon when the drop-down list is closed*/
+    char * options;
+    lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/
+    uint16_t option_cnt;          /*Number of options*/
+    uint16_t sel_opt_id;          /*Index of the currently selected option*/
+    uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
+    uint16_t pr_opt_id;             /*Index of the currently pressed option*/
+    lv_dir_t dir         : 4;
+    uint8_t static_txt : 1;
+}lv_dropdown_t;
 
-#define _lv_dropdown_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
-
-#define _lv_dropdown_data             \
-  _lv_obj_data                  \
-  lv_obj_t * list;             /*The dropped down list*/    \
-  const char * text;           /*Text to display on the ddlist's button*/   \
-  const char * symbol;         /*Arrow or other icon when the drop-down list is closed*/    \
-  char * options;                                       \
-  lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/    \
-  uint16_t option_cnt;          /*Number of options*/   \
-  uint16_t sel_opt_id;          /*Index of the currently selected option*/  \
-  uint16_t sel_opt_id_orig;     /*Store the original index on focus*/       \
-  uint16_t pr_opt_id;             /*Index of the currently pressed option*/ \
-  lv_dir_t dir         : 4;             \
-  uint8_t static_txt : 1;
-
-#define _lv_dropdown_class_dsc        \
-  _lv_obj_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_dropdown, lv_obj);
-
-extern lv_dropdown_class_t lv_dropdown;
-
-LV_CLASS_DECLARE_START(lv_dropdown_list, lv_obj);
-
-#define _lv_dropdown_list_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
-
-#define _lv_dropdown_list_data             \
-  _lv_obj_data                  \
+typedef struct {
+  lv_obj_t obj;
   lv_obj_t * dropdown;
+}lv_dropdown_list_t;
 
-#define _lv_dropdown_list_class_dsc        \
-  _lv_obj_class_dsc              \
-
-LV_CLASS_DECLARE_END(lv_dropdown_list, lv_obj);
-
-extern lv_dropdown_list_class_t lv_dropdown_list;
+extern const  lv_obj_class_t lv_dropdown;
+extern const  lv_obj_class_t lv_dropdown_list;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -153,7 +136,7 @@ void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h);
  * @param ddlist pointer to drop down list object
  * @param symbol a text like `LV_SYMBOL_DOWN` or NULL to not draw icon
  */
-void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol);
+void lv_dropdown_set_symbol(lv_obj_t * ddlist, const void * symbol);
 
 /*=====================
  * Getter functions

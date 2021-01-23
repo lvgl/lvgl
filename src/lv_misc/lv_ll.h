@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_mem.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>

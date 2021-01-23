@@ -117,7 +117,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                 break;
         }
 
-        if(_lv_mem_get_size(LV_GC_ROOT(_lv_font_decompr_buf)) < buf_size) {
+        if(lv_mem_get_size(LV_GC_ROOT(_lv_font_decompr_buf)) < buf_size) {
             LV_GC_ROOT(_lv_font_decompr_buf) = lv_mem_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
             LV_ASSERT_MEM(LV_GC_ROOT(_lv_font_decompr_buf));
             if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) return NULL;
@@ -359,12 +359,12 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     rle_init(in, bpp);
 
-    uint8_t * line_buf1 = _lv_mem_buf_get(w);
+    uint8_t * line_buf1 = lv_mem_buf_get(w);
 
     uint8_t * line_buf2 = NULL;
 
     if(prefilter) {
-        line_buf2 = _lv_mem_buf_get(w);
+        line_buf2 = lv_mem_buf_get(w);
     }
 
     decompress_line(line_buf1, w);
@@ -397,8 +397,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
         }
     }
 
-    _lv_mem_buf_release(line_buf1);
-    _lv_mem_buf_release(line_buf2);
+    lv_mem_buf_release(line_buf1);
+    lv_mem_buf_release(line_buf2);
 }
 
 /**

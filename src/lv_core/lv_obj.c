@@ -85,7 +85,7 @@ static void lv_obj_destructor(lv_obj_t * obj);
  **********************/
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
-static const void * event_act_data;
+static void * event_act_data;
 const lv_obj_class_t lv_obj = {
     .constructor = lv_obj_constructor,
     .destructor = lv_obj_destructor,
@@ -117,7 +117,7 @@ void lv_init(void)
     LV_LOG_TRACE("lv_init started");
 
     /*Initialize the lv_misc modules*/
-    _lv_mem_init();
+    lv_mem_init();
 
     _lv_timer_core_init();
 
@@ -193,7 +193,7 @@ void lv_deinit(void)
     _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
-    _lv_mem_deinit();
+    lv_mem_deinit();
     lv_initialized = false;
 
     LV_LOG_INFO("lv_deinit done");
@@ -225,7 +225,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_obj_t * obj = lv_mem_alloc(class->instance_size);
-    _lv_memset_00(obj, class->instance_size);
+    lv_memset_00(obj, class->instance_size);
     obj->class_p = class;
 
     class->constructor(obj, parent, copy);
@@ -482,13 +482,10 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         old_parent->spec_attr->children = NULL;
     }
 
-    /*Add the child to the new parent*/
+    /*Add the child to the new parent as the last (newest child)*/
     parent->spec_attr->child_cnt++;
     parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    for(i = lv_obj_get_child_cnt(parent) - 1; i > 0 ; i--) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i - 1];
-    }
-    parent->spec_attr->children[0] = obj;
+    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     obj->parent = parent;
 
@@ -584,7 +581,7 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
     obj->spec_attr->ext_click_pad.y2 = bottom;
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->ext_click_pad = LV_MATH_MAX4(left, right, top, bottom);
+    obj->spec_attr->ext_click_pad = LV_MAX4(left, right, top, bottom);
 #else
     LV_UNUSED(obj);
     LV_UNUSED(left);
@@ -687,8 +684,8 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
-    trans_set_t * ts = _lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
-    _lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
+    trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
+    lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
     uint32_t tsi = 0;
     uint32_t i;
     for(i = 0; i < obj->style_list.style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
@@ -698,7 +695,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
         lv_style_value_t v;
         if(lv_style_get_prop(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
-        const lv_style_transiton_t * tr = v.ptr;
+        const lv_style_transition_t * tr = v.ptr;
 
         /*Add the props t the set is not added yet or added but with smaller weight*/
         uint32_t j;
@@ -725,7 +722,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         _lv_obj_create_style_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
     }
 
-    _lv_mem_buf_release(ts);
+    lv_mem_buf_release(ts);
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) _lv_obj_refresh_ext_draw_pad(obj);
@@ -953,7 +950,7 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
         LV_ASSERT_MEM(obj->spec_attr);
         if(obj->spec_attr == NULL) return NULL;
 
-        _lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
+        lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
         obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
@@ -1496,7 +1493,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
         obj->flags  = copy->flags;
         if(copy->spec_attr) {
             lv_obj_allocate_spec_attr(obj);
-            _lv_memcpy_small(obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
+            lv_memcpy_small(obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
             obj->spec_attr->children = NULL;    /*Make the child list empty*/
         }
 #if LV_USE_GROUP
@@ -1564,8 +1561,9 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
 
         if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
 
-        if(lv_obj_get_style_bg_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
-        if(lv_obj_get_style_border_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+#if LV_USE_BLEND_MODES
+        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+#endif
         if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
 
         return  LV_DRAW_RES_COVER;
@@ -1590,30 +1588,22 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         coords.y1 -= h;
         coords.y2 += h;
 
-        lv_obj_draw_hook_dsc_t hook_dsc;
-        lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
-        hook_dsc.draw_area = &coords;
-        hook_dsc.part = LV_PART_MAIN;
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
-
         lv_draw_rect(&coords, clip_area, &draw_dsc);
 
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
             lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
             lv_draw_mask_radius_init(mp, &obj->coords, r, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
         }
-
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
     }
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
         _lv_obj_draw_scrollbar(obj, clip_area);
 
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
-            _lv_mem_buf_release(param);
+            lv_mem_buf_release(param);
         }
 
         /*If the border is drawn later disable loading other properties*/
@@ -1833,7 +1823,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t * s = param;
         lv_coord_t d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MAIN);
-        *s = LV_MATH_MAX(*s, d);
+        *s = LV_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         /* Padding might have changed so the layout should be recalculated*/

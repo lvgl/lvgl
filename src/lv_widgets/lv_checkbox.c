@@ -219,6 +219,7 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
         marker_area_transf.x2 += transf_w;
         marker_area_transf.y1 -= transf_h;
         marker_area_transf.y2 += transf_h;
+
         lv_draw_rect(&marker_area_transf, clip_area, &marker_dsc);
 
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -239,7 +240,6 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
         txt_area.y2 = txt_area.y1 + txt_size.y;
 
         lv_draw_label(&txt_area, clip_area, &txt_dsc, cb->txt, NULL);
-
     } else {
         lv_obj.draw_cb(obj, clip_area, mode);
     }
@@ -283,12 +283,12 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         marker_size.y = font_h + marker_topp + marker_bottomp;
 
         p->x = marker_size.x + txt_size.x + bg_colp;
-        p->y = LV_MATH_MAX(marker_size.y, txt_size.y);
+        p->y = LV_MAX(marker_size.y, txt_size.y);
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t *s = param;
         lv_coord_t m = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MARKER);
-        *s = LV_MATH_MAX(*s, m);
+        *s = LV_MAX(*s, m);
     }
 
     return res;

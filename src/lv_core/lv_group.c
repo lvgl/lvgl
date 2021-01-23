@@ -72,7 +72,7 @@ lv_group_t * lv_group_create(void)
     group->wrap           = 1;
 
 #if LV_USE_USER_DATA
-    _lv_memset_00(&group->user_data, sizeof(lv_group_user_data_t));
+    lv_memset_00(&group->user_data, sizeof(lv_group_user_data_t));
 #endif
 
     return group;

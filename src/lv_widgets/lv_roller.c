@@ -127,7 +127,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         roller->mode = LV_ROLLER_MODE_INFINITE;
 
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = _lv_mem_buf_get(opt_len * LV_ROLLER_INF_PAGES);
+        char * opt_extra = lv_mem_buf_get(opt_len * LV_ROLLER_INF_PAGES);
         uint8_t i;
         for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
             strcpy(&opt_extra[opt_len * i], options);
@@ -135,7 +135,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         }
         opt_extra[opt_len * LV_ROLLER_INF_PAGES - 1] = '\0';
         lv_label_set_text(label, opt_extra);
-        _lv_mem_buf_release(opt_extra);
+        lv_mem_buf_release(opt_extra);
 
         roller->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 0) * roller->option_cnt;
 
@@ -646,7 +646,7 @@ static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void 
         lv_obj_t * obj = lv_obj_get_parent(label);
         lv_coord_t sel_w = get_selected_label_width(obj);
         lv_coord_t label_w = lv_obj_get_width(label);
-        *s = LV_MATH_MAX(*s, sel_w - label_w);
+        *s = LV_MAX(*s, sel_w - label_w);
     }
 
     return res;

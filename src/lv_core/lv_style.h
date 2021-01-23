@@ -63,6 +63,7 @@ typedef enum {
     LV_STYLE_ANIM_TIME  = 10,
     LV_STYLE_TRANSITION = 11,
     LV_STYLE_SIZE = 12,
+    LV_STYLE_BLEND_MODE = 13,
 
     LV_STYLE_PAD_TOP        = 20 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_BOTTOM     = 21 | LV_STYLE_PROP_LAYOUT_REFR,
@@ -77,63 +78,70 @@ typedef enum {
     LV_STYLE_BG_GRAD_COLOR =  32,
     LV_STYLE_BG_GRAD_COLOR_FILTERED =  32 | LV_STYLE_PROP_FILTER,
     LV_STYLE_BG_GRAD_DIR =    33,
-    LV_STYLE_BG_BLEND_MODE =  34,
     LV_STYLE_BG_MAIN_STOP =   35,
     LV_STYLE_BG_GRAD_STOP =   36,
 
-    LV_STYLE_BORDER_COLOR   = 40,
-    LV_STYLE_BORDER_COLOR_FILTERED   = 40 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BORDER_OPA     = 41,
-    LV_STYLE_BORDER_WIDTH   = 42,
-    LV_STYLE_BORDER_SIDE    = 43,
-    LV_STYLE_BORDER_POST    = 44,
-    LV_STYLE_BORDER_BLEND_MODE = 45,
+    LV_STYLE_BG_IMG_SRC = 40,
+    LV_STYLE_BG_IMG_OPA = 41,
+    LV_STYLE_BG_IMG_RECOLOR = 42,
+    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 43 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_BG_IMG_RECOLOR_OPA = 44,
+    LV_STYLE_BG_IMG_TILED = 45,
 
-    LV_STYLE_TEXT_COLOR     = 50    | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_COLOR_FILTERED = 50    | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_FILTER,
-    LV_STYLE_TEXT_OPA       = 51    | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_FONT      = 52    | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_LETTER_SPACE = 53 | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_LINE_SPACE = 54   | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_DECOR = 55        | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_ALIGN = 56        | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_BLEND_MODE = 57   | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_BORDER_COLOR   = 50,
+    LV_STYLE_BORDER_COLOR_FILTERED   = 50 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_BORDER_OPA     = 51,
+    LV_STYLE_BORDER_WIDTH   = 52,
+    LV_STYLE_BORDER_SIDE    = 53,
+    LV_STYLE_BORDER_POST    = 54,
 
-    LV_STYLE_IMG_OPA        = 60,
-    LV_STYLE_IMG_BLEND_MODE = 61,
-    LV_STYLE_IMG_RECOLOR = 62,
-    LV_STYLE_IMG_RECOLOR_FILTERED = 62 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_IMG_RECOLOR_OPA = 63,
+    LV_STYLE_TEXT_COLOR     = 60    | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_COLOR_FILTERED = 60    | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_FILTER,
+    LV_STYLE_TEXT_OPA       = 61    | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_FONT      = 62    | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_LETTER_SPACE = 63 | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_LINE_SPACE = 64   | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_DECOR = 65        | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TEXT_ALIGN = 66        | LV_STYLE_PROP_INHERIT,
 
-    LV_STYLE_OUTLINE_WIDTH = 71 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OUTLINE_COLOR = 72,
-    LV_STYLE_OUTLINE_COLOR_FILTERED = 72 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_OUTLINE_OPA = 73     | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OUTLINE_PAD = 74     | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OUTLINE_BLEND_MODE = 75,
+    LV_STYLE_IMG_OPA        = 70,
+    LV_STYLE_IMG_RECOLOR = 71,
+    LV_STYLE_IMG_RECOLOR_FILTERED = 71 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_IMG_RECOLOR_OPA = 73,
 
-    LV_STYLE_SHADOW_WIDTH = 80 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_OFS_X = 81 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_OFS_Y = 82 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_SPREAD = 83 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_BLEND_MODE = 84,
-    LV_STYLE_SHADOW_COLOR = 85,
-    LV_STYLE_SHADOW_COLOR_FILTERED = 85 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_SHADOW_OPA = 86 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_OUTLINE_WIDTH = 80 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_OUTLINE_COLOR = 81,
+    LV_STYLE_OUTLINE_COLOR_FILTERED = 81 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_OUTLINE_OPA = 82     | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_OUTLINE_PAD = 83     | LV_STYLE_PROP_EXT_DRAW,
 
-    LV_STYLE_LINE_WIDTH = 90 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_LINE_BLEND_MODE = 91,
-    LV_STYLE_LINE_DASH_WIDTH = 92,
-    LV_STYLE_LINE_DASH_GAP = 93,
-    LV_STYLE_LINE_ROUNDED = 94,
-    LV_STYLE_LINE_COLOR = 95,
-    LV_STYLE_LINE_COLOR_FILTERED = 95 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_LINE_OPA = 96,
+    LV_STYLE_SHADOW_WIDTH = 90 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_SHADOW_OFS_X = 91 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_SHADOW_OFS_Y = 92 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_SHADOW_SPREAD = 93 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_SHADOW_COLOR = 94,
+    LV_STYLE_SHADOW_COLOR_FILTERED = 94 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_SHADOW_OPA = 95 | LV_STYLE_PROP_EXT_DRAW,
 
-    LV_STYLE_CONTENT_SRC = 100   | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_ALIGN = 101 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_OFS_X = 102 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_OFS_Y = 103 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_LINE_WIDTH = 100 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_LINE_DASH_WIDTH = 101,
+    LV_STYLE_LINE_DASH_GAP = 102,
+    LV_STYLE_LINE_ROUNDED = 103,
+    LV_STYLE_LINE_COLOR = 104,
+    LV_STYLE_LINE_COLOR_FILTERED = 104 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_LINE_OPA = 105,
+
+    LV_STYLE_CONTENT_TEXT = 110   | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_ALIGN = 111 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_OFS_X = 112 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_OFS_Y = 113 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_FONT = 114  | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_COLOR = 115 | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_COLOR_FILTERED = 115 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_FILTER,
+    LV_STYLE_CONTENT_OPA = 116   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_LETTER_SPACE = 117   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_LINE_SPACE = 118   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_DECOR = 119   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
 
     _LV_STYLE_LAST_BUILT_IN_PROP = 128,
 
@@ -147,7 +155,7 @@ typedef struct _lv_style_transiton_t{
     const lv_anim_path_t * path;
     uint32_t time;
     uint32_t delay;
-}lv_style_transiton_t;
+}lv_style_transition_t;
 
 #if LV_USE_ASSERT_STYLE
 #  define _LV_STYLE_SENTINEL uint32_t sentinel;
@@ -196,7 +204,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
 
-void lv_style_transition_init(lv_style_transiton_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay);
+void lv_style_transition_init(lv_style_transition_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay);
 
 uint32_t lv_style_find_index_num(lv_style_value_t v);
 uint32_t lv_style_find_index_color(lv_style_value_t v);
@@ -212,9 +220,6 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop);
 
 static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_RADIUS, v); }
-
-static inline void lv_style_set_anim_time(lv_style_t * style, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v); }
 
 static inline void lv_style_set_clip_corner(lv_style_t * style, bool value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, v); }
@@ -239,6 +244,18 @@ static inline void lv_style_set_color_filter_cb(lv_style_t * style, lv_color_fil
 
 static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v); }
+
+static inline void lv_style_set_anim_time(lv_style_t * style, uint32_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v); }
+
+static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transition_t * value) {
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION, v); }
+
+static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SIZE, v); }
+
+static inline void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BLEND_MODE, v); }
 
 static inline void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_PAD_TOP, v); }
@@ -276,14 +293,26 @@ static inline void lv_style_set_bg_grad_color_filtered(lv_style_t * style, lv_co
 static inline void lv_style_set_bg_grad_dir(lv_style_t * style, lv_grad_dir_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_DIR, v); }
 
-static inline void lv_style_set_bg_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_BLEND_MODE, v); }
-
 static inline void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_MAIN_STOP, v); }
 
 static inline void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_STOP, v); }
+
+static inline void lv_style_set_bg_img_src(lv_style_t * style, const void * value) {
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_SRC, v); }
+
+static inline void lv_style_set_bg_img_recolor(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR, v); }
+
+static inline void lv_style_set_bg_img_recolor_filtered(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_FILTERED, v); }
+
+static inline void lv_style_set_bg_img_recolor_opa(lv_style_t * style, lv_opa_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_OPA, v); }
+
+static inline void lv_style_set_bg_img_tiled(lv_style_t * style, bool value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_TILED, v); }
 
 static inline void lv_style_set_border_color(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BORDER_COLOR, v); }
@@ -302,9 +331,6 @@ static inline void lv_style_set_border_side(lv_style_t * style, lv_border_side_t
 
 static inline void lv_style_set_border_post(lv_style_t * style, bool value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BORDER_POST, v); }
-
-static inline void lv_style_set_border_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BORDER_BLEND_MODE, v); }
 
 static inline void lv_style_set_text_color(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, v); }
@@ -327,14 +353,11 @@ static inline void lv_style_set_text_line_space(lv_style_t * style, lv_coord_t v
 static inline void lv_style_set_text_decor(lv_style_t * style, lv_text_decor_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_TEXT_DECOR, v); }
 
-static inline void lv_style_set_text_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_TEXT_BLEND_MODE, v); }
+static inline void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_TEXT_ALIGN, v); }
 
 static inline void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_IMG_OPA, v); }
-
-static inline void lv_style_set_img_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_IMG_BLEND_MODE, v); }
 
 static inline void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, v); }
@@ -351,14 +374,14 @@ static inline void lv_style_set_outline_width(lv_style_t * style, lv_coord_t val
 static inline void lv_style_set_outline_color(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR, v); }
 
+static inline void lv_style_set_outline_color_filtered(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR_FILTERED, v); }
+
 static inline void lv_style_set_outline_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_OPA, v); }
 
 static inline void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_PAD, v); }
-
-static inline void lv_style_set_outline_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_BLEND_MODE, v); }
 
 static inline void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_WIDTH, v); }
@@ -372,9 +395,6 @@ static inline void lv_style_set_shadow_ofs_y(lv_style_t * style, lv_coord_t valu
 static inline void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_SPREAD, v); }
 
-static inline void lv_style_set_shadow_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_BLEND_MODE, v); }
-
 static inline void lv_style_set_shadow_color(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR, v); }
 
@@ -386,9 +406,6 @@ static inline void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value) {
 
 static inline void lv_style_set_line_width(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_WIDTH, v); }
-
-static inline void lv_style_set_line_blend_mode(lv_style_t * style, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_BLEND_MODE, v); }
 
 static inline void lv_style_set_line_dash_width(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_DASH_WIDTH, v); }
@@ -408,8 +425,8 @@ static inline void lv_style_set_line_color_filtered(lv_style_t * style, lv_color
 static inline void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_OPA, v); }
 
-static inline void lv_style_set_content_src(lv_style_t * style, const char * value) {
-  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_SRC, v); }
+static inline void lv_style_set_content_text(lv_style_t * style, const char * value) {
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_TEXT, v); }
 
 static inline void lv_style_set_content_align(lv_style_t * style, lv_align_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_ALIGN, v); }
@@ -420,11 +437,27 @@ static inline void lv_style_set_content_ofs_x(lv_style_t * style, lv_coord_t val
 static inline void lv_style_set_content_ofs_y(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_OFS_Y, v); }
 
-static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transiton_t * value) {
-  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION, v); }
+static inline void lv_style_set_content_opa(lv_style_t * style, lv_opa_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_OPA, v); }
 
-static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SIZE, v); }
+static inline void lv_style_set_content_font(lv_style_t * style, const lv_font_t * value) {
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_FONT, v); }
+
+static inline void lv_style_set_content_color(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_COLOR, v); }
+
+static inline void lv_style_set_content_color_filtered(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_COLOR_FILTERED, v); }
+
+static inline void lv_style_set_content_letter_space(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_LETTER_SPACE, v); }
+
+static inline void lv_style_set_content_line_space(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_LINE_SPACE, v); }
+
+static inline void lv_style_set_content_decor(lv_style_t * style, lv_text_decor_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_DECOR, v); }
+
 
 static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)
 {

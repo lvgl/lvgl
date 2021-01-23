@@ -234,7 +234,7 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
     hsv.v = (100 * rgbMax) >> 10;
 
     int32_t delta = rgbMax - rgbMin;
-    if(LV_MATH_ABS(delta) < 3) {
+    if(LV_ABS(delta) < 3) {
         hsv.h = 0;
         hsv.s = 0;
         return hsv;

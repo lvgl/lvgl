@@ -50,7 +50,7 @@ static const int16_t sin0_90_table[] = {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int16_t _lv_trigo_sin(int16_t angle)
+LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle)
 {
     int16_t ret = 0;
     angle       = angle % 360;
@@ -85,7 +85,7 @@ LV_ATTRIBUTE_FAST_MEM int16_t _lv_trigo_sin(int16_t angle)
  * @param u3 end values in range of [0..LV_BEZIER_VAL_MAX]
  * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
  */
-int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
+int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 {
     uint32_t t_rem  = 1024 - t;
     uint32_t t_rem2 = (t_rem * t_rem) >> 10;
@@ -111,7 +111,7 @@ int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
+LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 {
     x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
 
@@ -134,7 +134,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask
  * @param y
  * @return the angle in degree calculated from the given parameters in range of [0..360]
  */
-uint16_t _lv_atan2(int x, int y)
+uint16_t lv_atan2(int x, int y)
 {
     // Fast XY vector to integer degree algorithm - Jan 2011 www.RomanBlack.com
     // Converts any XY values including 0 to a degree value that should be
@@ -150,8 +150,6 @@ uint16_t _lv_atan2(int x, int y)
     unsigned char tempdegree;
     unsigned char comp;
     unsigned int degree;     // this will hold the result
-    //signed int x;            // these hold the XY vector at the start
-    //signed int y;            // (and they will be destroyed)
     unsigned int ux;
     unsigned int uy;
 
@@ -218,7 +216,7 @@ uint16_t _lv_atan2(int x, int y)
  * @param power
  * @return base raised to the power exponent
  */
-int64_t _lv_pow(int64_t base, int8_t exp)
+int64_t lv_pow(int64_t base, int8_t exp)
 {
     int64_t result = 1;
     while(exp) {
@@ -240,13 +238,13 @@ int64_t _lv_pow(int64_t base, int8_t exp)
  * @param max_out max output range
  * @return the mapped number
  */
-int16_t _lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
+int16_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
 {
     if(x <= min_in) return min_out;
     if(x >= max_in) return max_out;
 
     /* The equation should be:
-     *   ((x - min_in) / delta in) * delta_out + min_out
+     *   ((x - min_in) * (delta_out / delta_min)) + min_out
      * To avoid rounding error reorder the operations:
      *   (((x - min_in) * delta_out) / delta in) + min_out
      */

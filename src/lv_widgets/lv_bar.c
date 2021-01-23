@@ -474,7 +474,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
 
     uint16_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-    lv_coord_t short_side = LV_MATH_MIN(barw, barh);
+    lv_coord_t short_side = LV_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
     lv_draw_rect_dsc_t draw_indic_dsc;
@@ -483,14 +483,6 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_area_t indic_area;
     lv_area_copy(&indic_area, &bar->indic_area);
-
-    /*Handle custom drawer*/
-    lv_obj_draw_hook_dsc_t hook_dsc;
-    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
-    hook_dsc.draw_area = &indic_area;
-    hook_dsc.part = LV_PART_INDICATOR;
-    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
-
 
     /* Draw only the shadow if the indicator is long enough.
      * The radius of the bg and the indicator can make a strange shape where
@@ -560,9 +552,6 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     draw_indic_dsc.content_opa = content_opa;
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
-
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
-
 }
 
 /**
@@ -587,7 +576,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
         /*Bg size is handled by lv_obj*/
         lv_coord_t * s = param;
-        *s = LV_MATH_MAX(*s, indic_size);
+        *s = LV_MAX(*s, indic_size);
     }
 
     return res;

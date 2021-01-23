@@ -38,10 +38,10 @@
 //{
 //   lv_base_class_t * c = class_p;
 //   const lv_base_class_t * bc = base_p;
-//   _lv_memset_00(c, class_size);
+//   lv_memset_00(c, class_size);
 //
 //   /*By default use the same methods as the base*/
-//   if(bc) _lv_memcpy(c, base_p, bc->_class_size);
+//   if(bc) lv_memcpy(c, base_p, bc->_class_size);
 //
 //  c->base_p = base_p; /*Save the base to allow accessing its methods later*/
 //  c->init = NULL;
@@ -55,7 +55,7 @@
 //{
 //  lv_base_class_t * base_class_p = class_p;
 //  lv_base_t * instance = lv_mem_alloc(base_class_p->_instance_size);
-//  _lv_memset_00(instance, base_class_p->_instance_size);
+//  lv_memset_00(instance, base_class_p->_instance_size);
 //  instance->class_p = class_p;
 //  return instance;
 //}
@@ -84,6 +84,6 @@
 //{
 //    lv_base_t * base_inst = inst;
 //    void * class_p = base_inst->class_p;
-//    _lv_memset_00(inst, base_inst->class_p->_instance_size);
+//    lv_memset_00(inst, base_inst->class_p->_instance_size);
 //    base_inst->class_p = class_p;   /*Restore class dsc pointer*/
 //}

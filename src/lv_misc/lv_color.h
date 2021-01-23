@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include "lv_math.h"
 
 /*Error checking*/
 #if LV_COLOR_DEPTH == 24
@@ -207,6 +206,9 @@ enum {
 # define LV_COLOR_GET_B(c) LV_COLOR_GET_B32(c)
 # define LV_COLOR_GET_A(c) LV_COLOR_GET_A32(c)
 #endif
+
+
+#define LV_UDIV255(x) ((uint32_t)((uint32_t) (x) * 0x8081) >> 0x17)
 
 /**********************
  *      TYPEDEFS
@@ -467,11 +469,11 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
-    LV_COLOR_SET_R(ret, LV_MATH_UDIV255((uint16_t) LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
+    LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
                                         (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_G(ret, LV_MATH_UDIV255((uint16_t) LV_COLOR_GET_G(c1) * mix + LV_COLOR_GET_G(c2) *
+    LV_COLOR_SET_G(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_G(c1) * mix + LV_COLOR_GET_G(c2) *
                                         (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_B(ret, LV_MATH_UDIV255((uint16_t) LV_COLOR_GET_B(c1) * mix + LV_COLOR_GET_B(c2) *
+    LV_COLOR_SET_B(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_B(c1) * mix + LV_COLOR_GET_B(c2) *
                                         (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
 #else
@@ -513,9 +515,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * p
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
-    LV_COLOR_SET_R(ret, LV_MATH_UDIV255((uint16_t) premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_G(ret, LV_MATH_UDIV255((uint16_t) premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_B(ret, LV_MATH_UDIV255((uint16_t) premult_c1[2] + LV_COLOR_GET_B(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
+    LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t) premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
+    LV_COLOR_SET_G(ret, LV_UDIV255((uint16_t) premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
+    LV_COLOR_SET_B(ret, LV_UDIV255((uint16_t) premult_c1[2] + LV_COLOR_GET_B(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
 #else
     /*LV_COLOR_DEPTH == 1*/
