@@ -1,11 +1,23 @@
 # Changelog
 
+## v7.9.1 (Planned at 19.01.2020)
+
+### Bugfixes
+- fix(cpicker) fix division by zero
+- fix(dropdown) fix selecting options after the last one
+- fix(msgbox) use the animation time provided
+- fix(gpu_nxp_pxp) fix incorrect define name
+- fix(indev) don't leave edit mode if there is only one object in the group
+- fix(draw_rect) fix draw pattern stack-use-after-scope error
+
+
 ## v7.9.0 
 
 ### New features
 - feat(chart) add lv_chart_remove_series and lv_chart_hide_series
-- feat(img_cahce) allow disabling image cacheing
+- feat(img_cahce) allow disabling image caching
 - calendar: make get_day_of_week() public
+- Added support for Zephyr integration
  
 ### Bugfixes
 - fix(draw_rect) free buffer used for arabic processing
@@ -15,8 +27,11 @@
 - fix(textarea) cursor position after hiding character in password mode
 - fix(linemeter) draw critical lines with correct color
 - fix(lv_conf_internal) be sure Kconfig defines are always uppercase
+- fix(kconfig) handle disable sprintf float correctly.
+- fix(layout) stop layout after recursion threshold is reached
+- fix(gauge) fix redraw with image needle
 
-## v7.8.1 (Plannad at 15.12.2020)
+## v7.8.1
 
 ### Bugfixes
 - fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
@@ -43,7 +58,7 @@
 - fix reference to LV_DRAW_BUF_MAX_NUM in lv_mem.c
 - fix(polygon draw) join adjacent points if they are on the same coordinate
 - fix(linemeter) fix invalidation when setting new value 
-- fix(table) add missing invalidation when changeing cell type
+- fix(table) add missing invalidation when changing cell type
 - refactor(roller) rename LV_ROLLER_MODE_INIFINITE -> LV_ROLLER_MODE_INFINITE
 
 ## v7.7.2 (17.11.2020)
@@ -53,7 +68,7 @@
 - fix(arc) fix and improve arc dragging
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
 - fix(theme_material): remove the bottom border from tabview header
-- fix(imgbtn) guess a the closest availabe state with valid src
+- fix(imgbtn) guess a the closest available state with valid src
 - fix(spinbox) update cursor position in lv_spinbox_set_step 
 
 ## v7.7.1 (03.11.2020)
@@ -70,7 +85,7 @@
 - Allow max. 16 cell types for table
 - Add `lv_table_set_text_fmt()`
 - Use margin on calendar header to set distances and padding to the size of the header
-- Add `text_sel_bg` style proeprty
+- Add `text_sel_bg` style property
 
 ### Bugfixes
 - Theme update to support text selection background
@@ -93,7 +108,6 @@
 - Fix imgbtn image switching with empty style
 - Material theme: do not set the text font to allow easy global font change
 
-
 ## v7.6.0 (22.09.2020)
 
 ### New features
@@ -111,7 +125,7 @@
 - Add 10px and 8ox built in fonts
 
 ### Bugfixes
-- Fix unexpeted DEFOCUS on lv_page when clicking to bg after the scrollable
+- Fix unexpected DEFOCUS on lv_page when clicking to bg after the scrollable
 - Fix `lv_obj_del` and `lv_obj_clean` if the children list changed during deletion.
 - Adjust button matrix button width to include padding when spanning multiple units.
 - Add rounding to btnmatrix line height calculation
@@ -126,10 +140,10 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 ### New features
 - Add `lv_font_load()` function - Loads a `lv_font_t` object from a binary font file
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
-- Add style caching to reduce acces time of properties with default value
+- Add style caching to reduce access time of properties with default value
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
-- send gestures even if the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
+- send gestures event if the object was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function.
 
 ### Bugfixes
 - Fix color bleeding on border drawing
@@ -177,7 +191,6 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - gauge: fix image needle drawing
 - fix using freed memory in _lv_style_list_remove_style
 
-
 ## v7.2.0 (21.07.2020)
 
 ### New features
@@ -214,7 +227,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Add lv_btnmatrix_set/get_align capability
 - DMA2D: Remove dependency on ST CubeMX HAL
 - Added `max_used` propriety to `lv_mem_monitor_t` struct
-- In `lv_init` test if the the strings are UTF-8 encoded.
+- In `lv_init` test if the strings are UTF-8 encoded.
 - Add `user_data` to themes
 - Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
 - Add inline function lv_checkbox_get_state(const lv_obj_t * cb) to extend the checkbox functionality.
@@ -268,7 +281,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Remove memcpy from `lv_ll` (caused issues with some optimization settings)
 - `lv_chart` fix X tick drawing
 - Fix vertical dashed line drawing
-- Some additonal minor fixes and formattings
+- Some additional minor fixes and formattings
 
 ## v7.0.0 (18.05.2020)
 
@@ -280,7 +293,6 @@ The docs for v7 is available at https://docs.littlevgl.com/v7/en/html/index.html
 The name of the project is changed to LVGL and the new website is on https://lvgl.io
 
 LVGL remains free under the same conditions (MIT license) and a company is created to manage LVGL and offer services.
-
 
 ### New drawing system
 Complete rework of LVGL's draw engine to use "masks" for more advanced and higher quality graphical effects. 
@@ -294,7 +306,6 @@ The API in this regard remained the same but some new functions were added:
 - `lv_img_set_zoom`: set image object's zoom factor
 - `lv_img_set_angle`: set image object's angle without using canvas
 - `lv_img_set_pivot`: set the pivot point of rotation
-
 
 The new drawing engine brought new drawing features too. They are highlighted in the "style" section.
 

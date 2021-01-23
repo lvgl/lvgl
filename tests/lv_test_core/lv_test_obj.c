@@ -47,7 +47,6 @@ void lv_test_obj(void)
     create_delete_change_parent();
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -58,7 +57,6 @@ static void create_delete_change_parent(void)
     lv_test_print("");
     lv_test_print("Create, delete, change parent of a simple object:");
     lv_test_print("-------------------------------------------------");
-
 
     lv_test_print("Create an object on the default screen");
     lv_test_assert_int_eq(0, lv_obj_count_children(lv_scr_act()), "Screen's children count before creation");

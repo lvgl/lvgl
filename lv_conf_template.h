@@ -1,10 +1,6 @@
 /**
  * @file lv_conf.h
-<<<<<<< HEAD
  * Configuration file for v8.0.0-dev
-=======
- * Configuration file for v7.8.1-dev
->>>>>>> master
  */
 
 /*
@@ -137,7 +133,6 @@ typedef int16_t lv_coord_t;
 /* Repeated trigger period in long press [ms]
  * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
 #define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
-
 
 /* Gesture threshold in pixels */
 #define LV_INDEV_DEF_GESTURE_LIMIT        50
@@ -690,6 +685,26 @@ typedef void * lv_obj_user_data_t;
 #  define LV_TABLE_CELL_STYLE_CNT 4
 #endif
 
+<<<<<<< HEAD
+=======
+/*Tab (dependencies: lv_page, lv_btnm)*/
+#define LV_USE_TABVIEW      1
+#  if LV_USE_TABVIEW != 0
+/*Time of slide animation [ms] (0: no animation)*/
+#  define LV_TABVIEW_DEF_ANIM_TIME    300
+#endif
+
+/*Tileview (dependencies: lv_page) */
+#define LV_USE_TILEVIEW     1
+#if LV_USE_TILEVIEW
+/*Time of slide animation [ms] (0: no animation)*/
+#  define LV_TILEVIEW_DEF_ANIM_TIME   300
+#endif
+
+/*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
+#define LV_USE_WIN      1
+
+>>>>>>> master
 /*==================
  * Non-user section
  *==================*/

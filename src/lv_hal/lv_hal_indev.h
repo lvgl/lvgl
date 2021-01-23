@@ -76,7 +76,6 @@ typedef struct {
     lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
 } lv_indev_data_t;
 
-
 /** Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct _lv_indev_drv_t {
 

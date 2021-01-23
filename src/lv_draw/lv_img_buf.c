@@ -38,7 +38,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 /**
  * Get the color of an image's pixel
  * @param dsc an image descriptor
@@ -411,7 +410,6 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
     }
 }
 
-
 #if LV_USE_IMG_TRANSFORM
 /**
  * Initialize a descriptor to transform an image
@@ -484,7 +482,6 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
         res->y2 = h - 1;
         return;
     }
-
 
     res->x1 = (((-pivot->x) * zoom) >> 8) - 1;
     res->y1 = (((-pivot->y) * zoom) >> 8) - 1;
@@ -772,4 +769,3 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-

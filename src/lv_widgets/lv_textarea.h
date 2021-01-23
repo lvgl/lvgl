@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
-#error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -145,7 +145,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos);
 void lv_textarea_set_cursor_hidden(lv_obj_t * ta, bool hide);
 
 /**
- * Enable/Disable the positioning of the the cursor by clicking the text on the text area.
+ * Enable/Disable the positioning of the cursor by clicking the text on the text area.
  * @param ta pointer to a text area object
  * @param en true: enable click positions; false: disable
  */

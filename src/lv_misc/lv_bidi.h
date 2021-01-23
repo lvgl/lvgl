@@ -21,7 +21,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/* Special non printable  strong characters.
+/* Special non printable strong characters.
  * They can be inserted to texts to affect the run's direction*/
 #define LV_BIDI_LRO  "\xE2\x80\xAD" /*U+202D*/
 #define LV_BIDI_RLO  "\xE2\x80\xAE" /*U+202E*/
@@ -72,7 +72,7 @@ lv_bidi_dir_t _lv_bidi_detect_base_dir(const char * txt);
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BIDI_DIR_LTR` or `LV_BIDI_DIR_RTL`
  * @param visual_pos the visual character position which logical position should be get
- * @param is_rtl tell the the char at `visual_pos` is RTL or LTR context
+ * @param is_rtl tell the char at `visual_pos` is RTL or LTR context
  * @return the logical character position
  */
 uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t len, lv_bidi_dir_t base_dir,
@@ -87,7 +87,7 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BIDI_DIR_LTR` or `LV_BIDI_DIR_RTL`
  * @param logical_pos the logical character position which visual position should be get
- * @param is_rtl tell the the char at `logical_pos` is RTL or LTR context
+ * @param is_rtl tell the char at `logical_pos` is RTL or LTR context
  * @return the visual character position
  */
 uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t len, lv_bidi_dir_t base_dir,

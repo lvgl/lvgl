@@ -128,7 +128,6 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
  */
 void lv_arc_set_angle_ofs(lv_obj_t * arc, uint16_t rotation_angle);
 
-
 /**
  * Set the type of arc.
  * @param arc pointer to arc object

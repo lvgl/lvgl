@@ -12,7 +12,7 @@
 
 /*Testing of dependencies*/
 #if LV_USE_SLIDER == 0
-    #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1) "
+    #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER 1)"
 #endif
 
 #include "../lv_misc/lv_debug.h"
@@ -189,7 +189,6 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area,
 
     return LV_DRAW_RES_OK;
 }
-
 
 /**
  * Signal function of the switch

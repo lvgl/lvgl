@@ -1,5 +1,5 @@
 /**
- * @file lv_ll.c
+ * @file lv_ll.h
  * Handle linked lists. The nodes are dynamically allocated by the 'lv_mem' module.
  */
 
@@ -70,7 +70,7 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p);
 
 /**
  * Remove the node 'node_p' from 'll_p' linked list.
- * It does not free the the memory of node.
+ * It does not free the memory of node.
  * @param ll_p pointer to the linked list of 'node_p'
  * @param node_p pointer to node in 'll_p' linked list
  */

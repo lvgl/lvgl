@@ -433,7 +433,6 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     visual_byte_pos = byte_id - line_start;
 #endif
 
-
     /*Calculate the x coordinate*/
     lv_coord_t x = _lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
     if(char_id != line_start) x += letter_space;
@@ -990,7 +989,6 @@ void lv_label_refr_text(lv_obj_t * obj)
             }
 
             uint32_t letter_id = lv_label_get_letter_on(obj, &p);
-
 
             /*Be sure there is space for the dots*/
             size_t txt_len = strlen(label->text);

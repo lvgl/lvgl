@@ -12,7 +12,6 @@
 #include "lv_imgbtn.h"
 #include "lv_label.h"
 
-
 #if LV_USE_IMGBTN != 0
 
 /*********************

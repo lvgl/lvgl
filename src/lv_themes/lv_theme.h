@@ -140,7 +140,6 @@ uint32_t lv_theme_get_flags(void);
  *     POST INCLUDE
  *********************/
 #include "lv_theme_default.h"
-#include "lv_theme_mono.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

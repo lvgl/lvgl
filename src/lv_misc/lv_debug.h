@@ -60,7 +60,6 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 #define LV_DEBUG_IS_NULL(p)    (lv_debug_check_null(p))
 #endif
 
-
 #ifndef LV_DEBUG_CHECK_MEM_INTEGRITY
 #define LV_DEBUG_CHECK_MEM_INTEGRITY()    (lv_debug_check_mem_integrity())
 #endif
@@ -111,7 +110,6 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 #   define LV_ASSERT_STR(str)
 # endif
 #endif
-
 
 #else /* LV_USE_DEBUG == 0 */
 

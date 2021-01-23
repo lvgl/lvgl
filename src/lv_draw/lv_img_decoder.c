@@ -13,10 +13,6 @@
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -421,7 +417,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             /*The palette begins in the beginning of the image data. Just point to it.*/
             lv_color32_t * palette_p = (lv_color32_t *)((lv_img_dsc_t *)dsc->src)->data;
 
-
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
                 user_data->palette[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
@@ -524,7 +519,6 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
         dsc->user_data = NULL;
     }
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

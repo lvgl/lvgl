@@ -23,10 +23,6 @@
     #include "../lv_widgets/lv_label.h"
 #endif
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -78,7 +74,7 @@ void _lv_refr_init(void)
 /**
  * Redraw the invalidated areas now.
  * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process
- * can prevent the call of `lv_task_handler`. In this case if the the GUI is updated in the process
+ * can prevent the call of `lv_task_handler`. In this case if the GUI is updated in the process
  * (e.g. progress bar) this function can be called when the screen should be updated.
  * @param disp pointer to display to refresh. NULL to refresh all displays.
  */
@@ -563,7 +559,6 @@ static void lv_refr_area_part(const lv_area_t * area_p)
         lv_refr_obj_and_children(top_prev_scr, &start_mask);
 
     }
-
 
     if(top_act_scr == NULL) {
         top_act_scr = disp_refr->act_scr;

@@ -1,7 +1,7 @@
 # Kconfig file for LVGL v7.8.1
 
 menu "LVGL configuration"
-    
+
     config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
         bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
         help
@@ -47,12 +47,14 @@ menu "LVGL configuration"
         default 8 if LV_COLOR_DEPTH_8
         default 16 if LV_COLOR_DEPTH_16
         default 32 if LV_COLOR_DEPTH_32
-    
+
     config LV_COLOR_16_SWAP
         bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
+        depends on LV_COLOR_DEPTH_16
 
     config LV_COLOR_SCREEN_TRANSP
         bool "Enable screen transparency."
+        depends on LV_COLOR_DEPTH_32
         help
             Useful for OSD or other overlapping GUIs.
             Requires `LV_COLOR_DEPTH = 32` colors and the screen's style
@@ -95,7 +97,7 @@ menu "LVGL configuration"
             According to the width of the display (hor. res. / dpi) the
             displays fall in 4 categories. This is the upper limit for medium
             displays.
-    
+
     config LV_DISP_LARGE_LIMIT
         int "Large display limit"
         default 70
@@ -103,34 +105,34 @@ menu "LVGL configuration"
             According to the width of the display (hor. res. / dpi) the
             displays fall in 4 categories. This is the upper limit for large
             displays.
-    
+
     menu "Memory manager settings"
     config LV_MEM_CUSTOM
-	    bool
-	    prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
+        bool
+        prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
 
     config LV_MEM_CUSTOM_INCLUDE
         string
         prompt "Header to include for the custom memory function"
-        default stdlib.h
+        default "stdlib.h"
         depends on LV_MEM_CUSTOM
 
     config LV_MEM_CUSTOM_ALLOC
         string
         prompt "Wrapper to malloc"
-        default malloc 
+        default "malloc"
         depends on LV_MEM_CUSTOM
 
     config LV_MEM_CUSTOM_FREE
         string
         prompt "Wrapper to free"
-        default free 
+        default "free"
         depends on LV_MEM_CUSTOM
 
-	config LV_MEM_SIZE_BYTES
-	    int
-	    prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
-	    range 2 128
+    config LV_MEM_SIZE_KILOBYTES
+        int
+        prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
+        range 2 128
         default 32
         depends on !LV_MEM_CUSTOM
 
@@ -138,7 +140,7 @@ menu "LVGL configuration"
         bool
         prompt "Use the standard memcpy and memset instead of LVGL's own functions"
     endmenu
-    
+
     menu "Indev device settings"
         config LV_INDEV_DEF_READ_PERIOD
             int "Input device read period [ms]."
@@ -163,7 +165,7 @@ menu "LVGL configuration"
             default 3
 
     endmenu
-    
+
     menu "Feature usage"
         config LV_USE_ANIMATION
             bool "Enable the Animations."
@@ -208,6 +210,7 @@ menu "LVGL configuration"
             bool "Enable STM32 DMA2D."
         config LV_GPU_DMA2D_CMSIS_INCLUDE
             string "include path of CMSIS header of target processor"
+            depends on LV_USE_GPU_STM32_DMA2D
             default ""
             help
                 e.g. "stm32f769xx.h" or "stm32f429xx.h"
@@ -215,6 +218,7 @@ menu "LVGL configuration"
             bool "Use PXP for CPU off-load on NXP RTxxx platforms."
         config LV_USE_GPU_NXP_PXP_AUTO_INIT
             bool "Call lv_gpu_nxp_pxp_init() automatically or manually."
+            depends on LV_USE_GPU_NXP_PXP
             help
                 1: Add default bare metal and FreeRTOS interrupt handling
                 routines for PXP (lv_gpu_nxp_pxp_osa.c) and call
@@ -251,10 +255,10 @@ menu "LVGL configuration"
             bool "Use the functions and types from the older (v7) API if possible."
             default y if !LV_CONF_MINIMAL
     endmenu
-    
+
     menu "Image decoder and cache"
         config LV_IMG_CF_INDEXED
-            bool "Enable indexed (pallete) images."
+            bool "Enable indexed (palette) images."
             default y if !LV_CONF_MINIMAL
         config LV_IMG_CF_ALPHA
             bool "Enable alpha indexed images."
@@ -280,19 +284,19 @@ menu "LVGL configuration"
 
     menu "HAL Settings"
         config LV_TICK_CUSTOM
-            bool 
+            bool
             prompt "Use a custom tick source"
 
         config LV_TICK_CUSTOM_INCLUDE
             string
             prompt "Header for the system time function"
-            default Arduino.h
+            default "Arduino.h"
             depends on LV_TICK_CUSTOM
 
         config LV_TICK_CUSTOM_SYS_TIME_EXPR
             string
             prompt "Expression evaluating to current system time in ms"
-            default "(millis())"
+            default "millis()"
             depends on LV_TICK_CUSTOM
     endmenu
 
@@ -308,13 +312,13 @@ menu "LVGL configuration"
 
             config LV_LOG_LEVEL_TRACE
                 bool "Trace - Detailed information"
-            config LV_LOG_LEVEL_INFO 
+            config LV_LOG_LEVEL_INFO
                 bool "Info  - Log important events"
-            config LV_LOG_LEVEL_WARN 
+            config LV_LOG_LEVEL_WARN
                 bool "Warn  - Log if something unwanted happened"
             config LV_LOG_LEVEL_ERROR
                 bool "Error - Only critical issues"
-            config LV_LOG_LEVEL_NONE 
+            config LV_LOG_LEVEL_NONE
                 bool "None  - Do not log anything"
         endchoice
 
@@ -330,15 +334,15 @@ menu "LVGL configuration"
         config LV_LOG_PRINTF
             bool "Print the log with 'printf'" if LV_USE_LOG
             help
-                Use printf for log output. 
+                Use printf for log output.
                 If not set the user needs to register a callback with `lv_log_register_print_cb`.
 
     endmenu
-    
+
     menu "Debug Settings"
         config LV_USE_DEBUG
             bool "Enable Debug"
-        
+
         config LV_USE_ASSERT_NULL
             bool "Check if the parameter is NULL. (Quite fast)"
             default y if !LV_CONF_MINIMAL
@@ -349,21 +353,21 @@ menu "LVGL configuration"
 
         config LV_USE_ASSERT_MEM_INTEGRITY
             bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
-            
+
         config LV_USE_ASSERT_STR
             bool "Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)"
-            help 
+            help
                 If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled).
-            
+
         config LV_USE_ASSERT_OBJ
             bool "Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)."
-            help 
+            help
                 If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled)
-            
+
         config LV_USE_ASSERT_STYLE
             bool "Check if the styles are properly initialized. (Fast)"
     endmenu
-    
+
     menu "Font usage"
         config LV_FONT_FMT_TXT_LARGE
             bool "Enable it if you have fonts with a lot of characters."
@@ -372,13 +376,17 @@ menu "LVGL configuration"
                 but with > 10,000 characters if you see issues probably you
                 need to enable it.
 
+        config LV_USE_FONT_SUBPX
+            bool "Enable subpixel rendering."
+
         config LV_FONT_SUBPX_BGR
             bool "Use BGR instead RGB for sub-pixel rendering."
+            depends on LV_USE_FONT_SUBPX
             help
                 Set the pixel order of the display.
                 Important only if "subpx fonts" are used.
                 With "normal" font it doesn't matter.
-        
+
         menu "Enable built-in fonts"
             config LV_FONT_MONTSERRAT_8
                 bool "Enable Montserrat 8"
@@ -527,7 +535,7 @@ menu "LVGL configuration"
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
         endchoice
-        
+
         choice LV_FONT_DEFAULT_NORMAL
             prompt "Select theme default normal font"
             default LV_FONT_DEFAULT_NORMAL_MONTSERRAT_16 if !LV_CONF_MINIMAL
@@ -617,7 +625,7 @@ menu "LVGL configuration"
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
         endchoice
-        
+
         choice LV_FONT_DEFAULT_SUBTITLE
             prompt "Select theme default subtitle font"
             default LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_16 if !LV_CONF_MINIMAL
@@ -707,7 +715,7 @@ menu "LVGL configuration"
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
         endchoice
-        
+
         choice LV_FONT_DEFAULT_TITLE
             prompt "Select theme default title font"
             default LV_FONT_DEFAULT_TITLE_MONTSERRAT_16 if !LV_CONF_MINIMAL
@@ -797,7 +805,7 @@ menu "LVGL configuration"
     endmenu
 
     menu "Theme usage"
-	menu "Enable theme usage, always enable at least one theme"
+    menu "Enable theme usage, always enable at least one theme"
             config LV_THEME_EMPTY
                 bool "Empty: No theme, you can apply your styles as you need."
                 default y if LV_CONF_MINIMAL
@@ -808,7 +816,7 @@ menu "LVGL configuration"
                 default y if !LV_CONF_MINIMAL
             config LV_THEME_MONO
                 bool "Mono: Mono-color theme for monochrome displays"
-	endmenu
+    endmenu
 
         choice LV_THEME_DEFAULT_INIT
             prompt "Select theme default init"
@@ -830,7 +838,7 @@ menu "LVGL configuration"
                 bool "Default init for mono theme"
                 select LV_THEME_MONO
         endchoice
-        
+
         config LV_THEME_DEFAULT_COLOR_PRIMARY
             hex "Select theme default primary color"
             range 0x000000 0xFFFFFF
@@ -849,7 +857,7 @@ menu "LVGL configuration"
 
         choice LV_THEME_DEFAULT_FLAG
             depends on LV_THEME_MATERIAL
-            
+
             prompt "Select theme default flag"
             default LV_THEME_DEFAULT_FLAG_LIGHT
             help
@@ -857,10 +865,8 @@ menu "LVGL configuration"
 
             config LV_THEME_DEFAULT_FLAG_LIGHT
                 bool "Light theme"
-                depends on LV_THEME_MATERIAL
             config LV_THEME_DEFAULT_FLAG_DARK
                 bool "Dark theme"
-                depends on LV_THEME_MATERIAL
         endchoice
 
     endmenu
@@ -882,39 +888,39 @@ menu "LVGL configuration"
         config LV_TXT_BREAK_CHARS
             string "Can break (wrap) texts on these chars"
             default " ,.;:-_"
-        
+
         config LV_TXT_LINE_BREAK_LONG_LEN
             int "Line break long length"
             default 0
             help
-                If a word is at least this long, will break wherever 'prettiest'. 
+                If a word is at least this long, will break wherever 'prettiest'.
                 To disable, set to a value <= 0.
-        
+
         config LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
             int "Min num chars before break"
             default 3
+            depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
             help
                 Minimum number of characters in a long word to put on a line before a break.
-                Depends on LV_TXT_LINE_BREAK_LONG_LEN
-                
+
         config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
             int "Min num chars after break"
             default 3
+            depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
             help
                 Minimum number of characters in a long word to put on a line after a break.
-                Depends on LV_TXT_LINE_BREAK_LONG_LEN
-                        
+
         config LV_TXT_COLOR_CMD
             string "The control character to use for signalling text recoloring"
             default "#"
 
         config LV_USE_BIDI
             bool "Support bidirectional texts"
-            help 
+            help
                 Allows mixing Left-to-Right and Right-to-Left texts.
                 The direction will be processed according to the Unicode Bidirectional Algorithm:
                 https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
-        
+
         choice
             prompt "Set the default BIDI direction"
             default LV_BIDI_DIR_AUTO
@@ -930,7 +936,7 @@ menu "LVGL configuration"
 
         config LV_USE_ARABIC_PERSIAN_CHARS
             bool "Enable Arabic/Persian processing"
-            help 
+            help
                 In these languages characters should be replaced with
                 an other form based on their position in the text.
 
@@ -938,14 +944,14 @@ menu "LVGL configuration"
         bool "Change the built-in (v)snprintf functions"
 
         config LV_SPRINTF_DISABLE_FLOAT
-            bool "Disable float in built-in (v)snprintf functions" if !LV_SPRINTF_CUSTOM 
+            bool "Disable float in built-in (v)snprintf functions" if !LV_SPRINTF_CUSTOM
     endmenu
 
     menu "Widgets"
         config LV_USE_OBJ_REALIGN
             bool "Enable `lv_obj_realign()` based on `lv_obj_align()` parameters."
             default y if !LV_CONF_MINIMAL
-        
+
         choice
             prompt "Enable to make the object clickable on a larger area."
             default LV_USE_EXT_CLICK_AREA_TINY
@@ -976,6 +982,7 @@ menu "LVGL configuration"
            default y if !LV_CONF_MINIMAL
        config LV_CALENDAR_WEEK_STARTS_MONDAY
            bool "Calendar week starts monday."
+           depends on LV_USE_CALENDAR
        config LV_USE_CANVAS
            bool "Canvas. Dependencies: lv_img."
            select LV_USE_IMG
@@ -1005,7 +1012,7 @@ menu "LVGL configuration"
            default y if !LV_CONF_MINIMAL
        config LV_DROPDOWN_DEF_ANIM_TIME
            int "Drop down animation time. 0: no animation."
-           depends on LV_USE_DROPBOX
+           depends on LV_USE_DROPDOWN
            default 200
        config LV_USE_GAUGE
            bool "Gauge. Dependencies: lv_bar, lv_linemeter."
@@ -1033,13 +1040,17 @@ menu "LVGL configuration"
        config LV_LABEL_DEF_SCROLL_SPEED
            int "Hor. or ver. scroll speed [px/sec] in LV_LABEL_LONG_ROLL/ROLL_CIRC mode."
            default 25
+           depends on LV_USE_LABEL
        config LV_LABEL_WAIT_CHAR_COUNT
            int "Waiting period at beginning/end of animation cycle."
            default 3
+           depends on LV_USE_LABEL
        config LV_LABEL_TEXT_SEL
            bool "Enable selecting text of the label."
+           depends on LV_USE_LABEL
        config LV_LABEL_LONG_TXT_HINT
            bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
+           depends on LV_USE_LABEL
        config LV_USE_LED
            bool "LED."
            default y if !LV_CONF_MINIMAL
@@ -1047,10 +1058,12 @@ menu "LVGL configuration"
            int "LED minimal brightness."
            range 0 255
            default 120
+           depends on LV_USE_LED
        config LV_LED_BRIGHT_MAX
            int "LED maximal brightness."
            range 0 255
            default 255
+           depends on LV_USE_LED
        config LV_USE_LINE
            bool "Line."
            default y if !LV_CONF_MINIMAL
@@ -1064,12 +1077,14 @@ menu "LVGL configuration"
        config LV_LIST_DEF_ANIM_TIME
            int "List default animation time of focusing to a list element [ms]. 0: no animation."
            default 100
+           depends on LV_USE_LIST
        config LV_USE_LINEMETER
            bool "Line meter."
            default y if !LV_CONF_MINIMAL
        choice
            prompt "Draw line more precisely at cost of performance."
            default LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
+           depends on LV_USE_LINEMETER
            config LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
                bool "0: No extra precision."
            config LV_LINEMETER_PRECISE_SOME_EXTRA_PRECISION
@@ -1093,6 +1108,7 @@ menu "LVGL configuration"
        config LV_PAGE_DEF_ANIM_TIME
            int "Focus default animation time [ms]. 0: No animation."
            default 100
+           depends on LV_USE_PAGE
        config LV_USE_SPINNER
            bool "Spinner. Dependencies: lv_arc, lv_anim."
            select LV_USE_ARC
@@ -1101,12 +1117,15 @@ menu "LVGL configuration"
        config LV_SPINNER_DEF_ARC_LENGTH
            int "Spinner def. arc length [deg]."
            default 60
+           depends on LV_USE_SPINNER
        config LV_SPINNER_DEF_SPIN_TIME
            int "Spinner def. spin time [ms]."
            default 1000
+           depends on LV_USE_SPINNER
        choice
            prompt "Type of spinner (animation type)."
            default LV_SPINNER_TYPE_SPINNING_ARC
+           depends on LV_USE_SPINNER
            config LV_SPINNER_TYPE_SPINNING_ARC
                bool "0: Spinner type spinning arc."
            config LV_SPINNER_TYPE_FILLSPIN_ARC
@@ -1121,9 +1140,11 @@ menu "LVGL configuration"
        config LV_ROLLER_DEF_ANIM_TIME
            int "Focus animation time [ms]. 0: no animation."
            default 200
+           depends on LV_USE_ROLLER
        config LV_ROLLER_INF_PAGES
            int "Number of extra 'pages' when the controller is infinite."
            default 7
+           depends on LV_USE_ROLLER
        config LV_USE_SLIDER
            bool "Slider. Dependencies: lv_bar."
            select LV_USE_BAR
@@ -1144,9 +1165,11 @@ menu "LVGL configuration"
        config LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
            int "Text area def. cursor blink time [ms]."
            default 400
+           depends on LV_USE_TEXTAREA
        config LV_TEXTAREA_DEF_PWN_SHOW_TIME
            int "Text area def. pwn show time [ms]."
            default 1500
+           depends on LV_USE_TEXTAREA
        config LV_USE_TABLE
            bool "Table. Dependencies: lv_label."
            select LV_USE_LABEL
@@ -1154,9 +1177,11 @@ menu "LVGL configuration"
        config LV_TABLE_COL_MAX
            int "Table col max."
            default 12
+           depends on LV_USE_TABLE
        config LV_TABLE_CELL_STYLE_CNT
            int "Table cell style count."
            default 4
+           depends on LV_USE_TABLE
        config LV_USE_TABVIEW
            bool "Tab. Dependencies: lv_page, lv_btnm."
            select LV_USE_PAGE
@@ -1165,6 +1190,7 @@ menu "LVGL configuration"
        config LV_TABVIEW_DEF_ANIM_TIME
            int "Time of slide animation [ms]. 0: No animation."
            default 300
+           depends on LV_USE_TABVIEW
        config LV_USE_TILEVIEW
            bool "Tileview. Dependencies: lv_page."
            select LV_USE_PAGE
@@ -1172,6 +1198,7 @@ menu "LVGL configuration"
        config LV_TILEVIEW_DEF_ANIM_TIME
            int "Time of slide animation [ms]. 0: No animation."
            default 300
+           depends on LV_USE_TILEVIEW
        config LV_USE_WIN
            bool "Window. Dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page."
            select LV_USE_CONT

@@ -185,6 +185,5 @@ uint32_t lv_theme_get_flags(void)
 static void apply_theme(lv_theme_t * th, lv_obj_t * obj)
 {
     if(th->base) apply_theme(th->base, obj);
-
     if(th->apply_cb) th->apply_cb(act_theme, obj);
 }

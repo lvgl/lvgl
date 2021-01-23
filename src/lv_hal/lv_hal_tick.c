@@ -1,5 +1,5 @@
 /**
- * @file systick.c
+ * @file lv_hal_tick.c
  * Provide access to the system tick with 1 millisecond resolution
  */
 
@@ -76,7 +76,7 @@ uint32_t lv_tick_get(void)
 
 /**
  * Get the elapsed milliseconds since a previous time stamp
- * @param prev_tick a previous time stamp (return value of systick_get() )
+ * @param prev_tick a previous time stamp (return value of lv_tick_get() )
  * @return the elapsed milliseconds since 'prev_tick'
  */
 uint32_t lv_tick_elaps(uint32_t prev_tick)

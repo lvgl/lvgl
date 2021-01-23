@@ -752,5 +752,4 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-
 #endif

@@ -23,12 +23,12 @@ extern "C" {
 /*Possible log level. For compatibility declare it independently from `LV_USE_LOG`*/
 
 #define LV_LOG_LEVEL_TRACE 0 /**< A lot of logs to give detailed information*/
-#define LV_LOG_LEVEL_INFO 1  /**< Log important events*/
-#define LV_LOG_LEVEL_WARN 2  /**< Log if something unwanted happened but didn't caused problem*/
+#define LV_LOG_LEVEL_INFO  1 /**< Log important events*/
+#define LV_LOG_LEVEL_WARN  2 /**< Log if something unwanted happened but didn't caused problem*/
 #define LV_LOG_LEVEL_ERROR 3 /**< Only critical issue, when the system may fail*/
-#define LV_LOG_LEVEL_USER 4 /**< Custom logs from the user*/
-#define LV_LOG_LEVEL_NONE 5 /**< Do not log anything*/
-#define _LV_LOG_LEVEL_NUM 6 /**< Number of log levels */
+#define LV_LOG_LEVEL_USER  4 /**< Custom logs from the user*/
+#define LV_LOG_LEVEL_NONE  5 /**< Do not log anything*/
+#define _LV_LOG_LEVEL_NUM  6 /**< Number of log levels */
 
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_TRACE);
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_INFO);
@@ -108,7 +108,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
 
 #else /*LV_USE_LOG*/
 
-/*Do nothing if `LV_USE_LOG  0`*/
+/*Do nothing if `LV_USE_LOG 0`*/
 #define _lv_log_add(level, file, line, ...)
 #define LV_LOG_TRACE(...)
 #define LV_LOG_INFO(...)

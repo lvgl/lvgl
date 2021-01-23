@@ -188,7 +188,7 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * btnm);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
+ * Useful in the `event_cb` to get the text of the button, check if hidden etc.
  * @param btnm pointer to button matrix object
  * @return  index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
@@ -196,7 +196,7 @@ uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * btnm);
 
 /**
  * Get the text of the lastly "activated" button by the user (pressed, released etc)
- * Useful in the the `event_cb`
+ * Useful in the `event_cb`
  * @param btnm pointer to button matrix object
  * @return text of the last released button (NULL: if unset)
  */

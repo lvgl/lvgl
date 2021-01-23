@@ -79,7 +79,6 @@ void lv_port_indev_init(void)
      *  You should shape them according to your hardware
      */
 
-
     lv_indev_drv_t indev_drv;
 
     /*------------------
@@ -174,8 +173,6 @@ void lv_port_indev_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-
-
 /*------------------
  * Touchpad
  * -----------------*/
@@ -224,7 +221,6 @@ static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
     (*x) = 0;
     (*y) = 0;
 }
-
 
 /*------------------
  * Mouse
@@ -360,7 +356,6 @@ static void encoder_handler(void)
     encoder_diff += 0;
     encoder_state = LV_INDEV_STATE_REL;
 }
-
 
 /*------------------
  * Button

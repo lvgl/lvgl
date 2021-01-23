@@ -292,7 +292,6 @@ void lv_textarea_del_char(lv_obj_t * obj)
     lv_label_set_text(ta->label, label_txt);
     lv_textarea_clear_selection(obj);
 
-
     /*If the textarea became empty, invalidate it to hide the placeholder*/
     if(ta->placeholder_txt) {
         const char * txt = lv_label_get_text(ta->label);
@@ -364,7 +363,6 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         lv_label_set_text(ta->label, txt);
         lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
     }
-
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ta->placeholder_txt) {
@@ -497,7 +495,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 }
 
 /**
- * Enable/Disable the positioning of the the cursor by clicking the text on the text area.
+ * Enable/Disable the positioning of the cursor by clicking the text on the text area.
  * @param ta pointer to a text area object
  * @param en true: enable click positions; false: disable
  */

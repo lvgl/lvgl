@@ -138,7 +138,6 @@ void lv_mem_buf_release(void * p);
  */
 void lv_mem_buf_free_all(void);
 
-
 //! @cond Doxygen_Suppress
 
 #if LV_MEMCPY_MEMSET_STD
@@ -251,7 +250,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len);
 //! @endcond
 
 #endif
-
 
 /**********************
  *      MACROS

@@ -36,7 +36,6 @@ typedef struct {
     uint32_t dummy2;
 }dir_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -81,7 +80,7 @@ void lv_port_fs_init(void)
     fs_init();
 
     /*---------------------------------------------------
-     * Register the file system interface  in LVGL
+     * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
     /* Add a simple drive to open images */
@@ -118,7 +117,7 @@ void lv_port_fs_init(void)
 /* Initialize your Storage device and File system. */
 static void fs_init(void)
 {
-    /*E.g. for FatFS initalize the SD card and FatFS itself*/
+    /*E.g. for FatFS initialize the SD card and FatFS itself*/
 
     /*You code here*/
 }
@@ -156,7 +155,6 @@ static lv_fs_res_t fs_open (lv_fs_drv_t * drv, void * file_p, const char * path,
 
     return res;
 }
-
 
 /**
  * Close an opened file
@@ -264,7 +262,7 @@ static lv_fs_res_t fs_tell (lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  * Delete a file
  * @param drv pointer to a driver where this function belongs
  * @param path path of the file to delete
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 static lv_fs_res_t fs_remove (lv_fs_drv_t * drv, const char *path)
 {

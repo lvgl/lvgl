@@ -1,6 +1,6 @@
 # Roadmap
 
-This is a summary for thenew fatures of the major releases and a collection of ideas. 
+This is a summary for thenew fatures of the major releases and a collection of ideas.
 
 This list indicates only the current intention and can be changed.
 
@@ -27,40 +27,37 @@ Planned to November/December 2020
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
-- Remove the copy paramter from create functions
-- Style selectors and style-based states See [#1832](https://github.com/lvgl/lvgl/issues/1832)
-- Add Object Orianted system [#1919](https://github.com/lvgl/lvgl/issues/1919)
-
-## v8.1
-- Add radio button widget
+- Make the copy parameter obsolate in create functions
+- Optimize and simplifie styles [#1832](https://github.com/lvgl/lvgl/issues/1832)
+- Use a more generic inheritenace [#1919](https://github.com/lvgl/lvgl/issues/1919)
 
 ## v8.x
+- Add radio button widget
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
+- chart: pre-delete `X` pint after the lastly set
+- chart: autoscroll to the right
 
 ## v9
 - Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).
 - Consider direct binary font format support
-- Optimize line and cirle drawing and masking
+- Optimize line and circle drawing and masking
 - Reconsider color format management for run time color format setting, and custom color format usage. (Also [RGB888](https://github.com/lvgl/lvgl/issues/1722))
 - 9-patch support for `lv_imgbtn`.
 - Handle stride. See [#1858](https://github.com/lvgl/lvgl/issues/1858)
 - Make gradients more versatile
 - Make image transformations more versatile
-- Allow snapshoting object to tranfrom them as images
-
-## v10
-- Remove property level states
-
+- Allow snapshoting object to tranfrom them to images
 
 ## Ideas
+- Use [generate-changelog](https://github.com/lob/generate-changelog) to automatically generate changelog
 - lv_mem_alloc_aligned(size, align)
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
-- Optmize font decompression
+- Optimize font decompression
 - Switch to RGBA colors in styles
 - Need coverage report for tests
-- Need static analize (via coverity.io or somehing else)
+- Need static analyze (via coverity.io or somehing else)
 - Support dot_begin and dot_middle long modes for labels
 - Add new label alignment modes. [#1656](https://github.com/lvgl/lvgl/issues/1656)
 - Support larger images: [#1892](https://github.com/lvgl/lvgl/issues/1892)

@@ -20,7 +20,7 @@ extern "C" {
 /*Testing of dependencies*/
 
 #if LV_USE_LABEL == 0
-#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_widgets/lv_label.h"
@@ -115,7 +115,6 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
  * @param sel_opt id of the selected option (0 ... number of option - 1);
  */
 void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
-
 
 /**
  * Set the direction of the a drop down list

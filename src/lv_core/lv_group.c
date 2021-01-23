@@ -13,10 +13,6 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -84,7 +80,7 @@ lv_group_t * lv_group_create(void)
  */
 void lv_group_del(lv_group_t * group)
 {
-    /*Defocus the the currently focused object*/
+    /*Defocus the currently focused object*/
     if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
@@ -191,7 +187,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
  */
 void lv_group_remove_all_objs(lv_group_t * group)
 {
-    /*Defocus the the currently focused object*/
+    /*Defocus the currently focused object*/
     if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);

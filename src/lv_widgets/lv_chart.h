@@ -49,7 +49,6 @@ enum {
 };
 typedef uint8_t lv_chart_update_mode_t;
 
-
 enum {
     LV_CHART_AXIS_PRIMARY_Y,    /*Y axis should be the first to allow indexing arrays with the values*/
     LV_CHART_AXIS_SECONDARY_Y,
@@ -152,11 +151,9 @@ void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series);
  */
 void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide);
 
-
 /*=====================
  * Setter functions
  *====================*/
-
 
 /**
  * Set the number of horizontal and vertical division lines
@@ -302,7 +299,6 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
  * @param point the new coordinate of cursor relative to the series area
  */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point);
-
 
 /*=====================
  * Getter functions

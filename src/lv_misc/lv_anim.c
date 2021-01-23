@@ -17,10 +17,6 @@
 #include "lv_math.h"
 #include "lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -371,7 +367,6 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
     return (lv_anim_value_t)new_value;
 }
 
-
 /**
  * Calculate the current value of an animation with 3 bounces
  * @param a pointer to an animation
@@ -481,7 +476,7 @@ static void anim_task(lv_timer_t * param)
         anim_list_changed = false;
 
         if(!a->has_run) {
-            a->has_run = 1; /*The list readying might be reseted so need to know which anim has run already*/
+            a->has_run = 1; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;

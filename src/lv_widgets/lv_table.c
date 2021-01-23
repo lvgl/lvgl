@@ -125,7 +125,6 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
     refr_size(obj) ;
 }
 
-
 /**
  * Set the value of a cell.  Memory will be allocated to store the text by the table.
  * @param table pointer to a Table object

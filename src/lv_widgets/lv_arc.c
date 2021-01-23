@@ -147,7 +147,6 @@ void lv_arc_set_end_angle(lv_obj_t * obj, uint16_t end)
    arc->indic_angle_end = end;
 }
 
-
 /**
  * Set the start and end angles
  * @param arc pointer to an arc object
@@ -279,7 +278,6 @@ void lv_arc_set_angle_ofs(lv_obj_t * obj, uint16_t angle_ofs)
 
     lv_obj_invalidate(obj);
 }
-
 
 /**
  * Set the type of arc.
@@ -413,7 +411,6 @@ void lv_arc_set_adjustable(lv_obj_t * obj, bool adjustable)
  *   STATIC FUNCTIONS
  **********************/
 
-
 static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_arc create started");
@@ -521,7 +518,6 @@ static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
                         &arc_dsc);
         }
 
-
         /*make the indicator arc smaller or larger according to its greatest padding value*/
         lv_coord_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
         lv_coord_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
@@ -619,10 +615,10 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             bg_end =arc->bg_angle_end + 360;
         }
 
-
         angle = lv_atan2(p.y, p.x);
         angle -=arc->angle_ofs;
         angle -=arc->bg_angle_start;   /*Make the angle relative to the start angle*/
+
         if(angle < 0) angle += 360;
 
         int16_t deg_range = bg_end -arc->bg_angle_start;
@@ -860,7 +856,6 @@ static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
     *arc_r = r;
     center->x = obj->coords.x1 + r + left_bg;
     center->y = obj->coords.y1 + r + top_bg;
-
 
     lv_coord_t indic_width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
     r -= indic_width;

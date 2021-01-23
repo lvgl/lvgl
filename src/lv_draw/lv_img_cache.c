@@ -13,9 +13,6 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_misc/lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
 /*********************
  *      DEFINES
  *********************/
@@ -37,14 +34,14 @@
  *  STATIC PROTOTYPES
  **********************/
 #if LV_IMG_CACHE_DEF_SIZE == 0
-static lv_img_cache_entry_t cache_temp;
+    static lv_img_cache_entry_t cache_temp;
 #endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 #if LV_IMG_CACHE_DEF_SIZE
-static uint16_t entry_cnt;
+    static uint16_t entry_cnt;
 #endif
 
 /**********************

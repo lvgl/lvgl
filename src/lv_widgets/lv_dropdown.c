@@ -1158,6 +1158,7 @@ static void page_press_handler(lv_obj_t * list_obj)
 
 static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
 {
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return 0;
     y -= label->coords.y1;
@@ -1171,6 +1172,7 @@ static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
 
     uint16_t opt = y / h;
 
+    if(opt >= dropdown->option_cnt) opt = dropdown->option_cnt - 1;
     return opt;
 }
 

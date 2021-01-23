@@ -228,7 +228,6 @@ uint16_t lv_roller_get_selected(const lv_obj_t * obj)
     }
 }
 
-
 /**
  * Get the current selected option as a string
  * @param ddlist pointer to ddlist object
@@ -344,6 +343,9 @@ static void lv_roller_destructor(lv_obj_t * obj)
 //    bar->class_p->base_p->destructor(obj);
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_label.constructor(obj, parent, copy);
@@ -352,6 +354,7 @@ static void lv_roller_label_destructor(lv_obj_t * obj)
 {
     lv_label.destructor(obj);
 }
+
 /**
  * Handle the drawing related tasks of the rollers
  * @param roller pointer to an object
@@ -455,7 +458,6 @@ static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area,
 
     return LV_DRAW_RES_OK;
 }
-
 
 /**
  * Handle the drawing related tasks of the roller's label
@@ -723,7 +725,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
 #endif
     }
 }
-
 
 static lv_res_t release_handler(lv_obj_t * obj)
 {

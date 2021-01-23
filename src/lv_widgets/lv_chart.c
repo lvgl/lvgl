@@ -206,7 +206,6 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
     lv_chart_refresh(chart);
 }
 
-
 /*=====================
  * Setter functions
  *====================*/
@@ -535,7 +534,6 @@ void lv_chart_set_cursor_point(lv_obj_t * obj, lv_chart_cursor_t * cursor, lv_po
     lv_chart_refresh(obj);
 }
 
-
 /*=====================
  * Getter functions
  *====================*/
@@ -647,7 +645,6 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * obj, lv_chart_series_t * ser, ui
     lv_coord_t w = lv_obj_get_width(obj);
 
     lv_coord_t x = 0;
-
 
     if(chart->type & LV_CHART_TYPE_LINE) {
         x = (w * id) / (chart->point_cnt - 1);

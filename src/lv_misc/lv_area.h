@@ -49,8 +49,6 @@ typedef struct {
     lv_coord_t y2;
 } lv_area_t;
 
-
-
 /** Alignments */
 enum {
     LV_ALIGN_CENTER = 0,
@@ -89,7 +87,6 @@ enum {
 };
 
 typedef uint8_t lv_dir_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -209,7 +206,6 @@ bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
  * @return true: `ain_p` is fully inside `aholder_p`
  */
 bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius);
-
 
 /**
  * Align an area to an other

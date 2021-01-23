@@ -42,7 +42,6 @@ typedef lv_coord_t lv_anim_value_t;
 
 #define LV_ANIM_REPEAT_INFINITE      0xFFFF
 
-
 struct _lv_anim_t;
 struct _lv_anim_path_t;
 /** Get the current value during an animation*/
@@ -52,8 +51,6 @@ typedef struct _lv_anim_path_t {
     lv_anim_path_cb_t cb;
     void * user_data;
 } lv_anim_path_t;
-
-
 
 /** Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
@@ -99,7 +96,6 @@ typedef struct _lv_anim_t {
     uint8_t playback_now : 1; /**< Play back is in progress*/
     uint32_t has_run : 1;     /**< Indicates the animation has run in this round*/
 } lv_anim_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -197,7 +193,6 @@ static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec
  *                The built in functions starts with `lv_anim_path_...`
  */
 void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path);
-
 
 /**
  * Set a function call when the animation really starts (considering `delay`)
@@ -309,7 +304,6 @@ static inline int32_t lv_anim_get_delay(lv_anim_t * a)
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb);
-
 
 /**
  * Get the animation of a variable and its `exec_cb`.

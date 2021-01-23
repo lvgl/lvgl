@@ -581,8 +581,6 @@ bool lv_style_is_empty(const lv_style_t * style);
  */
 #define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy_p);
 
-
-
 #if LV_USE_DEBUG
 
 # ifndef LV_DEBUG_IS_STYLE

@@ -126,14 +126,12 @@ void lv_gpu_nxp_pxp_deinit(void);
 void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_width, const lv_area_t * fill_area, lv_color_t color,
                          lv_opa_t opa);
 
-
-
 /**
  * @brief BLock Image Transfer - copy rectangular image from src buffer to dst buffer with effects.
  *
  * By default, image is copied directly, with optional opacity configured by \p opa.
  * Color keying can be enabled by calling lv_gpu_nxp_pxp_enable_color_key() before calling this function.
- * Recoloring can be enabled by calling  lv_gpu_nxp_pxp_enable_recolor() before calling this function.
+ * Recoloring can be enabled by calling lv_gpu_nxp_pxp_enable_recolor() before calling this function.
  * Note that color keying and recoloring at the same time is not supported and black rectangle is rendered.
  *
  * @param[in/out] dest destination buffer
@@ -147,7 +145,6 @@ void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_width, const lv_
 void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src, lv_coord_t src_width,
                          lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa);
 
-
 /**
  * @brief Enable color keying for subsequent calls to lv_gpu_nxp_pxp_blit()
  *
@@ -160,7 +157,6 @@ void lv_gpu_nxp_pxp_enable_color_key(void);
  *
  */
 void lv_gpu_nxp_pxp_disable_color_key(void);
-
 
 /**
  * @brief Enable recolor feature for subsequent calls to lv_gpu_nxp_pxp_blit()

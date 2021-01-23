@@ -78,7 +78,6 @@ const lv_obj_class_t lv_bar = {
  */
 lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-
     return lv_obj_create_from_class(&lv_bar, parent, copy);
 }
 
@@ -101,7 +100,6 @@ void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
 
     value = LV_CLAMP(bar->min_value, value, bar->max_value);
     value = value < bar->start_value ? bar->start_value : value; /*Can be smaller then the left value*/
-
 
     if(bar->cur_value == value) return;
 #if LV_USE_ANIMATION == 0

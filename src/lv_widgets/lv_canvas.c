@@ -47,7 +47,6 @@ static void set_px_cb_alpha2(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t
 static void set_px_cb_alpha4(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                              lv_color_t color, lv_opa_t opa);
 
-
 static void set_px_cb_alpha8(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                              lv_color_t color, lv_opa_t opa);
 
@@ -343,7 +342,6 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * img, int16_t angle, uint
 #endif
 }
 
-
 /**
  * Apply horizontal blur on the canvas
  * @param canvas pointer to a canvas object
@@ -405,7 +403,6 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
         lv_color_t c;
         lv_opa_t opa = LV_OPA_TRANSP;
         lv_memcpy(line_buf, &canvas->dsc.data[y * line_w], line_w);
-
 
         for(x = a.x1 - r_back; x <= a.x1 + r_front; x++) {
             x_safe = x < 0 ? 0 : x;
@@ -478,7 +475,6 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
     lv_mem_buf_release(line_buf);
 }
-
 
 /**
  * Apply vertical blur on the canvas
@@ -671,7 +667,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
-        LV_LOG_WARN("lv_canvas_draw_rect: can't raw to LV_IMG_CF_INDEXED canvas");
+        LV_LOG_WARN("lv_canvas_draw_rect: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
 
@@ -741,7 +737,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
-        LV_LOG_WARN("lv_canvas_draw_text: can't raw to LV_IMG_CF_INDEXED canvas");
+        LV_LOG_WARN("lv_canvas_draw_text: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
 
@@ -798,7 +794,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
-        LV_LOG_WARN("lv_canvas_draw_img: can't raw to LV_IMG_CF_INDEXED canvas");
+        LV_LOG_WARN("lv_canvas_draw_img: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
 
@@ -863,7 +859,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
-        LV_LOG_WARN("lv_canvas_draw_line: can't raw to LV_IMG_CF_INDEXED canvas");
+        LV_LOG_WARN("lv_canvas_draw_line: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
     /* Create a dummy display to fool the lv_draw function.
@@ -926,7 +922,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
-        LV_LOG_WARN("lv_canvas_draw_polygon: can't raw to LV_IMG_CF_INDEXED canvas");
+        LV_LOG_WARN("lv_canvas_draw_polygon: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
 
@@ -990,7 +986,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
-        LV_LOG_WARN("lv_canvas_draw_arc: can't raw to LV_IMG_CF_INDEXED canvas");
+        LV_LOG_WARN("lv_canvas_draw_arc: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
 
@@ -1185,7 +1181,6 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
     lv_img_buf_set_px_alpha(d, x, y, br);
 }
 
-
 static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
                                     lv_coord_t y,
                                     lv_color_t color, lv_opa_t opa)
@@ -1207,7 +1202,6 @@ static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_
     lv_color_t res_color;
 
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &res_opa);
-
 
     lv_img_buf_set_px_alpha(&d, x, y, res_opa);
     lv_img_buf_set_px_color(&d, x, y, res_color);

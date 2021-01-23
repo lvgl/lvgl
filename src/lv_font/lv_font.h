@@ -43,7 +43,6 @@ typedef struct {
     uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
 } lv_font_glyph_dsc_t;
 
-
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering. */
 enum {
     LV_FONT_SUBPX_NONE,
@@ -56,7 +55,7 @@ typedef uint8_t lv_font_subpx_t;
 
 /** Describe the properties of a font*/
 typedef struct _lv_font_struct {
-    /** Get a glyph's  descriptor from a font*/
+    /** Get a glyph's descriptor from a font*/
     bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
@@ -75,7 +74,6 @@ typedef struct _lv_font_struct {
     lv_font_user_data_t user_data;  /**< Custom user data for font. */
 #endif
 
-
 } lv_font_t;
 
 /**********************
@@ -86,7 +84,7 @@ typedef struct _lv_font_struct {
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
- * @return  pointer to the bitmap of the letter
+ * @return pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter);
 

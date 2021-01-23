@@ -30,8 +30,8 @@ extern "C" {
  *******************/
 
 #ifndef LV_MEM_SIZE
-#if defined (CONFIG_LV_MEM_SIZE_BYTES)
-#define CONFIG_LV_MEM_SIZE    (CONFIG_LV_MEM_SIZE_BYTES * 1024U)
+#if defined (CONFIG_LV_MEM_SIZE_KILOBYTES)
+#define CONFIG_LV_MEM_SIZE    (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
 #endif
 #endif
 
@@ -337,9 +337,9 @@ extern "C" {
  *-----------------*/
 #ifndef LV_TEXT_ENC
 #ifdef CONFIG_LV_TXT_ENC_UTF8
-#define CONFIG_LV_TXT_ENC  LV_TXT_ENC_UTF8
+#define CONFIG_LV_TXT_ENC LV_TXT_ENC_UTF8
 #elif defined CONFIG_LV_TXT_ENC_ASCII
-#define CONFIG_LV_TXT_ENC  LV_TXT_ENC_ASCII
+#define CONFIG_LV_TXT_ENC LV_TXT_ENC_ASCII
 #endif
 #endif
 
@@ -363,11 +363,11 @@ extern "C" {
 
 #ifndef LV_USE_EXT_CLICK_AREA
 #ifdef CONFIG_LV_USE_EXT_CLICK_AREA_OFF
-#define CONFIG_LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_OFF
+#define CONFIG_LV_USE_EXT_CLICK_AREA LV_EXT_CLICK_AREA_OFF
 #elif defined CONFIG_LV_USE_EXT_CLICK_AREA_TINY
-#define CONFIG_LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_TINY
+#define CONFIG_LV_USE_EXT_CLICK_AREA LV_EXT_CLICK_AREA_TINY
 #elif defined CONFIG_LV_USE_EXT_CLICK_AREA_FULL
-#define CONFIG_LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_FULL
+#define CONFIG_LV_USE_EXT_CLICK_AREA LV_EXT_CLICK_AREA_FULL
 #endif
 #endif
 
@@ -385,7 +385,6 @@ extern "C" {
 #endif
 #endif
 
-
 /*------------------
  * SPINNER DEF ANIM
  *-----------------*/
@@ -398,6 +397,20 @@ extern "C" {
 #elif defined CONFIG_LV_SPINNER_TYPE_CONSTANT_ARC
 #define CONFIG_LV_SPINNER_DEF_ANIM   LV_SPINNER_TYPE_CONSTANT_ARC
 #endif
+#endif
+
+/*------------------
+ * SPRINTF DISABLE FLOAT
+ *-----------------*/
+
+#if defined(CONFIG_LV_CONF_SKIP) || defined(LV_CONF_SKIP)
+#  ifndef LV_SPRINTF_DISABLE_FLOAT
+#    ifndef CONFIG_LV_SPRINTF_DISABLE_FLOAT
+#      define LV_SPRINTF_DISABLE_FLOAT    0
+#    else
+#      define LV_SPRINTF_DISABLE_FLOAT    1
+#    endif
+#  endif
 #endif
 
 #ifdef __cplusplus
