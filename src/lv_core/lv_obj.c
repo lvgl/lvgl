@@ -48,6 +48,8 @@
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
 #define STYLE_TRANSITION_MAX 32
+#define SCROLLBAR_MIN_SIZE (LV_DPX(10))
+
 
 /**********************
  *      TYPEDEFS
@@ -72,6 +74,8 @@ typedef struct {
  **********************/
 static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
+static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
@@ -138,8 +142,6 @@ void lv_init(void)
     lv_gpu_stm32_dma2d_init();
 #endif
 
-    _lv_style_system_init();
-
     _lv_obj_style_init();
 
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
@@ -162,9 +164,6 @@ void lv_init(void)
 
     /*Initialize the screen refresh system*/
     _lv_refr_init();
-
-    /*Init the input device handling*/
-    _lv_indev_init();
 
     _lv_img_decoder_init();
 #if LV_IMG_CACHE_DEF_SIZE
@@ -598,7 +597,7 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  */
 lv_coord_t _lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->ext_draw_pad;
+    if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
 }
 /*---------------------
@@ -637,11 +636,11 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(f & LV_OBJ_FLAG_HIDDEN) {
-        lv_obj_invalidate(obj);
-    }
+    if(f & LV_OBJ_FLAG_HIDDEN)lv_obj_invalidate(obj);
 
     obj->flags |= f;
+
+    if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 
 }
 
@@ -652,9 +651,9 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     obj->flags &= (~f);
-    if(f & LV_OBJ_FLAG_HIDDEN) {
-        lv_obj_invalidate(obj);
-    }
+
+    if(f & LV_OBJ_FLAG_HIDDEN) lv_obj_invalidate(obj);
+    if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 }
 
 
@@ -695,7 +694,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
         lv_style_value_t v;
         if(lv_style_get_prop(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
-        const lv_style_transition_t * tr = v.ptr;
+        const lv_style_transition_dsc_t * tr = v.ptr;
 
         /*Add the props t the set is not added yet or added but with smaller weight*/
         uint32_t j;
@@ -725,7 +724,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_mem_buf_release(ts);
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
-    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) _lv_obj_refresh_ext_draw_pad(obj);
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) lv_obj_invalidate(obj);
 
 #endif
@@ -1477,6 +1476,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     obj->flags |= LV_OBJ_FLAG_SNAPABLE;
     if(parent) obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
     if(parent) obj->flags |= LV_OBJ_FLAG_SCROLL_CHAIN;
+    if(parent) obj->flags |= LV_OBJ_FLAG_LAYOUTABLE;
     obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
     obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
     obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
@@ -1599,7 +1599,7 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         }
     }
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        _lv_obj_draw_scrollbar(obj, clip_area);
+        draw_scrollbar(obj, clip_area);
 
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
@@ -1673,6 +1673,178 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
 
     return LV_DRAW_RES_OK;
 }
+
+static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
+{
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
+
+    lv_scroll_dir_t sm = lv_obj_get_scrollbar_mode(obj);
+    if(sm == LV_SCROLLBAR_MODE_OFF)  return;
+
+    /*If there is no indev scrolling this object but `mode==active` return*/
+    lv_indev_t * indev = lv_indev_get_next(NULL);
+    if(sm == LV_SCROLLBAR_MODE_ACTIVE) {
+        while(indev) {
+            if(lv_indev_get_scroll_obj(indev) == obj) break;
+            indev = lv_indev_get_next(indev);
+        }
+        if(indev == NULL)  return;
+    }
+
+    lv_coord_t st = lv_obj_get_scroll_top(obj);
+    lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
+    lv_coord_t sl = lv_obj_get_scroll_left(obj);
+    lv_coord_t sr = lv_obj_get_scroll_right(obj);
+
+    lv_scroll_dir_t dir = lv_obj_get_scroll_dir(obj);
+
+    bool ver_draw = false;
+    if((dir & LV_DIR_VER) &&
+            ((sm == LV_SCROLLBAR_MODE_ON) ||
+                    (sm == LV_SCROLLBAR_MODE_AUTO && (st > 0 || sb > 0)) ||
+                    (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER))) {
+        ver_draw = true;
+    }
+
+
+    bool hor_draw = false;
+    if((dir & LV_DIR_HOR) &&
+            ((sm == LV_SCROLLBAR_MODE_ON) ||
+                    (sm == LV_SCROLLBAR_MODE_AUTO && (sl > 0 || sr > 0)) ||
+                    (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR))) {
+        hor_draw = true;
+    }
+
+    if(!hor_draw && !ver_draw) return;
+
+    lv_coord_t end_space = lv_obj_get_style_pad_top(obj, LV_PART_SCROLLBAR);
+    lv_coord_t side_space = lv_obj_get_style_pad_right(obj, LV_PART_SCROLLBAR);
+    lv_coord_t tickness = lv_obj_get_style_size(obj, LV_PART_SCROLLBAR);
+
+    lv_coord_t obj_h = lv_obj_get_height(obj);
+    lv_coord_t obj_w = lv_obj_get_width(obj);
+
+    lv_coord_t ver_reg_space = ver_draw ? tickness + side_space : 0;
+    lv_coord_t hor_req_space = hor_draw ? tickness + side_space : 0;
+    lv_coord_t rem;
+
+    lv_draw_rect_dsc_t draw_dsc;
+    lv_res_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
+    if(sb_res != LV_RES_OK) return;
+
+    lv_area_t area;
+    area.y1 = obj->coords.y1;
+    area.y2 = obj->coords.y2;
+    area.x2 = obj->coords.x2 - side_space;
+    area.x1 = area.x2 - tickness;
+
+    /*Draw horizontal scrollbar if the mode is ON or can be scrolled in this direction*/
+    if(ver_draw && _lv_area_is_on(&area, clip_area)) {
+        lv_coord_t content_h = obj_h + st + sb;
+        lv_coord_t sb_h = ((obj_h - end_space * 2 - hor_req_space) * obj_h) / content_h;
+        sb_h = LV_MAX(sb_h, SCROLLBAR_MIN_SIZE);
+        rem = (obj_h - end_space * 2 - hor_req_space) - sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
+        lv_coord_t scroll_h = content_h - obj_h; /*The size of the content which can be really scrolled*/
+        if(scroll_h <= 0) {
+            area.y1 = obj->coords.y1 + end_space;
+            area.y2 = obj->coords.y2 - end_space - hor_req_space - 1;
+            area.x2 = obj->coords.x2 - side_space;
+            area.x1 = area.x2 - tickness + 1;
+        } else {
+            lv_coord_t sb_y = (rem * sb) / scroll_h;
+            sb_y = rem - sb_y;
+
+            area.y1 = obj->coords.y1 + sb_y + end_space;
+            area.y2 = area.y1 + sb_h - 1;
+            area.x2 = obj->coords.x2 - side_space;
+            area.x1 = area.x2 - tickness;
+            if(area.y1 < obj->coords.y1 + end_space) {
+                area.y1 = obj->coords.y1 + end_space;
+                if(area.y1 + SCROLLBAR_MIN_SIZE > area.y2) area.y2 = area.y1 + SCROLLBAR_MIN_SIZE;
+            }
+            if(area.y2 > obj->coords.y2 - hor_req_space - end_space) {
+                area.y2 = obj->coords.y2 - hor_req_space - end_space;
+                if(area.y2 - SCROLLBAR_MIN_SIZE < area.y1) area.y1 = area.y2 - SCROLLBAR_MIN_SIZE;
+            }
+        }
+        lv_draw_rect(&area, clip_area, &draw_dsc);
+    }
+
+    area.y2 = obj->coords.y2 - side_space;
+    area.y1 = area.y2 - tickness;
+    area.x1 = obj->coords.x1;
+    area.x2 = obj->coords.x2;
+    /*Draw horizontal scrollbar if the mode is ON or can be scrolled in this direction*/
+    if(hor_draw && _lv_area_is_on(&area, clip_area)) {
+        lv_coord_t content_w = obj_w + sl + sr;
+        lv_coord_t sb_w = ((obj_w - end_space * 2 - ver_reg_space) * obj_w) / content_w;
+        sb_w = LV_MAX(sb_w, SCROLLBAR_MIN_SIZE);
+        rem = (obj_w - end_space * 2 - ver_reg_space) - sb_w;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
+        lv_coord_t scroll_w = content_w - obj_w; /*The size of the content which can be really scrolled*/
+        if(scroll_w <= 0) {
+            area.y2 = obj->coords.y2 - side_space;
+            area.y1 = area.y2 - tickness + 1;
+            area.x1 = obj->coords.x1 + end_space;
+            area.x2 = obj->coords.x2 - end_space - ver_reg_space - 1;
+        } else {
+            lv_coord_t sb_x = (rem * sr) / scroll_w;
+            sb_x = rem - sb_x;
+
+            area.x1 = obj->coords.x1 + sb_x + end_space;
+            area.x2 = area.x1 + sb_w - 1;
+            area.y2 = obj->coords.y2 - side_space;
+            area.y1 = area.y2 - tickness;
+            if(area.x1 < obj->coords.x1 + end_space) {
+                area.x1 = obj->coords.x1 + end_space;
+                if(area.x1 + SCROLLBAR_MIN_SIZE > area.x2) area.x2 = area.x1 + SCROLLBAR_MIN_SIZE;
+            }
+            if(area.x2 > obj->coords.x2 - ver_reg_space - end_space) {
+                area.x2 = obj->coords.x2 - ver_reg_space - end_space;
+                if(area.x2 - SCROLLBAR_MIN_SIZE < area.x1) area.x1 = area.x2 - SCROLLBAR_MIN_SIZE;
+            }
+        }
+        lv_draw_rect(&area, clip_area, &draw_dsc);
+    }
+}
+
+/**
+ * Initialize the draw descriptor for the scrollbar
+ * @param obj pointer to an object
+ * @param dsc the draw descriptor to initialize
+ * @return LV_RES_OK: the scrollbar is visible; LV_RES_INV: the scrollbar is not visible
+ */
+static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc)
+{
+    lv_draw_rect_dsc_init(dsc);
+    dsc->bg_opa = lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR);
+    if(dsc->bg_opa > LV_OPA_MIN) {
+        dsc->bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR);
+    }
+
+    dsc->border_opa = lv_obj_get_style_border_opa(obj, LV_PART_SCROLLBAR);
+    if(dsc->border_opa > LV_OPA_MIN) {
+        dsc->border_width = lv_obj_get_style_border_width(obj, LV_PART_SCROLLBAR);
+        if(dsc->border_width > 0) {
+            dsc->border_color = lv_obj_get_style_border_color(obj, LV_PART_SCROLLBAR);
+        } else {
+            dsc->border_opa = LV_OPA_TRANSP;
+        }
+    }
+
+    lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
+    if(opa < LV_OPA_MAX) {
+        dsc->bg_opa = (dsc->bg_opa * opa) >> 8;
+        dsc->border_opa = (dsc->bg_opa * opa) >> 8;
+    }
+
+    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) {
+        dsc->radius = lv_obj_get_style_radius(obj, LV_PART_SCROLLBAR);
+        return LV_RES_OK;
+    } else {
+        return LV_RES_INV;
+    }
+}
+
 
 static void base_dir_refr_children(lv_obj_t * obj)
 {
@@ -1820,9 +1992,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_invalidate(obj);
         }
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = param;
-        lv_coord_t d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MAIN);
+        lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         *s = LV_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
@@ -1841,7 +2013,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
-        _lv_obj_refresh_ext_draw_pad(obj);
+        lv_obj_refresh_ext_draw_size(obj);
     }
     return res;
 }

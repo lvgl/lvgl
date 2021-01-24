@@ -16,14 +16,15 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    lv_layout_update_cb_t update_cb;
-}lv_layout_base_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+static void calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out);
+
+void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify);
+void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 
 /**********************
  *  STATIC VARIABLES
@@ -37,36 +38,11 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
-{
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    if(parent == NULL) return false;
-    if(parent->spec_attr && parent->spec_attr->layout_dsc) return true;
-    else return false;
-}
-
-void lv_obj_update_layout(lv_obj_t * cont, lv_obj_t * item)
-{
-    if(cont->spec_attr == NULL) return;
-    if(cont->spec_attr->layout_dsc == NULL) return;
-    if(cont->spec_attr->child_cnt == 0) return;
-
-    const lv_layout_base_t * layout = cont->spec_attr->layout_dsc;
-    if(layout->update_cb == NULL) return;
-    layout->update_cb(cont, item);
-}
-
 /**
- * Set relative the position of an object (relative to the parent)
- * @param obj pointer to an object
- * @param x new distance from the left side of the parent plus the parent's left padding or a grid cell
- * @param y new distance from the top side of the parent  plus the parent's right padding or a grid cell
- * @note Zero value value means place the object is on the left padding of the parent, and not on the left edge.
- * @note A grid cell can be and explicit placement with cell position and span:
- *         `LV_GRID_CELL_START/END/CENTER/STRETCH(pos, span)`
- *       or "auto" to place the object on the grid in the creation order of other children
- *       `LV_GRID_AUTO_START/END/CENTER/STRETCH`
- * @note to use grid placement the parent needs have a defined grid with `lv_obj_set_grid`
+ * Set the relative the position of an object (relative to the parent's top left corner)
+ * @param obj: pointer to an object
+ * @param x:   new distance from the left side of the parent plus the parent's left padding
+ * @param y:   new distance from the top side of the parent  plus the parent's right padding
  */
 void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
@@ -80,13 +56,13 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->x_set = x;
     obj->y_set = y;
 
-    _lv_obj_move_to(obj, x, y, true);
+    lv_obj_move_to(obj, x, y, true);
 }
 
 /**
  * Set the x coordinate of a object
- * @param obj pointer to an object
- * @param x new distance from the left side from the parent plus the parent's left padding or a grid cell
+ * @param obj: pointer to an object
+ * @param x:   new distance from the left side from the parent plus the parent's left padding
  */
 void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
@@ -97,8 +73,8 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 
 /**
  * Set the y coordinate of a object
- * @param obj pointer to an object
- * @param y new distance from the top of the parent  plus the parent's top padding or a grid cell
+ * @param obj: pointer to an object
+ * @param y:   new distance from the top of the parent  plus the parent's top padding
  */
 void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 {
@@ -109,17 +85,16 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 
 /**
  * Set the size of an object.
- * @param obj pointer to an object
- * @param w new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
- * @param h new height  in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param obj: pointer to an object
+ * @param w: new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param h: new height in pixels or `LV_SIZE_AUTO` to set the size to involve all children
  */
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-
+    /*If the width or height is set by a layout do not modify them*/
     if(obj->w_set == LV_SIZE_LAYOUT && obj->h_set == LV_SIZE_LAYOUT) return;
-
 
     if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
     if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
@@ -135,9 +110,9 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     if(x_auto) lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
     if(y_auto) lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
 
-    if(x_auto && y_auto) _lv_obj_calc_auto_size(obj, &w, &h);
-    else if(x_auto) _lv_obj_calc_auto_size(obj, &w, NULL);
-    else if(y_auto) _lv_obj_calc_auto_size(obj, NULL, &h);
+    if(x_auto && y_auto) calc_auto_size(obj, &w, &h);
+    else if(x_auto) calc_auto_size(obj, &w, NULL);
+    else if(y_auto) calc_auto_size(obj, NULL, &h);
 
     /*Calculate the required auto sizes*/
     bool pct_w = LV_COORD_IS_PCT(obj->w_set) ? true : false;
@@ -156,8 +131,8 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
 /**
  * Set the width of an object
- * @param obj pointer to an object
- * @param w new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param obj: pointer to an object
+ * @param w:   new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
  */
 void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 {
@@ -168,8 +143,8 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 
 /**
  * Set the height of an object
- * @param obj pointer to an object
- * @param h new height in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param obj: pointer to an object
+ * @param h: new height in pixels or `LV_SIZE_AUTO` to set the size to involve all children
  */
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 {
@@ -180,8 +155,8 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 
 /**
  * Set the width reduced by the left and right padding.
- * @param obj pointer to an object
- * @param w the width without paddings in pixels
+ * @param obj: pointer to an object
+ * @param w:   the width without paddings in pixels
  */
 void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)
 {
@@ -193,8 +168,8 @@ void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)
 
 /**
  * Set the height reduced by the top and bottom padding.
- * @param obj pointer to an object
- * @param h the height without paddings in pixels
+ * @param obj: pointer to an object
+ * @param h:   the height without paddings in pixels
  */
 void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
 {
@@ -206,8 +181,8 @@ void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
 
 /**
  * Set a layout for an object
- * @param obj pointer to an object
- * @param layout pointer to a layout descriptor to set
+ * @param obj:    pointer to an object
+ * @param layout: pointer to a layout descriptor to set
  */
 void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
 {
@@ -220,12 +195,45 @@ void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
 }
 
 /**
+ * Test whether the and object is positioned by a layout or not
+ * @param obj: pointer to an object to test
+ * @return true: positioned by a layout; false: not positioned by a layout
+ */
+bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
+{
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_LAYOUTABLE) == false) return false;
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent == NULL) return false;
+    if(parent->spec_attr && parent->spec_attr->layout_dsc) return true;
+    else return false;
+}
+
+/**
+ * Update the layout of an object.
+ * @param cont: pointer to an object whose children needs to be updated
+ * @param item: pointer to a child object that triggered the update. Set to `NULL` is not known.
+ *              If not `NULL` the update process should make some optimization
+ *              to update only the required parts of the layout
+ */
+void lv_obj_update_layout(lv_obj_t * cont, lv_obj_t * item)
+{
+    if(cont->spec_attr == NULL) return;
+    if(cont->spec_attr->layout_dsc == NULL) return;
+    if(cont->spec_attr->child_cnt == 0) return;
+
+    const lv_layout_dsc_t * layout = cont->spec_attr->layout_dsc;
+    if(layout->update_cb == NULL) return;
+    layout->update_cb(cont, item);
+}
+
+/**
  * Align an object to an other object.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- * @param y_ofs y coordinate offset after alignment
+ * @param obj:   pointer to an object to align
+ * @param base:  pointer to an other object (if NULL `obj`s parent is used). 'obj' will be aligned to it.
+ * @param align: type of alignment (see 'lv_align_t' enum)
+ * @param x_ofs: x coordinate offset after alignment
+ * @param y_ofs: y coordinate offset after alignment
  */
 void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
@@ -353,41 +361,23 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
 /**
  * Copy the coordinates of an object to an area
- * @param obj pointer to an object
- * @param coords_out pointer to an area to store the coordinates
+ * @param obj:        pointer to an object
+ * @param coords: pointer to an area to store the coordinates
  */
-void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords_out)
+void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_area_copy(coords_out, &obj->coords);
-}
-
-/**
- * Reduce area retried by `lv_obj_get_coords()` the get graphically usable area of an object.
- * (Without the size of the border or other extra graphical elements)
- * @param coords_out store the result area here
- */
-void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_out)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_border_side_t part = lv_obj_get_style_border_side(obj, LV_PART_MAIN);
-    lv_coord_t w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-
-    if(part & LV_BORDER_SIDE_LEFT) coords_out->x1 += w;
-    if(part & LV_BORDER_SIDE_RIGHT) coords_out->x2 -= w;
-    if(part & LV_BORDER_SIDE_TOP) coords_out->y1 += w;
-    if(part & LV_BORDER_SIDE_BOTTOM) coords_out->y2 -= w;
+    lv_area_copy(coords, &obj->coords);
 }
 
 /**
  * Get the x coordinate of object.
- * @param obj pointer to an object
- * @return distance of 'obj' from the left side of its parent plus the parent's left padding
+ * @param obj: pointer to an object
+ * @return distance of `obj` from the left side of its parent plus the parent's left padding
  * @note Zero return value means the object is on the left padding of the parent, and not on the left edge.
  * @note Scrolling of the parent doesn't change the returned value.
- * @note The returned value is always the distance from the parent even if the position is grid cell or other special value.
+ * @note The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
 lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
 {
@@ -396,7 +386,7 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
     lv_coord_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
-        rel_x   = obj->coords.x1 - parent->coords.x1;
+        rel_x  = obj->coords.x1 - parent->coords.x1;
         rel_x += lv_obj_get_scroll_x(parent);
         rel_x -= lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
     }
@@ -408,11 +398,11 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
 
 /**
  * Get the y coordinate of object.
- * @param obj pointer to an object
- * @return distance of 'obj' from the top side of its parent plus the parent's top padding
+ * @param obj: pointer to an object
+ * @return distance of `obj` from the top side of its parent plus the parent's top padding
  * @note Zero return value means the object is on the top padding of the parent, and not on the top edge.
  * @note Scrolling of the parent doesn't change the returned value.
- * @note The returned value is always the distance from the parent even if the position is grid cell or other special value.
+ * @note The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
 lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
 {
@@ -435,7 +425,6 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
  * Get the width of an object
  * @param obj pointer to an object
  * @return the width in pixels
- * @note The returned value is always the width in pixels even if the width is set to `LV_SIZE_AUTO` or other special value.
  */
 lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
 {
@@ -448,7 +437,6 @@ lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
  * Get the height of an object
  * @param obj pointer to an object
  * @return the height in pixels
- * @note The returned value is always the width in pixels even if the width is set to `LV_SIZE_AUTO` or other special value.
  */
 lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
 {
@@ -459,8 +447,8 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
 
 /**
  * Get that width reduced by the left and right padding.
- * @param obj pointer to an object
- * @return the width which still fits into the container without causing overflow
+ * @param obj: pointer to an object
+ * @return the width which still fits into the container without causing overflow (making the object scrollable)
  */
 lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
 {
@@ -474,8 +462,8 @@ lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
 
 /**
  * Get that height reduced by the top an bottom padding.
- * @param obj pointer to an object
- * @return the height which still fits into the container without causing overflow
+ * @param obj: pointer to an object
+ * @return the height which still fits into the container without causing overflow (making the object scrollable)
  */
 lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 {
@@ -486,12 +474,15 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 
     return lv_obj_get_height(obj) - top - bottom;
 }
+
 /**
- * Get the width of the virtual content of an object
- * @param obj pointer to an objects
+ * Get the width occupied by the "parts" of the widget. E.g. the width of all columns of a table.
+ * @param obj: pointer to an objects
  * @return the width of the virtually drawn content
+ * @note This size independent from the real size of the widget.
+ *       It just tells how large the internal ("virtual") content is.
  */
-lv_coord_t _lv_obj_get_self_width(struct _lv_obj_t * obj)
+lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
     lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
@@ -499,11 +490,13 @@ lv_coord_t _lv_obj_get_self_width(struct _lv_obj_t * obj)
 }
 
 /**
- * Get the height of the virtual content of an object
- * @param obj pointer to an objects
+ * Get the height occupied by the "parts" of the widget. E.g. the height of all rows of a table.
+ * @param obj: pointer to an objects
  * @return the width of the virtually drawn content
+ * @note This size independent from the real size of the widget.
+ *       It just tells how large the internal ("virtual") content is.
  */
-lv_coord_t _lv_obj_get_self_height(struct _lv_obj_t * obj)
+lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
     lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
@@ -511,11 +504,11 @@ lv_coord_t _lv_obj_get_self_height(struct _lv_obj_t * obj)
 }
 
 /**
- * Handle if the size of the internal (virtual) content of an object has changed.
- * @param obj pointer to an object
+ * Handle if the size of the internal ("virtual") content of an object has changed.
+ * @param obj: pointer to an object
  * @return false: nothing happened; true: refresh happened
  */
-bool _lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
+bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 {
     if(obj->w_set != LV_SIZE_AUTO && obj->h_set == LV_SIZE_AUTO) return false;
 
@@ -524,37 +517,14 @@ bool _lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 }
 
 /**
- * Calculate the "auto size". It's `auto_size = max(children_size, self_size)`
- * @param obj pointer to an object
- * @param w_out store the width here. NULL to not calculate width
- * @param h_out store the height here. NULL to not calculate height
- */
-void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out)
-{
-    if(!w_out && !h_out) return;
-    /*Get the bounding box of the children*/
-    if(w_out) {
-        lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
-        lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
-        *w_out = lv_obj_get_width(obj) + scroll_right + scroll_left;
-    }
-
-    if(h_out) {
-        lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
-        lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
-        *h_out = lv_obj_get_height(obj) + scroll_bottom + scroll_top;
-    }
-}
-
-/**
  * Move an object to a given x and y coordinate.
- * It's the core function to move objects but user should use `lv_obj_set_pos/x/y/..` etc.
- * @param obj pointer to an object to move
- * @param x the new x coordinate in pixels
- * @param y the new y coordinate in pixels
- * @param notify_parent true: send `LV_SIGNAL_CHILD_CHG` to the parent if `obj` moved; false: do not notify the parent
+ * It's the core function to move objects. User should use `lv_obj_set_pos/x/y/..` etc.
+ * @param obj:    pointer to an object to move
+ * @param x:      the new x coordinate in pixels
+ * @param y:      the new y coordinate in pixels
+ * @param notify: true: send `LV_SIGNAL_CHILD_CHG` to the parent if `obj` moved; false: do not notify the parent
  */
-void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_parent)
+void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * parent = obj->parent;
@@ -589,13 +559,13 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
     obj->coords.x2 += diff.x;
     obj->coords.y2 += diff.y;
 
-    _lv_obj_move_children_by(obj, diff.x, diff.y);
+    lv_obj_move_children_by(obj, diff.x, diff.y);
 
     /*Inform the object about its new coordinates*/
     lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    if(parent && notify_parent) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent && notify) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -604,11 +574,12 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
 
 /**
  * Reposition the children of an object. (Called recursively)
- * @param obj pointer to an object which children will be repositioned
- * @param x_diff x coordinate shift
- * @param y_diff y coordinate shift
+ * It's a low level function and shouldn't be used by the user directly.
+ * @param obj:    pointer to an object which children will be repositioned
+ * @param x_diff: x coordinate shift
+ * @param y_diff: y coordinate shift
  */
-void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
+void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
@@ -618,7 +589,7 @@ void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_di
         child->coords.x2 += x_diff;
         child->coords.y2 += y_diff;
 
-        _lv_obj_move_children_by(child, x_diff, y_diff);
+        lv_obj_move_children_by(child, x_diff, y_diff);
     }
 }
 
@@ -678,3 +649,26 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     return true;
 }
 
+
+/**
+ * Calculate the "auto size". It's `auto_size = max(children_size, self_size)`
+ * @param obj pointer to an object
+ * @param w_out store the width here. NULL to not calculate width
+ * @param h_out store the height here. NULL to not calculate height
+ */
+static void calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out)
+{
+    if(!w_out && !h_out) return;
+    /*Get the bounding box of the children*/
+    if(w_out) {
+        lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
+        lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
+        *w_out = lv_obj_get_width(obj) + scroll_right + scroll_left;
+    }
+
+    if(h_out) {
+        lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
+        lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
+        *h_out = lv_obj_get_height(obj) + scroll_bottom + scroll_top;
+    }
+}

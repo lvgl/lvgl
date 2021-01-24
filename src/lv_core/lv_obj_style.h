@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stdbool.h>
-#include "lv_style.h"
+#include "../lv_misc/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -45,8 +45,8 @@ typedef struct {
 
 typedef struct {
     lv_obj_style_t * styles;
-    uint32_t style_cnt  :6;
     uint32_t skip_trans :1;
+    uint32_t style_cnt  :6;
     uint32_t cache_state :9;
 
     uint32_t cache_opa_set :1;
@@ -58,25 +58,17 @@ typedef struct {
     uint32_t cache_clip_corner_enable:1;
 
     uint32_t cache_bg_opa_cover:1;
-    uint32_t cache_bg_grad_dir_zero:1;
 
     uint32_t cache_border_width_zero:1;
-    uint32_t cache_border_opa_cover:1;
     uint32_t cache_border_post_enable:1;
 
-    uint32_t cache_text_font_set:1;
-    uint32_t cache_text_opa_set:1;
-    uint32_t cache_text_color_set:1;
-    uint32_t cache_text_extra_zero :1;   /*no align,  letter or line space*/
+    uint32_t cache_text_any_set:1;
 
     uint32_t cache_img_opa_cover:1;
-    uint32_t cache_img_recolor_opa_zero:1;
-
     uint32_t cache_outline_width_zero:1;
-
     uint32_t cache_shadow_width_zero:1;
-
-    uint32_t cache_content_src_zero:1;
+    uint32_t cache_content_text_zero:1;
+    uint32_t cache_bg_img_src_zero:1;
 }lv_obj_style_list_t;
 
 /**********************
@@ -225,8 +217,8 @@ static inline lv_opa_t lv_obj_get_style_color_filter_opa(const struct _lv_obj_t 
 static inline uint32_t lv_obj_get_style_anim_time(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM_TIME); return (uint32_t) v.num; }
 
-static inline const lv_style_transition_t * lv_obj_get_style_transition(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION); return (const lv_style_transition_t *) v.ptr; }
+static inline const lv_style_transition_dsc_t * lv_obj_get_style_transition(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION); return (const lv_style_transition_dsc_t *) v.ptr; }
 
 static inline lv_coord_t lv_obj_get_style_size(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_SIZE); return (lv_coord_t) v.num; }
@@ -278,6 +270,9 @@ static inline lv_coord_t lv_obj_get_style_bg_grad_stop(const struct _lv_obj_t * 
 
 static inline const void * lv_obj_get_style_bg_img_src(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMG_SRC); return (const void *) v.ptr; }
+
+static inline lv_opa_t lv_obj_get_style_bg_img_opa(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMG_OPA); return (lv_opa_t) v.num; }
 
 static inline lv_color_t lv_obj_get_style_bg_img_recolor(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMG_RECOLOR); return (lv_color_t) v.color; }

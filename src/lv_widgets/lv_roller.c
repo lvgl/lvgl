@@ -146,7 +146,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     roller->sel_opt_id_ori = roller->sel_opt_id;
 
     /*If the selected text has larger font the label needs some extra draw padding to draw it.*/
-    _lv_obj_refresh_ext_draw_pad(label);
+    lv_obj_refresh_ext_draw_size(label);
 
 }
 
@@ -539,7 +539,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_t * label = get_label(obj);
         /*Be sure the label's style is updated before processing the roller*/
         if(label) lv_signal_send(label, LV_SIGNAL_STYLE_CHG, NULL);
-        _lv_obj_handle_self_size_chg(obj);
+        lv_obj_handle_self_size_chg(obj);
         refr_position(obj, false);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
@@ -642,7 +642,7 @@ static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void 
     res = lv_label.signal_cb(label, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         /*If the selected text has a larger font it needs some extra space to draw it*/
         lv_coord_t * s = param;
         lv_obj_t * obj = lv_obj_get_parent(label);
@@ -782,7 +782,7 @@ static lv_res_t release_handler(lv_obj_t * obj)
 
             lv_coord_t label_unit = font_h + line_space;
             lv_coord_t mid        = obj->coords.y1 + (obj->coords.y2 - obj->coords.y1) / 2;
-            lv_coord_t label_y1 = label->coords.y1 + _lv_scroll_throw_predict(indev, LV_DIR_VER);
+            lv_coord_t label_y1 = label->coords.y1 + lv_indev_scroll_throw_predict(indev, LV_DIR_VER);
             int32_t id = (mid - label_y1) / label_unit;
 
             if(id < 0) id = 0;

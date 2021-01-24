@@ -91,7 +91,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
     cb->static_txt = 0;
 
-    _lv_obj_handle_self_size_chg(obj);
+    lv_obj_handle_self_size_chg(obj);
 }
 
 /**
@@ -109,7 +109,7 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
     cb->txt = (char*)txt;
     cb->static_txt = 1;
 
-    _lv_obj_handle_self_size_chg(obj);
+    lv_obj_handle_self_size_chg(obj);
 }
 
 /*=====================
@@ -285,9 +285,9 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         p->x = marker_size.x + txt_size.x + bg_colp;
         p->y = LV_MAX(marker_size.y, txt_size.y);
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t *s = param;
-        lv_coord_t m = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MARKER);
+        lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_MARKER);
         *s = LV_MAX(*s, m);
     }
 

@@ -83,7 +83,7 @@ void lv_line_set_points(lv_obj_t * obj, const lv_point_t point_a[], uint16_t poi
     line->point_array    = point_a;
     line->point_num      = point_num;
 
-    _lv_obj_handle_self_size_chg(obj);
+    lv_obj_handle_self_size_chg(obj);
 
     lv_obj_invalidate(obj);
 }
@@ -233,7 +233,7 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     res = lv_obj.signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         /*The corner of the skew lines is out of the intended area*/
         lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
         lv_coord_t * s = param;

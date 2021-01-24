@@ -429,7 +429,7 @@ void lv_chart_set_tick_label_cb(lv_obj_t * obj, lv_chart_tick_label_cb_t tick_la
     lv_chart_t * chart  = (lv_chart_t *)obj;
     chart->tick_label_cb = tick_label_cb;
     chart->ext_size = ext_size;
-    _lv_obj_refresh_ext_draw_pad(obj);
+    lv_obj_refresh_ext_draw_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -838,7 +838,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_point_t * p = param;
         p->x = (lv_obj_get_width(obj) * chart->x_zoom) >> 8;
         p->y = (lv_obj_get_height(obj) * chart->y_zoom) >> 8;
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = param;
         *s = LV_MAX(*s, chart->ext_size);
     } else if(sign == LV_SIGNAL_PRESSING) {

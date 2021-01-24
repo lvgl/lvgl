@@ -30,9 +30,14 @@
  **********************/
 
 /**********************
+ *  GLOBAL PROTOTYPES
+ **********************/
+void lv_indev_scroll_handler(lv_indev_proc_t * proc);
+void lv_indev_scroll_throw_handler(lv_indev_proc_t * proc);
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
-
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
@@ -58,19 +63,7 @@ static lv_obj_t * indev_obj_act = NULL;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Initialize the display input device subsystem
- */
-void _lv_indev_init(void)
-{
-    lv_indev_reset(NULL, NULL); /*Reset all input devices*/
-}
-
-/**
- * Called periodically to read the input devices
- * @param param pointer to and input device to read
- */
-void _lv_indev_read_task(lv_timer_t * task)
+void lv_indev_read_task_cb(lv_timer_t * task)
 {
     LV_LOG_TRACE("indev read task started");
 
@@ -127,21 +120,18 @@ void _lv_indev_read_task(lv_timer_t * task)
     LV_LOG_TRACE("indev read task finished");
 }
 
-/**
- * Get the currently processed input device. Can be used in action functions too.
- * @return pointer to the currently processed input device or NULL if no input device processing
- * right now
- */
+void lv_indev_enable(lv_indev_t * indev, bool en)
+{
+    if(!indev) return;
+
+    indev->proc.disabled = en ? 0 : 1;
+}
+
 lv_indev_t * lv_indev_get_act(void)
 {
     return indev_act;
 }
 
-/**
- * Get the type of an input device
- * @param indev pointer to an input device
- * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
- */
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
     if(indev == NULL) return LV_INDEV_TYPE_NONE;
@@ -149,11 +139,6 @@ lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
     return indev->driver.type;
 }
 
-/**
- * Reset one or all input devices
- * @param indev pointer to an input device to reset or NULL to reset all of them
- * @param obj pointer to an object which triggers the reset.
- */
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
     if(indev) {
@@ -167,19 +152,16 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
             i->proc.reset_query = 1;
-            if(indev_act == i) indev_obj_act = NULL;
-            if(obj == NULL || i->proc.types.pointer.last_pressed == obj) {
+            if((i->driver.type == LV_INDEV_TYPE_POINTER || i->driver.type == LV_INDEV_TYPE_KEYPAD) &&
+               (obj == NULL || i->proc.types.pointer.last_pressed == obj)) {
                 i->proc.types.pointer.last_pressed = NULL;
             }
             i = lv_indev_get_next(i);
         }
+        indev_obj_act = NULL;
     }
 }
 
-/**
- * Reset the long press state of an input device
- * @param indev pointer to an input device
- */
 void lv_indev_reset_long_press(lv_indev_t * indev)
 {
     indev->proc.long_pr_sent         = 0;
@@ -187,23 +169,6 @@ void lv_indev_reset_long_press(lv_indev_t * indev)
     indev->proc.pr_timestamp         = lv_tick_get();
 }
 
-/**
- * Enable or disable an input devices
- * @param indev pointer to an input device
- * @param en true: enable; false: disable
- */
-void lv_indev_enable(lv_indev_t * indev, bool en)
-{
-    if(!indev) return;
-
-    indev->proc.disabled = en ? 0 : 1;
-}
-
-/**
- * Set a cursor for a pointer input device (for LV_INPUT_TYPE_POINTER and LV_INPUT_TYPE_BUTTON)
- * @param indev pointer to an input device
- * @param cur_obj pointer to an object to be used as cursor
- */
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 {
     if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
@@ -212,14 +177,10 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x, indev->proc.types.pointer.act_point.y);
     lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_LAYOUTABLE);
 }
 
 #if LV_USE_GROUP
-/**
- * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
- * @param indev pointer to an input device
- * @param group point to a group
- */
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 {
     if(indev->driver.type == LV_INDEV_TYPE_KEYPAD || indev->driver.type == LV_INDEV_TYPE_ENCODER) {
@@ -228,12 +189,6 @@ void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 }
 #endif
 
-/**
- * Set the an array of points for LV_INDEV_TYPE_BUTTON.
- * These points will be assigned to the buttons to press a specific point on the screen
- * @param indev pointer to an input device
- * @param group point to a group
- */
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[])
 {
     if(indev->driver.type == LV_INDEV_TYPE_BUTTON) {
@@ -241,11 +196,6 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[])
     }
 }
 
-/**
- * Get the last point of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
- * @param indev pointer to an input device
- * @param point pointer to a point to store the result
- */
 void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
 {
     if(indev == NULL) {
@@ -263,21 +213,11 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
     }
 }
 
-/**
-* Get the current gesture direct
-* @param indev pointer to an input device
-* @return current gesture direct
-*/
 lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
 {
     return indev->proc.types.pointer.gesture_dir;
 }
 
-/**
- * Get the last pressed key of an input device (for LV_INDEV_TYPE_KEYPAD)
- * @param indev pointer to an input device
- * @return the last pressed key (0 on error)
- */
 uint32_t lv_indev_get_key(const lv_indev_t * indev)
 {
     if(indev->driver.type != LV_INDEV_TYPE_KEYPAD)
@@ -286,25 +226,13 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev)
         return indev->proc.types.keypad.last_key;
 }
 
-/**
- * Check the current scroll direction of an input device (for LV_INDEV_TYPE_POINTER and
- * LV_INDEV_TYPE_BUTTON)
- * @param indev pointer to an input device
- * @return LV_SCROLL_DIR_NONE: no scrolling now
- *         LV_SCROLL_DIR_HOR/VER
- */
 lv_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
 {
     if(indev == NULL) return false;
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return false;
     return indev->proc.types.pointer.scroll_dir;
 }
-/**
- * Get the currently scrolled object (for LV_INDEV_TYPE_POINTER and
- * LV_INDEV_TYPE_BUTTON)
- * @param indev pointer to an input device
- * @return pointer to the currently scrolled object or NULL if no scrolling by this indev
- */
+
 lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
@@ -312,55 +240,30 @@ lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev)
     return indev->proc.types.pointer.scroll_obj;
 }
 
-/**
- * Get the movement vector of an input device (for LV_INDEV_TYPE_POINTER and
- * LV_INDEV_TYPE_BUTTON)
- * @param indev pointer to an input device
- * @param point pointer to a point to store the types.pointer.vector
- */
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 {
-    if(indev == NULL) {
-        point->x = 0;
-        point->y = 0;
-        return;
-    }
+    point->x = 0;
+    point->y = 0;
 
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
-        point->x = 0;
-        point->y = 0;
-    }
-    else {
+    if(indev == NULL) return;
+
+    if(indev->driver.type == LV_INDEV_TYPE_POINTER || indev->driver.type == LV_INDEV_TYPE_BUTTON) {
         point->x = indev->proc.types.pointer.vect.x;
         point->y = indev->proc.types.pointer.vect.y;
     }
 }
 
-/**
- * Do nothing until the next release
- * @param indev pointer to an input device
- */
 void lv_indev_wait_release(lv_indev_t * indev)
 {
     if(indev == NULL)return;
     indev->proc.wait_until_release = 1;
 }
 
-/**
- * Gets a pointer to the currently active object in the currently processed input device.
- * @return pointer to currently active object or NULL if no active object
- */
 lv_obj_t * lv_indev_get_obj_act(void)
 {
     return indev_obj_act;
 }
 
-/**
- * Get a pointer to the indev read task to
- * modify its parameters with `lv_task_...` functions.
- * @param indev pointer to an input device
- * @return pointer to the indev read refresher task. (NULL on error)
- */
 lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev)
 {
     if(!indev) {
@@ -368,7 +271,38 @@ lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev)
         return NULL;
     }
 
-    return indev->refr_task;
+    return indev->read_task;
+}
+
+lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
+{
+    lv_obj_t * found_p = NULL;
+
+    /*If the point is on this object check its children too*/
+    if(lv_obj_hit_test(obj, point)) {
+        int32_t i;
+        for(i = lv_obj_get_child_cnt(obj) - 1; i >= 0; i--) {
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+            found_p = lv_indev_search_obj(child, point);
+
+            /*If a child was found then break*/
+            if(found_p != NULL) break;
+        }
+
+        /*If then the children was not ok, and this obj is clickable
+         * and it or its parent is not hidden then save this object*/
+        if(found_p == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) {
+            lv_obj_t * hidden_i = obj;
+            while(hidden_i != NULL) {
+                if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == true) break;
+                hidden_i = lv_obj_get_parent(hidden_i);
+            }
+            /*No parent found with hidden == true*/
+            if(hidden_i == NULL && (lv_obj_get_state(obj) & LV_STATE_DISABLED) == false) found_p = obj;
+        }
+    }
+
+    return found_p;
 }
 
 /**********************
@@ -852,7 +786,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     if(new_obj_searched && proc->types.pointer.last_obj) {
         proc->types.pointer.scroll_throw_vect.x = 0;
         proc->types.pointer.scroll_throw_vect.y = 0;
-        _lv_scroll_throw_handler(proc);
+        lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;
     }
 
@@ -924,7 +858,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
         if(indev_act->proc.wait_until_release) return;
 
-        _lv_scroll_handler(proc);
+        lv_indev_scroll_handler(proc);
         if(indev_reset_check(proc)) return;
         indev_gesture(proc);
         if(indev_reset_check(proc)) return;
@@ -1006,7 +940,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     /*The reset can be set in the signal function.
      * In case of reset query ignore the remaining parts.*/
     if(scroll_obj) {
-        _lv_scroll_throw_handler(proc);
+        lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;
     }
 }
@@ -1037,42 +971,6 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->proc.reset_query                     = 0;
         indev_obj_act                               = NULL;
     }
-}
-/**
- * Search the most top, clickable object by a point
- * @param obj pointer to a start object, typically the screen
- * @param point pointer to a point for searching the most top child
- * @return pointer to the found object or NULL if there was no suitable object
- */
-lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
-{
-    lv_obj_t * found_p = NULL;
-
-    /*If the point is on this object check its children too*/
-    if(lv_obj_hit_test(obj, point)) {
-        int32_t i;
-        for(i = lv_obj_get_child_cnt(obj) - 1; i >= 0; i--) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
-            found_p = lv_indev_search_obj(child, point);
-
-            /*If a child was found then break*/
-            if(found_p != NULL) break;
-        }
-
-        /*If then the children was not ok, and this obj is clickable
-         * and it or its parent is not hidden then save this object*/
-        if(found_p == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) {
-            lv_obj_t * hidden_i = obj;
-            while(hidden_i != NULL) {
-                if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == true) break;
-                hidden_i = lv_obj_get_parent(hidden_i);
-            }
-            /*No parent found with hidden == true*/
-            if(hidden_i == NULL && (lv_obj_get_state(obj) & LV_STATE_DISABLED) == false) found_p = obj;
-        }
-    }
-
-    return found_p;
 }
 
 /**

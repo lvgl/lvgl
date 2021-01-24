@@ -568,9 +568,9 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     res = lv_obj.signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t indic_size;
-        indic_size = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_INDICATOR);
+        indic_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
 
         /*Bg size is handled by lv_obj*/
         lv_coord_t * s = param;

@@ -30,15 +30,17 @@ extern "C" {
  **********************/
 
 /**
- * Initialize the display input device subsystem
+ * Called periodically to read the input devices
+ * @param param pointer to and input device to read
  */
-void _lv_indev_init(void);
+void lv_indev_read_task_cb(lv_timer_t * task);
 
 /**
- * Called periodically to read the input devices
- * @param task pointer to the task itself
+ * Enable or disable an input devices
+ * @param indev pointer to an input device
+ * @param en true: enable; false: disable
  */
-void _lv_indev_read_task(lv_timer_t * task);
+void lv_indev_enable(lv_indev_t * indev, bool en);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -63,16 +65,9 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
 /**
  * Reset the long press state of an input device
- * @param indev_proc pointer to an input device
+ * @param indev pointer to an input device
  */
 void lv_indev_reset_long_press(lv_indev_t * indev);
-
-/**
- * Enable or disable an input devices
- * @param indev pointer to an input device
- * @param en true: enable; false: disable
- */
-void lv_indev_enable(lv_indev_t * indev, bool en);
 
 /**
  * Set a cursor for a pointer input device (for LV_INPUT_TYPE_POINTER and LV_INPUT_TYPE_BUTTON)
@@ -151,11 +146,18 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
 void lv_indev_wait_release(lv_indev_t * indev);
 
 /**
- * Gets a pointer to the currently active object in indev proc functions.
- * NULL if no object is currently being handled or if groups aren't used.
- * @return pointer to currently active object
+ * Gets a pointer to the currently active object in the currently processed input device.
+ * @return pointer to currently active object or NULL if no active object
  */
 lv_obj_t * lv_indev_get_obj_act(void);
+
+/**
+ * Get a pointer to the indev read task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param indev pointer to an input device
+ * @return pointer to the indev read refresher task. (NULL on error)
+ */
+lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**
  * Search the most top, clickable object by a point
@@ -164,14 +166,6 @@ lv_obj_t * lv_indev_get_obj_act(void);
  * @return pointer to the found object or NULL if there was no suitable object
  */
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
-
-/**
- * Get a pointer to the indev read task to
- * modify its parameters with `lv_task_...` functions.
- * @param indev pointer to an inout device
- * @return pointer to the indev read refresher task. (NULL on error)
- */
-lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**********************
  *      MACROS

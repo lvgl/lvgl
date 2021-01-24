@@ -85,13 +85,13 @@ void lv_refr_now(lv_disp_t * disp)
 #endif
 
     if(disp) {
-        _lv_disp_refr_task(disp->refr_task);
+        _lv_disp_refr_task(disp->read_task);
     }
     else {
         lv_disp_t * d;
         d = lv_disp_get_next(NULL);
         while(d) {
-            _lv_disp_refr_task(d->refr_task);
+            _lv_disp_refr_task(d->read_task);
             d = lv_disp_get_next(d);
         }
     }
@@ -144,7 +144,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
             lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
         }
         disp->inv_p++;
-        lv_timer_pause(disp->refr_task, false);
+        lv_timer_pause(disp->read_task, false);
     }
 }
 
@@ -300,7 +300,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     }
     else {
         perf_last_time = lv_tick_get();
-        uint32_t fps_limit = 1000 / disp_refr->refr_task->period;
+        uint32_t fps_limit = 1000 / disp_refr->read_task->period;
         uint32_t fps;
 
         if(elaps_sum == 0) elaps_sum = 1;

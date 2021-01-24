@@ -57,6 +57,15 @@ enum {
 };
 typedef uint8_t lv_text_cmd_state_t;
 
+/** Label align policy*/
+enum {
+    LV_TEXT_ALIGN_LEFT, /**< Align text to left */
+    LV_TEXT_ALIGN_CENTER, /**< Align text to center */
+    LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
+    LV_TEXT_ALIGN_AUTO, /**<  */
+};
+typedef uint8_t lv_text_align_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

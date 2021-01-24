@@ -845,7 +845,7 @@ static void refr_size(lv_obj_t * obj)
                                        cell_left, cell_right, cell_top, cell_bottom);
     }
 
-    _lv_obj_handle_self_size_chg(obj) ;
+    lv_obj_handle_self_size_chg(obj) ;
 }
 
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,

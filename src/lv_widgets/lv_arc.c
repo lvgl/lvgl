@@ -750,7 +750,7 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     extra_area = rounded ? w / 2 + 2 : 0;
 
     if(part == LV_PART_INDICATOR) {
-        lv_coord_t knob_extra_size = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_KNOB);
+        lv_coord_t knob_extra_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);

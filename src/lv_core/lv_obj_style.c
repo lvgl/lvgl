@@ -417,7 +417,7 @@ void _lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
         lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL);
         lv_obj_invalidate(obj);
     } else if(prop & LV_STYLE_PROP_EXT_DRAW) {
-        _lv_obj_refresh_ext_draw_pad(obj);
+        lv_obj_refresh_ext_draw_size(obj);
         lv_obj_invalidate(obj);
     }
 
@@ -666,19 +666,20 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         else list->cache_opa_set = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_LETTER_SPACE || prop == LV_STYLE_TEXT_LINE_SPACE
-       || prop == LV_STYLE_TEXT_DECOR || prop == LV_STYLE_TEXT_ALIGN)
+       || prop == LV_STYLE_TEXT_DECOR || prop == LV_STYLE_TEXT_ALIGN || prop == LV_STYLE_TEXT_OPA
+       || prop == LV_STYLE_TEXT_COLOR || prop == LV_STYLE_TEXT_COLOR_FILTERED)
     {
-        lv_style_value_t va[4];
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_LETTER_SPACE, &va[0]) == false) va[0].num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_LINE_SPACE, &va[1]) == false) va[1].num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_DECOR, &va[2]) == false) va[2].num = 0;
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_ALIGN, &va[3]) == false) va[3].num = 0;
-        if(va[0].num || va[1].num || va[2].num || va[3].num) list->cache_text_extra_zero = 0;
-        else list->cache_text_extra_zero = 1;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_OPA) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_OPA, &v)) list->cache_text_opa_set = 1;
-        else list->cache_text_opa_set = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_LETTER_SPACE, &v) ||
+           get_prop_core(obj, part, LV_STYLE_TEXT_LINE_SPACE, &v) ||
+           get_prop_core(obj, part, LV_STYLE_TEXT_DECOR, &v) ||
+           get_prop_core(obj, part, LV_STYLE_TEXT_ALIGN, &v) ||
+           get_prop_core(obj, part, LV_STYLE_TEXT_OPA, &v) ||
+           get_prop_core(obj, part, LV_STYLE_TEXT_COLOR, &v))
+        {
+            list->cache_text_any_set = 1;
+        } else {
+            list->cache_text_any_set = 0;
+        }
     }
 
     /*Indexed*/
@@ -699,13 +700,6 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_WIDTH) {
         if(get_prop_core(obj, part, LV_STYLE_BORDER_WIDTH, &v) == 0) v.num = 0;
         list->cache_border_width_zero = v.num ? 0 : 1;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_COLOR_FILTERED) {
-        if(get_prop_core(obj, part, LV_STYLE_TEXT_COLOR_FILTERED, &v)) {
-            list->cache_text_color_set = 1;
-        } else {
-            list->cache_text_color_set = 0;
-        }
     }
 
     /*Zero or Needs check*/
@@ -728,11 +722,6 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         list->cache_blend_mode_zero = v.num == LV_BLEND_MODE_NORMAL ? 1 : 0;
     }
 
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_GRAD_DIR) {
-        if(get_prop_core(obj, part, LV_STYLE_BG_GRAD_DIR, &v) == false) v.num = 0;
-        if(v.num == 0) list->cache_bg_grad_dir_zero = 1;
-        else list->cache_bg_grad_dir_zero = 0;
-    }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_OUTLINE_WIDTH) {
         if(get_prop_core(obj, part, LV_STYLE_OUTLINE_WIDTH, &v) == false) v.num = 0;
         if(v.num == 0) list->cache_outline_width_zero = 1;
@@ -743,15 +732,10 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         if(v.num == 0) list->cache_shadow_width_zero = 1;
         else list->cache_shadow_width_zero = 0;
     }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_IMG_RECOLOR_OPA) {
-        if(get_prop_core(obj, part, LV_STYLE_IMG_RECOLOR_OPA, &v) == false) v.num = 0;
-        if(v.num == 0) list->cache_img_recolor_opa_zero = 1;
-        else list->cache_img_recolor_opa_zero = 0;
-    }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_CONTENT_TEXT) {
         if(get_prop_core(obj, part, LV_STYLE_CONTENT_TEXT, &v) == false) v.ptr = NULL;
-        if(v.ptr == NULL) list->cache_content_src_zero = 1;
-        else list->cache_content_src_zero = 0;
+        if(v.ptr == NULL) list->cache_content_text_zero = 1;
+        else list->cache_content_text_zero = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_COLOR_FILTER_CB || prop == LV_STYLE_COLOR_FILTER_OPA) {
         lv_style_value_t vf[2];
@@ -778,11 +762,6 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         if(get_prop_core(obj, part, LV_STYLE_BG_OPA, &v) == false) v.num = LV_OPA_TRANSP;
         if(v.num == LV_OPA_COVER) list->cache_bg_opa_cover = 1;
         else list->cache_bg_opa_cover = 0;
-    }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_OPA) {
-        if(get_prop_core(obj, part, LV_STYLE_BORDER_OPA, &v) == false) v.num = LV_OPA_COVER;
-        if(v.num == LV_OPA_COVER) list->cache_border_opa_cover = 1;
-        else list->cache_border_opa_cover = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_IMG_OPA) {
         if(get_prop_core(obj, part, LV_STYLE_IMG_OPA, &v) == false) v.num = LV_OPA_COVER;
@@ -816,12 +795,11 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     case LV_STYLE_TEXT_LINE_SPACE:
     case LV_STYLE_TEXT_DECOR:
     case LV_STYLE_TEXT_ALIGN:
-        if(list->cache_text_extra_zero) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
     case LV_STYLE_TEXT_OPA:
-        if(list->cache_text_opa_set) return CACHE_NEED_CHECK;
+    case LV_STYLE_TEXT_COLOR:
+    case LV_STYLE_TEXT_COLOR_FILTERED:
+        if(list->cache_text_any_set) return CACHE_NEED_CHECK;
         else return CACHE_UNSET;
-        break;
 
     case LV_STYLE_RADIUS:
         if(list->cache_radius_zero) return CACHE_ZERO;
@@ -844,10 +822,6 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         if(list->cache_transform_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
-    case LV_STYLE_BG_GRAD_DIR:
-        if(list->cache_bg_grad_dir_zero ) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
-        break;
     case LV_STYLE_OUTLINE_WIDTH:
         if(list->cache_outline_width_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
@@ -861,7 +835,7 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_CONTENT_TEXT:
-        if(list->cache_content_src_zero ) return CACHE_ZERO;
+        if(list->cache_content_text_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_COLOR_FILTER_CB:
@@ -883,10 +857,6 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     /*255 or Needs check*/
     case LV_STYLE_BG_OPA:
         if(list->cache_bg_opa_cover) return CACHE_255;
-        else return CACHE_ZERO;
-        break;
-    case LV_STYLE_BORDER_OPA:
-        if(list->cache_border_opa_cover) return CACHE_255;
         else return CACHE_ZERO;
         break;
     case LV_STYLE_IMG_OPA:
@@ -1049,7 +1019,7 @@ static void trans_anim_start_cb(lv_anim_t * a)
 
     /*Init prop to an invalid values to be sure `trans_del` won't delete this added `tr`*/
     lv_style_prop_t prop_tmp = tr->prop;
-    tr->prop = _LV_STYLE_PROP_INV;
+    tr->prop = LV_STYLE_PROP_INV;
 
     /*Delete the related transitions if any*/
     trans_del(tr->obj, tr->part, prop_tmp, tr);

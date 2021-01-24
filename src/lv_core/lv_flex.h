@@ -18,10 +18,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-/** Can be set as width or height (on main axis) to grow the object in order fill the free space*/
-#define LV_FLEX_GROW(grow)    (LV_COORD_SET_LAYOUT(grow))
-
 #define _LV_FLEX_GET_GROW(v) (LV_COORD_IS_LAYOUT(v) ? _LV_COORD_PLAIN(v) : 0)
 
 #define _LV_FLEX_WRAP       (1 << 2)
@@ -56,7 +52,7 @@ typedef enum {
 }lv_flex_flow_t;
 
 typedef struct {
-    lv_layout_update_cb_t update_cb; /*The first element must be the update callback*/
+    lv_layout_dsc_t base;
     uint32_t dir          :2;
     uint32_t wrap         :1;
     uint32_t rev          :1;
@@ -69,100 +65,45 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-/*=====================
- * Setter functions
- *====================*/
+/**
+ * Initialize a felx layout the default values
+ * @param flex: pointer to a flex layout descriptor
+ */
+void lv_flex_init(lv_flex_t * flex);
 
 /**
- * Makes an object a flex container by setting the direction of the layout.
- * The children explicitly needs to be made flex items with
- * `lv_obj_set_flex_item()` or `lv_obj_set_flex_item_place()`
- * @param obj pointer to an object
- * @param flex_dir the flex direction, an element of `lv_flex_dir_t`
+ * Set hot the item should flow
+ * @param flex: pointer to a flex layout descriptor
+ * @param flow: an element of `lv_flex_flow_t`.
  */
-void lv_obj_set_flex_dir(struct _lv_obj_t * obj, lv_flex_flow_t flex_dir);
+void lv_flex_set_flow(lv_flex_t * flex, lv_flex_flow_t flow);
 
 /**
- * Set how to place the items and the tracks
- * @param obj pointer to a flex container
- * @param main_place tells how to distribute the free space among the items in the same track
- * @param cross_place tells how to distribute the free space among the tracks
- * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
+ * Set how to place (where to align) the items an tracks
+ * @param flex pointer: to a flex layout descriptor
+ * @param item_main_place: where to place the items on main axis (in their track). Any value of `lv_flex_place_t`.
+ * @param item_cross_place: where to place the item in their track on the cross axis. `LV_FLEX_PLACE_START/END/CENTER`
+ * @param track_place: how to place the tracks in the cross direction. Any value of `lv_flex_place_t`.
  */
-void lv_obj_set_flex_place(struct _lv_obj_t * obj, lv_flex_place_t main_place, lv_flex_place_t cross_place);
+void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_flex_place_t item_cross_place, lv_flex_place_t track_place);
 
 /**
- * Set a minimal gap between items in the main direction.
- * @param obj pointer to a flex container
- * @param gap the gap in pixels
+ * Sets the width or height (on main axis) to grow the object in order fill the free space
+ * @param obj: pointer to an object. The parent must have flex layout else nothing will happen.
+ * @param grow: a value to set how much free space to take proportionally to other growing items.
  */
-void lv_obj_set_flex_gap(struct _lv_obj_t * obj, lv_coord_t gap);
-
-/**
- * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.
- * @param obj pointer to an object
- */
-void lv_obj_set_flex_item(struct _lv_obj_t * obj, bool en);
-
-/**
- * Set how the place the item in it's track in the cross direction.
- * It has a visible effect only if the objects in the same track has different size in the cross direction.
- * For ROW direction it means how to place the objects vertically in their row.
- * For COLUMN direction it means how to place the objects horizontally in their column.
- * @param obj pointer to a flex item
- * @param place:
- *   - `LV_FLEX_PLACE_START` top/left (in case of RTL base direction right)
- *   - `LV_FLEX_PLACE_CENTER` center
- *   - `LV_FLEX_PLACE_END` bottom/right (in case of RTL base direction left)
- */
-void lv_obj_set_flex_item_place(struct _lv_obj_t * obj, lv_flex_place_t place);
-
-/*=====================
- * Getter functions
- *====================*/
-
-/**
- * Get the flex direction of an object
- * @param obj pointer to an object
- * @return the flex direction of `obj`
- */
-lv_flex_flow_t lv_obj_get_flex_dir(const struct _lv_obj_t * obj);
-
-/**
- * Get the item placement of a flex container
- * @param obj pointer to an object
- * @return the item placement
- */
-lv_flex_place_t lv_obj_get_flex_item_place(const struct _lv_obj_t * obj);
-
-/**
- * Get the track placement of a flex container
- * @param obj pointer to an object
- * @return the track placement
- */
-lv_flex_place_t lv_obj_get_flex_track_place(const struct _lv_obj_t * obj);
-
-/**
- * Get the minimal gap between flex item in the main direction
- * @param obj pointer to a flex container
- * @return the gap
- */
-lv_coord_t lv_obj_get_flex_gap(const struct _lv_obj_t * obj);
-/**
- * Get how the flex item is placed in its track in the cross direction.
- * For ROW direction it means how the item is placed vertically in its row.
- * For COLUMN direction it means how the item is placed horizontally in its column.
- * @param obj pointer to a flex item
- * @return `LV_FLEX_PLACE_NONE/START/CENTER/END`
- */
-lv_flex_place_t lv_obj_get_flex_self_place(struct _lv_obj_t * obj);
+void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow);
 
 /**********************
  *   GLOBAL VARIABLES
  **********************/
-extern const lv_flex_t lv_flex_center;
-extern const lv_flex_t lv_flex_stacked;
-extern const lv_flex_t lv_flex_even;
+
+/**
+ * Predefines flex layouts
+ */
+extern const lv_flex_t lv_flex_center;  /**< Center in a row with wrap*/
+extern const lv_flex_t lv_flex_stacked; /**< Stack the items vertically*/
+extern const lv_flex_t lv_flex_even;    /**< Place the items evenly in row with wrapping and vertical centering*/
 
 /**********************
  *      MACROS

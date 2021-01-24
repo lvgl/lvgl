@@ -149,7 +149,7 @@ typedef struct _disp_t {
     lv_disp_drv_t driver;
 
     /**< A task which periodically checks the dirty areas and refreshes them*/
-    lv_timer_t * refr_task;
+    lv_timer_t * read_task;
 
     /** Screens of the display*/
     struct _lv_obj_t ** screens;          /**< Array of screen objects. `NULL` terminated*/

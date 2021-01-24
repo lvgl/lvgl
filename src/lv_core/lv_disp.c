@@ -368,7 +368,7 @@ lv_timer_t * _lv_disp_get_refr_task(lv_disp_t * disp)
         return NULL;
     }
 
-    return disp->refr_task;
+    return disp->read_task;
 }
 
 /**********************

@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "lv_style.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_anim.h"
 
@@ -38,14 +38,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_style_system_init(void)
-{
-}
-
-/**
- * Initialize a style
- * @param style pointer to a style to initialize
- */
 void lv_style_init(lv_style_t * style)
 {
     lv_memset_00(style, sizeof(lv_style_t));
@@ -55,21 +47,21 @@ void lv_style_init(lv_style_t * style)
 
 }
 
-uint16_t lv_style_register_prop(bool inherit)
+void lv_style_reset(lv_style_t * style)
+{
+    LV_ASSERT_STYLE(style);
+
+    if(style->allocated) lv_mem_free(style->props_and_values);
+    lv_style_init(style);
+}
+
+lv_style_prop_t lv_style_register_prop(void)
 {
     static uint16_t act_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     act_id++;
-    if(inherit) return act_id | LV_STYLE_PROP_INHERIT;
-    else return act_id;
+    return act_id;
 }
 
-/**
- * Remove a property from a style
- * @param style pointer to a style
- * @param prop  a style property ORed with a state.
- * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @return true: the property was found and removed; false: the property wasn't found
- */
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
     if(style == NULL) return false;
@@ -77,11 +69,10 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
     if(!style->allocated) {
         if(style->prop1 == prop) {
-            style->prop1 = _LV_STYLE_PROP_INV;
+            style->prop1 = LV_STYLE_PROP_INV;
             return true;
         }
         return false;
-
     }
 
     uint8_t * tmp = style->props_and_values + style->prop_cnt * sizeof(lv_style_value_t);
@@ -116,17 +107,6 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
     }
 
     return false;
-}
-
-/**
- * Clear all properties from a style and all allocated memories.
- * @param style pointer to a style
- */
-void lv_style_reset(lv_style_t * style)
-{
-    LV_ASSERT_STYLE(style);
-//    lv_mem_free(style->ext);
-    lv_style_init(style);
 }
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
@@ -209,11 +189,11 @@ bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
     return false;
 }
 
-void lv_style_transition_init(lv_style_transition_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay)
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay)
 {
-    lv_memset_00(tr, sizeof(lv_style_transition_t));
+    lv_memset_00(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
-    tr->path = path;
+    tr->path = path == NULL ? &lv_anim_path_def : path;
     tr->time = time;
     tr->delay = delay;
 }
@@ -259,39 +239,25 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
     return value;
 }
 
+bool lv_style_is_empty(const lv_style_t * style)
+{
+    LV_ASSERT_STYLE(style);
 
-/**
- * Check whether a style is valid (initialized correctly)
- * @param style pointer to a style
- * @return true: valid
- */
+    return style->prop_cnt == 0 ? true : false;
+}
+
 bool lv_debug_check_style(const lv_style_t * style)
 {
     if(style == NULL) return true;  /*NULL style is still valid*/
 
 #if LV_USE_ASSERT_STYLE
     if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
-        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        LV_LOG_WARN("Invalid style (was local variable or not initialized?)");
         return false;
     }
 #endif
 
     return true;
-}
-
-/**
- * Check whether a style list is valid (initialized correctly)
- * @param style pointer to a style
- * @return true: valid
- */
-bool lv_debug_check_style_list(const void * list)
-{
-    return true;
-}
-
-bool lv_style_is_empty(const lv_style_t * style)
-{
-    return style->prop_cnt == 0 ? true : false;
 }
 
 /**********************

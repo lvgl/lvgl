@@ -45,8 +45,6 @@ extern "C" {
 #define LV_IMG_BUF_SIZE_INDEXED_4BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h) + 4 * 16)
 #define LV_IMG_BUF_SIZE_INDEXED_8BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h) + 4 * 256)
 
-#define LV_IMG_ZOOM_NONE   256
-
 #define _LV_TRANSFORM_TRIGO_SHIFT 10
 #define _LV_ZOOM_INV_UPSCALE 5
 

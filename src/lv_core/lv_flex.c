@@ -25,6 +25,11 @@ typedef struct {
 
 
 /**********************
+ *  GLOBAL PROTOTYPES
+ **********************/
+void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
 static void flex_update(lv_obj_t * cont, lv_obj_t * item);
@@ -37,7 +42,7 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
  *  GLOBAL VARIABLES
  **********************/
 const lv_flex_t lv_flex_center = {
-        .update_cb = flex_update,
+        .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_CENTER,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
         .track_place = LV_FLEX_PLACE_CENTER,
@@ -46,7 +51,7 @@ const lv_flex_t lv_flex_center = {
 };
 
 const lv_flex_t lv_flex_stacked = {
-        .update_cb = flex_update,
+        .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_START,
         .item_cross_place = LV_FLEX_PLACE_START,
         .track_place = LV_FLEX_PLACE_START,
@@ -54,7 +59,7 @@ const lv_flex_t lv_flex_stacked = {
 };
 
 const lv_flex_t lv_flex_even = {
-        .update_cb = flex_update,
+        .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_SPACE_EVENLY,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
         .track_place = LV_FLEX_PLACE_CENTER,
@@ -81,7 +86,7 @@ const lv_flex_t lv_flex_even = {
 void lv_flex_init(lv_flex_t * flex)
 {
     lv_memset_00(flex, sizeof(lv_flex_t));
-    flex->update_cb = flex_update;
+    flex->base.update_cb = flex_update;
     flex->dir = LV_FLEX_FLOW_ROW;
     flex->item_main_place = LV_FLEX_PLACE_START;
     flex->track_place = LV_FLEX_PLACE_START;
@@ -102,14 +107,25 @@ void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_fle
     flex->item_cross_place = item_cross_place;
 }
 
-/*=====================
- * Getter functions
- *====================*/
+void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
+{
+    if(!lv_obj_is_layout_positioned(obj)) return;
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent->spec_attr->layout_dsc->update_cb  != flex_update) return;
+    const lv_flex_t * f = (const lv_flex_t *) parent->spec_attr->layout_dsc;
+
+    if(f->dir == LV_FLEX_FLOW_ROW) lv_obj_set_width(obj, (LV_COORD_SET_LAYOUT(grow)));
+    else lv_obj_set_height(obj, (LV_COORD_SET_LAYOUT(grow)));
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void flex_update(lv_obj_t * cont, lv_obj_t * item)
 {
     if(cont->spec_attr == NULL) return;
-    const lv_flex_t * f = cont->spec_attr->layout_dsc;
+    const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
 
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
@@ -188,13 +204,12 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
+/**
+ * Find the last item of a track
+ */
 static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t)
 {
-    const lv_flex_t * f = cont->spec_attr->layout_dsc;
+    const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
 
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
     bool wrap = f->wrap;
@@ -216,20 +231,21 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
-        lv_coord_t main_size = (row ? item->w_set : item->h_set);
-        if(_LV_FLEX_GET_GROW(main_size)) {
-            grow_sum += _LV_FLEX_GET_GROW(main_size);
-            grow_item_cnt++;
-        } else {
-            lv_coord_t item_size = get_main_size(item) + item_gap;
-            if(wrap && t->track_main_size + item_size > max_main_size) break;
-            t->track_main_size += item_size;
+        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE)) {
+            lv_coord_t main_size = (row ? item->w_set : item->h_set);
+            if(_LV_FLEX_GET_GROW(main_size)) {
+                grow_sum += _LV_FLEX_GET_GROW(main_size);
+                grow_item_cnt++;
+            } else {
+                lv_coord_t item_size = get_main_size(item) + item_gap;
+                if(wrap && t->track_main_size + item_size > max_main_size) break;
+                t->track_main_size += item_size;
+            }
+            t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
+            t->item_cnt++;
         }
-        t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
-
         item_id += f->rev ? -1 : +1;
         item = lv_obj_get_child(cont, item_id);
-        t->item_cnt++;
     }
 
     if(t->track_main_size > 0) t->track_main_size -= item_gap; /*There is no gap after the last item*/
@@ -256,11 +272,13 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
     return item_id;
 }
 
-
+/**
+ * Position the children in the same track
+ */
 static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t)
 {
 
-    const lv_flex_t * f = cont->spec_attr->layout_dsc;
+    const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
 
     void (*area_set_main_size)(lv_area_t *, lv_coord_t) = (row ? lv_area_set_width : lv_area_set_height);
@@ -279,6 +297,10 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
     while(item && item_first_id != item_last_id) {
+        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) == false) {
+            item = get_next_item(cont, f->rev, &item_first_id);
+            continue;
+        }
         lv_coord_t main_size = (row ? item->w_set : item->h_set);
         if(_LV_FLEX_GET_GROW(main_size)) {
             lv_area_t old_coords;
@@ -316,7 +338,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
             item->coords.x2 += diff_x;
             item->coords.y1 += diff_y;
             item->coords.y2 += diff_y;
-            _lv_obj_move_children_by(item, diff_x, diff_y);
+            lv_obj_move_children_by(item, diff_x, diff_y);
         }
 
         if(!(row && rtl)) {
@@ -326,6 +348,9 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     }
 }
 
+/**
+ * Tell a start coordinate and gap for a placement type.
+ */
 static void place_content(lv_flex_place_t place, lv_coord_t max_size, lv_coord_t content_size, lv_coord_t item_cnt, lv_coord_t * start_pos, lv_coord_t * gap)
 {
     if(item_cnt <= 1) {

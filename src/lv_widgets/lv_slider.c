@@ -336,10 +336,10 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
          * During the drawing method the obj. size is used by the knob so refresh the obj. size.*/
         if(lv_obj_get_width(obj) != lv_area_get_width(param) ||
            lv_obj_get_height(obj) != lv_area_get_height(param)) {
-            _lv_obj_refresh_ext_draw_pad(obj);
+            lv_obj_refresh_ext_draw_size(obj);
         }
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,LV_PART_KNOB);
         lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
@@ -352,7 +352,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
-        knob_size += _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_KNOB);
+        knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
         /*Indic. size is handled by bar*/
         lv_coord_t * s = param;

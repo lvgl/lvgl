@@ -21,6 +21,11 @@
  **********************/
 
 /**********************
+ *  GLOBAL PROTOTYPES
+ **********************/
+void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
 #if LV_USE_ANIMATION
@@ -138,7 +143,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
 
     child_res -= (obj->coords.y2 - pad_bottom);
 
-    lv_coord_t self_h = _lv_obj_get_self_height(obj);
+    lv_coord_t self_h = lv_obj_get_self_height(obj);
     self_h = self_h - (lv_obj_get_height(obj) - pad_top - pad_bottom);
     self_h -= lv_obj_get_scroll_y(obj);
     return LV_MAX(child_res, self_h);
@@ -174,7 +179,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
         child_res = (obj->coords.x1 + pad_left) - child_res;
     }
 
-    lv_coord_t self_w = _lv_obj_get_self_width(obj);
+    lv_coord_t self_w = lv_obj_get_self_width(obj);
     self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
     self_w -= lv_obj_get_scroll_x(obj);
 
@@ -206,7 +211,7 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     child_res -= (obj->coords.x2 - pad_right);
 
     lv_coord_t self_w;
-    self_w = _lv_obj_get_self_width(obj);
+    self_w = lv_obj_get_self_width(obj);
     self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
     self_w -= lv_obj_get_scroll_x(obj);
     return LV_MAX(child_res, self_w);
@@ -241,7 +246,7 @@ void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->spec_attr->scroll.x += x;
     obj->spec_attr->scroll.y += y;
 
-    _lv_obj_move_children_by(obj, x, y);
+    lv_obj_move_children_by(obj, x, y);
     lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
     if(res != LV_RES_OK) return;
     lv_obj_invalidate(obj);

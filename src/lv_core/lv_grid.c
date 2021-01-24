@@ -12,7 +12,18 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_obj"
+/**
+ * Some helper defines
+ * */
+#define CELL_SHIFT        4
+#define CELL_POS_MASK     ((1 << CELL_SHIFT) - 1)
+#define CELL_SPAN_MASK    (CELL_POS_MASK << CELL_SHIFT)
+#define CELL_FLAG_MASK    (CELL_POS_MASK << (2 * CELL_SHIFT))
+#define CELL_PLACE(b)      ((b) << (CELL_SHIFT * 2))
+
+#define IS_FR(x)       (LV_COORD_IS_LAYOUT(x))
+#define GET_FR(x)      (_LV_COORD_PLAIN(x))
+
 
 /**********************
  *      TYPEDEFS
@@ -24,9 +35,14 @@ typedef struct {
 }item_repos_hint_t;
 
 /**********************
+ *  GLOBAL PROTOTYPES
+ **********************/
+void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_parent);
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
-void grid_update(lv_obj_t * cont, lv_obj_t * item);
+static void grid_update(lv_obj_t * cont, lv_obj_t * item);
 static void full_refresh(lv_obj_t * cont);
 static void item_refr(lv_obj_t * item);
 static void calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
@@ -43,6 +59,9 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
 /**********************
  *      MACROS
  **********************/
+#define GET_CELL_POS(c)    ((c) & CELL_POS_MASK)
+#define GET_CELL_SPAN(c)   (((c) & CELL_SPAN_MASK) >> CELL_SHIFT)
+#define GET_CELL_PLACE(c)  ((c) >> (CELL_SHIFT * 2) & 0x7)
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -51,7 +70,7 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
 void lv_grid_init(lv_grid_t * grid)
 {
     lv_memset_00(grid,sizeof(lv_grid_t));
-    grid->update_cb = grid_update;
+    grid->base.update_cb = grid_update;
     grid->col_place = LV_GRID_START;
     grid->row_place = LV_GRID_START;
 }
@@ -71,18 +90,27 @@ void lv_grid_set_place(lv_grid_t * grid, uint8_t col_place, uint8_t row_place)
     grid->row_place = row_place;
 }
 
-void lv_obj_set_grid_cell(lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos)
-{
-    lv_obj_set_pos(obj, col_pos, row_pos);
-}
+void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t ver_place, uint8_t col_pos, uint8_t col_span,
+                                          lv_grid_place_t hor_place, uint8_t row_pos, uint8_t row_span)
 
+{
+    if(!lv_obj_is_layout_positioned(obj)) return;
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent->spec_attr->layout_dsc->update_cb  != grid_update) return;
+    const lv_grid_t * g = (const lv_grid_t *) parent->spec_attr->layout_dsc;
+
+    lv_coord_t x = LV_COORD_SET_LAYOUT(col_pos | (col_span << CELL_SHIFT) | CELL_PLACE(hor_place));
+    lv_coord_t y = LV_COORD_SET_LAYOUT(row_pos | (row_span << CELL_SHIFT) | CELL_PLACE(ver_place));
+
+    lv_obj_set_pos(obj, x, y);
+}
 
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-void grid_update(lv_obj_t * cont, lv_obj_t * item)
+static void grid_update(lv_obj_t * cont, lv_obj_t * item)
 {
     if(cont->spec_attr == NULL) return;
     if(cont->spec_attr->layout_dsc == NULL) return;
@@ -97,7 +125,7 @@ void grid_update(lv_obj_t * cont, lv_obj_t * item)
  */
 static void full_refresh(lv_obj_t * cont)
 {
-    const lv_grid_t * g = cont->spec_attr->layout_dsc;
+    const lv_grid_t * g = (const lv_grid_t *)cont->spec_attr->layout_dsc;
     /*Calculate the grid*/
     if(g == NULL) return;
     _lv_grid_calc_t c;
@@ -153,7 +181,7 @@ static void item_refr(lv_obj_t * item)
  */
 static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 {
-    const lv_grid_t * g = cont->spec_attr->layout_dsc;
+    const lv_grid_t * g = (const lv_grid_t *)cont->spec_attr->layout_dsc;
     if(g->col_dsc == NULL || g->row_dsc == NULL) return;
     if(g->col_dsc_len == 0 || g->row_dsc_len == 0) return;
 
@@ -194,7 +222,7 @@ static void calc_free(_lv_grid_calc_t * calc)
 
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
-    const lv_grid_t * grid = cont->spec_attr->layout_dsc;
+    const lv_grid_t * grid = (const lv_grid_t *)cont->spec_attr->layout_dsc;
     uint32_t i;
 
     lv_coord_t cont_w = lv_obj_get_width_fit(cont);
@@ -209,7 +237,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
-        if(LV_GRID_IS_FR(x)) col_fr_cnt += LV_GRID_GET_FR(x);
+        if(IS_FR(x)) col_fr_cnt += GET_FR(x);
         else {
             c->w[i] = x;
             grid_w += x;
@@ -222,10 +250,10 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
-        if(LV_GRID_IS_FR(x)) {
+        if(IS_FR(x)) {
             if(auto_w) c->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
             else {
-                lv_coord_t f = LV_GRID_GET_FR(x);
+                lv_coord_t f = GET_FR(x);
                 c->w[i] = (free_w * f) / col_fr_cnt;
             }
         }
@@ -234,7 +262,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 
 static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
-    const lv_grid_t * grid = cont->spec_attr->layout_dsc;
+    const lv_grid_t * grid = (const lv_grid_t *)cont->spec_attr->layout_dsc;
     uint32_t i;
 
     c->row_num = grid->row_dsc_len;
@@ -249,7 +277,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 
     for(i = 0; i < grid->row_dsc_len; i++) {
         lv_coord_t x = grid->row_dsc[i];
-        if(LV_GRID_IS_FR(x)) row_fr_cnt += LV_GRID_GET_FR(x);
+        if(IS_FR(x)) row_fr_cnt += GET_FR(x);
         else {
             c->h[i] = x;
             grid_h += x;
@@ -262,10 +290,10 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 
     for(i = 0; i < grid->row_dsc_len; i++) {
         lv_coord_t x = grid->row_dsc[i];
-        if(LV_GRID_IS_FR(x)) {
+        if(IS_FR(x)) {
             if(auto_h) c->h[i] = 0;   /*Fr is considered zero if the obj has auto height*/
             else {
-                lv_coord_t f = LV_GRID_GET_FR(x);
+                lv_coord_t f = GET_FR(x);
                 c->h[i] = (free_h * f) / row_fr_cnt;
             }
         }
@@ -282,11 +310,12 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
     if(LV_COORD_IS_LAYOUT(item->x_set) && LV_COORD_IS_LAYOUT(item->y_set)) return;
+    if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) == false) return;
 
-    uint32_t col_pos = LV_GRID_GET_CELL_POS(item->x_set);
-    uint32_t col_span = LV_GRID_GET_CELL_SPAN(item->x_set);
-    uint32_t row_pos = LV_GRID_GET_CELL_POS(item->y_set);
-    uint32_t row_span = LV_GRID_GET_CELL_SPAN(item->y_set);
+    uint32_t col_pos = GET_CELL_POS(item->x_set);
+    uint32_t col_span = GET_CELL_SPAN(item->x_set);
+    uint32_t row_pos = GET_CELL_POS(item->y_set);
+    uint32_t row_span = GET_CELL_SPAN(item->y_set);
 
     lv_coord_t col_x1 = c->x[col_pos];
     lv_coord_t col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
@@ -296,8 +325,8 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     lv_coord_t row_y2 = c->y[row_pos + row_span - 1] + c->h[row_pos + row_span - 1];
     lv_coord_t row_h = row_y2 - row_y1;
 
-    uint8_t x_flag = LV_GRID_GET_CELL_PLACE(item->x_set);
-    uint8_t y_flag = LV_GRID_GET_CELL_PLACE(item->y_set);
+    uint8_t x_flag = GET_CELL_PLACE(item->x_set);
+    uint8_t y_flag = GET_CELL_PLACE(item->y_set);
 
     /*If the item has RTL base dir switch start and end*/
     if(lv_obj_get_base_dir(item) == LV_BIDI_DIR_RTL) {
@@ -365,7 +394,7 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
         if(hint->grid_abs.x + x == item->coords.x1 && hint->grid_abs.y + y == item->coords.y1) moved = false;
     }
 
-    if(moved) _lv_obj_move_to(item, x, y, false);
+    if(moved) lv_obj_move_to(item, x, y, false);
 }
 
 /**

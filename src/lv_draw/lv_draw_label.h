@@ -27,25 +27,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Text decorations (Use 'OR'ed values)*/
-enum {
-    LV_TEXT_DECOR_NONE          = 0x00,
-    LV_TEXT_DECOR_UNDERLINE     = 0x01,
-    LV_TEXT_DECOR_STRIKETHROUGH = 0x02,
-    _LV_TEXT_DECOR_LAST
-};
-
-typedef uint8_t lv_text_decor_t;
-/** Label align policy*/
-enum {
-    LV_TEXT_ALIGN_LEFT, /**< Align text to left */
-    LV_TEXT_ALIGN_CENTER, /**< Align text to center */
-    LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
-    LV_TEXT_ALIGN_AUTO, /**<  */
-};
-typedef uint8_t lv_text_align_t;
-
-
 typedef struct {
     lv_color_t color;
     lv_color_t sel_color;

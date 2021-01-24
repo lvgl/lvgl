@@ -46,7 +46,7 @@ static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scrol
  * Handle scrolling. Called by LVGL during input device processing
  * @param proc pointer to an input device's proc field
  */
-void _lv_scroll_handler(lv_indev_proc_t * proc)
+void lv_indev_scroll_handler(lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     /*If there is no scroll object yet try to find one*/
@@ -101,7 +101,7 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
  * Handle throwing after scrolling. Called by LVGL during input device processing
  * @param proc pointer to an input device's proc field
  */
-void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
+void lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     if(scroll_obj == NULL) return;
@@ -213,7 +213,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
  * @param dir `LV_DIR_VER` or `LV_DIR_HOR`
  * @return the difference compared to the current position when the throw would be finished
  */
-lv_coord_t _lv_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
+lv_coord_t lv_indev_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
 {
     if(indev == NULL) return 0;
     lv_coord_t v;

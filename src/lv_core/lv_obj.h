@@ -17,9 +17,7 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdbool.h>
-#include "lv_style.h"
-#include "lv_grid.h"
-#include "lv_flex.h"
+#include "../lv_misc/lv_style.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
@@ -113,7 +111,7 @@ enum {
     LV_SIGNAL_COORD_CHG,         /**< Object coordinates/size have changed */
     LV_SIGNAL_STYLE_CHG,         /**< Object's style has changed */
     LV_SIGNAL_BASE_DIR_CHG,      /**< The base dir has changed*/
-    LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
+    LV_SIGNAL_REFR_EXT_DRAW_SIZE, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_SELF_SIZE,     /**< Get the internal size of a widget*/
 
     /*Input device related*/
@@ -172,18 +170,15 @@ enum {
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13),
     LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14),
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15),
-    LV_OBJ_FLAG_LAYOUT_1        = (1 << 16), /** Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_LAYOUT_2        = (1 << 17), /** Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_LAYOUT_3        = (1 << 18), /** Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_LAYOUT_4        = (1 << 19), /** Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_WIDGET_1        = (1 << 20), /** Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_WIDGET_2        = (1 << 21), /** Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_WIDGET_3        = (1 << 22), /** Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_WIDGET_4        = (1 << 23), /** Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_USER_1          = (1 << 24), /** Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_2          = (1 << 25), /** Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_3          = (1 << 26), /** Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_4          = (1 << 27), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_LAYOUTABLE      = (1 << 16),
+    LV_OBJ_FLAG_LAYOUT_1        = (1 << 24), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_2        = (1 << 25), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_WIDGET_1        = (1 << 26), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_2        = (1 << 27), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_USER_1          = (1 << 28), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_2          = (1 << 29), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_3          = (1 << 30), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_4          = (1 << 31), /** Custom flag, free to use by user*/
 };
 typedef uint32_t lv_obj_flag_t;
 
@@ -191,6 +186,8 @@ typedef uint32_t lv_obj_flag_t;
 #include "lv_obj_scroll.h"
 #include "lv_obj_style.h"
 #include "lv_obj_draw.h"
+#include "lv_grid.h"
+#include "lv_flex.h"
 
 typedef struct {
     struct _lv_obj_t ** children;       /**< Store the pointer of the children.*/
@@ -199,12 +196,12 @@ typedef struct {
     void * group_p;
 #endif
 
-    const void * layout_dsc;
+    const lv_layout_dsc_t * layout_dsc;
 
     lv_event_cb_t event_cb; /**< Event callback function */
 
     lv_point_t scroll; /**< The current X/Y scroll offset*/
-    lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
+    lv_coord_t ext_draw_size; /**< EXTend the size in every direction for drawing. */
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad; /**< Extra click padding in all direction */
