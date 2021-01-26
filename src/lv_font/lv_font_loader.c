@@ -205,7 +205,7 @@ static int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
             it->bit_pos = 7;
             *res = lv_fs_read(it->fp, &(it->byte_value), 1, NULL);
             if(*res != LV_FS_RES_OK) {
-                return -1;
+                return 0;
             }
         }
         int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
