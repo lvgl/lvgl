@@ -527,8 +527,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     bool failed = false;
     uint32_t * glyph_offset = lv_mem_alloc(sizeof(uint32_t) * (loca_count + 1));
 
-    for(unsigned int i = 0; i < loca_count; ++i) {
-        if(font_header.index_to_loc_format == 0) {
+    if(font_header.index_to_loc_format == 0) {
+        for(unsigned int i = 0; i < loca_count; ++i) {
             uint16_t offset;
             if(lv_fs_read(fp, &offset, sizeof(uint16_t), NULL) != LV_FS_RES_OK) {
                 failed = true;
@@ -536,19 +536,15 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
             }
             glyph_offset[i] = offset;
         }
-        else if(font_header.index_to_loc_format == 1) {
-            uint32_t offset;
-            if(lv_fs_read(fp, &offset, sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
-                failed = true;
-                break;
-            }
-            glyph_offset[i] = offset;
-        }
-        else {
-            LV_LOG_WARN("Unknown index_to_loc_format: %d.", font_header.index_to_loc_format);
+    }
+    else if(font_header.index_to_loc_format == 1) {
+        if(lv_fs_read(fp, glyph_offset, loca_count * sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
             failed = true;
-            break;
         }
+    }
+    else {
+        LV_LOG_WARN("Unknown index_to_loc_format: %d.", font_header.index_to_loc_format);
+        failed = true;
     }
 
     if(failed) {
