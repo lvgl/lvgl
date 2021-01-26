@@ -290,6 +290,13 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_MARKER);
         *s = LV_MAX(*s, m);
     }
+    else if(sign == LV_SIGNAL_RELEASED) {
+        uint32_t v = lv_obj_get_state(obj) & LV_STATE_CHECKED ? 1 : 0;
+        res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &v);
+        if(res != LV_RES_OK) return res;
+
+        lv_obj_invalidate(obj);
+    }
 
     return res;
 }

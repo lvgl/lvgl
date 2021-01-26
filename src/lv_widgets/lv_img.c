@@ -740,8 +740,11 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
             info->result = _lv_area_is_point_on(&coords, info->point, 0);
         }
-        else
-            info->result = _lv_obj_is_click_point_on(obj, info->point);
+        else {
+            lv_area_t a;
+            lv_obj_get_click_area(obj, &a);
+            info->result = _lv_area_is_point_on(&a, info->point, 0);
+        }
     }
     else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
         lv_point_t * p = param;

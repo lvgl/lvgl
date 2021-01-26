@@ -224,13 +224,11 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
     }
     else if(sign == LV_SIGNAL_RELEASED) {
+        uint32_t v = lv_obj_get_state(obj) & LV_STATE_CHECKED ? 1 : 0;
+        res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &v);
+        if(res != LV_RES_OK) return res;
+
         lv_obj_invalidate(obj);
-    }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
-#if LV_USE_GROUP
-        bool * editable = (bool *)param;
-        *editable       = false; /*The ancestor slider is editable the switch is not*/
-#endif
     }
 
     return res;

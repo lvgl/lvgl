@@ -226,7 +226,7 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev)
         return indev->proc.types.keypad.last_key;
 }
 
-lv_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
+lv_indev_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
 {
     if(indev == NULL) return false;
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return false;
@@ -815,7 +815,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->long_pr_sent                 = 0;
             proc->types.pointer.scroll_sum.x     = 0;
             proc->types.pointer.scroll_sum.y     = 0;
-            proc->types.pointer.scroll_dir = LV_SCROLL_DIR_NONE;
+            proc->types.pointer.scroll_dir = LV_INDEV_SCROLL_DIR_NONE;
             proc->types.pointer.gesture_sent   = 0;
             proc->types.pointer.gesture_sum.x  = 0;
             proc->types.pointer.gesture_sum.y  = 0;
@@ -963,7 +963,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->proc.longpr_rep_timestamp            = 0;
         indev->proc.types.pointer.scroll_sum.x        = 0;
         indev->proc.types.pointer.scroll_sum.y        = 0;
-        indev->proc.types.pointer.scroll_dir = LV_SCROLL_DIR_NONE;
+        indev->proc.types.pointer.scroll_dir = LV_INDEV_SCROLL_DIR_NONE;
         indev->proc.types.pointer.scroll_throw_vect.x = 0;
         indev->proc.types.pointer.scroll_throw_vect.y = 0;
         indev->proc.types.pointer.gesture_sum.x     = 0;
@@ -980,7 +980,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
-    lv_obj_t * obj_to_focus = _lv_obj_get_focused_obj(indev_obj_act);
+    lv_obj_t * obj_to_focus = lv_obj_get_focused_obj(indev_obj_act);
     if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) &&
        proc->types.pointer.last_pressed != obj_to_focus) {
 #if LV_USE_GROUP

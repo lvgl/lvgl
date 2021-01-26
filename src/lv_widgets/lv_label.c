@@ -1132,8 +1132,8 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
         label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
         if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-            label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_HIGHLIGHT);
-            label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_HIGHLIGHT);
+            label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_SELECTED);
+            label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
         }
 
         /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.

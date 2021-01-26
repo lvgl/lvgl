@@ -593,6 +593,150 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
     }
 }
 
+
+void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_area_t area_tmp;
+    lv_area_copy(&area_tmp, area);
+    bool visible = lv_obj_area_is_visible(obj, &area_tmp);
+
+    if(visible) _lv_inv_area(lv_obj_get_disp(obj), &area_tmp);
+}
+
+void lv_obj_invalidate(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    /*Truncate the area to the object*/
+    lv_area_t obj_coords;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords.x1 -= ext_size;
+    obj_coords.y1 -= ext_size;
+    obj_coords.x2 += ext_size;
+    obj_coords.y2 += ext_size;
+
+    lv_obj_invalidate_area(obj, &obj_coords);
+
+}
+
+bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
+{
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
+
+    /*Invalidate the object only if it belongs to the current or previous'*/
+    lv_obj_t * obj_scr = lv_obj_get_screen(obj);
+    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
+    if(obj_scr == lv_disp_get_scr_act(disp) ||
+       obj_scr == lv_disp_get_scr_prev(disp) ||
+       obj_scr == lv_disp_get_layer_top(disp) ||
+       obj_scr == lv_disp_get_layer_sys(disp)) {
+
+        /*Truncate the area to the object*/
+        lv_area_t obj_coords;
+        lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+        lv_area_copy(&obj_coords, &obj->coords);
+        obj_coords.x1 -= ext_size;
+        obj_coords.y1 -= ext_size;
+        obj_coords.x2 += ext_size;
+        obj_coords.y2 += ext_size;
+
+        bool is_common;
+
+        is_common = _lv_area_intersect(area, area, &obj_coords);
+        if(is_common == false) return false;  /*The area is not on the object*/
+
+        /*Truncate recursively to the parents*/
+        lv_obj_t * par = lv_obj_get_parent(obj);
+        while(par != NULL) {
+            is_common = _lv_area_intersect(area, area, &par->coords);
+            if(is_common == false) return false;       /*If no common parts with parent break;*/
+            if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
+
+            par = lv_obj_get_parent(par);
+        }
+    }
+
+    return true;
+}
+
+bool lv_obj_is_visible(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_area_t obj_coords;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords.x1 -= ext_size;
+    obj_coords.y1 -= ext_size;
+    obj_coords.x2 += ext_size;
+    obj_coords.y2 += ext_size;
+
+    return lv_obj_area_is_visible(obj, &obj_coords);
+
+}
+
+void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+    lv_obj_allocate_spec_attr(obj);
+    obj->spec_attr->ext_click_pad.x1 = left;
+    obj->spec_attr->ext_click_pad.x2 = right;
+    obj->spec_attr->ext_click_pad.y1 = top;
+    obj->spec_attr->ext_click_pad.y2 = bottom;
+#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    lv_obj_allocate_spec_attr(obj);
+    obj->spec_attr->ext_click_pad = LV_MAX4(left, right, top, bottom);
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(left);
+    LV_UNUSED(right);
+    LV_UNUSED(top);
+    LV_UNUSED(bottom);
+#endif
+}
+
+void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
+{
+    lv_area_copy(area, &obj->coords);
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    if(obj->spec_attr) {
+        area->x1 -= obj->spec_attr->ext_click_pad;
+        area->x2 += obj->spec_attr->ext_click_pad;
+        area->y1 -= obj->spec_attr->ext_click_pad;
+        area->y2 += obj->spec_attr->ext_click_pad;
+    }
+#else
+    if(obj->spec_attr) {
+        area->x1 -= obj->spec_attr->ext_click_pad.x1;
+        area->x2 += obj->spec_attr->ext_click_pad.x2;
+        area->y1 -= obj->spec_attr->ext_click_pad.y1;
+        area->y2 += obj->spec_attr->ext_click_pad.y2;
+    }
+#endif
+}
+
+bool lv_obj_hit_test(const lv_obj_t * obj, const lv_point_t * point)
+{
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
+        lv_hit_test_info_t hit_info;
+        hit_info.point = point;
+        hit_info.result = true;
+        lv_signal_send(obj, LV_SIGNAL_HIT_TEST, &hit_info);
+        return hit_info.result;
+    }
+    else {
+        lv_area_t a;
+        lv_obj_get_click_area(obj, &a);
+        return _lv_area_is_point_on(&a, point, 0);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

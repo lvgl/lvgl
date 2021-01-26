@@ -141,6 +141,13 @@ void lv_obj_draw_hook_dsc_init(lv_obj_draw_hook_dsc_t * hook_dsc, const lv_area_
  */
 void lv_obj_refresh_ext_draw_size(struct _lv_obj_t * obj);
 
+/**
+ * Get the extended draw area of an object.
+ * @param obj pointer to an object
+ * @return the size extended draw area around the real coordinates
+ */
+lv_coord_t _lv_obj_get_ext_draw_size(const struct _lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

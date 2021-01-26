@@ -344,41 +344,41 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint8_t part)
     return s;
 }
 
-/**
- * Initialize a draw hook.
- * @param hook_dsc: pointer to a raw hook. Later it should be passed as parameter to an `LV_EEVNT_DRAW_PART_BEGIN/END` event.
- * @param clip_area: the current clip area of the drawing
- */
 void lv_obj_draw_hook_dsc_init(lv_obj_draw_hook_dsc_t * hook_dsc, const lv_area_t * clip_area)
 {
     lv_memset_00(hook_dsc, sizeof(lv_obj_draw_hook_dsc_t));
     hook_dsc->clip_area = clip_area;
 }
 
-/**
- * Send a 'LV_SIGNAL_REFR_EXT_DRAW_SIZE' signal to the object to refresh the value of the extended draw size.
- * The result will be saved in `obj`.
- * @param obj: pointer to an object
- */
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_coord_t s = 0;
-    lv_signal_send(obj, LV_SIGNAL_REFR_EXT_DRAW_SIZE, &s);
+    lv_coord_t s_old = _lv_obj_get_ext_draw_size(obj);
+    lv_coord_t s_new = 0;
+    lv_signal_send(obj, LV_SIGNAL_REFR_EXT_DRAW_SIZE, &s_new);
+
+    if(s_new != s_old) lv_obj_invalidate(obj);
 
     /*Store the result if the special attrs already allocated*/
     if(obj->spec_attr) {
-        obj->spec_attr->ext_draw_size = s;
+        obj->spec_attr->ext_draw_size = s_new;
     }
     /* Allocate spec. attrs. only if the result is not zero.
      * Zero is the default value if the spec. attr. are not defined. */
-    else if(s != 0) {
+    else if(s_new != 0) {
         lv_obj_allocate_spec_attr(obj);
-        obj->spec_attr->ext_draw_size = s;
+        obj->spec_attr->ext_draw_size = s_new;
     }
+
+    if(s_new != s_old) lv_obj_invalidate(obj);
 }
 
+lv_coord_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
+    else return 0;
+}
 
 /**********************
  *   STATIC FUNCTIONS

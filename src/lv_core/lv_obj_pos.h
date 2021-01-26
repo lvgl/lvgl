@@ -211,6 +211,64 @@ lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj);
  */
 bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj);
 
+
+/**
+ * Mark an area of an object as invalid.
+ * The area will be truncated to the object's area and marked for redraw.
+ * @param obj:  pointer to an object
+ * @param area: the area to redraw
+ */
+void lv_obj_invalidate_area(const struct _lv_obj_t * obj, const lv_area_t * area);
+
+/**
+ * Mark the object as invalid to redrawn its area
+ * @param obj: pointer to an object
+ */
+void lv_obj_invalidate(const struct _lv_obj_t * obj);
+
+/**
+ * Tell whether an area of an object is visible (even partially) now or not
+ * @param obj:  pointer to an object
+ * @param area: the are to check. The visible part of the area will be written back here.
+ * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ */
+bool lv_obj_area_is_visible(const struct _lv_obj_t * obj, lv_area_t * area);
+
+/**
+ * Tell whether an object is visible (even partially) now or not
+ * @param obj pointer to an object
+ * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ */
+bool lv_obj_is_visible(const struct _lv_obj_t * obj);
+
+/**
+ * Set the size of an extended clickable area
+ * If `LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY` in `lv_conf.h`,
+ *  only the graetes value will be used.
+ * @param obj pointer to an object
+ * @param left extended clickable are on the left [px]
+ * @param right extended clickable are on the right [px]
+ * @param top extended clickable are on the top [px]
+ * @param bottom extended clickable are on the bottom [px]
+ */
+void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom);
+
+/**
+ * Get the an area where to object can be clicked.
+ * It's the object's normal area plus the extended click area.
+ * @param obj: pointer to an object
+ * @param area: store the result area here
+ */
+void lv_obj_get_click_area(const struct _lv_obj_t * obj, lv_area_t * area);
+
+/**
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point (absolute coordinate)
+ * @return true: if the object is considered under the point
+ */
+bool lv_obj_hit_test(const struct _lv_obj_t * obj, const lv_point_t * point);
+
 /**********************
  *      MACROS
  **********************/

@@ -25,15 +25,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
-
-#if defined(LV_USER_DATA_FREE_INCLUDE)
-    #include LV_USER_DATA_FREE_INCLUDE
-#endif /* LV_USE_USER_DATA_FREE */
-
 #include LV_THEME_DEFAULT_INCLUDE
 
 #if LV_USE_GPU_STM32_DMA2D
@@ -70,16 +61,20 @@ typedef struct {
 }trans_set_t;
 
 /**********************
+ *  GLOBAL PROTOTYPES
+ **********************/
+void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
+                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path);
+_lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
-static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
-static void lv_obj_del_async_cb(void * obj);
-static void obj_del_core(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_obj_destructor(lv_obj_t * obj);
@@ -89,7 +84,7 @@ static void lv_obj_destructor(lv_obj_t * obj);
  **********************/
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
-static void * event_act_data;
+static const void * event_act_data;
 const lv_obj_class_t lv_obj = {
     .constructor = lv_obj_constructor,
     .destructor = lv_obj_destructor,
@@ -107,9 +102,6 @@ const lv_obj_class_t lv_obj = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Init. the 'lv' library.
- */
 void lv_init(void)
 {
     /* Do nothing if already initialized */
@@ -143,22 +135,12 @@ void lv_init(void)
 #endif
 
     _lv_obj_style_init();
-
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
-    lv_mem_monitor_t mon;
-    lv_mem_monitor(&mon);
-    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
-           (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-           (int)mon.free_biggest_size);
+
     lv_theme_t * th = LV_THEME_DEFAULT_INIT(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
                                             LV_THEME_DEFAULT_FLAG,
                                             LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
-
-    lv_mem_monitor(&mon);
-    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
-           (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-           (int)mon.free_biggest_size);
 
     lv_theme_set_act(th);
 
@@ -183,10 +165,6 @@ void lv_init(void)
 
 #if LV_ENABLE_GC || !LV_MEM_CUSTOM
 
-/**
- * Deinit the 'lv' library
- * Currently only implemented when not using custom allocators, or GC is enabled.
- */
 void lv_deinit(void)
 {
     _lv_gc_clear_roots();
@@ -203,434 +181,109 @@ void lv_deinit(void)
 }
 #endif
 
-/*--------------------
- * Create and delete
- *-------------------*/
-
-/**
- * Create a basic object
- * @param parent pointer to a parent object.
- *                  If NULL then a screen will be created
- *
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other base object to copy.
- * @return pointer to the new object
- */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     return lv_obj_create_from_class(&lv_obj, parent, copy);
 }
 
-lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class, lv_obj_t * parent, const lv_obj_t * copy)
+/*---------------------
+ * Event/Signal sending
+ *---------------------*/
+
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 {
-    lv_obj_t * obj = lv_mem_alloc(class->instance_size);
-    lv_memset_00(obj, class->instance_size);
-    obj->class_p = class;
+    if(obj == NULL) return LV_RES_OK;
 
-    class->constructor(obj, parent, copy);
-
-    if(!copy) lv_theme_apply(obj);
-//    else lv_style_list_copy(&checkbox->style_indic, &checkbox_copy->style_indic);
-
-    return obj;
-}
-
-
-void lv_obj_construct_base(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
-{
-    const lv_obj_class_t * original_class_p = obj->class_p;
-
-    /*Don't let the descendant methods to run during constructing the ancestor type*/
-    obj->class_p = obj->class_p->base_class;
-
-    obj->class_p->constructor(obj, parent, copy);
-
-    /*Restore the original class*/
-    obj->class_p = original_class_p;
-
-}
-/**
- * Delete 'obj' and all of its children
- * @param obj pointer to an object to delete
- * @return LV_RES_INV because the object is deleted
- */
-lv_res_t lv_obj_del(lv_obj_t * obj)
-{
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    lv_obj_invalidate(obj);
 
-    lv_disp_t * disp = NULL;
-    bool act_scr_del = false;
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par == NULL) {
-        disp = lv_obj_get_disp(obj);
-        if(!disp) return LV_RES_INV;   /*Shouldn't happen*/
-        if(disp->act_scr == obj) act_scr_del = true;
+    /*Nothing to do if no event function and not bubbled*/
+    lv_event_cb_t event_cb = lv_obj_get_event_cb(obj);
+    if(event_cb == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
+        return LV_RES_OK;
     }
 
-    obj_del_core(obj);
+    /* Build a simple linked list from the objects used in the events
+     * It's important to know if an this object was deleted by a nested event
+     * called from this `event_cb`. */
+    lv_event_temp_data_t event_temp_data;
+    event_temp_data.obj     = obj;
+    event_temp_data.deleted = false;
+    event_temp_data.prev    = NULL;
 
-    /*Send a signal to the parent to notify it about the child delete*/
-    if(par) {
-        lv_signal_send(par, LV_SIGNAL_CHILD_CHG, NULL);
+    if(event_temp_data_head) {
+        event_temp_data.prev = event_temp_data_head;
+    }
+    event_temp_data_head = &event_temp_data;
+
+    const void * event_act_data_save = event_act_data;
+    event_act_data = data;
+
+    /*Call the input device's feedback callback if set*/
+    lv_indev_t * indev_act = lv_indev_get_act();
+    if(indev_act) {
+        if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, event);
     }
 
-    /*Handle if the active screen was deleted*/
-    if(act_scr_del)  {
-        disp->act_scr = NULL;
-    }
+    /*Call the event callback*/
+    if(event_cb) event_cb(obj, event);
 
-    return LV_RES_INV;
-}
+    /*Restore the event data*/
+    event_act_data = event_act_data_save;
 
-#if LV_USE_ANIMATION
-/**
- * A function to be easily used in animation ready callback to delete an object when the animation is ready
- * @param a pointer to the animation
- */
-void lv_obj_del_anim_ready_cb(lv_anim_t * a)
-{
-    lv_obj_del(a->var);
-}
-#endif
+    /*Remove this element from the list*/
+    event_temp_data_head = event_temp_data_head->prev;
 
-/**
- * Helper function for asynchronously deleting objects.
- * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
- * @param obj object to delete
- * @see lv_async_call
- */
-void lv_obj_del_async(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    lv_async_call(lv_obj_del_async_cb, obj);
-}
+    if(event_temp_data.deleted) return LV_RES_INV;
 
-/**
- * Delete all children of an object
- * @param obj pointer to an object
- */
-void lv_obj_clean(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    if(obj) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
 
-    while(1) {
-        lv_obj_t * child = lv_obj_get_child(obj, 0);
-        obj_del_core(child);
-    }
-}
-
-/**
- * Mark an area of an object as invalid.
- * This area will be redrawn by 'lv_refr_task'
- * @param obj pointer to an object
- * @param area the area to redraw
- */
-void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_area_t area_tmp;
-    lv_area_copy(&area_tmp, area);
-    bool visible = lv_obj_area_is_visible(obj, &area_tmp);
-
-    if(visible) _lv_inv_area(lv_obj_get_disp(obj), &area_tmp);
-}
-
-/**
- * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
- * @param obj pointer to an object
- */
-void lv_obj_invalidate(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    /*Truncate the area to the object*/
-    lv_area_t obj_coords;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
-    obj_coords.x1 -= ext_size;
-    obj_coords.y1 -= ext_size;
-    obj_coords.x2 += ext_size;
-    obj_coords.y2 += ext_size;
-
-    lv_obj_invalidate_area(obj, &obj_coords);
-
-}
-
-/**
- * Tell whether an area of an object is visible (even partially) now or not
- * @param obj pointer to an object
- * @param area the are to check. The visible part of the area will be written back here.
- * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
- */
-bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
-{
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
-
-    /*Invalidate the object only if it belongs to the current or previous'*/
-    lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr == lv_disp_get_scr_act(disp) ||
-       obj_scr == lv_disp_get_scr_prev(disp) ||
-       obj_scr == lv_disp_get_layer_top(disp) ||
-       obj_scr == lv_disp_get_layer_sys(disp)) {
-
-        /*Truncate the area to the object*/
-        lv_area_t obj_coords;
-        lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
-        lv_area_copy(&obj_coords, &obj->coords);
-        obj_coords.x1 -= ext_size;
-        obj_coords.y1 -= ext_size;
-        obj_coords.x2 += ext_size;
-        obj_coords.y2 += ext_size;
-
-        bool is_common;
-
-        is_common = _lv_area_intersect(area, area, &obj_coords);
-        if(is_common == false) return false;  /*The area is not on the object*/
-
-        /*Truncate recursively to the parents*/
-        lv_obj_t * par = lv_obj_get_parent(obj);
-        while(par != NULL) {
-            is_common = _lv_area_intersect(area, area, &par->coords);
-            if(is_common == false) return false;       /*If no common parts with parent break;*/
-            if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
-
-            par = lv_obj_get_parent(par);
+            lv_res_t res = lv_event_send(obj->parent, event, data);
+            if(res != LV_RES_OK) return LV_RES_INV;
         }
     }
 
-    return true;
+    return LV_RES_OK;
+}
+
+
+void * lv_event_get_data(void)
+{
+    return event_act_data;
 }
 
 /**
- * Tell whether an object is visible (even partially) now or not
- * @param obj pointer to an object
- * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ * Nested events can be called and one of them might belong to an object that is being deleted.
+ * Mark this object's `event_temp_data` deleted to know that it's `lv_event_send` should return `LV_RES_INV`
+ * @param obj pointer to an obejct to mark as deleted
  */
-bool lv_obj_is_visible(const lv_obj_t * obj)
+void lv_event_mark_deleted(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_event_temp_data_t * t = event_temp_data_head;
 
-    lv_area_t obj_coords;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
-    obj_coords.x1 -= ext_size;
-    obj_coords.y1 -= ext_size;
-    obj_coords.x2 += ext_size;
-    obj_coords.y2 += ext_size;
+    while(t) {
+        if(t->obj == obj) t->deleted = true;
+        t = t->prev;
+    }
+}
 
-    return lv_obj_area_is_visible(obj, &obj_coords);
+lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
+{
+    if(obj == NULL) return LV_RES_OK;
 
+    lv_res_t res = LV_RES_OK;
+    if(obj->class_p->signal_cb) res = obj->class_p->signal_cb(obj, signal, param);
+
+    return res;
 }
 
 /*=====================
  * Setter functions
  *====================*/
 
-/*--------------------
- * Parent/children set
- *--------------------*/
-
-/**
- * Set a new parent for an object. Its relative position will be the same.
- * @param obj pointer to an object. Can't be a screen.
- * @param parent pointer to the new parent object. (Can't be NULL)
- */
-void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
-
-    if(obj->parent == NULL) {
-        LV_LOG_WARN("Can't set the parent of a screen");
-        return;
-    }
-
-    if(parent == NULL) {
-        LV_LOG_WARN("Can't set parent == NULL to an object");
-        return;
-    }
-
-    lv_obj_invalidate(obj);
-
-    if(parent->spec_attr == NULL) {
-        parent->spec_attr = lv_obj_allocate_spec_attr(parent);
-    }
-
-    lv_obj_t * old_parent = obj->parent;
-    lv_point_t old_pos;
-    old_pos.y = lv_obj_get_y(obj);
-
-    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
-
-    if(new_base_dir != LV_BIDI_DIR_RTL) old_pos.x = lv_obj_get_x(obj);
-    else  old_pos.x = old_parent->coords.x2 - obj->coords.x2;
-
-    /*Remove the object from the old parent's child list*/
-    int32_t i;
-    for(i = lv_obj_get_child_id(obj); i <= (int32_t)lv_obj_get_child_cnt(old_parent) - 2; i++) {
-        old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i+1];
-    }
-    old_parent->spec_attr->child_cnt--;
-    if(old_parent->spec_attr->child_cnt) {
-        old_parent->spec_attr->children = lv_mem_realloc(old_parent->spec_attr->children, old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    } else {
-        lv_mem_free(old_parent->spec_attr->children);
-        old_parent->spec_attr->children = NULL;
-    }
-
-    /*Add the child to the new parent as the last (newest child)*/
-    parent->spec_attr->child_cnt++;
-    parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
-
-    obj->parent = parent;
-
-    if(new_base_dir != LV_BIDI_DIR_RTL) {
-        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
-    }
-    else {
-        /*Align to the right in case of RTL base dir*/
-        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
-        lv_obj_set_pos(obj, new_x, old_pos.y);
-    }
-
-    /*Notify the original parent because one of its children is lost*/
-    lv_signal_send(old_parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    lv_obj_invalidate(obj);
-}
-
-/**
- * Move and object to the foreground
- * @param obj pointer to an object
- */
-void lv_obj_move_foreground(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    lv_obj_invalidate(parent);
-
-    uint32_t i;
-    for(i = lv_obj_get_child_id(obj) - 1; i > 0; i--) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
-    }
-    parent->spec_attr->children[0] = obj;
-
-    /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    lv_obj_invalidate(parent);
-}
-
-/**
- * Move and object to the background
- * @param obj pointer to an object
- */
-void lv_obj_move_background(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    lv_obj_invalidate(parent);
-
-    uint32_t i;
-    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 2; i++) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
-    }
-    parent->spec_attr->children[ lv_obj_get_child_cnt(parent) - 1] = obj;
-
-    /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    lv_obj_invalidate(parent);
-}
-
-/*--------------------
- * Coordinate set
- * ------------------*/
-
-/**
- * Set the size of an extended clickable area
- * If TINY mode is used, only the largest of the horizontal and vertical padding
- * values are considered.
- * @param obj pointer to an object
- * @param left extended clickable are on the left [px]
- * @param right extended clickable are on the right [px]
- * @param top extended clickable are on the top [px]
- * @param bottom extended clickable are on the bottom [px]
- */
-void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->ext_click_pad.x1 = left;
-    obj->spec_attr->ext_click_pad.x2 = right;
-    obj->spec_attr->ext_click_pad.y1 = top;
-    obj->spec_attr->ext_click_pad.y2 = bottom;
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->ext_click_pad = LV_MAX4(left, right, top, bottom);
-#else
-    LV_UNUSED(obj);
-    LV_UNUSED(left);
-    LV_UNUSED(right);
-    LV_UNUSED(top);
-    LV_UNUSED(bottom);
-#endif
-}
-
-/**
- * Get the extended draw area of an object.
- * @param obj pointer to an object
- * @return the size extended draw area around the real coordinates
- */
-lv_coord_t _lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
-{
-    if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
-    else return 0;
-}
-/*---------------------
- * Appearance set
- *--------------------*/
-
 /*-----------------
  * Attribute set
  *----------------*/
-
-/**
- * Set the base direction of the object
- * @param obj pointer to an object
- * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
- */
-void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
-{
-    if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
-       dir != LV_BIDI_DIR_AUTO && dir != LV_BIDI_DIR_INHERIT) {
-
-        LV_LOG_WARN("lv_obj_set_base_dir: invalid base dir");
-        return;
-    }
-
-    lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->base_dir = dir;
-    lv_signal_send(obj, LV_SIGNAL_BASE_DIR_CHG, NULL);
-
-    /* Notify the children about the parent base dir has changed.
-     * (The children might have `LV_BIDI_DIR_INHERIT`)*/
-    base_dir_refr_children(obj);
-}
-
 
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
@@ -644,8 +297,6 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 }
 
-
-
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -656,15 +307,6 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 }
 
-
-
-/**
- * Set the state (fully overwrite) of an object.
- * If specified in the styles a transition animation will be started
- * from the previous state to the current
- * @param obj pointer to an object
- * @param state the new state
- */
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 {
     if(obj->state == new_state) return;
@@ -673,12 +315,12 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 #if LV_USE_ANIMATION == 0
     obj->state = new_state;
-    _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+    lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 #else
     lv_state_t prev_state = obj->state;
     obj->state = new_state;
 
-    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
+    _lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
 
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
@@ -718,26 +360,18 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     }
 
     for(i = 0;i < tsi; i++) {
-        _lv_obj_create_style_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
+        lv_obj_style_create_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
     }
 
     lv_mem_buf_release(ts);
 
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) lv_obj_invalidate(obj);
 
 #endif
 }
 
-
-/**
- * Add a given state or states to the object. The other state bits will remain unchanged.
- * If specified in the styles a transition animation will be started
- * from the previous state to the current
- * @param obj pointer to an object
- * @param state the state bits to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
- */
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -748,13 +382,6 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-/**
- * Remove a given state or states to the object. The other state bits will remain unchanged.
- * If specified in the styles a transition animation will be started
- * from the previous state to the current
- * @param obj pointer to an object
- * @param state the state bits to remove. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
- */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -765,417 +392,36 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-
-/**
- * Set a an event handler function for an object.
- * Used by the user to react on event which happens with the object.
- * @param obj pointer to an object
- * @param event_cb the new event function
- */
 void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    if(obj->spec_attr == NULL) obj->spec_attr = lv_obj_allocate_spec_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
 
     obj->spec_attr->event_cb = event_cb;
 }
 
-/**
- * Send an event to the object
- * @param obj pointer to an object
- * @param event the type of the event from `lv_event_t`
- * @param data arbitrary data depending on the object type and the event. (Usually `NULL`)
- * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
- */
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
+void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
 {
-    if(obj == NULL) return LV_RES_OK;
+    if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
+       dir != LV_BIDI_DIR_AUTO && dir != LV_BIDI_DIR_INHERIT) {
 
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    /*Nothing to do if no event function and not bubbled*/
-    if(lv_obj_get_event_cb(obj) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
-        return LV_RES_OK;
-    }
-    lv_res_t res;
-    res = lv_event_send_func(lv_obj_get_event_cb(obj), obj, event, data);
-    return res;
-}
-
-/**
- * Send LV_EVENT_REFRESH event to an object
- * @param obj point to an obejct. (Can NOT be NULL)
- * @return LV_RES_OK: success, LV_RES_INV: to object become invalid (e.g. deleted) due to this event.
- */
-lv_res_t lv_event_send_refresh(lv_obj_t * obj)
-{
-    return lv_event_send(obj, LV_EVENT_REFRESH, NULL);
-}
-
-/**
- * Send LV_EVENT_REFRESH event to an object and all of its children.
- * @param obj pointer to an object or NULL to refresh all objects of all displays
- */
-void lv_event_send_refresh_recursive(lv_obj_t * obj)
-{
-    if(obj == NULL) {
-        /*If no obj specified refresh all screen of all displays */
-        lv_disp_t * d = lv_disp_get_next(NULL);
-        while(d) {
-            uint32_t i;
-            for(i = 0; i < d->screen_cnt; i++) {
-                lv_event_send_refresh_recursive(d->screens[i]);
-            }
-            lv_event_send_refresh_recursive(d->top_layer);
-            lv_event_send_refresh_recursive(d->sys_layer);
-
-            d = lv_disp_get_next(d);
-        }
-    }
-    else {
-
-        lv_res_t res = lv_event_send_refresh(obj);
-        if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
-
-        uint32_t i;
-        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-            lv_event_send_refresh_recursive(lv_obj_get_child(obj, i));
-        }
-    }
-}
-
-
-/**
- * Call an event function with an object, event, and data.
- * @param event_xcb an event callback function. If `NULL` `LV_RES_OK` will return without any actions.
- *        (the 'x' in the argument name indicates that its not a fully generic function because it not follows
- *         the `func_name(object, callback, ...)` convention)
- * @param obj pointer to an object to associate with the event (can be `NULL` to simply call the `event_cb`)
- * @param event an event
- * @param data pointer to a custom data
- * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
- */
-lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const void * data)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    /* Build a simple linked list from the objects used in the events
-     * It's important to know if an this object was deleted by a nested event
-     * called from this `event_cb`. */
-    lv_event_temp_data_t event_temp_data;
-    event_temp_data.obj     = obj;
-    event_temp_data.deleted = false;
-    event_temp_data.prev    = NULL;
-
-    if(event_temp_data_head) {
-        event_temp_data.prev = event_temp_data_head;
-    }
-    event_temp_data_head = &event_temp_data;
-
-    const void * event_act_data_save = event_act_data;
-    event_act_data = data;
-
-    /*Call the input device's feedback callback if set*/
-    lv_indev_t * indev_act = lv_indev_get_act();
-    if(indev_act) {
-        if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, event);
+        LV_LOG_WARN("lv_obj_set_base_dir: invalid base direction: %d", dir);
+        return;
     }
 
-    /*Call the event callback itself*/
-    if(event_xcb) event_xcb(obj, event);
+    lv_obj_allocate_spec_attr(obj);
+    obj->spec_attr->base_dir = dir;
+    lv_signal_send(obj, LV_SIGNAL_BASE_DIR_CHG, NULL);
 
-    /*Restore the event data*/
-    event_act_data = event_act_data_save;
-
-    /*Remove this element from the list*/
-    event_temp_data_head = event_temp_data_head->prev;
-
-    if(event_temp_data.deleted) return LV_RES_INV;
-
-    if(obj) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-
-            lv_res_t res = lv_event_send(obj->parent, event, data);
-            if(res != LV_RES_OK) return LV_RES_INV;
-        }
-    }
-
-    return LV_RES_OK;
+    /* Notify the children about the parent base dir has changed.
+     * (The children might have `LV_BIDI_DIR_INHERIT`)*/
+    base_dir_refr_children(obj);
 }
 
-/**
- * Get the `data` parameter of the current event
- * @return the `data` parameter
- */
-void * lv_event_get_data(void)
-{
-    return event_act_data;
-}
-/**
- * Send an event to the object
- * @param obj pointer to an object
- * @param event the type of the event from `lv_event_t`.
- * @return LV_RES_OK or LV_RES_INV
- */
-lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
-{
-    if(obj == NULL) return LV_RES_OK;
-
-    lv_res_t res = LV_RES_OK;
-    if(obj->class_p->signal_cb) res = obj->class_p->signal_cb(obj, signal, param);
-
-    return res;
-}
-
-/*----------------
- * Other set
- *--------------*/
-
-/**
- * Allocate a new ext. data for an object
- * @param obj pointer to an object
- * @param ext_size the size of the new ext. data
- * @return pointer to the allocated ext.
- * If out of memory NULL is returned and the original ext is preserved
- */
-lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(obj->spec_attr == NULL) {
-        static uint32_t x = 0;
-        x++;
-        obj->spec_attr = lv_mem_alloc(sizeof(lv_obj_spec_attr_t));
-        LV_ASSERT_MEM(obj->spec_attr);
-        if(obj->spec_attr == NULL) return NULL;
-
-        lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
-
-        obj->spec_attr->scroll_dir = LV_DIR_ALL;
-        obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
-        obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
-
-    }
-    return obj->spec_attr;
-}
 
 /*=======================
  * Getter functions
  *======================*/
-
-/**
- * Return with the screen of an object
- * @param obj pointer to an object
- * @return pointer to a screen
- */
-lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    const lv_obj_t * par = obj;
-    const lv_obj_t * act_p;
-
-    do {
-        act_p = par;
-        par   = lv_obj_get_parent(act_p);
-    } while(par != NULL);
-
-    return (lv_obj_t *)act_p;
-}
-
-/**
- * Get the display of an object
- * @param scr pointer to an object
- * @return pointer the object's display
- */
-lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    const lv_obj_t * scr;
-
-    if(obj->parent == NULL) scr = obj; /*`obj` is a screen*/
-    else scr = lv_obj_get_screen(obj); /*get the screen of `obj`*/
-
-    lv_disp_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_disp_ll), d) {
-        uint32_t i;
-        for(i = 0; i < d->screen_cnt; i++) {
-            if(d->screens[i] == scr) return d;
-        }
-    }
-
-    LV_LOG_WARN("No screen found")
-    return NULL;
-}
-
-/*---------------------
- * Parent/children get
- *--------------------*/
-
-/**
- * Returns with the parent of an object
- * @param obj pointer to an object
- * @return pointer to the parent of  'obj'
- */
-lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->parent;
-}
-
-/**
- * Get the Nth child of an object. 0th is the lastly created.
- * @param obj pointer to an object whose children should be get
- * @param id of a child
- * @return the child or `NULL` if `id` was greater then the `number of children - 1`
- */
-lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, uint32_t id)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(obj->spec_attr == NULL) return NULL;
-
-    if(id >= obj->spec_attr->child_cnt) return NULL;
-    else return obj->spec_attr->children[id];
-}
-
-uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    if(obj->spec_attr == NULL) return 0;
-    return obj->spec_attr->child_cnt;
-}
-
-/**
- * Get the child index of an object.
- * If this object is the firstly created child of its parent 0 will be return.
- * If its the second child return 1, etc.
- * @param obj pointer to an object whose index should be get
- * @return the child index of the object.
- */
-uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    if(parent == NULL) return 0;
-
-    uint32_t i = 0;
-    for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
-        if(lv_obj_get_child(parent, i) == obj) return i;
-    }
-
-    return 0xFFFFFFFF;
-}
-
-/** Recursively count the children of an object
- * @param obj pointer to an object
- * @return children number of 'obj'
- */
-uint32_t lv_obj_count_children_recursive(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    uint16_t cnt = 0;
-
-    uint32_t i = 0;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-        cnt++;
-        cnt += lv_obj_count_children_recursive(lv_obj_get_child(obj, i));
-    }
-
-    return cnt;
-}
-
-/*---------------------
- * Coordinate get
- *--------------------*/
-
-/**
- * Get the extended extended clickable area in a direction
- * @param obj pointer to an object
- * @param dir in which direction get the extended area (`LV_DIR_LEFT/RIGHT/TOP`)
- * @return the extended left padding
- */
-lv_coord_t lv_obj_get_ext_click_area(const lv_obj_t * obj, lv_dir_t dir)
-{
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_OFF
-    LV_UNUSED(obj);
-    LV_UNUSED(dir);
-    return 0;
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    LV_UNUSED(dir);
-    if(obj->spec_attr) return obj->spec_attr->ext_click_pad;
-    else return 0;
-#else
-    switch(dir) {
-    case LV_DIR_LEFT:
-        return obj->spec_attr->ext_click_pad.x1;
-    case LV_DIR_RIGHT:
-        return obj->spec_attr->ext_click_pad.x2;
-    case LV_DIR_TOP:
-        return obj->spec_attr->ext_click_pad.y1;
-    case LV_DIR_BOTTOM:
-        return obj->spec_attr->ext_click_pad.y2;
-    default:
-        return 0;
-    }
-#endif
-}
-
-
-/**
- * Check if a given screen-space point is on an object's coordinates.
- * This method is intended to be used mainly by advanced hit testing algorithms to check
- * whether the point is even within the object (as an optimization).
- * @param obj object to check
- * @param point screen-space point
- */
-bool _lv_obj_is_click_point_on(lv_obj_t * obj, const lv_point_t * point)
-{
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_OFF
-    return _lv_area_is_point_on(&obj->coords, point, 0);
-#else
-    lv_area_t ext_area;
-    ext_area.x1 = obj->coords.x1 - lv_obj_get_ext_click_area(obj, LV_DIR_LEFT);
-    ext_area.x2 = obj->coords.x2 + lv_obj_get_ext_click_area(obj, LV_DIR_RIGHT);
-    ext_area.y1 = obj->coords.y1 - lv_obj_get_ext_click_area(obj, LV_DIR_TOP);
-    ext_area.y2 = obj->coords.y2 + lv_obj_get_ext_click_area(obj, LV_DIR_BOTTOM);
-
-    return _lv_area_is_point_on(&ext_area, point, 0);
-#endif
-}
-
-/**
- * Hit-test an object given a particular point in screen space.
- * @param obj object to hit-test
- * @param point screen-space point
- * @return true if the object is considered under the point
- */
-bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point)
-{
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
-        lv_hit_test_info_t hit_info;
-        hit_info.point = point;
-        hit_info.result = true;
-        lv_signal_send(obj, LV_SIGNAL_HIT_TEST, &hit_info);
-        return hit_info.result;
-    }
-    else {
-        return _lv_obj_is_click_point_on(obj, point);
-    }
-}
-/*-----------------
- * Appearance get
- *---------------*/
-
-
-/*-----------------
- * Attribute get
- *----------------*/
 
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 {
@@ -1215,11 +461,6 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj)
     return ((lv_obj_t *)obj)->state;
 }
 
-/**
- * Get the event function of an object
- * @param obj pointer to an object
- * @return the event function
- */
 lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -1228,15 +469,6 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj)
     else return NULL;
 }
 
-/*------------------
- * Other get
- *-----------------*/
-
-/**
- * Get the group of the object
- * @param obj pointer to an object
- * @return the pointer to group of the object
- */
 void * lv_obj_get_group(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -1250,45 +482,31 @@ void * lv_obj_get_group(const lv_obj_t * obj)
 #endif
 }
 
-/**
- * Tell whether the object is the focused object of a group or not.
- * @param obj pointer to an object
- * @return true: the object is focused, false: the object is not focused or not in a group
- */
-bool lv_obj_is_focused(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_USE_GROUP
-    lv_group_t * g = lv_obj_get_group(obj);
-    if(g) {
-        if(lv_group_get_focused(g) == obj) return true;
-    }
-    return false;
-#else
-    LV_UNUSED(obj);
-    return false;
-#endif
-}
-
-lv_obj_t ** lv_obj_get_children(const lv_obj_t * obj)
-{
-    static lv_obj_t * empty[1] = {NULL};
-    if(obj->spec_attr) return obj->spec_attr->children;
-    else return empty;
-}
-
 /*-------------------
  * OTHER FUNCTIONS
  *------------------*/
 
+void lv_obj_allocate_spec_attr(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-/**
- * Get the really focused object by taking `focus_parent` into account.
- * @param obj the start object
- * @return the object to really focus
- */
-lv_obj_t * _lv_obj_get_focused_obj(const lv_obj_t * obj)
+    if(obj->spec_attr == NULL) {
+        static uint32_t x = 0;
+        x++;
+        obj->spec_attr = lv_mem_alloc(sizeof(lv_obj_spec_attr_t));
+        LV_ASSERT_MEM(obj->spec_attr);
+        if(obj->spec_attr == NULL) return;
+
+        lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
+
+        obj->spec_attr->scroll_dir = LV_DIR_ALL;
+        obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
+        obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
+
+    }
+}
+
+lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
 {
     if(obj == NULL) return NULL;
     const lv_obj_t * focus_obj = obj;
@@ -1299,33 +517,16 @@ lv_obj_t * _lv_obj_get_focused_obj(const lv_obj_t * obj)
     return (lv_obj_t *)focus_obj;
 }
 
-/**
- * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
- * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
- * @param obj pointer to an object which type should be get
- * @param buf pointer to an `lv_obj_type_t` buffer to store the types
- */
 bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p)
 {
     return obj->class_p == class_p ? true : false;
 }
-/**
- * Check if any object has a given type
- * @param obj pointer to an object
- * @param obj_type type of the object. (e.g. "lv_btn")
- * @return true: valid
- */
+
 bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
 {
     return true;
 }
 
-/**
- * Check if any object is still "alive", and part of the hierarchy
- * @param obj pointer to an object
- * @param obj_type type of the object. (e.g. "lv_btn")
- * @return true: valid
- */
 bool _lv_debug_check_obj_valid(const lv_obj_t * obj)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
@@ -1346,69 +547,6 @@ bool _lv_debug_check_obj_valid(const lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void lv_obj_del_async_cb(void * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_del(obj);
-}
-
-static void obj_del_core(lv_obj_t * obj)
-{
-    /*Let the user free the resources used in `LV_EVENT_DELETE`*/
-    lv_res_t res = lv_event_send(obj, LV_EVENT_DELETE, NULL);
-    if(res == LV_RES_INV) return;
-
-    /*Delete from the group*/
-#if LV_USE_GROUP
-    lv_group_t * group = lv_obj_get_group(obj);
-    if(group) lv_group_remove_obj(obj);
-#endif
-
-    /*Remove the animations from this object*/
-#if LV_USE_ANIMATION
-    lv_anim_del(obj, NULL);
-    _lv_obj_remove_style_trans(obj);
-#endif
-
-    /*Delete the user data*/
-#if LV_USE_USER_DATA
-#if LV_USE_USER_DATA_FREE
-    LV_USER_DATA_FREE(obj);
-#endif
-#endif
-
-    /*Recursively delete the children*/
-    while(1) {
-        lv_obj_t * child = lv_obj_get_child(obj, 0);
-        obj_del_core(child);
-    }
-
-    lv_event_mark_deleted(obj);
-
-    /* Reset all input devices if the object to delete is used*/
-    lv_indev_t * indev = lv_indev_get_next(NULL);
-    while(indev) {
-        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
-            lv_indev_reset(indev, obj);
-        }
-        if(indev->proc.types.pointer.last_pressed == obj) {
-            indev->proc.types.pointer.last_pressed = NULL;
-        }
-
-#if LV_USE_GROUP
-        if(indev->group == group && obj == lv_indev_get_obj_act()) {
-            lv_indev_reset(indev, obj);
-        }
-#endif
-        indev = lv_indev_get_next(indev);
-    }
-
-    /* All children deleted.
-     * Now clean up the object specific data*/
-    obj->class_p->destructor(obj);
-}
 
 static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
@@ -1442,7 +580,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
         LV_LOG_TRACE("Object create started");
         LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
         if(parent->spec_attr == NULL) {
-            parent->spec_attr = lv_obj_allocate_spec_attr(parent);
+            lv_obj_allocate_spec_attr(parent);
         }
 
         if(parent->spec_attr->children == NULL) {
@@ -1513,8 +651,10 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     } else {
         lv_obj_set_pos(obj, 0, 0);
     }
-    /*Send a signal to the parent to notify it about the new child*/
-    if(parent != NULL) {
+
+    if(parent) {
+        /* Send a signal to the parent to notify it about the new child.
+         * Also triggers layout update*/
         lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
 
         /*Invalidate the area if not screen created*/
@@ -1527,20 +667,11 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 static void lv_obj_destructor(lv_obj_t * p)
 {
     lv_obj_t * obj = p;
-    lv_obj_remove_all_styles(obj);
+//    lv_obj_remove_all_styles(obj);
     if(obj->spec_attr) lv_mem_free(obj->spec_attr);
 
 }
 
-/**
- * Handle the drawing related tasks of the base objects.
- * @param obj pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
@@ -1626,49 +757,6 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             coords.y2 += h;
             lv_draw_rect(&coords, clip_area, &draw_dsc);
         }
-
-#if GRID_DEBUG
-        /*Draw the grid cells*/
-        if(lv_obj_get_grid(obj)) {
-            _lv_grid_calc_t calc;
-            _lv_grid_calc(obj, &calc);
-
-            /*Create a color unique to this object. */
-            uint32_t cx = ((lv_uintptr_t) obj) & 0xFFFFFF;
-            cx = (cx & 0xff) ^ ((cx >> 8) & 0xff) ^ ((cx >> 16) & 0xff) ^ ((cx >> 24) & 0xff);
-            lv_color_t c = lv_color_hsv_to_rgb(cx & 0xff, 100, 100);
-
-            lv_draw_rect_dsc_t grid_rect_dsc;
-            lv_draw_rect_dsc_init(&grid_rect_dsc);
-            grid_rect_dsc.bg_color = c;
-            grid_rect_dsc.bg_opa = LV_OPA_10;
-            grid_rect_dsc.border_width = 2;
-            grid_rect_dsc.border_color = c;
-            grid_rect_dsc.border_opa = LV_OPA_30;
-
-            lv_point_t grid_abs;
-            lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
-            lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
-            grid_abs.x = pad_left + obj->coords.x1 - lv_obj_get_scroll_x(obj);
-            grid_abs.y = pad_top + obj->coords.y1 - lv_obj_get_scroll_y(obj);
-
-            uint32_t row;
-            uint32_t col;
-            for(row = 0; row < calc.row_num; row ++) {
-                for(col = 0; col < calc.col_num; col ++) {
-                    lv_area_t a;
-                    a.x1 = grid_abs.x + calc.x[col];
-                    a.x2 = a.x1 + calc.w[col];
-                    a.y1 = grid_abs.y + calc.y[row];
-                    a.y2 = a.y1 + calc.h[row];
-                    lv_draw_rect(&a, clip_area, &grid_rect_dsc);
-                }
-            }
-
-
-            _lv_grid_calc_free(&calc);
-        }
-#endif
     }
 
     return LV_DRAW_RES_OK;
@@ -1678,7 +766,7 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
-    lv_scroll_dir_t sm = lv_obj_get_scrollbar_mode(obj);
+    lv_indev_scroll_dir_t sm = lv_obj_get_scrollbar_mode(obj);
     if(sm == LV_SCROLLBAR_MODE_OFF)  return;
 
     /*If there is no indev scrolling this object but `mode==active` return*/
@@ -1696,13 +784,13 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t sl = lv_obj_get_scroll_left(obj);
     lv_coord_t sr = lv_obj_get_scroll_right(obj);
 
-    lv_scroll_dir_t dir = lv_obj_get_scroll_dir(obj);
+    lv_indev_scroll_dir_t dir = lv_obj_get_scroll_dir(obj);
 
     bool ver_draw = false;
     if((dir & LV_DIR_VER) &&
             ((sm == LV_SCROLLBAR_MODE_ON) ||
                     (sm == LV_SCROLLBAR_MODE_AUTO && (st > 0 || sb > 0)) ||
-                    (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER))) {
+                    (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_INDEV_SCROLL_DIR_VER))) {
         ver_draw = true;
     }
 
@@ -1711,7 +799,7 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     if((dir & LV_DIR_HOR) &&
             ((sm == LV_SCROLLBAR_MODE_ON) ||
                     (sm == LV_SCROLLBAR_MODE_AUTO && (sl > 0 || sr > 0)) ||
-                    (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR))) {
+                    (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_INDEV_SCROLL_DIR_HOR))) {
         hor_draw = true;
     }
 
@@ -1846,25 +934,6 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 }
 
 
-static void base_dir_refr_children(lv_obj_t * obj)
-{
-    uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
-        if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
-            lv_signal_send(child, LV_SIGNAL_BASE_DIR_CHG, NULL);
-            base_dir_refr_children(child);
-        }
-    }
-}
-
-/**
- * Signal function of the basic object
- * @param obj pointer to an object
- * @param sign signal type
- * @param param parameter for the signal (depends on signal type)
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res = LV_RES_OK;
@@ -1877,18 +946,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
         /*Go the checked state if enabled*/
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
-            uint32_t toggled = 0;
-            if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
-                lv_obj_add_state(obj, LV_STATE_CHECKED);
-                toggled = 0;
-            }
-            else {
-                lv_obj_clear_state(obj, LV_STATE_CHECKED);
-                toggled = 1;
-            }
-
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &toggled);
-            if(res != LV_RES_OK) return res;
+            if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
+            else lv_obj_clear_state(obj, LV_STATE_CHECKED);
         }
     }
     else if(sign == LV_SIGNAL_PRESS_LOST) {
@@ -1926,18 +985,17 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         editing = lv_group_get_editing(lv_obj_get_group(obj));
 #endif
         if(editing) {
-            uint8_t state = LV_STATE_FOCUSED;
+            lv_state_t state = LV_STATE_FOCUSED;
             state |= LV_STATE_EDITED;
 
             /*if using focus mode, change target to parent*/
-            obj = _lv_obj_get_focused_obj(obj);
+            obj = lv_obj_get_focused_obj(obj);
 
             lv_obj_add_state(obj, state);
         }
         else {
-
             /*if using focus mode, change target to parent*/
-            obj = _lv_obj_get_focused_obj(obj);
+            obj = lv_obj_get_focused_obj(obj);
 
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
@@ -1951,7 +1009,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
         /*if using focus mode, change target to parent*/
-        obj = _lv_obj_get_focused_obj(obj);
+        obj = lv_obj_get_focused_obj(obj);
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
@@ -1982,6 +1040,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
+    }
+    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+        /* The layout might depend on the base dir.
+         * E.g. the first is element is on the left or right*/
+        lv_obj_update_layout(obj, NULL);
     }
     else if(sign == LV_SIGNAL_SCROLL) {
         res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
@@ -2018,16 +1081,18 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-
-static void lv_event_mark_deleted(lv_obj_t * obj)
+static void base_dir_refr_children(lv_obj_t * obj)
 {
-    lv_event_temp_data_t * t = event_temp_data_head;
-
-    while(t) {
-        if(t->obj == obj) t->deleted = true;
-        t = t->prev;
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
+            lv_signal_send(child, LV_SIGNAL_BASE_DIR_CHG, NULL);
+            base_dir_refr_children(child);
+        }
     }
 }
+
 
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {

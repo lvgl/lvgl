@@ -389,14 +389,14 @@ static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area,
 
         lv_draw_rect_dsc_t sel_dsc;
         lv_draw_rect_dsc_init(&sel_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_HIGHLIGHT, &sel_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_SELECTED, &sel_dsc);
         lv_draw_rect(&rect_area, clip_area, &sel_dsc);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_HIGHLIGHT, &label_dsc);
+        lv_obj_init_draw_label_dsc(obj, LV_PART_SELECTED, &label_dsc);
 
         lv_coord_t bg_font_h = lv_font_get_line_height(lv_obj_get_style_text_font(obj, LV_PART_MAIN));
 
@@ -844,8 +844,8 @@ static lv_coord_t get_selected_label_width(const lv_obj_t * obj)
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return 0;
 
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_HIGHLIGHT);
-    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_HIGHLIGHT);
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_SELECTED);
+    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_SELECTED);
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
     _lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);

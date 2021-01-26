@@ -153,13 +153,17 @@ void lv_mem_deinit(void)
  */
 void * lv_mem_alloc(size_t size)
 {
+
+
     if(size == 0) {
+        printf("alloc: 0\n");
         return &zero_mem;
     }
 
     /*Round the size up to ALIGN_MASK*/
     size = (size + ALIGN_MASK) & (~ALIGN_MASK);
     void * alloc = NULL;
+    printf("alloc: %d\n", size);
 
 #if LV_MEM_CUSTOM == 0
     alloc = alloc_core(size);
@@ -217,12 +221,17 @@ void * lv_mem_alloc(size_t size)
  */
 void lv_mem_free(const void * data)
 {
-    if(data == &zero_mem) return;
+    if(data == &zero_mem) {
+        printf("free: %d\n", 0);
+        return;
+    }
     if(data == NULL) return;
+
 
 #if LV_ENABLE_GC == 0
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
+    printf("free: %d\n", e->header.s.d_size);
 #  if LV_MEM_ADD_JUNK
     lv_memset((void *)data, 0xbb, lv_mem_get_size(data));
 #  endif
@@ -291,9 +300,8 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
     if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
-        if(old_size != 0) {
+        if(old_size != 0 && new_size != 0) {
             lv_memcpy(new_p, data_p, LV_MIN(new_size, old_size));
-            lv_mem_free(data_p);
         }
         lv_mem_free(data_p);
     }

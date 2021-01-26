@@ -72,6 +72,7 @@ const lv_obj_class_t lv_textarea = {
     .destructor = lv_textarea_destructor,
     .signal_cb = lv_textarea_signal,
     .draw_cb = lv_textarea_draw,
+    .editable = 1,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj
 };
@@ -1152,12 +1153,6 @@ static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         else {
             lv_textarea_add_char(obj, c);
         }
-#endif
-    }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
-#if LV_USE_GROUP
-        bool * editable = (bool *)param;
-        *editable       = true;
 #endif
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||

@@ -51,12 +51,12 @@ enum { LV_INDEV_STATE_REL = 0, LV_INDEV_STATE_PR };
 typedef uint8_t lv_indev_state_t;
 
 enum {
-    LV_SCROLL_DIR_NONE,
-    LV_SCROLL_DIR_HOR,
-    LV_SCROLL_DIR_VER,
+    LV_INDEV_SCROLL_DIR_NONE,
+    LV_INDEV_SCROLL_DIR_HOR,
+    LV_INDEV_SCROLL_DIR_VER,
 };
 
-typedef uint8_t lv_scroll_dir_t;
+typedef uint8_t lv_indev_scroll_dir_t;
 
 enum {
     LV_GESTURE_DIR_TOP,     /**< Gesture dir up. */
@@ -144,7 +144,7 @@ typedef struct _lv_indev_proc_t {
             lv_gesture_dir_t gesture_dir;
             lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
             /*Flags*/
-            lv_scroll_dir_t scroll_dir  : 2;
+            lv_indev_scroll_dir_t scroll_dir  : 2;
             uint8_t gesture_sent : 1;
         } pointer;
         struct {

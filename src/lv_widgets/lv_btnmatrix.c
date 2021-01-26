@@ -59,6 +59,7 @@ const lv_obj_class_t lv_btnmatrix = {
         .signal_cb = lv_btnmatrix_signal,
         .draw_cb = lv_btnmatrix_draw,
         .instance_size = sizeof(lv_btnmatrix_t),
+        .editable = 1,
         .base_class = &lv_obj
     };
 
@@ -993,12 +994,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             btnm->btn_id_act = btnm->btn_id_focused;
             lv_obj_invalidate(obj);
         }
-#endif
-    }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
-#if LV_USE_GROUP
-        bool * editable = (bool *)param;
-        *editable       = true;
 #endif
     }
     return res;

@@ -1133,14 +1133,14 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_CURSOR, &line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_MARKER, &line_dsc);
 
     lv_draw_rect_dsc_t point_dsc;
     lv_draw_rect_dsc_init(&point_dsc);
     point_dsc.bg_opa = line_dsc.opa;
     point_dsc.radius = LV_RADIUS_CIRCLE;
 
-    lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_PART_CURSOR);
+    lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_PART_MARKER);
 
     /*Do not bother with line ending is the point will over it*/
     if(point_radius > line_dsc.width / 2) line_dsc.raw_end = 1;
@@ -1461,7 +1461,7 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i)
 
         _lv_inv_area(lv_obj_get_disp(obj), &col_a);
     } else {
-        lv_obj_invalidate(chart);
+        lv_obj_invalidate(obj);
     }
 }
 

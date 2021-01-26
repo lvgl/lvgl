@@ -59,7 +59,7 @@ void _lv_anim_core_init(void)
     last_task_run = lv_tick_get();
     _lv_anim_tmr = lv_timer_create(anim_task, LV_DISP_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation task*/
-    anim_list_changed = false; /*The list has not actually changed*/
+    anim_list_changed = false;
 }
 
 /**

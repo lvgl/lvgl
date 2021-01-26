@@ -70,6 +70,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
     if(!style->allocated) {
         if(style->prop1 == prop) {
             style->prop1 = LV_STYLE_PROP_INV;
+            style->prop_cnt = 0;
             return true;
         }
         return false;

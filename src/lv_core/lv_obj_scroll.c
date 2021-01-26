@@ -240,9 +240,8 @@ void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     if(x == 0 && y == 0) return;
 
-    if(obj->spec_attr == NULL) {
-        obj->spec_attr = lv_obj_allocate_spec_attr(obj);
-    }
+    lv_obj_allocate_spec_attr(obj);
+
     obj->spec_attr->scroll.x += x;
     obj->spec_attr->scroll.y += y;
 

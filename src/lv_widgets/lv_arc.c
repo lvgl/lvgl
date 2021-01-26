@@ -47,6 +47,7 @@ const lv_obj_class_t lv_arc  = {
     .signal_cb = lv_arc_signal,
     .draw_cb = lv_arc_draw,
     .instance_size = sizeof(lv_arc_t),
+    .editable = 1,
     .base_class = &lv_obj
 };
 
@@ -707,12 +708,6 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
-    }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
-#if LV_USE_GROUP
-        bool * editable = (bool *)param;
-        *editable = true;
-#endif
     }
 
     return res;

@@ -29,10 +29,10 @@ struct _lv_obj_t;
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
-    LV_SCROLLBAR_MODE_OFF    = 0x0, /**< Never show scrollbars*/
-    LV_SCROLLBAR_MODE_ON     = 0x1, /**< Always show scrollbars*/
-    LV_SCROLLBAR_MODE_ACTIVE = 0x2, /**< Show scroll bars when object is being scrolled*/
-    LV_SCROLLBAR_MODE_AUTO   = 0x3, /**< Show scroll bars when the content is large enough to be scrolled*/
+    LV_SCROLLBAR_MODE_OFF,      /**< Never show scrollbars*/
+    LV_SCROLLBAR_MODE_ON,       /**< Always show scrollbars*/
+    LV_SCROLLBAR_MODE_ACTIVE,   /**< Show scroll bars when object is being scrolled*/
+    LV_SCROLLBAR_MODE_AUTO,     /**< Show scroll bars when the content is large enough to be scrolled*/
 };
 typedef uint8_t lv_scrollbar_mode_t;
 

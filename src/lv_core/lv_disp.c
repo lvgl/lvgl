@@ -201,7 +201,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
         lv_disp_load_scr(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
-        lv_style_remove_prop(lv_obj_get_local_style(d->scr_to_load, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
+//        lv_style_remove_prop(lv_obj_get_local_style(d->scr_to_load, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
 
         act_scr = d->scr_to_load;
     }
@@ -222,8 +222,8 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     /*Be sure both screens are in a normal position*/
     lv_obj_set_pos(new_scr, 0, 0);
     lv_obj_set_pos(lv_scr_act(), 0, 0);
-    lv_style_remove_prop(lv_obj_get_local_style(new_scr, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
-    lv_style_remove_prop(lv_obj_get_local_style(lv_scr_act(), LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
+//    lv_style_remove_prop(lv_obj_get_local_style(new_scr, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
+//    lv_style_remove_prop(lv_obj_get_local_style(lv_scr_act(), LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
 
     lv_anim_t a_new;
     lv_anim_init(&a_new);
@@ -396,6 +396,6 @@ static void scr_anim_ready(lv_anim_t * a)
     if(d->prev_scr && d->del_prev) lv_obj_del(d->prev_scr);
     d->prev_scr = NULL;
     d->scr_to_load = NULL;
-    lv_style_remove_prop(lv_obj_get_local_style(a->var, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
+//    lv_style_remove_prop(lv_obj_get_local_style(a->var, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
 }
 #endif

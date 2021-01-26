@@ -48,6 +48,7 @@ const lv_obj_class_t lv_slider = {
     .destructor = lv_slider_destructor,
     .signal_cb = lv_slider_signal,
     .draw_cb = lv_slider_draw,
+    .editable = 1,
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar
 };
@@ -377,12 +378,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
-#endif
-    }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
-#if LV_USE_GROUP
-        bool * editable = (bool *)param;
-        *editable       = true;
 #endif
     }
 

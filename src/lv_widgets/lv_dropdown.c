@@ -66,6 +66,7 @@ const lv_obj_class_t lv_dropdown = {
     .signal_cb = lv_dropdown_signal,
     .draw_cb = lv_dropdown_draw,
     .instance_size = sizeof(lv_dropdown_t),
+    .editable = 1,
     .base_class = &lv_obj
 };
 
@@ -983,12 +984,6 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         }
 #endif
     }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
-#if LV_USE_GROUP
-        bool * editable = (bool *)param;
-        *editable       = true;
-#endif
-    }
 
     return res;
 }
@@ -1037,8 +1032,8 @@ static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint1
     }
 
     /*Draw a rectangle under the selected item*/
-    const lv_font_t * font    = lv_obj_get_style_text_font(list_obj, LV_PART_HIGHLIGHT);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(list_obj,  LV_PART_HIGHLIGHT);
+    const lv_font_t * font    = lv_obj_get_style_text_font(list_obj, LV_PART_SELECTED);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(list_obj,  LV_PART_SELECTED);
     lv_coord_t font_h         = lv_font_get_line_height(font);
 
     /*Draw the selected*/
@@ -1054,7 +1049,7 @@ static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint1
 
     lv_draw_rect_dsc_t sel_rect;
     lv_draw_rect_dsc_init(&sel_rect);
-    lv_obj_init_draw_rect_dsc(list_obj,  LV_PART_HIGHLIGHT, &sel_rect);
+    lv_obj_init_draw_rect_dsc(list_obj,  LV_PART_SELECTED, &sel_rect);
     lv_draw_rect(&rect_area, clip_area, &sel_rect);
 
     list_obj->state = state_orig;
@@ -1072,9 +1067,9 @@ static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area,
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
-    lv_obj_init_draw_label_dsc(list_obj, LV_PART_HIGHLIGHT, &label_dsc);
+    lv_obj_init_draw_label_dsc(list_obj, LV_PART_SELECTED, &label_dsc);
 
-    label_dsc.line_space = lv_obj_get_style_text_line_space(list_obj, LV_PART_HIGHLIGHT);  /*Line space should come from the list*/
+    label_dsc.line_space = lv_obj_get_style_text_line_space(list_obj, LV_PART_SELECTED);  /*Line space should come from the list*/
 
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
@@ -1183,7 +1178,6 @@ static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
 static void position_to_selected(lv_obj_t * dropdown_obj)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
-    lv_obj_t * list_obj = dropdown->list;
 
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;

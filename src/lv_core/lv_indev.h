@@ -121,7 +121,7 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev);
  * @return LV_SCROLL_DIR_NONE: no scrolling now
  *         LV_SCROLL_DIR_HOR/VER
  */
-lv_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev);
+lv_indev_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev);
 
 /**
  * Get the currently scrolled object (for LV_INDEV_TYPE_POINTER and

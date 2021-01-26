@@ -15,12 +15,11 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stdbool.h>
-#include "../lv_misc/lv_style.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJ_STYLE_CACHE_STATE_INVALID    0x1ff
+#define LV_OBJ_STYLE_CACHE_STATE_INVALID    LV_STATE_ANY
 
 /**********************
  *      TYPEDEFS
@@ -46,8 +45,8 @@ typedef struct {
 typedef struct {
     lv_obj_style_t * styles;
     uint32_t skip_trans :1;
-    uint32_t style_cnt  :6;
-    uint32_t cache_state :9;
+    uint32_t style_cnt  :5;
+    uint32_t cache_state :10;
 
     uint32_t cache_opa_set :1;
     uint32_t cache_radius_zero:1;
@@ -82,107 +81,70 @@ typedef struct {
 void _lv_obj_style_init(void);
 
 /**
- * Add a new style to the style list of an object.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- *             E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param style pointer to a style to add (Only its pointer will be saved)
+ * Add a style to an object.
+ * @param obj:   pointer to an object
+ * @param part:  a part of the object to which the style should be added E.g. `LV_PART_MAIN` or `LV_PART_KNOB`
+ * @param state: a state or combination of states to which the style should be assigned
+ * @param style: pointer to a style to add
+ * @example lv_obj_add_style_no_refresh(slider, LV_PART_KNOB, LV_STATE_PRESSED, &style1);
  */
 void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style);
 
 /**
- * Remove a style from the style list of an object.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- *              E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param style pointer to a style to remove
+ * Add a style to an object.
+ * @param obj:   pointer to an object
+ * @param part:  a part of the object from which the style should be removed E.g. `LV_PART_MAIN` or `LV_PART_KNOB`
+ * @param state: a state or combination of states from which the style should be removed
+ * @param style: pointer to a style to remove
  */
-void lv_obj_remove_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style);
-
-/**
- * Reset a style to the default (empty) state.
- * Release all used memories and cancel pending related transitions.
- * Also notifies the object about the style change.
- * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
- *             E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- */
-void lv_obj_remove_all_styles(struct _lv_obj_t * obj);
+void lv_obj_remove_style(struct _lv_obj_t * objj, uint32_t part, uint32_t state, lv_style_t * style);
 
 /**
  * Notify all object if a style is modified
- * @param style pointer to a style. Only the objects with this style will be notified
+ * @param style: pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
 void lv_obj_report_style_change(lv_style_t * style);
 
-#if LV_USE_ANIMATION
+/**
+ * Notify an object and its children about its style is modified.
+ * @param obj: pointer to an object
+ * @param prop: `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property.
+ *              It is used to optimize what needs to be refreshed.
+ */
+void lv_obj_refresh_style(struct _lv_obj_t * obj,lv_style_prop_t prop);
 
 /**
- * Fade in (from transparent to fully cover) an object and all its children using an `opa_scale` animation.
- * @param obj the object to fade in
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
+ * Get the value of a style property. The current state of the object will be considered.
+ * Inherited properties will be inherited.
+ * If a property is not set a default value will be returned.
+ * @param obj:  pointer to an object
+ * @param part: a part from which the property should be get
+ * @param prop: the property to get
+ * @return the value of the property.
+ *         Should be read from the correct field of the `lv_style_value_t` according to the type of the property.
  */
-void lv_obj_fade_in(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
-
-/**
- * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
- * @param obj the object to fade in
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
- */
-void lv_obj_fade_out(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
-
-#endif
-
 lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, uint8_t part, lv_style_prop_t prop);
 
 /**
- * Notify an object and its children about its style is modified
- * @param obj pointer to an object
- * @param part the part of the object which style property should be refreshed.
- * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
+ * Set local style property on an object's part and state.
+ * @param obj:   pointer to an object
+ * @param part:  a part to which the property should be added
+ * @param state: a state to which the property should be added
+ * @param prop:  the property
+ * @param value: value of the property. The correct element should be set according to the type of the property
  */
-void _lv_obj_refresh_style(struct _lv_obj_t * obj, lv_style_prop_t prop);
-
-lv_style_t * lv_obj_get_local_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state);
-/**
- * Remove all transitions from an object
- * @param obj pointer to an object
- */
-void _lv_obj_remove_style_trans(struct _lv_obj_t * obj);
-void lv_obj_set_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t value);
-
-#if LV_USE_ANIMATION
+void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t value);
 
 /**
- * Allocate and initialize a transition for a property of an object if the properties value is different in the new state.
- * It allocates `lv_style_trans_t` in `_lv_obj_style_trans_ll` and set only `start/end_values`. No animation will be created here.
- * @param obj and object to add the transition
- * @param prop the property to apply the transaction
- * @param part the part of the object to apply the transaction
- * @param prev_state the previous state of the objects
- * @param new_state the new state of the object
- * @param time duration of transition in [ms]
- * @param delay delay before starting the transition in [ms]
- * @param path the path of the transition
- * @return pointer to the allocated `the transaction` variable or `NULL` if no transition created
+ * Remove a local style property from a part of an object with a given state.
+ * @param obj:   pointer to an object
+ * @param part:  the part of the object which style property should be removed.
+ * @param state: the state from which the property should be removed.
+ * @param prop:  a style property to remove.
+ * @return true: the property was found and removed; false: the property was not found
  */
-void _lv_obj_create_style_transition(struct _lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
-                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path);
-
-#endif
-
-/**
- * Compare the style properties of an object in 2 different states
- * @param obj pointer to an object
- * @param state1 a state
- * @param state2 an other state
- * @return an element of `_lv_style_state_cmp_t`
- */
-_lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
-
+bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop);
 
 /*********************
  * OBJ STYLE GET
