@@ -362,6 +362,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
                       draw_dsc->blend_mode);
     }
+#if LV_DRAW_COMPLEX
+
 #if LV_USE_GPU_NXP_PXP
     /* Simple case without masking and transformations */
     else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
@@ -637,6 +639,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             lv_mem_buf_release(map2);
         }
     }
+#endif
 }
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg)

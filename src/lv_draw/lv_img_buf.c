@@ -410,7 +410,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
     }
 }
 
-#if LV_USE_IMG_TRANSFORM
+#if LV_DRAW_COMPLEX
 /**
  * Initialize a descriptor to transform an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
@@ -474,7 +474,7 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                       const lv_point_t * pivot)
 {
-#if LV_USE_IMG_TRANSFORM
+#if LV_DRAW_COMPLEX
     if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
         res->x1 = 0;
         res->y1 = 0;
@@ -556,7 +556,8 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
 #endif
 }
 
-#if LV_USE_IMG_TRANSFORM
+
+#if LV_DRAW_COMPLEX
 /**
  * Get which color and opa would come to a pixel if it were rotated
  * @param dsc a descriptor initialized by `lv_img_buf_rotate_init`

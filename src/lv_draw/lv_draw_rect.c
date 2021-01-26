@@ -35,10 +35,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv
 LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip,
                                               const lv_draw_rect_dsc_t * dsc);
 
-#if LV_USE_OUTLINE
-    static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
-#endif
-#if LV_USE_SHADOW
+static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
+
+#if LV_USE_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
                                               const lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s,
@@ -46,13 +45,13 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
 #endif
 
-#if LV_USE_PATTERN
-    static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
-#endif
+static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 
 static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * area_outer, const lv_area_t * clip,
                              lv_coord_t radius, bool radius_is_in, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+#if LV_USE_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -100,7 +99,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
-#if LV_USE_SHADOW
+#if LV_DRAW_COMPLEX
     draw_shadow(coords, clip, dsc);
 #endif
 
@@ -163,10 +162,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    int32_t draw_area_w = lv_area_get_width(&draw_area);
-
-    /*Create a mask if there is a radius*/
-    lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
     lv_grad_dir_t grad_dir = dsc->bg_grad_dir;
     if(dsc->bg_color.full == dsc->bg_grad_color.full) grad_dir = LV_GRAD_DIR_NONE;
@@ -176,7 +171,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     if(other_mask_cnt) simple_mode = false;
     else if(grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
 
-    int16_t mask_rout_id = LV_MASK_ID_INV;
 
     int32_t coords_w = lv_area_get_width(&coords_bg);
     int32_t coords_h = lv_area_get_height(&coords_bg);
@@ -192,10 +186,16 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
                        dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
                        dsc->blend_mode);
     }
+
+#if LV_DRAW_COMPLEX
     /*More complex case: there is a radius, gradient or other mask.*/
     else {
+        int32_t draw_area_w = lv_area_get_width(&draw_area);
+        int16_t mask_rout_id = LV_MASK_ID_INV;
+        lv_opa_t * mask_buf = NULL;
         lv_draw_mask_radius_param_t mask_rout_param;
         if(rout > 0) {
+            mask_buf = lv_mem_buf_get(draw_area_w);
             lv_draw_mask_radius_init(&mask_rout_param, &coords_bg, rout, false);
             mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
         }
@@ -205,8 +205,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         lv_draw_mask_res_t mask_res = LV_DRAW_MASK_RES_FULL_COVER;
         lv_color_t grad_color = dsc->bg_color;
 
-        lv_color_t * grad_map = NULL;
         /*In case of horizontal gradient pre-compute a line with a gradient*/
+        lv_color_t * grad_map = NULL;
         if(grad_dir == LV_GRAD_DIR_HOR) {
             grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
 
@@ -335,12 +335,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         }
 
         if(grad_map) lv_mem_buf_release(grad_map);
+        if(mask_buf) lv_mem_buf_release(mask_buf);
+        lv_draw_mask_remove_id(mask_rout_id);
     }
 
-    lv_draw_mask_remove_id(mask_rout_id);
-
-    lv_mem_buf_release(mask_buf);
-
+#endif
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv_area_t * clip,
@@ -416,6 +415,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         draw_full_border(&area_inner, coords, clip, dsc->radius, false, dsc->border_color, dsc->border_opa,
                          dsc->blend_mode);
     }
+#if LV_DRAW_COMPLEX
     else {
         lv_opa_t opa = dsc->border_opa;
         if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -507,8 +507,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         lv_draw_mask_remove_id(mask_rout_id);
         lv_mem_buf_release(mask_buf);
     }
+#endif /*LV_DRAW_COMPLEX*/
 }
 
+#if LV_DRAW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i)
 {
     int32_t min = (dsc->bg_main_color_stop * s) >> 8;
@@ -524,7 +526,6 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
     return lv_color_mix(dsc->bg_grad_color, dsc->bg_color, mix);
 }
 
-#if LV_USE_SHADOW
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
                                               const lv_draw_rect_dsc_t * dsc)
 {
@@ -1152,7 +1153,6 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 
 #endif
 
-#if LV_USE_OUTLINE
 static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->outline_opa <= LV_OPA_MIN) return;
@@ -1181,15 +1181,21 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const
     draw_full_border(&area_inner, &area_outer, clip, dsc->radius, true, dsc->outline_color, dsc->outline_opa,
                      dsc->blend_mode);
 }
-#endif
 
-#if LV_USE_PATTERN
 static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->content_text == NULL) return;
     if(dsc->content_opa == LV_OPA_MIN) return;
 
     lv_draw_label_dsc_t label_dsc;
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    size_t len = _lv_txt_ap_calc_bytes_cnt(dsc->content_text) + 1;
+    const char * txt = txt = lv_mem_buf_get(len);
+    _lv_txt_ap_proc(dsc->content_text, txt);
+#else
+    const char * txt = dsc->content_text;
+#endif
 
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.color = dsc->content_color;
@@ -1204,7 +1210,6 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
     if(s.x == 0 || s.y == 0) return;
 
     lv_area_t coords_tmp;
-    lv_draw_mask_radius_param_t radius_mask_param;
 
     coords_tmp.x1 = 0;
     coords_tmp.y1 = 0;
@@ -1222,15 +1227,16 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
     lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->content_text, NULL);
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    lv_mem_buf_release(str);
+    lv_mem_buf_release(txt);
 #endif
 }
-#endif
 
 
 static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * area_outer, const lv_area_t * clip,
                              lv_coord_t radius, bool radius_is_in, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
+
+#if LV_DRAW_COMPLEX
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
     bool simple_mode = true;
     if(other_mask_cnt) simple_mode = false;
@@ -1411,4 +1417,5 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     lv_draw_mask_remove_id(mask_rin_id);
     lv_draw_mask_remove_id(mask_rout_id);
     lv_mem_buf_release(mask_buf);
+#endif /*LV_DRAW_COMPLEX*/
 }

@@ -24,9 +24,11 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
                                                  const lv_area_t * clip,
                                                  const lv_draw_line_dsc_t * dsc);
+
 LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
                                                 const lv_draw_line_dsc_t * dsc);
@@ -149,6 +151,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
                        dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
                        dsc->blend_mode);
     }
+#if LV_DRAW_COMPLEX
     /*If there other mask apply it*/
     else {
         /* Get clipped fill area which is the real draw area.
@@ -214,6 +217,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
         }
         lv_mem_buf_release(mask_buf);
     }
+#endif /*LV_DRAW_COMPLEX*/
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
@@ -249,6 +253,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
                        dsc->color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
                        dsc->blend_mode);
     }
+
+#if LV_DRAW_COMPLEX
     /*If there other mask apply it*/
     else {
         /* Get clipped fill area which is the real draw area.
@@ -308,12 +314,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
         }
         lv_mem_buf_release(mask_buf);
     }
+#endif /*LV_DRAW_COMPLEX*/
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
                                                  const lv_area_t * clip,
                                                  const lv_draw_line_dsc_t * dsc)
 {
+#if LV_DRAW_COMPLEX
     /*Keep the great y in p1*/
     lv_point_t p1;
     lv_point_t p2;
@@ -475,4 +483,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     lv_draw_mask_remove_id(mask_right_id);
     lv_draw_mask_remove_id(mask_top_id);
     lv_draw_mask_remove_id(mask_bottom_id);
+#else
+    LV_LOG_WARN("Can't draw skewed line with LV_DRAW_COMPLEX == 0");
+#endif /*LV_DRAW_COMPLEX*/
 }
+

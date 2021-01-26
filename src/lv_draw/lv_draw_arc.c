@@ -10,6 +10,7 @@
 #include "lv_draw_rect.h"
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_log.h"
 
 /*********************
  *      DEFINES
@@ -37,11 +38,13 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_DRAW_COMPLEX
 static void draw_quarter_0(quarter_draw_dsc_t * q);
 static void draw_quarter_1(quarter_draw_dsc_t * q);
 static void draw_quarter_2(quarter_draw_dsc_t * q);
 static void draw_quarter_3(quarter_draw_dsc_t * q);
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness, lv_area_t * res_area);
+#endif /*LV_DRAW_COMPLEX*/
 
 /**********************
  *  STATIC VARIABLES
@@ -77,6 +80,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
                  const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {
+#if LV_DRAW_COMPLEX
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
     if(start_angle == end_angle) return;
@@ -197,12 +201,16 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
             lv_draw_mask_remove_id(mask_end_id);
         }
     }
+#else
+    LV_LOG_WARN("Can't draw arc with LV_DRAW_COMPLEX == 0");
+#endif /*LV_DRAW_COMPLEX*/
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+#if LV_DRAW_COMPLEX
 static void draw_quarter_0(quarter_draw_dsc_t * q)
 {
     lv_area_t quarter_area;
@@ -452,3 +460,5 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness
         res_area->y2 = cir_y + thick_half - thick_corr;
     }
 }
+
+#endif /*LV_DRAW_COMPLEX*/

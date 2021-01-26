@@ -153,17 +153,11 @@ void lv_mem_deinit(void)
  */
 void * lv_mem_alloc(size_t size)
 {
-
-
-    if(size == 0) {
-        printf("alloc: 0\n");
-        return &zero_mem;
-    }
+    if(size == 0) return &zero_mem;
 
     /*Round the size up to ALIGN_MASK*/
     size = (size + ALIGN_MASK) & (~ALIGN_MASK);
     void * alloc = NULL;
-    printf("alloc: %d\n", size);
 
 #if LV_MEM_CUSTOM == 0
     alloc = alloc_core(size);
@@ -221,17 +215,13 @@ void * lv_mem_alloc(size_t size)
  */
 void lv_mem_free(const void * data)
 {
-    if(data == &zero_mem) {
-        printf("free: %d\n", 0);
-        return;
-    }
+    if(data == &zero_mem) return;
     if(data == NULL) return;
 
 
 #if LV_ENABLE_GC == 0
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
-    printf("free: %d\n", e->header.s.d_size);
 #  if LV_MEM_ADD_JUNK
     lv_memset((void *)data, 0xbb, lv_mem_get_size(data));
 #  endif
@@ -793,21 +783,12 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
  */
 static inline void * ent_alloc(lv_mem_ent_t * e, size_t size)
 {
-//    static uint32_t cnt = 0;
-//
-////    if((cnt & 0xFFFF) == 0)
-//        printf("alloc: %d\n", cnt);
-//    cnt++;
-//
+    /*Truncate the entry to the desired size */
+    ent_trunc(e, size);
+    e->header.s.used = 1;
 
-
-        /*Truncate the entry to the desired size */
-        ent_trunc(e, size);
-        e->header.s.used = 1;
-
-        /*Save the allocated data*/
-        return &e->first_data;
-
+    /*Save the allocated data*/
+    return &e->first_data;
 }
 
 /**

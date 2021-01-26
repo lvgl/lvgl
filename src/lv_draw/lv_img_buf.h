@@ -263,7 +263,7 @@ void lv_img_buf_free(lv_img_dsc_t * dsc);
  */
 uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
-#if LV_USE_IMG_TRANSFORM
+#if LV_DRAW_COMPLEX
 /**
  * Initialize a descriptor to rotate an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized

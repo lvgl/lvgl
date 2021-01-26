@@ -543,7 +543,7 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DRAW_RES_NOT_COVER;
         }
 
-#if LV_USE_BLEND_MODES
+#if LV_DRAW_COMPLEX
         if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
 #endif
 

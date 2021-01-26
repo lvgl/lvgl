@@ -51,7 +51,7 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
  */
 enum {
     LV_BLEND_MODE_NORMAL,     /**< Simply mix according to the opacity value*/
-#if LV_USE_BLEND_MODES
+#if LV_DRAW_COMPLEX
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
 #endif

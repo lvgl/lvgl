@@ -6,6 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
+#if LV_DRAW_COMPLEX
+
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
@@ -1230,3 +1233,5 @@ LV_ATTRIBUTE_FAST_MEM static inline void sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_
     q->i = d >> 4;
     q->f = (d & 0xF) << 4;
 }
+
+#endif /*LV_DRAW_COMPLEX*/

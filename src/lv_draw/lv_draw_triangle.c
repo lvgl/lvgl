@@ -42,7 +42,11 @@
  */
 void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area, const lv_draw_rect_dsc_t * draw_dsc)
 {
+#if LV_DRAW_COMPLEX
     lv_draw_polygon(points, 3, clip_area, draw_dsc);
+#else
+    LV_LOG_WARN("Can't draw triangle with LV_DRAW_COMPLEX == 0");
+#endif /*LV_DRAW_COMPLEX*/
 }
 
 /**
@@ -55,6 +59,7 @@ void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area, co
 void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
                      const lv_draw_rect_dsc_t * draw_dsc)
 {
+#if LV_DRAW_COMPLEX
     if(point_cnt < 3) return;
     if(points == NULL) return;
 
@@ -193,7 +198,9 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
 
     lv_mem_buf_release(mp);
     lv_mem_buf_release(p);
-
+#else
+    LV_LOG_WARN("Can't draw polygon with LV_DRAW_COMPLEX == 0");
+#endif /*LV_DRAW_COMPLEX*/
 }
 
 /**********************

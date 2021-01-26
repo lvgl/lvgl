@@ -357,6 +357,19 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data);
 void * lv_event_get_data(void);
 
 /**
+ * Register a new, custom event ID.
+ * It can be used the same way as e.g. `LV_EVENT_CLICKED` to send custom events
+ * @return the new event id
+ * @example
+ * uint32_t LV_EVENT_MINE = 0;
+ * ...
+ * e = lv_event_register_id();
+ * ...
+ * lv_event_send(obj, LV_EVENT_MINE, &some_data);
+ */
+uint32_t lv_event_register_id(void);
+
+/**
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.

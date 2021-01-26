@@ -249,10 +249,16 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data)
     return res;
 }
 
-
 void * lv_event_get_data(void)
 {
     return event_act_data;
+}
+
+uint32_t lv_event_register_id(void)
+{
+    static uint32_t last_id = _LV_EVENT_LAST;
+    last_id ++;
+    return last_id;
 }
 
 /**
@@ -689,7 +695,7 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
 
         if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
 
-#if LV_USE_BLEND_MODES
+#if LV_DRAW_COMPLEX
         if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
 #endif
         if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
@@ -718,6 +724,7 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
 
         lv_draw_rect(&coords, clip_area, &draw_dsc);
 
+#if LV_DRAW_COMPLEX
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
             lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
@@ -725,14 +732,17 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
         }
+#endif
     }
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
         draw_scrollbar(obj, clip_area);
 
+#if LV_DRAW_COMPLEX
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
             lv_mem_buf_release(param);
         }
+#endif
 
         /*If the border is drawn later disable loading other properties*/
         if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
@@ -916,6 +926,7 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         }
     }
 
+#if LV_DRAW_COMPLEX
     lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
     if(opa < LV_OPA_MAX) {
         dsc->bg_opa = (dsc->bg_opa * opa) >> 8;
@@ -928,6 +939,10 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
     } else {
         return LV_RES_INV;
     }
+#else
+    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) return LV_RES_OK;
+    else return LV_RES_INV;
+#endif
 }
 
 

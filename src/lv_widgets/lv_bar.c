@@ -477,9 +477,11 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         draw_indic_dsc.content_opa = content_opa;
     }
 
+#if LV_DRAW_COMPLEX
     lv_draw_mask_radius_param_t mask_bg_param;
     lv_draw_mask_radius_init(&mask_bg_param, &bar_coords, bg_radius, false);
     int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
+#endif
 
     /*Draw_only the background and the pattern*/
     lv_opa_t shadow_opa = draw_indic_dsc.shadow_opa;
@@ -505,11 +507,12 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         mask_indic_max_area.x2 = mask_indic_max_area.x1 + LV_BAR_SIZE_MIN;
     }
 
+#if LV_DRAW_COMPLEX
     /*Create a mask to the current indicator area to see only this part from the whole gradient.*/
     lv_draw_mask_radius_param_t mask_indic_param;
     lv_draw_mask_radius_init(&mask_indic_param, &bar->indic_area, draw_indic_dsc.radius, false);
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
-
+#endif
     lv_draw_rect(&mask_indic_max_area, clip_area, &draw_indic_dsc);
     draw_indic_dsc.border_opa = border_opa;
     draw_indic_dsc.shadow_opa = shadow_opa;
@@ -521,8 +524,10 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     draw_indic_dsc.content_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
+#if LV_DRAW_COMPLEX
     lv_draw_mask_remove_id(mask_indic_id);
     lv_draw_mask_remove_id(mask_bg_id);
+#endif
 
     /*When not masks draw the value*/
     draw_indic_dsc.content_opa = content_opa;

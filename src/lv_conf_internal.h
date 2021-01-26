@@ -420,15 +420,6 @@
 #  endif
 #endif
 
-/* 1: Use other blend modes than normal (`LV_BLEND_MODE_...`)*/
-#ifndef LV_USE_BLEND_MODES
-#  ifdef CONFIG_LV_USE_BLEND_MODES
-#    define LV_USE_BLEND_MODES CONFIG_LV_USE_BLEND_MODES
-#  else
-#    define  LV_USE_BLEND_MODES      1
-#  endif
-#endif
-
 /* 1: Use the `opa_scale` style property to set the opacity of an object and its children at once*/
 #ifndef LV_USE_OPA_SCALE
 #  ifdef CONFIG_LV_USE_OPA_SCALE
