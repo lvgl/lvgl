@@ -48,6 +48,8 @@ typedef struct font_header_bin {
     uint8_t compression_id;
     uint8_t subpixels_mode;
     uint8_t padding;
+    int16_t underline_position;
+    uint16_t underline_thickness;
 } font_header_bin_t;
 
 typedef struct cmap_table_bin {
@@ -500,6 +502,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font->get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt;
     font->get_glyph_bitmap = lv_font_get_bitmap_fmt_txt;
     font->subpx = font_header.subpixels_mode;
+    font->underline_position = font_header.underline_position;
+    font->underline_thickness = font_header.underline_thickness;
 
     font_dsc->bpp = font_header.bits_per_pixel;
     font_dsc->kern_scale = font_header.kerning_scale;
