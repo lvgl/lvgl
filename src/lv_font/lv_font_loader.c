@@ -245,16 +245,8 @@ static int read_label(lv_fs_file_t * fp, int start, const char * label)
 static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
                               uint32_t cmaps_start, cmap_table_bin_t * cmap_table)
 {
-    for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
-        if(lv_fs_read(fp, &cmap_table[i], sizeof(cmap_table_bin_t), NULL) != LV_FS_RES_OK) {
-            return false;
-        }
-
-        lv_font_fmt_txt_cmap_t * cmap = (lv_font_fmt_txt_cmap_t *) & (font_dsc->cmaps[i]);
-
-        cmap->range_start = cmap_table[i].range_start;
-        cmap->range_length = cmap_table[i].range_length;
-        cmap->glyph_id_start = cmap_table[i].glyph_id_start;
+    if(lv_fs_read(fp, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t), NULL) != LV_FS_RES_OK) {
+        return false;
     }
 
     for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
@@ -265,6 +257,9 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
         lv_font_fmt_txt_cmap_t * cmap = (lv_font_fmt_txt_cmap_t *) & (font_dsc->cmaps[i]);
 
+        cmap->range_start = cmap_table[i].range_start;
+        cmap->range_length = cmap_table[i].range_length;
+        cmap->glyph_id_start = cmap_table[i].glyph_id_start;
         cmap->type = cmap_table[i].format_type;
 
         switch(cmap_table[i].format_type) {
