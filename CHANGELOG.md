@@ -2,6 +2,10 @@
 
 ## v7.9.1 (Planned at 19.01.2020)
 
+### New features
+
+- feat(indev) allow input events to be passed to disabled objects 
+
 ### Bugfixes
 - fix(cpicker) fix division by zero
 - fix(dropdown) fix selecting options after the last one
