@@ -177,7 +177,7 @@ enum {
     LV_PROTECT_PRESS_LOST = 0x10,  /**< If the `indev` was pressing this object but swiped out while
                                       pressing do not search other object.*/
     LV_PROTECT_CLICK_FOCUS = 0x20, /**< Prevent focusing the object by clicking on it*/
-	LV_PROTECT_EVENT_TO_DISABLED = 0x40, /**< Pass events even to disabled objects*/
+    LV_PROTECT_EVENT_TO_DISABLED = 0x40, /**< Pass events even to disabled objects*/
 };
 typedef uint8_t lv_protect_t;
 
