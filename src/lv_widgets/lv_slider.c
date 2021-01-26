@@ -307,7 +307,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         slider->dragging = false;
         slider->value_to_set = NULL;
 
-#if LV_USE_GROUP
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
         lv_group_t * g             = lv_obj_get_group(slider);
         bool editing               = lv_group_get_editing(g);
@@ -326,7 +325,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 }
             }
         }
-#endif
 
     }
     else if(sign == LV_SIGNAL_FOCUS) {
@@ -361,7 +359,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-#if LV_USE_GROUP
         char c = *((char *)param);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -378,7 +375,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
-#endif
     }
 
     return res;

@@ -80,9 +80,7 @@ void _lv_refr_init(void)
  */
 void lv_refr_now(lv_disp_t * disp)
 {
-#if LV_USE_ANIMATION
     lv_anim_refr_now();
-#endif
 
     if(disp) {
         _lv_disp_refr_task(disp->read_task);

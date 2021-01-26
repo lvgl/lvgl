@@ -680,15 +680,13 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
        arc->dragging = false;
 
-#if LV_USE_GROUP
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
-        lv_group_t * g             = lv_obj_get_group(arc);
+        lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) lv_group_set_editing(g, false);
         }
-#endif
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {

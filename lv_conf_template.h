@@ -181,12 +181,6 @@ typedef void * lv_anim_user_data_t;
 /* 1: Use image zoom and rotation*/
 #define LV_USE_IMG_TRANSFORM    1
 
-/* 1: Enable object groups (for keyboard/encoder navigation) */
-#define LV_USE_GROUP            1
-#if LV_USE_GROUP
-typedef void * lv_group_user_data_t;
-#endif  /*LV_USE_GROUP*/
-
 /* 1: Enable GPU interface*/
 #define LV_USE_GPU              1   /*Only enables `gpu_fill_cb` and `gpu_blend_cb` in the disp. drv- */
 #define LV_USE_GPU_STM32_DMA2D  0

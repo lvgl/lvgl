@@ -21,11 +21,6 @@
  *********************/
 #define LV_OBJX_NAME "lv_roller"
 
-#if LV_USE_ANIMATION == 0
-    #undef LV_ROLLER_DEF_ANIM_TIME
-    #define LV_ROLLER_DEF_ANIM_TIME 0 /*No animation*/
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -46,9 +41,7 @@ static lv_res_t release_handler(lv_obj_t * obj);
 static void inf_normalize(lv_obj_t * obj_scrl);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 static lv_coord_t get_selected_label_width(const lv_obj_t * obj);
-#if LV_USE_ANIMATION
-    static void scroll_anim_ready_cb(lv_anim_t * a);
-#endif
+static void scroll_anim_ready_cb(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -159,10 +152,6 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_USE_ANIMATION == 0
-    anim = LV_ANIM_OFF;
-#endif
 
     /* Set the value even if it's the same as the current value because
      * if moving to the next option with an animation which was just deleted in the PRESS signal
@@ -551,9 +540,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_PRESSED) {
         roller->moved = 0;
-#if LV_USE_ANIMATION
         lv_anim_del(get_label(obj), (lv_anim_exec_xcb_t)lv_obj_set_y);
-#endif
     }
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
@@ -569,7 +556,6 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         release_handler(obj);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
-#if LV_USE_GROUP
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -578,7 +564,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*In navigate mode revert the original value*/
             if(!editing) {
-                if(obj->sel_opt_id != roller->sel_opt_id_ori) {
+                if(roller->sel_opt_id != roller->sel_opt_id_ori) {
                     roller->sel_opt_id = roller->sel_opt_id_ori;
                     refr_position(obj, true);
                 }
@@ -592,36 +578,31 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             roller->sel_opt_id_ori = roller->sel_opt_id; /*Save the current value. Used to revert this state if
                                                                     ENTER won't be pressed*/
         }
-#endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
-#if LV_USE_GROUP
         /*Revert the original state*/
-        if(obj->sel_opt_id != roller->sel_opt_id_ori) {
+        if(roller->sel_opt_id != roller->sel_opt_id_ori) {
             roller->sel_opt_id = roller->sel_opt_id_ori;
             refr_position(obj, true);
         }
-#endif
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
-            if(obj->sel_opt_id + 1 < roller->option_cnt) {
+            if(roller->sel_opt_id + 1 < roller->option_cnt) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
                 lv_roller_set_selected(obj, roller->sel_opt_id + 1, true);
                 roller->sel_opt_id_ori = ori_id;
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
-            if(obj->sel_opt_id > 0) {
+            if(roller->sel_opt_id > 0) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
 
                 lv_roller_set_selected(obj, roller->sel_opt_id - 1, true);
                 roller->sel_opt_id_ori = ori_id;
             }
         }
-#endif
     }
 
     return res;
@@ -664,10 +645,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return;
 
-#if LV_USE_ANIMATION == 0
-    anim_en = LV_ANIM_OFF;
-#endif
-
     lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
     switch(align) {
     case LV_TEXT_ALIGN_CENTER:
@@ -703,13 +680,10 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_coord_t new_y = mid_y1 - sel_y1;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
-#if LV_USE_ANIMATION
         lv_anim_del(label, (lv_anim_exec_xcb_t)lv_obj_set_y);
-#endif
         lv_obj_set_y(label, new_y);
     }
     else {
-#if LV_USE_ANIMATION
         lv_anim_path_t path;
         lv_anim_path_init(&path);
         lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
@@ -722,7 +696,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
         lv_anim_set_path(&a, &path);
         lv_anim_start(&a);
-#endif
     }
 }
 
@@ -735,7 +708,6 @@ static lv_res_t release_handler(lv_obj_t * obj)
     lv_indev_t * indev = lv_indev_get_act();
     lv_roller_t * roller = (lv_roller_t*)obj;
 
-#if LV_USE_GROUP
     /*Leave edit mode once a new option is selected*/
     lv_indev_type_t indev_type = lv_indev_get_type(indev);
     if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
@@ -748,7 +720,6 @@ static lv_res_t release_handler(lv_obj_t * obj)
             }
         }
     }
-#endif
 
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
         /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
@@ -852,12 +823,9 @@ static lv_coord_t get_selected_label_width(const lv_obj_t * obj)
     return size.x;
 }
 
-#if LV_USE_ANIMATION
 static void scroll_anim_ready_cb(lv_anim_t * a)
 {
     lv_obj_t * obj = lv_obj_get_parent(a->var); /*The label is animated*/
     inf_normalize(obj);
 }
-#endif
-
 #endif

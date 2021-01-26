@@ -26,11 +26,6 @@
  *********************/
 #define LV_OBJX_NAME "lv_dropdown"
 
-#if LV_USE_ANIMATION == 0
-    #undef LV_DROPDOWN_DEF_ANIM_TIME
-    #define LV_DROPDOWN_DEF_ANIM_TIME 0 /*No animation*/
-#endif
-
 #define LV_DROPDOWN_PR_NONE 0xFFFF
 
 /**********************
@@ -901,20 +896,18 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     if(sign == LV_SIGNAL_FOCUS) {
-#if LV_USE_GROUP
-        lv_group_t * g             = lv_obj_get_group(ddlist);
+        lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*Open the list if editing*/
-            if(editing) lv_dropdown_open(ddlist);
+            if(editing) lv_dropdown_open(obj);
             /*Close the list if navigating*/
             else
-                lv_dropdown_close(ddlist);
+                lv_dropdown_close(obj);
         }
-#endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
         lv_dropdown_close(obj);
@@ -931,12 +924,10 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
                     if(res != LV_RES_OK) return res;
                     lv_obj_invalidate(obj);
                 }
-#if LV_USE_GROUP
                 lv_indev_type_t indev_type = lv_indev_get_type(indev);
                 if(indev_type == LV_INDEV_TYPE_ENCODER) {
-                    lv_group_set_editing(lv_obj_get_group(ddlist), false);
+                    lv_group_set_editing(lv_obj_get_group(obj), false);
                 }
-#endif
             }
             else {
                 lv_dropdown_open(obj);
@@ -957,32 +948,30 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         lv_obj_set_height(obj, top + bottom + lv_font_get_line_height(font));
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(dropdown->list == NULL) {
-                lv_dropdown_open(ddlist);
+                lv_dropdown_open(obj);
             }
             else if(dropdown->sel_opt_id + 1 < dropdown->option_cnt) {
                 dropdown->sel_opt_id++;
-                position_to_selected(ddlist);
+                position_to_selected(obj);
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
 
             if(dropdown->list == NULL) {
-                lv_dropdown_open(ddlist);
+                lv_dropdown_open(obj);
             }
             else if(dropdown->sel_opt_id > 0) {
                 dropdown->sel_opt_id--;
-                position_to_selected(ddlist);
+                position_to_selected(obj);
             }
         }
         else if(c == LV_KEY_ESC) {
             dropdown->sel_opt_id = dropdown->sel_opt_id_orig;
-            lv_dropdown_close(ddlist);
+            lv_dropdown_close(obj);
         }
-#endif
     }
 
     return res;
@@ -1105,16 +1094,14 @@ static lv_res_t list_release_handler(lv_obj_t * list_obj)
     lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
 
     lv_indev_t * indev = lv_indev_get_act();
-#if LV_USE_GROUP
     /*Leave edit mode once a new item is selected*/
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
         dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
-        lv_group_t * g      = lv_obj_get_group(ddlist);
+        lv_group_t * g      = lv_obj_get_group(dropdown_obj);
         if(lv_group_get_editing(g)) {
             lv_group_set_editing(g, false);
         }
     }
-#endif
 
     /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {

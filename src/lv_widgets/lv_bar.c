@@ -23,12 +23,9 @@
 
 #define LV_BAR_SIZE_MIN  4   /*hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
 
-#if LV_USE_ANIMATION
-    #define LV_BAR_IS_ANIMATING(anim_struct) (((anim_struct).anim_state) != LV_BAR_ANIM_STATE_INV)
-    #define LV_BAR_GET_ANIM_VALUE(orig_value, anim_struct) (LV_BAR_IS_ANIMATING(anim_struct) ? ((anim_struct).anim_end) : (orig_value))
-#else
-    #define LV_BAR_GET_ANIM_VALUE(orig_value, anim_struct) (orig_value)
-#endif
+#define LV_BAR_IS_ANIMATING(anim_struct) (((anim_struct).anim_state) != LV_BAR_ANIM_STATE_INV)
+#define LV_BAR_GET_ANIM_VALUE(orig_value, anim_struct) (LV_BAR_IS_ANIMATING(anim_struct) ? ((anim_struct).anim_end) : (orig_value))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -42,13 +39,11 @@ static lv_draw_res_t lv_bar_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 
-#if LV_USE_ANIMATION
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(lv_bar_anim_t * bar, lv_anim_value_t value);
 static void lv_bar_anim_ready(lv_anim_t * a);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -102,13 +97,7 @@ void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
     value = value < bar->start_value ? bar->start_value : value; /*Can be smaller then the left value*/
 
     if(bar->cur_value == value) return;
-#if LV_USE_ANIMATION == 0
-    LV_UNUSED(anim);
-    bar->cur_value = value;
-    lv_obj_invalidate(bar);
-#else
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
-#endif
 }
 
 /**
@@ -129,12 +118,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int16_t start_value, lv_anim_enable_
     new_value = new_value > bar->cur_value ? bar->cur_value : new_value;
 
     if(bar->start_value == new_value) return;
-#if LV_USE_ANIMATION == 0
-    LV_UNUSED(anim);
-    bar->start_value = new_value;
-#else
     lv_bar_set_value_with_anim(obj, new_value, &bar->start_value, &bar->start_value_anim, anim);
-#endif
 }
 
 /**
@@ -272,10 +256,8 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     bar->cur_value = 0;
     bar->type         = LV_BAR_TYPE_NORMAL;
 
-#if LV_USE_ANIMATION
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);
-#endif
 
    if(copy == NULL) {
        lv_obj_clear_flag(obj, LV_OBJ_FLAG_CHECKABLE);
@@ -401,7 +383,6 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         indic_length_calc = lv_area_get_height;
     }
 
-#if LV_USE_ANIMATION
     if(LV_BAR_IS_ANIMATING(bar->start_value_anim)) {
         lv_coord_t anim_start_value_start_x =
             (int32_t)((int32_t)anim_length * (bar->start_value_anim.anim_start - bar->min_value)) / range;
@@ -414,12 +395,10 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         anim_start_value_x += anim_start_value_start_x;
     }
     else
-#endif
     {
         anim_start_value_x = (int32_t)((int32_t)anim_length * (bar->start_value - bar->min_value)) / range;
     }
 
-#if LV_USE_ANIMATION
     if(LV_BAR_IS_ANIMATING(bar->cur_value_anim)) {
         lv_coord_t anim_cur_value_start_x =
             (int32_t)((int32_t)anim_length * (bar->cur_value_anim.anim_start - bar->min_value)) / range;
@@ -431,7 +410,6 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
                                                      LV_BAR_ANIM_STATE_END);
     }
     else
-#endif
     {
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (bar->cur_value - bar->min_value)) / range;
     }
@@ -580,7 +558,6 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-#if LV_USE_ANIMATION
 static void lv_bar_anim(lv_bar_anim_t * var, lv_anim_value_t value)
 {
     var->anim_state    = value;
@@ -641,6 +618,5 @@ static void lv_bar_init_anim(lv_obj_t * obj, lv_bar_anim_t * bar_anim)
     bar_anim->anim_end = 0;
     bar_anim->anim_state = LV_BAR_ANIM_STATE_INV;
 }
-#endif
 
 #endif

@@ -49,14 +49,12 @@ enum {
 };
 typedef uint8_t lv_bar_type_t;
 
-#if LV_USE_ANIMATION
 typedef struct {
     lv_obj_t * bar;
     lv_anim_value_t anim_start;
     lv_anim_value_t anim_end;
     lv_anim_value_t anim_state;
 } lv_bar_anim_t;
-#endif
 
 typedef struct {
     lv_obj_t obj;
@@ -65,10 +63,8 @@ typedef struct {
     int16_t max_value; /*Maximum value of the bar*/
     int16_t start_value; /*Start value of the bar*/
     lv_area_t indic_area;   /*Save the indicator area. Might be used by derived types*/
-#if LV_USE_ANIMATION
     lv_bar_anim_t cur_value_anim;
     lv_bar_anim_t start_value_anim;
-#endif
     uint8_t type : 2;           /*Type of bar*/
 }lv_bar_t;
 

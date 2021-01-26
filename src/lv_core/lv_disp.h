@@ -99,7 +99,6 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
  */
 void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
 
-#if LV_USE_ANIMATION
 
 /**
  * Switch screen with animation
@@ -111,7 +110,6 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
  */
 void lv_scr_load_anim(lv_obj_t * scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool auto_del);
 
-#endif
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
  * @param disp pointer to an display (NULL to get the overall smallest inactivity)

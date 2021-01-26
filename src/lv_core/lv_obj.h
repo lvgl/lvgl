@@ -91,6 +91,9 @@ typedef enum {
     LV_EVENT_DRAW_PART_BEGIN,
     LV_EVENT_DRAW_PART_END,
 
+    LV_EVENT_READY,             /**< A process has finished */
+    LV_EVENT_CANCEL,             /**< A process has been cancelled */
+
     _LV_EVENT_LAST /** Number of default events*/
 }lv_event_t;
 
@@ -153,7 +156,7 @@ enum {
     LV_STATE_DEFAULT     =  0x00,
     LV_STATE_CHECKED     =  0x01,
     LV_STATE_FOCUSED     =  0x02,
-    LV_STATE_KEY_FOCUSED =  0x04,
+    LV_STATE_FOCUS_GROUP =  0x04,
     LV_STATE_EDITED      =  0x08,
     LV_STATE_HOVERED     =  0x10,
     LV_STATE_PRESSED     =  0x20,
@@ -233,6 +236,7 @@ typedef uint32_t lv_obj_flag_t;
 #include "lv_obj_style.h"
 #include "lv_obj_draw.h"
 #include "lv_grid.h"
+#include "lv_group.h"
 #include "lv_flex.h"
 
 /**
@@ -261,13 +265,11 @@ extern const lv_obj_class_t lv_obj;
 typedef struct {
     struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
     uint32_t child_cnt;                 /**< Number of children */
-#if LV_USE_GROUP != 0
-    void * group_p;
-#endif
+    lv_group_t * group_p;
 
     const lv_layout_dsc_t * layout_dsc; /**< Pointer to the layout descriptor*/
 
-    lv_event_cb_t event_cb;             /**< Event callback function */
+    lv_event_cb_t * event_cb;             /**< Event callback function */
     lv_point_t scroll;                  /**< The current X/Y scroll offset*/
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
@@ -282,6 +284,7 @@ typedef struct {
     lv_snap_align_t snap_align_y : 2;      /**< Where to align the snapable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
+    uint8_t event_cb_cnt;           /**< Number of event callabcks stored in `event_cb` array */
 }lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t{
@@ -345,7 +348,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
  * @param data arbitrary data depending on the object type and the event. (Usually `NULL`)
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data);
 
 /**
  * Get the `data` parameter of the current event
@@ -449,10 +452,11 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
 
 /**
  * Get the event function of an object
- * @param obj pointer to an object
+ * @param obj: pointer to an object
+ * @param id:  the index of the event callback. 0: the firstly added
  * @return the event function
  */
-lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
+lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj, uint32_t id);
 
 /**
  * Get the group of the object

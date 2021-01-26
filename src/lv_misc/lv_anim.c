@@ -8,7 +8,6 @@
  *********************/
 #include "lv_anim.h"
 
-#if LV_USE_ANIMATION
 #include <stddef.h>
 #include <string.h>
 #include "../lv_misc/lv_debug.h"
@@ -575,4 +574,3 @@ static void anim_mark_list_change(void)
     else
         lv_timer_pause(_lv_anim_tmr, false);
 }
-#endif

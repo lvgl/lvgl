@@ -371,20 +371,6 @@
  * Feature usage
  *==================*/
 
-/*1: Enable the Animations */
-#ifndef LV_USE_ANIMATION
-#  ifdef CONFIG_LV_USE_ANIMATION
-#    define LV_USE_ANIMATION CONFIG_LV_USE_ANIMATION
-#  else
-#    define  LV_USE_ANIMATION        1
-#  endif
-#endif
-#if LV_USE_ANIMATION
-
-/*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
-
-#endif
-
 /* 1: Enable shadow drawing on rectangles*/
 #ifndef LV_USE_SHADOW
 #  ifdef CONFIG_LV_USE_SHADOW
@@ -461,16 +447,6 @@
 #  endif
 #endif
 
-/* 1: Enable object groups (for keyboard/encoder navigation) */
-#ifndef LV_USE_GROUP
-#  ifdef CONFIG_LV_USE_GROUP
-#    define LV_USE_GROUP CONFIG_LV_USE_GROUP
-#  else
-#    define  LV_USE_GROUP            1
-#  endif
-#endif
-#if LV_USE_GROUP
-#endif  /*LV_USE_GROUP*/
 
 /* 1: Enable GPU interface*/
 #ifndef LV_USE_GPU
@@ -528,17 +504,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-/* 1: Enable file system (might be required for images */
-#ifndef LV_USE_FILESYSTEM
-#  ifdef CONFIG_LV_USE_FILESYSTEM
-#    define LV_USE_FILESYSTEM CONFIG_LV_USE_FILESYSTEM
-#  else
-#    define  LV_USE_FILESYSTEM       1
-#  endif
-#endif
-#if LV_USE_FILESYSTEM
-/*Declare the type of the user data of file system drivers (can be e.g. `void *`, `int`, `struct`)*/
-#endif
 
 /*1: Add a `user_data` to drivers and objects*/
 #ifndef LV_USE_USER_DATA
@@ -578,23 +543,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * Image decoder and cache
  *========================*/
 
-/* 1: Enable indexed (palette) images */
-#ifndef LV_IMG_CF_INDEXED
-#  ifdef CONFIG_LV_IMG_CF_INDEXED
-#    define LV_IMG_CF_INDEXED CONFIG_LV_IMG_CF_INDEXED
-#  else
-#    define  LV_IMG_CF_INDEXED       1
-#  endif
-#endif
-
-/* 1: Enable alpha indexed images */
-#ifndef LV_IMG_CF_ALPHA
-#  ifdef CONFIG_LV_IMG_CF_ALPHA
-#    define LV_IMG_CF_ALPHA CONFIG_LV_IMG_CF_ALPHA
-#  else
-#    define  LV_IMG_CF_ALPHA         1
-#  endif
-#endif
 
 /* Default image cache size. Image caching keeps the images opened.
  * If only the built-in image formats are used there is no real advantage of caching.

@@ -89,9 +89,7 @@ void _lv_obj_style_init(void)
  */
 void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
 {
-#if LV_USE_ANIMATION
     trans_del(obj, part, 0xFF, NULL);
-#endif
 
     uint32_t i;
     /*Go after the transition and local styles*/
@@ -435,7 +433,6 @@ _lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t stat
 }
 
 
-#if LV_USE_ANIMATION
 /**
  * Fade in (from transparent to fully cover) an object and all its children using an `opa_scale` animation.
  * @param obj the object to fade in
@@ -472,7 +469,7 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }
-#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -38,8 +38,6 @@ typedef uint8_t lv_anim_enable_t;
 /** Type of the animated value*/
 typedef lv_coord_t lv_anim_value_t;
 
-#if LV_USE_ANIMATION
-
 #define LV_ANIM_REPEAT_INFINITE      0xFFFF
 
 struct _lv_anim_t;
@@ -80,7 +78,7 @@ typedef struct _lv_anim_t {
     int32_t start;               /**< Start value*/
     int32_t current;             /**< Current value */
     int32_t end;                 /**< End value*/
-    int32_t time;               /**< Animation time in ms*/
+    int32_t time;                /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
     uint32_t playback_time;      /**< Duration of playback animation*/
@@ -88,7 +86,7 @@ typedef struct _lv_anim_t {
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
     uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay` */
 #if LV_USE_USER_DATA
-    lv_anim_user_data_t user_data; /**< Custom user data*/
+    lv_user_data_t user_data;    /**< Custom user data*/
 #endif
 
     /*Animation system use these - user shouldn't set*/
@@ -418,4 +416,3 @@ extern const lv_anim_path_t lv_anim_path_def;
 } /* extern "C" */
 #endif
 
-#endif /*LV_ANIM_H*/

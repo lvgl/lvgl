@@ -10,10 +10,10 @@
 #if LV_USE_BTNMATRIX != 0
 
 #include "../lv_misc/lv_debug.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_refr.h"
-#include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_txt_ap.h"
 
@@ -763,13 +763,11 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
                 }
             }
         }
-#if LV_USE_GROUP
         else if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER &&
                                                        lv_group_get_editing(lv_obj_get_group(obj)))) {
             btnm->btn_id_pr = btnm->btn_id_focused;
             invalidate_button_area(obj, btnm->btn_id_focused);
         }
-#endif
 
         if(btnm->btn_id_pr != LV_BTNMATRIX_BTN_NONE) {
             if(button_is_click_trig(btnm->ctrl_bits[btnm->btn_id_pr]) == false &&
@@ -860,7 +858,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
         lv_obj_invalidate(obj);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
-#if LV_USE_GROUP
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
@@ -890,8 +887,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             btnm->btn_id_focused = b;
             btnm->btn_id_act = b;
         }
-
-#endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
         if(btnm->btn_id_focused != LV_BTNMATRIX_BTN_NONE) invalidate_button_area(obj, btnm->btn_id_focused);
@@ -901,7 +896,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
         btnm->btn_id_act = LV_BTNMATRIX_BTN_NONE;
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT) {
             if(btnm->btn_id_focused == LV_BTNMATRIX_BTN_NONE)  btnm->btn_id_focused = 0;
@@ -929,18 +923,10 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             lv_obj_invalidate(obj);
         }
         else if(c == LV_KEY_DOWN) {
-<<<<<<< HEAD
-            lv_coord_t col_gap = LV_MAX(lv_obj_get_style_margin_left(obj, LV_BTNMATRIX_PART_BTN), lv_obj_get_style_margin_right(obj, LV_BTNMATRIX_PART_BTN));
-
+            lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
             /*Find the area below the the current*/
             if(btnm->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_focused = 0;
-=======
-            lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
-            /*Find the area below the current*/
-            if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
-                ext->btn_id_focused = 0;
->>>>>>> master
             }
             else {
                 uint16_t area_below;
@@ -963,17 +949,10 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             lv_obj_invalidate(obj);
         }
         else if(c == LV_KEY_UP) {
-<<<<<<< HEAD
-            lv_coord_t col_gap = LV_MAX(lv_obj_get_style_margin_left(obj, LV_BTNMATRIX_PART_BTN), lv_obj_get_style_margin_right(obj, LV_BTNMATRIX_PART_BTN));
+            lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
             /*Find the area below the the current*/
             if(btnm->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_focused = 0;
-=======
-            lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
-            /*Find the area below the current*/
-            if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) {
-                ext->btn_id_focused = 0;
->>>>>>> master
             }
             else {
                 int16_t area_above;
@@ -994,7 +973,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             btnm->btn_id_act = btnm->btn_id_focused;
             lv_obj_invalidate(obj);
         }
-#endif
     }
     return res;
 }

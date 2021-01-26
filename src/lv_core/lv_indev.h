@@ -76,14 +76,12 @@ void lv_indev_reset_long_press(lv_indev_t * indev);
  */
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj);
 
-#if LV_USE_GROUP
 /**
  * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
  * @param group point to a group
  */
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group);
-#endif
 
 /**
  * Set the an array of points for LV_INDEV_TYPE_BUTTON.

@@ -40,10 +40,8 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
 static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_label_revert_dots(lv_obj_t * label);
 
-#if LV_USE_ANIMATION
-    static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
-    static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
-#endif
+static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
+static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
 
 static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint32_t len);
 static char * lv_label_get_dot_tmp(lv_obj_t * label);
@@ -225,13 +223,11 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 
     lv_label_t * label = (lv_label_t *)obj;
 
-#if LV_USE_ANIMATION
     /*Delete the old animation (if exists)*/
     lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
     lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
-#endif
     label->offset.x = 0;
     label->offset.y = 0;
 
@@ -829,7 +825,6 @@ void lv_label_refr_text(lv_obj_t * obj)
     }
     /*In roll mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SROLL) {
-#if LV_USE_ANIMATION
         uint16_t anim_speed = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
         lv_anim_t a;
         lv_anim_init(&a);
@@ -909,11 +904,9 @@ void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
             label->offset.y = 0;
         }
-#endif
     }
     /*In roll inf. mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
-#if LV_USE_ANIMATION
         uint16_t anim_speed = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
         lv_anim_t a;
         lv_anim_init(&a);
@@ -961,7 +954,6 @@ void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
             label->offset.y = 0;
         }
-#endif
     }
     else if(label->long_mode == LV_LABEL_LONG_DOT) {
         if(size.y <= lv_area_get_height(&txt_coords)) { /*No dots are required, the text is short enough*/
@@ -1248,7 +1240,6 @@ static void lv_label_revert_dots(lv_obj_t * obj)
     label->dot_end = LV_LABEL_DOT_END_INV;
 }
 
-#if LV_USE_ANIMATION
 static void lv_label_set_offset_x(lv_obj_t * obj, lv_coord_t x)
 {
     lv_label_t * label = (lv_label_t *)obj;
@@ -1262,7 +1253,6 @@ static void lv_label_set_offset_y(lv_obj_t * obj, lv_coord_t y)
     label->offset.y        = y;
     lv_obj_invalidate(obj);
 }
-#endif
 
 /**
  * Store `len` characters from `data`. Allocates space if necessary.

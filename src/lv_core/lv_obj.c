@@ -84,7 +84,7 @@ static void lv_obj_destructor(lv_obj_t * obj);
  **********************/
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
-static const void * event_act_data;
+static void * event_act_data;
 const lv_obj_class_t lv_obj = {
     .constructor = lv_obj_constructor,
     .destructor = lv_obj_destructor,
@@ -117,17 +117,11 @@ void lv_init(void)
 
     _lv_timer_core_init();
 
-#if LV_USE_FILESYSTEM
     _lv_fs_init();
-#endif
 
-#if LV_USE_ANIMATION
     _lv_anim_core_init();
-#endif
 
-#if LV_USE_GROUP
     _lv_group_init();
-#endif
 
 #if LV_USE_GPU_STM32_DMA2D
     /*Initialize DMA2D GPU*/
@@ -190,14 +184,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
  * Event/Signal sending
  *---------------------*/
 
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data)
 {
     if(obj == NULL) return LV_RES_OK;
 
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     /*Nothing to do if no event function and not bubbled*/
-    lv_event_cb_t event_cb = lv_obj_get_event_cb(obj);
+    lv_event_cb_t event_cb = lv_obj_get_event_cb(obj, 0);
     if(event_cb == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
         return LV_RES_OK;
     }
@@ -215,7 +209,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
     }
     event_temp_data_head = &event_temp_data;
 
-    const void * event_act_data_save = event_act_data;
+    void * event_act_data_save = event_act_data;
     event_act_data = data;
 
     /*Call the input device's feedback callback if set*/
@@ -224,8 +218,27 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
         if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, event);
     }
 
-    /*Call the event callback*/
-    if(event_cb) event_cb(obj, event);
+    uint32_t i = 0;
+    lv_res_t res = LV_RES_OK;
+    while(event_cb) {
+        event_cb(obj, event);
+
+        /*Stop if the object is deleted*/
+        if(event_temp_data.deleted) {
+            res = LV_RES_INV;
+            break;
+        }
+
+        if(obj) {
+            if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
+                lv_res_t res = lv_event_send(obj->parent, event, data);
+                if(res != LV_RES_OK) return LV_RES_INV;
+            }
+        }
+
+        i++;
+        event_cb = lv_obj_get_event_cb(obj, i);
+    }
 
     /*Restore the event data*/
     event_act_data = event_act_data_save;
@@ -233,17 +246,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
 
-    if(event_temp_data.deleted) return LV_RES_INV;
-
-    if(obj) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-
-            lv_res_t res = lv_event_send(obj->parent, event, data);
-            if(res != LV_RES_OK) return LV_RES_INV;
-        }
-    }
-
-    return LV_RES_OK;
+    return res;
 }
 
 
@@ -313,10 +316,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-#if LV_USE_ANIMATION == 0
-    obj->state = new_state;
-    lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-#else
     lv_state_t prev_state = obj->state;
     obj->state = new_state;
 
@@ -368,8 +367,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) lv_obj_invalidate(obj);
-
-#endif
 }
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
@@ -397,7 +394,12 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     lv_obj_allocate_spec_attr(obj);
 
-    obj->spec_attr->event_cb = event_cb;
+    obj->spec_attr->event_cb_cnt++;
+    obj->spec_attr->event_cb = lv_mem_realloc(obj->spec_attr->event_cb, obj->spec_attr->event_cb_cnt * sizeof(lv_event_cb_t));
+    LV_ASSERT_MEM(obj->spec_attr->event_cb);
+
+    obj->spec_attr->event_cb[obj->spec_attr->event_cb_cnt - 1] = event_cb;
+
 }
 
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
@@ -461,25 +463,22 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj)
     return ((lv_obj_t *)obj)->state;
 }
 
-lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj)
+lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->spec_attr) return obj->spec_attr->event_cb;
-    else return NULL;
+    if(!obj->spec_attr) return NULL;
+    if(id >= obj->spec_attr->event_cb_cnt) return NULL;
+
+    return obj->spec_attr->event_cb[id];
 }
 
 void * lv_obj_get_group(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-#if LV_USE_GROUP
     if(obj->spec_attr) return obj->spec_attr->group_p;
     else return NULL;
-#else
-    LV_UNUSED(obj);
-    return NULL;
-#endif
 }
 
 /*-------------------
@@ -634,13 +633,11 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
             lv_memcpy_small(obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
             obj->spec_attr->children = NULL;    /*Make the child list empty*/
         }
-#if LV_USE_GROUP
         /*Add to the same group*/
         if(copy->spec_attr && copy->spec_attr->group_p) {
             obj->spec_attr->group_p = NULL; /*It was simply copied */
             lv_group_add_obj(copy->spec_attr->group_p, obj);
         }
-#endif
 
         /*Set the same coordinates for non screen objects*/
         if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
@@ -954,7 +951,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-#if LV_USE_GROUP
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             uint32_t state = 0;
             char c = *((char *)param);
@@ -969,7 +965,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         }
-#endif
     }
     else if(sign == LV_SIGNAL_FOCUS) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -981,12 +976,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
 
         bool editing = false;
-#if LV_USE_GROUP
         editing = lv_group_get_editing(lv_obj_get_group(obj));
-#endif
+        lv_state_t state = LV_STATE_FOCUSED;
         if(editing) {
-            lv_state_t state = LV_STATE_FOCUSED;
             state |= LV_STATE_EDITED;
+            if(lv_obj_get_group(obj)) state |= LV_STATE_FOCUS_GROUP;
 
             /*if using focus mode, change target to parent*/
             obj = lv_obj_get_focused_obj(obj);
@@ -997,7 +991,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             /*if using focus mode, change target to parent*/
             obj = lv_obj_get_focused_obj(obj);
 
-            lv_obj_add_state(obj, LV_STATE_FOCUSED);
+            lv_obj_add_state(obj, state);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     }

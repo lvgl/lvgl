@@ -22,11 +22,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_USE_ANIMATION
-    static void scr_load_anim_start(lv_anim_t * a);
-    static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
-    static void scr_anim_ready(lv_anim_t * a);
-#endif
+static void scr_load_anim_start(lv_anim_t * a);
+static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
+static void scr_anim_ready(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -181,8 +179,6 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa)
     _lv_inv_area(disp, &a);
 }
 
-#if LV_USE_ANIMATION
-
 /**
  * Switch screen with animation
  * @param scr pointer to the new screen to load
@@ -300,8 +296,6 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     lv_anim_start(&a_old);
 }
 
-#endif
-
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
  * @param disp pointer to an display (NULL to get the overall smallest inactivity)
@@ -375,7 +369,6 @@ lv_timer_t * _lv_disp_get_refr_task(lv_disp_t * disp)
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_ANIMATION
 static void scr_load_anim_start(lv_anim_t * a)
 {
     lv_disp_t * d = lv_obj_get_disp(a->var);
@@ -398,4 +391,3 @@ static void scr_anim_ready(lv_anim_t * a)
     d->scr_to_load = NULL;
 //    lv_style_remove_prop(lv_obj_get_local_style(a->var, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
 }
-#endif

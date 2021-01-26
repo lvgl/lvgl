@@ -329,16 +329,12 @@ static void obj_del_core(lv_obj_t * obj)
     if(res == LV_RES_INV) return;
 
     /*Delete from the group*/
-#if LV_USE_GROUP
     lv_group_t * group = lv_obj_get_group(obj);
     if(group) lv_group_remove_obj(obj);
-#endif
 
     /*Remove the animations from this object*/
-#if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
 //    _lv_obj_remove_style_trans(obj);
-#endif
 
     /*Delete the user data*/
 #if LV_USE_USER_DATA
@@ -365,11 +361,9 @@ static void obj_del_core(lv_obj_t * obj)
             indev->proc.types.pointer.last_pressed = NULL;
         }
 
-#if LV_USE_GROUP
         if(indev->group == group && obj == lv_indev_get_obj_act()) {
             lv_indev_reset(indev, obj);
         }
-#endif
         indev = lv_indev_get_next(indev);
     }
 
