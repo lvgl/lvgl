@@ -68,7 +68,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font);
 int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
 
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
-static int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
+static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
 
 /**********************
  *      MACROS
@@ -194,9 +194,9 @@ static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp)
     return it;
 }
 
-static int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
-    int value = 0;
+    unsigned int value = 0;
     while(n_bits--) {
         it->byte_value = it->byte_value << 1;
         it->bit_pos--;
@@ -218,11 +218,9 @@ static int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
-    int value = read_bits(it, n_bits, res);
+    unsigned int value = read_bits(it, n_bits, res);
     if(value & (1 << (n_bits - 1))) {
-        for(int bit = n_bits; bit < 16; ++bit) {
-            value |= (1 << bit);
-        }
+        value |= ~0u << n_bits;
     }
     return value;
 }
