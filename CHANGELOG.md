@@ -1,10 +1,12 @@
 # Changelog
 
-## v7.9.1 (Planned at 19.01.2020)
+## v7.9.2 (Planned for 02.02.2021)
 
 ### New features
 
 - feat(indev) allow input events to be passed to disabled objects 
+
+## v7.9.1
 
 ### Bugfixes
 - fix(cpicker) fix division by zero
