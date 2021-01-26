@@ -265,8 +265,10 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
         lv_font_fmt_txt_cmap_t * cmap = (lv_font_fmt_txt_cmap_t *) & (font_dsc->cmaps[i]);
 
+        cmap->type = cmap_table[i].format_type;
+
         switch(cmap_table[i].format_type) {
-            case 0: {
+            case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
                     uint8_t ids_size = sizeof(uint8_t) * cmap_table[i].data_entries_count;
                     uint8_t * glyph_id_ofs_list = lv_mem_alloc(ids_size);
 
@@ -276,19 +278,13 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
                         return false;
                     }
 
-                    cmap->type = LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL;
                     cmap->list_length = cmap->range_length;
-                    cmap->unicode_list = NULL;
                     break;
                 }
-            case 2:
-                cmap->type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY;
-                cmap->list_length = 0;
-                cmap->unicode_list = NULL;
-                cmap->glyph_id_ofs_list = NULL;
+            case LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY:
                 break;
-            case 1:
-            case 3: {
+            case LV_FONT_FMT_TXT_CMAP_SPARSE_FULL:
+            case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY: {
                     uint32_t list_size = sizeof(uint16_t) * cmap_table[i].data_entries_count;
                     uint16_t * unicode_list = (uint16_t *) lv_mem_alloc(list_size);
 
@@ -299,19 +295,14 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
                         return false;
                     }
 
-                    if(cmap_table[i].format_type == 1) {
+                    if(cmap_table[i].format_type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
                         uint16_t * buf = lv_mem_alloc(sizeof(uint16_t) * cmap->list_length);
 
-                        cmap->type = LV_FONT_FMT_TXT_CMAP_SPARSE_FULL;
                         cmap->glyph_id_ofs_list = buf;
 
                         if(lv_fs_read(fp, buf, sizeof(uint16_t) * cmap->list_length, NULL) != LV_FS_RES_OK) {
                             return false;
                         }
-                    }
-                    else {
-                        cmap->type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY;
-                        cmap->glyph_id_ofs_list = NULL;
                     }
                     break;
                 }
