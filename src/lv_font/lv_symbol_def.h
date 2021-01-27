@@ -85,11 +85,11 @@ extern "C" {
 /*-------------------------------
  * Symbols from "normal" font
  *-----------------------------*/
-#define LV_SYMBOL_BULLET          "\xE2\x80\xA2"   /*20042, 0x2022*/
+#define LV_SYMBOL_BULLET          "\xE2\x80\xA2" /*20042, 0x2022*/
 
 /*
  * The following list is generated using
- * cat src/lv_misc/lv_symbol_def.h | sed -E -n 's/^#define\s+(LV_SYMBOL_\w+).*"$/    _LV_STR_\1,/p'
+ * cat src/lv_font/lv_symbol_def.h | sed -E -n 's/^#define\s+LV_(SYMBOL_\w+).*".*$/    _LV_STR_\1,/p'
  */
 enum {
     _LV_STR_SYMBOL_AUDIO,
@@ -150,6 +150,7 @@ enum {
     _LV_STR_SYMBOL_SD_CARD,
     _LV_STR_SYMBOL_NEW_LINE,
     _LV_STR_SYMBOL_DUMMY,
+    _LV_STR_SYMBOL_BULLET,
 };
 
 #ifdef __cplusplus

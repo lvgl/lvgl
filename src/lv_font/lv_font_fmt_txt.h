@@ -47,10 +47,10 @@ typedef struct {
 
 /** Format of font character map. */
 enum {
-    LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
-    LV_FONT_FMT_TXT_CMAP_SPARSE_TINY,
     LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,
+    LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
+    LV_FONT_FMT_TXT_CMAP_SPARSE_TINY,
 };
 
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
