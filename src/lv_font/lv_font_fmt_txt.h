@@ -1,5 +1,5 @@
 /**
- * @file lv_font.h
+ * @file lv_font_fmt_txt.h
  *
  */
 
@@ -34,13 +34,13 @@ typedef struct {
     uint8_t box_w;                  /**< Width of the glyph's bounding box*/
     uint8_t box_h;                  /**< Height of the glyph's bounding box*/
     int8_t ofs_x;                   /**< x offset of the bounding box*/
-    int8_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
+    int8_t ofs_y;                   /**< y offset of the bounding box. Measured from the top of the line*/
 #else
     uint32_t bitmap_index;          /**< Start index of the bitmap. A font can be max 4 GB. */
     uint32_t adv_w;                 /**< Draw the next glyph after this width. 28.4 format (real_value * 16 is stored). */
-    uint16_t box_w;                  /**< Width of the glyph's bounding box*/
-    uint16_t box_h;                  /**< Height of the glyph's bounding box*/
-    int16_t ofs_x;                   /**< x offset of the bounding box*/
+    uint16_t box_w;                 /**< Width of the glyph's bounding box*/
+    uint16_t box_h;                 /**< Height of the glyph's bounding box*/
+    int16_t ofs_x;                  /**< x offset of the bounding box*/
     int16_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
 #endif
 } lv_font_fmt_txt_glyph_dsc_t;
@@ -115,7 +115,7 @@ typedef struct {
 typedef struct {
     /*To get a kern value of two code points:
        1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
-       2. for(i = 0; i < pair_cnt * 2; i+2)
+       2. for(i = 0; i < pair_cnt * 2; i += 2)
              if(gylph_ids[i] == glyph_id_left &&
                 gylph_ids[i+1] == glyph_id_right)
                  return values[i / 2];
@@ -136,7 +136,7 @@ typedef struct {
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (right_class-1)]
         */
 
-    const int8_t * class_pair_values;    /*left_class_num * right_class_num value*/
+    const int8_t * class_pair_values;    /*left_class_cnt * right_class_cnt value*/
     const uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     const uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     uint8_t left_class_cnt;

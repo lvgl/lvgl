@@ -35,7 +35,7 @@ extern "C" {
 
 /** Describes the properties of a glyph. */
 typedef struct {
-    uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
+    uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width. */
     uint16_t box_w;  /**< Width of the glyph's bounding box*/
     uint16_t box_h;  /**< Height of the glyph's bounding box*/
     int16_t ofs_x;   /**< x offset of the bounding box*/

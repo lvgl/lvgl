@@ -1,5 +1,5 @@
 /**
- * @file lv_font.c
+ * @file lv_font_fmt_txt.c
  *
  */
 
@@ -9,7 +9,6 @@
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
 #include "../lv_misc/lv_debug.h"
-#include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_log.h"
@@ -576,9 +575,9 @@ static inline uint8_t rle_next(void)
  *  @param[in]  pElement    Pointer to the element to compare.
  *
  *  @return Result of comparison.
- *  @retval < 0   Reference is greater than element.
+ *  @retval < 0   Reference is less than element.
  *  @retval = 0   Reference is equal to element.
- *  @retval > 0   Reference is less than element.
+ *  @retval > 0   Reference is greater than element.
  *
  */
 static int32_t unicode_list_compare(const void * ref, const void * element)
