@@ -122,7 +122,7 @@ typedef struct {
      */
     const void * glyph_ids;
     const int8_t * values;
-    uint32_t pair_cnt   : 24;
+    uint32_t pair_cnt   : 30;
     uint32_t glyph_ids_size : 2;    /*0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t`*/
 } lv_font_fmt_txt_kern_pair_t;
 
@@ -172,7 +172,7 @@ typedef struct {
     uint16_t kern_scale;
 
     /*Number of cmap tables*/
-    uint16_t cmap_num       : 10;
+    uint16_t cmap_num       : 9;
 
     /*Bit per pixel: 1, 2, 3, 4, 8*/
     uint16_t bpp            : 4;
