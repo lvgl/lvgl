@@ -142,8 +142,6 @@ int32_t lv_spinbox_get_value(lv_obj_t * spinbox);
  */
 static inline int32_t lv_spinbox_get_step(lv_obj_t * spinbox)
 {
-    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
-
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     return ext->step;
