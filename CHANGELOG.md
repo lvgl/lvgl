@@ -3,7 +3,8 @@
 ## v7.9.2 (Planned for 02.02.2021)
 
 ### New features
-- feat(indev) allow input events to be passed to disabled objects 
+- feat(indev) allow input events to be passed to disabled objects
+- feat(spinbox) add inline get_step function for MicroPython support
 
 ### Bugfixes
 - fix(btnmatrix) fix lv_btnmatrix_get_active_btn_text() when used in a group
