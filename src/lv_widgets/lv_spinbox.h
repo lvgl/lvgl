@@ -135,6 +135,18 @@ bool lv_spinbox_get_rollover(lv_obj_t * spinbox);
  */
 int32_t lv_spinbox_get_value(lv_obj_t * spinbox);
 
+/**
+ * Get the spinbox step value (user has to convert to float according to its digit format)
+ * @param spinbox pointer to spinbox
+ * @return value integer step value of the spinbox
+ */
+static inline int32_t lv_spinbox_get_step(lv_obj_t * spinbox)
+{
+    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+
+    return ext->step;
+}
+
 /*=====================
  * Other functions
  *====================*/
