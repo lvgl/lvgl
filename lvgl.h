@@ -32,6 +32,8 @@ extern "C" {
 #include "src/lv_core/lv_obj.h"
 #include "src/lv_core/lv_group.h"
 #include "src/lv_core/lv_indev.h"
+#include "src/lv_core/lv_flex.h"
+#include "src/lv_core/lv_grid.h"
 
 #include "src/lv_core/lv_refr.h"
 #include "src/lv_core/lv_disp.h"
@@ -43,6 +45,7 @@ extern "C" {
 #include "src/lv_font/lv_font_fmt_txt.h"
 #include "src/lv_misc/lv_printf.h"
 
+#include "src/lv_widgets/lv_arc.h"
 #include "src/lv_widgets/lv_btn.h"
 #include "src/lv_widgets/lv_imgbtn.h"
 #include "src/lv_widgets/lv_img.h"
@@ -60,7 +63,6 @@ extern "C" {
 #include "src/lv_widgets/lv_canvas.h"
 #include "src/lv_widgets/lv_meter.h"
 #include "src/lv_widgets/lv_switch.h"
-#include "src/lv_widgets/lv_arc.h"
 
 #include "src/lv_draw/lv_img_cache.h"
 

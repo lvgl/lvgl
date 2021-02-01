@@ -11,8 +11,7 @@
 
 #include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_group.h"
-#include "../lv_themes/lv_theme.h"
-#include "lv_label.h"
+#include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -51,12 +50,6 @@ const lv_obj_class_t lv_checkbox = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a check box objects
- * @param par pointer to an object, it will be the parent of the new check box
- * @param copy pointer to a check box object, if not NULL then the new object will be copied from it
- * @return pointer to the created check box
- */
 lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     return lv_obj_create_from_class(&lv_checkbox, parent, copy);
@@ -66,12 +59,6 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/**
- * Set the text of a check box. `txt` will be copied and may be deallocated
- * after this function returns.
- * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
- */
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
@@ -94,12 +81,6 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
     lv_obj_handle_self_size_chg(obj);
 }
 
-/**
- * Set the text of a check box. `txt` must not be deallocated during the life
- * of this checkbox.
- * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
- */
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 {
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
@@ -116,11 +97,6 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
  * Getter functions
  *====================*/
 
-/**
- * Get the text of a check box
- * @param cb pointer to check box object
- * @return pointer to the text of the check box
- */
 const char * lv_checkbox_get_text(const lv_obj_t * obj)
 {
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
@@ -226,7 +202,7 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
         lv_point_t txt_size;
-        _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
         lv_draw_label_dsc_t txt_dsc;
         lv_draw_label_dsc_init(&txt_dsc);
@@ -270,7 +246,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
         lv_point_t txt_size;
-        _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
 
         lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);

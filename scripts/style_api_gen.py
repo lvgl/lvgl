@@ -9,7 +9,7 @@ props = [
 {'name': 'COLOR_FILTER_CB', 					'style_type': 'func', 	'var_type': 'lv_color_filter_cb_t' },
 {'name': 'COLOR_FILTER_OPA', 					'style_type': 'num', 	'var_type': 'lv_opa_t' },
 {'name': 'ANIM_TIME', 					      'style_type': 'num', 	'var_type': 'uint32_t' },
-{'name': 'TRANSITION', 							  'style_type': 'ptr', 	'var_type': 'const lv_style_transition_t *' },
+{'name': 'TRANSITION', 							  'style_type': 'ptr', 	'var_type': 'const lv_style_transition_dsc_t *' },
 {'name': 'SIZE', 						    			'style_type': 'num', 	'var_type': 'lv_coord_t' },
 {'name': 'BLEND_MODE', 						    'style_type': 'num', 	'var_type': 'lv_blend_mode_t' },
 {'name': 'PAD_TOP', 									'style_type': 'num', 	'var_type': 'lv_coord_t' },
@@ -90,13 +90,17 @@ def obj_style_get(i):
 	
 def style_set(i):
   print("static inline void lv_style_set_" + props[i]['name'].lower() +"(lv_style_t * style, "+ props[i]['var_type'] +" value) {")
-  print("  lv_style_value_t v = {." + props[i][			'style_type'] +" = value}; lv_style_set_prop(style, LV_STYLE_" + props[i]['name'] +", v); }")
+  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = value}; lv_style_set_prop(style, LV_STYLE_" + props[i]['name'] +", v); }")
   print("")
 
+def local_style_set(i):
+  print("static inline void lv_obj_set_style_" + props[i]['name'].lower() + "(struct _lv_obj_t * obj, uint32_t part, uint32_t state, " + props[i]['var_type'] +" value) {")
+  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + props[i]['name'] +", v); }")
+  print("")
 
 	
 for i in range(len(props)): 
-  style_set(i)
+  local_style_set(i)
   
   
   

@@ -137,7 +137,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     else {
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
-        _lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
+        lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
                          dsc->flag);
         w = p.x;
     }
@@ -195,14 +195,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     }
 
     /*Align to middle*/
-    if(dsc->flag & LV_TEXT_FLAG_CENTER) {
+    if(dsc->align == LV_TEXT_ALIGN_CENTER) {
         line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
-    else if(dsc->flag & LV_TEXT_FLAG_RIGHT) {
+    else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
         line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
@@ -361,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         pos.x = coords->x1;
         /*Align to middle*/
-        if(dsc->flag & LV_TEXT_FLAG_CENTER) {
+        if(dsc->align == LV_TEXT_ALIGN_CENTER) {
             line_width =
                 _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
@@ -369,7 +369,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         }
         /*Align to the right*/
-        else if(dsc->flag & LV_TEXT_FLAG_RIGHT) {
+        else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
             line_width =
                 _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
             pos.x += lv_area_get_width(coords) - line_width;

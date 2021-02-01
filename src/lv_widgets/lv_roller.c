@@ -332,9 +332,6 @@ static void lv_roller_destructor(lv_obj_t * obj)
 //    bar->class_p->base_p->destructor(obj);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_label.constructor(obj, parent, copy);
@@ -400,18 +397,10 @@ static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area,
         area_ok = _lv_area_intersect(&mask_sel, clip_area, &rect_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
-            lv_text_align_t label_align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
-
-            if(LV_TEXT_ALIGN_CENTER == label_align) {
-                label_dsc.flag |= LV_TEXT_FLAG_CENTER;
-            }
-            else if(LV_TEXT_ALIGN_RIGHT == label_align) {
-                label_dsc.flag |= LV_TEXT_FLAG_RIGHT;
-            }
 
             /*Get the size of the "selected text"*/
             lv_point_t res_p;
-            _lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+            lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                              lv_obj_get_width(obj), LV_TEXT_FLAG_EXPAND);
 
             /*Move the selected label proportionally with the background label*/
@@ -819,7 +808,7 @@ static lv_coord_t get_selected_label_width(const lv_obj_t * obj)
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_SELECTED);
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
-    _lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);
+    lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);
     return size.x;
 }
 

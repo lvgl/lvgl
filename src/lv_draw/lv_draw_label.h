@@ -28,21 +28,22 @@ extern "C" {
  **********************/
 
 typedef struct {
+    const lv_font_t * font;
+    uint32_t sel_start;
+    uint32_t sel_end;
     lv_color_t color;
     lv_color_t sel_color;
     lv_color_t sel_bg_color;
-    const lv_font_t * font;
-    lv_opa_t opa;
     lv_coord_t line_space;
     lv_coord_t letter_space;
-    uint32_t sel_start;
-    uint32_t sel_end;
     lv_coord_t ofs_x;
     lv_coord_t ofs_y;
+    lv_opa_t opa;
     lv_bidi_dir_t bidi_dir;
     lv_text_flag_t flag;
-    lv_text_decor_t decor;
-    lv_blend_mode_t blend_mode;
+    lv_text_align_t align :2;
+    lv_text_decor_t decor : 3;
+    lv_blend_mode_t blend_mode: 3;
 } lv_draw_label_dsc_t;
 
 /** Store some info to speed up drawing of very large texts

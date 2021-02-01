@@ -572,7 +572,7 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
             lv_point_t label_size;
-            _lv_txt_get_size(&label_size, hook_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+            lv_txt_get_size(&label_size, hook_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                     LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t label_cord;

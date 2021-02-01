@@ -223,17 +223,10 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
 #endif
 
-    lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
-    switch (align) {
-    case LV_TEXT_ALIGN_CENTER:
-        draw_dsc->flag |= LV_TEXT_FLAG_CENTER;
-        break;
-    case LV_TEXT_ALIGN_RIGHT:
-        draw_dsc->flag |= LV_TEXT_FLAG_RIGHT;
-        break;
-    case LV_TEXT_ALIGN_AUTO:
-        draw_dsc->flag |= draw_dsc->bidi_dir == LV_BIDI_DIR_RTL ? LV_TEXT_FLAG_RIGHT : LV_TEXT_FLAG_CENTER;
-        break;
+    draw_dsc->align = lv_obj_get_style_text_align(obj, part);
+    if(draw_dsc->align == LV_TEXT_ALIGN_AUTO) {
+        if(draw_dsc->bidi_dir == LV_BIDI_DIR_RTL) draw_dsc->align = LV_TEXT_ALIGN_RIGHT;
+        draw_dsc->align = LV_TEXT_ALIGN_LEFT;
     }
 }
 
@@ -356,7 +349,7 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint8_t part)
             lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, part);
             lv_coord_t line_space = lv_obj_get_style_text_letter_space(obj, part);
             const lv_font_t * font = lv_obj_get_style_text_font(obj, part);
-            _lv_txt_get_size(&content_size, content_text, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+            lv_txt_get_size(&content_size, content_text, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t content_area;
             content_area.x1 = 0;
@@ -403,6 +396,7 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     lv_coord_t s_old = _lv_obj_get_ext_draw_size(obj);
     lv_coord_t s_new = 0;
     lv_signal_send(obj, LV_SIGNAL_REFR_EXT_DRAW_SIZE, &s_new);
+    lv_event_send(obj, LV_EVENT_REFR_EXT_DRAW_SIZE, &s_new);
 
     if(s_new != s_old) lv_obj_invalidate(obj);
 

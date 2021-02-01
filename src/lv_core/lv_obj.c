@@ -348,7 +348,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
             uint32_t t;
             for(t = 0; t < tsi; t++) {
-                if(ts[t].prop == tr->props[j] && ts[t].state > obj_style->state) break;
+                if(ts[t].prop == tr->props[j] && ts[t].state >= obj_style->state) break;
             }
 
             /*If not found  add it*/
@@ -395,7 +395,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     lv_obj_allocate_spec_attr(obj);
@@ -466,7 +466,15 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    return ((lv_obj_t *)obj)->state;
+    return obj->state;
+}
+
+
+bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->state & state ? true : false;
 }
 
 lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj, uint32_t id)

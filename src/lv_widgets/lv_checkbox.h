@@ -39,12 +39,13 @@ extern const lv_obj_class_t lv_checkbox;
  **********************/
 
 /**
- * Create a check box objects
- * @param par pointer to an object, it will be the parent of the new check box
- * @param copy pointer to a check box object, if not NULL then the new object will be copied from it
- * @return pointer to the created check box
+ * Create a check box object
+ * @param parent    pointer to an object, it will be the parent of the new button
+ * @param copy      DEPRECATED, will be removed in v9.
+ *                  Pointer to an other check box to copy.
+ * @return          pointer to the created check box
  */
-lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -53,18 +54,18 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy);
 /**
  * Set the text of a check box. `txt` will be copied and may be deallocated
  * after this function returns.
- * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
+ * @param cb    pointer to a check box
+ * @param txt   the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_text(lv_obj_t * cb, const char * txt);
+void lv_checkbox_set_text(lv_obj_t * obj, const char * txt);
 
 /**
  * Set the text of a check box. `txt` must not be deallocated during the life
  * of this checkbox.
- * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
+ * @param cb    pointer to a check box
+ * @param txt   the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
+void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt);
 
 /*=====================
  * Getter functions
@@ -72,10 +73,10 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
 
 /**
  * Get the text of a check box
- * @param cb pointer to check box object
- * @return pointer to the text of the check box
+ * @param cb    pointer to check box object
+ * @return      pointer to the text of the check box
  */
-const char * lv_checkbox_get_text(const lv_obj_t * cb);
+const char * lv_checkbox_get_text(const lv_obj_t * obj);
 
 /**********************
  *      MACROS

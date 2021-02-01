@@ -108,6 +108,13 @@ int64_t lv_pow(int64_t base, int8_t exp);
  */
 int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min, int32_t max);
 
+/**
+ * Get a pseudo random number in the given range
+ * @param min   the minimum value
+ * @param max   the maximum value
+ * @return return the random number. min <= return_value <= max
+ */
+uint32_t lv_rand(uint32_t min, uint32_t max);
 /**********************
  *      MACROS
  **********************/

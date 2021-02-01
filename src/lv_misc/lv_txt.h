@@ -42,9 +42,7 @@ enum {
     LV_TEXT_FLAG_NONE    = 0x00,
     LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
     LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
-    LV_TEXT_FLAG_CENTER  = 0x04, /**< Align the text to the middle*/
-    LV_TEXT_FLAG_RIGHT   = 0x08, /**< Align the text to the right*/
-    LV_TEXT_FLAG_FIT     = 0x10, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
 };
 typedef uint8_t lv_text_flag_t;
 
@@ -77,11 +75,11 @@ typedef uint8_t lv_text_align_t;
  * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param line_space line space of the text
- * @param flags settings for the text from 'txt_flag_t' enum
+ * @param flags settings for the text from ::lv_text_flag_t
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
  * line breaks
  */
-void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
                       lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag);
 
 /**

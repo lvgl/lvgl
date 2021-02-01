@@ -1,5 +1,5 @@
 /**
- * @file lv_obj.c
+ * @file lv_btnmatrix.c
  *
  */
 
@@ -22,6 +22,7 @@
  *********************/
 #define LV_OBJX_NAME "lv_btnmatrix"
 #define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI / 4)
+#define LV_BTNMATRIX_WIDTH_MASK 0x0007
 
 /**********************
  *      TYPEDEFS
@@ -71,29 +72,15 @@ const lv_obj_class_t lv_btnmatrix = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a button matrix objects
- * @param par pointer to an object, it will be the parent of the new button matrix
- * @param copy pointer to a button matrix object, if not NULL then the new object will be copied
- * from it
- * @return pointer to the created button matrix
- */
 lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-  return lv_obj_create_from_class(&lv_btnmatrix, parent, copy);
+    return lv_obj_create_from_class(&lv_btnmatrix, parent, copy);
 }
 
 /*=====================
  * Setter functions
  *====================*/
 
-/**
- * Set a new map. Buttons will be created/deleted according to the map. The
- * button matrix keeps a reference to the map and so the string array must not
- * be deallocated during the life of the matrix.
- * @param obj pointer to a button matrix object
- * @param map pointer a string array. The last string has to be: "". Use "\n" to make a line break.
- */
 void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -184,18 +171,6 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set the button control map (hidden, disabled etc.) for a button matrix. The
- * control map array will be copied and so may be deallocated after this
- * function returns.
- * @param obj pointer to a button matrix object
- * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes. The
- *                 length of the array and position of the elements must match
- *                 the number and order of the individual buttons (i.e. excludes
- *                 newline entries).
- *                 An element of the map should look like e.g.:
- *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT |  LV_BTNMATRIX_CTRL_TGL_ENABLE`
- */
 void lv_btnmatrix_set_ctrl_map(lv_obj_t * obj, const lv_btnmatrix_ctrl_t ctrl_map[])
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -206,11 +181,6 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * obj, const lv_btnmatrix_ctrl_t ctrl_ma
     lv_btnmatrix_set_map(obj, btnm->map_p);
 }
 
-/**
- * Set the focused button i.e. visually highlight it.
- * @param obj pointer to button matrix object
- * @param id index of the button to focus(`LV_BTNMATRIX_BTN_NONE` to remove focus)
- */
 void lv_btnmatrix_set_focused_btn(lv_obj_t * obj, uint16_t id)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -225,11 +195,6 @@ void lv_btnmatrix_set_focused_btn(lv_obj_t * obj, uint16_t id)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Enable recoloring of button's texts
- * @param obj pointer to button matrix object
- * @param en true: enable recoloring; false: disable
- */
 void lv_btnmatrix_set_recolor(const lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -240,11 +205,6 @@ void lv_btnmatrix_set_recolor(const lv_obj_t * obj, bool en)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set the attributes of a button of the button matrix
- * @param obj pointer to button matrix object
- * @param btn_id 0 based index of the button to modify. (Not counting new lines)
- */
 void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -261,11 +221,6 @@ void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
     invalidate_button_area(obj, btn_id);
 }
 
-/**
- * Clear the attributes of a button of the button matrix
- * @param obj pointer to button matrix object
- * @param btn_id 0 based index of the button to modify. (Not counting new lines)
- */
 void lv_btnmatrix_clear_btn_ctrl(const lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -278,11 +233,6 @@ void lv_btnmatrix_clear_btn_ctrl(const lv_obj_t * obj, uint16_t btn_id, lv_btnma
     invalidate_button_area(obj, btn_id);
 }
 
-/**
- * Set the attributes of all buttons of a button matrix
- * @param obj pointer to a button matrix object
- * @param ctrl attribute(s) to set from `lv_btnmatrix_ctrl_t`. Values can be ORed.
- */
 void lv_btnmatrix_set_btn_ctrl_all(lv_obj_t * obj, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -294,12 +244,6 @@ void lv_btnmatrix_set_btn_ctrl_all(lv_obj_t * obj, lv_btnmatrix_ctrl_t ctrl)
     }
 }
 
-/**
- * Clear the attributes of all buttons of a button matrix
- * @param obj pointer to a button matrix object
- * @param ctrl attribute(s) to set from `lv_btnmatrix_ctrl_t`. Values can be ORed.
- * @param en true: set the attributes; false: clear the attributes
- */
 void lv_btnmatrix_clear_btn_ctrl_all(lv_obj_t * obj, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -311,15 +255,6 @@ void lv_btnmatrix_clear_btn_ctrl_all(lv_obj_t * obj, lv_btnmatrix_ctrl_t ctrl)
     }
 }
 
-/**
- * Set a single buttons relative width.
- * This method will cause the matrix be regenerated and is a relatively
- * expensive operation. It is recommended that initial width be specified using
- * `lv_btnmatrix_set_ctrl_map` and this method only be used for dynamic changes.
- * @param obj pointer to button matrix object
- * @param btn_id 0 based index of the button to modify.
- * @param width Relative width compared to the buttons in the same row. [1..7]
- */
 void lv_btnmatrix_set_btn_width(lv_obj_t * obj, uint16_t btn_id, uint8_t width)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -332,19 +267,12 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * obj, uint16_t btn_id, uint8_t width)
     lv_btnmatrix_set_map(obj, btnm->map_p);
 }
 
-/**
- * Make the button matrix like a selector widget (only one button may be checked at a time).
- * `Checkable` must be enabled on the buttons you want to be selected with `lv_btnmatrix_set_ctrl` or
- * `lv_btnmatrix_set_btn_ctrl_all`.
- * @param obj pointer to a button matrix object
- * @param one_chk whether "one check" mode is enabled
- */
-void lv_btnmatrix_set_one_checked(lv_obj_t * obj, bool one_chk)
+void lv_btnmatrix_set_one_checked(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
-    btnm->one_check     = one_chk;
+    btnm->one_check     = en;
 
     /*If more than one button is toggled only the first one should be*/
     make_one_button_checked(obj, 0);
@@ -354,12 +282,7 @@ void lv_btnmatrix_set_one_checked(lv_obj_t * obj, bool one_chk)
  * Getter functions
  *====================*/
 
-/**
- * Get the current map of a button matrix
- * @param obj pointer to a button matrix object
- * @return the current map
- */
-const char ** lv_btnmatrix_get_map_array(const lv_obj_t * obj)
+const char ** lv_btnmatrix_get_map(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -367,11 +290,6 @@ const char ** lv_btnmatrix_get_map_array(const lv_obj_t * obj)
     return btnm->map_p;
 }
 
-/**
- * Check whether the button's text can use recolor or not
- * @param obj pointer to button matrix object
- * @return true: text recolor enable; false: disabled
- */
 bool lv_btnmatrix_get_recolor(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -381,17 +299,6 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * obj)
     return btnm->recolor;
 }
 
-/**
- * Get the index of the lastly "activated" button by the user (pressed, released etc)
-<<<<<<< HEAD
- * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
- * @param obj pointer to button matrix object
-=======
- * Useful in the `event_cb` to get the text of the button, check if hidden etc.
- * @param btnm pointer to button matrix object
->>>>>>> master
- * @return  index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
- */
 uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -400,36 +307,15 @@ uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * obj)
     return btnm->btn_id_act;
 }
 
-/**
- * Get the text of the lastly "activated" button by the user (pressed, released etc)
-<<<<<<< HEAD
- * Useful in the the `event_cb`
- * @param obj pointer to button matrix object
-=======
- * Useful in the `event_cb`
- * @param btnm pointer to button matrix object
->>>>>>> master
- * @return text of the last released button (NULL: if unset)
- */
-const char * lv_btnmatrix_get_active_btn_text(const lv_obj_t * obj)
+uint16_t lv_btnmatrix_get_pressed_btn(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
-    if(btnm->btn_id_act != LV_BTNMATRIX_BTN_NONE) {
-        return lv_btnmatrix_get_btn_text(obj, btnm->btn_id_act);
-    }
-    else {
-        return NULL;
-    }
+    return btnm->btn_id_pr;
 }
 
-/**
- * Get the pressed button's index.
- * The button be really pressed by the user or manually set to pressed with `lv_btnmatrix_set_pressed`
- * @param obj pointer to button matrix object
- * @return  index of the pressed button (LV_BTNMATRIX_BTN_NONE: if unset)
- */
+
 uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -438,18 +324,13 @@ uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * obj)
     return btnm->btn_id_focused;
 }
 
-/**
- * Get the button's text
- * @param obj pointer to button matrix object
- * @param btn_id the index a button not counting new line characters. (The return value of
- * lv_btnmatrix_get_pressed/released)
- * @return  text of btn_index` button
- */
 const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
+    if(btn_id == LV_BTNMATRIX_BTN_NONE) return NULL;
+
+    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     if(btn_id > btnm->btn_cnt) return NULL;
 
     uint16_t txt_i = 0;
@@ -468,15 +349,7 @@ const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
     return btnm->map_p[txt_i];
 }
 
-/**
- * Get the whether a control value is enabled or disabled for button of a button matrix
- * @param obj pointer to a button matrix object
- * @param btn_id the index a button not counting new line characters. (E.g. the return value of
- * lv_btnmatrix_get_pressed/released)
- * @param ctrl control values to check (ORed value can be used)
- * @return true: long press repeat is disabled; false: long press repeat enabled
- */
-bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl)
+bool lv_btnmatrix_has_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -486,11 +359,6 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
     return (btnm->ctrl_bits[btn_id] & ctrl) ? true : false;
 }
 
-/**
- * Find whether "one check" mode is enabled.
- * @param obj Button matrix object
- * @return whether "one check" mode is enabled
- */
 bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -537,10 +405,13 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv
 
 static void lv_btnmatrix_destructor(lv_obj_t * obj)
 {
-
-//    lv_mem_free(btnm->button_areas);
-//    lv_mem_free(btnm->ctrl_bits);
+    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
+    lv_mem_free(btnm->button_areas);
+    lv_mem_free(btnm->ctrl_bits);
+    btnm->button_areas = NULL;
+    btnm->ctrl_bits = NULL;
 }
+
 /**
  * Handle the drawing related tasks of the button matrix
  * @param obj pointer to a button matrix object
@@ -584,10 +455,10 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
         lv_state_t state_ori = obj->state;
         obj->state = LV_STATE_DEFAULT;
         obj->style_list.skip_trans = 1;
-        lv_draw_rect_dsc_init(&draw_rect_dsc_act);
-        lv_draw_label_dsc_init(&draw_label_dsc_act);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
+        lv_draw_rect_dsc_init(&draw_rect_def_default);
+        lv_draw_label_dsc_init(&draw_label_def_default);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_def_default);
+        lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_def_default);
         draw_label_dsc_act.flag |= recolor_flag;
         obj->style_list.skip_trans = 0;
         obj->state = state_ori;
@@ -634,14 +505,6 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
             btn_area.x2 += area_obj.x1;
             btn_area.y2 += area_obj.y1;
 
-            /*Use the custom draw if any*/
-            if(btnm->custom_draw_cb) {
-                obj->state = btn_state;
-                bool drawn = btnm->custom_draw_cb(obj, btn_i, &btn_area, clip_area);
-                obj->state = state_ori;
-                if(drawn) continue;
-            }
-
             /*Set up the draw descriptors*/
             if(btn_state == LV_STATE_DEFAULT) {
                 lv_memcpy(&draw_rect_dsc_act, &draw_rect_def_default, sizeof(lv_draw_rect_dsc_t));
@@ -650,12 +513,14 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
             /*In other cases get the styles directly without caching them*/
             else {
                 obj->state = btn_state;
+                obj->style_list.skip_trans = 1;
                 lv_draw_rect_dsc_init(&draw_rect_dsc_act);
                 lv_draw_label_dsc_init(&draw_label_dsc_act);
                 lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
                 draw_label_dsc_act.flag = recolor_flag;
                 obj->state = state_ori;
+                obj->style_list.skip_trans = 0;
             }
 
             hook_dsc.draw_area = &btn_area;
@@ -689,7 +554,7 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
 #endif
 
             lv_point_t txt_size;
-            _lv_txt_get_size(&txt_size, txt, font, letter_space,
+            lv_txt_get_size(&txt_size, txt, font, letter_space,
                              line_space, lv_area_get_width(&area_obj), recolor_flag);
 
             btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
@@ -1148,7 +1013,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
 static void make_one_button_checked(lv_obj_t * obj, uint16_t btn_idx)
 {
     /*Save whether the button was toggled*/
-    bool was_toggled = lv_btnmatrix_get_btn_ctrl(obj, btn_idx, LV_BTNMATRIX_CTRL_CHECKED);
+    bool was_toggled = lv_btnmatrix_has_btn_ctrl(obj, btn_idx, LV_BTNMATRIX_CTRL_CHECKED);
 
     lv_btnmatrix_clear_btn_ctrl_all(obj, LV_BTNMATRIX_CTRL_CHECKED);
 

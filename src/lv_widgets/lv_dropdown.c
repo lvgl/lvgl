@@ -44,6 +44,7 @@ static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, cons
 static void lv_dropdown_list_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static lv_res_t list_release_handler(lv_obj_t * list_obj);
@@ -83,13 +84,6 @@ const lv_obj_class_t lv_dropdown_list = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a drop down list objects
- * @param par pointer to an object, it will be the parent of the new drop down list
- * @param copy pointer to a drop down list object, if not NULL then the new object will be copied
- * from it
- * @return pointer to the created drop down list
- */
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     return lv_obj_create_from_class(&lv_dropdown, parent, copy);
@@ -99,11 +93,6 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/**
- * Set text of the ddlist (Displayed on the button if `show_selected = false`)
- * @param ddlist pointer to a drop down list object
- * @param txt the text as a string (Only it's pointer is saved)
- */
 void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -115,32 +104,6 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Clear all options in a drop down list.  Static or dynamic.
- * @param ddlist pointer to drop down list object
- */
-void lv_dropdown_clear_options(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
-    if(dropdown->options == NULL) return;
-
-    if(dropdown->static_txt == 0)
-        lv_mem_free(dropdown->options);
-
-    dropdown->options = NULL;
-    dropdown->static_txt = 0;
-    dropdown->option_cnt = 0;
-
-    lv_obj_invalidate(obj);
-}
-
-/**
- * Set the options in a drop down list from a string
- * @param ddlist pointer to drop down list object
- * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
- * The options string can be destroyed after calling this function
- */
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -185,11 +148,6 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     dropdown->static_txt = 0;
 }
 
-/**
- * Set the options in a drop down list from a string
- * @param ddlist pointer to drop down list object
- * @param options a static string with '\n' separated options. E.g. "One\nTwo\nThree"
- */
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -216,12 +174,6 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     dropdown->options = (char *)options;
 }
 
-/**
- * Add an options to a drop down list from a string.  Only works for dynamic options.
- * @param ddlist pointer to drop down list object
- * @param option a string without '\n'. E.g. "Four"
- * @param pos the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
- */
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -292,11 +244,22 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set the selected option
- * @param ddlist pointer to drop down list object
- * @param sel_opt id of the selected option (0 ... number of option - 1);
- */
+void lv_dropdown_clear_options(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
+    if(dropdown->options == NULL) return;
+
+    if(dropdown->static_txt == 0)
+        lv_mem_free(dropdown->options);
+
+    dropdown->options = NULL;
+    dropdown->static_txt = 0;
+    dropdown->option_cnt = 0;
+
+    lv_obj_invalidate(obj);
+}
+
 void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -310,11 +273,6 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set the direction of the a drop down list
- * @param ddlist pointer to a drop down list object
- * @param dir LV_DIR_LEFT/RIGHT/TOP/BOTTOM
- */
 void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -327,11 +285,6 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set the maximal height for the drop down list
- * @param ddlist pointer to a drop down list
- * @param h the maximal height
- */
 void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -342,11 +295,6 @@ void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h)
     dropdown->max_height = h;
 }
 
-/**
- * Set an arrow or other symbol to display when the drop-down list is closed.
- * @param ddlist pointer to drop down list object
- * @param symbol a text like `LV_SYMBOL_DOWN` or NULL to not draw icon
- */
 void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -360,11 +308,15 @@ void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
  * Getter functions
  *====================*/
 
-/**
- * Get text of the ddlist (Displayed on the button if `show_selected = false`)
- * @param ddlist pointer to a drop down list object
- * @return the text string
- */
+lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
+
+    return dropdown->list;
+
+}
+
 const char * lv_dropdown_get_text(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -373,11 +325,6 @@ const char * lv_dropdown_get_text(lv_obj_t * obj)
     return dropdown->text;
 }
 
-/**
- * Get the options of a drop down list
- * @param ddlist pointer to drop down list object
- * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
- */
 const char * lv_dropdown_get_options(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -386,11 +333,6 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj)
     return dropdown->options;
 }
 
-/**
- * Get the selected option
- * @param ddlist pointer to drop down list object
- * @return id of the selected option (0 ... number of option - 1);
- */
 uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -400,11 +342,6 @@ uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
     return dropdown->sel_opt_id;
 }
 
-/**
- * Get the total number of options
- * @param ddlist pointer to drop down list object
- * @return the total number of options in the list
- */
 uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -414,12 +351,6 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
     return dropdown->option_cnt;
 }
 
-/**
- * Get the current selected option as a string
- * @param ddlist pointer to ddlist object
- * @param buf pointer to an array to store the string
- * @param buf_size size of `buf` in bytes. 0: to ignore it.
- */
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -446,11 +377,6 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     buf[c] = '\0';
 }
 
-/**
- * Get the fix height value.
- * @param ddlist pointer to a drop down list object
- * @return the height if the ddlist is opened (0: auto size)
- */
 lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -459,11 +385,6 @@ lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
     return dropdown->max_height;
 }
 
-/**
- * Get the symbol to draw when the drop-down list is closed
- * @param ddlist pointer to drop down list object
- * @return the symbol or NULL if not enabled
- */
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -473,11 +394,6 @@ const char * lv_dropdown_get_symbol(lv_obj_t * obj)
     return dropdown->symbol;
 }
 
-/**
- * Get the direction of the drop down list
- * @param ddlist pointer to a drop down list object
- * @return LV_DIR_LEF/RIGHT/TOP/BOTTOM
- */
 lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -491,10 +407,6 @@ lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
  * Other functions
  *====================*/
 
-/**
- * Open the drop down list with or without animation
- * @param ddlist pointer to drop down list object
- */
 void lv_dropdown_open(lv_obj_t * dropdown_obj)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
@@ -530,10 +442,10 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
             if(dropdown_obj->coords.y1 > LV_VER_RES - dropdown_obj->coords.y2) {
                 /*There is more space on the top, so make it drop up*/
                 dir = LV_DIR_TOP;
-                list_h = dropdown_obj->coords.y1;
+                list_h = dropdown_obj->coords.y1 - 1;
             }
             else {
-                list_h = LV_VER_RES - dropdown_obj->coords.y2;
+                list_h = LV_VER_RES - dropdown_obj->coords.y2 - 1;
             }
         }
     }
@@ -564,8 +476,8 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     else if(dir == LV_DIR_RIGHT)lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
     if(dropdown->dir == LV_DIR_LEFT || dropdown->dir == LV_DIR_RIGHT) {
-        if(dropdown->list->coords.y2 > LV_VER_RES) {
-            lv_obj_set_y(dropdown->list, lv_obj_get_y(dropdown->list) - (dropdown->list->coords.y2 - LV_VER_RES));
+        if(dropdown->list->coords.y2 >= LV_VER_RES) {
+            lv_obj_set_y(dropdown->list, lv_obj_get_y(dropdown->list) - (dropdown->list->coords.y2 - LV_VER_RES) - 1);
         }
     }
 
@@ -585,10 +497,6 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     }
 }
 
-/**
- * Close (Collapse) the drop down list
- * @param ddlist pointer to drop down list object
- */
 void lv_dropdown_close(lv_obj_t * obj)
 {
     lv_obj_clear_state(obj, LV_STATE_CHECKED);
@@ -722,8 +630,7 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
             lv_coord_t symbol_h;
             if(symbol_type == LV_IMG_SRC_SYMBOL) {
                 lv_point_t size;
-                _lv_txt_get_size(&size, dropdown->symbol, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                                           label_dsc.flag);
+                lv_txt_get_size(&size, dropdown->symbol, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
                 symbol_w = size.x;
                 symbol_h = size.y;
             } else {
@@ -739,8 +646,6 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
             }
 
             lv_area_t symbol_area;
-            symbol_area.y1 = obj->coords.y1 + top;
-            symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             if(symbol_to_left) {
                 symbol_area.x1 = obj->coords.x1 + left;
                 symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
@@ -750,8 +655,12 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
             }
 
             if(symbol_type == LV_IMG_SRC_SYMBOL) {
+                symbol_area.y1 = obj->coords.y1 + top;
+                symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
                 lv_draw_label(&symbol_area, clip_area, &label_dsc, dropdown->symbol, NULL);
             } else {
+                symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
+                symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
                 lv_draw_img_dsc_t img_dsc;
                 lv_draw_img_dsc_init(&img_dsc);
                 lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
@@ -762,8 +671,7 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
             }
 
             lv_point_t size;
-            _lv_txt_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                    label_dsc.flag);
+            lv_txt_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
 
             lv_area_t txt_area;
             txt_area.y1 = obj->coords.y1 + top;
@@ -1174,12 +1082,8 @@ static void position_to_selected(lv_obj_t * dropdown_obj)
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
-
-    lv_coord_t line_y1 = dropdown->sel_opt_id * (font_h + line_space);
-
-    /*Do not allow scrolling in*/
-    lv_coord_t bottom_diff = dropdown->list->coords.y2 - lv_obj_get_style_pad_bottom(dropdown->list, LV_PART_MAIN) - (label->coords.y2 - line_y1);
-    if(bottom_diff > 0) line_y1 -= bottom_diff;
+    lv_coord_t unit_h = font_h + line_space;
+    lv_coord_t line_y1 = dropdown->sel_opt_id * unit_h;
 
     /*Scroll to the selected option*/
     lv_obj_scroll_to_y(dropdown->list, line_y1, LV_ANIM_OFF);

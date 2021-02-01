@@ -61,6 +61,7 @@ static void fade_in_anim_ready(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static style_refr = true;
 
 /**********************
  *      MACROS
@@ -70,23 +71,11 @@ static void fade_in_anim_ready(lv_anim_t * a);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Initialize the object related style manager module.
- * Called by LVGL in `lv_init()`
- */
 void _lv_obj_style_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));
 }
 
-/**
- * Add a style to an object.
- * @param obj:   pointer to an object
- * @param part:  a part of the object to which the style should be added E.g. `LV_PART_MAIN` or `LV_PART_KNOB`
- * @param state: a state or combination of states to which the style should be assigned
- * @param style: pointer to a style to add
- * @example lv_obj_add_style_no_refresh(slider, LV_PART_KNOB, LV_STATE_PRESSED, &style1);
- */
 void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
 {
     trans_del(obj, part, 0xFF, NULL);
@@ -118,13 +107,6 @@ void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_
     lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
-/**
- * Add a style to an object.
- * @param obj:   pointer to an object
- * @param part:  a part of the object from which the style should be removed E.g. `LV_PART_MAIN` or `LV_PART_KNOB`
- * @param state: a state or combination of states from which the style should be removed
- * @param style: pointer to a style to remove
- */
 void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
 {
     uint32_t i = 0;
@@ -163,13 +145,9 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
     }
 }
 
-/**
- * Notify all object if a style is modified
- * @param style: pointer to a style. Only the objects with this style will be notified
- *               (NULL to notify all objects)
- */
 void lv_obj_report_style_change(lv_style_t * style)
 {
+    if(!style_refr) return;
     lv_disp_t * d = lv_disp_get_next(NULL);
 
     while(d) {
@@ -181,15 +159,11 @@ void lv_obj_report_style_change(lv_style_t * style)
     }
 }
 
-/**
- * Notify an object and its children about its style is modified.
- * @param obj: pointer to an object
- * @param prop: `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property.
- *              It is used to optimize what needs to be refreshed.
- */
 void lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    if(!style_refr) return;
 
     update_cache(obj, LV_PART_MAIN, prop);
 
@@ -209,16 +183,11 @@ void lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
     }
 }
 
-/**
- * Get the value of a style property. The current state of the object will be considered.
- * Inherited properties will be inherited.
- * If a property is not set a default value will be returned.
- * @param obj:  pointer to an object
- * @param part: a part from which the property should be get
- * @param prop: the property to get
- * @return the value of the property.
- *         Should be read from the correct field of the `lv_style_value_t` according to the type of the property.
- */
+void lv_obj_enable_style_refresh(bool en)
+{
+    style_refr = en;
+}
+
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
@@ -248,31 +217,13 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_st
     return value_act;
 }
 
-
-/**
- * Set local style property on an object's part and state.
- * @param obj:   pointer to an object
- * @param part:  a part to which the property should be added
- * @param state: a state to which the property should be added
- * @param prop:  the property
- * @param value: value of the property. The correct element should be set according to the type of the property
- */
 void lv_obj_set_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t value)
 {
     lv_style_t * style = get_local_style(obj, part, state);
     lv_style_set_prop(style, prop, value);
     lv_obj_refresh_style(obj, prop);
-
 }
 
-/**
- * Remove a local style property from a part of an object with a given state.
- * @param obj:   pointer to an object
- * @param part:  the part of the object which style property should be removed.
- * @param state: the state from which the property should be removed.
- * @param prop:  a style property to remove.
- * @return true: the property was found and removed; false: the property was not found
- */
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -293,19 +244,6 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t stat
     return lv_style_remove_prop(obj->style_list.styles[i].style, prop);
 }
 
-/**
- * Allocate and initialize a transition for a property of an object if the properties value is different in the new state.
- * It allocates `lv_style_trans_t` in `_lv_obj_style_trans_ll` and set only `start/end_values`. No animation will be created here.
- * @param obj and object to add the transition
- * @param prop the property to apply the transaction
- * @param part the part of the object to apply the transaction
- * @param prev_state the previous state of the objects
- * @param new_state the new state of the object
- * @param time duration of transition in [ms]
- * @param delay delay before starting the transition in [ms]
- * @param path the path of the transition
- * @return pointer to the allocated `the transaction` variable or `NULL` if no transition created
- */
 void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path)
 {
@@ -362,13 +300,6 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_
     }
 }
 
-/**
- * Compare the style properties of an object in 2 different states
- * @param obj pointer to an object
- * @param state1 a state
- * @param state2 an other state
- * @return an element of `_lv_style_state_cmp_t`
- */
 _lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
     lv_obj_style_list_t * list = &obj->style_list;
@@ -432,13 +363,6 @@ _lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t stat
     return res;
 }
 
-
-/**
- * Fade in (from transparent to fully cover) an object and all its children using an `opa_scale` animation.
- * @param obj the object to fade in
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
- */
 void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
 {
     lv_anim_t a;
@@ -452,12 +376,6 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_start(&a);
 }
 
-/**
- * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
- * @param obj the object to fade in
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
- */
 void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 {
     lv_anim_t a;
@@ -552,7 +470,8 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
     cache_t cache_res = read_cache(obj, part, prop);
     switch(cache_res) {
     case CACHE_ZERO:
-        v->ptr = 0;
+        if(prop == LV_STYLE_TRANSFORM_ZOOM) v->num = LV_IMG_ZOOM_NONE;
+        else v->ptr = 0;
         return true;
     case CACHE_TRUE:
         v->num = 1;
@@ -703,7 +622,7 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         else list->cache_outline_width_zero = 0;
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_SHADOW_WIDTH) {
-        if(get_prop_core(obj, part, LV_STYLE_OUTLINE_WIDTH, &v) == false) v.num = 0;
+        if(get_prop_core(obj, part, LV_STYLE_SHADOW_WIDTH, &v) == false) v.num = 0;
         if(v.num == 0) list->cache_shadow_width_zero = 1;
         else list->cache_shadow_width_zero = 0;
     }
@@ -805,10 +724,6 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         if(list->cache_shadow_width_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
-    case LV_STYLE_IMG_RECOLOR_OPA:
-        if(list->cache_shadow_width_zero ) return CACHE_ZERO;
-        else return CACHE_NEED_CHECK;
-        break;
     case LV_STYLE_CONTENT_TEXT:
         if(list->cache_content_text_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
@@ -832,7 +747,7 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     /*255 or Needs check*/
     case LV_STYLE_BG_OPA:
         if(list->cache_bg_opa_cover) return CACHE_255;
-        else return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_IMG_OPA:
         if(list->cache_img_opa_cover) return CACHE_255;

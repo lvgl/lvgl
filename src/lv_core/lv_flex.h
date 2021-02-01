@@ -57,7 +57,7 @@ typedef struct {
     uint32_t wrap         :1;
     uint32_t rev          :1;
     uint32_t item_main_place   :3;
-    uint32_t track_place  :3;
+    uint32_t track_cross_place  :3;
     uint32_t item_cross_place   :3;
 }lv_flex_t;
 
@@ -85,7 +85,7 @@ void lv_flex_set_flow(lv_flex_t * flex, lv_flex_flow_t flow);
  * @param item_cross_place: where to place the item in their track on the cross axis. `LV_FLEX_PLACE_START/END/CENTER`
  * @param track_place: how to place the tracks in the cross direction. Any value of `lv_flex_place_t`.
  */
-void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_flex_place_t item_cross_place, lv_flex_place_t track_place);
+void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_flex_place_t item_cross_place, lv_flex_place_t track_cross_place);
 
 /**
  * Sets the width or height (on main axis) to grow the object in order fill the free space
@@ -101,7 +101,8 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow);
 /**
  * Predefines flex layouts
  */
-extern const lv_flex_t lv_flex_center;  /**< Center in a row with wrap*/
+extern const lv_flex_t lv_flex_center_row;     /**< Center in a row with wrap*/
+extern const lv_flex_t lv_flex_center_column;  /**< Center in a column with wrap*/
 extern const lv_flex_t lv_flex_stacked; /**< Stack the items vertically*/
 extern const lv_flex_t lv_flex_even;    /**< Place the items evenly in row with wrapping and vertical centering*/
 

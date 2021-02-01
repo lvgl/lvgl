@@ -214,9 +214,11 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMG_OPA:
+        case LV_STYLE_BG_IMG_OPA:
         case LV_STYLE_LINE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
+        case LV_STYLE_CONTENT_OPA:
             value.num = LV_OPA_COVER;
             break;
         case LV_STYLE_BG_GRAD_STOP:
@@ -226,6 +228,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.num = LV_BORDER_SIDE_FULL;
             break;
         case LV_STYLE_TEXT_FONT:
+        case LV_STYLE_CONTENT_FONT:
             value.ptr = LV_THEME_DEFAULT_FONT_NORMAL;
             break;
         case LV_STYLE_SIZE:

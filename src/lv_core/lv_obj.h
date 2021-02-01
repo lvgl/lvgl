@@ -82,10 +82,10 @@ typedef enum {
     LV_EVENT_DELETE, /**< Object is being deleted */
 
     LV_EVENT_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_EVENT_REFR_EXT_SIZE,   /**< Draw extras on the object */
+    LV_EVENT_REFR_EXT_DRAW_SIZE,   /**< Draw extras on the object */
 
     LV_EVENT_DRAW_MAIN_BEGIN,
-    LV_EVENT_DRAW_MAIN_FINISH,
+    LV_EVENT_DRAW_MAIN_END,
     LV_EVENT_DRAW_POST_BEGIN,
     LV_EVENT_DRAW_POST_END,
     LV_EVENT_DRAW_PART_BEGIN,
@@ -162,6 +162,7 @@ enum {
     LV_STATE_PRESSED     =  0x20,
     LV_STATE_SCROLLED    =  0x40,
     LV_STATE_DISABLED    =  0x80,
+    _LV_STATE_RESERVED    =  0x80,
 
     LV_STATE_ANY = 0x1FF,    /**< Special value can be used in some functions to target all states */
 };
@@ -329,9 +330,9 @@ void lv_deinit(void);
 
 /**
  * Create a base object (a rectangle)
- * @param parent: pointer to a parent object. If NULL then a screen will be created.
- * @param copy:   DEPRECATED, will be removed in v9.
- *                Pointer to an other base object to copy.
+ * @param parent    pointer to a parent object. If NULL then a screen will be created.
+ * @param copy      DEPRECATED, will be removed in v9.
+ *                  Pointer to an other base object to copy.
  * @return pointer to the new object
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
@@ -352,14 +353,14 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data);
 
 /**
  * Get the `data` parameter of the current event
- * @return the `data` parameter
+ * @return      the `data` parameter
  */
 void * lv_event_get_data(void);
 
 /**
  * Register a new, custom event ID.
  * It can be used the same way as e.g. `LV_EVENT_CLICKED` to send custom events
- * @return the new event id
+ * @return      the new event id
  * @example
  * uint32_t LV_EVENT_MINE = 0;
  * ...
@@ -371,8 +372,8 @@ uint32_t lv_event_register_id(void);
 
 /**
  * Send an event to the object
- * @param obj pointer to an object
- * @param event the type of the event from `lv_event_t`.
+ * @param obj       pointer to an object
+ * @param event     the type of the event from `lv_event_t`.
  * @return LV_RES_OK or LV_RES_INV
  */
 lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
@@ -381,26 +382,25 @@ lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
  * Setter functions
  *====================*/
 
-
 /**
  * Set one or more flags
- * @param obj: pointer to an object
- * @param f:   OR-ed values from `lv_obj_flag_t` to set.
+ * @param obj   pointer to an object
+ * @param f     R-ed values from `lv_obj_flag_t` to set.
  */
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Clear one or more flags
- * @param obj: pointer to an object
- * @param f:   OR-ed values from `lv_obj_flag_t` to set.
+ * @param obj   pointer to an object
+ * @param f     OR-ed values from `lv_obj_flag_t` to set.
  */
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Set the state (fully overwrite) of an object.
  * If specified in the styles, transition animations will be started from the previous state to the current.
- * @param obj:   pointer to an object
- * @param state: the new state
+ * @param obj       pointer to an object
+ * @param state     the new state
  */
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 
@@ -408,31 +408,32 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
  * If specified in the styles, transition animation will be started from the previous state to the current.
- * @param obj:   pointer to an object
- * @param state: the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ * @param obj       pointer to an object
+ * @param state     the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
  */
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
 
 /**
  * Remove one or more states to the object. The other state bits will remain unchanged.
  * If specified in the styles, transition animation will be started from the previous state to the current.
- * @param obj:   pointer to an object
- * @param state: the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ * @param obj       pointer to an object
+ * @param state     the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
  */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
 /**
- * Set a an event handler function for an object.
+ * Add a an event handler function for an object.
  * Used by the user to react on event which happens with the object.
- * @param obj pointer to an object
- * @param event_cb the new event function
+ * An object can have multiple event handler. They will be called in the same the order as they were  added.
+ * @param obj       pointer to an object
+ * @param event_cb  the new event function
  */
-void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
+void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 
 /**
  * Set the base direction of the object
- * @param obj pointer to an object
- * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
+ * @param obj   pointer to an object
+ * @param dir   the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
  */
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 
@@ -443,38 +444,46 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 
 /**
  * Check if a given flag or flags are set on an object.
- * @param obj pointer to an object
- * @param f the flag(s) to check (OR-ed values can be used)
- * @return true: all flags are set; false: not all flags are set
+ * @param obj   pointer to an object
+ * @param f     the flag(s) to check (OR-ed values can be used)
+ * @return      true: all flags are set; false: not all flags are set
  */
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Get the base direction of the object
- * @param obj pointer to an object
- * @return the base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
+ * @param obj   pointer to an object
+ * @return      the base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
  */
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
 /**
  * Get the state of an object
- * @param obj pointer to an object
- * @return the state (OR-ed values from `lv_state_t`)
+ * @param obj   pointer to an object
+ * @return      the state (OR-ed values from `lv_state_t`)
  */
 lv_state_t lv_obj_get_state(const lv_obj_t * obj);
 
 /**
+ * Check if the object is in a given state or not.
+ * @param obj       pointer to an object
+ * @param state     a state or combination of states to check
+ * @return          true: `obj` is in `state`; false: `obj` is not in `state`
+ */
+bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
+
+/**
  * Get the event function of an object
- * @param obj: pointer to an object
- * @param id:  the index of the event callback. 0: the firstly added
- * @return the event function
+ * @param obj   pointer to an object
+ * @param id    the index of the event callback. 0: the firstly added
+ * @return      the event function
  */
 lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj, uint32_t id);
 
 /**
  * Get the group of the object
- * @param obj pointer to an object
- * @return the pointer to group of the object
+ * @param       obj pointer to an object
+ * @return      the pointer to group of the object
  */
 void * lv_obj_get_group(const lv_obj_t * obj);
 
@@ -484,38 +493,38 @@ void * lv_obj_get_group(const lv_obj_t * obj);
 
 /**
  * Allocate special data for an object if not allocated yet.
- * @param obj pointer to an object
+ * @param obj   pointer to an object
  */
 void lv_obj_allocate_spec_attr(lv_obj_t * obj);
 
 /**
  * Get the focused object by taking `LV_OBJ_FLAG_FOCUS_BUBBLE` into account.
- * @param obj the start object
- * @return the object to to really focus
+ * @param obj   the start object
+ * @return      the object to to really focus
  */
 lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
 
 /**
  * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
  * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
- * @param obj pointer to an object which type should be get
- * @param buf pointer to an `lv_obj_type_t` buffer to store the types
+ * @param obj   pointer to an object which type should be get
+ * @param buf   pointer to an `lv_obj_type_t` buffer to store the types
  */
 bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p);
 
 /**
  * Check if any object has a given type
- * @param obj pointer to an object
- * @param obj_type type of the object. (e.g. "lv_btn")
- * @return true: valid
+ * @param obj       pointer to an object
+ * @param obj_type  type of the object. (e.g. "lv_btn")
+ * @return          true: valid
  */
 bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
 
 /**
  * Check if any object is still "alive", and part of the hierarchy
- * @param obj pointer to an object
- * @param obj_type type of the object. (e.g. "lv_btn")
- * @return true: valid
+ * @param obj       pointer to an object
+ * @param obj_type  type of the object. (e.g. "lv_btn")
+ * @return          true: valid
  */
 bool _lv_debug_check_obj_valid(const lv_obj_t * obj);
 

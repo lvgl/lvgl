@@ -436,6 +436,9 @@ static inline void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t valu
 static inline void lv_style_set_bg_img_src(lv_style_t * style, const void * value) {
   lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_SRC, v); }
 
+static inline void lv_style_set_bg_img_opa(lv_style_t * style, lv_opa_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_OPA, v); }
+
 static inline void lv_style_set_bg_img_recolor(lv_style_t * style, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR, v); }
 

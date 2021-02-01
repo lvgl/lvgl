@@ -39,7 +39,6 @@ const lv_obj_class_t lv_btn  = {
     .base_class = &lv_obj
 };
 
-
 /**********************
  *      MACROS
  **********************/
@@ -48,26 +47,11 @@ const lv_obj_class_t lv_btn  = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a button object
- * @param parent pointer to an object, it will be the parent of the new button
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other button to copy.
- * @return pointer to the created button
- */
 lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
      LV_LOG_TRACE("button create started");
      return lv_obj_create_from_class(&lv_btn, parent, copy);
 }
-
-/*=====================
- * Setter functions
- *====================*/
-
-/*=====================
- * Getter functions
- *====================*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -87,16 +71,9 @@ static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 
 static void lv_btn_destructor(lv_obj_t * obj)
 {
-//    lv_bar_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-//#if LV_USE_ANIMATION
-//    lv_anim_del(&bar->cur_value_anim, NULL);
-//    lv_anim_del(&bar->start_value_anim, NULL);
-//#endif
 
-//    lv_btn.base_p->destructor(obj);
 }
+
 static lv_draw_res_t lv_btn_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     return lv_obj.draw_cb(obj, clip_area, mode);

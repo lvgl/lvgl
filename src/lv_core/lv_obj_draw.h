@@ -36,19 +36,22 @@ typedef enum {
 
 typedef struct
 {
+    const lv_area_t * draw_area;
+    const lv_area_t * clip_area;
     lv_draw_rect_dsc_t * rect_dsc;
     lv_draw_label_dsc_t * label_dsc;
     lv_draw_line_dsc_t * line_dsc;
     lv_draw_img_dsc_t *  img_dsc;
     lv_draw_arc_dsc_t *  arc_dsc;
-    char text[16];
-    const lv_area_t * draw_area;
     const lv_point_t * p1;
     const lv_point_t * p2;
     const lv_coord_t * radius;
-    const lv_area_t * clip_area;
+    char text[16];
     uint32_t id;
-    uint8_t part;
+    uint32_t part   :8;
+    uint32_t sub_part_id :12;
+    uint32_t size       :12;
+    const void * sub_part_ptr;
 }lv_obj_draw_hook_dsc_t;
 
 /** Design modes */

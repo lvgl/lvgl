@@ -80,7 +80,7 @@ void _lv_img_decoder_init(void)
  * @param header the image info will be stored here
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
-lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
+lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 {
     header->always_zero = 0;
     header->h = 0;

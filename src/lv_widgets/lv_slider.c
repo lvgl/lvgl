@@ -61,32 +61,12 @@ const lv_obj_class_t lv_slider = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a slider objects
- * @param parent pointer to an object, it will be the parent of the new slider
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other slider to copy.
- * @return pointer to the created slider
- */
 lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
 
     return lv_obj_create_from_class(&lv_slider, parent, copy);
 }
 
-/*=====================
- * Setter functions
- *====================*/
-
-/*=====================
- * Getter functions
- *====================*/
-
-/**
- * Give the slider is being dragged or not
- * @param slider pointer to a slider object
- * @return true: drag in progress false: not dragged
- */
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -132,16 +112,6 @@ static void lv_slider_destructor(lv_obj_t * obj)
 //    slider->class_p->base_p->destructor(obj);
 }
 
-/**
- * Handle the drawing related tasks of the sliders
- * @param slider pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
@@ -165,13 +135,6 @@ static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area,
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the slider
- * @param slider pointer to a slider object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
@@ -195,10 +158,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             info->result = _lv_area_is_point_on(&slider->left_knob_area, info->point, 0);
         }
     }
-
-    lv_point_t p;
-
-    if(sign == LV_SIGNAL_PRESSED) {
+    else if(sign == LV_SIGNAL_PRESSED) {
+        lv_point_t p;
         slider->dragging = true;
         if(type == LV_SLIDER_TYPE_NORMAL || type == LV_SLIDER_TYPE_SYMMETRICAL) {
             slider->value_to_set = &slider->bar.cur_value;
@@ -250,6 +211,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_PRESSING && slider->value_to_set != NULL) {
         if(lv_indev_get_type(param) != LV_INDEV_TYPE_POINTER) return res;
 
+        lv_point_t p;
         lv_indev_get_point(param, &p);
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
 
@@ -380,7 +342,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
+static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
 {
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);

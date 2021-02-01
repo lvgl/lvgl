@@ -105,7 +105,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
         format.s.crop        = 0;
     }
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
+    #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
@@ -116,7 +116,6 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
 #else
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
     LV_ASSERT_MEM(table->cell_data[cell]);
-    if(table->cell_data[cell] == NULL) return;
 
     strcpy(table->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
 #endif
@@ -257,21 +256,35 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     LV_ASSERT_MEM(table->col_w);
     if(table->col_w == NULL) return;
 
-    table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
-    LV_ASSERT_MEM(table->cell_data);
-    if(table->cell_data == NULL) return;
+    char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
+    LV_ASSERT_MEM(new_cell_data);
+    if(new_cell_data == NULL) return;
+    uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
+    lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
 
     /*Initialize the new fields*/
     if(old_col_cnt < col_cnt) {
-        uint32_t old_cell_cnt = old_col_cnt * table->row_cnt;
-        uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
-        lv_memset_00(&table->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(table->cell_data[0]));
-
         uint32_t col;
-        for(col = old_cell_cnt; col < new_cell_cnt; col++) {
+        for(col = old_col_cnt; col < col_cnt; col++) {
             table->col_w[col] = LV_DPI;
         }
     }
+
+    /*The new column(s) messes up the mapping of `cell_data`*/
+    uint32_t old_col_start;
+    uint32_t new_col_start;
+    uint32_t min_col_cnt = LV_MIN(old_col_cnt, col_cnt);
+    uint32_t row;
+    for(row = 0; row < table->row_cnt; row++) {
+        old_col_start = row * old_col_cnt;
+        new_col_start = row * col_cnt;
+
+        lv_memcpy_small(&new_cell_data[new_col_start], &table->cell_data[old_col_start], sizeof(new_cell_data[0]) * min_col_cnt);
+    }
+
+    lv_mem_free(table->cell_data);
+    table->cell_data = new_cell_data;
+
 
     refr_size(obj) ;
 }
@@ -571,7 +584,7 @@ static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
         table->col_w = lv_mem_alloc(table->col_cnt * sizeof(table->col_w[0]));
         table->row_h = lv_mem_alloc(table->row_cnt * sizeof(table->row_h[0]));
         table->col_w[0] = LV_DPI;
-        table->row_h[0] = LV_DPI; /*It will be overwritten when the theme is applied*/
+        table->row_h[0] = LV_DPI;
         table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
         table->cell_data[0] = NULL;
 
@@ -754,11 +767,10 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                     if(format.s.crop == 0) txt_flags = LV_TEXT_FLAG_NONE;
                     else txt_flags = LV_TEXT_FLAG_EXPAND;
 
-                    _lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_base.font,
-                                     label_dsc_base.letter_space, label_dsc_base.line_space,
+                    lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_base.font,
+                                     label_dsc_act.letter_space, label_dsc_act.line_space,
                                      lv_area_get_width(&txt_area), txt_flags);
 
-                    label_dsc_base.flag = 0;
                     /*Align the content to the middle if not cropped*/
                     if(format.s.crop == 0) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
@@ -892,7 +904,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
             else {
                 txt_w -= cell_left + cell_right;
 
-                _lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
+                lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
                                  letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
                 h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);

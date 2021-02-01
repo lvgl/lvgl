@@ -655,9 +655,9 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
         }
 
         /*Call the post draw draw function of the parents of the to object*/
-        lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, NULL);
+        lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, mask_p);
         par->class_p->draw_cb(par, mask_p, LV_DRAW_MODE_POST_DRAW);
-        lv_event_send(par, LV_EVENT_DRAW_POST_END, NULL);
+        lv_event_send(par, LV_EVENT_DRAW_POST_END, mask_p);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/
@@ -694,9 +694,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
         /* Redraw the object */
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, NULL);
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, &obj_ext_mask);
         obj->class_p->draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_MAIN_DRAW);
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, NULL);
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
 
 #if MASK_AREA_DEBUG
         static lv_color_t debug_color = LV_COLOR_RED;
@@ -743,9 +743,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn make 'post draw' draw */
-        lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, NULL);
+        lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, &obj_ext_mask);
         obj->class_p->draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_POST_DRAW);
-        lv_event_send(obj, LV_EVENT_DRAW_POST_END, NULL);
+        lv_event_send(obj, LV_EVENT_DRAW_POST_END, &obj_ext_mask);
     }
 }
 

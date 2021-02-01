@@ -177,7 +177,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 
         lv_coord_t dash_start = 0;
         if(dashed) {
-            dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+            dash_start = (point1->x) % (dsc->dash_gap + dsc->dash_width);
         }
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);

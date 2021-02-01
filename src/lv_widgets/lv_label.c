@@ -38,6 +38,8 @@ static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 static void lv_label_destructor(lv_obj_t * obj);
 static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
+
+static void lv_label_refr_text(lv_obj_t * obj);
 static void lv_label_revert_dots(lv_obj_t * label);
 
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
@@ -68,13 +70,6 @@ const lv_obj_class_t lv_label = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a label objects
- * @param parent pointer to an object, it will be the parent of the new label
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other label to copy.
- * @return pointer to the created button
- */
 lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     return lv_obj_create_from_class(&lv_label, parent, copy);
@@ -84,11 +79,6 @@ lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/**
- * Set a new text for a label. Memory will be allocated to store the text by the label.
- * @param label pointer to a label object
- * @param text '\0' terminated character string. NULL to refresh with the current text.
- */
 void lv_label_set_text(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -153,11 +143,6 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
     lv_label_refr_text(obj);
 }
 
-/**
- * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
- * @param label pointer to a label object
- * @param fmt `printf`-like format
- */
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -186,12 +171,6 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     lv_label_refr_text(obj);
 }
 
-/**
- * Set a static text. It will not be saved by the label so the 'text' variable
- * has to be 'alive' while the label exist.
- * @param label pointer to a label object
- * @param text pointer to a text. NULL to refresh with the current text.
- */
 void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -210,13 +189,6 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text)
     lv_label_refr_text(obj);
 }
 
-/**
- * Set the behavior of the label with longer text then the object size
- * @param label pointer to a label object
- * @param long_mode the new mode from 'lv_label_long_mode' enum.
- *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this
- * function
- */
 void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -245,11 +217,6 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     lv_label_refr_text(obj);
 }
 
-/**
- * Enable the recoloring by in-line commands
- * @param label pointer to a label object
- * @param en true: enable recoloring, false: disable
- */
 void lv_label_set_recolor(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -295,11 +262,6 @@ void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index)
  * Getter functions
  *====================*/
 
-/**
- * Get the text of a label
- * @param label pointer to a label object
- * @return the text of the label
- */
 char * lv_label_get_text(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -307,11 +269,6 @@ char * lv_label_get_text(const lv_obj_t * obj)
     return label->text;
 }
 
-/**
- * Get the long mode of a label
- * @param label pointer to a label object
- * @return the long mode
- */
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -319,11 +276,6 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
     return label->long_mode;
 }
 
-/**
- * Get the recoloring attribute
- * @param label pointer to a label object
- * @return true: recoloring is enabled, false: disable
- */
 bool lv_label_get_recolor(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -332,13 +284,6 @@ bool lv_label_get_recolor(const lv_obj_t * obj)
     return label->recolor == 0 ? false : true;
 }
 
-/**
- * Get the relative x and y coordinates of a letter
- * @param label pointer to a label object
- * @param index index of the letter [0 ... text length]. Expressed in character index, not byte
- * index (different in UTF-8)
- * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
- */
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -380,9 +325,6 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
-
-    if(align == LV_TEXT_ALIGN_CENTER) flag |= LV_TEXT_FLAG_CENTER;
-    if(align == LV_TEXT_ALIGN_RIGHT) flag |= LV_TEXT_FLAG_RIGHT;
 
     uint32_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
 
@@ -453,13 +395,6 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 #endif
 }
 
-/**
- * Get the index of letter on a relative point of a label
- * @param label pointer to label object
- * @param pos pointer to point with coordinates on a the label
- * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
- * Expressed in character index and not byte index (different in UTF-8)
- */
 uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -490,8 +425,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_CENTER) flag |= LV_TEXT_FLAG_CENTER;
-    if(align == LV_TEXT_ALIGN_RIGHT) flag |= LV_TEXT_FLAG_RIGHT;
 
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
@@ -586,49 +519,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     return  logical_pos + _lv_txt_encoded_get_char_id(txt, line_start);
 }
 
-/**
- * @brief Get the selection start index.
- * @param label pointer to a label object.
- * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
- */
-uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_LABEL_TEXT_SEL
-    lv_label_t * label = (lv_label_t *)obj;
-    return label->sel_start;
-
-#else
-    (void)obj;    /*Unused*/
-    return LV_LABEL_TEXT_SEL_OFF;
-#endif
-}
-
-/**
- * @brief Get the selection end index.
- * @param label pointer to a label object.
- * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
- */
-uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_LABEL_TEXT_SEL
-    lv_label_t * label = (lv_label_t *)obj;
-    return label->sel_end;
-#else
-    (void)obj; /*Unused*/
-    return LV_LABEL_TEXT_SEL_OFF;
-#endif
-}
-
-/**
- * Check if a character is drawn under a point.
- * @param label Label object
- * @param pos Point to check for character under
- * @return whether a character is drawn under the point
- */
 bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -652,7 +542,6 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
-    if(align == LV_TEXT_ALIGN_CENTER) flag |= LV_TEXT_FLAG_CENTER;
 
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
@@ -715,17 +604,37 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     return (pos->x >= (last_x - letter_space) && pos->x <= (last_x + max_diff));
 }
 
+uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+#if LV_LABEL_TEXT_SEL
+    lv_label_t * label = (lv_label_t *)obj;
+    return label->sel_start;
+
+#else
+    (void)obj;    /*Unused*/
+    return LV_LABEL_TEXT_SEL_OFF;
+#endif
+}
+
+uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+#if LV_LABEL_TEXT_SEL
+    lv_label_t * label = (lv_label_t *)obj;
+    return label->sel_end;
+#else
+    (void)obj; /*Unused*/
+    return LV_LABEL_TEXT_SEL_OFF;
+#endif
+}
+
 /*=====================
  * Other functions
  *====================*/
 
-/**
- * Insert a text to the label. The label text can not be static.
- * @param label pointer to a label object
- * @param pos character index to insert. Expressed in character index and not byte index (Different
- * in UTF-8) 0: before first char. LV_LABEL_POS_LAST: after last char.
- * @param txt pointer to the text to insert
- */
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -765,13 +674,6 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
     lv_label_set_text(obj, NULL);
 }
 
-/**
- * Delete characters from a label. The label text can not be static.
- * @param label pointer to a label object
- * @param pos character index to insert. Expressed in character index and not byte index (Different
- * in UTF-8) 0: before first char.
- * @param cnt number of characters to cut
- */
 void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -790,11 +692,206 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
     lv_label_refr_text(obj);
 }
 
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    LV_LOG_TRACE("label create started");
+
+    lv_obj_construct_base(obj, parent, copy);
+
+    lv_label_t * label = (lv_label_t *)obj;
+
+    label->text       = NULL;
+    label->static_txt = 0;
+    label->recolor    = 0;
+    label->dot_end    = LV_LABEL_DOT_END_INV;
+    label->long_mode  = LV_LABEL_LONG_EXPAND;
+    label->offset.x = 0;
+    label->offset.y = 0;
+
+#if LV_LABEL_LONG_TXT_HINT
+    label->hint.line_start = -1;
+    label->hint.coord_y    = 0;
+    label->hint.y          = 0;
+#endif
+
+#if LV_LABEL_TEXT_SEL
+    label->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
+    label->sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
+#endif
+    label->dot.tmp_ptr   = NULL;
+    label->dot_tmp_alloc = 0;
+
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_label_set_long_mode(obj, LV_LABEL_LONG_EXPAND);
+    lv_label_set_text(obj, "Text");
+
+    LV_LOG_INFO("label created");
+}
+
+static void lv_label_destructor(lv_obj_t * obj)
+{
+//    lv_label_dot_tmp_free(label->dot_...);
+//    lv_label_dot_tmp_free(label->text);
+
+//    lv_bar_t * bar = obj;
+//
+//    _lv_obj_reset_style_list_no_refr(obj, LV_PART_INDICATOR);
+//#if LV_USE_ANIMATION
+//    lv_anim_del(&bar->cur_value_anim, NULL);
+//    lv_anim_del(&bar->start_value_anim, NULL);
+//#endif
+
+//    bar->class_p->base_p->destructor(obj);
+}
+
+/**
+ * Handle the drawing related tasks of the labels
+ * @param label pointer to a label object
+ * @param clip_area the object will be drawn only in this area
+ * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DRAW_DRAW: draw the object (always return 'true')
+ *             LV_DRAW_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_draw_res_t`
+ */
+static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+{
+    /* A label never covers an area */
+    if(mode == LV_DRAW_MODE_COVER_CHECK)
+        return LV_DRAW_RES_NOT_COVER;
+    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
+
+        lv_obj.draw_cb(obj, clip_area, mode);
+
+        lv_label_t * label = (lv_label_t *)obj;
+        lv_area_t txt_coords;
+        get_txt_coords(obj, &txt_coords);
+
+        lv_area_t txt_clip;
+        bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
+        if(!is_common) return LV_DRAW_RES_OK;
+
+        lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
+        lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
+        if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
+        if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
+        if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
+
+        lv_draw_label_dsc_t label_draw_dsc;
+        lv_draw_label_dsc_init(&label_draw_dsc);
+
+        label_draw_dsc.ofs_x = label->offset.x;
+        label_draw_dsc.ofs_y = label->offset.y;
+        label_draw_dsc.flag = flag;
+        lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
+
+        label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
+        label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
+        if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
+            label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_SELECTED);
+            label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
+        }
+
+        /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
+         * (In addition they will result misalignment is this case)*/
+        if((label->long_mode == LV_LABEL_LONG_SROLL || label->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
+           (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
+            lv_point_t size;
+            lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+                             LV_COORD_MAX, flag);
+            if(size.x > lv_area_get_width(&txt_coords)) {
+                label_draw_dsc.align = LV_TEXT_ALIGN_LEFT;
+            }
+        }
+#if LV_LABEL_LONG_TXT_HINT
+        lv_draw_label_hint_t * hint = &label->hint;
+        if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
+            hint = NULL;
+
+#else
+        /*Just for compatibility*/
+        lv_draw_label_hint_t * hint = NULL;
+#endif
+
+        lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
+
+        if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
+            lv_point_t size;
+            lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+                             LV_COORD_MAX, flag);
+
+            /*Draw the text again on label to the original to make an circular effect */
+            if(size.x > lv_area_get_width(&txt_coords)) {
+                label_draw_dsc.ofs_x = label->offset.x + size.x +
+                                       lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+                label_draw_dsc.ofs_y = label->offset.y;
+
+                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
+            }
+
+            /*Draw the text again below the original to make an circular effect */
+            if(size.y > lv_area_get_height(&txt_coords)) {
+                label_draw_dsc.ofs_x = label->offset.x;
+                label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
+
+                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
+            }
+        }
+    } else if(mode == LV_DRAW_MODE_POST_DRAW) {
+        lv_obj.draw_cb(obj, clip_area, mode);
+    }
+
+    return LV_DRAW_RES_OK;
+}
+
+/**
+ * Signal function of the label
+ * @param label pointer to a label object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_label_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = lv_obj.signal_cb(obj, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_STYLE_CHG) {
+        /*Revert dots for proper refresh*/
+        lv_label_revert_dots(obj);
+        lv_label_refr_text(obj);
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
+        if(lv_area_get_width(&obj->coords) != lv_area_get_width(param) ||
+           lv_area_get_height(&obj->coords) != lv_area_get_height(param)) {
+            lv_label_revert_dots(obj);
+            lv_label_refr_text(obj);
+        }
+    }
+    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+#if LV_USE_BIDI
+        lv_label_t * label = (lv_label_t *)obj;
+        if(label->static_txt == 0) lv_label_set_text(obj, NULL);
+#endif
+    }
+
+    return res;
+}
+
+
 /**
  * Refresh the label with its text stored in its labelended data
  * @param label pointer to a label object
  */
-void lv_label_refr_text(lv_obj_t * obj)
+static void lv_label_refr_text(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
     if(label->text == NULL) return;
@@ -815,7 +912,7 @@ void lv_label_refr_text(lv_obj_t * obj)
     if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
-    _lv_txt_get_size(&size, label->text, font, letter_space, line_space, max_w, flag);
+    lv_txt_get_size(&size, label->text, font, letter_space, line_space, max_w, flag);
 
     /*Set the full size in expand mode*/
     if(label->long_mode == LV_LABEL_LONG_EXPAND) {
@@ -826,6 +923,7 @@ void lv_label_refr_text(lv_obj_t * obj)
     /*In roll mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SROLL) {
         uint16_t anim_speed = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+        if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
@@ -908,6 +1006,7 @@ void lv_label_refr_text(lv_obj_t * obj)
     /*In roll inf. mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
         uint16_t anim_speed = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+        if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
@@ -1021,201 +1120,6 @@ void lv_label_refr_text(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-
-static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
-{
-    LV_LOG_TRACE("label create started");
-
-    lv_obj_construct_base(obj, parent, copy);
-
-    lv_label_t * label = (lv_label_t *)obj;
-
-    label->text       = NULL;
-    label->static_txt = 0;
-    label->recolor    = 0;
-    label->dot_end    = LV_LABEL_DOT_END_INV;
-    label->long_mode  = LV_LABEL_LONG_EXPAND;
-    label->offset.x = 0;
-    label->offset.y = 0;
-
-#if LV_LABEL_LONG_TXT_HINT
-    label->hint.line_start = -1;
-    label->hint.coord_y    = 0;
-    label->hint.y          = 0;
-#endif
-
-#if LV_LABEL_TEXT_SEL
-    label->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
-    label->sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
-#endif
-    label->dot.tmp_ptr   = NULL;
-    label->dot_tmp_alloc = 0;
-
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_label_set_long_mode(obj, LV_LABEL_LONG_EXPAND);
-    lv_label_set_text(obj, "Text");
-
-    LV_LOG_INFO("label created");
-}
-
-static void lv_label_destructor(lv_obj_t * obj)
-{
-//    lv_label_dot_tmp_free(label->dot_...);
-//    lv_label_dot_tmp_free(label->text);
-
-//    lv_bar_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_PART_INDICATOR);
-//#if LV_USE_ANIMATION
-//    lv_anim_del(&bar->cur_value_anim, NULL);
-//    lv_anim_del(&bar->start_value_anim, NULL);
-//#endif
-
-//    bar->class_p->base_p->destructor(obj);
-}
-
-/**
- * Handle the drawing related tasks of the labels
- * @param label pointer to a label object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
-static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /* A label never covers an area */
-    if(mode == LV_DRAW_MODE_COVER_CHECK)
-        return LV_DRAW_RES_NOT_COVER;
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-
-        lv_obj.draw_cb(obj, clip_area, mode);
-
-        lv_label_t * label = (lv_label_t *)obj;
-        lv_area_t txt_coords;
-        get_txt_coords(obj, &txt_coords);
-
-        lv_area_t txt_clip;
-        bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
-        if(!is_common) return LV_DRAW_RES_OK;
-
-        lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-        lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-        if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
-        if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-        if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
-        if(align == LV_TEXT_ALIGN_CENTER) flag |= LV_TEXT_FLAG_CENTER;
-        if(align == LV_TEXT_ALIGN_RIGHT) flag |= LV_TEXT_FLAG_RIGHT;
-
-        lv_draw_label_dsc_t label_draw_dsc;
-        lv_draw_label_dsc_init(&label_draw_dsc);
-
-        label_draw_dsc.ofs_x = label->offset.x;
-        label_draw_dsc.ofs_y = label->offset.y;
-        label_draw_dsc.flag = flag;
-        lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
-
-        label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
-        label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
-        if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-            label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_SELECTED);
-            label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
-        }
-
-        /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
-         * (In addition they will result misalignment is this case)*/
-        if((label->long_mode == LV_LABEL_LONG_SROLL || label->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
-           (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
-            lv_point_t size;
-            _lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                             LV_COORD_MAX, flag);
-            if(size.x > lv_area_get_width(&txt_coords)) {
-                label_draw_dsc.flag &= ~LV_TEXT_FLAG_RIGHT;
-                label_draw_dsc.flag &= ~LV_TEXT_FLAG_CENTER;
-            }
-        }
-#if LV_LABEL_LONG_TXT_HINT
-        lv_draw_label_hint_t * hint = &label->hint;
-        if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
-            hint = NULL;
-
-#else
-        /*Just for compatibility*/
-        lv_draw_label_hint_t * hint = NULL;
-#endif
-
-        lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-
-        if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
-            lv_point_t size;
-            _lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                             LV_COORD_MAX, flag);
-
-            /*Draw the text again on label to the original to make an circular effect */
-            if(size.x > lv_area_get_width(&txt_coords)) {
-                label_draw_dsc.ofs_x = label->offset.x + size.x +
-                                       lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
-                label_draw_dsc.ofs_y = label->offset.y;
-
-                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-            }
-
-            /*Draw the text again below the original to make an circular effect */
-            if(size.y > lv_area_get_height(&txt_coords)) {
-                label_draw_dsc.ofs_x = label->offset.x;
-                label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
-
-                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-            }
-        }
-    } else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
-/**
- * Signal function of the label
- * @param label pointer to a label object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_label_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
-{
-    lv_res_t res;
-
-    /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
-    if(res != LV_RES_OK) return res;
-
-    if(sign == LV_SIGNAL_STYLE_CHG) {
-        /*Revert dots for proper refresh*/
-        lv_label_revert_dots(obj);
-        lv_label_refr_text(obj);
-    }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
-        if(lv_area_get_width(&obj->coords) != lv_area_get_width(param) ||
-           lv_area_get_height(&obj->coords) != lv_area_get_height(param)) {
-            lv_label_revert_dots(obj);
-            lv_label_refr_text(obj);
-        }
-    }
-    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
-#if LV_USE_BIDI
-        if(label->static_txt == 0) lv_label_set_text(label, NULL);
-#endif
-    }
-
-    return res;
-}
 
 static void lv_label_revert_dots(lv_obj_t * obj)
 {

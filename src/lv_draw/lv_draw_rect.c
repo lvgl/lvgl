@@ -37,7 +37,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
 
 static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 
-#if LV_USE_COMPLEX
+#if LV_DRAW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
                                               const lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s,
@@ -49,7 +49,7 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
 
 static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * area_outer, const lv_area_t * clip,
                              lv_coord_t radius, bool radius_is_in, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-#if LV_USE_COMPLEX
+#if LV_DRAW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 #endif
 
@@ -192,10 +192,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     else {
         int32_t draw_area_w = lv_area_get_width(&draw_area);
         int16_t mask_rout_id = LV_MASK_ID_INV;
-        lv_opa_t * mask_buf = NULL;
+        lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         lv_draw_mask_radius_param_t mask_rout_param;
         if(rout > 0) {
-            mask_buf = lv_mem_buf_get(draw_area_w);
             lv_draw_mask_radius_init(&mask_rout_param, &coords_bg, rout, false);
             mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
         }
@@ -1201,8 +1200,10 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
     label_dsc.color = dsc->content_color;
     label_dsc.font = dsc->content_font;
     label_dsc.opa = dsc->content_opa;
+    label_dsc.letter_space = dsc->content_letter_space;
+    label_dsc.line_space = dsc->content_line_space;
     lv_point_t s;
-    _lv_txt_get_size(&s, dsc->content_text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+    lv_txt_get_size(&s, dsc->content_text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
             LV_TEXT_FLAG_NONE);
 
 

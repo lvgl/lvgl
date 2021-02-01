@@ -203,7 +203,8 @@ void _lv_obj_scroll_by_raw(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 void lv_obj_scroll_by(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
- * Scroll to a given coordinate on an object
+ * Scroll to a given coordinate on an object.
+ * `x` and `y` will be limited internally to allow scrolling only on the content area.
  * @param obj pointer to an object to scroll
  * @param x pixels to scroll horizontally
  * @param y pixels to scroll vertically
@@ -212,7 +213,8 @@ void lv_obj_scroll_by(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_ani
 void lv_obj_scroll_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
- * Scroll to a given X coordinate on an object
+ * Scroll to a given X coordinate on an object.
+ * `x` will be limited internally to allow scrolling only on the content area.
  * @param obj pointer to an object to scroll
  * @param x pixels to scroll horizontally
  * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
@@ -220,7 +222,8 @@ void lv_obj_scroll_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_ani
 void lv_obj_scroll_to_x(struct _lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en);
 
 /**
- * Scroll to a given X coordinate on an object
+ * Scroll to a given Y coordinate on an object
+ * `y` will be limited internally to allow scrolling only on the content area.
  * @param obj pointer to an object to scroll
  * @param y pixels to scroll vertically
  * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately

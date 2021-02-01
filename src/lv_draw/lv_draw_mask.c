@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 
-#if LV_DRAW_COMPLEX
 
 #include "lv_draw_mask.h"
+#if LV_DRAW_COMPLEX
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_misc/lv_debug.h"

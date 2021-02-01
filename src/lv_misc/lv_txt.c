@@ -90,11 +90,11 @@ static inline bool is_break_char(uint32_t letter);
  * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param txt.line_space line space of the text
- * @param flags settings for the text from 'txt_flag_t' enum
+ * @param flags settings for the text from ::lv_text_flag_t
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
  * line breaks
  */
-void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
                       lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     size_res->x = 0;

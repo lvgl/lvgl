@@ -83,10 +83,10 @@ extern const lv_obj_class_t lv_label;
 
 /**
  * Create a label objects
- * @param parent pointer to an object, it will be the parent of the new label
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other label to copy.
- * @return pointer to the created button
+ * @param parent    pointer to an object, it will be the parent of the new label
+ * @param copy      DEPRECATED, will be removed in v9.
+ *                  Pointer to an other label to copy.
+ * @return          pointer to the created button
  */
 lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy);
 
@@ -96,55 +96,56 @@ lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /**
  * Set a new text for a label. Memory will be allocated to store the text by the label.
- * @param label pointer to a label object
- * @param text '\0' terminated character string. NULL to refresh with the current text.
+ * @param label         pointer to a label object
+ * @param text          '\0' terminated character string. NULL to refresh with the current text.
  */
-void lv_label_set_text(lv_obj_t * label, const char * text);
+void lv_label_set_text(lv_obj_t * obj, const char * text);
 
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
- * @param label pointer to a label object
- * @param fmt `printf`-like format
+ * @param label         pointer to a label object
+ * @param fmt           `printf`-like format
+ * @example lv_label_set_text_fmt(label1, "%d user", user_num);
  */
-void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...);
+void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...);
 
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the label exist.
- * @param label pointer to a label object
- * @param text pointer to a text. NULL to refresh with the current text.
+ * @param label         pointer to a label object
+ * @param text          pointer to a text. NULL to refresh with the current text.
  */
-void lv_label_set_text_static(lv_obj_t * label, const char * text);
+void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 
 /**
  * Set the behavior of the label with longer text then the object size
- * @param label pointer to a label object
- * @param long_mode the new mode from 'lv_label_long_mode' enum.
- *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this
- * function
+ * @param label         pointer to a label object
+ * @param long_mode     the new mode from 'lv_label_long_mode' enum.
+ *                      In LV_LONG_WRAP/DOT/SCROLL/SCROLL_CIRC the size of the label should be set AFTER this function
  */
-void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
+void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode);
 
 /**
  * Enable the recoloring by in-line commands
- * @param label pointer to a label object
- * @param en true: enable recoloring, false: disable
+ * @param label         pointer to a label object
+ * @param en            true: enable recoloring, false: disable
+ * @example "This is a #ff0000 red# word"
  */
-void lv_label_set_recolor(lv_obj_t * label, bool en);
+void lv_label_set_recolor(lv_obj_t * obj, bool en);
 
 /**
- * @brief Set the selection start index.
- * @param label pointer to a label object.
- * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
+ * Set where text selection should start
+ * @param obj       pointer to a label object
+ * @param index     character index from where selection should start. `LV_LABEL_TEXT_SEL_OFF` for no selection
  */
-void lv_label_set_text_sel_start(lv_obj_t * label, uint32_t index);
+void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index);
 
 /**
- * @brief Set the selection end index.
- * @param label pointer to a label object.
- * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
+ * Set where text selection should end
+ * @param obj       pointer to a label object
+ * @param index     character index where selection should end.  `LV_LABEL_TEXT_SEL_OFF` for no selection
  */
-void lv_label_set_text_sel_end(lv_obj_t * label, uint32_t index);
+void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index);
 
 /*=====================
  * Getter functions
@@ -152,49 +153,42 @@ void lv_label_set_text_sel_end(lv_obj_t * label, uint32_t index);
 
 /**
  * Get the text of a label
- * @param label pointer to a label object
- * @return the text of the label
+ * @param obj     pointer to a label object
+ * @return          the text of the label
  */
-char * lv_label_get_text(const lv_obj_t * label);
+char * lv_label_get_text(const lv_obj_t * obj);
 
 /**
  * Get the long mode of a label
- * @param label pointer to a label object
- * @return the long mode
+ * @param obj       pointer to a label object
+ * @return          the current long mode
  */
-lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
+lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
 
 /**
  * Get the recoloring attribute
- * @param label pointer to a label object
- * @return true: recoloring is enabled, false: disable
+ * @param obj       pointer to a label object
+ * @return          true: recoloring is enabled, false: disable
  */
-bool lv_label_get_recolor(const lv_obj_t * label);
-
-/**
- * Get the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
- * @param label pointer to a label object
- * @return speed of animation in px/sec unit
- */
-uint16_t lv_label_get_anim_speed(const lv_obj_t * label);
+bool lv_label_get_recolor(const lv_obj_t * obj);
 
 /**
  * Get the relative x and y coordinates of a letter
- * @param label pointer to a label object
- * @param index index of the letter [0 ... text length]. Expressed in character index, not byte
- * index (different in UTF-8)
- * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
+ * @param obj       pointer to a label object
+ * @param index     index of the character [0 ... text length - 1].
+ *                  Expressed in character index, not byte index (different in UTF-8)
+ * @param pos       store the result here (E.g. index = 0 gives 0;0 coordinates if the text if aligned to the left)
  */
-void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t index, lv_point_t * pos);
+void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos);
 
 /**
- * Get the index of letter on a relative point of a label
- * @param label pointer to label object
- * @param pos pointer to point with coordinates on a the label
- * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
- * Expressed in character index and not byte index (different in UTF-8)
+ * Get the index of letter on a relative point of a label.
+ * @param obj       pointer to label object
+ * @param pos       pointer to point with coordinates on a the label
+ * @return          The index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter if aligned to the left)
+ *                  Expressed in character index and not byte index (different in UTF-8)
  */
-uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
+uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in);
 
 /**
  * Check if a character is drawn under a point.
@@ -202,49 +196,43 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
  * @param pos Point to check for character under
  * @return whether a character is drawn under the point
  */
-bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
+bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos);
 
 /**
  * @brief Get the selection start index.
- * @param label pointer to a label object.
- * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
+ * @param obj       pointer to a label object.
+ * @return          selection start index. `LV_LABEL_TEXT_SEL_OFF` if nothing is selected.
  */
-uint32_t lv_label_get_text_sel_start(const lv_obj_t * label);
+uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj);
 
 /**
  * @brief Get the selection end index.
- * @param label pointer to a label object.
- * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
+ * @param obj       pointer to a label object.
+ * @return          selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-uint32_t lv_label_get_text_sel_end(const lv_obj_t * label);
+uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj);
 
 /*=====================
  * Other functions
  *====================*/
 
 /**
- * Insert a text to the label. The label text can not be static.
- * @param label pointer to a label object
- * @param pos character index to insert. Expressed in character index and not byte index (Different
- * in UTF-8) 0: before first char. LV_LABEL_POS_LAST: after last char.
- * @param txt pointer to the text to insert
+ * Insert a text to a label. The label text can not be static.
+ * @param obj       pointer to a label object
+ * @param pos       character index to insert. Expressed in character index and not byte index.
+ *                  0: before first char. LV_LABEL_POS_LAST: after last char.
+ * @param txt       pointer to the text to insert
  */
-void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt);
+void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt);
 
 /**
  * Delete characters from a label. The label text can not be static.
- * @param label pointer to a label object
- * @param pos character index to insert. Expressed in character index and not byte index (Different
- * in UTF-8) 0: before first char.
- * @param cnt number of characters to cut
+ * @param label     pointer to a label object
+ * @param pos       character index from where to cut. Expressed in character index and not byte index.
+ *                  0: start in from of the first character
+ * @param cnt       number of characters to cut
  */
-void lv_label_cut_text(lv_obj_t * label, uint32_t pos, uint32_t cnt);
-
-/**
- * Refresh the label with its text stored in its extended data
- * @param label pointer to a label object
- */
-void lv_label_refr_text(lv_obj_t * label);
+void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt);
 
 /**********************
  *      MACROS
