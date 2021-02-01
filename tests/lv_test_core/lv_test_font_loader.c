@@ -51,6 +51,11 @@ extern lv_font_t font_3;
 void lv_test_font_loader(void)
 {
 #if LV_USE_FILESYSTEM
+    lv_test_print("");
+    lv_test_print("===================");
+    lv_test_print("Start lv_font tests");
+    lv_test_print("===================");
+
     lv_font_t * font_1_bin = lv_font_load("f:font_1.fnt");
     lv_font_t * font_2_bin = lv_font_load("f:font_2.fnt");
     lv_font_t * font_3_bin = lv_font_load("f:font_3.fnt");

@@ -402,7 +402,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         }
 
         int nbits = header->advance_width_bits + 2 * header->xy_bits + 2 * header->wh_bits;
-        int next_offset = (i < loca_count - 1) ? glyph_offset[i + 1] : (uint32_t)(glyph_length - 1);
+        int next_offset = (i < loca_count - 1) ? glyph_offset[i + 1] : (uint32_t)glyph_length;
         int bmp_size = next_offset - glyph_offset[i] - nbits / 8;
 
         if(i == 0) {
@@ -443,7 +443,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
             continue;
         }
 
-        int next_offset = (i < loca_count - 1) ? glyph_offset[i + 1] : (uint32_t)(glyph_length - 1);
+        int next_offset = (i < loca_count - 1) ? glyph_offset[i + 1] : (uint32_t)glyph_length;
         int bmp_size = next_offset - glyph_offset[i] - nbits / 8;
 
         if (nbits % 8 == 0) { /* Fast path */
@@ -452,11 +452,15 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
             }
         }
         else {
-            for(int k = 0; k < bmp_size; ++k) {
+            for(int k = 0; k < bmp_size - 1; ++k) {
                 glyph_bmp[cur_bmp_size + k] = read_bits(&bit_it, 8, &res);
                 if(res != LV_FS_RES_OK) {
                     return -1;
                 }
+            }
+            glyph_bmp[cur_bmp_size + bmp_size - 1] = read_bits(&bit_it, 8 - nbits % 8, &res);
+            if(res != LV_FS_RES_OK) {
+                return -1;
             }
         }
 
