@@ -1,5 +1,5 @@
 /**
- * @file lv_font_loader.h
+ * @file lv_test_font_loader.h
  *
  */
 
