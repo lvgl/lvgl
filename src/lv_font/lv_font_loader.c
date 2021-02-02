@@ -446,7 +446,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         int next_offset = (i < loca_count - 1) ? glyph_offset[i + 1] : (uint32_t)glyph_length;
         int bmp_size = next_offset - glyph_offset[i] - nbits / 8;
 
-        if (nbits % 8 == 0) { /* Fast path */
+        if(nbits % 8 == 0) {  /* Fast path */
             if(lv_fs_read(fp, &glyph_bmp[cur_bmp_size], bmp_size, NULL) != LV_FS_RES_OK) {
                 return -1;
             }
