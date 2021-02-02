@@ -1,6 +1,15 @@
 # Changelog
 
-## v7.9.1 (Planned at 19.01.2020
+## v7.10.0 (Planned for 02.02.2021)
+
+### New features
+- feat(indev) allow input events to be passed to disabled objects
+- feat(spinbox) add inline get_step function for MicroPython support
+
+### Bugfixes
+- fix(btnmatrix) fix lv_btnmatrix_get_active_btn_text() when used in a group
+
+## v7.9.1
 
 ### Bugfixes
 - fix(cpicker) fix division by zero
@@ -8,9 +17,10 @@
 - fix(msgbox) use the animation time provided
 - fix(gpu_nxp_pxp) fix incorrect define name
 - fix(indev) don't leave edit mode if there is only one object in the group
+- fix(draw_rect) fix draw pattern stack-use-after-scope error
 
 
-## v7.9.0 (Plann1d at 05.01.2020
+## v7.9.0
 
 ### New features
 - feat(chart) add lv_chart_remove_series and lv_chart_hide_series

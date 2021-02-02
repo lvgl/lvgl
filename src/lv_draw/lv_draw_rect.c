@@ -1230,9 +1230,9 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
     if(img_w == 0 || img_h == 0) return;
 
     lv_area_t coords_tmp;
+    lv_draw_mask_radius_param_t radius_mask_param;
 
     if(dsc->pattern_repeat) {
-        lv_draw_mask_radius_param_t radius_mask_param;
         lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
         int16_t radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
 
@@ -1271,7 +1271,6 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
 
         int16_t radius_mask_id = LV_MASK_ID_INV;
         if(_lv_area_is_in(&coords_tmp, coords, dsc->radius) == false) {
-            lv_draw_mask_radius_param_t radius_mask_param;
             lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
             radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
         }

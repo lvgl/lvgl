@@ -1,6 +1,6 @@
 ---
 name: Development discussion
-about: Discussion strictly related to the develoopment of the LVGL.
+about: Discussion strictly related to the development of the LVGL.
 title: ''
 labels: ''
 assignees: ''
@@ -13,7 +13,7 @@ Issues that don't use this template will be ignored and closed.
 Normal Feature requests should go to the Forum: https://forum.lvgl.io/c/feature-request/9
 -->
 
-### Introcude the problem
+### Introduce the problem
 <!--
 A clear and concise description of the problem.
 -->

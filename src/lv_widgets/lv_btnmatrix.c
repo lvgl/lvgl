@@ -293,9 +293,11 @@ void lv_btnmatrix_set_focused_btn(lv_obj_t * btnm, uint16_t id)
 
     if(id >= ext->btn_cnt && id != LV_BTNMATRIX_BTN_NONE) return;
 
-    if(id == ext->btn_id_focused) return;
+    if(ext->btn_id_act == LV_BTNMATRIX_BTN_NONE) ext->btn_id_act = id;
 
+    if(id == ext->btn_id_focused) return;
     ext->btn_id_focused = id;
+
     lv_obj_invalidate(btnm);
 }
 

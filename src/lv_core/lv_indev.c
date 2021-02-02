@@ -1148,7 +1148,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
                 hidden_i = lv_obj_get_parent(hidden_i);
             }
             /*No parent found with hidden == true*/
-            if(hidden_i == NULL && (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) == false) found_p = obj;
+            if(lv_obj_is_protected(obj, LV_PROTECT_EVENT_TO_DISABLED) == false) {
+                if(hidden_i == NULL && (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) == false) found_p = obj;
+            }
+            else {
+                if(hidden_i == NULL) found_p = obj;
+            }
         }
     }
 
