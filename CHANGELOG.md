@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.9.2 (Planned for 02.02.2021)
+## v7.10.0 (Planned for 02.02.2021)
 
 ### New features
 - feat(indev) allow input events to be passed to disabled objects
