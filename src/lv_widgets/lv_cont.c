@@ -508,7 +508,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
     lv_coord_t pright         =  lv_obj_get_style_pad_right(cont, LV_CONT_PART_MAIN);
     lv_coord_t pinner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
 
-    child_rc = child_rs; /*Initially the the row starter and closer is the same*/
+    child_rc = child_rs; /*Initially the row starter and closer is the same*/
     while(child_rs != NULL) {
         lv_coord_t h_row = 0;
         lv_coord_t w_row = pleft + pright; /*The width is at least the left+right pad*/

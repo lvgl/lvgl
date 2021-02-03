@@ -1025,7 +1025,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
 /**
  * Draw an arc on the canvas
  * @param canvas pointer to a canvas object
- * @param x origo x  of the arc
+ * @param x origo x of the arc
  * @param y origo y of the arc
  * @param r radius of the arc
  * @param start_angle start angle in degrees

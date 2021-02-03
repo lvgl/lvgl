@@ -108,7 +108,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
     const char * real_path = lv_fs_get_real_path(path);
 
-    if (file_p->drv->file_size == 0) { /*Is file_d zero size?*/
+    if(file_p->drv->file_size == 0) {  /*Is file_d zero size?*/
         /*Pass file_d's address to open_cb, so the implementor can allocate memory byself*/
         return file_p->drv->open_cb(file_p->drv, &file_p->file_d, real_path, mode);
     }
@@ -134,7 +134,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 /**
  * Close an already opened file
  * @param file_p pointer to a lv_fs_file_t variable
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 {
@@ -158,7 +158,7 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 /**
  * Delete a file
  * @param path path of the file to delete
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_remove(const char * path)
 {
@@ -382,7 +382,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
     const char * real_path = lv_fs_get_real_path(path);
 
-    if (rddir_p->drv->rddir_size == 0) { /*Is dir_d zero size?*/
+    if(rddir_p->drv->rddir_size == 0) {  /*Is dir_d zero size?*/
         /*Pass dir_d's address to dir_open_cb, so the implementor can allocate memory byself*/
         return rddir_p->drv->dir_open_cb(rddir_p->drv, &rddir_p->dir_d, real_path);
     }

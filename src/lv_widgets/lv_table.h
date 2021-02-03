@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
-#error "lv_table: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#error "lv_table: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -56,7 +56,7 @@ typedef union {
     struct {
         uint8_t align : 2;
         uint8_t right_merge : 1;
-        uint8_t type : 4; // upto 16 values
+        uint8_t type : 4; // up to 16 values
         uint8_t crop : 1;
     } s;
     uint8_t format_byte;
@@ -78,7 +78,7 @@ uint16_t cell_types :
 /*Parts of the table*/
 enum {
     LV_TABLE_PART_BG,     /* Because of this member, LV_PART.*CELL1 has enum value of 1,        */
-    LV_TABLE_PART_CELL1,  /*   LV_PART.*CELL2 has an enum value of 2 and so on upto the maximum */
+    LV_TABLE_PART_CELL1,  /*   LV_PART.*CELL2 has an enum value of 2 and so on up to the maximum */
     LV_TABLE_PART_CELL2,  /*   number of styles specified by LV_TABLE_CELL_STYLE_CNT            */
     LV_TABLE_PART_CELL3,
     LV_TABLE_PART_CELL4,  /* CELL 5-16 are not needed to be defined, the values in this enum

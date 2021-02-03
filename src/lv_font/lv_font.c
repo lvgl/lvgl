@@ -43,7 +43,7 @@
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
- * @return  pointer to the bitmap of the letter
+ * @return pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter)
 {

@@ -597,7 +597,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     /* Save the last keys before anything else.
-     * They need to be already saved if the the function returns for any reason*/
+     * They need to be already saved if the function returns for any reason*/
     lv_indev_state_t last_state     = i->proc.types.keypad.last_state;
     i->proc.types.keypad.last_state = data->state;
     i->proc.types.keypad.last_key   = data->key;
@@ -669,7 +669,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 /*On enter long press toggle edit mode.*/
                 if(editable) {
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
-                    if (_lv_ll_get_len(&g->obj_ll) > 1 ) {
+                    if(_lv_ll_get_len(&g->obj_ll) > 1) {
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                     }
                 }
@@ -803,7 +803,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
     /* Die gracefully if i->btn_points is NULL */
     if(i->btn_points == NULL) {
-        LV_LOG_WARN("indev_button_proc: btn_points was  NULL");
+        LV_LOG_WARN("indev_button_proc: btn_points was NULL");
         return;
     }
 
@@ -1148,7 +1148,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
                 hidden_i = lv_obj_get_parent(hidden_i);
             }
             /*No parent found with hidden == true*/
-            if(hidden_i == NULL && (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) == false) found_p = obj;
+            if(lv_obj_is_protected(obj, LV_PROTECT_EVENT_TO_DISABLED) == false) {
+                if(hidden_i == NULL && (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) == false) found_p = obj;
+            }
+            else {
+                if(hidden_i == NULL) found_p = obj;
+            }
         }
     }
 

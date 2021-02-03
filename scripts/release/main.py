@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
 #    if(len(sys.argv) != 2):
 #        print("Missing argument. Usage ./release.py bugfix | minor | major")
-#        print("Use minor by deafult")
+#        print("Use minor by default")
 #    else:
 #        dev_prepare = sys.argv[1]
 

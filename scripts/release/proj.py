@@ -10,7 +10,7 @@ import com
 def make(repo_path, auto_push = False):
         os.chdir("./" + repo_path)
         com.cmd('git checkout master')
-        print("Upadte lvgl");
+        print("Update lvgl");
         os.chdir("./lvgl")
         com.cmd("git checkout master")
         com.cmd("git pull origin --tags")
@@ -37,11 +37,11 @@ def make(repo_path, auto_push = False):
                 com.define_set("lv_conf.h", str(key), str(val))
 
         if os.path.exists("lv_examples"):
-            print("Upadte lv_examples");
+            print("Update lv_examples");
             com.cmd("cd lv_examples; git co " + release_br + "; git pull origin " + release_br)
 
         if os.path.exists("lv_drivers"):
-            print("upadte lv_drivers");
+            print("update lv_drivers");
             com.cmd("cd lv_drivers " + release_br + "; git pull origin " + release_br)
 
         msg = 'Update to ' + ver_str

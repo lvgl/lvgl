@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_ARC == 0
-#error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
+#error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC 1)"
 #endif
 
 #if LV_USE_ANIMATION == 0
-#error "lv_spinner: animations are required. Enable it in lv_conf.h (LV_USE_ANIMATION  1) "
+#error "lv_spinner: animations are required. Enable it in lv_conf.h (LV_USE_ANIMATION 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -95,7 +95,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy);
  *=====================*/
 
 /**
- * Set the length of the spinning  arc in degrees
+ * Set the length of the spinning arc in degrees
  * @param spinner pointer to a spinner object
  * @param deg length of the arc
  */

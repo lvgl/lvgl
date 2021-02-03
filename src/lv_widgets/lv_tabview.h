@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_BTNMATRIX == 0
-#error "lv_tabview: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
+#error "lv_tabview: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX 1)"
 #endif
 
 #if LV_USE_PAGE == 0
-#error "lv_tabview: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
+#error "lv_tabview: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1)"
 #endif
 
 #include "../lv_core/lv_obj.h"

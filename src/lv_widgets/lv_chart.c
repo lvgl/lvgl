@@ -424,7 +424,7 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
  * Initialize all data points with a value
  * @param chart pointer to chart object
  * @param ser pointer to a data series on 'chart'
- * @param y the new value  for all points
+ * @param y the new value for all points
  */
 void lv_chart_init_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
 {
@@ -901,8 +901,8 @@ lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 
 /**
  * Get the series area of a chart.
- * @param chart  pointer to a chart object
- * @param series_area  pointer to an area variable that the result will be put in.
+ * @param chart pointer to a chart object
+ * @param series_area pointer to an area variable that the result will be put in.
  */
 void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area)
 {

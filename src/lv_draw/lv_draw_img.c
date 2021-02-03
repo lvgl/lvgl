@@ -553,7 +553,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                             lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                             mask_buf[px_i] = px_opa;
                             if(px_opa == 0) {
-#if  LV_COLOR_DEPTH == 32
+#if LV_COLOR_DEPTH == 32
                                 map2[px_i].full = 0;
 #endif
                                 continue;
@@ -576,7 +576,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         if(chroma_key) {
                             if(c.full == chroma_keyed_color.full) {
                                 mask_buf[px_i] = LV_OPA_TRANSP;
-#if  LV_COLOR_DEPTH == 32
+#if LV_COLOR_DEPTH == 32
                                 map2[px_i].full = 0;
 #endif
                                 continue;

@@ -14,9 +14,9 @@ extern "C" {
  * CURRENT VERSION OF LVGL
  ***************************/
 #define LVGL_VERSION_MAJOR 7
-#define LVGL_VERSION_MINOR 10
+#define LVGL_VERSION_MINOR 11
 #define LVGL_VERSION_PATCH 0
-#define LVGL_VERSION_INFO "dev"
+#define LVGL_VERSION_INFO ""
 
 /*********************
  *      INCLUDES
@@ -124,22 +124,22 @@ extern "C" {
  * Wrapper functions for VERSION macros
  */
 
-static inline int lv_version_major()
+static inline int lv_version_major(void)
 {
     return LVGL_VERSION_MAJOR;
 }
 
-static inline int lv_version_minor()
+static inline int lv_version_minor(void)
 {
     return LVGL_VERSION_MINOR;
 }
 
-static inline int lv_version_patch()
+static inline int lv_version_patch(void)
 {
     return LVGL_VERSION_PATCH;
 }
 
-static inline const char *lv_version_info()
+static inline const char *lv_version_info(void)
 {
     return LVGL_VERSION_INFO;
 }

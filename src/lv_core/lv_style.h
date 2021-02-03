@@ -29,8 +29,8 @@ extern "C" {
 #define LV_RADIUS_CIRCLE (0x7FFF) /**< A very big radius to always draw as circle*/
 LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
-#define LV_DEBUG_STYLE_SENTINEL_VALUE       0x2288AAEE
-#define LV_DEBUG_STYLE_LIST_SENTINEL_VALUE  0x9977CCBB
+#define LV_DEBUG_STYLE_SENTINEL_VALUE      0x2288AAEE
+#define LV_DEBUG_STYLE_LIST_SENTINEL_VALUE 0x9977CCBB
 
 #define LV_STYLE_PROP_INIT(name, group, id, attr)  name = (((group << 4) + id) | ((attr) << 8))
 
@@ -287,7 +287,7 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
 
 /**
  * Add a style to a style list.
- * Only the the style pointer will be saved so the shouldn't be a local variable.
+ * Only the style pointer will be saved so the shouldn't be a local variable.
  * (It should be static, global or dynamically allocated)
  * @param list pointer to a style list
  * @param style pointer to a style to add
@@ -338,7 +338,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 /**
  * Remove a property from a style
  * @param style pointer to a style
- * @param prop  a style property ORed with a state.
+ * @param prop a style property ORed with a state.
  * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
  * @return true: the property was found and removed; false: the property wasn't found
  */

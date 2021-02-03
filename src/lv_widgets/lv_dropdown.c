@@ -1105,7 +1105,7 @@ static lv_res_t lv_dropdown_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, 
         ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
         lv_obj_invalidate(page);
     }
-    else  if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /* Make possible to draw on the full width of the background to redraw the selected rectangle
          * when the ddlist is scrolled in fix height mode.
          * (The scrollable is scrolled then "select rectangle" is drawn on the bg too)*/

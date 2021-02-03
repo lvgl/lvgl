@@ -147,7 +147,7 @@ static void add_remove_read_prop(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an existing 'color' property");
     lv_test_assert_color_eq(LV_COLOR_RED, color, "Get the value of a 'color' property");
 
-    lv_test_print("Reset the the style");
+    lv_test_print("Reset the style");
     lv_style_reset(&style);
     found = _lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get an 'int' property from a reseted style");
@@ -414,7 +414,7 @@ static void mem_leak(void)
 {
 
     lv_test_print("");
-    lv_test_print("Test style  set, add, remove memory leak");
+    lv_test_print("Test style set, add, remove memory leak");
     lv_test_print("----------------------------------------");
 
     lv_mem_monitor_t mon_start;

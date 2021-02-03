@@ -23,7 +23,7 @@
  *********************/
 #define LV_OBJX_NAME "lv_bar"
 
-#define LV_BAR_SIZE_MIN  4   /*hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
+#define LV_BAR_SIZE_MIN 4 /*hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
 
 #if LV_USE_ANIMATION
     #define LV_BAR_IS_ANIMATING(anim_struct) (((anim_struct).anim_state) != LV_BAR_ANIM_STATE_INV)
@@ -109,7 +109,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_signal_cb(bar, lv_bar_signal);
     lv_obj_set_design_cb(bar, lv_bar_design);
 
-    /*Init the new  bar object*/
+    /*Init the new bar object*/
     if(copy == NULL) {
 
         lv_obj_set_click(bar, false);

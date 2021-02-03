@@ -191,7 +191,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
  * @param mask_res LV_MASK_RES_COVER: the mask has only 0xff values (no mask),
  *                 LV_MASK_RES_TRANSP: the mask has only 0x00 values (full transparent),
  *                 LV_MASK_RES_CHANGED: the mask has mixed values
- * @param opa  overall opacity in 0x00..0xff range
+ * @param opa overall opacity in 0x00..0xff range
  * @param mode blend mode from `lv_blend_mode_t`
  */
 LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area,

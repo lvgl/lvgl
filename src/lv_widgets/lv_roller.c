@@ -522,7 +522,7 @@ static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t 
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        /* Split the drawing of the label into  an upper (above the selected area)
+        /* Split the drawing of the label into an upper (above the selected area)
          * and a lower (below the selected area)*/
         lv_obj_t * roller = lv_obj_get_parent(lv_obj_get_parent(label));
         const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);

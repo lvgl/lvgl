@@ -57,9 +57,9 @@ typedef struct {
 #endif /* LV_ENABLE_GC */
 
 #ifdef LV_ARCH_64
-    #define ALIGN_MASK  0x7
+    #define ALIGN_MASK 0x7
 #else
-    #define ALIGN_MASK  0x3
+    #define ALIGN_MASK 0x3
 #endif
 
 #define MEM_BUF_SMALL_SIZE 16
