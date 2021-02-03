@@ -799,6 +799,7 @@ static lv_color_t *lv_refr_vdb_rotate_pre(lv_disp_drv_t *drv, lv_area_t *area, l
 }
 
 static void lv_refr_vdb_rotate_post(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+    LV_UNUSED(area);
     if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate)
         return;
     if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
