@@ -357,6 +357,7 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
+    if(txt[0] == '\0') return 0;
 
     uint32_t i                   = 0;
     lv_coord_t width             = 0;
