@@ -4,6 +4,7 @@
 
 ### Bugfixes
 - fix(indev) clear the indev's `act_obj` in `lv_indev_reset`
+- fix(text) fix out of bounds read in `_lv_txt_get_width`
 
 ## v7.10.0
 
