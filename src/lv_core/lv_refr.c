@@ -742,11 +742,78 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 }
 
 /**
+ * Rotate the VDB to the display's native orientation.
+ */
+static lv_color_t *lv_refr_vdb_rotate_pre(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+    if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate) {
+        LV_LOG_ERROR("lv_refr_vdb_rotate_pre: cannot rotate a true double-buffered display!");
+        return color_p;
+    }
+    lv_coord_t area_w = lv_area_get_width(area);
+    lv_coord_t area_h = lv_area_get_height(area);
+    uint32_t total = area_w * area_h;
+    if(drv->rotated == LV_DISP_ROT_180) {
+        /* Swap the beginning and end values */
+        lv_color_t tmp;
+        uint32_t i = total - 1, j = 0;
+        while(i > j) {
+            tmp = color_p[i];
+            color_p[i] = color_p[j];
+            color_p[j] = tmp;
+            i--;
+            j++;
+        }
+        lv_coord_t tmp_coord;
+        tmp_coord = area->y2;
+        area->y2 = drv->ver_res - area->y1 - 1;
+        area->y1 = drv->ver_res - tmp_coord - 1;
+        tmp_coord = area->x2;
+        area->x2 = drv->hor_res - area->x1 - 1;
+        area->x1 = drv->hor_res - tmp_coord - 1;
+    } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
+        lv_color_t * orig_color_p = color_p;
+        color_p = _lv_mem_buf_get(sizeof(lv_color_t) * total);
+        for(lv_coord_t y = 0; y < area_h; y++) {
+            for(lv_coord_t x = 0; x < area_w; x++) {
+                uint32_t i = ((area_w - x - 1) * area_h) + y;
+                if(drv->rotated == LV_DISP_ROT_270)
+                    i = total - 1 - i;
+                color_p[i] = *(orig_color_p++);
+            }
+        }
+        lv_coord_t tmp_coord;
+        tmp_coord = area->y1;
+        if(drv->rotated == LV_DISP_ROT_90) {
+            area->y2 = drv->ver_res - area->x1 - 1;
+            area->y1 = area->y2 - area_w + 1;
+            area->x1 = tmp_coord;
+            area->x2 = area->x1 + area_h - 1;
+        } else {
+            area->y1 = area->x1;
+            area->y2 = area->y1 + area_w - 1;
+            area->x2 = drv->hor_res - tmp_coord - 1;
+            area->x1 = area->x2 - area_h + 1;
+        }
+    }
+    return color_p;
+}
+
+static void lv_refr_vdb_rotate_post(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+    if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate)
+        return;
+    if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
+        /* Release the temporarily allocated color_p variable */
+        _lv_mem_buf_release(color_p);
+    }
+}
+
+/**
  * Flush the content of the VDB
  */
 static void lv_refr_vdb_flush(void)
 {
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
+    lv_color_t * color_p = vdb->buf_act;
 
     /*In double buffered mode wait until the other buffer is flushed before flushing the current
      * one*/
@@ -765,7 +832,15 @@ static void lv_refr_vdb_flush(void)
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver.gpu_wait_cb) disp->driver.gpu_wait_cb(&disp->driver);
 
-    if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
+    /*Rotate the buffer to the display's native orientation if necessary*/
+    if(disp->driver.rotated != LV_DISP_ROT_NONE && disp->driver.sw_rotate)
+        color_p = lv_refr_vdb_rotate_pre(&disp->driver, &vdb->area, vdb->buf_act);
+    
+    if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, color_p);
+
+    /*Handle any post-rotation freeing of buffers*/
+    if(disp->driver.rotated != LV_DISP_ROT_NONE && disp->driver.sw_rotate)
+        lv_refr_vdb_rotate_post(&disp->driver, &vdb->area, color_p);
 
     if(vdb->buf1 && vdb->buf2) {
         if(vdb->buf_act == vdb->buf1)

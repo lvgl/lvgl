@@ -58,7 +58,8 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->hor_res          = LV_HOR_RES_MAX;
     driver->ver_res          = LV_VER_RES_MAX;
     driver->buffer           = NULL;
-    driver->rotated          = 0;
+    driver->rotated          = LV_DISP_ROT_NONE;
+    driver->sw_rotate        = 0;
     driver->color_chroma_key = LV_COLOR_TRANSP;
     driver->dpi = LV_DPI;
 
@@ -177,12 +178,26 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
  * @param new_drv pointer to the new driver
  */
 void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
-{
-    memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
-
+{    
+    if(new_drv != &disp->driver)
+        memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
+      
     lv_obj_t * scr;
     _LV_LL_READ(disp->scr_ll, scr) {
         lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
+    }
+
+    /*
+     * This method is usually called upon orientation change, thus the screen is now a
+     * different size.
+     * The object invalidated its previous area. That area is now out of the screen area
+     * so we reset all invalidated areas and invalidate the object's new area only.
+     */
+    _lv_memset_00(disp->inv_areas, sizeof(disp->inv_areas));
+    _lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
+    disp->inv_p = 0;
+    _LV_LL_READ(disp->scr_ll, scr) {
+        lv_obj_invalidate(scr);
     }
 }
 
@@ -240,8 +255,15 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
 
     if(disp == NULL)
         return LV_HOR_RES_MAX;
-    else
-        return disp->driver.rotated == 0 ? disp->driver.hor_res : disp->driver.ver_res;
+    else {
+        switch(disp->driver.rotated) {
+            case LV_DISP_ROT_90:
+            case LV_DISP_ROT_270:
+                return disp->driver.ver_res;
+            default:
+                return disp->driver.hor_res;
+        }
+    }
 }
 
 /**
@@ -255,8 +277,15 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 
     if(disp == NULL)
         return LV_VER_RES_MAX;
-    else
-        return disp->driver.rotated == 0 ? disp->driver.ver_res : disp->driver.hor_res;
+    else {
+        switch(disp->driver.rotated) {
+            case LV_DISP_ROT_90:
+            case LV_DISP_ROT_270:
+                return disp->driver.hor_res;
+            default:
+                return disp->driver.ver_res;
+        }
+    }
 }
 
 /**
@@ -414,6 +443,31 @@ bool lv_disp_is_true_double_buf(lv_disp_t * disp)
     else {
         return false;
     }
+}
+
+/**
+ * Set the rotation of this display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @param rotation rotation angle
+ */
+void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rot_t rotation)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    disp->driver.rotated = rotation;
+    lv_disp_drv_update(disp, &disp->driver);
+}
+
+/**
+ * Get the current rotation of this display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return rotation angle
+ */
+lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    return disp->driver.rotated;
 }
 
 /**********************
