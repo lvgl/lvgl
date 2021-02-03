@@ -164,6 +164,12 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
         if(obj == NULL || indev->proc.types.pointer.last_pressed == obj) {
             indev->proc.types.pointer.last_pressed = NULL;
         }
+        if(obj == NULL || indev->proc.types.pointer.act_obj == obj) {
+            indev->proc.types.pointer.act_obj = NULL;
+        }
+        if(obj == NULL || indev->proc.types.pointer.last_obj == obj) {
+            indev->proc.types.pointer.last_obj = NULL;
+        }
     }
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
@@ -172,6 +178,12 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
             if(indev_act == i) indev_obj_act = NULL;
             if(obj == NULL || i->proc.types.pointer.last_pressed == obj) {
                 i->proc.types.pointer.last_pressed = NULL;
+            }
+            if(obj == NULL || i->proc.types.pointer.act_obj == obj) {
+                i->proc.types.pointer.act_obj = NULL;
+            }
+            if(obj == NULL || i->proc.types.pointer.last_obj == obj) {
+                i->proc.types.pointer.last_obj = NULL;
             }
             i = lv_indev_get_next(i);
         }
