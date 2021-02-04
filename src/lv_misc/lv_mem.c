@@ -118,7 +118,7 @@ void lv_mem_init(void)
 
 #if LV_MEM_ADR == 0
     /*Allocate a large array to store the dynamically allocated data*/
-    static LV_MEM_ATTR MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
+    static LV_ATTRIBUTE_LARGE_RAM_ARRAY MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
     work_mem = (uint8_t *)work_mem_int;
 #else
     work_mem = (uint8_t *)LV_MEM_ADR;

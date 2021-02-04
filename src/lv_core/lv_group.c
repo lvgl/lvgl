@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_group.h"
 #include <stddef.h>
-#include "../lv_misc/lv_debug.h"
-#include "../lv_themes/lv_theme.h"
+
+#include "lv_group.h"
 #include "../lv_misc/lv_gc.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES

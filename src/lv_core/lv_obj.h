@@ -28,23 +28,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/*Error check of lv_conf.h*/
-#if LV_HOR_RES_MAX == 0 || LV_VER_RES_MAX == 0
-#error "LVGL: LV_HOR_RES_MAX and LV_VER_RES_MAX must be greater than 0"
-#endif
-
-#if LV_ANTIALIAS > 1
-#error "LVGL: LV_ANTIALIAS can be only 0 or 1"
-#endif
-
-/**
- * Options for extra click area behavior.
- * These values can be selected in `lv_conf.h`
- */
-#define LV_EXT_CLICK_AREA_OFF   0  /*Disable the usage of extra click area*/
-#define LV_EXT_CLICK_AREA_TINY  1  /*Use the same value in all 4 directions*/
-#define LV_EXT_CLICK_AREA_FULL  2  /*Allow setting different values in every 4 directions*/
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -104,6 +87,10 @@ typedef enum {
  */
 typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
 
+typedef struct {
+    lv_event_cb_t cb;
+    void * user_data;
+}lv_event_dsc_t;
 
 /*---------------------
  *       EVENTS
@@ -236,23 +223,8 @@ typedef uint32_t lv_obj_flag_t;
 #include "lv_obj_scroll.h"
 #include "lv_obj_style.h"
 #include "lv_obj_draw.h"
-#include "lv_grid.h"
+#include "lv_obj_class.h"
 #include "lv_group.h"
-#include "lv_flex.h"
-
-/**
- * Describe the common methods of every object.
- * Similar to a C++ class.
- */
-typedef struct _lv_obj_class_t{
-    const struct _lv_obj_class_t * base_class;
-    void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
-    void (*destructor)(struct _lv_obj_t * obj);
-    lv_signal_cb_t signal_cb;       /**< Object type specific signal function*/
-    lv_draw_cb_t draw_cb;           /**< Object type specific draw function*/
-    uint32_t editable :1;
-    uint32_t instance_size :20;
-}lv_obj_class_t;
 
 /**
  * Make the base object's class publicly available.
@@ -270,14 +242,10 @@ typedef struct {
 
     const lv_layout_dsc_t * layout_dsc; /**< Pointer to the layout descriptor*/
 
-    lv_event_cb_t * event_cb;             /**< Event callback function */
-    lv_point_t scroll;                  /**< The current X/Y scroll offset*/
+    lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array */
+    lv_point_t scroll;                      /**< The current X/Y scroll offset*/
 
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad;      /**< Extra click padding in all direction */
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    lv_area_t ext_click_pad;   /**< Extra click padding area. */
-#endif
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing. */
 
     lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/
@@ -285,7 +253,7 @@ typedef struct {
     lv_snap_align_t snap_align_y : 2;      /**< Where to align the snapable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
-    uint8_t event_cb_cnt;           /**< Number of event callabcks stored in `event_cb` array */
+    uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array */
 }lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t{
@@ -346,16 +314,22 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`
- * @param data arbitrary data depending on the object type and the event. (Usually `NULL`)
+ * @param param arbitrary data depending on the object type and the event. (Usually `NULL`)
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data);
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param);
 
 /**
- * Get the `data` parameter of the current event
- * @return      the `data` parameter
+ * Get the `param` parameter of the current event
+ * @return      the `param` parameter
  */
-void * lv_event_get_data(void);
+void * lv_event_get_param(void);
+
+/**
+ * Get the user data of the event callback. (Set when the callback is registered)
+ * @return      the user data parameter
+ */
+void * lv_event_get_user_data(void);
 
 /**
  * Register a new, custom event ID.
@@ -427,8 +401,9 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
  * An object can have multiple event handler. They will be called in the same the order as they were  added.
  * @param obj       pointer to an object
  * @param event_cb  the new event function
+ * @param user_data custom data data will be available in `event_cb`
  */
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
+void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
 
 /**
  * Set the base direction of the object
@@ -476,9 +451,9 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
  * Get the event function of an object
  * @param obj   pointer to an object
  * @param id    the index of the event callback. 0: the firstly added
- * @return      the event function
+ * @return      the event descriptor
  */
-lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj, uint32_t id);
+lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id);
 
 /**
  * Get the group of the object

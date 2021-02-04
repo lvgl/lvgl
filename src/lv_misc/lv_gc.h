@@ -39,7 +39,7 @@ extern "C" {
     f(lv_timer_t*, _lv_timer_act)                                      \
     f(lv_mem_buf_arr_t , lv_mem_buf)                              \
     f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)              \
-    f(void * , _lv_theme_material_styles)                          \
+    f(void * , _lv_theme_default_styles)                          \
     f(void * , _lv_theme_mono_styles)                              \
     f(void * , _lv_theme_empty_styles)                             \
     f(uint8_t *, _lv_font_decompr_buf)                             \

@@ -529,7 +529,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.pr_timestamp = lv_tick_get();
 
         if(data->key == LV_KEY_ENTER) {
-            bool editable = indev_obj_act->class_p->editable;
+            bool editable = lv_obj_is_editable(indev_obj_act);
 
             if(lv_group_get_editing(g) == true || editable == false) {
                 indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_PRESSED, NULL);
@@ -568,7 +568,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
             if(data->key == LV_KEY_ENTER) {
-                bool editable = indev_obj_act->class_p->editable;
+                bool editable = lv_obj_is_editable(indev_obj_act);
 
                 /*On enter long press toggle edit mode.*/
                 if(editable) {
@@ -619,7 +619,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_REL && last_state == LV_INDEV_STATE_PR) {
 
         if(data->key == LV_KEY_ENTER) {
-            bool editable = indev_obj_act->class_p->editable;
+            bool editable = lv_obj_is_editable(indev_obj_act);
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable == false) {
@@ -964,9 +964,8 @@ static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
     lv_obj_t * obj_to_focus = lv_obj_get_focused_obj(indev_obj_act);
-    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) &&
+    if(lv_obj_has_flag(obj_to_focus, LV_OBJ_FLAG_CLICK_FOCUSABLE) &&
        proc->types.pointer.last_pressed != obj_to_focus) {
-#if LV_USE_GROUP
         lv_group_t * g_act = lv_obj_get_group(obj_to_focus);
         lv_group_t * g_prev = proc->types.pointer.last_pressed ? lv_obj_get_group(proc->types.pointer.last_pressed) : NULL;
 
@@ -1033,19 +1032,6 @@ static void indev_click_focus(lv_indev_proc_t * proc)
                 if(indev_reset_check(proc)) return;
             }
         }
-#else
-        if(proc->types.pointer.last_pressed) {
-            lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
-            if(indev_reset_check(proc)) return;
-            lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
-            if(indev_reset_check(proc)) return;
-        }
-
-        lv_signal_send(obj_to_focus, LV_SIGNAL_FOCUS, NULL);
-        if(indev_reset_check(proc)) return;
-        lv_event_send(obj_to_focus, LV_EVENT_FOCUSED, NULL);
-        if(indev_reset_check(proc)) return;
-#endif
         proc->types.pointer.last_pressed = obj_to_focus;
     }
 

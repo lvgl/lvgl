@@ -243,15 +243,10 @@ bool lv_obj_is_visible(const struct _lv_obj_t * obj);
 
 /**
  * Set the size of an extended clickable area
- * If `LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY` in `lv_conf.h`,
- *  only the graetes value will be used.
  * @param obj pointer to an object
- * @param left extended clickable are on the left [px]
- * @param right extended clickable are on the right [px]
- * @param top extended clickable are on the top [px]
- * @param bottom extended clickable are on the bottom [px]
+ * @param size extended clickable area in all 4 directions [px]
  */
-void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom);
+void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, lv_coord_t size);
 
 /**
  * Get the an area where to object can be clicked.
@@ -267,7 +262,7 @@ void lv_obj_get_click_area(const struct _lv_obj_t * obj, lv_area_t * area);
  * @param point screen-space point (absolute coordinate)
  * @return true: if the object is considered under the point
  */
-bool lv_obj_hit_test(const struct _lv_obj_t * obj, const lv_point_t * point);
+bool lv_obj_hit_test(struct _lv_obj_t * obj, const lv_point_t * point);
 
 /**********************
  *      MACROS

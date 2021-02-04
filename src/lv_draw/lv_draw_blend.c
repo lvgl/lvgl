@@ -157,12 +157,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-#if LV_ANTIALIAS
-    if(mask && disp->driver.antialiasing == 0)
-#else
-    if(mask)
-#endif
-    {
+    if(mask && disp->driver.antialiasing == 0 && mask) {
         int32_t mask_w = lv_area_get_width(&draw_area);
         int32_t i;
         for(i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;

@@ -15,7 +15,6 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_draw/lv_draw.h"
-#include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
@@ -23,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_textarea"
+#define MY_CLASS &lv_textarea
 
 /*Test configuration*/
 #ifndef LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
@@ -34,8 +33,8 @@
     #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500 /*ms*/
 #endif
 
-#define LV_TEXTAREA_DEF_WIDTH (2 * LV_DPI)
-#define LV_TEXTAREA_DEF_HEIGHT (1 * LV_DPI)
+#define LV_TEXTAREA_DEF_WIDTH (2 * LV_DPI_DEF)
+#define LV_TEXTAREA_DEF_HEIGHT (1 * LV_DPI_DEF)
 
 #define LV_TEXTAREA_PWD_BULLET_UNICODE      0x2022
 
@@ -58,7 +57,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c);
 static void start_cursor_blink(lv_obj_t * obj);
 static void refr_cursor_area(lv_obj_t * obj);
 static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv_indev_t * click_source);
-static lv_res_t insert_handler(lv_obj_t * obj, const char * txt);
+static lv_res_t insert_handler(lv_obj_t * obj, char * txt);
 static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area);
 static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
 
@@ -66,11 +65,11 @@ static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_textarea = {
-    .constructor = lv_textarea_constructor,
-    .destructor = lv_textarea_destructor,
+    .constructor_cb = lv_textarea_constructor,
+    .destructor_cb = lv_textarea_destructor,
     .signal_cb = lv_textarea_signal,
     .draw_cb = lv_textarea_draw,
-    .editable = 1,
+    .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj
 };
@@ -108,7 +107,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * parent, const lv_obj_t * copy)
  */
 void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -192,7 +191,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
  */
 void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(txt);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -262,7 +261,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
  */
 void lv_textarea_del_char(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     uint32_t cur_pos  = ta->cursor.pos;
@@ -310,7 +309,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
  */
 void lv_textarea_del_char_forward(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     uint32_t cp = lv_textarea_get_cursor_pos(obj);
     lv_textarea_set_cursor_pos(obj, cp + 1);
@@ -328,7 +327,7 @@ void lv_textarea_del_char_forward(lv_obj_t * obj)
  */
 void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(txt);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -397,7 +396,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
  */
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(txt);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -440,7 +439,7 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
  */
 void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     if((uint32_t)ta->cursor.pos == (uint32_t)pos) return;
@@ -487,7 +486,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
  */
 void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_textarea_t * ta = (lv_textarea_t *) obj;
     ta->cursor.click_pos = en ? 1 : 0;
@@ -500,7 +499,7 @@ void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en)
  */
 void lv_textarea_set_pwd_mode(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     if(ta->pwd_mode == en) return;
@@ -538,7 +537,7 @@ void lv_textarea_set_pwd_mode(lv_obj_t * obj, bool en)
  */
 void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     if(ta->one_line == en) return;
@@ -568,7 +567,7 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
  */
 void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -582,7 +581,7 @@ void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list)
  */
 void lv_textarea_set_max_length(lv_obj_t * obj, uint32_t num)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -599,7 +598,7 @@ void lv_textarea_set_max_length(lv_obj_t * obj, uint32_t num)
  */
 void lv_textarea_set_insert_replace(lv_obj_t * obj, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     LV_UNUSED(obj);
     ta_insert_replace = txt;
@@ -612,7 +611,7 @@ void lv_textarea_set_insert_replace(lv_obj_t * obj, const char * txt)
  */
 void lv_textarea_set_text_sel(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -633,7 +632,7 @@ void lv_textarea_set_text_sel(lv_obj_t * obj, bool en)
  */
 void lv_textarea_set_pwd_show_time(lv_obj_t * obj, uint16_t time)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_textarea_t * ta = (lv_textarea_t *) obj;
     ta->pwd_show_time = time;
@@ -650,7 +649,7 @@ void lv_textarea_set_pwd_show_time(lv_obj_t * obj, uint16_t time)
  */
 const char * lv_textarea_get_text(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -672,7 +671,7 @@ const char * lv_textarea_get_text(const lv_obj_t * obj)
  */
 const char * lv_textarea_get_placeholder_text(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     if(ta->placeholder_txt) return ta->placeholder_txt;
@@ -686,7 +685,7 @@ const char * lv_textarea_get_placeholder_text(lv_obj_t * obj)
  */
 lv_obj_t * lv_textarea_get_label(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->label;
@@ -699,7 +698,7 @@ lv_obj_t * lv_textarea_get_label(const lv_obj_t * obj)
  */
 uint32_t lv_textarea_get_cursor_pos(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->cursor.pos;
@@ -712,7 +711,7 @@ uint32_t lv_textarea_get_cursor_pos(const lv_obj_t * obj)
  */
 bool lv_textarea_get_cursor_click_pos(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->cursor.click_pos ? true : false;
@@ -725,7 +724,7 @@ bool lv_textarea_get_cursor_click_pos(lv_obj_t * obj)
  */
 bool lv_textarea_get_pwd_mode(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->pwd_mode == 0 ? false : true;
@@ -738,7 +737,7 @@ bool lv_textarea_get_pwd_mode(const lv_obj_t * obj)
  */
 bool lv_textarea_get_one_line(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->one_line == 0 ? false : true;
@@ -751,7 +750,7 @@ bool lv_textarea_get_one_line(const lv_obj_t * obj)
  */
 const char * lv_textarea_get_accepted_chars(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -765,7 +764,7 @@ const char * lv_textarea_get_accepted_chars(lv_obj_t * obj)
  */
 uint32_t lv_textarea_get_max_length(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->max_length;
@@ -778,7 +777,7 @@ uint32_t lv_textarea_get_max_length(lv_obj_t * obj)
  */
 bool lv_textarea_text_is_selected(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -803,7 +802,7 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj)
  */
 bool lv_textarea_get_text_sel_en(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -821,7 +820,7 @@ bool lv_textarea_get_text_sel_en(lv_obj_t * obj)
  */
 uint16_t lv_textarea_get_pwd_show_time(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -838,7 +837,7 @@ uint16_t lv_textarea_get_pwd_show_time(lv_obj_t * obj)
  */
 void lv_textarea_clear_selection(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
      lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -859,7 +858,7 @@ void lv_textarea_clear_selection(lv_obj_t * obj)
  */
 void lv_textarea_cursor_right(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     uint32_t cp = lv_textarea_get_cursor_pos(obj);
     cp++;
@@ -872,7 +871,7 @@ void lv_textarea_cursor_right(lv_obj_t * obj)
  */
 void lv_textarea_cursor_left(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     uint32_t cp = lv_textarea_get_cursor_pos(obj);
     if(cp > 0) {
@@ -887,7 +886,7 @@ void lv_textarea_cursor_left(lv_obj_t * obj)
  */
 void lv_textarea_cursor_down(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     lv_point_t pos;
@@ -920,7 +919,7 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
  */
 void lv_textarea_cursor_up(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     lv_point_t pos;
@@ -1025,30 +1024,20 @@ static void lv_textarea_destructor(lv_obj_t * obj)
 //          /* (The created label will be deleted automatically) */
 }
 
-/**
- * Handle the drawing related tasks of the text areas
- * @param ta pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW_MAIN: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
         /*Return false if the object is not covers the mask_p area*/
-        return lv_obj.draw_cb(obj, clip_area, mode);
+        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*Draw the object*/
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
         draw_placeholder(obj, clip_area);
 
     }
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
         draw_cursor(obj, clip_area);
     }
     return LV_DRAW_RES_OK;
@@ -1065,7 +1054,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 {
     lv_res_t res;
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     lv_textarea_t * ta = (lv_textarea_t *) obj;
@@ -1092,6 +1081,9 @@ static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * para
             refr_cursor_area(obj);
             start_cursor_blink(obj);
         }
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        start_cursor_blink(obj);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
         /*Set the label width according to the text area width*/
@@ -1470,7 +1462,7 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
 #endif
 }
 
-static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
+static lv_res_t insert_handler(lv_obj_t * obj, char * txt)
 {
     ta_insert_replace = NULL;
     lv_event_send(obj, LV_EVENT_INSERT, txt);

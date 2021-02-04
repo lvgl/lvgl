@@ -14,7 +14,6 @@
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_disp.h"
-#include "../lv_themes/lv_theme.h"
 #include "../lv_font/lv_symbol_def.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_math.h"
@@ -24,7 +23,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_dropdown"
+#define MY_CLASS &lv_dropdown
+#define MY_CLASS_LIST &lv_dropdown_list
 
 #define LV_DROPDOWN_PR_NONE 0xFFFF
 
@@ -57,18 +57,18 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_dropdown = {
-    .constructor = lv_dropdown_constructor,
-    .destructor = lv_dropdown_destructor,
+    .constructor_cb = lv_dropdown_constructor,
+    .destructor_cb = lv_dropdown_destructor,
     .signal_cb = lv_dropdown_signal,
     .draw_cb = lv_dropdown_draw,
     .instance_size = sizeof(lv_dropdown_t),
-    .editable = 1,
+    .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj
 };
 
 const lv_obj_class_t lv_dropdown_list = {
-    .constructor = lv_dropdown_list_constructor,
-    .destructor = lv_dropdown_list_destructor,
+    .constructor_cb = lv_dropdown_list_constructor,
+    .destructor_cb = lv_dropdown_list_destructor,
     .signal_cb = lv_dropdown_list_signal,
     .draw_cb = lv_dropdown_list_draw,
     .instance_size = sizeof(lv_dropdown_list_t),
@@ -95,7 +95,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(dropdown->text == txt) return;
 
@@ -106,7 +106,7 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
@@ -150,7 +150,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
@@ -176,7 +176,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(option);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
@@ -246,7 +246,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(dropdown->options == NULL) return;
 
@@ -262,7 +262,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(dropdown->sel_opt_id == sel_opt) return;
@@ -275,7 +275,7 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
 
 void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(dropdown->dir == dir) return;
@@ -287,7 +287,7 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 
 void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(dropdown->max_height == h) return;
@@ -297,7 +297,7 @@ void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h)
 
 void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     dropdown->symbol = symbol;
@@ -310,7 +310,7 @@ void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 
 lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return dropdown->list;
@@ -319,7 +319,7 @@ lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
 
 const char * lv_dropdown_get_text(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return dropdown->text;
@@ -327,7 +327,7 @@ const char * lv_dropdown_get_text(lv_obj_t * obj)
 
 const char * lv_dropdown_get_options(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     return dropdown->options;
@@ -335,7 +335,7 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj)
 
 uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -344,7 +344,7 @@ uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
 
 uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -353,7 +353,7 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
 
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -379,7 +379,7 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
 
 lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     return dropdown->max_height;
@@ -387,7 +387,7 @@ lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
 
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -396,7 +396,7 @@ const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 
 lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -595,11 +595,11 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj.draw_cb(obj, clip_area, mode);
+        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
         lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -700,7 +700,7 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
 
     }
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
@@ -720,11 +720,11 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj.draw_cb(list_obj, clip_area, mode);
+        return lv_obj_draw_base(MY_CLASS_LIST, list_obj, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj.draw_cb(list_obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS_LIST, list_obj, clip_area, mode);
 
         lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
         lv_obj_t * dropdown_obj = list->dropdown;
@@ -748,7 +748,7 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(list_obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS_LIST, list_obj, clip_area, mode);
 
         lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
         lv_obj_t * dropdown_obj = list->dropdown;
@@ -798,7 +798,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
@@ -897,7 +897,7 @@ static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void 
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(list, sign, param);
+    res = lv_obj_signal_base(MY_CLASS_LIST, list, sign, param);
     if(res != LV_RES_OK) return res;
 
     lv_obj_t * dropdown_obj = ((lv_dropdown_list_t *)list)->dropdown;

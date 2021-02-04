@@ -14,7 +14,6 @@
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_draw/lv_draw.h"
-#include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_disp.h"
 #include "lv_img.h"
@@ -22,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_slider"
+#define MY_CLASS &lv_slider
 
 #define LV_SLIDER_KNOB_COORD(hor, is_rtl, area) (hor ? (is_rtl ? area.x1 : area.x2) : (is_rtl ? area.y1 : area.y2))
 
@@ -44,11 +43,11 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_slider = {
-    .constructor = lv_slider_constructor,
-    .destructor = lv_slider_destructor,
+    .constructor_cb = lv_slider_constructor,
+    .destructor_cb = lv_slider_destructor,
     .signal_cb = lv_slider_signal,
     .draw_cb = lv_slider_draw,
-    .editable = 1,
+    .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar
 };
@@ -69,7 +68,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     return slider->dragging ? true : false;
@@ -93,8 +92,8 @@ static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
     if(copy == NULL) {
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_ext_click_area(obj, lv_dpx(5), lv_dpx(5), lv_dpx(5), lv_dpx(5));
-        lv_obj_set_height(obj, LV_DPI / 15);
+        lv_obj_set_ext_click_area(obj, lv_dpx(5));
+        lv_obj_set_height(obj, LV_DPI_DEF / 15);
     } else {
         lv_slider_t * copy_slider = (lv_slider_t * ) copy;
         lv_area_copy(&slider->left_knob_area, &copy_slider->left_knob_area);
@@ -122,14 +121,14 @@ static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area,
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /* The ancestor draw function will draw the background and the indicator.
          * It also sets slider->bar.indic_area*/
-        lv_bar.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
         draw_knob(obj, clip_area);
 
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        return lv_bar.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
@@ -140,7 +139,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_bar.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     lv_slider_t * slider = (lv_slider_t *)obj;
@@ -270,12 +269,12 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         slider->value_to_set = NULL;
 
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
-        lv_group_t * g             = lv_obj_get_group(slider);
-        bool editing               = lv_group_get_editing(g);
+        lv_group_t * g   = lv_obj_get_group(obj);
+        bool editing     = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) {
-                if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
+                if(lv_slider_get_type(obj) == LV_SLIDER_TYPE_RANGE) {
                     if(slider->left_knob_focus == 0) slider->left_knob_focus = 1;
                     else {
                         slider->left_knob_focus = 0;
@@ -324,17 +323,17 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         char c = *((char *)param);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-            if(!slider->left_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, LV_ANIM_ON);
-            else lv_slider_set_left_value(slider, lv_slider_get_left_value(slider) + 1, LV_ANIM_ON);
+            if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) + 1, LV_ANIM_ON);
+            else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
 
-            res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-            if(!slider->left_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, LV_ANIM_ON);
-            else lv_slider_set_left_value(slider, lv_slider_get_left_value(slider) - 1, LV_ANIM_ON);
+            if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) - 1, LV_ANIM_ON);
+            else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) - 1, LV_ANIM_ON);
 
-            res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     }

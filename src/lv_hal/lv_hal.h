@@ -20,13 +20,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_HOR_RES_MAX
-# define LV_HOR_RES_MAX LV_HOR_RES_DEF
-#endif
-
-#ifndef LV_VER_RES_MAX
-# define LV_VER_RES_MAX LV_VER_RES_DEF
-#endif
 
 /**********************
  *      TYPEDEFS

@@ -10,7 +10,6 @@
 #if LV_USE_IMG != 0
 
 #include "../lv_misc/lv_debug.h"
-#include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_txt.h"
@@ -20,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_img"
+#define MY_CLASS &lv_img
 
 /**********************
  *      TYPEDEFS
@@ -38,8 +37,8 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_img = {
-         .constructor = lv_img_constructor,
-         .destructor = lv_img_destructor,
+         .constructor_cb = lv_img_constructor,
+         .destructor_cb = lv_img_destructor,
          .signal_cb = lv_img_signal,
          .draw_cb = lv_img_draw,
          .instance_size = sizeof(lv_img_t),
@@ -65,7 +64,7 @@ lv_obj_t * lv_img_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 void lv_img_set_src(lv_obj_t * obj, const void * src)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
 
@@ -160,7 +159,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
 
 void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -172,7 +171,7 @@ void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x)
 
 void lv_img_set_offset_y(lv_obj_t * obj, lv_coord_t y)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -296,7 +295,7 @@ void lv_img_set_antialias(lv_obj_t * obj, bool antialias)
 
 const void * lv_img_get_src(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -305,7 +304,7 @@ const void * lv_img_get_src(lv_obj_t * obj)
 
 lv_coord_t lv_img_get_offset_x(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -314,7 +313,7 @@ lv_coord_t lv_img_get_offset_x(lv_obj_t * obj)
 
 lv_coord_t lv_img_get_offset_y(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -323,7 +322,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * obj)
 
 uint16_t lv_img_get_angle(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -332,7 +331,7 @@ uint16_t lv_img_get_angle(lv_obj_t * obj)
 
 void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -341,7 +340,7 @@ void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
 
 uint16_t lv_img_get_zoom(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -350,7 +349,7 @@ uint16_t lv_img_get_zoom(lv_obj_t * obj)
 
 bool lv_img_get_antialias(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
    lv_img_t * img = (lv_img_t *)obj;
 
@@ -376,7 +375,7 @@ static void lv_img_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     img->h         = lv_obj_get_height(obj);
     img->angle = 0;
     img->zoom = LV_IMG_ZOOM_NONE;
-    img->antialias = LV_ANTIALIAS ? 1 : 0;
+    img->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
     img->offset.x  = 0;
     img->offset.y  = 0;
     img->pivot.x = 0;
@@ -477,7 +476,7 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
     lv_area_copy(&ori_coords, &obj->coords);
     lv_area_copy(&obj->coords, &bg_coords);
 
-    lv_obj.draw_cb(obj, clip_area, mode);
+    lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     lv_area_copy(&obj->coords, &ori_coords);
 
     if(mode == LV_DRAW_MODE_MAIN_DRAW) {
@@ -545,7 +544,7 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
    lv_img_t * img = (lv_img_t *)obj;

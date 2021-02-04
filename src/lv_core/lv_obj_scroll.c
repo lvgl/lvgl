@@ -12,7 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_obj"
+#define MY_CLASS &lv_obj
 #define SCROLL_ANIM_TIME_MIN 200    /*ms*/
 #define SCROLL_ANIM_TIME_MAX 400    /*ms*/
 
@@ -49,7 +49,7 @@ static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
 
 void lv_obj_set_scrollbar_mode(lv_obj_t * obj, lv_scrollbar_mode_t mode)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_allocate_spec_attr(obj);
 
@@ -127,7 +127,7 @@ lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj)
 
 lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t child_res = LV_COORD_MIN;
     uint32_t i;
@@ -149,7 +149,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
 
 lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /* Normally can't scroll the object out on the left.
      * So simply use the current scroll position as "left size"*/
@@ -186,7 +186,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
 
 lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /* With RTL base dir can't scroll to the object out on the right.
      * So simply use the current scroll position as "right size"*/
@@ -301,6 +301,8 @@ void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
     /*Don't let scroll more then naturally possible by the size of the content*/
     if(x < 0) x = 0;
     lv_coord_t  scroll_max = lv_obj_get_scroll_left(obj) + lv_obj_get_scroll_right(obj);
+    if(scroll_max < 0) scroll_max = 0;
+
     if(x > scroll_max) x = scroll_max;
 
     lv_coord_t scroll_x = lv_obj_get_scroll_x(obj);
@@ -316,6 +318,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
     /*Don't let scroll more then naturally possible by the size of the content*/
     if(y < 0) y = 0;
     lv_coord_t  scroll_max = lv_obj_get_scroll_top(obj) + lv_obj_get_scroll_bottom(obj);
+    if(scroll_max < 0) scroll_max = 0;
     if(y > scroll_max) y = scroll_max;
 
     lv_coord_t scroll_y = lv_obj_get_scroll_y(obj);

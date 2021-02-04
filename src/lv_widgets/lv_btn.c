@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_btn"
+#define MY_CLASS &lv_btn
 
 /**********************
  *      TYPEDEFS
@@ -23,18 +23,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_btn_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_btn_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_btn_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_btn  = {
-    .constructor = lv_btn_constructor,
-    .destructor = lv_btn_destructor,
-    .signal_cb = lv_btn_signal,
-    .draw_cb = lv_btn_draw,
+    .constructor_cb = lv_btn_constructor,
     .instance_size = sizeof(lv_btn_t),
     .base_class = &lv_obj
 };
@@ -63,24 +57,10 @@ static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 
     lv_obj_construct_base(obj, parent, copy);
 
-    lv_obj_set_size(obj, LV_DPI, LV_DPI / 3);
+    lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
     LV_LOG_INFO("btn created");
 }
 
-static void lv_btn_destructor(lv_obj_t * obj)
-{
-
-}
-
-static lv_draw_res_t lv_btn_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    return lv_obj.draw_cb(obj, clip_area, mode);
-}
-
-static lv_res_t lv_btn_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
-{
-    return lv_obj.signal_cb(obj, sign, param);
-}
 #endif

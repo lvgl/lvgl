@@ -8,7 +8,6 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_disp.h"
-#include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
@@ -18,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_obj"
+#define MY_CLASS &lv_obj
 
 /**********************
  *      TYPEDEFS
@@ -161,7 +160,7 @@ void lv_obj_report_style_change(lv_style_t * style)
 
 void lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(!style_refr) return;
 
@@ -226,7 +225,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, 
 
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     uint32_t i;
     /*Find the style*/

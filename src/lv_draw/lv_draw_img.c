@@ -60,7 +60,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->recolor = LV_COLOR_BLACK;
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_IMG_ZOOM_NONE;
-    dsc->antialias = LV_ANTIALIAS;
+    dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 
 }
 
@@ -393,7 +393,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
         map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1)) * px_size_byte;
 
         lv_color_t c;
-        lv_color_t chroma_keyed_color = LV_COLOR_TRANSP;
+        lv_color_t chroma_keyed_color = LV_COLOR_CHROMA_KEY;
         uint32_t px_i = 0;
 
         const uint8_t * map_px;

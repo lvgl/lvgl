@@ -34,8 +34,6 @@ enum {
 };
 typedef uint8_t lv_arc_type_t;
 
-
-
 typedef struct {
     lv_obj_t obj;
     uint16_t angle_ofs;
@@ -174,100 +172,63 @@ void lv_arc_set_adjustable(lv_obj_t * arc, bool adjustable);
  * @param arc pointer to an arc object
  * @return the start angle [0..360]
  */
-static inline uint16_t lv_arc_get_angle_start(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->indic_angle_start;
-}
+uint16_t lv_arc_get_angle_start(lv_obj_t * obj);
 
 /**
  * Get the end angle of an arc.
  * @param arc pointer to an arc object
  * @return the end angle [0..360]
  */
-static inline uint16_t lv_arc_get_angle_end(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->indic_angle_end;
-}
+uint16_t lv_arc_get_angle_end(lv_obj_t * obj);
 
 /**
  * Get the start angle of an arc background.
  * @param arc pointer to an arc object
  * @return the start angle [0..360]
  */
-static inline uint16_t lv_arc_get_bg_angle_start(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->bg_angle_start;
-}
+uint16_t lv_arc_get_bg_angle_start(lv_obj_t * obj);
 
 /**
  * Get the end angle of an arc background.
  * @param arc pointer to an arc object
  * @return the end angle [0..360]
  */
-static inline uint16_t lv_arc_get_bg_angle_end(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->bg_angle_end;
-}
-
+uint16_t lv_arc_get_bg_angle_end(lv_obj_t * obj);
 
 /**
  * Get the value of a arc
  * @param arc pointer to a arc object
  * @return the value of the arc
  */
-static inline int16_t lv_arc_get_value(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->value;
-}
+int16_t lv_arc_get_value(const lv_obj_t * obj);
 
 /**
  * Get the minimum value of a arc
  * @param arc pointer to a arc object
  * @return the minimum value of the arc
  */
-static inline int16_t lv_arc_get_min_value(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->min_value;
-}
+int16_t lv_arc_get_min_value(const lv_obj_t * obj);
 
 /**
  * Get the maximum value of a arc
  * @param arc pointer to a arc object
  * @return the maximum value of the arc
  */
-static inline int16_t lv_arc_get_max_value(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->max_value;
-}
+int16_t lv_arc_get_max_value(const lv_obj_t * obj);
 
 /**
  * Get whether the arc is type or not.
  * @param arc pointer to a arc object
  * @return arc type
  */
-static inline lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->type;
-}
+lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj);
 
 /**
  * Get whether the arc is adjustable.
  * @param arc pointer to a arc object
  * @return whether the arc has a knob that can be dragged
  */
-static inline bool lv_arc_get_adjustable(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return ((lv_arc_t*) obj)->adjustable;
-}
+bool lv_arc_get_adjustable(lv_obj_t * obj);
 
 /*=====================
  * Other functions

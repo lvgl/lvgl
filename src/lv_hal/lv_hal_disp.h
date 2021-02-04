@@ -72,9 +72,7 @@ typedef struct _disp_drv_t {
      * LVGL will use this buffer(s) to draw the screens contents */
     lv_disp_buf_t * buffer;
 
-#if LV_ANTIALIAS
-    uint32_t antialiasing : 1; /**< 1: antialiasing is enabled on this display. */
-#endif
+    uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display. */
     uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
 
 #if LV_COLOR_SCREEN_TRANSP
@@ -117,8 +115,6 @@ typedef struct _disp_drv_t {
     /** OPTIONAL: called to wait while the gpu is working */
     void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
 
-#if LV_USE_GPU
-
     /** OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
                          lv_opa_t opa);
@@ -126,14 +122,13 @@ typedef struct _disp_drv_t {
     /** OPTIONAL: Fill a memory with a color (GPU only)*/
     void (*gpu_fill_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                         const lv_area_t * fill_area, lv_color_t color);
-#endif
 
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_TRANSP` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
 #if LV_USE_USER_DATA
-    lv_disp_drv_user_data_t user_data; /**< Custom display driver user data */
+    lv_user_data_t user_data; /**< Custom display driver user data */
 #endif
 
 } lv_disp_drv_t;
@@ -272,12 +267,6 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp);
  */
 lv_coord_t lv_disp_get_dpi(lv_disp_t * disp);
 
-/**
- * Get the size category of the display based on it's hor. res. and dpi.
- * @param disp pointer to a display (NULL to use the default display)
- * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE
- */
-lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp);
 
 //! @cond Doxygen_Suppress
 

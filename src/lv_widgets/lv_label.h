@@ -27,6 +27,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_LABEL_WAIT_CHAR_COUNT        3
 #define LV_LABEL_DOT_NUM 3
 #define LV_LABEL_POS_LAST 0xFFFF
 #define LV_LABEL_TEXT_SEL_OFF LV_DRAW_LABEL_NO_TXT_SEL

@@ -21,7 +21,15 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
 #define _LV_COORD_MAX_REDUCE    8192
+
+#if LV_USE_LARGE_COORD
+typedef int32_t lv_coord_t;
+#else
+typedef int16_t lv_coord_t;
+#endif
+
 /*To allow some special values in the end reduce the max value */
 #define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - _LV_COORD_MAX_REDUCE))
 #define LV_COORD_MIN (-LV_COORD_MAX)
@@ -237,7 +245,7 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
 #define LV_COORD_SET_LAYOUT(x) ((x) | _LV_COORD_TYPE_LAYOUT)
 
 /*Special coordinates*/
-#define LV_COORD_PCT(x)      _LV_COORD_SPEC(x)
+#define LV_COORD_PCT(x)      LV_COORD_SET_SPEC(x)
 #define LV_COORD_IS_PCT(x)   ((LV_COORD_IS_SPEC(x) && _LV_COORD_PLAIN(x) <= 1000) ? true : false)
 #define LV_COORD_GET_PCT(x)  _LV_COORD_PLAIN(x)
 #define LV_SIZE_AUTO         LV_COORD_SET_SPEC(1001)

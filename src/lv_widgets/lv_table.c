@@ -16,12 +16,11 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_printf.h"
 #include "../lv_draw/lv_draw_label.h"
-#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_table"
+#define MY_CLASS &lv_table
 
 /**********************
  *      TYPEDEFS
@@ -43,8 +42,8 @@ static void refr_size(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_table  = {
-    .constructor = lv_table_constructor,
-    .destructor = lv_table_destructor,
+    .constructor_cb = lv_table_constructor,
+    .destructor_cb = lv_table_destructor,
     .signal_cb = lv_table_signal,
     .draw_cb = lv_table_draw,
     .base_class = &lv_obj,
@@ -83,7 +82,7 @@ lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy)
  */
 void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(txt);
 
     lv_table_t * table = (lv_table_t *) obj;
@@ -133,7 +132,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
  */
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(fmt);
 
     lv_table_t * table = (lv_table_t *) obj;
@@ -216,7 +215,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
  */
 void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     uint16_t old_row_cnt = table->row_cnt;
@@ -247,7 +246,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
  */
 void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     uint16_t old_col_cnt = table->col_cnt;
@@ -266,7 +265,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     if(old_col_cnt < col_cnt) {
         uint32_t col;
         for(col = old_col_cnt; col < col_cnt; col++) {
-            table->col_w[col] = LV_DPI;
+            table->col_w[col] = LV_DPI_DEF;
         }
     }
 
@@ -297,7 +296,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
  */
 void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
 
@@ -317,7 +316,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
  */
 void lv_table_set_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col, bool crop)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
 
@@ -351,7 +350,7 @@ void lv_table_set_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col, bool cro
  */
 void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
 
@@ -391,7 +390,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, b
  */
 const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
@@ -412,7 +411,7 @@ const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col)
  */
 uint16_t lv_table_get_row_cnt(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     return table->row_cnt;
@@ -425,7 +424,7 @@ uint16_t lv_table_get_row_cnt(lv_obj_t * obj)
  */
 uint16_t lv_table_get_col_cnt(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     return table->col_cnt;
@@ -439,7 +438,7 @@ uint16_t lv_table_get_col_cnt(lv_obj_t * obj)
  */
 lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col_id)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
 
@@ -460,7 +459,7 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col_id)
  */
 bool lv_table_get_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
@@ -487,7 +486,7 @@ bool lv_table_get_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col)
  */
 bool lv_table_get_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
@@ -583,8 +582,8 @@ static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
         table->row_cnt = 1;
         table->col_w = lv_mem_alloc(table->col_cnt * sizeof(table->col_w[0]));
         table->row_h = lv_mem_alloc(table->row_cnt * sizeof(table->row_h[0]));
-        table->col_w[0] = LV_DPI;
-        table->row_h[0] = LV_DPI;
+        table->col_w[0] = LV_DPI_DEF;
+        table->row_h[0] = LV_DPI_DEF;
         table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
         table->cell_data[0] = NULL;
 
@@ -617,26 +616,17 @@ static void lv_table_destructor(lv_obj_t * obj)
 //               _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_CELL1 + i);
 //           }
 }
-/**
- * Handle the drawing related tasks of the tables
- * @param table pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
+
 static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj.draw_cb(obj, clip_area, mode);
+        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*Draw the background*/
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
         lv_table_t * table = (lv_table_t *) obj;
 
@@ -794,25 +784,18 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the table
- * @param table pointer to a table object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     lv_table_t * table = (lv_table_t *) obj;

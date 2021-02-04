@@ -26,6 +26,28 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/* Drag threshold in pixels */
+#define LV_INDEV_DEF_DRAG_LIMIT           10
+
+/* Drag throw slow-down in [%]. Greater value -> faster slow-down */
+#define LV_INDEV_DEF_DRAG_THROW           10
+
+/* Long press time in milliseconds.
+ * Time to send `LV_EVENT_LONG_PRESSSED`) */
+#define LV_INDEV_DEF_LONG_PRESS_TIME      400
+
+/* Repeated trigger period in long press [ms]
+ * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
+
+
+/* Gesture threshold in pixels */
+#define LV_INDEV_DEF_GESTURE_LIMIT        50
+
+/* Gesture min velocity at release before swipe (pixels)*/
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -92,7 +114,7 @@ typedef struct _lv_indev_drv_t {
     void (*feedback_cb)(struct _lv_indev_drv_t *, uint8_t);
 
 #if LV_USE_USER_DATA
-    lv_indev_drv_user_data_t user_data;
+    lv_user_data_t user_data;
 #endif
 
     /**< Pointer to the assigned display*/

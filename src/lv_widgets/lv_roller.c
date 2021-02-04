@@ -14,12 +14,12 @@
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_indev_scroll.h"
-#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_roller"
+#define MY_CLASS &lv_roller
+#define MY_CLASS_LABEL &lv_roller_label
 
 /**********************
  *      TYPEDEFS
@@ -29,11 +29,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_roller_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_roller_label_destructor(lv_obj_t * obj);
+static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label_obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
@@ -47,8 +44,7 @@ static void scroll_anim_ready_cb(lv_anim_t * a);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_roller = {
-        .constructor = lv_roller_constructor,
-        .destructor = lv_roller_destructor,
+        .constructor_cb = lv_roller_constructor,
         .signal_cb = lv_roller_signal,
         .draw_cb = lv_roller_draw,
         .instance_size = sizeof(lv_roller_t),
@@ -56,8 +52,6 @@ const lv_obj_class_t lv_roller = {
 };
 
 const lv_obj_class_t lv_roller_label  = {
-        .constructor = lv_roller_label_constructor,
-        .destructor = lv_roller_label_destructor,
         .signal_cb = lv_roller_label_signal,
         .draw_cb = lv_roller_label_draw,
         .instance_size = sizeof(lv_label_t),
@@ -95,7 +89,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy)
  */
 void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(options);
 
     lv_roller_t * roller = (lv_roller_t*)obj;
@@ -151,7 +145,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
  */
 void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t anim)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /* Set the value even if it's the same as the current value because
      * if moving to the next option with an animation which was just deleted in the PRESS signal
@@ -187,7 +181,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
  */
 void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -205,7 +199,7 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt)
  */
 uint16_t lv_roller_get_selected(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_roller_t * roller = (lv_roller_t*)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
@@ -225,7 +219,7 @@ uint16_t lv_roller_get_selected(const lv_obj_t * obj)
  */
 void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_roller_t * roller = (lv_roller_t*)obj;
     lv_obj_t * label = get_label(obj);
@@ -258,7 +252,7 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
  */
 const char * lv_roller_get_options(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_label_get_text(get_label(obj));
 }
@@ -271,7 +265,7 @@ const char * lv_roller_get_options(const lv_obj_t * obj)
  */
 uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_roller_t * roller = (lv_roller_t*)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
@@ -322,43 +316,14 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 
 }
 
-static void lv_roller_destructor(lv_obj_t * obj)
-{
-//    lv_bar_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-//    _lv_obj_reset_style_list_no_refr(sw, LV_PART_KNOB);
-//
-//    bar->class_p->base_p->destructor(obj);
-}
-
-static void lv_roller_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
-{
-    lv_label.constructor(obj, parent, copy);
-}
-static void lv_roller_label_destructor(lv_obj_t * obj)
-{
-    lv_label.destructor(obj);
-}
-
-/**
- * Handle the drawing related tasks of the rollers
- * @param roller pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after all children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj.draw_cb(obj, clip_area, mode);
+        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
         /*Draw the selected rectangle*/
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
@@ -431,32 +396,22 @@ static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area,
             lv_draw_label(&label_sel_area, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
         }
 
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Handle the drawing related tasks of the roller's label
- * @param roller pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after all children are drawn
- * @param return an element of `lv_draw_res_t`
- */
-static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode)
+static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label_obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_label.draw_cb(label, clip_area, mode);
+        return lv_obj_draw_base(MY_CLASS_LABEL, label_obj, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /* Split the drawing of the label into  an upper (above the selected area)
          * and a lower (below the selected area)*/
-        lv_obj_t * roller = lv_obj_get_parent(label);
+        lv_obj_t * roller = lv_obj_get_parent(label_obj);
         const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_PART_MAIN);
         lv_coord_t line_space = lv_obj_get_style_text_line_space(roller, LV_PART_MAIN);
         lv_coord_t font_h        = lv_font_get_line_height(font);
@@ -472,39 +427,32 @@ static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label, const lv_area_t * cl
         rect_area.x2 = roller_coords.x2;
 
         lv_area_t clip2;
-        clip2.x1 = label->coords.x1;
-        clip2.y1 = label->coords.y1;
-        clip2.x2 = label->coords.x2;
+        clip2.x1 = label_obj->coords.x1;
+        clip2.y1 = label_obj->coords.y1;
+        clip2.x2 = label_obj->coords.x2;
         clip2.y2 = rect_area.y1;
         if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
-            lv_label.draw_cb(label, &clip2, mode);
+            lv_obj_draw_base(MY_CLASS_LABEL, label_obj, clip_area, mode);
         }
 
-        clip2.x1 = label->coords.x1;
+        clip2.x1 = label_obj->coords.x1;
         clip2.y1 = rect_area.y2;
-        clip2.x2 = label->coords.x2;
-        clip2.y2 = label->coords.y2;
+        clip2.x2 = label_obj->coords.x2;
+        clip2.y2 = label_obj->coords.y2;
         if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
-            lv_label.draw_cb(label, &clip2, mode);
+            lv_obj_draw_base(MY_CLASS_LABEL, label_obj, clip_area, mode);
         }
     }
 
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the roller
- * @param roller pointer to a roller object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     lv_roller_t * roller = (lv_roller_t*)obj;
@@ -609,7 +557,7 @@ static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void 
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_label.signal_cb(label, sign, param);
+    res = lv_obj_signal_base(MY_CLASS_LABEL, label, sign, param);
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {

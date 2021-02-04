@@ -33,23 +33,6 @@ struct _lv_obj_class_t;
  **********************/
 
 /**
- * Create an object form a class descriptor
- * @param class pointer to  a class
- * @param parent pointer to an object where the new object should be created
- * @param copy pointer to an other object with the same type to copy (DEPRECATED will be removed in v9)
- * @return pointer to the created object
- */
-struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
-
-/**
- * Used internally in widget's constructor to construct the base type
- * @param obj pointer to the object being constructed
- * @param parent pointer to the parent
- * @param copy pointer to the object to copy (DEPRECATED will be removed in v9)
- */
-void lv_obj_construct_base(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
-
-/**
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created

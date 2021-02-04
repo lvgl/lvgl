@@ -17,7 +17,6 @@
 #include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_refr.h"
-#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -55,25 +54,21 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     lv_memset_00(driver, sizeof(lv_disp_drv_t));
 
     driver->flush_cb         = NULL;
-    driver->hor_res          = LV_HOR_RES_MAX;
-    driver->ver_res          = LV_VER_RES_MAX;
+    driver->hor_res          = 320;
+    driver->ver_res          = 240;
     driver->buffer           = NULL;
     driver->rotated          = 0;
-    driver->color_chroma_key = LV_COLOR_TRANSP;
-    driver->dpi = LV_DPI;
+    driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
+    driver->dpi = LV_DPI_DEF;
 
-#if LV_ANTIALIAS
-    driver->antialiasing = true;
-#endif
+    driver->antialiasing = LV_COLOR_DEPTH > 8 ? 1: 0;
 
 #if LV_COLOR_SCREEN_TRANSP
     driver->screen_transp = 1;
 #endif
 
-#if LV_USE_GPU
     driver->gpu_blend_cb = NULL;
     driver->gpu_fill_cb  = NULL;
-#endif
 
 #if LV_USE_USER_DATA
     driver->user_data = NULL;
@@ -240,10 +235,8 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
-    if(disp == NULL)
-        return LV_HOR_RES_MAX;
-    else
-        return disp->driver.rotated == 0 ? disp->driver.hor_res : disp->driver.ver_res;
+    if(disp == NULL) return 0;
+    else return disp->driver.rotated == 0 ? disp->driver.hor_res : disp->driver.ver_res;
 }
 
 /**
@@ -255,10 +248,8 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
-    if(disp == NULL)
-        return LV_VER_RES_MAX;
-    else
-        return disp->driver.rotated == 0 ? disp->driver.ver_res : disp->driver.hor_res;
+    if(disp == NULL) return 0;
+    else return disp->driver.rotated == 0 ? disp->driver.ver_res : disp->driver.hor_res;
 }
 
 /**
@@ -268,15 +259,10 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
  */
 bool lv_disp_get_antialiasing(lv_disp_t * disp)
 {
-#if LV_ANTIALIAS == 0
-    LV_UNUSED(disp);
-    return false;
-#else
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return false;
 
     return disp->driver.antialiasing ? true : false;
-#endif
 }
 
 /**
@@ -287,31 +273,8 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
 lv_coord_t lv_disp_get_dpi(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
-    if(disp == NULL) return LV_DPI;  /*Do not return 0 because it might be a divider*/
+    if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
     return disp->driver.dpi;
-}
-
-/**
- * Get the size category of the display based on it's hor. res. and dpi.
- * @param disp pointer to a display (NULL to use the default display)
- * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE
- */
-lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp)
-{
-    if(disp == NULL) disp = lv_disp_get_default();
-
-    uint32_t w;
-    if(disp == NULL) w = LV_HOR_RES_MAX;
-    else w = lv_disp_get_hor_res(disp);
-
-    uint32_t dpi = lv_disp_get_dpi(disp);
-
-    w = w * 10 / dpi;
-
-    if(w < LV_DISP_SMALL_LIMIT) return LV_DISP_SIZE_SMALL;
-    if(w < LV_DISP_MEDIUM_LIMIT) return LV_DISP_SIZE_MEDIUM;
-    if(w < LV_DISP_LARGE_LIMIT) return LV_DISP_SIZE_LARGE;
-    else return LV_DISP_SIZE_EXTRA_LARGE;
 }
 
 /**

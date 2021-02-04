@@ -28,43 +28,69 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_METER_INDICATOR_TYPE_SCALE = 0x01,
-    LV_METER_INDICATOR_TYPE_NEEDLE = 0x02,
-    LV_METER_INDICATOR_TYPE_ARC = 0x04,
+    LV_METER_INDICATOR_TYPE_NEEDLE_IMG,
+    LV_METER_INDICATOR_TYPE_NEEDLE_LINE,
+    LV_METER_INDICATOR_TYPE_SCALE_LINES,
+    LV_METER_INDICATOR_TYPE_ARC,
 }lv_meter_indicator_type_t;
 
-typedef enum {
-    LV_METER_SEGMENT_TYPE_SCALE = 0x1,
-    LV_METER_SEGMENT_TYPE_ARC = 0x2,
-}lv_meter_segment_type_t;
-
 typedef struct {
+    lv_meter_indicator_type_t type;
+    lv_opa_t opa;
     int32_t start_value;
     int32_t end_value;
-    lv_meter_indicator_type_t type;
-    lv_coord_t r_mod;
-    lv_color_t color;
-    lv_opa_t opa;
-    lv_coord_t width;
-
-    lv_color_t grad_color;
-    const void * img_src;
-    lv_opa_t recolor_opa;
-    lv_point_t img_pivot;
-    lv_point_t arc_ofs;
-    uint8_t scale_color_local:1;
+    union {
+        struct {
+            const void * src;
+            lv_point_t pivot;
+        }needle_img;
+        struct {
+            uint16_t width;
+            int16_t r_mod;
+            lv_color_t color;
+        }needle_line;
+        struct {
+            uint16_t width;
+            const void * src;
+            lv_color_t color;
+            int16_t r_mod;
+        }arc;
+        struct {
+            int16_t width_mod;
+            lv_color_t color_start;
+            lv_color_t color_end;
+            uint8_t local_grad  :1;
+        }scale_lines;
+    };
 }lv_meter_indicator_t;
+
+typedef struct {
+    lv_ll_t indicator_ll;
+
+    lv_color_t tick_color;
+    uint16_t tick_cnt;
+    uint16_t tick_length;
+    uint16_t tick_width;
+
+    lv_color_t tick_major_color;
+    int16_t tick_major_nth;
+    uint16_t tick_major_length;
+    uint16_t tick_major_width;
+
+    int16_t label_gap;
+    int16_t label_color;
+
+    int32_t min;
+    int32_t max;
+    int16_t r_mod;
+    uint16_t angle_range;
+    int16_t angle_ofs;
+}lv_meter_scale_t;
 
 /*Data of line meter*/
 typedef struct {
     lv_obj_t obj;
-    lv_ll_t indic_ll;
-    uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
-    uint16_t angle_ofs;
-    uint16_t line_cnt;     /*Count of lines */
-    uint16_t marker_nth;  /*Every Nth line should be marker */
-    int32_t min_value;
-    int32_t max_value;
+    lv_ll_t scale_ll;
 } lv_meter_t;
 
 extern const lv_obj_class_t lv_meter;
@@ -74,96 +100,139 @@ extern const lv_obj_class_t lv_meter;
  **********************/
 
 /**
- * Create a line meter objects
- * @param par pointer to an object, it will be the parent of the new line meter
- * @param copy pointer to a line meter object, if not NULL then the new object will be copied from
- * it
- * @return pointer to the created line meter
+ * Create a meter objects
+ * @param parent pointer to an object, it will be the parent of the new bar
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other meter to copy.
+ * @return pointer to the created meter
  */
-lv_obj_t * lv_meter_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_meter_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /*=====================
- * Setter functions
+ * Add scale
  *====================*/
 
 /**
- * Set a new value on the line meter
- * @param lmeter pointer to a line meter object
- * @param value new value
+ * Add a new scale to the meter.
+ * @param obj   pointer to a meter object
+ * @return      the new scale
+ * @note        Indicators can be attached to scales.
  */
-lv_meter_indicator_t * lv_meter_add_indicator(lv_obj_t * obj);
-
-void lv_meter_set_value(lv_obj_t * meter, lv_meter_indicator_t * indic, int32_t value);
-
-/**
- * Set minimum and the maximum values of a line meter
- * @param lmeter pointer to he line meter object
- * @param min minimum value
- * @param max maximum value
- */
-void lv_meter_set_range(lv_obj_t * meter, int32_t min, int32_t max);
+lv_meter_scale_t * lv_meter_add_scale(lv_obj_t * obj);
 
 /**
- * Set the scale settings of a line meter
- * @param lmeter pointer to a line meter object
- * @param angle angle of the scale (0..360)
- * @param line_cnt number of lines
+ * Set the properties of the ticks of a scale
+ * @param obj       pointer to a meter object
+ * @param scale     pointer to scale (added to `meter`)
+ * @param cnt       number of tick lines
+ * @param width     width of tick lines
+ * @param len       length of tick lines
+ * @param color     color of tick lines
  */
-void lv_meter_set_scale(lv_obj_t * meter, uint16_t angle, uint16_t line_cnt, uint16_t nth_marker);
+void lv_meter_set_scale_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t cnt, uint16_t width, uint16_t len, lv_color_t color);
 
 /**
- * Set the set an offset for the line meter's angles to rotate it.
- * @param lmeter pointer to a line meter object
- * @param angle angle offset (0..360), rotates clockwise
+ * Make some "normal" ticks major ticks and set their attributes.
+ * Texts with the current value are also added to the major ticks.
+ * @param obj           pointer to a meter object
+ * @param scale         pointer to scale (added to `meter`)
+ * @param nth           make every Nth normal tick major tick. (start from the first on the left)
+ * @param width         width of the major ticks
+ * @param len           length of the major ticks
+ * @param color         color of the major ticks
+ * @param label_gap     gap between the major ticks and the labels
  */
-void lv_meter_set_angle_offset(lv_obj_t * meter, uint16_t angle);
+void lv_meter_set_scale_major_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t nth, uint16_t width, uint16_t len, lv_color_t color, int16_t label_gap);
+
+/**
+ * Set the value and angular range of a scale.
+ * @param obj           pointer to a meter object
+ * @param scale         pointer to scale (added to `meter`)
+ * @param min           the minimum value
+ * @param max           the maximal value
+ * @param angle_range   the angular range of the scale
+ * @param angle_ofs     the angular offset from 3 o'clock position (clock-wise)
+ */
+void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range, uint32_t angle_ofs);
 
 /*=====================
- * Getter functions
+ * Add indicator
  *====================*/
 
 /**
- * Get the value of a line meter
- * @param lmeter pointer to a line meter object
- * @return the value of the line meter
+ * Add a needle line indicator the scale
+ * @param obj           pointer to a meter object
+ * @param scale         pointer to scale (added to `meter`)
+ * @param width         width of the line
+ * @param color         color of the line
+ * @param r_mod         the radius modifier (added to the scale's radius) to get the lines length
+ * @return              the new indicator
  */
-int32_t lv_meter_get_value(const lv_obj_t * obj, const lv_meter_indicator_t * indic);
+lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color, int16_t r_mod);
 
 /**
- * Get the minimum value of a line meter
- * @param lmeter pointer to a line meter object
- * @return the minimum value of the line meter
+ * Add a needle image indicator the scale
+ * @param obj           pointer to a meter object
+ * @param scale         pointer to scale (added to `meter`)
+ * @param src           the image source of the indicator. path or pointer to ::lv_img_dsc_t
+ * @param pivot_x       the X pivot point of the needle
+ * @param pivot_y       the Y pivot point of the needle
+ * @return              the new indicator
+ * @note                the needle image should point to the right, like -O----->
  */
-int32_t lv_meter_get_min_value(const lv_obj_t * meter);
+lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src, lv_coord_t pivot_x, lv_coord_t pivot_y);
 
 /**
- * Get the maximum value of a line meter
- * @param lmeter pointer to a line meter object
- * @return the maximum value of the line meter
+ * Add an arc indicator the scale
+ * @param obj           pointer to a meter object
+ * @param scale         pointer to scale (added to `meter`)
+ * @param width         width of the arc
+ * @param color         color of the arc
+ * @param r_mod         the radius modifier (added to the scale's radius) to get the outer radius of the arc
+ * @return              the new indicator
  */
-int32_t lv_meter_get_max_value(const lv_obj_t * meter);
+lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color, int16_t r_mod);
+
 
 /**
- * Get the scale number of a line meter
- * @param lmeter pointer to a line meter object
- * @return number of the scale units
+ * Add a scale line indicator the scale. It will modify the ticks.
+ * @param obj           pointer to a meter object
+ * @param scale         pointer to scale (added to `meter`)
+ * @param color_start   the start color
+ * @param color_end     the end color
+ * @param local         tell how to map start and end color. true: the indicator's start and end_value; false: the scale's min max value
+ * @param width_mod     add this the affected tick's width
+ * @return              the new indicator
  */
-uint16_t lv_meter_get_line_count(const lv_obj_t * meter);
+lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t * scale, lv_color_t color_start, lv_color_t color_end, bool local, int16_t width_mod);
+
+/*=====================
+ * Set indicator value
+ *====================*/
 
 /**
- * Get the scale angle of a line meter
- * @param lmeter pointer to a line meter object
- * @return angle of the scale
+ * Set the value of the indicator. It will set start and and value to the same value
+ * @param obj           pointer to a meter object
+ * @param indic         pointer to an indicator
+ * @param value         the new value
  */
-uint16_t lv_meter_get_scale_angle(const lv_obj_t * meter);
+void lv_meter_set_indicator_value(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
 /**
- * Get the offset for the line meter.
- * @param lmeter pointer to a line meter object
- * @return angle offset (0..360)
+ * Set the start value of the indicator.
+ * @param obj           pointer to a meter object
+ * @param indic         pointer to an indicator
+ * @param value         the new value
  */
-uint16_t lv_meter_get_angle_offset(lv_obj_t * meter);
+void lv_meter_set_indicator_start_value(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
+/**
+ * Set the start value of the indicator.
+ * @param obj           pointer to a meter object
+ * @param indic         pointer to an indicator
+ * @param value         the new value
+ */
+void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
 /**********************
  *      MACROS

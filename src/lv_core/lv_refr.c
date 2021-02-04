@@ -44,6 +44,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p);
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 static void lv_refr_vdb_flush(void);
+static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 /**********************
  *  STATIC VARIABLES
@@ -587,7 +588,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     /*If this object is fully cover the draw area check the children too */
     if(_lv_area_is_in(area_p, &obj->coords, 0) && lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == false) {
-        lv_draw_res_t draw_res = obj->class_p->draw_cb(obj, area_p, LV_DRAW_MODE_COVER_CHECK);
+        lv_draw_res_t draw_res = call_draw_cb(obj, area_p, LV_DRAW_MODE_COVER_CHECK);
         if(draw_res == LV_DRAW_RES_MASKED) return NULL;
 
 #if LV_USE_OPA_SCALE
@@ -656,7 +657,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 
         /*Call the post draw draw function of the parents of the to object*/
         lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, mask_p);
-        par->class_p->draw_cb(par, mask_p, LV_DRAW_MODE_POST_DRAW);
+        call_draw_cb(par, mask_p, LV_DRAW_MODE_POST_DRAW);
         lv_event_send(par, LV_EVENT_DRAW_POST_END, mask_p);
 
         /*The new border will be the last parents,
@@ -695,7 +696,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     if(union_ok != false) {
         /* Redraw the object */
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, &obj_ext_mask);
-        obj->class_p->draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_MAIN_DRAW);
+        call_draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_MAIN_DRAW);
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
 
 #if MASK_AREA_DEBUG
@@ -744,7 +745,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 
         /* If all the children are redrawn make 'post draw' draw */
         lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, &obj_ext_mask);
-        obj->class_p->draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_POST_DRAW);
+        call_draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_POST_DRAW);
         lv_event_send(obj, LV_EVENT_DRAW_POST_END, &obj_ext_mask);
     }
 }
@@ -781,4 +782,21 @@ static void lv_refr_vdb_flush(void)
         else
             vdb->buf_act = vdb->buf1;
     }
+}
+
+static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+{
+    if(obj == NULL) return LV_DRAW_RES_OK;
+
+    const lv_obj_class_t * class_p = obj->class_p;
+    while(class_p && class_p->draw_cb == NULL) class_p = class_p->base_class;
+
+    if(class_p == NULL) return LV_DRAW_RES_OK;
+
+
+    lv_draw_res_t res = LV_DRAW_RES_OK;
+
+    if(class_p->draw_cb) res = class_p->draw_cb(obj, clip_area, mode);
+
+    return res;
 }

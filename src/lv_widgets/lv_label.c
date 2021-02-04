@@ -17,13 +17,13 @@
 #include "../lv_misc/lv_bidi.h"
 #include "../lv_misc/lv_txt_ap.h"
 #include "../lv_misc/lv_printf.h"
-#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_label"
+#define MY_CLASS &lv_label
 
+#define LV_LABEL_DEF_SCROLL_SPEED   25
 #define LV_LABEL_DOT_END_INV 0xFFFFFFFF
 #define LV_LABEL_HINT_HEIGHT_LIMIT 1024 /*Enable "hint" to buffer info about labels larger than this. (Speed up drawing)*/
 
@@ -54,8 +54,8 @@ static void get_txt_coords(const lv_obj_t * label, lv_area_t * area);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_label = {
-    .constructor = lv_label_constructor,
-    .destructor = lv_label_destructor,
+    .constructor_cb = lv_label_constructor,
+    .destructor_cb = lv_label_destructor,
     .signal_cb = lv_label_signal,
     .draw_cb = lv_label_draw,
     .instance_size = sizeof(lv_label_t),
@@ -81,7 +81,7 @@ lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 void lv_label_set_text(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
 
     lv_obj_invalidate(obj);
@@ -145,7 +145,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(fmt);
 
     lv_obj_invalidate(obj);
@@ -173,7 +173,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 
 void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
 
     if(label->static_txt == 0 && label->text != NULL) {
@@ -191,7 +191,7 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 
 void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -219,7 +219,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 
 void lv_label_set_recolor(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_label_t * label = (lv_label_t *)obj;
     if(label->recolor == en) return;
@@ -232,7 +232,7 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en)
 
 void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
     lv_label_t * label = (lv_label_t *)obj;
@@ -246,7 +246,7 @@ void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index)
 
 void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
     lv_label_t * label = (lv_label_t *)obj;
@@ -264,21 +264,21 @@ void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index)
 
 char * lv_label_get_text(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
     return label->text;
 }
 
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
     return label->long_mode;
 }
 
 bool lv_label_get_recolor(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_label_t * label = (lv_label_t *)obj;
     return label->recolor == 0 ? false : true;
@@ -286,7 +286,7 @@ bool lv_label_get_recolor(const lv_obj_t * obj)
 
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(pos);
 
     const char * txt         = lv_label_get_text(obj);
@@ -360,7 +360,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
         bool is_rtl;
         uint32_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
-                                                           lv_obj_get_base_dir(label), line_char_id, &is_rtl);
+                                                           lv_obj_get_base_dir(obj), line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if(is_rtl) visual_char_pos++;
 
@@ -397,7 +397,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
 uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(pos_in);
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -448,7 +448,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
     uint32_t txt_len = new_line_start - line_start;
     if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
-    _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
+    _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(obj), NULL, 0);
 #else
     bidi_txt = (char *)txt + line_start;
 #endif
@@ -508,7 +508,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     else {
         bool is_rtl;
         logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL,
-                                               txt_len, lv_obj_get_base_dir(label), cid, &is_rtl);
+                                               txt_len, lv_obj_get_base_dir(obj), cid, &is_rtl);
         if(is_rtl) logical_pos++;
         lv_mem_buf_release(bidi_txt);
     }
@@ -521,7 +521,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 
 bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(pos);
 
     lv_area_t txt_coords;
@@ -606,7 +606,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
 uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
     lv_label_t * label = (lv_label_t *)obj;
@@ -620,7 +620,7 @@ uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj)
 
 uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_LABEL_TEXT_SEL
     lv_label_t * label = (lv_label_t *)obj;
@@ -637,7 +637,7 @@ uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
 
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_STR(txt);
 
     lv_label_t * label = (lv_label_t *)obj;
@@ -664,7 +664,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
     LV_ASSERT_MEM(bidi_buf);
     if(bidi_buf == NULL) return;
 
-    _lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
+    _lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(obj));
     _lv_txt_ins(label->text, pos, bidi_buf);
 
     lv_mem_buf_release(bidi_buf);
@@ -676,7 +676,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 
 void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
 
     /*Can not append to static text*/
@@ -766,7 +766,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         return LV_DRAW_RES_NOT_COVER;
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
 
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
         lv_label_t * label = (lv_label_t *)obj;
         lv_area_t txt_coords;
@@ -843,7 +843,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
             }
         }
     } else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
@@ -861,7 +861,7 @@ static lv_res_t lv_label_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_STYLE_CHG) {

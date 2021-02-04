@@ -11,7 +11,7 @@
 #include "lv_refr.h"
 #include "lv_group.h"
 #include "lv_disp.h"
-#include "../lv_themes/lv_theme.h"
+#include "lv_theme.h"
 #include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include LV_THEME_DEFAULT_INCLUDE
+#include LV_THEME_INIT_INCLUDE
 
 #if LV_USE_GPU_STM32_DMA2D
     #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
@@ -34,7 +34,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_obj"
+#define MY_CLASS &lv_obj
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
@@ -84,10 +84,11 @@ static void lv_obj_destructor(lv_obj_t * obj);
  **********************/
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
-static void * event_act_data;
+static void * event_act_param;
+static void * event_act_user_data_cb;
 const lv_obj_class_t lv_obj = {
-    .constructor = lv_obj_constructor,
-    .destructor = lv_obj_destructor,
+    .constructor_cb = lv_obj_constructor,
+    .destructor_cb = lv_obj_destructor,
     .signal_cb = lv_obj_signal,
     .draw_cb = lv_obj_draw,
     .instance_size = (sizeof(lv_obj_t)),
@@ -132,9 +133,7 @@ void lv_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
-    lv_theme_t * th = LV_THEME_DEFAULT_INIT(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
-                                            LV_THEME_DEFAULT_FLAG,
-                                            LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
+    lv_theme_t * th = LV_THEME_INIT
 
     lv_theme_set_act(th);
 
@@ -184,15 +183,15 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
  * Event/Signal sending
  *---------------------*/
 
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data)
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 {
     if(obj == NULL) return LV_RES_OK;
 
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*Nothing to do if no event function and not bubbled*/
-    lv_event_cb_t event_cb = lv_obj_get_event_cb(obj, 0);
-    if(event_cb == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
+    if((event_dsc == NULL  || event_dsc->cb == NULL) && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
         return LV_RES_OK;
     }
 
@@ -209,8 +208,8 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data)
     }
     event_temp_data_head = &event_temp_data;
 
-    void * event_act_data_save = event_act_data;
-    event_act_data = data;
+    void * event_act_param_save = event_act_param;
+    event_act_param = param;
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
@@ -220,28 +219,33 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data)
 
     uint32_t i = 0;
     lv_res_t res = LV_RES_OK;
-    while(event_cb) {
-        event_cb(obj, event);
+    while(event_dsc) {
+        if(event_dsc->cb) {
+            void * event_act_user_data_cb_save = event_act_user_data_cb;
+            event_act_user_data_cb = event_dsc->user_data;
 
-        /*Stop if the object is deleted*/
-        if(event_temp_data.deleted) {
-            res = LV_RES_INV;
-            break;
-        }
+            event_dsc->cb(obj, event);
 
-        if(obj) {
+            event_act_user_data_cb = event_act_user_data_cb_save;
+
+            /*Stop if the object is deleted*/
+            if(event_temp_data.deleted) {
+                res = LV_RES_INV;
+                break;
+            }
+
             if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-                lv_res_t res = lv_event_send(obj->parent, event, data);
+                lv_res_t res = lv_event_send(obj->parent, event, param);
                 if(res != LV_RES_OK) return LV_RES_INV;
             }
         }
 
         i++;
-        event_cb = lv_obj_get_event_cb(obj, i);
+        event_dsc = lv_obj_get_event_dsc(obj, i);
     }
 
-    /*Restore the event data*/
-    event_act_data = event_act_data_save;
+    /*Restore the event param*/
+    event_act_param = event_act_param_save;
 
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
@@ -249,9 +253,14 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * data)
     return res;
 }
 
-void * lv_event_get_data(void)
+void * lv_event_get_param(void)
 {
-    return event_act_data;
+    return event_act_param;
+}
+
+void * lv_event_get_user_data(void)
+{
+    return event_act_user_data_cb;
 }
 
 uint32_t lv_event_register_id(void)
@@ -280,8 +289,15 @@ lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 {
     if(obj == NULL) return LV_RES_OK;
 
+    const lv_obj_class_t * class_p = obj->class_p;
+    while(class_p && class_p->signal_cb == NULL) class_p = class_p->base_class;
+
+    if(class_p == NULL) return LV_RES_OK;
+
+
     lv_res_t res = LV_RES_OK;
-    if(obj->class_p->signal_cb) res = obj->class_p->signal_cb(obj, signal, param);
+
+    if(class_p->signal_cb) res = class_p->signal_cb(obj, signal, param);
 
     return res;
 }
@@ -296,7 +312,7 @@ lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(f & LV_OBJ_FLAG_HIDDEN)lv_obj_invalidate(obj);
 
@@ -308,7 +324,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     obj->flags &= (~f);
 
@@ -320,7 +336,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 {
     if(obj->state == new_state) return;
 
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_state_t prev_state = obj->state;
     obj->state = new_state;
@@ -328,7 +344,10 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     _lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
 
     /*If there is no difference in styles there is nothing else to do*/
-    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) {
+        lv_obj_invalidate(obj);
+        return;
+    }
 
     trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
     lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
@@ -377,7 +396,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
@@ -387,7 +406,7 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
@@ -395,16 +414,17 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
 
-    obj->spec_attr->event_cb_cnt++;
-    obj->spec_attr->event_cb = lv_mem_realloc(obj->spec_attr->event_cb, obj->spec_attr->event_cb_cnt * sizeof(lv_event_cb_t));
-    LV_ASSERT_MEM(obj->spec_attr->event_cb);
+    obj->spec_attr->event_dsc_cnt++;
+    obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+    LV_ASSERT_MEM(obj->spec_attr->event_dsc);
 
-    obj->spec_attr->event_cb[obj->spec_attr->event_cb_cnt - 1] = event_cb;
+    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
+    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].user_data = user_data;
 
 }
 
@@ -433,14 +453,14 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
 
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return obj->flags & f ? true : false;
 }
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
 #if LV_USE_BIDI
     if(obj->spec_attr == NULL) return LV_BIDI_DIR_LTR;
@@ -464,7 +484,7 @@ lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return obj->state;
 }
@@ -472,24 +492,24 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return obj->state & state ? true : false;
 }
 
-lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj, uint32_t id)
+lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(!obj->spec_attr) return NULL;
-    if(id >= obj->spec_attr->event_cb_cnt) return NULL;
+    if(id >= obj->spec_attr->event_dsc_cnt) return NULL;
 
-    return obj->spec_attr->event_cb[id];
+    return &obj->spec_attr->event_dsc[id];
 }
 
 void * lv_obj_get_group(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr) return obj->spec_attr->group_p;
     else return NULL;
@@ -501,7 +521,7 @@ void * lv_obj_get_group(const lv_obj_t * obj)
 
 void lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr == NULL) {
         static uint32_t x = 0;
@@ -591,7 +611,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     /*Create a normal object*/
     else {
         LV_LOG_TRACE("Object create started");
-        LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
+        LV_ASSERT_OBJ(parent, MY_CLASS);
         if(parent->spec_attr == NULL) {
             lv_obj_allocate_spec_attr(parent);
         }

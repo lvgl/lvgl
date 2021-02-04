@@ -23,7 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_templ"
+#define MY_CLASS &lv_templ
 
 /**********************
  *      TYPEDEFS
@@ -124,7 +124,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, const lv_style_t * style)
 {
-    LV_ASSERT_OBJ(templ, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(templ, MY_CLASS);
 
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 
@@ -152,7 +152,7 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, const lv_style_
  */
 lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
 {
-    LV_ASSERT_OBJ(templ, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(templ, MY_CLASS);
 
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
     lv_style_t * style   = NULL;
@@ -222,7 +222,7 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
     /* Include the ancient signal function */
     res = ancestor_signal(templ, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, MY_CLASS);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

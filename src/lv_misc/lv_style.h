@@ -608,6 +608,11 @@ static inline void lv_style_set_pad_hor(lv_style_t * style, lv_coord_t value)
     lv_style_set_pad_right(style, value);
 }
 
+static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_pad_row(style, value);
+    lv_style_set_pad_column(style, value);
+}
 static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 {
     lv_style_set_pad_top(style, value);

@@ -12,7 +12,6 @@
 #include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_themes/lv_theme.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -20,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_line"
+#define MY_CLASS &lv_line
 
 /**********************
  *      TYPEDEFS
@@ -38,8 +37,8 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_line = {
-    .constructor = lv_line_constructor,
-    .destructor = lv_line_destructor,
+    .constructor_cb = lv_line_constructor,
+    .destructor_cb = lv_line_destructor,
     .signal_cb = lv_line_signal,
     .draw_cb = lv_line_draw,
     .instance_size = sizeof(lv_line_t),
@@ -65,7 +64,7 @@ lv_obj_t * lv_line_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint16_t point_num)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_line_t * line = (lv_line_t *) obj;
     line->point_array    = points;
@@ -78,7 +77,7 @@ void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint16_t poin
 
 void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_line_t * line = (lv_line_t *) obj;
     if(line->y_inv == en) return;
@@ -94,7 +93,7 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 
 bool lv_line_get_y_invert(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_line_t * line = (lv_line_t *) obj;
 
@@ -145,7 +144,7 @@ static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, l
     if(mode == LV_DRAW_MODE_COVER_CHECK)
         return LV_DRAW_RES_NOT_COVER;
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
         lv_line_t * line = (lv_line_t *) obj;
 
         if(line->point_num == 0 || line->point_array == NULL) return false;
@@ -181,7 +180,7 @@ static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, l
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
     } else if (mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj.draw_cb(obj, clip_area, mode);
+        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     }
     return LV_DRAW_RES_OK;
 }
@@ -191,7 +190,7 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj.signal_cb(obj, sign, param);
+    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {

@@ -56,7 +56,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_USE_SHADOW && LV_SHADOW_CACHE_SIZE
+#if LV_SHADOW_CACHE_SIZE
     static uint8_t sh_cache[LV_SHADOW_CACHE_SIZE * LV_SHADOW_CACHE_SIZE];
     static int32_t sh_cache_size = -1;
     static int32_t sh_cache_r = -1;
@@ -83,7 +83,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->bg_img_opa = LV_OPA_COVER;
     dsc->outline_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
-    dsc->content_font = LV_THEME_DEFAULT_FONT_NORMAL;
+    dsc->content_font = LV_THEME_FONT_NORMAL;
     dsc->content_opa = LV_OPA_COVER;
     dsc->content_align = LV_ALIGN_CENTER;
     dsc->shadow_opa = LV_OPA_COVER;
@@ -108,13 +108,9 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_dra
 
     draw_border(coords, clip, dsc);
 
-#if LV_USE_VALUE_STR
     draw_content(coords, clip, dsc);
-#endif
 
-#if LV_USE_OUTLINE
     draw_outline(coords, clip, dsc);
-#endif
 
     LV_ASSERT_MEM_INTEGRITY();
 }

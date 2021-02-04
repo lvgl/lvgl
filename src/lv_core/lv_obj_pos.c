@@ -11,7 +11,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_obj"
+#define MY_CLASS &lv_obj
 
 /**********************
  *      TYPEDEFS
@@ -46,7 +46,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
  */
 void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(lv_obj_is_layout_positioned(obj)) {
         LV_LOG_WARN("Can't set position because the position is set by a layout");
@@ -66,7 +66,7 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
  */
 void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_set_pos(obj, x, obj->y_set);
 }
@@ -78,7 +78,7 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
  */
 void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_set_pos(obj, obj->x_set, y);
 }
@@ -91,7 +91,7 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
  */
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*If the width or height is set by a layout do not modify them*/
     if(obj->w_set == LV_SIZE_LAYOUT && obj->h_set == LV_SIZE_LAYOUT) return;
@@ -136,7 +136,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
  */
 void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_set_size(obj, w, obj->h_set);
 }
@@ -148,7 +148,7 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
  */
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_set_size(obj, obj->w_set, h);
 }
@@ -186,7 +186,7 @@ void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
  */
 void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->layout_dsc = layout;
@@ -237,11 +237,11 @@ void lv_obj_update_layout(lv_obj_t * cont, lv_obj_t * item)
  */
 void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(base == NULL) base = lv_obj_get_parent(obj);
 
-    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(base, MY_CLASS);
 
     lv_coord_t x = 0;
     lv_coord_t y = 0;
@@ -366,7 +366,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
  */
 void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_area_copy(coords, &obj->coords);
 }
@@ -381,7 +381,7 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
  */
 lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -406,7 +406,7 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t rel_y;
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -428,7 +428,7 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_area_get_width(&obj->coords);
 }
@@ -440,7 +440,7 @@ lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_area_get_height(&obj->coords);
 }
@@ -452,7 +452,7 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
@@ -467,7 +467,7 @@ lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t top = lv_obj_get_style_pad_top((lv_obj_t *)obj, LV_PART_MAIN);
     lv_coord_t bottom =  lv_obj_get_style_pad_bottom((lv_obj_t *)obj, LV_PART_MAIN);
@@ -596,7 +596,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
 
 void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
@@ -607,7 +607,7 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
 void lv_obj_invalidate(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
@@ -664,7 +664,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_is_visible(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_area_t obj_coords;
     lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
@@ -678,49 +678,26 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
 
 }
 
-void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom)
+void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t size)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->ext_click_pad.x1 = left;
-    obj->spec_attr->ext_click_pad.x2 = right;
-    obj->spec_attr->ext_click_pad.y1 = top;
-    obj->spec_attr->ext_click_pad.y2 = bottom;
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->ext_click_pad = LV_MAX4(left, right, top, bottom);
-#else
-    LV_UNUSED(obj);
-    LV_UNUSED(left);
-    LV_UNUSED(right);
-    LV_UNUSED(top);
-    LV_UNUSED(bottom);
-#endif
+    obj->spec_attr->ext_click_pad = size;
 }
 
 void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 {
     lv_area_copy(area, &obj->coords);
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     if(obj->spec_attr) {
         area->x1 -= obj->spec_attr->ext_click_pad;
         area->x2 += obj->spec_attr->ext_click_pad;
         area->y1 -= obj->spec_attr->ext_click_pad;
         area->y2 += obj->spec_attr->ext_click_pad;
     }
-#else
-    if(obj->spec_attr) {
-        area->x1 -= obj->spec_attr->ext_click_pad.x1;
-        area->x2 += obj->spec_attr->ext_click_pad.x2;
-        area->y1 -= obj->spec_attr->ext_click_pad.y1;
-        area->y2 += obj->spec_attr->ext_click_pad.y2;
-    }
-#endif
 }
 
-bool lv_obj_hit_test(const lv_obj_t * obj, const lv_point_t * point)
+bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
         lv_hit_test_info_t hit_info;
@@ -751,6 +728,10 @@ bool lv_obj_hit_test(const lv_obj_t * obj, const lv_point_t * point)
  */
 static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
+    /* If the size is managed by the layout don't let to overwrite it.*/
+    if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
+    if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
+
     /* Do nothing if the size is not changed */
     /* It is very important else recursive resizing can
      * occur without size change*/
@@ -763,13 +744,6 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     /*Save the original coordinates*/
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
-
-    /* Grow size is managed by the flexbox in `LV_SIGNAL_CHILD_CHG`
-     * So the real current value now.
-     * w or h has `LV_FLEX_GROW(x)` value which is a very large special value
-     * so it should be avoided to use such a special value as width*/
-    if(_LV_FLEX_GET_GROW(obj->w_set)) w = lv_obj_get_width(obj);
-    if(_LV_FLEX_GET_GROW(obj->h_set)) h = lv_obj_get_height(obj);
 
     /* Set the length and height
      * Be sure the content is not scrolled in an invalid position on the new size*/

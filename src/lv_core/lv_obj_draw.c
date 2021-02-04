@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_obj"
+#define MY_CLASS &lv_obj
 
 /**********************
  *      TYPEDEFS
@@ -391,7 +391,7 @@ void lv_obj_draw_hook_dsc_init(lv_obj_draw_hook_dsc_t * hook_dsc, const lv_area_
 
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t s_old = _lv_obj_get_ext_draw_size(obj);
     lv_coord_t s_new = 0;

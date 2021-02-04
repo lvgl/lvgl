@@ -628,7 +628,7 @@ bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_
     }
 
     if(dsc->tmp.chroma_keyed) {
-        lv_color_t ct = LV_COLOR_TRANSP;
+        lv_color_t ct = LV_COLOR_CHROMA_KEY;
         if(dsc->res.color.full == ct.full) return false;
     }
 
