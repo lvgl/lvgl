@@ -13,17 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_SPINNER
 
 /*Testing of dependencies*/
 #if LV_USE_ARC == 0
 #error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
-#endif
-
-#if LV_USE_ANIMATION == 0
-#error "lv_spinner: animations are required. Enable it in lv_conf.h (LV_USE_ANIMATION  1) "
 #endif
 
 /*********************

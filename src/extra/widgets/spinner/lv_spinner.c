@@ -48,25 +48,27 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
     LV_ASSERT_MEM(spinner);
     if(spinner == NULL) return NULL;
 
-    lv_obj_set_size(spinner, LV_DPI, LV_DPI);
+    lv_obj_set_size(spinner, LV_DPI_DEF, LV_DPI_DEF);
 
-   lv_anim_path_t path;
-   lv_anim_path_init(&path);
-   lv_anim_path_set_cb(&path, lv_anim_path_ease_in_out);
+    lv_obj_remove_style(spinner, LV_PART_KNOB, LV_STATE_ANY, NULL);
 
-   lv_anim_t a;
-   lv_anim_init(&a);
-   lv_anim_set_var(&a, spinner);
-   lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_angle_anim_cb);
-   lv_anim_set_path(&a, &path);
-   lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-   lv_anim_set_time(&a, time);
-   lv_anim_set_values(&a, 0, 360);
-   lv_anim_start(&a);
+    lv_anim_path_t path;
+    lv_anim_path_init(&path);
+    lv_anim_path_set_cb(&path, lv_anim_path_ease_in_out);
 
-   lv_arc_set_angles(spinner, 0, arc_length);
-   lv_arc_set_bg_angles(spinner, 0, 360);
-   lv_arc_set_rotation(spinner, 270 - arc_length / 2);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, spinner);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_angle_anim_cb);
+    lv_anim_set_path(&a, &path);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_time(&a, time);
+    lv_anim_set_values(&a, 0, 360);
+    lv_anim_start(&a);
+
+    lv_arc_set_bg_angles(spinner, 0, 360);
+    lv_arc_set_angles(spinner, 0, arc_length);
+    lv_arc_set_angle_ofs(spinner, 270 - arc_length / 2);
 
     return spinner;
 }

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_TABVIEW
 
@@ -24,6 +24,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct
+{
+    lv_obj_t obj;
+    uint16_t tab_cnt;
+    uint16_t tab_cur;
+}lv_tabview_t;
 
 /**********************
  * GLOBAL PROTOTYPES

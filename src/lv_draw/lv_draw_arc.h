@@ -25,7 +25,7 @@ extern "C" {
 typedef struct {
     lv_color_t color;
     lv_coord_t width;
-    const void * bg_img_src;
+    const void * img_src;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;
     uint8_t rounded : 1;

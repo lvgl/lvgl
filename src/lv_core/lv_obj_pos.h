@@ -64,22 +64,37 @@ void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
 /**
  * Set the size of an object.
  * @param obj: pointer to an object
- * @param w: new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
- * @param h: new height in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param w: the new width
+ * @param h: the new height
+ * @note possible values are:
+ *      pixel:              simple set the size accordingly
+ *      LV_SIZE_AUTO:       to set the size to involve all children in the given direction
+ *      LV_COORD_PCT(x):    to set size to a percentage of the parent's content area size (the size without paddings).
+ *                          x should be [0..1000] range
  */
 void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
 /**
  * Set the width of an object
  * @param obj: pointer to an object
- * @param w:   new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param w:   the new width
+ * @note possible values are:
+ *      pixel:              simple set the size accordingly
+ *      LV_SIZE_AUTO:       to set the size to involve all children in the given direction
+ *      LV_COORD_PCT(x):    to set size to a percentage of the parent's content area size (the size without paddings).
+ *                          x should be [0..1000] range
  */
 void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the height of an object
  * @param obj: pointer to an object
- * @param h: new height in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param h: the new height
+ * @note possible values are:
+ *      pixel:              simple set the size accordingly
+ *      LV_SIZE_AUTO:       to set the size to involve all children in the given direction
+ *      LV_COORD_PCT(x):    to set size to a percentage of the parent's content area size (the size without paddings).
+ *                          x should be [0..1000] range
  */
 void lv_obj_set_height(struct _lv_obj_t * obj, lv_coord_t h);
 

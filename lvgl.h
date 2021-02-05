@@ -73,6 +73,10 @@ extern "C" {
 #include "src/extra/widgets/calendar/lv_calendar_header_arrow.h"
 #include "src/extra/widgets/keyboard/lv_keyboard.h"
 #include "src/extra/widgets/list/lv_list.h"
+#include "src/extra/widgets/msgbox/lv_msgbox.h"
+#include "src/extra/widgets/spinbox/lv_spinbox.h"
+#include "src/extra/widgets/spinner/lv_spinner.h"
+#include "src/extra/widgets/tabview/lv_tabview.h"
 
 /* LAYOUTS */
 #include "src/extra/layouts/flex/lv_flex.h"

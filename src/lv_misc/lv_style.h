@@ -193,19 +193,26 @@ typedef enum {
     LV_STYLE_LINE_COLOR_FILTERED = 104 | LV_STYLE_PROP_FILTER,
     LV_STYLE_LINE_OPA        = 105,
 
-    LV_STYLE_CONTENT_TEXT  = 110   | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_ALIGN = 111 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_OFS_X = 112 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_OFS_Y = 113 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_CONTENT_FONT  = 114  | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_CONTENT_COLOR = 115 | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_CONTENT_COLOR_FILTERED = 115 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_FILTER,
-    LV_STYLE_CONTENT_OPA   = 116   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_CONTENT_LETTER_SPACE = 117   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_CONTENT_LINE_SPACE   = 118   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_CONTENT_DECOR = 119   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_ARC_WIDTH      = 110 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_ARC_ROUNDED    = 111,
+    LV_STYLE_ARC_COLOR      = 112,
+    LV_STYLE_ARC_COLOR_FILTERED = 112 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_ARC_OPA        = 113,
+    LV_STYLE_ARC_IMG_SRC    = 114,
 
-    _LV_STYLE_LAST_BUILT_IN_PROP = 128,
+    LV_STYLE_CONTENT_TEXT  = 120   | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_ALIGN = 121 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_OFS_X = 122 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_OFS_Y = 123 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_CONTENT_FONT  = 124  | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_COLOR = 125 | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_COLOR_FILTERED = 125 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_FILTER,
+    LV_STYLE_CONTENT_OPA   = 126   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_LETTER_SPACE = 127   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_LINE_SPACE   = 128   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_CONTENT_DECOR = 129   | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_INHERIT,
+
+    _LV_STYLE_LAST_BUILT_IN_PROP = 140,
 
     LV_STYLE_PROP_ALL = 0xFFFF
 }lv_style_prop_t;
@@ -561,6 +568,24 @@ static inline void lv_style_set_line_color_filtered(lv_style_t * style, lv_color
 
 static inline void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_OPA, v); }
+
+static inline void lv_style_set_arc_width(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_ARC_WIDTH, v); }
+
+static inline void lv_style_set_arc_rounded(lv_style_t * style, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_ARC_ROUNDED, v); }
+
+static inline void lv_style_set_arc_color(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_ARC_COLOR, v); }
+
+static inline void lv_style_set_arc_color_filtered(lv_style_t * style, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_ARC_COLOR_FILTERED, v); }
+
+static inline void lv_style_set_arc_opa(lv_style_t * style, lv_opa_t value) {
+  lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_ARC_OPA, v); }
+
+static inline void lv_style_set_arc_img_src(lv_style_t * style, const void * value) {
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_ARC_IMG_SRC, v); }
 
 static inline void lv_style_set_content_text(lv_style_t * style, const char * value) {
   lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_TEXT, v); }

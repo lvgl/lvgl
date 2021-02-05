@@ -40,6 +40,12 @@
 
 void lv_style_init(lv_style_t * style)
 {
+#if LV_USE_ASSERT_STYLE
+    if(style->sentinel == LV_DEBUG_STYLE_SENTINEL_VALUE && style->allocated && style->props_and_values != NULL) {
+        LV_LOG_WARN("Style might be already inited. (Potential memory leak)")
+    }
+#endif
+
     lv_memset_00(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
@@ -215,9 +221,10 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMG_OPA:
         case LV_STYLE_BG_IMG_OPA:
-        case LV_STYLE_LINE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
+        case LV_STYLE_LINE_OPA:
+        case LV_STYLE_ARC_OPA:
         case LV_STYLE_CONTENT_OPA:
             value.num = LV_OPA_COVER;
             break;

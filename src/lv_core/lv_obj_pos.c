@@ -95,12 +95,16 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*If the width or height is set by a layout do not modify them*/
     if(obj->w_set == LV_SIZE_LAYOUT && obj->h_set == LV_SIZE_LAYOUT) return;
-
     if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
     if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
 
     obj->w_set = w;
     obj->h_set = h;
+
+    /* If the width or height is set to special layout related value save them in w_set and h_set
+     * but use the current size on the object width*/
+    if(LV_COORD_IS_LAYOUT(w)) w = lv_obj_get_width(obj);
+    if(LV_COORD_IS_LAYOUT(h)) h = lv_obj_get_height(obj);
 
     /*Calculate the required auto sizes*/
     bool x_auto = obj->w_set == LV_SIZE_AUTO ? true : false;

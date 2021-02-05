@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_MSGBOX
 
@@ -33,6 +33,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+extern const lv_obj_class_t lv_msgbox;
 
 /**********************
  * GLOBAL PROTOTYPES

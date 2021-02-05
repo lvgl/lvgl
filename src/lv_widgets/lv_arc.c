@@ -163,8 +163,8 @@ void lv_arc_set_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
 
     inv_arc_area(obj,arc->indic_angle_start,arc->indic_angle_end, LV_PART_INDICATOR);
 
-   arc->indic_angle_start = start;
-   arc->indic_angle_end = end;
+    arc->indic_angle_start = start;
+    arc->indic_angle_end = end;
 
     inv_arc_area(obj,arc->indic_angle_start,arc->indic_angle_end, LV_PART_INDICATOR);
 }
@@ -375,25 +375,6 @@ void lv_arc_set_chg_rate(lv_obj_t * obj, uint16_t rate)
    arc->chg_rate = rate;
 }
 
-/**
- * Set whether the arc is adjustable.
- * @param arc pointer to a arc object
- * @param adjustable whether the arc has a knob that can be dragged
- */
-void lv_arc_set_adjustable(lv_obj_t * obj, bool adjustable)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_arc_t * arc = (lv_arc_t *)obj;
-
-    if(arc->adjustable == adjustable)
-        return;
-
-   arc->adjustable = adjustable;
-    if(!adjustable)
-       arc->dragging = false;
-    lv_obj_invalidate(obj);
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -487,17 +468,6 @@ lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj)
     return ((lv_arc_t*) obj)->type;
 }
 
-/**
- * Get whether the arc is adjustable.
- * @param arc pointer to a arc object
- * @return whether the arc has a knob that can be dragged
- */
-bool lv_arc_get_adjustable(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    return ((lv_arc_t*) obj)->adjustable;
-}
-
 /*=====================
  * Other functions
  *====================*/
@@ -533,7 +503,6 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
    arc->min_value = 0;
    arc->max_value = 100;
    arc->dragging = false;
-   arc->adjustable = false;
    arc->chg_rate = 540;
    arc->last_tick = lv_tick_get();
    arc->last_angle =arc->indic_angle_end;
@@ -558,7 +527,6 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
        arc->min_value = copy_arc->min_value;
        arc->max_value = copy_arc->max_value;
        arc->dragging = copy_arc->dragging;
-       arc->adjustable = copy_arc->adjustable;
        arc->chg_rate = copy_arc->chg_rate;
        arc->last_tick = copy_arc->last_tick;
        arc->last_angle = copy_arc->last_angle;
@@ -580,16 +548,6 @@ static void lv_arc_destructor(lv_obj_t * obj)
 }
 
 
-/**
- * Handle the drawing related tasks of the arcs
- * @param arc pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
@@ -633,16 +591,14 @@ static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
                         &arc_dsc);
         }
 
-        if(arc->adjustable) {
-            lv_area_t knob_area;
-            get_knob_area(obj, &center, arc_r, &knob_area);
+        lv_area_t knob_area;
+        get_knob_area(obj, &center, arc_r, &knob_area);
 
-            lv_draw_rect_dsc_t knob_rect_dsc;
-            lv_draw_rect_dsc_init(&knob_rect_dsc);
-            lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
+        lv_draw_rect_dsc_t knob_rect_dsc;
+        lv_draw_rect_dsc_init(&knob_rect_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-            lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
-        }
+        lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
 
     }
     /*Post draw when the children are drawn*/
@@ -653,13 +609,6 @@ static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the arc
- * @param arc pointer to a arc object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
@@ -670,9 +619,6 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     lv_arc_t * arc = (lv_arc_t *)obj;
     if(sign == LV_SIGNAL_PRESSING) {
-        /* Only adjustable arcs can be dragged */
-        if(!arc->adjustable) return res;
-
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
@@ -693,7 +639,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
         /*Enter dragging mode if pressed out of the knob*/
         if(arc->dragging == false) {
-            lv_coord_t indic_width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
+            lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
             r -=  indic_width;
             r -= r / 2; /*Add some more sensitive area*/
             if(p.x * p.x + p.y * p.y > r * r) {
@@ -789,8 +735,6 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-        if(!arc->adjustable) return res;
-
         char c = *((char *)param);
 
         int16_t old_value =arc->value;
@@ -834,8 +778,8 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     lv_coord_t rout       = (LV_MIN(lv_obj_get_width(obj) - left - right, lv_obj_get_height(obj) - top - bottom)) / 2;
     lv_coord_t x       = obj->coords.x1 + rout + left;
     lv_coord_t y       = obj->coords.y1 + rout + top;
-    lv_coord_t w = lv_obj_get_style_line_width(obj, part);
-    lv_coord_t rounded = lv_obj_get_style_line_rounded(obj, part);
+    lv_coord_t w = lv_obj_get_style_arc_width(obj, part);
+    lv_coord_t rounded = lv_obj_get_style_arc_rounded(obj, part);
     lv_coord_t rin       = rout - w;
     lv_coord_t extra_area = 0;
 
@@ -852,7 +796,6 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
         knob_extra_size += LV_MAX4(knob_left, knob_right, knob_top, knob_bottom);
 
         extra_area = LV_MAX(extra_area, w / 2 + 2 + knob_extra_size);
-
     }
 
     lv_area_t inv_area;
@@ -949,7 +892,7 @@ static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
     center->x = obj->coords.x1 + r + left_bg;
     center->y = obj->coords.y1 + r + top_bg;
 
-    lv_coord_t indic_width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
     r -= indic_width;
 }
 
@@ -958,7 +901,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    lv_coord_t indic_width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
     lv_coord_t indic_width_half = indic_width / 2;
     r -= indic_width_half;
 

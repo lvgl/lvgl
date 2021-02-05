@@ -91,9 +91,9 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);
     cir_dsc.blend_mode = dsc->blend_mode;
-    if(dsc->bg_img_src) {
+    if(dsc->img_src) {
         cir_dsc.bg_opa = LV_OPA_TRANSP;
-        cir_dsc.bg_img_src = dsc->bg_img_src;
+        cir_dsc.bg_img_src = dsc->img_src;
         cir_dsc.bg_img_opa = dsc->opa;
     } else {
         cir_dsc.bg_opa = dsc->opa;
@@ -115,6 +115,11 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle || start_angle == end_angle + 360) {
+        cir_dsc.border_width = dsc->width;
+        cir_dsc.border_color = dsc->color;
+        cir_dsc.border_opa = dsc->opa;
+        cir_dsc.bg_opa = LV_OPA_TRANSP;
+        cir_dsc.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&area_out, clip_area, &cir_dsc);
         return;
     }

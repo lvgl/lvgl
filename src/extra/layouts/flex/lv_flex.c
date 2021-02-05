@@ -44,7 +44,7 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
 const lv_flex_t lv_flex_inline = {
         .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_START,
+        .item_cross_place = LV_FLEX_PLACE_CENTER,
         .track_cross_place = LV_FLEX_PLACE_START,
         .dir = LV_FLEX_FLOW_ROW,
         .wrap = 1
@@ -75,6 +75,14 @@ const lv_flex_t lv_flex_stacked = {
         .item_cross_place = LV_FLEX_PLACE_START,
         .track_cross_place = LV_FLEX_PLACE_START,
         .dir = LV_FLEX_FLOW_COLUMN
+};
+
+const lv_flex_t lv_flex_queue = {
+        .base.update_cb = flex_update,
+        .item_main_place = LV_FLEX_PLACE_START,
+        .item_cross_place = LV_FLEX_PLACE_START,
+        .track_cross_place = LV_FLEX_PLACE_START,
+        .dir = LV_FLEX_FLOW_ROW
 };
 
 const lv_flex_t lv_flex_even = {

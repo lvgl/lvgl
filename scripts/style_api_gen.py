@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 props = [
 {'name': 'RADIUS', 										'style_type': 'num', 	'var_type': 'lv_coord_t' },
 {'name': 'CLIP_CORNER', 							'style_type': 'num', 	'var_type': 'bool' },
@@ -68,7 +70,13 @@ props = [
 {'name': 'LINE_ROUNDED', 							'style_type': 'num', 	'var_type': 'lv_coord_t' },
 {'name': 'LINE_COLOR', 								'style_type': 'color', 'var_type': 'lv_color_t' },
 {'name': 'LINE_COLOR_FILTERED', 			'style_type': 'color', 'var_type': 'lv_color_t' },
-{'name': 'LINE_OPA', 									'style_type': 'num', 	'var_type': 'lv_opa_t' },
+{'name': 'LINE_OPA', 									'style_type': 'num', 	'var_type': 'lv_opa_t' },   
+{'name': 'ARC_WIDTH', 								'style_type': 'num', 	'var_type': 'lv_coord_t' },
+{'name': 'ARC_ROUNDED', 							'style_type': 'num', 	'var_type': 'lv_coord_t' },
+{'name': 'ARC_COLOR', 								'style_type': 'color', 'var_type': 'lv_color_t' },
+{'name': 'ARC_COLOR_FILTERED', 			'style_type': 'color', 'var_type': 'lv_color_t' },
+{'name': 'ARC_OPA', 									'style_type': 'num', 	'var_type': 'lv_opa_t' },   
+{'name': 'ARC_IMG_SRC', 							'style_type': 'ptr', 'var_type': 'const void *' },
 {'name': 'CONTENT_TEXT', 							'style_type': 'ptr', 	'var_type': 'const char *' },
 {'name': 'CONTENT_ALIGN', 						'style_type': 'num', 	'var_type': 'lv_align_t' },
 {'name': 'CONTENT_OFS_X', 						'style_type': 'num', 	'var_type': 'lv_coord_t' },
@@ -100,8 +108,22 @@ def local_style_set(i):
 
 	
 for i in range(len(props)): 
+  obj_style_get(i)
+
+print("")
+print("--------------------------------------------------------------------------------------------")
+print("")
+
+  
+for i in range(len(props)): 
   local_style_set(i)
   
+print("")
+print("--------------------------------------------------------------------------------------------")
+print("")
+  
+for i in range(len(props)): 
+  style_set(i)
   
   
   

@@ -369,6 +369,24 @@ static inline lv_color_t lv_obj_get_style_line_color_filtered(const struct _lv_o
 static inline lv_opa_t lv_obj_get_style_line_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_OPA); return (lv_opa_t) v.num; }
 
+static inline lv_coord_t lv_obj_get_style_arc_width(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_WIDTH); return (lv_coord_t) v.num; }
+
+static inline lv_coord_t lv_obj_get_style_arc_rounded(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_ROUNDED); return (lv_coord_t) v.num; }
+
+static inline lv_color_t lv_obj_get_style_arc_color(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_COLOR); return (lv_color_t) v.color; }
+
+static inline lv_color_t lv_obj_get_style_arc_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_COLOR_FILTERED); return (lv_color_t) v.color; }
+
+static inline lv_opa_t lv_obj_get_style_arc_opa(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_OPA); return (lv_opa_t) v.num; }
+
+static inline const void * lv_obj_get_style_arc_img_src(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_IMG_SRC); return (const void *) v.ptr; }
+
 static inline const char * lv_obj_get_style_content_text(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_TEXT); return (const char *) v.ptr; }
 
@@ -403,9 +421,10 @@ static inline lv_text_decor_t lv_obj_get_style_content_decor(const struct _lv_ob
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_DECOR); return (lv_text_decor_t) v.num; }
 
 
-/*=====================
- * Local style set
- *====================*/
+/*********************
+ * LOCAL STYLE SET
+ *********************/
+
 static inline void lv_obj_set_style_radius(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_RADIUS, v); }
 
@@ -615,6 +634,24 @@ static inline void lv_obj_set_style_line_color_filtered(struct _lv_obj_t * obj, 
 
 static inline void lv_obj_set_style_line_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_OPA, v); }
+
+static inline void lv_obj_set_style_arc_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_WIDTH, v); }
+
+static inline void lv_obj_set_style_arc_rounded(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_ROUNDED, v); }
+
+static inline void lv_obj_set_style_arc_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_COLOR, v); }
+
+static inline void lv_obj_set_style_arc_color_filtered(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
+  lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_COLOR_FILTERED, v); }
+
+static inline void lv_obj_set_style_arc_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
+  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_OPA, v); }
+
+static inline void lv_obj_set_style_arc_img_src(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const void * value) {
+  lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_IMG_SRC, v); }
 
 static inline void lv_obj_set_style_content_text(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const char * value) {
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_TEXT, v); }

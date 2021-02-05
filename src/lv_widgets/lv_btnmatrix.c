@@ -528,10 +528,11 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
             hook_dsc.id = btn_i;
             lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
-            /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
+//            /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
             if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
+                draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
                 if(btn_area.x1 == obj->coords.x1 + pleft) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_LEFT;
-                if(btn_area.y2 == obj->coords.x2 - pright) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_RIGHT;
+                if(btn_area.x2 == obj->coords.x2 - pright) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_RIGHT;
                 if(btn_area.y1 == obj->coords.y1 + ptop) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_TOP;
                 if(btn_area.y2 == obj->coords.y2 - pbottom) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_BOTTOM;
             }
