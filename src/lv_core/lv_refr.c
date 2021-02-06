@@ -745,46 +745,61 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     }
 }
 
+
+static void lv_refr_vdb_rotate_180(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+    lv_coord_t area_w = lv_area_get_width(area);
+    lv_coord_t area_h = lv_area_get_height(area);
+    uint32_t total = area_w * area_h;
+    /* Swap the beginning and end values */
+    lv_color_t tmp;
+    uint32_t i = total - 1, j = 0;
+    while(i > j) {
+        tmp = color_p[i];
+        color_p[i] = color_p[j];
+        color_p[j] = tmp;
+        i--;
+        j++;
+    }
+    lv_coord_t tmp_coord;
+    tmp_coord = area->y2;
+    area->y2 = drv->ver_res - area->y1 - 1;
+    area->y1 = drv->ver_res - tmp_coord - 1;
+    tmp_coord = area->x2;
+    area->x2 = drv->hor_res - area->x1 - 1;
+    area->x1 = drv->hor_res - tmp_coord - 1;
+}
+static LV_ATTRIBUTE_FAST_MEM lv_color_t *lv_refr_vdb_rotate_90(bool invert_i, lv_coord_t area_w, lv_coord_t area_h, lv_color_t *orig_color_p) {
+    lv_color_t * color_p = _lv_mem_buf_get(sizeof(lv_color_t) * area_w * area_h);
+    uint32_t invert = (area_w * area_h) - 1;
+    uint32_t initial_i = ((area_w - 1) * area_h);
+    for(lv_coord_t y = 0; y < area_h; y++) {
+        uint32_t i = initial_i + y;
+        if(invert_i)
+            i = invert - i;
+        for(lv_coord_t x = 0; x < area_w; x++) {
+            color_p[i] = *(orig_color_p++);
+            if(invert_i)
+                i += area_h;
+            else
+                i -= area_h;
+        }
+    }
+    return color_p;
+}
 /**
  * Rotate the VDB to the display's native orientation.
  */
-static LV_ATTRIBUTE_FAST_MEM lv_color_t *lv_refr_vdb_rotate_pre(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+static lv_color_t *lv_refr_vdb_rotate_pre(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
     if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate) {
         LV_LOG_ERROR("cannot rotate a true double-buffered display!");
         return color_p;
     }
-    lv_coord_t area_w = lv_area_get_width(area);
-    lv_coord_t area_h = lv_area_get_height(area);
-    uint32_t total = area_w * area_h;
     if(drv->rotated == LV_DISP_ROT_180) {
-        /* Swap the beginning and end values */
-        lv_color_t tmp;
-        uint32_t i = total - 1, j = 0;
-        while(i > j) {
-            tmp = color_p[i];
-            color_p[i] = color_p[j];
-            color_p[j] = tmp;
-            i--;
-            j++;
-        }
-        lv_coord_t tmp_coord;
-        tmp_coord = area->y2;
-        area->y2 = drv->ver_res - area->y1 - 1;
-        area->y1 = drv->ver_res - tmp_coord - 1;
-        tmp_coord = area->x2;
-        area->x2 = drv->hor_res - area->x1 - 1;
-        area->x1 = drv->hor_res - tmp_coord - 1;
+        lv_refr_vdb_rotate_180(drv, area, color_p);
     } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
-        lv_color_t * orig_color_p = color_p;
-        color_p = _lv_mem_buf_get(sizeof(lv_color_t) * total);
-        for(lv_coord_t y = 0; y < area_h; y++) {
-            for(lv_coord_t x = 0; x < area_w; x++) {
-                uint32_t i = ((area_w - x - 1) * area_h) + y;
-                if(drv->rotated == LV_DISP_ROT_270)
-                    i = total - 1 - i;
-                color_p[i] = *(orig_color_p++);
-            }
-        }
+        lv_coord_t area_w = lv_area_get_width(area);
+        lv_coord_t area_h = lv_area_get_height(area);
+        color_p = lv_refr_vdb_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, area_h, color_p);
         lv_coord_t tmp_coord;
         tmp_coord = area->y1;
         if(drv->rotated == LV_DISP_ROT_90) {
