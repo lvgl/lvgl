@@ -69,6 +69,9 @@
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 typedef int16_t lv_coord_t;
 
+/* Maximum buffer size to allocate for rotation. Only used if software rotation is enabled. */
+#define LV_DISP_ROT_MAX_BUF  (20U * 1024U)
+
 /*=========================
    Memory manager settings
  *=========================*/

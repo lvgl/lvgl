@@ -191,14 +191,13 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
      * This method is usually called upon orientation change, thus the screen is now a
      * different size.
      * The object invalidated its previous area. That area is now out of the screen area
-     * so we reset all invalidated areas and invalidate the object's new area only.
+     * so we reset all invalidated areas and invalidate the active screen's new area only.
      */
     _lv_memset_00(disp->inv_areas, sizeof(disp->inv_areas));
     _lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
     disp->inv_p = 0;
-    _LV_LL_READ(disp->scr_ll, scr) {
-        lv_obj_invalidate(scr);
-    }
+    if(disp->act_scr != NULL)
+        lv_obj_invalidate(disp->act_scr);
 }
 
 /**

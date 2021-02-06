@@ -430,7 +430,11 @@ static void lv_refr_area(const lv_area_t * area_p)
         lv_coord_t y2 =
             area_p->y2 >= lv_disp_get_ver_res(disp_refr) ? lv_disp_get_ver_res(disp_refr) - 1 : area_p->y2;
 
-        int32_t max_row = (uint32_t)vdb->size / w;
+        int32_t max_row;
+        if(disp_refr->driver.sw_rotate && (disp_refr->driver.rotated == LV_DISP_ROT_90 || disp_refr->driver.rotated == LV_DISP_ROT_270)) {
+            max_row = (uint32_t)LV_MATH_MIN(vdb->size, LV_DISP_ROT_MAX_BUF / sizeof(lv_color_t)) / w;
+        } else
+            max_row = (uint32_t)vdb->size / w;
 
         if(max_row > h) max_row = h;
 
@@ -744,9 +748,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 /**
  * Rotate the VDB to the display's native orientation.
  */
-static lv_color_t *lv_refr_vdb_rotate_pre(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+static LV_ATTRIBUTE_FAST_MEM lv_color_t *lv_refr_vdb_rotate_pre(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
     if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate) {
-        LV_LOG_ERROR("lv_refr_vdb_rotate_pre: cannot rotate a true double-buffered display!");
+        LV_LOG_ERROR("cannot rotate a true double-buffered display!");
         return color_p;
     }
     lv_coord_t area_w = lv_area_get_width(area);
