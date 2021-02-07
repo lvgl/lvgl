@@ -187,8 +187,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
     switch(align) {
     case LV_ALIGN_CENTER:
-        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
-        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
+        x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2 - pleft;
+        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2- ptop;
         break;
     case LV_ALIGN_IN_TOP_LEFT:
         x = 0;

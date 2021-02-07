@@ -67,28 +67,28 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     const char ** new_map;
 
     /*top or bottom dir*/
-//    if(lv_obj_get_flex_dir(tv) == LV_FLEX_DIR_COLUMN) {
+    if(tabview->tab_pos & LV_DIR_VER) {
         new_map = lv_mem_alloc((tab_id + 1) * sizeof(const char *));
         lv_memcpy_small(new_map, old_map, sizeof(const char *) * (tab_id - 1));
         new_map[tab_id - 1] = lv_mem_alloc(strlen(name) + 1);
         strcpy((char *)new_map[tab_id - 1], name);
         new_map[tab_id] = "";
-//    }
-//    /*left or right dir*/
-//    else {
-//        new_map = lv_mem_alloc((tab_id * 2) * sizeof(const char *));
-//        lv_memcpy_small(new_map, old_map, sizeof(const char *) * tab_id * 2);
-//        if(ext->tab_cnt == 0) {
-//            new_map[0] = lv_mem_alloc(strlen(name) + 1);
-//            strcpy((char *)new_map[0], name);
-//            new_map[1] = "";
-//        } else {
-//            new_map[tab_id * 2 - 3] = "\n";
-//            new_map[tab_id * 2 - 2] = lv_mem_alloc(strlen(name) + 1);
-//            new_map[tab_id * 2 - 1] = "";
-//            strcpy((char *)new_map[(tab_id * 2) - 2], name);
-//        }
-//    }
+    }
+    /*left or right dir*/
+    else {
+        new_map = lv_mem_alloc((tab_id * 2) * sizeof(const char *));
+        lv_memcpy_small(new_map, old_map, sizeof(const char *) * tab_id * 2);
+        if(tabview->tab_cnt == 0) {
+            new_map[0] = lv_mem_alloc(strlen(name) + 1);
+            strcpy((char *)new_map[0], name);
+            new_map[1] = "";
+        } else {
+            new_map[tab_id * 2 - 3] = "\n";
+            new_map[tab_id * 2 - 2] = lv_mem_alloc(strlen(name) + 1);
+            new_map[tab_id * 2 - 1] = "";
+            strcpy((char *)new_map[(tab_id * 2) - 2], name);
+        }
+    }
 
     lv_btnmatrix_set_map(btns, new_map);
     lv_mem_free(old_map);
@@ -147,28 +147,29 @@ static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
 {
     lv_tabview_t * tabview = (lv_tabview_t *) obj;
 
-//    lv_flex_flow_t flex_dir;
-//    switch(tab_pos) {
-//    case LV_DIR_TOP:
-//        flex_dir = LV_FLEX_DIR_COLUMN;
-//        break;
-//    case LV_DIR_BOTTOM:
-//        flex_dir = LV_FLEX_DIR_COLUMN_REVERSE;
-//        break;
-//    case LV_DIR_LEFT:
-//        flex_dir = LV_FLEX_DIR_ROW;
-//        break;
-//    case LV_DIR_RIGHT:
-//        flex_dir = LV_FLEX_DIR_ROW_REVERSE;
-//        break;
-//    }
+    tabview->tab_pos = tabpos_create;
+    lv_flex_init(&tabview->flex);
+
+    switch(tabview->tab_pos) {
+    case LV_DIR_TOP:
+        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_COLUMN);
+        break;
+    case LV_DIR_BOTTOM:
+        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_COLUMN_REVERSE);
+        break;
+    case LV_DIR_LEFT:
+        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_ROW);
+        break;
+    case LV_DIR_RIGHT:
+        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_ROW_REVERSE);
+        break;
+    }
 
     lv_obj_set_size(obj, LV_COORD_PCT(100), LV_COORD_PCT(100));
-    lv_obj_set_layout(obj, &lv_flex_stacked);
+    lv_obj_set_layout(obj, &tabview->flex);
 
     lv_obj_t * btnm;
     lv_obj_t * cont;
-
 
     btnm = lv_btnmatrix_create(obj, NULL);
     cont = lv_obj_create(obj, NULL);
@@ -183,16 +184,16 @@ static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
     lv_obj_add_event_cb(cont, cont_event_cb, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
-    switch(tabpos_create) {
+    switch(tabview->tab_pos) {
      case LV_DIR_TOP:
-     case LV_DIR_LEFT:
+     case LV_DIR_BOTTOM:
          lv_obj_set_size(btnm, LV_COORD_PCT(100), tabsize_create);
          lv_obj_set_width(cont, LV_COORD_PCT(100));
          lv_obj_set_flex_grow(cont, 1);
          break;
-     case LV_DIR_BOTTOM:
+     case LV_DIR_LEFT:
      case LV_DIR_RIGHT:
-         lv_obj_set_size(btnm, LV_COORD_PCT(100), tabsize_create);
+         lv_obj_set_size(btnm, tabsize_create, LV_COORD_PCT(100));
          lv_obj_set_height(cont, LV_COORD_PCT(100));
          lv_obj_set_flex_grow(cont, 1);
          break;

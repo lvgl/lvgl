@@ -457,7 +457,7 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
 
     /* This trick is required only to avoid the garbage collection of
      * styles' data if LVGL is used in a binding (e.g. Micropython)
-     * In a general case styles could be simple `static lv_style_t my style` variables*/
+     * In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!inited) {
         LV_GC_ROOT(_lv_theme_default_styles) = lv_mem_alloc(sizeof(my_theme_styles_t));
         styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);
@@ -466,9 +466,9 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     theme.color_primary = color_primary;
     theme.color_secondary = color_secondary;
     theme.font_small = font_small;
-    theme.font_small = font_normal;
-    theme.font_small = font_large;
-    theme.font_small = font_extra_large;
+    theme.font_normal = font_normal;
+    theme.font_large = font_large;
+    theme.font_extra_large = font_extra_large;
     theme.apply_cb = theme_apply;
 
     style_init();
@@ -493,7 +493,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     if(lv_obj_check_type(obj, &lv_obj)) {
 #if LV_USE_TABVIEW
         lv_obj_t * parent = lv_obj_get_parent(obj);
-        /*Tabvew content area*/
+        /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview)) {
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_gap);

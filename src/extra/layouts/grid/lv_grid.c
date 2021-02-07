@@ -52,6 +52,13 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
 static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t place, lv_coord_t gap, uint32_t track_num, lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse);
 
 /**********************
+ *  GLOBAL VARIABLES
+ **********************/
+const static lv_coord_t grid_12_template[12] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1),
+                                          LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1)};
+const lv_grid_t grid_12 = {.base.update_cb = grid_update, .col_dsc = grid_12_template, .col_dsc_len = 12, .row_dsc = grid_12_template, .row_dsc_len = 12};
+
+/**********************
  *  STATIC VARIABLES
  **********************/
 

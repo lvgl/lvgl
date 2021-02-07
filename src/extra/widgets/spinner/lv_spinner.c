@@ -66,9 +66,9 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
     lv_anim_set_values(&a, 0, 360);
     lv_anim_start(&a);
 
-    lv_arc_set_bg_angles(spinner, 0, 360);
     lv_arc_set_angles(spinner, 0, arc_length);
-    lv_arc_set_angle_ofs(spinner, 270 - arc_length / 2);
+    lv_arc_set_bg_angles(spinner, 0, 360);
+    lv_arc_set_rotation(spinner, 270 - arc_length / 2);
 
     return spinner;
 }

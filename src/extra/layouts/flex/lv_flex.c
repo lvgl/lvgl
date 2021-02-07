@@ -165,18 +165,18 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
-    lv_flex_place_t cross_place = f->track_cross_place;
+    lv_flex_place_t track_cross_place = f->track_cross_place;
     lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
 
     if((row && cont->h_set == LV_SIZE_CONTENT) ||
        (!row && cont->w_set == LV_SIZE_CONTENT))
     {
-        cross_place = LV_FLEX_PLACE_START;
+        track_cross_place = LV_FLEX_PLACE_START;
     }
 
     if(rtl && !row) {
-        if(cross_place == LV_FLEX_PLACE_START) cross_place = LV_FLEX_PLACE_END;
-        else if(cross_place == LV_FLEX_PLACE_END) cross_place = LV_FLEX_PLACE_START;
+        if(track_cross_place == LV_FLEX_PLACE_START) track_cross_place = LV_FLEX_PLACE_END;
+        else if(track_cross_place == LV_FLEX_PLACE_END) track_cross_place = LV_FLEX_PLACE_START;
     }
 
     lv_coord_t total_track_cross_size = 0;
@@ -185,7 +185,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     int32_t track_first_item;
     int32_t next_track_first_item;
 
-    if(cross_place != LV_FLEX_PLACE_START) {
+    if(track_cross_place != LV_FLEX_PLACE_START) {
         track_first_item = f->rev ? cont->spec_attr->child_cnt - 1 : 0;
         track_t t;
         while(track_first_item < cont->spec_attr->child_cnt && track_first_item >= 0) {
@@ -203,7 +203,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
          * always use the gap = 0 and start position = 0 to avoid unintuitive scrolling*/
         lv_coord_t max_cross_size = (row ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
         if(total_track_cross_size < max_cross_size) {
-            place_content(cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
+            place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
         }
     }
 
@@ -267,13 +267,14 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
                 grow_item_cnt++;
             } else {
                 lv_coord_t item_size = get_main_size(item) + item_gap;
-                if(wrap && t->track_main_size + item_size > max_main_size) break;
+                if(wrap && t->track_main_size + item_size > max_main_size + item_gap) break;
                 t->track_main_size += item_size;
             }
             t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
             t->item_cnt++;
         }
         item_id += f->rev ? -1 : +1;
+        if(item_id < 0) break;
         item = lv_obj_get_child(cont, item_id);
     }
 

@@ -29,6 +29,7 @@
  *  GLOBAL PROTOTYPES
  **********************/
 void lv_event_mark_deleted(lv_obj_t * obj);
+void lv_obj_destruct(lv_obj_t * obj);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -335,7 +336,18 @@ static void obj_del_core(lv_obj_t * obj)
         indev = lv_indev_get_next(indev);
     }
 
-    /* All children deleted.
-     * Now clean up the object specific data*/
-    obj->class_p->destructor_cb(obj);
+    /* All children deleted. Now clean up the object specific data*/
+    lv_obj_destruct(obj);
+
+    /*Remove the object from the child list of its parent*/
+    uint32_t id = lv_obj_get_child_id(obj);
+    uint32_t i;
+    for(i = id; i < obj->parent->spec_attr->child_cnt - 1; i++) {
+        obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
+    }
+    obj->parent->spec_attr->child_cnt--;
+    lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+
+    /*Free the object itself*/
+    lv_mem_free(obj);
 }

@@ -28,8 +28,10 @@ extern "C" {
 typedef struct
 {
     lv_obj_t obj;
+    lv_flex_t flex;
     uint16_t tab_cnt;
     uint16_t tab_cur;
+    lv_dir_t tab_pos;
 }lv_tabview_t;
 
 extern const lv_obj_class_t lv_tabview;

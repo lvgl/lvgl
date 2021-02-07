@@ -58,6 +58,19 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     return obj;
 }
 
+void lv_obj_destruct(lv_obj_t * obj)
+{
+    if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj);
+
+    if(obj->class_p->base_class) {
+        /*Don't let the descendant methods run during constructing the ancestor type*/
+        obj->class_p = obj->class_p->base_class;
+
+        /*Call the base class's destructor too*/
+        lv_obj_destruct(obj);
+    }
+}
+
 
 lv_res_t lv_obj_signal_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_signal_t sign, void * param)
 {

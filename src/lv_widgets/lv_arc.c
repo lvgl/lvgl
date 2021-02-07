@@ -20,6 +20,8 @@
  *********************/
 #define MY_CLASS &lv_arc
 
+#define VALUE_UNSET INT16_MIN
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -266,15 +268,15 @@ void lv_arc_set_bg_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
 /**
  * Set the rotation for the whole arc
  * @param arc pointer to an arc object
- * @param angle_ofs rotation angle
+ * @param rotation rotation angle
  */
-void lv_arc_set_angle_ofs(lv_obj_t * obj, uint16_t angle_ofs)
+void lv_arc_set_rotation(lv_obj_t * obj, uint16_t rotation)
 {
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-   arc->angle_ofs = angle_ofs;
+   arc->rotation = rotation;
 
     lv_obj_invalidate(obj);
 }
@@ -490,13 +492,13 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     /*Create the ancestor of arc*/
 
     /*Initialize the allocated 'ext' */
-   arc->angle_ofs = 0;
+   arc->rotation = 0;
    arc->bg_angle_start = 135;
    arc->bg_angle_end   = 45;
    arc->indic_angle_start = 135;
    arc->indic_angle_end   = 270;
    arc->type = LV_ARC_TYPE_NORMAL;
-   arc->value = -1;
+   arc->value = VALUE_UNSET;
    arc->min_close = 1;
    arc->min_value = 0;
    arc->max_value = 100;
@@ -511,7 +513,6 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     if(copy == NULL) {
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
-        lv_arc_set_value(obj,arc->min_value);
     }
     /*Copy an existing arc*/
     else {
@@ -568,8 +569,8 @@ static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             lv_draw_arc_dsc_init(&arc_dsc);
             lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
 
-            lv_draw_arc(center.x, center.y, arc_r,arc->bg_angle_start +arc->angle_ofs,
-                       arc->bg_angle_end + arc->angle_ofs, clip_area,
+            lv_draw_arc(center.x, center.y, arc_r,arc->bg_angle_start +arc->rotation,
+                       arc->bg_angle_end + arc->rotation, clip_area,
                         &arc_dsc);
         }
 
@@ -584,8 +585,8 @@ static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             lv_draw_arc_dsc_init(&arc_dsc);
             lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
 
-            lv_draw_arc(center.x, center.y, indic_r,arc->indic_angle_start +arc->angle_ofs,
-                       arc->indic_angle_end +arc->angle_ofs, clip_area,
+            lv_draw_arc(center.x, center.y, indic_r,arc->indic_angle_start +arc->rotation,
+                       arc->indic_angle_end +arc->rotation, clip_area,
                         &arc_dsc);
         }
 
@@ -660,7 +661,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
 
         angle = lv_atan2(p.y, p.x);
-        angle -=arc->angle_ofs;
+        angle -=arc->rotation;
         angle -=arc->bg_angle_start;   /*Make the angle relative to the start angle*/
 
         if(angle < 0) angle += 360;
@@ -760,8 +761,8 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     /*Skip this complicated invalidation if the arc is not visible*/
     if(lv_obj_is_visible(obj) == false) return;
 
-    start_angle +=arc->angle_ofs;
-    end_angle +=arc->angle_ofs;
+    start_angle +=arc->rotation;
+    end_angle +=arc->rotation;
 
     if(start_angle >= 360) start_angle -= 360;
     if(end_angle >= 360) end_angle -= 360;
@@ -903,7 +904,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t 
     lv_coord_t indic_width_half = indic_width / 2;
     r -= indic_width_half;
 
-    uint16_t angle =arc->angle_ofs;
+    uint16_t angle =arc->rotation;
     if(arc->type == LV_ARC_TYPE_NORMAL) {
         angle +=arc->indic_angle_end;
     }
@@ -937,6 +938,9 @@ static void value_update(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
+
+    /*If the value is still not set to any value do not update*/
+    if(arc->value == VALUE_UNSET) return;
 
     int16_t bg_midpoint, range_midpoint, bg_end =arc->bg_angle_end;
     if(arc->bg_angle_end <arc->bg_angle_start) bg_end =arc->bg_angle_end + 360;

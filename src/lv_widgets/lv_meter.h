@@ -84,7 +84,7 @@ typedef struct {
     int32_t max;
     int16_t r_mod;
     uint16_t angle_range;
-    int16_t angle_ofs;
+    int16_t rotation;
 }lv_meter_scale_t;
 
 /*Data of line meter*/
@@ -151,9 +151,9 @@ void lv_meter_set_scale_major_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, ui
  * @param min           the minimum value
  * @param max           the maximal value
  * @param angle_range   the angular range of the scale
- * @param angle_ofs     the angular offset from 3 o'clock position (clock-wise)
+ * @param rotation      the angular offset from the 3 o'clock position (clock-wise)
  */
-void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range, uint32_t angle_ofs);
+void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range, uint32_t rotation);
 
 /*=====================
  * Add indicator

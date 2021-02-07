@@ -43,7 +43,6 @@ const lv_obj_class_t lv_btn  = {
 
 lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-     LV_LOG_TRACE("button create started");
      return lv_obj_create_from_class(&lv_btn, parent, copy);
 }
 

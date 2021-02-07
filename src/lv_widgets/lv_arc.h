@@ -36,7 +36,7 @@ typedef uint8_t lv_arc_type_t;
 
 typedef struct {
     lv_obj_t obj;
-    uint16_t angle_ofs;
+    uint16_t rotation;
     uint16_t indic_angle_start;
     uint16_t indic_angle_end;
     uint16_t bg_angle_start;
@@ -123,7 +123,7 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
  * @param arc pointer to an arc object
  * @param rotation_angle rotation angle
  */
-void lv_arc_set_angle_ofs(lv_obj_t * arc, uint16_t rotation_angle);
+void lv_arc_set_rotation(lv_obj_t * arc, uint16_t rotation);
 
 /**
  * Set the type of arc.

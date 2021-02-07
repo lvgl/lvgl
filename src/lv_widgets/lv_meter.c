@@ -72,7 +72,7 @@ lv_meter_scale_t * lv_meter_add_scale(lv_obj_t * obj)
 
     _lv_ll_init(&scale->indicator_ll, sizeof(lv_meter_indicator_t));
     scale->angle_range = 270;
-    scale->angle_ofs = 90 + (360 - scale->angle_range) / 2;
+    scale->rotation = 90 + (360 - scale->angle_range) / 2;
     scale->min = 0;
     scale->max = 100;
     scale->tick_cnt = 6;
@@ -102,12 +102,12 @@ void lv_meter_set_scale_major_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, ui
     lv_obj_invalidate(obj);
 }
 
-void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range, uint32_t angle_ofs)
+void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range, uint32_t rotation)
 {
     scale->min = min;
     scale->max = max;
     scale->angle_range = angle_range;
-    scale->angle_ofs = angle_ofs;
+    scale->rotation = rotation;
     lv_obj_invalidate(obj);
 }
 
@@ -210,8 +210,6 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
 static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("line meter create started");
-    lv_obj_construct_base(obj, parent, copy);
-
 
     lv_meter_t * meter = (lv_meter_t *) obj;
 
@@ -317,8 +315,8 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
             arc_dsc.width = indic->arc.width;
             arc_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
 
-            int32_t start_angle = lv_map(indic->start_value, scale->min, scale->max, scale->angle_ofs, scale->angle_ofs + scale->angle_range);
-            int32_t end_angle = lv_map(indic->end_value, scale->min, scale->max, scale->angle_ofs, scale->angle_ofs + scale->angle_range);
+            int32_t start_angle = lv_map(indic->start_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
+            int32_t end_angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
             lv_draw_arc(scale_center.x, scale_center.y, r_out + indic->arc.r_mod, start_angle, end_angle, clip_area, &arc_dsc);
         }
     }
@@ -431,12 +429,12 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             int32_t angle_rem = angle_upscale & 0xFF;
 
             /*Interpolate sine and cos*/
-            int32_t sin_low = lv_trigo_sin(angle_low + scale->angle_ofs);
-            int32_t sin_high = lv_trigo_sin(angle_high + scale->angle_ofs);
+            int32_t sin_low = lv_trigo_sin(angle_low + scale->rotation);
+            int32_t sin_high = lv_trigo_sin(angle_high + scale->rotation);
             int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
 
-            int32_t cos_low = lv_trigo_cos(angle_low + scale->angle_ofs);
-            int32_t cos_high = lv_trigo_cos(angle_high + scale->angle_ofs);
+            int32_t cos_low = lv_trigo_cos(angle_low + scale->rotation);
+            int32_t cos_high = lv_trigo_cos(angle_high + scale->rotation);
             int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
             lv_point_t p_outer;
@@ -516,7 +514,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
         lv_meter_indicator_t * indic;
         _LV_LL_READ_BACK(&scale->indicator_ll, indic) {
             if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_LINE) {
-                int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->angle_ofs, scale->angle_ofs + scale->angle_range);
+                int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
                 lv_coord_t r_out = r_edge + scale->r_mod + indic->needle_line.r_mod;
                 lv_point_t p_end;
                 p_end.y = (lv_trigo_sin(angle) * (r_out)) / LV_TRIGO_SIN_MAX + scale_center.y;
@@ -528,7 +526,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
 
             }
             else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
-                int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->angle_ofs, scale->angle_ofs + scale->angle_range);
+                int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
                 lv_img_header_t info;
                 lv_img_decoder_get_info(indic->needle_img.src, &info);
                 lv_area_t a;

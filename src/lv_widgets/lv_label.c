@@ -733,30 +733,13 @@ static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 
 static void lv_label_destructor(lv_obj_t * obj)
 {
-//    lv_label_dot_tmp_free(label->dot_...);
-//    lv_label_dot_tmp_free(label->text);
+    lv_label_t * label = (lv_label_t *)obj;
 
-//    lv_bar_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_PART_INDICATOR);
-//#if LV_USE_ANIMATION
-//    lv_anim_del(&bar->cur_value_anim, NULL);
-//    lv_anim_del(&bar->start_value_anim, NULL);
-//#endif
-
-//    bar->class_p->base_p->destructor(obj);
+    lv_label_dot_tmp_free(obj);
+    if(!label->static_txt) lv_mem_free(label->text);
+    label->text = NULL;
 }
 
-/**
- * Handle the drawing related tasks of the labels
- * @param label pointer to a label object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /* A label never covers an area */

@@ -411,16 +411,6 @@ static void lv_btnmatrix_destructor(lv_obj_t * obj)
     btnm->ctrl_bits = NULL;
 }
 
-/**
- * Handle the drawing related tasks of the button matrix
- * @param obj pointer to a button matrix object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
@@ -526,7 +516,7 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
             hook_dsc.id = btn_i;
             lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
-//            /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
+            /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
             if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
                 draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
                 if(btn_area.x1 == obj->coords.x1 + pleft) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_LEFT;
@@ -580,13 +570,6 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the button matrix
- * @param obj pointer to a button matrix object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;

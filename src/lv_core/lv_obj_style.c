@@ -124,6 +124,10 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
             continue;
         }
 
+        if(obj->style_list.styles[i].is_trans) {
+            trans_del(obj, part, LV_STYLE_PROP_ALL, NULL);
+        }
+
         if(obj->style_list.styles[i].is_local || obj->style_list.styles[i].is_trans) {
             lv_style_reset(obj->style_list.styles[i].style);
             lv_mem_free(obj->style_list.styles[i].style);
@@ -143,7 +147,6 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
         /* The style from the current `i` index is removed, so `i` points to the next style.
          * Therefore it doesn't needs to be incremented*/
     }
-
     if(deleted) {
         lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
     }
@@ -827,12 +830,12 @@ static bool trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, trans_
         /*'tr' might be deleted, so get the next object while 'tr' is valid*/
         tr_prev = _lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
-        if(tr->obj == obj && (part == tr->part || part == LV_PART_ANY) && (prop == tr->prop || prop == 0xFF)) {
+        if(tr->obj == obj && (part == tr->part || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ALL)) {
             /* Remove the transitioned property from trans. style
              * to allow changing it by normal styles*/
             uint32_t i;
             for(i = 0; i < obj->style_list.style_cnt; i++) {
-                if(obj->style_list.styles[i].is_trans && (part == 0xff || obj->style_list.styles[i].part == part)) {
+                if(obj->style_list.styles[i].is_trans && (part == LV_PART_ANY || obj->style_list.styles[i].part == part)) {
                     lv_style_remove_prop(obj->style_list.styles[i].style, tr->prop);
                     lv_anim_del(tr, NULL);
                     _lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);

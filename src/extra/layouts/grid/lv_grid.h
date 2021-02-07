@@ -118,6 +118,7 @@ static inline lv_coord_t lv_grid_fr(uint8_t x)
 /**********************
  * GLOBAL VARIABLES
  **********************/
+extern const lv_grid_t grid_12;
 
 /**********************
  *      MACROS
