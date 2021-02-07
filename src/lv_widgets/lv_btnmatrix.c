@@ -375,8 +375,6 @@ bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
 
 static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     btnm->btn_cnt        = 0;
     btnm->btn_id_pr      = LV_BTNMATRIX_BTN_NONE;

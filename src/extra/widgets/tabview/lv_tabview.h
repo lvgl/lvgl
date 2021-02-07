@@ -32,6 +32,8 @@ typedef struct
     uint16_t tab_cur;
 }lv_tabview_t;
 
+extern const lv_obj_class_t lv_tabview;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

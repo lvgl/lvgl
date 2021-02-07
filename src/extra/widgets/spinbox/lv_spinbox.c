@@ -269,8 +269,6 @@ static void lv_spinbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
 {
     LV_LOG_TRACE("spinbox create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *) obj;
 

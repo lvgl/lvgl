@@ -80,7 +80,6 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
 
 static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_construct_base(obj, parent, copy);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     /*Initialize the allocated 'slider' */

@@ -209,8 +209,6 @@ bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * dat
 
 static void my_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_calendar_t * calendar = (lv_calendar_t *) obj;
 
     /*Initialize the allocated 'ext' */

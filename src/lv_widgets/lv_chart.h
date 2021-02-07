@@ -181,9 +181,9 @@ uint16_t lv_chart_get_zoom_x(const lv_obj_t * obj);
 uint16_t lv_chart_get_zoom_y(const lv_obj_t * obj);
 
 /**
- * Set the number of tick lines between two division lines
+ * Set the number of tick lines on an axis
  * @param obj           pointer to a chart object
- * @param axis          an axis which sub tick count should be set
+ * @param axis          an axis which ticks count should be set
  * @param major_len     length of major ticks
  * @param minor_len     length of minor ticks
  * @param major_cnt     number of major ticks on the axis

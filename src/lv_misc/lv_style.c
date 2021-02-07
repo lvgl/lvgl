@@ -41,7 +41,7 @@
 void lv_style_init(lv_style_t * style)
 {
 #if LV_USE_ASSERT_STYLE
-    if(style->sentinel == LV_DEBUG_STYLE_SENTINEL_VALUE && style->allocated && style->props_and_values != NULL) {
+    if(style->sentinel == LV_DEBUG_STYLE_SENTINEL_VALUE && style->allocated && style->values_and_props != NULL) {
         LV_LOG_WARN("Style might be already inited. (Potential memory leak)")
     }
 #endif
@@ -57,7 +57,7 @@ void lv_style_reset(lv_style_t * style)
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->allocated) lv_mem_free(style->props_and_values);
+    if(style->allocated) lv_mem_free(style->values_and_props);
     lv_style_init(style);
 }
 
@@ -82,12 +82,12 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
         return false;
     }
 
-    uint8_t * tmp = style->props_and_values + style->prop_cnt * sizeof(lv_style_value_t);
+    uint8_t * tmp = style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
     uint16_t * props = (uint16_t *) tmp;
     uint32_t i;
     for(i = 0; i < style->prop_cnt; i++) {
         if(props[i] == prop) {
-            lv_style_value_t * values = (lv_style_value_t *)style->props_and_values;
+            lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
             style->prop_cnt--;
             size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
             uint8_t * new_values_and_props = lv_mem_alloc(size);
@@ -107,8 +107,8 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 }
             }
 
-            lv_mem_free(style->props_and_values);
-            style->props_and_values = new_values_and_props;
+            lv_mem_free(style->values_and_props);
+            style->values_and_props = new_values_and_props;
             return true;
         }
     }
@@ -116,15 +116,31 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
     return false;
 }
 
+/**
+ * Tell the group of a property. If the a property from a group is set in a style the (1 << group) bit of style->has_group is set.
+ * It allows early skipping the style if the property is not exists in the style at all.
+ * @param prop a style property
+ * @return the group [0..7] 7 means all the custom properties with index > 112
+ */
+uint8_t lv_style_get_prop_group(lv_style_prop_t prop)
+{
+    uint16_t group = (prop & 0x1FF) >> 4;
+    if(group > 7) group = 7;    /*The MSB marks all the custom properties*/
+    return (uint8_t)group;
+}
+
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
+    uint8_t group = lv_style_get_prop_group(prop);
+    style->has_group |= 1 << group;
+
     if(style->allocated) {
-        uint8_t * tmp = style->props_and_values + style->prop_cnt * sizeof(lv_style_value_t);
+        uint8_t * tmp = style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *) tmp;
         int32_t i;
         for(i = 0; i < style->prop_cnt; i++) {
             if(props[i] == prop) {
-                lv_style_value_t * values = (lv_style_value_t *)style->props_and_values;
+                lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
                 values[i] = value;
                 return;
             }
@@ -132,8 +148,8 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
         style->prop_cnt++;
         size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        style->props_and_values = lv_mem_realloc(style->props_and_values, size);
-        tmp = style->props_and_values + (style->prop_cnt - 1) * sizeof(lv_style_value_t);
+        style->values_and_props = lv_mem_realloc(style->values_and_props, size);
+        tmp = style->values_and_props + (style->prop_cnt - 1) * sizeof(lv_style_value_t);
         props = (uint16_t *) tmp;
         /*Shift all props to make place for the value before them*/
         for(i = style->prop_cnt - 2; i >= 0; i--) {
@@ -141,9 +157,9 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         }
 
         /*Go to the new position wit the props*/
-        tmp = style->props_and_values + (style->prop_cnt) * sizeof(lv_style_value_t);
+        tmp = style->values_and_props + (style->prop_cnt) * sizeof(lv_style_value_t);
         props = (uint16_t *) tmp;
-        lv_style_value_t * values = (lv_style_value_t *)style->props_and_values;
+        lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
 
         /*Set the new property and value*/
         props[style->prop_cnt - 1] = prop;
@@ -155,16 +171,16 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         }
         style->prop_cnt++;
         size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        uint8_t * props_and_values = lv_mem_alloc(size);
-        uint8_t * tmp = props_and_values + (style->prop_cnt) * sizeof(lv_style_value_t);
+        uint8_t * values_and_props = lv_mem_alloc(size);
+        uint8_t * tmp = values_and_props + (style->prop_cnt) * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *) tmp;
-        lv_style_value_t * values = (lv_style_value_t *)props_and_values;
+        lv_style_value_t * values = (lv_style_value_t *)values_and_props;
         props[0] = style->prop1;
         props[1] = prop;
         values[0] = style->value1;
         values[1] = value;
 
-        style->props_and_values = props_and_values;
+        style->values_and_props = values_and_props;
 
         style->allocated = 1;
     } else if (style->prop_cnt == 0) {
@@ -176,13 +192,15 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
+    if(style->prop_cnt == 0) return false;
+
     if(style->allocated) {
-        uint8_t * tmp = style->props_and_values + style->prop_cnt * sizeof(lv_style_value_t);
+        uint8_t * tmp = style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *) tmp;
         uint32_t i;
         for(i = 0; i < style->prop_cnt; i++) {
             if(props[i] == prop) {
-                lv_style_value_t * values = (lv_style_value_t *)style->props_and_values;
+                lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
                 *value = values[i];
                 return true;
             }

@@ -82,9 +82,9 @@ void lv_indev_scroll_handler(lv_indev_proc_t * proc)
         }
 
         lv_dir_t scroll_dir = lv_obj_get_scroll_dir(scroll_obj);
-        if((scroll_dir & LV_DIR_LEFT) == 0 && diff_x > 0) diff_x = 0;
-        if((scroll_dir & LV_DIR_RIGHT) == 0 && diff_x < 0) diff_x = 0;
-        if((scroll_dir & LV_DIR_TOP) == 0 && diff_y > 0) diff_y = 0;
+        if((scroll_dir & LV_DIR_LEFT)   == 0 && diff_x > 0) diff_x = 0;
+        if((scroll_dir & LV_DIR_RIGHT)  == 0 && diff_x < 0) diff_x = 0;
+        if((scroll_dir & LV_DIR_TOP)    == 0 && diff_y > 0) diff_y = 0;
         if((scroll_dir & LV_DIR_BOTTOM) == 0 && diff_y < 0) diff_y = 0;
 
         /*Respect the scroll limit area*/
@@ -552,7 +552,7 @@ static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scrol
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
         /*Elastic scroll if scrolled in*/
         if(scroll_end < 0) diff = (diff + ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
-        else if(scroll_start < 0) diff = (diff + ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
+        else if(scroll_start < 0) diff = (diff - ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
     } else {
         /*Scroll back to the boundary id required*/
         if(scroll_end + diff < 0) diff = - scroll_end;

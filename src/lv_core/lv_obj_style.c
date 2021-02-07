@@ -40,6 +40,11 @@ typedef enum {
 }cache_t;
 
 /**********************
+ *  GLOBAL PROTOTYPES
+ **********************/
+uint8_t lv_style_get_prop_group(lv_style_prop_t prop);
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, uint32_t part, uint32_t state);
@@ -60,7 +65,7 @@ static void fade_in_anim_ready(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static style_refr = true;
+static bool style_refr = true;
 
 /**********************
  *      MACROS
@@ -484,6 +489,7 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
         break;
     }
 
+    uint8_t group = 1 << lv_style_get_prop_group(prop);
     int32_t weight = -1;
     lv_state_t state = obj->state;
     lv_state_t state_inv = ~state;
@@ -496,6 +502,7 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
         if(obj_style->is_trans == false) break;
         if(skip_trans) continue;
         if(obj_style->part != part) continue;
+        if((obj_style->style->has_group & group) == 0) continue;
         found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
         if(found) {
             *v = value_tmp;
@@ -506,6 +513,8 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
     for(; i < obj->style_list.style_cnt; i++) {
         lv_obj_style_t * obj_style = &obj->style_list.styles[i];
         if(obj_style->part != part) continue;
+
+        if((obj_style->style->has_group & group) == 0) continue;
 
         /* Be sure the style not specifies other state than the requested.
          * E.g. For HOVER+PRESS object state, HOVER style only is OK, but HOVER+FOCUS style is not*/

@@ -145,7 +145,6 @@ lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv)
 
 static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_construct_base(obj, parent, copy);
     lv_tabview_t * tabview = (lv_tabview_t *) obj;
 
 //    lv_flex_flow_t flex_dir;

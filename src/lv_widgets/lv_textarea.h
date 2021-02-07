@@ -67,6 +67,10 @@ typedef struct {
 
 extern const lv_obj_class_t lv_textarea;
 
+enum {
+    LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_1,
+};
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

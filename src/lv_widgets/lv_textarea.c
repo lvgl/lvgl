@@ -948,7 +948,6 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
 static void lv_textarea_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("text area create started");
-    lv_obj_construct_base(obj, parent, copy);
 
     lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -1488,7 +1487,7 @@ static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area)
     if(txt[0] == '\0' && ta->placeholder_txt && ta->placeholder_txt[0] != 0) {
         lv_draw_label_dsc_t ph_dsc;
         lv_draw_label_dsc_init(&ph_dsc);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_PLACEHOLDER, &ph_dsc);
+        lv_obj_init_draw_label_dsc(obj, LV_PART_TEXTAREA_PLACEHOLDER, &ph_dsc);
 
         if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../lvgl.h"
 
 /*********************
  *      DEFINES
@@ -22,6 +22,11 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_obj_t obj;
+}lv_win_t;
+
+extern const lv_obj_class_t lv_win;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -31,7 +36,7 @@ lv_obj_t * lv_win_create(lv_obj_t * parent, lv_coord_t header_height);
 
 
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * icon, lv_coord_t btn_w, lv_coord_t btn_h, lv_event_cb_t event_cb);
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * icon, lv_coord_t btn_w, lv_event_cb_t event_cb);
 
 lv_obj_t * lv_win_get_header(lv_obj_t * win);
 lv_obj_t * lv_win_get_content(lv_obj_t * win);

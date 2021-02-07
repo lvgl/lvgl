@@ -564,9 +564,6 @@ static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 {
     LV_LOG_TRACE("lv_table create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
-
     lv_table_t * table = (lv_table_t *) obj;
 
     /*Initialize the allocated 'ext' */
@@ -587,7 +584,7 @@ static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
         table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
         table->cell_data[0] = NULL;
 
-        lv_obj_set_size(obj, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     }
     /*Copy an existing table*/
     else {

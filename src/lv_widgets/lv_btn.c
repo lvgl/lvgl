@@ -55,8 +55,6 @@ static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 {
     LV_LOG_TRACE("lv_btn create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 

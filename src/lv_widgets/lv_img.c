@@ -364,8 +364,6 @@ static void lv_img_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 {
     LV_LOG_TRACE("lv_bar create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_img_t * img = (lv_img_t *)obj;
 
     img->src       = NULL;
@@ -388,7 +386,7 @@ static void lv_img_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
         /* Enable auto size for non screens
          * because image screens are wallpapers
          * and must be screen sized*/
-        if(parent) lv_obj_set_size(obj, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        if(parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     }
     else {
         lv_img_t * copy_img = (lv_img_t *) copy;
@@ -526,7 +524,7 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-            label_dsc.color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
+//            label_dsc.color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
             lv_draw_label(&obj->coords, clip_area, &label_dsc, img->src, NULL);
         }
         else {

@@ -60,15 +60,6 @@ typedef struct _lv_obj_class_t{
  */
 struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
 
-/**
- * Used internally in widget's constructor to construct the base type
- * @param obj pointer to the object being constructed
- * @param parent pointer to the parent
- * @param copy pointer to the object to copy (DEPRECATED will be removed in v9)
- */
-void lv_obj_construct_base(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
-
-
 lv_res_t lv_obj_signal_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
 lv_draw_res_t lv_obj_draw_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);

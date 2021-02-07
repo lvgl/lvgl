@@ -493,8 +493,6 @@ static void lv_chart_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 {
     LV_LOG_TRACE("chart create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_chart_t * chart = (lv_chart_t *) obj;
 
     _lv_ll_init(&chart->series_ll, sizeof(lv_chart_series_t));
@@ -627,7 +625,7 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
     if(chart->hdiv_cnt != 0) {
         lv_coord_t y_ofs = obj->coords.y1 + pad_top - scroll_top;
-        p1.x = obj->coords.x1 + scroll_left;
+        p1.x = obj->coords.x1;
         p2.x = obj->coords.x2;
         for(i = 0; i <= chart->hdiv_cnt + 1; i++) {
             p1.y = (int32_t)((int32_t)(h - line_dsc.width) * i) / (chart->hdiv_cnt + 1);
@@ -639,7 +637,7 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
 
     if(chart->vdiv_cnt != 0) {
         lv_coord_t x_ofs = obj->coords.x1 + pad_left - scroll_left;
-        p1.y = obj->coords.y1 + scroll_top;
+        p1.y = obj->coords.y1;
         p2.y = obj->coords.y2;
         for(i = 0; i <= chart->vdiv_cnt + 1; i++) {
             p1.x = (int32_t)((int32_t)(w - line_dsc.width) * i) / (chart->vdiv_cnt + 1);

@@ -1,6 +1,6 @@
 /**
  * @file lvgl.h
- * Include all LittleV GL related headers
+ * Include all LVGL related headers
  */
  
 #ifndef LVGL_H
@@ -77,6 +77,8 @@ extern "C" {
 #include "src/extra/widgets/spinbox/lv_spinbox.h"
 #include "src/extra/widgets/spinner/lv_spinner.h"
 #include "src/extra/widgets/tabview/lv_tabview.h"
+#include "src/extra/widgets/tileview/lv_tileview.h"
+#include "src/extra/widgets/win/lv_win.h"
 
 /* LAYOUTS */
 #include "src/extra/layouts/flex/lv_flex.h"

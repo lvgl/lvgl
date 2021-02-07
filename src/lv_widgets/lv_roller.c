@@ -284,8 +284,6 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
 static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_roller_t * roller = (lv_roller_t*)obj;
 
     roller->mode = LV_ROLLER_MODE_NORMAL;
@@ -297,7 +295,7 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
     if(copy == NULL) {
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
-        lv_obj_set_width(obj, LV_SIZE_AUTO);
+        lv_obj_set_width(obj, LV_SIZE_CONTENT);
 
         lv_obj_create_from_class(&lv_roller_label, obj, NULL);
         lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);

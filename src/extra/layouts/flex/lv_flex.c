@@ -143,6 +143,8 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
 
     if(f->dir == LV_FLEX_FLOW_ROW) lv_obj_set_width(obj, (LV_COORD_SET_LAYOUT(grow)));
     else lv_obj_set_height(obj, (LV_COORD_SET_LAYOUT(grow)));
+
+    lv_obj_update_layout(parent, obj);
 }
 
 /**********************
@@ -166,8 +168,8 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     lv_flex_place_t cross_place = f->track_cross_place;
     lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
 
-    if((row && cont->h_set == LV_SIZE_AUTO) ||
-       (!row && cont->w_set == LV_SIZE_AUTO))
+    if((row && cont->h_set == LV_SIZE_CONTENT) ||
+       (!row && cont->w_set == LV_SIZE_CONTENT))
     {
         cross_place = LV_FLEX_PLACE_START;
     }
@@ -241,7 +243,7 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
     bool wrap = f->wrap;
     /*Can't wrap if the size if auto (i.e. the size depends on the children)*/
-    if(wrap && ((row && cont->w_set == LV_SIZE_AUTO) || (!row && cont->h_set == LV_SIZE_AUTO))) {
+    if(wrap && ((row && cont->w_set == LV_SIZE_CONTENT) || (!row && cont->h_set == LV_SIZE_CONTENT))) {
         wrap = false;
     }
     lv_coord_t(*get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width : lv_obj_get_height);

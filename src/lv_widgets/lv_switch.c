@@ -78,8 +78,6 @@ static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 {
     LV_LOG_TRACE("switch create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
    if(copy == NULL) {
        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
        lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);

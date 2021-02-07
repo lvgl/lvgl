@@ -41,7 +41,6 @@ static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_are
 static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_dropdown_list_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 
@@ -68,7 +67,6 @@ const lv_obj_class_t lv_dropdown = {
 
 const lv_obj_class_t lv_dropdown_list = {
     .constructor_cb = lv_dropdown_list_constructor,
-    .destructor_cb = lv_dropdown_list_destructor,
     .signal_cb = lv_dropdown_list_signal,
     .draw_cb = lv_dropdown_list_draw,
     .instance_size = sizeof(lv_dropdown_list_t),
@@ -421,7 +419,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
        (dropdown->dir == LV_DIR_TOP || dropdown->dir == LV_DIR_BOTTOM)) {
         lv_obj_set_width(dropdown->list, lv_obj_get_width(dropdown_obj));
     } else {
-        lv_obj_set_width(dropdown->list, LV_SIZE_AUTO);
+        lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
     }
 
     lv_obj_t * label = get_label(dropdown_obj);
@@ -525,8 +523,6 @@ lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy)
 static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("dropdown create started");
-
-    lv_obj_construct_base(obj, parent, copy);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -776,14 +772,7 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
 
 static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_label_create(obj, NULL);
-}
-
-static void lv_dropdown_list_destructor(lv_obj_t * obj)
-{
-
 }
 
 /**

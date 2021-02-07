@@ -552,6 +552,7 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
 
 bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p)
 {
+    if(obj == NULL) return false;
     return obj->class_p == class_p ? true : false;
 }
 
@@ -1074,7 +1075,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_CHILD_CHG) {
         lv_obj_update_layout(obj, param);
 
-        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
+        if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
     }
@@ -1110,7 +1111,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             }
         }
 
-        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
+        if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
         lv_obj_refresh_ext_draw_size(obj);

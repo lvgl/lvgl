@@ -111,8 +111,6 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 {
     LV_LOG_TRACE("lv_checkbox create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
     /*Create the ancestor basic object*/
 
@@ -122,7 +120,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
         cb->static_txt = 1;
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-        lv_obj_set_size(obj, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     }
     else {
 //        const lv_checkbox_t * copy_ext = (const lv_checkbox_t *)copy;

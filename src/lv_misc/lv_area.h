@@ -248,7 +248,7 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
 #define LV_COORD_PCT(x)      LV_COORD_SET_SPEC(x)
 #define LV_COORD_IS_PCT(x)   ((LV_COORD_IS_SPEC(x) && _LV_COORD_PLAIN(x) <= 1000) ? true : false)
 #define LV_COORD_GET_PCT(x)  _LV_COORD_PLAIN(x)
-#define LV_SIZE_AUTO         LV_COORD_SET_SPEC(1001)
+#define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(1001)
 #define LV_SIZE_LAYOUT    LV_COORD_SET_SPEC(1002) /*The size is managed by the layout therefore `lv_obj_set_width/height/size()` can't change is*/
 
 #ifdef __cplusplus

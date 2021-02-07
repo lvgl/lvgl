@@ -484,8 +484,6 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 {
     LV_LOG_TRACE("lv_arc create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_arc_t * arc = (lv_arc_t *)obj;
     LV_LOG_TRACE("arc create started");
 

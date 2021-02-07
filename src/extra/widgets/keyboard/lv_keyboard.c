@@ -319,8 +319,6 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
 
 static void my_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;

@@ -203,8 +203,6 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 {
     LV_LOG_TRACE("lv_bar create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_bar_t * bar = (lv_bar_t *)obj;
     bar->min_value = 0;
     bar->max_value = 100;

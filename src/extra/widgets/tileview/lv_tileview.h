@@ -24,6 +24,17 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_obj_t obj;
+}lv_tileview_t;
+
+typedef struct {
+    lv_obj_t obj;
+    lv_dir_t dir;
+}lv_tileview_tile_t;
+
+extern const lv_obj_class_t lv_tileview;
+extern const lv_obj_class_t lv_tileview_tile;
 
 /**********************
  * GLOBAL PROTOTYPES

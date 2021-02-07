@@ -150,7 +150,7 @@ static void full_refresh(lv_obj_t * cont)
     }
     calc_free(&c);
 
-    if(cont->w_set == LV_SIZE_AUTO || cont->h_set == LV_SIZE_AUTO) {
+    if(cont->w_set == LV_SIZE_CONTENT || cont->h_set == LV_SIZE_CONTENT) {
         lv_obj_set_size(cont, cont->w_set, cont->h_set);
     }
 }
@@ -196,11 +196,11 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
 
     bool rev = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
-    bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
+    bool auto_w = cont->w_set == LV_SIZE_CONTENT ? true : false;
     lv_coord_t cont_w = lv_obj_get_width_fit(cont);
     calc_out->grid_w = grid_place(cont_w, auto_w, g->col_place, col_gap, calc_out->col_num, calc_out->w, calc_out->x, rev);
 
-    bool auto_h = cont->h_set == LV_SIZE_AUTO ? true : false;
+    bool auto_h = cont->h_set == LV_SIZE_CONTENT ? true : false;
     lv_coord_t cont_h = lv_obj_get_height_fit(cont);
     calc_out->grid_h = grid_place(cont_h, auto_h, g->row_place, row_gap, calc_out->row_num, calc_out->h, calc_out->y, false);
 
@@ -232,7 +232,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 
     uint32_t col_fr_cnt = 0;
     lv_coord_t grid_w = 0;
-    bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
+    bool auto_w = cont->w_set == LV_SIZE_CONTENT ? true : false;
 
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
@@ -271,7 +271,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     uint32_t row_fr_cnt = 0;
     lv_coord_t grid_h = 0;
 
-    bool auto_h = cont->h_set == LV_SIZE_AUTO ? true : false;
+    bool auto_h = cont->h_set == LV_SIZE_CONTENT ? true : false;
 
 
     for(i = 0; i < grid->row_dsc_len; i++) {

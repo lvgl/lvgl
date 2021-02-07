@@ -701,8 +701,6 @@ static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 {
     LV_LOG_TRACE("label create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-
     lv_label_t * label = (lv_label_t *)obj;
 
     label->text       = NULL;

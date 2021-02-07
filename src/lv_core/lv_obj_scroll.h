@@ -37,7 +37,7 @@ enum {
 typedef uint8_t lv_scrollbar_mode_t;
 
 
-/** Scroll span align options. Tells where to align the object when it's snapped. */
+/** Scroll span align options. Tells where to align the snapable children when scroll stops. */
 enum {
     LV_SCROLL_SNAP_ALIGN_NONE,    /**< Do not align, leave where it is */
     LV_SCROLL_SNAP_ALIGN_START,   /**< Align to to the left/top */
@@ -56,29 +56,29 @@ typedef uint8_t lv_snap_align_t;
 
 /**
  * Set how the scrollbars should behave.
- * @param obj pointer to an object
- * @param mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
+ * @param obj       pointer to an object
+ * @param mode      LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
  */
 void lv_obj_set_scrollbar_mode(struct _lv_obj_t * obj, lv_scrollbar_mode_t mode);
 
 /**
  * Set the object in which directions can be scrolled
- * @param obj pointer to an object
- * @param dir the allow scroll directions. An element or OR-ed values of `lv_dir_t`
+ * @param obj       pointer to an object
+ * @param dir       the allow scroll directions. An element or OR-ed values of `lv_dir_t`
  */
 void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir);
 
 /**
  * Set where to snap the children when scrolling ends horizontally
- * @param obj pointer to an object
- * @param align the snap align to set from `lv_snap_align_t`
+ * @param obj       pointer to an object
+ * @param align     the snap align to set from `lv_snap_align_t`
  */
 void lv_obj_set_snap_align_x(struct _lv_obj_t * obj, lv_snap_align_t align);
 
 /**
  * Set where to snap the children when scrolling ends vertically
- * @param obj pointer to an object
- * @param align the snap align to set from `lv_snap_align_t`
+ * @param obj       pointer to an object
+ * @param align     the snap align to set from `lv_snap_align_t`
  */
 void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align);
 
@@ -88,49 +88,49 @@ void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align);
 
 /**
  * Get the current scroll mode (when to hide the scrollbars)
- * @param obj pointer to an object
- * @return the current scroll mode from `lv_scroll_mode_t`
+ * @param obj       pointer to an object
+ * @return          the current scroll mode from `lv_scroll_mode_t`
  */
 lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const struct _lv_obj_t * obj);
 
 /**
  * Get the object in which directions can be scrolled
- * @param obj pointer to an object
- * @param dir the allow scroll directions. An element or OR-ed values of `lv_dir_t`
+ * @param obj       pointer to an object
+ * @param dir       the allow scroll directions. An element or OR-ed values of `lv_dir_t`
  */
 lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj);
 
 /**
  * Get where to snap the children when scrolling ends horizontally
- * @param obj pointer to an object
- * @return the current snap align from `lv_snap_align_t`
+ * @param obj       pointer to an object
+ * @return          the current snap align from `lv_snap_align_t`
  */
 lv_snap_align_t lv_obj_get_snap_align_x(const struct _lv_obj_t * obj);
 
 /**
  * Get where to snap the children when scrolling ends vertically
- * @param obj pointer to an object
- * @return the current snap align from `lv_snap_align_t`
+ * @param  obj      pointer to an object
+ * @return          the current snap align from `lv_snap_align_t`
  */
 lv_snap_align_t lv_obj_get_snap_align_y(const struct _lv_obj_t * obj);
 
 /**
  * Get current X scroll position.
- * @param obj pointer to an object
- * @return the current scroll position from the left edge.
- *   If the object is not scrolled return 0
- *   If scrolled return > 0
- *   If scrolled in (elastic scroll) return < 0
+ * @param obj       pointer to an object
+ * @return          the current scroll position from the left edge.
+ *                  If the object is not scrolled return 0
+ *                  If scrolled return > 0
+ *                  If scrolled in (elastic scroll) return < 0
  */
 lv_coord_t lv_obj_get_scroll_x(const struct _lv_obj_t * obj);
 
 /**
  * Get current Y scroll position.
- * @param obj pointer to an object
- * @return the current scroll position from the top edge.
- *   If the object is not scrolled return 0
- *   If scrolled return > 0
- *   If scrolled inside return < 0
+ * @param obj       pointer to an object
+ * @return          the current scroll position from the top edge.
+ *                  If the object is not scrolled return 0
+ *                  If scrolled return > 0
+ *                  If scrolled inside return < 0
  */
 lv_coord_t lv_obj_get_scroll_y(const struct _lv_obj_t * obj);
 
@@ -138,8 +138,8 @@ lv_coord_t lv_obj_get_scroll_y(const struct _lv_obj_t * obj);
  * Return the height of the area above the object.
  * That is the number of pixels the object can be scrolled down.
  * Normally positive but can be negative when scrolled inside.
- * @param obj pointer to an object
- * @return the scrollable area above the object in pixels
+ * @param obj       pointer to an object
+ * @return          the scrollable area above the object in pixels
  */
 lv_coord_t lv_obj_get_scroll_top(struct _lv_obj_t * obj);
 
@@ -147,8 +147,8 @@ lv_coord_t lv_obj_get_scroll_top(struct _lv_obj_t * obj);
  * Return the height of the area below the object.
  * That is the number of pixels the object can be scrolled down.
  * Normally positive but can be negative when scrolled inside.
- * @param obj pointer to an object
- * @return the scrollable area below the object in pixels
+ * @param obj       pointer to an object
+ * @return          the scrollable area below the object in pixels
  */
 lv_coord_t lv_obj_get_scroll_bottom(struct _lv_obj_t * obj);
 
@@ -156,8 +156,8 @@ lv_coord_t lv_obj_get_scroll_bottom(struct _lv_obj_t * obj);
  * Return the width of the area on the left the object.
  * That is the number of pixels the object can be scrolled down.
  * Normally positive but can be negative when scrolled inside.
- * @param obj pointer to an object
- * @return the scrollable area on the left the object in pixels
+ * @param obj       pointer to an object
+ * @return          the scrollable area on the left the object in pixels
  */
 lv_coord_t lv_obj_get_scroll_left(struct _lv_obj_t * obj);
 
@@ -165,16 +165,16 @@ lv_coord_t lv_obj_get_scroll_left(struct _lv_obj_t * obj);
  * Return the width of the area on the right the object.
  * That is the number of pixels the object can be scrolled down.
  * Normally positive but can be negative when scrolled inside.
- * @param obj pointer to an object
- * @return the scrollable area on the right the object in pixels
+ * @param obj       pointer to an object
+ * @return          the scrollable area on the right the object in pixels
  */
 lv_coord_t lv_obj_get_scroll_right(struct _lv_obj_t * obj);
 
 /**
  * Get the X and Y coordinates where the scrolling will end for this object if a scrolling animation is in progress.
  * In no scrolling animation give the current `x` or `y` scroll position.
- * @param obj pointer to an object
- * @param end poinr to point to store the result
+ * @param obj       pointer to an object
+ * @param           end poinr to point to store the result
  */
 void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
 
@@ -183,59 +183,70 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
  *====================*/
 
 /**
- * The most basic function to scroll by a given amount of pixels
- * @param obj pointer to an object to scroll
- * @param x pixels to scroll horizontally
- * @param y pixels to scroll vertically
- * @note > 0 value means scroll right/bottom (show the right/bottom content)
+ * The most basic function to scroll by a given amount of pixels.
+ * Used internally.
+ * @param obj       pointer to an object to scroll
+ * @param x         pixels to scroll horizontally
+ * @param y         pixels to scroll vertically
+ * @note            > 0 value means scroll right/bottom (show the more content on the right/bottom)
  */
 void _lv_obj_scroll_by_raw(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 /**
  *
  * Scroll by a given amount of pixels
- * @param obj pointer to an object to scroll
- * @param x pixels to scroll horizontally
- * @param y pixels to scroll vertically
- * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
- * @note > 0 value means scroll right/bottom (show the right/bottom content)
+ * @param obj       pointer to an object to scroll
+ * @param x         pixels to scroll horizontally
+ * @param y         pixels to scroll vertically
+ * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ * @note            > 0 value means scroll right/bottom (show the more content on the right/bottom)
+ * @note
  */
 void lv_obj_scroll_by(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
  * Scroll to a given coordinate on an object.
  * `x` and `y` will be limited internally to allow scrolling only on the content area.
- * @param obj pointer to an object to scroll
- * @param x pixels to scroll horizontally
- * @param y pixels to scroll vertically
- * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ * @param obj       pointer to an object to scroll
+ * @param x         pixels to scroll horizontally
+ * @param y         pixels to scroll vertically
+ * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
  * Scroll to a given X coordinate on an object.
  * `x` will be limited internally to allow scrolling only on the content area.
- * @param obj pointer to an object to scroll
- * @param x pixels to scroll horizontally
- * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ * @param obj       pointer to an object to scroll
+ * @param x         pixels to scroll horizontally
+ * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to_x(struct _lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en);
 
 /**
  * Scroll to a given Y coordinate on an object
  * `y` will be limited internally to allow scrolling only on the content area.
- * @param obj pointer to an object to scroll
- * @param y pixels to scroll vertically
- * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ * @param obj       pointer to an object to scroll
+ * @param y         pixels to scroll vertically
+ * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to_y(struct _lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
- * Scroll to an object
- * @param obj pointer to an object to scroll into view
- * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ * Scroll to an object until it becomes visible on its parent
+ * @param obj       pointer to an object to scroll into view
+ * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to_view(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
+
+/**
+ * Scroll to an object until it becomes visible on its parent.
+ * Do the same on the parent's parent, and so on.
+ * Therefore the object will be scrolled into view even it has nested scrollable parents
+ * @param obj       pointer to an object to scroll into view
+ * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ */
+void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
 
 /**********************
  *      MACROS

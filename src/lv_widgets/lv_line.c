@@ -108,8 +108,6 @@ static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_
 {
     LV_LOG_TRACE("line create started");
 
-    lv_obj_construct_base(obj, parent, copy);
-    /*Create a basic object*/
     lv_line_t * line = (lv_line_t *) obj;
 
     line->point_num   = 0;
@@ -119,7 +117,7 @@ static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_
 
     /*Init the new line*/
     if(copy == NULL) {
-        lv_obj_set_size(obj, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     }
     /*Copy an existing object*/

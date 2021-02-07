@@ -240,6 +240,7 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
 
 lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
 {
+    if(obj == NULL) return NULL;
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return obj->parent;
@@ -305,14 +306,6 @@ static void obj_del_core(lv_obj_t * obj)
 
     /*Remove the animations from this object*/
     lv_anim_del(obj, NULL);
-//    _lv_obj_remove_style_trans(obj);
-
-    /*Delete the user data*/
-#if LV_USE_USER_DATA
-#if LV_USE_USER_DATA_FREE
-    LV_USER_DATA_FREE(obj);
-#endif
-#endif
 
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);
@@ -322,6 +315,9 @@ static void obj_del_core(lv_obj_t * obj)
     }
 
     lv_event_mark_deleted(obj);
+
+    /*Remove all style*/
+    lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
 
     /* Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);

@@ -30,6 +30,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
  **********************/
 static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
+static void scroll_anim_ready_cb(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -252,12 +253,20 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
+        lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
 
         lv_anim_path_t path;
         lv_anim_path_init(&path);
         lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
 
         if(x) {
+            lv_res_t res;
+            res = lv_signal_send(obj, LV_SIGNAL_SCROLL_BEGIN, NULL);
+            if(res != LV_RES_OK) return;
+
+            res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
+            if(res != LV_RES_OK) return;
+
             uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 2) >> 2, 0, x);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
@@ -270,6 +279,13 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         }
 
         if(y) {
+            lv_res_t res;
+            res = lv_signal_send(obj, LV_SIGNAL_SCROLL_BEGIN, NULL);
+            if(res != LV_RES_OK) return;
+
+            res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
+            if(res != LV_RES_OK) return;
+
             uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 2) >> 2, 0, y);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
@@ -356,6 +372,15 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
 }
 
+void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    while(parent) {
+        lv_obj_scroll_to_view(obj, LV_ANIM_ON);
+        obj = parent;
+        parent = lv_obj_get_parent(parent);
+    }
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -369,4 +394,12 @@ static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v)
 static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
     _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
+}
+
+static void scroll_anim_ready_cb(lv_anim_t * a)
+{
+    lv_res_t res = lv_signal_send(a->var, LV_SIGNAL_SCROLL_END, NULL);
+    if(res != LV_RES_OK) return;
+
+    lv_event_send(a->var, LV_EVENT_SCROLL_END, NULL);
 }

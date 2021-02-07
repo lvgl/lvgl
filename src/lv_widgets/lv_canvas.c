@@ -890,8 +890,6 @@ static void lv_canvas_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 {
    LV_LOG_TRACE("canvas create started");
 
-   lv_obj_construct_base(obj, parent, copy);
-
    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
    /*Initialize the allocated 'ext' */
