@@ -20,7 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_table
+#define MY_CLASS &lv_table_class
 
 /**********************
  *      TYPEDEFS
@@ -41,12 +41,12 @@ static void refr_size(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_table  = {
+const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
     .signal_cb = lv_table_signal,
     .draw_cb = lv_table_draw,
-    .base_class = &lv_obj,
+    .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_table_t),
 };
 /**********************
@@ -65,7 +65,7 @@ const lv_obj_class_t lv_table  = {
  */
 lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_table, parent, copy);
+    return lv_obj_create_from_class(&lv_table_class, parent, copy);
 }
 
 /*=====================

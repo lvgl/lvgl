@@ -34,7 +34,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj
+#define MY_CLASS &lv_obj_class
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
@@ -86,7 +86,7 @@ static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static void * event_act_param;
 static void * event_act_user_data_cb;
-const lv_obj_class_t lv_obj = {
+const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
     .signal_cb = lv_obj_signal,
@@ -176,7 +176,7 @@ void lv_deinit(void)
 
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_obj, parent, copy);
+    return lv_obj_create_from_class(&lv_obj_class, parent, copy);
 }
 
 /*---------------------

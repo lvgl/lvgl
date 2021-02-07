@@ -67,22 +67,10 @@ extern "C" {
 /*-----------------
  * EXTRAS
  *----------------*/
+#include "src/extra/widgets/lv_widgets.h"
 
 /* WIDGETS */
-#include "src/extra/widgets/calendar/lv_calendar.h"
-#include "src/extra/widgets/calendar/lv_calendar_header_arrow.h"
-#include "src/extra/widgets/keyboard/lv_keyboard.h"
-#include "src/extra/widgets/list/lv_list.h"
-#include "src/extra/widgets/msgbox/lv_msgbox.h"
-#include "src/extra/widgets/spinbox/lv_spinbox.h"
-#include "src/extra/widgets/spinner/lv_spinner.h"
-#include "src/extra/widgets/tabview/lv_tabview.h"
-#include "src/extra/widgets/tileview/lv_tileview.h"
-#include "src/extra/widgets/win/lv_win.h"
-
 /* LAYOUTS */
-#include "src/extra/layouts/flex/lv_flex.h"
-#include "src/extra/layouts/grid/lv_grid.h"
 
 /* THEMES */
 #include "src/extra/themes/lv_themes.h"

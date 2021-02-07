@@ -52,7 +52,7 @@ typedef struct {
     int16_t last_angle; /*Last dragging angle of the arc*/
 }lv_arc_t;
 
-extern const lv_obj_class_t lv_arc;
+extern const lv_obj_class_t lv_arc_class;
 
 /**********************
  * GLOBAL PROTOTYPES

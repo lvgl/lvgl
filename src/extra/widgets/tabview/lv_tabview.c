@@ -27,9 +27,9 @@ static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_tabview = {
+const lv_obj_class_t lv_tabview_class = {
         .constructor_cb = lv_tabview_constructor,
-        .base_class = &lv_obj,
+        .base_class = &lv_obj_class,
         .instance_size = sizeof(lv_tabview_t)};
 
 static lv_dir_t tabpos_create;
@@ -47,7 +47,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab
 {
     tabpos_create = tab_pos;
     tabsize_create = tab_size;
-    return lv_obj_create_from_class(&lv_tabview, parent, NULL);
+    return lv_obj_create_from_class(&lv_tabview_class, parent, NULL);
 }
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)

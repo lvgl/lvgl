@@ -26,7 +26,7 @@ static void msgbox_close_event_cb(lv_obj_t * btn, lv_event_t e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_msgbox = {.base_class = &lv_obj};
+const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class};
 
 /**********************
  *      MACROS
@@ -49,7 +49,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     lv_obj_set_size(parent, LV_COORD_PCT(100), LV_COORD_PCT(100));
     lv_obj_remove_style(parent, LV_PART_ANY, LV_STATE_ANY, NULL);
 
-    lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox, parent, NULL);
+    lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent, NULL);
     LV_ASSERT_MEM(mbox);
     if(mbox == NULL) return NULL;
 
@@ -106,7 +106,7 @@ lv_obj_t * lv_msgbox_get_title(lv_obj_t * mbox)
 lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * mbox)
 {
     lv_obj_t * obj = lv_obj_get_child(mbox, 1);
-    if(lv_obj_check_type(obj, &lv_btn)) return obj;
+    if(lv_obj_check_type(obj, &lv_btn_class)) return obj;
     else return NULL;
 }
 

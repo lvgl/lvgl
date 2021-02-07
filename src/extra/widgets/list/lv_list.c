@@ -27,8 +27,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
-const lv_obj_class_t lv_list = {
-    .base_class = &lv_obj,
+const lv_obj_class_t lv_list_class = {
+    .base_class = &lv_obj_class,
 };
 
 /**********************
@@ -45,7 +45,7 @@ const lv_obj_class_t lv_list = {
 
 lv_obj_t * lv_list_create(lv_obj_t * parent)
 {
-    lv_obj_t * list = lv_obj_create_from_class(&lv_list, parent, NULL);
+    lv_obj_t * list = lv_obj_create_from_class(&lv_list_class, parent, NULL);
     lv_obj_set_size(list, LV_DPX(200), LV_DPX(300));
     lv_obj_set_layout(list, &lv_flex_stacked);
 
@@ -88,7 +88,7 @@ const char * lv_list_get_btn_text(lv_obj_t * btn)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(btn); i++) {
         lv_obj_t * child = lv_obj_get_child(btn, i);
-        if(lv_obj_check_type(child, &lv_label)) {
+        if(lv_obj_check_type(child, &lv_label_class)) {
             return lv_label_get_text(child);
         }
 

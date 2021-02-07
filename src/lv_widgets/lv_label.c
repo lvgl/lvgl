@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_label
+#define MY_CLASS &lv_label_class
 
 #define LV_LABEL_DEF_SCROLL_SPEED   25
 #define LV_LABEL_DOT_END_INV 0xFFFFFFFF
@@ -53,13 +53,13 @@ static void get_txt_coords(const lv_obj_t * label, lv_area_t * area);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_label = {
+const lv_obj_class_t lv_label_class = {
     .constructor_cb = lv_label_constructor,
     .destructor_cb = lv_label_destructor,
     .signal_cb = lv_label_signal,
     .draw_cb = lv_label_draw,
     .instance_size = sizeof(lv_label_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -72,7 +72,7 @@ const lv_obj_class_t lv_label = {
 
 lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_label, parent, copy);
+    return lv_obj_create_from_class(&lv_label_class, parent, copy);
 }
 
 /*=====================

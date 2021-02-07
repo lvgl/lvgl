@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_meter
+#define MY_CLASS &lv_meter_class
 
 /**********************
  *      TYPEDEFS
@@ -37,12 +37,12 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_meter = {
+const lv_obj_class_t lv_meter_class = {
     .constructor_cb = lv_meter_constructor,
     .destructor_cb = lv_meter_destructor,
     .draw_cb = lv_meter_draw,
     .instance_size = sizeof(lv_meter_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -55,7 +55,7 @@ const lv_obj_class_t lv_meter = {
 
 lv_obj_t * lv_meter_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_meter, parent, copy);
+    return lv_obj_create_from_class(&lv_meter_class, parent, copy);
 }
 
 /*=====================

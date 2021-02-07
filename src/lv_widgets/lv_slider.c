@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_slider
+#define MY_CLASS &lv_slider_class
 
 #define LV_SLIDER_KNOB_COORD(hor, is_rtl, area) (hor ? (is_rtl ? area.x1 : area.x2) : (is_rtl ? area.y1 : area.y2))
 
@@ -42,14 +42,14 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_slider = {
+const lv_obj_class_t lv_slider_class = {
     .constructor_cb = lv_slider_constructor,
     .destructor_cb = lv_slider_destructor,
     .signal_cb = lv_slider_signal,
     .draw_cb = lv_slider_draw,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_slider_t),
-    .base_class = &lv_bar
+    .base_class = &lv_bar_class
 };
 
 /**********************
@@ -63,7 +63,7 @@ const lv_obj_class_t lv_slider = {
 lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
 
-    return lv_obj_create_from_class(&lv_slider, parent, copy);
+    return lv_obj_create_from_class(&lv_slider_class, parent, copy);
 }
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)

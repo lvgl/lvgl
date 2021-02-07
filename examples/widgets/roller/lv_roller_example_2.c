@@ -14,7 +14,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event)
 /**
  * Roller with various alignments and larger text in the selected area
  */
-void lv_ex_roller_2(void)
+void lv_example_roller_2(void)
 {
     /*A style to make the selected option larger*/
     static lv_style_t style_sel;

@@ -33,7 +33,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-extern const lv_obj_class_t lv_msgbox;
+extern const lv_obj_class_t lv_msgbox_class;
 
 /**********************
  * GLOBAL PROTOTYPES

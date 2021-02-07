@@ -66,7 +66,7 @@ typedef struct {
 } lv_btnmatrix_t;
 
 
-extern const lv_obj_class_t lv_btnmatrix;
+extern const lv_obj_class_t lv_btnmatrix_class;
 
 /**********************
  * GLOBAL PROTOTYPES

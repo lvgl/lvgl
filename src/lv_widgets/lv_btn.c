@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_btn
+#define MY_CLASS &lv_btn_class
 
 /**********************
  *      TYPEDEFS
@@ -27,10 +27,10 @@ static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_btn  = {
+const lv_obj_class_t lv_btn_class  = {
     .constructor_cb = lv_btn_constructor,
     .instance_size = sizeof(lv_btn_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -43,7 +43,7 @@ const lv_obj_class_t lv_btn  = {
 
 lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-     return lv_obj_create_from_class(&lv_btn, parent, copy);
+     return lv_obj_create_from_class(&lv_btn_class, parent, copy);
 }
 
 /**********************

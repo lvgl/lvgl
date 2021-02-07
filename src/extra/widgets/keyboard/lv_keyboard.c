@@ -30,11 +30,11 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_keyboard = {
+const lv_obj_class_t lv_keyboard_class = {
     .constructor_cb = my_constructor,
     .instance_size = sizeof(lv_keyboard_t),
     .editable = 1,
-    .base_class = &lv_btnmatrix
+    .base_class = &lv_btnmatrix_class
 };
 
 static const char * const default_kb_map_lc[] = {"1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
@@ -120,7 +120,7 @@ static const lv_btnmatrix_ctrl_t * kb_ctrl[5] = {
  */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
 {
-    return lv_obj_create_from_class(&lv_keyboard, parent, NULL);
+    return lv_obj_create_from_class(&lv_keyboard_class, parent, NULL);
 }
 
 /*=====================

@@ -43,7 +43,7 @@ typedef struct {
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
 } lv_img_t;
 
-extern const lv_obj_class_t lv_img;
+extern const lv_obj_class_t lv_img_class;
 
 /**********************
  * GLOBAL PROTOTYPES

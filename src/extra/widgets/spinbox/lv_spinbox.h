@@ -44,7 +44,7 @@ typedef struct {
     uint16_t rollover : 1;   // Set to true for rollover functionality
 } lv_spinbox_t;
 
-extern const lv_obj_class_t lv_spinbox;
+extern const lv_obj_class_t lv_spinbox_class;
 
 /**********************
  * GLOBAL PROTOTYPES

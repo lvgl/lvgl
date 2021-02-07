@@ -93,7 +93,7 @@ typedef struct {
     lv_ll_t scale_ll;
 } lv_meter_t;
 
-extern const lv_obj_class_t lv_meter;
+extern const lv_obj_class_t lv_meter_class;
 
 /**********************
  * GLOBAL PROTOTYPES

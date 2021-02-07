@@ -11,7 +11,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj
+#define MY_CLASS &lv_obj_class
 
 /**********************
  *      TYPEDEFS

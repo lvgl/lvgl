@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_checkbox
+#define MY_CLASS &lv_checkbox_class
 
 /**********************
  *      TYPEDEFS
@@ -33,13 +33,13 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_checkbox = {
+const lv_obj_class_t lv_checkbox_class = {
     .constructor_cb = lv_checkbox_constructor,
     .destructor_cb = lv_checkbox_destructor,
     .signal_cb = lv_checkbox_signal,
     .draw_cb = lv_checkbox_draw,
     .instance_size = sizeof(lv_checkbox_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -52,7 +52,7 @@ const lv_obj_class_t lv_checkbox = {
 
 lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_checkbox, parent, copy);
+    return lv_obj_create_from_class(&lv_checkbox_class, parent, copy);
 }
 
 /*=====================

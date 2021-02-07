@@ -5,7 +5,7 @@
 /**
  * Create a style transition on a button to act like a gum when clicked
  */
-void lv_ex_btn_3(void)
+void lv_example_btn_3(void)
 {
     /*Properties to transition*/
     static lv_style_prop_t props[] = {

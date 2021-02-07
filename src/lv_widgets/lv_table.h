@@ -58,7 +58,7 @@ typedef struct {
     lv_coord_t * col_w;
 } lv_table_t;
 
-extern const lv_obj_class_t lv_table;
+extern const lv_obj_class_t lv_table_class;
 
 /**********************
  * GLOBAL PROTOTYPES

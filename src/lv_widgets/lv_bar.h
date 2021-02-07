@@ -56,7 +56,7 @@ typedef struct {
     lv_bar_type_t type : 2;     /**< Type of bar*/
 }lv_bar_t;
 
-extern const lv_obj_class_t lv_bar;
+extern const lv_obj_class_t lv_bar_class;
 
 /**********************
  * GLOBAL PROTOTYPES

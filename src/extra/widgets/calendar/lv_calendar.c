@@ -34,10 +34,10 @@ static void highlight_update(lv_obj_t * calendar);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_calendar = {
+const lv_obj_class_t lv_calendar_class = {
     .constructor_cb = my_constructor,
     .instance_size = sizeof(lv_calendar_t),
-    .base_class = &lv_btnmatrix
+    .base_class = &lv_btnmatrix_class
 };
 
 
@@ -53,7 +53,7 @@ static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
 
 lv_obj_t * lv_calendar_create(lv_obj_t * parent)
 {
-    lv_obj_t * obj = lv_obj_create_from_class(&lv_calendar, parent, NULL);
+    lv_obj_t * obj = lv_obj_create_from_class(&lv_calendar_class, parent, NULL);
 
     return obj;
 }

@@ -12,7 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_spinbox
+#define MY_CLASS    &lv_spinbox_class
 
 /**********************
  *      TYPEDEFS
@@ -30,12 +30,12 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_spinbox = {
+const lv_obj_class_t lv_spinbox_class = {
     .constructor_cb = lv_spinbox_constructor,
     .destructor_cb = lv_spinbox_destructor,
     .signal_cb = lv_spinbox_signal,
     .instance_size = sizeof(lv_spinbox_t),
-    .base_class = &lv_textarea
+    .base_class = &lv_textarea_class
 };
 /**********************
  *      MACROS
@@ -53,7 +53,7 @@ const lv_obj_class_t lv_spinbox = {
  */
 lv_obj_t * lv_spinbox_create(lv_obj_t * parent)
 {
-   return lv_obj_create_from_class(&lv_spinbox, parent, NULL);
+   return lv_obj_create_from_class(&lv_spinbox_class, parent, NULL);
 }
 
 /*=====================

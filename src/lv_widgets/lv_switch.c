@@ -24,7 +24,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_switch
+#define MY_CLASS &lv_switch_class
 
 /**********************
  *      TYPEDEFS
@@ -41,13 +41,13 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, 
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_switch = {
+const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
     .destructor_cb = lv_switch_destructor,
     .signal_cb = lv_switch_signal,
     .draw_cb = lv_switch_draw,
     .instance_size = sizeof(lv_switch_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -67,7 +67,7 @@ const lv_obj_class_t lv_switch = {
  */
 lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_switch, parent, copy);
+    return lv_obj_create_from_class(&lv_switch_class, parent, copy);
 }
 
 /**********************

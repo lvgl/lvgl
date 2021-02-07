@@ -76,7 +76,7 @@ typedef struct {
     uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters */
 }lv_label_t;
 
-extern const lv_obj_class_t lv_label;
+extern const lv_obj_class_t lv_label_class;
 
 /**********************
  * GLOBAL PROTOTYPES

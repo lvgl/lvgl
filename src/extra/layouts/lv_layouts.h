@@ -1,10 +1,10 @@
 /**
- * @file lv_ex_grid.h
+ * @file lv_layouts.h
  *
  */
 
-#ifndef LV_EX_GRID_H
-#define LV_EX_GRID_H
+#ifndef LV_LAYOUTS_H
+#define LV_LAYOUTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "layouts/flex/lv_flex.h"
+#include "layouts/grid/lv_grid.h"
+
 
 /*********************
  *      DEFINES
@@ -34,4 +37,4 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-#endif /*LV_EX_GRID_H*/
+#endif /*LV_LAYOUTS_H*/

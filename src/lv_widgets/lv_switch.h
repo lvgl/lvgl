@@ -37,7 +37,7 @@ typedef struct {
 }lv_switch_t;
 
 
-extern const lv_obj_class_t lv_switch;
+extern const lv_obj_class_t lv_switch_class;
 
 /**********************
  * GLOBAL PROTOTYPES

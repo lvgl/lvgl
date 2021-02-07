@@ -20,7 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_btnmatrix
+#define MY_CLASS &lv_btnmatrix_class
 
 #define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 4)
 #define LV_BTNMATRIX_WIDTH_MASK 0x0007
@@ -55,14 +55,14 @@ static void make_one_button_checked(lv_obj_t * obj, uint16_t btn_idx);
  **********************/
 static const char * lv_btnmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 
-const lv_obj_class_t lv_btnmatrix = {
+const lv_obj_class_t lv_btnmatrix_class = {
         .constructor_cb = lv_btnmatrix_constructor,
         .destructor_cb = lv_btnmatrix_destructor,
         .signal_cb = lv_btnmatrix_signal,
         .draw_cb = lv_btnmatrix_draw,
         .instance_size = sizeof(lv_btnmatrix_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
-        .base_class = &lv_obj
+        .base_class = &lv_obj_class
     };
 
 /**********************
@@ -75,7 +75,7 @@ const lv_obj_class_t lv_btnmatrix = {
 
 lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_btnmatrix, parent, copy);
+    return lv_obj_create_from_class(&lv_btnmatrix_class, parent, copy);
 }
 
 /*=====================

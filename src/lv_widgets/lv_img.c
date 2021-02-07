@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_img
+#define MY_CLASS &lv_img_class
 
 /**********************
  *      TYPEDEFS
@@ -36,13 +36,13 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_img = {
+const lv_obj_class_t lv_img_class = {
          .constructor_cb = lv_img_constructor,
          .destructor_cb = lv_img_destructor,
          .signal_cb = lv_img_signal,
          .draw_cb = lv_img_draw,
          .instance_size = sizeof(lv_img_t),
-         .base_class = &lv_obj
+         .base_class = &lv_obj_class
      };
 
 /**********************
@@ -55,7 +55,7 @@ const lv_obj_class_t lv_img = {
 
 lv_obj_t * lv_img_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_img, parent, copy);
+    return lv_obj_create_from_class(&lv_img_class, parent, copy);
 }
 
 /*=====================

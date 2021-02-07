@@ -28,12 +28,12 @@ static void tileview_event_cb(lv_obj_t * tv, lv_event_t e);
  *  STATIC VARIABLES
  **********************/
 
-const lv_obj_class_t lv_tileview = {.constructor_cb = lv_tileview_constructor,
-                                    .base_class = &lv_obj,
+const lv_obj_class_t lv_tileview_class = {.constructor_cb = lv_tileview_constructor,
+                                    .base_class = &lv_obj_class,
                                     .instance_size = sizeof(lv_tileview_t)};
 
-const lv_obj_class_t lv_tileview_tile = {.constructor_cb = lv_tileview_tile_constructor,
-                                         .base_class = &lv_obj,
+const lv_obj_class_t lv_tileview_tile_class = {.constructor_cb = lv_tileview_tile_constructor,
+                                         .base_class = &lv_obj_class,
                                          .instance_size = sizeof(lv_tileview_tile_t)};
 
 static lv_dir_t create_dir;
@@ -56,7 +56,7 @@ static uint32_t create_row_id;
  */
 lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 {
-   return lv_obj_create_from_class(&lv_tileview, parent, NULL);
+   return lv_obj_create_from_class(&lv_tileview_class, parent, NULL);
 }
 
 /*======================
@@ -68,7 +68,7 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
     create_dir = dir;
     create_col_id = col_id;
     create_row_id = row_id;
-    return lv_obj_create_from_class(&lv_tileview_tile, tv, NULL);
+    return lv_obj_create_from_class(&lv_tileview_tile_class, tv, NULL);
 }
 
 void lv_obj_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)

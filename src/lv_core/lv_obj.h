@@ -228,7 +228,7 @@ typedef uint32_t lv_obj_flag_t;
 /**
  * Make the base object's class publicly available.
  */
-extern const lv_obj_class_t lv_obj;
+extern const lv_obj_class_t lv_obj_class;
 
 /**
  * Special, rarely used attributes.

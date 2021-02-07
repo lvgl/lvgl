@@ -18,8 +18,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_roller
-#define MY_CLASS_LABEL &lv_roller_label
+#define MY_CLASS &lv_roller_class
+#define MY_CLASS_LABEL &lv_roller_label_class
 
 /**********************
  *      TYPEDEFS
@@ -43,19 +43,19 @@ static void scroll_anim_ready_cb(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_roller = {
+const lv_obj_class_t lv_roller_class = {
         .constructor_cb = lv_roller_constructor,
         .signal_cb = lv_roller_signal,
         .draw_cb = lv_roller_draw,
         .instance_size = sizeof(lv_roller_t),
-        .base_class = &lv_obj
+        .base_class = &lv_obj_class
 };
 
-const lv_obj_class_t lv_roller_label  = {
+const lv_obj_class_t lv_roller_label_class  = {
         .signal_cb = lv_roller_label_signal,
         .draw_cb = lv_roller_label_draw,
         .instance_size = sizeof(lv_label_t),
-        .base_class = &lv_label
+        .base_class = &lv_label_class
     };;
 
 /**********************
@@ -74,7 +74,7 @@ const lv_obj_class_t lv_roller_label  = {
  */
 lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_roller, parent, copy);
+    return lv_obj_create_from_class(&lv_roller_class, parent, copy);
 }
 
 /*=====================
@@ -297,12 +297,12 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         lv_obj_set_width(obj, LV_SIZE_CONTENT);
 
-        lv_obj_create_from_class(&lv_roller_label, obj, NULL);
+        lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);
         lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
         lv_roller_set_visible_row_count(obj, 3);
     }
     else {
-        lv_obj_create_from_class(&lv_roller_label, obj, NULL);
+        lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);
         lv_roller_t * copy_roller = (lv_roller_t *) copy;
         roller->mode = copy_roller->mode;
         roller->option_cnt = copy_roller->option_cnt;

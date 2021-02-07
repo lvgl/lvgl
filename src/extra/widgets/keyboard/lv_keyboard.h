@@ -52,7 +52,7 @@ typedef struct {
     lv_keyboard_mode_t mode;    /*Key map type*/
 } lv_keyboard_t;
 
-extern const lv_obj_class_t lv_keyboard;
+extern const lv_obj_class_t lv_keyboard_class;
 
 /**********************
  * GLOBAL PROTOTYPES

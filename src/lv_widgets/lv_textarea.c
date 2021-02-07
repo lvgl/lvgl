@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_textarea
+#define MY_CLASS &lv_textarea_class
 
 /*Test configuration*/
 #ifndef LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
@@ -64,14 +64,14 @@ static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_textarea = {
+const lv_obj_class_t lv_textarea_class = {
     .constructor_cb = lv_textarea_constructor,
     .destructor_cb = lv_textarea_destructor,
     .signal_cb = lv_textarea_signal,
     .draw_cb = lv_textarea_draw,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_textarea_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 static const char * ta_insert_replace;
@@ -92,7 +92,7 @@ static const char * ta_insert_replace;
  */
 lv_obj_t * lv_textarea_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-  return lv_obj_create_from_class(&lv_textarea, parent, copy);
+  return lv_obj_create_from_class(&lv_textarea_class, parent, copy);
 }
 
 /*======================

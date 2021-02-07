@@ -4,7 +4,7 @@
 /**
  * Example of styling the bar
  */
-void lv_ex_bar_2(void)
+void lv_example_bar_2(void)
 {
     static lv_style_t style_bg;
     static lv_style_t style_indic;

@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_canvas
+#define MY_CLASS &lv_canvas_class
 
 /**********************
  *      TYPEDEFS
@@ -52,11 +52,11 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_canvas = {
+const lv_obj_class_t lv_canvas_class = {
     .constructor_cb = lv_canvas_constructor,
     .destructor_cb = lv_canvas_destructor,
     .instance_size = sizeof(lv_canvas_t),
-    .base_class = &lv_img
+    .base_class = &lv_img_class
 };
 
 /**********************
@@ -69,7 +69,7 @@ const lv_obj_class_t lv_canvas = {
 
 lv_obj_t * lv_canvas_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_canvas, parent, copy);
+    return lv_obj_create_from_class(&lv_canvas_class, parent, copy);
 }
 
 /*=====================

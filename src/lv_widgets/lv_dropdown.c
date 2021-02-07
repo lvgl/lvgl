@@ -23,8 +23,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_dropdown
-#define MY_CLASS_LIST &lv_dropdown_list
+#define MY_CLASS &lv_dropdown_class
+#define MY_CLASS_LIST &lv_dropdown_list_class
 
 #define LV_DROPDOWN_PR_NONE 0xFFFF
 
@@ -55,22 +55,22 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_dropdown = {
+const lv_obj_class_t lv_dropdown_class = {
     .constructor_cb = lv_dropdown_constructor,
     .destructor_cb = lv_dropdown_destructor,
     .signal_cb = lv_dropdown_signal,
     .draw_cb = lv_dropdown_draw,
     .instance_size = sizeof(lv_dropdown_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
-const lv_obj_class_t lv_dropdown_list = {
+const lv_obj_class_t lv_dropdown_list_class = {
     .constructor_cb = lv_dropdown_list_constructor,
     .signal_cb = lv_dropdown_list_signal,
     .draw_cb = lv_dropdown_list_draw,
     .instance_size = sizeof(lv_dropdown_list_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 
@@ -84,7 +84,7 @@ const lv_obj_class_t lv_dropdown_list = {
 
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_dropdown, parent, copy);
+    return lv_obj_create_from_class(&lv_dropdown_class, parent, copy);
 }
 
 /*=====================
@@ -517,7 +517,7 @@ void lv_dropdown_close(lv_obj_t * obj)
  */
 lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_dropdown_list, parent, copy);
+    return lv_obj_create_from_class(&lv_dropdown_list_class, parent, copy);
 }
 
 static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)

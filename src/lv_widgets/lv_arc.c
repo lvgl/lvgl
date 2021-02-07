@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_arc
+#define MY_CLASS &lv_arc_class
 
 #define VALUE_UNSET INT16_MIN
 
@@ -42,14 +42,14 @@ static void value_update(lv_obj_t * arc);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_arc  = {
+const lv_obj_class_t lv_arc_class  = {
     .constructor_cb = lv_arc_constructor,
     .destructor_cb = lv_arc_destructor,
     .signal_cb = lv_arc_signal,
     .draw_cb = lv_arc_draw,
     .instance_size = sizeof(lv_arc_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -68,7 +68,7 @@ const lv_obj_class_t lv_arc  = {
  */
 lv_obj_t * lv_arc_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_arc, parent, copy);
+    return lv_obj_create_from_class(&lv_arc_class, parent, copy);
 }
 
 /*======================

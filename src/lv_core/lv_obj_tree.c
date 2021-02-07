@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj
+#define MY_CLASS &lv_obj_class
 
 #if defined(LV_USER_DATA_FREE_INCLUDE)
     #include LV_USER_DATA_FREE_INCLUDE

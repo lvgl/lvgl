@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_bar
+#define MY_CLASS &lv_bar_class
 
 /** hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
 #define LV_BAR_SIZE_MIN  4
@@ -59,13 +59,13 @@ static void lv_bar_anim_ready(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_bar = {
+const lv_obj_class_t lv_bar_class = {
     .constructor_cb = lv_bar_constructor,
     .destructor_cb = lv_bar_destructor,
     .signal_cb = lv_bar_signal,
     .draw_cb = lv_bar_draw,
     .instance_size = sizeof(lv_bar_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -78,7 +78,7 @@ const lv_obj_class_t lv_bar = {
 
 lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_bar, parent, copy);
+    return lv_obj_create_from_class(&lv_bar_class, parent, copy);
 }
 
 /*=====================

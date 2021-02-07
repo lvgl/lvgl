@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_chart
+#define MY_CLASS &lv_chart_class
 
 #define LV_CHART_YMIN_DEF 0
 #define LV_CHART_YMAX_DEF 100
@@ -51,13 +51,13 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_chart = {
+const lv_obj_class_t lv_chart_class = {
     .constructor_cb = lv_chart_constructor,
     .destructor_cb = lv_chart_destructor,
     .signal_cb = lv_chart_signal,
     .draw_cb = lv_chart_draw,
     .instance_size = sizeof(lv_chart_t),
-    .base_class = &lv_obj
+    .base_class = &lv_obj_class
 };
 
 /**********************
@@ -70,7 +70,7 @@ const lv_obj_class_t lv_chart = {
 
 lv_obj_t * lv_chart_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    return lv_obj_create_from_class(&lv_chart, parent, copy);
+    return lv_obj_create_from_class(&lv_chart_class, parent, copy);
 }
 
 void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
