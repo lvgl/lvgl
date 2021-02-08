@@ -50,7 +50,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     lv_obj_remove_style(parent, LV_PART_ANY, LV_STATE_ANY, NULL);
 
     lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent, NULL);
-    LV_ASSERT_MEM(mbox);
+    LV_ASSERT_MALLOC(mbox);
     if(mbox == NULL) return NULL;
 
     lv_coord_t w = lv_obj_get_width_fit(parent);

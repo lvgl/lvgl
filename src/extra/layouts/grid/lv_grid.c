@@ -54,8 +54,8 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-const static lv_coord_t grid_12_template[12] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1),
-                                          LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1)};
+const static lv_coord_t grid_12_template[12] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1),
+                                                LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1)};
 const lv_grid_t grid_12 = {.base.update_cb = grid_update, .col_dsc = grid_12_template, .col_dsc_len = 12, .row_dsc = grid_12_template, .row_dsc_len = 12};
 
 /**********************
@@ -211,7 +211,7 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     lv_coord_t cont_h = lv_obj_get_height_fit(cont);
     calc_out->grid_h = grid_place(cont_h, auto_h, g->row_place, row_gap, calc_out->row_num, calc_out->h, calc_out->y, false);
 
-    LV_ASSERT_MEM_INTEGRITY();
+    LV_ASSERT_MALLOC_INTEGRITY();
 }
 
 /**

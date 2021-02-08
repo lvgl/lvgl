@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "layouts/flex/lv_flex.h"
-#include "layouts/grid/lv_grid.h"
+#include "flex/lv_flex.h"
+#include "grid/lv_grid.h"
 
 
 /*********************

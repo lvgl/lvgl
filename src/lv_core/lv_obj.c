@@ -12,7 +12,7 @@
 #include "lv_group.h"
 #include "lv_disp.h"
 #include "lv_theme.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_timer.h"
@@ -40,7 +40,6 @@
 #define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
 #define STYLE_TRANSITION_MAX 32
 #define SCROLLBAR_MIN_SIZE (LV_DPX(10))
-
 
 /**********************
  *      TYPEDEFS
@@ -421,7 +420,7 @@ void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_dat
 
     obj->spec_attr->event_dsc_cnt++;
     obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
-    LV_ASSERT_MEM(obj->spec_attr->event_dsc);
+    LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
 
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].user_data = user_data;
@@ -527,7 +526,7 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
         static uint32_t x = 0;
         x++;
         obj->spec_attr = lv_mem_alloc(sizeof(lv_obj_spec_attr_t));
-        LV_ASSERT_MEM(obj->spec_attr);
+        LV_ASSERT_MALLOC(obj->spec_attr);
         if(obj->spec_attr == NULL) return;
 
         lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
@@ -550,18 +549,24 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
     return (lv_obj_t *)focus_obj;
 }
 
-bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p)
+bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
     if(obj == NULL) return false;
     return obj->class_p == class_p ? true : false;
 }
 
-bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
+bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    return true;
+    lv_obj_class_t * obj_class = obj->class_p;
+    while(obj_class) {
+        if(obj_class == class_p) return true;
+        obj_class = obj_class->base_class;
+    }
+
+    return false;
 }
 
-bool _lv_debug_check_obj_valid(const lv_obj_t * obj)
+bool lv_obj_is_valid(const lv_obj_t * obj)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
@@ -1135,9 +1140,11 @@ static void base_dir_refr_children(lv_obj_t * obj)
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {
     /*Check all children of `parent`*/
+    uint32_t child_cnt = 0;
+    if(parent->spec_attr) child_cnt = parent->spec_attr->child_cnt;
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
-        lv_obj_t * child = lv_obj_get_child(parent, i);
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = parent->spec_attr->children[i];
         if(child == obj_to_find) return true;
 
         /*Check the children*/

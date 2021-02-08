@@ -320,7 +320,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param
                         if(new_step >= spinbox->range_max) break;
                         spinbox->step = new_step;
                     }
-                    lv_spinbox_step_prev(spinbox);
+                    lv_spinbox_step_prev(obj);
                 }
             }
         }
@@ -365,7 +365,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param
         }
         else if(c == LV_KEY_LEFT) {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
-                lv_spinbox_decrement(spinbox);
+                lv_spinbox_decrement(obj);
             else
                 lv_spinbox_step_prev(obj);
         }
@@ -453,7 +453,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 
     cur_pos -= cur_shift_left;
 
-    lv_textarea_set_cursor_pos(spinbox, cur_pos);
+    lv_textarea_set_cursor_pos(obj, cur_pos);
 }
 
 #endif /*LV_USE_SPINBOX*/

@@ -9,7 +9,7 @@
 #include "lv_line.h"
 
 #if LV_USE_LINE != 0
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_math.h"
 #include <stdbool.h>

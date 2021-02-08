@@ -10,7 +10,7 @@
 #if LV_USE_TEXTAREA != 0
 
 #include <string.h>
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_core/lv_indev.h"
@@ -152,7 +152,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 
     if(ta->pwd_mode != 0) {
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + strlen(letter_buf) + 1); /*+2: the new char + \0 */
-        LV_ASSERT_MEM(ta->pwd_tmp);
+        LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
         _lv_txt_ins(ta->pwd_tmp, ta->cursor.pos, (const char *)letter_buf);
@@ -223,7 +223,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 
     if(ta->pwd_mode != 0) {
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + strlen(txt) + 1);
-        LV_ASSERT_MEM(ta->pwd_tmp);
+        LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
         _lv_txt_ins(ta->pwd_tmp, ta->cursor.pos, txt);
@@ -292,7 +292,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
         _lv_txt_cut(ta->pwd_tmp, ta->cursor.pos - 1, _lv_txt_encoded_size(&ta->pwd_tmp[byte_pos]));
 
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + 1);
-        LV_ASSERT_MEM(ta->pwd_tmp);
+        LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
     }
 
@@ -361,7 +361,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
 
     if(ta->pwd_mode != 0) {
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(txt) + 1);
-        LV_ASSERT_MEM(ta->pwd_tmp);
+        LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
         strcpy(ta->pwd_tmp, txt);
 
@@ -419,7 +419,7 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
             ta->placeholder_txt = lv_mem_realloc(ta->placeholder_txt, txt_len + 1);
 
         }
-        LV_ASSERT_MEM(ta->placeholder_txt);
+        LV_ASSERT_MALLOC(ta->placeholder_txt);
         if(ta->placeholder_txt == NULL) {
             LV_LOG_ERROR("lv_textarea_set_placeholder_text: couldn't allocate memory for placeholder");
             return;
@@ -510,7 +510,7 @@ void lv_textarea_set_pwd_mode(lv_obj_t * obj, bool en)
         char * txt   = lv_label_get_text(ta->label);
         size_t len = strlen(txt);
         ta->pwd_tmp = lv_mem_alloc(len + 1);
-        LV_ASSERT_MEM(ta->pwd_tmp);
+        LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
         strcpy(ta->pwd_tmp, txt);
@@ -994,7 +994,7 @@ static void lv_textarea_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
           if(copy_ta->pwd_tmp) {
               uint32_t len = lv_mem_get_size(copy_ta->pwd_tmp);
               ta->pwd_tmp = lv_mem_alloc(len);
-              LV_ASSERT_MEM(ta->pwd_tmp);
+              LV_ASSERT_MALLOC(ta->pwd_tmp);
               if(ta->pwd_tmp == NULL) return;
 
               lv_memcpy(ta->pwd_tmp, copy_ta->pwd_tmp, len);

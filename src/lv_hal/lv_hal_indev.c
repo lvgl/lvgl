@@ -8,7 +8,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_misc/lv_mem.h"
@@ -81,7 +81,7 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
 
     lv_indev_t * indev = _lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
     if(!indev) {
-        LV_ASSERT_MEM(indev);
+        LV_ASSERT_MALLOC(indev);
         return NULL;
     }
 

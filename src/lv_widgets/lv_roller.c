@@ -9,7 +9,7 @@
 #include "lv_roller.h"
 #if LV_USE_ROLLER != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
@@ -90,7 +90,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy)
 void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(options);
+    LV_ASSERT_NULL(options);
 
     lv_roller_t * roller = (lv_roller_t*)obj;
     lv_obj_t * label = get_label(obj);

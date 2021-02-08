@@ -9,7 +9,7 @@
 #include "lv_btnmatrix.h"
 #if LV_USE_BTNMATRIX != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
@@ -857,9 +857,9 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** 
     }
 
     btnm->button_areas = lv_mem_alloc(sizeof(lv_area_t) * btn_cnt);
-    LV_ASSERT_MEM(btnm->button_areas);
+    LV_ASSERT_MALLOC(btnm->button_areas);
     btnm->ctrl_bits = lv_mem_alloc(sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
-    LV_ASSERT_MEM(btnm->ctrl_bits);
+    LV_ASSERT_MALLOC(btnm->ctrl_bits);
     if(btnm->button_areas == NULL || btnm->ctrl_bits == NULL) btn_cnt = 0;
 
     lv_memset_00(btnm->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);

@@ -9,7 +9,7 @@
 #include "lv_checkbox.h"
 #if LV_USE_CHECKBOX != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 

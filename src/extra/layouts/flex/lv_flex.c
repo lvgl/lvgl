@@ -230,7 +230,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
             *cross_pos += t.track_cross_size + gap + track_gap;
         }
     }
-    LV_ASSERT_MEM_INTEGRITY();
+    LV_ASSERT_MALLOC_INTEGRITY();
 }
 
 /**

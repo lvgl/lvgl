@@ -282,7 +282,7 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_
     }
 
     tr = _lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-    LV_ASSERT_MEM(tr);
+    LV_ASSERT_MALLOC(tr);
     if(tr == NULL) return;
     tr->start_value = v1;
     tr->end_value = v2;

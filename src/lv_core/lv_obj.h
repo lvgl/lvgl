@@ -21,7 +21,7 @@ extern "C" {
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_hal/lv_hal.h"
 
 /*********************
@@ -484,7 +484,7 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
  * @param obj   pointer to an object which type should be get
  * @param buf   pointer to an `lv_obj_type_t` buffer to store the types
  */
-bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p);
+bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 
 /**
  * Check if any object has a given type
@@ -492,7 +492,7 @@ bool lv_obj_check_type(const lv_obj_t * obj, const void * class_p);
  * @param obj_type  type of the object. (e.g. "lv_btn")
  * @return          true: valid
  */
-bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
+bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 
 /**
  * Check if any object is still "alive", and part of the hierarchy
@@ -500,34 +500,20 @@ bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
  * @param obj_type  type of the object. (e.g. "lv_btn")
  * @return          true: valid
  */
-bool _lv_debug_check_obj_valid(const lv_obj_t * obj);
+bool lv_obj_is_valid(const lv_obj_t * obj);
 
 /**********************
  *      MACROS
  **********************/
 
-#if LV_USE_DEBUG
+#if LV_USE_ASSERT && LV_USE_ASSERT_OBJ
+#  define LV_ASSERT_OBJ(obj_p, obj_class)                                    \
+            LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");               \
+            LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type."); \
+            LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?");
 
-# ifndef LV_DEBUG_IS_OBJ
-#  define LV_DEBUG_IS_OBJ(obj_p, obj_type) (lv_debug_check_null(obj_p) &&      \
-                                            _lv_debug_check_obj_valid(obj_p) && \
-                                            _lv_debug_check_obj_type(obj_p, obj_type))
-# endif
-
-
-# if LV_USE_ASSERT_OBJ
-#  ifndef LV_ASSERT_OBJ
-#   define LV_ASSERT_OBJ(obj_p, obj_type) LV_DEBUG_ASSERT(LV_DEBUG_IS_OBJ(obj_p, obj_type), "Invalid object", obj_p);
-#  endif
-# else /* LV_USE_ASSERT_OBJ == 0 */
-#  if LV_USE_ASSERT_NULL /*Use at least LV_ASSERT_NULL if enabled*/
-#    define LV_ASSERT_OBJ(obj_p, obj_type) LV_ASSERT_NULL(obj_p)
-#  else
-#    define LV_ASSERT_OBJ(obj_p, obj_type)
-#  endif
-# endif
-#else
-# define LV_ASSERT_OBJ(obj, obj_type)
+# else
+# define LV_ASSERT_OBJ(obj_p, obj_class) do{}while(0)
 #endif
 
 

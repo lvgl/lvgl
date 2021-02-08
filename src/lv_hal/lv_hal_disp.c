@@ -14,7 +14,7 @@
 #include "lv_hal.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_refr.h"
 
@@ -112,7 +112,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
     lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
     if(!disp) {
-        LV_ASSERT_MEM(disp);
+        LV_ASSERT_MALLOC(disp);
         return NULL;
     }
 
@@ -128,7 +128,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
                                         new display*/
     /*Create a refresh task*/
     disp->read_task = lv_timer_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, disp);
-    LV_ASSERT_MEM(disp->read_task);
+    LV_ASSERT_MALLOC(disp->read_task);
     if(disp->read_task == NULL) return NULL;
 
     disp->inv_p = 0;

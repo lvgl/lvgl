@@ -71,14 +71,14 @@ lv_obj_t * lv_led_create(lv_obj_t * parent)
 
     /*Create the ancestor basic object*/
     lv_obj_t * led = lv_obj_create(parent, NULL);
-    LV_ASSERT_MEM(led);
+    LV_ASSERT_MALLOC(led);
     if(led == NULL) return NULL;
 
     if(ancestor_draw == NULL) ancestor_draw = lv_obj_get_draw_cb(led);
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(led, sizeof(lv_led_ext_t));
-    LV_ASSERT_MEM(ext);
+    LV_ASSERT_MALLOC(ext);
     if(ext == NULL) {
         lv_obj_del(led);
         return NULL;

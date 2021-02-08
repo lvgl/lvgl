@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "lv_img_cache.h"
 #include "lv_img_decoder.h"
 #include "lv_draw_img.h"
@@ -172,7 +172,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
 
     /*Reallocate the cache*/
     LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(lv_img_cache_entry_t) * new_entry_cnt);
-    LV_ASSERT_MEM(LV_GC_ROOT(_lv_img_cache_array));
+    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_img_cache_array));
     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
         entry_cnt = 0;
         return;

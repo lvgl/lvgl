@@ -11,7 +11,7 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_bidi.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -381,7 +381,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         if(pos.y > mask->y2) return;
     }
 
-    LV_ASSERT_MEM_INTEGRITY();
+    LV_ASSERT_MALLOC_INTEGRITY();
 }
 
 /**********************

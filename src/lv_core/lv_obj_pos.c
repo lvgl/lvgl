@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_disp.h"
+#include "lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -43,7 +45,6 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(lv_obj_is_layout_positioned(obj)) {
-        LV_LOG_WARN("Can't set position because the position is set by a layout");
         return;
     }
 
@@ -559,6 +560,11 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
+    lv_area_t a;
+    lv_obj_get_click_area(obj, &a);
+    bool res = _lv_area_is_point_on(&a, point, 0);
+    if(res == false) return false;
+
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
@@ -566,11 +572,8 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
         lv_signal_send(obj, LV_SIGNAL_HIT_TEST, &hit_info);
         return hit_info.result;
     }
-    else {
-        lv_area_t a;
-        lv_obj_get_click_area(obj, &a);
-        return _lv_area_is_point_on(&a, point, 0);
-    }
+
+    return res;
 }
 
 

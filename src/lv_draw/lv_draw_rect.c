@@ -12,7 +12,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_txt_ap.h"
 #include "../lv_core/lv_refr.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -112,7 +112,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_dra
 
     draw_outline(coords, clip, dsc);
 
-    LV_ASSERT_MEM_INTEGRITY();
+    LV_ASSERT_MALLOC_INTEGRITY();
 }
 
 /**********************

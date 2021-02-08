@@ -10,7 +10,7 @@
 
 #include <stddef.h>
 #include <string.h>
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_timer.h"
 #include "lv_math.h"
@@ -96,7 +96,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = _lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
-    LV_ASSERT_MEM(new_anim);
+    LV_ASSERT_MALLOC(new_anim);
     if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/

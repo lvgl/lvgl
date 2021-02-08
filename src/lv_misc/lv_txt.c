@@ -12,7 +12,7 @@
 #include "lv_math.h"
 #include "lv_log.h"
 #include "lv_mem.h"
-#include "lv_debug.h"
+#include "lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -493,7 +493,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
     char * raw_txt = lv_mem_buf_get(len + 1);
-    LV_ASSERT_MEM(raw_txt);
+    LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         return NULL;
     }
@@ -503,7 +503,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
     text = lv_mem_alloc(len_ap + 1);
-    LV_ASSERT_MEM(text);
+    LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
     }
@@ -512,7 +512,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     lv_mem_buf_release(raw_txt);
 #else
     text = lv_mem_alloc(len + 1);
-    LV_ASSERT_MEM(text);
+    LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
     }

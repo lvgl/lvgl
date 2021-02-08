@@ -9,7 +9,7 @@
 #include "lv_chart.h"
 #if LV_USE_CHART != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_disp.h"
@@ -103,7 +103,7 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint16_t cnt)
         if(!ser->ext_buf_assigned) {
             if(ser->last_point != 0) {
                 lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * cnt);
-                LV_ASSERT_MEM(new_points);
+                LV_ASSERT_MALLOC(new_points);
                 if(new_points == NULL) return;
 
                 if(cnt >= point_cnt_old) {
@@ -128,7 +128,7 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint16_t cnt)
             }
             else {
                 ser->points = lv_mem_realloc(ser->points, sizeof(lv_coord_t) * cnt);
-                LV_ASSERT_MEM(ser->points);
+                LV_ASSERT_MALLOC(ser->points);
                 if(ser->points == NULL) return;
                 /*Initialize the new points*/
                 if(cnt > point_cnt_old) {
@@ -333,14 +333,14 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
     lv_chart_series_t * ser = _lv_ll_ins_head(&chart->series_ll);
-    LV_ASSERT_MEM(ser);
+    LV_ASSERT_MALLOC(ser);
     if(ser == NULL) return NULL;
 
     lv_coord_t def = LV_CHART_POINT_DEF;
 
     ser->color  = color;
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * chart->point_cnt);
-    LV_ASSERT_MEM(ser->points);
+    LV_ASSERT_MALLOC(ser->points);
     if(ser->points == NULL) {
         _lv_ll_remove(&chart->series_ll, ser);
         lv_mem_free(ser);

@@ -780,6 +780,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
     }
 #endif
+
+#if LV_USE_COLORWHEEL
+    else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_normal);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_panel);
+    }
+#endif
 }
 
 /**********************

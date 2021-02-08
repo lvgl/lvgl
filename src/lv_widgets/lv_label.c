@@ -9,7 +9,7 @@
 #include "lv_label.h"
 #if LV_USE_LABEL != 0
 #include "../lv_core/lv_obj.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
@@ -89,8 +89,6 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
     /*If text is NULL then just refresh with the current text */
     if(text == NULL) text = label->text;
 
-    LV_ASSERT_STR(text);
-
     if(label->text == text && label->static_txt == 0) {
         /*If set its own text then reallocate it (maybe its size changed)*/
 #if LV_USE_ARABIC_PERSIAN_CHARS
@@ -98,7 +96,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         size_t len = _lv_txt_ap_calc_bytes_cnt(text);
 
         label->text = lv_mem_realloc(label->text, len);
-        LV_ASSERT_MEM(label->text);
+        LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
         _lv_txt_ap_proc(label->text, label->text);
@@ -106,7 +104,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         label->text = lv_mem_realloc(label->text, strlen(label->text) + 1);
 #endif
 
-        LV_ASSERT_MEM(label->text);
+        LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
     }
     else {
@@ -121,7 +119,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         size_t len = _lv_txt_ap_calc_bytes_cnt(text);
 
         label->text = lv_mem_alloc(len);
-        LV_ASSERT_MEM(label->text);
+        LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
         _lv_txt_ap_proc(text, label->text);
@@ -131,7 +129,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 
         /*Allocate space for the new text*/
         label->text = lv_mem_alloc(len);
-        LV_ASSERT_MEM(label->text);
+        LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
         strcpy(label->text, text);
 #endif
@@ -146,7 +144,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(fmt);
+    LV_ASSERT_NULL(fmt);
 
     lv_obj_invalidate(obj);
     lv_label_t * label = (lv_label_t *)obj;
@@ -638,7 +636,7 @@ uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(txt);
+    LV_ASSERT_NULL(txt);
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -652,7 +650,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
     size_t ins_len = strlen(txt);
     size_t new_len = ins_len + old_len;
     label->text        = lv_mem_realloc(label->text, new_len + 1);
-    LV_ASSERT_MEM(label->text);
+    LV_ASSERT_MALLOC(label->text);
     if(label->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {
@@ -661,7 +659,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 
 #if LV_USE_BIDI
     char * bidi_buf = lv_mem_buf_get(ins_len + 1);
-    LV_ASSERT_MEM(bidi_buf);
+    LV_ASSERT_MALLOC(bidi_buf);
     if(bidi_buf == NULL) return;
 
     _lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(obj));

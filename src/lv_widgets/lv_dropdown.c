@@ -9,7 +9,7 @@
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
@@ -105,7 +105,7 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(options);
+    LV_ASSERT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -133,7 +133,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
     dropdown->options = lv_mem_alloc(len);
 
-    LV_ASSERT_MEM(dropdown->options);
+    LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
@@ -149,7 +149,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(options);
+    LV_ASSERT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -175,7 +175,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(option);
+    LV_ASSERT_NULL(option);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -185,7 +185,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         size_t len = strlen(static_options) + 1;
 
         dropdown->options = lv_mem_alloc(len);
-        LV_ASSERT_MEM(dropdown->options);
+        LV_ASSERT_MALLOC(dropdown->options);
         if(dropdown->options == NULL) return;
 
         strcpy(dropdown->options, static_options);
@@ -202,7 +202,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
     size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
     dropdown->options        = lv_mem_realloc(dropdown->options, new_len + 1);
-    LV_ASSERT_MEM(dropdown->options);
+    LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
 
     dropdown->options[old_len] = '\0';
@@ -225,7 +225,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
     /*Insert the new option, adding \n if necessary*/
     char * ins_buf = lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
-    LV_ASSERT_MEM(ins_buf);
+    LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     strcpy(ins_buf, option);

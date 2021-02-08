@@ -656,9 +656,9 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
         }
 
         /*Call the post draw draw function of the parents of the to object*/
-        lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, mask_p);
+        lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, (void*)mask_p);
         call_draw_cb(par, mask_p, LV_DRAW_MODE_POST_DRAW);
-        lv_event_send(par, LV_EVENT_DRAW_POST_END, mask_p);
+        lv_event_send(par, LV_EVENT_DRAW_POST_END, (void*)mask_p);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/

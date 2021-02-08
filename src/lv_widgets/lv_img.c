@@ -9,7 +9,7 @@
 #include "lv_img.h"
 #if LV_USE_IMG != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_txt.h"
@@ -122,7 +122,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
                 old_src = img->src;
             }
             char * new_str = lv_mem_alloc(strlen(src) + 1);
-            LV_ASSERT_MEM(new_str);
+            LV_ASSERT_MALLOC(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src);
             img->src = new_str;

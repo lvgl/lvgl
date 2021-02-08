@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_COLORWHEEL
 
@@ -35,9 +35,9 @@ typedef uint8_t lv_colorwheel_mode_t;
 
 /*Data of color picker*/
 typedef struct {
+    lv_obj_t obj;
     lv_color_hsv_t hsv;
     struct {
-        lv_style_list_t style_list;
         lv_point_t pos;
         uint8_t recolor     : 1;
     } knob;
@@ -46,15 +46,9 @@ typedef struct {
     lv_point_t last_press_point;
     lv_colorwheel_mode_t mode  : 2;
     uint8_t mode_fixed            : 1;
-} lv_colorwheel_ext_t;
+} lv_colorwheel_t;
 
-/*Parts*/
-enum {
-    LV_COLORWHEEL_PART_MAIN = LV_OBJ_PART_MAIN,
-    LV_COLORWHEEL_PART_KNOB,
-    _LV_COLORWHEEL_PART_VIRTUAL_LAST,
-};
-
+extern const lv_obj_class_t lv_colorwheel_class;
 
 /**********************
  * GLOBAL PROTOTYPES

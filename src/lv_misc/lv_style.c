@@ -41,14 +41,14 @@
 void lv_style_init(lv_style_t * style)
 {
 #if LV_USE_ASSERT_STYLE
-    if(style->sentinel == LV_DEBUG_STYLE_SENTINEL_VALUE && style->allocated && style->values_and_props != NULL) {
+    if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->allocated && style->values_and_props != NULL) {
         LV_LOG_WARN("Style might be already inited. (Potential memory leak)")
     }
 #endif
 
     lv_memset_00(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
-    style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
+    style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
 
 }
@@ -70,7 +70,6 @@ lv_style_prop_t lv_style_register_prop(void)
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
-    if(style == NULL) return false;
     LV_ASSERT_STYLE(style);
 
     if(!style->allocated) {
@@ -131,6 +130,8 @@ uint8_t lv_style_get_prop_group(lv_style_prop_t prop)
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
+    LV_ASSERT_STYLE(style);
+
     uint8_t group = lv_style_get_prop_group(prop);
     style->has_group |= 1 << group;
 
@@ -257,6 +258,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.ptr = LV_THEME_FONT_NORMAL;
             break;
         case LV_STYLE_SIZE:
+        case LV_STYLE_ARC_WIDTH:
             value.num = 10;
             break;
         default:
@@ -273,20 +275,6 @@ bool lv_style_is_empty(const lv_style_t * style)
     LV_ASSERT_STYLE(style);
 
     return style->prop_cnt == 0 ? true : false;
-}
-
-bool lv_debug_check_style(const lv_style_t * style)
-{
-    if(style == NULL) return true;  /*NULL style is still valid*/
-
-#if LV_USE_ASSERT_STYLE
-    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
-        LV_LOG_WARN("Invalid style (was local variable or not initialized?)");
-        return false;
-    }
-#endif
-
-    return true;
 }
 
 /**********************

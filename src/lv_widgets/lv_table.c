@@ -10,7 +10,7 @@
 #if LV_USE_TABLE != 0
 
 #include "../lv_core/lv_indev.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_txt_ap.h"
 #include "../lv_misc/lv_math.h"
@@ -108,13 +108,13 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
-    LV_ASSERT_MEM(table->cell_data[cell]);
+    LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) return;
 
     _lv_txt_ap_proc(txt, &table->cell_data[cell][1]);
 #else
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-    LV_ASSERT_MEM(table->cell_data[cell]);
+    LV_ASSERT_MALLOC(table->cell_data[cell]);
 
     strcpy(table->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
 #endif
@@ -133,7 +133,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_STR(fmt);
+    LV_ASSERT_NULL(fmt);
 
     lv_table_t * table = (lv_table_t *) obj;
     if(col >= table->col_cnt) {
@@ -170,7 +170,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
     char * raw_txt = lv_mem_buf_get(len + 1);
-    LV_ASSERT_MEM(raw_txt);
+    LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         va_end(ap2);
         return;
@@ -181,7 +181,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
-    LV_ASSERT_MEM(table->cell_data[cell]);
+    LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
@@ -191,7 +191,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     lv_mem_buf_release(raw_txt);
 #else
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len + 2); /*+1: trailing '\0; +1: format byte*/
-    LV_ASSERT_MEM(table->cell_data[cell]);
+    LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
@@ -222,11 +222,11 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     table->row_cnt         = row_cnt;
 
     table->row_h = lv_mem_realloc(table->row_h, table->row_cnt * sizeof(table->row_h[0]));
-    LV_ASSERT_MEM(table->row_h);
+    LV_ASSERT_MALLOC(table->row_h);
     if(table->row_h == NULL) return;
 
     table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
-    LV_ASSERT_MEM(table->cell_data);
+    LV_ASSERT_MALLOC(table->cell_data);
     if(table->cell_data == NULL) return;
 
     /*Initialize the new fields*/
@@ -252,11 +252,11 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
     table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->row_h[0]));
-    LV_ASSERT_MEM(table->col_w);
+    LV_ASSERT_MALLOC(table->col_w);
     if(table->col_w == NULL) return;
 
     char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
-    LV_ASSERT_MEM(new_cell_data);
+    LV_ASSERT_MALLOC(new_cell_data);
     if(new_cell_data == NULL) return;
     uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
     lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
@@ -328,7 +328,7 @@ void lv_table_set_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col, bool cro
 
     if(table->cell_data[cell] == NULL) {
         table->cell_data[cell]    = lv_mem_alloc(2); /*+1: trailing '\0; +1: format byte*/
-        LV_ASSERT_MEM(table->cell_data[cell]);
+        LV_ASSERT_MALLOC(table->cell_data[cell]);
         if(table->cell_data[cell] == NULL) return;
 
         table->cell_data[cell][0] = 0;
@@ -362,7 +362,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, b
 
     if(table->cell_data[cell] == NULL) {
         table->cell_data[cell]    = lv_mem_alloc(2); /*+1: trailing '\0; +1: format byte*/
-        LV_ASSERT_MEM(table->cell_data[cell]);
+        LV_ASSERT_MALLOC(table->cell_data[cell]);
         if(table->cell_data[cell] == NULL) return;
 
         table->cell_data[cell][0] = 0;

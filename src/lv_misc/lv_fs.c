@@ -8,7 +8,7 @@
  *********************/
 #include "lv_fs.h"
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "lv_ll.h"
 #include <string.h>
 #include "lv_gc.h"
@@ -225,7 +225,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     }
 
     rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
-    LV_ASSERT_MEM(rddir_p->dir_d);
+    LV_ASSERT_MALLOC(rddir_p->dir_d);
     if(rddir_p->dir_d == NULL) {
         rddir_p->drv = NULL;
         return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
@@ -288,7 +288,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     /*Save the new driver*/
     lv_fs_drv_t * new_drv;
     new_drv = _lv_ll_ins_head(&LV_GC_ROOT(_lv_drv_ll));
-    LV_ASSERT_MEM(new_drv);
+    LV_ASSERT_MALLOC(new_drv);
     if(new_drv == NULL) return;
 
     lv_memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));

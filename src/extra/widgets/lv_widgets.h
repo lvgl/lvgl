@@ -23,6 +23,7 @@ extern "C" {
 #include "tabview/lv_tabview.h"
 #include "tileview/lv_tileview.h"
 #include "win/lv_win.h"
+#include "colorwheel/lv_colorwheel.h"
 
 
 /*********************

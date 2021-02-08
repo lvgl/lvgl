@@ -7,7 +7,7 @@
  *********************/
 #include "lv_timer.h"
 #include <stddef.h>
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_gc.h"
 
@@ -151,7 +151,7 @@ lv_timer_t * lv_timer_create_basic(void)
     lv_timer_t * new_timer = NULL;
 
     new_timer = _lv_ll_ins_head(&LV_GC_ROOT(_lv_timer_ll));
-    LV_ASSERT_MEM(new_timer);
+    LV_ASSERT_MALLOC(new_timer);
     if(new_timer == NULL) return NULL;
 
     new_timer->period  = DEF_PERIOD;
@@ -178,7 +178,7 @@ lv_timer_t * lv_timer_create_basic(void)
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
 {
     lv_timer_t * new_timer = lv_timer_create_basic();
-    LV_ASSERT_MEM(new_timer);
+    LV_ASSERT_MALLOC(new_timer);
     if(new_timer == NULL) return NULL;
 
     lv_timer_set_cb(new_timer, timer_xcb);
@@ -307,7 +307,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
         timer_deleted   = false;
         timer_created   = false;
         if(timer->timer_cb) timer->timer_cb(timer);
-        LV_ASSERT_MEM_INTEGRITY();
+        LV_ASSERT_MALLOC_INTEGRITY();
 
         /*Delete if it was a one shot lv_timer*/
         if(timer_deleted == false) { /*The timer might be deleted by itself as well*/

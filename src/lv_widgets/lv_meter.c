@@ -9,7 +9,7 @@
 #include <lvgl/src/lv_widgets/lv_meter.h>
 #if LV_USE_METER != 0
 
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_misc/lv_math.h"
@@ -67,7 +67,7 @@ lv_meter_scale_t * lv_meter_add_scale(lv_obj_t * obj)
     lv_meter_t * meter = (lv_meter_t *)obj;
 
     lv_meter_scale_t * scale = _lv_ll_ins_head(&meter->scale_ll);
-    LV_ASSERT_MEM(scale);
+    LV_ASSERT_MALLOC(scale);
     lv_memset_00(scale, sizeof(lv_meter_scale_t));
 
     _lv_ll_init(&scale->indicator_ll, sizeof(lv_meter_indicator_t));
@@ -118,7 +118,7 @@ void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t 
 lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color, int16_t r_mod)
 {
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&scale->indicator_ll);
-    LV_ASSERT_MEM(indic);
+    LV_ASSERT_MALLOC(indic);
     lv_memset_00(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 
@@ -134,7 +134,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
 lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src, lv_coord_t pivot_x, lv_coord_t pivot_y)
 {
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&scale->indicator_ll);
-    LV_ASSERT_MEM(indic);
+    LV_ASSERT_MALLOC(indic);
     lv_memset_00(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 
@@ -150,7 +150,7 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
 lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color, int16_t r_mod)
 {
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&scale->indicator_ll);
-    LV_ASSERT_MEM(indic);
+    LV_ASSERT_MALLOC(indic);
     lv_memset_00(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 
@@ -166,7 +166,7 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale
 lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t * scale, lv_color_t color_start, lv_color_t color_end, bool local, int16_t width_mod)
 {
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&scale->indicator_ll);
-    LV_ASSERT_MEM(indic);
+    LV_ASSERT_MALLOC(indic);
     lv_memset_00(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 

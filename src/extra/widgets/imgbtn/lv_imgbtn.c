@@ -7,7 +7,7 @@
 // *      INCLUDES
 // *********************/
 //
-//#include "../lv_misc/lv_debug.h"
+//#include "../lv_misc/lv_assert.h"
 //#include "lv_imgbtn.h"
 //#include "lv_label.h"
 //
@@ -58,12 +58,12 @@
 //
 //    /*Create the ancestor of image button*/
 //    lv_obj_t * imgbtn = lv_btn_create(par, copy);
-//    LV_ASSERT_MEM(imgbtn);
+//    LV_ASSERT_MALLOC(imgbtn);
 //    if(imgbtn == NULL) return NULL;
 //
 //    /*Allocate the image button type specific extended data*/
 //    lv_imgbtn_ext_t * ext = lv_obj_allocate_ext_attr(imgbtn, sizeof(lv_imgbtn_ext_t));
-//    LV_ASSERT_MEM(ext);
+//    LV_ASSERT_MALLOC(ext);
 //    if(ext == NULL) {
 //        lv_obj_del(imgbtn);
 //        return NULL;

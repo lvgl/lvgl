@@ -44,7 +44,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
 {
     /*Create the ancestor of spinner*/
     lv_obj_t * spinner = lv_arc_create(par, NULL);
-    LV_ASSERT_MEM(spinner);
+    LV_ASSERT_MALLOC(spinner);
     if(spinner == NULL) return NULL;
 
     lv_obj_set_size(spinner, LV_DPI_DEF, LV_DPI_DEF);

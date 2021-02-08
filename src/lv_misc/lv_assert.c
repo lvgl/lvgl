@@ -1,14 +1,14 @@
 /**
- * @file lv_debug.c
+ * @file lv_assert.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_debug.h"
+#include "lv_assert.h"
 
-#if LV_USE_DEBUG
+#if LV_USE_ASSERT
 
 #include "lv_mem.h"
 #include <string.h>
@@ -135,4 +135,4 @@ void lv_debug_log_error(const char * msg, uint64_t value)
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_DEBUG*/
+#endif /*LV_USE_ASSERT*/

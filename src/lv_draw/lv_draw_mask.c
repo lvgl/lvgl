@@ -12,7 +12,7 @@
 #if LV_DRAW_COMPLEX
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_misc/lv_gc.h"
 
 /*********************
@@ -331,26 +331,22 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_angle;
     param->dsc.type = LV_DRAW_MASK_TYPE_ANGLE;
 
+    LV_ASSERT_MSG(start_angle < 0 && start_angle >= 360, "Unexpected start angle");
+
     if(start_angle >= 0 && start_angle < 180) {
         start_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
     else if(start_angle >= 180 && start_angle < 360) {
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
-    else {
-        LV_DEBUG_ASSERT(false, "Unexpected start_angle", start_angle);
-        return;
-    }
+
+    LV_ASSERT_MSG(end_angle < 0 && start_angle >= 360, "Unexpected end angle");
 
     if(end_angle >= 0 && end_angle < 180) {
         end_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
     else if(end_angle >= 180 && end_angle < 360) {
         end_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
-    }
-    else {
-        LV_DEBUG_ASSERT(false, "Unexpected end_angle", end_angle);
-        return;
     }
 
     lv_draw_mask_line_angle_init(&param->start_line, vertex_x, vertex_y, start_angle, start_side);

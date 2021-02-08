@@ -20,13 +20,13 @@ extern "C" {
 #include "lv_anim.h"
 #include "lv_txt.h"
 #include "lv_types.h"
-#include "lv_debug.h"
+#include "lv_assert.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-#define LV_DEBUG_STYLE_SENTINEL_VALUE       0xAABBCCDD
+#define LV_STYLE_SENTINEL_VALUE       0xAABBCCDD
 
 /**
  * Flags for style properties
@@ -362,13 +362,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
  */
 bool lv_style_is_empty(const lv_style_t * style);
 
-/**
- * Check whether a style is valid (initialized correctly)
- * @param style pointer to a style
- * @return true: valid
- */
-bool lv_debug_check_style(const lv_style_t * style);
-
 static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_RADIUS, v); }
 
@@ -664,42 +657,11 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
  *      MACROS
  **********************/
 
-/**
- * Create and initialize a `static` style
- * Example:
- *     LV_STYLE_CREATE(my_style, &style_to_copy);
- *   is equivalent to
- *     static lv_style_t my_style;
- *     lv_style_init(&my_style);
- *     lv_style_copy(&my_style, &style_to_copy);
- */
-#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy_p);
-
-#if LV_USE_DEBUG
-
-# ifndef LV_DEBUG_IS_STYLE
-#  define LV_DEBUG_IS_STYLE(style_p) (lv_debug_check_style(style_p))
-# endif
-
-# ifndef LV_DEBUG_IS_STYLE_LIST
-#  define LV_DEBUG_IS_STYLE_LIST(list_p) (lv_debug_check_style_list(list_p))
-# endif
-
-# if LV_USE_ASSERT_STYLE
-#  ifndef LV_ASSERT_STYLE
-#   define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p), "Invalid style", style_p);
-#  endif
-#  ifndef LV_ASSERT_STYLE_LIST
-#   define LV_ASSERT_STYLE_LIST(list_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE_LIST(list_p), "Invalid style list", list_p);
-#  endif
-# else
-#   define LV_ASSERT_STYLE(style_p)
-#   define LV_ASSERT_STYLE_LIST(list_p)
-# endif
-
+#if LV_USE_ASSERT && LV_USE_ASSERT_STYLE
+#  define LV_ASSERT_STYLE(style_p)    LV_ASSERT_MSG(style_p != NULL, "The style is NULL");          \
+                                      LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted");
 #else
 # define LV_ASSERT_STYLE(p)
-# define LV_ASSERT_STYLE_LIST(p)
 #endif
 
 #ifdef __cplusplus

@@ -15,7 +15,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_misc/lv_debug.h"
+#include <lvgl/src/lv_misc/lv_assert.h>
 //#include "lv_templ.h" /*TODO uncomment this*/
 
 #if defined(LV_USE_TEMPL) && LV_USE_TEMPL != 0
@@ -62,7 +62,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Create the ancestor of template*/
     /*TODO modify it to the ancestor create function */
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
-    LV_ASSERT_MEM(new_templ);
+    LV_ASSERT_MALLOC(new_templ);
     if(new_templ == NULL) return NULL;
 
     /*Allocate the template type specific extended data*/

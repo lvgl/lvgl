@@ -10,7 +10,7 @@
 #include "lv_mem.h"
 #include "lv_math.h"
 #include "lv_gc.h"
-#include "lv_debug.h"
+#include "lv_assert.h"
 #include <string.h>
 
 #if LV_MEM_CUSTOM != 0
@@ -484,10 +484,7 @@ void * lv_mem_buf_get(uint32_t size)
         if(LV_GC_ROOT(lv_mem_buf[i]).used == 0) {
             /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
             void * buf = lv_mem_realloc(LV_GC_ROOT(lv_mem_buf[i]).p, size);
-            if(buf == NULL) {
-                LV_DEBUG_ASSERT(false, "Out of memory, can't allocate a new buffer (increase your LV_MEM_SIZE/heap size)", 0x00);
-                return NULL;
-            }
+            LV_ASSERT_MSG(buf != NULL, "Out of memory, can't allocate a new buffer (increase your LV_MEM_SIZE/heap size)");
             LV_GC_ROOT(lv_mem_buf[i]).used = 1;
             LV_GC_ROOT(lv_mem_buf[i]).size = size;
             LV_GC_ROOT(lv_mem_buf[i]).p    = buf;
@@ -495,7 +492,7 @@ void * lv_mem_buf_get(uint32_t size)
         }
     }
 
-    LV_DEBUG_ASSERT(false, "No free buffer. Increase LV_MEM_BUF_MAX_NUM.", 0x00);
+    LV_ASSERT_MSG(false, "No free buffer. Increase LV_MEM_BUF_MAX_NUM.");
     return NULL;
 }
 

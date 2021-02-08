@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_img_decoder.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_draw/lv_draw_img.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
@@ -63,7 +63,7 @@ void _lv_img_decoder_init(void)
     decoder = lv_img_decoder_create();
     if(decoder == NULL) {
         LV_LOG_WARN("lv_img_decoder_init: out of memory");
-        LV_ASSERT_MEM(decoder);
+        LV_ASSERT_MALLOC(decoder);
         return;
     }
 
@@ -191,7 +191,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
 {
     lv_img_decoder_t * decoder;
     decoder = _lv_ll_ins_head(&LV_GC_ROOT(_lv_img_defoder_ll));
-    LV_ASSERT_MEM(decoder);
+    LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) return NULL;
 
     lv_memset_00(decoder, sizeof(lv_img_decoder_t));
@@ -323,7 +323,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         /*If the file was open successfully save the file descriptor*/
         if(dsc->user_data == NULL) {
             dsc->user_data = lv_mem_alloc(sizeof(lv_img_decoder_built_in_data_t));
-            LV_ASSERT_MEM(dsc->user_data);
+            LV_ASSERT_MALLOC(dsc->user_data);
             if(dsc->user_data == NULL) {
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
                 return LV_RES_INV;
@@ -366,7 +366,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         /*Allocate the palette*/
         if(dsc->user_data == NULL) {
             dsc->user_data = lv_mem_alloc(sizeof(lv_img_decoder_built_in_data_t));
-            LV_ASSERT_MEM(dsc->user_data);
+            LV_ASSERT_MALLOC(dsc->user_data);
             if(dsc->user_data == NULL) {
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
                 lv_img_decoder_built_in_close(decoder, dsc);
@@ -377,9 +377,9 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
         user_data->palette                         = lv_mem_alloc(palette_size * sizeof(lv_color_t));
-        LV_ASSERT_MEM(user_data->palette);
+        LV_ASSERT_MALLOC(user_data->palette);
         user_data->opa                             = lv_mem_alloc(palette_size * sizeof(lv_opa_t));
-        LV_ASSERT_MEM(user_data->opa);
+        LV_ASSERT_MALLOC(user_data->opa);
         if(user_data->palette == NULL || user_data->opa == NULL) {
             LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
             lv_img_decoder_built_in_close(decoder, dsc);
