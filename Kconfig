@@ -846,6 +846,11 @@ menu "LVGL configuration"
             default 0x000000 if LV_THEME_DEFAULT_INIT_MONO
             help
                 See lv_misc/lv_color.h for some color values examples.
+                When using LV_THEME_MONO the suggested values to use are
+                0x000000 (LV_COLOR_BLACK) or 0xFFFFFF (LV_COLOR_WHITE).
+                If LV_THEME_DEFAULT_COLOR_PRIMARY is 0x000000 (LV_COLOR_BLACK)
+                the texts and borders will be black and the background will be
+                white, otherwise the colors are inverted.
 
         config LV_THEME_DEFAULT_COLOR_SECONDARY
             hex "Select theme default secondary color"
@@ -854,6 +859,11 @@ menu "LVGL configuration"
             default 0xFFFFFF if LV_THEME_DEFAULT_INIT_MONO
             help
                 See lv_misc/lv_color.h for some color values examples.
+                When using LV_THEME_MONO the suggested values to use are
+                0x000000 (LV_COLOR_BLACK) or 0xFFFFFF (LV_COLOR_WHITE).
+                If LV_THEME_DEFAULT_COLOR_PRIMARY is 0x000000 (LV_COLOR_BLACK)
+                the texts and borders will be black and the background will be
+                white, otherwise the colors are inverted.
 
         choice LV_THEME_DEFAULT_FLAG
             depends on LV_THEME_MATERIAL
