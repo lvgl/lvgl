@@ -219,18 +219,12 @@ lv_anim_value_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    uint32_t step;
-    if(a->time == a->act_time) {
-        step = LV_ANIM_RESOLUTION; /*Use the last value if the time fully elapsed*/
-    }
-    else {
-        step = ((int32_t)a->act_time * LV_ANIM_RESOLUTION) / a->time;
-    }
+    int32_t step = _lv_map(a->act_time, 0, a->time, 0, LV_ANIM_RESOLUTION);
 
     /* Get the new value which will be proportional to `step`
      * and the `start` and `end` values*/
     int32_t new_value;
-    new_value = (int32_t)step * (a->end - a->start);
+    new_value = step * (a->end - a->start);
     new_value = new_value >> LV_ANIM_RES_SHIFT;
     new_value += a->start;
 
@@ -247,16 +241,12 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    uint32_t t;
-    if(a->time == a->act_time)
-        t = 1024;
-    else
-        t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
+    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = _lv_bezier3(t, 0, 1, 1, 1024);
 
     int32_t new_value;
-    new_value = (int32_t)step * (a->end - a->start);
+    new_value = step * (a->end - a->start);
     new_value = new_value >> 10;
     new_value += a->start;
 
@@ -274,16 +264,11 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
 
     /*Calculate the current step*/
 
-    uint32_t t;
-    if(a->time == a->act_time)
-        t = 1024;
-    else
-        t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
-
+    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = _lv_bezier3(t, 0, 1023, 1023, 1024);
 
     int32_t new_value;
-    new_value = (int32_t)step * (a->end - a->start);
+    new_value = step * (a->end - a->start);
     new_value = new_value >> 10;
     new_value += a->start;
 
@@ -301,16 +286,11 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
 
     /*Calculate the current step*/
 
-    uint32_t t;
-    if(a->time == a->act_time)
-        t = 1024;
-    else
-        t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
-
+    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = _lv_bezier3(t, 0, 100, 924, 1024);
 
     int32_t new_value;
-    new_value = (int32_t)step * (a->end - a->start);
+    new_value = step * (a->end - a->start);
     new_value = new_value >> 10;
     new_value += a->start;
 
@@ -328,16 +308,11 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
 
     /*Calculate the current step*/
 
-    uint32_t t;
-    if(a->time == a->act_time)
-        t = 1024;
-    else
-        t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
-
+    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = _lv_bezier3(t, 0, 1000, 1300, 1024);
 
     int32_t new_value;
-    new_value = (int32_t)step * (a->end - a->start);
+    new_value = step * (a->end - a->start);
     new_value = new_value >> 10;
     new_value += a->start;
 
@@ -354,12 +329,8 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    int32_t t;
-    if(a->time == a->act_time)
-        t = 1024;
-    else
-        t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
+    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t diff = (a->end - a->start);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
@@ -388,20 +359,17 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
         t    = 1024 - t;
         diff = diff / 40;
     }
-    else if(t >= 921 && t <= 1024) {
+    else {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
         diff = diff / 40;
     }
 
-    if(t > 1024) t = 1024;
-    if(t < 0) t = 0;
-
     int32_t step = _lv_bezier3(t, 1024, 800, 500, 0);
 
     int32_t new_value;
-    new_value = (int32_t)step * diff;
+    new_value = step * diff;
     new_value = new_value >> 10;
     new_value = a->end - new_value;
 
