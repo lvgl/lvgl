@@ -40,6 +40,7 @@ static void anim_ready_handler(lv_anim_t * a);
  **********************/
 static uint32_t last_task_run;
 static bool anim_list_changed;
+static bool anim_run_round;
 static lv_task_t * _lv_anim_task;
 const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 
@@ -102,6 +103,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*Initialize the animation descriptor*/
     a->time_orig = a->time;
+    a->run_round = anim_run_round;
     _lv_memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
@@ -404,14 +406,12 @@ static void anim_task(lv_task_t * param)
 {
     (void)param;
 
-    lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
-        a->has_run = 0;
-    }
-
     uint32_t elaps = lv_tick_elaps(last_task_run);
 
-    a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
+    /*Flip the run round*/
+    anim_run_round = anim_run_round ? false : true;
+
+    lv_anim_t * a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
 
     while(a != NULL) {
         /*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete
@@ -420,8 +420,8 @@ static void anim_task(lv_task_t * param)
          */
         anim_list_changed = false;
 
-        if(!a->has_run) {
-            a->has_run = 1; /*The list readying might be reset so need to know which anim has run already*/
+        if(a->run_round != anim_run_round) {
+            a->run_round = anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;
