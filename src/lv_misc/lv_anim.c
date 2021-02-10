@@ -33,7 +33,7 @@
  **********************/
 static void anim_task(lv_task_t * param);
 static void anim_mark_list_change(void);
-static bool anim_ready_handler(lv_anim_t * a);
+static void anim_ready_handler(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -496,9 +496,8 @@ static void anim_task(lv_task_t * param)
  * Called when an animation is ready to do the necessary thinks
  * e.g. repeat, play back, delete etc.
  * @param a pointer to an animation descriptor
- * @return true: animation delete occurred and the `LV_GC_ROOT(_lv_anim_ll)` has changed
- * */
-static bool anim_ready_handler(lv_anim_t * a)
+ */
+static void anim_ready_handler(lv_anim_t * a)
 {
     /*In the end of a forward anim decrement repeat cnt.*/
     if(a->playback_now == 0 && a->repeat_cnt > 0 && a->repeat_cnt != LV_ANIM_REPEAT_INFINITE) {
@@ -541,8 +540,6 @@ static bool anim_ready_handler(lv_anim_t * a)
             a->time = a->playback_now == 0 ? a->time_orig : a->playback_time;
         }
     }
-
-    return anim_list_changed;
 }
 static void anim_mark_list_change(void)
 {
