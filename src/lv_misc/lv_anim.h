@@ -37,7 +37,7 @@ enum {
 typedef uint8_t lv_anim_enable_t;
 
 /** Type of the animated value*/
-typedef lv_coord_t lv_anim_value_t;
+typedef int32_t lv_anim_value_t;
 
 #if LV_USE_ANIMATION
 
@@ -223,7 +223,7 @@ static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_
  * @param a pointer to an initialized `lv_anim_t` variable
  * @param time the duration of the playback animation in in milliseconds. 0: disable playback
  */
-static inline void lv_anim_set_playback_time(lv_anim_t * a, uint16_t time)
+static inline void lv_anim_set_playback_time(lv_anim_t * a, uint32_t time)
 {
     a->playback_time = time;
 }
@@ -233,7 +233,7 @@ static inline void lv_anim_set_playback_time(lv_anim_t * a, uint16_t time)
  * @param a pointer to an initialized `lv_anim_t` variable
  * @param delay delay in milliseconds before starting the playback animation.
  */
-static inline void lv_anim_set_playback_delay(lv_anim_t * a, uint16_t delay)
+static inline void lv_anim_set_playback_delay(lv_anim_t * a, uint32_t delay)
 {
     a->playback_delay = delay;
 }
@@ -253,7 +253,7 @@ static inline void lv_anim_set_repeat_count(lv_anim_t * a, uint16_t cnt)
  * @param a pointer to an initialized `lv_anim_t` variable
  * @param delay delay in milliseconds before repeating the animation.
  */
-static inline void lv_anim_set_repeat_delay(lv_anim_t * a, uint16_t delay)
+static inline void lv_anim_set_repeat_delay(lv_anim_t * a, uint32_t delay)
 {
     a->repeat_delay = delay;
 }
@@ -298,7 +298,7 @@ static inline void lv_anim_path_set_user_data(lv_anim_path_t * path, void * user
  * @param a pointer to an initialized `lv_anim_t` variable
  * @return delay before the animation in milliseconds
  */
-static inline int32_t lv_anim_get_delay(lv_anim_t * a)
+static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 {
     return -a->act_time;
 }
@@ -350,7 +350,7 @@ uint16_t lv_anim_count_running(void);
  * @param end end value of the animation
  * @return the required time [ms] for the animation with the given parameters
  */
-uint16_t lv_anim_speed_to_time(uint16_t speed, lv_anim_value_t start, lv_anim_value_t end);
+uint32_t lv_anim_speed_to_time(uint32_t speed, lv_anim_value_t start, lv_anim_value_t end);
 
 /**
  * Manually refresh the state of the animations.
