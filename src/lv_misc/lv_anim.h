@@ -94,7 +94,7 @@ typedef struct _lv_anim_t {
 
     /*Animation system use these - user shouldn't set*/
     uint8_t playback_now : 1; /**< Play back is in progress*/
-    uint8_t has_run : 1;      /**< Indicates the animation has run in this round*/
+    uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint32_t time_orig;
 } lv_anim_t;
 
