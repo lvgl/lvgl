@@ -24,6 +24,8 @@ extern "C" {
 #include "tileview/lv_tileview.h"
 #include "win/lv_win.h"
 #include "colorwheel/lv_colorwheel.h"
+#include "led/lv_led.h"
+#include "imgbtn/lv_imgbtn.h"
 
 
 /*********************

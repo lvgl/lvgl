@@ -378,7 +378,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             /*Send the ENTER as a normal KEY*/
             lv_group_send_data(g, LV_KEY_ENTER);
 
-            indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_PRESSED, NULL);
+            lv_signal_send(indev_obj_act, LV_SIGNAL_PRESSED, NULL);
             if(indev_reset_check(&i->proc)) return;
             lv_event_send(indev_obj_act, LV_EVENT_PRESSED, NULL);
             if(indev_reset_check(&i->proc)) return;
@@ -411,7 +411,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR) {
 
         if(data->key == LV_KEY_ENTER) {
-            indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_PRESSING, NULL);
+            lv_signal_send(indev_obj_act, LV_SIGNAL_PRESSING, NULL);
             if(indev_reset_check(&i->proc)) return;
             lv_event_send(indev_obj_act, LV_EVENT_PRESSING, NULL);
             if(indev_reset_check(&i->proc)) return;
@@ -422,7 +422,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.long_pr_sent = 1;
             if(data->key == LV_KEY_ENTER) {
                 i->proc.longpr_rep_timestamp = lv_tick_get();
-                indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_LONG_PRESS, NULL);
+                lv_signal_send(indev_obj_act, LV_SIGNAL_LONG_PRESS, NULL);
                 if(indev_reset_check(&i->proc)) return;
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED, NULL);
                 if(indev_reset_check(&i->proc)) return;
@@ -436,7 +436,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             /*Send LONG_PRESS_REP on ENTER*/
             if(data->key == LV_KEY_ENTER) {
-                indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_LONG_PRESS_REP, NULL);
+                lv_signal_send(indev_obj_act, LV_SIGNAL_LONG_PRESS_REP, NULL);
                 if(indev_reset_check(&i->proc)) return;
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
                 if(indev_reset_check(&i->proc)) return;
@@ -466,7 +466,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
 
-            indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
+            lv_signal_send(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
             if(indev_reset_check(&i->proc)) return;
 
             if(i->proc.long_pr_sent == 0) {
@@ -532,7 +532,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             bool editable = lv_obj_is_editable(indev_obj_act);
 
             if(lv_group_get_editing(g) == true || editable == false) {
-                indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_PRESSED, NULL);
+                lv_signal_send(indev_obj_act, LV_SIGNAL_PRESSED, NULL);
                 if(indev_reset_check(&i->proc)) return;
 
                 lv_event_send(indev_obj_act, LV_EVENT_PRESSED, NULL);
@@ -579,7 +579,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 }
                 /*If not editable then just send a long press signal*/
                 else {
-                    indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_LONG_PRESS, NULL);
+                    lv_signal_send(indev_obj_act, LV_SIGNAL_LONG_PRESS, NULL);
                     if(indev_reset_check(&i->proc)) return;
                     lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED, NULL);
                     if(indev_reset_check(&i->proc)) return;
@@ -594,7 +594,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
             if(data->key == LV_KEY_ENTER) {
-                indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_LONG_PRESS_REP, NULL);
+                lv_signal_send(indev_obj_act, LV_SIGNAL_LONG_PRESS_REP, NULL);
                 if(indev_reset_check(&i->proc)) return;
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
                 if(indev_reset_check(&i->proc)) return;
@@ -623,7 +623,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable == false) {
-                indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
+                lv_signal_send(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
                 if(indev_reset_check(&i->proc)) return;
 
                 if(i->proc.long_pr_sent == 0) lv_event_send(indev_obj_act, LV_EVENT_SHORT_CLICKED, NULL);
@@ -639,7 +639,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             else if(g->editing) {
                 /*Ignore long pressed enter release because it comes from mode switch*/
                 if(!i->proc.long_pr_sent || _lv_ll_get_len(&g->obj_ll) <= 1) {
-                    indev_obj_act->class_p->signal_cb(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
+                    lv_signal_send(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
                     if(indev_reset_check(&i->proc)) return;
 
                     lv_event_send(indev_obj_act, LV_EVENT_SHORT_CLICKED, NULL);

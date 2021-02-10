@@ -13,13 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_IMGBTN != 0
-
-#include "../lv_core/lv_obj.h"
-#include "lv_btn.h"
-#include "../lv_draw/lv_draw_img.h"
 
 /*********************
  *      DEFINES
@@ -39,21 +35,14 @@ typedef enum {
  **********************/
 /*Data of image button*/
 typedef struct {
-    /*New data for this type */
+    lv_obj_t obj;
     const void * img_src_mid[_LV_IMGBTN_STATE_NUM];   /*Store center images to each state*/
-#if LV_IMGBTN_TILED
     const void * img_src_left[_LV_IMGBTN_STATE_NUM];  /*Store left side images to each state*/
     const void * img_src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
-#endif
     lv_img_cf_t act_cf; /*Color format of the currently active image*/
-    uint8_t tiled   : 1; /*1: the middle src will be repeated to fill the user defined width*/
-} lv_imgbtn_ext_t;
+} lv_imgbtn_t;
 
-/*Parts of the image button*/
-enum {
-    LV_IMGBTN_PART_MAIN = LV_BTN_PART_MAIN,
-};
-typedef uint8_t lv_imgbtn_part_t;
+extern const lv_obj_class_t lv_imgbtn_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -66,7 +55,7 @@ typedef uint8_t lv_imgbtn_part_t;
  * it
  * @return pointer to the created image button
  */
-lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_imgbtn_create(lv_obj_t * parent);
 
 /*======================
  * Add/remove functions
@@ -80,15 +69,6 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set images for a state of the image button
  * @param imgbtn pointer to an image button object
  * @param state for which state set the new image
- * @param src pointer to an image source (a C array or path to a file)
- */
-void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * src);
-
-#if LV_IMGBTN_TILED
-/**
- * Set images for a state of the image button
- * @param imgbtn pointer to an image button object
- * @param state for which state set the new image
  * @param src_left pointer to an image source for the left side of the button (a C array or path to
  * a file)
  * @param src_mid pointer to an image source for the middle of the button (ideally 1px wide) (a C
@@ -96,25 +76,13 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * 
  * @param src_right pointer to an image source for the right side of the button (a C array or path
  * to a file)
  */
-void lv_imgbtn_set_src_tiled(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * src_left, const void * src_mid,
+void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * src_left, const void * src_mid,
                              const void * src_right);
 
-#endif
 
 /*=====================
  * Getter functions
  *====================*/
-
-#if LV_IMGBTN_TILED == 0
-/**
- * Get the images in a  given state
- * @param imgbtn pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
- * @return pointer to an image source (a C array or path to a file)
- */
-const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
-
-#else
 
 /**
  * Get the left image in a given state
@@ -139,8 +107,6 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_imgbtn_state_t state
  * @return pointer to the left image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
-
-#endif
 
 
 /*=====================

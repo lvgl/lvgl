@@ -35,6 +35,7 @@ const lv_obj_class_t lv_spinbox_class = {
     .destructor_cb = lv_spinbox_destructor,
     .signal_cb = lv_spinbox_signal,
     .instance_size = sizeof(lv_spinbox_t),
+    .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_textarea_class
 };
 /**********************

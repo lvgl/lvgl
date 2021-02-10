@@ -50,6 +50,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * parent);
 
 lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t row_id, uint8_t col_id, lv_dir_t dir);
 
+void lv_obj_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en);
+void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim_enable_t anim_en);
 
 
 /*=====================

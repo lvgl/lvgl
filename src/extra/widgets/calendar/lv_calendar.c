@@ -41,7 +41,7 @@ const lv_obj_class_t lv_calendar_class = {
 };
 
 
-static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
+static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;
 
 /**********************
  *      MACROS

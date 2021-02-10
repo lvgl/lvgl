@@ -234,18 +234,23 @@ static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 
 static void lv_meter_destructor(lv_obj_t * obj)
 {
+    lv_meter_t * meter = (lv_meter_t *)obj;
+    lv_meter_scale_t * scale;
+    scale = _lv_ll_get_head(&meter->scale_ll);
+    while(scale) {
+        lv_meter_indicator_t * indicator = _lv_ll_get_head(&scale->indicator_ll);
+        while(indicator) {
+            _lv_ll_remove(&scale->indicator_ll, indicator);
+            lv_mem_free(indicator);
+            indicator = _lv_ll_get_head(&scale->indicator_ll);
+        }
+        _lv_ll_remove(&meter->scale_ll, scale);
+        lv_mem_free(scale);
+        scale = _lv_ll_get_head(&meter->scale_ll);
+    }
 
 }
-/**
- * Handle the drawing related tasks of the line meters
- * @param lmeter pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
+
 static lv_draw_res_t lv_meter_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
@@ -294,7 +299,7 @@ static lv_draw_res_t lv_meter_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
 
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
 {
-    lv_meter_t * meter    = (lv_meter_t *)obj;
+    lv_meter_t * meter = (lv_meter_t *)obj;
 
     lv_draw_arc_dsc_t arc_dsc;
     lv_draw_arc_dsc_init(&arc_dsc);

@@ -369,6 +369,10 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
         else x_scroll = -right_diff;
     }
 
+    /* Remove any pending scroll animations.*/
+    lv_anim_del(parent, (lv_anim_exec_xcb_t)scroll_anim_x_cb);
+    lv_anim_del(parent, (lv_anim_exec_xcb_t)scroll_anim_y_cb);
+
     lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
 }
 

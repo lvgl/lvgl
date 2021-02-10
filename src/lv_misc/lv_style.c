@@ -58,7 +58,8 @@ void lv_style_reset(lv_style_t * style)
     LV_ASSERT_STYLE(style);
 
     if(style->allocated) lv_mem_free(style->values_and_props);
-    lv_style_init(style);
+    lv_memset_00(style, sizeof(lv_style_t));
+
 }
 
 lv_style_prop_t lv_style_register_prop(void)

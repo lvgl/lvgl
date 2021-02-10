@@ -22,7 +22,7 @@
  *********************/
 #define MY_CLASS &lv_btnmatrix_class
 
-#define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 4)
+#define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 10)
 #define LV_BTNMATRIX_WIDTH_MASK 0x0007
 
 /**********************
@@ -34,7 +34,6 @@
  **********************/
 static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_btnmatrix_destructor(lv_obj_t * obj);
-
 static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 

@@ -21,6 +21,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_tabview_destructor(lv_obj_t * obj);
 static void btns_event_cb(lv_obj_t * btns, lv_event_t e);
 static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
 
@@ -29,6 +30,7 @@ static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
  **********************/
 const lv_obj_class_t lv_tabview_class = {
         .constructor_cb = lv_tabview_constructor,
+        .destructor_cb = lv_tabview_destructor,
         .base_class = &lv_obj_class,
         .instance_size = sizeof(lv_tabview_t)};
 
@@ -63,8 +65,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
 
-    const char ** old_map = lv_btnmatrix_get_map(btns);
-    const char ** new_map;
+    char ** old_map = tabview->map;
+    char ** new_map;
 
     /*top or bottom dir*/
     if(tabview->tab_pos & LV_DIR_VER) {
@@ -89,7 +91,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
             strcpy((char *)new_map[(tab_id * 2) - 2], name);
         }
     }
-
+    tabview->map = new_map;
     lv_btnmatrix_set_map(btns, new_map);
     lv_mem_free(old_map);
 
@@ -97,7 +99,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     tabview->tab_cnt++;
     if(tabview->tab_cnt == 1) {
-        lv_tabview_set_act(obj, 0);
+        lv_tabview_set_act(obj, 0, LV_ANIM_OFF);
     }
 
     lv_btnmatrix_set_btn_ctrl(btns, tabview->tab_cur, LV_BTNMATRIX_CTRL_CHECKED);
@@ -105,7 +107,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     return page;
 }
 
-void lv_tabview_set_act(lv_obj_t * obj, uint32_t id)
+void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
     lv_tabview_t * tabview = (lv_tabview_t *) obj;
 
@@ -116,7 +118,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id)
     lv_obj_t * cont = lv_tabview_get_content(obj);
     lv_obj_t * tab = lv_obj_get_child(cont, 0);
     lv_coord_t gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
-    lv_obj_scroll_to_x(cont, id * (gap + lv_obj_get_width(tab)), LV_ANIM_ON);
+    lv_obj_scroll_to_x(cont, id * (gap + lv_obj_get_width(tab)), anim_en);
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
     lv_btnmatrix_set_btn_ctrl(btns, id, LV_BTNMATRIX_CTRL_CHECKED);
@@ -175,9 +177,9 @@ static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
     cont = lv_obj_create(obj, NULL);
 
     lv_btnmatrix_set_one_checked(btnm, true);
-    const char ** map = lv_mem_alloc(sizeof(const char *));
-    map[0] = "";
-    lv_btnmatrix_set_map(btnm, map);
+    tabview->map = lv_mem_alloc(sizeof(const char *));
+    tabview->map[0] = "";
+    lv_btnmatrix_set_map(btnm, tabview->map);
     lv_obj_add_event_cb(btnm, btns_event_cb, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 
@@ -205,12 +207,29 @@ static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
     lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 }
 
+static void lv_tabview_destructor(lv_obj_t * obj)
+{
+    lv_tabview_t * tabview = (lv_tabview_t *) obj;
+
+    uint32_t i;
+    if(tabview->tab_pos & LV_DIR_VER) {
+        for(i = 0; i < tabview->tab_cnt; i++) {
+            lv_mem_free(tabview->map[i]);
+            tabview->map[i] = NULL;
+        }
+    }
+
+
+    lv_mem_free(tabview->map);
+    tabview->map = NULL;
+}
+
 static void btns_event_cb(lv_obj_t * btns, lv_event_t e)
 {
     if(e == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * tv = lv_obj_get_parent(btns);
         uint32_t id = lv_btnmatrix_get_active_btn(btns);
-        lv_tabview_set_act(tv, id);
+        lv_tabview_set_act(tv, id, LV_ANIM_ON);
     }
 }
 static void cont_event_cb(lv_obj_t * cont, lv_event_t e)
@@ -224,7 +243,7 @@ static void cont_event_cb(lv_obj_t * cont, lv_event_t e)
         lv_coord_t w = lv_obj_get_width_fit(cont);
         lv_coord_t t = (p.x + w/ 2) / w;
         if(t < 0) t = 0;
-        lv_tabview_set_act(tv, t);
+        lv_tabview_set_act(tv, t, LV_ANIM_ON);
     }
 }
 #endif /*LV_USE_TABVIEW*/

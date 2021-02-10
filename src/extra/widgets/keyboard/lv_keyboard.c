@@ -135,7 +135,7 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
 void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 {
     if(ta) {
-        LV_ASSERT_OBJ(ta, "lv_textarea");
+        LV_ASSERT_OBJ(ta, &lv_textarea_class);
     }
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
@@ -259,7 +259,6 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
             if(res != LV_RES_OK) return;
         }
         lv_keyboard_set_textarea(obj, NULL); /*De-assign the text area  to hide it cursor if needed*/
-        lv_obj_del(obj);
         return;
     }
     else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
@@ -272,7 +271,6 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
         }
 
         lv_keyboard_set_textarea(obj, NULL); /*De-assign the text area  to hide it cursor if needed*/
-        lv_obj_del(obj);
         return;
     }
 

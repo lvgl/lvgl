@@ -762,7 +762,7 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         break;
     case LV_STYLE_IMG_OPA:
         if(list->cache_img_opa_cover) return CACHE_255;
-        else return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
         break;
     default:
         return CACHE_NEED_CHECK;

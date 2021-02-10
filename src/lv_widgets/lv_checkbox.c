@@ -112,7 +112,6 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
     LV_LOG_TRACE("lv_checkbox create started");
 
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
-    /*Create the ancestor basic object*/
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
@@ -131,15 +130,11 @@ static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 
 static void lv_checkbox_destructor(lv_obj_t * obj)
 {
-//    lv_checkbox_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_PART_INDICATOR);
-//#if LV_USE_ANIMATION
-//    lv_anim_del(&bar->cur_value_anim, NULL);
-//    lv_anim_del(&bar->start_value_anim, NULL);
-//#endif
-
-//    bar->class_p->base_p->destructor(obj);
+    lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+    if(!cb->static_txt) {
+        lv_mem_free(cb->txt);
+        cb->txt = NULL;
+    }
 }
 
 static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

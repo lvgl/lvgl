@@ -153,6 +153,8 @@ void lv_mem_deinit(void)
  */
 void * lv_mem_alloc(size_t size)
 {
+ //   printf("alloc: %d\n", size);
+
     if(size == 0) return &zero_mem;
 
     /*Round the size up to ALIGN_MASK*/
@@ -215,6 +217,7 @@ void * lv_mem_alloc(size_t size)
  */
 void lv_mem_free(const void * data)
 {
+
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
@@ -226,6 +229,7 @@ void lv_mem_free(const void * data)
     lv_memset((void *)data, 0xbb, lv_mem_get_size(data));
 #  endif
 #endif
+//    printf("free: %d\n", lv_mem_get_size(data));
 
 #if LV_MEM_CUSTOM == 0
     e->header.s.used = 0;
@@ -273,6 +277,10 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     if(old_size == new_size) return data_p; /*Also avoid reallocating the same memory*/
 
 #if LV_MEM_CUSTOM == 0
+    if(new_size == 0) {
+        lv_mem_free(data_p);
+        return &zero_mem;
+    }
     /* Truncate the memory if the new size is smaller. */
     if(new_size < old_size) {
         lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));

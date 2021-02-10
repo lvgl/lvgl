@@ -401,11 +401,12 @@ static void lv_img_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 
 static void lv_img_destructor(lv_obj_t * obj)
 {
-//    if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-//                lv_mem_free(img->src);
-//                img->src      = NULL;
-//                img->src_type = LV_IMG_SRC_UNKNOWN;
-//            }
+    lv_img_t * img = (lv_img_t *)obj;
+    if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
+        lv_mem_free(img->src);
+        img->src      = NULL;
+        img->src_type = LV_IMG_SRC_UNKNOWN;
+    }
 }
 
 static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

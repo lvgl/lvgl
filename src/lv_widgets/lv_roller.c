@@ -48,6 +48,7 @@ const lv_obj_class_t lv_roller_class = {
         .signal_cb = lv_roller_signal,
         .draw_cb = lv_roller_draw,
         .instance_size = sizeof(lv_roller_t),
+        .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
         .base_class = &lv_obj_class
 };
 
@@ -56,7 +57,7 @@ const lv_obj_class_t lv_roller_label_class  = {
         .draw_cb = lv_roller_label_draw,
         .instance_size = sizeof(lv_label_t),
         .base_class = &lv_label_class
-    };;
+    };
 
 /**********************
  *      MACROS
@@ -299,7 +300,7 @@ static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 
         lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);
         lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
-        lv_roller_set_visible_row_count(obj, 3);
+        lv_obj_set_height(obj, LV_DPI_DEF);
     }
     else {
         lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);

@@ -260,15 +260,15 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
-        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE)) {
+        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) || !lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
             lv_coord_t main_size = (row ? item->w_set : item->h_set);
             if(_LV_FLEX_GET_GROW(main_size)) {
                 grow_sum += _LV_FLEX_GET_GROW(main_size);
                 grow_item_cnt++;
             } else {
-                lv_coord_t item_size = get_main_size(item) + item_gap;
-                if(wrap && t->track_main_size + item_size > max_main_size + item_gap) break;
-                t->track_main_size += item_size;
+                lv_coord_t item_size = get_main_size(item);
+                if(wrap && t->track_main_size + item_size > max_main_size) break;
+                t->track_main_size += item_size + item_gap;
             }
             t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
             t->item_cnt++;
@@ -291,7 +291,8 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     /*Have at least one item in a row*/
     if(item && item_id == item_start_id) {
-        item = get_next_item(cont, f->rev, &item_id);
+        item = cont->spec_attr->children[item_id];
+        get_next_item(cont, f->rev, &item_id);
         if(item) {
             t->track_cross_size = get_cross_size(item);
             t->track_main_size = get_main_size(item);
@@ -327,7 +328,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
     while(item && item_first_id != item_last_id) {
-        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) == false) {
+        if(!lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) || lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
             item = get_next_item(cont, f->rev, &item_first_id);
             continue;
         }
@@ -349,7 +350,9 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
         lv_coord_t cross_pos = 0;
         switch(f->item_cross_place) {
         case LV_FLEX_PLACE_CENTER:
-            cross_pos = (t->track_cross_size - area_get_cross_size(&item->coords)) / 2;
+            /* Round the up the cross size to avoid rounding error when dividing by 2
+             * The issue comes up e,g, with column direction with center cross direction if an element's width changes*/
+            cross_pos = (((t->track_cross_size + 1) & (~1)) - area_get_cross_size(&item->coords)) / 2;
             break;
         case LV_FLEX_PLACE_END:
             cross_pos = t->track_cross_size - area_get_cross_size(&item->coords);
@@ -364,10 +367,12 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
         diff_y += row ? cross_pos : main_pos;
 
         if(diff_x || diff_y) {
+            lv_obj_invalidate(item);
             item->coords.x1 += diff_x;
             item->coords.x2 += diff_x;
             item->coords.y1 += diff_y;
             item->coords.y2 += diff_y;
+            lv_obj_invalidate(item);
             lv_obj_move_children_by(item, diff_x, diff_y);
         }
 

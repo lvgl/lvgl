@@ -343,6 +343,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv
     if(dsc->bg_img_src == NULL) return;
     if(dsc->bg_img_opa <= LV_OPA_MIN) return;
 
+    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
+    if(src_type != LV_IMG_SRC_VARIABLE && src_type != LV_IMG_SRC_FILE) {
+        LV_LOG_WARN("bg_img_src must be variable or path");
+        return;
+    }
     lv_img_header_t header;
     lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
     if(res != LV_RES_OK) {

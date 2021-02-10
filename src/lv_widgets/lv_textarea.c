@@ -69,7 +69,6 @@ const lv_obj_class_t lv_textarea_class = {
     .destructor_cb = lv_textarea_destructor,
     .signal_cb = lv_textarea_signal,
     .draw_cb = lv_textarea_draw,
-    .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class
 };
@@ -992,7 +991,7 @@ static void lv_textarea_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
           }
 
           if(copy_ta->pwd_tmp) {
-              uint32_t len = lv_mem_get_size(copy_ta->pwd_tmp);
+              uint32_t len = strlen(copy_ta->pwd_tmp) + 1;
               ta->pwd_tmp = lv_mem_alloc(len);
               LV_ASSERT_MALLOC(ta->pwd_tmp);
               if(ta->pwd_tmp == NULL) return;
@@ -1010,17 +1009,16 @@ static void lv_textarea_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 
 static void lv_textarea_destructor(lv_obj_t * obj)
 {
-//    else if(sign == LV_SIGNAL_CLEANUP) {
-//          if(ta->pwd_tmp != NULL) lv_mem_free(ta->pwd_tmp);
-//          if(ta->placeholder_txt != NULL) lv_mem_free(ta->placeholder_txt);
-//
-//          ta->pwd_tmp = NULL;
-//          ta->placeholder_txt = NULL;
-//
-//          _lv_obj_reset_style_list_no_refr(obj, LV_PART_MARKER);
-//          _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_PLACEHOLDER);
-//
-//          /* (The created label will be deleted automatically) */
+
+    lv_textarea_t * ta = (lv_textarea_t *) obj;
+    if(ta->pwd_tmp != NULL) {
+        lv_mem_free(ta->pwd_tmp);
+        ta->pwd_tmp = NULL;
+    }
+    if(ta->placeholder_txt != NULL) {
+        lv_mem_free(ta->placeholder_txt);
+        ta->placeholder_txt = NULL;
+    }
 }
 
 static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

@@ -186,7 +186,7 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
 
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
         lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
         lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
@@ -198,6 +198,8 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         knob_size += 2;         /*For rounding error*/
 
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
+
+        knob_size = (knob_size - lv_obj_get_height(obj)) / 2;
 
         lv_coord_t * s = param;
         *s = LV_MAX(*s, knob_size);

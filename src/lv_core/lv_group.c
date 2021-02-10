@@ -498,8 +498,10 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
 
     group->obj_focus = obj_next;
 
-    lv_signal_send(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
-    lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
+    lv_res_t res;
+    res = lv_signal_send(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+    if(res != LV_RES_OK) return;
+    res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
     if(res != LV_RES_OK) return;
 
     lv_obj_invalidate(*group->obj_focus);

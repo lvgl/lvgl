@@ -67,6 +67,12 @@ void lv_obj_del(lv_obj_t * obj)
 
     /*Send a signal to the parent to notify it about the child delete*/
     if(par) {
+        /*Just to remove scroll animations if any*/
+        lv_obj_scroll_to(par, 0, 0, LV_ANIM_OFF);
+        if(par->spec_attr) {
+                par->spec_attr->scroll.x = 0;
+                par->spec_attr->scroll.y = 0;
+            }
         lv_signal_send(par, LV_SIGNAL_CHILD_CHG, NULL);
     }
 
@@ -80,10 +86,20 @@ void lv_obj_clean(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    while(1) {
-        lv_obj_t * child = lv_obj_get_child(obj, 0);
+    lv_obj_invalidate(obj);
+
+    lv_obj_t * child = lv_obj_get_child(obj, 0);
+    while(child) {
         obj_del_core(child);
+        child = lv_obj_get_child(obj, 0);
     }
+    /*Just to remove scroll animations if any*/
+    lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
+    if(obj->spec_attr) {
+        obj->spec_attr->scroll.x = 0;
+        obj->spec_attr->scroll.y = 0;
+    }
+
 }
 
 void lv_obj_del_anim_ready_cb(lv_anim_t * a)
@@ -318,7 +334,9 @@ static void obj_del_core(lv_obj_t * obj)
     lv_event_mark_deleted(obj);
 
     /*Remove all style*/
+    lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
     lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
+    lv_obj_enable_style_refresh(true);
 
     /* Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
@@ -346,7 +364,7 @@ static void obj_del_core(lv_obj_t * obj)
         obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
     }
     obj->parent->spec_attr->child_cnt--;
-    lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+    obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
 
     /*Free the object itself*/
     lv_mem_free(obj);

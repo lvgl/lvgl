@@ -35,12 +35,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 static void lv_dropdown_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_dropdown_list_destructor(lv_obj_t * list_obj);
 static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 
@@ -67,6 +69,7 @@ const lv_obj_class_t lv_dropdown_class = {
 
 const lv_obj_class_t lv_dropdown_list_class = {
     .constructor_cb = lv_dropdown_list_constructor,
+    .destructor_cb = lv_dropdown_list_destructor,
     .signal_cb = lv_dropdown_list_signal,
     .draw_cb = lv_dropdown_list_draw,
     .instance_size = sizeof(lv_dropdown_list_t),
@@ -411,9 +414,13 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 
     lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
 
-    lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_CLICK_FOCUSABLE);
-    lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
+    if(dropdown->list == NULL) {
+        lv_obj_t * list_obj = lv_dropdown_list_create(lv_obj_get_screen(dropdown_obj), NULL);
+        ((lv_dropdown_list_t*) list_obj)->dropdown = dropdown_obj;
+        dropdown->list = list_obj;
+        lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    }
+
     /*Set smaller width to the width of the button*/
     if(lv_obj_get_width(dropdown->list) <= lv_obj_get_width(dropdown_obj) &&
        (dropdown->dir == LV_DIR_TOP || dropdown->dir == LV_DIR_BOTTOM)) {
@@ -501,21 +508,14 @@ void lv_dropdown_close(lv_obj_t * obj)
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
-    lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
+    if(dropdown->list) lv_obj_del(dropdown->list);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * Create a switch objects
- * @param parent pointer to an object, it will be the parent of the new switch
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other switch to copy.
- * @return pointer to the created switch
- */
-lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy)
+static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     return lv_obj_create_from_class(&lv_dropdown_list_class, parent, copy);
 }
@@ -539,10 +539,6 @@ static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
     dropdown->dir = LV_DIR_BOTTOM;
     dropdown->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
 
-    lv_obj_t * list_obj = lv_dropdown_list_create(parent, copy);
-    ((lv_dropdown_list_t*)list_obj)->dropdown = (lv_obj_t *) dropdown;
-    dropdown->list = list_obj;
-    lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     if(copy == NULL) {
         lv_obj_set_width(obj, LV_DPX(150));
@@ -569,24 +565,19 @@ static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 
 static void lv_dropdown_destructor(lv_obj_t * obj)
 {
-//    lv_bar_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-//    _lv_obj_reset_style_list_no_refr(sw, LV_PART_KNOB);
-//
-//    bar->class_p->base_p->destructor(obj);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
+
+    if(dropdown->list) {
+        lv_obj_del(dropdown->list);
+        dropdown->list = NULL;
+    }
+
+    if(!dropdown->static_txt) {
+        lv_mem_free(dropdown->options);
+        dropdown->options = NULL;
+    }
 }
 
-/**
- * Handle the drawing related tasks of the drop down list
- * @param ddlist pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DRAW_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DRAW_DRAW: draw the object (always return 'true')
- *             LV_DRAW_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_draw_res_t`
- */
 static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
@@ -775,13 +766,14 @@ static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, cons
     lv_label_create(obj, NULL);
 }
 
-/**
- * Signal function of the drop down list
- * @param ddlist pointer to a drop down list object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
+static void lv_dropdown_list_destructor(lv_obj_t * list_obj)
+{
+    lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
+    lv_obj_t * dropdown_obj = list->dropdown;
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
+    dropdown->list = NULL;
+}
+
 static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
@@ -812,7 +804,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
     else if(sign == LV_SIGNAL_RELEASED) {
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_scroll_obj(indev) == NULL) {
-            if(!lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN)) {
+            if(dropdown->list) {
                 lv_dropdown_close(obj);
                 if(dropdown->sel_opt_id_orig != dropdown->sel_opt_id) {
                     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;

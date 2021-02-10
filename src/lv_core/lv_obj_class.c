@@ -52,6 +52,18 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
 
 //    class_start->constructor_cb(obj, parent, copy);
     lv_obj_construct(obj, parent, copy);
+
+//   lv_obj_set_pos(obj, 0, 0);
+
+   if(parent) {
+       /* Send a signal to the parent to notify it about the new child.
+        * Also triggers layout update*/
+       lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+       /*Invalidate the area if not screen created*/
+       lv_obj_invalidate(obj);
+   }
+
     if(!copy) lv_theme_apply(obj);
 //    else lv_style_list_copy(&checkbox->style_indic, &checkbox_copy->style_indic);
 
@@ -105,12 +117,11 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj)
     const lv_obj_class_t * class_p = obj->class_p;
 
     /*Find a base in which editable is set*/
-    const lv_obj_class_t * base = class_p->base_class;
-    while(base && base->editable != LV_OBJ_CLASS_EDITABLE_INHERIT) base = base->base_class;
+    while(class_p && class_p->editable == LV_OBJ_CLASS_EDITABLE_INHERIT) class_p = class_p->base_class;
 
-    if(base == NULL) return false;
+    if(class_p == NULL) return false;
 
-    return base->editable == LV_OBJ_CLASS_EDITABLE_TRUE ? true : false;
+    return class_p->editable == LV_OBJ_CLASS_EDITABLE_TRUE ? true : false;
 }
 
 /**********************

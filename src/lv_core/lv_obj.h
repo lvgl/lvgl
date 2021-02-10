@@ -143,7 +143,7 @@ enum {
     LV_STATE_DEFAULT     =  0x00,
     LV_STATE_CHECKED     =  0x01,
     LV_STATE_FOCUSED     =  0x02,
-    LV_STATE_FOCUS_GROUP =  0x04,
+    LV_STATE_FOCUS_KEY   =  0x04,
     LV_STATE_EDITED      =  0x08,
     LV_STATE_HOVERED     =  0x10,
     LV_STATE_PRESSED     =  0x20,

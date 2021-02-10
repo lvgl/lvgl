@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_LED
 
@@ -28,10 +28,12 @@ extern "C" {
 
 /*Data of led*/
 typedef struct {
-    /*No inherited ext.*/
-    /*New data for this type */
-    uint8_t bright; /*Current brightness of the LED (0..255)*/
-} lv_led_ext_t;
+    lv_obj_t obj;
+    lv_color_t color;
+    uint8_t bright;     /**< Current brightness of the LED (0..255)*/
+} lv_led_t;
+
+extern const lv_obj_class_t lv_led_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -46,11 +48,18 @@ typedef struct {
 lv_obj_t * lv_led_create(lv_obj_t * parent);
 
 /**
+ * Set the color of the LED
+ * @param led       pointer to a LED object
+ * @param color     the color of the the LED
+ */
+void lv_led_set_color(lv_obj_t * led, lv_color_t color);
+
+/**
  * Set the brightness of a LED object
  * @param led pointer to a LED object
  * @param bright LV_LED_BRIGHT_MIN (max. dark) ... LV_LED_BRIGHT_MAX (max. light)
  */
-void lv_led_set_bright(lv_obj_t * led, uint8_t bright);
+void lv_led_set_brightness(lv_obj_t * led, uint8_t bright);
 
 /**
  * Light on a LED
@@ -75,7 +84,7 @@ void lv_led_toggle(lv_obj_t * led);
  * @param led pointer to LED object
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
-uint8_t lv_led_get_bright(const lv_obj_t * led);
+uint8_t lv_led_get_brightness(const lv_obj_t * obj);
 
 /**********************
  *      MACROS

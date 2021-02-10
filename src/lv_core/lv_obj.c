@@ -207,6 +207,8 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
     }
     event_temp_data_head = &event_temp_data;
 
+    /* There could be nested event sending with different param.
+     * It needs to be saved for the current event context because `lv_event_get_data` returns a global param. */
     void * event_act_param_save = event_act_param;
     event_act_param = param;
 
@@ -232,11 +234,6 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
                 res = LV_RES_INV;
                 break;
             }
-
-            if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-                lv_res_t res = lv_event_send(obj->parent, event, param);
-                if(res != LV_RES_OK) return LV_RES_INV;
-            }
         }
 
         i++;
@@ -248,6 +245,13 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
+
+    if(res == LV_RES_OK) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
+            lv_res_t res = lv_event_send(obj->parent, event, param);
+            if(res != LV_RES_OK) return LV_RES_INV;
+        }
+    }
 
     return res;
 }
@@ -293,9 +297,7 @@ lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 
     if(class_p == NULL) return LV_RES_OK;
 
-
     lv_res_t res = LV_RES_OK;
-
     if(class_p->signal_cb) res = class_p->signal_cb(obj, signal, param);
 
     return res;
@@ -341,12 +343,8 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     obj->state = new_state;
 
     _lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
-
     /*If there is no difference in styles there is nothing else to do*/
-    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) {
-        lv_obj_invalidate(obj);
-        return;
-    }
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
     trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
     lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
@@ -388,9 +386,10 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_mem_buf_release(ts);
 
+    lv_obj_invalidate(obj);
+
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
-    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) lv_obj_invalidate(obj);
 }
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
@@ -557,7 +556,7 @@ bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
 bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    lv_obj_class_t * obj_class = obj->class_p;
+    const lv_obj_class_t * obj_class = obj->class_p;
     while(obj_class) {
         if(obj_class == class_p) return true;
         obj_class = obj_class->base_class;
@@ -623,7 +622,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
         }
 
         if(parent->spec_attr->children == NULL) {
-            parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *) * 2);
+            parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *));
             parent->spec_attr->children[0] = obj;
             parent->spec_attr->child_cnt = 1;
         } else {
@@ -634,15 +633,18 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 
         obj->parent = parent;
 
-        obj->coords.y1 = parent->coords.y1;
-        obj->coords.y2 = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
+        lv_coord_t sl = lv_obj_get_scroll_left(parent);
+        lv_coord_t st = lv_obj_get_scroll_top(parent);
+
+        obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top(parent, LV_PART_MAIN) - st;
+        obj->coords.y2 = obj->coords.y1 + LV_OBJ_DEF_HEIGHT;
         if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
-            obj->coords.x2    = parent->coords.x2;
-            obj->coords.x1    = parent->coords.x2 - LV_OBJ_DEF_WIDTH;
+            obj->coords.x2  = parent->coords.x2 - lv_obj_get_style_pad_right(parent, LV_PART_MAIN) - sl;
+            obj->coords.x1  = obj->coords.x2 - LV_OBJ_DEF_WIDTH;
         }
         else {
-            obj->coords.x1    = parent->coords.x1;
-            obj->coords.x2    = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
+            obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left(parent, LV_PART_MAIN) - sl;
+            obj->coords.x2  = obj->coords.x1 + LV_OBJ_DEF_WIDTH;
         }
         obj->w_set = lv_area_get_width(&obj->coords);
         obj->h_set = lv_area_get_height(&obj->coords);
@@ -685,17 +687,6 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
             lv_obj_set_size(obj, lv_obj_get_width(copy), lv_obj_get_height(copy));
 
         }
-    } else {
-        lv_obj_set_pos(obj, 0, 0);
-    }
-
-    if(parent) {
-        /* Send a signal to the parent to notify it about the new child.
-         * Also triggers layout update*/
-        lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-        /*Invalidate the area if not screen created*/
-        lv_obj_invalidate(obj);
     }
 
     LV_LOG_INFO("Object create ready");
@@ -704,8 +695,19 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 static void lv_obj_destructor(lv_obj_t * p)
 {
     lv_obj_t * obj = p;
-//    lv_obj_remove_all_styles(obj);
-    if(obj->spec_attr) lv_mem_free(obj->spec_attr);
+    if(obj->spec_attr) {
+        if(obj->spec_attr->children) {
+            lv_mem_free(obj->spec_attr->children);
+            obj->spec_attr->children = NULL;
+        }
+        if(obj->spec_attr->event_dsc) {
+            lv_mem_free(obj->spec_attr->event_dsc);
+            obj->spec_attr->event_dsc = NULL;
+        }
+
+        lv_mem_free(obj->spec_attr);
+        obj->spec_attr = NULL;
+    }
 
 }
 
@@ -868,8 +870,8 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     area.x1 = area.x2 - tickness;
 
     /*Draw horizontal scrollbar if the mode is ON or can be scrolled in this direction*/
-    if(ver_draw && _lv_area_is_on(&area, clip_area)) {
-        lv_coord_t content_h = obj_h + st + sb;
+    lv_coord_t content_h = obj_h + st + sb;
+    if(ver_draw && content_h && _lv_area_is_on(&area, clip_area)) {
         lv_coord_t sb_h = ((obj_h - end_space * 2 - hor_req_space) * obj_h) / content_h;
         sb_h = LV_MAX(sb_h, SCROLLBAR_MIN_SIZE);
         rem = (obj_h - end_space * 2 - hor_req_space) - sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
@@ -904,8 +906,8 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     area.x1 = obj->coords.x1;
     area.x2 = obj->coords.x2;
     /*Draw horizontal scrollbar if the mode is ON or can be scrolled in this direction*/
-    if(hor_draw && _lv_area_is_on(&area, clip_area)) {
-        lv_coord_t content_w = obj_w + sl + sr;
+    lv_coord_t content_w = obj_w + sl + sr;
+    if(hor_draw && content_w && _lv_area_is_on(&area, clip_area)) {
         lv_coord_t sb_w = ((obj_w - end_space * 2 - ver_reg_space) * obj_w) / content_w;
         sb_w = LV_MAX(sb_w, SCROLLBAR_MIN_SIZE);
         rem = (obj_w - end_space * 2 - ver_reg_space) - sb_w;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
@@ -1027,9 +1029,10 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         bool editing = false;
         editing = lv_group_get_editing(lv_obj_get_group(obj));
         lv_state_t state = LV_STATE_FOCUSED;
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) state |= LV_STATE_FOCUS_KEY;
         if(editing) {
             state |= LV_STATE_EDITED;
-            if(lv_obj_get_group(obj)) state |= LV_STATE_FOCUS_GROUP;
 
             /*if using focus mode, change target to parent*/
             obj = lv_obj_get_focused_obj(obj);
@@ -1054,7 +1057,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*if using focus mode, change target to parent*/
         obj = lv_obj_get_focused_obj(obj);
 
-        lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
+        lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
         bool w_new = true;
@@ -1139,18 +1142,22 @@ static void base_dir_refr_children(lv_obj_t * obj)
 
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {
+
     /*Check all children of `parent`*/
     uint32_t child_cnt = 0;
     if(parent->spec_attr) child_cnt = parent->spec_attr->child_cnt;
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = parent->spec_attr->children[i];
-        if(child == obj_to_find) return true;
+        if(child == obj_to_find) {
+            return true;
+        }
 
         /*Check the children*/
         bool found = obj_valid_child(child, obj_to_find);
-        if(found) return true;
+        if(found) {
+            return true;
+        }
     }
-
     return false;
 }

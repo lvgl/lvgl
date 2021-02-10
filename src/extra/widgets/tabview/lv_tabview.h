@@ -28,6 +28,7 @@ extern "C" {
 typedef struct
 {
     lv_obj_t obj;
+    char ** map;
     lv_flex_t flex;
     uint16_t tab_cnt;
     uint16_t tab_cur;
@@ -48,7 +49,7 @@ lv_obj_t * lv_tabview_get_content(lv_obj_t * tv);
 
 lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv);
 
-void lv_tabview_set_act(lv_obj_t * tv, uint32_t id);
+void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
 
 uint16_t lv_tabview_get_tab_act(lv_obj_t * tv);
 
