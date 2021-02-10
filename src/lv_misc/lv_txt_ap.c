@@ -25,6 +25,7 @@
  **********************/
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
 static uint32_t lv_ap_get_char_index(uint16_t c);
+static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,7 +59,7 @@ const ap_chars_map_t ap_chars_map[] = {
     {22, 0xFEC6, 1, 2, -1,  {1, 1}},   // ظ
     {23, 0xFECA, 1, 2, -1,  {1, 1}},   // ع
     {24, 0xFECE, 1, 2, -1,  {1, 1}},   // غ
-    {30, 0x0640, 0, 0, 0,  {1, 1}},   // - (mad)
+    {30, 0x0640, 0, 0, 0,  {1, 1}},   // - (mad, hyphen)
     {31, 0xFED2, 1, 2, -1,  {1, 1}},   // ف
     {32, 0xFED6, 1, 2, -1,  {1, 1}},   // ق
     {135, 0xFB8F, 1, 2, -1,  {1, 1}},  // ک
@@ -126,23 +127,6 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
     return chars_cnt + 1;
 }
 
-uint32_t _lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next)
-{
-	uint16_t ch_code = 0;
-	if (ap_chars_map[ch_curr].char_offset != 34) {
-		return 0;
-	}
-	if (ch_next == LV_UNDEF_ARABIC_PERSIAN_CHARS) {
-		return 0;
-	}
-	ch_code = ap_chars_map[ch_next].char_offset + LV_AP_ALPHABET_BASE_CODE;
-	if (ch_code == 0x0622) { return 0xFEF5; } // mad
-	if (ch_code == 0x0623) { return 0xFEF7; } // top hamza
-	if (ch_code == 0x0625) { return 0xFEF9; } // bot hamza
-	if (ch_code == 0x0627) { return 0xFEFB; } // alef
-	return 0;
-}
-
 void _lv_txt_ap_proc(const char * txt, char * txt_out)
 {
     uint32_t txt_length = 0;
@@ -183,7 +167,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
         uint8_t conjunction_to_next = ((i == txt_length - 1) ||
                                        idx_next == LV_UNDEF_ARABIC_PERSIAN_CHARS) ? 0 : ap_chars_map[idx_next].ap_chars_conjunction.conj_to_previous;
 
-        uint32_t lam_alef = _lv_txt_lam_alef(index_current, idx_next);
+        uint32_t lam_alef = lv_txt_lam_alef(index_current, idx_next);
         if ( lam_alef ) {
         	if (conjunction_to_previuse) {
         		lam_alef ++;
@@ -213,7 +197,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
     for (i=0; i<j; i++)
     	ch_enc[i] = ch_fin[i];
     lv_mem_free(ch_fin);
-
+    
     txt_out_temp = txt_out;
     i = 0;
 
@@ -259,6 +243,23 @@ static uint32_t lv_ap_get_char_index(uint16_t c)
         }
     }
     return LV_UNDEF_ARABIC_PERSIAN_CHARS;
+}
+
+static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next)
+{
+	uint32_t ch_code = 0;
+	if (ap_chars_map[ch_curr].char_offset != 34) {
+		return 0;
+	}
+	if (ch_next == LV_UNDEF_ARABIC_PERSIAN_CHARS) {
+		return 0;
+	}
+	ch_code = ap_chars_map[ch_next].char_offset + LV_AP_ALPHABET_BASE_CODE;
+	if (ch_code == 0x0622) { return 0xFEF5; } // (lam-alef) mad
+	if (ch_code == 0x0623) { return 0xFEF7; } // (lam-alef) top hamza
+	if (ch_code == 0x0625) { return 0xFEF9; } // (lam-alef) bot hamza
+	if (ch_code == 0x0627) { return 0xFEFB; } // (lam-alef) alef
+	return 0;
 }
 
 #endif
