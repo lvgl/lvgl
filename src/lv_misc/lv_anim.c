@@ -57,7 +57,6 @@ const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    last_task_run = lv_tick_get();
     _lv_anim_task = lv_task_create(anim_task, LV_DISP_DEF_REFR_PERIOD, LV_ANIM_TASK_PRIO, NULL);
     anim_mark_list_change(); /*Turn off the animation task*/
     anim_list_changed = false; /*The list has not actually changed*/
@@ -93,7 +92,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*If the list is empty the anim task was suspended and it's last run measure is invalid*/
     if(_lv_ll_is_empty(&LV_GC_ROOT(_lv_anim_ll))) {
-        last_task_run = lv_tick_get() - 1;
+        last_task_run = lv_tick_get();
     }
 
     /*Add the new animation to the animation linked list*/
