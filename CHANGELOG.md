@@ -6,6 +6,7 @@
 - fix(indev) clear the indev's `act_obj` in `lv_indev_reset`
 - fix(text) fix out of bounds read in `_lv_txt_get_width`
 - fix(text) improve Arabic contextual analysis by adding hyphen processing and proper handling of lam-alef sequence
+- fix(delete) delete animation after the children are deleted
 
 ## v7.10.0
 
