@@ -1160,18 +1160,21 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const
     /*Get the inner radius*/
     lv_area_t area_inner;
     lv_area_copy(&area_inner, coords);
-    area_inner.x1 -= dsc->outline_pad;
-    area_inner.y1 -= dsc->outline_pad;
-    area_inner.x2 += dsc->outline_pad;
-    area_inner.y2 += dsc->outline_pad;
+
+    lv_coord_t pad = dsc->outline_pad - 1;
+    area_inner.x1 -= pad;
+    area_inner.y1 -= pad;
+    area_inner.x2 += pad;
+    area_inner.y2 += pad;
 
     lv_area_t area_outer;
     lv_area_copy(&area_outer, &area_inner);
 
-    area_outer.x1 -= dsc->outline_width;
-    area_outer.x2 += dsc->outline_width;
-    area_outer.y1 -= dsc->outline_width;
-    area_outer.y2 += dsc->outline_width;
+    lv_coord_t width = dsc->outline_width + 1;
+    area_outer.x1 -= width;
+    area_outer.x2 += width;
+    area_outer.y1 -= width;
+    area_outer.y2 += width;
 
     draw_full_border(&area_inner, &area_outer, clip, dsc->radius, true, dsc->outline_color, dsc->outline_opa,
                      dsc->outline_blend_mode);
