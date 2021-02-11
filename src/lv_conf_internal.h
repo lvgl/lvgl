@@ -181,7 +181,7 @@
 #  ifdef CONFIG_LV_DISP_ROT_MAX_BUF
 #    define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
 #  else
-#    define  LV_DISP_ROT_MAX_BUF  (20U * 1024U)
+#    define  LV_DISP_ROT_MAX_BUF  (10U * 1024U)
 #  endif
 #endif
 
