@@ -1161,7 +1161,8 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const
     lv_area_t area_inner;
     lv_area_copy(&area_inner, coords);
 
-    lv_coord_t pad = dsc->outline_pad - 1;
+    /*Extend the outline into the background area if it's overlapping the edge*/
+    lv_coord_t pad = (dsc->outline_pad == 0 ? (dsc->outline_pad - 1) : dsc->outline_pad);
     area_inner.x1 -= pad;
     area_inner.y1 -= pad;
     area_inner.x2 += pad;
@@ -1170,7 +1171,7 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const
     lv_area_t area_outer;
     lv_area_copy(&area_outer, &area_inner);
 
-    lv_coord_t width = dsc->outline_width + 1;
+    lv_coord_t width = (dsc->outline_pad == 0 ? (dsc->outline_width + 1) : dsc->outline_width);
     area_outer.x1 -= width;
     area_outer.x2 += width;
     area_outer.y1 -= width;
