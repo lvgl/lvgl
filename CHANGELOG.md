@@ -5,7 +5,7 @@
 ### Bugfixes
 - fix(indev) clear the indev's `act_obj` in `lv_indev_reset`
 - fix(text) fix out of bounds read in `_lv_txt_get_width`
-- fix(delete) delete animation after the children are deleted because new animation can be added during child delete
+- fix(delete) delete animation after the children are deleted
 
 ## v7.10.0
 
