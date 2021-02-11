@@ -275,7 +275,7 @@ char * lv_fs_up(char * path);
 
 /**
  * Get the last element of a path (e.g. U:/folder/file -> file)
- * @param buf buffer to store the letters ('\0' added after the last letter)
+ * @param path pointer to a file name
  * @return pointer to the beginning of the last element in the path
  */
 const char * lv_fs_get_last(const char * path);
