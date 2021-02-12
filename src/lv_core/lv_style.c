@@ -546,10 +546,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv
         lv_style_attr_t attr_act;
         attr_act = get_style_prop_attr(style, id);
 
-        lv_style_attr_t attr_goal;
-        attr_goal = (prop >> 8) & 0xFF;
-
-        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+        return LV_STYLE_ATTR_GET_STATE(attr_act);
     }
 }
 
@@ -582,10 +579,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv
         lv_style_attr_t attr_act;
         attr_act = get_style_prop_attr(style, id);
 
-        lv_style_attr_t attr_goal;
-        attr_goal = (prop >> 8) & 0xFF;
-
-        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+        return LV_STYLE_ATTR_GET_STATE(attr_act);
     }
 }
 
@@ -615,10 +609,7 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
         lv_style_attr_t attr_act;
         attr_act = get_style_prop_attr(style, id);
 
-        lv_style_attr_t attr_goal;
-        attr_goal = (prop >> 8) & 0xFF;
-
-        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+        return LV_STYLE_ATTR_GET_STATE(attr_act);
     }
 }
 
@@ -649,10 +640,7 @@ int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, co
         lv_style_attr_t attr_act;
         attr_act = get_style_prop_attr(style, id);
 
-        lv_style_attr_t attr_goal;
-        attr_goal = (prop >> 8) & 0xFF;
-
-        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+        return LV_STYLE_ATTR_GET_STATE(attr_act);
     }
 }
 
