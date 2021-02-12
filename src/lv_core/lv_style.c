@@ -1082,9 +1082,7 @@ static inline bool style_resize(lv_style_t * style, size_t sz)
 static inline lv_style_property_t get_style_prop(const lv_style_t * style, size_t idx)
 {
     lv_style_property_t prop;
-    uint8_t * prop_p = (uint8_t *)&prop;
-    prop_p[0] = style->map[idx];
-    prop_p[1] = style->map[idx + 1];
+    _lv_memcpy_small(&prop, &style->map[idx], sizeof(lv_style_property_t));
     return prop;
 }
 
