@@ -204,15 +204,6 @@
 #endif
 #endif   /*LV_TICK_CUSTOM*/
 
-/*Max horizontal or vertical resolution that LVGL is able to manage*/
-#ifndef LV_MAX_RESOLUTION
-#  ifdef CONFIG_LV_MAX_RESOLUTION
-#    define LV_MAX_RESOLUTION CONFIG_LV_MAX_RESOLUTION
-#  else
-#    define  LV_MAX_RESOLUTION           1366
-#  endif
-#endif
-
 /* Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI_DEF

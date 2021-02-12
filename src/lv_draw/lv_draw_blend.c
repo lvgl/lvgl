@@ -70,10 +70,6 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *  STATIC VARIABLES
  **********************/
 
-#if (LV_USE_GPU || LV_USE_GPU_STM32_DMA2D) && (LV_USE_GPU_NXP_PXP == 0) && (LV_USE_GPU_NXP_VG_LITE == 0)
-    LV_ATTRIBUTE_DMA static lv_color_t blend_buf[LV_HOR_RES_MAX];
-#endif
-
 /**********************
  *      MACROS
  **********************/
@@ -364,35 +360,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                     return;
                 }
                 /* Fall down to SW render in case of error */
-            }
-#elif LV_USE_GPU
-            if(disp->driver.gpu_blend_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
-                for(x = 0; x < draw_area_w ; x++) blend_buf[x].full = color.full;
-
-                for(y = draw_area->y1; y <= draw_area->y2; y++) {
-                    disp->driver.gpu_blend_cb(&disp->driver, disp_buf_first, blend_buf, draw_area_w, opa);
-                    disp_buf_first += disp_w;
-                }
-                return;
-            }
-#endif
-
-#if LV_USE_GPU_STM32_DMA2D
-            if(lv_area_get_size(draw_area) >= 240) {
-                if(blend_buf[0].full != color.full) lv_color_fill(blend_buf, color, LV_HOR_RES_MAX);
-
-                lv_coord_t line_h = LV_HOR_RES_MAX / draw_area_w;
-                for(y = 0; y <= draw_area_h - line_h; y += line_h) {
-                    lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, blend_buf, opa, draw_area_w, draw_area_w, line_h);
-                    lv_gpu_stm32_dma2d_wait_cb(NULL);
-                    disp_buf_first += disp_w * line_h;
-                }
-
-                if(y != draw_area_h) {
-                    lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, blend_buf, opa, draw_area_w, draw_area_w, draw_area_h - y);
-                }
-
-                return;
             }
 #endif
             lv_color_t last_dest_color = LV_COLOR_BLACK;

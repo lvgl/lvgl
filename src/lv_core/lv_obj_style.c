@@ -108,7 +108,7 @@ void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_
     obj->style_list.styles[i].part = part;
     obj->style_list.styles[i].state = state;
 
-    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+    lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
 }
 
 void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style)
@@ -148,7 +148,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
          * Therefore it doesn't needs to be incremented*/
     }
     if(deleted) {
-        lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
     }
 }
 
@@ -166,22 +166,21 @@ void lv_obj_report_style_change(lv_style_t * style)
     }
 }
 
-void lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
+void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(!style_refr) return;
 
-    update_cache(obj, LV_PART_MAIN, prop);
+    update_cache(obj, part, prop);
 
     lv_obj_invalidate(obj);
-    if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR)) {
-        lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL);
-        lv_obj_invalidate(obj);
+    if(part == LV_PART_MAIN && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
+        lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL); /*To update layout*/
     } else if(prop & LV_STYLE_PROP_EXT_DRAW) {
         lv_obj_refresh_ext_draw_size(obj);
-        lv_obj_invalidate(obj);
     }
+    lv_obj_invalidate(obj);
 
     if(prop == LV_STYLE_PROP_ALL ||
       ((prop & LV_STYLE_PROP_INHERIT) && (prop & LV_STYLE_PROP_EXT_DRAW) && (prop & LV_STYLE_PROP_LAYOUT_REFR)))
@@ -228,7 +227,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, 
 {
     lv_style_t * style = get_local_style(obj, part, state);
     lv_style_set_prop(style, prop, value);
-    lv_obj_refresh_style(obj, prop);
+    lv_obj_refresh_style(obj, part, prop);
 }
 
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop)
@@ -781,7 +780,7 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < list->style_cnt; i++) {
         if(style == NULL || list->styles[i].style == style) {
-            lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+            lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
             break;
         }
     }
@@ -904,7 +903,7 @@ static void trans_anim_cb(trans_t * tr, lv_anim_value_t v)
             }
         }
         lv_style_set_prop(list->styles[i].style, tr->prop, value_final);
-        if (refr) lv_obj_refresh_style(tr->obj, tr->prop);
+        if (refr) lv_obj_refresh_style(tr->obj, tr->part, tr->prop);
         break;
 
     }

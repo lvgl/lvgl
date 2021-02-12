@@ -59,6 +59,9 @@ void lv_style_reset(lv_style_t * style)
 
     if(style->allocated) lv_mem_free(style->values_and_props);
     lv_memset_00(style, sizeof(lv_style_t));
+#if LV_USE_ASSERT_STYLE
+    style->sentinel = LV_STYLE_SENTINEL_VALUE;
+#endif
 
 }
 
@@ -259,7 +262,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.ptr = LV_THEME_FONT_NORMAL;
             break;
         case LV_STYLE_SIZE:
-        case LV_STYLE_ARC_WIDTH:
             value.num = 10;
             break;
         default:

@@ -1,28 +1,52 @@
-//#include "../../lv_examples.h"
-//
-///**
-// * Demonstrate the effect of margin on flex item
-// */
-//void lv_example_flex_5(void)
-//{
-//    lv_obj_t * cont = lv_obj_create(lv_scr_act(), NULL);
-//    lv_obj_set_size(cont, 300, 220);
-//    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
-//    lv_obj_set_flex_dir(cont, LV_FLEX_DIR_ROW_WRAP);
-//
-//    uint32_t i;
-//    for(i = 0; i < 20; i++) {
-//        lv_obj_t * obj = lv_obj_create(cont, NULL);
-//        lv_obj_set_size(obj, 100, LV_SIZE_AUTO);
-//        lv_obj_set_flex_item(obj, true);
-//
-//        /*Set margin on every side*/
-//        if(i == 4) {
-//            lv_obj_set_style_local_margin_all(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 20);
-//        }
-//
-//        lv_obj_t * label = lv_label_create(obj, NULL);
-//        lv_label_set_text_fmt(label, "Item:%d", i);
-//    }
-//}
-//
+#include "../../../lvgl.h"
+
+#if LV_USE_FLEX
+
+static void row_gap_anim(lv_obj_t * obj, lv_anim_value_t v)
+{
+    lv_obj_set_style_pad_row(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
+}
+
+static void column_gap_anim(lv_obj_t * obj, lv_anim_value_t v)
+{
+    lv_obj_set_style_pad_column(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
+}
+
+/**
+ * Demonstrate the effect of column and row gap style properties
+ */
+void lv_example_flex_5(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_set_size(cont, 300, 220);
+    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_layout(cont, &lv_flex_inline);
+
+    uint32_t i;
+    for(i = 0; i < 9; i++) {
+        lv_obj_t * obj = lv_obj_create(cont, NULL);
+        lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
+
+        lv_obj_t * label = lv_label_create(obj, NULL);
+        lv_label_set_text_fmt(label, "%d", i);
+        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+    }
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, cont);
+    lv_anim_set_values(&a, 0, 10);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) row_gap_anim);
+    lv_anim_set_time(&a, 500);
+    lv_anim_set_playback_time(&a, 500);
+    lv_anim_start(&a);
+
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) column_gap_anim);
+    lv_anim_set_time(&a, 3000);
+    lv_anim_set_playback_time(&a, 3000);
+    lv_anim_start(&a);
+}
+
+#endif

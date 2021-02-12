@@ -176,10 +176,10 @@ void lv_test_assert_img_eq(const char * fn_ref, const char * s)
     return;
 #endif
 
-#if LV_HOR_RES_MAX != 800 || LV_VER_RES_MAX != 480
-    lv_test_print("   SKIP: Can't compare '%s' because the resolution needs to be 800x480 (LV_HOR_RES_MAX, LV_VER_RES_MAX)", fn_ref);
+if (LV_HOR_RES != 800 || LV_VER_RES != 480) {
+    lv_test_print("   SKIP: Can't compare '%s' because the resolution needs to be 800x480", fn_ref);
     return;
-#endif
+}
 
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);

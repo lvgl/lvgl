@@ -18,7 +18,6 @@
 #define CELL_POS_MASK     ((1 << CELL_SHIFT) - 1)
 #define CELL_SPAN_MASK    (CELL_POS_MASK << CELL_SHIFT)
 #define CELL_FLAG_MASK    (CELL_POS_MASK << (2 * CELL_SHIFT))
-#define CELL_PLACE(b)      ((b) << (CELL_SHIFT * 2))
 
 #define IS_FR(x)       (LV_COORD_IS_LAYOUT(x))
 #define GET_FR(x)      (_LV_COORD_PLAIN(x))
@@ -103,12 +102,12 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t ver_place, uint8_t col
     if(!lv_obj_is_layout_positioned(obj)) return;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent->spec_attr->layout_dsc->update_cb  != grid_update) return;
-    const lv_grid_t * g = (const lv_grid_t *) parent->spec_attr->layout_dsc;
 
-    lv_coord_t x = LV_COORD_SET_LAYOUT(col_pos | (col_span << CELL_SHIFT) | CELL_PLACE(hor_place));
-    lv_coord_t y = LV_COORD_SET_LAYOUT(row_pos | (row_span << CELL_SHIFT) | CELL_PLACE(ver_place));
+    obj->x_set = LV_COORD_SET_LAYOUT(col_pos | (col_span << CELL_SHIFT) | (hor_place << (CELL_SHIFT * 2)));
+    obj->y_set = LV_COORD_SET_LAYOUT(row_pos | (row_span << CELL_SHIFT) | (ver_place << (CELL_SHIFT * 2)));
 
-    lv_obj_set_pos(obj, x, y);
+    lv_obj_update_layout(parent, obj);
+
 }
 
 
@@ -315,13 +314,14 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
  */
 static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
-    if(LV_COORD_IS_LAYOUT(item->x_set) && LV_COORD_IS_LAYOUT(item->y_set)) return;
+    if(LV_COORD_IS_LAYOUT(item->x_set) == 0 || LV_COORD_IS_LAYOUT(item->y_set) == 0) return;
     if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) == false) return;
+    uint32_t col_span = GET_CELL_SPAN(item->x_set);
+    uint32_t row_span = GET_CELL_SPAN(item->y_set);
+    if(row_span == 0 || col_span == 0) return;
 
     uint32_t col_pos = GET_CELL_POS(item->x_set);
-    uint32_t col_span = GET_CELL_SPAN(item->x_set);
     uint32_t row_pos = GET_CELL_POS(item->y_set);
-    uint32_t row_span = GET_CELL_SPAN(item->y_set);
 
     lv_coord_t col_x1 = c->x[col_pos];
     lv_coord_t col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];

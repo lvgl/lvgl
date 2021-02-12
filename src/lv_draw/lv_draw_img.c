@@ -407,11 +407,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
         lv_coord_t draw_area_h = lv_area_get_height(&draw_area);
         lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
-#if LV_USE_IMG_TRANSFORM
         bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
-#else
-        bool transform = false;
-#endif
         /*Simple ARGB image. Handle it as special case because it's very common*/
         if(other_mask_cnt == 0 && !transform && !chroma_key && draw_dsc->recolor_opa == LV_OPA_TRANSP && alpha_byte) {
 #if LV_USE_GPU_STM32_DMA2D && LV_COLOR_DEPTH == 32
@@ -481,7 +477,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
             lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
-#if LV_USE_IMG_TRANSFORM
             lv_img_transform_dsc_t trans_dsc;
             lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
             if(transform) {
@@ -502,7 +497,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
                 _lv_img_buf_transform_init(&trans_dsc);
             }
-#endif
             uint16_t recolor_premult[3] = {0};
             lv_opa_t recolor_opa_inv = 255 - draw_dsc->recolor_opa;
             if(draw_dsc->recolor_opa != 0) {
@@ -520,19 +514,13 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
             int32_t x;
             int32_t y;
-#if LV_USE_IMG_TRANSFORM
             int32_t rot_y = disp_area->y1 + draw_area.y1 - map_area->y1;
-#endif
             for(y = 0; y < draw_area_h; y++) {
                 map_px = map_buf_tmp;
                 uint32_t px_i_start = px_i;
 
-#if LV_USE_IMG_TRANSFORM
                 int32_t rot_x = disp_area->x1 + draw_area.x1 - map_area->x1;
-#endif
                 for(x = 0; x < draw_area_w; x++, map_px += px_size_byte, px_i++) {
-
-#if LV_USE_IMG_TRANSFORM
                     if(transform) {
 
                         /*Transform*/
@@ -548,9 +536,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         }
                     }
                     /*No transform*/
-                    else
-#endif
-                    {
+                    else {
                         if(alpha_byte) {
                             lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                             mask_buf[px_i] = px_opa;

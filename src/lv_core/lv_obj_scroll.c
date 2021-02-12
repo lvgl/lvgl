@@ -180,7 +180,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
 
     lv_coord_t self_w = lv_obj_get_self_width(obj);
     self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
-    self_w -= lv_obj_get_scroll_x(obj);
+    self_w += lv_obj_get_scroll_x(obj);
 
     return LV_MAX(child_res, self_w);
 }

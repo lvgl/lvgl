@@ -7,10 +7,13 @@
 #if LV_BUILD_TEST
 #include <sys/time.h>
 
+#define HOR_RES 800
+#define VER_RES 480
+
 static void hal_init(void);
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
-lv_color_t test_fb[LV_HOR_RES_MAX * LV_VER_RES_MAX];
+lv_color_t test_fb[HOR_RES * VER_RES];
 
 int main(void)
 {
@@ -99,6 +102,8 @@ static void hal_init(void)
     lv_disp_drv_init(&disp_drv);
     disp_drv.buffer = &disp_buf;
     disp_drv.flush_cb = dummy_flush_cb;
+    disp_drv.hor_res = HOR_RES;
+    disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
 
 #if LV_USE_FILESYSTEM

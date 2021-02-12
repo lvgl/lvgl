@@ -69,7 +69,7 @@ void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
  * @note            possible values are:
  *                  pixel               simple set the size accordingly
  *                  LV_SIZE_CONTENT     set the size to involve all children in the given direction
- *                  LV_COORD_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
+ *                  LV_SIZE_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
 void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
@@ -81,7 +81,7 @@ void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
  * @note            possible values are:
  *                  pixel               simple set the size accordingly
  *                  LV_SIZE_CONTENT     set the size to involve all children in the given direction
- *                  LV_COORD_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
+ *                  LV_SIZE_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
 void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
@@ -93,7 +93,7 @@ void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
  * @note            possible values are:
  *                  pixel               simple set the size accordingly
  *                  LV_SIZE_CONTENT     set the size to involve all children in the given direction
- *                  LV_COORD_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
+ *                  LV_SIZE_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
 void lv_obj_set_height(struct _lv_obj_t * obj, lv_coord_t h);

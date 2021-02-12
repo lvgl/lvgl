@@ -72,9 +72,6 @@
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current system time in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
-/*Max horizontal or vertical resolution that LVGL is able to manage*/
-#define LV_MAX_RESOLUTION           1366
-
 /* Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF                  130     /*[px/inch]*/

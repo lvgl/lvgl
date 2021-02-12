@@ -112,10 +112,11 @@ void lv_obj_report_style_change(lv_style_t * style);
 /**
  * Notify an object and its children about its style is modified.
  * @param obj       pointer to an object
+ * @param part      the part whose style was changed. E.g. `LV_PART_ANY`, `LV_PART_MAIN`
  * @param prop      `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property.
  *                  It is used to optimize what needs to be refreshed.
  */
-void lv_obj_refresh_style(struct _lv_obj_t * obj,lv_style_prop_t prop);
+void lv_obj_refresh_style(struct _lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 
 /**
  * Enable or disable automatic style refreshing when a new style is added/removed to/from an object

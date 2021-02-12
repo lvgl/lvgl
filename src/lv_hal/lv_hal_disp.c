@@ -66,15 +66,6 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 #if LV_COLOR_SCREEN_TRANSP
     driver->screen_transp = 1;
 #endif
-
-    driver->gpu_blend_cb = NULL;
-    driver->gpu_fill_cb  = NULL;
-
-#if LV_USE_USER_DATA
-    driver->user_data = NULL;
-#endif
-
-    driver->set_px_cb = NULL;
 }
 
 /**

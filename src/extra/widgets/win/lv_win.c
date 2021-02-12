@@ -56,7 +56,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * icon, lv_coord_t btn_w, l
 {
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * btn = lv_btn_create(header, NULL);
-    lv_obj_set_size(btn, btn_w, LV_COORD_PCT(100));
+    lv_obj_set_size(btn, btn_w, LV_SIZE_PCT(100));
     lv_obj_add_event_cb(btn, event_cb, NULL);
 
     lv_obj_t * img = lv_img_create(btn, NULL);
@@ -86,12 +86,12 @@ static void lv_win_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     lv_obj_set_layout(obj, &lv_flex_stacked);
 
     lv_obj_t * header = lv_obj_create(obj, NULL);
-    lv_obj_set_size(header, LV_COORD_PCT(100), create_header_height);
+    lv_obj_set_size(header, LV_SIZE_PCT(100), create_header_height);
     lv_obj_set_layout(header, &lv_flex_inline);
 
     lv_obj_t * cont = lv_obj_create(obj, NULL);
     lv_obj_set_flex_grow(cont, 1);
-    lv_obj_set_width(cont, LV_COORD_PCT(100));
+    lv_obj_set_width(cont, LV_SIZE_PCT(100));
 }
 
 #endif
