@@ -64,14 +64,11 @@ void lv_style_init(lv_style_t * style)
  */
 void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 {
-    if(style_src == NULL) return;
-
     LV_ASSERT_STYLE(style_dest);
-    LV_ASSERT_STYLE(style_src);
-
-    if(style_src->map == NULL) return;
 
     uint16_t size = _lv_style_get_mem_size(style_src);
+    if(size == 0) return;
+
     style_dest->map = lv_mem_alloc(size);
     if(style_dest->map)
         _lv_memcpy(style_dest->map, style_src->map, size);
@@ -86,9 +83,6 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
  */
 bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
 {
-    if(style == NULL) return false;
-    LV_ASSERT_STYLE(style);
-
     int32_t id = get_property_index(style, prop);
     /*The property exists but not sure it's state is the same*/
     if(id >= 0) {
@@ -141,7 +135,7 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
 
     _lv_style_list_reset(list_dest);
 
-    if(list_src->style_list == NULL) return;
+    if(list_src == NULL || list_src->style_list == NULL) return;
 
     /*Copy the styles but skip the transitions*/
     if(list_src->has_local == 0) {
@@ -330,7 +324,7 @@ uint16_t _lv_style_get_mem_size(const lv_style_t * style)
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->map == NULL) return 0;
+    if(style == NULL || style->map == NULL) return 0;
 
     size_t i = 0;
     uint8_t prop_id;
@@ -353,8 +347,6 @@ uint16_t _lv_style_get_mem_size(const lv_style_t * style)
  */
 void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value)
 {
-    LV_ASSERT_STYLE(style);
-
     int32_t id = get_property_index(style, prop);
     /*The property already exists but not sure it's state is the same*/
     if(id >= 0) {
@@ -397,8 +389,6 @@ void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_in
  */
 void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color)
 {
-    LV_ASSERT_STYLE(style);
-
     int32_t id = get_property_index(style, prop);
     /*The property already exists but not sure it's state is the same*/
     if(id >= 0) {
@@ -442,8 +432,6 @@ void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_
  */
 void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa)
 {
-    LV_ASSERT_STYLE(style);
-
     int32_t id = get_property_index(style, prop);
     /*The property already exists but not sure it's state is the same*/
     if(id >= 0) {
@@ -487,8 +475,6 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
  */
 void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p)
 {
-    LV_ASSERT_STYLE(style);
-
     int32_t id = get_property_index(style, prop);
     /*The property already exists but not sure it's state is the same*/
     if(id >= 0) {
@@ -532,11 +518,6 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
  */
 int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res)
 {
-    LV_ASSERT_STYLE(style);
-
-    if(style == NULL) return -1;
-    if(style->map == NULL) return -1;
-
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -565,11 +546,6 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv
  */
 int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res)
 {
-    LV_ASSERT_STYLE(style);
-
-    if(style == NULL) return -1;
-    if(style->map == NULL) return -1;
-
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -598,8 +574,6 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv
  */
 int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res)
 {
-    if(style == NULL) return -1;
-    if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -628,9 +602,6 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
  */
 int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, const void ** res)
 {
-    if(style == NULL) return -1;
-    if(style->map == NULL) return -1;
-
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -1022,6 +993,7 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
 {
     LV_ASSERT_STYLE(style);
 
+    if(style == NULL) return -1;
     if(style->map == NULL) return -1;
 
     uint8_t id_to_find = prop & 0xFF;
