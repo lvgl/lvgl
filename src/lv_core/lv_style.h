@@ -405,7 +405,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
  *       For example: `lv_style_get_border_width()`
  * @note for performance reasons it's not checked if the property really has integer type
  */
-int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
 
 /**
  * Get a color typed property from a style.
@@ -420,7 +420,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, vo
  *       For example: `lv_style_get_border_color()`
  * @note for performance reasons it's not checked if the property really has color type
  */
-int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 
 /**
  * Get an opacity typed property from a style.
@@ -435,7 +435,7 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
  *       For example: `lv_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 
 /**
  * Get a pointer typed property from a style.
@@ -450,7 +450,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
  *       For example: `lv_style_get_text_font()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, const void ** res);
 
 /**
  * Get the local style of a style list
