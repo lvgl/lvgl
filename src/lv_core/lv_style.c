@@ -199,12 +199,12 @@ void _lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
     /*Remove the style first if already exists*/
     _lv_style_list_remove_style(list, style);
 
-    lv_style_t ** new_classes;
-    if(list->style_cnt == 0) new_classes = lv_mem_alloc(sizeof(lv_style_t *));
-    else new_classes = lv_mem_realloc(list->style_list, sizeof(lv_style_t *) * (list->style_cnt + 1));
-    LV_ASSERT_MEM(new_classes);
-    if(new_classes == NULL) {
-        LV_LOG_WARN("lv_style_list_add_style: couldn't add the class");
+    lv_style_t ** new_styles;
+    if(list->style_cnt == 0) new_styles = lv_mem_alloc(sizeof(lv_style_t *));
+    else new_styles = lv_mem_realloc(list->style_list, sizeof(lv_style_t *) * (list->style_cnt + 1));
+    LV_ASSERT_MEM(new_styles);
+    if(new_styles == NULL) {
+        LV_LOG_WARN("lv_style_list_add_style: couldn't add the style");
         return;
     }
 
@@ -214,12 +214,12 @@ void _lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
     if(list->has_trans) first_style++;
     if(list->has_local) first_style++;
     for(i = list->style_cnt; i > first_style; i--) {
-        new_classes[i] = new_classes[i - 1];
+        new_styles[i] = new_styles[i - 1];
     }
 
-    new_classes[first_style] = style;
+    new_styles[first_style] = style;
     list->style_cnt++;
-    list->style_list = new_classes;
+    list->style_list = new_styles;
 }
 
 /**
@@ -253,24 +253,22 @@ void _lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
         return;
     }
 
-    lv_style_t ** new_classes = lv_mem_alloc(sizeof(lv_style_t *) * (list->style_cnt - 1));
-    LV_ASSERT_MEM(new_classes);
-    if(new_classes == NULL) {
-        LV_LOG_WARN("lv_style_list_remove_style: couldn't reallocate class list");
+    lv_style_t ** new_styles = lv_mem_alloc(sizeof(lv_style_t *) * (list->style_cnt - 1));
+    LV_ASSERT_MEM(new_styles);
+    if(new_styles == NULL) {
+        LV_LOG_WARN("lv_style_list_remove_style: couldn't reallocate style list");
         return;
     }
     uint8_t j;
     for(i = 0, j = 0; i < list->style_cnt; i++) {
         if(list->style_list[i] == style) continue;
-        new_classes[j] = list->style_list[i];
-        j++;
-
+        new_styles[j++] = list->style_list[i];
     }
 
     lv_mem_free(list->style_list);
 
     list->style_cnt--;
-    list->style_list = new_classes;
+    list->style_list = new_styles;
 }
 
 /**
@@ -808,9 +806,8 @@ lv_res_t _lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
-        /* changed class to _class to allow compilation as c++ */
-        lv_style_t * _class = lv_style_list_get_style(list, ci);
-        int16_t weight_act = _lv_style_get_int(_class, prop, &value_act);
+        lv_style_t * style = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_int(style, prop, &value_act);
 
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
@@ -861,8 +858,8 @@ lv_res_t _lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pr
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
-        lv_style_t * _class = lv_style_list_get_style(list, ci);
-        int16_t weight_act = _lv_style_get_color(_class, prop, &value_act);
+        lv_style_t * style = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_color(style, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;
@@ -911,8 +908,8 @@ lv_res_t _lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
-        lv_style_t * _class = lv_style_list_get_style(list, ci);
-        int16_t weight_act = _lv_style_get_opa(_class, prop, &value_act);
+        lv_style_t * style = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_opa(style, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;
@@ -961,8 +958,8 @@ lv_res_t _lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
-        lv_style_t * _class = lv_style_list_get_style(list, ci);
-        int16_t weight_act = _lv_style_get_ptr(_class, prop, &value_act);
+        lv_style_t * style = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_ptr(style, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;
