@@ -170,6 +170,15 @@
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 
+/* Maximum buffer size to allocate for rotation. Only used if software rotation is enabled. */
+#ifndef LV_DISP_ROT_MAX_BUF
+#  ifdef CONFIG_LV_DISP_ROT_MAX_BUF
+#    define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+#  else
+#    define  LV_DISP_ROT_MAX_BUF  (10U * 1024U)
+#  endif
+#endif
+
 /*=========================
    Memory manager settings
  *=========================*/

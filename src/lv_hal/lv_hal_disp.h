@@ -60,6 +60,14 @@ typedef struct {
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
 } lv_disp_buf_t;
 
+
+typedef enum {
+    LV_DISP_ROT_NONE = 0,
+    LV_DISP_ROT_90,
+    LV_DISP_ROT_180,
+    LV_DISP_ROT_270
+} lv_disp_rot_t;
+
 /**
  * Display Driver structure to be registered by HAL
  */
@@ -75,7 +83,8 @@ typedef struct _disp_drv_t {
 #if LV_ANTIALIAS
     uint32_t antialiasing : 1; /**< 1: antialiasing is enabled on this display. */
 #endif
-    uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+    uint32_t rotated : 2;
+    uint32_t sw_rotate : 1; /**< 1: use software rotation (slower) */
 
 #if LV_COLOR_SCREEN_TRANSP
     /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
@@ -280,6 +289,20 @@ lv_coord_t lv_disp_get_dpi(lv_disp_t * disp);
  * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE
  */
 lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp);
+
+/**
+ * Set the rotation of this display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @param rotation rotation angle
+ */
+void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rot_t rotation);
+
+/**
+ * Get the current rotation of this display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return rotation angle
+ */
+lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp);
 
 //! @cond Doxygen_Suppress
 
