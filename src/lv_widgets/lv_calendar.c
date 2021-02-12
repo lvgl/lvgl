@@ -800,7 +800,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DAY_NAMES, &label_dsc);
-    label_dsc.flag = LV_TXT_FLAG_CENTER;
+    label_dsc.flag = LV_TXT_FLAG_CENTER | LV_TXT_FLAG_EXPAND;
 
     uint32_t i;
     for(i = 0; i < 7; i++) {
@@ -925,7 +925,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
             if(prev_state != day_state) {
                 lv_draw_rect_dsc_init(&rect_dsc);
                 lv_draw_label_dsc_init(&label_dsc);
-                label_dsc.flag = LV_TXT_FLAG_CENTER;
+                label_dsc.flag = LV_TXT_FLAG_CENTER | LV_TXT_FLAG_EXPAND;
 
                 calendar->state = day_state;
                 lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE, &label_dsc);
