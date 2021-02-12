@@ -6,26 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "lv_style.h"
 #include "../lv_misc/lv_mem.h"
-#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define STYLE_MIX_MAX 256
-#define STYLE_MIX_SHIFT 8 /*log2(STYLE_MIX_MAX)*/
-
-#define VAL_PROP(v1, v2, r) v1 + (((v2 - v1) * r) >> STYLE_MIX_SHIFT)
-#define STYLE_ATTR_MIX(attr, r)                                                                                        \
-    if(start->attr != end->attr) {                                                                                     \
-        res->attr = VAL_PROP(start->attr, end->attr, r);                                                               \
-    } else {                                                                                                           \
-        res->attr = start->attr;                                                                                       \
-    }
-
-#define LV_STYLE_PROP_TO_ID(prop) (prop & 0xFF);
-#define LV_STYLE_PROP_GET_TYPE(prop) ((prop >> 8) & 0xFF);
 
 /**********************
  *      TYPEDEFS
