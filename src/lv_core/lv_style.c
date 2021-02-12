@@ -535,7 +535,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
 }
 
 /**
- * Get the a property from a style.
+ * Get an integer typed property from a style.
  * Take into account the style state and return the property which matches the best.
  * @param style pointer to a style where to search
  * @param prop the property, might contain ORed style states too
@@ -846,7 +846,6 @@ lv_res_t _lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop
 
     if(weight >= 0) return LV_RES_OK;
     else return LV_RES_INV;
-
 }
 
 /**
@@ -1094,7 +1093,7 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
 }
 
 /**
- * Get he local style from a style list. Allocate it if not exists yet.
+ * Get the local style from a style list. Allocate it if not exists yet.
  * @param list pointer to a style list
  * @return pointer to the local style
  */
@@ -1169,8 +1168,7 @@ static inline uint8_t get_style_prop_attr(const lv_style_t * style, size_t idx)
 /**
  * Get property size.
  * @param prop_id property id.
- * @param idx index of the style in style->map
- * @return attribute of property in style->map + idx
+ * @return size of property
  */
 static inline size_t get_prop_size(uint8_t prop_id)
 {
