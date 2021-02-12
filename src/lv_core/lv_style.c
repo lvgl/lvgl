@@ -22,7 +22,7 @@
  **********************/
 LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
 static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
-static inline void style_resize(lv_style_t * style, size_t sz);
+static inline bool style_resize(lv_style_t * style, size_t sz);
 static inline lv_style_property_t get_style_prop(const lv_style_t * style, size_t idx);
 static inline uint8_t get_style_prop_id(const lv_style_t * style, size_t idx);
 static inline uint8_t get_style_prop_attr(const lv_style_t * style, size_t idx);
@@ -73,7 +73,8 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 
     uint16_t size = _lv_style_get_mem_size(style_src);
     style_dest->map = lv_mem_alloc(size);
-    _lv_memcpy(style_dest->map, style_src->map, size);
+    if(style_dest->map)
+        _lv_memcpy(style_dest->map, style_src->map, size);
 }
 
 /**
@@ -146,29 +147,38 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
     if(list_src->has_local == 0) {
         if(list_src->has_trans) {
             list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
-            _lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
-            list_dest->style_cnt = list_src->style_cnt - 1;
+            if(list_dest->style_list) {
+                _lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+                list_dest->style_cnt = list_src->style_cnt - 1;
+            }
         }
         else {
             list_dest->style_list = lv_mem_alloc(list_src->style_cnt * sizeof(lv_style_t *));
-            _lv_memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
-            list_dest->style_cnt = list_src->style_cnt;
+            if(list_dest->style_list) {
+                _lv_memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
+                list_dest->style_cnt = list_src->style_cnt;
+            }
         }
     }
     else {
         if(list_src->has_trans) {
             list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 2) * sizeof(lv_style_t *));
-            _lv_memcpy(list_dest->style_list, list_src->style_list + 2, (list_src->style_cnt - 2) * sizeof(lv_style_t *));
-            list_dest->style_cnt = list_src->style_cnt - 2;
+            if(list_dest->style_list) {
+                _lv_memcpy(list_dest->style_list, list_src->style_list + 2, (list_src->style_cnt - 2) * sizeof(lv_style_t *));
+                list_dest->style_cnt = list_src->style_cnt - 2;
+            }
         }
         else {
             list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
-            _lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
-            list_dest->style_cnt = list_src->style_cnt - 1;
+            if(list_dest->style_list) {
+                _lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+                list_dest->style_cnt = list_src->style_cnt - 1;
+            }
         }
 
         lv_style_t * local_style = get_alloc_local_style(list_dest);
-        lv_style_copy(local_style, get_alloc_local_style((lv_style_list_t *)list_src));
+        if (local_style)
+            lv_style_copy(local_style, get_alloc_local_style((lv_style_list_t *)list_src));
     }
 }
 
@@ -370,9 +380,7 @@ void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_in
     uint16_t size = _lv_style_get_mem_size(style);
     if(size == 0) size += end_mark_size;
     size += sizeof(lv_style_property_t) + sizeof(lv_style_int_t);
-    style_resize(style, size);
-    LV_ASSERT_MEM(style->map);
-    if(style == NULL) return;
+    if(!style_resize(style, size)) return;
 
     _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
     _lv_memcpy_small(style->map + size - sizeof(lv_style_int_t) - end_mark_size, &value, sizeof(lv_style_int_t));
@@ -417,9 +425,7 @@ void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_
     if(size == 0) size += end_mark_size;
 
     size += sizeof(lv_style_property_t) + sizeof(lv_color_t);
-    style_resize(style, size);
-    LV_ASSERT_MEM(style->map);
-    if(style == NULL) return;
+    if(!style_resize(style, size)) return;
 
     _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
     _lv_memcpy_small(style->map + size - sizeof(lv_color_t) - end_mark_size, &color, sizeof(lv_color_t));
@@ -464,9 +470,7 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
     if(size == 0) size += end_mark_size;
 
     size += sizeof(lv_style_property_t) + sizeof(lv_opa_t);
-    style_resize(style, size);
-    LV_ASSERT_MEM(style->map);
-    if(style == NULL) return;
+    if(!style_resize(style, size)) return;
 
     _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
     _lv_memcpy_small(style->map + size - sizeof(lv_opa_t) - end_mark_size, &opa, sizeof(lv_opa_t));
@@ -511,9 +515,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
     if(size == 0) size += end_mark_size;
 
     size += sizeof(lv_style_property_t) + sizeof(const void *);
-    style_resize(style, size);
-    LV_ASSERT_MEM(style->map);
-    if(style == NULL) return;
+    if(!style_resize(style, size)) return;
 
     _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
     _lv_memcpy_small(style->map + size - sizeof(const void *) - end_mark_size, &p, sizeof(const void *));
@@ -1105,9 +1107,12 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
  * @param style pointer to the style to be resized.
  * @param size new size
  */
-static inline void style_resize(lv_style_t * style, size_t sz)
+static inline bool style_resize(lv_style_t * style, size_t sz)
 {
-    style->map = lv_mem_realloc(style->map, sz);
+    uint8_t * new_map = lv_mem_realloc(style->map, sz);
+    if(sz && new_map == NULL) return false;
+    style->map = new_map;
+    return true;
 }
 
 /**
