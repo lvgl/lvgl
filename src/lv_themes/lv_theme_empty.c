@@ -95,8 +95,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
     LV_UNUSED(th);
     if(name == LV_THEME_SCR) {
-        lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
         lv_obj_add_style(obj, LV_OBJ_PART_MAIN, &styles->opa_cover);
+        lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 }
 
