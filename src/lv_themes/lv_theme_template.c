@@ -42,8 +42,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name);
 static lv_theme_t theme;
 static theme_styles_t * styles;
 
-static bool inited;
-
 /**********************
  *      MACROS
  **********************/
@@ -51,11 +49,10 @@ static bool inited;
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void style_init_reset(lv_style_t * style);
 
 static void basic_init(void)
 {
-    style_init_reset(&styles->bg);
+    lv_style_reset(&styles->bg);
     lv_style_set_bg_opa(&styles->bg, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_border_width(&styles->bg, LV_STATE_DEFAULT, 1);
     lv_style_set_border_width(&styles->bg, LV_STATE_FOCUSED, 2);
@@ -71,7 +68,7 @@ static void basic_init(void)
     lv_style_set_pad_bottom(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_inner(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
 
-    style_init_reset(&styles->btn);
+    lv_style_reset(&styles->btn);
     lv_style_set_bg_color(&styles->btn, LV_STATE_PRESSED, lv_color_hex3(0xccc));
     lv_style_set_bg_color(&styles->btn, LV_STATE_CHECKED, theme.color_primary);
     lv_style_set_bg_color(&styles->btn, LV_STATE_CHECKED | LV_STATE_PRESSED, lv_color_darken(theme.color_primary,
@@ -80,24 +77,24 @@ static void basic_init(void)
     lv_style_set_text_color(&styles->btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
     lv_style_set_image_recolor(&styles->btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
 
-    style_init_reset(&styles->round);
+    lv_style_reset(&styles->round);
     lv_style_set_radius(&styles->round, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
 
-    style_init_reset(&styles->color);
+    lv_style_reset(&styles->color);
     lv_style_set_bg_color(&styles->color, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_line_color(&styles->color, LV_STATE_DEFAULT, theme.color_primary);
 
-    style_init_reset(&styles->gray);
+    lv_style_reset(&styles->gray);
     lv_style_set_bg_color(&styles->gray, LV_STATE_DEFAULT, LV_COLOR_SILVER);
     lv_style_set_line_color(&styles->gray, LV_STATE_DEFAULT, LV_COLOR_SILVER);
     lv_style_set_text_color(&styles->gray, LV_STATE_DEFAULT, LV_COLOR_GRAY);
 
-    style_init_reset(&styles->tick_line);
+    lv_style_reset(&styles->tick_line);
     lv_style_set_line_width(&styles->tick_line, LV_STATE_DEFAULT, 5);
     lv_style_set_scale_end_line_width(&styles->tick_line, LV_STATE_DEFAULT, 5);
     lv_style_set_scale_end_color(&styles->tick_line, LV_STATE_DEFAULT, theme.color_primary);
 
-    style_init_reset(&styles->tight);
+    lv_style_reset(&styles->tight);
     lv_style_set_pad_left(&styles->tight, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_right(&styles->tight, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_top(&styles->tight, LV_STATE_DEFAULT, 0);
@@ -337,9 +334,11 @@ lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_s
     /* This trick is required only to avoid the garbage collection of
      * styles' data if LVGL is used in a binding (e.g. Micropython)
      * In a general case styles could be simple `static lv_style_t my style` variables or allocated directly into `styles`*/
-    if(!inited) {
-        LV_GC_ROOT(_lv_theme_template_styles) = lv_mem_alloc(sizeof(theme_styles_t));
-        styles = (theme_styles_t *)LV_GC_ROOT(_lv_theme_template_styles);
+    if(styles == NULL) {
+        styles = lv_mem_alloc(sizeof(theme_styles_t));
+        if (styles == NULL) return NULL;
+        _lv_memset_00(styles, sizeof(theme_styles_t));
+        LV_GC_ROOT(_lv_theme_template_styles) = styles;
     }
 
     theme.color_primary = color_primary;
@@ -388,7 +387,11 @@ lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_s
     return &theme;
 }
 
-void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
     LV_UNUSED(th);
 
@@ -830,16 +833,6 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
     }
 
     lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void style_init_reset(lv_style_t * style)
-{
-    if(inited) lv_style_reset(style);
-    else lv_style_init(style);
 }
 
 #endif
