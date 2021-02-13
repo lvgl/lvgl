@@ -98,10 +98,10 @@ def update_version(ver):
         cmd("sed -i -r 's/version=[0-9]+\.[0-9]+\.[0-9]+/"+ "version=" + ver_num + "/' library.properties")
 
     if path.exists("conf.py"):
-        cmd("sed -i -r \"s/'v[0-9]+\.[0-9]+\.[0-9]+.*'/\'" + ver_str + "'/\" conf.py")
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/" + ver_str + "/' conf.py")
 
     if path.exists("Kconfig"):
-        cmd("sed -i -r \"s/'v[0-9]+\.[0-9]+\.[0-9]+.*'/\'" + ver_str + "'/\" Kconfig")
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/" + ver_str + "/' Kconfig")
 
     if path.exists("lvgl.h"):
         define_set("./lvgl.h", "LVGL_VERSION_MAJOR", str(ver[0]))
