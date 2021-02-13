@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
 #include "../../lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_EMPTY
