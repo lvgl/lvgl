@@ -3,6 +3,7 @@
 
 static void event_cb(lv_obj_t * chart, lv_event_t e)
 {
+    LV_UNUSED(chart);
     if(e == LV_EVENT_DRAW_PART_BEGIN) {
         lv_obj_draw_hook_dsc_t * hook_dsc = lv_event_get_param();
         if(hook_dsc->part == LV_PART_MARKER && hook_dsc->sub_part_id == LV_CHART_AXIS_X) {

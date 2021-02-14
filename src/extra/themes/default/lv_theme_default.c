@@ -190,7 +190,7 @@ static bool inited;
 
 static void style_init(void)
 {
-    const static lv_style_prop_t trans_props[] = {
+    static const lv_style_prop_t trans_props[] = {
             LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, LV_STYLE_CONTENT_OPA,
             LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
             LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,

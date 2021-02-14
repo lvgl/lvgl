@@ -95,12 +95,12 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
             size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
             uint8_t * new_values_and_props = lv_mem_alloc(size);
 
-            uint8_t * tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
+            tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
             uint16_t * new_props = (uint16_t *) tmp;
             lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
 
             uint32_t j;
-            for(j = 0; j < style->prop_cnt + 1; j++) { /* +1: because prop_cnt already reduced but all the old props. needs to be checked. */
+            for(j = 0; j < (uint32_t)style->prop_cnt + 1; j++) { /* +1: because prop_cnt already reduced but all the old props. needs to be checked. */
                 if(props[j] != prop) {
                     *new_values = values[j];
                     *new_props = props[j];
@@ -119,24 +119,11 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
     return false;
 }
 
-/**
- * Tell the group of a property. If the a property from a group is set in a style the (1 << group) bit of style->has_group is set.
- * It allows early skipping the style if the property is not exists in the style at all.
- * @param prop a style property
- * @return the group [0..7] 7 means all the custom properties with index > 112
- */
-uint8_t lv_style_get_prop_group(lv_style_prop_t prop)
-{
-    uint16_t group = (prop & 0x1FF) >> 4;
-    if(group > 7) group = 7;    /*The MSB marks all the custom properties*/
-    return (uint8_t)group;
-}
-
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
     LV_ASSERT_STYLE(style);
 
-    uint8_t group = lv_style_get_prop_group(prop);
+    uint8_t group = _lv_style_get_prop_group(prop);
     style->has_group |= 1 << group;
 
     if(style->allocated) {
@@ -280,6 +267,12 @@ bool lv_style_is_empty(const lv_style_t * style)
     return style->prop_cnt == 0 ? true : false;
 }
 
+uint8_t _lv_style_get_prop_group(lv_style_prop_t prop)
+{
+    uint16_t group = (prop & 0x1FF) >> 4;
+    if(group > 7) group = 7;    /*The MSB marks all the custom properties*/
+    return (uint8_t)group;
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/

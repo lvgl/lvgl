@@ -153,6 +153,8 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
 
 static void flex_update(lv_obj_t * cont, lv_obj_t * item)
 {
+    LV_UNUSED(item);
+
     if(cont->spec_attr == NULL) return;
     const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
 
@@ -187,7 +189,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     if(track_cross_place != LV_FLEX_PLACE_START) {
         track_first_item = f->rev ? cont->spec_attr->child_cnt - 1 : 0;
         track_t t;
-        while(track_first_item < cont->spec_attr->child_cnt && track_first_item >= 0) {
+        while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
             /*Search the first item of the next row */
             next_track_first_item = find_track_end(cont, track_first_item, max_main_size, item_gap, &t);
             total_track_cross_size += t.track_cross_size + track_gap;
@@ -217,7 +219,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
          *cross_pos += total_track_cross_size;
     }
 
-    while(track_first_item < cont->spec_attr->child_cnt && track_first_item >= 0) {
+    while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
         track_t t;
         /*Search the first item of the next row */
         next_track_first_item = find_track_end(cont, track_first_item, max_main_size, item_gap, &t);
@@ -234,7 +236,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
             *cross_pos += t.track_cross_size + gap + track_gap;
         }
     }
-    LV_ASSERT_MALLOC_INTEGRITY();
+    LV_ASSERT_MEM_INTEGRITY();
 }
 
 /**
@@ -440,7 +442,7 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id)
         else return NULL;
     } else {
         (*item_id)++;
-        if((*item_id) < cont->spec_attr->child_cnt) return cont->spec_attr->children[*item_id];
+        if((*item_id) < (int32_t)cont->spec_attr->child_cnt) return cont->spec_attr->children[*item_id];
         else return NULL;
     }
 }

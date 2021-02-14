@@ -28,8 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_line_destructor(lv_obj_t * obj);
+static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -38,7 +37,6 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  **********************/
 const lv_obj_class_t lv_line_class = {
     .constructor_cb = lv_line_constructor,
-    .destructor_cb = lv_line_destructor,
     .signal_cb = lv_line_signal,
     .draw_cb = lv_line_draw,
     .instance_size = sizeof(lv_line_t),
@@ -104,7 +102,7 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("line create started");
 
@@ -129,11 +127,6 @@ static void lv_line_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_
     }
 
     LV_LOG_INFO("line created");
-}
-
-static void lv_line_destructor(lv_obj_t * obj)
-{
-
 }
 
 static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

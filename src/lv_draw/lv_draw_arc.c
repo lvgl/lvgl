@@ -209,6 +209,13 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     }
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_COMPLEX == 0");
+    LV_UNUSED(center_x);
+    LV_UNUSED(center_y);
+    LV_UNUSED(radius);
+    LV_UNUSED(start_angle);
+    LV_UNUSED(end_angle);
+    LV_UNUSED(clip_area);
+    LV_UNUSED(dsc);
 #endif /*LV_DRAW_COMPLEX*/
 }
 

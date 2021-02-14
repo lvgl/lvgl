@@ -34,7 +34,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_label_destructor(lv_obj_t * obj);
 static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
@@ -695,7 +695,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("label create started");
 
@@ -722,9 +722,11 @@ static void lv_label_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
     label->dot.tmp_ptr   = NULL;
     label->dot_tmp_alloc = 0;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_label_set_long_mode(obj, LV_LABEL_LONG_EXPAND);
-    lv_label_set_text(obj, "Text");
+    if(copy == NULL) {
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+        lv_label_set_long_mode(obj, LV_LABEL_LONG_EXPAND);
+        lv_label_set_text(obj, "Text");
+    }
 
     LV_LOG_INFO("label created");
 }

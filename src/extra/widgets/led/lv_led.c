@@ -31,7 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_led_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_led_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_led_draw(lv_obj_t * led, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 /**********************
@@ -72,10 +72,13 @@ lv_obj_t * lv_led_create(lv_obj_t * parent)
  * @param led       pointer to a LED object
  * @param color     the color of the the LED
  */
-void lv_led_set_color(lv_obj_t * led, lv_color_t color)
+void lv_led_set_color(lv_obj_t * obj, lv_color_t color)
 {
-
+    lv_led_t * led = (lv_led_t *) obj;
+    led->color = color;
+    lv_obj_invalidate(obj);
 }
+
 /**
  * Set the brightness of a LED object
  * @param led pointer to a LED object
@@ -83,7 +86,6 @@ void lv_led_set_color(lv_obj_t * led, lv_color_t color)
  */
 void lv_led_set_brightness(lv_obj_t * obj, uint8_t bright)
 {
-    /*Set the brightness*/
     lv_led_t * led = (lv_led_t *) obj;
     if(led->bright == bright) return;
 
@@ -146,9 +148,9 @@ uint8_t lv_led_get_brightness(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_led_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_led_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-
+    LV_UNUSED(copy);
     lv_led_t * led = (lv_led_t *) obj;
     led->color = lv_theme_get_color_primary();
     led->bright = LV_LED_BRIGHT_MAX;

@@ -360,6 +360,14 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
  */
 bool lv_style_is_empty(const lv_style_t * style);
 
+/**
+ * Tell the group of a property. If the a property from a group is set in a style the (1 << group) bit of style->has_group is set.
+ * It allows early skipping the style if the property is not exists in the style at all.
+ * @param prop a style property
+ * @return the group [0..7] 7 means all the custom properties with index > 112
+ */
+uint8_t _lv_style_get_prop_group(lv_style_prop_t prop);
+
 static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_RADIUS, v); }
 

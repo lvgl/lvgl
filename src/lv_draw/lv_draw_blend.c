@@ -675,7 +675,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
     const lv_color_t * map_buf_first = map_buf + map_w * (draw_area->y1 - (map_area->y1 - disp_area->y1));
     map_buf_first += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 
-#if LV_COLOR_SCREEN_TRANSP || LV_USE_GPU
+#if LV_COLOR_SCREEN_TRANSP
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 #endif
 

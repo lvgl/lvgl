@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_imgbtn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * param);
 static void refr_img(lv_obj_t * imgbtn);
@@ -150,8 +150,10 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_imgbtn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
+
    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
    /*Initialize the allocated 'ext' */
    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
@@ -186,7 +188,6 @@ static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * obj, const lv_area_t * clip_area,
         lv_obj_draw_base(&lv_imgbtn_class, obj, clip_area, mode);
 
         /*Just draw an image*/
-        lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
         lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
 
         /*Simply draw the middle src if no tiled*/

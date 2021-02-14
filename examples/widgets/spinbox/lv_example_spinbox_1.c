@@ -6,6 +6,7 @@ static lv_obj_t * spinbox;
 
 static void lv_spinbox_increment_event_cb(lv_obj_t * btn, lv_event_t e)
 {
+    LV_UNUSED(btn);
     if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_spinbox_increment(spinbox);
     }
@@ -13,6 +14,7 @@ static void lv_spinbox_increment_event_cb(lv_obj_t * btn, lv_event_t e)
 
 static void lv_spinbox_decrement_event_cb(lv_obj_t * btn, lv_event_t e)
 {
+    LV_UNUSED(btn);
     if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_spinbox_decrement(spinbox);
     }

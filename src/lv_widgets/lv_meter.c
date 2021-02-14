@@ -27,7 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_meter_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_meter_draw(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -207,7 +207,7 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_meter_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("line meter create started");
 

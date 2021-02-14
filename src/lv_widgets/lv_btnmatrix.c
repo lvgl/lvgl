@@ -32,7 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_btnmatrix_destructor(lv_obj_t * obj);
 static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
@@ -372,7 +372,7 @@ bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_btnmatrix_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     btnm->btn_cnt        = 0;

@@ -10,6 +10,7 @@
 #if LV_USE_CHECKBOX != 0
 
 #include "../lv_misc/lv_assert.h"
+#include "../lv_misc/lv_txt_ap.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -25,7 +26,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_checkbox_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -63,7 +64,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    size_t len = _lv_txt_ap_proc(txt);
+    size_t len = _lv_txt_ap_calc_bytes_cnt(txt);
 #else
     size_t len = strlen(txt);
 #endif
@@ -107,7 +108,7 @@ const char * lv_checkbox_get_text(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_checkbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_checkbox create started");
 

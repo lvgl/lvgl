@@ -56,7 +56,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_SHADOW_CACHE_SIZE
+#if defined(LV_SHADOW_CACHE_SIZE) && LV_SHADOW_CACHE_SIZE > 0
     static uint8_t sh_cache[LV_SHADOW_CACHE_SIZE * LV_SHADOW_CACHE_SIZE];
     static int32_t sh_cache_size = -1;
     static int32_t sh_cache_r = -1;
@@ -112,7 +112,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_dra
 
     draw_outline(coords, clip, dsc);
 
-    LV_ASSERT_MALLOC_INTEGRITY();
+    LV_ASSERT_MEM_INTEGRITY();
 }
 
 /**********************
@@ -1186,7 +1186,7 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     size_t len = _lv_txt_ap_calc_bytes_cnt(dsc->content_text) + 1;
-    const char * txt = txt = lv_mem_buf_get(len);
+    char * txt = txt = lv_mem_buf_get(len);
     _lv_txt_ap_proc(dsc->content_text, txt);
 #else
     const char * txt = dsc->content_text;
@@ -1414,5 +1414,15 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     lv_draw_mask_remove_id(mask_rin_id);
     lv_draw_mask_remove_id(mask_rout_id);
     lv_mem_buf_release(mask_buf);
+
+#else /*LV_DRAW_COMPLEX*/
+    LV_UNUSED(area_inner);
+    LV_UNUSED(area_outer);
+    LV_UNUSED(clip);
+    LV_UNUSED(radius);
+    LV_UNUSED(radius_is_in);
+    LV_UNUSED(color);
+    LV_UNUSED(opa);
+    LV_UNUSED(blend_mode);
 #endif /*LV_DRAW_COMPLEX*/
 }

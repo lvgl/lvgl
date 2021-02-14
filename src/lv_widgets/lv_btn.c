@@ -22,7 +22,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 
 /**********************
  *  STATIC VARIABLES
@@ -50,12 +50,14 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_btn create started");
 
-    lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    if(copy == NULL) {
+        lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    }
 
     LV_LOG_INFO("btn created");
 }

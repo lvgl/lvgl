@@ -10,9 +10,9 @@
 #include "../../lvgl.h"
 #if LV_BUILD_TEST
 #include "../lv_test_assert.h"
-#include "../src/lv_font/lv_font_fmt_txt.h"
-#include "../src/lv_font/lv_font.h"
-#include "../src/lv_font/lv_font_loader.h"
+#include "../../src/lv_font/lv_font_fmt_txt.h"
+#include "../../src/lv_font/lv_font.h"
+#include "../../src/lv_font/lv_font_loader.h"
 
 #include "lv_test_font_loader.h" 
 
@@ -28,9 +28,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_USE_FILESYSTEM
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -50,7 +48,6 @@ extern lv_font_t font_3;
 
 void lv_test_font_loader(void)
 {
-#if LV_USE_FILESYSTEM
     lv_font_t * font_1_bin = lv_font_load("F:font_1.fnt");
     lv_font_t * font_2_bin = lv_font_load("F:font_2.fnt");
     lv_font_t * font_3_bin = lv_font_load("F:font_3.fnt");
@@ -62,12 +59,8 @@ void lv_test_font_loader(void)
     lv_font_free(font_1_bin);
     lv_font_free(font_2_bin);
     lv_font_free(font_3_bin);
-#else
-    lv_test_print("SKIP: font load test because it requires LV_USE_FILESYSTEM 1 and LV_FONT_FMT_TXT_LARGE 0");
-#endif
 }
 
-#if LV_USE_FILESYSTEM
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
 {
     lv_test_assert_true(f1 != NULL && f2 != NULL, "font not null");
@@ -205,7 +198,6 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     LV_LOG_INFO("No differences found!");
     return 0;
 }
-#endif
 
 /**********************
  *   STATIC FUNCTIONS

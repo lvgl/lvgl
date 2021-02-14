@@ -73,7 +73,7 @@ typedef struct {
     uint16_t tick_width;
 
     lv_color_t tick_major_color;
-    int16_t tick_major_nth;
+    uint16_t tick_major_nth;
     uint16_t tick_major_length;
     uint16_t tick_major_width;
 

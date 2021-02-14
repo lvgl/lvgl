@@ -45,7 +45,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_textarea_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_textarea_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -944,7 +944,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_textarea_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("text area create started");
 

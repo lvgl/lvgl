@@ -36,7 +36,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_chart_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_chart_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_chart_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -258,6 +258,7 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * obj)
 
 uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
+    LV_UNUSED(obj);
     LV_ASSERT_NULL(ser);
 
     return(ser->last_point);
@@ -474,6 +475,7 @@ void lv_chart_set_ext_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t 
 
 lv_coord_t * lv_chart_get_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
+    LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
     return ser->points;
@@ -489,7 +491,7 @@ int32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_chart_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("chart create started");
 
@@ -505,7 +507,7 @@ static void lv_chart_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
     chart->hdiv_cnt    = LV_CHART_HDIV_DEF;
     chart->vdiv_cnt    = LV_CHART_VDIV_DEF;
     chart->point_cnt   = LV_CHART_POINT_CNT_DEF;
-    chart->pressed_point_id  = -1;
+    chart->pressed_point_id  = LV_CHART_POINT_ID_NONE;
     chart->type        = LV_CHART_TYPE_LINE;
     chart->update_mode = LV_CHART_UPDATE_MODE_SHIFT;
     chart->zoom_x      = LV_IMG_ZOOM_NONE;
@@ -590,8 +592,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
-//        invalidate_point(obj, chart->pressed_point_id);
-        chart->pressed_point_id = -1;
+        chart->pressed_point_id = LV_CHART_POINT_ID_NONE;
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = param;
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
@@ -609,7 +610,7 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     bool mask_ret = _lv_area_intersect(&series_mask, &obj->coords, clip_area);
     if(mask_ret == false) return;
 
-    uint32_t i;
+    uint16_t i;
     lv_point_t p1;
     lv_point_t p2;
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);

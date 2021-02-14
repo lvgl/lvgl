@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_keyboard_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 
 static void lv_keyboard_update_map(lv_obj_t * obj);
 
@@ -31,7 +31,7 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_keyboard_class = {
-    .constructor_cb = my_constructor,
+    .constructor_cb = lv_keyboard_constructor,
     .instance_size = sizeof(lv_keyboard_t),
     .editable = 1,
     .base_class = &lv_btnmatrix_class
@@ -255,7 +255,7 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
         if(res != LV_RES_OK) return;
 
         if(keyboard->ta) {
-            lv_res_t res = lv_event_send(keyboard->ta, LV_EVENT_CANCEL, NULL);
+            res = lv_event_send(keyboard->ta, LV_EVENT_CANCEL, NULL);
             if(res != LV_RES_OK) return;
         }
         lv_keyboard_set_textarea(obj, NULL); /*De-assign the text area  to hide it cursor if needed*/
@@ -266,7 +266,7 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
         if(res != LV_RES_OK) return;
 
         if(keyboard->ta) {
-            lv_res_t res = lv_event_send(keyboard->ta, LV_EVENT_READY, NULL);
+            res = lv_event_send(keyboard->ta, LV_EVENT_READY, NULL);
             if(res != LV_RES_OK) return;
         }
 
@@ -315,14 +315,17 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
  *   STATIC FUNCTIONS
  **********************/
 
-static void my_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_keyboard_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
+
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
     keyboard->ta         = NULL;
     keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
 
+    lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, lv_obj_get_width_fit(parent), lv_obj_get_height_fit(parent) / 2);
     lv_obj_align(obj, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
     lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, NULL);

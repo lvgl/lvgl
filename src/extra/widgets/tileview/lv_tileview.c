@@ -20,8 +20,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_tileview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_tileview_tile_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_tileview_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_tileview_tile_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void tileview_event_cb(lv_obj_t * tv, lv_event_t e);
 
 /**********************
@@ -107,8 +107,9 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_tileview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_tileview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
     lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
     lv_obj_add_event_cb(obj, tileview_event_cb, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
@@ -117,8 +118,10 @@ static void lv_tileview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_
 
 }
 
-static void lv_tileview_tile_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_tileview_tile_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
+    lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
     lv_obj_set_pos(obj, create_col_id * lv_obj_get_width_fit(parent),  create_row_id * lv_obj_get_height_fit(parent));
 

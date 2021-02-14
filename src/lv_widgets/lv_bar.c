@@ -45,7 +45,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_bar_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_bar_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
@@ -199,7 +199,7 @@ lv_bar_type_t lv_bar_get_type(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_bar create started");
 

@@ -4,7 +4,7 @@
 #include "lv_test_core/lv_test_core.h"
 #include "lv_test_widgets/lv_test_label.h"
 
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST && !defined(LV_BUILD_TEST_NO_MAIN)
 #include <sys/time.h>
 
 #define HOR_RES 800
@@ -23,13 +23,12 @@ int main(void)
     hal_init();
 
     lv_test_core();
-    lv_test_label();
+//    lv_test_label();
 
     printf("Exit with success!\n");
     return 0;
 }
 
-#if LV_USE_FILESYSTEM
 static void * open_cb(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     (void) drv;
@@ -89,7 +88,6 @@ static lv_fs_res_t tell_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * 
     return LV_FS_RES_OK;
 }
 
-#endif
 
 static void hal_init(void)
 {
@@ -106,7 +104,6 @@ static void hal_init(void)
     disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
 
-#if LV_USE_FILESYSTEM
     lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
 
@@ -118,7 +115,6 @@ static void hal_init(void)
     drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position  */
 
     lv_fs_drv_register(&drv);                 /*Finally register the drive*/
-#endif
 }
 #include <stdio.h>
 

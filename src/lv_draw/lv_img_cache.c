@@ -195,6 +195,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
  */
 void lv_img_cache_invalidate_src(const void * src)
 {
+    LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
     lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
 

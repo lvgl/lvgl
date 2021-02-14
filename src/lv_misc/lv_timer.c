@@ -307,7 +307,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
         timer_deleted   = false;
         timer_created   = false;
         if(timer->timer_cb) timer->timer_cb(timer);
-        LV_ASSERT_MALLOC_INTEGRITY();
+        LV_ASSERT_MEM_INTEGRITY();
 
         /*Delete if it was a one shot lv_timer*/
         if(timer_deleted == false) { /*The timer might be deleted by itself as well*/

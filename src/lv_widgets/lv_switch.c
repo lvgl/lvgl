@@ -33,8 +33,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_switch_destructor(lv_obj_t * obj);
+static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
@@ -43,7 +42,6 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, 
  **********************/
 const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
-    .destructor_cb = lv_switch_destructor,
     .signal_cb = lv_switch_signal,
     .draw_cb = lv_switch_draw,
     .instance_size = sizeof(lv_switch_t),
@@ -74,7 +72,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("switch create started");
 
@@ -85,16 +83,6 @@ static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
    }
 
    LV_LOG_INFO("switch created");
-}
-
-static void lv_switch_destructor(lv_obj_t * obj)
-{
-//    lv_bar_t * bar = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-//    _lv_obj_reset_style_list_no_refr(sw, LV_PART_KNOB);
-//
-//    bar->class_p->base_p->destructor(obj);
 }
 
 static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

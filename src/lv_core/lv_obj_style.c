@@ -42,7 +42,6 @@ typedef enum {
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-uint8_t lv_style_get_prop_group(lv_style_prop_t prop);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -491,7 +490,7 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
         break;
     }
 
-    uint8_t group = 1 << lv_style_get_prop_group(prop);
+    uint8_t group = 1 << _lv_style_get_prop_group(prop);
     int32_t weight = -1;
     lv_state_t state = obj->state;
     lv_state_t state_inv = ~state;

@@ -38,10 +38,10 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-
+#if LV_DRAW_COMPLEX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-
+#endif
 static uint8_t hex_char_to_num(char hex);
 
 /**********************
@@ -381,7 +381,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         if(pos.y > mask->y2) return;
     }
 
-    LV_ASSERT_MALLOC_INTEGRITY();
+    LV_ASSERT_MEM_INTEGRITY();
 }
 
 /**********************
@@ -441,8 +441,15 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
         return;
     }
 
-    if(font_p->subpx) draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
-    else draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
+    if(font_p->subpx) {
+#if LV_DRAW_COMPLEX
+    draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
+#else
+    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
+#endif
+    } else {
+        draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
+    }
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
@@ -526,15 +533,17 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     fill_area.x2 = col_end  + pos_x - 1;
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
-
+#if LV_DRAW_COMPLEX
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
+#endif
 
     uint32_t col_bit_max = 8 - bpp;
     uint32_t col_bit_row_ofs = (box_w + col_start - col_end) * bpp;
 
     for(row = row_start ; row < row_end; row++) {
+#if LV_DRAW_COMPLEX
         int32_t mask_p_start = mask_p;
-
+#endif
         bitmask = bitmask_init >> col_bit;
         for(col = col_start; col < col_end; col++) {
             /*Load the pixel's opacity into the mask*/
@@ -602,10 +611,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     lv_mem_buf_release(mask_buf);
 }
 
+#if LV_DRAW_COMPLEX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
-#if LV_DRAW_COMPLEX
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;
     uint32_t bitmask;
@@ -804,10 +813,8 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
     lv_mem_buf_release(mask_buf);
     lv_mem_buf_release(color_buf);
-#else
-    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
-#endif
 }
+#endif
 
 /**
  * Convert a hexadecimal characters to a number (0..15)

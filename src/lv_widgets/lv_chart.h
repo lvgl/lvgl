@@ -28,6 +28,9 @@ extern "C" {
 #define LV_CHART_POINT_DEF (LV_COORD_MIN)
 LV_EXPORT_CONST_INT(LV_CHART_POINT_DEF);
 
+#define LV_CHART_POINT_ID_NONE     0xFFFF
+LV_EXPORT_CONST_INT(LV_CHART_POINT_ID_NONE);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -86,14 +89,13 @@ typedef struct {
 typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the data line pointers (stores lv_chart_series_t)*/
-
     lv_chart_tick_dsc_t tick[_LV_CHART_AXIS_LAST];
-    int32_t pressed_point_id;
-    uint8_t hdiv_cnt;      /**< Number of horizontal division lines*/
-    uint8_t vdiv_cnt;      /**< Number of vertical division lines*/
-    uint16_t point_cnt;    /**< Point number in a data line*/
     lv_coord_t ymin[2];
     lv_coord_t ymax[2];
+    uint16_t pressed_point_id;
+    uint16_t hdiv_cnt;      /**< Number of horizontal division lines*/
+    uint16_t vdiv_cnt;      /**< Number of vertical division lines*/
+    uint16_t point_cnt;    /**< Point number in a data line*/
     uint16_t zoom_x;
     uint16_t zoom_y;
     lv_chart_type_t type :2; /**< Line or column chart */

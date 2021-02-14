@@ -29,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_table_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -560,7 +560,7 @@ lv_res_t lv_table_get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * co
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_table create started");
 
@@ -597,21 +597,18 @@ static void lv_table_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj
 
 static void lv_table_destructor(lv_obj_t * obj)
 {
-//    /*Free the cell texts*/
-//           uint16_t i;
-//           for(i = 0; i < table->col_cnt * table->row_cnt; i++) {
-//               if(table->cell_data[i]) {
-//                   lv_mem_free(table->cell_data[i]);
-//                   table->cell_data[i] = NULL;
-//               }
-//           }
-//
-//           if(table->cell_data) lv_mem_free(table->cell_data);
-//           if(table->row_h) lv_mem_free(table->row_h);
-//
-//           for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-//               _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_CELL1 + i);
-//           }
+    lv_table_t * table = (lv_table_t *) obj;
+    /*Free the cell texts*/
+    uint16_t i;
+    for(i = 0; i < table->col_cnt * table->row_cnt; i++) {
+        if(table->cell_data[i]) {
+            lv_mem_free(table->cell_data[i]);
+            table->cell_data[i] = NULL;
+        }
+    }
+
+    if(table->cell_data) lv_mem_free(table->cell_data);
+    if(table->row_h) lv_mem_free(table->row_h);
 }
 
 static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

@@ -1,4 +1,3 @@
-
 /**
  * @file lv_slider.c
  *
@@ -32,8 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_slider_destructor(lv_obj_t * obj);
+static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
@@ -44,7 +42,6 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area);
  **********************/
 const lv_obj_class_t lv_slider_class = {
     .constructor_cb = lv_slider_constructor,
-    .destructor_cb = lv_slider_destructor,
     .signal_cb = lv_slider_signal,
     .draw_cb = lv_slider_draw,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
@@ -78,7 +75,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     lv_slider_t * slider = (lv_slider_t *)obj;
 
@@ -99,15 +96,6 @@ static void lv_slider_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
         lv_area_copy(&slider->right_knob_area, &copy_slider->right_knob_area);
     }
 
-}
-
-static void lv_slider_destructor(lv_obj_t * obj)
-{
-//    lv_slider_t * slider = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_PART_KNOB);
-//
-//    slider->class_p->base_p->destructor(obj);
 }
 
 static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

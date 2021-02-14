@@ -30,7 +30,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_arc_draw(lv_obj_t * arc, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
@@ -480,7 +480,7 @@ lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_arc create started");
 

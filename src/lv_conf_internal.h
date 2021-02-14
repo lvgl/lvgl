@@ -401,7 +401,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  ifdef CONFIG_LV_ASSERT_HANDLER_INCLUDE
 #    define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
 #  else
-#    define  LV_ASSERT_HANDLER_INCLUDE
+#    define  LV_ASSERT_HANDLER_INCLUDE  <stdint.h>
 #  endif
 #endif
 #ifndef LV_ASSERT_HANDLER

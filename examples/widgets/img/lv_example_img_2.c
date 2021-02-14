@@ -40,6 +40,8 @@ void lv_example_img_2(void)
 
 static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 {
+    LV_UNUSED(slider);
+
     if(event == LV_EVENT_VALUE_CHANGED) {
         /* Recolor the image based on the sliders' values */
         lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider), lv_slider_get_value(blue_slider));

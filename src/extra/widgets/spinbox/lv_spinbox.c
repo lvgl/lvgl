@@ -22,8 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_spinbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_spinbox_destructor(lv_obj_t * obj);
+static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
@@ -32,7 +31,6 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_spinbox_class = {
     .constructor_cb = lv_spinbox_constructor,
-    .destructor_cb = lv_spinbox_destructor,
     .signal_cb = lv_spinbox_signal,
     .instance_size = sizeof(lv_spinbox_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
@@ -266,10 +264,11 @@ void lv_spinbox_decrement(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_spinbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("spinbox create started");
+    LV_UNUSED(copy);
 
+    LV_LOG_TRACE("spinbox create started");
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *) obj;
 
@@ -289,11 +288,6 @@ static void lv_spinbox_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
     lv_spinbox_updatevalue(obj);
 
     LV_LOG_INFO("spinbox created");
-}
-
-static void lv_spinbox_destructor(lv_obj_t * obj)
-{
-
 }
 
 static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param)

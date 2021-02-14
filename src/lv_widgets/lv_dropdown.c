@@ -36,12 +36,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_dropdown_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
-static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_dropdown_list_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_dropdown_list_destructor(lv_obj_t * list_obj);
 static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
@@ -520,7 +520,7 @@ static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * co
     return lv_obj_create_from_class(&lv_dropdown_list_class, parent, copy);
 }
 
-static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("dropdown create started");
 
@@ -761,8 +761,9 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
     return LV_DRAW_RES_OK;
 }
 
-static void lv_dropdown_list_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_dropdown_list_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
     lv_label_create(obj, NULL);
 }
 

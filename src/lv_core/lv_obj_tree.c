@@ -25,8 +25,6 @@
  *      TYPEDEFS
  **********************/
 
-void lv_obj_destruct(lv_obj_t * obj);
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/

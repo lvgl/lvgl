@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label_obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -282,7 +282,7 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
  **********************/
 
 
-static void lv_roller_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
 
     lv_roller_t * roller = (lv_roller_t*)obj;

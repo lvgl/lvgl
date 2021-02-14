@@ -31,7 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_colorwheel_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_colorwheel_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -208,8 +208,10 @@ bool lv_colorwheel_get_color_mode_fixed(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_colorwheel_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
+
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
     colorwheel->hsv.h = 0;
     colorwheel->hsv.s = 100;

@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void my_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void draw_event_cb(lv_obj_t * obj, lv_event_t e);
 
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
@@ -67,7 +67,7 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char * day_names[])
     lv_calendar_t * calendar = (lv_calendar_t *) obj;
     uint32_t i;
     for(i = 0; i < 7; i++) {
-        calendar->map[i] = day_names_def[i];
+        calendar->map[i] = day_names[i];
     }
 }
 
@@ -207,8 +207,9 @@ bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * dat
  *  STATIC FUNCTIONS
  **********************/
 
-static void my_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void my_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
     lv_calendar_t * calendar = (lv_calendar_t *) obj;
 
     /*Initialize the allocated 'ext' */

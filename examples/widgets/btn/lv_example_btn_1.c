@@ -3,6 +3,7 @@
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
+    LV_UNUSED(obj);
     if(event == LV_EVENT_CLICKED) {
         LV_LOG_USER("Clicked\n");
     }

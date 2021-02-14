@@ -276,14 +276,14 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
-        lv_label_set_align(perf_label, LV_TEXT_ALIGN_RIGHT);
-        lv_obj_set_style_local_bg_opa(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
-        lv_obj_set_style_local_bg_color(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-        lv_obj_set_style_local_text_color(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-        lv_obj_set_style_local_pad_top(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_local_pad_bottom(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_local_pad_left(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_local_pad_right(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
+        lv_obj_set_style_bg_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+        lv_obj_set_style_text_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+        lv_obj_set_style_pad_top(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_bottom(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_left(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_right(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_text_align(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_TEXT_ALIGN_RIGHT);
         lv_label_set_text(perf_label, "?");
         lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     }
@@ -311,7 +311,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
 
         fps_sum_all += fps;
         fps_sum_cnt ++;
-        uint32_t cpu = 100 - lv_task_get_idle();
+        uint32_t cpu = 100 - lv_timer_get_idle();
         lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
         lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     }

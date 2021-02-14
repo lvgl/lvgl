@@ -45,6 +45,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
 
 static void add_data(lv_timer_t * timer)
 {
+    LV_UNUSED(timer);
     static uint32_t cnt = 0;
     lv_chart_set_next_value(chart1, ser1, lv_rand(20, 90));
 

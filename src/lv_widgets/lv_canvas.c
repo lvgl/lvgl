@@ -27,8 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_canvas_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_canvas_destructor(lv_obj_t * obj);
+static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
 static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
@@ -54,7 +53,6 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
  **********************/
 const lv_obj_class_t lv_canvas_class = {
     .constructor_cb = lv_canvas_constructor,
-    .destructor_cb = lv_canvas_destructor,
     .instance_size = sizeof(lv_canvas_t),
     .base_class = &lv_img_class
 };
@@ -878,6 +876,13 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 
     lv_obj_invalidate(canvas);
 #else
+    LV_UNUSED(canvas);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(r);
+    LV_UNUSED(start_angle);
+    LV_UNUSED(end_angle);
+    LV_UNUSED(draw_dsc);
     LV_LOG_WARN("Can't draw arc with LV_DRAW_COMPLEX == 0");
 #endif
 }
@@ -886,8 +891,9 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_canvas_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+   LV_UNUSED(copy);
    LV_LOG_TRACE("canvas create started");
 
    lv_canvas_t * canvas = (lv_canvas_t *) obj;
@@ -903,11 +909,6 @@ static void lv_canvas_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
    lv_img_set_src(obj, &canvas->dsc);
 
    LV_LOG_INFO("canvas created");
-}
-
-static void lv_canvas_destructor(lv_obj_t * obj)
-{
-
 }
 
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)

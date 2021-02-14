@@ -20,7 +20,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_tabview_destructor(lv_obj_t * obj);
 static void btns_event_cb(lv_obj_t * btns, lv_event_t e);
 static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
@@ -145,8 +145,9 @@ lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_UNUSED(copy);
     lv_tabview_t * tabview = (lv_tabview_t *) obj;
 
     tabview->tab_pos = tabpos_create;

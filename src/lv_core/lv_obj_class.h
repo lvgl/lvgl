@@ -39,7 +39,7 @@ typedef enum {
  */
 typedef struct _lv_obj_class_t{
     const struct _lv_obj_class_t * base_class;
-    void (*constructor_cb)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
+    void (*constructor_cb)(struct _lv_obj_t * obj, const struct _lv_obj_t * copy);
     void (*destructor_cb)(struct _lv_obj_t * obj);
     lv_signal_cb_t signal_cb;       /**< Object type specific signal function*/
     lv_draw_cb_t draw_cb;           /**< Object type specific draw function*/

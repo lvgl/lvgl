@@ -124,11 +124,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 {
     lv_opa_t opa = dsc->opa;
 
-    lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
-
-    const lv_area_t * disp_area = &vdb->area;
-
     int32_t w = dsc->width - 1;
     int32_t w_half0 = w >> 1;
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
@@ -154,6 +149,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 #if LV_DRAW_COMPLEX
     /*If there other mask apply it*/
     else {
+        lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
+        lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+        const lv_area_t * disp_area = &vdb->area;
         /* Get clipped fill area which is the real draw area.
          * It is always the same or inside `fill_area` */
         bool is_common;
@@ -226,11 +224,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 {
     lv_opa_t opa = dsc->opa;
 
-    lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
-
-    const lv_area_t * disp_area = &vdb->area;
-
     int32_t w = dsc->width - 1;
     int32_t w_half0 = w >> 1;
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
@@ -257,6 +250,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 #if LV_DRAW_COMPLEX
     /*If there other mask apply it*/
     else {
+        lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
+        lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+        const lv_area_t * disp_area = &vdb->area;
         /* Get clipped fill area which is the real draw area.
          * It is always the same or inside `fill_area` */
         bool is_common;
@@ -484,6 +480,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     lv_draw_mask_remove_id(mask_top_id);
     lv_draw_mask_remove_id(mask_bottom_id);
 #else
+    LV_UNUSED(point1);
+    LV_UNUSED(point2);
+    LV_UNUSED(clip);
+    LV_UNUSED(dsc);
     LV_LOG_WARN("Can't draw skewed line with LV_DRAW_COMPLEX == 0");
 #endif /*LV_DRAW_COMPLEX*/
 }

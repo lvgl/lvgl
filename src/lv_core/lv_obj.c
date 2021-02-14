@@ -68,7 +68,7 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void base_dir_refr_children(lv_obj_t * obj);
-static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_obj_destructor(lv_obj_t * obj);
 
 /**********************
@@ -585,8 +585,9 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    lv_obj_t * parent = obj->parent;
     /*Create a screen*/
     if(parent == NULL) {
         LV_LOG_TRACE("Screen create started");
