@@ -74,6 +74,12 @@ typedef uint32_t lv_uintptr_t;
 
 #define LV_UNUSED(x) ((void) x)
 
+#define _LV_CONCAT(x, y) x ## y
+#define LV_CONCAT(x, y) _LV_CONCAT(x, y)
+
+#define _LV_CONCAT3(x, y, z) x ## y ## z
+#define LV_CONCAT3(x, y, z) _LV_CONCAT3(x, y, z)
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
