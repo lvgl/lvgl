@@ -1,5 +1,6 @@
 #include "../../../lvgl.h" 
-#if LV_USE_ARC
+
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * An `lv_task` to call periodically to set the angles of the arc

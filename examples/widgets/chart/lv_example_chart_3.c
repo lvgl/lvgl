@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_CHART
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 static void event_cb(lv_obj_t * chart, lv_event_t e)
 {

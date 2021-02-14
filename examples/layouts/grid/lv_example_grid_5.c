@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-
-#if LV_USE_GRID
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 static void row_gap_anim(lv_obj_t * obj, lv_anim_value_t v)
 {
@@ -12,7 +11,7 @@ static void column_gap_anim(lv_obj_t * obj, lv_anim_value_t v)
     lv_obj_set_style_pad_column(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
 }
 /**
- * Demonstrate margin in grid
+ * Demonstrate column and row gap
  */
 void lv_example_grid_5(void)
 {

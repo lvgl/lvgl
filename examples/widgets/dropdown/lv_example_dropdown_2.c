@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_DROPDOWN
+#if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 
 /**

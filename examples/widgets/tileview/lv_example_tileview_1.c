@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_TILEVIEW
+#if LV_USE_TILEVIEW && LV_BUILD_EXAMPLES
 
 /**
  * Create a 2x2 tile view and allow scrolling only in an "L" shape.

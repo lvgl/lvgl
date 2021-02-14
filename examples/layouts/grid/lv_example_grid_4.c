@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-
-#if LV_USE_GRID
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * Demonstrate track placement

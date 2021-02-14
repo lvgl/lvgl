@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_BTNMATRIX
+#if LV_USE_BTNMATRIX && LV_BUILD_EXAMPLES
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
@@ -8,7 +7,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event)
         uint32_t id = lv_btnmatrix_get_active_btn(obj);
         const char * txt = lv_btnmatrix_get_btn_text(obj, id);
 
-        printf("%s was pressed\n", txt);
+        LV_LOG_USER("%s was pressed\n", txt);
     }
 }
 

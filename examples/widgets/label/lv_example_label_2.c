@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_LABEL
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * Create a fake text shadow

@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-
-#if LV_USE_FLEX
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * Use a built in flex layout and demonstrate flex grow.

@@ -57,7 +57,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c);
 static void start_cursor_blink(lv_obj_t * obj);
 static void refr_cursor_area(lv_obj_t * obj);
 static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv_indev_t * click_source);
-static lv_res_t insert_handler(lv_obj_t * obj, char * txt);
+static lv_res_t insert_handler(lv_obj_t * obj, const char * txt);
 static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area);
 static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
 
@@ -1459,10 +1459,10 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
 #endif
 }
 
-static lv_res_t insert_handler(lv_obj_t * obj, char * txt)
+static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
 {
     ta_insert_replace = NULL;
-    lv_event_send(obj, LV_EVENT_INSERT, txt);
+    lv_event_send(obj, LV_EVENT_INSERT, (char*)txt);
     if(ta_insert_replace) {
         if(ta_insert_replace[0] == '\0') return LV_RES_INV; /*Drop this text*/
 

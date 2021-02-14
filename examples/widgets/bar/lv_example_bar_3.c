@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_BAR
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 static void set_temp(lv_obj_t * bar, int32_t temp)
 {

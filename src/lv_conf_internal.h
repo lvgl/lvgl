@@ -51,6 +51,7 @@
 
 #include <stdint.h>
 
+
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -259,6 +260,62 @@
 #endif
 
 /*-------------
+ * GPU
+ *-----------*/
+
+/*Use STM32's DMA2D (aka Chrom Art) GPU*/
+#ifndef LV_USE_GPU_STM32_DMA2D
+#  ifdef CONFIG_LV_USE_GPU_STM32_DMA2D
+#    define LV_USE_GPU_STM32_DMA2D CONFIG_LV_USE_GPU_STM32_DMA2D
+#  else
+#    define  LV_USE_GPU_STM32_DMA2D  0
+#  endif
+#endif
+#if LV_USE_GPU_STM32_DMA2D
+/*Must be defined to include path of CMSIS header of target processor
+e.g. "stm32f769xx.h" or "stm32f429xx.h" */
+#ifndef LV_GPU_DMA2D_CMSIS_INCLUDE
+#  ifdef CONFIG_LV_GPU_DMA2D_CMSIS_INCLUDE
+#    define LV_GPU_DMA2D_CMSIS_INCLUDE CONFIG_LV_GPU_DMA2D_CMSIS_INCLUDE
+#  else
+#    define  LV_GPU_DMA2D_CMSIS_INCLUDE
+#  endif
+#endif
+#endif
+
+/* Use NXP's PXP GPU iMX RTxxx platforms */
+#ifndef LV_USE_GPU_NXP_PXP
+#  ifdef CONFIG_LV_USE_GPU_NXP_PXP
+#    define LV_USE_GPU_NXP_PXP CONFIG_LV_USE_GPU_NXP_PXP
+#  else
+#    define  LV_USE_GPU_NXP_PXP      0
+#  endif
+#endif
+#if LV_USE_GPU_NXP_PXP
+/*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
+ *   and call lv_gpu_nxp_pxp_init() automatically during lv_init(). Note that symbol FSL_RTOS_FREE_RTOS
+ *   has to be defined in order to use FreeRTOS OSA, otherwise bare-metal implementation is selected.
+ *0: lv_gpu_nxp_pxp_init() has to be called manually before lv_init()
+ * */
+#ifndef LV_USE_GPU_NXP_PXP_AUTO_INIT
+#  ifdef CONFIG_LV_USE_GPU_NXP_PXP_AUTO_INIT
+#    define LV_USE_GPU_NXP_PXP_AUTO_INIT CONFIG_LV_USE_GPU_NXP_PXP_AUTO_INIT
+#  else
+#    define  LV_USE_GPU_NXP_PXP_AUTO_INIT 0
+#  endif
+#endif
+#endif
+
+/* Use NXP's VG-Lite GPU iMX RTxxx platforms */
+#ifndef LV_USE_GPU_NXP_VG_LITE
+#  ifdef CONFIG_LV_USE_GPU_NXP_VG_LITE
+#    define LV_USE_GPU_NXP_VG_LITE CONFIG_LV_USE_GPU_NXP_VG_LITE
+#  else
+#    define  LV_USE_GPU_NXP_VG_LITE   0
+#  endif
+#endif
+
+/*-------------
  * Logging
  *-----------*/
 
@@ -267,7 +324,7 @@
 #  ifdef CONFIG_LV_USE_LOG
 #    define LV_USE_LOG CONFIG_LV_USE_LOG
 #  else
-#    define  LV_USE_LOG      0
+#    define  LV_USE_LOG      1
 #  endif
 #endif
 #if LV_USE_LOG
@@ -292,7 +349,7 @@
 #  ifdef CONFIG_LV_LOG_PRINTF
 #    define LV_LOG_PRINTF CONFIG_LV_LOG_PRINTF
 #  else
-#    define  LV_LOG_PRINTF   0
+#    define  LV_LOG_PRINTF   1
 #  endif
 #endif
 #endif  /*LV_USE_LOG*/
@@ -303,15 +360,6 @@
 
 /* Enable asserts if an operation is failed or an invalid data is found.
  * If LV_USE_LOG is enabled an error message will be printed on failure*/
-#ifndef LV_USE_ASSERT
-#  ifdef CONFIG_LV_USE_ASSERT
-#    define LV_USE_ASSERT CONFIG_LV_USE_ASSERT
-#  else
-#    define  LV_USE_ASSERT        1
-#  endif
-#endif
-#if LV_USE_ASSERT
-
 #ifndef LV_USE_ASSERT_NULL
 #  ifdef CONFIG_LV_USE_ASSERT_NULL
 #    define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
@@ -330,21 +378,21 @@
 #  ifdef CONFIG_LV_USE_ASSERT_STYLE
 #    define LV_USE_ASSERT_STYLE CONFIG_LV_USE_ASSERT_STYLE
 #  else
-#    define  LV_USE_ASSERT_STYLE         0   /*Check if the styles are properly initialized. (Very fast, recommended)*/
+#    define  LV_USE_ASSERT_STYLE         1   /*Check if the styles are properly initialized. (Very fast, recommended)*/
 #  endif
 #endif
 #ifndef LV_USE_ASSERT_MEM_INTEGRITY
 #  ifdef CONFIG_LV_USE_ASSERT_MEM_INTEGRITY
 #    define LV_USE_ASSERT_MEM_INTEGRITY CONFIG_LV_USE_ASSERT_MEM_INTEGRITY
 #  else
-#    define  LV_USE_ASSERT_MEM_INTEGRITY 0   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
+#    define  LV_USE_ASSERT_MEM_INTEGRITY 1   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
 #  endif
 #endif
 #ifndef LV_USE_ASSERT_OBJ
 #  ifdef CONFIG_LV_USE_ASSERT_OBJ
 #    define LV_USE_ASSERT_OBJ CONFIG_LV_USE_ASSERT_OBJ
 #  else
-#    define  LV_USE_ASSERT_OBJ           0   /*Check the object's type and existence (e.g. not deleted). (Slow) */
+#    define  LV_USE_ASSERT_OBJ           1   /*Check the object's type and existence (e.g. not deleted). (Slow) */
 #  endif
 #endif
 
@@ -364,11 +412,18 @@
 #  endif
 #endif
 
-#endif /*LV_USE_ASSERT*/
-
 /*-------------
  * Others
  *-----------*/
+
+/*1: Show CPU usage and FPS count in the right bottom corner*/
+#ifndef LV_USE_PERF_MONITOR
+#  ifdef CONFIG_LV_USE_PERF_MONITOR
+#    define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
+#  else
+#    define  LV_USE_PERF_MONITOR     0
+#  endif
+#endif
 
 /*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
@@ -757,14 +812,14 @@
 #  ifdef CONFIG_LV_FONT_UNSCII_8
 #    define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8
 #  else
-#    define  LV_FONT_UNSCII_8     0
+#    define  LV_FONT_UNSCII_8        0
 #  endif
 #endif
 #ifndef LV_FONT_UNSCII_16
 #  ifdef CONFIG_LV_FONT_UNSCII_16
 #    define LV_FONT_UNSCII_16 CONFIG_LV_FONT_UNSCII_16
 #  else
-#    define  LV_FONT_UNSCII_16     0
+#    define  LV_FONT_UNSCII_16       0
 #  endif
 #endif
 
@@ -776,15 +831,6 @@
 #    define LV_FONT_CUSTOM_DECLARE CONFIG_LV_FONT_CUSTOM_DECLARE
 #  else
 #    define  LV_FONT_CUSTOM_DECLARE
-#  endif
-#endif
-
-/*Always set a default font*/
-#ifndef LV_FONT_DEFAULT
-#  ifdef CONFIG_LV_FONT_DEFAULT
-#    define LV_THEME_FONT_NORMAL CONFIG_LV_FONT_DEFAULT
-#  else
-#    define  LV_THEME_FONT_NORMAL     &lv_font_montserrat_14
 #  endif
 #endif
 
@@ -804,7 +850,7 @@
 #  ifdef CONFIG_LV_USE_FONT_COMPRESSED
 #    define LV_USE_FONT_COMPRESSED CONFIG_LV_USE_FONT_COMPRESSED
 #  else
-#    define  LV_USE_FONT_COMPRESSED 1
+#    define  LV_USE_FONT_COMPRESSED  0
 #  endif
 #endif
 
@@ -813,7 +859,7 @@
 #  ifdef CONFIG_LV_USE_FONT_SUBPX
 #    define LV_USE_FONT_SUBPX CONFIG_LV_USE_FONT_SUBPX
 #  else
-#    define  LV_USE_FONT_SUBPX 1
+#    define  LV_USE_FONT_SUBPX       0
 #  endif
 #endif
 #if LV_USE_FONT_SUBPX
@@ -822,7 +868,7 @@
 #  ifdef CONFIG_LV_FONT_SUBPX_BGR
 #    define LV_FONT_SUBPX_BGR CONFIG_LV_FONT_SUBPX_BGR
 #  else
-#    define  LV_FONT_SUBPX_BGR    0  /*0: RGB; 1:BGR order*/
+#    define  LV_FONT_SUBPX_BGR       0  /*0: RGB; 1:BGR order*/
 #  endif
 #endif
 #endif
@@ -899,7 +945,7 @@
 #  ifdef CONFIG_LV_USE_BIDI
 #    define LV_USE_BIDI CONFIG_LV_USE_BIDI
 #  else
-#    define  LV_USE_BIDI     1
+#    define  LV_USE_BIDI         0
 #  endif
 #endif
 #if LV_USE_BIDI
@@ -926,6 +972,72 @@
 #  endif
 #endif
 
+
+/*==================
+ *  THEME USAGE
+ *================*/
+/*Set the very basic the attributes*/
+#ifndef LV_THEME_COLOR_PRIMARY
+#  ifdef CONFIG_LV_THEME_COLOR_PRIMARY
+#    define LV_THEME_COLOR_PRIMARY CONFIG_LV_THEME_COLOR_PRIMARY
+#  else
+#    define  LV_THEME_COLOR_PRIMARY      lv_color_hex(0x01a2b1)
+#  endif
+#endif
+#ifndef LV_THEME_COLOR_SECONDARY
+#  ifdef CONFIG_LV_THEME_COLOR_SECONDARY
+#    define LV_THEME_COLOR_SECONDARY CONFIG_LV_THEME_COLOR_SECONDARY
+#  else
+#    define  LV_THEME_COLOR_SECONDARY    lv_color_hex(0x44d1b6)
+#  endif
+#endif
+#ifndef LV_THEME_FONT_SMALL
+#  ifdef CONFIG_LV_THEME_FONT_SMALL
+#    define LV_THEME_FONT_SMALL CONFIG_LV_THEME_FONT_SMALL
+#  else
+#    define  LV_THEME_FONT_SMALL         &lv_font_montserrat_14
+#  endif
+#endif
+#ifndef LV_THEME_FONT_NORMAL
+#  ifdef CONFIG_LV_THEME_FONT_NORMAL
+#    define LV_THEME_FONT_NORMAL CONFIG_LV_THEME_FONT_NORMAL
+#  else
+#    define  LV_THEME_FONT_NORMAL        &lv_font_montserrat_14
+#  endif
+#endif
+#ifndef LV_THEME_FONT_LARGE
+#  ifdef CONFIG_LV_THEME_FONT_LARGE
+#    define LV_THEME_FONT_LARGE CONFIG_LV_THEME_FONT_LARGE
+#  else
+#    define  LV_THEME_FONT_LARGE         &lv_font_montserrat_14
+#  endif
+#endif
+#ifndef LV_THEME_FONT_EXTRA_LARGE
+#  ifdef CONFIG_LV_THEME_FONT_EXTRA_LARGE
+#    define LV_THEME_FONT_EXTRA_LARGE CONFIG_LV_THEME_FONT_EXTRA_LARGE
+#  else
+#    define  LV_THEME_FONT_EXTRA_LARGE   &lv_font_montserrat_14
+#  endif
+#endif
+
+/* An external include file required to see the theme init function.
+ * Relative to "lv_core/lv_obj" */
+#ifndef LV_THEME_INIT_INCLUDE
+#  ifdef CONFIG_LV_THEME_INIT_INCLUDE
+#    define LV_THEME_INIT_INCLUDE CONFIG_LV_THEME_INIT_INCLUDE
+#  else
+#    define  LV_THEME_INIT_INCLUDE "../extra/themes/lv_themes.h"
+#  endif
+#endif
+
+/* Set a theme initialization function */
+#ifndef LV_THEME_INIT
+#  ifdef CONFIG_LV_THEME_INIT
+#    define LV_THEME_INIT CONFIG_LV_THEME_INIT
+#  else
+#    define  LV_THEME_INIT lv_theme_default_init
+#  endif
+#endif
 
 /*==================
  *  WIDGET USAGE
@@ -1114,22 +1226,64 @@
 #  ifdef CONFIG_LV_USE_CALENDAR
 #    define LV_USE_CALENDAR CONFIG_LV_USE_CALENDAR
 #  else
-#    define  LV_USE_CALENDAR     0
+#    define  LV_USE_CALENDAR     1
+#  endif
+#endif
+#if LV_USE_CALENDAR
+#ifndef LV_CALENDAR_WEEK_STARTS_MONDAY
+#  ifdef CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY
+#    define LV_CALENDAR_WEEK_STARTS_MONDAY CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY
+#  else
+#    define  LV_CALENDAR_WEEK_STARTS_MONDAY 0
+#  endif
+#endif
+# if LV_CALENDAR_WEEK_STARTS_MONDAY
+#ifndef LV_CALENDAR_DEFAULT_DAY_NAMES
+#  ifdef CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES
+#    define LV_CALENDAR_DEFAULT_DAY_NAMES CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES
+#  else
+#    define  LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
+#  endif
+#endif
+# else
+#ifndef LV_CALENDAR_DEFAULT_DAY_NAMES
+#  ifdef CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES
+#    define LV_CALENDAR_DEFAULT_DAY_NAMES CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES
+#  else
+#    define  LV_CALENDAR_DEFAULT_DAY_NAMES {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
+#  endif
+#endif
+# endif
+
+#ifndef LV_CALENDAR_DEFAULT_MONTH_NAMES
+#  ifdef CONFIG_LV_CALENDAR_DEFAULT_MONTH_NAMES
+#    define LV_CALENDAR_DEFAULT_MONTH_NAMES CONFIG_LV_CALENDAR_DEFAULT_MONTH_NAMES
+#  else
+#    define  LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",  "June", "July", "August", "September", "October", "November", "December"}
 #  endif
 #endif
 #ifndef LV_USE_CALENDAR_HEADER_ARROW
 #  ifdef CONFIG_LV_USE_CALENDAR_HEADER_ARROW
 #    define LV_USE_CALENDAR_HEADER_ARROW CONFIG_LV_USE_CALENDAR_HEADER_ARROW
 #  else
-#    define  LV_USE_CALENDAR_HEADER_ARROW 0
+#    define  LV_USE_CALENDAR_HEADER_ARROW 1
 #  endif
 #endif
+#endif  /*LV_USE_CALENDAR*/
 
 #ifndef LV_USE_COLORWHEEL
 #  ifdef CONFIG_LV_USE_COLORWHEEL
 #    define LV_USE_COLORWHEEL CONFIG_LV_USE_COLORWHEEL
 #  else
-#    define  LV_USE_COLORWHEEL   0
+#    define  LV_USE_COLORWHEEL   1
+#  endif
+#endif
+
+#ifndef LV_USE_IMGBTN
+#  ifdef CONFIG_LV_USE_IMGBTN
+#    define LV_USE_IMGBTN CONFIG_LV_USE_IMGBTN
+#  else
+#    define  LV_USE_IMGBTN       1
 #  endif
 #endif
 
@@ -1137,7 +1291,7 @@
 #  ifdef CONFIG_LV_USE_KEYBOARD
 #    define LV_USE_KEYBOARD CONFIG_LV_USE_KEYBOARD
 #  else
-#    define  LV_USE_KEYBOARD     0
+#    define  LV_USE_KEYBOARD     1
 #  endif
 #endif
 
@@ -1145,7 +1299,7 @@
 #  ifdef CONFIG_LV_USE_LED
 #    define LV_USE_LED CONFIG_LV_USE_LED
 #  else
-#    define  LV_USE_LED          0
+#    define  LV_USE_LED          1
 #  endif
 #endif
 
@@ -1153,7 +1307,7 @@
 #  ifdef CONFIG_LV_USE_LIST
 #    define LV_USE_LIST CONFIG_LV_USE_LIST
 #  else
-#    define  LV_USE_LIST         0
+#    define  LV_USE_LIST         1
 #  endif
 #endif
 
@@ -1161,7 +1315,7 @@
 #  ifdef CONFIG_LV_USE_MSGBOX
 #    define LV_USE_MSGBOX CONFIG_LV_USE_MSGBOX
 #  else
-#    define  LV_USE_MSGBOX       0
+#    define  LV_USE_MSGBOX       1
 #  endif
 #endif
 
@@ -1169,7 +1323,7 @@
 #  ifdef CONFIG_LV_USE_SPINBOX
 #    define LV_USE_SPINBOX CONFIG_LV_USE_SPINBOX
 #  else
-#    define  LV_USE_SPINBOX      0
+#    define  LV_USE_SPINBOX      1
 #  endif
 #endif
 
@@ -1177,7 +1331,7 @@
 #  ifdef CONFIG_LV_USE_SPINNER
 #    define LV_USE_SPINNER CONFIG_LV_USE_SPINNER
 #  else
-#    define  LV_USE_SPINNER      0
+#    define  LV_USE_SPINNER      1
 #  endif
 #endif
 
@@ -1185,7 +1339,7 @@
 #  ifdef CONFIG_LV_USE_TABVIEW
 #    define LV_USE_TABVIEW CONFIG_LV_USE_TABVIEW
 #  else
-#    define  LV_USE_TABVIEW      0
+#    define  LV_USE_TABVIEW      1
 #  endif
 #endif
 
@@ -1193,7 +1347,7 @@
 #  ifdef CONFIG_LV_USE_TILEVIEW
 #    define LV_USE_TILEVIEW CONFIG_LV_USE_TILEVIEW
 #  else
-#    define  LV_USE_TILEVIEW     0
+#    define  LV_USE_TILEVIEW     1
 #  endif
 #endif
 
@@ -1201,14 +1355,14 @@
 #  ifdef CONFIG_LV_USE_WIN
 #    define LV_USE_WIN CONFIG_LV_USE_WIN
 #  else
-#    define  LV_USE_WIN          0
+#    define  LV_USE_WIN          1
 #  endif
 #endif
 
 /*-----------
  * Themes
  *----------*/
-/* Use the default theme. If not used a custom theme needs be assigned to the display.*/
+/* A simple, impressive and very complete theme */
 #ifndef LV_USE_THEME_DEFAULT
 #  ifdef CONFIG_LV_USE_THEME_DEFAULT
 #    define LV_USE_THEME_DEFAULT CONFIG_LV_USE_THEME_DEFAULT
@@ -1267,52 +1421,20 @@
 #  endif
 #endif
 
-/*==================
- * Non-user section
- *==================*/
-
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
-#ifndef _CRT_SECURE_NO_WARNINGS
-#  ifdef CONFIG__CRT_SECURE_NO_WARNINGS
-#    define _CRT_SECURE_NO_WARNINGS CONFIG__CRT_SECURE_NO_WARNINGS
-#  else
-#    define  _CRT_SECURE_NO_WARNINGS
-#  endif
-#endif
-#endif
-
 
 
 /*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
 
-  /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-  typedef int16_t lv_coord_t;
 
-#  if LV_USE_ANIMATION
-  /*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
-  typedef void * lv_anim_user_data_t;
-#  endif
-
-#  if LV_USE_GROUP
-  typedef void * lv_group_user_data_t;
-#  endif
-
-#  if LV_USE_FILESYSTEM
-  typedef void * lv_fs_drv_user_data_t;
-#  endif
-
-  typedef void * lv_img_decoder_user_data_t;
-
-  typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
-  typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
-
-  typedef void * lv_font_user_data_t;
-
-#  if LV_USE_USER_DATA
+# if LV_USE_USER_DATA
   typedef void * lv_obj_user_data_t;
-#  endif
+# endif
 
-#endif
+# if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
+#  define _CRT_SECURE_NO_WARNINGS
+# endif
+
+#endif  /*defined(LV_CONF_SKIP)*/
 
 #endif  /*LV_CONF_INTERNAL_H*/

@@ -14,8 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-
-#if LV_USE_ASSERT
 #include <stdbool.h>
 
 /*********************
@@ -29,13 +27,6 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-bool lv_debug_check_null(const void * p);
-
-bool lv_debug_check_mem_integrity(void);
-
-bool lv_debug_check_str(const void * str);
-
-void lv_debug_log_error(const char * msg, uint64_t value);
 
 /**********************
  *      MACROS
@@ -81,17 +72,6 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 #else
 # define LV_ASSERT_MALLOC_INTEGRIT()
 #endif
-
-#else /* LV_USE_ASSERT == 0 */
-
-#define LV_ASSERT(expr)    do{}while(0)
-#define LV_ASSERT_MSG(expr, msg)    do{}while(0)
-
-#define LV_ASSERT_NULL(p)
-#define LV_ASSERT_MALLOC(p)
-#define LV_ASSERT_MALLOC_INTEGRITY()
-
-#endif /* LV_USE_ASSERT */
 
 #ifdef __cplusplus
 } /* extern "C" */

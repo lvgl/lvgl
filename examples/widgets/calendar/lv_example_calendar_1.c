@@ -1,14 +1,12 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-
-#if LV_USE_CALENDAR
+#if LV_USE_CALENDAR && LV_BUILD_EXAMPLES
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_VALUE_CHANGED) {
         lv_calendar_date_t date;
         if(lv_calendar_get_pressed_date(obj, &date)) {
-            printf("Clicked date: %02d.%02d.%d\n", date.day, date.month, date.year);
+            LV_LOG_USER("Clicked date: %02d.%02d.%d\n", date.day, date.month, date.year);
         }
     }
 }

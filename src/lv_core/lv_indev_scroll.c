@@ -42,11 +42,7 @@ static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scrol
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Handle scrolling. Called by LVGL during input device processing
- * @param proc pointer to an input device's proc field
- */
-void lv_indev_scroll_handler(lv_indev_proc_t * proc)
+void _lv_indev_scroll_handler(lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     /*If there is no scroll object yet try to find one*/
@@ -97,11 +93,7 @@ void lv_indev_scroll_handler(lv_indev_proc_t * proc)
 }
 
 
-/**
- * Handle throwing after scrolling. Called by LVGL during input device processing
- * @param proc pointer to an input device's proc field
- */
-void lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
+void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     if(scroll_obj == NULL) return;

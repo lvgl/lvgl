@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_BTNMATRIX
+#if LV_USE_BTNMATRIX && LV_BUILD_EXAMPLES
 
 
 void event_cb(lv_obj_t * obj, lv_event_t e)

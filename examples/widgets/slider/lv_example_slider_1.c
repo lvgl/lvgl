@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_SLIDER
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
 static lv_obj_t * slider_label;

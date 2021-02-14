@@ -1,13 +1,12 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_ROLLER
+#if LV_USE_ROLLER && LV_BUILD_EXAMPLES
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_VALUE_CHANGED) {
         char buf[32];
         lv_roller_get_selected_str(obj, buf, sizeof(buf));
-        printf("Selected month: %s\n", buf);
+        LV_LOG_USER("Selected month: %s\n", buf);
     }
 }
 

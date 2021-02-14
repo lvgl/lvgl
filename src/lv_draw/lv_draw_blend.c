@@ -299,9 +299,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                                               const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
 
-#if LV_USE_GPU || LV_COLOR_SCREEN_TRANSP
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-#endif
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
     int32_t disp_w = lv_area_get_width(disp_area);
@@ -335,12 +333,13 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 lv_gpu_stm32_dma2d_fill(disp_buf_first, disp_w, color, draw_area_w, draw_area_h);
                 return;
             }
-#elif LV_USE_GPU
+#endif
+
             if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
                 disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
-#endif
+
             /*Software rendering*/
             for(y = 0; y < draw_area_h; y++) {
                 lv_color_fill(disp_buf_first, color, draw_area_w);
@@ -393,14 +392,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
     }
     /*Masked*/
     else {
-        /*DMA2D could be used here but it's much slower than software rendering*/
-#if LV_USE_GPU_STM32_DMA2D && 0
-        if(lv_area_get_size(draw_area) > 240) {
-            lv_gpu_stm32_dma2d_fill_mask(disp_buf_first, disp_w, color, mask, opa, draw_area_w, draw_area_h);
-            return;
-        }
-#endif
-
         /*Buffer the result color to avoid recalculating the same color*/
         lv_color_t last_dest_color;
         lv_color_t last_res_color;
@@ -693,17 +684,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
-#if LV_USE_GPU
-        if(disp->driver.gpu_blend_cb && (lv_area_get_size(draw_area) > GPU_SIZE_LIMIT)) {
-            for(y = draw_area->y1; y <= draw_area->y2; y++) {
-                disp->driver.gpu_blend_cb(&disp->driver, disp_buf_first, map_buf_first, draw_area_w, opa);
-                disp_buf_first += disp_w;
-                map_buf_first += map_w;
-            }
-            return;
-        }
-#endif
-
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_NXP_PXP
             if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT) {

@@ -114,34 +114,16 @@ fout.write(
 /*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
 
-  /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-  typedef int16_t lv_coord_t;
 
-#  if LV_USE_ANIMATION
-  /*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
-  typedef void * lv_anim_user_data_t;
-#  endif
-
-#  if LV_USE_GROUP
-  typedef void * lv_group_user_data_t;
-#  endif
-
-#  if LV_USE_FILESYSTEM
-  typedef void * lv_fs_drv_user_data_t;
-#  endif
-
-  typedef void * lv_img_decoder_user_data_t;
-
-  typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
-  typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
-
-  typedef void * lv_font_user_data_t;
-
-#  if LV_USE_USER_DATA
+# if LV_USE_USER_DATA
   typedef void * lv_obj_user_data_t;
-#  endif
+# endif
 
-#endif
+# if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
+#  define _CRT_SECURE_NO_WARNINGS
+# endif
+
+#endif  /*defined(LV_CONF_SKIP)*/
 
 #endif  /*LV_CONF_INTERNAL_H*/
 '''

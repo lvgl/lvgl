@@ -1,6 +1,9 @@
 #include "../../../lvgl.h"
-#if LV_USE_LED
+#if LV_USE_LED && LV_BUILD_EXAMPLES
 
+/**
+ * Create LED's with different brightness and color
+ */
 void lv_example_led_1(void)
 {
     /*Create a LED and switch it OFF*/
@@ -11,7 +14,8 @@ void lv_example_led_1(void)
     /*Copy the previous LED and set a brightness*/
     lv_obj_t * led2  = lv_led_create(lv_scr_act());
     lv_obj_align(led2, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_led_set_bright(led2, 150);
+    lv_led_set_brightness(led2, 150);
+    lv_led_set_color(led2, LV_COLOR_RED);
 
     /*Copy the previous LED and switch it ON*/
     lv_obj_t * led3  = lv_led_create(lv_scr_act());

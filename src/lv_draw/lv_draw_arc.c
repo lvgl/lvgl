@@ -11,6 +11,7 @@
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_misc/lv_mem.h"
 
 /*********************
  *      DEFINES

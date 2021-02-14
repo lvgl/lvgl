@@ -153,8 +153,6 @@ void lv_mem_deinit(void)
  */
 void * lv_mem_alloc(size_t size)
 {
- //   printf("alloc: %d\n", size);
-
     if(size == 0) return &zero_mem;
 
     /*Round the size up to ALIGN_MASK*/
@@ -229,9 +227,8 @@ void lv_mem_free(const void * data)
     lv_memset((void *)data, 0xbb, lv_mem_get_size(data));
 #  endif
 #endif
-//    printf("free: %d\n", lv_mem_get_size(data));
 
-#if LV_MEM_CUSTOM == 0
+    #if LV_MEM_CUSTOM == 0
     e->header.s.used = 0;
 
     static uint32_t defr = 0;

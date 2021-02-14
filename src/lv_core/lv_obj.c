@@ -60,13 +60,6 @@ typedef struct {
 }trans_set_t;
 
 /**********************
- *  GLOBAL PROTOTYPES
- **********************/
-void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
-                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path);
-_lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
-
-/**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
@@ -132,7 +125,9 @@ void lv_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
-    lv_theme_t * th = LV_THEME_INIT
+    lv_theme_t * th = LV_THEME_INIT(LV_THEME_COLOR_PRIMARY, LV_THEME_COLOR_SECONDARY,
+                                    LV_THEME_FONT_SMALL, LV_THEME_FONT_NORMAL,
+                                    LV_THEME_FONT_LARGE, LV_THEME_FONT_EXTRA_LARGE);
 
     lv_theme_set_act(th);
 
@@ -150,6 +145,15 @@ void lv_init(void)
     if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
         LV_LOG_WARN("The strings has no UTF-8 encoding. Some characters won't be displayed.")
     }
+
+#if LV_USE_ASSERT_MEM_INTEGRITY
+    LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower")
+#endif
+
+#if LV_USE_ASSERT_OBJ
+    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower")
+#endif
+
 
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
@@ -248,7 +252,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     if(res == LV_RES_OK) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-            lv_res_t res = lv_event_send(obj->parent, event, param);
+            res = lv_event_send(obj->parent, event, param);
             if(res != LV_RES_OK) return LV_RES_INV;
         }
     }
@@ -273,12 +277,7 @@ uint32_t lv_event_register_id(void)
     return last_id;
 }
 
-/**
- * Nested events can be called and one of them might belong to an object that is being deleted.
- * Mark this object's `event_temp_data` deleted to know that it's `lv_event_send` should return `LV_RES_INV`
- * @param obj pointer to an obejct to mark as deleted
- */
-void lv_event_mark_deleted(lv_obj_t * obj)
+void _lv_event_mark_deleted(lv_obj_t * obj)
 {
     lv_event_temp_data_t * t = event_temp_data_head;
 
@@ -342,7 +341,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_state_t prev_state = obj->state;
     obj->state = new_state;
 
-    _lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
+    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
@@ -381,7 +380,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     }
 
     for(i = 0;i < tsi; i++) {
-        lv_obj_style_create_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
+        _lv_obj_style_create_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
     }
 
     lv_mem_buf_release(ts);

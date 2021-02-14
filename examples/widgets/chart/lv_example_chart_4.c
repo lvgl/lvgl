@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_CHART
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 
 static void event_cb(lv_obj_t * chart, lv_event_t e)
@@ -15,7 +15,7 @@ static void event_cb(lv_obj_t * chart, lv_event_t e)
         int32_t id = lv_chart_get_pressed_point(chart);
         if(id < 0) return;
 
-        printf("Selected point %d\n", id);
+        LV_LOG_USER("Selected point %d\n", id);
 
         lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
         while(ser) {

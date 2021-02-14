@@ -344,6 +344,13 @@ void * lv_event_get_user_data(void);
 uint32_t lv_event_register_id(void);
 
 /**
+ * Nested events can be called and one of them might belong to an object that is being deleted.
+ * Mark this object's `event_temp_data` deleted to know that it's `lv_event_send` should return `LV_RES_INV`
+ * @param obj pointer to an obejct to mark as deleted
+ */
+void _lv_event_mark_deleted(lv_obj_t * obj);
+
+/**
  * Send an event to the object
  * @param obj       pointer to an object
  * @param event     the type of the event from `lv_event_t`.
@@ -506,7 +513,7 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
  *      MACROS
  **********************/
 
-#if LV_USE_ASSERT && LV_USE_ASSERT_OBJ
+#if LV_USE_ASSERT_OBJ
 #  define LV_ASSERT_OBJ(obj_p, obj_class)                                    \
             LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");               \
             LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type."); \

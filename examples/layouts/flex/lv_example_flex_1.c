@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-
-#if LV_USE_FLEX
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * A simple row and a column layout with flexbox

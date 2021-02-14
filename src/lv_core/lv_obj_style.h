@@ -157,6 +157,45 @@ void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t
  */
 bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop);
 
+/**
+ * Used internally to create a style tarnsition
+ * @param obj
+ * @param prop
+ * @param part
+ * @param prev_state
+ * @param new_state
+ * @param time
+ * @param delay
+ * @param path
+ */
+void _lv_obj_style_create_transition(struct _lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
+                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path);
+
+/**
+ * Used internally to compare the appearance of an object in 2 states
+ * @param obj
+ * @param state1
+ * @param state2
+ * @return
+ */
+_lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
+
+/**
+ * Fade in an an object and all its children.
+ * @param obj       the object to fade in
+ * @param time      time of fade
+ * @param delay     delay to start the animation
+ */
+void lv_obj_fade_in(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
+
+/**
+ * Fade out an an object and all its children.
+ * @param obj       the object to fade out
+ * @param time      time of fade
+ * @param delay     delay to start the animation
+ */
+void lv_obj_fade_out(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
+
 /*********************
  * OBJ STYLE GET
  *********************/

@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_CHART
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 void lv_example_chart_1(void)
 {

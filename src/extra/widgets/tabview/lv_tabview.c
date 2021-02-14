@@ -92,7 +92,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
         }
     }
     tabview->map = new_map;
-    lv_btnmatrix_set_map(btns, new_map);
+    lv_btnmatrix_set_map(btns, (const char **)new_map);
     lv_mem_free(old_map);
 
     lv_btnmatrix_set_btn_ctrl_all(btns, LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
@@ -179,7 +179,7 @@ static void lv_tabview_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_o
     lv_btnmatrix_set_one_checked(btnm, true);
     tabview->map = lv_mem_alloc(sizeof(const char *));
     tabview->map[0] = "";
-    lv_btnmatrix_set_map(btnm, tabview->map);
+    lv_btnmatrix_set_map(btnm, (const char **)tabview->map);
     lv_obj_add_event_cb(btnm, btns_event_cb, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 

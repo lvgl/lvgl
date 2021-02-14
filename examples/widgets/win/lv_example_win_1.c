@@ -1,12 +1,11 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_WIN
+#if LV_USE_WIN && LV_BUILD_EXAMPLES
 
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_CLICKED) {
-        printf("Button: %d\n", lv_obj_get_child_id(obj));
+        LV_LOG_USER("Button: %d\n", lv_obj_get_child_id(obj));
     }
 }
 

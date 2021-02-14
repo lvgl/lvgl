@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_IMG
+#if LV_USE_IMG && LV_BUILD_EXAMPLES
 
 /* Find the image here: https://github.com/lvgl/lv_examples/tree/master/assets */
 LV_IMG_DECLARE(img_cogwheel_argb);

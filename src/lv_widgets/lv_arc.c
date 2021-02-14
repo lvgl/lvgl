@@ -31,7 +31,6 @@
  **********************/
 
 static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
-static void lv_arc_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_arc_draw(lv_obj_t * arc, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
@@ -44,7 +43,6 @@ static void value_update(lv_obj_t * arc);
  **********************/
 const lv_obj_class_t lv_arc_class  = {
     .constructor_cb = lv_arc_constructor,
-    .destructor_cb = lv_arc_destructor,
     .signal_cb = lv_arc_signal,
     .draw_cb = lv_arc_draw,
     .instance_size = sizeof(lv_arc_t),
@@ -489,9 +487,7 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     lv_arc_t * arc = (lv_arc_t *)obj;
     LV_LOG_TRACE("arc create started");
 
-    /*Create the ancestor of arc*/
-
-    /*Initialize the allocated 'ext' */
+   /*Initialize the allocated 'ext' */
    arc->rotation = 0;
    arc->bg_angle_start = 135;
    arc->bg_angle_end   = 45;
@@ -532,20 +528,6 @@ static void lv_arc_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     }
 
 }
-
-static void lv_arc_destructor(lv_obj_t * obj)
-{
-//    lv_arc_t * arc = obj;
-//
-//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-//#if LV_USE_ANIMATION
-//    lv_anim_del(&arc->cur_value_anim, NULL);
-//    lv_anim_del(&arc->start_value_anim, NULL);
-//#endif
-//
-//   arc->class_p->base_p->destructor(obj);
-}
-
 
 static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {

@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_BAR
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
  * Bar with stripe pattern and ranged value

@@ -349,20 +349,22 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 
     lv_meter_scale_t * scale;
 
-    lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
-
     lv_obj_draw_hook_dsc_t hook_dsc;
     lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
 
+#if LV_DRAW_COMPLEX
     lv_draw_mask_radius_param_t inner_minor_mask;
     lv_draw_mask_radius_param_t inner_major_mask;
     lv_draw_mask_radius_param_t outer_mask;
+#endif
 
     _LV_LL_READ_BACK(&meter->scale_ll, scale) {
 
         lv_coord_t r_out = r_edge + scale->r_mod;
         lv_coord_t r_in_minor = r_out - scale->tick_length;
         lv_coord_t r_in_major = r_out - scale->tick_major_length;
+
+#if LV_DRAW_COMPLEX
         lv_area_t area_inner_minor;
         area_inner_minor.x1 = p_center.x - r_in_minor;
         area_inner_minor.y1 = p_center.y - r_in_minor;
@@ -386,6 +388,7 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
         int16_t outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
 
         int16_t inner_act_mask_id = -1; /*Will be added later*/
+#endif
 
         uint32_t minor_cnt = scale->tick_major_nth ? scale->tick_major_nth - 1 : 0xFFFF;
         for(i = 0; i < scale->tick_cnt; i++) {
@@ -396,7 +399,9 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 major = true;
             }
 
+#if LV_DRAW_COMPLEX
             inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
+#endif
 
             int32_t value_of_line = lv_map(i, 0, scale->tick_cnt - 1, scale->min, scale->max);
 
@@ -442,24 +447,40 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             int32_t cos_high = lv_trigo_cos(angle_high + scale->rotation);
             int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
-            lv_point_t p_outer;
-            /* Use the interpolated values to get the outer x and y coordinates.
-             * */
-            p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + 5) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
-            p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + 5) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
 
             line_dsc.color = line_color;
             line_dsc.width = line_width;
+#if LV_DRAW_COMPLEX
+            /* Use the interpolated angle to get the outer x and y coordinates.
+             * Draw a little bit longer lines to be sure the mask will clip them correctly*/
+            lv_point_t p_outer;
+            p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
+            p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
             lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
+#else
+            /* Use the interpolated angle to get the outer and inner x and y coordinates.*/
+            lv_point_t p_outer;
+            p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
+            p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
+            lv_point_t p_inner;
+            lv_coord_t r_in = major ? r_in_major : r_in_minor;
+            p_inner.x = (int32_t)(((int32_t)cos_mid * (r_in) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
+            p_inner.y = (int32_t)(((int32_t)sin_mid * (r_in) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
+            lv_draw_line(&p_outer, &p_inner, clip_area, &line_dsc);
+#endif
+
             line_dsc.color = line_color_ori;
             line_dsc.width = line_width_ori;
 
+#if LV_DRAW_COMPLEX
             lv_draw_mask_remove_id(inner_act_mask_id);
+#endif
 
             /*Draw the text*/
             if(major) {
+#if LV_DRAW_COMPLEX
                 lv_draw_mask_remove_id(outer_mask_id);
-
+#endif
                 uint32_t r_text = r_in_major - scale->label_gap;
                 lv_point_t p;
                 p.x = (int32_t)(((int32_t)cos_mid * r_text + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
@@ -485,11 +506,15 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 
                 lv_draw_label(&label_cord, clip_area, &label_dsc, hook_dsc.text, NULL);
 
+#if LV_DRAW_COMPLEX
                 outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
+#endif
             }
 
         }
+#if LV_DRAW_COMPLEX
         lv_draw_mask_remove_id(outer_mask_id);
+#endif
     }
 }
 

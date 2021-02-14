@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -103,11 +104,37 @@
 #define LV_IMG_CACHE_DEF_SIZE       0
 
 /*-------------
+ * GPU
+ *-----------*/
+
+/*Use STM32's DMA2D (aka Chrom Art) GPU*/
+#define LV_USE_GPU_STM32_DMA2D  0
+#if LV_USE_GPU_STM32_DMA2D
+/*Must be defined to include path of CMSIS header of target processor
+e.g. "stm32f769xx.h" or "stm32f429xx.h" */
+#define LV_GPU_DMA2D_CMSIS_INCLUDE
+#endif
+
+/* Use NXP's PXP GPU iMX RTxxx platforms */
+#define LV_USE_GPU_NXP_PXP      0
+#if LV_USE_GPU_NXP_PXP
+/*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
+ *   and call lv_gpu_nxp_pxp_init() automatically during lv_init(). Note that symbol FSL_RTOS_FREE_RTOS
+ *   has to be defined in order to use FreeRTOS OSA, otherwise bare-metal implementation is selected.
+ *0: lv_gpu_nxp_pxp_init() has to be called manually before lv_init()
+ * */
+#define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
+#endif
+
+/* Use NXP's VG-Lite GPU iMX RTxxx platforms */
+#define LV_USE_GPU_NXP_VG_LITE   0
+
+/*-------------
  * Logging
  *-----------*/
 
 /*Enable the log module*/
-#define LV_USE_LOG      0
+#define LV_USE_LOG      1
 #if LV_USE_LOG
 
 /* How important log should be added:
@@ -120,7 +147,7 @@
 
 /* 1: Print the log with 'printf';
  * 0: User need to register a callback with `lv_log_register_print_cb()`*/
-#  define LV_LOG_PRINTF   0
+#  define LV_LOG_PRINTF   1
 #endif  /*LV_USE_LOG*/
 
 /*-------------
@@ -129,24 +156,22 @@
 
 /* Enable asserts if an operation is failed or an invalid data is found.
  * If LV_USE_LOG is enabled an error message will be printed on failure*/
-#define LV_USE_ASSERT        1
-#if LV_USE_ASSERT
-
 #define LV_USE_ASSERT_NULL          1   /*Check if the parameter is NULL. (Very fast, recommended) */
 #define LV_USE_ASSERT_MALLOC        1   /*Checks is the memory is successfully allocated or no. (Very fast, recommended)*/
-#define LV_USE_ASSERT_STYLE         0   /*Check if the styles are properly initialized. (Very fast, recommended)*/
-#define LV_USE_ASSERT_MEM_INTEGRITY 0   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
-#define LV_USE_ASSERT_OBJ           0   /*Check the object's type and existence (e.g. not deleted). (Slow) */
+#define LV_USE_ASSERT_STYLE         1   /*Check if the styles are properly initialized. (Very fast, recommended)*/
+#define LV_USE_ASSERT_MEM_INTEGRITY 1   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
+#define LV_USE_ASSERT_OBJ           1   /*Check the object's type and existence (e.g. not deleted). (Slow) */
 
 /*Add a custom handler when assert happens e.g. to restart the MCU*/
 #define LV_ASSERT_HANDLER_INCLUDE
 #define LV_ASSERT_HANDLER   while(1);   /*Halt by default*/
 
-#endif /*LV_USE_ASSERT*/
-
 /*-------------
  * Others
  *-----------*/
+
+/*1: Show CPU usage and FPS count in the right bottom corner*/
+#define LV_USE_PERF_MONITOR     0
 
 /*Change the built in (v)snprintf functions*/
 #define LV_SPRINTF_CUSTOM   0
@@ -250,16 +275,13 @@ typedef void * lv_user_data_t;
 
 /*Pixel perfect monospace fonts
  * http://pelulamu.net/unscii/ */
-#define LV_FONT_UNSCII_8     0
-#define LV_FONT_UNSCII_16     0
+#define LV_FONT_UNSCII_8        0
+#define LV_FONT_UNSCII_16       0
 
 /* Optionally declare custom fonts here.
  * You can use these fonts as default font too and they will be available globally.
  * E.g. #define LV_FONT_CUSTOM_DECLARE   LV_FONT_DECLARE(my_font_1) LV_FONT_DECLARE(my_font_2) */
 #define LV_FONT_CUSTOM_DECLARE
-
-/*Always set a default font*/
-#define LV_FONT_DEFAULT     &lv_font_montserrat_14
 
 /* Enable handling large font and/or fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp.
@@ -267,13 +289,13 @@ typedef void * lv_user_data_t;
 #define LV_FONT_FMT_TXT_LARGE   0
 
 /* Enables/disables support for compressed fonts. */
-#define LV_USE_FONT_COMPRESSED 1
+#define LV_USE_FONT_COMPRESSED  0
 
 /* Enable subpixel rendering */
-#define LV_USE_FONT_SUBPX 1
+#define LV_USE_FONT_SUBPX       0
 #if LV_USE_FONT_SUBPX
 /* Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/
-#define LV_FONT_SUBPX_BGR    0  /*0: RGB; 1:BGR order*/
+#define LV_FONT_SUBPX_BGR       0  /*0: RGB; 1:BGR order*/
 #endif
 
 /*=================
@@ -308,7 +330,7 @@ typedef void * lv_user_data_t;
 /* Support bidirectional texts. Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
-#define LV_USE_BIDI     1
+#define LV_USE_BIDI         0
 #if LV_USE_BIDI
 /* Set the default direction. Supported values:
  * `LV_BIDI_DIR_LTR` Left-to-Right
@@ -321,6 +343,24 @@ typedef void * lv_user_data_t;
  * In these languages characters should be replaced with an other form based on their position in the text */
 #define LV_USE_ARABIC_PERSIAN_CHARS 0
 
+
+/*==================
+ *  THEME USAGE
+ *================*/
+/*Set the very basic the attributes*/
+#define LV_THEME_COLOR_PRIMARY      lv_color_hex(0x01a2b1)
+#define LV_THEME_COLOR_SECONDARY    lv_color_hex(0x44d1b6)
+#define LV_THEME_FONT_SMALL         &lv_font_montserrat_14
+#define LV_THEME_FONT_NORMAL        &lv_font_montserrat_14
+#define LV_THEME_FONT_LARGE         &lv_font_montserrat_14
+#define LV_THEME_FONT_EXTRA_LARGE   &lv_font_montserrat_14
+
+/* An external include file required to see the theme init function.
+ * Relative to "lv_core/lv_obj" */
+#define LV_THEME_INIT_INCLUDE "../extra/themes/lv_themes.h"
+
+/* Set a theme initialization function */
+#define LV_THEME_INIT lv_theme_default_init
 
 /*==================
  *  WIDGET USAGE
@@ -379,33 +419,45 @@ typedef void * lv_user_data_t;
 /*-----------
  * Widgets
  *----------*/
-#define LV_USE_CALENDAR     0
-#define LV_USE_CALENDAR_HEADER_ARROW 0
+#define LV_USE_CALENDAR     1
+#if LV_USE_CALENDAR
+# define LV_CALENDAR_WEEK_STARTS_MONDAY 0
+# if LV_CALENDAR_WEEK_STARTS_MONDAY
+#  define LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
+# else
+#  define LV_CALENDAR_DEFAULT_DAY_NAMES {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
+# endif
 
-#define LV_USE_COLORWHEEL   0
+# define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",  "June", "July", "August", "September", "October", "November", "December"}
+# define LV_USE_CALENDAR_HEADER_ARROW 1
+#endif  /*LV_USE_CALENDAR*/
 
-#define LV_USE_KEYBOARD     0
+#define LV_USE_COLORWHEEL   1
 
-#define LV_USE_LED          0
+#define LV_USE_IMGBTN       1
 
-#define LV_USE_LIST         0
+#define LV_USE_KEYBOARD     1
 
-#define LV_USE_MSGBOX       0
+#define LV_USE_LED          1
 
-#define LV_USE_SPINBOX      0
+#define LV_USE_LIST         1
 
-#define LV_USE_SPINNER      0
+#define LV_USE_MSGBOX       1
 
-#define LV_USE_TABVIEW      0
+#define LV_USE_SPINBOX      1
 
-#define LV_USE_TILEVIEW     0
+#define LV_USE_SPINNER      1
 
-#define LV_USE_WIN          0
+#define LV_USE_TABVIEW      1
+
+#define LV_USE_TILEVIEW     1
+
+#define LV_USE_WIN          1
 
 /*-----------
  * Themes
  *----------*/
-/* Use the default theme. If not used a custom theme needs be assigned to the display.*/
+/* A simple, impressive and very complete theme */
 #define LV_USE_THEME_DEFAULT    1
 #if LV_USE_THEME_DEFAULT
 /* 1: Light mode; 0: Dark mode*/
@@ -427,14 +479,6 @@ typedef void * lv_user_data_t;
 
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES   1
-
-/*==================
- * Non-user section
- *==================*/
-
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
-#  define _CRT_SECURE_NO_WARNINGS
-#endif
 
 /*--END OF LV_CONF_H--*/
 

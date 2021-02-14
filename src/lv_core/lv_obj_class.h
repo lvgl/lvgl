@@ -60,6 +60,8 @@ typedef struct _lv_obj_class_t{
  */
 struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
 
+void _lv_obj_destruct(struct _lv_obj_t * obj);
+
 lv_res_t lv_obj_signal_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
 lv_draw_res_t lv_obj_draw_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);

@@ -25,10 +25,6 @@
  *      TYPEDEFS
  **********************/
 
-/**********************
- *  GLOBAL PROTOTYPES
- **********************/
-void lv_event_mark_deleted(lv_obj_t * obj);
 void lv_obj_destruct(lv_obj_t * obj);
 
 /**********************
@@ -269,12 +265,16 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t id)
 
     if(obj->spec_attr == NULL) return NULL;
 
+    uint32_t idu;
     if(id < 0) {
         id = obj->spec_attr->child_cnt + id;
         if(id < 0) return NULL;
+        idu = (uint32_t) id;
+    } else {
+        idu = id;
     }
 
-    if(id >= obj->spec_attr->child_cnt) return NULL;
+    if(idu >= obj->spec_attr->child_cnt) return NULL;
     else return obj->spec_attr->children[id];
 }
 
@@ -331,7 +331,7 @@ static void obj_del_core(lv_obj_t * obj)
         child = lv_obj_get_child(obj, 0);
     }
 
-    lv_event_mark_deleted(obj);
+    _lv_event_mark_deleted(obj);
 
     /*Remove all style*/
     lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
@@ -355,7 +355,7 @@ static void obj_del_core(lv_obj_t * obj)
     }
 
     /* All children deleted. Now clean up the object specific data*/
-    lv_obj_destruct(obj);
+    _lv_obj_destruct(obj);
 
     /*Remove the object from the child list of its parent*/
     uint32_t id = lv_obj_get_child_id(obj);

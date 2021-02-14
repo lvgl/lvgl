@@ -380,7 +380,7 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
     while(parent) {
-        lv_obj_scroll_to_view(obj, LV_ANIM_ON);
+        lv_obj_scroll_to_view(obj, anim_en);
         obj = parent;
         parent = lv_obj_get_parent(parent);
     }

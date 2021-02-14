@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -70,7 +71,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     return obj;
 }
 
-void lv_obj_destruct(lv_obj_t * obj)
+void _lv_obj_destruct(lv_obj_t * obj)
 {
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj);
 
@@ -79,7 +80,7 @@ void lv_obj_destruct(lv_obj_t * obj)
         obj->class_p = obj->class_p->base_class;
 
         /*Call the base class's destructor too*/
-        lv_obj_destruct(obj);
+        _lv_obj_destruct(obj);
     }
 }
 

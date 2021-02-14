@@ -51,10 +51,8 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
  */
 enum {
     LV_BLEND_MODE_NORMAL,     /**< Simply mix according to the opacity value*/
-#if LV_DRAW_COMPLEX
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
-#endif
 };
 
 typedef uint8_t lv_blend_mode_t;
@@ -657,7 +655,7 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
  *      MACROS
  **********************/
 
-#if LV_USE_ASSERT && LV_USE_ASSERT_STYLE
+#if LV_USE_ASSERT_STYLE
 #  define LV_ASSERT_STYLE(style_p)    LV_ASSERT_MSG(style_p != NULL, "The style is NULL");          \
                                       LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted");
 #else

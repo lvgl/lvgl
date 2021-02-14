@@ -1,6 +1,6 @@
 #include "../../../lvgl.h"
 
-#if LV_USE_ARC
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 void lv_example_arc_1(void) 
 {

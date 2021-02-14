@@ -1,7 +1,5 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_DROPDOWN
-
+#if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
  * Create a menu from a drop-down list and show some drop-down list features and styling

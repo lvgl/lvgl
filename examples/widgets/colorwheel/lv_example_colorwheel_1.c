@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_COLORWHEEL
+#if LV_USE_COLORWHEEL && LV_BUILD_EXAMPLES
 
 void lv_example_colorwheel_1(void)
 {

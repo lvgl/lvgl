@@ -30,12 +30,6 @@
  **********************/
 
 /**********************
- *  GLOBAL PROTOTYPES
- **********************/
-void lv_indev_scroll_handler(lv_indev_proc_t * proc);
-void lv_indev_scroll_throw_handler(lv_indev_proc_t * proc);
-
-/**********************
  *  STATIC PROTOTYPES
  **********************/
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data);
@@ -769,7 +763,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     if(new_obj_searched && proc->types.pointer.last_obj) {
         proc->types.pointer.scroll_throw_vect.x = 0;
         proc->types.pointer.scroll_throw_vect.y = 0;
-        lv_indev_scroll_throw_handler(proc);
+        _lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;
     }
 
@@ -841,7 +835,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
         if(indev_act->proc.wait_until_release) return;
 
-        lv_indev_scroll_handler(proc);
+        _lv_indev_scroll_handler(proc);
         if(indev_reset_check(proc)) return;
         indev_gesture(proc);
         if(indev_reset_check(proc)) return;
@@ -923,7 +917,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     /*The reset can be set in the signal function.
      * In case of reset query ignore the remaining parts.*/
     if(scroll_obj) {
-        lv_indev_scroll_throw_handler(proc);
+        _lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;
     }
 }

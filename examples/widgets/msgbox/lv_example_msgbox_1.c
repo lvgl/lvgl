@@ -1,11 +1,10 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_MSGBOX
+#if LV_USE_MSGBOX && LV_BUILD_EXAMPLES
 
 static void event_cb(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_VALUE_CHANGED) {
-        printf("Button: %s\n", lv_msgbox_get_active_btn_text(obj));
+        LV_LOG_USER("Button: %s\n", lv_msgbox_get_active_btn_text(obj));
     }
 }
 

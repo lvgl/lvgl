@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_TABVIEW
+#if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
 void lv_example_tabview_1(void)
 {

@@ -1199,7 +1199,7 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
     label_dsc.letter_space = dsc->content_letter_space;
     label_dsc.line_space = dsc->content_line_space;
     lv_point_t s;
-    lv_txt_get_size(&s, dsc->content_text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+    lv_txt_get_size(&s, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
             LV_TEXT_FLAG_NONE);
 
 

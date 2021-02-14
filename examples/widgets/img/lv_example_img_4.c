@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_IMG
+#if LV_USE_IMG && LV_BUILD_EXAMPLES
 
 LV_IMG_DECLARE(img_skew_strip);
 

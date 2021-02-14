@@ -136,7 +136,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
 
         /*Shift the styles after `i` by one*/
         uint32_t j;
-        for(j = i; j < obj->style_list.style_cnt - 1 ; j++) {
+        for(j = i; j < (uint32_t)obj->style_list.style_cnt - 1 ; j++) {
             obj->style_list.styles[j] = obj->style_list.styles[j + 1];
         }
 
@@ -250,7 +250,7 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t stat
     return lv_style_remove_prop(obj->style_list.styles[i].style, prop);
 }
 
-void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
+void _lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path)
 {
     trans_t * tr;
@@ -306,7 +306,7 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8_
     }
 }
 
-_lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
+_lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
     lv_obj_style_list_t * list = &obj->style_list;
     _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
@@ -971,12 +971,12 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 
 static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
-//    lv_obj_style_set_local_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
+    lv_obj_set_style_opa(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
 }
 
 static void fade_in_anim_ready(lv_anim_t * a)
 {
-//    lv_style_remove_prop(_lv_obj_get_local_style(a->var, LV_OBJ_PART_MAIN), LV_STYLE_OPA_SCALE);
+    lv_obj_remove_local_style_prop(a->var, LV_PART_MAIN,LV_STATE_DEFAULT, LV_STYLE_OPA);
 }
 
 

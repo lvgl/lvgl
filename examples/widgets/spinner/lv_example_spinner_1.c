@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_SPINNER
+#if LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
 void lv_example_spinner_1(void)
 {

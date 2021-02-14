@@ -28,6 +28,18 @@ extern "C" {
  **********************/
 
 /**
+ * Handle scrolling. Called by LVGL during input device processing
+ * @param proc pointer to an input device's proc field
+ */
+void _lv_indev_scroll_handler(lv_indev_proc_t * proc);
+
+/**
+ * Handle throwing after scrolling. Called by LVGL during input device processing
+ * @param proc pointer to an input device's proc field
+ */
+void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc);
+
+/**
  * Predict where would a scroll throw end
  * @param indev pointer to an input device
  * @param dir `LV_DIR_VER` or `LV_DIR_HOR`

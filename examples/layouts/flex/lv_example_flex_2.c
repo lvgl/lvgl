@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-
-#if LV_USE_FLEX
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * Arrange items in rows with wrap and place the items to get even space around them.

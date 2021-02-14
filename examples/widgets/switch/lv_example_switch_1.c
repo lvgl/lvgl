@@ -1,11 +1,10 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_SWITCH
+#if LV_USE_SWITCH && LV_BUILD_EXAMPLES
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_VALUE_CHANGED) {
-        printf("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
+        LV_LOG_USER("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
     }
 }
 

@@ -81,7 +81,7 @@ void lv_led_set_color(lv_obj_t * led, lv_color_t color)
  * @param led pointer to a LED object
  * @param bright LV_LED_BRIGHT_MIN (max. dark) ... LV_LED_BRIGHT_MAX (max. light)
  */
-void lv_led_set_bright(lv_obj_t * obj, uint8_t bright)
+void lv_led_set_brightness(lv_obj_t * obj, uint8_t bright)
 {
     /*Set the brightness*/
     lv_led_t * led = (lv_led_t *) obj;
@@ -102,7 +102,7 @@ void lv_led_set_bright(lv_obj_t * obj, uint8_t bright)
  */
 void lv_led_on(lv_obj_t * led)
 {
-    lv_led_set_bright(led, LV_LED_BRIGHT_MAX);
+    lv_led_set_brightness(led, LV_LED_BRIGHT_MAX);
 }
 
 /**
@@ -111,7 +111,7 @@ void lv_led_on(lv_obj_t * led)
  */
 void lv_led_off(lv_obj_t * led)
 {
-    lv_led_set_bright(led, LV_LED_BRIGHT_MIN);
+    lv_led_set_brightness(led, LV_LED_BRIGHT_MIN);
 }
 
 /**

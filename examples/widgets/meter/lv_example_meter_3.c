@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-#include <stdio.h>
-#if LV_USE_METER
+#if LV_USE_METER && LV_BUILD_EXAMPLES
 
 static lv_obj_t * meter;
 

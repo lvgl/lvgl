@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_KEYBOARD
-
+#if LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
 static void ta_event_cb(lv_obj_t * ta, lv_event_t e)
 {

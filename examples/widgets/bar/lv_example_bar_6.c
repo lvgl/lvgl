@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_BAR
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 static void event_cb(lv_obj_t * obj, lv_event_t e)
 {

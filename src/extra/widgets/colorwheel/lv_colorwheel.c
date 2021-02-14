@@ -260,11 +260,11 @@ static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask)
     uint16_t i;
     lv_coord_t cir_w = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
 
-    /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
+#if LV_DRAW_COMPLEX
+    /* Mask outer and inner ring of widget to tidy up ragged edges of lines while drawing outer ring */
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &obj->coords, LV_RADIUS_CIRCLE, false);
     int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
-
 
     lv_area_t mask_area;
     lv_area_copy(&mask_area, &obj->coords);
@@ -276,25 +276,30 @@ static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask)
     lv_draw_mask_radius_init(&mask_in_param, &mask_area, LV_RADIUS_CIRCLE, true);
     int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, 0);
 
-    /* The inner line ends will be masked out.
+    /* The inner and outer line ends will be masked out.
      * So make lines a little bit longer because the masking makes a more even result */
-    lv_coord_t cir_w_extra = cir_w + line_dsc.width;
+    lv_coord_t cir_w_extra = line_dsc.width;
+#else
+    lv_coord_t cir_w_extra = 0;
+#endif
 
 
     for(i = 0; i <= 360; i += LV_CPICKER_DEF_QF) {
         line_dsc.color = angle_to_mode_color(obj, i);
 
         lv_point_t p[2];
-        p[0].x = cx + ((r + line_dsc.width) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[0].y = cy + ((r + line_dsc.width) * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-        p[1].x = cx + ((r - cir_w_extra) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[1].y = cy + ((r - cir_w_extra) * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[0].x = cx + ((r + cir_w_extra) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[0].y = cy + ((r + cir_w_extra) * lv_trigo_cos(i) >> LV_TRIGO_SHIFT);
+        p[1].x = cx + ((r - cir_w - cir_w_extra) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[1].y = cy + ((r - cir_w - cir_w_extra) * lv_trigo_cos(i) >> LV_TRIGO_SHIFT);
 
         lv_draw_line(&p[0], &p[1], mask, &line_dsc);
     }
+
+#if LV_DRAW_COMPLEX
     lv_draw_mask_remove_id(mask_out_id);
     lv_draw_mask_remove_id(mask_in_id);
-
+#endif
 }
 
 static void draw_knob(lv_obj_t * obj, const lv_area_t * mask)

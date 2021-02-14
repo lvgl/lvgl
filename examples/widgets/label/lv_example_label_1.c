@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_LABEL
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * Show line wrap, re-color, line align and text scrolling.

@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
-
-#if LV_USE_FLEX
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 static void row_gap_anim(lv_obj_t * obj, lv_anim_value_t v)
 {
