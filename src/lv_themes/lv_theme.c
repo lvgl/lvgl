@@ -91,7 +91,6 @@ void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy)
         theme->apply_cb = copy->apply_cb;
         theme->apply_xcb = copy->apply_xcb;
     }
-
 }
 
 /**
@@ -471,5 +470,4 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
         default:
             break;
     }
-
 }

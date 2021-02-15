@@ -53,4 +53,4 @@ lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secon
 } /* extern "C" */
 #endif
 
-#endif /*LV_THEME_TEMPLATE_H*/
+#endif /*LV_THEME_MONO_H*/
