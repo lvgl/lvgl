@@ -125,12 +125,13 @@ void lv_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
+#ifdef LV_THEME_INIT
     lv_theme_t * th = LV_THEME_INIT(LV_THEME_COLOR_PRIMARY, LV_THEME_COLOR_SECONDARY,
                                     LV_THEME_FONT_SMALL, LV_THEME_FONT_NORMAL,
                                     LV_THEME_FONT_LARGE, LV_THEME_FONT_EXTRA_LARGE);
 
     lv_theme_set_act(th);
-
+#endif
     /*Initialize the screen refresh system*/
     _lv_refr_init();
 

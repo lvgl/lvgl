@@ -64,6 +64,7 @@ void lv_theme_apply(lv_obj_t * obj)
 
     lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
 
+    if(act_theme == NULL) return;
     apply_theme(act_theme, obj);    /*Apply the theme including the base theme(s)*/
 
     lv_obj_enable_style_refresh(true);
