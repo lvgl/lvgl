@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "lv_math.h"
+#include "lv_types.h"
 
 /*Error checking*/
 #if LV_COLOR_DEPTH == 24
@@ -103,6 +104,34 @@ enum {
 #endif
 #endif
 
+#if defined(__cplusplus) && !defined(_LV_COLOR_HAS_MODERN_CPP)
+/**
+* MSVC compiler's definition of the __cplusplus indicating 199711L regardless to C++ standard version
+* see https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-cplusplus
+* so we use _MSC_VER macro instead of __cplusplus
+*/
+#ifdef _MSC_VER
+#if _MSC_VER >= 1900 /* Visual Studio 2015 */
+#define _LV_COLOR_HAS_MODERN_CPP 1
+#endif
+#else
+#if __cplusplus >= 201103L
+#define _LV_COLOR_HAS_MODERN_CPP 1
+#endif
+#endif
+#endif /* __cplusplus */
+
+#ifndef _LV_COLOR_HAS_MODERN_CPP
+#define _LV_COLOR_HAS_MODERN_CPP 0
+#endif
+
+#if _LV_COLOR_HAS_MODERN_CPP
+/* Fix msvc compiler error C4576 inside C++ code */
+#define _LV_COLOR_MAKE_TYPE_HELPER lv_color_t
+#else
+#define _LV_COLOR_MAKE_TYPE_HELPER (lv_color_t)
+#endif
+
 /*---------------------------------------
  * Macros for all existing color depths
  * to set/get values of the color channels
@@ -117,6 +146,9 @@ enum {
 # define LV_COLOR_GET_B1(c) (c).ch.blue
 # define LV_COLOR_GET_A1(c) 0xFF
 
+# define _LV_COLOR_ZERO_INITIALIZER1 {0x00}
+# define LV_COLOR_MAKE1(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{(uint8_t)((b8 >> 7) | (g8 >> 7) | (r8 >> 7))})
+
 # define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)((v) & 0x7U)
 # define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)((v) & 0x7U)
 # define LV_COLOR_SET_B8(c, v) (c).ch.blue = (uint8_t)((v) & 0x3U)
@@ -126,6 +158,9 @@ enum {
 # define LV_COLOR_GET_G8(c) (c).ch.green
 # define LV_COLOR_GET_B8(c) (c).ch.blue
 # define LV_COLOR_GET_A8(c) 0xFF
+
+# define _LV_COLOR_ZERO_INITIALIZER8 {{0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE8(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}})
 
 # define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)((v) & 0x1FU)
 #if LV_COLOR_16_SWAP == 0
@@ -145,6 +180,14 @@ enum {
 # define LV_COLOR_GET_B16(c) (c).ch.blue
 # define LV_COLOR_GET_A16(c) 0xFF
 
+#if LV_COLOR_16_SWAP == 0
+# define _LV_COLOR_ZERO_INITIALIZER16 {{0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE16(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x3FU), (uint8_t)((r8 >> 3) & 0x1FU)}})
+#else
+# define _LV_COLOR_ZERO_INITIALIZER16 {{0x00, 0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE16(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 3) & 0x1FU), (uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x7U)}})
+#endif
+
 # define LV_COLOR_SET_R32(c, v) (c).ch.red = (uint8_t)((v) & 0xFF)
 # define LV_COLOR_SET_G32(c, v) (c).ch.green = (uint8_t)((v) & 0xFF)
 # define LV_COLOR_SET_B32(c, v) (c).ch.blue = (uint8_t)((v) & 0xFF)
@@ -155,54 +198,25 @@ enum {
 # define LV_COLOR_GET_B32(c) (c).ch.blue
 # define LV_COLOR_GET_A32(c) (c).ch.alpha
 
+# define _LV_COLOR_ZERO_INITIALIZER32 {{0x00, 0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE32(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{b8, g8, r8, 0xff}}) /*Fix 0xff alpha*/
+
 /*---------------------------------------
  * Macros for the current color depth
  * to set/get values of the color channels
  *------------------------------------------*/
-#if LV_COLOR_DEPTH == 1
-# define LV_COLOR_SET_R(c, v) LV_COLOR_SET_R1(c,v)
-# define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G1(c,v)
-# define LV_COLOR_SET_B(c, v) LV_COLOR_SET_B1(c,v)
-# define LV_COLOR_SET_A(c, v) LV_COLOR_SET_A1(c,v)
+#define LV_COLOR_SET_R(c, v) LV_CONCAT(LV_COLOR_SET_R, LV_COLOR_DEPTH)(c, v)
+#define LV_COLOR_SET_G(c, v) LV_CONCAT(LV_COLOR_SET_G, LV_COLOR_DEPTH)(c, v)
+#define LV_COLOR_SET_B(c, v) LV_CONCAT(LV_COLOR_SET_B, LV_COLOR_DEPTH)(c, v)
+#define LV_COLOR_SET_A(c, v) LV_CONCAT(LV_COLOR_SET_A, LV_COLOR_DEPTH)(c, v)
 
-# define LV_COLOR_GET_R(c) LV_COLOR_GET_R1(c)
-# define LV_COLOR_GET_G(c) LV_COLOR_GET_G1(c)
-# define LV_COLOR_GET_B(c) LV_COLOR_GET_B1(c)
-# define LV_COLOR_GET_A(c) LV_COLOR_GET_A1(c)
+#define LV_COLOR_GET_R(c) LV_CONCAT(LV_COLOR_GET_R, LV_COLOR_DEPTH)(c)
+#define LV_COLOR_GET_G(c) LV_CONCAT(LV_COLOR_GET_G, LV_COLOR_DEPTH)(c)
+#define LV_COLOR_GET_B(c) LV_CONCAT(LV_COLOR_GET_B, LV_COLOR_DEPTH)(c)
+#define LV_COLOR_GET_A(c) LV_CONCAT(LV_COLOR_GET_A, LV_COLOR_DEPTH)(c)
 
-#elif LV_COLOR_DEPTH == 8
-# define LV_COLOR_SET_R(c, v) LV_COLOR_SET_R8(c,v)
-# define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G8(c,v)
-# define LV_COLOR_SET_B(c, v) LV_COLOR_SET_B8(c,v)
-# define LV_COLOR_SET_A(c, v) LV_COLOR_SET_A8(c,v)
-
-# define LV_COLOR_GET_R(c) LV_COLOR_GET_R8(c)
-# define LV_COLOR_GET_G(c) LV_COLOR_GET_G8(c)
-# define LV_COLOR_GET_B(c) LV_COLOR_GET_B8(c)
-# define LV_COLOR_GET_A(c) LV_COLOR_GET_A8(c)
-
-#elif LV_COLOR_DEPTH == 16
-# define LV_COLOR_SET_R(c, v) LV_COLOR_SET_R16(c,v)
-# define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G16(c,v)
-# define LV_COLOR_SET_B(c, v) LV_COLOR_SET_B16(c,v)
-# define LV_COLOR_SET_A(c, v) LV_COLOR_SET_A16(c,v)
-
-# define LV_COLOR_GET_R(c) LV_COLOR_GET_R16(c)
-# define LV_COLOR_GET_G(c) LV_COLOR_GET_G16(c)
-# define LV_COLOR_GET_B(c) LV_COLOR_GET_B16(c)
-# define LV_COLOR_GET_A(c) LV_COLOR_GET_A16(c)
-
-#elif LV_COLOR_DEPTH == 32
-# define LV_COLOR_SET_R(c, v) LV_COLOR_SET_R32(c,v)
-# define LV_COLOR_SET_G(c, v) LV_COLOR_SET_G32(c,v)
-# define LV_COLOR_SET_B(c, v) LV_COLOR_SET_B32(c,v)
-# define LV_COLOR_SET_A(c, v) LV_COLOR_SET_A32(c,v)
-
-# define LV_COLOR_GET_R(c) LV_COLOR_GET_R32(c)
-# define LV_COLOR_GET_G(c) LV_COLOR_GET_G32(c)
-# define LV_COLOR_GET_B(c) LV_COLOR_GET_B32(c)
-# define LV_COLOR_GET_A(c) LV_COLOR_GET_A32(c)
-#endif
+#define _LV_COLOR_ZERO_INITIALIZER LV_CONCAT(_LV_COLOR_ZERO_INITIALIZER, LV_COLOR_DEPTH)
+#define LV_COLOR_MAKE(r8, g8, b8) LV_CONCAT(LV_COLOR_MAKE, LV_COLOR_DEPTH)(r8, g8, b8)
 
 /**********************
  *      TYPEDEFS
@@ -252,29 +266,8 @@ typedef union {
     uint32_t full;
 } lv_color32_t;
 
-#if LV_COLOR_DEPTH == 1
-typedef uint8_t lv_color_int_t;
-typedef lv_color1_t lv_color_t;
-#define _LV_COLOR_ZERO_INITIALIZER {0x00}
-#elif LV_COLOR_DEPTH == 8
-typedef uint8_t lv_color_int_t;
-typedef lv_color8_t lv_color_t;
-#define _LV_COLOR_ZERO_INITIALIZER {{0x00, 0x00, 0x00}}
-#elif LV_COLOR_DEPTH == 16
-typedef uint16_t lv_color_int_t;
-typedef lv_color16_t lv_color_t;
-# if LV_COLOR_16_SWAP == 0
-#  define _LV_COLOR_ZERO_INITIALIZER {{0x00, 0x00, 0x00}}
-# else
-#  define _LV_COLOR_ZERO_INITIALIZER {{0x00, 0x00, 0x00, 0x00}}
-# endif
-#elif LV_COLOR_DEPTH == 32
-typedef uint32_t lv_color_int_t;
-typedef lv_color32_t lv_color_t;
-#define _LV_COLOR_ZERO_INITIALIZER {{0x00, 0x00, 0x00, 0x00}}
-#else
-#error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
-#endif
+typedef LV_CONCAT3(uint, LV_COLOR_SIZE, _t) lv_color_int_t;
+typedef LV_CONCAT3(lv_color, LV_COLOR_DEPTH, _t) lv_color_t;
 
 typedef struct {
     uint16_t h;
@@ -586,49 +579,6 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
     uint16_t bright = (uint16_t)(3u * LV_COLOR_GET_R32(c32) + LV_COLOR_GET_B32(c32) + 4u * LV_COLOR_GET_G32(c32));
     return (uint8_t)(bright >> 3);
 }
-
-#if defined(__cplusplus) && !defined(_LV_COLOR_HAS_MODERN_CPP)
-/**
-* MSVC compiler's definition of the __cplusplus indicating 199711L regardless to C++ standard version
-* see https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-cplusplus
-* so we use _MSC_VER macro instead of __cplusplus
-*/
-#ifdef _MSC_VER
-#if _MSC_VER >= 1900 /* Visual Studio 2015 */
-#define _LV_COLOR_HAS_MODERN_CPP 1
-#endif
-#else
-#if __cplusplus >= 201103L
-#define _LV_COLOR_HAS_MODERN_CPP 1
-#endif
-#endif
-#endif /* __cplusplus */
-
-#ifndef _LV_COLOR_HAS_MODERN_CPP
-#define _LV_COLOR_HAS_MODERN_CPP 0
-#endif
-
-#if _LV_COLOR_HAS_MODERN_CPP
-/* Fix msvc compiler error C4576 inside C++ code */
-#define _LV_COLOR_MAKE_TYPE_HELPER lv_color_t
-#else
-#define _LV_COLOR_MAKE_TYPE_HELPER (lv_color_t)
-#endif
-
-/* The most simple macro to create a color from R,G and B values */
-#if LV_COLOR_DEPTH == 1
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{(uint8_t)((b8 >> 7) | (g8 >> 7) | (r8 >> 7))})
-#elif LV_COLOR_DEPTH == 8
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}})
-#elif LV_COLOR_DEPTH == 16
-#if LV_COLOR_16_SWAP == 0
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x3FU), (uint8_t)((r8 >> 3) & 0x1FU)}})
-#else
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 3) & 0x1FU), (uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x7U)}})
-#endif
-#elif LV_COLOR_DEPTH == 32
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{b8, g8, r8, 0xff}}) /*Fix 0xff alpha*/
-#endif
 
 static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 {
