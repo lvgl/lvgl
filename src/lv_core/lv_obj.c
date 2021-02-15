@@ -315,12 +315,18 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    if(f & LV_OBJ_FLAG_HIDDEN)lv_obj_invalidate(obj);
+    if(f & LV_OBJ_FLAG_HIDDEN) lv_obj_invalidate(obj);
 
     obj->flags |= f;
 
     if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 
+    if(f & LV_OBJ_FLAG_HIDDEN) {
+    	lv_obj_invalidate(obj);
+    	if(lv_obj_is_layout_positioned(obj)) {
+    		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
+    	}
+    }
 }
 
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
@@ -329,7 +335,12 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     obj->flags &= (~f);
 
-    if(f & LV_OBJ_FLAG_HIDDEN) lv_obj_invalidate(obj);
+    if(f & LV_OBJ_FLAG_HIDDEN) {
+    	lv_obj_invalidate(obj);
+    	if(lv_obj_is_layout_positioned(obj)) {
+    		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
+    	}
+    }
     if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 }
 
