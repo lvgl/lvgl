@@ -1743,7 +1743,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         lv_style_int_t time = lv_obj_get_style_transition_time(obj, part);
         lv_style_property_t props[LV_STYLE_TRANS_NUM_MAX];
         lv_style_int_t delay = lv_obj_get_style_transition_delay(obj, part);
-        lv_anim_path_t * path = lv_obj_get_style_transition_path(obj, part);
+        const lv_anim_path_t * path = lv_obj_get_style_transition_path(obj, part);
         props[0] = lv_obj_get_style_transition_prop_1(obj, part);
         props[1] = lv_obj_get_style_transition_prop_2(obj, part);
         props[2] = lv_obj_get_style_transition_prop_3(obj, part);
