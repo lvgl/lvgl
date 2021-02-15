@@ -8,8 +8,8 @@ LVGL_DIR_NAME ?= lvgl
 WARNINGS = -Werror -Wall -Wextra \
            -Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wpointer-arith -Wuninitialized \
            -Wunreachable-code -Wreturn-type -Wmultichar -Wformat-security -Wdouble-promotion -Wclobbered -Wdeprecated  \
-           -Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
-           -Wtype-limits -Wsizeof-pointer-memaccess
+           -Wempty-body -Wshift-negative-value -Wstack-usage=2048 -pedantic-errors \
+           -Wtype-limits -Wsizeof-pointer-memaccess -Wpedantic -Wmissing-prototypes -Wno-discarded-qualifiers
 
 #-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -O3 -g0
