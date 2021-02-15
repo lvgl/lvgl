@@ -123,28 +123,33 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     bool suc;
 
     suc = _lv_area_intersect(&com_area, area_p, &scr_area);
+    if(suc == false)  return; /*Out of the screen*/
 
-    /*The area is truncated to the screen*/
-    if(suc != false) {
-        if(disp->driver.rounder_cb) disp->driver.rounder_cb(&disp->driver, &com_area);
-
-        /*Save only if this area is not in one of the saved areas*/
-        uint16_t i;
-        for(i = 0; i < disp->inv_p; i++) {
-            if(_lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
-        }
-
-        /*Save the area*/
-        if(disp->inv_p < LV_INV_BUF_SIZE) {
-            lv_area_copy(&disp->inv_areas[disp->inv_p], &com_area);
-        }
-        else {   /*If no place for the area add the screen*/
-            disp->inv_p = 0;
-            lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
-        }
-        disp->inv_p++;
-        lv_timer_pause(disp->read_task, false);
+    /*If there were at least 1 invalid area in true double buffered mode, redraw the whole screen*/
+    if(lv_disp_is_true_double_buf(disp)) {
+        disp->inv_areas[0] = scr_area;
+        disp->inv_p = 1;
+        return;
     }
+
+    if(disp->driver.rounder_cb) disp->driver.rounder_cb(&disp->driver, &com_area);
+
+    /*Save only if this area is not in one of the saved areas*/
+    uint16_t i;
+    for(i = 0; i < disp->inv_p; i++) {
+        if(_lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
+    }
+
+    /*Save the area*/
+    if(disp->inv_p < LV_INV_BUF_SIZE) {
+        lv_area_copy(&disp->inv_areas[disp->inv_p], &com_area);
+    }
+    else {   /*If no place for the area add the screen*/
+        disp->inv_p = 0;
+        lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
+    }
+    disp->inv_p++;
+    lv_timer_pause(disp->read_task, false);
 }
 
 /**
@@ -199,63 +204,9 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        /* In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date.
-         * With set_px_cb we don't know anything about the buffer (even it's size) so skip copying.*/
         if(lv_disp_is_true_double_buf(disp_refr)) {
-            if(disp_refr->driver.set_px_cb) {
-                LV_LOG_WARN("Can't handle 2 screen sized buffers with set_px_cb. Display is not refreshed.");
-            }
-            else {
-                lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
-
-                /*Flush the content of the VDB*/
-                lv_refr_vdb_flush();
-
-                /* With true double buffering the flushing should be only the address change of the
-                 * current frame buffer. Wait until the address change is ready and copy the changed
-                 * content to the other frame buffer (new active VDB) to keep the buffers synchronized*/
-                while(vdb->flushing);
-
-                lv_color_t * copy_buf = NULL;
-#if LV_USE_GPU_STM32_DMA2D
-                LV_UNUSED(copy_buf);
-#else
-                copy_buf = lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
-#endif
-
-                uint8_t * buf_act = (uint8_t *)vdb->buf_act;
-                uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
-
-                lv_coord_t hres = lv_disp_get_hor_res(disp_refr);
-                uint16_t a;
-                for(a = 0; a < disp_refr->inv_p; a++) {
-                    if(disp_refr->inv_area_joined[a] == 0) {
-                        uint32_t start_offs =
-                            (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
-#if LV_USE_GPU_STM32_DMA2D
-                        lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
-                                                (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
-                                                lv_area_get_width(&disp_refr->inv_areas[a]),
-                                                lv_area_get_height(&disp_refr->inv_areas[a]));
-#else
-
-                        lv_coord_t y;
-                        uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
-
-                        for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                            /* The frame buffer is probably in an external RAM where sequential access is much faster.
-                             * So first copy a line into a buffer and write it back the ext. RAM */
-                            lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
-                            lv_memcpy(buf_act + start_offs, copy_buf, line_length);
-                            start_offs += hres * sizeof(lv_color_t);
-                        }
-#endif
-                    }
-                }
-
-                if(copy_buf) lv_mem_buf_release(copy_buf);
-            }
-        } /*End of true double buffer handling*/
+            lv_refr_vdb_flush();
+        }
 
         /*Clean up*/
         lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -499,12 +450,8 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 {
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
-    /*In non double buffered mode, before rendering the next part wait until the previous image is
-     * flushed*/
-    if(lv_disp_is_double_buf(disp_refr) == false) {
-        while(vdb->flushing) {
-            if(disp_refr->driver.wait_cb) disp_refr->driver.wait_cb(&disp_refr->driver);
-        }
+    while(vdb->flushing) {
+        if(disp_refr->driver.wait_cb) disp_refr->driver.wait_cb(&disp_refr->driver);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -754,14 +701,6 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 static void lv_refr_vdb_flush(void)
 {
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
-
-    /*In double buffered mode wait until the other buffer is flushed before flushing the current
-     * one*/
-    if(lv_disp_is_double_buf(disp_refr)) {
-        while(vdb->flushing) {
-            if(disp_refr->driver.wait_cb) disp_refr->driver.wait_cb(&disp_refr->driver);
-        }
-    }
 
     vdb->flushing = 1;
 
