@@ -266,11 +266,12 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
-        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) || !lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
+        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) && !lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
             lv_coord_t main_size = (row ? item->w_set : item->h_set);
             if(_LV_FLEX_GET_GROW(main_size)) {
                 grow_sum += _LV_FLEX_GET_GROW(main_size);
                 grow_item_cnt++;
+                t->track_main_size += item_gap;
             } else {
                 lv_coord_t item_size = get_main_size(item);
                 if(wrap && t->track_main_size + item_size > max_main_size) break;
@@ -287,8 +288,7 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
     if(t->track_main_size > 0) t->track_main_size -= item_gap; /*There is no gap after the last item*/
 
     if(grow_item_cnt && grow_sum) {
-        lv_coord_t s = max_main_size - t->track_main_size;
-        s -= grow_item_cnt * item_gap;
+        lv_coord_t s = max_main_size - t->track_main_size;	/*The remaining size for grow items*/
         t->grow_unit =  s / grow_sum;
         t->track_main_size = max_main_size;  /*If there is at least one "grow item" the track takes the full space*/
     } else {
