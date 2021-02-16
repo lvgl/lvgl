@@ -246,9 +246,8 @@ const char * lv_fs_get_last(const char * path);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_FILESYSTEM*/
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
+#endif /*LV_FS_H*/
