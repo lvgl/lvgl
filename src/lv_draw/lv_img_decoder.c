@@ -83,10 +83,7 @@ void _lv_img_decoder_init(void)
  */
 lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 {
-    header->always_zero = 0;
-    header->h = 0;
-    header->w = 0;
-    header->cf = LV_IMG_CF_UNKNOWN;
+   _lv_memset_00(header, sizeof(lv_img_header_t));
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
@@ -114,9 +111,10 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
  */
 lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color)
 {
-    dsc->color     = color;
-    dsc->src_type  = lv_img_src_get_type(src);
-    dsc->user_data = NULL;
+    _lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
+
+    dsc->color    = color;
+    dsc->src_type = lv_img_src_get_type(src);
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         size_t fnlen = strlen(src);
@@ -142,14 +140,19 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         res = d->info_cb(d, src, &dsc->header);
         if(res != LV_RES_OK) continue;
 
-        dsc->error_msg = NULL;
-        dsc->img_data  = NULL;
-        dsc->decoder   = d;
-
+        dsc->decoder = d;
         res = d->open_cb(d, dsc);
 
         /*Opened successfully. It is a good decoder to for this image source*/
         if(res == LV_RES_OK) return res;
+
+        /*Prepare for the next loop*/
+        _lv_memset_00(&dsc->header, sizeof(lv_img_header_t));
+
+        dsc->error_msg = NULL;
+        dsc->img_data  = NULL;
+        dsc->user_data = NULL;
+        dsc->time_to_open = 0;
     }
 
     if(dsc->src_type == LV_IMG_SRC_FILE)
@@ -377,7 +380,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
         else {
             /*If it's a file it need to be read line by line later*/
-            dsc->img_data = NULL;
             return LV_RES_OK;
         }
     }
@@ -438,7 +440,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             }
         }
 
-        dsc->img_data = NULL;
         return LV_RES_OK;
 #else
         LV_LOG_WARN("Indexed (palette) images are not enabled in lv_conf.h. See LV_IMG_CF_INDEXED");
@@ -449,7 +450,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     else if(cf == LV_IMG_CF_ALPHA_1BIT || cf == LV_IMG_CF_ALPHA_2BIT || cf == LV_IMG_CF_ALPHA_4BIT ||
             cf == LV_IMG_CF_ALPHA_8BIT) {
 #if LV_IMG_CF_ALPHA
-        dsc->img_data = NULL;
         return LV_RES_OK; /*Nothing to process*/
 #else
         LV_LOG_WARN("Alpha indexed images are not enabled in lv_conf.h. See LV_IMG_CF_ALPHA");
