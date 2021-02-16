@@ -8,6 +8,8 @@
  *********************/
 #include "lv_flex.h"
 
+#if LV_USE_FLEX
+
 /*********************
  *      DEFINES
  *********************/
@@ -446,3 +448,5 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id)
         else return NULL;
     }
 }
+
+#endif /*LV_USE_FLEX*/

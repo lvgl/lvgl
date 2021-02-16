@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../../lv_core/lv_obj.h"
+#if LV_USE_FLEX
 
 /*********************
  *      DEFINES
@@ -111,6 +112,8 @@ extern const lv_flex_t lv_flex_even;            /**< Place the items evenly in r
 /**********************
  *      MACROS
  **********************/
+
+#endif  /*LV_USE_FLEX*/
 
 #ifdef __cplusplus
 } /* extern "C" */

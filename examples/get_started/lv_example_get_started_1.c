@@ -1,4 +1,5 @@
 #include "../../lvgl.h"
+#if LV_BUILD_EXAMPLES
 
 static void btn_event_cb(lv_obj_t * btn, lv_event_t event)
 {
@@ -25,4 +26,6 @@ void lv_example_get_started_1(void)
     lv_obj_t * label = lv_label_create(btn, NULL);          /*Add a label to the button*/
     lv_label_set_text(label, "Button");                     /*Set the labels text*/
 }
+
+#endif
 

@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_grid.h"
+#if LV_USE_GRID
 
 /*********************
  *      DEFINES
@@ -479,3 +480,5 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
     /*Return the full size of the grid*/
     return total_gird_size;
 }
+
+#endif /*LV_USE_GRID*/

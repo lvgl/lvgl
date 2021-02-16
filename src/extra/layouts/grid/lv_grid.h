@@ -18,6 +18,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_GRID
 
 /**********************
  *      TYPEDEFS
@@ -123,6 +124,7 @@ extern const lv_grid_t grid_12;
 /**********************
  *      MACROS
  **********************/
+#endif /*LV_USE_GRID*/
 
 #ifdef __cplusplus
 } /* extern "C" */
