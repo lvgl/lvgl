@@ -282,6 +282,9 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
     }
 #if LV_USE_FILESYSTEM
     else if(src_type == LV_IMG_SRC_FILE) {
+        /*Support only "*.bin" files*/
+        if(strcmp(lv_fs_get_ext(src), "bin")) return LV_RES_INV;
+
         lv_fs_file_t file;
         lv_fs_res_t res;
         uint32_t rn;
@@ -325,7 +328,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
 #if LV_USE_FILESYSTEM
-
         /*Support only "*.bin" files*/
         if(strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RES_INV;
 
