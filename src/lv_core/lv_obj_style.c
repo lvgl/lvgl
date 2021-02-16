@@ -559,7 +559,7 @@ static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, 
 static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_obj_style_list_t * list = &obj->style_list;
-    if(part != LV_PART_MAIN) return;
+    if(part != LV_PART_MAIN || part != LV_PART_ANY) return;
     list->cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID; /*Set an invalid state to disable cache reading*/
 
     lv_style_value_t v;
