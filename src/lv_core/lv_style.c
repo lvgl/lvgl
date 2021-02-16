@@ -321,10 +321,8 @@ void _lv_style_list_reset(lv_style_list_t * list)
  */
 void lv_style_reset(lv_style_t * style)
 {
-    LV_ASSERT_STYLE(style);
-
     lv_mem_free(style->map);
-    style->map = NULL;
+    lv_style_init(style);
 }
 
 /**

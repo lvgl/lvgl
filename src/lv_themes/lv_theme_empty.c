@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
 #include "../../lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_EMPTY
@@ -28,15 +27,12 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name);
-static void style_init_reset(lv_style_t * style);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_theme_t theme;
 static theme_styles_t * styles;
-
-static bool inited;
 
 /**********************
  *      MACROS
@@ -68,9 +64,11 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
     /* This trick is required only to avoid the garbage collection of
      * styles' data if LVGL is used in a binding (e.g. Micropython)
      * In a general case styles could be simple `static lv_style_t my style` variables*/
-    if(!inited) {
-        LV_GC_ROOT(_lv_theme_empty_styles) = lv_mem_alloc(sizeof(theme_styles_t));
-        styles = (theme_styles_t *)LV_GC_ROOT(_lv_theme_empty_styles);
+    if(styles == NULL) {
+        styles = lv_mem_alloc(sizeof(theme_styles_t));
+        if(styles == NULL) return NULL;
+        _lv_memset_00(styles, sizeof(theme_styles_t));
+        LV_GC_ROOT(_lv_theme_empty_styles) = styles;
     }
 
     theme.color_primary = color_primary;
@@ -81,7 +79,7 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
     theme.font_title = font_title;
     theme.flags = flags;
 
-    style_init_reset(&styles->opa_cover);
+    lv_style_reset(&styles->opa_cover);
     lv_style_set_bg_opa(&styles->opa_cover, LV_STATE_DEFAULT, LV_OPA_COVER);
 
     theme.apply_xcb = NULL;
@@ -89,23 +87,17 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
     return &theme;
 }
 
-static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
-{
-    LV_UNUSED(th);
-    if(name == LV_THEME_SCR) {
-        lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
-        lv_obj_add_style(obj, LV_OBJ_PART_MAIN, &styles->opa_cover);
-    }
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void style_init_reset(lv_style_t * style)
+static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
-    if(inited) lv_style_reset(style);
-    else lv_style_init(style);
+    LV_UNUSED(th);
+    if(name == LV_THEME_SCR) {
+        lv_obj_add_style(obj, LV_OBJ_PART_MAIN, &styles->opa_cover);
+        lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+    }
 }
 
 #endif
