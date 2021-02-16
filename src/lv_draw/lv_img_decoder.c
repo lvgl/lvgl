@@ -121,10 +121,15 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         size_t fnlen = strlen(src);
         dsc->src = lv_mem_alloc(fnlen + 1);
+        LV_ASSERT_MEM(dsc->src);
+        if(dsc->src == NULL) {
+            LV_LOG_WARN("lv_img_decoder_open: out of memory");
+            return LV_RES_INV;
+        }
         strcpy((char *)dsc->src, src);
     }
     else {
-        dsc->src       = src;
+        dsc->src = src;
     }
 
     lv_res_t res = LV_RES_INV;
@@ -144,8 +149,11 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         res = d->open_cb(d, dsc);
 
         /*Opened successfully. It is a good decoder to for this image source*/
-        if(res == LV_RES_OK) break;
+        if(res == LV_RES_OK) return res;
     }
+
+    if(dsc->src_type == LV_IMG_SRC_FILE)
+        lv_mem_free(dsc->src);
 
     return res;
 }
