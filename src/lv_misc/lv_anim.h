@@ -411,9 +411,9 @@ extern const lv_anim_path_t lv_anim_path_def;
  *      MACROS
  **********************/
 
-#endif /*LV_ANIM_H*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
+#endif /*LV_ANIM_H*/
