@@ -130,7 +130,6 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
-        lv_img_decoder_close(&cached_src->dec_dsc);
         _lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
         cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use  */
         return NULL;
