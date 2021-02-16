@@ -136,7 +136,7 @@ static inline const char *lv_version_info()
 }
 
 #ifdef __cplusplus
-}
+} /* extern "C" */
 #endif
 
 #endif /*LVGL_H*/
