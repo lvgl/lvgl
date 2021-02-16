@@ -295,6 +295,26 @@ void lv_label_cut_text(lv_obj_t * label, uint32_t pos, uint32_t cnt);
  */
 void lv_label_refr_text(lv_obj_t * label);
 
+#if LV_USE_ANIMATION
+/**
+ * Reverse the direction of text animation according to both X and Y axis
+ * @param label pointer to a label object
+ */
+void lv_label_reverse_animation_direction(lv_obj_t * label);
+
+/**
+ * Reverse the direction of text animation according to X axis
+ * @param label pointer to a label object
+ */
+void lv_label_reverse_animation_direction_x(lv_obj_t * label);
+
+/**
+ * Reverse the direction of text animation according to Y axis
+ * @param label pointer to a label object
+ */
+void lv_label_reverse_animation_direction_y(lv_obj_t * label);
+#endif
+
 /**********************
  *      MACROS
  **********************/
