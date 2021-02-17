@@ -355,14 +355,32 @@ static void obj_del_core(lv_obj_t * obj)
     /* All children deleted. Now clean up the object specific data*/
     _lv_obj_destruct(obj);
 
-    /*Remove the object from the child list of its parent*/
-    uint32_t id = lv_obj_get_child_id(obj);
-    uint32_t i;
-    for(i = id; i < obj->parent->spec_attr->child_cnt - 1; i++) {
-        obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
+    /*Remove the screen for the screen list*/
+    if(obj->parent == NULL) {
+    	lv_disp_t * disp = lv_obj_get_disp(obj);
+		uint32_t i;
+		/*Find the screen in the list*/
+		for(i = 0; i < disp->screen_cnt; i++) {
+			if(disp->screens[i] == obj) break;
+		}
+
+		uint32_t id = i;
+		for(i = id; i < disp->screen_cnt - 1; i++) {
+			disp->screens[i] = disp->screens[i + 1];
+		}
+		disp->screen_cnt--;
+		disp->screens = lv_mem_realloc(disp->screens, disp->screen_cnt * sizeof(lv_obj_t *));
     }
-    obj->parent->spec_attr->child_cnt--;
-    obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+    /*Remove the object from the child list of its parent*/
+    else {
+		uint32_t id = lv_obj_get_child_id(obj);
+		uint32_t i;
+		for(i = id; i < obj->parent->spec_attr->child_cnt - 1; i++) {
+			obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
+		}
+		obj->parent->spec_attr->child_cnt--;
+		obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+    }
 
     /*Free the object itself*/
     lv_mem_free(obj);
