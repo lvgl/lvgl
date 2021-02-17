@@ -611,8 +611,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             lv_img_decoder_get_info(ext->needle_img, &info);
 
             lv_area_t a;
-            a.x1 = gauge->coords.x1 + lv_area_get_width(&gauge->coords) / 2 - ext->needle_img_pivot.x;
-            a.y1 = gauge->coords.y1 + lv_area_get_height(&gauge->coords) / 2  - ext->needle_img_pivot.y;
+            a.x1 = x_ofs - ext->needle_img_pivot.x;
+            a.y1 = y_ofs - ext->needle_img_pivot.y;
             a.x2 = a.x1 + info.w - 1;
             a.y2 = a.y1 + info.h - 1;
             img_dsc.pivot.x = ext->needle_img_pivot.x;
