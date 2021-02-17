@@ -16,6 +16,9 @@
 
 #include "lv_test_font_loader.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 /*********************
  *      DEFINES
  *********************/
@@ -212,6 +215,7 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
 }
 #endif
 
+#pragma GCC diagnostic pop
 /**********************
  *   STATIC FUNCTIONS
  **********************/

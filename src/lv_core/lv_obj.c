@@ -1743,7 +1743,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         lv_style_int_t time = lv_obj_get_style_transition_time(obj, part);
         lv_style_property_t props[LV_STYLE_TRANS_NUM_MAX];
         lv_style_int_t delay = lv_obj_get_style_transition_delay(obj, part);
-        lv_anim_path_t * path = lv_obj_get_style_transition_path(obj, part);
+        const lv_anim_path_t * path = lv_obj_get_style_transition_path(obj, part);
         props[0] = lv_obj_get_style_transition_prop_1(obj, part);
         props[1] = lv_obj_get_style_transition_prop_2(obj, part);
         props[2] = lv_obj_get_style_transition_prop_3(obj, part);
@@ -3764,12 +3764,6 @@ static void obj_del_core(lv_obj_t * obj)
     if(group) lv_group_remove_obj(obj);
 #endif
 
-    /*Remove the animations from this object*/
-#if LV_USE_ANIMATION
-    lv_anim_del(obj, NULL);
-    trans_del(obj, 0xFF, 0xFF, NULL);
-#endif
-
     /*Delete the user data*/
 #if LV_USE_USER_DATA
 #if LV_USE_USER_DATA_FREE
@@ -3787,6 +3781,12 @@ static void obj_del_core(lv_obj_t * obj)
         /*Set i to the new head node*/
         i = _lv_ll_get_head(&(obj->child_ll));
     }
+
+    /*Remove the animations from this object*/
+#if LV_USE_ANIMATION
+    lv_anim_del(obj, NULL);
+    trans_del(obj, 0xFF, 0xFF, NULL);
+#endif
 
     lv_event_mark_deleted(obj);
 

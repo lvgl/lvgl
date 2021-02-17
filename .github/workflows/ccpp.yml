@@ -13,5 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: ammaraskar/gcc-problem-matcher@master
     - name: Run tests
       run: sudo apt-get install libpng-dev; cd tests; python ./build.py
