@@ -71,7 +71,7 @@
 #define TRANSITION_TIME         LV_THEME_DEFAULT_TRANSITON_TIME
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(2)
-#define IS_LIGHT (LV_THEME_DEFAULT_FLAG_LIGHT)
+#define IS_LIGHT (LV_THEME_DEFAULT_PALETTE_LIGHT)
 
 #define PAD_DEF LV_DPX(15)
 //(lv_disp_get_size_category(NULL) <= LV_DISP_SIZE_MEDIUM ? LV_DPX(15) : (LV_DPX(30)))
