@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.10.1 (Planned for 16.02.2021)
+## v7.10.1
 
 ### Bugfixes
 - fix(draw) overlap outline with background to prevent aliasing artifacts
@@ -8,6 +8,7 @@
 - fix(text) fix out of bounds read in `_lv_txt_get_width`
 - fix(text) improve Arabic contextual analysis by adding hyphen processing and proper handling of lam-alef sequence
 - fix(delete) delete animation after the children are deleted
+- fix(gauge) consider paddigns for needle images
 
 ## v7.10.0
 
