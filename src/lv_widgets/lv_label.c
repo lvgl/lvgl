@@ -1440,7 +1440,7 @@ void lv_label_reverse_animation_direction_x(lv_obj_t * label)
 {
     lv_anim_t * anim = lv_anim_get(label, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
 
-    if (!anim){
+    if (anim){
     int32_t temp = anim->start;
 
     anim->start = anim->end;
