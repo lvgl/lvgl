@@ -460,8 +460,12 @@ typedef void * lv_user_data_t;
 /* A simple, impressive and very complete theme */
 #define LV_USE_THEME_DEFAULT    1
 #if LV_USE_THEME_DEFAULT
+
 /* 1: Light mode; 0: Dark mode*/
-# define LV_THEME_DEFAULT_FLAG_LIGHT        1
+# define LV_THEME_DEFAULT_PALETTE_LIGHT     1
+
+/* 1: Enable grow on press*/
+# define LV_THEME_DEFAULT_GROW        		0
 
 /*Default transition time in [ms]*/
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80

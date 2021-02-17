@@ -221,12 +221,12 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     case LV_ALIGN_IN_LEFT_MID:
         x = 0;
-        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2 - pleft;
+        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_IN_RIGHT_MID:
         x = lv_obj_get_width_fit(base) - lv_obj_get_width(obj);
-        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2 - pleft;
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_OUT_TOP_LEFT:
