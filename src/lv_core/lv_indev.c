@@ -890,6 +890,13 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     /*Forget the act obj and send a released signal */
     if(indev_obj_act) {
 
+        /*Send RELEASE signal and event*/
+        lv_signal_send(indev_obj_act, LV_SIGNAL_RELEASED, indev_act);
+        if(indev_reset_check(proc)) return;
+
+        lv_event_send(indev_obj_act, LV_EVENT_RELEASED, NULL);
+        if(indev_reset_check(proc)) return;
+
         /*Send CLICK if no scrolling*/
         if(scroll_obj == NULL) {
             if(proc->long_pr_sent == 0) {
@@ -900,13 +907,6 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             lv_event_send(indev_obj_act, LV_EVENT_CLICKED, NULL);
             if(indev_reset_check(proc)) return;
         }
-
-        /*Send RELEASE signal and event*/
-        lv_signal_send(indev_obj_act, LV_SIGNAL_RELEASED, indev_act);
-        if(indev_reset_check(proc)) return;
-
-        lv_event_send(indev_obj_act, LV_EVENT_RELEASED, NULL);
-        if(indev_reset_check(proc)) return;
 
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
