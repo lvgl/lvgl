@@ -461,9 +461,17 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
     lv_coord_t obj_w = lv_obj_get_width(obj);
     lv_coord_t obj_h = lv_obj_get_height(obj);
 
+    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+    lv_point_t bg_pivot;
+    bg_pivot.x = img->pivot.x + pleft;
+    bg_pivot.y = img->pivot.y + ptop;
     lv_area_t bg_coords;
     _lv_img_buf_get_transformed_area(&bg_coords, obj_w, obj_h,
-                                     angle_final, zoom_final, &img->pivot);
+                                     angle_final, zoom_final, &bg_pivot);
 
     /*Modify the coordinates to draw the background for the rotated and scaled coordinates*/
     bg_coords.x1 += obj->coords.x1;
@@ -483,12 +491,12 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
 
         if(zoom_final == 0) return LV_DRAW_RES_OK;
 
-        lv_area_t img_coords;
-        lv_area_copy(&img_coords, &bg_coords);
-        img_coords.x1 += lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        img_coords.y1 += lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        img_coords.x2 -= lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        img_coords.y2 -= lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        lv_area_t img_max_area;
+        lv_area_copy(&img_max_area, &obj->coords);
+        img_max_area.x1 += pleft;
+        img_max_area.y1 += ptop;
+        img_max_area.x2 -= pright;
+        img_max_area.y2 -= pbottom;
 
         if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_VARIABLE) {
             LV_LOG_TRACE("lv_img_draw: start to draw image");
@@ -503,19 +511,26 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             img_dsc.pivot.y = img->pivot.y;
             img_dsc.antialias = img->antialias;
 
-            lv_area_t coords_tmp;
+            lv_area_t img_clip_area;
+            img_clip_area.x1 = bg_coords.x1 + pleft;
+            img_clip_area.y1 = bg_coords.y1 + ptop;
+            img_clip_area.x2 = bg_coords.x2 - pright;
+            img_clip_area.y2 = bg_coords.y2 - pbottom;
 
-            coords_tmp.y1 = obj->coords.y1 + img->offset.y;
-            if(coords_tmp.y1 > obj->coords.y1) coords_tmp.y1 -= img->h;
+            _lv_area_intersect(&img_clip_area, clip_area, &img_clip_area);
+
+            lv_area_t coords_tmp;
+            coords_tmp.y1 = img_max_area.y1 + img->offset.y;
+            if(coords_tmp.y1 > img_max_area.y1) coords_tmp.y1 -= img->h;
             coords_tmp.y2 = coords_tmp.y1 + img->h - 1;
 
-            for(; coords_tmp.y1 < obj->coords.y2; coords_tmp.y1 += img->h, coords_tmp.y2 += img->h) {
-                coords_tmp.x1 = obj->coords.x1 + img->offset.x;
-                if(coords_tmp.x1 > obj->coords.x1) coords_tmp.x1 -= img->w;
+            for(; coords_tmp.y1 < img_max_area.y2; coords_tmp.y1 += img->h, coords_tmp.y2 += img->h) {
+                coords_tmp.x1 = img_max_area.x1 + img->offset.x;
+                if(coords_tmp.x1 > img_max_area.x1) coords_tmp.x1 -= img->w;
                 coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
-                for(; coords_tmp.x1 < obj->coords.x2; coords_tmp.x1 += img->w, coords_tmp.x2 += img->w) {
-                    lv_draw_img(&coords_tmp, clip_area, img->src, &img_dsc);
+                for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img->w, coords_tmp.x2 += img->w) {
+                    lv_draw_img(&coords_tmp, &img_clip_area, img->src, &img_dsc);
                 }
             }
         }
@@ -525,7 +540,6 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-//            label_dsc.color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
             lv_draw_label(&obj->coords, clip_area, &label_dsc, img->src, NULL);
         }
         else {
@@ -575,17 +589,6 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             *s = LV_MAX(*s, pad_ori + a.x2 - w);
             *s = LV_MAX(*s, pad_ori + a.y2 - h);
         }
-
-        /*Handle the padding of the background*/
-        lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
-        *s = LV_MAX(*s, left);
-        *s = LV_MAX(*s, right);
-        *s = LV_MAX(*s, top);
-        *s = LV_MAX(*s, bottom);
     }
     else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t * info = param;
