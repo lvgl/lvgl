@@ -100,7 +100,16 @@ void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_
  * @example lv_obj_remove_style(obj, LV_PART_MAIN, LV_STATE_ANY, &style); //Remove all styles from the main part
  * @example lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL); //Remove all styles
  */
-void lv_obj_remove_style(struct _lv_obj_t * objj, uint32_t part, uint32_t state, lv_style_t * style);
+void lv_obj_remove_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_t * style);
+
+/**
+ * Remove all styles from an object
+ * @param obj       pointer to an object
+ */
+static inline void lv_obj_remove_style_all(struct _lv_obj_t * obj)
+{
+    lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
+}
 
 /**
  * Notify all object if a style is modified
