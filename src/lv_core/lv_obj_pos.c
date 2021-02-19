@@ -221,12 +221,12 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     case LV_ALIGN_IN_LEFT_MID:
         x = 0;
-        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2 - pleft;
+        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_IN_RIGHT_MID:
         x = lv_obj_get_width_fit(base) - lv_obj_get_width(obj);
-        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2 - pleft;
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_OUT_TOP_LEFT:
@@ -490,35 +490,37 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*Invalidate the object only if it belongs to the current or previous'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr == lv_disp_get_scr_act(disp) ||
-       obj_scr == lv_disp_get_scr_prev(disp) ||
-       obj_scr == lv_disp_get_layer_top(disp) ||
-       obj_scr == lv_disp_get_layer_sys(disp)) {
-
-        /*Truncate the area to the object*/
-        lv_area_t obj_coords;
-        lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-        lv_area_copy(&obj_coords, &obj->coords);
-        obj_coords.x1 -= ext_size;
-        obj_coords.y1 -= ext_size;
-        obj_coords.x2 += ext_size;
-        obj_coords.y2 += ext_size;
-
-        bool is_common;
-
-        is_common = _lv_area_intersect(area, area, &obj_coords);
-        if(is_common == false) return false;  /*The area is not on the object*/
-
-        /*Truncate recursively to the parents*/
-        lv_obj_t * par = lv_obj_get_parent(obj);
-        while(par != NULL) {
-            is_common = _lv_area_intersect(area, area, &par->coords);
-            if(is_common == false) return false;       /*If no common parts with parent break;*/
-            if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
-
-            par = lv_obj_get_parent(par);
-        }
+    if(obj_scr != lv_disp_get_scr_act(disp) &&
+       obj_scr != lv_disp_get_scr_prev(disp) &&
+       obj_scr != lv_disp_get_layer_top(disp) &&
+       obj_scr != lv_disp_get_layer_sys(disp))
+    {
+    	return false;
     }
+
+	/*Truncate the area to the object*/
+	lv_area_t obj_coords;
+	lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+	lv_area_copy(&obj_coords, &obj->coords);
+	obj_coords.x1 -= ext_size;
+	obj_coords.y1 -= ext_size;
+	obj_coords.x2 += ext_size;
+	obj_coords.y2 += ext_size;
+
+	bool is_common;
+
+	is_common = _lv_area_intersect(area, area, &obj_coords);
+	if(is_common == false) return false;  /*The area is not on the object*/
+
+	/*Truncate recursively to the parents*/
+	lv_obj_t * par = lv_obj_get_parent(obj);
+	while(par != NULL) {
+		is_common = _lv_area_intersect(area, area, &par->coords);
+		if(is_common == false) return false;       /*If no common parts with parent break;*/
+		if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
+
+		par = lv_obj_get_parent(par);
+	}
 
     return true;
 }

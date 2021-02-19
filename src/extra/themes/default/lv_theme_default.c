@@ -71,7 +71,7 @@
 #define TRANSITION_TIME         LV_THEME_DEFAULT_TRANSITON_TIME
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(2)
-#define IS_LIGHT (LV_THEME_DEFAULT_FLAG_LIGHT)
+#define IS_LIGHT (LV_THEME_DEFAULT_PALETTE_LIGHT)
 
 #define PAD_DEF LV_DPX(15)
 //(lv_disp_get_size_category(NULL) <= LV_DISP_SIZE_MEDIUM ? LV_DPX(15) : (LV_DPX(30)))
@@ -105,7 +105,9 @@ typedef struct {
     lv_style_t circle;
     lv_style_t no_radius;
     lv_style_t clip_corner;
+#if LV_THEME_DEFAULT_GROW
     lv_style_t grow;
+#endif
     lv_style_t transition_delayed;
     lv_style_t transition_normal;
     lv_style_t anim;
@@ -334,9 +336,11 @@ static void style_init(void)
     style_init_reset(&styles->no_radius);
     lv_style_set_radius(&styles->no_radius, 0);
 
+#if LV_THEME_DEFAULT_GROW
     style_init_reset(&styles->grow);
     lv_style_set_transform_width(&styles->grow, LV_DPX(3));
     lv_style_set_transform_height(&styles->grow, LV_DPX(3));
+#endif
 
     style_init_reset(&styles->knob);
     lv_style_set_bg_color(&styles->knob, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
@@ -578,7 +582,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+#if LV_THEME_DEFAULT_GROW
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
+#endif
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->bg_color_secondary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DISABLED, &styles->disabled);
     }
@@ -636,7 +642,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
         lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+#if LV_THEME_DEFAULT_GROW
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->grow);
+#endif
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->transition_delayed);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->transition_normal);
     }
@@ -665,7 +673,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->cb_marker_checked);
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->pressed);
+#if LV_THEME_DEFAULT_GROW
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->grow);
+#endif
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->transition_delayed);
     }
@@ -719,7 +729,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+#if LV_THEME_DEFAULT_GROW
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
+#endif
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->ddlist_flip);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->focus_outline);

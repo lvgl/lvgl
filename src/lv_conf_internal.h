@@ -401,7 +401,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  ifdef CONFIG_LV_ASSERT_HANDLER_INCLUDE
 #    define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
 #  else
-#    define  LV_ASSERT_HANDLER_INCLUDE  <stdint.h>
+#    define  LV_ASSERT_HANDLER_INCLUDE   <stdint.h>
 #  endif
 #endif
 #ifndef LV_ASSERT_HANDLER
@@ -1371,12 +1371,22 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #if LV_USE_THEME_DEFAULT
+
 /* 1: Light mode; 0: Dark mode*/
-#ifndef LV_THEME_DEFAULT_FLAG_LIGHT
-#  ifdef CONFIG_LV_THEME_DEFAULT_FLAG_LIGHT
-#    define LV_THEME_DEFAULT_FLAG_LIGHT CONFIG_LV_THEME_DEFAULT_FLAG_LIGHT
+#ifndef LV_THEME_DEFAULT_PALETTE_LIGHT
+#  ifdef CONFIG_LV_THEME_DEFAULT_PALETTE_LIGHT
+#    define LV_THEME_DEFAULT_PALETTE_LIGHT CONFIG_LV_THEME_DEFAULT_PALETTE_LIGHT
 #  else
-#    define  LV_THEME_DEFAULT_FLAG_LIGHT        1
+#    define  LV_THEME_DEFAULT_PALETTE_LIGHT     1
+#  endif
+#endif
+
+/* 1: Enable grow on press*/
+#ifndef LV_THEME_DEFAULT_GROW
+#  ifdef CONFIG_LV_THEME_DEFAULT_GROW
+#    define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
+#  else
+#    define  LV_THEME_DEFAULT_GROW        		0
 #  endif
 #endif
 

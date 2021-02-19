@@ -129,6 +129,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(lv_disp_is_true_double_buf(disp)) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
+        lv_timer_pause(disp->read_task, false);
         return;
     }
 

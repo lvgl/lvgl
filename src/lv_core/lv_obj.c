@@ -195,7 +195,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     /*Nothing to do if no event function and not bubbled*/
     lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
-    if((event_dsc == NULL  || event_dsc->cb == NULL) && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
+    if(event_dsc == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
         return LV_RES_OK;
     }
 
