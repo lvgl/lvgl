@@ -181,7 +181,7 @@ void lv_obj_move_foreground(lv_obj_t * obj)
 
     lv_obj_invalidate(parent);
 
-    uint32_t i;
+    int32_t i;
     for(i = lv_obj_get_child_id(obj) - 1; i > 0; i--) {
         parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
     }
