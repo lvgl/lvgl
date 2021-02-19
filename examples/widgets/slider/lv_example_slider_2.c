@@ -7,8 +7,7 @@ static lv_style_t style_pr;
 static lv_style_t style_def;
 
 /**
- * Show the current value when the slider if pressed (using only styles).
- *
+ * Show the current value when the slider if pressed using a fancy style transition.
  */
 void lv_example_slider_2(void)
 {
