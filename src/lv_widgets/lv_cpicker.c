@@ -485,7 +485,8 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
 
     line_dsc.width = (r * 628 / (256 / LV_CPICKER_DEF_QF)) / 100;
     line_dsc.width += 2;
-    uint16_t i; uint32_t a = 0;
+    uint16_t i;
+    uint32_t a = 0;
     lv_coord_t cir_w = lv_obj_get_style_scale_width(cpicker, LV_CPICKER_PART_MAIN);
 
     /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
@@ -1055,7 +1056,7 @@ static lv_color_t angle_to_mode_color_fast(lv_obj_t * cpicker, uint16_t angle)
         case LV_CPICKER_COLOR_MODE_HUE:
             /* Don't recompute costly scaling if it does not change */
             if (m != ext->color_mode) {
-              s = (uint8_t)(ext->hsv.s * 2.55f); v = (uint8_t)(ext->hsv.v * 2.55f);
+              s = (uint8_t)(((uint16_t)ext->hsv.s * 51) / 20); v = (uint8_t)(((uint16_t)ext->hsv.v * 51) / 20);
               m = ext->color_mode;
             }
             fast_hsv2rgb(angle * 6, s, v, &r, &g, &b); /* A smart compiler will replace x * 6 by (x << 2) + (x << 1) if it's more efficient */
@@ -1063,7 +1064,7 @@ static lv_color_t angle_to_mode_color_fast(lv_obj_t * cpicker, uint16_t angle)
         case LV_CPICKER_COLOR_MODE_SATURATION:
             /* Don't recompute costly scaling if it does not change */
             if (m != ext->color_mode) {
-              h = (uint16_t)(ext->hsv.h * 4.2666667f); v = (uint8_t)(ext->hsv.v * 2.55f); /* The magical number is simply 6*256 / 360 */ 
+              h = (uint16_t)(((uint32_t)ext->hsv.h * 6 * 256) / 360); v = (uint8_t)(((uint16_t)ext->hsv.v * 51) / 20); 
               m = ext->color_mode;
             }
             fast_hsv2rgb(h, angle, v, &r, &g, &b);
@@ -1071,7 +1072,7 @@ static lv_color_t angle_to_mode_color_fast(lv_obj_t * cpicker, uint16_t angle)
         case LV_CPICKER_COLOR_MODE_VALUE:
             /* Don't recompute costly scaling if it does not change */
             if (m != ext->color_mode) {
-              h = (uint16_t)(ext->hsv.h * 4.2666667f); s = (uint8_t)(ext->hsv.s * 2.55f);
+              h = (uint16_t)(((uint32_t)ext->hsv.h * 6 * 256) / 360); s = (uint8_t)(((uint16_t)ext->hsv.s * 51) / 20);
               m = ext->color_mode;
             }
             fast_hsv2rgb(h, s, angle, &r, &g, &b);
