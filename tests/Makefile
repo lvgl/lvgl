@@ -11,7 +11,7 @@ WARNINGS = -Werror -Wall -Wextra \
            -Wempty-body -Wshift-negative-value -Wstack-usage=2048  \
            -Wtype-limits -Wsizeof-pointer-memaccess -Wmissing-prototypes -Wno-discarded-qualifiers
 
-#WARNINGS += -Wpedantic -pedantic-errors
+WARNINGS += -Wpedantic -pedantic-errors
 
 #-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -O3 -g0

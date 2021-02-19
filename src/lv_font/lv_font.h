@@ -71,7 +71,7 @@ typedef struct _lv_font_struct {
 
     void * dsc;                     /**< Store implementation specific or run_time data or caching here*/
 #if LV_USE_USER_DATA
-    lv_user_data_t user_data;       /**< Custom user data for font. */
+    void * user_data;       /**< Custom user data for font. */
 #endif
 
 } lv_font_t;

@@ -90,7 +90,7 @@ typedef struct _lv_img_decoder {
     lv_img_decoder_close_f_t close_cb;
 
 #if LV_USE_USER_DATA
-    lv_user_data_t user_data;
+    void * user_data;
 #endif
 } lv_img_decoder_t;
 

@@ -114,7 +114,7 @@ typedef struct _lv_indev_drv_t {
     void (*feedback_cb)(struct _lv_indev_drv_t *, uint8_t);
 
 #if LV_USE_USER_DATA
-    lv_user_data_t user_data;
+    void * user_data;
 #endif
 
     /**< Pointer to the assigned display*/

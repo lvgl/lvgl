@@ -6,3 +6,4 @@ include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_misc/lv_misc.mk
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_draw/lv_draw.mk
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_gpu/lv_gpu.mk
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/extra/extra.mk
+include $(LVGL_DIR)/$(LVGL_DIR_NAME)/examples/examples.mk

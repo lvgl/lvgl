@@ -60,7 +60,7 @@ typedef struct _lv_group_t {
 
     lv_group_focus_cb_t focus_cb;              /**< A function to call when a new object is focused (optional)*/
 #if LV_USE_USER_DATA
-    lv_user_data_t user_data;
+    void * user_data;
 #endif
 
     uint8_t frozen : 1;         /**< 1: can't focus to new object*/
@@ -192,16 +192,6 @@ void lv_group_set_wrap(lv_group_t * group, bool en);
  * @return pointer to the focused object
  */
 struct _lv_obj_t * lv_group_get_focused(const lv_group_t * group);
-
-#if LV_USE_USER_DATA
-/**
- * Get a pointer to the group's user data
- * @param group pointer to an group
- * @return pointer to the user data
- */
-lv_user_data_t * lv_group_get_user_data(lv_group_t * group);
-
-#endif
 
 /**
  * Get the focus callback function of a group

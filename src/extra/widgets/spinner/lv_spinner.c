@@ -20,6 +20,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void arc_anim_start_angle(void * obj, lv_anim_value_t v);
+static void arc_anim_end_angle(void * obj, lv_anim_value_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,7 +60,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, spinner);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_arc_set_end_angle);
+    lv_anim_set_exec_cb(&a, arc_anim_end_angle);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_time(&a, time);
     lv_anim_set_values(&a, arc_length, 360 + arc_length);
@@ -66,7 +68,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
 
     lv_anim_set_path(&a, &path);
     lv_anim_set_values(&a, 0, 360);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_arc_set_start_angle);
+    lv_anim_set_exec_cb(&a, arc_anim_start_angle);
     lv_anim_start(&a);
 
     lv_arc_set_bg_angles(spinner, 0, 360);
@@ -76,9 +78,19 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
 }
 
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void arc_anim_start_angle(void * obj, lv_anim_value_t v)
+{
+    lv_arc_set_start_angle(obj, (uint16_t) v);
+}
+
+
+static void arc_anim_end_angle(void * obj, lv_anim_value_t v)
+{
+    lv_arc_set_end_angle(obj, (uint16_t) v);
+}
 
 #endif /*LV_USE_SPINNER*/

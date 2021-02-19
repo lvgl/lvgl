@@ -133,7 +133,7 @@ typedef struct _disp_drv_t {
     lv_color_t color_chroma_key;
 
 #if LV_USE_USER_DATA
-    lv_user_data_t user_data; /**< Custom display driver user data */
+    void * user_data; /**< Custom display driver user data */
 #endif
 
 } lv_disp_drv_t;

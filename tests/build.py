@@ -56,7 +56,7 @@ minimal_monochrome = {
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
   
-  "LV_USE_LOG":0,
+  "LV_USE_LOG":1,
 
   "LV_USE_ASSERT_NULL":0,
   "LV_USE_ASSERT_MALLOC":0,
@@ -70,6 +70,8 @@ minimal_monochrome = {
   
   "LV_USE_BIDI": 0,
   "LV_USE_ARABIC_PERSIAN_CHARS":0,
+  
+  "LV_BUILD_EXAMPLES":1,
 
 #  "LV_USE_THEME_MONO":1,   
 #  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
@@ -90,7 +92,7 @@ minimal_16bit = {
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
   
-  "LV_USE_LOG":0,
+  "LV_USE_LOG":1,
 
   "LV_USE_ASSERT_NULL":0,
   "LV_USE_ASSERT_MALLOC":0,
@@ -104,6 +106,8 @@ minimal_16bit = {
   
   "LV_USE_BIDI": 0,
   "LV_USE_ARABIC_PERSIAN_CHARS":0,
+  
+  "LV_BUILD_EXAMPLES":1,
 
 #  "LV_USE_THEME_MONO":1,   
 #  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
@@ -125,7 +129,7 @@ minimal_16bit_swap = {
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
   
-  "LV_USE_LOG":0,
+  "LV_USE_LOG":1,
 
   "LV_USE_ASSERT_NULL":0,
   "LV_USE_ASSERT_MALLOC":0,
@@ -139,6 +143,8 @@ minimal_16bit_swap = {
   
   "LV_USE_BIDI": 0,
   "LV_USE_ARABIC_PERSIAN_CHARS":0,
+  
+  "LV_BUILD_EXAMPLES":1,
 
 #  "LV_USE_THEME_MONO":1,   
 #  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
@@ -209,6 +215,8 @@ full_32bit = {
   "LV_USE_BIDI": 1,
   "LV_USE_ARABIC_PERSIAN_CHARS":1,
 
+  "LV_BUILD_EXAMPLES":1,
+  
 #  "LV_USE_THEME_MONO":1,   
 #  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
 #  "LV_THEME_DEFAULT_COLOR_PRIMARY":      "\\\"LV_COLOR_RED\\\"",

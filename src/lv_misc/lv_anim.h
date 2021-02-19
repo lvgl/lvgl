@@ -76,7 +76,7 @@ typedef struct _lv_anim_t {
     lv_anim_start_cb_t start_cb; /**< Call it when the animation is starts (considering `delay`)*/
     lv_anim_ready_cb_t ready_cb; /**< Call it when the animation is ready*/
 #if LV_USE_USER_DATA
-    lv_user_data_t user_data; /**< Custom user data*/
+    void * user_data; /**< Custom user data*/
 #endif
     lv_anim_path_t path;         /**< Describe the path (curve) of animations*/
     int32_t start;               /**< Start value*/

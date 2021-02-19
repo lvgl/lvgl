@@ -67,7 +67,7 @@ lv_group_t * lv_group_create(void)
     group->wrap           = 1;
 
 #if LV_USE_USER_DATA
-    lv_memset_00(&group->user_data, sizeof(lv_user_data_t));
+    group->user_data = NULL;
 #endif
 
     return group;
@@ -367,18 +367,6 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
 
     return *group->obj_focus;
 }
-
-#if LV_USE_USER_DATA
-/**
- * Get a pointer to the group's user data
- * @param group pointer to an group
- * @return pointer to the user data
- */
-lv_user_data_t * lv_group_get_user_data(lv_group_t * group)
-{
-    return &group->user_data;
-}
-#endif
 
 /**
  * Get the focus callback function of a group
