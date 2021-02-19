@@ -175,8 +175,8 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
      * The object invalidated its previous area. That area is now out of the screen area
      * so we reset all invalidated areas and invalidate the active screen's new area only.
      */
-    _lv_memset_00(disp->inv_areas, sizeof(disp->inv_areas));
-    _lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
+    lv_memset_00(disp->inv_areas, sizeof(disp->inv_areas));
+    lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
     disp->inv_p = 0;
     if(disp->act_scr != NULL) lv_obj_invalidate(disp->act_scr);
 }

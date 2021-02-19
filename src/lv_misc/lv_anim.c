@@ -240,7 +240,7 @@ lv_anim_value_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    int32_t step = _lv_map(a->act_time, 0, a->time, 0, LV_ANIM_RESOLUTION);
+    int32_t step = lv_map(a->act_time, 0, a->time, 0, LV_ANIM_RESOLUTION);
 
     /* Get the new value which will be proportional to `step`
      * and the `start` and `end` values*/
@@ -263,8 +263,8 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
 
     /*Calculate the current step*/
 
-    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = _lv_bezier3(t, 0, 1, 1, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    int32_t step = lv_bezier3(t, 0, 1, 1, 1024);
 
     int32_t new_value;
     new_value = step * (a->end - a->start);
@@ -284,8 +284,8 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = _lv_bezier3(t, 0, 1023, 1023, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    int32_t step = lv_bezier3(t, 0, 1023, 1023, 1024);
 
     int32_t new_value;
     new_value = step * (a->end - a->start);
@@ -305,8 +305,8 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = _lv_bezier3(t, 0, 100, 924, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    int32_t step = lv_bezier3(t, 0, 100, 924, 1024);
 
     int32_t new_value;
     new_value = step * (a->end - a->start);
@@ -327,8 +327,8 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
 
     /*Calculate the current step*/
 
-    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = _lv_bezier3(t, 0, 1000, 1300, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    int32_t step = lv_bezier3(t, 0, 1000, 1300, 1024);
 
     int32_t new_value;
     new_value = step * (a->end - a->start);
@@ -349,7 +349,7 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
 
     /*Calculate the current step*/
 
-    uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t diff = (a->end - a->start);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
@@ -385,7 +385,7 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
         diff = diff / 40;
     }
 
-    int32_t step = _lv_bezier3(t, 1024, 800, 500, 0);
+    int32_t step = lv_bezier3(t, 1024, 800, 500, 0);
 
     int32_t new_value;
     new_value = step * diff;

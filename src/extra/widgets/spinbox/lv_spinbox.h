@@ -129,12 +129,7 @@ int32_t lv_spinbox_get_value(lv_obj_t * obj);
  * @param spinbox pointer to spinbox
  * @return value integer step value of the spinbox
  */
-static inline int32_t lv_spinbox_get_step(lv_obj_t * spinbox)
-{
-    lv_spinbox_ext_t * ext = (lv_spinbox_ext_t *)lv_obj_get_ext_attr(spinbox);
-
-    return ext->step;
-}
+int32_t lv_spinbox_get_step(lv_obj_t * obj);
 
 /*=====================
  * Other functions

@@ -60,7 +60,7 @@ void _lv_img_decoder_init(void)
 
     /*Create a decoder for the built in color format*/
     decoder = lv_img_decoder_create();
-    LV_ASSERT_MEM(decoder);
+    LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
         LV_LOG_WARN("lv_img_decoder_init: out of memory");
         return;
@@ -81,7 +81,7 @@ void _lv_img_decoder_init(void)
  */
 lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 {
-   _lv_memset_00(header, sizeof(lv_img_header_t));
+   lv_memset_00(header, sizeof(lv_img_header_t));
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
@@ -110,7 +110,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
  */
 lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color)
 {
-    _lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
     dsc->color    = color;
     dsc->src_type = lv_img_src_get_type(src);
@@ -118,7 +118,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         size_t fnlen = strlen(src);
         dsc->src = lv_mem_alloc(fnlen + 1);
-        LV_ASSERT_MEM(dsc->src);
+        LV_ASSERT_MALLOC(dsc->src);
         if(dsc->src == NULL) {
             LV_LOG_WARN("lv_img_decoder_open: out of memory");
             return LV_RES_INV;
@@ -146,7 +146,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         if(res == LV_RES_OK) return res;
 
         /*Prepare for the next loop*/
-        _lv_memset_00(&dsc->header, sizeof(lv_img_header_t));
+        lv_memset_00(&dsc->header, sizeof(lv_img_header_t));
 
         dsc->error_msg = NULL;
         dsc->img_data  = NULL;

@@ -40,7 +40,7 @@ enum {
     LV_KEYBOARD_MODE_TEXT_LOWER,
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
-    LV_KEYBOARD_MODE_NUM,
+    LV_KEYBOARD_MODE_NUMBER,
 };
 typedef uint8_t lv_keyboard_mode_t;
 

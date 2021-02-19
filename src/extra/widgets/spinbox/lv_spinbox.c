@@ -163,6 +163,17 @@ int32_t lv_spinbox_get_value(lv_obj_t * obj)
 
     return spinbox->value;
 }
+/**
+ * Get the spinbox step value (user has to convert to float according to its digit format)
+ * @param spinbox pointer to spinbox
+ * @return value integer step value of the spinbox
+ */
+int32_t lv_spinbox_get_step(lv_obj_t * obj)
+{
+    lv_spinbox_t * spinbox = (lv_spinbox_t *) obj;
+
+    return spinbox->step;
+}
 
 /*=====================
  * Other functions

@@ -797,7 +797,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
         lv_coord_t area_w = lv_area_get_width(area);
         lv_coord_t area_h = lv_area_get_height(area);
         /*Determine the maximum number of rows that can be rotated at a time*/
-        lv_coord_t max_row = LV_MATH_MIN((lv_coord_t)((LV_DISP_ROT_MAX_BUF/sizeof(lv_color_t)) / area_w), area_h);
+        lv_coord_t max_row = LV_MIN((lv_coord_t)((LV_DISP_ROT_MAX_BUF/sizeof(lv_color_t)) / area_w), area_h);
         lv_coord_t init_y_off;
         init_y_off = area->y1;
         if(drv->rotated == LV_DISP_ROT_90) {
@@ -811,7 +811,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
         /*Rotate the screen in chunks, flushing after each one*/
         lv_coord_t row = 0;
         while(row < area_h) {
-            lv_coord_t height = LV_MATH_MIN(max_row, area_h-row);
+            lv_coord_t height = LV_MIN(max_row, area_h-row);
             vdb->flushing = 1;
             if((row == 0) && (area_h >= area_w)) {
                 /*Rotate the initial area as a square*/
@@ -826,8 +826,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
                 }
             } else {
                 /*Rotate other areas using a maximum buffer size*/
-                if(rot_buf == NULL)
-                    rot_buf = _lv_mem_buf_get(LV_DISP_ROT_MAX_BUF);
+                if(rot_buf == NULL) rot_buf = lv_mem_buf_get(LV_DISP_ROT_MAX_BUF);
                 lv_refr_vdb_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, height, color_p, rot_buf);
                 
                 if(drv->rotated == LV_DISP_ROT_90) {
@@ -848,8 +847,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
             row += height;
         }
         /*Free the allocated buffer at the end if necessary*/
-        if(rot_buf != NULL)
-            _lv_mem_buf_release(rot_buf);
+        if(rot_buf != NULL) lv_mem_buf_release(rot_buf);
     }
 }
 

@@ -80,16 +80,9 @@ typedef struct _disp_drv_t {
      * LVGL will use this buffer(s) to draw the screens contents */
     lv_disp_buf_t * buffer;
 
-<<<<<<< HEAD
-#if LV_ANTIALIAS
-    uint32_t antialiasing : 1; /**< 1: antialiasing is enabled on this display. */
-#endif
-    uint32_t rotated : 2;
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower) */
-=======
     uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display. */
     uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
->>>>>>> dev-v8
 
 #if LV_COLOR_SCREEN_TRANSP
     /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
