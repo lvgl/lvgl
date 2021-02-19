@@ -1,5 +1,14 @@
 # Changelog
 
+## v7.11.0 (Planned for 19.02.2021)
+
+### New features
+- Add better screen oriantetaion management with sowftware rotation support
+
+### Bugfixes
+- fix(gauge) fix needle invalidation
+
+
 ## v7.10.1
 
 ### Bugfixes
