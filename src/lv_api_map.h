@@ -19,6 +19,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_NO_TASK_READY LV_NO_TIMER_READY
+
 /**********************
  *      TYPEDEFS
  **********************/

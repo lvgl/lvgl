@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys, os
+
 props = [
 {'name': 'RADIUS',                    'style_type': 'num',   'var_type': 'lv_coord_t' },
 {'name': 'CLIP_CORNER',               'style_type': 'num',   'var_type': 'bool' },
@@ -92,38 +94,36 @@ props = [
 
 def obj_style_get(i):
   print("static inline " + props[i]['var_type'] + " lv_obj_get_style_" + props[i]['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part) {")
-  print("  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + props[i]['name'] + "); return (" + props[i]['var_type'] + ") v." + props[i]['style_type'] + "; }")
+  is_struct = props[i]['style_type'] == 'color'
+  cast = "(" + props[i]['var_type'] + ")" if not is_struct else ""
+  print("  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + props[i]['name'] + "); return " + cast + " v." + props[i]['style_type'] + "; }")
   print("")   
   
   
 def style_set(i):
   print("static inline void lv_style_set_" + props[i]['name'].lower() +"(lv_style_t * style, "+ props[i]['var_type'] +" value) {")
-  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = value}; lv_style_set_prop(style, LV_STYLE_" + props[i]['name'] +", v); }")
+  func_cast = "(void (*)(void))" if props[i]['style_type'] == 'func' else ""
+  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = " + func_cast + "value}; lv_style_set_prop(style, LV_STYLE_" + props[i]['name'] +", v); }")
   print("")
 
 def local_style_set(i):
   print("static inline void lv_obj_set_style_" + props[i]['name'].lower() + "(struct _lv_obj_t * obj, uint32_t part, uint32_t state, " + props[i]['var_type'] +" value) {")
-  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + props[i]['name'] +", v); }")
+  func_cast = "(void (*)(void))" if props[i]['style_type'] == 'func' else ""
+  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = " + func_cast + "value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + props[i]['name'] +", v); }")
   print("")
 
-  
+
+base_dir = os.path.abspath(os.path.dirname(__file__))
+sys.stdout = open(base_dir + '/../src/lv_core/lv_obj_style_gen.h', 'w')
+
 for i in range(len(props)): 
   obj_style_get(i)
 
-print("")
-print("--------------------------------------------------------------------------------------------")
-print("")
-
-  
 for i in range(len(props)): 
   local_style_set(i)
-  
-print("")
-print("--------------------------------------------------------------------------------------------")
-print("")
-  
+
+sys.stdout = open(base_dir + '/../src/lv_misc/lv_style_gen.h', 'w')
+
 for i in range(len(props)): 
   style_set(i)
-  
-  
-  
+
