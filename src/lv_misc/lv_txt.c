@@ -11,7 +11,8 @@
 #include "lv_txt_ap.h"
 #include "lv_math.h"
 #include "lv_log.h"
-#include "lv_debug.h"
+#include "lv_mem.h"
+#include "lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -89,12 +90,12 @@ static inline bool is_break_char(uint32_t letter);
  * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param txt.line_space line space of the text
- * @param flags settings for the text from 'txt_flag_t' enum
+ * @param flags settings for the text from ::lv_text_flag_t
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
  * line breaks
  */
-void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                      lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
+                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -102,7 +103,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
     if(text == NULL) return;
     if(font == NULL) return;
 
-    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t line_start     = 0;
     uint32_t new_line_start = 0;
@@ -125,7 +126,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
         lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
                                                        flag);
 
-        size_res->x = LV_MATH_MAX(act_line_length, size_res->x);
+        size_res->x = LV_MAX(act_line_length, size_res->x);
         line_start  = new_line_start;
     }
 
@@ -174,12 +175,12 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  */
 static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
                                      lv_coord_t letter_space, lv_coord_t max_width,
-                                     lv_txt_flag_t flag, uint32_t * word_w_ptr, lv_txt_cmd_state_t * cmd_state, bool force)
+                                     lv_text_flag_t flag, uint32_t * word_w_ptr, lv_text_cmd_state_t * cmd_state, bool force)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
 
-    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t i = 0, i_next = 0, i_next_next = 0;  /* Iterating index into txt */
     uint32_t letter = 0;      /* Letter at i */
@@ -199,7 +200,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         word_len++;
 
         /*Handle the recolor command*/
-        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+        if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
             if(_lv_txt_is_cmd(cmd_state, letter) != false) {
                 i = i_next;
                 i_next = i_next_next;
@@ -293,14 +294,14 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
 uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
-                               lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
+                               lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     /* If max_width doesn't mater simply find the new line character
      * without thinking about word wrapping*/
-    if((flag & LV_TXT_FLAG_EXPAND) || (flag & LV_TXT_FLAG_FIT)) {
+    if((flag & LV_TEXT_FLAG_EXPAND) || (flag & LV_TEXT_FLAG_FIT)) {
         uint32_t i;
         for(i = 0; txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
             /*Just find the new line chars or string ends by incrementing `i`*/
@@ -309,8 +310,8 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         return i;
     }
 
-    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+    if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
     uint32_t i = 0;                                        /* Iterating index into txt */
 
     while(txt[i] != '\0' && max_width > 0) {
@@ -353,7 +354,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
  * @return length of a char_num long text
  */
 lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                             lv_txt_flag_t flag)
+                             lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
@@ -361,13 +362,13 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
 
     uint32_t i                   = 0;
     lv_coord_t width             = 0;
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     if(length != 0) {
         while(i < length) {
             uint32_t letter      = _lv_txt_encoded_next(txt, &i);
             uint32_t letter_next = _lv_txt_encoded_next(&txt[i], NULL);
-            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(_lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
@@ -397,30 +398,30 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
  * @return true: the character is part of a command and should not be written,
  *         false: the character should be written
  */
-bool _lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c)
+bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
 {
     bool ret = false;
 
     if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
-        if(*state == LV_TXT_CMD_STATE_WAIT) { /*Start char*/
-            *state = LV_TXT_CMD_STATE_PAR;
+        if(*state == LV_TEXT_CMD_STATE_WAIT) { /*Start char*/
+            *state = LV_TEXT_CMD_STATE_PAR;
             ret    = true;
         }
         /*Other start char in parameter is escaped cmd. char */
-        else if(*state == LV_TXT_CMD_STATE_PAR) {
-            *state = LV_TXT_CMD_STATE_WAIT;
+        else if(*state == LV_TEXT_CMD_STATE_PAR) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
         }
         /*Command end */
-        else if(*state == LV_TXT_CMD_STATE_IN) {
-            *state = LV_TXT_CMD_STATE_WAIT;
+        else if(*state == LV_TEXT_CMD_STATE_IN) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
             ret    = true;
         }
     }
 
     /*Skip the color parameter and wait the space after it*/
-    if(*state == LV_TXT_CMD_STATE_PAR) {
+    if(*state == LV_TEXT_CMD_STATE_PAR) {
         if(c == ' ') {
-            *state = LV_TXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+            *state = LV_TEXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
         }
         ret = true;
     }
@@ -451,7 +452,7 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     }
 
     /* Copy the text into the new space*/
-    _lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
+    lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
 }
 
 /**
@@ -492,8 +493,8 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     char * text = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = _lv_mem_buf_get(len + 1);
-    LV_ASSERT_MEM(raw_txt);
+    char * raw_txt = lv_mem_buf_get(len + 1);
+    LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         return NULL;
     }
@@ -503,16 +504,16 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
     text = lv_mem_alloc(len_ap + 1);
-    LV_ASSERT_MEM(text);
+    LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
     }
     _lv_txt_ap_proc(raw_txt, text);
 
-    _lv_mem_buf_release(raw_txt);
+    lv_mem_buf_release(raw_txt);
 #else
     text = lv_mem_alloc(len + 1);
-    LV_ASSERT_MEM(text);
+    LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
     }
@@ -582,7 +583,7 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
 
 /**
  * Convert a wide character, e.g. 'Á' little endian to be UTF-8 compatible
- * @param c a wide character or a Little endian number
+ * @param c a wide character or a  Little endian number
  * @return `c` in big endian
  */
 static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
@@ -592,7 +593,7 @@ static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
     if((c & 0x80) != 0) {
         uint32_t swapped;
         uint8_t c8[4];
-        _lv_memcpy_small(c8, &c, 4);
+        lv_memcpy_small(c8, &c, 4);
         swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
         uint8_t i;
         for(i = 0; i < 4; i++) {

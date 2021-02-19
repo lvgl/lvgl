@@ -61,7 +61,7 @@ int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va);
 #endif
 
 #ifdef __cplusplus
-}
+} /* extern "C" */
 #endif
 
 #endif  // _LV_PRINTF_H_

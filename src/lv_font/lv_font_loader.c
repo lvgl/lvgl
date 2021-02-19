@@ -14,8 +14,6 @@
 #include "../lv_misc/lv_fs.h"
 #include "lv_font_loader.h"
 
-#if LV_USE_FILESYSTEM
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -92,25 +90,25 @@ lv_font_t * lv_font_load(const char * font_name)
     lv_font_t * font = lv_mem_alloc(sizeof(lv_font_t));
     memset(font, 0, sizeof(lv_font_t));
 
-    lv_fs_file_t file;
-    lv_fs_res_t res = lv_fs_open(&file, font_name, LV_FS_MODE_RD);
+    lv_fs_file_t * file;
+    file = lv_fs_open(font_name, LV_FS_MODE_RD);
 
-    if(res == LV_FS_RES_OK) {
-        success = lvgl_load_font(&file, font);
-
-        if(!success) {
-            LV_LOG_WARN("Error loading font file: %s\n", font_name);
-            /*
-            * When `lvgl_load_font` fails it can leak some pointers.
-            * All non-null pointers can be assumed as allocated and
-            * `lv_font_free` should free them correctly.
-            */
-            lv_font_free(font);
-            font = NULL;
-        }
-
-        lv_fs_close(&file);
+    if(file) {
+        success = lvgl_load_font(file, font);
     }
+
+    if(!success) {
+        LV_LOG_WARN("Error loading font file: %s\n", font_name);
+        /*
+         * When `lvgl_load_font` fails it can leak some pointers.
+         * All non-null pointers can be assumed as allocated and
+         * `lv_font_free` should free them correctly.
+         */
+        lv_font_free(font);
+        font = NULL;
+    }
+
+    lv_fs_close(file);
 
     return font;
 }
@@ -229,7 +227,7 @@ static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 
 static int read_label(lv_fs_file_t * fp, int start, const char * label)
 {
-    lv_fs_seek(fp, start);
+    lv_fs_seek(fp, start, LV_FS_SEEK_SET);
 
     uint32_t length;
     char buf[4];
@@ -252,7 +250,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
     }
 
     for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
-        lv_fs_res_t res = lv_fs_seek(fp, cmaps_start + cmap_table[i].data_offset);
+        lv_fs_res_t res = lv_fs_seek(fp, cmaps_start + cmap_table[i].data_offset, LV_FS_SEEK_SET);
         if(res != LV_FS_RES_OK) {
             return false;
         }
@@ -360,7 +358,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     for(unsigned int i = 0; i < loca_count; ++i) {
         lv_font_fmt_txt_glyph_dsc_t * gdsc = &glyph_dsc[i];
 
-        lv_fs_res_t res = lv_fs_seek(fp, start + glyph_offset[i]);
+        lv_fs_res_t res = lv_fs_seek(fp, start + glyph_offset[i], LV_FS_SEEK_SET);
         if(res != LV_FS_RES_OK) {
             return -1;
         }
@@ -426,7 +424,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     cur_bmp_size = 0;
 
     for(unsigned int i = 1; i < loca_count; ++i) {
-        lv_fs_res_t res = lv_fs_seek(fp, start + glyph_offset[i]);
+        lv_fs_res_t res = lv_fs_seek(fp, start + glyph_offset[i], LV_FS_SEEK_SET);
         if(res != LV_FS_RES_OK) {
             return -1;
         }
@@ -680,5 +678,3 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 
     return kern_length;
 }
-
-#endif /*LV_USE_FILESYSTEM*/

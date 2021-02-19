@@ -15,11 +15,8 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_FILESYSTEM
-
 #include <stdint.h>
 #include <stdbool.h>
-#include "lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -52,7 +49,7 @@ enum {
 typedef uint8_t lv_fs_res_t;
 
 /**
- * Filesystem mode.
+ * File open mode.
  */
 enum {
     LV_FS_MODE_WR = 0x01,
@@ -60,30 +57,35 @@ enum {
 };
 typedef uint8_t lv_fs_mode_t;
 
+
+/**
+ * Seek modes.
+ */
+enum {
+    LV_FS_SEEK_SET = 0x00,
+    LV_FS_SEEK_CUR = 0x01,
+    LV_FS_SEEK_END = 0x02,
+};
+typedef uint8_t lv_fs_whence_t;
+
 typedef struct _lv_fs_drv_t {
     char letter;
-    uint16_t file_size;
     uint16_t rddir_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
-    lv_fs_res_t (*open_cb)(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode);
+    void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(struct _lv_fs_drv_t * drv, void * file_p);
-    lv_fs_res_t (*remove_cb)(struct _lv_fs_drv_t * drv, const char * fn);
     lv_fs_res_t (*read_cb)(struct _lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
     lv_fs_res_t (*write_cb)(struct _lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-    lv_fs_res_t (*seek_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos);
+    lv_fs_res_t (*seek_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
     lv_fs_res_t (*tell_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
-    lv_fs_res_t (*trunc_cb)(struct _lv_fs_drv_t * drv, void * file_p);
-    lv_fs_res_t (*size_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * size_p);
-    lv_fs_res_t (*rename_cb)(struct _lv_fs_drv_t * drv, const char * oldname, const char * newname);
-    lv_fs_res_t (*free_space_cb)(struct _lv_fs_drv_t * drv, uint32_t * total_p, uint32_t * free_p);
 
     lv_fs_res_t (*dir_open_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, const char * path);
     lv_fs_res_t (*dir_read_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
     lv_fs_res_t (*dir_close_cb)(struct _lv_fs_drv_t * drv, void * rddir_p);
 
 #if LV_USE_USER_DATA
-    lv_fs_drv_user_data_t user_data; /**< Custom file user data */
+    lv_user_data_t user_data; /**< Custom file user data */
 #endif
 } lv_fs_drv_t;
 
@@ -143,21 +145,14 @@ bool lv_fs_is_ready(char letter);
  * @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
+void * lv_fs_open(const char * path, lv_fs_mode_t mode);
 
 /**
  * Close an already opened file
  * @param file_p pointer to a lv_fs_file_t variable
- * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p);
-
-/**
- * Delete a file
- * @param path path of the file to delete
- * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
- */
-lv_fs_res_t lv_fs_remove(const char * path);
 
 /**
  * Read from a file
@@ -185,7 +180,7 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
  * @param pos the new position expressed in bytes index (0: start of file)
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos);
+lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);
 
 /**
  * Give the position of the read write pointer
@@ -194,30 +189,6 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos);
  * @return LV_FS_RES_OK or any error from 'fs_res_t'
  */
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos);
-
-/**
- * Truncate the file size to the current position of the read write pointer
- * @param file_p pointer to an 'ufs_file_t' variable. (opened with lv_fs_open )
- * @return LV_FS_RES_OK: no error, the file is read
- *         any error from lv_fs_res_t enum
- */
-lv_fs_res_t lv_fs_trunc(lv_fs_file_t * file_p);
-
-/**
- * Give the size of a file bytes
- * @param file_p pointer to a lv_fs_file_t variable
- * @param size pointer to a variable to store the size
- * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
- */
-lv_fs_res_t lv_fs_size(lv_fs_file_t * file_p, uint32_t * size);
-
-/**
- * Rename a file
- * @param oldname path to the file
- * @param newname path with the new name
- * @return LV_FS_RES_OK or any error from 'fs_res_t'
- */
-lv_fs_res_t lv_fs_rename(const char * oldname, const char * newname);
 
 /**
  * Initialize a 'fs_dir_t' variable for directory reading
@@ -242,15 +213,6 @@ lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn);
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p);
-
-/**
- * Get the free and total size of a driver in kB
- * @param letter the driver letter
- * @param total_p pointer to store the total size [kB]
- * @param free_p pointer to store the free size [kB]
- * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
- */
-lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p);
 
 /**
  * Fill a buffer with the letters of existing drivers
@@ -283,8 +245,6 @@ const char * lv_fs_get_last(const char * path);
 /**********************
  *      MACROS
  **********************/
-
-#endif /*LV_USE_FILESYSTEM*/
 
 #ifdef __cplusplus
 } /* extern "C" */

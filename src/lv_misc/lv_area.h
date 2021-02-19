@@ -17,13 +17,21 @@ extern "C" {
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "lv_mem.h"
 
 /*********************
  *      DEFINES
  *********************/
-/*To avoid overflow don't let the max ranges (reduce with 1000) */
-#define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - 1000))
+
+#define _LV_COORD_MAX_REDUCE    8192
+
+#if LV_USE_LARGE_COORD
+typedef int32_t lv_coord_t;
+#else
+typedef int16_t lv_coord_t;
+#endif
+
+/*To allow some special values in the end reduce the max value */
+#define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - _LV_COORD_MAX_REDUCE))
 #define LV_COORD_MIN (-LV_COORD_MAX)
 
 LV_EXPORT_CONST_INT(LV_COORD_MAX);
@@ -75,6 +83,19 @@ enum {
 };
 typedef uint8_t lv_align_t;
 
+enum {
+    LV_DIR_NONE     = 0x00,
+    LV_DIR_LEFT     = (1 << 0),
+    LV_DIR_RIGHT    = (1 << 1),
+    LV_DIR_TOP      = (1 << 2),
+    LV_DIR_BOTTOM   = (1 << 3),
+    LV_DIR_HOR      = LV_DIR_LEFT | LV_DIR_RIGHT,
+    LV_DIR_VER      = LV_DIR_TOP | LV_DIR_BOTTOM,
+    LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
+};
+
+typedef uint8_t lv_dir_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -96,7 +117,10 @@ void lv_area_set(lv_area_t * area_p, lv_coord_t x1, lv_coord_t y1, lv_coord_t x2
  */
 inline static void lv_area_copy(lv_area_t * dest, const lv_area_t * src)
 {
-    _lv_memcpy_small(dest, src, sizeof(lv_area_t));
+    dest->x1 = src->x1;
+    dest->y1 = src->y1;
+    dest->x2 = src->x2;
+    dest->y2 = src->y2;
 }
 
 /**
@@ -203,6 +227,29 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
 /**********************
  *      MACROS
  **********************/
+
+#define _LV_COORD_TYPE_SHIFT    (13)
+#define _LV_COORD_TYPE_MASK     (3 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_PLAIN(x)      ((x) & (~_LV_COORD_TYPE_MASK))  /*Remove type specifiers*/
+
+#define _LV_COORD_TYPE_PX       (0 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_SPEC     (1 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_LAYOUT   (2 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_RESERVED (3 << _LV_COORD_TYPE_SHIFT)
+
+#define LV_COORD_IS_PX(x)     ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_PX) ? true : false)
+#define LV_COORD_IS_SPEC(x)   ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_SPEC) ? true : false)
+#define LV_COORD_IS_LAYOUT(x) ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_LAYOUT) ? true : false)
+
+#define LV_COORD_SET_SPEC(x)   ((x) | _LV_COORD_TYPE_SPEC)
+#define LV_COORD_SET_LAYOUT(x) ((x) | _LV_COORD_TYPE_LAYOUT)
+
+/*Special coordinates*/
+#define LV_SIZE_PCT(x)      LV_COORD_SET_SPEC(x)
+#define LV_COORD_IS_PCT(x)   ((LV_COORD_IS_SPEC(x) && _LV_COORD_PLAIN(x) <= 1000) ? true : false)
+#define LV_COORD_GET_PCT(x)  _LV_COORD_PLAIN(x)
+#define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(1001)
+#define LV_SIZE_LAYOUT    LV_COORD_SET_SPEC(1002) /*The size is managed by the layout therefore `lv_obj_set_width/height/size()` can't change is*/
 
 #ifdef __cplusplus
 } /* extern "C" */

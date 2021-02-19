@@ -90,7 +90,7 @@ uint32_t lv_refr_get_fps_avg(void);
  * Called periodically to handle the refreshing
  * @param task pointer to the task itself
  */
-void _lv_disp_refr_task(lv_task_t * task);
+void _lv_disp_refr_task(lv_timer_t * task);
 
 /**********************
  *   STATIC FUNCTIONS

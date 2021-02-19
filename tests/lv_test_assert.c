@@ -159,6 +159,7 @@ void lv_test_assert_ptr_eq(const void * p_ref, const void * p_act, const char * 
 
 void lv_test_assert_color_eq(lv_color_t c_ref, lv_color_t c_act, const char * s)
 {
+#if LV_COLOR_16_SWAP == 0
     if(c_ref.full != c_act.full) {
         lv_test_error("   FAIL: %s. (Expected:  R:%02x, G:%02x, B:%02x, Actual: R:%02x, G:%02x, B:%02x)",  s,
                 c_ref.ch.red, c_ref.ch.green, c_ref.ch.blue,
@@ -167,6 +168,12 @@ void lv_test_assert_color_eq(lv_color_t c_ref, lv_color_t c_act, const char * s)
         lv_test_print("   PASS: %s. (Expected: R:%02x, G:%02x, B:%02x)", s,
                 c_ref.ch.red, c_ref.ch.green, c_ref.ch.blue);
     }
+#else
+    LV_UNUSED(c_ref);
+    LV_UNUSED(c_act);
+    LV_UNUSED(s);
+    lv_test_print("   SKIP");
+#endif
 }
 
 void lv_test_assert_img_eq(const char * fn_ref, const char * s)
@@ -176,10 +183,10 @@ void lv_test_assert_img_eq(const char * fn_ref, const char * s)
     return;
 #endif
 
-#if LV_HOR_RES_MAX != 800 || LV_VER_RES_MAX != 480
-    lv_test_print("   SKIP: Can't compare '%s' because the resolution needs to be 800x480 (LV_HOR_RES_MAX, LV_VER_RES_MAX)", fn_ref);
+if (LV_HOR_RES != 800 || LV_VER_RES != 480) {
+    lv_test_print("   SKIP: Can't compare '%s' because the resolution needs to be 800x480", fn_ref);
     return;
-#endif
+}
 
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);

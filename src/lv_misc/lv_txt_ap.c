@@ -10,6 +10,7 @@
 #include "lv_bidi.h"
 #include "lv_txt.h"
 #include "lv_txt_ap.h"
+#include "lv_mem.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************

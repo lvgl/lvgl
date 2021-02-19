@@ -8,12 +8,11 @@
  *********************/
 #include "lv_anim.h"
 
-#if LV_USE_ANIMATION
 #include <stddef.h>
 #include <string.h>
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_hal/lv_hal_tick.h"
-#include "lv_task.h"
+#include "lv_timer.h"
 #include "lv_math.h"
 #include "lv_gc.h"
 
@@ -22,7 +21,6 @@
  *********************/
 #define LV_ANIM_RESOLUTION 1024
 #define LV_ANIM_RES_SHIFT 10
-#define LV_ANIM_TASK_PRIO LV_TASK_PRIO_HIGH
 
 /**********************
  *      TYPEDEFS
@@ -31,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_task(lv_task_t * param);
+static void anim_task(lv_timer_t * param);
 static void anim_mark_list_change(void);
 static void anim_ready_handler(lv_anim_t * a);
 
@@ -41,7 +39,7 @@ static void anim_ready_handler(lv_anim_t * a);
 static uint32_t last_task_run;
 static bool anim_list_changed;
 static bool anim_run_round;
-static lv_task_t * _lv_anim_task;
+static lv_timer_t * _lv_anim_tmr;
 const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 
 /**********************
@@ -58,9 +56,9 @@ const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    _lv_anim_task = lv_task_create(anim_task, LV_DISP_DEF_REFR_PERIOD, LV_ANIM_TASK_PRIO, NULL);
+    _lv_anim_tmr = lv_timer_create(anim_task, LV_DISP_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation task*/
-    anim_list_changed = false; /*The list has not actually changed*/
+    anim_list_changed = false;
 }
 
 /**
@@ -73,11 +71,11 @@ void _lv_anim_core_init(void)
  */
 void lv_anim_init(lv_anim_t * a)
 {
-    _lv_memset_00(a, sizeof(lv_anim_t));
+    lv_memset_00(a, sizeof(lv_anim_t));
     a->time    = 500;
     a->start   = 0;
     a->end     = 100;
-    _lv_memcpy_small(&a->path, &lv_anim_path_def, sizeof(lv_anim_path_cb_t));
+    lv_memcpy_small(&a->path, &lv_anim_path_def, sizeof(lv_anim_path_cb_t));
     a->repeat_cnt = 1;
     a->early_apply = 1;
 }
@@ -88,7 +86,7 @@ void lv_anim_init(lv_anim_t * a)
 void lv_anim_start(lv_anim_t * a)
 {
     LV_LOG_TRACE("animation create started")
-    /* Do not let two animations for the same 'var' with the same 'fp'*/
+    /* Do not let two animations for the  same 'var' with the same 'fp'*/
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*If the list is empty the anim task was suspended and it's last run measure is invalid*/
@@ -98,13 +96,13 @@ void lv_anim_start(lv_anim_t * a)
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = _lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
-    LV_ASSERT_MEM(new_anim);
+    LV_ASSERT_MALLOC(new_anim);
     if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/
     a->time_orig = a->time;
     a->run_round = anim_run_round;
-    _lv_memcpy(new_anim, a, sizeof(lv_anim_t));
+    lv_memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
     if(new_anim->early_apply) {
@@ -116,6 +114,27 @@ void lv_anim_start(lv_anim_t * a)
     anim_mark_list_change();
 
     LV_LOG_TRACE("animation created")
+}
+
+/**
+ * Initialize an animation path
+ * @param path pointer to path
+ */
+void lv_anim_path_init(lv_anim_path_t * path)
+{
+    lv_memset_00(path, sizeof(lv_anim_path_t));
+}
+
+
+/**
+ * Set the path (curve) of the animation.
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param path_cb a function the get the current value of the animation.
+ *                The built in functions starts with `lv_anim_path_...`
+ */
+void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path)
+{
+    lv_memcpy_small(&a->path, path, sizeof(lv_anim_path_t));
 }
 
 /**
@@ -159,7 +178,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
         if(a->var == var && a->exec_cb == exec_cb) {
             return a;
         }
@@ -176,7 +195,7 @@ uint16_t lv_anim_count_running(void)
 {
     uint16_t cnt = 0;
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
     return cnt;
 }
@@ -190,7 +209,7 @@ uint16_t lv_anim_count_running(void)
  */
 uint32_t lv_anim_speed_to_time(uint32_t speed, lv_anim_value_t start, lv_anim_value_t end)
 {
-    uint32_t d    = LV_MATH_ABS(start - end);
+    uint32_t d    = LV_ABS(start - end);
     uint32_t time = (d * 1000) / speed;
 
     if(time == 0) {
@@ -265,7 +284,6 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-
     uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = _lv_bezier3(t, 0, 1023, 1023, 1024);
 
@@ -287,7 +305,6 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-
     uint32_t t = _lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = _lv_bezier3(t, 0, 100, 924, 1024);
 
@@ -402,7 +419,7 @@ lv_anim_value_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t *
  * Periodically handle the animations.
  * @param param unused
  */
-static void anim_task(lv_task_t * param)
+static void anim_task(lv_timer_t * param)
 {
     (void)param;
 
@@ -480,7 +497,7 @@ static void anim_ready_handler(lv_anim_t * a)
         /*Create copy from the animation and delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
         lv_anim_t a_tmp;
-        _lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
+        lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
         _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
         /*Flag that the list has changed */
@@ -513,8 +530,7 @@ static void anim_mark_list_change(void)
 {
     anim_list_changed = true;
     if(_lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
-        lv_task_set_prio(_lv_anim_task, LV_TASK_PRIO_OFF);
+        lv_timer_pause(_lv_anim_tmr, true);
     else
-        lv_task_set_prio(_lv_anim_task, LV_ANIM_TASK_PRIO);
+        lv_timer_pause(_lv_anim_tmr, false);
 }
-#endif

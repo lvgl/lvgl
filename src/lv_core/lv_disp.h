@@ -73,17 +73,10 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
 /**
  * Return with the sys. layer. (Same on every screen and it is above the normal screen and the top
  * layer)
- * @param disp pointer to display which sys. layer should be get. (NULL to use the default screen)
+ * @param disp pointer to display which sys. layer  should be get. (NULL to use the default screen)
  * @return pointer to the sys layer object  (transparent screen sized lv_obj)
  */
 lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
-
-/**
- * Assign a screen to a display.
- * @param disp pointer to a display where to assign the screen
- * @param scr pointer to a screen object to assign
- */
-void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
 /**
  * Set the background color of a display
@@ -106,7 +99,6 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
  */
 void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
 
-#if LV_USE_ANIMATION
 
 /**
  * Switch screen with animation
@@ -118,7 +110,6 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
  */
 void lv_scr_load_anim(lv_obj_t * scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool auto_del);
 
-#endif
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
  * @param disp pointer to an display (NULL to get the overall smallest inactivity)
@@ -144,7 +135,7 @@ void lv_disp_clean_dcache(lv_disp_t * disp);
  * @param disp pointer to a display
  * @return pointer to the display refresher task. (NULL on error)
  */
-lv_task_t * _lv_disp_get_refr_task(lv_disp_t * disp);
+lv_timer_t * _lv_disp_get_refr_task(lv_disp_t * disp);
 
 /*------------------------------------------------
  * To improve backward compatibility
@@ -161,7 +152,7 @@ static inline lv_obj_t * lv_scr_act(void)
 }
 
 /**
- * Get the top layer of the default display
+ * Get the top layer  of the default display
  * @return pointer to the top layer
  */
 static inline lv_obj_t * lv_layer_top(void)
@@ -171,7 +162,7 @@ static inline lv_obj_t * lv_layer_top(void)
 
 /**
  * Get the active screen of the default display
- * @return pointer to the sys layer
+ * @return  pointer to the sys layer
  */
 static inline lv_obj_t * lv_layer_sys(void)
 {
@@ -212,7 +203,7 @@ static inline void lv_scr_load(lv_obj_t * scr)
  * 1 dip is 2 px on a 320 DPI screen
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
-#define LV_DPX(n)   (n == 0 ? 0 :LV_MATH_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1)) /*+80 for rounding*/
+#define LV_DPX(n)   (n == 0 ? 0 :LV_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1)) /*+80 for rounding*/
 
 static inline lv_coord_t lv_dpx(lv_coord_t n)
 {

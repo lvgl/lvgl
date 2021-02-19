@@ -132,6 +132,14 @@ lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl)
     return lv_color_mix(LV_COLOR_BLACK, c, lvl);
 }
 
+lv_color_t lv_color_change_lightness(lv_color_t c, lv_opa_t lvl)
+{
+    /* It'd be better to convert the color to HSL, change L and convert back to RGB.*/
+    if(lvl == LV_OPA_50) return c;
+    else if(lvl < LV_OPA_50) return lv_color_darken(c, (LV_OPA_50 - lvl) * 2);
+    else return lv_color_lighten(c, (lvl - LV_OPA_50) * 2);
+}
+
 /**
  * Convert a HSV color to RGB
  * @param h hue [0..359]

@@ -138,12 +138,12 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
                                   uint32_t visual_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    char * buf = _lv_mem_buf_get(len + 1);
+    char * buf = lv_mem_buf_get(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t * pos_conv_buf = _lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
-        _lv_mem_buf_release(buf);
+        lv_mem_buf_release(buf);
         return (uint16_t) -1;
     }
 
@@ -153,9 +153,9 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
 
     if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
 
-    if(bidi_txt == NULL) _lv_mem_buf_release(buf);
+    if(bidi_txt == NULL) lv_mem_buf_release(buf);
     uint16_t res = GET_POS(pos_conv_buf[visual_pos]);
-    _lv_mem_buf_release(pos_conv_buf);
+    lv_mem_buf_release(pos_conv_buf);
     return res;
 }
 
@@ -175,12 +175,12 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
                                  uint32_t logical_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    char * buf = _lv_mem_buf_get(len + 1);
+    char * buf = lv_mem_buf_get(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t * pos_conv_buf = _lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
-        _lv_mem_buf_release(buf);
+        lv_mem_buf_release(buf);
         return (uint16_t) -1;
     }
 
@@ -192,14 +192,14 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
         if(GET_POS(pos_conv_buf[i]) == logical_pos) {
 
             if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
-            _lv_mem_buf_release(pos_conv_buf);
+            lv_mem_buf_release(pos_conv_buf);
 
-            if(bidi_txt == NULL) _lv_mem_buf_release(buf);
+            if(bidi_txt == NULL) lv_mem_buf_release(buf);
             return i;
         }
     }
-    _lv_mem_buf_release(pos_conv_buf);
-    if(bidi_txt == NULL) _lv_mem_buf_release(buf);
+    lv_mem_buf_release(pos_conv_buf);
+    if(bidi_txt == NULL) lv_mem_buf_release(buf);
     return (uint16_t) -1;
 }
 
@@ -258,7 +258,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
     if(rd) {
         if(base_dir == LV_BIDI_DIR_LTR) {
             if(str_out) {
-                _lv_memcpy(&str_out[wr], str_in, rd);
+                lv_memcpy(&str_out[wr], str_in, rd);
                 wr += rd;
             }
             if(pos_conv_out) {
@@ -281,7 +281,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
 
         if(base_dir == LV_BIDI_DIR_LTR) {
             if(run_dir == LV_BIDI_DIR_LTR) {
-                if(str_out) _lv_memcpy(&str_out[wr], &str_in[rd], run_len);
+                if(str_out) lv_memcpy(&str_out[wr], &str_in[rd], run_len);
                 if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
             }
             else rtl_reverse(str_out ? &str_out[wr] : NULL, &str_in[rd], run_len, pos_conv_out ? &pos_conv_out[pos_conv_wr] : NULL,
@@ -293,7 +293,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
             wr -= run_len;
             pos_conv_wr -= pos_conv_run_len;
             if(run_dir == LV_BIDI_DIR_LTR) {
-                if(str_out) _lv_memcpy(&str_out[wr], &str_in[rd], run_len);
+                if(str_out) lv_memcpy(&str_out[wr], &str_in[rd], run_len);
                 if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
             }
             else rtl_reverse(str_out ? &str_out[wr] : NULL, &str_in[rd], run_len, pos_conv_out ? &pos_conv_out[pos_conv_wr] : NULL,
@@ -536,7 +536,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
                 pos_conv_first_weak = 0;
             }
 
-            if(dest) _lv_memcpy(&dest[wr], &src[first_weak], last_weak - first_weak + 1);
+            if(dest) lv_memcpy(&dest[wr], &src[first_weak], last_weak - first_weak + 1);
             if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_last_weak - pos_conv_first_weak + 1,
                                                pos_conv_rd_base + pos_conv_first_weak);
             wr += last_weak - first_weak + 1;
@@ -556,7 +556,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
             }
             /*Just store the letter*/
             else {
-                if(dest) _lv_memcpy(&dest[wr], &src[i], letter_size);
+                if(dest) lv_memcpy(&dest[wr], &src[i], letter_size);
                 if(pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_i, true);
                 wr += letter_size;
                 pos_conv_wr++;

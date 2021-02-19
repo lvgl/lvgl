@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_style.h"
+#include "lv_draw_blend.h"
 
 /*********************
  *      DEFINES
@@ -24,9 +24,9 @@ extern "C" {
  **********************/
 typedef struct {
     lv_color_t color;
-    lv_style_int_t width;
-    lv_style_int_t dash_width;
-    lv_style_int_t dash_gap;
+    lv_coord_t width;
+    lv_coord_t dash_width;
+    lv_coord_t dash_gap;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;
     uint8_t round_start : 1;

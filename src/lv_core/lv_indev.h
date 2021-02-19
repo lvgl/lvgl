@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../lv_hal/lv_hal_indev.h"
-#include "../lv_core/lv_group.h"
+#include "lv_group.h"
 
 /*********************
  *      DEFINES
@@ -30,15 +30,17 @@ extern "C" {
  **********************/
 
 /**
- * Initialize the display input device subsystem
+ * Called periodically to read the input devices
+ * @param param pointer to and input device to read
  */
-void _lv_indev_init(void);
+void lv_indev_read_task_cb(lv_timer_t * task);
 
 /**
- * Called periodically to read the input devices
- * @param task pointer to the task itself
+ * Enable or disable an input devices
+ * @param indev pointer to an input device
+ * @param en true: enable; false: disable
  */
-void _lv_indev_read_task(lv_task_t * task);
+void lv_indev_enable(lv_indev_t * indev, bool en);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -63,16 +65,9 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
 /**
  * Reset the long press state of an input device
- * @param indev_proc pointer to an input device
+ * @param indev pointer to an input device
  */
 void lv_indev_reset_long_press(lv_indev_t * indev);
-
-/**
- * Enable or disable an input devices
- * @param indev pointer to an input device
- * @param en true: enable; false: disable
- */
-void lv_indev_enable(lv_indev_t * indev, bool en);
 
 /**
  * Set a cursor for a pointer input device (for LV_INPUT_TYPE_POINTER and LV_INPUT_TYPE_BUTTON)
@@ -81,14 +76,12 @@ void lv_indev_enable(lv_indev_t * indev, bool en);
  */
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj);
 
-#if LV_USE_GROUP
 /**
  * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
  * @param group point to a group
  */
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group);
-#endif
 
 /**
  * Set the an array of points for LV_INDEV_TYPE_BUTTON.
@@ -120,28 +113,29 @@ lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev);
 uint32_t lv_indev_get_key(const lv_indev_t * indev);
 
 /**
- * Check if there is dragging with an input device or not (for LV_INDEV_TYPE_POINTER and
+ * Check the current scroll direction of an input device (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
- * @return true: drag is in progress
+ * @return LV_SCROLL_DIR_NONE: no scrolling now
+ *         LV_SCROLL_DIR_HOR/VER
  */
-bool lv_indev_is_dragging(const lv_indev_t * indev);
+lv_indev_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev);
 
 /**
- * Get the vector of dragging of an input device (for LV_INDEV_TYPE_POINTER and
+ * Get the currently scrolled object (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
- * @param point pointer to a point to store the vector
+ * @return pointer to the currently scrolled object or NULL if no scrolling by this indev
+ */
+lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev);
+
+/**
+ * Get the movement vector of an input device (for LV_INDEV_TYPE_POINTER and
+ * LV_INDEV_TYPE_BUTTON)
+ * @param indev pointer to an input device
+ * @param point pointer to a point to store the types.pointer.vector
  */
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
-
-/**
- * Manually finish dragging.
- * `LV_SIGNAL_DRAG_END` and `LV_EVENT_DRAG_END` will be sent.
- * @param indev pointer to an input device
- * @return `LV_RES_INV` if the object being dragged was deleted. Else `LV_RES_OK`.
- */
-lv_res_t lv_indev_finish_drag(lv_indev_t * indev);
 
 /**
  * Do nothing until the next release
@@ -150,11 +144,18 @@ lv_res_t lv_indev_finish_drag(lv_indev_t * indev);
 void lv_indev_wait_release(lv_indev_t * indev);
 
 /**
- * Gets a pointer to the currently active object in indev proc functions.
- * NULL if no object is currently being handled or if groups aren't used.
- * @return pointer to currently active object
+ * Gets a pointer to the currently active object in the currently processed input device.
+ * @return pointer to currently active object or NULL if no active object
  */
 lv_obj_t * lv_indev_get_obj_act(void);
+
+/**
+ * Get a pointer to the indev read task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param indev pointer to an input device
+ * @return pointer to the indev read refresher task. (NULL on error)
+ */
+lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**
  * Search the most top, clickable object by a point
@@ -163,14 +164,6 @@ lv_obj_t * lv_indev_get_obj_act(void);
  * @return pointer to the found object or NULL if there was no suitable object
  */
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
-
-/**
- * Get a pointer to the indev read task to
- * modify its parameters with `lv_task_...` functions.
- * @param indev pointer to an inout device
- * @return pointer to the indev read refresher task. (NULL on error)
- */
-lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**********************
  *      MACROS

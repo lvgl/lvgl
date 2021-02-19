@@ -26,12 +26,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-#if LV_USE_FILESYSTEM
-
 lv_font_t * lv_font_load(const char * fontName);
 void lv_font_free(lv_font_t * font);
-
-#endif
 
 /**********************
  *      MACROS

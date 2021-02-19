@@ -1,14 +1,15 @@
 /**
- * @file lv_mask.h
+ * @file lv_draw_mask.h
  *
  */
 
-#ifndef LV_MASK_H
-#define LV_MASK_H
+#ifndef LV_DRAW_MASK_H
+#define LV_DRAW_MASK_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /*********************
  *      INCLUDES
@@ -16,12 +17,20 @@ extern "C" {
 #include <stdbool.h>
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_MASK_ID_INV  (-1)
-#define _LV_MASK_MAX_NUM     16
+#if LV_DRAW_COMPLEX
+# define _LV_MASK_MAX_NUM     16
+# ifndef _LV_MASK_BUF_MAX_SIZE
+#  define _LV_MASK_BUF_MAX_SIZE  2048    /*Should be >= than the max hor res*/
+# endif
+#else
+# define _LV_MASK_MAX_NUM     1
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -35,6 +44,23 @@ enum {
 };
 
 typedef uint8_t lv_draw_mask_res_t;
+
+typedef struct {
+    void * param;
+    void * custom_id;
+} _lv_draw_mask_saved_t;
+
+typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
+
+
+
+#if LV_DRAW_COMPLEX == 0
+static inline  uint8_t lv_draw_mask_get_cnt(void) {
+    return 0;
+}
+#endif
+
+#if LV_DRAW_COMPLEX
 
 enum {
     LV_DRAW_MASK_TYPE_LINE,
@@ -160,12 +186,6 @@ typedef struct _lv_draw_mask_map_param_t {
     } cfg;
 } lv_draw_mask_map_param_t;
 
-typedef struct {
-    void * param;
-    void * custom_id;
-} _lv_draw_mask_saved_t;
-
-typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -291,6 +311,8 @@ void lv_draw_mask_fade_init(lv_draw_mask_fade_param_t * param, const lv_area_t *
  */
 void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * coords, const lv_opa_t * map);
 
+#endif /*LV_DRAW_COMPLEX*/
+
 /**********************
  *      MACROS
  **********************/
@@ -299,4 +321,4 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
 } /* extern "C" */
 #endif
 
-#endif /*LV_MASK_H*/
+#endif /*LV_DRAW_MASK_H*/

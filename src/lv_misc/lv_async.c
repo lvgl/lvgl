@@ -26,7 +26,7 @@ typedef struct _lv_async_info_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_async_task_cb(lv_task_t * task);
+static void lv_async_task_cb(lv_timer_t * task);
 
 /**********************
  *  STATIC VARIABLES
@@ -50,7 +50,7 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
 
     /* Create a new task */
     /* Use highest priority so that it will run before a refresh */
-    lv_task_t * task = lv_task_create(lv_async_task_cb, 0, LV_TASK_PRIO_HIGHEST, info);
+    lv_timer_t * task = lv_timer_create(lv_async_task_cb, 0, info);
 
     if(task == NULL) {
         lv_mem_free(info);
@@ -60,7 +60,9 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
     info->cb = async_xcb;
     info->user_data = user_data;
 
-    lv_task_set_repeat_count(task, 1);
+    /* Set the task's user data */
+    task->user_data = info;
+    lv_timer_set_repeat_count(task, 1);
     return LV_RES_OK;
 }
 
@@ -68,7 +70,7 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_async_task_cb(lv_task_t * task)
+static void lv_async_task_cb(lv_timer_t * task)
 {
     lv_async_info_t * info = (lv_async_info_t *)task->user_data;
 

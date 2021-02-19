@@ -34,38 +34,25 @@ enum {
 };
 typedef uint8_t lv_arc_type_t;
 
-/*Data of arc*/
 typedef struct {
-    /*New data for this type */
-    uint16_t rotation_angle;
-    uint16_t arc_angle_start;
-    uint16_t arc_angle_end;
+    lv_obj_t obj;
+    uint16_t rotation;
+    uint16_t indic_angle_start;
+    uint16_t indic_angle_end;
     uint16_t bg_angle_start;
     uint16_t bg_angle_end;
-    lv_style_list_t style_arc;
-    lv_style_list_t style_knob; /* Style of the knob */
-
-    int16_t cur_value; /*Current value of the arc*/
+    int16_t value; /*Current value of the arc*/
     int16_t min_value; /*Minimum value of the arc*/
     int16_t max_value; /*Maximum value of the arc*/
     uint16_t dragging    : 1;
     uint16_t type        : 2;
-    uint16_t adjustable  : 1;
     uint16_t min_close   : 1;  /*1: the last pressed angle was closer to minimum end*/
     uint16_t chg_rate; /*Drag angle rate of change of the arc (degrees/sec)*/
     uint32_t last_tick; /*Last dragging event timestamp of the arc*/
     int16_t last_angle; /*Last dragging angle of the arc*/
-} lv_arc_ext_t;
+}lv_arc_t;
 
-/*Parts of the arc*/
-enum {
-    LV_ARC_PART_BG = LV_OBJ_PART_MAIN,
-    LV_ARC_PART_INDIC,
-    LV_ARC_PART_KNOB,
-    _LV_ARC_PART_VIRTUAL_LAST,
-    _LV_ARC_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
-};
-typedef uint8_t lv_arc_part_t;
+extern const lv_obj_class_t lv_arc_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -136,7 +123,7 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
  * @param arc pointer to an arc object
  * @param rotation_angle rotation angle
  */
-void lv_arc_set_rotation(lv_obj_t * arc, uint16_t rotation_angle);
+void lv_arc_set_rotation(lv_obj_t * arc, uint16_t rotation);
 
 /**
  * Set the type of arc.
@@ -184,70 +171,63 @@ void lv_arc_set_adjustable(lv_obj_t * arc, bool adjustable);
  * @param arc pointer to an arc object
  * @return the start angle [0..360]
  */
-uint16_t lv_arc_get_angle_start(lv_obj_t * arc);
+uint16_t lv_arc_get_angle_start(lv_obj_t * obj);
 
 /**
  * Get the end angle of an arc.
  * @param arc pointer to an arc object
  * @return the end angle [0..360]
  */
-uint16_t lv_arc_get_angle_end(lv_obj_t * arc);
+uint16_t lv_arc_get_angle_end(lv_obj_t * obj);
 
 /**
  * Get the start angle of an arc background.
  * @param arc pointer to an arc object
  * @return the start angle [0..360]
  */
-uint16_t lv_arc_get_bg_angle_start(lv_obj_t * arc);
+uint16_t lv_arc_get_bg_angle_start(lv_obj_t * obj);
 
 /**
  * Get the end angle of an arc background.
  * @param arc pointer to an arc object
  * @return the end angle [0..360]
  */
-uint16_t lv_arc_get_bg_angle_end(lv_obj_t * arc);
+uint16_t lv_arc_get_bg_angle_end(lv_obj_t * obj);
 
 /**
- * Get whether the arc is type or not.
+ * Get the value of a arc
  * @param arc pointer to a arc object
- * @return arc type
+ * @return the value of the arc
  */
-lv_arc_type_t lv_arc_get_type(const lv_obj_t * arc);
-
-/**
- * Get the value of the of a arc
- * @param arc pointer to a arc object
- * @return the value of the of the arc
- */
-int16_t lv_arc_get_value(const lv_obj_t * arc);
+int16_t lv_arc_get_value(const lv_obj_t * obj);
 
 /**
  * Get the minimum value of a arc
  * @param arc pointer to a arc object
  * @return the minimum value of the arc
  */
-int16_t lv_arc_get_min_value(const lv_obj_t * arc);
+int16_t lv_arc_get_min_value(const lv_obj_t * obj);
 
 /**
  * Get the maximum value of a arc
  * @param arc pointer to a arc object
  * @return the maximum value of the arc
  */
-int16_t lv_arc_get_max_value(const lv_obj_t * arc);
+int16_t lv_arc_get_max_value(const lv_obj_t * obj);
 
 /**
- * Give the arc is being dragged or not
+ * Get whether the arc is type or not.
  * @param arc pointer to a arc object
- * @return true: drag in progress false: not dragged
+ * @return arc type
  */
-bool lv_arc_is_dragged(const lv_obj_t * arc);
+lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj);
 
 /**
  * Get whether the arc is adjustable.
  * @param arc pointer to a arc object
  * @return whether the arc has a knob that can be dragged
  */
-bool lv_arc_get_adjustable(lv_obj_t * arc);
+bool lv_arc_get_adjustable(lv_obj_t * obj);
 
 /*=====================
  * Other functions

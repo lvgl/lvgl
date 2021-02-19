@@ -6,10 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+
+
 #include "lv_draw_mask.h"
+#if LV_DRAW_COMPLEX
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "../lv_misc/lv_gc.h"
 
 /*********************
@@ -185,7 +188,7 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void)
 void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x,
                                    lv_coord_t p2y, lv_draw_mask_line_side_t side)
 {
-    _lv_memset_00(param, sizeof(lv_draw_mask_line_param_t));
+    lv_memset_00(param, sizeof(lv_draw_mask_line_param_t));
 
     if(p1y > p2y) {
         lv_coord_t t;
@@ -206,7 +209,7 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
 
     param->origo.x = p1x;
     param->origo.y = p1y;
-    param->flat = (LV_MATH_ABS(p2x - p1x) > LV_MATH_ABS(p2y - p1y)) ? 1 : 0;
+    param->flat = (LV_ABS(p2x - p1x) > LV_ABS(p2y - p1y)) ? 1 : 0;
     param->yx_steep = 0;
     param->xy_steep = 0;
     param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_line;
@@ -283,8 +286,8 @@ void lv_draw_mask_line_angle_init(lv_draw_mask_line_param_t * param, lv_coord_t 
     int32_t p2x;
     int32_t p2y;
 
-    p2x = (_lv_trigo_sin(angle + 90) >> 5) + p1x;
-    p2y = (_lv_trigo_sin(angle) >> 5) + py;
+    p2x = (lv_trigo_sin(angle + 90) >> 5) + p1x;
+    p2y = (lv_trigo_sin(angle) >> 5) + py;
 
     lv_draw_mask_line_points_init(param, p1x, py, p2x, p2y, side);
 }
@@ -318,7 +321,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
         param->delta_deg = 360 - start_angle + end_angle;
     }
     else {
-        param->delta_deg = LV_MATH_ABS(end_angle - start_angle);
+        param->delta_deg = LV_ABS(end_angle - start_angle);
     }
 
     param->cfg.start_angle = start_angle;
@@ -328,26 +331,22 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_angle;
     param->dsc.type = LV_DRAW_MASK_TYPE_ANGLE;
 
+    LV_ASSERT_MSG(start_angle >= 0 && start_angle <= 360, "Unexpected start angle");
+
     if(start_angle >= 0 && start_angle < 180) {
         start_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
     else if(start_angle >= 180 && start_angle < 360) {
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
-    else {
-        LV_DEBUG_ASSERT(false, "Unexpected start_angle", start_angle);
-        return;
-    }
+
+    LV_ASSERT_MSG(end_angle >= 0 && start_angle <= 360, "Unexpected end angle");
 
     if(end_angle >= 0 && end_angle < 180) {
         end_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
     else if(end_angle >= 180 && end_angle < 360) {
         end_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
-    }
-    else {
-        LV_DEBUG_ASSERT(false, "Unexpected end_angle", end_angle);
-        return;
     }
 
     lv_draw_mask_line_angle_init(&param->start_line, vertex_x, vertex_y, start_angle, start_side);
@@ -365,7 +364,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 {
     lv_coord_t w = lv_area_get_width(rect);
     lv_coord_t h = lv_area_get_height(rect);
-    int32_t short_side = LV_MATH_MIN(w, h);
+    int32_t short_side = LV_MIN(w, h);
     if(radius > short_side >> 1) radius = short_side >> 1;
 
     lv_area_copy(&param->cfg.rect, rect);
@@ -450,8 +449,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mas
                 else {
                     int32_t k = - abs_x;
                     if(k < 0) return LV_DRAW_MASK_RES_TRANSP;
-                    if(k >= 0 && k < len) _lv_memset_00(&mask_buf[k], len - k);
-                    return LV_DRAW_MASK_RES_CHANGED;
+                    if(k >= 0 && k < len) lv_memset_00(&mask_buf[k], len - k);
+                    return  LV_DRAW_MASK_RES_CHANGED;
                 }
             }
             else {
@@ -460,8 +459,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mas
                     int32_t k = - abs_x;
                     if(k < 0) k = 0;
                     if(k >= len) return LV_DRAW_MASK_RES_TRANSP;
-                    else if(k >= 0 && k < len) _lv_memset_00(&mask_buf[0], k);
-                    return LV_DRAW_MASK_RES_CHANGED;
+                    else if(k >= 0 && k < len) lv_memset_00(&mask_buf[0], k);
+                    return  LV_DRAW_MASK_RES_CHANGED;
                 }
             }
         }
@@ -577,7 +576,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
             return LV_DRAW_MASK_RES_TRANSP;
         }
         if(k >= 0) {
-            _lv_memset_00(&mask_buf[0], k);
+            lv_memset_00(&mask_buf[0], k);
         }
     }
     else {
@@ -586,7 +585,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
             return LV_DRAW_MASK_RES_TRANSP;
         }
         if(k <= len) {
-            _lv_memset_00(&mask_buf[k], len - k);
+            lv_memset_00(&mask_buf[k], len - k);
         }
     }
 
@@ -656,13 +655,13 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
             if(k >= len) {
                 return LV_DRAW_MASK_RES_TRANSP;
             }
-            if(k >= 0) _lv_memset_00(&mask_buf[0], k);
+            if(k >= 0) lv_memset_00(&mask_buf[0], k);
 
         }
         else {
             if(k > len) k = len;
             if(k == 0) return LV_DRAW_MASK_RES_TRANSP;
-            else if(k > 0) _lv_memset_00(&mask_buf[k],  len - k);
+            else if(k > 0) lv_memset_00(&mask_buf[k],  len - k);
         }
 
     }
@@ -691,12 +690,12 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
                 k = xsi - abs_x - 1;
 
                 if(k > len) k = len;
-                else if(k > 0) _lv_memset_00(&mask_buf[0],  k);
+                else if(k > 0) lv_memset_00(&mask_buf[0],  k);
 
             }
             else {
                 if(k > len) return LV_DRAW_MASK_RES_FULL_COVER;
-                if(k >= 0) _lv_memset_00(&mask_buf[k],  len - k);
+                if(k >= 0) lv_memset_00(&mask_buf[k],  len - k);
             }
 
         }
@@ -721,13 +720,13 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
             if(p->inv) {
                 k = xsi - abs_x;
                 if(k > len)  return LV_DRAW_MASK_RES_TRANSP;
-                if(k >= 0) _lv_memset_00(&mask_buf[0],  k);
+                if(k >= 0) lv_memset_00(&mask_buf[0],  k);
 
             }
             else {
                 if(k > len) k = len;
                 if(k == 0) return LV_DRAW_MASK_RES_TRANSP;
-                else if(k > 0) _lv_memset_00(&mask_buf[k],  len - k);
+                else if(k > 0) lv_memset_00(&mask_buf[k],  len - k);
             }
         }
     }
@@ -773,7 +772,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
         if(tmp > 0) {
             res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, &p->start_line);
             if(res1 == LV_DRAW_MASK_RES_TRANSP) {
-                _lv_memset_00(&mask_buf[0], tmp);
+                lv_memset_00(&mask_buf[0], tmp);
             }
         }
 
@@ -781,7 +780,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
         if(tmp < 0) tmp = 0;
         res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x + tmp, abs_y, len - tmp, &p->end_line);
         if(res2 == LV_DRAW_MASK_RES_TRANSP) {
-            _lv_memset_00(&mask_buf[tmp], len - tmp);
+            lv_memset_00(&mask_buf[tmp], len - tmp);
         }
         if(res1 == res2) return res1;
         else return LV_DRAW_MASK_RES_CHANGED;
@@ -815,7 +814,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
         if(tmp > 0) {
             res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_draw_mask_line_param_t *)&p->end_line);
             if(res1 == LV_DRAW_MASK_RES_TRANSP) {
-                _lv_memset_00(&mask_buf[0], tmp);
+                lv_memset_00(&mask_buf[0], tmp);
             }
         }
 
@@ -823,7 +822,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
         if(tmp < 0) tmp = 0;
         res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x + tmp, abs_y, len - tmp, (lv_draw_mask_line_param_t *)&p->start_line);
         if(res2 == LV_DRAW_MASK_RES_TRANSP) {
-            _lv_memset_00(&mask_buf[tmp], len - tmp);
+            lv_memset_00(&mask_buf[tmp], len - tmp);
         }
         if(res1 == res2) return res1;
         else return LV_DRAW_MASK_RES_CHANGED;
@@ -899,13 +898,13 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             int32_t last =  rect.x1 - abs_x;
             if(last > len) return LV_DRAW_MASK_RES_TRANSP;
             if(last >= 0) {
-                _lv_memset_00(&mask_buf[0], last);
+                lv_memset_00(&mask_buf[0], last);
             }
 
             int32_t first = rect.x2 - abs_x + 1;
             if(first <= 0) return LV_DRAW_MASK_RES_TRANSP;
             else if(first < len) {
-                _lv_memset_00(&mask_buf[first], len - first);
+                lv_memset_00(&mask_buf[first], len - first);
             }
             if(last == 0 && first == len) return LV_DRAW_MASK_RES_FULL_COVER;
             else return LV_DRAW_MASK_RES_CHANGED;
@@ -917,7 +916,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                 int32_t last =  rect.x2 - abs_x - first + 1;
                 if(first + last > len) last = len - first;
                 if(last >= 0) {
-                    _lv_memset_00(&mask_buf[first], last);
+                    lv_memset_00(&mask_buf[first], last);
                 }
             }
         }
@@ -955,9 +954,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                 x0.i = p->y_prev_x.i;
             }
             else {
-                _lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
+                lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
             }
-            _lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
+            lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
             p->y_prev = y - 1;
             p->y_prev_x.f = x1.f;
             p->y_prev_x.i = x1.i;
@@ -973,10 +972,10 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                 x1.i = p->y_prev_x.i;
             }
             else {
-                _lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
+                lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
             }
 
-            _lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
+            lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
             p->y_prev = y;
             p->y_prev_x.f = x0.f;
             p->y_prev_x.i = x0.i;
@@ -1015,13 +1014,13 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                     return LV_DRAW_MASK_RES_TRANSP;
                 }
                 if(kl >= 0) {
-                    _lv_memset_00(&mask_buf[0], kl);
+                    lv_memset_00(&mask_buf[0], kl);
                 }
                 if(kr < 0) {
                     return LV_DRAW_MASK_RES_TRANSP;
                 }
                 if(kr <= len) {
-                    _lv_memset_00(&mask_buf[kr], len - kr);
+                    lv_memset_00(&mask_buf[kr], len - kr);
                 }
             }
             else {
@@ -1032,7 +1031,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                 int32_t len_tmp = kr - first;
                 if(len_tmp + first > len) len_tmp = len - first;
                 if(first < len && len_tmp >= 0) {
-                    _lv_memset_00(&mask_buf[first], len_tmp);
+                    lv_memset_00(&mask_buf[first], len_tmp);
                 }
             }
         }
@@ -1049,7 +1048,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                 int32_t len_tmp = kr - first;
                 if(len_tmp + first > len) len_tmp = len - first;
                 if(first < len && len_tmp >= 0) {
-                    _lv_memset_00(&mask_buf[first], len_tmp);
+                    lv_memset_00(&mask_buf[first], len_tmp);
                 }
             }
 
@@ -1058,7 +1057,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             lv_sqrt_res_t y_prev;
             lv_sqrt_res_t y_next;
 
-            _lv_sqrt(r2 - (x0.i * x0.i), &y_prev, sqrt_mask);
+            lv_sqrt(r2 - (x0.i * x0.i), &y_prev, sqrt_mask);
 
             if(y_prev.f == 0) {
                 y_prev.i--;
@@ -1067,7 +1066,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
 
             /*The first y intersection is special as it might be in the previous line*/
             if(y_prev.i >= y) {
-                _lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);
+                lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);
                 m = 255 - (((255 - x0.f) * (255 - y_next.f)) >> 9);
 
                 if(outer) m = 255 - m;
@@ -1110,12 +1109,12 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
                 if(kl > len) {
                     return LV_DRAW_MASK_RES_TRANSP;
                 }
-                if(kl >= 0) _lv_memset_00(&mask_buf[0], kl);
+                if(kl >= 0) lv_memset_00(&mask_buf[0], kl);
 
                 if(kr < 0) {
                     return LV_DRAW_MASK_RES_TRANSP;
                 }
-                if(kr < len) _lv_memset_00(&mask_buf[kr], len - kr);
+                if(kr < len) lv_memset_00(&mask_buf[kr], len - kr);
             }
         }
     }
@@ -1208,7 +1207,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
     if(mask_new >= LV_OPA_MAX) return mask_act;
     if(mask_new <= LV_OPA_MIN) return 0;
 
-    return LV_MATH_UDIV255(mask_act * mask_new);// >> 8);
+    return LV_UDIV255(mask_act * mask_new);// >> 8);
 }
 
 /**
@@ -1230,3 +1229,5 @@ LV_ATTRIBUTE_FAST_MEM static inline void sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_
     q->i = d >> 4;
     q->f = (d & 0xF) << 4;
 }
+
+#endif /*LV_DRAW_COMPLEX*/

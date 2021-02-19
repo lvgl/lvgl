@@ -21,7 +21,7 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_ll.h"
-#include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_timer.h"
 
 /*********************
  *      DEFINES
@@ -80,11 +80,16 @@ typedef struct _disp_drv_t {
      * LVGL will use this buffer(s) to draw the screens contents */
     lv_disp_buf_t * buffer;
 
+<<<<<<< HEAD
 #if LV_ANTIALIAS
     uint32_t antialiasing : 1; /**< 1: antialiasing is enabled on this display. */
 #endif
     uint32_t rotated : 2;
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower) */
+=======
+    uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display. */
+    uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+>>>>>>> dev-v8
 
 #if LV_COLOR_SCREEN_TRANSP
     /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
@@ -126,23 +131,16 @@ typedef struct _disp_drv_t {
     /** OPTIONAL: called to wait while the gpu is working */
     void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
 
-#if LV_USE_GPU
-
-    /** OPTIONAL: Blend two memories using opacity (GPU only)*/
-    void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
-                         lv_opa_t opa);
-
     /** OPTIONAL: Fill a memory with a color (GPU only)*/
     void (*gpu_fill_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                         const lv_area_t * fill_area, lv_color_t color);
-#endif
 
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_TRANSP` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
 #if LV_USE_USER_DATA
-    lv_disp_drv_user_data_t user_data; /**< Custom display driver user data */
+    lv_user_data_t user_data; /**< Custom display driver user data */
 #endif
 
 } lv_disp_drv_t;
@@ -158,18 +156,16 @@ typedef struct _disp_t {
     lv_disp_drv_t driver;
 
     /**< A task which periodically checks the dirty areas and refreshes them*/
-    lv_task_t * refr_task;
+    lv_timer_t * read_task;
 
     /** Screens of the display*/
-    lv_ll_t scr_ll;
-    struct _lv_obj_t * act_scr;         /**< Currently active screen on this display */
-    struct _lv_obj_t * prev_scr;        /**< Previous screen. Used during screen animations */
-#if LV_USE_ANIMATION
+    struct _lv_obj_t ** screens;          /**< Array of screen objects. `NULL` terminated*/
+    struct _lv_obj_t * act_scr;   /**< Currently active screen on this display */
+    struct _lv_obj_t * prev_scr;  /**< Previous screen. Used during screen animations */
     struct _lv_obj_t * scr_to_load;     /**< The screen prepared to load in lv_scr_load_anim*/
-#endif
     struct _lv_obj_t * top_layer; /**< @see lv_disp_get_layer_top */
     struct _lv_obj_t * sys_layer; /**< @see lv_disp_get_layer_sys */
-
+    uint32_t screen_cnt;
 uint8_t del_prev  :
     1;        /**< 1: Automatically delete the previous screen when the screen load animation is ready */
 
@@ -283,12 +279,6 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp);
  */
 lv_coord_t lv_disp_get_dpi(lv_disp_t * disp);
 
-/**
- * Get the size category of the display based on it's hor. res. and dpi.
- * @param disp pointer to a display (NULL to use the default display)
- * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE
- */
-lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp);
 
 /**
  * Set the rotation of this display.

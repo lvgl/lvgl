@@ -1,5 +1,5 @@
 CSRCS += lv_area.c
-CSRCS += lv_task.c
+CSRCS += lv_timer.c
 CSRCS += lv_fs.c
 CSRCS += lv_anim.c
 CSRCS += lv_mem.c
@@ -14,7 +14,7 @@ CSRCS += lv_utils.c
 CSRCS += lv_async.c
 CSRCS += lv_printf.c
 CSRCS += lv_bidi.c
-CSRCS += lv_debug.c
+CSRCS += lv_style.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_misc
 VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_misc

@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
+#include "../lv_misc/lv_style.h"
 #include "lv_draw_mask.h"
 
 /*********************
@@ -24,15 +25,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
-    LV_BLEND_MODE_NORMAL,
-#if LV_USE_BLEND_MODES
-    LV_BLEND_MODE_ADDITIVE,
-    LV_BLEND_MODE_SUBTRACTIVE,
-#endif
-};
-
-typedef uint8_t lv_blend_mode_t;
 
 /**********************
  * GLOBAL PROTOTYPES

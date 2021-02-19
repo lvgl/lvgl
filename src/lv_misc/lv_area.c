@@ -113,10 +113,10 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
 bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /* Get the smaller area from 'a1_p' and 'a2_p' */
-    res_p->x1 = LV_MATH_MAX(a1_p->x1, a2_p->x1);
-    res_p->y1 = LV_MATH_MAX(a1_p->y1, a2_p->y1);
-    res_p->x2 = LV_MATH_MIN(a1_p->x2, a2_p->x2);
-    res_p->y2 = LV_MATH_MIN(a1_p->y2, a2_p->y2);
+    res_p->x1 = LV_MAX(a1_p->x1, a2_p->x1);
+    res_p->y1 = LV_MAX(a1_p->y1, a2_p->y1);
+    res_p->x2 = LV_MIN(a1_p->x2, a2_p->x2);
+    res_p->y2 = LV_MIN(a1_p->y2, a2_p->y2);
 
     /*If x1 or y1 greater then x2 or y2 then the areas union is empty*/
     bool union_ok = true;
@@ -134,10 +134,10 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
  */
 void _lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
-    a_res_p->x1 = LV_MATH_MIN(a1_p->x1, a2_p->x1);
-    a_res_p->y1 = LV_MATH_MIN(a1_p->y1, a2_p->y1);
-    a_res_p->x2 = LV_MATH_MAX(a1_p->x2, a2_p->x2);
-    a_res_p->y2 = LV_MATH_MAX(a1_p->y2, a2_p->y2);
+    a_res_p->x1 = LV_MIN(a1_p->x1, a2_p->x1);
+    a_res_p->y1 = LV_MIN(a1_p->y1, a2_p->y1);
+    a_res_p->x2 = LV_MAX(a1_p->x2, a2_p->x2);
+    a_res_p->y2 = LV_MAX(a1_p->y2, a2_p->y2);
 }
 
 /**
@@ -163,7 +163,7 @@ bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coor
     }
     lv_coord_t w = lv_area_get_width(a_p) / 2;
     lv_coord_t h = lv_area_get_height(a_p) / 2;
-    lv_coord_t max_radius = LV_MATH_MIN(w, h);
+    lv_coord_t max_radius = LV_MIN(w, h);
     if(radius > max_radius)
         radius = max_radius;
 

@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 #include "lv_img_cache.h"
 #include "lv_img_decoder.h"
 #include "lv_draw_img.h"
@@ -132,8 +132,8 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_img_decoder_close(&cached_src->dec_dsc);
-        _lv_memset_00(&cached_src->dec_dsc, sizeof(lv_img_decoder_dsc_t));
-        _lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
+        lv_memset_00(&cached_src->dec_dsc, sizeof(lv_img_decoder_dsc_t));
+        lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
         cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use  */
         return NULL;
     }
@@ -170,7 +170,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
 
     /*Reallocate the cache*/
     LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(lv_img_cache_entry_t) * new_entry_cnt);
-    LV_ASSERT_MEM(LV_GC_ROOT(_lv_img_cache_array));
+    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_img_cache_array));
     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
         entry_cnt = 0;
         return;
@@ -180,8 +180,8 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     /*Clean the cache*/
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
-        _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
-        _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i], sizeof(lv_img_cache_entry_t));
+        lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+        lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i], sizeof(lv_img_cache_entry_t));
     }
 #endif
 }
@@ -193,6 +193,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
  */
 void lv_img_cache_invalidate_src(const void * src)
 {
+    LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
     lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
 
@@ -203,8 +204,8 @@ void lv_img_cache_invalidate_src(const void * src)
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
 
-            _lv_memset_00(&cache[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
-            _lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
+            lv_memset_00(&cache[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+            lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
         }
     }
 #endif

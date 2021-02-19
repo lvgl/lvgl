@@ -38,23 +38,30 @@ extern "C" {
  * Options for text rendering.
  */
 enum {
-    LV_TXT_FLAG_NONE    = 0x00,
-    LV_TXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
-    LV_TXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
-    LV_TXT_FLAG_CENTER  = 0x04, /**< Align the text to the middle*/
-    LV_TXT_FLAG_RIGHT   = 0x08, /**< Align the text to the right*/
-    LV_TXT_FLAG_FIT     = 0x10, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_NONE    = 0x00,
+    LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
+    LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
+    LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
 };
-typedef uint8_t lv_txt_flag_t;
+typedef uint8_t lv_text_flag_t;
 
 /**
  * State machine for text renderer. */
 enum {
-    LV_TXT_CMD_STATE_WAIT, /**< Waiting for command*/
-    LV_TXT_CMD_STATE_PAR,  /**< Processing the parameter*/
-    LV_TXT_CMD_STATE_IN,   /**< Processing the command*/
+    LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
+    LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
+    LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
 };
-typedef uint8_t lv_txt_cmd_state_t;
+typedef uint8_t lv_text_cmd_state_t;
+
+/** Label align policy*/
+enum {
+    LV_TEXT_ALIGN_LEFT, /**< Align text to left */
+    LV_TEXT_ALIGN_CENTER, /**< Align text to center */
+    LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
+    LV_TEXT_ALIGN_AUTO, /**<  */
+};
+typedef uint8_t lv_text_align_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -67,12 +74,12 @@ typedef uint8_t lv_txt_cmd_state_t;
  * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param line_space line space of the text
- * @param flags settings for the text from 'txt_flag_t' enum
+ * @param flags settings for the text from ::lv_text_flag_t
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
  * line breaks
  */
-void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                      lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
+                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -86,7 +93,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * they are different)
  */
 uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
-                               lv_txt_flag_t flag);
+                               lv_text_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -99,7 +106,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * @return length of a char_num long text
  */
 lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                             lv_txt_flag_t flag);
+                             lv_text_flag_t flag);
 
 /**
  * Check next character in a string and decide if the character is part of the command or not
@@ -109,7 +116,7 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
  * @return true: the character is part of a command and should not be written,
  *         false: the character should be written
  */
-bool _lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c);
+bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
 
 /**
  * Insert a string into an other

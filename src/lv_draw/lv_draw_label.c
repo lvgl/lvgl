@@ -11,7 +11,7 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_bidi.h"
-#include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -38,9 +38,10 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+#if LV_DRAW_COMPLEX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-
+#endif
 static uint8_t hex_char_to_num(char hex);
 
 /**********************
@@ -63,6 +64,7 @@ const uint8_t _lv_bpp4_opa_table[16] = {0,  17, 34,  51,  /*Opacity mapping with
                                         136, 153, 170, 187,
                                         204, 221, 238, 255
                                        };
+
 const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
                                          16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
                                          32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -91,10 +93,10 @@ const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
-    _lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = LV_COLOR_BLACK;
-    dsc->font = LV_THEME_DEFAULT_FONT_NORMAL;
+    dsc->font = LV_THEME_FONT_NORMAL;
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_color = LV_COLOR_BLACK;
@@ -109,7 +111,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param dsc pointer to draw descriptor
  * @param txt `\0` terminated text to write
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
- * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
+ * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
                                          const lv_draw_label_dsc_t * dsc,
@@ -128,14 +130,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     bool clip_ok = _lv_area_intersect(&clipped_area, coords, mask);
     if(!clip_ok) return;
 
-    if((dsc->flag & LV_TXT_FLAG_EXPAND) == 0) {
+    if((dsc->flag & LV_TEXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);
     }
     else {
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
-        _lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
+        lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
                          dsc->flag);
         w = p.x;
     }
@@ -161,7 +163,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     /*Check the hint to use the cached info*/
     if(hint && y_ofs == 0 && coords->y1 < 0) {
         /*If the label changed too much recalculate the hint.*/
-        if(LV_MATH_ABS(hint->coord_y - coords->y1) > LV_LABEL_HINT_UPDATE_TH - 2 * line_height) {
+        if(LV_ABS(hint->coord_y - coords->y1) > LV_LABEL_HINT_UPDATE_TH - 2 * line_height) {
             hint->line_start = -1;
         }
         last_line_start = hint->line_start;
@@ -193,14 +195,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     }
 
     /*Align to middle*/
-    if(dsc->flag & LV_TXT_FLAG_CENTER) {
+    if(dsc->align == LV_TEXT_ALIGN_CENTER) {
         line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
-    else if(dsc->flag & LV_TXT_FLAG_RIGHT) {
+    else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
         line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
@@ -243,7 +245,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         cmd_state = CMD_STATE_WAIT;
         i         = 0;
 #if LV_USE_BIDI
-        char * bidi_txt = _lv_mem_buf_get(line_end - line_start + 1);
+        char * bidi_txt = lv_mem_buf_get(line_end - line_start + 1);
         _lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, dsc->bidi_dir, NULL, 0);
 #else
         const char * bidi_txt = txt + line_start;
@@ -265,7 +267,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
             uint32_t letter_next = _lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the re-color command*/
-            if((dsc->flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
                         par_start = i;
@@ -287,7 +289,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
-                            _lv_memcpy_small(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            lv_memcpy_small(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r, g, b;
                             r       = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
@@ -350,7 +352,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         }
 
 #if LV_USE_BIDI
-        _lv_mem_buf_release(bidi_txt);
+        lv_mem_buf_release(bidi_txt);
         bidi_txt = NULL;
 #endif
         /*Go to next line*/
@@ -359,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         pos.x = coords->x1;
         /*Align to middle*/
-        if(dsc->flag & LV_TXT_FLAG_CENTER) {
+        if(dsc->align == LV_TEXT_ALIGN_CENTER) {
             line_width =
                 _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
@@ -367,7 +369,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         }
         /*Align to the right*/
-        else if(dsc->flag & LV_TXT_FLAG_RIGHT) {
+        else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
             line_width =
                 _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
             pos.x += lv_area_get_width(coords) - line_width;
@@ -440,9 +442,12 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
     }
 
     if(font_p->subpx) {
-        draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
-    }
-    else {
+#if LV_DRAW_COMPLEX
+    draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
+#else
+    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
+#endif
+    } else {
         draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
 }
@@ -520,7 +525,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
     lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
     uint32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : box_w * box_h;
-    lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
+    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
 
     lv_area_t fill_area;
@@ -528,15 +533,17 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     fill_area.x2 = col_end  + pos_x - 1;
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
-
+#if LV_DRAW_COMPLEX
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
+#endif
 
     uint32_t col_bit_max = 8 - bpp;
     uint32_t col_bit_row_ofs = (box_w + col_start - col_end) * bpp;
 
     for(row = row_start ; row < row_end; row++) {
+#if LV_DRAW_COMPLEX
         int32_t mask_p_start = mask_p;
-
+#endif
         bitmask = bitmask_init >> col_bit;
         for(col = col_start; col < col_end; col++) {
             /*Load the pixel's opacity into the mask*/
@@ -563,14 +570,16 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
             mask_p++;
         }
 
+#if LV_DRAW_COMPLEX
         /*Apply masks if any*/
         if(other_mask_cnt) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
                                                              lv_area_get_width(&fill_area));
             if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
-                _lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&fill_area));
+                lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&fill_area));
             }
         }
+#endif
 
         if((uint32_t) mask_p + (col_end - col_start) < mask_buf_size) {
             fill_area.y2 ++;
@@ -599,13 +608,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
         mask_p = 0;
     }
 
-    _lv_mem_buf_release(mask_buf);
+    lv_mem_buf_release(mask_buf);
 }
 
+#if LV_DRAW_COMPLEX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
-#if LV_USE_FONT_SUBPX
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;
     uint32_t bitmask;
@@ -655,11 +664,11 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     int32_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
-    int32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : g->box_w * g->box_h;
-    lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
+    int32_t mask_buf_size = box_w * box_h > _LV_MASK_BUF_MAX_SIZE ? _LV_MASK_BUF_MAX_SIZE : g->box_w * g->box_h;
+    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
 
-    lv_color_t * color_buf = _lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+    lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
@@ -772,7 +781,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
                                                              lv_area_get_width(&map_area));
             if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
-                _lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&map_area));
+                lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&map_area));
             }
         }
 
@@ -802,12 +811,10 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
         _lv_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
     }
 
-    _lv_mem_buf_release(mask_buf);
-    _lv_mem_buf_release(color_buf);
-#else
-    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
-#endif
+    lv_mem_buf_release(mask_buf);
+    lv_mem_buf_release(color_buf);
 }
+#endif
 
 /**
  * Convert a hexadecimal characters to a number (0..15)
