@@ -483,8 +483,8 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 #endif
                 uint32_t r_text = r_in_major - scale->label_gap;
                 lv_point_t p;
-                p.x = (int32_t)(((int32_t)cos_mid * r_text + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
-                p.y = (int32_t)(((int32_t)sin_mid * r_text + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
+                p.x = (int32_t)((int32_t)((int32_t)cos_mid * r_text + 127) >> LV_TRIGO_SHIFT) + p_center.x;
+                p.y = (int32_t)((int32_t)((int32_t)sin_mid * r_text + 127) >> LV_TRIGO_SHIFT) + p_center.y;
 
                 lv_draw_label_dsc_t label_dsc_tmp;
                 lv_memcpy(&label_dsc_tmp, &label_dsc, sizeof(label_dsc_tmp));
