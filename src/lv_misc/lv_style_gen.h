@@ -259,3 +259,25 @@ static inline void lv_style_set_content_line_space(lv_style_t * style, lv_coord_
 static inline void lv_style_set_content_decor(lv_style_t * style, lv_text_decor_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_DECOR, v); }
 
+static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+static inline void lv_style_set_pad_hor(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+}
+
+static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_row(style, value);
+    lv_style_set_pad_column(style, value);
+}
+

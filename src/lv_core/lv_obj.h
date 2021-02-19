@@ -204,16 +204,16 @@ enum {
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners. */
     LV_OBJ_FLAG_LAYOUTABLE      = (1 << 16), /**< Make the object position-able by the layouts */
 
-    LV_OBJ_FLAG_LAYOUT_1        = (1 << 24), /** Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_LAYOUT_2        = (1 << 25), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_1        = (1 << 23), /** Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_2        = (1 << 24), /** Custom flag, free to use by layouts*/
 
-    LV_OBJ_FLAG_WIDGET_1        = (1 << 26), /** Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_WIDGET_2        = (1 << 27), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_1        = (1 << 25), /** Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_2        = (1 << 26), /** Custom flag, free to use by widget*/
 
-    LV_OBJ_FLAG_USER_1          = (1 << 28), /** Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_2          = (1 << 29), /** Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_3          = (1 << 30), /** Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_4          = (1 << 31), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_1          = (1 << 27), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_2          = (1 << 28), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_3          = (1 << 29), /** Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_4          = (1 << 30), /** Custom flag, free to use by user*/
 };
 typedef uint32_t lv_obj_flag_t;
 

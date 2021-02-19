@@ -288,7 +288,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
         uint32_t rn;
         f = lv_fs_open(src, LV_FS_MODE_RD);
         if(f) {
-            lv_fs_res_t res = lv_fs_read(f, header, sizeof(lv_img_header_t), &rn);
+            res = lv_fs_read(f, header, sizeof(lv_img_header_t), &rn);
             lv_fs_close(f);
             if(res != LV_FS_RES_OK || rn != sizeof(lv_img_header_t)) {
                 LV_LOG_WARN("Image get info get read file header");
@@ -339,7 +339,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             LV_ASSERT_MALLOC(dsc->user_data);
             if(dsc->user_data == NULL) {
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-                lv_fs_close(&f);
+                lv_fs_close(f);
                 return LV_RES_INV;
             }
             lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
@@ -403,7 +403,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             lv_color32_t cur_color;
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
-                lv_fs_read(&user_data->f, &cur_color, sizeof(lv_color32_t), NULL);
+                lv_fs_read(user_data->f, &cur_color, sizeof(lv_color32_t), NULL);
                 user_data->palette[i] = lv_color_make(cur_color.ch.red, cur_color.ch.green, cur_color.ch.blue);
                 user_data->opa[i]     = cur_color.ch.alpha;
             }
@@ -521,7 +521,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
     }
     uint32_t btr = len * (px_size >> 3);
     uint32_t br  = 0;
-    res = lv_fs_read(&user_data->f, buf, btr, &br);
+    res = lv_fs_read(user_data->f, buf, btr, &br);
     if(res != LV_FS_RES_OK || btr != br) {
         LV_LOG_WARN("Built-in image decoder read failed");
         return LV_RES_INV;

@@ -520,3 +520,26 @@ static inline void lv_obj_set_style_content_line_space(struct _lv_obj_t * obj, u
 static inline void lv_obj_set_style_content_decor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_text_decor_t value) {
   lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_DECOR, v); }
 
+
+static inline void lv_obj_set_pad_all(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_left(obj, part, state, value);
+    lv_obj_set_style_pad_right(obj, part, state, value);
+    lv_obj_set_style_pad_top(obj, part, state, value);
+    lv_obj_set_style_pad_bottom(obj, part, state, value);
+}
+
+static inline void lv_obj_set_pad_hor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_left(obj, part, state, value);
+    lv_obj_set_style_pad_right(obj, part, state, value);
+}
+
+static inline void lv_obj_set_pad_ver(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_top(obj, part, state, value);
+    lv_obj_set_style_pad_bottom(obj, part, state, value);
+}
+
+static inline void lv_obj_set_pad_gap(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_row(obj, part, state, value);
+    lv_obj_set_style_pad_column(obj, part, state, value);
+}
+

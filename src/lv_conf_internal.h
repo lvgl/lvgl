@@ -10,12 +10,6 @@
 
 #include <stdint.h>
 
-/* Add ESP-IDF related includes */
-#if defined (ESP_PLATFORM)
-#  include "sdkconfig.h"
-#  include "esp_attr.h"
-#endif
-
 /* Handle special Kconfig options */
 #include "lv_conf_kconfig.h"
 
@@ -259,6 +253,14 @@
 #  endif
 #endif
 
+/* Maximum buffer size to allocate for rotation. Only used if software rotation is enabled in the display driver. */
+#ifndef LV_DISP_ROT_MAX_BUF
+#  ifdef CONFIG_LV_DISP_ROT_MAX_BUF
+#    define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+#  else
+#    define  LV_DISP_ROT_MAX_BUF         (10*1024)
+#  endif
+#endif
 /*-------------
  * GPU
  *-----------*/

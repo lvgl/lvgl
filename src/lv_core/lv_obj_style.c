@@ -871,8 +871,8 @@ static void trans_anim_cb(trans_t * tr, lv_anim_value_t v)
                 else value_final.ptr = tr->end_value.ptr;
                 break;
             case LV_STYLE_COLOR_FILTER_CB:
-                if(tr->start_value.func == NULL) value_final.ptr = tr->end_value.func;
-                else if(tr->end_value.func == NULL) value_final.ptr = tr->start_value.func;
+                if(tr->start_value.func == NULL) value_final.func = tr->end_value.func;
+                else if(tr->end_value.func == NULL) value_final.func = tr->start_value.func;
                 else if(v < 128) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
@@ -897,7 +897,7 @@ static void trans_anim_cb(trans_t * tr, lv_anim_value_t v)
         lv_style_value_t old_value;
         bool refr = true;
         if(lv_style_get_prop(list->styles[i].style, tr->prop, &old_value)) {
-            if(value_final.ptr == old_value.ptr && value_final.func == old_value.ptr && value_final.color.full == old_value.color.full && value_final.num == old_value.num) {
+            if(value_final.ptr == old_value.ptr && value_final.func == old_value.func && value_final.color.full == old_value.color.full && value_final.num == old_value.num) {
                 refr = false;
             }
         }

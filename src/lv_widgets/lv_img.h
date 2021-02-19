@@ -162,7 +162,7 @@ uint16_t lv_img_get_angle(lv_obj_t * obj);
  * @param img       pointer to an image object
  * @param pivot     store the rotation center here
  */
-void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot);;
+void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
 
 /**
  * Get the zoom factor of the image.

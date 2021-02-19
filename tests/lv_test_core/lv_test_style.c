@@ -1,3 +1,5 @@
+typedef int _keep_pedantic_happy;
+
 ///**
 // * @file lv_test_style.c
 // *

@@ -82,7 +82,7 @@ typedef struct _disp_drv_t {
 
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower) */
     uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display. */
-    uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+    uint32_t rotated : 3; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
 
 #if LV_COLOR_SCREEN_TRANSP
     /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
