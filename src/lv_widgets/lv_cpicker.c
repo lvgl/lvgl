@@ -76,7 +76,7 @@ static lv_area_t get_knob_area(lv_obj_t * cpicker);
 static void next_color_mode(lv_obj_t * cpicker);
 static lv_res_t double_click_reset(lv_obj_t * cpicker);
 static void refr_knob_pos(lv_obj_t * cpicker);
-static lv_color_t angle_to_mode_color(lv_obj_t * cpicker, uint16_t angle);
+static lv_color_t angle_to_mode_color_fast(lv_obj_t * cpicker, uint16_t angle);
 static uint16_t get_angle(lv_obj_t * cpicker);
 
 /**********************
@@ -434,6 +434,7 @@ bool lv_cpicker_get_knob_colored(lv_obj_t * cpicker)
  *   STATIC FUNCTIONS
  **********************/
 
+
 /**
  * Handle the drawing related tasks of the color_picker
  * @param cpicker pointer to an object
@@ -482,9 +483,9 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(cpicker, LV_CPICKER_PART_MAIN, &line_dsc);
 
-    line_dsc.width = (r * 628 / (360 / LV_CPICKER_DEF_QF)) / 100;
+    line_dsc.width = (r * 628 / (256 / LV_CPICKER_DEF_QF)) / 100;
     line_dsc.width += 2;
-    uint16_t i;
+    uint16_t i; uint32_t a = 0;
     lv_coord_t cir_w = lv_obj_get_style_scale_width(cpicker, LV_CPICKER_PART_MAIN);
 
     /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
@@ -502,14 +503,15 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
      * So make lines a little bit longer because the masking makes a more even result */
     lv_coord_t cir_w_extra = cir_w + line_dsc.width;
 
-    for(i = 0; i <= 360; i += LV_CPICKER_DEF_QF) {
-        line_dsc.color = angle_to_mode_color(cpicker, i);
-
+    for(i = 0; i <= 256; i += LV_CPICKER_DEF_QF, a += 360 * LV_CPICKER_DEF_QF) {
+        line_dsc.color = angle_to_mode_color_fast(cpicker, i);
+        uint16_t angle_trigo = (uint16_t)(a >> 8); /* i * 360 / 256 is the scale to apply, but we can skip multiplication here */
+ 
         lv_point_t p[2];
-        p[0].x = cx + (r * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[0].y = cy + (r * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-        p[1].x = cx + ((r - cir_w_extra) * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[1].y = cy + ((r - cir_w_extra) * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[0].x = cx + (r * _lv_trigo_sin(angle_trigo) >> LV_TRIGO_SHIFT);
+        p[0].y = cy + (r * _lv_trigo_sin(angle_trigo + 90) >> LV_TRIGO_SHIFT);
+        p[1].x = cx + ((r - cir_w_extra) * _lv_trigo_sin(angle_trigo) >> LV_TRIGO_SHIFT);
+        p[1].y = cy + ((r - cir_w_extra) * _lv_trigo_sin(angle_trigo + 90) >> LV_TRIGO_SHIFT);
 
         lv_draw_line(&p[0], &p[1], mask, &line_dsc);
     }
@@ -564,7 +566,7 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask)
         lv_obj_get_coords(cpicker, &rounded_edge_area);
         rounded_edge_area.x2 = rounded_edge_area.x1 + 2 * r;
 
-        bg_dsc.bg_color = angle_to_mode_color(cpicker, 0);
+        bg_dsc.bg_color = angle_to_mode_color_fast(cpicker, 0);
 
         lv_draw_rect(&rounded_edge_area, mask, &bg_dsc);
 
@@ -572,28 +574,27 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask)
         lv_obj_get_coords(cpicker, &rounded_edge_area);
         rounded_edge_area.x1 = rounded_edge_area.x2 - 2 * r;
 
-        bg_dsc.bg_color = angle_to_mode_color(cpicker, 359);
+        bg_dsc.bg_color = angle_to_mode_color_fast(cpicker, 255);
 
         lv_draw_rect(&rounded_edge_area, mask, &bg_dsc);
     }
 
     lv_coord_t grad_w = lv_area_get_width(&grad_area);
-    if(grad_w < 1) return;
-    uint16_t i_step = LV_MATH_MAX(LV_CPICKER_DEF_QF, 360 / grad_w);
+    uint16_t i_step = LV_MATH_MAX(LV_CPICKER_DEF_QF, 256 / grad_w);
     bg_dsc.radius = 0;
     bg_dsc.border_width = 0;
     bg_dsc.shadow_width = 0;
 
     uint16_t i;
-    for(i = 0; i < 360; i += i_step) {
-        bg_dsc.bg_color = angle_to_mode_color(cpicker, i);
+    for(i = 0; i < 256; i += i_step) {
+        bg_dsc.bg_color = angle_to_mode_color_fast(cpicker, i);
 
         /*the following attribute might need changing between index to add border, shadow, radius etc*/
         lv_area_t rect_area;
 
         /*scale angle (hue/sat/val) to linear coordinate*/
-        lv_coord_t xi = (i * grad_w) / 360;
-        lv_coord_t xi2 = ((i + i_step) * grad_w) / 360;
+        lv_coord_t xi = (i * grad_w) / 256;
+        lv_coord_t xi2 = ((i + i_step) * grad_w) / 256;
 
         rect_area.x1 = LV_MATH_MIN(grad_area.x1 + xi, grad_area.x1 + grad_w - i_step);
         rect_area.y1 = grad_area.y1;
@@ -875,6 +876,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     return res;
 }
 
+
 /**
  * Get the style_list descriptor of a part of the object
  * @param cpicker pointer the object
@@ -911,6 +913,7 @@ static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
     lv_cpicker_ext_t * ext = (lv_cpicker_ext_t *)lv_obj_get_ext_attr(cpicker);
     if(ext->type == LV_CPICKER_TYPE_RECT)
         return true;
+
 
     /*Valid clicks can be only in the circle*/
     if(_lv_area_is_point_on(&cpicker->coords, p, LV_RADIUS_CIRCLE)) return true;
@@ -996,23 +999,85 @@ static lv_res_t double_click_reset(lv_obj_t * cpicker)
     return LV_RES_OK;
 }
 
-static lv_color_t angle_to_mode_color(lv_obj_t * cpicker, uint16_t angle)
+#define SWAPPTR(A, B) do { uint8_t * t = A; A = B; B = t; } while(0)
+#define HSV_PTR_SWAP(sextant,r,g,b)     if((sextant) & 2) { SWAPPTR((r), (b)); } if((sextant) & 4) { SWAPPTR((g), (b)); } if(!((sextant) & 6)) { \
+                                                if(!((sextant) & 1)) { SWAPPTR((r), (g)); } } else { if((sextant) & 1) { SWAPPTR((r), (g)); } } 
+
+/* Based on the idea from https://www.vagrearg.org/content/hsvrgb
+   Here we want to compute an approximate RGB value from a HSV input color space. We don't want to be accurate 
+   (for that, there's lv_color_hsv_to_rgb), but we want to be fast.
+   
+   Few tricks are used here: Hue is in range [0; 6 * 256] (so that the sextant is in the high byte and the fractional part is in the low byte)
+   both s and v are in [0; 255] range (very convenient to avoid divisions).
+
+   We fold all symmetry by swapping the R, G, B pointers so that the code is the same for all sextants.
+   We replace division by 255 by a division by 256, a.k.a a shift right by 8 bits. 
+   This is wrong, but since this is only used to compute the pixels on the screen and not the final color, it's ok.
+ */
+static void fast_hsv2rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g , uint8_t *b);
+static void fast_hsv2rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g , uint8_t *b)
+{
+    if (!s) { *r = *g = *b = v; return; }
+
+    uint8_t sextant = h >> 8;
+    HSV_PTR_SWAP(sextant, r, g, b); /* Swap pointers so the conversion code is the same */
+
+    *g = v;     
+
+    uint8_t bb = ~s;
+    uint16_t ww = v * bb; /* Don't try to be precise, but instead, be fast */
+    *b = ww >> 8;
+
+    uint8_t h_frac = h & 0xff;
+
+    if(!(sextant & 1)) { 
+        /* Up slope */
+        ww = !h_frac ? ((uint16_t)s << 8) : (s * (uint8_t)(-h_frac)); /* Skip multiply if not required */
+    } else { 
+        /* Down slope */
+        ww = s * h_frac;
+    }
+    bb = ww >> 8;
+    bb = ~bb;
+    ww = v * bb;
+    *r = ww >> 8;
+}
+
+static lv_color_t angle_to_mode_color_fast(lv_obj_t * cpicker, uint16_t angle)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-    lv_color_t color;
+    uint8_t r = 0, g = 0, b = 0;
+    static uint16_t h = 0;
+    static uint8_t s = 0, v = 0, m = 255;
+    
     switch(ext->color_mode) {
         default:
         case LV_CPICKER_COLOR_MODE_HUE:
-            color = lv_color_hsv_to_rgb(angle % 360, ext->hsv.s, ext->hsv.v);
+            /* Don't recompute costly scaling if it does not change */
+            if (m != ext->color_mode) {
+              s = (uint8_t)(ext->hsv.s * 2.55f); v = (uint8_t)(ext->hsv.v * 2.55f);
+              m = ext->color_mode;
+            }
+            fast_hsv2rgb(angle * 6, s, v, &r, &g, &b); /* A smart compiler will replace x * 6 by (x << 2) + (x << 1) if it's more efficient */
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            color = lv_color_hsv_to_rgb(ext->hsv.h, ((angle % 360) * 100) / 360, ext->hsv.v);
+            /* Don't recompute costly scaling if it does not change */
+            if (m != ext->color_mode) {
+              h = (uint16_t)(ext->hsv.h * 4.2666667f); v = (uint8_t)(ext->hsv.v * 2.55f); /* The magical number is simply 6*256 / 360 */ 
+              m = ext->color_mode;
+            }
+            fast_hsv2rgb(h, angle, v, &r, &g, &b);
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
-            color = lv_color_hsv_to_rgb(ext->hsv.h, ext->hsv.s, ((angle % 360) * 100) / 360);
+            /* Don't recompute costly scaling if it does not change */
+            if (m != ext->color_mode) {
+              h = (uint16_t)(ext->hsv.h * 4.2666667f); s = (uint8_t)(ext->hsv.s * 2.55f);
+              m = ext->color_mode;
+            }
+            fast_hsv2rgb(h, s, angle, &r, &g, &b);
             break;
     }
-    return color;
+    return LV_COLOR_MAKE(r, g, b);
 }
 
 static uint16_t get_angle(lv_obj_t * cpicker)
