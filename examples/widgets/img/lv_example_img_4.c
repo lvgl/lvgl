@@ -1,13 +1,13 @@
 #include "../../../lvgl.h"
 #if LV_USE_IMG && LV_BUILD_EXAMPLES
 
-LV_IMG_DECLARE(img_skew_strip);
-
 /**
  * Image styling and offset
  */
 void lv_example_img_4(void)
 {
+    LV_IMG_DECLARE(img_skew_strip);
+
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_bg_color(&style, LV_COLOR_YELLOW);

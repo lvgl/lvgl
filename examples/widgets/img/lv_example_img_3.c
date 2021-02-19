@@ -1,13 +1,14 @@
 #include "../../../lvgl.h"
 #if LV_USE_IMG && LV_BUILD_EXAMPLES
 
-LV_IMG_DECLARE(img_cogwheel_argb);
 
 /**
  * Show transformations (zoom and rotation) using a pivot point.
  */
 void lv_example_img_3(void)
 {
+    LV_IMG_DECLARE(img_cogwheel_argb);
+
     /* Now create the actual image */
     lv_obj_t * img = lv_img_create(lv_scr_act(), NULL);
     lv_img_set_src(img, &img_cogwheel_argb);

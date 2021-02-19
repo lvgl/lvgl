@@ -1,10 +1,10 @@
 /**
- * @file lv_example_flex.h
+ * @file lv_example_layout.h
  *
  */
 
-#ifndef LV_EXAMPLE_FLEX_H
-#define LV_EXAMPLE_FLEX_H
+#ifndef LV_EXAMPLE_LAYOUT_H
+#define LV_EXAMPLE_LAYOUT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "flex/lv_example_flex.h"
+#include "grid/lv_example_grid.h"
 
 /*********************
  *      DEFINES
@@ -25,12 +27,6 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_flex_1(void);
-void lv_example_flex_2(void);
-void lv_example_flex_3(void);
-void lv_example_flex_4(void);
-void lv_example_flex_5(void);
-void lv_example_flex_6(void);
 
 /**********************
  *      MACROS
@@ -40,4 +36,4 @@ void lv_example_flex_6(void);
 } /* extern "C" */
 #endif
 
-#endif /*LV_EXAMPLE_FLEX_H*/
+#endif /*LV_EXAMPLE_LAYOUT_H*/

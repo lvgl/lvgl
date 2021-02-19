@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EX_GRID_H
-#define LV_EX_GRID_H
+#ifndef LV_EXAMPLE_GRID_H
+#define LV_EXAMPLE_GRID_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +25,12 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_grid_1(void);
+void lv_example_grid_2(void);
+void lv_example_grid_3(void);
+void lv_example_grid_4(void);
+void lv_example_grid_5(void);
+void lv_example_grid_6(void);
 
 /**********************
  *      MACROS
@@ -34,4 +40,4 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-#endif /*LV_EX_GRID_H*/
+#endif /*LV_EXAMPLE_GRID_H*/

@@ -30,7 +30,7 @@ void lv_example_img_2(void)
     lv_obj_align(intense_slider, blue_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
 
     /* Now create the actual image */
-    LV_IMG_DECLARE(img_cogwheel_argb);
+    LV_IMG_DECLARE(img_cogwheel_argb)
     img1 = lv_img_create(lv_scr_act(), NULL);
     lv_img_set_src(img1, &img_cogwheel_argb);
     lv_obj_align(img1, NULL, LV_ALIGN_IN_RIGHT_MID, -20, 0);

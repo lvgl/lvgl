@@ -1,3 +1,4 @@
+typedef int _keep_pedantic_happy;
 //#include "../../lv_examples.h"
 //
 ///**
