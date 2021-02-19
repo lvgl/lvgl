@@ -143,8 +143,20 @@ void lv_obj_update_layout(struct _lv_obj_t * obj, struct _lv_obj_t * item);
  * @param align     type of alignment (see 'lv_align_t' enum)
  * @param x_ofs     x coordinate offset after alignment
  * @param y_ofs     y coordinate offset after alignment
+ * @note            if the position or size of `base` changes `obj` needs to be aligned manually again
  */
 void lv_obj_align(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
+/**
+ * Align an object to the center on its parent.
+ * @param obj       pointer to an object to align
+ * @note            if the parent size changes `obj` needs to be aligned manually again
+ */
+static inline void lv_obj_center(struct _lv_obj_t * obj)
+{
+    lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
+}
+
 
 /**
  * Copy the coordinates of an object to an area
