@@ -1037,7 +1037,6 @@ void lv_label_refr_text(lv_obj_t * label)
 #ifdef LV_USE_BIDI
             lv_anim_value_t start, end;
             lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-            lv_label_ext_t* ext = lv_obj_get_ext_attr(label);
 
             if (base_dir == LV_BIDI_DIR_AUTO)
                 base_dir = _lv_bidi_detect_base_dir(ext->text);
@@ -1136,7 +1135,6 @@ void lv_label_refr_text(lv_obj_t * label)
 #ifdef LV_USE_BIDI
             lv_anim_value_t start, end;
             lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-            lv_label_ext_t* ext = lv_obj_get_ext_attr(label);
 
             if (base_dir == LV_BIDI_DIR_AUTO)
                 base_dir = _lv_bidi_detect_base_dir(ext->text);
