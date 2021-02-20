@@ -893,7 +893,7 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
      * In a general case styles could be simple `static lv_style_t my style` variables*/
     if(styles == NULL) {
         styles = lv_mem_alloc(sizeof(theme_styles_t));
-        if (styles == NULL) return NULL;
+        if(styles == NULL) return NULL;
         _lv_memset_00(styles, sizeof(theme_styles_t));
         LV_GC_ROOT(_lv_theme_material_styles) = styles;
     }

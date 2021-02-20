@@ -15,8 +15,10 @@
 - fix(draw) overlap outline with background to prevent aliasing artifacts
 - fix(indev) clear the indev's `act_obj` in `lv_indev_reset`
 - fix(text) fix out of bounds read in `_lv_txt_get_width`
+- fix(list) scroll list when button is focused using LV_KEY_NEXT/PREV
 - fix(text) improve Arabic contextual analysis by adding hyphen processing and proper handling of lam-alef sequence
 - fix(delete) delete animation after the children are deleted
+- fix(gauge) consider paddigns for needle images
 
 ## v7.10.0
 
