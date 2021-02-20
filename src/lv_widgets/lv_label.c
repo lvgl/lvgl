@@ -1132,7 +1132,7 @@ void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
-#ifdef LV_USE_BIDI
+#if LV_USE_BIDI
             lv_anim_value_t start, end;
             lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
 
