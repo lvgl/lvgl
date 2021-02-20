@@ -619,7 +619,7 @@ void lv_textarea_set_text_sel(lv_obj_t * obj, bool en)
 
     if(!en) lv_textarea_clear_selection(obj);
 #else
-    (void)ta; /*Unused*/
+    (void)obj; /*Unused*/
     (void)en; /*Unused*/
 #endif
 }
@@ -789,7 +789,7 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj)
         return false;
     }
 #else
-    (void)ta; /*Unused*/
+    (void)obj; /*Unused*/
     return false;
 #endif
 }
@@ -807,7 +807,7 @@ bool lv_textarea_get_text_sel_en(lv_obj_t * obj)
      lv_textarea_t * ta = (lv_textarea_t *) obj;
     return ta->text_sel_en;
 #else
-    (void)ta; /*Unused*/
+    (void)obj; /*Unused*/
     return false;
 #endif
 }
@@ -847,7 +847,7 @@ void lv_textarea_clear_selection(lv_obj_t * obj)
         lv_label_set_text_sel_end(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
     }
 #else
-    (void)ta; /*Unused*/
+    (void)obj; /*Unused*/
 #endif
 }
 

@@ -339,6 +339,8 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     else if(start_angle >= 180 && start_angle < 360) {
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
+    else
+        start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /* silence compiler */
 
     LV_ASSERT_MSG(end_angle >= 0 && start_angle <= 360, "Unexpected end angle");
 
@@ -348,6 +350,8 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     else if(end_angle >= 180 && end_angle < 360) {
         end_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
+    else
+        end_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /* silence compiler */
 
     lv_draw_mask_line_angle_init(&param->start_line, vertex_x, vertex_y, start_angle, start_side);
     lv_draw_mask_line_angle_init(&param->end_line, vertex_x, vertex_y, end_angle, end_side);

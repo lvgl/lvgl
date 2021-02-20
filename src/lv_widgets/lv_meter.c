@@ -123,9 +123,9 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
     indic->opa = LV_OPA_COVER;
 
     indic->type = LV_METER_INDICATOR_TYPE_NEEDLE_LINE;
-    indic->needle_line.width = width;
-    indic->needle_line.color = color;
-    indic->needle_line.r_mod = r_mod;
+    indic->type_data.needle_line.width = width;
+    indic->type_data.needle_line.color = color;
+    indic->type_data.needle_line.r_mod = r_mod;
     lv_obj_invalidate(obj);
 
     return indic;
@@ -139,9 +139,9 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
     indic->opa = LV_OPA_COVER;
 
     indic->type = LV_METER_INDICATOR_TYPE_NEEDLE_IMG;
-    indic->needle_img.src = src;
-    indic->needle_img.pivot.x = pivot_x;
-    indic->needle_img.pivot.y = pivot_y;
+    indic->type_data.needle_img.src = src;
+    indic->type_data.needle_img.pivot.x = pivot_x;
+    indic->type_data.needle_img.pivot.y = pivot_y;
     lv_obj_invalidate(obj);
 
     return indic;
@@ -155,9 +155,9 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale
     indic->opa = LV_OPA_COVER;
 
     indic->type = LV_METER_INDICATOR_TYPE_ARC;
-    indic->arc.width = width;
-    indic->arc.color = color;
-    indic->arc.r_mod = r_mod;
+    indic->type_data.arc.width = width;
+    indic->type_data.arc.color = color;
+    indic->type_data.arc.r_mod = r_mod;
 
     lv_obj_invalidate(obj);
     return indic;
@@ -171,10 +171,10 @@ lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t
     indic->opa = LV_OPA_COVER;
 
     indic->type = LV_METER_INDICATOR_TYPE_SCALE_LINES;
-    indic->scale_lines.color_start = color_start;
-    indic->scale_lines.color_end = color_end;
-    indic->scale_lines.local_grad = local;
-    indic->scale_lines.width_mod = width_mod;
+    indic->type_data.scale_lines.color_start = color_start;
+    indic->type_data.scale_lines.color_end = color_end;
+    indic->type_data.scale_lines.local_grad = local;
+    indic->type_data.scale_lines.width_mod = width_mod;
 
     lv_obj_invalidate(obj);
     return indic;
@@ -316,13 +316,13 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
         _LV_LL_READ(&scale->indicator_ll, indic) {
             if(indic->type != LV_METER_INDICATOR_TYPE_ARC) continue;
 
-            arc_dsc.color = indic->arc.color;
-            arc_dsc.width = indic->arc.width;
+            arc_dsc.color = indic->type_data.arc.color;
+            arc_dsc.width = indic->type_data.arc.width;
             arc_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
 
             int32_t start_angle = lv_map(indic->start_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
             int32_t end_angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
-            lv_draw_arc(scale_center.x, scale_center.y, r_out + indic->arc.r_mod, start_angle, end_angle, clip_area, &arc_dsc);
+            lv_draw_arc(scale_center.x, scale_center.y, r_out + indic->type_data.arc.r_mod, start_angle, end_angle, clip_area, &arc_dsc);
         }
     }
 }
@@ -415,18 +415,18 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             _LV_LL_READ(&scale->indicator_ll, indic) {
                 if(indic->type != LV_METER_INDICATOR_TYPE_SCALE_LINES) continue;
                 if(value_of_line >= indic->start_value && value_of_line <= indic->end_value) {
-                    line_width += indic->scale_lines.width_mod;
+                    line_width += indic->type_data.scale_lines.width_mod;
 
-                    if(indic->scale_lines.color_start.full == indic->scale_lines.color_end.full) {
-                        line_color = indic->scale_lines.color_start;
+                    if(indic->type_data.scale_lines.color_start.full == indic->type_data.scale_lines.color_end.full) {
+                        line_color = indic->type_data.scale_lines.color_start;
                     } else {
                         lv_opa_t ratio;
-                        if(indic->scale_lines.local_grad) {
+                        if(indic->type_data.scale_lines.local_grad) {
                             ratio = lv_map(value_of_line, indic->start_value, indic->end_value, LV_OPA_TRANSP, LV_OPA_COVER);
                         } else {
                             ratio = lv_map(value_of_line, scale->min, scale->max, LV_OPA_TRANSP, LV_OPA_COVER);
                         }
-                        line_color = lv_color_mix(indic->scale_lines.color_end, indic->scale_lines.color_start, ratio);
+                        line_color = lv_color_mix(indic->type_data.scale_lines.color_end, indic->type_data.scale_lines.color_start, ratio);
                     }
                 }
             }
@@ -545,12 +545,12 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
         _LV_LL_READ_BACK(&scale->indicator_ll, indic) {
             if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_LINE) {
                 int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
-                lv_coord_t r_out = r_edge + scale->r_mod + indic->needle_line.r_mod;
+                lv_coord_t r_out = r_edge + scale->r_mod + indic->type_data.needle_line.r_mod;
                 lv_point_t p_end;
                 p_end.y = (lv_trigo_sin(angle) * (r_out)) / LV_TRIGO_SIN_MAX + scale_center.y;
                 p_end.x = (lv_trigo_cos(angle) * (r_out)) / LV_TRIGO_SIN_MAX + scale_center.x;
-                line_dsc.color = indic->needle_line.color;
-                line_dsc.width = indic->needle_line.width;
+                line_dsc.color = indic->type_data.needle_line.color;
+                line_dsc.width = indic->type_data.needle_line.width;
                 line_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
                 lv_draw_line(&scale_center, &p_end, clip_area, &line_dsc);
 
@@ -558,20 +558,20 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
             else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
                 int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
                 lv_img_header_t info;
-                lv_img_decoder_get_info(indic->needle_img.src, &info);
+                lv_img_decoder_get_info(indic->type_data.needle_img.src, &info);
                 lv_area_t a;
-                a.x1 = scale_center.x - indic->needle_img.pivot.x;
-                a.y1 = scale_center.y - indic->needle_img.pivot.y;
+                a.x1 = scale_center.x - indic->type_data.needle_img.pivot.x;
+                a.y1 = scale_center.y - indic->type_data.needle_img.pivot.y;
                 a.x2 = a.x1 + info.w - 1;
                 a.y2 = a.y1 + info.h - 1;
 
                 img_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
-                img_dsc.pivot.x = indic->needle_img.pivot.x;
-                img_dsc.pivot.y = indic->needle_img.pivot.y;
+                img_dsc.pivot.x = indic->type_data.needle_img.pivot.x;
+                img_dsc.pivot.y = indic->type_data.needle_img.pivot.y;
                 angle = angle * 10;
                 if(angle > 3600) angle -= 3600;
                 img_dsc.angle = angle;
-                lv_draw_img(&a, clip_area, indic->needle_img.src, &img_dsc);
+                lv_draw_img(&a, clip_area, indic->type_data.needle_img.src, &img_dsc);
             }
         }
     }

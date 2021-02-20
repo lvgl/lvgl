@@ -207,6 +207,28 @@ void lv_obj_fade_out(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
 
 #include "lv_obj_style_gen.h"
 
+static inline void lv_obj_set_pad_all(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_left(obj, part, state, value);
+    lv_obj_set_style_pad_right(obj, part, state, value);
+    lv_obj_set_style_pad_top(obj, part, state, value);
+    lv_obj_set_style_pad_bottom(obj, part, state, value);
+}
+
+static inline void lv_obj_set_pad_hor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_left(obj, part, state, value);
+    lv_obj_set_style_pad_right(obj, part, state, value);
+}
+
+static inline void lv_obj_set_pad_ver(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_top(obj, part, state, value);
+    lv_obj_set_style_pad_bottom(obj, part, state, value);
+}
+
+static inline void lv_obj_set_pad_gap(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
+    lv_obj_set_style_pad_row(obj, part, state, value);
+    lv_obj_set_style_pad_column(obj, part, state, value);
+}
+
 /**********************
  *      MACROS
  **********************/
