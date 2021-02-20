@@ -1,5 +1,14 @@
 # Changelog
 
+## v7.11.0 (Planned for 19.02.2021)
+
+### New features
+- Add better screen orientation management with software rotation support
+
+### Bugfixes
+- fix(gauge) fix needle invalidation
+- fix(bar) correct symmetric handling for vertical sliders
+
 ## v7.10.1 (Planned for 16.02.2021)
 
 ### Bugfixes
