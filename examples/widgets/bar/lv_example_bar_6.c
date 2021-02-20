@@ -1,6 +1,11 @@
 #include "../../../lvgl.h"
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
+static void set_value(lv_obj_t *bar, lv_anim_value_t v)
+{
+    lv_bar_set_value(bar, v, LV_ANIM_OFF);
+}
+
 static void event_cb(lv_obj_t * obj, lv_event_t e)
 {
     if(e == LV_EVENT_DRAW_POST_END) {
@@ -57,7 +62,7 @@ void lv_example_bar_6(void)
     lv_anim_init(&a);
     lv_anim_set_var(&a, bar);
     lv_anim_set_values(&a, 0, 100);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_bar_set_value);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) set_value);
     lv_anim_set_time(&a, 2000);
     lv_anim_set_playback_time(&a, 2000);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);

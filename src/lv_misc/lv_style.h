@@ -254,13 +254,9 @@ typedef struct {
     /* If there is only one property store it directly.
      * For more properties allocate an array */
     union {
-        struct {
-            lv_style_value_t value1;
-        };
-        struct {
-            uint8_t * values_and_props;
-        };
-    };
+        lv_style_value_t value1;
+        uint8_t * values_and_props;
+    } v_p;
 
     uint16_t prop1;
     uint8_t has_group;
@@ -369,6 +365,29 @@ bool lv_style_is_empty(const lv_style_t * style);
 uint8_t _lv_style_get_prop_group(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
+
+static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+static inline void lv_style_set_pad_hor(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+}
+
+static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_pad_row(style, value);
+    lv_style_set_pad_column(style, value);
+}
+
 
 /*************************
  *    GLOBAL VARIABLES
