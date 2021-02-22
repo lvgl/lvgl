@@ -30,7 +30,6 @@ extern "C" {
     f(lv_ll_t, _lv_disp_ll)  /*Linked list of screens*/            \
     f(lv_ll_t, _lv_indev_ll) /*Linked list of input device*/       \
     f(lv_ll_t, _lv_drv_ll)                                         \
-    f(lv_ll_t, _lv_file_ll)                                        \
     f(lv_ll_t, _lv_anim_ll)                                        \
     f(lv_ll_t, _lv_group_ll)                                       \
     f(lv_ll_t, _lv_img_defoder_ll)                                 \
@@ -40,8 +39,6 @@ extern "C" {
     f(lv_mem_buf_arr_t , lv_mem_buf)                              \
     f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)              \
     f(void * , _lv_theme_default_styles)                          \
-    f(void * , _lv_theme_mono_styles)                              \
-    f(void * , _lv_theme_empty_styles)                             \
     f(uint8_t *, _lv_font_decompr_buf)                             \
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
