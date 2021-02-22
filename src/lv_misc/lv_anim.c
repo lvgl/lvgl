@@ -369,7 +369,6 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
     }
 
     if(t > 1024) t = 1024;
-    if(t < 0) t = 0;
 
 
     int32_t step = _lv_bezier3(t, 1024, 800, 500, 0);
