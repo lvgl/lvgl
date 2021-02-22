@@ -39,6 +39,7 @@ static void inf_normalize(lv_obj_t * obj_scrl);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 static lv_coord_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_ready_cb(lv_anim_t * a);
+static void set_y_anim(void * obj, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -476,7 +477,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_PRESSED) {
         roller->moved = 0;
-        lv_anim_del(get_label(obj), (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_del(get_label(obj), set_y_anim);
     }
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
@@ -616,7 +617,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_coord_t new_y = mid_y1 - sel_y1;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
-        lv_anim_del(label, (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_del(label, set_y_anim);
         lv_obj_set_y(label, new_y);
     }
     else {
@@ -626,7 +627,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_set_exec_cb(&a, set_y_anim);
         lv_anim_set_values(&a, lv_obj_get_y(label), new_y);
         lv_anim_set_time(&a, anim_time);
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
@@ -764,4 +765,11 @@ static void scroll_anim_ready_cb(lv_anim_t * a)
     lv_obj_t * obj = lv_obj_get_parent(a->var); /*The label is animated*/
     inf_normalize(obj);
 }
+
+
+static void set_y_anim(void * obj, int32_t v)
+{
+    lv_obj_set_y(obj, v);
+}
+
 #endif

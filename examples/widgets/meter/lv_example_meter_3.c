@@ -3,7 +3,7 @@
 
 static lv_obj_t * meter;
 
-static void set_value(lv_meter_indicator_t * indic, int32_t v)
+static void set_value(void * indic, int32_t v)
 {
     lv_meter_set_indicator_end_value(meter, indic, v);
 }
@@ -38,7 +38,7 @@ void lv_example_meter_3(void)
     /*Create an animation to set the value*/
     lv_anim_t a;
     lv_anim_init(&a);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) set_value);
+    lv_anim_set_exec_cb(&a, set_value);
     lv_anim_set_values(&a, 0, 60);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_time(&a, 2000);     /*2 sec for 1 turn of the minute hand (1 hour)*/

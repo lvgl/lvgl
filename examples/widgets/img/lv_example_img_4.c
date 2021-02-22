@@ -1,6 +1,11 @@
 #include "../../../lvgl.h"
 #if LV_USE_IMG && LV_BUILD_EXAMPLES
 
+static void ofs_y_anim(void * img, int32_t v)
+{
+    lv_img_set_offset_y(img, v);
+}
+
 /**
  * Image styling and offset
  */
@@ -24,7 +29,7 @@ void lv_example_img_4(void)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, img);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_img_set_offset_y);
+    lv_anim_set_exec_cb(&a, ofs_y_anim);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_time(&a, 3000);
     lv_anim_set_playback_time(&a, 500);

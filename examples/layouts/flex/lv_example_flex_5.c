@@ -1,12 +1,12 @@
 #include "../../../lvgl.h"
 #if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
-static void row_gap_anim(lv_obj_t * obj, int32_t v)
+static void row_gap_anim(void * obj, int32_t v)
 {
     lv_obj_set_style_pad_row(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
 }
 
-static void column_gap_anim(lv_obj_t * obj, int32_t v)
+static void column_gap_anim(void * obj, int32_t v)
 {
     lv_obj_set_style_pad_column(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
 }
@@ -37,12 +37,12 @@ void lv_example_flex_5(void)
     lv_anim_set_values(&a, 0, 10);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) row_gap_anim);
+    lv_anim_set_exec_cb(&a, row_gap_anim);
     lv_anim_set_time(&a, 500);
     lv_anim_set_playback_time(&a, 500);
     lv_anim_start(&a);
 
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) column_gap_anim);
+    lv_anim_set_exec_cb(&a, column_gap_anim);
     lv_anim_set_time(&a, 3000);
     lv_anim_set_playback_time(&a, 3000);
     lv_anim_start(&a);

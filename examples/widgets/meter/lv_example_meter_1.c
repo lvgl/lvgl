@@ -3,7 +3,7 @@
 
 static lv_obj_t * meter;
 
-static void set_value(lv_meter_indicator_t * indic, int32_t v)
+static void set_value(void * indic, int32_t v)
 {
     lv_meter_set_indicator_value(meter, indic, v);
 }
@@ -39,7 +39,7 @@ void lv_example_meter_1(void)
     /*Create an animation to set the value*/
     lv_anim_t a;
     lv_anim_init(&a);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) set_value);
+    lv_anim_set_exec_cb(&a, set_value);
     lv_anim_set_var(&a, indic);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_time(&a, 2000);

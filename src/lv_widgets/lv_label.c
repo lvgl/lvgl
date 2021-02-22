@@ -42,13 +42,12 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area
 static void lv_label_refr_text(lv_obj_t * obj);
 static void lv_label_revert_dots(lv_obj_t * label);
 
-static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
-static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
-
 static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint32_t len);
 static char * lv_label_get_dot_tmp(lv_obj_t * label);
 static void lv_label_dot_tmp_free(lv_obj_t * label);
 static void get_txt_coords(const lv_obj_t * label, lv_area_t * area);
+static void set_ofs_x_anim(void * obj, int32_t v);
+static void set_ofs_y_anim(void * obj, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -194,10 +193,8 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     lv_label_t * label = (lv_label_t *)obj;
 
     /*Delete the old animation (if exists)*/
-    lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_obj_set_x);
-    lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_obj_set_y);
-    lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
-    lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+    lv_anim_del(obj, set_ofs_x_anim);
+    lv_anim_del(obj, set_ofs_y_anim);
     label->offset.x = 0;
     label->offset.y = 0;
 
@@ -917,11 +914,11 @@ static void lv_label_refr_text(lv_obj_t * obj)
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
             lv_anim_set_values(&a, 0, lv_area_get_width(&txt_coords) - size.x);
-            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            lv_anim_set_exec_cb(&a, set_ofs_x_anim);
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
             lv_anim_set_playback_time(&a, a.time);
 
-            lv_anim_t * anim_cur = lv_anim_get(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = 0;
             bool playback_now = false;
             if(anim_cur) {
@@ -946,17 +943,17 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            lv_anim_del(obj, set_ofs_x_anim);
             label->offset.x = 0;
         }
 
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
             lv_anim_set_values(&a, 0, lv_area_get_height(&txt_coords) - size.y - (lv_font_get_line_height(font)));
-            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            lv_anim_set_exec_cb(&a, set_ofs_y_anim);
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
             lv_anim_set_playback_time(&a, a.time);
 
-            lv_anim_t * anim_cur = lv_anim_get(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = 0;
             bool playback_now = false;
             if(anim_cur) {
@@ -980,7 +977,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            lv_anim_del(obj, set_ofs_y_anim);
             label->offset.y = 0;
         }
     }
@@ -996,10 +993,10 @@ static void lv_label_refr_text(lv_obj_t * obj)
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
-            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            lv_anim_set_exec_cb(&a, set_ofs_x_anim);
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
 
-            lv_anim_t * anim_cur = lv_anim_get(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
             if(act_time < a.time) {
                 a.act_time = act_time;      /*To keep the old position*/
@@ -1011,16 +1008,16 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            lv_anim_del(obj, set_ofs_x_anim);
             label->offset.x = 0;
         }
 
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
             lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height(font)));
-            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            lv_anim_set_exec_cb(&a, set_ofs_y_anim);
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
 
-            lv_anim_t * anim_cur = lv_anim_get(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
             if(act_time < a.time) {
                 a.act_time = act_time;      /*To keep the old position*/
@@ -1031,7 +1028,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            lv_anim_del(obj, set_ofs_y_anim);
             label->offset.y = 0;
         }
     }
@@ -1125,20 +1122,6 @@ static void lv_label_revert_dots(lv_obj_t * obj)
     label->dot_end = LV_LABEL_DOT_END_INV;
 }
 
-static void lv_label_set_offset_x(lv_obj_t * obj, lv_coord_t x)
-{
-    lv_label_t * label = (lv_label_t *)obj;
-    label->offset.x        = x;
-    lv_obj_invalidate(obj);
-}
-
-static void lv_label_set_offset_y(lv_obj_t * obj, lv_coord_t y)
-{
-    lv_label_t * label = (lv_label_t *)obj;
-    label->offset.y        = y;
-    lv_obj_invalidate(obj);
-}
-
 /**
  * Store `len` characters from `data`. Allocates space if necessary.
  *
@@ -1215,5 +1198,21 @@ static void get_txt_coords(const lv_obj_t * obj, lv_area_t * area)
     area->y1 += top;
     area->y2 -= bottom;
 }
+
+
+static void set_ofs_x_anim(void * obj, int32_t v)
+{
+    lv_label_t * label = (lv_label_t *)obj;
+    label->offset.x    = v;
+    lv_obj_invalidate(obj);
+}
+
+static void set_ofs_y_anim(void * obj, int32_t v)
+{
+    lv_label_t * label = (lv_label_t *)obj;
+    label->offset.y    = v;
+    lv_obj_invalidate(obj);
+}
+
 
 #endif
