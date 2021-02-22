@@ -207,7 +207,7 @@ uint16_t lv_anim_count_running(void)
  * @param end end value of the animation
  * @return the required time [ms] for the animation with the given parameters
  */
-uint32_t lv_anim_speed_to_time(uint32_t speed, lv_anim_value_t start, lv_anim_value_t end)
+uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
 {
     uint32_t d    = LV_ABS(start - end);
     uint32_t time = (d * 1000) / speed;
@@ -235,7 +235,7 @@ void lv_anim_refr_now(void)
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 
@@ -257,7 +257,7 @@ lv_anim_value_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 
@@ -279,7 +279,7 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 
@@ -300,7 +300,7 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 
@@ -321,7 +321,7 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 
@@ -343,7 +343,7 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 
@@ -402,7 +402,7 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
  * @param a pointer to an animation
  * @return the current value to set
  */
-lv_anim_value_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t * a)
 {
     LV_UNUSED(path);
 

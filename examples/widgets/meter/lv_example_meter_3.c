@@ -3,7 +3,7 @@
 
 static lv_obj_t * meter;
 
-static void set_value(lv_meter_indicator_t * indic, lv_anim_value_t v)
+static void set_value(lv_meter_indicator_t * indic, int32_t v)
 {
     lv_meter_set_indicator_end_value(meter, indic, v);
 }

@@ -23,7 +23,7 @@
  **********************/
 
 static void scr_load_anim_start(lv_anim_t * a);
-static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
+static void opa_scale_anim(lv_obj_t * obj, int32_t v);
 static void scr_anim_ready(lv_anim_t * a);
 
 /**********************
@@ -377,7 +377,7 @@ static void scr_load_anim_start(lv_anim_t * a)
     lv_disp_load_scr(a->var);
 }
 
-static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
+static void opa_scale_anim(lv_obj_t * obj, int32_t v)
 {
     lv_obj_set_style_opa(obj, LV_PART_MAIN, LV_STATE_DEFAULT, v);
 }

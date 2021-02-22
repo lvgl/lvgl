@@ -1,12 +1,12 @@
 #include "../../../lvgl.h"
 #if LV_USE_IMG && LV_BUILD_EXAMPLES
 
-static void set_angle(void * img, lv_anim_value_t v)
+static void set_angle(void * img, int32_t v)
 {
     lv_img_set_angle(img, v);
 }
 
-static void set_zoom(void * img, lv_anim_value_t v)
+static void set_zoom(void * img, int32_t v)
 {
     lv_img_set_zoom(img, v);
 }

@@ -28,8 +28,8 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v);
-static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
+static void scroll_anim_x_cb(lv_obj_t * obj, int32_t v);
+static void scroll_anim_y_cb(lv_obj_t * obj, int32_t v);
 static void scroll_anim_ready_cb(lv_anim_t * a);
 
 /**********************
@@ -390,12 +390,12 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
  *   STATIC FUNCTIONS
  **********************/
 
-static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v)
+static void scroll_anim_x_cb(lv_obj_t * obj, int32_t v)
 {
     _lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
 }
 
-static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v)
+static void scroll_anim_y_cb(lv_obj_t * obj, int32_t v)
 {
     _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }

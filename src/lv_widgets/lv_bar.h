@@ -39,9 +39,9 @@ typedef uint8_t lv_bar_type_t;
 
 typedef struct {
     lv_obj_t * bar;
-    lv_anim_value_t anim_start;
-    lv_anim_value_t anim_end;
-    lv_anim_value_t anim_state;
+    int32_t anim_start;
+    int32_t anim_end;
+    int32_t anim_state;
 } lv_bar_anim_t;
 
 typedef struct {

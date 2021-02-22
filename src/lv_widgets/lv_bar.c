@@ -53,7 +53,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
-static void lv_bar_anim(lv_bar_anim_t * bar, lv_anim_value_t value);
+static void lv_bar_anim(lv_bar_anim_t * bar, int32_t value);
 static void lv_bar_anim_ready(lv_anim_t * a);
 
 /**********************
@@ -497,7 +497,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-static void lv_bar_anim(lv_bar_anim_t * var, lv_anim_value_t value)
+static void lv_bar_anim(lv_bar_anim_t * var, int32_t value)
 {
     var->anim_state    = value;
     lv_obj_invalidate(var->bar);

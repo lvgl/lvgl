@@ -20,8 +20,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void arc_anim_start_angle(void * obj, lv_anim_value_t v);
-static void arc_anim_end_angle(void * obj, lv_anim_value_t v);
+static void arc_anim_start_angle(void * obj, int32_t v);
+static void arc_anim_end_angle(void * obj, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -82,13 +82,13 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
  *   STATIC FUNCTIONS
  **********************/
 
-static void arc_anim_start_angle(void * obj, lv_anim_value_t v)
+static void arc_anim_start_angle(void * obj, int32_t v)
 {
     lv_arc_set_start_angle(obj, (uint16_t) v);
 }
 
 
-static void arc_anim_end_angle(void * obj, lv_anim_value_t v)
+static void arc_anim_end_angle(void * obj, int32_t v)
 {
     lv_arc_set_end_angle(obj, (uint16_t) v);
 }
