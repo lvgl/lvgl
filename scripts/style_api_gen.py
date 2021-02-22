@@ -99,16 +99,23 @@ def obj_style_get(i):
   print("  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + props[i]['name'] + "); return " + cast + " v." + props[i]['style_type'] + "; }")
   print("")   
   
-  
+def get_func_cast(style):
+  func_cast = ""
+  if style['style_type'] == 'func':
+    func_cast =  "(void (*)(void))"
+  elif style['style_type'] == 'num':
+    func_cast = "(int32_t)"
+  return func_cast
+
 def style_set(i):
   print("static inline void lv_style_set_" + props[i]['name'].lower() +"(lv_style_t * style, "+ props[i]['var_type'] +" value) {")
-  func_cast = "(void (*)(void))" if props[i]['style_type'] == 'func' else ""
+  func_cast = get_func_cast(props[i])
   print("  lv_style_value_t v = {." + props[i]['style_type'] +" = " + func_cast + "value}; lv_style_set_prop(style, LV_STYLE_" + props[i]['name'] +", v); }")
   print("")
 
 def local_style_set(i):
   print("static inline void lv_obj_set_style_" + props[i]['name'].lower() + "(struct _lv_obj_t * obj, uint32_t part, uint32_t state, " + props[i]['var_type'] +" value) {")
-  func_cast = "(void (*)(void))" if props[i]['style_type'] == 'func' else ""
+  func_cast = get_func_cast(props[i])
   print("  lv_style_value_t v = {." + props[i]['style_type'] +" = " + func_cast + "value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + props[i]['name'] +", v); }")
   print("")
 

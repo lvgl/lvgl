@@ -61,7 +61,7 @@ typedef struct {
             lv_color_t color_end;
             uint8_t local_grad  :1;
         }scale_lines;
-    };
+    } type_data;
 }lv_meter_indicator_t;
 
 typedef struct {

@@ -260,61 +260,61 @@ static inline lv_text_decor_t lv_obj_get_style_content_decor(const struct _lv_ob
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_DECOR); return (lv_text_decor_t) v.num; }
 
 static inline void lv_obj_set_style_radius(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_RADIUS, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_RADIUS, v); }
 
 static inline void lv_obj_set_style_clip_corner(struct _lv_obj_t * obj, uint32_t part, uint32_t state, bool value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CLIP_CORNER, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CLIP_CORNER, v); }
 
 static inline void lv_obj_set_style_transform_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_WIDTH, v); }
 
 static inline void lv_obj_set_style_transform_height(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_HEIGHT, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_HEIGHT, v); }
 
 static inline void lv_obj_set_style_transform_zoom(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_ZOOM, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_ZOOM, v); }
 
 static inline void lv_obj_set_style_transform_angle(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_ANGLE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSFORM_ANGLE, v); }
 
 static inline void lv_obj_set_style_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OPA, v); }
 
 static inline void lv_obj_set_style_color_filter_cb(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_filter_cb_t value) {
   lv_style_value_t v = {.func = (void (*)(void))value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_COLOR_FILTER_CB, v); }
 
 static inline void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_COLOR_FILTER_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_COLOR_FILTER_OPA, v); }
 
 static inline void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t part, uint32_t state, uint32_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ANIM_TIME, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ANIM_TIME, v); }
 
 static inline void lv_obj_set_style_transition(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const lv_style_transition_dsc_t * value) {
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TRANSITION, v); }
 
 static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SIZE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SIZE, v); }
 
 static inline void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_blend_mode_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BLEND_MODE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BLEND_MODE, v); }
 
 static inline void lv_obj_set_style_pad_top(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_TOP, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_TOP, v); }
 
 static inline void lv_obj_set_style_pad_bottom(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_BOTTOM, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_BOTTOM, v); }
 
 static inline void lv_obj_set_style_pad_left(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_LEFT, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_LEFT, v); }
 
 static inline void lv_obj_set_style_pad_right(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_RIGHT, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_RIGHT, v); }
 
 static inline void lv_obj_set_style_pad_row(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_ROW, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_ROW, v); }
 
 static inline void lv_obj_set_style_pad_column(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_COLUMN, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_PAD_COLUMN, v); }
 
 static inline void lv_obj_set_style_bg_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_COLOR, v); }
@@ -323,7 +323,7 @@ static inline void lv_obj_set_style_bg_color_filtered(struct _lv_obj_t * obj, ui
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_bg_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_OPA, v); }
 
 static inline void lv_obj_set_style_bg_grad_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_GRAD_COLOR, v); }
@@ -332,19 +332,19 @@ static inline void lv_obj_set_style_bg_grad_color_filtered(struct _lv_obj_t * ob
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_GRAD_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_bg_grad_dir(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_grad_dir_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_GRAD_DIR, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_GRAD_DIR, v); }
 
 static inline void lv_obj_set_style_bg_main_stop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_MAIN_STOP, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_MAIN_STOP, v); }
 
 static inline void lv_obj_set_style_bg_grad_stop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_GRAD_STOP, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_GRAD_STOP, v); }
 
 static inline void lv_obj_set_style_bg_img_src(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const void * value) {
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_SRC, v); }
 
 static inline void lv_obj_set_style_bg_img_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_OPA, v); }
 
 static inline void lv_obj_set_style_bg_img_recolor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_RECOLOR, v); }
@@ -353,10 +353,10 @@ static inline void lv_obj_set_style_bg_img_recolor_filtered(struct _lv_obj_t * o
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_RECOLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_bg_img_recolor_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_RECOLOR_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_RECOLOR_OPA, v); }
 
 static inline void lv_obj_set_style_bg_img_tiled(struct _lv_obj_t * obj, uint32_t part, uint32_t state, bool value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_TILED, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BG_IMG_TILED, v); }
 
 static inline void lv_obj_set_style_border_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_COLOR, v); }
@@ -365,16 +365,16 @@ static inline void lv_obj_set_style_border_color_filtered(struct _lv_obj_t * obj
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_border_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_OPA, v); }
 
 static inline void lv_obj_set_style_border_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_WIDTH, v); }
 
 static inline void lv_obj_set_style_border_side(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_border_side_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_SIDE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_SIDE, v); }
 
 static inline void lv_obj_set_style_border_post(struct _lv_obj_t * obj, uint32_t part, uint32_t state, bool value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_POST, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_BORDER_POST, v); }
 
 static inline void lv_obj_set_style_text_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_COLOR, v); }
@@ -383,25 +383,25 @@ static inline void lv_obj_set_style_text_color_filtered(struct _lv_obj_t * obj, 
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_text_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_OPA, v); }
 
 static inline void lv_obj_set_style_text_font(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const lv_font_t * value) {
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_FONT, v); }
 
 static inline void lv_obj_set_style_text_letter_space(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_LETTER_SPACE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_LETTER_SPACE, v); }
 
 static inline void lv_obj_set_style_text_line_space(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_LINE_SPACE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_LINE_SPACE, v); }
 
 static inline void lv_obj_set_style_text_decor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_text_decor_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_DECOR, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_DECOR, v); }
 
 static inline void lv_obj_set_style_text_align(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_text_align_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_ALIGN, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_TEXT_ALIGN, v); }
 
 static inline void lv_obj_set_style_img_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_IMG_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_IMG_OPA, v); }
 
 static inline void lv_obj_set_style_img_recolor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_IMG_RECOLOR, v); }
@@ -410,10 +410,10 @@ static inline void lv_obj_set_style_img_recolor_filtered(struct _lv_obj_t * obj,
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_IMG_RECOLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_img_recolor_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_IMG_RECOLOR_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_IMG_RECOLOR_OPA, v); }
 
 static inline void lv_obj_set_style_outline_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_WIDTH, v); }
 
 static inline void lv_obj_set_style_outline_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_COLOR, v); }
@@ -422,22 +422,22 @@ static inline void lv_obj_set_style_outline_color_filtered(struct _lv_obj_t * ob
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_outline_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_OPA, v); }
 
 static inline void lv_obj_set_style_outline_pad(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_PAD, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OUTLINE_PAD, v); }
 
 static inline void lv_obj_set_style_shadow_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_WIDTH, v); }
 
 static inline void lv_obj_set_style_shadow_ofs_x(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_OFS_X, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_OFS_X, v); }
 
 static inline void lv_obj_set_style_shadow_ofs_y(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_OFS_Y, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_OFS_Y, v); }
 
 static inline void lv_obj_set_style_shadow_spread(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_SPREAD, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_SPREAD, v); }
 
 static inline void lv_obj_set_style_shadow_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_COLOR, v); }
@@ -446,19 +446,19 @@ static inline void lv_obj_set_style_shadow_color_filtered(struct _lv_obj_t * obj
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_shadow_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_SHADOW_OPA, v); }
 
 static inline void lv_obj_set_style_line_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_WIDTH, v); }
 
 static inline void lv_obj_set_style_line_dash_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_DASH_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_DASH_WIDTH, v); }
 
 static inline void lv_obj_set_style_line_dash_gap(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_DASH_GAP, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_DASH_GAP, v); }
 
 static inline void lv_obj_set_style_line_rounded(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_ROUNDED, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_ROUNDED, v); }
 
 static inline void lv_obj_set_style_line_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_COLOR, v); }
@@ -467,13 +467,13 @@ static inline void lv_obj_set_style_line_color_filtered(struct _lv_obj_t * obj, 
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_line_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LINE_OPA, v); }
 
 static inline void lv_obj_set_style_arc_width(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_WIDTH, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_WIDTH, v); }
 
 static inline void lv_obj_set_style_arc_rounded(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_ROUNDED, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_ROUNDED, v); }
 
 static inline void lv_obj_set_style_arc_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value) {
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_COLOR, v); }
@@ -482,7 +482,7 @@ static inline void lv_obj_set_style_arc_color_filtered(struct _lv_obj_t * obj, u
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_arc_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_OPA, v); }
 
 static inline void lv_obj_set_style_arc_img_src(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const void * value) {
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ARC_IMG_SRC, v); }
@@ -491,16 +491,16 @@ static inline void lv_obj_set_style_content_text(struct _lv_obj_t * obj, uint32_
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_TEXT, v); }
 
 static inline void lv_obj_set_style_content_align(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_align_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_ALIGN, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_ALIGN, v); }
 
 static inline void lv_obj_set_style_content_ofs_x(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_OFS_X, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_OFS_X, v); }
 
 static inline void lv_obj_set_style_content_ofs_y(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_OFS_Y, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_OFS_Y, v); }
 
 static inline void lv_obj_set_style_content_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_OPA, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_OPA, v); }
 
 static inline void lv_obj_set_style_content_font(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const lv_font_t * value) {
   lv_style_value_t v = {.ptr = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_FONT, v); }
@@ -512,34 +512,11 @@ static inline void lv_obj_set_style_content_color_filtered(struct _lv_obj_t * ob
   lv_style_value_t v = {.color = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_COLOR_FILTERED, v); }
 
 static inline void lv_obj_set_style_content_letter_space(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_LETTER_SPACE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_LETTER_SPACE, v); }
 
 static inline void lv_obj_set_style_content_line_space(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_LINE_SPACE, v); }
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_LINE_SPACE, v); }
 
 static inline void lv_obj_set_style_content_decor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_text_decor_t value) {
-  lv_style_value_t v = {.num = value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_DECOR, v); }
-
-
-static inline void lv_obj_set_pad_all(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-    lv_obj_set_style_pad_left(obj, part, state, value);
-    lv_obj_set_style_pad_right(obj, part, state, value);
-    lv_obj_set_style_pad_top(obj, part, state, value);
-    lv_obj_set_style_pad_bottom(obj, part, state, value);
-}
-
-static inline void lv_obj_set_pad_hor(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-    lv_obj_set_style_pad_left(obj, part, state, value);
-    lv_obj_set_style_pad_right(obj, part, state, value);
-}
-
-static inline void lv_obj_set_pad_ver(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-    lv_obj_set_style_pad_top(obj, part, state, value);
-    lv_obj_set_style_pad_bottom(obj, part, state, value);
-}
-
-static inline void lv_obj_set_pad_gap(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value) {
-    lv_obj_set_style_pad_row(obj, part, state, value);
-    lv_obj_set_style_pad_column(obj, part, state, value);
-}
+  lv_style_value_t v = {.num = (int32_t)value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_CONTENT_DECOR, v); }
 
