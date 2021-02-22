@@ -149,6 +149,10 @@ typedef struct {
     lv_style_t calendar_day;
 #endif
 
+#if LV_USE_COLORWHEEL
+    lv_style_t colorwheel_main;
+#endif
+
 #if LV_USE_MSGBOX
     lv_style_t msgbox_btns_bg;
 #endif
@@ -439,6 +443,11 @@ static void style_init(void)
     lv_style_set_border_width(&styles->calendar_day, LV_DPX(1));
     lv_style_set_border_color(&styles->calendar_day, CARD_BORDER_COLOR);
     lv_style_set_bg_opa(&styles->calendar_day, LV_OPA_COVER);
+#endif
+
+#if LV_USE_COLORWHEEL
+    style_init_reset(&styles->colorwheel_main);
+    lv_style_set_arc_width(&styles->colorwheel_main, LV_DPX(10));
 #endif
 
 #if LV_USE_MSGBOX
@@ -850,6 +859,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_COLORWHEEL
     else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->colorwheel_main);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_normal);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_panel);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_normal);

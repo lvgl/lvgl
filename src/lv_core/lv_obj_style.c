@@ -174,7 +174,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     update_cache(obj, part, prop);
 
     lv_obj_invalidate(obj);
-    if(part == LV_PART_MAIN && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
         lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL); /*To update layout*/
     } else if(prop & LV_STYLE_PROP_EXT_DRAW) {
         lv_obj_refresh_ext_draw_size(obj);

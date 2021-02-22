@@ -35,7 +35,5 @@ void lv_example_tabview_1(void)
 
     label = lv_label_create(tab3, NULL);
     lv_label_set_text(label, "Third tab");
-
-    lv_obj_scroll_to_view_recursive(label, LV_ANIM_ON);
 }
 #endif
