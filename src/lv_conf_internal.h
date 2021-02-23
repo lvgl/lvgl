@@ -1388,7 +1388,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  ifdef CONFIG_LV_THEME_DEFAULT_GROW
 #    define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
 #  else
-#    define  LV_THEME_DEFAULT_GROW        		0
+#    define  LV_THEME_DEFAULT_GROW        		1
 #  endif
 #endif
 
