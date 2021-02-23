@@ -84,7 +84,7 @@
 #  ifdef CONFIG_LV_COLOR_CHROMA_KEY
 #    define LV_COLOR_CHROMA_KEY CONFIG_LV_COLOR_CHROMA_KEY
 #  else
-#    define  LV_COLOR_CHROMA_KEY    LV_COLOR_LIME         /*pure green*/
+#    define  LV_COLOR_CHROMA_KEY    lv_color_hex(0x00ff00)         /*pure green*/
 #  endif
 #endif
 

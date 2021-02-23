@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 
-#if LV_INDEV_DEF_DRAG_THROW <= 0
+#if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
