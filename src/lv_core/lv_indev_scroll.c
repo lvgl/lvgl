@@ -108,8 +108,8 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
         proc->types.pointer.scroll_throw_vect.x = 0;
     }
 
-    lv_snap_align_t align_x = lv_obj_get_snap_align_x(scroll_obj);
-    lv_snap_align_t align_y = lv_obj_get_snap_align_y(scroll_obj);
+    lv_snap_align_t align_x = lv_obj_get_scroll_snap_align_x(scroll_obj);
+    lv_snap_align_t align_y = lv_obj_get_scroll_snap_align_y(scroll_obj);
 
     if(proc->types.pointer.scroll_dir == LV_INDEV_SCROLL_DIR_VER) {
         proc->types.pointer.scroll_throw_vect.x = 0;
@@ -348,7 +348,7 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
     }
     /*With STOP limit the scrolling to the perv and next snap point*/
     else {
-        switch(lv_obj_get_snap_align_y(obj)) {
+        switch(lv_obj_get_scroll_snap_align_y(obj)) {
         case LV_SCROLL_SNAP_ALIGN_START:
             proc->types.pointer.scroll_area.y1 = find_snap_point_y(obj, obj->coords.y1 + 1, LV_COORD_MAX, 0);
             proc->types.pointer.scroll_area.y2 = find_snap_point_y(obj, LV_COORD_MIN, obj->coords.y1 - 1, 0);
@@ -369,7 +369,7 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
             break;
         }
 
-        switch(lv_obj_get_snap_align_x(obj)) {
+        switch(lv_obj_get_scroll_snap_align_x(obj)) {
         case LV_SCROLL_SNAP_ALIGN_START:
             proc->types.pointer.scroll_area.x1 = find_snap_point_x(obj, obj->coords.x1, LV_COORD_MAX, 0);
             proc->types.pointer.scroll_area.x2 = find_snap_point_x(obj, LV_COORD_MIN, obj->coords.x1, 0);
@@ -400,7 +400,7 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
 
 static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs)
 {
-    lv_snap_align_t align = lv_obj_get_snap_align_x(obj);
+    lv_snap_align_t align = lv_obj_get_scroll_snap_align_x(obj);
     if(align == LV_SCROLL_SNAP_ALIGN_NONE) return 0;
 
     lv_coord_t dist = LV_COORD_MAX;
@@ -447,7 +447,7 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
  */
 static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs)
 {
-    lv_snap_align_t align = lv_obj_get_snap_align_y(obj);
+    lv_snap_align_t align = lv_obj_get_scroll_snap_align_y(obj);
     if(align == LV_SCROLL_SNAP_ALIGN_NONE) return 0;
 
     lv_coord_t dist = LV_COORD_MAX;

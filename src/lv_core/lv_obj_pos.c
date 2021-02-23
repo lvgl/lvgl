@@ -371,6 +371,18 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
     return lv_obj_get_height(obj) - top - bottom;
 }
 
+void lv_obj_get_coords_fit(const lv_obj_t * obj, lv_area_t * area)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_obj_get_coords(obj, area);
+    area->x1 += lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    area->x2 -= lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    area->y1 += lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    area->y2 -= lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+}
+
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
@@ -423,6 +435,15 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
 
+    /*Check if the object inside the parent or not*/
+    lv_area_t parent_fit_area;
+    lv_obj_get_coords_fit(parent, &parent_fit_area);
+
+    /* If the object is already out of the parent and its position is changes
+     * surely the scrollbars also changes so invalidate them*/
+    bool on1 = _lv_area_is_in(&ori, &parent_fit_area, 0);
+    if(!on1) lv_obj_scrollbar_invalidate(parent);
+
     obj->coords.x1 += diff.x;
     obj->coords.y1 += diff.y;
     obj->coords.x2 += diff.x;
@@ -438,6 +459,11 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
+
+    /* If the object was out of the parent invalidate the new scrollbar area too.
+     * If it wasn't out of the parent but out now, also invalidate the srollbars*/
+    bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
+    if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
 }
 
 void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
@@ -610,6 +636,17 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
 
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    /*Check if the object inside the parent or not*/
+    lv_area_t parent_fit_area;
+    lv_obj_get_coords_fit(parent, &parent_fit_area);
+
+    /* If the object is already out of the parent and its position is changes
+     * surely the scrollbars also changes so invalidate them*/
+    bool on1 = _lv_area_is_in(&ori, &parent_fit_area, 0);
+    if(!on1) lv_obj_scrollbar_invalidate(parent);
+
     /* Set the length and height
      * Be sure the content is not scrolled in an invalid position on the new size*/
     obj->coords.y2 = obj->coords.y1 + h - 1;
@@ -624,11 +661,15 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par != NULL) lv_signal_send(par, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent != NULL) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
+
+    /* If the object was out of the parent invalidate the new scrollbar area too.
+     * If it wasn't out of the parent but out now, also invalidate the srollbars*/
+    bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
+    if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
     return true;
 }
 

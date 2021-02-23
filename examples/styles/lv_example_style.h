@@ -1,10 +1,10 @@
 /**
- * @file lv_example_widgets.h
+ * @file lv_example_style.h
  *
  */
 
-#ifndef LV_EX_STYLE_H
-#define LV_EX_STYLE_H
+#ifndef LV_EXAMPLE_STYLE_H
+#define LV_EXAMPLE_STYLE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,4 +45,4 @@ void lv_example_style_11(void);
 } /* extern "C" */
 #endif
 
-#endif /*LV_EX_STYLE_H*/
+#endif /*LV_EXAMPLE_STYLE_H*/

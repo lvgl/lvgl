@@ -200,18 +200,25 @@ lv_coord_t lv_obj_get_width(const struct _lv_obj_t * obj);
 lv_coord_t lv_obj_get_height(const struct _lv_obj_t * obj);
 
 /**
- * Get that width reduced by the left and right padding.
+ * Get the width reduced by the left and right padding.
  * @param obj       pointer to an object
- * @return          the width which still fits into the container without causing overflow (making the object scrollable)
+ * @return          the width which still fits into its parent without causing overflow (making the parent scrollable)
  */
 lv_coord_t lv_obj_get_width_fit(const struct _lv_obj_t * obj);
 
 /**
- * Get that height reduced by the top an bottom padding.
+ * Get the height reduced by the top an bottom padding.
  * @param obj       pointer to an object
- * @return          the height which still fits into the container without causing overflow (making the object scrollable)
+ * @return          the height which still fits into the parent without causing overflow (making the parent scrollable)
  */
 lv_coord_t lv_obj_get_height_fit(const struct _lv_obj_t * obj);
+
+/**
+ * Get the area reduced by the paddings.
+ * @param obj       pointer to an object
+ * @param area      the area which still fits into the parent without causing overflow (making the parent scrollable)
+ */
+void lv_obj_get_coords_fit(const struct _lv_obj_t * obj, lv_area_t * area);
 
 /**
  * Get the width occupied by the "parts" of the widget. E.g. the width of all columns of a table.

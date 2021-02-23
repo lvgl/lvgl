@@ -73,14 +73,14 @@ void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir);
  * @param obj       pointer to an object
  * @param align     the snap align to set from `lv_snap_align_t`
  */
-void lv_obj_set_snap_align_x(struct _lv_obj_t * obj, lv_snap_align_t align);
+void lv_obj_set_scroll_snap_align_x(struct _lv_obj_t * obj, lv_snap_align_t align);
 
 /**
  * Set where to snap the children when scrolling ends vertically
  * @param obj       pointer to an object
  * @param align     the snap align to set from `lv_snap_align_t`
  */
-void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align);
+void lv_obj_set_scroll_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align);
 
 /*=====================
  * Getter functions
@@ -105,14 +105,14 @@ lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @return          the current snap align from `lv_snap_align_t`
  */
-lv_snap_align_t lv_obj_get_snap_align_x(const struct _lv_obj_t * obj);
+lv_snap_align_t lv_obj_get_scroll_snap_align_x(const struct _lv_obj_t * obj);
 
 /**
  * Get where to snap the children when scrolling ends vertically
  * @param  obj      pointer to an object
  * @return          the current snap align from `lv_snap_align_t`
  */
-lv_snap_align_t lv_obj_get_snap_align_y(const struct _lv_obj_t * obj);
+lv_snap_align_t lv_obj_get_scroll_snap_align_y(const struct _lv_obj_t * obj);
 
 /**
  * Get current X scroll position.
@@ -247,6 +247,21 @@ void lv_obj_scroll_to_view(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
  * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
+
+
+/**
+ * Get the area of the scrollbars
+ * @param obj       pointer to an object
+ * @param hor_area  pointer to store the area of the horizontal scrollbar
+ * @param ver_area  pointer to store the area of the vertical  scrollbar
+ */
+void lv_obj_get_scrollbar_area(struct _lv_obj_t * obj, lv_area_t * hor, lv_area_t * ver);
+
+/**
+ * Invalidate the area of the scrollbars
+ * @param obj       pointer to an object
+ */
+void lv_obj_scrollbar_invalidate(struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS
