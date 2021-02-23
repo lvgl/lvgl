@@ -18,23 +18,23 @@ void lv_example_meter_1(void)
 
     /*Add a scale first*/
     lv_meter_scale_t * scale = lv_meter_add_scale(meter);
-    lv_meter_set_scale_ticks(meter, scale, 51, 2, 10, LV_COLOR_GRAY);
-    lv_meter_set_scale_major_ticks(meter, scale, 10, 4, 15, LV_COLOR_BLACK, 10);
+    lv_meter_set_scale_ticks(meter, scale, 51, 2, 10, lv_color_grey());
+    lv_meter_set_scale_major_ticks(meter, scale, 10, 4, 15, lv_color_black(), 10);
 
     lv_meter_indicator_t * indic;
 
     /*Add a red arc to the end */
-    indic = lv_meter_add_arc(meter, scale, 3, LV_COLOR_RED, 1);
+    indic = lv_meter_add_arc(meter, scale, 3, lv_color_red(), 1);
     lv_meter_set_indicator_start_value(meter, indic, 80);
     lv_meter_set_indicator_end_value(meter, indic, 100);
 
     /*Make the tick lines red at the end of the scale*/
-    indic = lv_meter_add_scale_lines(meter, scale, LV_COLOR_RED, LV_COLOR_RED, false, 0);
+    indic = lv_meter_add_scale_lines(meter, scale, lv_color_red(), lv_color_red(), false, 0);
     lv_meter_set_indicator_start_value(meter, indic, 80);
     lv_meter_set_indicator_end_value(meter, indic, 100);
 
     /*Add a needle line indicator*/
-    indic = lv_meter_add_needle_line(meter, scale, 4, LV_COLOR_GRAY, -10);
+    indic = lv_meter_add_needle_line(meter, scale, 4, lv_color_grey(), -10);
 
     /*Create an animation to set the value*/
     lv_anim_t a;

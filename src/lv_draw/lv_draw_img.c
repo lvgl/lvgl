@@ -57,7 +57,7 @@ static void draw_cleanup(lv_img_cache_entry_t * cache);
 void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_img_dsc_t));
-    dsc->recolor = LV_COLOR_BLACK;
+    dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_IMG_ZOOM_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
@@ -632,7 +632,7 @@ static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, co
 {
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_color = LV_COLOR_WHITE;
+    rect_dsc.bg_color = lv_color_white();
     lv_draw_rect(coords, clip_area, &rect_dsc);
 
     lv_draw_label_dsc_t label_dsc;

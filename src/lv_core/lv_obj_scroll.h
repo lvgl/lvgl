@@ -183,16 +183,6 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
  *====================*/
 
 /**
- * The most basic function to scroll by a given amount of pixels.
- * Used internally.
- * @param obj       pointer to an object to scroll
- * @param x         pixels to scroll horizontally
- * @param y         pixels to scroll vertically
- * @note            > 0 value means scroll right/bottom (show the more content on the right/bottom)
- */
-void _lv_obj_scroll_by_raw(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
-
-/**
  *
  * Scroll by a given amount of pixels
  * @param obj       pointer to an object to scroll

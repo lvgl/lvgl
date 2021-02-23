@@ -30,11 +30,11 @@ static void event_cb(lv_obj_t * chart, lv_event_t e)
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
-            draw_rect_dsc.bg_color = LV_COLOR_BLACK;
+            draw_rect_dsc.bg_color = lv_color_black();
             draw_rect_dsc.bg_opa = LV_OPA_50;
             draw_rect_dsc.radius = 3;
             draw_rect_dsc.content_text = buf;
-            draw_rect_dsc.content_color = LV_COLOR_WHITE;
+            draw_rect_dsc.content_color = lv_color_white();
 
             lv_area_t a;
             a.x1 = chart->coords.x1 + p.x - 20;
@@ -68,8 +68,8 @@ void lv_example_chart_4(void)
     lv_chart_set_zoom_x(chart, 800);
 
     /*Add two data series*/
-    lv_chart_series_t * ser1 = lv_chart_add_series(chart, LV_COLOR_RED, LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_series_t * ser2 = lv_chart_add_series(chart, LV_COLOR_GREEN, LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_color_green(), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
         lv_chart_set_next_value(chart, ser1, lv_rand(60,90));

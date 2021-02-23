@@ -15,10 +15,10 @@ void lv_example_img_4(void)
 
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_bg_color(&style, LV_COLOR_YELLOW);
+    lv_style_set_bg_color(&style, lv_color_yellow());
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
     lv_style_set_img_recolor_opa(&style, LV_OPA_COVER);
-    lv_style_set_img_recolor(&style, LV_COLOR_BLACK);
+    lv_style_set_img_recolor(&style, lv_color_black());
 
     lv_obj_t * img = lv_img_create(lv_scr_act(), NULL);
     lv_obj_add_style(img, LV_PART_MAIN, LV_STATE_DEFAULT, &style);

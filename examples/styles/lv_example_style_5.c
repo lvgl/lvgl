@@ -12,10 +12,10 @@ void lv_example_style_6(void)
     /*Set a background color and a radius*/
     lv_style_set_radius(&style, 5);
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
-    lv_style_set_bg_color(&style, LV_COLOR_SILVER);
+    lv_style_set_bg_color(&style, lv_color_grey_lighten_3());
 
     /*Add a value text properties*/
-    lv_style_set_content_color(&style, LV_COLOR_BLUE);
+    lv_style_set_content_color(&style, lv_color_blue());
     lv_style_set_content_align(&style, LV_ALIGN_IN_BOTTOM_RIGHT);
     lv_style_set_content_ofs_x(&style, -5);
     lv_style_set_content_ofs_y(&style, -5);

@@ -68,8 +68,8 @@ void lv_example_chart_2(void)
     lv_obj_add_event_cb(chart1, event_cb, NULL);
 
     /*Add two data series*/
-    ser1 = lv_chart_add_series(chart1, LV_COLOR_RED, LV_CHART_AXIS_PRIMARY_Y);
-    ser2 = lv_chart_add_series(chart1, LV_COLOR_BLUE, LV_CHART_AXIS_SECONDARY_Y);
+    ser1 = lv_chart_add_series(chart1, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
+    ser2 = lv_chart_add_series(chart1, lv_color_blue(), LV_CHART_AXIS_SECONDARY_Y);
 
     uint32_t i;
     for(i = 0; i < 10; i++) {

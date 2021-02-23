@@ -124,12 +124,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
 
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl)
 {
-    return lv_color_mix(LV_COLOR_WHITE, c, lvl);
+    return lv_color_mix(lv_color_white(), c, lvl);
 }
 
 lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl)
 {
-    return lv_color_mix(LV_COLOR_BLACK, c, lvl);
+    return lv_color_mix(lv_color_black(), c, lvl);
 }
 
 lv_color_t lv_color_change_lightness(lv_color_t c, lv_opa_t lvl)

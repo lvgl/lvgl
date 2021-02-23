@@ -126,7 +126,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp->inv_p = 0;
     disp->last_activity_time = 0;
 
-    disp->bg_color = LV_COLOR_WHITE;
+    disp->bg_color = lv_color_white();
     disp->bg_img = NULL;
 #if LV_COLOR_SCREEN_TRANSP
     disp->bg_opa = LV_OPA_TRANSP;

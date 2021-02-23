@@ -41,7 +41,7 @@ void lv_example_btnmatrix_3(void)
     lv_style_set_radius(&style_btn, 0);
     lv_style_set_border_width(&style_btn, 1);
     lv_style_set_border_opa(&style_btn, LV_OPA_50);
-    lv_style_set_border_color(&style_btn, LV_COLOR_GRAY);
+    lv_style_set_border_color(&style_btn, lv_color_grey());
     lv_style_set_border_side(&style_btn, LV_BORDER_SIDE_INTERNAL);
     lv_style_set_radius(&style_btn, 0);
 

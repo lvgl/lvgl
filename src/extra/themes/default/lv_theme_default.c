@@ -25,7 +25,7 @@
 
 /*SCREEN*/
 //#define COLOR_SCR        (IS_LIGHT ? lv_color_hex(0xf5f8fa) : lv_color_hex(0x444b5a))
-#define COLOR_SCR        (IS_LIGHT ? lv_color_hex(0xf3f6f7) : lv_color_hex(0x444b5a))
+#define COLOR_SCR        (IS_LIGHT ? lv_color_blue_grey_lighten_5() : lv_color_hex(0x444b5a))
 #define COLOR_SCR_TEXT   (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xe7e9ec))
 
 /*BUTTON*/
@@ -312,14 +312,14 @@ static void style_init(void)
 
     style_init_reset(&styles->bg_color_primary);
     lv_style_set_bg_color(&styles->bg_color_primary, theme.color_primary);
-    lv_style_set_text_color(&styles->bg_color_primary, LV_COLOR_WHITE);
-    lv_style_set_content_color(&styles->bg_color_primary, LV_COLOR_WHITE);
+    lv_style_set_text_color(&styles->bg_color_primary, lv_color_white());
+    lv_style_set_content_color(&styles->bg_color_primary, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_primary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_secondary);
     lv_style_set_bg_color(&styles->bg_color_secondary, theme.color_secondary);
-    lv_style_set_text_color(&styles->bg_color_secondary, LV_COLOR_WHITE);
-    lv_style_set_content_color(&styles->bg_color_secondary, LV_COLOR_WHITE);
+    lv_style_set_text_color(&styles->bg_color_secondary, lv_color_white());
+    lv_style_set_content_color(&styles->bg_color_secondary, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_secondary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_gray);
@@ -329,7 +329,7 @@ static void style_init(void)
     lv_style_set_content_color(&styles->bg_color_gray, CARD_TEXT_COLOR);
 
     style_init_reset(&styles->bg_color_panel);
-    lv_style_set_bg_color(&styles->bg_color_panel, LV_COLOR_WHITE);
+    lv_style_set_bg_color(&styles->bg_color_panel, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_panel, LV_OPA_COVER);
     lv_style_set_text_color(&styles->bg_color_panel, CARD_TEXT_COLOR);
     lv_style_set_content_color(&styles->bg_color_panel, CARD_TEXT_COLOR);
@@ -347,7 +347,7 @@ static void style_init(void)
 #endif
 
     style_init_reset(&styles->knob);
-    lv_style_set_bg_color(&styles->knob, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
+    lv_style_set_bg_color(&styles->knob, IS_LIGHT ? theme.color_primary : lv_color_white());
     lv_style_set_bg_opa(&styles->knob, LV_OPA_COVER);
     lv_style_set_pad_all(&styles->knob, LV_DPX(5));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
@@ -375,13 +375,13 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
     lv_style_set_border_width(&styles->cb_marker, BORDER_WIDTH);
     lv_style_set_border_color(&styles->cb_marker, theme.color_primary);
-    lv_style_set_bg_color(&styles->cb_marker, LV_COLOR_WHITE);
+    lv_style_set_bg_color(&styles->cb_marker, lv_color_white());
     lv_style_set_bg_opa(&styles->cb_marker, LV_OPA_COVER);
     lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
 
     style_init_reset(&styles->cb_marker_checked);
     lv_style_set_content_text(&styles->cb_marker_checked, LV_SYMBOL_OK);
-    lv_style_set_content_color(&styles->cb_marker_checked, LV_COLOR_WHITE);
+    lv_style_set_content_color(&styles->cb_marker_checked, lv_color_white());
     lv_style_set_content_font(&styles->cb_marker_checked, theme.font_small);
 
     style_init_reset(&styles->cb_bg_outline_pad);
@@ -478,11 +478,11 @@ static void style_init(void)
 #if LV_USE_LED
     lv_style_init(&styles->led);
     lv_style_set_bg_opa(&styles->led, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->led, LV_COLOR_WHITE);
-    lv_style_set_bg_grad_color(&styles->led, LV_COLOR_GRAY);
+    lv_style_set_bg_color(&styles->led, lv_color_white());
+    lv_style_set_bg_grad_color(&styles->led, lv_color_grey());
     lv_style_set_radius(&styles->led, LV_RADIUS_CIRCLE);
     lv_style_set_shadow_width(&styles->led, LV_DPX(15));
-    lv_style_set_shadow_color(&styles->led, LV_COLOR_WHITE);
+    lv_style_set_shadow_color(&styles->led, lv_color_white());
     lv_style_set_shadow_spread(&styles->led, LV_DPX(5));
 #endif
 }
@@ -880,7 +880,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static lv_color_t gray_filter(lv_color_t color, lv_opa_t opa)
 {
-    return lv_color_mix(LV_COLOR_SILVER, color, opa);
+    return lv_color_mix(lv_color_grey_lighten_2(), color, opa);
 }
 static void style_init_reset(lv_style_t * style)
 {

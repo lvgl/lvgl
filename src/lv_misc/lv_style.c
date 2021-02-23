@@ -224,7 +224,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.num = LV_IMG_ZOOM_NONE;
             break;
         case LV_STYLE_BG_COLOR:
-            value.color = LV_COLOR_WHITE;
+            value.color = lv_color_white();
             break;
         case LV_STYLE_OPA:
         case LV_STYLE_BORDER_OPA:

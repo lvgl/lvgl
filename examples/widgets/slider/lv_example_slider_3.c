@@ -21,7 +21,7 @@ void lv_example_slider_3(void)
 
     /*Now use only a local style.*/
     lv_obj_set_style_content_ofs_y(slider, LV_PART_INDICATOR, LV_STATE_DEFAULT, -20);
-    lv_obj_set_style_content_color(slider, LV_PART_INDICATOR, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_set_style_content_color(slider, LV_PART_INDICATOR, LV_STATE_DEFAULT, lv_color_grey_darken_3());
 
     /*To update the value text*/
     lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);

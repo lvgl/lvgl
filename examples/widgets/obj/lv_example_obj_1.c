@@ -12,7 +12,7 @@ void lv_example_obj_1(void)
     lv_style_init(&style_shadow);
     lv_style_set_shadow_width(&style_shadow, 10);
     lv_style_set_shadow_spread(&style_shadow, 5);
-    lv_style_set_shadow_color(&style_shadow, LV_COLOR_BLUE);
+    lv_style_set_shadow_color(&style_shadow, lv_color_blue());
 
     lv_obj_t * obj3;
     obj3 = lv_obj_create(lv_scr_act(), NULL);

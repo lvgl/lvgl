@@ -9,7 +9,7 @@ void lv_example_style_8(void)
     static lv_style_t style;
     lv_style_init(&style);
 
-    lv_style_set_line_color(&style, LV_COLOR_GRAY);
+    lv_style_set_line_color(&style, lv_color_grey());
     lv_style_set_line_width(&style, 6);
     lv_style_set_line_rounded(&style, true);
 

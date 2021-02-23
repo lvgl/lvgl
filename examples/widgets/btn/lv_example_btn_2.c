@@ -17,20 +17,20 @@ void lv_example_btn_2(void)
     lv_style_set_radius(&style, 3);
 
     lv_style_set_bg_opa(&style, LV_OPA_70);
-    lv_style_set_bg_color(&style, LV_COLOR_BLUE);
-    lv_style_set_bg_grad_color(&style, LV_COLOR_AQUA);
+    lv_style_set_bg_color(&style, lv_color_blue());
+    lv_style_set_bg_grad_color(&style, lv_color_blue_darken_4());
     lv_style_set_bg_grad_dir(&style, LV_GRAD_DIR_VER);
 
     lv_style_set_border_opa(&style, LV_OPA_40);
     lv_style_set_border_width(&style, 2);
-    lv_style_set_border_color(&style, LV_COLOR_GRAY);
+    lv_style_set_border_color(&style, lv_color_grey());
 
     lv_style_set_shadow_width(&style, 8);
-    lv_style_set_shadow_color(&style, LV_COLOR_GRAY);
+    lv_style_set_shadow_color(&style, lv_color_grey());
     lv_style_set_shadow_ofs_x(&style, 8);
     lv_style_set_shadow_ofs_y(&style, 8);
 
-    lv_style_set_text_color(&style, LV_COLOR_WHITE);
+    lv_style_set_text_color(&style, lv_color_white());
 
     /*Init the pressed style*/
     lv_style_set_shadow_ofs_x(&style_pr, 4);

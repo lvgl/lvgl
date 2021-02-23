@@ -12,13 +12,13 @@ void lv_example_style_9(void)
     /*Set a background color and a radius*/
     lv_style_set_radius(&style, 5);
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
-    lv_style_set_bg_color(&style, LV_COLOR_SILVER);
+    lv_style_set_bg_color(&style, lv_color_grey_lighten_3());
     lv_style_set_border_width(&style, 2);
-    lv_style_set_border_color(&style, LV_COLOR_BLUE);
+    lv_style_set_border_color(&style, lv_color_blue());
 
 //    lv_style_set_pad_all(&style, 10);
 
-    lv_style_set_img_recolor(&style, LV_COLOR_BLUE);
+    lv_style_set_img_recolor(&style, lv_color_blue());
     lv_style_set_img_recolor_opa(&style, LV_OPA_50);
     lv_style_set_transform_angle(&style, 300);
 

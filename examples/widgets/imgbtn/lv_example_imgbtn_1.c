@@ -14,14 +14,14 @@ void lv_example_imgbtn_1(void)
 
     static lv_style_t style_def;
     lv_style_init(&style_def);
-    lv_style_set_text_color(&style_def, LV_COLOR_WHITE);
+    lv_style_set_text_color(&style_def, lv_color_white());
     lv_style_set_transition(&style_def, &tr);
 
     /*Darken the button when pressed and make it wider*/
     static lv_style_t style_pr;
     lv_style_init(&style_pr);
     lv_style_set_img_recolor_opa(&style_pr, LV_OPA_30);
-    lv_style_set_img_recolor(&style_pr, LV_COLOR_BLACK);
+    lv_style_set_img_recolor(&style_pr, lv_color_black());
     lv_style_set_transform_width(&style_pr, 20);
 
     /*Create an image button*/

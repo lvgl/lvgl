@@ -15,7 +15,7 @@ void lv_example_led_1(void)
     lv_obj_t * led2  = lv_led_create(lv_scr_act());
     lv_obj_align(led2, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_led_set_brightness(led2, 150);
-    lv_led_set_color(led2, LV_COLOR_RED);
+    lv_led_set_color(led2, lv_color_red());
 
     /*Copy the previous LED and switch it ON*/
     lv_obj_t * led3  = lv_led_create(lv_scr_act());

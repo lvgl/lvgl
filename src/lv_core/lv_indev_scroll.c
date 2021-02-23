@@ -123,7 +123,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
 
              proc->types.pointer.scroll_throw_vect.y = elastic_diff(scroll_obj, proc->types.pointer.scroll_throw_vect.y, st, sb);
 
-            _lv_obj_scroll_by_raw(scroll_obj, 0, proc->types.pointer.scroll_throw_vect.y);
+            lv_obj_scroll_by(scroll_obj, 0, proc->types.pointer.scroll_throw_vect.y, LV_ANIM_OFF);
         }
         /*With snapping find the nearest snap point and scroll there*/
         else {
@@ -146,7 +146,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
 
             proc->types.pointer.scroll_throw_vect.x = elastic_diff(scroll_obj, proc->types.pointer.scroll_throw_vect.x, sl ,sr);
 
-            _lv_obj_scroll_by_raw(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0);
+            lv_obj_scroll_by(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0, LV_ANIM_OFF);
         }
         /*With snapping find the nearest snap point and scroll there*/
         else {

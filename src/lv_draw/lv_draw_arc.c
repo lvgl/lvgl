@@ -64,7 +64,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
     lv_memset_00(dsc, sizeof(lv_draw_arc_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
-    dsc->color = LV_COLOR_BLACK;
+    dsc->color = lv_color_black();
 }
 
 /**

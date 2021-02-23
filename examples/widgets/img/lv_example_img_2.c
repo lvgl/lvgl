@@ -14,10 +14,10 @@ static lv_obj_t * img1;
 void lv_example_img_2(void)
 {
     /*Create 4 sliders to adjust RGB color and re-color intensity*/
-    red_slider = create_slider(LV_COLOR_RED);
-    green_slider = create_slider(LV_COLOR_LIME);
-    blue_slider = create_slider(LV_COLOR_BLUE);
-    intense_slider = create_slider(LV_COLOR_GRAY);
+    red_slider = create_slider(lv_color_red());
+    green_slider = create_slider(lv_color_green());
+    blue_slider = create_slider(lv_color_blue());
+    intense_slider = create_slider(lv_color_grey());
 
     lv_slider_set_value(red_slider, LV_OPA_20, LV_ANIM_OFF);
     lv_slider_set_value(green_slider, LV_OPA_90, LV_ANIM_OFF);

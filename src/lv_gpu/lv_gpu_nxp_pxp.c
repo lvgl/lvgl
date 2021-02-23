@@ -377,7 +377,7 @@ static void lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest, lv_coord_t dest_width
     if(colorKeyEnabled) {
         /* should never get here, recolor & color keying not supported. Draw black box instead. */
         const lv_area_t fill_area = {.x1 = 0, .y1 = 0, .x2 = copy_width - 1, .y2 = copy_height - 1};
-        lv_gpu_nxp_pxp_fill(dest, dest_width, &fill_area, LV_COLOR_BLACK, LV_OPA_MAX);
+        lv_gpu_nxp_pxp_fill(dest, dest_width, &fill_area, lv_color_black(), LV_OPA_MAX);
         LV_LOG_WARN("Recoloring and color keying is not supported. Black rectangle rendered.");
         return ;
     }

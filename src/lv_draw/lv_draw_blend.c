@@ -361,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 /* Fall down to SW render in case of error */
             }
 #endif
-            lv_color_t last_dest_color = LV_COLOR_BLACK;
+            lv_color_t last_dest_color = lv_color_black();
             lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
 
             uint16_t color_premult[3];
@@ -540,7 +540,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
-        lv_color_t last_dest_color = LV_COLOR_BLACK;
+        lv_color_t last_dest_color = lv_color_black();
         lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {

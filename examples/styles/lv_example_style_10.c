@@ -12,10 +12,10 @@ typedef int _keep_pedantic_happy;
 //    /*Set a background color and a radius*/
 //    lv_style_set_radius(&style, LV_STATE_DEFAULT, 5);
 //    lv_style_set_bg_opa(&style, LV_STATE_DEFAULT, LV_OPA_COVER);
-//    lv_style_set_bg_color(&style, LV_STATE_DEFAULT, LV_COLOR_SILVER);
+//    lv_style_set_bg_color(&style, LV_STATE_DEFAULT, lv_color_grey_lighten_3());
 //
 //    /*Set different background color in pressed state*/
-//    lv_style_set_bg_color(&style, LV_STATE_PRESSED, LV_COLOR_GRAY);
+//    lv_style_set_bg_color(&style, LV_STATE_PRESSED, lv_color_grey());
 //
 //    /*Set different transition time in default and pressed state
 //     *fast press, slower revert to default*/

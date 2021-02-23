@@ -73,11 +73,11 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
 LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_rect_dsc_t));
-    dsc->bg_color = LV_COLOR_WHITE;
-    dsc->bg_grad_color = LV_COLOR_BLACK;
-    dsc->border_color = LV_COLOR_BLACK;
-    dsc->content_color = LV_COLOR_BLACK;
-    dsc->shadow_color = LV_COLOR_BLACK;
+    dsc->bg_color = lv_color_white();
+    dsc->bg_grad_color = lv_color_black();
+    dsc->border_color = lv_color_black();
+    dsc->content_color = lv_color_black();
+    dsc->shadow_color = lv_color_black();
     dsc->bg_grad_color_stop = 0xFF;
     dsc->bg_opa = LV_OPA_COVER;
     dsc->bg_img_opa = LV_OPA_COVER;

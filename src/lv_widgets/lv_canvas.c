@@ -371,7 +371,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
             x_safe = x + 1 + r_front;
             x_safe = x_safe > canvas->dsc.header.w - 1 ? canvas->dsc.header.w - 1 : x_safe;
-            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED);
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, lv_color_white());
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum += c.ch.red;
@@ -1018,7 +1018,7 @@ static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_
     d.header.w = buf_w;
     d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 
-    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, LV_COLOR_BLACK);
+    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, lv_color_black());
     lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
 
     lv_opa_t res_opa;

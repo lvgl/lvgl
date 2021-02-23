@@ -10,7 +10,7 @@ void lv_example_label_2(void)
     static lv_style_t style_shadow;
     lv_style_init(&style_shadow);
     lv_style_set_text_opa(&style_shadow, LV_OPA_30);
-    lv_style_set_text_color(&style_shadow, LV_COLOR_BLACK);
+    lv_style_set_text_color(&style_shadow, lv_color_black());
 
     /*Create a label for the shadow first (it's in the background) */
     lv_obj_t * shadow_label = lv_label_create(lv_scr_act(), NULL);

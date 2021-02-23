@@ -95,12 +95,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
-    dsc->color = LV_COLOR_BLACK;
+    dsc->color = lv_color_black();
     dsc->font = LV_THEME_FONT_NORMAL;
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
-    dsc->sel_color = LV_COLOR_BLACK;
-    dsc->sel_bg_color = LV_COLOR_BLUE;
+    dsc->sel_color = lv_color_black();
+    dsc->sel_bg_color = lv_color_blue();
     dsc->bidi_dir = LV_BIDI_DIR_LTR;
 }
 

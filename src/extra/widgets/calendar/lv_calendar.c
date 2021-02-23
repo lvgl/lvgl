@@ -267,7 +267,7 @@ static void draw_event_cb(lv_obj_t * obj, lv_event_t e)
             else if(lv_btnmatrix_has_btn_ctrl(obj, hook_dsc->id, LV_BTNMATRIX_CTRL_DISABLED)) {
                 hook_dsc->rect_dsc->bg_opa = LV_OPA_TRANSP;
                 hook_dsc->rect_dsc->border_opa = LV_OPA_TRANSP;
-                hook_dsc->label_dsc->color = LV_COLOR_GRAY;
+                hook_dsc->label_dsc->color = lv_color_grey();
             }
 
             if(lv_btnmatrix_has_btn_ctrl(obj, hook_dsc->id, LV_CALENDAR_CTRL_HIGHLIGHT)) {

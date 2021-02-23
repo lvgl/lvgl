@@ -229,8 +229,8 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
         lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
-        lv_obj_set_style_bg_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-        lv_obj_set_style_text_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+        lv_obj_set_style_bg_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
+        lv_obj_set_style_text_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
         lv_obj_set_style_pad_top(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
         lv_obj_set_style_pad_bottom(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
         lv_obj_set_style_pad_left(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
@@ -646,7 +646,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
 
 #if MASK_AREA_DEBUG
-        static lv_color_t debug_color = LV_COLOR_RED;
+        static lv_color_t debug_color = lv_color_red();
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         draw_dsc.bg_color.full = debug_color.full;

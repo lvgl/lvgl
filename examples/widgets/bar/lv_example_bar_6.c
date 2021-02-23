@@ -26,13 +26,13 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
         if(lv_area_get_width(&bar->indic_area) > txt_size.x + 20) {
             txt_area.x2 = bar->indic_area.x2 - 5;
             txt_area.x1 = txt_area.x2 - txt_size.x + 1;
-            dsc.color = LV_COLOR_WHITE;
+            dsc.color = lv_color_white();
         }
         /*If the indicator is still short put the text out of it on the right */
         else {
             txt_area.x1 = bar->indic_area.x2 + 5;
             txt_area.x2 = txt_area.x1 + txt_size.x - 1;
-            dsc.color = LV_COLOR_BLACK;
+            dsc.color = lv_color_black();
         }
 
         txt_area.y1 = bar->indic_area.y1 + (lv_area_get_height(&bar->indic_area) - txt_size.y) / 2;
