@@ -1,10 +1,10 @@
 /**
- * @file lv_examples.h
+ * @file lv_example_scroll.h
  *
  */
 
-#ifndef LV_EXAMPLES_H
-#define LV_EXAMPLES_H
+#ifndef LV_EXAMPLE_SCROLL_H
+#define LV_EXAMPLE_SCROLL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,11 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "styles/lv_example_style.h"
-#include "get_started/lv_example_get_started.h"
-#include "widgets/lv_example_widgets.h"
-#include "layouts/lv_example_layout.h"
-#include "scroll/lv_example_scroll.h"
 
 /*********************
  *      DEFINES
@@ -30,6 +25,10 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_scroll_1(void);
+void lv_example_scroll_2(void);
+void lv_example_scroll_3(void);
+void lv_example_scroll_4(void);
 
 /**********************
  *      MACROS
@@ -39,4 +38,4 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-#endif /*LV_EXAMPLES_H*/
+#endif /*LV_EXAMPLE_SCROLL_H*/
