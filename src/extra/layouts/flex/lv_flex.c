@@ -74,7 +74,7 @@ const lv_flex_t lv_flex_center_column = {
 const lv_flex_t lv_flex_stacked = {
         .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_START,
+        .item_cross_place = LV_FLEX_PLACE_CENTER,
         .track_cross_place = LV_FLEX_PLACE_START,
         .dir = LV_FLEX_FLOW_COLUMN
 };
