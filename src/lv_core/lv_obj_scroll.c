@@ -350,23 +350,25 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
 
-    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
-    lv_coord_t pright = lv_obj_get_style_pad_right(parent, LV_PART_MAIN);
-    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
-    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(parent, LV_PART_MAIN);
+    lv_dir_t scroll_dir = lv_obj_get_scroll_dir(parent);
 
-    lv_coord_t left_diff = parent->coords.x1 + pleft - obj->coords.x1;
-    lv_coord_t right_diff = -(parent->coords.x2 - pright - obj->coords.x2);
-    lv_coord_t top_diff = parent->coords.y1 + ptop - obj->coords.y1;
-    lv_coord_t bottom_diff = -(parent->coords.y2 - pbottom - obj->coords.y2);
+
 
     lv_coord_t y_scroll = 0;
+    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
+    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(parent, LV_PART_MAIN);
+    lv_coord_t top_diff = parent->coords.y1 + ptop - obj->coords.y1;
+    lv_coord_t bottom_diff = -(parent->coords.y2 - pbottom - obj->coords.y2);
     if((top_diff > 0 || bottom_diff > 0)) {
         if(LV_ABS(top_diff) < LV_ABS(bottom_diff)) y_scroll = top_diff;
         else y_scroll = -bottom_diff;
     }
 
     lv_coord_t x_scroll = 0;
+    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
+    lv_coord_t pright = lv_obj_get_style_pad_right(parent, LV_PART_MAIN);
+    lv_coord_t left_diff = parent->coords.x1 + pleft - obj->coords.x1;
+    lv_coord_t right_diff = -(parent->coords.x2 - pright - obj->coords.x2);
     if((left_diff > 0 || right_diff > 0)) {
         if(LV_ABS(left_diff) < LV_ABS(right_diff)) x_scroll = left_diff;
         else x_scroll = -right_diff;
@@ -375,6 +377,11 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
     /* Remove any pending scroll animations.*/
     lv_anim_del(parent, scroll_x_anim);
     lv_anim_del(parent, scroll_y_anim);
+
+    if((scroll_dir & LV_DIR_LEFT) == 0 && x_scroll < 0) x_scroll = 0;
+    if((scroll_dir & LV_DIR_RIGHT) == 0 && x_scroll > 0) x_scroll = 0;
+    if((scroll_dir & LV_DIR_TOP) == 0 && y_scroll < 0) y_scroll = 0;
+    if((scroll_dir & LV_DIR_BOTTOM) == 0 && y_scroll > 0) y_scroll = 0;
 
     lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
 }
@@ -549,6 +556,7 @@ static void scroll_x_anim(void * obj, int32_t v)
 
 static void scroll_y_anim(void * obj, int32_t v)
 {
+	printf("scrl_anim %d\n", v);
     _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
 
