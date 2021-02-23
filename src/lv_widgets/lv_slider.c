@@ -378,10 +378,26 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
     position_knob(obj, &knob_area, knob_size, hor);
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
-    /*Handle custom drawer*/
-    lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+    lv_obj_draw_hook_dsc_t hook_dsc;
+    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+    hook_dsc.part = LV_PART_KNOB;
+    hook_dsc.sub_part_id = 0;
+	hook_dsc.draw_area = &slider->right_knob_area;
+	hook_dsc.rect_dsc = &knob_rect_dsc;
 
-    if(lv_slider_get_type(obj) == LV_SLIDER_TYPE_RANGE) {
+    if(lv_slider_get_type(obj) != LV_SLIDER_TYPE_RANGE) {
+		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+		lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+		lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
+    } else {
+    	/*Save the draw dsc. because it can be modified in the hook*/
+    	lv_draw_rect_dsc_t knob_rect_dsc_tmp;
+    	lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
+
+		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+		lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+		lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
+
         /* Draw a second knob for the start_value side */
         if(hor) {
             knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
@@ -390,11 +406,16 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
             knob_area.y1 = slider->bar.indic_area.y2;
         }
         position_knob(obj, &knob_area, knob_size, hor);
-
         lv_area_copy(&slider->left_knob_area, &knob_area);
 
-        /*Draw the knob if the custom drawer allows it*/
+    	lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
+		hook_dsc.draw_area = &slider->left_knob_area;
+		hook_dsc.rect_dsc = &knob_rect_dsc;
+		hook_dsc.sub_part_id = 1;
+
+		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
         lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
+		lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
     }
 
 }

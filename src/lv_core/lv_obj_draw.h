@@ -36,7 +36,7 @@ typedef enum {
 
 typedef struct
 {
-    const lv_area_t * draw_area;
+    lv_area_t * draw_area;
     const lv_area_t * clip_area;
     lv_draw_rect_dsc_t * rect_dsc;
     lv_draw_label_dsc_t * label_dsc;
