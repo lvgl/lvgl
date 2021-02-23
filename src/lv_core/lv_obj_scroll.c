@@ -10,6 +10,7 @@
 #include "lv_obj.h"
 #include "lv_indev.h"
 #include "lv_disp.h"
+#include "lv_indev_scroll.h"
 
 /*********************
  *      DEFINES
@@ -394,6 +395,13 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
         obj = parent;
         parent = lv_obj_get_parent(parent);
     }
+}
+
+void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
+{
+    lv_point_t p;
+    lv_indev_scroll_get_snap_dist(obj, &p);
+    lv_obj_scroll_by(obj, p.x, p.y, anim_en);
 }
 
 void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t * ver_area)

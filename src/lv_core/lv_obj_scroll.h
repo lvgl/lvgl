@@ -248,6 +248,12 @@ void lv_obj_scroll_to_view(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
  */
 void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
 
+/**
+ * Check the children of `obj` and scroll `obj` to fulfill the scroll_snap settings
+ * @param obj       an object whose children needs to checked and snapped
+ * @param anim_en   LV_ANIM_ON/OFF
+ */
+void lv_obj_update_snap(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
 
 /**
  * Get the area of the scrollbars

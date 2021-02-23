@@ -230,6 +230,12 @@ lv_coord_t lv_indev_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
     return sum;
 }
 
+void lv_indev_scroll_get_snap_dist(lv_obj_t * obj, lv_point_t * p)
+{
+    p->x = find_snap_point_x(obj, obj->coords.x1, obj->coords.x2, 0);
+    p->y = find_snap_point_y(obj, obj->coords.y1, obj->coords.y2, 0);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -398,6 +404,15 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
     if(proc->types.pointer.scroll_area.y2 == 0) proc->types.pointer.scroll_area.y2 = LV_COORD_MAX;
 }
 
+/**
+ * Search for snap point in the `min` - `max` range.
+ * @param obj the object on which snap point should be found
+ * @param min ignore snap points smaller then this. (Absolute coordinate)
+ * @param max ignore snap points greater then this. (Absolute coordinate)
+ * @param ofs offset to snap points. Useful the get a snap point in an imagined case
+ *            what if children are already moved by this value
+ * @return the distance of the snap point.
+ */
 static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs)
 {
     lv_snap_align_t align = lv_obj_get_scroll_snap_align_x(obj);
