@@ -565,7 +565,6 @@ static void scroll_x_anim(void * obj, int32_t v)
 
 static void scroll_y_anim(void * obj, int32_t v)
 {
-	printf("scrl_anim %d\n", v);
     scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
 
