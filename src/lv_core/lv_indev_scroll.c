@@ -86,7 +86,7 @@ void _lv_indev_scroll_handler(lv_indev_proc_t * proc)
         /*Respect the scroll limit area*/
         scroll_limit_diff(proc, &diff_x, &diff_y);
 
-        _lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
+        lv_obj_scroll_by(scroll_obj, diff_x, diff_y, LV_ANIM_OFF);
         proc->types.pointer.scroll_sum.x += diff_x;
         proc->types.pointer.scroll_sum.y += diff_y;
     }

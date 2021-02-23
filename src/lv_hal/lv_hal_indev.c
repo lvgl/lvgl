@@ -55,8 +55,8 @@ void lv_indev_drv_init(lv_indev_drv_t * driver)
     lv_memset_00(driver, sizeof(lv_indev_drv_t));
 
     driver->type                 = LV_INDEV_TYPE_NONE;
-    driver->scroll_limit           = LV_INDEV_DEF_DRAG_LIMIT;
-    driver->scroll_throw           = LV_INDEV_DEF_DRAG_THROW;
+    driver->scroll_limit           = LV_INDEV_DEF_SCROLL_LIMIT;
+    driver->scroll_throw           = 3;//LV_INDEV_DEF_SCROLL_THROW;
     driver->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
     driver->long_press_rep_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
     driver->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
