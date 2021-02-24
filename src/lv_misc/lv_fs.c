@@ -62,11 +62,11 @@ bool lv_fs_is_ready(char letter)
     return drv->ready_cb(drv);
 }
 
-void * lv_fs_open(const char * path, lv_fs_mode_t mode)
+lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode)
 {
     if(path == NULL) {
         LV_LOG_WARN("Can't open file: path is NULL");
-        return NULL;
+        return LV_FS_RES_INV_PARAM;
     }
 
     char letter = path[0];
@@ -74,39 +74,32 @@ void * lv_fs_open(const char * path, lv_fs_mode_t mode)
 
     if(drv == NULL) {
         LV_LOG_WARN("Can't open file (%s): unknown driver letter", path);
-        return NULL;
+        return LV_FS_RES_NOT_EX;
     }
 
     if(drv->ready_cb) {
         if(drv->ready_cb(drv) == false) {
             LV_LOG_WARN("Can't open file (%s): driver not ready", path);
-            return NULL;
+            return LV_FS_RES_HW_ERR;
         }
     }
 
     if(drv->open_cb == NULL) {
         LV_LOG_WARN("Can't open file (%s): open function not exists", path);
-        return NULL;
+        return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_file_t * file_p = lv_mem_alloc(sizeof(lv_fs_file_t));
-    if(file_p == NULL) {
-        LV_LOG_WARN("Can't open file (%s): out of memory", path);
-        return NULL;
+    const char * real_path = lv_fs_get_real_path(path);
+    void *file_d = drv->open_cb(drv, real_path, mode);
+
+    if(file_d == NULL || file_d == (void*)(-1)) {
+        return LV_FS_RES_UNKNOWN;
     }
 
     file_p->drv = drv;
-    file_p->file_d = NULL;
+    file_p->file_d = file_d;
 
-    const char * real_path = lv_fs_get_real_path(path);
-    file_p->file_d = drv->open_cb(drv, real_path, mode);
-
-    if(file_p->file_d == NULL || file_p->file_d == (void*)(-1)) {
-        lv_mem_free(file_p);
-        return NULL;
-    }
-
-    return file_p;
+    return LV_FS_RES_OK;
 }
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
@@ -121,7 +114,8 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
-    lv_mem_free(file_p); /*Clean up*/
+    file_p->file_d = NULL;
+    file_p->drv    = NULL;
 
     return res;
 }

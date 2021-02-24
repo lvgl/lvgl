@@ -145,7 +145,7 @@ bool lv_fs_is_ready(char letter);
  * @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-void * lv_fs_open(const char * path, lv_fs_mode_t mode);
+lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
 
 /**
  * Close an already opened file
