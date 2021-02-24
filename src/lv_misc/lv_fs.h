@@ -70,7 +70,6 @@ typedef uint8_t lv_fs_whence_t;
 
 typedef struct _lv_fs_drv_t {
     char letter;
-    uint16_t rddir_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
     void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
@@ -80,7 +79,7 @@ typedef struct _lv_fs_drv_t {
     lv_fs_res_t (*seek_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
     lv_fs_res_t (*tell_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
-    lv_fs_res_t (*dir_open_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, const char * path);
+    void * (*dir_open_cb)(struct _lv_fs_drv_t * drv, const char * path);
     lv_fs_res_t (*dir_read_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
     lv_fs_res_t (*dir_close_cb)(struct _lv_fs_drv_t * drv, void * rddir_p);
 
