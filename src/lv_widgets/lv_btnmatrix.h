@@ -58,7 +58,7 @@ typedef struct {
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE */
+    uint16_t btn_id_sel;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE */
     uint8_t recolor : 1;    /*Enable button recoloring*/
     uint8_t one_check : 1;  /*Single button toggled at once*/
 } lv_btnmatrix_t;
@@ -187,7 +187,7 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * obj);
  * @param obj       pointer to button matrix object
  * @return          index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
-uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * obj);
+uint16_t lv_btnmatrix_get_selected_btn(const lv_obj_t * obj);
 
 /**
  * Get the button's text

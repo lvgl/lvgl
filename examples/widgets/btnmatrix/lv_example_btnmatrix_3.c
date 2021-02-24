@@ -4,7 +4,7 @@
 static void event_cb(lv_obj_t * obj, lv_event_t e)
 {
     if(e == LV_EVENT_VALUE_CHANGED) {
-        uint32_t id = lv_btnmatrix_get_active_btn(obj);
+        uint32_t id = lv_btnmatrix_get_selected_btn(obj);
         bool prev = id == 0 ? true : false;
         bool next = id == 6 ? true : false;
         if(prev || next) {
