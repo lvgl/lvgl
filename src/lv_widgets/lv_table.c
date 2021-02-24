@@ -37,6 +37,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
 static void refr_size(lv_obj_t * obj);
+static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 
 /**********************
  *  STATIC VARIABLES
@@ -57,12 +58,6 @@ const lv_obj_class_t lv_table_class  = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a table object
- * @param par pointer to an object, it will be the parent of the new table
- * @param copy pointer to a table object, if not NULL then the new object will be copied from it
- * @return pointer to the created table
- */
 lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     return lv_obj_create_from_class(&lv_table_class, parent, copy);
@@ -72,14 +67,6 @@ lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/**
- * Set the value of a cell.
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @param txt text to display in the cell. It will be copied and saved so this variable is not
- * required after this function call.
- */
 void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -92,19 +79,12 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
     if(row >= table->row_cnt) lv_table_set_row_cnt(obj, row + 1);
 
     uint32_t cell = row * table->col_cnt + col;
-    lv_table_cell_format_t format;
+    lv_table_cell_ctrl_t ctrl = 0;
 
-    /*Save the format byte*/
-    if(table->cell_data[cell]) {
-        format.format_byte = table->cell_data[cell][0];
-    }
-    /*Initialize the format byte*/
-    else {
-        format.s.right_merge = 0;
-        format.s.crop        = 0;
-    }
+    /*Save the control byte*/
+    if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
 
-    #if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
@@ -119,17 +99,10 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
     strcpy(table->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
 #endif
 
-    table->cell_data[cell][0] = format.format_byte;
+    table->cell_data[cell][0] = ctrl;
     refr_size(obj) ;
 }
 
-/**
- * Set the value of a cell.  Memory will be allocated to store the text by the table.
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @param fmt `printf`-like format
- */
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -147,17 +120,10 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     }
 
     uint32_t cell = row * table->col_cnt + col;
-    lv_table_cell_format_t format;
+    lv_table_cell_ctrl_t ctrl;
 
-    /*Save the format byte*/
-    if(table->cell_data[cell]) {
-        format.format_byte = table->cell_data[cell][0];
-    }
-    /*Initialize the format byte*/
-    else {
-        format.s.right_merge = 0;
-        format.s.crop        = 0;
-    }
+    /*Save the control byte*/
+    if(table->cell_data[cell]) ctrl= table->cell_data[cell][0];
 
     va_list ap, ap2;
     va_start(ap, fmt);
@@ -204,15 +170,10 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
     va_end(ap2);
 
-    table->cell_data[cell][0] = format.format_byte;
+    table->cell_data[cell][0] = ctrl;
     refr_size(obj) ;
 }
 
-/**
- * Set the number of rows
- * @param table table pointer to a Table object
- * @param row_cnt number of rows
- */
 void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -239,11 +200,6 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     refr_size(obj) ;
 }
 
-/**
- * Set the number of columns
- * @param table table pointer to a Table object
- * @param col_cnt number of columns.
- */
 void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -288,12 +244,6 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     refr_size(obj) ;
 }
 
-/**
- * Set the width of a column
- * @param table table pointer to a Table object
- * @param col_id id of the column [0 .. LV_TABLE_COL_MAX -1]
- * @param w width of the column
- */
 void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -307,14 +257,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
     refr_size(obj) ;
 }
 
-/**
- * Set the cell crop. (Don't adjust the height of the cell according to its content)
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @param crop true: crop the cell content; false: set the cell height to the content.
- */
-void lv_table_set_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col, bool crop)
+void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -335,20 +278,10 @@ void lv_table_set_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col, bool cro
         table->cell_data[cell][1] = '\0';
     }
 
-    lv_table_cell_format_t format;
-    format.format_byte      = table->cell_data[cell][0];
-    format.s.crop           = crop;
-    table->cell_data[cell][0] = format.format_byte;
+    table->cell_data[cell][0] |= ctrl;
 }
 
-/**
- * Merge a cell with the right neighbor. The value of the cell to the right won't be displayed.
- * @param table table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @param en true: merge right; false: don't merge right
- */
-void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, bool en)
+void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -369,25 +302,13 @@ void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, b
         table->cell_data[cell][1] = '\0';
     }
 
-    lv_table_cell_format_t format;
-    format.format_byte      = table->cell_data[cell][0];
-    format.s.right_merge    = en ? 1 : 0;
-    table->cell_data[cell][0] = format.format_byte;
-    refr_size(obj) ;
+    table->cell_data[cell][0] &= (~ctrl);
 }
-
 
 /*=====================
  * Getter functions
  *====================*/
 
-/**
- * Get the value of a cell.
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @return text in the cell
- */
 const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -404,11 +325,6 @@ const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col)
     return &table->cell_data[cell][1]; /*Skip the format byte*/
 }
 
-/**
- * Get the number of rows.
- * @param table table pointer to a Table object
- * @return number of rows.
- */
 uint16_t lv_table_get_row_cnt(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -417,11 +333,6 @@ uint16_t lv_table_get_row_cnt(lv_obj_t * obj)
     return table->row_cnt;
 }
 
-/**
- * Get the number of columns.
- * @param table table pointer to a Table object
- * @return number of columns.
- */
 uint16_t lv_table_get_col_cnt(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -430,130 +341,40 @@ uint16_t lv_table_get_col_cnt(lv_obj_t * obj)
     return table->col_cnt;
 }
 
-/**
- * Get the width of a column
- * @param table table pointer to a Table object
- * @param col_id id of the column [0 .. LV_TABLE_COL_MAX -1]
- * @return width of the column
- */
-lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col_id)
+lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
 
-    if(col_id >= table->col_cnt) {
+    if(col >= table->col_cnt) {
         LV_LOG_WARN("lv_table_set_col_width: too big 'col_id'. Must be < LV_TABLE_COL_MAX.");
         return 0;
     }
 
-    return table->col_w[col_id];
+    return table->col_w[col];
 }
 
-/**
- * Get the crop property of a cell
- * @param table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @return true: text crop enabled; false: disabled
- */
-bool lv_table_get_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col)
+bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *) obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
         LV_LOG_WARN("lv_table_get_cell_crop: invalid row or column");
-        return false; /*Just return with something*/
+        return false;
     }
     uint32_t cell = row * table->col_cnt + col;
 
-    if(table->cell_data[cell] == NULL)
-        return false; /*Just return with something*/
-    else {
-        lv_table_cell_format_t format;
-        format.format_byte = table->cell_data[cell][0];
-        return format.s.crop;
-    }
+    if(table->cell_data[cell] == NULL) return false;
+    else return (table->cell_data[cell][0] & ctrl) == ctrl ? true : false;
 }
 
-/**
- * Get the cell merge attribute.
- * @param table table pointer to a Table object
- * @param row id of the row [0 .. row_cnt -1]
- * @param col id of the column [0 .. col_cnt -1]
- * @return true: merge right; false: don't merge right
- */
-bool lv_table_get_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_table_t * table = (lv_table_t *) obj;
-    if(row >= table->row_cnt || col >= table->col_cnt) {
-        LV_LOG_WARN("lv_table_get_cell_merge_right: invalid row or column");
-        return false;
-    }
-
-    uint32_t cell = row * table->col_cnt + col;
-
-    if(table->cell_data[cell] == NULL)
-        return false;
-    else {
-        lv_table_cell_format_t format;
-        format.format_byte = table->cell_data[cell][0];
-        return format.s.right_merge ? true : false;
-    }
-}
-
-/**
- * Get the last pressed or being pressed cell
- * @param table pointer to a table object
- * @param row pointer to variable to store the pressed row
- * @param col pointer to variable to store the pressed column
- * @return LV_RES_OK: a valid pressed cell was found, LV_RES_INV: no valid cell is pressed
- */
-lv_res_t lv_table_get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
+void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 {
     lv_table_t * table = (lv_table_t *) obj;
-
-    lv_indev_type_t type = lv_indev_get_type(lv_indev_get_act());
-    if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {
-        if(col) *col = 0xFFFF;
-        if(row) *row = 0xFFFF;
-        return LV_RES_INV;
-    }
-
-    lv_point_t p;
-    lv_indev_get_point(lv_indev_get_act(), &p);
-
-    lv_coord_t tmp;
-    if(col) {
-        lv_coord_t x = p.x;
-        x -= obj->coords.x1;
-        x -= lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        *col = 0;
-        tmp = 0;
-        for(*col = 0; *col < table->col_cnt; (*col)++) {
-            tmp += table->col_w[*col];
-            if(x < tmp) break;
-        }
-    }
-
-    if(row) {
-        lv_coord_t y = p.y;
-        y -= obj->coords.y1;
-        y -= lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-
-        *row = 0;
-        tmp = 0;
-
-        for(*row = 0; *row < table->row_cnt; (*row)++) {
-            tmp += table->row_h[*row];
-            if(y < tmp) break;
-        }
-    }
-
-    return LV_RES_OK;
+    *row = table->row_act;
+    *col = table->col_act;
 }
 
 /**********************
@@ -639,15 +460,18 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
         lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
-        lv_draw_rect_dsc_t rect_dsc_base;
-        lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the draw_cb to modify it*/
-        lv_draw_rect_dsc_init(&rect_dsc_base);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_base);
+        lv_state_t state_ori = obj->state;
+        obj->state = LV_STATE_DEFAULT;
+        lv_draw_rect_dsc_t rect_dsc_def;
+        lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the draw_hook to modify it*/
+        lv_draw_rect_dsc_init(&rect_dsc_def);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_def);
 
-        lv_draw_label_dsc_t label_dsc_base;
-        lv_draw_label_dsc_t label_dsc_act;  /*Passed to the draw_cb to modify it*/
-        lv_draw_label_dsc_init(&label_dsc_base);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_base);
+        lv_draw_label_dsc_t label_dsc_def;
+        lv_draw_label_dsc_t label_dsc_act;  /*Passed to the draw_hook to modify it*/
+        lv_draw_label_dsc_init(&label_dsc_def);
+        lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_def);
+        obj->state = state_ori;
 
         uint16_t col;
         uint16_t row;
@@ -676,14 +500,8 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
             else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x;
 
             for(col = 0; col < table->col_cnt; col++) {
-                lv_table_cell_format_t format;
-                if(table->cell_data[cell]) {
-                    format.format_byte = table->cell_data[cell][0];
-                }
-                else {
-                    format.s.right_merge = 0;
-                    format.s.crop        = 1;
-                }
+                lv_table_cell_ctrl_t ctrl = 0;
+                if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
 
                 if(rtl) {
                     cell_area.x2 = cell_area.x1 - 1;
@@ -697,8 +515,9 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                 uint16_t col_merge = 0;
                 for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
                     if(table->cell_data[cell + col_merge]) {
-                        format.format_byte = table->cell_data[cell + col_merge][0];
-                        if(format.s.right_merge)
+                        char * next_cell_data = table->cell_data[cell + col_merge];
+                        if(next_cell_data) ctrl = next_cell_data[0];
+                        if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
                             if(rtl) cell_area.x1 -= table->col_w[col + col_merge + 1];
                             else cell_area.x2 += table->col_w[col + col_merge + 1];
                         else {
@@ -719,22 +538,45 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                 /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
                 lv_area_t cell_area_border;
                 lv_area_copy(&cell_area_border, &cell_area);
-                if((rect_dsc_base.border_side & LV_BORDER_SIDE_LEFT) && cell_area_border.x1 > obj->coords.x1 + bg_left) {
-                    cell_area_border.x1 -= rect_dsc_base.border_width / 2;
+                if((rect_dsc_def.border_side & LV_BORDER_SIDE_LEFT) && cell_area_border.x1 > obj->coords.x1 + bg_left) {
+                    cell_area_border.x1 -= rect_dsc_def.border_width / 2;
                 }
-                if((rect_dsc_base.border_side & LV_BORDER_SIDE_TOP) && cell_area_border.y1 > obj->coords.y1 + bg_top) {
-                    cell_area_border.y1 -= rect_dsc_base.border_width / 2;
+                if((rect_dsc_def.border_side & LV_BORDER_SIDE_TOP) && cell_area_border.y1 > obj->coords.y1 + bg_top) {
+                    cell_area_border.y1 -= rect_dsc_def.border_width / 2;
                 }
-                if((rect_dsc_base.border_side & LV_BORDER_SIDE_RIGHT) && cell_area_border.x2 < obj->coords.x2 - bg_right - 1) {
-                    cell_area_border.x2 += rect_dsc_base.border_width / 2 + (rect_dsc_base.border_width & 0x1);
+                if((rect_dsc_def.border_side & LV_BORDER_SIDE_RIGHT) && cell_area_border.x2 < obj->coords.x2 - bg_right - 1) {
+                    cell_area_border.x2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
                 }
-                if((rect_dsc_base.border_side & LV_BORDER_SIDE_BOTTOM) &&
+                if((rect_dsc_def.border_side & LV_BORDER_SIDE_BOTTOM) &&
                    cell_area_border.y2 < obj->coords.y2 - bg_bottom - 1) {
-                   cell_area_border.y2 += rect_dsc_base.border_width / 2 + (rect_dsc_base.border_width & 0x1);
+                   cell_area_border.y2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
                 }
 
-                lv_memcpy(&rect_dsc_act, &rect_dsc_base, sizeof(lv_draw_rect_dsc_t));
-                lv_memcpy(&label_dsc_act, &label_dsc_base, sizeof(lv_draw_label_dsc_t));
+                lv_state_t cell_state = LV_STATE_DEFAULT;
+                if(row == table->row_act && col == table->col_act) {
+                    if(obj->state & LV_STATE_PRESSED) cell_state |= LV_STATE_PRESSED;
+                    if(obj->state & LV_STATE_FOCUSED) cell_state |= LV_STATE_FOCUSED;
+                    if(obj->state & LV_STATE_FOCUS_KEY) cell_state |= LV_STATE_FOCUS_KEY;
+                    if(obj->state & LV_STATE_EDITED) cell_state |= LV_STATE_EDITED;
+                }
+
+                /*Set up the draw descriptors*/
+                if(cell_state == LV_STATE_DEFAULT) {
+                    lv_memcpy(&rect_dsc_act, &rect_dsc_def, sizeof(lv_draw_rect_dsc_t));
+                    lv_memcpy(&label_dsc_act, &label_dsc_def, sizeof(lv_draw_label_dsc_t));
+                }
+                /*In other cases get the styles directly without caching them*/
+                else {
+                    obj->state = cell_state;
+                    obj->style_list.skip_trans = 1;
+                    lv_draw_rect_dsc_init(&rect_dsc_act);
+                    lv_draw_label_dsc_init(&label_dsc_act);
+                    lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_act);
+                    lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_act);
+                    obj->state = state_ori;
+                    obj->style_list.skip_trans = 0;
+                }
+
                 hook_dsc.draw_area = &cell_area_border;
                 hook_dsc.id = row * table->col_cnt + col;
                 lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
@@ -748,15 +590,16 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                     txt_area.y2 = cell_area.y2 - cell_bottom;
 
                     /*Align the content to the middle if not cropped*/
-                    if(format.s.crop == 0) txt_flags = LV_TEXT_FLAG_NONE;
-                    else txt_flags = LV_TEXT_FLAG_EXPAND;
+                    bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP ? true : false;
+                    if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
+                    else txt_flags = LV_TEXT_FLAG_NONE;
 
-                    lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_base.font,
+                    lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
                                      label_dsc_act.letter_space, label_dsc_act.line_space,
                                      lv_area_get_width(&txt_area), txt_flags);
 
                     /*Align the content to the middle if not cropped*/
-                    if(format.s.crop == 0) {
+                    if(!crop) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
                         txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
                     }
@@ -809,6 +652,64 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         p->x = w;
         p->y = h;
     }
+    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING) {
+        uint16_t col;
+        uint16_t row;
+        get_pressed_cell(obj, &row, &col);
+
+        if(table->col_act != col || table->row_act != row) {
+            table->col_act = col;
+            table->row_act = row;
+            lv_obj_invalidate(obj);
+        }
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
+        lv_indev_t * indev = lv_indev_get_act();
+        lv_obj_t * scroll_obj = lv_indev_get_scroll_obj(indev);
+        if(table->col_act != 0xFFFF && table->row_act != 0xFFFF && scroll_obj == NULL) {
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return res;
+        }
+
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
+            table->col_act = 0xFFFF;
+            table->row_act = 0xFFFF;
+            lv_obj_invalidate(obj);
+        }
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
+        int32_t c = *((int32_t *)param);
+        int32_t col = table->col_act;
+        int32_t row = table->row_act;
+        if(c == LV_KEY_LEFT) col--;
+        else if(c == LV_KEY_RIGHT) col++;
+        else if(c == LV_KEY_UP) row--;
+        else if(c == LV_KEY_DOWN) row++;
+
+        if(col >= table->col_cnt) {
+            col = 0;
+            row++;
+        } else if (col < 0) {
+            col = table->col_cnt - 1;
+            row--;
+        }
+
+        if(row >= table->row_cnt) {
+            row = table->row_cnt - 1;
+        } else if(row < 0) {
+            row = 0;
+        }
+
+        if(table->col_act != col || table->row_act != row) {
+            table->col_act = col;
+            table->row_act = row;
+            lv_obj_invalidate(obj);
+
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return res;
+        }
+    }
 
     return res;
 }
@@ -857,9 +758,10 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
             for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
 
                 if(table->cell_data[cell + col_merge] != NULL) {
-                    lv_table_cell_format_t format;
-                    format.format_byte = table->cell_data[cell + col_merge][0];
-                    if(format.s.right_merge)
+                    lv_table_cell_ctrl_t ctrl = 0;
+                    char * next_cell_data = table->cell_data[cell + col_merge];
+                    if(next_cell_data) ctrl = next_cell_data[0];
+                    if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
                         txt_w += table->col_w[col + col_merge + 1];
                     else
                         break;
@@ -869,11 +771,11 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                 }
             }
 
-            lv_table_cell_format_t format;
-            format.format_byte = table->cell_data[cell][0];
+            lv_table_cell_ctrl_t ctrl = 0;
+            if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
 
             /*With text crop assume 1 line*/
-            if(format.s.crop) {
+            if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
                 h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
                                     h_max);
             }
@@ -893,5 +795,50 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
 
     return h_max;
 }
+
+static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
+{
+   lv_table_t * table = (lv_table_t *) obj;
+
+    lv_indev_type_t type = lv_indev_get_type(lv_indev_get_act());
+    if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {
+        if(col) *col = 0xFFFF;
+        if(row) *row = 0xFFFF;
+        return LV_RES_INV;
+    }
+
+    lv_point_t p;
+    lv_indev_get_point(lv_indev_get_act(), &p);
+
+    lv_coord_t tmp;
+    if(col) {
+        lv_coord_t x = p.x + lv_obj_get_scroll_x(obj);
+        x -= obj->coords.x1;
+        x -= lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        *col = 0;
+        tmp = 0;
+        for(*col = 0; *col < table->col_cnt; (*col)++) {
+            tmp += table->col_w[*col];
+            if(x < tmp) break;
+        }
+    }
+
+    if(row) {
+        lv_coord_t y = p.y + lv_obj_get_scroll_y(obj);;
+        y -= obj->coords.y1;
+        y -= lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+
+        *row = 0;
+        tmp = 0;
+
+        for(*row = 0; *row < table->row_cnt; (*row)++) {
+            tmp += table->row_h[*row];
+            if(y < tmp) break;
+        }
+    }
+
+    return LV_RES_OK;
+}
+
 
 #endif

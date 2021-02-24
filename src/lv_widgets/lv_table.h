@@ -28,25 +28,23 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_TABLE_CELL_NONE 0XFFFF
+LV_EXPORT_CONST_INT(LV_TABLE_CELL_NONE);
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_table_cell_draw_cb_t)(lv_obj_t * table, uint32_t row, uint32_t cell, lv_draw_rect_dsc_t * rect_draw_dsc, lv_draw_label_dsc_t * label_draw_dsc, const lv_area_t * draw_area, const lv_area_t * clip_area);
+enum {
+    LV_TABLE_CELL_CTRL_MERGE_RIGHT = 1 << 0,
+    LV_TABLE_CELL_CTRL_TEXT_CROP   = 1 << 1,
+    LV_TABLE_CELL_CTRL_CUSTOM_1    = 1 << 4,
+    LV_TABLE_CELL_CTRL_CUSTOM_2    = 1 << 5,
+    LV_TABLE_CELL_CTRL_CUSTOM_3    = 1 << 6,
+    LV_TABLE_CELL_CTRL_CUSTOM_4    = 1 << 7,
+};
 
-/**
- * Internal table cell format structure.
- *
- * Use the `lv_table` APIs instead.
- */
-typedef union {
-    struct {
-        uint8_t right_merge : 1;
-        uint8_t crop : 1;
-    } s;
-    uint8_t format_byte;
-} lv_table_cell_format_t;
+typedef uint8_t  lv_table_cell_ctrl_t;
 
 /*Data of table*/
 typedef struct {
@@ -56,6 +54,8 @@ typedef struct {
     char ** cell_data;
     lv_coord_t * row_h;
     lv_coord_t * col_w;
+    uint16_t col_act;
+    uint16_t row_act;
 } lv_table_t;
 
 extern const lv_obj_class_t lv_table_class;
@@ -65,11 +65,10 @@ extern const lv_obj_class_t lv_table_class;
  **********************/
 
 /**
- * Create a table objects
- * @param parent pointer to an object, it will be the parent of the new table
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other table to copy.
- * @return pointer to the created table
+ * Create a table object
+ * @param parent        pointer to an object, it will be the parent of the new table
+ * @param copy          pointer to a table object, if not NULL then the new object will be copied from it
+ * @return              pointer to the created table
  */
 lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy);
 
@@ -79,62 +78,64 @@ lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /**
  * Set the value of a cell.
- * @param obj       pointer to a table object
- * @param row       id of the row [0 .. row_cnt -1]
- * @param col       id of the column [0 .. col_cnt -1]
- * @param txt       text to display in the cell.
- *                  It will be copied and saved so this variable is not required after this function call.
+ * @param obj           pointer to a Table object
+ * @param row           id of the row [0 .. row_cnt -1]
+ * @param col           id of the column [0 .. col_cnt -1]
+ * @param txt           text to display in the cell. It will be copied and saved so this variable is not required after this function call.
+ * @note                New roes/columns are added automatically if required
  */
 void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const char * txt);
 
 /**
  * Set the value of a cell.  Memory will be allocated to store the text by the table.
- * @param obj       pointer to a table object
- * @param row       index of the row [0 .. row_cnt -1]
- * @param col       index of the column [0 .. col_cnt -1]
- * @param fmt `     printf`-like format
+ * @param obj           pointer to a Table object
+ * @param row           id of the row [0 .. row_cnt -1]
+ * @param col           id of the column [0 .. col_cnt -1]
+ * @param fmt           `printf`-like format
+ * @note                New roes/columns are added automatically if required
  */
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...);
 
 /**
  * Set the number of rows
- * @param obj       table pointer to a table object
- * @param row_cnt   number of rows
+ * @param obj           table pointer to a Table object
+ * @param row_cnt       number of rows
  */
 void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt);
 
 /**
  * Set the number of columns
- * @param obj       table pointer to a table object
+ * @param obj       table pointer to a Table object
  * @param col_cnt   number of columns.
  */
 void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt);
 
 /**
  * Set the width of a column
- * @param obj       table pointer to a table object
+ * @param obj       table pointer to a Table object
  * @param col_id    id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @param w         width of the column
  */
 void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w);
 
 /**
- * Set the cell crop. (Don't adjust the height of the cell according to this cell's content)
- * @param obj       pointer to a table object
+ * Add control bits to the cell.
+ * @param obj       pointer to a Table object
  * @param row       id of the row [0 .. row_cnt -1]
  * @param col       id of the column [0 .. col_cnt -1]
- * @param crop      true: crop the cell content; false: set the cell height to the content.
+ * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
  */
-void lv_table_set_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col, bool crop);
+void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl);
+
 
 /**
- * Merge a cell with the right neighbor. The value of the cell to the right won't be displayed.
- * @param obj       table pointer to a table object
- * @param row       index of the row [0 .. row_cnt -1]
- * @param col       index of the column [0 .. col_cnt -1]
- * @param en        true: merge right; false: don't merge right
+ * Clear control bits of the cell.
+ * @param obj       pointer to a Table object
+ * @param row       id of the row [0 .. row_cnt -1]
+ * @param col       id of the column [0 .. col_cnt -1]
+ * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
  */
-void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, bool en);
+void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl);
 
 /*=====================
  * Getter functions
@@ -142,62 +143,52 @@ void lv_table_set_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col, b
 
 /**
  * Get the value of a cell.
- * @param obj       pointer to a table object
- * @param row       index of the row [0 .. row_cnt -1]
- * @param col       index of the column [0 .. col_cnt -1]
- * @return          text of the cell
+ * @param obj       pointer to a Table object
+ * @param row       id of the row [0 .. row_cnt -1]
+ * @param col       id of the column [0 .. col_cnt -1]
+ * @return          text in the cell
  */
 const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col);
 
 /**
  * Get the number of rows.
- * @param obj       table pointer to a table object
+ * @param obj       table pointer to a Table object
  * @return          number of rows.
  */
 uint16_t lv_table_get_row_cnt(lv_obj_t * obj);
 
 /**
  * Get the number of columns.
- * @param obj       table pointer to a table object
+ * @param obj       table pointer to a Table object
  * @return          number of columns.
  */
 uint16_t lv_table_get_col_cnt(lv_obj_t * obj);
 
 /**
  * Get the width of a column
- * @param obj       table pointer to a table object
- * @param col_id    id of the column [0 .. LV_TABLE_COL_MAX -1]
+ * @param obj       table pointer to a Table object
+ * @param col       id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @return          width of the column
  */
-lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col_id);
+lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col);
 
 /**
- * Get the crop property of a cell
+ * Get whether a cell has the control bits
+ * @param obj       pointer to a Table object
+ * @param row       id of the row [0 .. row_cnt -1]
+ * @param col       id of the column [0 .. col_cnt -1]
+ * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
+ * @return          true: all control bits are set; false: not all control bits are set
+ */
+bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl);
+
+/**
+ * Get the selected cell (pressed and or focused)
  * @param obj       pointer to a table object
- * @param row       index of the row [0 .. row_cnt -1]
- * @param col       index of the column [0 .. col_cnt -1]
- * @return          true: text crop enabled; false: disabled
+ * @param row       pointer to variable to store the selected row (LV_TABLE_CELL_NONE: if no cell selected)
+ * @param col       pointer to variable to store the selected column  (LV_TABLE_CELL_NONE: if no cell selected)
  */
-bool lv_table_get_cell_crop(lv_obj_t * obj, uint16_t row, uint16_t col);
-
-/**
- * Get the cell merge attribute.
- * @param obj       pointer to a table object
- * @param row       index of the row [0 .. row_cnt -1]
- * @param col       index of the column [0 .. col_cnt -1]
- * @return          true: merge right; false: don't merge right
- */
-bool lv_table_get_cell_merge_right(lv_obj_t * obj, uint16_t row, uint16_t col);
-
-/**
- * Get the last pressed or being pressed cell
- * @param obj   pointer to a table object
- * @param row   pointer to variable to store the pressed row
- * @param col   pointer to variable to store the pressed column
- * @return      LV_RES_OK: a valid pressed cell was found, LV_RES_INV: no valid cell is pressed
- */
-lv_res_t lv_table_get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
-
+void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 
 /**********************
  *      MACROS
