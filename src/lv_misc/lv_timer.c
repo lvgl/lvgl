@@ -11,10 +11,6 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -34,7 +30,7 @@ static uint32_t lv_timer_time_remaining(lv_timer_t * timer);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_timer_run  = false;
+static bool lv_timer_run = false;
 static uint8_t idle_last = 0;
 static bool timer_deleted;
 static bool timer_created;
@@ -218,7 +214,6 @@ void lv_timer_del(lv_timer_t * timer)
 void lv_timer_pause(lv_timer_t * timer, bool pause)
 {
     timer->paused = pause;
-
 }
 /**
  * Set new period for a lv_timer

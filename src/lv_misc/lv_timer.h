@@ -34,7 +34,7 @@ extern "C" {
 struct _lv_timer_t;
 
 /**
- * Tasks execute this type type of functions.
+ * Tasks execute this type of functions.
  */
 typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
 
