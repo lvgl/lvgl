@@ -144,22 +144,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
  */
 lv_timer_t * lv_timer_create_basic(void)
 {
-    lv_timer_t * new_timer = NULL;
-
-    new_timer = _lv_ll_ins_head(&LV_GC_ROOT(_lv_timer_ll));
-    LV_ASSERT_MALLOC(new_timer);
-    if(new_timer == NULL) return NULL;
-
-    new_timer->period  = DEF_PERIOD;
-    new_timer->timer_cb = NULL;
-    new_timer->repeat_count = -1;
-    new_timer->paused = 0;
-    new_timer->last_run = lv_tick_get();
-    new_timer->user_data = NULL;
-
-    timer_created = true;
-
-    return new_timer;
+    return lv_timer_create(NULL, DEF_PERIOD, NULL);
 }
 
 /**
@@ -173,13 +158,20 @@ lv_timer_t * lv_timer_create_basic(void)
  */
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
 {
-    lv_timer_t * new_timer = lv_timer_create_basic();
+    lv_timer_t * new_timer = NULL;
+
+    new_timer = _lv_ll_ins_head(&LV_GC_ROOT(_lv_timer_ll));
     LV_ASSERT_MALLOC(new_timer);
     if(new_timer == NULL) return NULL;
 
-    lv_timer_set_cb(new_timer, timer_xcb);
-    lv_timer_set_period(new_timer, period);
+    new_timer->period  = period;
+    new_timer->timer_cb = timer_xcb;
+    new_timer->repeat_count = -1;
+    new_timer->paused = 0;
+    new_timer->last_run = lv_tick_get();
     new_timer->user_data = user_data;
+
+    timer_created = true;
 
     return new_timer;
 }
