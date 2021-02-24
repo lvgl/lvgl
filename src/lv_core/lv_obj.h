@@ -248,8 +248,8 @@ typedef struct {
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing. */
 
     lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/
-    lv_snap_align_t snap_align_x : 2;      /**< Where to align the snapable children horizontally*/
-    lv_snap_align_t snap_align_y : 2;      /**< Where to align the snapable children horizontally*/
+    lv_scroll_snap_t scroll_snap_x : 2;      /**< Where to align the snapable children horizontally*/
+    lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snapable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
     uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array */

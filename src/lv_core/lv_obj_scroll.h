@@ -39,12 +39,12 @@ typedef uint8_t lv_scrollbar_mode_t;
 
 /** Scroll span align options. Tells where to align the snapable children when scroll stops. */
 enum {
-    LV_SCROLL_SNAP_ALIGN_NONE,    /**< Do not align, leave where it is */
-    LV_SCROLL_SNAP_ALIGN_START,   /**< Align to to the left/top */
-    LV_SCROLL_SNAP_ALIGN_END,     /**< Align to to the right/bottom */
-    LV_SCROLL_SNAP_ALIGN_CENTER   /**< Align to to the center */
+    LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is */
+    LV_SCROLL_SNAP_START,   /**< Align to to the left/top */
+    LV_SCROLL_SNAP_END,     /**< Align to to the right/bottom */
+    LV_SCROLL_SNAP_CENTER   /**< Align to to the center */
 };
-typedef uint8_t lv_snap_align_t;
+typedef uint8_t lv_scroll_snap_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -73,14 +73,14 @@ void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir);
  * @param obj       pointer to an object
  * @param align     the snap align to set from `lv_snap_align_t`
  */
-void lv_obj_set_scroll_snap_align_x(struct _lv_obj_t * obj, lv_snap_align_t align);
+void lv_obj_set_scroll_snap_x(struct _lv_obj_t * obj, lv_scroll_snap_t align);
 
 /**
  * Set where to snap the children when scrolling ends vertically
  * @param obj       pointer to an object
  * @param align     the snap align to set from `lv_snap_align_t`
  */
-void lv_obj_set_scroll_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align);
+void lv_obj_set_scroll_snap_y(struct _lv_obj_t * obj, lv_scroll_snap_t align);
 
 /*=====================
  * Getter functions
@@ -105,14 +105,14 @@ lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @return          the current snap align from `lv_snap_align_t`
  */
-lv_snap_align_t lv_obj_get_scroll_snap_align_x(const struct _lv_obj_t * obj);
+lv_scroll_snap_t lv_obj_get_scroll_snap_x(const struct _lv_obj_t * obj);
 
 /**
  * Get where to snap the children when scrolling ends vertically
  * @param  obj      pointer to an object
  * @return          the current snap align from `lv_snap_align_t`
  */
-lv_snap_align_t lv_obj_get_scroll_snap_align_y(const struct _lv_obj_t * obj);
+lv_scroll_snap_t lv_obj_get_scroll_snap_y(const struct _lv_obj_t * obj);
 
 /**
  * Get current X scroll position.

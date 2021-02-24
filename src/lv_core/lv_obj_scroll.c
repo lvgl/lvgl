@@ -73,16 +73,16 @@ void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir)
     }
 }
 
-void lv_obj_set_scroll_snap_align_x(struct _lv_obj_t * obj, lv_snap_align_t align)
+void lv_obj_set_scroll_snap_x(struct _lv_obj_t * obj, lv_scroll_snap_t align)
 {
     lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->snap_align_x = align;
+    obj->spec_attr->scroll_snap_x = align;
 }
 
-void lv_obj_set_scroll_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align)
+void lv_obj_set_scroll_snap_y(struct _lv_obj_t * obj, lv_scroll_snap_t align)
 {
     lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->snap_align_y = align;
+    obj->spec_attr->scroll_snap_y = align;
 }
 
 /*=====================
@@ -101,16 +101,16 @@ lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj)
     else return LV_DIR_ALL;
 }
 
-lv_snap_align_t lv_obj_get_scroll_snap_align_x(const struct _lv_obj_t * obj)
+lv_scroll_snap_t lv_obj_get_scroll_snap_x(const struct _lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->snap_align_x;
-    else return LV_SCROLL_SNAP_ALIGN_NONE;
+    if(obj->spec_attr) return obj->spec_attr->scroll_snap_x;
+    else return LV_SCROLL_SNAP_NONE;
 }
 
-lv_snap_align_t lv_obj_get_scroll_snap_align_y(const struct _lv_obj_t * obj)
+lv_scroll_snap_t lv_obj_get_scroll_snap_y(const struct _lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->snap_align_y;
-    else return LV_SCROLL_SNAP_ALIGN_NONE;
+    if(obj->spec_attr) return obj->spec_attr->scroll_snap_y;
+    else return LV_SCROLL_SNAP_NONE;
 }
 
 lv_coord_t lv_obj_get_scroll_x(const lv_obj_t * obj)
