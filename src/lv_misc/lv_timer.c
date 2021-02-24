@@ -67,17 +67,15 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     if(already_running) return 1;
     already_running = true;
 
-    static uint32_t idle_period_start = 0;
-    static uint32_t handler_start     = 0;
-    static uint32_t busy_time         = 0;
-    static uint32_t time_till_next;
-
     if(lv_timer_run == false) {
         already_running = false; /*Release mutex*/
         return 1;
     }
 
-    handler_start = lv_tick_get();
+    static uint32_t idle_period_start = 0;
+    static uint32_t busy_time         = 0;
+
+    uint32_t handler_start = lv_tick_get();
 
     /* Run all timer from the highest to the lowest priority
      * If a lower priority timer is executed check timer again from the highest priority
@@ -110,17 +108,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         }
     } while(!end_flag);
 
-    busy_time += lv_tick_elaps(handler_start);
-    uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
-    if(idle_period_time >= IDLE_MEAS_PERIOD) {
-
-        idle_last         = (uint32_t)((uint32_t)busy_time * 100) / IDLE_MEAS_PERIOD; /*Calculate the busy percentage*/
-        idle_last         = idle_last > 100 ? 0 : 100 - idle_last;                    /*But we need idle time*/
-        busy_time         = 0;
-        idle_period_start = lv_tick_get();
-    }
-
-    time_till_next = LV_NO_TIMER_READY;
+    uint32_t time_till_next = LV_NO_TIMER_READY;
     next = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
     while(next) {
         if(next->repeat_count) {
@@ -130,6 +118,15 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         }
 
         next = _lv_ll_get_next(&LV_GC_ROOT(_lv_timer_ll), next); /*Find the next timer*/
+    }
+
+    busy_time += lv_tick_elaps(handler_start);
+    uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
+    if(idle_period_time >= IDLE_MEAS_PERIOD) {
+        idle_last         = (busy_time * 100) / idle_period_time;  /*Calculate the busy percentage*/
+        idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
+        busy_time         = 0;
+        idle_period_start = lv_tick_get();
     }
 
     already_running = false; /*Release the mutex*/
