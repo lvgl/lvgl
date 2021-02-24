@@ -224,12 +224,12 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
     if(event != LV_EVENT_VALUE_CHANGED) return;
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
-    uint16_t btn_id   = lv_btnmatrix_get_active_btn(obj);
+    uint16_t btn_id   = lv_btnmatrix_get_selected_btn(obj);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
     if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_HIDDEN | LV_BTNMATRIX_CTRL_DISABLED)) return;
     if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_NO_REPEAT) && event == LV_EVENT_LONG_PRESSED_REPEAT) return;
 
-    const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_active_btn(obj));
+    const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
     if(txt == NULL) return;
 
     if(strcmp(txt, "abc") == 0) {

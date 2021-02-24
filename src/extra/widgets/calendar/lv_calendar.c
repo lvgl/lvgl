@@ -183,7 +183,7 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
 bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date)
 {
     lv_calendar_t * calendar = (lv_calendar_t *) obj;
-    uint16_t d = lv_btnmatrix_get_active_btn(obj);
+    uint16_t d = lv_btnmatrix_get_selected_btn(obj);
     if(d == LV_BTNMATRIX_BTN_NONE) {
         date->year = 0;
         date->month = 0;
@@ -191,7 +191,7 @@ bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * dat
         return false;
     }
 
-    const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_active_btn(obj));
+    const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
 
     if(txt[1] == 0) date->day = txt[0] - '0';
     else date->day = (txt[0] - '0') * 10 + (txt[1] - '0');
@@ -273,7 +273,7 @@ static void draw_event_cb(lv_obj_t * obj, lv_event_t e)
             if(lv_btnmatrix_has_btn_ctrl(obj, hook_dsc->id, LV_CALENDAR_CTRL_HIGHLIGHT)) {
                 hook_dsc->rect_dsc->bg_opa = LV_OPA_40;
                 hook_dsc->rect_dsc->bg_color = lv_theme_get_color_primary();
-                if(lv_btnmatrix_get_active_btn(obj) == hook_dsc->id) {
+                if(lv_btnmatrix_get_selected_btn(obj) == hook_dsc->id) {
                     hook_dsc->rect_dsc->bg_opa = LV_OPA_70;
                 }
             }

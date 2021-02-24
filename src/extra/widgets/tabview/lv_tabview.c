@@ -229,7 +229,7 @@ static void btns_event_cb(lv_obj_t * btns, lv_event_t e)
 {
     if(e == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * tv = lv_obj_get_parent(btns);
-        uint32_t id = lv_btnmatrix_get_active_btn(btns);
+        uint32_t id = lv_btnmatrix_get_selected_btn(btns);
         lv_tabview_set_act(tv, id, LV_ANIM_ON);
     }
 }

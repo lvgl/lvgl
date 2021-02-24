@@ -6,7 +6,7 @@ static void btnm_event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * ta = lv_event_get_user_data();
-        const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_active_btn(obj));
+        const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
 
         if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) lv_textarea_del_char(ta);
         else if(strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) lv_textarea_add_char(ta, '\n');
