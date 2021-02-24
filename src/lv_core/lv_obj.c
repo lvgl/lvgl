@@ -463,7 +463,7 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    return obj->flags & f ? true : false;
+    return (obj->flags & f)  == f ? true : false;
 }
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
