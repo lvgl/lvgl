@@ -58,8 +58,6 @@ typedef struct {
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNMATRIX_BTN_NONE*/
-    uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNMATRIX_BTN_NONE*/
     uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE */
     uint8_t recolor : 1;    /*Enable button recoloring*/
     uint8_t one_check : 1;  /*Single button toggled at once*/
@@ -107,13 +105,6 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[]);
  *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT |  LV_BTNMATRIX_CTRL_TGL_ENABLE`
  */
 void lv_btnmatrix_set_ctrl_map(lv_obj_t * obj, const lv_btnmatrix_ctrl_t ctrl_map[]);
-
-/**
- * Set the focused button i.e. visually highlight it.
- * @param obj       pointer to button matrix object
- * @param id        index of the button to focus(`LV_BTNMATRIX_BTN_NONE` to remove focus)
- */
-void lv_btnmatrix_set_focused_btn(lv_obj_t * obj, uint16_t id);
 
 /**
  * Enable recoloring of button's texts. E.g. "a #ff0000 red# word"
@@ -191,7 +182,7 @@ const char ** lv_btnmatrix_get_map(const lv_obj_t * obj);
 bool lv_btnmatrix_get_recolor(const lv_obj_t * obj);
 
 /**
- * Get the index of the lastly "activated" button by the user (pressed, released etc)
+ * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)
  * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
  * @param obj       pointer to button matrix object
  * @return          index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
@@ -199,25 +190,9 @@ bool lv_btnmatrix_get_recolor(const lv_obj_t * obj);
 uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * obj);
 
 /**
- * Get the index of the button being pressed button.
- * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
- * @param obj       pointer to button matrix object
- * @return          index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
- */
-uint16_t lv_btnmatrix_get_pressed_btn(const lv_obj_t * obj);
-
-/**
- * Get the focused button's index.
- * @param obj       pointer to button matrix object
- * @return          index of the focused button (LV_BTNMATRIX_BTN_NONE: if unset)
- */
-uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * obj);
-
-/**
  * Get the button's text
  * @param obj       pointer to button matrix object
  * @param btn_id    the index a button not counting new line characters.
- *                  (The return value of lv_btnmatrix_get_active/pressed/released)
  * @return          text of btn_index` button
  */
 const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id);

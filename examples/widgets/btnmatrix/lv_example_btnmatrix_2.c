@@ -10,7 +10,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
         /*Change the draw descriptor the 2nd button */
         if(dsc->id == 1) {
             dsc->rect_dsc->radius = 0;
-            if(lv_btnmatrix_get_pressed_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_color_blue_darken_3();
+            if(lv_btnmatrix_get_active_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_color_blue_darken_3();
             else dsc->rect_dsc->bg_color = lv_color_blue();
 
             dsc->rect_dsc->shadow_width = 6;
@@ -21,7 +21,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
         /*Change the draw descriptor the 3rd button */
         else if(dsc->id == 2) {
             dsc->rect_dsc->radius = LV_RADIUS_CIRCLE;
-            if(lv_btnmatrix_get_pressed_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_color_red_darken_3();
+            if(lv_btnmatrix_get_active_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_color_red_darken_3();
             else dsc->rect_dsc->bg_color = lv_color_red();
 
             dsc->label_dsc->color = lv_color_white();
@@ -50,7 +50,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             lv_draw_img_dsc_t img_draw_dsc;
             lv_draw_img_dsc_init(&img_draw_dsc);
             img_draw_dsc.recolor = lv_color_black();
-            if(lv_btnmatrix_get_pressed_btn(obj) == dsc->id)  img_draw_dsc.recolor_opa = LV_OPA_30;
+            if(lv_btnmatrix_get_active_btn(obj) == dsc->id)  img_draw_dsc.recolor_opa = LV_OPA_30;
 
             lv_draw_img(&a, dsc->clip_area, &img_star, &img_draw_dsc);
         }

@@ -24,11 +24,11 @@ void lv_example_meter_4(void)
     lv_meter_set_indicator_start_value(meter, indic1, 0);
     lv_meter_set_indicator_end_value(meter, indic1, 40);
 
-    lv_meter_indicator_t * indic2 = lv_meter_add_arc(meter, scale, indic_w, lv_color_green(), 0);
+    lv_meter_indicator_t * indic2 = lv_meter_add_arc(meter, scale, indic_w, lv_color_yellow(), 0);
     lv_meter_set_indicator_start_value(meter, indic2, 40);  /*Start from the previous*/
     lv_meter_set_indicator_end_value(meter, indic2, 80);
 
-    lv_meter_indicator_t * indic3 = lv_meter_add_arc(meter, scale, indic_w, lv_color_blue(), 0);
+    lv_meter_indicator_t * indic3 = lv_meter_add_arc(meter, scale, indic_w, lv_color_deep_orange(), 0);
     lv_meter_set_indicator_start_value(meter, indic3, 80);  /*Start from the previous*/
     lv_meter_set_indicator_end_value(meter, indic3, 100);
 }
