@@ -277,8 +277,6 @@ static bool lv_timer_exec(lv_timer_t * timer)
     bool exec = false;
     if(lv_timer_time_remaining(timer) == 0) {
         timer->last_run = lv_tick_get();
-        timer_deleted   = false;
-        timer_created   = false;
         if(timer->timer_cb) timer->timer_cb(timer);
         LV_ASSERT_MEM_INTEGRITY();
 
