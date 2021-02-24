@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/lv_widgets/lv_meter.h>
+#include "lv_meter.h"
 #if LV_USE_METER != 0
 
 #include "../lv_misc/lv_assert.h"

@@ -15,7 +15,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/lv_misc/lv_assert.h>
+#include "../lv_misc/lv_assert.h"
 //#include "lv_templ.h" /*TODO uncomment this*/
 
 #if defined(LV_USE_TEMPL) && LV_USE_TEMPL != 0
