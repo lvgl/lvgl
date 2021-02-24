@@ -557,14 +557,64 @@ static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc)
 static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scroll_start, lv_coord_t scroll_end, lv_dir_t dir)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
-        /* Elastic scroll if scrolled in
-         * If there is snapping in a direction don't use the elastic factor because
+        /* If there is snapping in the current direction don't use the elastic factor because
          * it's natural that the first and last items are scrolled (snapped) in. */
-        lv_scroll_snap_t snap = dir == LV_DIR_HOR ? lv_obj_get_scroll_snap_x(obj) : lv_obj_get_scroll_snap_y(obj);
-        if(snap != LV_SCROLL_SNAP_NONE) return diff;
+        lv_scroll_snap_t snap;
+        void(*size)(const lv_area_t) = dir == LV_DIR_HOR ? lv_area_get_width : lv_area_get_height;
+        snap = dir == LV_DIR_HOR ? lv_obj_get_scroll_snap_x(obj) : lv_obj_get_scroll_snap_y(obj);
 
-        if(scroll_end < 0) diff = (diff + ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
-        else if(scroll_start < 0) diff = (diff - ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
+        lv_obj_t * act_obj = lv_indev_get_obj_act();
+        lv_coord_t scroll_obj_point = 0;
+        lv_coord_t act_obj_point = 0;
+
+        if(dir == LV_DIR_HOR) {
+            switch(snap) {
+            case LV_SCROLL_SNAP_CENTER:
+                scroll_obj_point = lv_area_get_width(&obj->coords) / 2 + obj->coords.x1;
+                act_obj_point = lv_area_get_width(&act_obj->coords) / 2 + act_obj->coords.x1;
+                break;
+            case LV_SCROLL_SNAP_START:
+                scroll_obj_point = obj->coords.x1;
+                act_obj_point = act_obj->coords.x1;
+                break;
+            case LV_SCROLL_SNAP_END:
+                scroll_obj_point = obj->coords.x2;
+                act_obj_point = act_obj->coords.x2;
+                break;
+            }
+        } else {
+            switch(snap) {
+            case LV_SCROLL_SNAP_CENTER:
+                scroll_obj_point = lv_area_get_height(&obj->coords) / 2 + obj->coords.y1;
+                act_obj_point = lv_area_get_height(&act_obj->coords) / 2 + act_obj->coords.y1;
+                break;
+            case LV_SCROLL_SNAP_START:
+                scroll_obj_point = obj->coords.y1;
+                act_obj_point = act_obj->coords.y1;
+                break;
+            case LV_SCROLL_SNAP_END:
+                scroll_obj_point = obj->coords.y2;
+                act_obj_point = act_obj->coords.y2;
+                break;
+            }
+        }
+
+        if(scroll_end < 0) {
+            if(snap != LV_SCROLL_SNAP_NONE && act_obj_point > scroll_obj_point) return diff;
+
+            /*Rounding*/
+            if(diff < 0) diff -= ELASTIC_SLOWNESS_FACTOR / 2;
+            if(diff > 0) diff += ELASTIC_SLOWNESS_FACTOR / 2;
+            return diff / ELASTIC_SLOWNESS_FACTOR;
+        }
+        else if(scroll_start < 0) {
+            if(snap != LV_SCROLL_SNAP_NONE && act_obj_point < scroll_obj_point) return diff;
+
+            /*Rounding*/
+            if(diff < 0) diff -= ELASTIC_SLOWNESS_FACTOR / 2;
+            if(diff > 0) diff += ELASTIC_SLOWNESS_FACTOR / 2;
+            return diff / ELASTIC_SLOWNESS_FACTOR;
+        }
     } else {
         /*Scroll back to the boundary if required*/
         if(scroll_end + diff < 0) diff = - scroll_end;
