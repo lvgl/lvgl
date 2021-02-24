@@ -265,8 +265,14 @@ typedef struct {
 typedef uint8_t lv_opa_t;
 //! @endcond
 
+struct _lv_color_filter_dsc_t;
 
-typedef lv_color_t (*lv_color_filter_cb_t)(lv_color_t, lv_opa_t);
+typedef lv_color_t (*lv_color_filter_cb_t)(const struct _lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
+
+typedef struct _lv_color_filter_dsc_t {
+    lv_color_filter_cb_t filter_cb;
+    void * user_data;
+}lv_color_filter_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -582,6 +588,11 @@ static inline lv_color_t lv_color_hex3(uint32_t c)
 {
     return lv_color_make((uint8_t)(((c >> 4) & 0xF0) | ((c >> 8) & 0xF)), (uint8_t)((c & 0xF0) | ((c & 0xF0) >> 4)),
                          (uint8_t)((c & 0xF) | ((c & 0xF) << 4)));
+}
+
+static inline void lv_color_filter_dsc_init(lv_color_filter_dsc_t * dsc, lv_color_filter_cb_t cb)
+{
+    dsc->filter_cb = cb;
 }
 
 //! @cond Doxygen_Suppress

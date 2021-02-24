@@ -102,7 +102,6 @@ typedef union {
     int32_t num;         /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
     const void * ptr;    /**< Constant pointers  (font, cone text, etc)*/
     lv_color_t color;    /**< Colors */
-    void (* func)(void); /**< Function pointers */
 }lv_style_value_t;
 
 /**
@@ -120,7 +119,7 @@ typedef enum {
     LV_STYLE_TRANSFORM_ANGLE  = 6   | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_OPA              = 7   | LV_STYLE_PROP_INHERIT,
 
-    LV_STYLE_COLOR_FILTER_CB  = 8,
+    LV_STYLE_COLOR_FILTER_DSC  = 8,
     LV_STYLE_COLOR_FILTER_OPA = 9,
     LV_STYLE_ANIM_TIME        = 10,
     LV_STYLE_TRANSITION       = 11,

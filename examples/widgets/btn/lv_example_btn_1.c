@@ -5,10 +5,10 @@ static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     LV_UNUSED(obj);
     if(event == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Clicked\n");
+        LV_LOG_USER("Clicked");
     }
     else if(event == LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_USER("Toggled\n");
+        LV_LOG_USER("Toggled");
     }
 }
 

@@ -28,13 +28,13 @@ void lv_example_get_started_2(void)
 
     /*Create a red style. Change only some colors.*/
     lv_style_init(&style_btn_red);
-    lv_style_set_bg_color(&style_btn_red, lv_color_red());
-    lv_style_set_bg_grad_color(&style_btn_red, lv_color_red_darken_3());
+    lv_style_set_bg_color(&style_btn_red, lv_color_light_blue());
+    lv_style_set_bg_grad_color(&style_btn_red, lv_color_light_blue_darken_3());
 
     /*Create a style for the pressed state. Add color filter to make every color darker*/
     lv_style_init(&style_btn_pressed);
-    lv_style_set_color_filter_cb(&style_btn_pressed, lv_color_darken);
-    lv_style_set_color_filter_opa(&style_btn_pressed, LV_OPA_30);
+    lv_style_set_bg_color(&style_btn_red, lv_color_blue());
+    lv_style_set_bg_grad_color(&style_btn_red, lv_color_blue_darken_3());
 
     /*Create a button and use the new styles*/
     lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);     /*Add a button the current screen*/

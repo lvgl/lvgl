@@ -194,6 +194,12 @@ static bool inited;
  *   STATIC FUNCTIONS
  **********************/
 
+static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t c, lv_opa_t opa)
+{
+    LV_UNUSED(f);
+    return lv_color_darken(c, opa);
+}
+
 static void style_init(void)
 {
     static const lv_style_prop_t trans_props[] = {
@@ -201,7 +207,7 @@ static void style_init(void)
             LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
             LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,
             LV_STYLE_CONTENT_OFS_X, LV_STYLE_CONTENT_OFS_Y,
-            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB,
+            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
             0
     };
 
@@ -271,13 +277,17 @@ static void style_init(void)
     lv_style_set_pad_column(&styles->btn, LV_DPX(5));
     lv_style_set_pad_row(&styles->btn, LV_DPX(5));
 
+
+    static lv_color_filter_dsc_t dark_filter;
+    lv_color_filter_dsc_init(&dark_filter, dark_color_filter_cb);
+
     style_init_reset(&styles->pressed);
-    lv_style_set_color_filter_cb(&styles->pressed, lv_color_darken);
+    lv_style_set_color_filter_dsc(&styles->pressed, &dark_filter);
     lv_style_set_color_filter_opa(&styles->pressed, 35);
 
     style_init_reset(&styles->disabled);
-    lv_style_set_color_filter_cb(&styles->disabled, gray_filter);
-    lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_50);
+//    lv_style_set_color_filter_dsc(&styles->disabled, gray_filter);
+//    lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_50);
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, true);

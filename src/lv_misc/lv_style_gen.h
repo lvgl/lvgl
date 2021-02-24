@@ -54,12 +54,12 @@ static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
     lv_style_set_prop(style, LV_STYLE_OPA, v);
 }
 
-static inline void lv_style_set_color_filter_cb(lv_style_t * style, lv_color_filter_cb_t value)
+static inline void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
 {
     lv_style_value_t v = {
-        .func = (void (*)(void))value
+        .ptr = (void *)value
     };
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_CB, v);
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, v);
 }
 
 static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)

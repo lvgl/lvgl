@@ -548,10 +548,10 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
 static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
 {
     if(obj == NULL) return v;
-    lv_color_filter_cb_t f = lv_obj_get_style_color_filter_cb(obj, part);
-    if(f) {
+    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
+    if(f && f->filter_cb) {
         lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
-        if(f_opa != 0) v.color = f(v.color, f_opa);
+        if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
     }
     return v;
 }
@@ -640,11 +640,11 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         if(v.ptr == NULL) list->cache_content_text_zero = 1;
         else list->cache_content_text_zero = 0;
     }
-    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_COLOR_FILTER_CB || prop == LV_STYLE_COLOR_FILTER_OPA) {
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_COLOR_FILTER_DSC || prop == LV_STYLE_COLOR_FILTER_OPA) {
         lv_style_value_t vf[2];
-        if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_CB, &vf[0]) == false) vf[0].func = 0;
+        if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_DSC, &vf[0]) == false) vf[0].ptr = NULL;
         if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_OPA, &vf[1]) == false) vf[1].num = 0;
-        if(vf[0].func == NULL || vf[1].num == 0) list->cache_filter_zero = 1;
+        if(vf[0].ptr == NULL || vf[1].num == 0) list->cache_filter_zero = 1;
         else list->cache_filter_zero = 0;
     }
 
@@ -737,7 +737,7 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         if(list->cache_content_text_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
-    case LV_STYLE_COLOR_FILTER_CB:
+    case LV_STYLE_COLOR_FILTER_DSC:
     case LV_STYLE_COLOR_FILTER_OPA:
         if(list->cache_filter_zero ) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
@@ -871,9 +871,9 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 if(v < 255) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
-            case LV_STYLE_COLOR_FILTER_CB:
-                if(tr->start_value.func == NULL) value_final.func = tr->end_value.func;
-                else if(tr->end_value.func == NULL) value_final.func = tr->start_value.func;
+            case LV_STYLE_COLOR_FILTER_DSC:
+                if(tr->start_value.ptr == NULL) value_final.ptr = tr->end_value.ptr;
+                else if(tr->end_value.ptr == NULL) value_final.ptr = tr->start_value.ptr;
                 else if(v < 128) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
@@ -898,7 +898,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
         lv_style_value_t old_value;
         bool refr = true;
         if(lv_style_get_prop(list->styles[i].style, tr->prop, &old_value)) {
-            if(value_final.ptr == old_value.ptr && value_final.func == old_value.func && value_final.color.full == old_value.color.full && value_final.num == old_value.num) {
+            if(value_final.ptr == old_value.ptr && value_final.color.full == old_value.color.full && value_final.num == old_value.num) {
                 refr = false;
             }
         }

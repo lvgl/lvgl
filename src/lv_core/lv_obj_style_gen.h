@@ -40,10 +40,10 @@ static inline lv_opa_t lv_obj_get_style_opa(const struct _lv_obj_t * obj, uint32
     return (lv_opa_t)v.num;
 }
 
-static inline lv_color_filter_cb_t lv_obj_get_style_color_filter_cb(const struct _lv_obj_t * obj, uint32_t part)
+static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_CB);
-    return (lv_color_filter_cb_t)v.func;
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_DSC);
+    return (const lv_color_filter_dsc_t *) v.ptr;
 }
 
 static inline lv_opa_t lv_obj_get_style_color_filter_opa(const struct _lv_obj_t * obj, uint32_t part)
@@ -576,12 +576,12 @@ static inline void lv_obj_set_style_opa(struct _lv_obj_t * obj, uint32_t part, u
     lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_OPA, v);
 }
 
-static inline void lv_obj_set_style_color_filter_cb(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_filter_cb_t value)
+static inline void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const lv_color_filter_dsc_t * value)
 {
     lv_style_value_t v = {
-        .func = (void (*)(void))value
+        .ptr = (void *) value
     };
-    lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_COLOR_FILTER_CB, v);
+    lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_COLOR_FILTER_DSC, v);
 }
 
 static inline void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_opa_t value)
