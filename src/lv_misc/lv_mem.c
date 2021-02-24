@@ -739,24 +739,20 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len)
 
 static void * alloc_core(size_t size)
 {
-    void * alloc = NULL;
-
     lv_mem_ent_t * e = NULL;
 
     /* Search for a appropriate entry*/
-    if(e == NULL) e = ent_get_next(NULL);
-    do {
+    while(1) {
         /* Get the next entry*/
-        /*If there is next entry then try to allocate there*/
-        if(!e->header.s.used && e->header.s.d_size >= size) alloc = ent_alloc(e, size);
-
         e = ent_get_next(e);
         if( e == NULL) break;
 
-        /* End if the alloc. is successful*/
-    } while(alloc == NULL);
+        /*If there is next entry then try to allocate there*/
+        if(!e->header.s.used && e->header.s.d_size >= size)
+            return ent_alloc(e, size);
+    }
 
-    return alloc;
+    return NULL;
 }
 
 /**
