@@ -60,8 +60,6 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
     info->cb = async_xcb;
     info->user_data = user_data;
 
-    /* Set the timer's user data */
-    task->user_data = info;
     lv_timer_set_repeat_count(timer, 1);
     return LV_RES_OK;
 }
