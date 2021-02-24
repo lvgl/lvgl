@@ -100,7 +100,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     uint32_t time_till_next = LV_NO_TIMER_READY;
     next = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
     while(next) {
-        if(next->repeat_count) {
+        if(!next->paused) {
             uint32_t delay = lv_timer_time_remaining(next);
             if(delay < time_till_next)
                 time_till_next = delay;
