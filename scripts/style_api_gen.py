@@ -92,45 +92,56 @@ props = [
 {'name': 'CONTENT_DECOR',             'style_type': 'num',   'var_type': 'lv_text_decor_t' },
 ]
 
-def obj_style_get(i):
-  print("static inline " + props[i]['var_type'] + " lv_obj_get_style_" + props[i]['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part) {")
-  is_struct = props[i]['style_type'] == 'color'
-  cast = "(" + props[i]['var_type'] + ")" if not is_struct else ""
-  print("  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + props[i]['name'] + "); return " + cast + " v." + props[i]['style_type'] + "; }")
-  print("")   
-  
+def obj_style_get(p):
+  is_struct = p['style_type'] == 'color'
+  cast = "(" + p['var_type'] + ")" if not is_struct else ""
+  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part)")
+  print("{")
+  print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
+  print("    return " + cast + "v." + p['style_type'] + ";")
+  print("}")
+  print("")
+
 def get_func_cast(style):
   func_cast = ""
-  if style['style_type'] == 'func':
-    func_cast =  "(void (*)(void))"
-  elif style['style_type'] == 'num':
+  if style == 'func':
+    func_cast = "(void (*)(void))"
+  elif style == 'num':
     func_cast = "(int32_t)"
   return func_cast
 
-def style_set(i):
-  print("static inline void lv_style_set_" + props[i]['name'].lower() +"(lv_style_t * style, "+ props[i]['var_type'] +" value) {")
-  func_cast = get_func_cast(props[i])
-  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = " + func_cast + "value}; lv_style_set_prop(style, LV_STYLE_" + props[i]['name'] +", v); }")
+def style_set(p):
+  func_cast = get_func_cast(p['style_type'])
+  print("static inline void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
+  print("{")
+  print("    lv_style_value_t v = {")
+  print("        ." + p['style_type'] +" = " + func_cast + "value")
+  print("    };")
+  print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
+  print("}")
   print("")
 
-def local_style_set(i):
-  print("static inline void lv_obj_set_style_" + props[i]['name'].lower() + "(struct _lv_obj_t * obj, uint32_t part, uint32_t state, " + props[i]['var_type'] +" value) {")
-  func_cast = get_func_cast(props[i])
-  print("  lv_style_value_t v = {." + props[i]['style_type'] +" = " + func_cast + "value}; lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + props[i]['name'] +", v); }")
+def local_style_set(p):
+  func_cast = get_func_cast(p['style_type'])
+  print("static inline void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, uint32_t part, uint32_t state, " + p['var_type'] +" value)")
+  print("{")
+  print("    lv_style_value_t v = {")
+  print("        ." + p['style_type'] +" = " + func_cast + "value")
+  print("    };")
+  print("    lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + p['name'] +", v);")
+  print("}")
   print("")
-
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 sys.stdout = open(base_dir + '/../src/lv_core/lv_obj_style_gen.h', 'w')
 
-for i in range(len(props)): 
-  obj_style_get(i)
+for p in props:
+  obj_style_get(p)
 
-for i in range(len(props)): 
-  local_style_set(i)
+for p in props:
+  local_style_set(p)
 
 sys.stdout = open(base_dir + '/../src/lv_misc/lv_style_gen.h', 'w')
 
-for i in range(len(props)): 
-  style_set(i)
-
+for p in props:
+  style_set(p)
