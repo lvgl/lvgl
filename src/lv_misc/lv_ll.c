@@ -169,7 +169,7 @@ void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
         }
     }
     else if(_lv_ll_get_tail(ll_p) == node_p) {
-        /*The new tail will be the  node before 'n_act'*/
+        /*The new tail will be the node before 'n_act'*/
         ll_p->tail = _lv_ll_get_prev(ll_p, node_p);
         if(ll_p->tail == NULL) {
             ll_p->head = NULL;
@@ -272,6 +272,7 @@ void * _lv_ll_get_tail(const lv_ll_t * ll_p)
     if(ll_p == NULL) return NULL;
     return ll_p->tail;
 }
+
 /**
  * Return with the pointer of the next node after 'n_act'
  * @param ll_p pointer to linked list

@@ -150,7 +150,7 @@ void * lv_fs_open(const char * path, lv_fs_mode_t mode);
 /**
  * Close an already opened file
  * @param file_p pointer to a lv_fs_file_t variable
- * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p);
 

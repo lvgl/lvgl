@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_H
-#define LV_H
+#ifndef LV_MATH_H
+#define LV_MATH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +45,6 @@ typedef struct {
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
 LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle);
-
 
 static inline LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_cos(int16_t angle)
 {
@@ -115,6 +114,7 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min, int32_t m
  * @return return the random number. min <= return_value <= max
  */
 uint32_t lv_rand(uint32_t min, uint32_t max);
+
 /**********************
  *      MACROS
  **********************/
@@ -134,7 +134,6 @@ uint32_t lv_rand(uint32_t min, uint32_t max);
 #define LV_UMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_MAX_OF(t) ((unsigned long) (LV_IS_SIGNED(t) ? LV_SMAX_OF(t) : LV_UMAX_OF(t)))
-
 
 #ifdef __cplusplus
 } /* extern "C" */

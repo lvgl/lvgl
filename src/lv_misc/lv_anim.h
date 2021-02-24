@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#include "lv_area.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -405,7 +404,6 @@ extern const lv_anim_path_t lv_anim_path_def;
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */
