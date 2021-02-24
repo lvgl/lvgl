@@ -107,6 +107,13 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[]);
 void lv_btnmatrix_set_ctrl_map(lv_obj_t * obj, const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /**
+ * Set the selected buttons
+ * @param obj        pointer to button matrix object
+ * @param id         0 based index of the button to modify. (Not counting new lines)
+ */
+void lv_btnmatrix_set_selected_btn(lv_obj_t * obj, uint16_t id);
+
+/**
  * Enable recoloring of button's texts. E.g. "a #ff0000 red# word"
  * @param obj       pointer to button matrix object
  * @param en        true: enable recoloring; false: disable

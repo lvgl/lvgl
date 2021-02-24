@@ -120,7 +120,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     }
 
     uint32_t cell = row * table->col_cnt + col;
-    lv_table_cell_ctrl_t ctrl;
+    lv_table_cell_ctrl_t ctrl = 0;
 
     /*Save the control byte*/
     if(table->cell_data[cell]) ctrl= table->cell_data[cell][0];

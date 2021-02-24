@@ -560,7 +560,6 @@ static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scrol
         /* If there is snapping in the current direction don't use the elastic factor because
          * it's natural that the first and last items are scrolled (snapped) in. */
         lv_scroll_snap_t snap;
-        void(*size)(const lv_area_t) = dir == LV_DIR_HOR ? lv_area_get_width : lv_area_get_height;
         snap = dir == LV_DIR_HOR ? lv_obj_get_scroll_snap_x(obj) : lv_obj_get_scroll_snap_y(obj);
 
         lv_obj_t * act_obj = lv_indev_get_obj_act();

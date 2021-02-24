@@ -129,6 +129,10 @@ void lv_mem_init(void)
     /*The total mem size reduced by the first header and the close patterns */
     full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
+
+#if LV_MEM_ADD_JUNK
+    LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower")
+#endif
 }
 
 /**

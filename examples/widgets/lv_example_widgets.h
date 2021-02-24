@@ -102,6 +102,7 @@ void lv_example_spinner_1(void);
 void lv_example_switch_1(void);
 
 void lv_example_table_1(void);
+void lv_example_table_2(void);
 
 void lv_example_tabview_1(void);
 

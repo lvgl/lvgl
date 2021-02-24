@@ -181,17 +181,17 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * obj, const lv_btnmatrix_ctrl_t ctrl_ma
     lv_btnmatrix_set_map(obj, btnm->map_p);
 }
 
-void lv_btnmatrix_set_active_btn(lv_obj_t * obj, uint16_t id)
+void lv_btnmatrix_set_selected_btn(lv_obj_t * obj, uint16_t btn_id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
 
-    if(id >= btnm->btn_cnt && id != LV_BTNMATRIX_BTN_NONE) return;
+    if(btn_id >= btnm->btn_cnt && btn_id != LV_BTNMATRIX_BTN_NONE) return;
 
     invalidate_button_area(obj, btnm->btn_id_sel);
-    btnm->btn_id_sel = id;
-    invalidate_button_area(obj, id);
+    btnm->btn_id_sel = btn_id;
+    invalidate_button_area(obj, btn_id);
 }
 
 void lv_btnmatrix_set_recolor(const lv_obj_t * obj, bool en)
