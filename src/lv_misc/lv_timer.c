@@ -77,13 +77,9 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     uint32_t handler_start = lv_tick_get();
 
-    /* Run all timer from the highest to the lowest priority
-     * If a lower priority timer is executed check timer again from the highest priority
-     * but on the priority of executed timers don't run timers before the executed*/
+    /* Run all timer from the list*/
     lv_timer_t * next;
-    bool end_flag;
     do {
-        end_flag                 = true;
         timer_deleted             = false;
         timer_created             = false;
         LV_GC_ROOT(_lv_timer_act) = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
@@ -93,20 +89,13 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
             next = _lv_ll_get_next(&LV_GC_ROOT(_lv_timer_ll), LV_GC_ROOT(_lv_timer_act));
 
             if(lv_timer_exec(LV_GC_ROOT(_lv_timer_act))) {
-                if(!timer_created && !timer_deleted) {
-                    end_flag         = false;
-                    break;
-                }
-            }
-
-            /*If a timer was created or deleted then this or the next item might be corrupted*/
-            if(timer_created || timer_deleted) {
-                break;
+                /*If a timer was created or deleted then this or the next item might be corrupted*/
+                if(timer_created || timer_deleted) break;
             }
 
             LV_GC_ROOT(_lv_timer_act) = next; /*Load the next timer*/
         }
-    } while(!end_flag);
+    } while(LV_GC_ROOT(_lv_timer_act));
 
     uint32_t time_till_next = LV_NO_TIMER_READY;
     next = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
