@@ -852,9 +852,9 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
             	hook_dsc.draw_area = &col_a;
             	hook_dsc.rect_dsc = &col_dsc;
             	hook_dsc.sub_part_ptr = ser;
-            	lv_event_send(chart, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+            	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
                 lv_draw_rect(&col_a, &series_mask, &col_dsc);
-            	lv_event_send(chart, LV_EVENT_DRAW_PART_END, &hook_dsc);
+            	lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
             }
         }
     }
