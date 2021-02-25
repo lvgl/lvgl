@@ -26,7 +26,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_STYLE_SENTINEL_VALUE       0xAABBCCDD
+#define LV_STYLE_SENTINEL_VALUE     0xAABBCCDD
 
 /**
  * Flags for style properties
@@ -39,7 +39,7 @@ extern "C" {
 /**
  * Other constants
  */
-#define LV_IMG_ZOOM_NONE   256          /*Value for not zooming the image*/
+#define LV_IMG_ZOOM_NONE            256        /*Value for not zooming the image*/
 LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 
 /**********************
@@ -226,8 +226,6 @@ typedef enum {
 /**
  * Descriptor for style transitions
  */
-struct _lv_style_transiton_t;
-
 typedef struct _lv_style_transiton_t{
     const lv_style_prop_t * props; /**< An array with the properties to animate. */
     const lv_anim_path_t * path;   /**< A path for the animation.*/
@@ -292,7 +290,7 @@ void lv_style_reset(lv_style_t * style);
  * lv_style_value_t v = {.color = value}; lv_style_set_prop(style, MY_PROP, v); }
  *
  * ...
- * MY_PROP = lv_style_register_prop;
+ * MY_PROP = lv_style_register_prop();
  * ...
  * lv_style_set_my_prop(&style1, lv_color_red());
  */

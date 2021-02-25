@@ -8,7 +8,6 @@
  *********************/
 #include "lv_style.h"
 #include "../lv_misc/lv_mem.h"
-#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +49,6 @@ void lv_style_init(lv_style_t * style)
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
-
 }
 
 void lv_style_reset(lv_style_t * style)
@@ -100,7 +98,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
             lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
 
             uint32_t j;
-            for(j = 0; j < (uint32_t)style->prop_cnt + 1; j++) { /* +1: because prop_cnt already reduced but all the old props. needs to be checked. */
+            for(j = 0; j <= style->prop_cnt; j++) { /* <=: because prop_cnt already reduced but all the old props. needs to be checked. */
                 if(props[j] != prop) {
                     *new_values = values[j];
                     *new_props = props[j];
@@ -219,7 +217,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 {
     lv_style_value_t value;
     switch(prop) {
-            break;
         case LV_STYLE_TRANSFORM_ZOOM:
             value.num = LV_IMG_ZOOM_NONE;
             break;
