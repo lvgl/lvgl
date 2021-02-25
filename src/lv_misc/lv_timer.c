@@ -11,10 +11,6 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_gc.h"
 
-#if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
-
 /*********************
  *      DEFINES
  *********************/
@@ -34,7 +30,7 @@ static uint32_t lv_timer_time_remaining(lv_timer_t * timer);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_timer_run  = false;
+static bool lv_timer_run = false;
 static uint8_t idle_last = 0;
 static bool timer_deleted;
 static bool timer_created;
@@ -71,25 +67,19 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     if(already_running) return 1;
     already_running = true;
 
-    static uint32_t idle_period_start = 0;
-    static uint32_t handler_start     = 0;
-    static uint32_t busy_time         = 0;
-    static uint32_t time_till_next;
-
     if(lv_timer_run == false) {
         already_running = false; /*Release mutex*/
         return 1;
     }
 
-    handler_start = lv_tick_get();
+    static uint32_t idle_period_start = 0;
+    static uint32_t busy_time         = 0;
 
-    /* Run all timer from the highest to the lowest priority
-     * If a lower priority timer is executed check timer again from the highest priority
-     * but on the priority of executed timers don't run timers before the executed*/
+    uint32_t handler_start = lv_tick_get();
+
+    /* Run all timer from the list*/
     lv_timer_t * next;
-    bool end_flag;
     do {
-        end_flag                 = true;
         timer_deleted             = false;
         timer_created             = false;
         LV_GC_ROOT(_lv_timer_act) = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
@@ -99,41 +89,33 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
             next = _lv_ll_get_next(&LV_GC_ROOT(_lv_timer_ll), LV_GC_ROOT(_lv_timer_act));
 
             if(lv_timer_exec(LV_GC_ROOT(_lv_timer_act))) {
-                if(!timer_created && !timer_deleted) {
-                    end_flag         = false;
-                    break;
-                }
-            }
-
-            /*If a timer was created or deleted then this or the next item might be corrupted*/
-            if(timer_created || timer_deleted) {
-                break;
+                /*If a timer was created or deleted then this or the next item might be corrupted*/
+                if(timer_created || timer_deleted) break;
             }
 
             LV_GC_ROOT(_lv_timer_act) = next; /*Load the next timer*/
         }
-    } while(!end_flag);
+    } while(LV_GC_ROOT(_lv_timer_act));
 
-    busy_time += lv_tick_elaps(handler_start);
-    uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
-    if(idle_period_time >= IDLE_MEAS_PERIOD) {
-
-        idle_last         = (uint32_t)((uint32_t)busy_time * 100) / IDLE_MEAS_PERIOD; /*Calculate the busy percentage*/
-        idle_last         = idle_last > 100 ? 0 : 100 - idle_last;                    /*But we need idle time*/
-        busy_time         = 0;
-        idle_period_start = lv_tick_get();
-    }
-
-    time_till_next = LV_NO_TIMER_READY;
+    uint32_t time_till_next = LV_NO_TIMER_READY;
     next = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
     while(next) {
-        if(next->repeat_count) {
+        if(!next->paused) {
             uint32_t delay = lv_timer_time_remaining(next);
             if(delay < time_till_next)
                 time_till_next = delay;
         }
 
         next = _lv_ll_get_next(&LV_GC_ROOT(_lv_timer_ll), next); /*Find the next timer*/
+    }
+
+    busy_time += lv_tick_elaps(handler_start);
+    uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
+    if(idle_period_time >= IDLE_MEAS_PERIOD) {
+        idle_last         = (busy_time * 100) / idle_period_time;  /*Calculate the busy percentage*/
+        idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
+        busy_time         = 0;
+        idle_period_start = lv_tick_get();
     }
 
     already_running = false; /*Release the mutex*/
@@ -148,22 +130,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
  */
 lv_timer_t * lv_timer_create_basic(void)
 {
-    lv_timer_t * new_timer = NULL;
-
-    new_timer = _lv_ll_ins_head(&LV_GC_ROOT(_lv_timer_ll));
-    LV_ASSERT_MALLOC(new_timer);
-    if(new_timer == NULL) return NULL;
-
-    new_timer->period  = DEF_PERIOD;
-    new_timer->timer_cb = NULL;
-    new_timer->repeat_count = -1;
-    new_timer->paused = 0;
-    new_timer->last_run = lv_tick_get();
-    new_timer->user_data = NULL;
-
-    timer_created = true;
-
-    return new_timer;
+    return lv_timer_create(NULL, DEF_PERIOD, NULL);
 }
 
 /**
@@ -177,13 +144,20 @@ lv_timer_t * lv_timer_create_basic(void)
  */
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
 {
-    lv_timer_t * new_timer = lv_timer_create_basic();
+    lv_timer_t * new_timer = NULL;
+
+    new_timer = _lv_ll_ins_head(&LV_GC_ROOT(_lv_timer_ll));
     LV_ASSERT_MALLOC(new_timer);
     if(new_timer == NULL) return NULL;
 
-    lv_timer_set_cb(new_timer, timer_xcb);
-    lv_timer_set_period(new_timer, period);
+    new_timer->period  = period;
+    new_timer->timer_cb = timer_xcb;
+    new_timer->repeat_count = -1;
+    new_timer->paused = 0;
+    new_timer->last_run = lv_tick_get();
     new_timer->user_data = user_data;
+
+    timer_created = true;
 
     return new_timer;
 }
@@ -218,7 +192,6 @@ void lv_timer_del(lv_timer_t * timer)
 void lv_timer_pause(lv_timer_t * timer, bool pause)
 {
     timer->paused = pause;
-
 }
 /**
  * Set new period for a lv_timer
@@ -304,8 +277,6 @@ static bool lv_timer_exec(lv_timer_t * timer)
     bool exec = false;
     if(lv_timer_time_remaining(timer) == 0) {
         timer->last_run = lv_tick_get();
-        timer_deleted   = false;
-        timer_created   = false;
         if(timer->timer_cb) timer->timer_cb(timer);
         LV_ASSERT_MEM_INTEGRITY();
 
