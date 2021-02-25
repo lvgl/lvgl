@@ -58,9 +58,9 @@ typedef struct {
 #endif /* LV_ENABLE_GC */
 
 #ifdef LV_ARCH_64
-    #define ALIGN_MASK  0x7
+    #define ALIGN_MASK 0x7
 #else
-    #define ALIGN_MASK  0x3
+    #define ALIGN_MASK 0x3
 #endif
 
 #define MEM_BUF_SMALL_SIZE 16
@@ -82,9 +82,9 @@ typedef struct {
     static uint8_t * work_mem;
 #endif
 
-static uint32_t zero_mem;   /*Give the address of this variable if 0 byte should be allocated*/
+static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
 #if LV_MEM_CUSTOM == 0
-    static uint8_t * last_mem;  /*Address of the last valid byte*/
+    static uint8_t * last_mem; /*Address of the last valid byte*/
     static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/
 #endif
 
@@ -219,10 +219,8 @@ void * lv_mem_alloc(size_t size)
  */
 void lv_mem_free(const void * data)
 {
-
     if(data == &zero_mem) return;
     if(data == NULL) return;
-
 
 #if LV_ENABLE_GC == 0
     /*e points to the header*/
@@ -232,7 +230,7 @@ void lv_mem_free(const void * data)
 #  endif
 #endif
 
-    #if LV_MEM_CUSTOM == 0
+#if LV_MEM_CUSTOM == 0
     e->header.s.used = 0;
 
     static uint32_t defr = 0;
@@ -365,7 +363,7 @@ lv_res_t lv_mem_test(void)
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
-        if( e->header.s.d_size > LV_MEM_SIZE) {
+        if(e->header.s.d_size > LV_MEM_SIZE) {
             return LV_RES_INV;
         }
         uint8_t * e8 = (uint8_t *) e;
@@ -408,13 +406,13 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     }
     mon_p->total_size = LV_MEM_SIZE;
     mon_p->max_used = mem_max_size;
-    mon_p->used_pct   = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
     if(mon_p->free_size > 0) {
         mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
-        mon_p->frag_pct   = 100 - mon_p->frag_pct;
+        mon_p->frag_pct = 100 - mon_p->frag_pct;
     }
     else {
-        mon_p->frag_pct   = 0; /*no fragmentation if all the RAM is used*/
+        mon_p->frag_pct = 0; /*no fragmentation if all the RAM is used*/
     }
 #endif
 }
@@ -494,6 +492,7 @@ void * lv_mem_buf_get(uint32_t size)
             /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
             void * buf = lv_mem_realloc(LV_GC_ROOT(lv_mem_buf[i]).p, size);
             LV_ASSERT_MSG(buf != NULL, "Out of memory, can't allocate a new buffer (increase your LV_MEM_SIZE/heap size)");
+            if(buf == NULL) return NULL;
             LV_GC_ROOT(lv_mem_buf[i]).used = 1;
             LV_GC_ROOT(lv_mem_buf[i]).size = size;
             LV_GC_ROOT(lv_mem_buf[i]).p    = buf;
@@ -744,25 +743,22 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len)
 
 static void * alloc_core(size_t size)
 {
-    void * alloc = NULL;
-
     lv_mem_ent_t * e = NULL;
 
     /* Search for a appropriate entry*/
-    if(e == NULL) e = ent_get_next(NULL);
-    do {
+    while(1) {
         /* Get the next entry*/
-        /*If there is next entry then try to allocate there*/
-        if(!e->header.s.used && e->header.s.d_size >= size) alloc = ent_alloc(e, size);
-
         e = ent_get_next(e);
         if( e == NULL) break;
 
-        /* End if the alloc. is successful*/
-    } while(alloc == NULL);
+        /*If there is next entry then try to allocate there*/
+        if(!e->header.s.used && e->header.s.d_size >= size)
+            return ent_alloc(e, size);
+    }
 
-    return alloc;
+    return NULL;
 }
+
 /**
  * Give the next entry after 'act_e'
  * @param act_e pointer to an entry
@@ -817,10 +813,10 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
         uint8_t * e_data             = &e->first_data;
         lv_mem_ent_t * after_new_e   = (lv_mem_ent_t *)&e_data[size];
         after_new_e->header.s.used   = 0;
-        after_new_e->header.s.d_size = (uint32_t)e->header.s.d_size - size - sizeof(lv_mem_header_t);
+        after_new_e->header.s.d_size = e->header.s.d_size - size - sizeof(lv_mem_header_t);
 
-    /* Set the new size for the original entry */
-    e->header.s.d_size = (uint32_t)size;
+        /* Set the new size for the original entry */
+        e->header.s.d_size = size;
     }
 }
 
