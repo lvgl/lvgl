@@ -32,7 +32,7 @@ extern "C" {
     f(lv_ll_t, _lv_drv_ll)                                         \
     f(lv_ll_t, _lv_anim_ll)                                        \
     f(lv_ll_t, _lv_group_ll)                                       \
-    f(lv_ll_t, _lv_img_defoder_ll)                                 \
+    f(lv_ll_t, _lv_img_decoder_ll)                                 \
     f(lv_ll_t, _lv_obj_style_trans_ll)                             \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
     f(lv_timer_t*, _lv_timer_act)                                      \
