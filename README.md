@@ -3,20 +3,14 @@
 <a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
 <a href="https://github.com/littlevgl/lvgl/releases/tag/v5.3"><img src="https://img.shields.io/badge/version-5.3-blue.svg"></a>
 <br>
-<img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
+<img src="https://user-images.githubusercontent.com/42941056/109342022-428df280-7839-11eb-89f7-a476495f8e9c.gif">
 </p>
 
 <p align="center">
 LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint. 
 </p>
 
-<h4 align="center">
-<a href="https://littlevgl.com">Website </a> &middot; 
-<a href="https://littlevgl.com/live-demo">Live demo</a> &middot; 
-<a href="https://docs.littlevgl.com/#PC-simulator">Simulator</a> &middot; 
-<a href="https://docs.littlevgl.com/">Docs</a> &middot;
-<a href="https://blog.littlevgl.com/">Blog</a>
-</h4>
+<h4><a href="https://github.com/lvgl/docs/raw/release/v6/en/docs_v5_3.zip">Documentation</a></h4>
 
 <!--
 <p align="center">
