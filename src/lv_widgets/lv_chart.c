@@ -818,9 +818,16 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
     bool mask_ret = _lv_area_intersect(&series_mask, &obj->coords, clip_area);
     if(mask_ret == false) return;
 
+    lv_obj_draw_hook_dsc_t hook_dsc;
+    lv_obj_draw_hook_dsc_init(&hook_dsc, &series_mask);
+	hook_dsc.part = LV_PART_ITEMS;
+
+
     /*Go through all points*/
     for(i = 0; i < chart->point_cnt; i++) {
         lv_coord_t x_act = (int32_t)((int32_t)(w + block_gap) * i) / (chart->point_cnt) + obj->coords.x1 + x_ofs;
+
+		hook_dsc.id = i;
 
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(&chart->series_ll, ser) {
@@ -842,7 +849,12 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
             col_a.y1         = h - y_tmp + obj->coords.y1 + y_ofs;
 
             if(ser->points[p_act] != LV_CHART_POINT_DEF) {
+            	hook_dsc.draw_area = &col_a;
+            	hook_dsc.rect_dsc = &col_dsc;
+            	hook_dsc.sub_part_ptr = ser;
+            	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
                 lv_draw_rect(&col_a, &series_mask, &col_dsc);
+            	lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
             }
         }
     }

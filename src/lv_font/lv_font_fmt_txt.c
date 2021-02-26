@@ -113,18 +113,10 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                 break;
         }
 
-<<<<<<< HEAD
-        if(_lv_mem_get_size(LV_GC_ROOT(_lv_font_decompr_buf)) < buf_size) {
-            uint8_t * tmp = lv_mem_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
-            LV_ASSERT_MEM(tmp);
-            if(tmp == NULL) return NULL;
-            LV_GC_ROOT(_lv_font_decompr_buf) = tmp;
-=======
         if(lv_mem_get_size(LV_GC_ROOT(_lv_font_decompr_buf)) < buf_size) {
             LV_GC_ROOT(_lv_font_decompr_buf) = lv_mem_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
             LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_font_decompr_buf));
             if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) return NULL;
->>>>>>> dev-v8
         }
 
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
