@@ -89,8 +89,8 @@ static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_ext_click_area(obj, lv_dpx(5));
-        lv_obj_set_height(obj, LV_DPI_DEF / 15);
+        lv_obj_set_ext_click_area(obj, LV_DPX(8));
+        lv_obj_set_height(obj, LV_DPX(10));
     } else {
         lv_slider_t * copy_slider = (lv_slider_t * ) copy;
         lv_area_copy(&slider->left_knob_area, &copy_slider->left_knob_area);

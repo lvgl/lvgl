@@ -127,7 +127,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
                     draw_dsc->shadow_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
                     draw_dsc->shadow_ofs_y = lv_obj_get_style_shadow_ofs_y(obj, part);
                     draw_dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, part);
-                    draw_dsc->shadow_color = lv_obj_get_style_shadow_color(obj, part);
+                    draw_dsc->shadow_color = lv_obj_get_style_shadow_color_filtered(obj, part);
                 }
             }
         }

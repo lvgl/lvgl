@@ -274,6 +274,29 @@ typedef struct _lv_color_filter_dsc_t {
     void * user_data;
 }lv_color_filter_dsc_t;
 
+
+typedef enum {
+    LV_COLOR_PALETTE_RED,
+    LV_COLOR_PALETTE_PINK,
+    LV_COLOR_PALETTE_PURPLE,
+    LV_COLOR_PALETTE_DEEP_PURPLE,
+    LV_COLOR_PALETTE_INDIGO,
+    LV_COLOR_PALETTE_BLUE,
+    LV_COLOR_PALETTE_LIGHT_BLUE,
+    LV_COLOR_PALETTE_CYAN,
+    LV_COLOR_PALETTE_TEAL,
+    LV_COLOR_PALETTE_GREEN,
+    LV_COLOR_PALETTE_LIGHT_GREEN,
+    LV_COLOR_PALETTE_LIME,
+    LV_COLOR_PALETTE_YELLOW,
+    LV_COLOR_PALETTE_AMBER,
+    LV_COLOR_PALETTE_ORANGE,
+    LV_COLOR_PALETTE_DEEP_ORANGE,
+    LV_COLOR_PALETTE_BROWN,
+    LV_COLOR_PALETTE_BLUE_GREY,
+    LV_COLOR_PALETTE_GREY,
+}lv_color_palette_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -631,6 +654,33 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
  */
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
+lv_color_t lv_color_get_palette_main(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_lighten_1(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_lighten_2(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_lighten_3(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_lighten_4(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_lighten_5(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_darken_1(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_darken_2(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_darken_3(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_darken_4(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_accent_1(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_accent_2(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_accent_3(lv_color_palette_t palette);
+
+lv_color_t lv_color_get_palette_accent_4(lv_color_palette_t palette);
 
 /**********************
  *  PREDEFINED COLORS

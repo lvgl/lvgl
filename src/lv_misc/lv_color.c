@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_color.h"
+#include "lv_log.h"
 
 /*********************
  *      DEFINES
@@ -268,4 +269,366 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
     lv_color32_t color32;
     color32.full = lv_color_to32(color);
     return lv_color_rgb_to_hsv(color32.ch.red, color32.ch.green, color32.ch.blue);
+}
+
+ lv_color_t lv_color_get_palette_main(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_lighten_1(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_lighten_1();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_lighten_1();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_lighten_1();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_lighten_1();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_lighten_1();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_lighten_1();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_lighten_1();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_lighten_1();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_lighten_1();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_lighten_1();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_lighten_1();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_lighten_1();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_lighten_1();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_lighten_1();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_lighten_1();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_lighten_1();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_1();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_1();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_1();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_lighten_2(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_lighten_2();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_lighten_2();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_lighten_2();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_lighten_2();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_lighten_2();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_lighten_2();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_lighten_2();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_lighten_2();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_lighten_2();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_lighten_2();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_lighten_2();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_lighten_2();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_lighten_2();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_lighten_2();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_lighten_2();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_lighten_2();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_2();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_2();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_2();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_lighten_3(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_lighten_3();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_lighten_3();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_lighten_3();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_lighten_3();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_lighten_3();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_lighten_3();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_lighten_3();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_lighten_3();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_lighten_3();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_lighten_3();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_lighten_3();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_lighten_3();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_lighten_3();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_lighten_3();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_lighten_3();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_lighten_3();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_3();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_3();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_3();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_lighten_4(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_lighten_4();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_lighten_4();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_lighten_4();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_lighten_4();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_lighten_4();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_lighten_4();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_lighten_4();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_lighten_4();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_lighten_4();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_lighten_4();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_lighten_4();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_lighten_4();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_lighten_4();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_lighten_4();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_lighten_4();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_lighten_4();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_4();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_4();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_4();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_lighten_5(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_lighten_5();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_lighten_5();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_lighten_5();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_lighten_5();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_lighten_5();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_lighten_5();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_lighten_5();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_lighten_5();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_lighten_5();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_lighten_5();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_lighten_5();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_lighten_5();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_lighten_5();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_lighten_5();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_lighten_5();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_lighten_5();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_5();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_5();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_5();
+    }
+
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_darken_1(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_darken_1();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_darken_1();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_darken_1();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_darken_1();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_darken_1();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_darken_1();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_darken_1();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_darken_1();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_darken_1();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_darken_1();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_darken_1();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_darken_1();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_darken_1();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_darken_1();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_darken_1();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_darken_1();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_1();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_1();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_1();
+    }
+
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_darken_2(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_darken_2();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_darken_2();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_darken_2();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_darken_2();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_darken_2();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_darken_2();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_darken_2();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_darken_2();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_darken_2();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_darken_2();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_darken_2();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_darken_2();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_darken_2();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_darken_2();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_darken_2();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_darken_2();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_2();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_2();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_2();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_darken_3(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_darken_3();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_darken_3();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_darken_3();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_darken_3();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_darken_3();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_darken_3();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_darken_3();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_darken_3();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_darken_3();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_darken_3();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_darken_3();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_darken_3();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_darken_3();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_darken_3();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_darken_3();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_darken_3();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_3();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_3();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_3();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_darken_4(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_darken_4();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_darken_4();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_darken_4();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_darken_4();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_darken_4();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_darken_4();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_darken_4();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_darken_4();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_darken_4();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_darken_4();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_darken_4();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_darken_4();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_darken_4();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_darken_4();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_darken_4();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_darken_4();
+        case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_4();
+        case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_4();
+        case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_4();
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_accent_1(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_accent_1();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_accent_1();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_accent_1();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_accent_1();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_accent_1();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_accent_1();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_accent_1();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_accent_1();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_accent_1();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_accent_1();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_accent_1();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_accent_1();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_accent_1();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_accent_1();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_1();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_1();
+        default:
+            LV_LOG_WARN("Color palette %d has no accent colors");
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_accent_2(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_accent_2();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_accent_2();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_accent_2();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_accent_2();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_accent_2();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_accent_2();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_accent_2();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_accent_2();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_accent_2();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_accent_2();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_accent_2();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_accent_2();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_accent_2();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_accent_2();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_2();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_2();
+        default:
+            LV_LOG_WARN("Color palette %d has no accent colors");
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_accent_3(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_accent_3();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_accent_3();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_accent_3();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_accent_3();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_accent_3();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_accent_3();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_accent_3();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_accent_3();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_accent_3();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_accent_3();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_accent_3();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_accent_3();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_accent_3();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_accent_3();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_3();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_3();
+        default:
+            LV_LOG_WARN("Color palette %d has no accent colors");
+    }
+    return lv_color_black();
+}
+
+ lv_color_t lv_color_get_palette_accent_4(lv_color_palette_t palette)
+{
+    switch(palette) {
+        case LV_COLOR_PALETTE_RED:          return lv_color_red_accent_4();
+        case LV_COLOR_PALETTE_PINK:         return lv_color_pink_accent_4();
+        case LV_COLOR_PALETTE_PURPLE:       return lv_color_purple_accent_4();
+        case LV_COLOR_PALETTE_DEEP_PURPLE:  return lv_color_deep_purple_accent_4();
+        case LV_COLOR_PALETTE_INDIGO:       return lv_color_indigo_accent_4();
+        case LV_COLOR_PALETTE_BLUE:         return lv_color_blue_accent_4();
+        case LV_COLOR_PALETTE_LIGHT_BLUE:   return lv_color_light_blue_accent_4();
+        case LV_COLOR_PALETTE_CYAN:         return lv_color_cyan_accent_4();
+        case LV_COLOR_PALETTE_TEAL:         return lv_color_teal_accent_4();
+        case LV_COLOR_PALETTE_GREEN:        return lv_color_green_accent_4();
+        case LV_COLOR_PALETTE_LIGHT_GREEN:  return lv_color_light_green_accent_4();
+        case LV_COLOR_PALETTE_LIME:         return lv_color_lime_accent_4();
+        case LV_COLOR_PALETTE_YELLOW:       return lv_color_yellow_accent_4();
+        case LV_COLOR_PALETTE_AMBER:        return lv_color_amber_accent_4();
+        case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_4();
+        case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_4();
+        default:
+            LV_LOG_WARN("Color palette %d has no accent colors");
+    }
+    return lv_color_black();
 }
