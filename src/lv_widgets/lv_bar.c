@@ -419,8 +419,8 @@ static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area)
     /*value will be drawn later*/
     draw_dsc.value_opa = LV_OPA_TRANSP;
     lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_BG, &draw_dsc);
-    lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
 
+    lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
 }
 
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
@@ -576,11 +576,16 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         draw_indic_dsc.border_opa = border_opa;
         draw_indic_dsc.value_opa = value_opa;
         draw_indic_dsc.pattern_image = pattern_src;
-
     }
 
     lv_draw_mask_radius_param_t mask_bg_param;
-    lv_draw_mask_radius_init(&mask_bg_param, &bar->coords, bg_radius, false);
+    lv_area_t bg_mask_area;
+    bg_mask_area.x1 = bar->coords.x1 + bg_left;
+    bg_mask_area.x2 = bar->coords.x2 - bg_right;
+    bg_mask_area.y1 = bar->coords.y1 + bg_top;
+    bg_mask_area.y2 = bar->coords.y2 - bg_bottom;
+
+    lv_draw_mask_radius_init(&mask_bg_param, &bg_mask_area, bg_radius, false);
     int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 
     /*Draw_only the background and the pattern*/
@@ -665,6 +670,16 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
         /*Bg size is handled by lv_obj*/
         bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, indic_size);
 
+        /*Calculate the indicator area*/
+        lv_style_int_t bg_left = lv_obj_get_style_pad_left(bar,     LV_BAR_PART_BG);
+        lv_style_int_t bg_right = lv_obj_get_style_pad_right(bar,   LV_BAR_PART_BG);
+        lv_style_int_t bg_top = lv_obj_get_style_pad_top(bar,       LV_BAR_PART_BG);
+        lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(bar, LV_BAR_PART_BG);
+
+        lv_coord_t pad = LV_MATH_MIN4(bg_left, bg_right, bg_top, bg_top);
+        if(pad < 0) {
+            bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, -pad);
+        }
     }
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(bar, LV_BAR_PART_INDIC);
