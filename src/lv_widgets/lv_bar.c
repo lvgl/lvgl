@@ -693,7 +693,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
         lv_style_int_t bg_top = lv_obj_get_style_pad_top(bar,       LV_BAR_PART_BG);
         lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(bar, LV_BAR_PART_BG);
 
-        lv_coord_t pad = LV_MATH_MIN4(bg_left, bg_right, bg_top, bg_top);
+        lv_coord_t pad = LV_MATH_MIN4(bg_left, bg_right, bg_top, bg_bottom);
         if(pad < 0) {
             bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, -pad);
         }
