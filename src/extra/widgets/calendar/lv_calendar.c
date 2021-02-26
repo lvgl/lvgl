@@ -272,7 +272,7 @@ static void draw_event_cb(lv_obj_t * obj, lv_event_t e)
 
             if(lv_btnmatrix_has_btn_ctrl(obj, hook_dsc->id, LV_CALENDAR_CTRL_HIGHLIGHT)) {
                 hook_dsc->rect_dsc->bg_opa = LV_OPA_40;
-                hook_dsc->rect_dsc->bg_color = lv_theme_get_color_primary();
+                hook_dsc->rect_dsc->bg_color = lv_theme_get_color_primary(obj);
                 if(lv_btnmatrix_get_selected_btn(obj) == hook_dsc->id) {
                     hook_dsc->rect_dsc->bg_opa = LV_OPA_70;
                 }
@@ -280,7 +280,7 @@ static void draw_event_cb(lv_obj_t * obj, lv_event_t e)
 
             if(lv_btnmatrix_has_btn_ctrl(obj, hook_dsc->id, LV_CALENDAR_CTRL_TODAY)) {
                 hook_dsc->rect_dsc->border_opa = LV_OPA_COVER;
-                hook_dsc->rect_dsc->border_color = lv_theme_get_color_primary();
+                hook_dsc->rect_dsc->border_color = lv_theme_get_color_primary(obj);
                 hook_dsc->rect_dsc->border_width += 1;
             }
 

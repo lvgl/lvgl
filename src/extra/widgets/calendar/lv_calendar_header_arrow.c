@@ -54,7 +54,7 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
     lv_obj_add_event_cb(mo_prev, month_event_cb, calendar);
 
     lv_obj_t * label = lv_label_create(header, NULL);
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SROLL_CIRC);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_style_text_align(label,  LV_PART_MAIN, LV_STATE_DEFAULT,  LV_TEXT_ALIGN_CENTER);
     lv_obj_set_flex_grow(label, 1);
     lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);

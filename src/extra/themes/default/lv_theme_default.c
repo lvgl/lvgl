@@ -21,11 +21,10 @@
  *      DEFINES
  *********************/
 
-#define RADIUS_DEFAULT LV_DPX(8)
+#define RADIUS_DEFAULT LV_DPX(10)
 
 /*SCREEN*/
-//#define COLOR_SCR        (IS_LIGHT ? lv_color_hex(0xf5f8fa) : lv_color_hex(0x444b5a))
-#define COLOR_SCR        (IS_LIGHT ? lv_color_blue_grey_lighten_5() : lv_color_hex(0x444b5a))
+#define COLOR_SCR        (IS_LIGHT ? lv_color_grey_lighten_5() : lv_color_hex(0x444b5a))
 #define COLOR_SCR_TEXT   (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xe7e9ec))
 
 /*BUTTON*/
@@ -38,9 +37,6 @@
 #define BTN_DIS_COLOR       (lv_color_lighten(theme.color_secondary, LV_OPA_40))
 
 #define BTN_BORDER_COLOR        theme.color_primary
-#define COLOR_BTN_BORDER_PR     theme.color_primary
-#define COLOR_BTN_BORDER_CHK    theme.color_primary
-#define COLOR_BTN_BORDER_CHK_PR theme.color_primary
 #define COLOR_BTN_BORDER_INA    (IS_LIGHT ? lv_color_hex3(0x888) : lv_color_hex(0x404040))
 
 /*BACKGROUND*/
@@ -88,9 +84,10 @@ typedef struct {
 
     /*Utility*/
     lv_style_t bg_color_primary;
+    lv_style_t bg_color_primary_light;
     lv_style_t bg_color_secondary;
     lv_style_t bg_color_gray;
-    lv_style_t bg_color_panel;
+    lv_style_t bg_color_white;
     lv_style_t pressed;
     lv_style_t disabled;
     lv_style_t pad_zero;
@@ -129,10 +126,6 @@ typedef struct {
     lv_style_t cb_marker, cb_marker_checked, cb_bg_outline_pad;
 #endif
 
-#if LV_USE_DROPDOWN
-    lv_style_t ddlist_flip;
-#endif
-
 #if LV_USE_TABLE
     lv_style_t table_cell;
 #endif
@@ -161,6 +154,9 @@ typedef struct {
     lv_style_t list_bg, list_btn, list_item_grow, list_label;
 #endif
 
+#if LV_USE_TABVIEW
+    lv_style_t tab_btn;
+#endif
 #if LV_USE_LED
     lv_style_t led;
 #endif
@@ -268,9 +264,15 @@ static void style_init(void)
     lv_style_set_outline_opa(&styles->edit_outline, LV_OPA_50);
 
     style_init_reset(&styles->btn);
-    lv_style_set_radius(&styles->btn, RADIUS_DEFAULT);
+    lv_style_set_radius(&styles->btn, LV_DPX(14));
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->btn, COLOR_GRAY);
+    lv_style_set_shadow_color(&styles->btn, COLOR_GRAY);
+    lv_style_set_shadow_width(&styles->btn, 1);
+    lv_style_set_shadow_ofs_y(&styles->btn, LV_DPX(4));
+//    lv_style_set_border_color(&styles->btn, COLOR_GRAY);
+//    lv_style_set_border_width(&styles->btn, 4);
+//    lv_style_set_border_side(&styles->btn, LV_BORDER_SIDE_BOTTOM);
     lv_style_set_text_color(&styles->btn, CARD_TEXT_COLOR);
     lv_style_set_pad_hor(&styles->btn, LV_DPX(40));
     lv_style_set_pad_ver(&styles->btn, LV_DPX(15));
@@ -326,6 +328,12 @@ static void style_init(void)
     lv_style_set_content_color(&styles->bg_color_primary, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_primary, LV_OPA_COVER);
 
+    style_init_reset(&styles->bg_color_primary_light);
+    lv_style_set_bg_color(&styles->bg_color_primary_light, lv_color_lighten(theme.color_primary, LV_OPA_90));
+    lv_style_set_text_color(&styles->bg_color_primary_light, theme.color_primary);
+    lv_style_set_content_color(&styles->bg_color_primary_light, theme.color_primary);
+    lv_style_set_bg_opa(&styles->bg_color_primary_light, LV_OPA_COVER);
+
     style_init_reset(&styles->bg_color_secondary);
     lv_style_set_bg_color(&styles->bg_color_secondary, theme.color_secondary);
     lv_style_set_text_color(&styles->bg_color_secondary, lv_color_white());
@@ -338,11 +346,11 @@ static void style_init(void)
     lv_style_set_text_color(&styles->bg_color_gray, CARD_TEXT_COLOR);
     lv_style_set_content_color(&styles->bg_color_gray, CARD_TEXT_COLOR);
 
-    style_init_reset(&styles->bg_color_panel);
-    lv_style_set_bg_color(&styles->bg_color_panel, lv_color_white());
-    lv_style_set_bg_opa(&styles->bg_color_panel, LV_OPA_COVER);
-    lv_style_set_text_color(&styles->bg_color_panel, CARD_TEXT_COLOR);
-    lv_style_set_content_color(&styles->bg_color_panel, CARD_TEXT_COLOR);
+    style_init_reset(&styles->bg_color_white);
+    lv_style_set_bg_color(&styles->bg_color_white, lv_color_white());
+    lv_style_set_bg_opa(&styles->bg_color_white, LV_OPA_COVER);
+    lv_style_set_text_color(&styles->bg_color_white, CARD_TEXT_COLOR);
+    lv_style_set_content_color(&styles->bg_color_white, CARD_TEXT_COLOR);
 
     style_init_reset(&styles->circle);
     lv_style_set_radius(&styles->circle, LV_RADIUS_CIRCLE);
@@ -373,11 +381,6 @@ static void style_init(void)
 
     style_init_reset(&styles->arc_indic_primary);
     lv_style_set_arc_color(&styles->arc_indic_primary, theme.color_primary);
-#endif
-
-#if LV_USE_DROPDOWN
-    style_init_reset(&styles->ddlist_flip);
-    lv_style_set_transform_angle(&styles->ddlist_flip, 1800);
 #endif
 
 #if LV_USE_CHECKBOX
@@ -466,6 +469,12 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->msgbox_btns_bg, OUTLINE_WIDTH);
 #endif
 
+#if LV_USE_TABVIEW
+    style_init_reset(&styles->tab_btn);
+    lv_style_set_border_color(&styles->tab_btn, theme.color_primary);
+    lv_style_set_border_width(&styles->tab_btn, lv_dpx(3));
+    lv_style_set_border_side(&styles->tab_btn, LV_BORDER_SIDE_BOTTOM);
+#endif
 #if LV_USE_LIST
     style_init_reset(&styles->list_bg);
     lv_style_set_pad_hor(&styles->list_bg, PAD_DEF);
@@ -502,9 +511,9 @@ static void style_init(void)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_secondary,
+lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, lv_color_t color_secondary,
                                    const lv_font_t * font_small, const lv_font_t * font_normal,
-                                   const lv_font_t * font_large, const lv_font_t * font_extra_large)
+                                   const lv_font_t * font_large)
 {
 
     /* This trick is required only to avoid the garbage collection of
@@ -515,12 +524,12 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
         styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);
     }
 
+    theme.disp = disp;
     theme.color_primary = color_primary;
     theme.color_secondary = color_secondary;
     theme.font_small = font_small;
     theme.font_normal = font_normal;
     theme.font_large = font_large;
-    theme.font_extra_large = font_extra_large;
     theme.apply_cb = theme_apply;
 
     style_init();
@@ -528,6 +537,11 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     inited = true;
 
     return (lv_theme_t *)&theme;
+}
+
+bool lv_theme_default_is_inited(void)
+{
+    return inited;
 }
 
 
@@ -587,7 +601,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_LIST
         /*Add different buttons to the lists*/
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_list_class)) {
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_panel);
+            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_white);
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->list_btn);
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->bg_color_primary);
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->list_item_grow);
@@ -625,10 +639,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 #if LV_USE_TABVIEW
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_tabview_class)) {
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_panel);
-            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_gray);
+            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_white);
+            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_white);
             lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
-            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_panel);
+            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_primary_light);
+            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->tab_btn);
             return;
         }
 #endif
@@ -678,7 +693,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->no_radius);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_panel);
+        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_white);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->table_cell);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->pad_normal);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
@@ -715,7 +730,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
         lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DISABLED, &styles->disabled);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_panel);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DISABLED, &styles->disabled);
     }
@@ -748,15 +763,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_DROPDOWN
     else if(lv_obj_check_type(obj, &lv_dropdown_class)) {
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
-#if LV_THEME_DEFAULT_GROW
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
-#endif
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->ddlist_flip);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->focus_outline);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->edit_outline);
@@ -831,7 +842,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->focus_outline);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->edit_outline);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->btn);
-        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_panel);
+        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_white);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_gray);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_FOCUSED, &styles->focus_outline);
@@ -876,9 +887,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->colorwheel_main);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_normal);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_panel);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_normal);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_panel);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
     }
 #endif
 

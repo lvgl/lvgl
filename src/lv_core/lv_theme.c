@@ -24,7 +24,6 @@ static void apply_theme(lv_theme_t * th, lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_theme_t * act_theme;
 
 /**********************
  *      MACROS
@@ -34,23 +33,10 @@ static lv_theme_t * act_theme;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Set a theme for the system.
- * From now, all the created objects will use styles from this theme by default
- * @param th pointer to theme (return value of: 'lv_theme_init_xxx()')
- */
-void lv_theme_set_act(lv_theme_t * th)
+lv_theme_t *  lv_theme_get_from_obj(lv_obj_t * obj)
 {
-    act_theme = th;
-}
-
-/**
- * Get the current system theme.
- * @return pointer to the current system theme. NULL if not set.
- */
-lv_theme_t * lv_theme_get_act(void)
-{
-    return act_theme;
+    lv_disp_t * disp = obj ? lv_obj_get_disp(obj) : lv_disp_get_default();
+    return lv_disp_get_theme(disp);
 }
 
 /**
@@ -60,12 +46,14 @@ lv_theme_t * lv_theme_get_act(void)
  */
 void lv_theme_apply(lv_obj_t * obj)
 {
+    lv_theme_t * th = lv_theme_get_from_obj(obj);
+    if(th == NULL) return;
+
     lv_obj_enable_style_refresh(false);
 
     lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
 
-    if(act_theme == NULL) return;
-    apply_theme(act_theme, obj);    /*Apply the theme including the base theme(s)*/
+    apply_theme(th, obj);    /*Apply the theme including the base theme(s)*/
 
     lv_obj_enable_style_refresh(true);
     lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
@@ -94,38 +82,34 @@ void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
     theme->apply_cb = apply_cb;
 }
 
-const lv_font_t * lv_theme_get_font_small(void)
+const lv_font_t * lv_theme_get_font_small(lv_obj_t * obj)
 {
-    return act_theme->font_small;
+    lv_theme_t * th = lv_theme_get_from_obj(obj);
+    return th ? th->font_small : LV_FONT_DEFAULT;
 }
 
-const lv_font_t * lv_theme_get_font_normal(void)
+const lv_font_t * lv_theme_get_font_normal(lv_obj_t * obj)
 {
-    return act_theme->font_normal;
+    lv_theme_t * th = lv_theme_get_from_obj(obj);
+    return th ? th->font_normal : LV_FONT_DEFAULT;
 }
 
-const lv_font_t * lv_theme_get_font_large(void)
+const lv_font_t * lv_theme_get_font_large(lv_obj_t * obj)
 {
-    return act_theme->font_large;
+    lv_theme_t * th = lv_theme_get_from_obj(obj);
+    return th ? th->font_large : LV_FONT_DEFAULT;
 }
 
-const lv_font_t * lv_theme_get_font_extra_large(void)
+lv_color_t lv_theme_get_color_primary(lv_obj_t * obj)
 {
-    return act_theme->font_extra_large;
+    lv_theme_t * th = lv_theme_get_from_obj(obj);
+    return th ? th->color_primary : lv_color_blue_grey();
 }
 
-lv_color_t lv_theme_get_color_primary(void)
+lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 {
-    return act_theme->color_primary;
-}
-
-/**
- * Get the secondary color of the theme
- * @return the color
- */
-lv_color_t lv_theme_get_color_secondary(void)
-{
-    return act_theme->color_secondary;
+    lv_theme_t * th = lv_theme_get_from_obj(obj);
+    return th ? th->color_secondary : lv_color_blue();
 }
 
 /**********************
@@ -135,5 +119,5 @@ lv_color_t lv_theme_get_color_secondary(void)
 static void apply_theme(lv_theme_t * th, lv_obj_t * obj)
 {
     if(th->parent) apply_theme(th->parent, obj);
-    if(th->apply_cb) th->apply_cb(act_theme, obj);
+    if(th->apply_cb) th->apply_cb(th, obj);
 }

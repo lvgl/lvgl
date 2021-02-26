@@ -121,6 +121,25 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
 }
 
 /**
+ * Get the theme of a display
+ * @param disp pointer to a display
+ * @return the display's theme (can be NULL)
+ */
+void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
+{
+    disp->theme = th;
+}
+/**
+ * Get the theme of a display
+ * @param disp pointer to a display
+ * @return the display's theme (can be NULL)
+ */
+lv_theme_t * lv_disp_get_theme(lv_disp_t * disp)
+{
+    return disp->theme;
+}
+
+/**
  * Set the background color of a display
  * @param disp pointer to a display
  * @param color color of the background
@@ -199,7 +218,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
         lv_disp_load_scr(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
-//        lv_style_remove_prop(lv_obj_get_local_style(d->scr_to_load, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
+        lv_obj_remove_local_style_prop(d->scr_to_load, LV_PART_MAIN, LV_STATE_DEFAULT, LV_STYLE_OPA);
 
         act_scr = d->scr_to_load;
     }
@@ -364,7 +383,7 @@ lv_timer_t * _lv_disp_get_refr_task(lv_disp_t * disp)
         return NULL;
     }
 
-    return disp->read_task;
+    return disp->refr_timer;
 }
 
 /**********************

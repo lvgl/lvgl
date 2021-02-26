@@ -20,6 +20,8 @@ extern "C" {
  *********************/
 
 #define LV_NO_TASK_READY LV_NO_TIMER_READY
+#define LV_INDEV_STATE_REL LV_INDEV_STATE_RELEASED
+#define LV_INDEV_STATE_PR LV_INDEV_STATE_PRESSED
 
 /**********************
  *      TYPEDEFS

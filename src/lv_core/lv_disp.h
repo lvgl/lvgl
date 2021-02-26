@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_hal/lv_hal.h"
 #include "lv_obj.h"
+#include "lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -79,6 +80,20 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
 lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 
 /**
+ * Get the theme of a display
+ * @param disp pointer to a display
+ * @return the display's theme (can be NULL)
+ */
+void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th);
+
+/**
+ * Get the theme of a display
+ * @param disp pointer to a display
+ * @return the display's theme (can be NULL)
+ */
+lv_theme_t * lv_disp_get_theme(lv_disp_t * disp);
+
+/**
  * Set the background color of a display
  * @param disp pointer to a display
  * @param color color of the background
@@ -98,7 +113,6 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
  * @param opa opacity (0..255)
  */
 void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
-
 
 /**
  * Switch screen with animation

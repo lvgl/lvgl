@@ -53,7 +53,7 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
-struct _disp_t;
+struct _lv_disp_t;
 struct _lv_indev_t;
 struct _lv_indev_drv_t;
 
@@ -62,14 +62,13 @@ enum {
     LV_INDEV_TYPE_NONE,    /**< Uninitialized state*/
     LV_INDEV_TYPE_POINTER, /**< Touch pad, mouse, external button*/
     LV_INDEV_TYPE_KEYPAD,  /**< Keypad or keyboard*/
-    LV_INDEV_TYPE_BUTTON,  /**< External (hardware button) which is assigned to a specific point of the
-                              screen*/
+    LV_INDEV_TYPE_BUTTON,  /**< External (hardware button) which is assigned to a specific point of the screen*/
     LV_INDEV_TYPE_ENCODER, /**< Encoder with only Left, Right turn and a Button*/
 };
 typedef uint8_t lv_indev_type_t;
 
 /** States for input devices*/
-enum { LV_INDEV_STATE_REL = 0, LV_INDEV_STATE_PR };
+enum { LV_INDEV_STATE_RELEASED = 0, LV_INDEV_STATE_PRESSED };
 typedef uint8_t lv_indev_state_t;
 
 enum {
@@ -118,7 +117,7 @@ typedef struct _lv_indev_drv_t {
 #endif
 
     /**< Pointer to the assigned display*/
-    struct _disp_t * disp;
+    struct _lv_disp_t * disp;
 
     /**< Task to read the periodically read the input device*/
     lv_timer_t * read_task;

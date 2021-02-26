@@ -246,7 +246,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             break;
         case LV_STYLE_TEXT_FONT:
         case LV_STYLE_CONTENT_FONT:
-            value.ptr = LV_THEME_FONT_NORMAL;
+            value.ptr = LV_FONT_DEFAULT;
             break;
         case LV_STYLE_SIZE:
             value.num = 10;

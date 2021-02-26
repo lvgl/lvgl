@@ -20,7 +20,8 @@
 #define CELL_SPAN_MASK    (CELL_POS_MASK << CELL_SHIFT)
 #define CELL_FLAG_MASK    (CELL_POS_MASK << (2 * CELL_SHIFT))
 
-#define IS_FR(x)       (LV_COORD_IS_LAYOUT(x))
+#define IS_FR(x)       (LV_COORD_IS_LAYOUT(x) && _LV_COORD_PLAIN(x) < 100)
+#define IS_CONTENT(x)  (LV_COORD_IS_LAYOUT(x) && _LV_COORD_PLAIN(x) == 100)
 #define GET_FR(x)      (_LV_COORD_PLAIN(x))
 
 
@@ -96,8 +97,8 @@ void lv_grid_set_place(lv_grid_t * grid, uint8_t col_place, uint8_t row_place)
     grid->row_place = row_place;
 }
 
-void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t ver_place, uint8_t col_pos, uint8_t col_span,
-                                          lv_grid_place_t hor_place, uint8_t row_pos, uint8_t row_span)
+void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t hor_place, uint8_t col_pos, uint8_t col_span,
+                                          lv_grid_place_t ver_place, uint8_t row_pos, uint8_t row_span)
 
 {
     if(!lv_obj_is_layout_positioned(obj)) return;
@@ -177,6 +178,10 @@ static void item_refr(lv_obj_t * item)
     item_repos(item, &c, NULL);
 
     calc_free(&c);
+
+    if(cont->w_set == LV_SIZE_CONTENT || cont->h_set == LV_SIZE_CONTENT) {
+        lv_obj_set_size(cont, cont->w_set, cont->h_set);
+    }
 }
 
 /**
@@ -237,6 +242,28 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     c->x = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
     c->w = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
 
+    /*Set sizes for CONTENT cells*/
+    for(i = 0; i < c->col_num; i++) {
+        lv_coord_t size = LV_COORD_MIN;
+        if(IS_CONTENT(grid->col_dsc[i])) {
+            /*Check the size of children of this cell*/
+            uint32_t ci;
+            for(ci = 0; ci < lv_obj_get_child_cnt(cont); ci++) {
+                lv_obj_t * item = lv_obj_get_child(cont, ci);
+                if(LV_COORD_IS_LAYOUT(item->x_set) == false || LV_COORD_IS_LAYOUT(item->y_set) == false) continue;
+                if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT)) continue;
+                uint32_t col_pos = GET_CELL_POS(item->x_set);
+                if(col_pos != i) continue;
+                uint32_t col_span = GET_CELL_SPAN(item->x_set);
+                if(col_span != 1) continue;
+
+                size = LV_MAX(size, lv_obj_get_width(item));
+            }
+            if(size >= 0) c->w[i] = size;
+            else c->w[i] = 0;
+        }
+    }
+
     uint32_t col_fr_cnt = 0;
     lv_coord_t grid_w = 0;
     bool auto_w = cont->w_set == LV_SIZE_CONTENT ? true : false;
@@ -244,7 +271,9 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
         if(IS_FR(x)) col_fr_cnt += GET_FR(x);
-        else {
+        else if (IS_CONTENT(x)) {
+            grid_w += c->w[i];
+        } else {
             c->w[i] = x;
             grid_w += x;
         }
@@ -274,17 +303,39 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     c->row_num = grid->row_dsc_len;
     c->y = lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
     c->h = lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
+    /*Set sizes for CONTENT cells*/
+    for(i = 0; i < c->row_num; i++) {
+        lv_coord_t size = LV_COORD_MIN;
+        if(IS_CONTENT(grid->row_dsc[i])) {
+            /*Check the size of children of this cell*/
+            uint32_t ci;
+            for(ci = 0; ci < lv_obj_get_child_cnt(cont); ci++) {
+                lv_obj_t * item = lv_obj_get_child(cont, ci);
+                if(LV_COORD_IS_LAYOUT(item->x_set) == false || LV_COORD_IS_LAYOUT(item->y_set) == false) continue;
+                if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT)) continue;
+                uint32_t row_pos = GET_CELL_POS(item->y_set);
+                if(row_pos != i) continue;
+                uint32_t row_span = GET_CELL_SPAN(item->y_set);
+                if(row_span != 1) continue;
+
+                size = LV_MAX(size, lv_obj_get_height(item));
+            }
+            if(size >= 0) c->h[i] = size;
+            else c->h[i] = 0;
+        }
+    }
 
     uint32_t row_fr_cnt = 0;
     lv_coord_t grid_h = 0;
 
     bool auto_h = cont->h_set == LV_SIZE_CONTENT ? true : false;
 
-
-    for(i = 0; i < grid->row_dsc_len; i++) {
+    for(i = 0; i < c->row_num; i++) {
         lv_coord_t x = grid->row_dsc[i];
         if(IS_FR(x)) row_fr_cnt += GET_FR(x);
-        else {
+        else if (IS_CONTENT(x)) {
+            grid_h += c->h[i];
+        } else {
             c->h[i] = x;
             grid_h += x;
         }
@@ -316,7 +367,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
     if(LV_COORD_IS_LAYOUT(item->x_set) == 0 || LV_COORD_IS_LAYOUT(item->y_set) == 0) return;
-    if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) == false) return;
+    if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT)) return;
     uint32_t col_span = GET_CELL_SPAN(item->x_set);
     uint32_t row_span = GET_CELL_SPAN(item->y_set);
     if(row_span == 0 || col_span == 0) return;

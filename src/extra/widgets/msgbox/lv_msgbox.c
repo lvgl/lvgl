@@ -65,7 +65,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     lv_obj_t * label;
     label = lv_label_create(mbox, NULL);
     lv_label_set_text(label, title);
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SROLL_CIRC);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     if(add_close_btn) lv_obj_set_flex_grow(label, 1);
     else lv_obj_set_width(label, LV_SIZE_PCT(100));
 

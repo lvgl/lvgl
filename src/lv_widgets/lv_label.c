@@ -198,7 +198,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     label->offset.x = 0;
     label->offset.y = 0;
 
-    if(long_mode == LV_LABEL_LONG_SROLL || long_mode == LV_LABEL_LONG_SROLL_CIRC || long_mode == LV_LABEL_LONG_CLIP)
+    if(long_mode == LV_LABEL_LONG_SCROLL || long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || long_mode == LV_LABEL_LONG_CLIP)
         label->expand = 1;
     else
         label->expand = 0;
@@ -777,7 +777,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
 
         /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
          * (In addition they will result misalignment is this case)*/
-        if((label->long_mode == LV_LABEL_LONG_SROLL || label->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
+        if((label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) &&
            (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
             lv_point_t size;
             lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
@@ -788,7 +788,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         }
 #if LV_LABEL_LONG_TXT_HINT
         lv_draw_label_hint_t * hint = &label->hint;
-        if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
+        if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
             hint = NULL;
 
 #else
@@ -798,7 +798,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
 
         lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
 
-        if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
+        if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
             lv_point_t size;
             lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                              LV_COORD_MAX, flag);
@@ -899,7 +899,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         lv_obj_set_size(obj, size.x, size.y);
     }
     /*In roll mode keep the size but start offset animations*/
-    else if(label->long_mode == LV_LABEL_LONG_SROLL) {
+    else if(label->long_mode == LV_LABEL_LONG_SCROLL) {
         uint16_t anim_speed = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
         if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
@@ -982,7 +982,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
     }
     /*In roll inf. mode keep the size but start offset animations*/
-    else if(label->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
+    else if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         uint16_t anim_speed = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
         if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;

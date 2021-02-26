@@ -13,7 +13,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
 
         lv_draw_label_dsc_t dsc;
         lv_draw_label_dsc_init(&dsc);
-        dsc.font = LV_THEME_FONT_NORMAL;
+        dsc.font = LV_FONT_DEFAULT;
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", lv_bar_get_value(obj));

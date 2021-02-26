@@ -152,7 +152,7 @@ static void lv_led_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
     lv_led_t * led = (lv_led_t *) obj;
-    led->color = lv_theme_get_color_primary();
+    led->color = lv_theme_get_color_primary(obj);
     led->bright = LV_LED_BRIGHT_MAX;
     led->bright = LV_LED_BRIGHT_MAX;
 

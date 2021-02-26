@@ -84,7 +84,7 @@ void lv_indev_read_task_cb(lv_timer_t * task)
         indev_act->proc.state = data.state;
 
         /*Save the last activity time*/
-        if(indev_act->proc.state == LV_INDEV_STATE_PR) {
+        if(indev_act->proc.state == LV_INDEV_STATE_PRESSED) {
             indev_act->driver.disp->last_activity_time = lv_tick_get();
         }
         else if(indev_act->driver.type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
@@ -183,7 +183,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x, indev->proc.types.pointer.act_point.y);
     lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_LAYOUTABLE);
+    lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_IGNORE_LAYOUT);
 }
 
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
@@ -275,7 +275,7 @@ lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev)
         return NULL;
     }
 
-    return indev->read_task;
+    return indev->refr_timer;
 }
 
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
@@ -339,7 +339,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->proc.types.pointer.act_point.x = data->point.x;
     i->proc.types.pointer.act_point.y = data->point.y;
 
-    if(i->proc.state == LV_INDEV_STATE_PR) {
+    if(i->proc.state == LV_INDEV_STATE_PRESSED) {
         indev_proc_press(&i->proc);
     }
     else {
@@ -357,13 +357,13 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    if(data->state == LV_INDEV_STATE_PR && i->proc.wait_until_release) return;
+    if(data->state == LV_INDEV_STATE_PRESSED && i->proc.wait_until_release) return;
 
     if(i->proc.wait_until_release) {
         i->proc.wait_until_release      = 0;
         i->proc.pr_timestamp            = 0;
         i->proc.long_pr_sent            = 0;
-        i->proc.types.keypad.last_state = LV_INDEV_STATE_REL; /*To skip the processing of release*/
+        i->proc.types.keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
     }
 
     lv_group_t * g = i->group;
@@ -386,7 +386,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->proc.types.keypad.last_state = data->state;
 
     /*Key press happened*/
-    if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_REL) {
+    if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_RELEASED) {
         i->proc.pr_timestamp = lv_tick_get();
 
         /*Simulate a press on the object if ENTER was pressed*/
@@ -424,7 +424,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Pressing*/
-    else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR) {
+    else if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
         if(data->key == LV_KEY_ENTER) {
             lv_signal_send(indev_obj_act, LV_SIGNAL_PRESSING, NULL);
@@ -477,7 +477,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Release happened*/
-    else if(data->state == LV_INDEV_STATE_REL && prev_state == LV_INDEV_STATE_PR) {
+    else if(data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
@@ -509,13 +509,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    if(data->state == LV_INDEV_STATE_PR && i->proc.wait_until_release) return;
+    if(data->state == LV_INDEV_STATE_PRESSED && i->proc.wait_until_release) return;
 
     if(i->proc.wait_until_release) {
         i->proc.wait_until_release      = 0;
         i->proc.pr_timestamp            = 0;
         i->proc.long_pr_sent            = 0;
-        i->proc.types.keypad.last_state = LV_INDEV_STATE_REL; /*To skip the processing of release*/
+        i->proc.types.keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
     }
 
     /* Save the last keys before anything else.
@@ -531,7 +531,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(indev_obj_act == NULL) return;
 
     /*Process the steps they are valid only with released button*/
-    if(data->state != LV_INDEV_STATE_REL) {
+    if(data->state != LV_INDEV_STATE_RELEASED) {
         data->enc_diff = 0;
     }
 
@@ -540,7 +540,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(indev_obj_act == NULL) return;
 
     /*Button press happened*/
-    if(data->state == LV_INDEV_STATE_PR && last_state == LV_INDEV_STATE_REL) {
+    if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_RELEASED) {
 
         i->proc.pr_timestamp = lv_tick_get();
 
@@ -576,7 +576,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Pressing*/
-    else if(data->state == LV_INDEV_STATE_PR && last_state == LV_INDEV_STATE_PR) {
+    else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
         /* Long press*/
         if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
 
@@ -632,7 +632,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     }
     /*Release happened*/
-    else if(data->state == LV_INDEV_STATE_REL && last_state == LV_INDEV_STATE_PR) {
+    else if(data->state == LV_INDEV_STATE_RELEASED && last_state == LV_INDEV_STATE_PRESSED) {
 
         if(data->key == LV_KEY_ENTER) {
             bool editable = lv_obj_is_editable(indev_obj_act);
@@ -725,7 +725,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_coord_t y = i->btn_points[data->btn_id].y;
 
     /*If a new point comes always make a release*/
-    if(data->state == LV_INDEV_STATE_PR) {
+    if(data->state == LV_INDEV_STATE_PRESSED) {
         if(i->proc.types.pointer.last_point.x != x ||
            i->proc.types.pointer.last_point.y != y) {
             indev_proc_release(&i->proc);
@@ -738,7 +738,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->proc.types.pointer.act_point.x = x;
     i->proc.types.pointer.act_point.y = y;
 
-    if(data->state == LV_INDEV_STATE_PR) indev_proc_press(&i->proc);
+    if(data->state == LV_INDEV_STATE_PRESSED) indev_proc_press(&i->proc);
     else indev_proc_release(&i->proc);
 
     if(indev_reset_check(&i->proc)) return;

@@ -193,7 +193,7 @@ enum {
     LV_OBJ_FLAG_SCROLLABLE      = (1 << 4),  /**< Make the object scrollable*/
     LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 5),  /**< Allow scrolling inside but with slower speed*/
     LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),  /**< Make the object scroll further when "thrown"*/
-    LV_OBJ_FLAG_SCROLL_ONE     = (1 << 7),   /**< Allow scrolling only one snapable children*/
+    LV_OBJ_FLAG_SCROLL_ONE      = (1 << 7),   /**< Allow scrolling only one snapable children*/
     LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8),  /**< Allow propagating the scroll to a parent */
     LV_OBJ_FLAG_SCROLL_ON_FOCUS = (1 << 9),  /**< Automatically scroll object to make it visible when focused*/
     LV_OBJ_FLAG_SNAPABLE        = (1 << 10), /**< If scroll snap is enabled on the parent it can snap to this object*/
@@ -202,7 +202,7 @@ enum {
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13), /**< Propagate the gestures to the parent */
     LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14), /**< Propagate the focus to the parent */
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners. */
-    LV_OBJ_FLAG_LAYOUTABLE      = (1 << 16), /**< Make the object position-able by the layouts */
+    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 16), /**< Make the object position-able by the layouts */
 
     LV_OBJ_FLAG_LAYOUT_1        = (1 << 23), /** Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1 << 24), /** Custom flag, free to use by layouts*/

@@ -24,6 +24,7 @@ extern "C" {
  **********************/
 
 struct _lv_theme_t;
+struct _lv_disp_t;
 
 typedef void (*lv_theme_apply_cb_t)(struct _lv_theme_t *, lv_obj_t *);
 
@@ -31,12 +32,12 @@ typedef struct _lv_theme_t {
     lv_theme_apply_cb_t apply_cb;
     struct _lv_theme_t * parent;    /**< Apply the current theme's style on top of this theme.*/
     void * user_data;
+    struct _lv_disp_t * disp;
     lv_color_t color_primary;
     lv_color_t color_secondary;
     const lv_font_t * font_small;
     const lv_font_t * font_normal;
     const lv_font_t * font_large;
-    const lv_font_t * font_extra_large;
 } lv_theme_t;
 
 /**********************
@@ -83,36 +84,30 @@ void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb);
  * Get the small font of the theme
  * @return pointer to the font
  */
-const lv_font_t * lv_theme_get_font_small(void);
+const lv_font_t * lv_theme_get_font_small(lv_obj_t * obj);
 /**
  * Get the normal font of the theme
  * @return pointer to the font
  */
-const lv_font_t * lv_theme_get_font_normal(void);
+const lv_font_t * lv_theme_get_font_normal(lv_obj_t * obj);
 
 /**
  * Get the subtitle font of the theme
  * @return pointer to the font
  */
-const lv_font_t * lv_theme_get_font_large(void);
-
-/**
- * Get the title font of the theme
- * @return pointer to the font
- */
-const lv_font_t * lv_theme_get_font_extra_large(void);
+const lv_font_t * lv_theme_get_font_large(lv_obj_t * obj);
 
 /**
  * Get the primary color of the theme
  * @return the color
  */
-lv_color_t lv_theme_get_color_primary(void);
+lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
 
 /**
  * Get the secondary color of the theme
  * @return the color
  */
-lv_color_t lv_theme_get_color_secondary(void);
+lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
 
 /**********************
  *    MACROS

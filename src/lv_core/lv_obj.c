@@ -25,8 +25,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include LV_THEME_INIT_INCLUDE
-
 #if LV_USE_GPU_STM32_DMA2D
     #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 #endif
@@ -124,13 +122,6 @@ void lv_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
-#ifdef LV_THEME_INIT
-    lv_theme_t * th = LV_THEME_INIT(LV_THEME_COLOR_PRIMARY, LV_THEME_COLOR_SECONDARY,
-                                    LV_THEME_FONT_SMALL, LV_THEME_FONT_NORMAL,
-                                    LV_THEME_FONT_LARGE, LV_THEME_FONT_EXTRA_LARGE);
-
-    lv_theme_set_act(th);
-#endif
     /*Initialize the screen refresh system*/
     _lv_refr_init();
 
@@ -318,9 +309,9 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     obj->flags |= f;
 
-    if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
+    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 
-    if(f & LV_OBJ_FLAG_HIDDEN) {
+    if(f & (LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2)) {
     	lv_obj_invalidate(obj);
     	if(lv_obj_is_layout_positioned(obj)) {
     		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
@@ -340,7 +331,7 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
     	}
     }
-    if(f & LV_OBJ_FLAG_LAYOUTABLE) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
+    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 }
 
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
@@ -666,7 +657,6 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     obj->flags |= LV_OBJ_FLAG_SNAPABLE;
     if(parent) obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
     if(parent) obj->flags |= LV_OBJ_FLAG_SCROLL_CHAIN;
-    if(parent) obj->flags |= LV_OBJ_FLAG_LAYOUTABLE;
     obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
     obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
     obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;

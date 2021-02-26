@@ -239,6 +239,10 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
         }
     }
     LV_ASSERT_MEM_INTEGRITY();
+
+    if(cont->w_set == LV_SIZE_CONTENT || cont->h_set == LV_SIZE_CONTENT) {
+        lv_obj_set_size(cont, cont->w_set, cont->h_set);
+    }
 }
 
 /**
@@ -268,7 +272,9 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
-        if(lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) && !lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
+        if(!lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT) && !lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
+            if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUT_1)) break;
+
             lv_coord_t main_size = (row ? item->w_set : item->h_set);
             if(_LV_FLEX_GET_GROW(main_size)) {
                 grow_sum += _LV_FLEX_GET_GROW(main_size);
@@ -279,8 +285,11 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
                 if(wrap && t->track_main_size + item_size > max_main_size) break;
                 t->track_main_size += item_size + item_gap;
             }
+
+
             t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
             t->item_cnt++;
+
         }
         item_id += f->rev ? -1 : +1;
         if(item_id < 0) break;
@@ -336,7 +345,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
     while(item && item_first_id != item_last_id) {
-        if(!lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUTABLE) || lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
+        if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT) || lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
             item = get_next_item(cont, f->rev, &item_first_id);
             continue;
         }

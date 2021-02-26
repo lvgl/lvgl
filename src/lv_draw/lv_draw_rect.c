@@ -83,7 +83,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->bg_img_opa = LV_OPA_COVER;
     dsc->outline_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
-    dsc->content_font = LV_THEME_FONT_NORMAL;
+    dsc->content_font = LV_FONT_DEFAULT;
     dsc->content_opa = LV_OPA_COVER;
     dsc->content_align = LV_ALIGN_CENTER;
     dsc->shadow_opa = LV_OPA_COVER;

@@ -345,25 +345,6 @@ typedef void * lv_user_data_t;
  * In these languages characters should be replaced with an other form based on their position in the text */
 #define LV_USE_ARABIC_PERSIAN_CHARS 0
 
-
-/*==================
- *  THEME USAGE
- *================*/
-/*Set the very basic the attributes*/
-#define LV_THEME_COLOR_PRIMARY      lv_color_hex(0x01a2b1)
-#define LV_THEME_COLOR_SECONDARY    lv_color_hex(0x44d1b6)
-#define LV_THEME_FONT_SMALL         &lv_font_montserrat_14
-#define LV_THEME_FONT_NORMAL        &lv_font_montserrat_14
-#define LV_THEME_FONT_LARGE         &lv_font_montserrat_14
-#define LV_THEME_FONT_EXTRA_LARGE   &lv_font_montserrat_14
-
-/* An external include file required to see the theme init function.
- * Relative to "lv_core/lv_obj" */
-#define LV_THEME_INIT_INCLUDE "../extra/themes/lv_themes.h"
-
-/* Set a theme initialization function */
-#define LV_THEME_INIT lv_theme_default_init
-
 /*==================
  *  WIDGET USAGE
  *================*/

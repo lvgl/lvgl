@@ -154,7 +154,7 @@ void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
 
 bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_LAYOUTABLE) == false) return false;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT)) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
