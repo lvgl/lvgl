@@ -836,6 +836,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
+/*Always set a default font*/
+#ifndef LV_FONT_DEFAULT
+#  ifdef CONFIG_LV_FONT_DEFAULT
+#    define LV_FONT_DEFAULT CONFIG_LV_FONT_DEFAULT
+#  else
+#    define  LV_FONT_DEFAULT &lv_font_montserrat_14
+#  endif
+#endif
+
 /* Enable handling large font and/or fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp.
  * Compiler error will be triggered if a font needs it.*/
