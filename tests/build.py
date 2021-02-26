@@ -72,16 +72,9 @@ minimal_monochrome = {
   "LV_USE_ARABIC_PERSIAN_CHARS":0,
   
   "LV_BUILD_EXAMPLES":1,
+  
+  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
 
-#  "LV_USE_THEME_MONO":1,   
-#  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
-#  "LV_THEME_DEFAULT_COLOR_PRIMARY":      "\\\"LV_COLOR_RED\\\"",
-# "LV_THEME_DEFAULT_COLOR_SECONDARY":    "\\\"LV_COLOR_BLUE\\\"",
-#  "LV_THEME_DEFAULT_FLAG"         :     "0",
-#  "LV_THEME_DEFAULT_FONT_SMALL"    :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_NORMAL"   :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_unscii_8\\\"",
 }
 
 
@@ -108,16 +101,9 @@ minimal_16bit = {
   "LV_USE_ARABIC_PERSIAN_CHARS":0,
   
   "LV_BUILD_EXAMPLES":1,
+  
+  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
 
-#  "LV_USE_THEME_MONO":1,   
-#  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
-#  "LV_THEME_DEFAULT_COLOR_PRIMARY":      "\\\"LV_COLOR_RED\\\"",
-# "LV_THEME_DEFAULT_COLOR_SECONDARY":    "\\\"LV_COLOR_BLUE\\\"",
-#  "LV_THEME_DEFAULT_FLAG"         :     "0",
-#  "LV_THEME_DEFAULT_FONT_SMALL"    :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_NORMAL"   :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_unscii_8\\\"",
 }
 
 minimal_16bit_swap = {
@@ -146,15 +132,7 @@ minimal_16bit_swap = {
   
   "LV_BUILD_EXAMPLES":1,
 
-#  "LV_USE_THEME_MONO":1,   
-#  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
-#  "LV_THEME_DEFAULT_COLOR_PRIMARY":      "\\\"LV_COLOR_RED\\\"",
-# "LV_THEME_DEFAULT_COLOR_SECONDARY":    "\\\"LV_COLOR_BLUE\\\"",
-#  "LV_THEME_DEFAULT_FLAG"         :     "0",
-#  "LV_THEME_DEFAULT_FONT_SMALL"    :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_NORMAL"   :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_unscii_8\\\"",
+  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
 }
 
 
@@ -217,15 +195,7 @@ full_32bit = {
 
   "LV_BUILD_EXAMPLES":1,
   
-#  "LV_USE_THEME_MONO":1,   
-#  "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_mono_init\\\"",
-#  "LV_THEME_DEFAULT_COLOR_PRIMARY":      "\\\"LV_COLOR_RED\\\"",
-# "LV_THEME_DEFAULT_COLOR_SECONDARY":    "\\\"LV_COLOR_BLUE\\\"",
-#  "LV_THEME_DEFAULT_FLAG"         :     "0",
-#  "LV_THEME_DEFAULT_FONT_SMALL"    :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_NORMAL"   :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_unscii_8\\\"",
-#  "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_unscii_8\\\"",
+  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_32\\\"",
 }
 
 build("Minimal config monochrome", minimal_monochrome)

@@ -47,17 +47,11 @@ typedef struct _lv_theme_t {
  **********************/
 
 /**
- * Set a theme for the system.
- * From now, all the created objects will use styles from this theme by default
- * @param th pointer to theme (return value of: 'lv_theme_init_xxx()')
+ * Get the theme assigned to the display of the object
+ * @param obj       pointer to object
+ * @return          the theme of the object's display (can be NULL)
  */
-void lv_theme_set_act(lv_theme_t * th);
-
-/**
- * Get the current system theme.
- * @return pointer to the current system theme. NULL if not set.
- */
-lv_theme_t * lv_theme_get_act(void);
+lv_theme_t *  lv_theme_get_from_obj(lv_obj_t * obj);
 
 /**
  * Apply the active theme on an object
