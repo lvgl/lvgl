@@ -125,6 +125,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
 
 #else
     cached_src = &cache_temp;
+    LV_GC_ROOT(_lv_img_cache_array) = cached_src;
 #endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
