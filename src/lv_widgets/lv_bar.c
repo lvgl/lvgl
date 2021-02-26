@@ -531,17 +531,34 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         *axis1 += anim_start_value_x;
     }
     else {
-        *axis1 = *axis2 - anim_cur_value_x;
+        *axis1 = *axis2 - anim_cur_value_x + 1;
         *axis2 -= anim_start_value_x;
     }
     if(sym) {
-        lv_coord_t zero;
-        zero = *axis1 + (-ext->min_value * anim_length) / range;
-        if(*axis2 > zero)
-            *axis1 = zero;
-        else {
-            *axis1 = *axis2;
-            *axis2 = zero;
+        lv_coord_t zero, shift;
+        shift = (-ext->min_value * anim_length) / range;
+        if(hor) {
+            zero = *axis1 + shift;
+            if(*axis2 > zero)
+                *axis1 = zero;
+            else {
+                *axis1 = *axis2;
+                *axis2 = zero;
+            }
+        } else {
+            zero = *axis2 - shift + 1;
+            if(*axis1 > zero)
+                *axis2 = zero;
+            else {
+                *axis2 = *axis1;
+                *axis1 = zero;
+            }
+            if(*axis2 < *axis1) {
+                /* swap */
+                zero = *axis1;
+                *axis1 = *axis2;
+                *axis2 = zero;
+            }
         }
     }
 
