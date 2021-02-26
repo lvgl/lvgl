@@ -29,7 +29,7 @@ extern "C" {
     f(lv_ll_t, _lv_timer_ll)  /*Linked list to store the lv_tmr-s*/ \
     f(lv_ll_t, _lv_disp_ll)  /*Linked list of screens*/            \
     f(lv_ll_t, _lv_indev_ll) /*Linked list of input device*/       \
-    f(lv_ll_t, _lv_drv_ll)                                         \
+    f(lv_ll_t, _lv_fsdrv_ll)                                       \
     f(lv_ll_t, _lv_anim_ll)                                        \
     f(lv_ll_t, _lv_group_ll)                                       \
     f(lv_ll_t, _lv_img_decoder_ll)                                 \
