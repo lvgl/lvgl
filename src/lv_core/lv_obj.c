@@ -59,14 +59,15 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_obj_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
+static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 static void base_dir_refr_children(lv_obj_t * obj);
-static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static void lv_obj_destructor(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -332,65 +333,6 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     	}
     }
     if(f & LV_OBJ_FLAG_IGNORE_LAYOUT) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
-}
-
-void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
-{
-    if(obj->state == new_state) return;
-
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_state_t prev_state = obj->state;
-    obj->state = new_state;
-
-    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
-    /*If there is no difference in styles there is nothing else to do*/
-    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
-
-    trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
-    lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
-    uint32_t tsi = 0;
-    uint32_t i;
-    for(i = 0; i < obj->style_list.style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
-        lv_obj_style_t * obj_style = &obj->style_list.styles[i];
-        if(obj_style->state & (~new_state)) continue; /*Skip unrelated styles*/
-        if(obj_style->is_trans) continue;
-
-        lv_style_value_t v;
-        if(lv_style_get_prop(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
-        const lv_style_transition_dsc_t * tr = v.ptr;
-
-        /*Add the props t the set is not added yet or added but with smaller weight*/
-        uint32_t j;
-        for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
-            uint32_t t;
-            for(t = 0; t < tsi; t++) {
-                if(ts[t].prop == tr->props[j] && ts[t].state >= obj_style->state) break;
-            }
-
-            /*If not found  add it*/
-            if(t == tsi) {
-                ts[tsi].time = tr->time;
-                ts[tsi].delay = tr->delay;
-                ts[tsi].path = tr->path;
-                ts[tsi].prop = tr->props[j];
-                ts[tsi].part = obj_style->part;
-                ts[tsi].state = obj_style->state;
-                tsi++;
-            }
-        }
-    }
-
-    for(i = 0;i < tsi; i++) {
-        _lv_obj_style_create_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
-    }
-
-    lv_mem_buf_release(ts);
-
-    lv_obj_invalidate(obj);
-
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
-    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
 }
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
@@ -1007,6 +949,72 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
     return res;
 }
+
+/**
+ * Set the state (fully overwrite) of an object.
+ * If specified in the styles, transition animations will be started from the previous state to the current.
+ * @param obj       pointer to an object
+ * @param state     the new state
+ */
+static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
+{
+    if(obj->state == new_state) return;
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_state_t prev_state = obj->state;
+    obj->state = new_state;
+
+    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
+    /*If there is no difference in styles there is nothing else to do*/
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
+
+    trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
+    lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
+    uint32_t tsi = 0;
+    uint32_t i;
+    for(i = 0; i < obj->style_list.style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
+        lv_obj_style_t * obj_style = &obj->style_list.styles[i];
+        if(obj_style->state & (~new_state)) continue; /*Skip unrelated styles*/
+        if(obj_style->is_trans) continue;
+
+        lv_style_value_t v;
+        if(lv_style_get_prop(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
+        const lv_style_transition_dsc_t * tr = v.ptr;
+
+        /*Add the props t the set is not added yet or added but with smaller weight*/
+        uint32_t j;
+        for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
+            uint32_t t;
+            for(t = 0; t < tsi; t++) {
+                if(ts[t].prop == tr->props[j] && ts[t].state >= obj_style->state) break;
+            }
+
+            /*If not found  add it*/
+            if(t == tsi) {
+                ts[tsi].time = tr->time;
+                ts[tsi].delay = tr->delay;
+                ts[tsi].path = tr->path;
+                ts[tsi].prop = tr->props[j];
+                ts[tsi].part = obj_style->part;
+                ts[tsi].state = obj_style->state;
+                tsi++;
+            }
+        }
+    }
+
+    for(i = 0;i < tsi; i++) {
+        _lv_obj_style_create_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
+    }
+
+    lv_mem_buf_release(ts);
+
+    lv_obj_invalidate(obj);
+
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
+}
+
 
 static void base_dir_refr_children(lv_obj_t * obj)
 {

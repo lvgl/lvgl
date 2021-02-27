@@ -376,14 +376,6 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
  */
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
-/**
- * Set the state (fully overwrite) of an object.
- * If specified in the styles, transition animations will be started from the previous state to the current.
- * @param obj       pointer to an object
- * @param state     the new state
- */
-void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
-
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.

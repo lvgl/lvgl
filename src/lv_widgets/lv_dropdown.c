@@ -541,6 +541,7 @@ static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 
     if(copy == NULL) {
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_set_width(obj, LV_DPX(150));
         lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
     }
@@ -764,6 +765,7 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
 static void lv_dropdown_list_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_label_create(obj, NULL);
 }
 
