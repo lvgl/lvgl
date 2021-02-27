@@ -305,6 +305,15 @@ void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
     lv_obj_invalidate(obj);
 }
 
+void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
+    dropdown->selected_highlight = en;
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -381,7 +390,6 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
 lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     return dropdown->max_height;
 }
@@ -389,18 +397,21 @@ lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
-
     return dropdown->symbol;
+}
+
+bool lv_dropdown_get_selected_highlight(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
+    return dropdown->selected_highlight;
 }
 
 lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
-
     return dropdown->dir;
 }
 
@@ -421,16 +432,16 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     }
 
+    lv_obj_t * label = get_label(dropdown_obj);
+    lv_label_set_text_static(label, dropdown->options);
+    lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
+
     /*Set smaller width to the width of the button*/
     if(lv_obj_get_width(dropdown->list) <= lv_obj_get_width(dropdown_obj) &&
        (dropdown->dir == LV_DIR_TOP || dropdown->dir == LV_DIR_BOTTOM)) {
         lv_obj_set_width(dropdown->list, lv_obj_get_width(dropdown_obj));
-    } else {
-        lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
     }
 
-    lv_obj_t * label = get_label(dropdown_obj);
-    lv_label_set_text_static(label, dropdown->options);
 
     lv_coord_t label_h = lv_obj_get_height(label);
     lv_coord_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN);
@@ -450,7 +461,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
                 list_h = dropdown_obj->coords.y1 - 1;
             }
             else {
-                list_h = LV_VER_RES - dropdown_obj->coords.y2 - 1;
+                list_h = LV_VER_RES - dropdown_obj->coords.y2 - 1 ;
             }
         }
     }
@@ -475,10 +486,10 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 
     position_to_selected(dropdown_obj);
 
-    if(dir == LV_DIR_BOTTOM)      lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    if(dir == LV_DIR_BOTTOM)     lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
     else if(dir == LV_DIR_TOP)   lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
-    else if(dir == LV_DIR_LEFT) lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
-    else if(dir == LV_DIR_RIGHT)lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
+    else if(dir == LV_DIR_LEFT)  lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
+    else if(dir == LV_DIR_RIGHT) lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
     if(dropdown->dir == LV_DIR_LEFT || dropdown->dir == LV_DIR_RIGHT) {
         if(dropdown->list->coords.y2 >= LV_VER_RES) {
@@ -532,6 +543,7 @@ static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     dropdown->symbol         = LV_SYMBOL_DOWN;
     dropdown->text         = NULL;
     dropdown->static_txt = 1;
+    dropdown->selected_highlight = 1;
     dropdown->sel_opt_id      = 0;
     dropdown->sel_opt_id_orig = 0;
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
@@ -713,30 +725,9 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
     /*Draw the object*/
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         lv_obj_draw_base(MY_CLASS_LIST, list_obj, clip_area, mode);
-
-        lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
-        lv_obj_t * dropdown_obj = list->dropdown;
-        lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
-
-        /*Draw the boxes if the page is not being deleted*/
-        if(dropdown->list) {
-            /* Clip area might be too large too to shadow but
-             * the selected option can be drawn on only the background*/
-            lv_area_t clip_area_core;
-            bool has_common;
-            has_common = _lv_area_intersect(&clip_area_core, clip_area, &dropdown->list->coords);
-            if(has_common) {
-                if(dropdown->pr_opt_id != LV_DROPDOWN_PR_NONE) {
-                    draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
-                }
-
-                draw_box(dropdown_obj, &clip_area_core, dropdown->sel_opt_id, LV_STATE_DEFAULT);
-            }
-        }
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS_LIST, list_obj, clip_area, mode);
 
         lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
         lv_obj_t * dropdown_obj = list->dropdown;
@@ -750,13 +741,23 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
             bool has_common;
             has_common = _lv_area_intersect(&clip_area_core, clip_area, &dropdown->list->coords);
             if(has_common) {
-                if(dropdown->pr_opt_id != LV_DROPDOWN_PR_NONE) {
+                if(dropdown->selected_highlight) {
+                    if(dropdown->pr_opt_id == dropdown->sel_opt_id) {
+                        draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
+                        draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
+                    } else {
+                        draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
+                        draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
+                        draw_box(dropdown_obj, &clip_area_core, dropdown->sel_opt_id, LV_STATE_CHECKED);
+                        draw_box_label(dropdown_obj, &clip_area_core, dropdown->sel_opt_id, LV_STATE_CHECKED);
+                    }
+                } else {
+                    draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
                     draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
                 }
-
-                draw_box_label(dropdown_obj, &clip_area_core, dropdown->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
+        lv_obj_draw_base(MY_CLASS_LIST, list_obj, clip_area, mode);
     }
 
     return LV_DRAW_RES_OK;
@@ -904,6 +905,8 @@ static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void 
 
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
+    if(id == LV_DROPDOWN_PR_NONE) return;
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
     lv_obj_t * list_obj = dropdown->list;
     lv_state_t state_orig = list_obj->state;
@@ -938,6 +941,8 @@ static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint1
 
 static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
+    if(id == LV_DROPDOWN_PR_NONE) return;
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *) dropdown_obj;
     lv_obj_t * list_obj = dropdown->list;
     lv_state_t state_orig = list_obj->state;

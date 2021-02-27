@@ -477,7 +477,7 @@ static void style_init(void)
 
 
 #if LV_USE_LED
-    lv_style_init(&styles->led);
+    style_init_reset(&styles->led);
     lv_style_set_bg_opa(&styles->led, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->led, lv_color_white());
     lv_style_set_bg_grad_color(&styles->led, lv_color_grey());
@@ -758,8 +758,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->line_space_large);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-        lv_obj_add_style(obj, LV_PART_SELECTED, LV_STATE_DEFAULT, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_SELECTED, LV_STATE_PRESSED, &styles->bg_color_grey);
+        lv_obj_add_style(obj, LV_PART_SELECTED, LV_STATE_DEFAULT, &styles->bg_color_white);
+        lv_obj_add_style(obj, LV_PART_SELECTED, LV_STATE_CHECKED, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_SELECTED, LV_STATE_PRESSED, &styles->pressed);
     }
 #endif
 

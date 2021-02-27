@@ -48,9 +48,13 @@ void lv_obj_del(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
+    lv_obj_t * par = lv_obj_get_parent(obj);
+    if(par) {
+        lv_obj_scrollbar_invalidate(par);
+    }
+
     lv_disp_t * disp = NULL;
     bool act_scr_del = false;
-    lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) {
         disp = lv_obj_get_disp(obj);
         if(!disp) return;   /*Shouldn't happen*/
@@ -93,7 +97,6 @@ void lv_obj_clean(lv_obj_t * obj)
         obj->spec_attr->scroll.x = 0;
         obj->spec_attr->scroll.y = 0;
     }
-
 }
 
 void lv_obj_del_anim_ready_cb(lv_anim_t * a)

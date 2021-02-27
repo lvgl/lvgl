@@ -361,8 +361,8 @@ void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 
 void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t * ver_area)
 {
-    lv_area_set(hor_area, 0, 0, 0, 0);
-    lv_area_set(ver_area, 0, 0, 0, 0);
+    lv_area_set(hor_area, 0, 0, -1, -1);
+    lv_area_set(ver_area, 0, 0, -1, -1);
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
