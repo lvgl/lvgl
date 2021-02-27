@@ -326,6 +326,42 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
  * @note For performance reasons there are no sanity check on `style`
  */
 bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+
+
+/**
+ * Get the value of a property
+ * @param style: pointer to a style
+ * @param prop:  the ID of a property
+ * @param value: pointer to a `lv_style_value_t` variable to store the value
+ * @return false: the property wsn't found in the style (`value` is unchanged)
+ *         true: the property was fond, and `value` is set accordingly
+ * @note For performance reasons there are no sanity check on `style`
+ * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
+ */
+static inline bool lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
+{
+    if(style->prop_cnt == 0) return false;
+
+    if(style->allocated) {
+        uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
+        uint16_t * props = (uint16_t *) tmp;
+        uint32_t i;
+        for(i = 0; i < style->prop_cnt; i++) {
+            if(props[i] == prop) {
+                lv_style_value_t * values = (lv_style_value_t *)style->v_p.values_and_props;
+                *value = values[i];
+                return true;
+            }
+        }
+    } else {
+        if(style->prop1 == prop) {
+            *value = style->v_p.value1;
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * Initialize a transition descriptor.
  * @param tr:    pointer to a transition descriptor to initialize
