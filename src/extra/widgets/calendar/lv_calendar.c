@@ -71,13 +71,12 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char * day_names[])
     }
 }
 
-void lv_calendar_set_today_date(lv_obj_t * obj, lv_calendar_date_t * today)
+void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, uint32_t day)
 {
-    LV_ASSERT_NULL(today);
     lv_calendar_t * calendar = (lv_calendar_t *) obj;
-    calendar->today.year         = today->year;
-    calendar->today.month        = today->month;
-    calendar->today.day          = today->day;
+    calendar->today.year         = year;
+    calendar->today.month        = month;
+    calendar->today.day          = day;
 
     highlight_update(obj);
 }
@@ -93,14 +92,12 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highli
     highlight_update(obj);
 }
 
-void lv_calendar_set_showed_date(lv_obj_t * obj, lv_calendar_date_t * showed)
+void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
 {
-    LV_ASSERT_NULL(showed);
-
     lv_calendar_t * calendar = (lv_calendar_t *) obj;
-    calendar->showed_date.year   = showed->year;
-    calendar->showed_date.month  = showed->month;
-    calendar->showed_date.day    = showed->day;
+    calendar->showed_date.year   = year;
+    calendar->showed_date.month  = month;
+    calendar->showed_date.day    = 1;
 
     lv_calendar_date_t d;
     d.year = calendar->showed_date.year;
@@ -247,8 +244,8 @@ static void my_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     lv_btnmatrix_set_btn_ctrl_all(obj, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
 
 
-    lv_calendar_set_showed_date(obj, &calendar->showed_date);
-    lv_calendar_set_today_date(obj, &calendar->today);
+    lv_calendar_set_showed_date(obj, calendar->showed_date.year, calendar->showed_date.month);
+    lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
 
     lv_obj_add_event_cb(obj, draw_event_cb, NULL);
 

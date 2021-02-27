@@ -603,7 +603,6 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
     obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
     obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
-    obj->flags |= LV_OBJ_FLAG_SCROLL_ON_FOCUS;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
     obj->style_list.cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID;

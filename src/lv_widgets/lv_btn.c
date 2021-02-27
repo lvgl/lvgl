@@ -57,6 +57,7 @@ static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     }
 
     LV_LOG_INFO("btn created");

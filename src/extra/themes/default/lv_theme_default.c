@@ -38,7 +38,8 @@ static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(2)
 
-#define PAD_DEF LV_DPX(24)
+#define PAD_DEF     LV_DPX(24)
+#define PAD_SMALL   (PAD_DEF / 2 + 2)
 
 /**********************
  *      TYPEDEFS
@@ -62,7 +63,6 @@ typedef struct {
     lv_style_t pad_small;
     lv_style_t pad_normal;
     lv_style_t pad_gap;
-    lv_style_t pad_small_negative;
     lv_style_t line_space_large;
     lv_style_t text_align_center;
     lv_style_t outline_primary;
@@ -94,6 +94,10 @@ typedef struct {
     lv_style_t cb_marker, cb_marker_checked, cb_bg_outline_pad;
 #endif
 
+#if LV_USE_SWITCH
+    lv_style_t switch_knob;
+#endif
+
 #if LV_USE_TABLE
     lv_style_t table_cell;
 #endif
@@ -107,7 +111,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CALENDAR
-    lv_style_t calendar_day;
+    lv_style_t calendar_bg, calendar_day;
 #endif
 
 #if LV_USE_COLORWHEEL
@@ -218,8 +222,8 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, COLOR_SCR);
     lv_style_set_text_color(&styles->scr, COLOR_SCR_TEXT);
-    lv_style_set_pad_row(&styles->scr, PAD_DEF);
-    lv_style_set_pad_column(&styles->scr, PAD_DEF);
+    lv_style_set_pad_row(&styles->scr, PAD_SMALL);
+    lv_style_set_pad_column(&styles->scr, PAD_SMALL);
 
     style_init_reset(&styles->card);
     lv_style_set_radius(&styles->card, RADIUS_DEFAULT);
@@ -230,8 +234,8 @@ static void style_init(void)
     lv_style_set_border_post(&styles->card, true);
     lv_style_set_text_color(&styles->card, lv_color_grey_darken_4());
     lv_style_set_pad_all(&styles->card, PAD_DEF);
-    lv_style_set_pad_row(&styles->card, PAD_DEF / 4  + 2);
-    lv_style_set_pad_column(&styles->card, PAD_DEF);
+    lv_style_set_pad_row(&styles->card, PAD_SMALL);
+    lv_style_set_pad_column(&styles->card, PAD_SMALL);
     lv_style_set_line_color(&styles->card, lv_color_grey());
     lv_style_set_line_width(&styles->card, LV_DPX(1));
 
@@ -282,15 +286,12 @@ static void style_init(void)
     lv_style_set_pad_column(&styles->pad_normal, PAD_DEF);
 
     style_init_reset(&styles->pad_small);
-    lv_style_set_pad_all(&styles->pad_small, PAD_DEF / 2 + 2);
-    lv_style_set_pad_gap(&styles->pad_small, PAD_DEF / 2 + 2);
+    lv_style_set_pad_all(&styles->pad_small, PAD_SMALL);
+    lv_style_set_pad_gap(&styles->pad_small, PAD_SMALL);
 
     style_init_reset(&styles->pad_gap);
     lv_style_set_pad_row(&styles->pad_gap, LV_DPX(10));
     lv_style_set_pad_column(&styles->pad_gap, LV_DPX(10));
-
-    style_init_reset(&styles->pad_small_negative);
-    lv_style_set_pad_all(&styles->pad_small_negative, - LV_DPX(4));
 
     style_init_reset(&styles->line_space_large);
     lv_style_set_text_line_space(&styles->line_space_large, LV_DPX(20));
@@ -382,6 +383,11 @@ static void style_init(void)
     lv_style_set_outline_pad(&styles->cb_bg_outline_pad, LV_DPX(5));
 #endif
 
+#if LV_USE_SWITCH
+    style_init_reset(&styles->switch_knob);
+    lv_style_set_pad_all(&styles->switch_knob, - LV_DPX(4));
+#endif
+
 #if LV_USE_CHART
     style_init_reset(&styles->chart_bg);
     lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
@@ -433,6 +439,10 @@ static void style_init(void)
 #endif
 
 #if LV_USE_CALENDAR
+    style_init_reset(&styles->calendar_bg);
+    lv_style_set_pad_all(&styles->calendar_bg, PAD_SMALL);
+    lv_style_set_pad_gap(&styles->calendar_bg, PAD_SMALL / 2);
+
     style_init_reset(&styles->calendar_day);
     lv_style_set_border_width(&styles->calendar_day, LV_DPX(1));
     lv_style_set_border_color(&styles->calendar_day, color_primary_muted);
@@ -712,7 +722,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DISABLED, &styles->disabled);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
-        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->switch_knob);
         lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DISABLED, &styles->disabled);
     }
 #endif
@@ -808,7 +818,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_CALENDAR
     else if(lv_obj_check_type(obj, &lv_calendar_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_small);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->calendar_bg);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->calendar_day);

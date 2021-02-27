@@ -496,7 +496,7 @@ void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en)
  * @param ta pointer to a text area object
  * @param en true: enable, false: disable
  */
-void lv_textarea_set_pwd_mode(lv_obj_t * obj, bool en)
+void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -629,7 +629,7 @@ void lv_textarea_set_text_sel(lv_obj_t * obj, bool en)
  * @param ta pointer to Text area
  * @param time show time in milliseconds. 0: hide immediately.
  */
-void lv_textarea_set_pwd_show_time(lv_obj_t * obj, uint16_t time)
+void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -721,7 +721,7 @@ bool lv_textarea_get_cursor_click_pos(lv_obj_t * obj)
  * @param ta pointer to a text area object
  * @return true: password mode is enabled, false: disabled
  */
-bool lv_textarea_get_pwd_mode(const lv_obj_t * obj)
+bool lv_textarea_get_password_mode(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -817,7 +817,7 @@ bool lv_textarea_get_text_sel_en(lv_obj_t * obj)
  * @param ta pointer to Text area
  * @return show time in milliseconds. 0: hide immediately.
  */
-uint16_t lv_textarea_get_pwd_show_time(lv_obj_t * obj)
+uint16_t lv_textarea_get_password_show_time(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -972,6 +972,7 @@ static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
           lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
           lv_label_set_text(ta->label, "");
           lv_obj_set_size(obj, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
+          lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
       }
       /*Copy an existing object*/
       else {

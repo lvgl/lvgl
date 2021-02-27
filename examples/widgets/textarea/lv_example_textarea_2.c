@@ -10,7 +10,7 @@ void lv_example_textarea_2(void)
     /* Create the password box */
     lv_obj_t * pwd_ta = lv_textarea_create(lv_scr_act(), NULL);
     lv_textarea_set_text(pwd_ta, "");
-    lv_textarea_set_pwd_mode(pwd_ta, true);
+    lv_textarea_set_password_mode(pwd_ta, true);
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
     lv_obj_set_pos(pwd_ta, 5, 20);
@@ -23,7 +23,7 @@ void lv_example_textarea_2(void)
 
     /* Create the one-line mode text area */
     lv_obj_t * oneline_ta = lv_textarea_create(lv_scr_act(), pwd_ta);
-    lv_textarea_set_pwd_mode(oneline_ta, false);
+    lv_textarea_set_password_mode(oneline_ta, false);
     lv_obj_align(oneline_ta, NULL, LV_ALIGN_IN_TOP_RIGHT, -5, 20);
 
 
