@@ -903,12 +903,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_FOCUS) {
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        lv_obj_t * child = obj;
-        while(parent && lv_obj_has_flag(child, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
-            lv_obj_scroll_to_view(child, LV_ANIM_ON);
-            child = parent;
-            parent = lv_obj_get_parent(parent);
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
+            lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
         }
 
         bool editing = false;
