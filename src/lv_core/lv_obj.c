@@ -148,7 +148,7 @@ static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, sty
  **********************/
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
-static const void * event_act_data;
+static const char * event_act_data;
 
 /**********************
  *      MACROS
@@ -1936,7 +1936,7 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
  * @param data pointer to a custom data
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const void * data)
+lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const char * data)
 {
     if(obj != NULL) {
         LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -1955,7 +1955,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
     }
     event_temp_data_head = &event_temp_data;
 
-    const void * event_act_data_save = event_act_data;
+    const char * event_act_data_save = event_act_data;
     event_act_data                   = data;
 
     /*Call the input device's feedback callback if set*/
@@ -1993,7 +1993,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
  * Get the `data` parameter of the current event
  * @return the `data` parameter
  */
-const void * lv_event_get_data(void)
+const char * lv_event_get_data(void)
 {
     return event_act_data;
 }
