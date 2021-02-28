@@ -78,7 +78,6 @@ static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
    if(copy == NULL) {
        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
        lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
        lv_obj_set_size(obj, LV_DPX(60), LV_DPX(35));
    }

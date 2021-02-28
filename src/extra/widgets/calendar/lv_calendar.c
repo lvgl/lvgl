@@ -249,6 +249,7 @@ static void my_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_obj_add_event_cb(obj, draw_event_cb, NULL);
 
+
 }
 
 static void draw_event_cb(lv_obj_t * obj, lv_event_t e)

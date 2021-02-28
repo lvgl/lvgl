@@ -17,7 +17,7 @@ static void float_btn_event_cb(lv_obj_t * float_btn, lv_event_t e)
 }
 
 /**
- * Show an example to scroll snap
+ * Create a list a with a floating button
  */
 void lv_example_scroll_3(void)
 {

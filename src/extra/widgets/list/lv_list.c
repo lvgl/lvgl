@@ -72,7 +72,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt, lv_event_cb_t event_cb)
 {
     lv_obj_t * btn = lv_obj_create_from_class(&lv_list_btn_class, list, NULL);
-    lv_obj_set_width(btn, LV_SIZE_PCT(100));
+    lv_obj_set_size(btn, LV_SIZE_PCT(100), LV_SIZE_CONTENT);
     lv_obj_add_event_cb(btn, event_cb, NULL);
     lv_obj_set_layout(btn, &lv_flex_inline);
 

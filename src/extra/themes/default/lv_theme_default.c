@@ -252,7 +252,7 @@ static void style_init(void)
     style_init_reset(&styles->btn);
     lv_style_set_radius(&styles->btn, LV_DPX(16));
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->btn, lv_color_grey());
+    lv_style_set_bg_color(&styles->btn, lv_color_grey_lighten_1());
     lv_style_set_shadow_color(&styles->btn, lv_color_grey_lighten_2());
     lv_style_set_shadow_width(&styles->btn, 1);
     lv_style_set_shadow_ofs_y(&styles->btn, LV_DPX(4));
@@ -435,13 +435,14 @@ static void style_init(void)
     lv_style_set_anim_time(&styles->ta_cursor, 400);
 
     style_init_reset(&styles->ta_placeholder);
-    lv_style_set_text_color(&styles->ta_placeholder, lv_color_grey_lighten_3());
+    lv_style_set_text_color(&styles->ta_placeholder, lv_color_grey());
 #endif
 
 #if LV_USE_CALENDAR
     style_init_reset(&styles->calendar_bg);
     lv_style_set_pad_all(&styles->calendar_bg, PAD_SMALL);
     lv_style_set_pad_gap(&styles->calendar_bg, PAD_SMALL / 2);
+    lv_style_set_radius(&styles->calendar_bg, 0);
 
     style_init_reset(&styles->calendar_day);
     lv_style_set_border_width(&styles->calendar_day, LV_DPX(1));
@@ -849,9 +850,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_SPINBOX
     else if(lv_obj_check_type(obj, &lv_spinbox_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_small);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->bg_color_grey);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_FOCUSED, &styles->bg_color_primary);
     }
 #endif
 #if LV_USE_TILEVIEW
