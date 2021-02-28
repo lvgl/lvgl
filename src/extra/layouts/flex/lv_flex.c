@@ -159,7 +159,7 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     if(cont->spec_attr == NULL) return;
     const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
 
-    LV_LOG_INFO("Flex update on 0x%p", cont);
+    LV_LOG_INFO("Flex update on 0x%p triggered by 0x%p", cont, item);
 
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;

@@ -5,7 +5,7 @@ static lv_obj_t * list1;
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Clicked: %s\n", lv_list_get_btn_text(list1, obj));
+        LV_LOG_USER("Clicked: %s", lv_list_get_btn_text(list1, obj));
     }
 }
 void lv_example_list_1(void)

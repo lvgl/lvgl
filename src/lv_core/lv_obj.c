@@ -188,6 +188,8 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    LV_LOG_TRACE("Sending event %d to 0x%p with 0x%p param", event, obj, param);
+
     /*Nothing to do if no event function and not bubbled*/
     lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
     if(event_dsc == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
@@ -286,6 +288,8 @@ void _lv_event_mark_deleted(lv_obj_t * obj)
 lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 {
     if(obj == NULL) return LV_RES_OK;
+
+    LV_LOG_TRACE("Sending signal %d to 0x%p with 0x%p param", signal, obj, param);
 
     const lv_obj_class_t * class_p = obj->class_p;
     while(class_p && class_p->signal_cb == NULL) class_p = class_p->base_class;

@@ -90,7 +90,10 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
             if(lv_timer_exec(LV_GC_ROOT(_lv_timer_act))) {
                 /*If a timer was created or deleted then this or the next item might be corrupted*/
-                if(timer_created || timer_deleted) break;
+                if(timer_created || timer_deleted) {
+                    LV_LOG_TRACE("Start from the first timer again because a timer was created or deleted");
+                    break;
+                }
             }
 
             LV_GC_ROOT(_lv_timer_act) = next; /*Load the next timer*/
@@ -120,7 +123,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     already_running = false; /*Release the mutex*/
 
-    LV_LOG_TRACE("lv_timer_handler ready");
+    LV_LOG_TRACE("lv_timer_handler ready. %d ms until the next timer call", time_till_next);
     return time_till_next;
 }
 /**
@@ -277,7 +280,9 @@ static bool lv_timer_exec(lv_timer_t * timer)
     bool exec = false;
     if(lv_timer_time_remaining(timer) == 0) {
         timer->last_run = lv_tick_get();
+        LV_LOG_TRACE("Calling timer callback 0x%p", timer->timer_cb);
         if(timer->timer_cb) timer->timer_cb(timer);
+        LV_LOG_TRACE("Timer callback 0x%p finished", timer->timer_cb);
         LV_ASSERT_MEM_INTEGRITY();
 
         /*Delete if it was a one shot lv_timer*/
@@ -286,6 +291,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
                 timer->repeat_count--;
             }
             if(timer->repeat_count == 0) {
+                LV_LOG_TRACE("Deleting timer with 0x%p callback because the repeat count is over", timer->timer_cb);
                 lv_timer_del(timer);
             }
         }

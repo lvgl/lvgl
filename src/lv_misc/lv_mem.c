@@ -166,9 +166,10 @@ void * lv_mem_alloc(size_t size)
 #if LV_MEM_CUSTOM == 0
     alloc = alloc_core(size);
     if(alloc == NULL) {
-        LV_LOG_TRACE("No more memory, try to defrag");
+        LV_LOG_WARN("Out of memory, try to defrag");
         lv_mem_defrag();
         alloc = alloc_core(size);
+        LV_LOG_INFO("Defrag made enough memory");
     }
 
 #else
@@ -195,7 +196,7 @@ void * lv_mem_alloc(size_t size)
         LV_LOG_WARN("Couldn't allocate memory (%d bytes)", size);
         lv_mem_monitor_t mon;
         lv_mem_monitor(&mon);
-        LV_LOG_WARN("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+        LV_LOG_WARN("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
                (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
                (int)mon.free_biggest_size);
     }
