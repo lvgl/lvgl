@@ -427,6 +427,16 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
+/*1: Show the used memory and the memory fragmentation  in the left bottom corner
+ * Requires LV_MEM_CUSTOM = 0*/
+#ifndef LV_USE_MEM_MONITOR
+#  ifdef CONFIG_LV_USE_MEM_MONITOR
+#    define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
+#  else
+#    define  LV_USE_MEM_MONITOR      0
+#  endif
+#endif
+
 /*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
 #  ifdef CONFIG_LV_SPRINTF_CUSTOM

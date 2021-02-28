@@ -19,7 +19,7 @@
 #include "../lv_font/lv_font_fmt_txt.h"
 #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 
-#if LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
     #include "../lv_widgets/lv_label.h"
 #endif
 
@@ -229,7 +229,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
-        lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
+        lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
         lv_obj_set_style_bg_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
         lv_obj_set_style_text_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
         lv_obj_set_style_pad_top(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
@@ -267,6 +267,34 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
         uint32_t cpu = 100 - lv_timer_get_idle();
         lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
         lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+    }
+#endif
+
+#if LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
+    static lv_obj_t * mem_label = NULL;
+    if(mem_label == NULL) {
+        mem_label = lv_label_create(lv_layer_sys(), NULL);
+        lv_obj_set_style_bg_opa(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
+        lv_obj_set_style_bg_color(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
+        lv_obj_set_style_text_color(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
+        lv_obj_set_style_pad_top(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_bottom(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_left(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_right(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_label_set_text(mem_label, "?");
+        lv_obj_align(mem_label, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    }
+
+    static uint32_t mem_last_time = 0;
+    if(lv_tick_elaps(mem_last_time) > 300) {
+        mem_last_time = lv_tick_get();
+        lv_mem_monitor_t mon;
+        lv_mem_monitor(&mon);
+        uint32_t used_size = mon.total_size - mon.free_size;;
+        uint32_t used_kb = used_size / 1024;
+        uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
+        lv_label_set_text_fmt(mem_label, "%d.%d kB used (%d %%)\n%d%% frag.", used_kb,  used_kb_tenth, mon.used_pct, mon.frag_pct);
+        lv_obj_align(mem_label, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
     }
 #endif
 
@@ -904,6 +932,6 @@ static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, l
 
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    LV_LOG_INFO("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
+    LV_LOG_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
     drv->flush_cb(drv, area, color_p);
 }
