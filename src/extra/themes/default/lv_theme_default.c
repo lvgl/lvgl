@@ -589,18 +589,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #if LV_USE_BTN
     else if(lv_obj_check_type(obj, &lv_btn_class)) {
-#if LV_USE_LIST
-        /*Add different buttons to the lists*/
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_list_class)) {
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_white);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->list_btn);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->bg_color_primary);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->list_item_grow);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->list_item_grow);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
-            return;
-        }
-#endif
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
@@ -774,17 +762,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_LABEL
-    else if(lv_obj_check_type(obj, &lv_label_class)) {
-#if LV_USE_LIST
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_list_class)) {
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_grey);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->list_item_grow);
-        }
-#endif
-    }
-#endif
-
 #if LV_USE_ARC
     else if(lv_obj_check_type(obj, &lv_arc_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->arc_indic);
@@ -848,6 +825,19 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
         return;
+    }
+    else if(lv_obj_check_type(obj, &lv_list_text_class)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_grey);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->list_item_grow);
+    }
+    else if(lv_obj_check_type(obj, &lv_list_btn_class)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_white);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->list_btn);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->list_item_grow);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->list_item_grow);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
+
     }
 #endif
 #if LV_USE_MSGBOX

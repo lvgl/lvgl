@@ -122,6 +122,7 @@ static void grid_update(lv_obj_t * cont, lv_obj_t * item)
     if(cont->spec_attr == NULL) return;
     if(cont->spec_attr->layout_dsc == NULL) return;
 
+    LV_LOG_INFO("Grid update on 0x%p. Triggered by 0x%p", cont, item);
     if(item) item_refr(item);
     else full_refresh(cont);
 }
@@ -251,7 +252,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
             for(ci = 0; ci < lv_obj_get_child_cnt(cont); ci++) {
                 lv_obj_t * item = lv_obj_get_child(cont, ci);
                 if(LV_COORD_IS_LAYOUT(item->x_set) == false || LV_COORD_IS_LAYOUT(item->y_set) == false) continue;
-                if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT)) continue;
+                if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
                 uint32_t col_pos = GET_CELL_POS(item->x_set);
                 if(col_pos != i) continue;
                 uint32_t col_span = GET_CELL_SPAN(item->x_set);
@@ -312,7 +313,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
             for(ci = 0; ci < lv_obj_get_child_cnt(cont); ci++) {
                 lv_obj_t * item = lv_obj_get_child(cont, ci);
                 if(LV_COORD_IS_LAYOUT(item->x_set) == false || LV_COORD_IS_LAYOUT(item->y_set) == false) continue;
-                if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT)) continue;
+                if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
                 uint32_t row_pos = GET_CELL_POS(item->y_set);
                 if(row_pos != i) continue;
                 uint32_t row_span = GET_CELL_SPAN(item->y_set);
@@ -367,7 +368,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
     if(LV_COORD_IS_LAYOUT(item->x_set) == 0 || LV_COORD_IS_LAYOUT(item->y_set) == 0) return;
-    if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT)) return;
+    if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) return;
     uint32_t col_span = GET_CELL_SPAN(item->x_set);
     uint32_t row_span = GET_CELL_SPAN(item->y_set);
     if(row_span == 0 || col_span == 0) return;

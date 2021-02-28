@@ -135,7 +135,7 @@ void lv_init(void)
 
     uint8_t * txt_u8 = (uint8_t *) txt;
     if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
-        LV_LOG_WARN("The strings has no UTF-8 encoding. Some characters won't be displayed.")
+        LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.")
     }
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
@@ -144,6 +144,10 @@ void lv_init(void)
 
 #if LV_USE_ASSERT_OBJ
     LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower")
+#endif
+
+#if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
+    LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
 #endif
 
 
@@ -310,7 +314,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     obj->flags |= f;
 
-    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
+    if(f & (LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING)) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 
     if(f & (LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2)) {
     	lv_obj_invalidate(obj);
@@ -332,7 +336,7 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
     	}
     }
-    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
+    if(f & (LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING)) lv_signal_send(lv_obj_get_parent(obj), LV_SIGNAL_CHILD_CHG, obj);
 }
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
@@ -397,6 +401,13 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return (obj->flags & f)  == f ? true : false;
+}
+
+bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return (obj->flags & f) ? true : false;
 }
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)

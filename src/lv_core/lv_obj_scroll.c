@@ -27,7 +27,6 @@
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -140,6 +139,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         child_res = LV_MAX(child_res, child->coords.y2);
     }
 
@@ -175,6 +175,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
     lv_coord_t x1 = LV_COORD_MAX;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
        lv_obj_t * child = lv_obj_get_child(obj, i);
+       if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         x1 = LV_MIN(x1, child->coords.x1);
 
     }
@@ -207,6 +208,7 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         child_res = LV_MAX(child_res, child->coords.x2);
     }
 
@@ -521,7 +523,7 @@ static void scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->spec_attr->scroll.x += x;
     obj->spec_attr->scroll.y += y;
 
-    lv_obj_move_children_by(obj, x, y);
+    lv_obj_move_children_by(obj, x, y, true);
     lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
     if(res != LV_RES_OK) return;
     lv_obj_invalidate(obj);

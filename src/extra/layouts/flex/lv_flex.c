@@ -28,7 +28,6 @@ typedef struct {
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -160,6 +159,8 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     if(cont->spec_attr == NULL) return;
     const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
 
+    LV_LOG_INFO("Flex update on 0x%p", cont);
+
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
     lv_coord_t track_gap = !row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
@@ -272,9 +273,7 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
-        if(!lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT) && !lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
-            if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUT_1)) break;
-
+        if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             lv_coord_t main_size = (row ? item->w_set : item->h_set);
             if(_LV_FLEX_GET_GROW(main_size)) {
                 grow_sum += _LV_FLEX_GET_GROW(main_size);
@@ -289,8 +288,8 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
             t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
             t->item_cnt++;
-
         }
+
         item_id += f->rev ? -1 : +1;
         if(item_id < 0) break;
         item = lv_obj_get_child(cont, item_id);
@@ -345,7 +344,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
     while(item && item_first_id != item_last_id) {
-        if(lv_obj_has_flag(item, LV_OBJ_FLAG_IGNORE_LAYOUT) || lv_obj_has_flag(item, LV_OBJ_FLAG_HIDDEN)) {
+        if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             item = get_next_item(cont, f->rev, &item_first_id);
             continue;
         }
@@ -393,7 +392,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
             item->coords.y1 += diff_y;
             item->coords.y2 += diff_y;
             lv_obj_invalidate(item);
-            lv_obj_move_children_by(item, diff_x, diff_y);
+            lv_obj_move_children_by(item, diff_x, diff_y, true);
         }
 
         if(!(row && rtl)) main_pos += area_get_main_size(&item->coords) + item_gap + place_gap;

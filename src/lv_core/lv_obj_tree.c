@@ -205,10 +205,10 @@ void lv_obj_move_background(lv_obj_t * obj)
     lv_obj_invalidate(parent);
 
     uint32_t i;
-    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 2; i++) {
+    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 1; i++) {
         parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
     }
-    parent->spec_attr->children[ lv_obj_get_child_cnt(parent) - 1] = obj;
+    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     /*Notify the new parent about the child*/
     lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);

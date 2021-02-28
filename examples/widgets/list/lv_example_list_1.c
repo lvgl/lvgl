@@ -1,16 +1,17 @@
 #include "../../../lvgl.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
+static lv_obj_t * list1;
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Clicked: %s\n", lv_list_get_btn_text(obj));
+        LV_LOG_USER("Clicked: %s\n", lv_list_get_btn_text(list1, obj));
     }
 }
 void lv_example_list_1(void)
 {
     /*Create a list*/
-    lv_obj_t * list1 = lv_list_create(lv_scr_act());
+    list1 = lv_list_create(lv_scr_act());
     lv_obj_align(list1, NULL, LV_ALIGN_CENTER, 0, 0);
 
     /*Add buttons to the list*/

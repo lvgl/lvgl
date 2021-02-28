@@ -45,6 +45,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 static void lv_refr_vdb_flush(void);
 static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -789,7 +790,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
     }
     if(drv->rotated == LV_DISP_ROT_180) {
         lv_refr_vdb_rotate_180(drv, area, color_p);
-        drv->flush_cb(drv, area, color_p);
+        call_flush_cb(drv, area, color_p);
     } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
         /*Allocate a temporary buffer to store rotated image */
         lv_color_t * rot_buf = NULL; 
@@ -838,7 +839,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
                 }
             }
             /*Flush the completed area to the display*/
-            drv->flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
+            call_flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
             /*FIXME: Rotation forces legacy behavior where rendering and flushing are done serially*/
             while(vdb->flushing) {
                 if(drv->wait_cb) drv->wait_cb(drv);
@@ -873,7 +874,7 @@ static void lv_refr_vdb_flush(void)
         if(disp->driver.rotated != LV_DISP_ROT_NONE && disp->driver.sw_rotate) {
             lv_refr_vdb_rotate(&vdb->area, vdb->buf_act);
         } else {
-            disp->driver.flush_cb(&disp->driver, &vdb->area, color_p);
+            call_flush_cb(&disp->driver, &vdb->area, color_p);
         }
     }
     if(vdb->buf1 && vdb->buf2) {
@@ -899,4 +900,10 @@ static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, l
     if(class_p->draw_cb) res = class_p->draw_cb(obj, clip_area, mode);
 
     return res;
+}
+
+static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
+{
+    LV_LOG_INFO("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
+    drv->flush_cb(drv, area, color_p);
 }
