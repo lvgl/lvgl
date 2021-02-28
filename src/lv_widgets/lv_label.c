@@ -71,6 +71,7 @@ const lv_obj_class_t lv_label_class = {
 
 lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_label_class, parent, copy);
 }
 
@@ -694,7 +695,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 
 static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("label create started");
+    LV_LOG_TRACE("begin");
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -725,7 +726,7 @@ static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_label_set_text(obj, "Text");
     }
 
-    LV_LOG_INFO("label created");
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_label_destructor(lv_obj_t * obj)

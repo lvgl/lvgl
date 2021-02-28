@@ -87,6 +87,7 @@ const lv_obj_class_t lv_dropdown_list_class = {
 
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_dropdown_class, parent, copy);
 }
 
@@ -533,7 +534,7 @@ static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * co
 
 static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("dropdown create started");
+    LV_LOG_TRACE("begin");
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
@@ -573,7 +574,7 @@ static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 //        dropdown->dir      = copy_dropdown->dir;
     }
 
-   LV_LOG_INFO("dropdown created");
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_dropdown_destructor(lv_obj_t * obj)
@@ -765,9 +766,13 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
 
 static void lv_dropdown_list_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_LOG_TRACE("begin");
+
     LV_UNUSED(copy);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_label_create(obj, NULL);
+
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_dropdown_list_destructor(lv_obj_t * list_obj)

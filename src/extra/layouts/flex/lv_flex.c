@@ -244,6 +244,8 @@ static void flex_update(lv_obj_t * cont, lv_obj_t * item)
     if(cont->w_set == LV_SIZE_CONTENT || cont->h_set == LV_SIZE_CONTENT) {
         lv_obj_set_size(cont, cont->w_set, cont->h_set);
     }
+
+    LV_LOG_TRACE("finished");
 }
 
 /**

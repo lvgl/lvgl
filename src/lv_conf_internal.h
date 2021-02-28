@@ -130,14 +130,21 @@
 #  ifdef CONFIG_LV_MEM_CUSTOM_ALLOC
 #    define LV_MEM_CUSTOM_ALLOC CONFIG_LV_MEM_CUSTOM_ALLOC
 #  else
-#    define  LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
+#    define  LV_MEM_CUSTOM_ALLOC     malloc
 #  endif
 #endif
 #ifndef LV_MEM_CUSTOM_FREE
 #  ifdef CONFIG_LV_MEM_CUSTOM_FREE
 #    define LV_MEM_CUSTOM_FREE CONFIG_LV_MEM_CUSTOM_FREE
 #  else
-#    define  LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#    define  LV_MEM_CUSTOM_FREE      free
+#  endif
+#endif
+#ifndef LV_MEM_CUSTOM_REALLOC
+#  ifdef CONFIG_LV_MEM_CUSTOM_REALLOC
+#    define LV_MEM_CUSTOM_REALLOC CONFIG_LV_MEM_CUSTOM_REALLOC
+#  else
+#    define  LV_MEM_CUSTOM_REALLOC   realloc
 #  endif
 #endif
 #endif     /*LV_MEM_CUSTOM*/
@@ -354,6 +361,23 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define  LV_LOG_PRINTF   1
 #  endif
 #endif
+
+/*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs */
+#ifndef LV_LOG_TRACE_MEM
+#  ifdef CONFIG_LV_LOG_TRACE_MEM
+#    define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
+#  else
+#    define  LV_LOG_TRACE_MEM    0
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_TIMER
+#  ifdef CONFIG_LV_LOG_TRACE_TIMER
+#    define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
+#  else
+#    define  LV_LOG_TRACE_TIMER  0
+#  endif
+#endif
+
 #endif  /*LV_USE_LOG*/
 
 /*-------------
@@ -502,20 +526,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define LV_GC_INCLUDE CONFIG_LV_GC_INCLUDE
 #  else
 #    define  LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#  endif
-#endif
-#ifndef LV_MEM_CUSTOM_REALLOC
-#  ifdef CONFIG_LV_MEM_CUSTOM_REALLOC
-#    define LV_MEM_CUSTOM_REALLOC CONFIG_LV_MEM_CUSTOM_REALLOC
-#  else
-#    define  LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
-#  endif
-#endif
-#ifndef LV_MEM_CUSTOM_GET_SIZE
-#  ifdef CONFIG_LV_MEM_CUSTOM_GET_SIZE
-#    define LV_MEM_CUSTOM_GET_SIZE CONFIG_LV_MEM_CUSTOM_GET_SIZE
-#  else
-#    define  LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
 #  endif
 #endif
 #endif /* LV_ENABLE_GC */

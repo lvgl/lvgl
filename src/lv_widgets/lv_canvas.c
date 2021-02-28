@@ -67,6 +67,7 @@ const lv_obj_class_t lv_canvas_class = {
 
 lv_obj_t * lv_canvas_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_canvas_class, parent, copy);
 }
 
@@ -894,7 +895,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
    LV_UNUSED(copy);
-   LV_LOG_TRACE("canvas create started");
+   LV_LOG_TRACE("begin");
 
    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
@@ -908,7 +909,7 @@ static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
    lv_img_set_src(obj, &canvas->dsc);
 
-   LV_LOG_INFO("canvas created");
+   LV_LOG_TRACE("finished");
 }
 
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)

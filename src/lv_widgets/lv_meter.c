@@ -55,6 +55,7 @@ const lv_obj_class_t lv_meter_class = {
 
 lv_obj_t * lv_meter_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_meter_class, parent, copy);
 }
 
@@ -209,7 +210,7 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
 
 static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("line meter create started");
+    LV_LOG_TRACE("begin");
 
     lv_meter_t * meter = (lv_meter_t *) obj;
 
@@ -229,7 +230,7 @@ static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 //        meter->cur_value             = copy_meter->cur_value;
     }
 
-    LV_LOG_INFO("line meter created");
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_meter_destructor(lv_obj_t * obj)

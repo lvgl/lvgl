@@ -553,7 +553,7 @@ lv_color_t lv_color_get_palette_accent_1(lv_color_palette_t palette)
         case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_1();
         case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_1();
         default:
-            LV_LOG_INFO("Color palette %d has no accent colors, use main color instead", palette);
+            LV_LOG_WARN("color palette %d has no accent colors, use main color instead", palette);
             return lv_color_get_palette_main(palette);
     }
     return lv_color_black();
@@ -579,7 +579,7 @@ lv_color_t lv_color_get_palette_accent_1(lv_color_palette_t palette)
         case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_2();
         case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_2();
         default:
-            LV_LOG_INFO("Color palette %d has no accent colors, use main color instead", palette);
+            LV_LOG_WARN("color palette %d has no accent colors, use main color instead", palette);
             return lv_color_get_palette_main(palette);
     }
     return lv_color_black();
@@ -605,7 +605,7 @@ lv_color_t lv_color_get_palette_accent_1(lv_color_palette_t palette)
         case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_3();
         case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_3();
         default:
-            LV_LOG_INFO("Color palette %d has no accent colors, use main color instead", palette);
+            LV_LOG_WARN("color palette %d has no accent colors, use main color instead", palette);
             return lv_color_get_palette_main(palette);
     }
     return lv_color_black();
@@ -631,7 +631,7 @@ lv_color_t lv_color_get_palette_accent_1(lv_color_palette_t palette)
         case LV_COLOR_PALETTE_ORANGE:       return lv_color_orange_accent_4();
         case LV_COLOR_PALETTE_DEEP_ORANGE:  return lv_color_deep_orange_accent_4();
         default:
-            LV_LOG_INFO("Color palette %d has no accent colors, use main color instead", palette);
+            LV_LOG_WARN("color palette %d has no accent colors, use main color instead", palette);
             return lv_color_get_palette_main(palette);
     }
     return lv_color_black();

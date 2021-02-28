@@ -76,6 +76,7 @@ const lv_obj_class_t lv_roller_label_class  = {
  */
 lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_roller_class, parent, copy);
 }
 
@@ -312,7 +313,7 @@ static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         roller->sel_opt_id_ori = copy_roller->sel_opt_id;
     }
 
-    LV_LOG_INFO("roller created");
+    LV_LOG_TRACE("finshed");
 
 }
 

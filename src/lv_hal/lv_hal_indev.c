@@ -151,12 +151,11 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     }
 
     if(indev->driver.read_cb) {
-        LV_LOG_TRACE("indev read started");
+        LV_LOG_TRACE("calling indev_read_cb");
         cont = indev->driver.read_cb(&indev->driver, data);
-        LV_LOG_TRACE("indev read finished");
     }
     else {
-        LV_LOG_WARN("indev function registered");
+        LV_LOG_WARN("indev_read_cb is not registered");
     }
 
     return cont;

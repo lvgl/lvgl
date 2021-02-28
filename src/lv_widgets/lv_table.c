@@ -60,6 +60,7 @@ const lv_obj_class_t lv_table_class  = {
 
 lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_table_class, parent, copy);
 }
 
@@ -383,7 +384,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 
 static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("lv_table create started");
+    LV_LOG_TRACE("begin");
 
     lv_table_t * table = (lv_table_t *) obj;
 
@@ -413,7 +414,8 @@ static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_table_set_row_cnt(obj, copy_table->row_cnt);
         lv_table_set_col_cnt(obj, copy_table->col_cnt);
     }
-   LV_LOG_INFO("table created");
+
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_table_destructor(lv_obj_t * obj)

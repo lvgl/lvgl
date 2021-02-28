@@ -279,7 +279,7 @@ static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
 
-    LV_LOG_TRACE("spinbox create started");
+    LV_LOG_TRACE("begin");
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *) obj;
 
@@ -298,7 +298,7 @@ static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_spinbox_updatevalue(obj);
 
-    LV_LOG_INFO("spinbox created");
+    LV_LOG_TRACE("Spinbox constructor finished");
 }
 
 static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param)

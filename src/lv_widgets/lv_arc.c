@@ -66,6 +66,7 @@ const lv_obj_class_t lv_arc_class  = {
  */
 lv_obj_t * lv_arc_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_arc_class, parent, copy);
 }
 
@@ -482,10 +483,9 @@ lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj)
 
 static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("lv_arc create started");
+    LV_LOG_TRACE("begin");
 
     lv_arc_t * arc = (lv_arc_t *)obj;
-    LV_LOG_TRACE("arc create started");
 
    /*Initialize the allocated 'ext' */
    arc->rotation = 0;

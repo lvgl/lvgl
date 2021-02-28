@@ -48,8 +48,9 @@
 #  define LV_MEM_ADR          0     /*0: unused*/
 #else       /*LV_MEM_CUSTOM*/
 #  define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
-#  define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
-#  define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#  define LV_MEM_CUSTOM_ALLOC     malloc
+#  define LV_MEM_CUSTOM_FREE      free
+#  define LV_MEM_CUSTOM_REALLOC   realloc
 #endif     /*LV_MEM_CUSTOM*/
 
 /* Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster). */
@@ -150,6 +151,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /* 1: Print the log with 'printf';
  * 0: User need to register a callback with `lv_log_register_print_cb()`*/
 #  define LV_LOG_PRINTF   1
+
+/*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs */
+#define LV_LOG_TRACE_MEM    0
+#define LV_LOG_TRACE_TIMER  0
+
 #endif  /*LV_USE_LOG*/
 
 /*-------------
@@ -199,8 +205,6 @@ typedef void * lv_user_data_t;
 #define LV_ENABLE_GC 0
 #if LV_ENABLE_GC != 0
 #  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#  define LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
-#  define LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
 #endif /* LV_ENABLE_GC */
 
 /*=====================

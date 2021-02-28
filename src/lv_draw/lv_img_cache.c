@@ -98,7 +98,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
             cached_src = &cache[i];
             cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
             if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
-            LV_LOG_TRACE("image draw: image found in the cache");
+            LV_LOG_TRACE("image source found in the cache");
             break;
         }
     }

@@ -91,6 +91,7 @@ static const char * ta_insert_replace;
  */
 lv_obj_t * lv_textarea_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
   return lv_obj_create_from_class(&lv_textarea_class, parent, copy);
 }
 
@@ -133,8 +134,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
     uint32_t c_uni = _lv_txt_encoded_next((const char *)&c, NULL);
 
     if(char_is_accepted(obj, c_uni) == false) {
-        LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the "
-                    "accepted list)");
+        LV_LOG_INFO("Character is not accepted by the text area (too long text or not in the accepted list)");
         return;
     }
 
@@ -946,7 +946,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
 
 static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("text area create started");
+    LV_LOG_TRACE("begin");
 
     lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -1005,7 +1005,7 @@ static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
       start_cursor_blink(obj);
 
-      LV_LOG_INFO("text area created");
+      LV_LOG_TRACE("finished");
 }
 
 static void lv_textarea_destructor(lv_obj_t * obj)

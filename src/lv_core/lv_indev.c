@@ -59,7 +59,7 @@ static lv_obj_t * indev_obj_act = NULL;
 
 void lv_indev_read_task_cb(lv_timer_t * task)
 {
-    LV_LOG_TRACE("indev read task started");
+    LV_LOG_TRACE("begin");
 
     lv_indev_data_t data;
 
@@ -111,7 +111,7 @@ void lv_indev_read_task_cb(lv_timer_t * task)
     indev_act     = NULL;
     indev_obj_act = NULL;
 
-    LV_LOG_TRACE("indev read task finished");
+    LV_LOG_TRACE("finished");
 }
 
 void lv_indev_enable(lv_indev_t * indev, bool en)

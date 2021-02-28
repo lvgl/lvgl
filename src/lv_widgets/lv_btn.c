@@ -43,6 +43,7 @@ const lv_obj_class_t lv_btn_class  = {
 
 lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
      return lv_obj_create_from_class(&lv_btn_class, parent, copy);
 }
 
@@ -52,7 +53,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("lv_btn create started");
+    LV_LOG_TRACE("begin");
 
     if(copy == NULL) {
         lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
@@ -60,7 +61,7 @@ static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     }
 
-    LV_LOG_INFO("btn created");
+    LV_LOG_TRACE("finished");
 }
 
 #endif

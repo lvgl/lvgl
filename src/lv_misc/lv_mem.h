@@ -113,12 +113,6 @@ lv_res_t lv_mem_test(void);
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p);
 
-/**
- * Give the size of an allocated memory
- * @param data pointer to an allocated memory
- * @return the size of data memory in bytes
- */
-uint32_t lv_mem_get_size(const void * data);
 
 /**
  * Get a temporal buffer with the given size.

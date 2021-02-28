@@ -180,7 +180,7 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  */
 void _lv_disp_refr_task(lv_timer_t * tmr)
 {
-    LV_LOG_TRACE("lv_refr_task: started");
+    LV_LOG_TRACE("begin");
 
     uint32_t start = lv_tick_get();
     uint32_t elaps = 0;
@@ -197,6 +197,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
+        LV_LOG_TRACE("finished (there were no invalid areas to redraw)");
         return;
     }
 
@@ -298,7 +299,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     }
 #endif
 
-    LV_LOG_TRACE("lv_refr_task: ready");
+    LV_LOG_TRACE("finished");
 }
 
 #if LV_USE_PERF_MONITOR

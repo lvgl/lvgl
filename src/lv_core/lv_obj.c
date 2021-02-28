@@ -101,7 +101,7 @@ void lv_init(void)
         return;
     }
 
-    LV_LOG_TRACE("lv_init started");
+    LV_LOG_TRACE("begin");
 
     /*Initialize the lv_misc modules*/
     lv_mem_init();
@@ -150,9 +150,9 @@ void lv_init(void)
     LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
 #endif
 
-
     lv_initialized = true;
-    LV_LOG_INFO("lv_init ready");
+
+    LV_LOG_TRACE("finished");
 }
 
 #if LV_ENABLE_GC || !LV_MEM_CUSTOM
@@ -546,10 +546,12 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
 
 static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
+    LV_LOG_TRACE("begin");
+
     lv_obj_t * parent = obj->parent;
     /*Create a screen*/
     if(parent == NULL) {
-        LV_LOG_TRACE("Screen create started");
+        LV_LOG_TRACE("creating a screen");
         lv_disp_t * disp = lv_disp_get_default();
         if(!disp) {
             LV_LOG_WARN("No display created to so far. No place to assign the new screen");
@@ -574,7 +576,7 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     }
     /*Create a normal object*/
     else {
-        LV_LOG_TRACE("Object create started");
+        LV_LOG_TRACE("creating normal object");
         LV_ASSERT_OBJ(parent, MY_CLASS);
         if(parent->spec_attr == NULL) {
             lv_obj_allocate_spec_attr(parent);
@@ -646,7 +648,7 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         }
     }
 
-    LV_LOG_INFO("Object create ready");
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_obj_destructor(lv_obj_t * p)

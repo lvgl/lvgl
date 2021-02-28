@@ -123,8 +123,11 @@ static void grid_update(lv_obj_t * cont, lv_obj_t * item)
     if(cont->spec_attr->layout_dsc == NULL) return;
 
     LV_LOG_INFO("Grid update on 0x%p. Triggered by 0x%p", cont, item);
+
     if(item) item_refr(item);
     else full_refresh(cont);
+
+    LV_LOG_TRACE("finished");
 }
 
 /**
