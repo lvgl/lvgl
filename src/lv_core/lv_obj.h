@@ -872,7 +872,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
  * Get the `data` parameter of the current event
  * @return the `data` parameter
  */
-const void * lv_event_get_data(void);
+const char * lv_event_get_data(void);
 
 /**
  * Set the a signal function of an object. Used internally by the library.
