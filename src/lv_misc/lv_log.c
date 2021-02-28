@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "lv_printf.h"
+#include "../lv_hal/lv_hal_tick.h"
 
 #if LV_LOG_PRINTF
     #include <stdio.h>
@@ -83,8 +84,9 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
             }
         }
 
-        static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error", "User"};
-        printf("%s: %s \t(%s #%d %s())\n", lvl_prefix[level], buf, &file[p], line, func);
+        uint32_t t = lv_tick_get();
+        static const char * lvl_prefix[] = {"Trace", "Info", "Warning", "Error", "User"};
+        printf("%s (%d.%03d): %s \t(%s #%d in %s())\n", lvl_prefix[level], t / 1000, t % 1000, buf, &file[p], line, func);
 #else
         if(custom_print_cb) custom_print_cb(level, file, line, func, buf);
 #endif
