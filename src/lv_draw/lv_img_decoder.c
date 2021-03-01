@@ -155,7 +155,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     }
 
     if(dsc->src_type == LV_IMG_SRC_FILE)
-        lv_mem_free(dsc->src);
+        lv_mem_free((void*)dsc->src);
 
     return res;
 }
@@ -187,7 +187,7 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
 
         if(dsc->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free(dsc->src);
+            lv_mem_free((void*)dsc->src);
             dsc->src = NULL;
         }
     }

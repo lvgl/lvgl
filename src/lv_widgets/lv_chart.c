@@ -496,7 +496,7 @@ int32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
 
 static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_chart_t * chart = (lv_chart_t *) obj;
 
@@ -530,7 +530,7 @@ static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_memcpy_small(chart->ymin, chart_copy->ymin, sizeof(chart->ymin));
         lv_memcpy_small(chart->ymax, chart_copy->ymax, sizeof(chart->ymax));
     }
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_chart_destructor(lv_obj_t * obj)

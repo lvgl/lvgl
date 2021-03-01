@@ -111,7 +111,7 @@ const char * lv_checkbox_get_text(const lv_obj_t * obj)
 
 static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_checkbox_t * cb = (lv_checkbox_t *) obj;
 
@@ -127,7 +127,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 //        const lv_checkbox_t * copy_ext = (const lv_checkbox_t *)copy;
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_checkbox_destructor(lv_obj_t * obj)

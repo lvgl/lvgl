@@ -946,7 +946,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
 
 static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_textarea_t * ta = (lv_textarea_t *) obj;
 
@@ -1005,7 +1005,7 @@ static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
       start_cursor_blink(obj);
 
-      LV_LOG_TRACE("finished");
+      LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_textarea_destructor(lv_obj_t * obj)

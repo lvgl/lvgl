@@ -210,7 +210,7 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
 
 static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_meter_t * meter = (lv_meter_t *) obj;
 
@@ -230,7 +230,7 @@ static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 //        meter->cur_value             = copy_meter->cur_value;
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_meter_destructor(lv_obj_t * obj)

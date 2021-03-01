@@ -202,7 +202,7 @@ lv_bar_type_t lv_bar_get_type(lv_obj_t * obj)
 
 static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_bar_t * bar = (lv_bar_t *)obj;
     bar->min_value = 0;
@@ -229,7 +229,7 @@ static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
    }
-   LV_LOG_TRACE("finshed");
+   LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_bar_destructor(lv_obj_t * obj)

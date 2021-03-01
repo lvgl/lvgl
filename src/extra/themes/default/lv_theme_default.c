@@ -479,8 +479,8 @@ static void style_init(void)
     lv_style_set_border_width(&styles->list_btn, LV_DPX(1));
     lv_style_set_border_color(&styles->list_btn, color_primary_muted);
     lv_style_set_border_side(&styles->list_btn, LV_BORDER_SIDE_BOTTOM);
-    lv_style_set_pad_all(&styles->list_btn, PAD_DEF);
-    lv_style_set_pad_column(&styles->list_btn, PAD_DEF);
+    lv_style_set_pad_all(&styles->list_btn, PAD_SMALL);
+    lv_style_set_pad_column(&styles->list_btn, PAD_SMALL);
 
     style_init_reset(&styles->list_item_grow);
     lv_style_set_transform_width(&styles->list_item_grow, PAD_DEF);

@@ -53,7 +53,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     if(copy == NULL) {
         lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
@@ -61,7 +61,7 @@ static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 #endif

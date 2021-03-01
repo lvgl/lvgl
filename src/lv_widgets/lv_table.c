@@ -384,7 +384,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 
 static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_table_t * table = (lv_table_t *) obj;
 
@@ -415,7 +415,7 @@ static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_table_set_col_cnt(obj, copy_table->col_cnt);
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_table_destructor(lv_obj_t * obj)

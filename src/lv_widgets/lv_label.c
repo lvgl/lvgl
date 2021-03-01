@@ -695,7 +695,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 
 static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -726,7 +726,7 @@ static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_label_set_text(obj, "Text");
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_label_destructor(lv_obj_t * obj)

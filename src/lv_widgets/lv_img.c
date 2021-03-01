@@ -92,7 +92,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMG_SRC_UNKNOWN) {
         LV_LOG_WARN("lv_img_set_src: unknown image type");
         if(img->src_type == LV_IMG_SRC_SYMBOL || img->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free(img->src);
+            lv_mem_free((void*)img->src);
         }
         img->src      = NULL;
         img->src_type = LV_IMG_SRC_UNKNOWN;
@@ -106,7 +106,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMG_SRC_VARIABLE) {
         /*If memory was allocated because of the previous `src_type` then free it*/
         if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-            lv_mem_free(img->src);
+            lv_mem_free((void*)img->src);
         }
         img->src = src;
     }
@@ -126,7 +126,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
             strcpy(new_str, src);
             img->src = new_str;
 
-            if(old_src) lv_mem_free(old_src);
+            if(old_src) lv_mem_free((void*)old_src);
         }
     }
 
@@ -361,7 +361,7 @@ bool lv_img_get_antialias(lv_obj_t * obj)
 
 static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_img_t * img = (lv_img_t *)obj;
 
@@ -397,14 +397,14 @@ static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_img_set_src(obj, copy_img->src);
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_img_destructor(lv_obj_t * obj)
 {
     lv_img_t * img = (lv_img_t *)obj;
     if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-        lv_mem_free(img->src);
+        lv_mem_free((void*)img->src);
         img->src      = NULL;
         img->src_type = LV_IMG_SRC_UNKNOWN;
     }

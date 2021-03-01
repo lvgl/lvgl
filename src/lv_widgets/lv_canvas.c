@@ -895,7 +895,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
    LV_UNUSED(copy);
-   LV_LOG_TRACE("begin");
+   LV_TRACE_OBJ_CREATE("begin");
 
    lv_canvas_t * canvas = (lv_canvas_t *) obj;
 
@@ -909,7 +909,7 @@ static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
    lv_img_set_src(obj, &canvas->dsc);
 
-   LV_LOG_TRACE("finished");
+   LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)

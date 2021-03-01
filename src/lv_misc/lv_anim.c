@@ -45,6 +45,12 @@ const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_ANIM
+#  define TRACE_ANIM(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define TRACE_ANIM(...)
+#endif
+
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -85,7 +91,7 @@ void lv_anim_init(lv_anim_t * a)
  */
 void lv_anim_start(lv_anim_t * a)
 {
-    LV_LOG_TRACE("begin");
+    TRACE_ANIM("begin");
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
@@ -113,7 +119,7 @@ void lv_anim_start(lv_anim_t * a)
      * It's important if it happens in a ready callback. (see `anim_task`)*/
     anim_mark_list_change();
 
-    LV_LOG_TRACE("finished");
+    TRACE_ANIM("finished");
 }
 
 /**
