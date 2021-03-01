@@ -23,6 +23,7 @@ void lv_example_scroll_3(void)
 {
     lv_obj_t * list = lv_list_create(lv_scr_act());
     lv_obj_set_size(list, 280, 220);
+    lv_obj_center(list);
 
     for(btn_cnt = 1; btn_cnt <= 2; btn_cnt++) {
         char buf[32];
@@ -33,7 +34,7 @@ void lv_example_scroll_3(void)
     lv_obj_t * float_btn = lv_btn_create(list, NULL);
     lv_obj_set_size(float_btn, 50, 50);
     lv_obj_add_flag(float_btn, LV_OBJ_FLAG_FLOATING);
-    lv_obj_align(float_btn, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_align(float_btn, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -lv_obj_get_style_pad_right(list, LV_PART_MAIN));
     lv_obj_add_event_cb(float_btn, float_btn_event_cb, list);
     lv_obj_set_style_radius(float_btn, LV_PART_MAIN, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_obj_set_style_content_text(float_btn, LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
