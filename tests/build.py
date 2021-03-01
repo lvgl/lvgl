@@ -80,7 +80,7 @@ minimal_monochrome = {
 
 minimal_16bit = {
   "LV_COLOR_DEPTH":16,
-  "LV_MEM_SIZE":64 * 1024,
+  "LV_MEM_CUSTOM":1,
   
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
