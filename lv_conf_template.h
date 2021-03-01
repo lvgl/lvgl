@@ -145,6 +145,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * LV_LOG_LEVEL_INFO        Log important events
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
+ * LV_LOG_LEVEL_USER        Only logs added by the user
  * LV_LOG_LEVEL_NONE        Do not log anything */
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 

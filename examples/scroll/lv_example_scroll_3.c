@@ -12,7 +12,7 @@ static void float_btn_event_cb(lv_obj_t * float_btn, lv_event_t e)
         lv_obj_t * list_btn = lv_list_add_btn(list, LV_SYMBOL_AUDIO, buf, NULL);
         btn_cnt++;
         lv_obj_scroll_to_view(list_btn, LV_ANIM_ON);
-        lv_obj_move_background(float_btn);
+        lv_obj_move_foreground(float_btn);
     }
 }
 
