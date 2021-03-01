@@ -8,7 +8,6 @@
  *********************/
 #include "lv_style.h"
 #include "../lv_misc/lv_mem.h"
-#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +49,6 @@ void lv_style_init(lv_style_t * style)
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
-
 }
 
 void lv_style_reset(lv_style_t * style)
@@ -94,13 +92,14 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
             style->prop_cnt--;
             size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
             uint8_t * new_values_and_props = lv_mem_alloc(size);
+            if(new_values_and_props == NULL) return false;
 
             tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
             uint16_t * new_props = (uint16_t *) tmp;
             lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
 
             uint32_t j;
-            for(j = 0; j < (uint32_t)style->prop_cnt + 1; j++) { /* +1: because prop_cnt already reduced but all the old props. needs to be checked. */
+            for(j = 0; j <= style->prop_cnt; j++) { /* <=: because prop_cnt already reduced but all the old props. needs to be checked. */
                 if(props[j] != prop) {
                     *new_values = values[j];
                     *new_props = props[j];
@@ -123,9 +122,6 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 {
     LV_ASSERT_STYLE(style);
 
-    uint8_t group = _lv_style_get_prop_group(prop);
-    style->has_group |= 1 << group;
-
     if(style->allocated) {
         uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *) tmp;
@@ -140,8 +136,9 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
         style->prop_cnt++;
         size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        style->v_p.values_and_props = lv_mem_realloc(style->v_p.values_and_props, size);
-        tmp = style->v_p.values_and_props + (style->prop_cnt - 1) * sizeof(lv_style_value_t);
+        uint8_t * values_and_props = lv_mem_realloc(style->v_p.values_and_props, size);
+        if(values_and_props == NULL) return;
+        tmp = values_and_props + (style->prop_cnt - 1) * sizeof(lv_style_value_t);
         props = (uint16_t *) tmp;
         /*Shift all props to make place for the value before them*/
         for(i = style->prop_cnt - 2; i >= 0; i--) {
@@ -149,13 +146,15 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         }
 
         /*Go to the new position wit the props*/
-        tmp = style->v_p.values_and_props + (style->prop_cnt) * sizeof(lv_style_value_t);
+        tmp = values_and_props + (style->prop_cnt) * sizeof(lv_style_value_t);
         props = (uint16_t *) tmp;
-        lv_style_value_t * values = (lv_style_value_t *)style->v_p.values_and_props;
+        lv_style_value_t * values = (lv_style_value_t *)values_and_props;
 
         /*Set the new property and value*/
         props[style->prop_cnt - 1] = prop;
         values[style->prop_cnt - 1] = value;
+
+        style->v_p.values_and_props = values_and_props;
     } else if(style->prop_cnt == 1) {
         if(style->prop1 == prop) {
             style->v_p.value1 = value;
@@ -164,6 +163,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         style->prop_cnt++;
         size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
         uint8_t * values_and_props = lv_mem_alloc(size);
+        if(values_and_props == NULL) return;
         uint8_t * tmp = values_and_props + (style->prop_cnt) * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *) tmp;
         lv_style_value_t * values = (lv_style_value_t *)values_and_props;
@@ -180,6 +180,9 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         style->prop1 = prop;
         style->v_p.value1 = value;
     }
+
+    uint8_t group = _lv_style_get_prop_group(prop);
+    style->has_group |= 1 << group;
 }
 
 bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
@@ -200,7 +203,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 {
     lv_style_value_t value;
     switch(prop) {
-            break;
         case LV_STYLE_TRANSFORM_ZOOM:
             value.num = LV_IMG_ZOOM_NONE;
             break;
