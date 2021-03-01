@@ -14,6 +14,7 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_timer.h"
 #include "lv_math.h"
+#include "lv_mem.h"
 #include "lv_gc.h"
 
 /*********************
@@ -92,7 +93,8 @@ void lv_anim_init(lv_anim_t * a)
 void lv_anim_start(lv_anim_t * a)
 {
     TRACE_ANIM("begin");
-    /* Do not let two animations for the  same 'var' with the same 'fp'*/
+    /* Do not let two animations for the same 'var' with the same 'fp'*/
+
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*If the list is empty the anim task was suspended and it's last run measure is invalid*/

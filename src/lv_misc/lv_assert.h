@@ -41,7 +41,6 @@ extern "C" {
         }                            \
     } while(0)
 
-
 #define LV_ASSERT_MSG(expr, msg)                     \
     do {                                             \
         if(!(expr)) {                                \
@@ -49,8 +48,6 @@ extern "C" {
             LV_ASSERT_HANDLER                        \
         }                                            \
     } while(0)
-
-
 
 /*-----------------
  * ASSERTS

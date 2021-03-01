@@ -242,9 +242,9 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
     if(x <= min_in) return min_out;
 
     /* The equation should be:
-     *   ((x - min_in) * (delta_out / delta_min)) + min_out
+     *   ((x - min_in) * delta_out) / delta in) + min_out
      * To avoid rounding error reorder the operations:
-     *   (((x - min_in) * delta_out) / delta in) + min_out
+     *   (x - min_in) * (delta_out / delta_min) + min_out
      */
 
     int32_t delta_in = max_in - min_in;
