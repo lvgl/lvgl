@@ -228,10 +228,10 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
 {
     lv_anim_t * a;
     a = lv_anim_get(obj, scroll_x_anim);
-    end->x = a ? -a->end : lv_obj_get_scroll_x(obj);
+    end->x = a ? -a->end_value : lv_obj_get_scroll_x(obj);
 
     a = lv_anim_get(obj, scroll_y_anim);
-    end->y = a ? -a->end : lv_obj_get_scroll_y(obj);
+    end->y = a ? -a->end_value : lv_obj_get_scroll_y(obj);
 }
 
 /*=====================
