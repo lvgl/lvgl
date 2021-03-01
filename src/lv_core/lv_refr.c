@@ -60,6 +60,11 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_DISP_REFR
+#  define TRACE_REFR(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define TRACE_REFR(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -180,7 +185,7 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  */
 void _lv_disp_refr_task(lv_timer_t * tmr)
 {
-    LV_LOG_TRACE("begin");
+    TRACE_REFR("begin");
 
     uint32_t start = lv_tick_get();
     uint32_t elaps = 0;
@@ -197,7 +202,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
-        LV_LOG_TRACE("finished (there were no invalid areas to redraw)");
+        TRACE_REFR("finished (there were no invalid areas to redraw)");
         return;
     }
 
@@ -299,7 +304,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     }
 #endif
 
-    LV_LOG_TRACE("finished");
+    TRACE_REFR("finished");
 }
 
 #if LV_USE_PERF_MONITOR
@@ -933,6 +938,6 @@ static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, l
 
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    LV_LOG_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
+    TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
     drv->flush_cb(drv, area, color_p);
 }

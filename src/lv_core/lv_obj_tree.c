@@ -45,6 +45,7 @@ static void obj_del_core(lv_obj_t * obj);
 
 void lv_obj_del(lv_obj_t * obj)
 {
+    LV_LOG_TRACE("begin (delete 0x%p)", obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
@@ -76,12 +77,17 @@ void lv_obj_del(lv_obj_t * obj)
 
     /*Handle if the active screen was deleted*/
     if(act_scr_del)  {
+        LV_LOG_WARN("the active screen was deleted")
         disp->act_scr = NULL;
     }
+
+    LV_ASSERT_MEM_INTEGRITY();
+    LV_LOG_TRACE("finished (delete 0x%p)", obj)
 }
 
 void lv_obj_clean(lv_obj_t * obj)
 {
+    LV_LOG_TRACE("begin (delete 0x%p)", obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
@@ -97,6 +103,10 @@ void lv_obj_clean(lv_obj_t * obj)
         obj->spec_attr->scroll.x = 0;
         obj->spec_attr->scroll.y = 0;
     }
+
+    LV_ASSERT_MEM_INTEGRITY();
+
+    LV_LOG_TRACE("finished (delete 0x%p)", obj)
 }
 
 void lv_obj_del_anim_ready_cb(lv_anim_t * a)

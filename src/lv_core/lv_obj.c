@@ -88,6 +88,17 @@ const lv_obj_class_t lv_obj_class = {
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_EVENT
+#  define EVENT_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define EVENT_TRACE(...)
+#endif
+
+#if LV_LOG_TRACE_SIGNAL
+#  define SIGNAL_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define SIGNAL_TRACE(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -101,7 +112,7 @@ void lv_init(void)
         return;
     }
 
-    LV_LOG_TRACE("begin");
+    LV_LOG_INFO("begin");
 
     /*Initialize the lv_misc modules*/
     lv_mem_init();
@@ -188,7 +199,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    LV_LOG_TRACE("Sending event %d to 0x%p with 0x%p param", event, obj, param);
+    EVENT_TRACE("Sending event %d to 0x%p with 0x%p param", event, obj, param);
 
     /*Nothing to do if no event function and not bubbled*/
     lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
@@ -289,7 +300,7 @@ lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 {
     if(obj == NULL) return LV_RES_OK;
 
-    LV_LOG_TRACE("Sending signal %d to 0x%p with 0x%p param", signal, obj, param);
+    SIGNAL_TRACE("Sending signal %d to 0x%p with 0x%p param", signal, obj, param);
 
     const lv_obj_class_t * class_p = obj->class_p;
     while(class_p && class_p->signal_cb == NULL) class_p = class_p->base_class;
@@ -546,12 +557,12 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
 
 static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("begin");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_obj_t * parent = obj->parent;
     /*Create a screen*/
     if(parent == NULL) {
-        LV_LOG_TRACE("creating a screen");
+        LV_TRACE_OBJ_CREATE("creating a screen");
         lv_disp_t * disp = lv_disp_get_default();
         if(!disp) {
             LV_LOG_WARN("No display created to so far. No place to assign the new screen");
@@ -576,7 +587,7 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     }
     /*Create a normal object*/
     else {
-        LV_LOG_TRACE("creating normal object");
+        LV_TRACE_OBJ_CREATE("creating normal object");
         LV_ASSERT_OBJ(parent, MY_CLASS);
         if(parent->spec_attr == NULL) {
             lv_obj_allocate_spec_attr(parent);
@@ -648,7 +659,7 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         }
     }
 
-    LV_LOG_TRACE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_obj_destructor(lv_obj_t * p)
