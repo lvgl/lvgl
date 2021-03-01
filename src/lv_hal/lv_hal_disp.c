@@ -174,9 +174,15 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
 {
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
+    lv_coord_t w = lv_disp_get_hor_res(disp);
+    lv_coord_t h = lv_disp_get_ver_res(disp);
     uint32_t i;
     for(i = 0; i < disp->screen_cnt; i++) {
-        lv_obj_set_size(disp->screens[i], lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
+        lv_area_t prev_coords;
+        lv_obj_get_coords(disp->screens[i], &prev_coords);
+        disp->screens[i]->coords.x2 = w;
+        disp->screens[i]->coords.y2 = h;
+        lv_signal_send(disp->screens[i], LV_SIGNAL_COORD_CHG, &prev_coords);
     }
 
     /*
