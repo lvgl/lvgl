@@ -724,7 +724,7 @@ static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
 {
     uint32_t i;
     uint32_t byte_cnt = 0;
-    for(i = 0; i < utf8_id; i++) {
+    for(i = 0; i < utf8_id && txt[byte_cnt] != '\0'; i++) {
         uint8_t c_size = _lv_txt_encoded_size(&txt[byte_cnt]);
         byte_cnt += c_size > 0 ? c_size : 1;
     }
