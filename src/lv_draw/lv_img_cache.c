@@ -33,9 +33,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_IMG_CACHE_DEF_SIZE == 0
-    static lv_img_cache_entry_t cache_temp;
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -124,7 +121,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
     }
 
 #else
-    cached_src = &cache_temp;
+    cached_src = &LV_GC_ROOT(_lv_img_cache_single);
 #endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();

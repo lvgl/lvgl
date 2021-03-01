@@ -54,7 +54,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
  * */
 void _lv_img_decoder_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_img_defoder_ll), sizeof(lv_img_decoder_t));
+    _lv_ll_init(&LV_GC_ROOT(_lv_img_decoder_ll), sizeof(lv_img_decoder_t));
 
     lv_img_decoder_t * decoder;
 
@@ -85,7 +85,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_defoder_ll), d) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
         res = LV_RES_INV;
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
@@ -132,7 +132,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     lv_res_t res = LV_RES_INV;
 
     lv_img_decoder_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_defoder_ll), d) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
         /*Info an Open callbacks are required*/
         if(d->info_cb == NULL || d->open_cb == NULL) continue;
 
@@ -200,7 +200,7 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 lv_img_decoder_t * lv_img_decoder_create(void)
 {
     lv_img_decoder_t * decoder;
-    decoder = _lv_ll_ins_head(&LV_GC_ROOT(_lv_img_defoder_ll));
+    decoder = _lv_ll_ins_head(&LV_GC_ROOT(_lv_img_decoder_ll));
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) return NULL;
 
@@ -215,7 +215,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
  */
 void lv_img_decoder_delete(lv_img_decoder_t * decoder)
 {
-    _lv_ll_remove(&LV_GC_ROOT(_lv_img_defoder_ll), decoder);
+    _lv_ll_remove(&LV_GC_ROOT(_lv_img_decoder_ll), decoder);
     lv_mem_free(decoder);
 }
 
