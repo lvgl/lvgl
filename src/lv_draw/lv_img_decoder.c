@@ -85,7 +85,6 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_defoder_ll), d) {
     _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
