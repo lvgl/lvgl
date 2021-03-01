@@ -188,10 +188,12 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  */
 void _lv_font_clean_up_fmt_txt(void)
 {
+#if LV_USE_FONT_COMPRESSED
     if(LV_GC_ROOT(_lv_font_decompr_buf)) {
         lv_mem_free(LV_GC_ROOT(_lv_font_decompr_buf));
         LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
     }
+#endif
 }
 
 /**********************

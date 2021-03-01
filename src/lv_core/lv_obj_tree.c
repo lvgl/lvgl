@@ -45,12 +45,17 @@ static void obj_del_core(lv_obj_t * obj);
 
 void lv_obj_del(lv_obj_t * obj)
 {
+    LV_LOG_TRACE("begin (delete 0x%p)", obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
+    lv_obj_t * par = lv_obj_get_parent(obj);
+    if(par) {
+        lv_obj_scrollbar_invalidate(par);
+    }
+
     lv_disp_t * disp = NULL;
     bool act_scr_del = false;
-    lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) {
         disp = lv_obj_get_disp(obj);
         if(!disp) return;   /*Shouldn't happen*/
@@ -72,12 +77,17 @@ void lv_obj_del(lv_obj_t * obj)
 
     /*Handle if the active screen was deleted*/
     if(act_scr_del)  {
+        LV_LOG_WARN("the active screen was deleted")
         disp->act_scr = NULL;
     }
+
+    LV_ASSERT_MEM_INTEGRITY();
+    LV_LOG_TRACE("finished (delete 0x%p)", obj)
 }
 
 void lv_obj_clean(lv_obj_t * obj)
 {
+    LV_LOG_TRACE("begin (delete 0x%p)", obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
@@ -94,6 +104,9 @@ void lv_obj_clean(lv_obj_t * obj)
         obj->spec_attr->scroll.y = 0;
     }
 
+    LV_ASSERT_MEM_INTEGRITY();
+
+    LV_LOG_TRACE("finished (delete 0x%p)", obj)
 }
 
 void lv_obj_del_anim_ready_cb(lv_anim_t * a)
@@ -181,11 +194,11 @@ void lv_obj_move_foreground(lv_obj_t * obj)
 
     lv_obj_invalidate(parent);
 
-    int32_t i;
-    for(i = lv_obj_get_child_id(obj) - 1; i > 0; i--) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
+    uint32_t i;
+    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 1; i++) {
+        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
     }
-    parent->spec_attr->children[0] = obj;
+    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     /*Notify the new parent about the child*/
     lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
@@ -201,11 +214,11 @@ void lv_obj_move_background(lv_obj_t * obj)
 
     lv_obj_invalidate(parent);
 
-    uint32_t i;
-    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 2; i++) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
+    int32_t i;
+    for(i = lv_obj_get_child_id(obj) - 1; i > 0; i--) {
+        parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
     }
-    parent->spec_attr->children[ lv_obj_get_child_cnt(parent) - 1] = obj;
+    parent->spec_attr->children[0] = obj;
 
     /*Notify the new parent about the child*/
     lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);

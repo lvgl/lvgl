@@ -71,6 +71,7 @@ const lv_obj_class_t lv_label_class = {
 
 lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_label_class, parent, copy);
 }
 
@@ -694,7 +695,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 
 static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("label create started");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -725,7 +726,7 @@ static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_label_set_text(obj, "Text");
     }
 
-    LV_LOG_INFO("label created");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_label_destructor(lv_obj_t * obj)
@@ -915,7 +916,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.x > lv_area_get_width(&txt_coords)) {
             lv_anim_set_values(&a, 0, lv_area_get_width(&txt_coords) - size.x);
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
+            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
             lv_anim_set_playback_time(&a, a.time);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
@@ -932,9 +933,9 @@ static void lv_label_refr_text(lv_obj_t * obj)
                     a.playback_now = 1;
                     /*Swap the start and end values*/
                     int32_t tmp;
-                    tmp      = a.start;
-                    a.start = a.end;
-                    a.end   = tmp;
+                    tmp      = a.start_value;
+                    a.start_value = a.end_value;
+                    a.end_value   = tmp;
                 }
             }
 
@@ -950,7 +951,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
             lv_anim_set_values(&a, 0, lv_area_get_height(&txt_coords) - size.y - (lv_font_get_line_height(font)));
             lv_anim_set_exec_cb(&a, set_ofs_y_anim);
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
+            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
             lv_anim_set_playback_time(&a, a.time);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
@@ -967,9 +968,9 @@ static void lv_label_refr_text(lv_obj_t * obj)
                     a.playback_now = 1;
                     /*Swap the start and end values*/
                     int32_t tmp;
-                    tmp      = a.start;
-                    a.start = a.end;
-                    a.end   = tmp;
+                    tmp      = a.start_value;
+                    a.start_value = a.end_value;
+                    a.end_value   = tmp;
                 }
             }
 
@@ -994,7 +995,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.x > lv_area_get_width(&txt_coords)) {
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
+            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
@@ -1015,7 +1016,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
             lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height(font)));
             lv_anim_set_exec_cb(&a, set_ofs_y_anim);
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start, a.end));
+            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;

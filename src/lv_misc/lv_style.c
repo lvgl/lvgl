@@ -184,26 +184,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
-    if(style->prop_cnt == 0) return false;
-
-    if(style->allocated) {
-        uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
-        uint16_t * props = (uint16_t *) tmp;
-        uint32_t i;
-        for(i = 0; i < style->prop_cnt; i++) {
-            if(props[i] == prop) {
-                lv_style_value_t * values = (lv_style_value_t *)style->v_p.values_and_props;
-                *value = values[i];
-                return true;
-            }
-        }
-    } else {
-        if(style->prop1 == prop) {
-            *value = style->v_p.value1;
-            return true;
-        }
-    }
-    return false;
+   return lv_style_get_prop_inlined(style, prop, value);
 }
 
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay)

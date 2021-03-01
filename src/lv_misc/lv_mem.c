@@ -17,22 +17,23 @@
     #include LV_MEM_CUSTOM_INCLUDE
 #endif
 
+
 /*********************
  *      DEFINES
  *********************/
 /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 #ifndef LV_MEM_ADD_JUNK
-    #define LV_MEM_ADD_JUNK 1
+#  define LV_MEM_ADD_JUNK 1
 #endif
 
 #ifndef LV_MEM_FULL_DEFRAG_CNT
-    #define LV_MEM_FULL_DEFRAG_CNT 64
+#  define LV_MEM_FULL_DEFRAG_CNT 64
 #endif
 
 #ifdef LV_ARCH_64
-    #define MEM_UNIT uint64_t
+#  define MEM_UNIT uint64_t
 #else
-    #define MEM_UNIT uint32_t
+#  define MEM_UNIT uint32_t
 #endif
 
 /**********************
@@ -65,6 +66,8 @@ typedef struct {
 
 #define MEM_BUF_SMALL_SIZE 16
 
+#define ZERO_MEM_SENTINEL   0xa1b2c3d4
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -73,6 +76,7 @@ typedef struct {
     static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e);
     static inline void * ent_alloc(lv_mem_ent_t * e, size_t size);
     static void ent_trunc(lv_mem_ent_t * e, size_t size);
+    static size_t get_size(void * data_p);
 #endif
 
 /**********************
@@ -82,7 +86,7 @@ typedef struct {
     static uint8_t * work_mem;
 #endif
 
-static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
+static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
 #if LV_MEM_CUSTOM == 0
     static uint8_t * last_mem; /*Address of the last valid byte*/
     static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/
@@ -98,6 +102,11 @@ static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_MEM
+#  define MEM_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define MEM_TRACE(...)
+#endif
 
 #define COPY32 *d32 = *s32; d32++; s32++;
 #define COPY8 *d8 = *s8; d8++; s8++;
@@ -157,7 +166,11 @@ void lv_mem_deinit(void)
  */
 void * lv_mem_alloc(size_t size)
 {
-    if(size == 0) return &zero_mem;
+    MEM_TRACE("allocating %d bytes", size);
+    if(size == 0) {
+        MEM_TRACE("using zero_mem");
+        return &zero_mem;
+    }
 
     /*Round the size up to ALIGN_MASK*/
     size = (size + ALIGN_MASK) & (~ALIGN_MASK);
@@ -166,25 +179,16 @@ void * lv_mem_alloc(size_t size)
 #if LV_MEM_CUSTOM == 0
     alloc = alloc_core(size);
     if(alloc == NULL) {
-        LV_LOG_TRACE("No more memory, try to defrag");
+        LV_LOG_WARN("out of memory, trying to defrag");
         lv_mem_defrag();
         alloc = alloc_core(size);
+        if(alloc) {
+            LV_LOG_INFO("defrag made enough memory, memory allocated successfully");
+        }
     }
 
 #else
-    /*Use custom, user defined malloc function*/
-#if LV_ENABLE_GC == 1 /*gc must not include header*/
     alloc = LV_MEM_CUSTOM_ALLOC(size);
-#else                 /* LV_ENABLE_GC */
-    /*Allocate a header too to store the size*/
-    alloc = LV_MEM_CUSTOM_ALLOC(size + sizeof(lv_mem_header_t));
-    if(alloc != NULL) {
-        ((lv_mem_ent_t *)alloc)->header.s.d_size = size;
-        ((lv_mem_ent_t *)alloc)->header.s.used   = 1;
-
-        alloc = &((lv_mem_ent_t *)alloc)->first_data;
-    }
-#endif                /* LV_ENABLE_GC */
 #endif                /* LV_MEM_CUSTOM */
 
 #if LV_MEM_ADD_JUNK
@@ -192,10 +196,10 @@ void * lv_mem_alloc(size_t size)
 #endif
 
     if(alloc == NULL) {
-        LV_LOG_WARN("Couldn't allocate memory (%d bytes)", size);
+        LV_LOG_ERROR("couldn't allocate memory (%d bytes)", size);
         lv_mem_monitor_t mon;
         lv_mem_monitor(&mon);
-        LV_LOG_WARN("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+        LV_LOG_ERROR("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
                (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
                (int)mon.free_biggest_size);
     }
@@ -210,6 +214,7 @@ void * lv_mem_alloc(size_t size)
 #endif
     }
 
+    MEM_TRACE("allocated at 0x%p", alloc);
     return alloc;
 }
 
@@ -217,8 +222,9 @@ void * lv_mem_alloc(size_t size)
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
-void lv_mem_free(const void * data)
+void lv_mem_free(void * data)
 {
+    MEM_TRACE("freeing 0x%p", data);
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
@@ -226,7 +232,7 @@ void lv_mem_free(const void * data)
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
 #  if LV_MEM_ADD_JUNK
-    lv_memset((void *)data, 0xbb, lv_mem_get_size(data));
+    lv_memset((void *)data, 0xbb, e->header.s.d_size);
 #  endif
 #endif
 
@@ -236,16 +242,13 @@ void lv_mem_free(const void * data)
     static uint32_t defr = 0;
     defr++;
     if(defr > LV_MEM_FULL_DEFRAG_CNT) {
+        MEM_TRACE("performing auto defrag")
         defr = 0;
         lv_mem_defrag();
     }
 #else
-#if LV_ENABLE_GC == 0
     /*e points to the header*/
-    LV_MEM_CUSTOM_FREE(e);
-#else
-    LV_MEM_CUSTOM_FREE((void *)data);
-#endif /*LV_ENABLE_GC*/
+    LV_MEM_CUSTOM_FREE(data);
 #endif
 }
 
@@ -256,11 +259,29 @@ void lv_mem_free(const void * data)
  * @param new_size the desired new size in byte
  * @return pointer to the new memory
  */
-
-#if LV_ENABLE_GC == 0
-
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
+    MEM_TRACE("reallocating 0x%p with %d size", data_p, new_size);
+    void * new_p = NULL;
+#if LV_MEM_CUSTOM
+    if(new_size == 0) {
+        MEM_TRACE("using zero_mem");
+        LV_MEM_CUSTOM_FREE(data_p);
+        return &zero_mem;
+    }
+
+    if(data_p == &zero_mem) new_p = LV_MEM_CUSTOM_ALLOC(new_size);
+    else  new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
+
+    if(new_p == NULL) {
+        LV_LOG_ERROR("couldn't allocate memory");
+        return NULL;
+    } else {
+        MEM_TRACE("allocated at 0x%p", new_p);
+        return new_p;
+    }
+#else
+
     /*Round the size up to ALIGN_MASK*/
     new_size = (new_size + ALIGN_MASK) & (~ALIGN_MASK);
 
@@ -272,10 +293,13 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
         }
     }
 
-    uint32_t old_size = lv_mem_get_size(data_p);
-    if(old_size == new_size) return data_p; /*Also avoid reallocating the same memory*/
+    uint32_t old_size = get_size(data_p);
 
-#if LV_MEM_CUSTOM == 0
+    if(old_size == new_size) {
+        MEM_TRACE("same size, using the original memory");
+        return data_p;
+    }
+
     if(new_size == 0) {
         lv_mem_free(data_p);
         return &zero_mem;
@@ -284,14 +308,13 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     if(new_size < old_size) {
         lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));
         ent_trunc(e, new_size);
+        MEM_TRACE("memory entry is truncated (same address 0x%p is used)", &e->first_data);
         return &e->first_data;
     }
-#endif
 
-    void * new_p;
     new_p = lv_mem_alloc(new_size);
     if(new_p == NULL) {
-        LV_LOG_WARN("Couldn't allocate memory");
+        LV_LOG_ERROR("couldn't allocate memory");
         return NULL;
     }
 
@@ -303,25 +326,17 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
         lv_mem_free(data_p);
     }
 
+    MEM_TRACE("allocated at 0x%p", new_p);
     return new_p;
+#endif
 }
-
-#else /* LV_ENABLE_GC */
-
-void * lv_mem_realloc(void * data_p, size_t new_size)
-{
-    void * new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
-    if(new_p == NULL) LV_LOG_WARN("Couldn't allocate memory");
-    return new_p;
-}
-
-#endif /* lv_enable_gc */
 
 /**
  * Join the adjacent free memory blocks
  */
 void lv_mem_defrag(void)
 {
+    MEM_TRACE("begin");
 #if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e_free;
     lv_mem_ent_t * e_next;
@@ -334,7 +349,10 @@ void lv_mem_defrag(void)
             else break;
         }
 
-        if(e_free == NULL) return;
+        if(e_free == NULL) {
+            MEM_TRACE("finished");
+            return;
+        }
 
         /*Joint the following free entries to the free*/
         e_next = ent_get_next(e_free);
@@ -349,7 +367,10 @@ void lv_mem_defrag(void)
             e_next = ent_get_next(e_next);
         }
 
-        if(e_next == NULL) return;
+        if(e_next == NULL) {
+            MEM_TRACE("finished");
+            return;
+        }
 
         /*Continue from the lastly checked entry*/
         e_free = e_next;
@@ -359,20 +380,28 @@ void lv_mem_defrag(void)
 
 lv_res_t lv_mem_test(void)
 {
+    if(zero_mem != ZERO_MEM_SENTINEL) {
+        LV_LOG_WARN("zero_mem is written");
+        return LV_RES_INV;
+    }
+
 #if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
         if(e->header.s.d_size > LV_MEM_SIZE) {
+            LV_LOG_WARN("failed");
             return LV_RES_INV;
         }
         uint8_t * e8 = (uint8_t *) e;
         if(e8 + e->header.s.d_size > work_mem + LV_MEM_SIZE) {
+            LV_LOG_WARN("failed");
             return LV_RES_INV;
         }
         e = ent_get_next(e);
     }
 #endif
+    MEM_TRACE("passed");
     return LV_RES_OK;
 }
 
@@ -386,6 +415,7 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     /*Init the data*/
     lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
 #if LV_MEM_CUSTOM == 0
+    MEM_TRACE("begin");
     lv_mem_ent_t * e;
 
     e = ent_get_next(NULL);
@@ -414,35 +444,11 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     else {
         mon_p->frag_pct = 0; /*no fragmentation if all the RAM is used*/
     }
+
+    MEM_TRACE("finished");
 #endif
 }
 
-/**
- * Give the size of an allocated memory
- * @param data pointer to an allocated memory
- * @return the size of data memory in bytes
- */
-
-#if LV_ENABLE_GC == 0
-
-uint32_t lv_mem_get_size(const void * data)
-{
-    if(data == NULL) return 0;
-    if(data == &zero_mem) return 0;
-
-    lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
-
-    return e->header.s.d_size;
-}
-
-#else /* LV_ENABLE_GC */
-
-uint32_t lv_mem_get_size(const void * data)
-{
-    return LV_MEM_CUSTOM_GET_SIZE(data);
-}
-
-#endif /*LV_ENABLE_GC*/
 
 /**
  * Get a temporal buffer with the given size.
@@ -452,12 +458,14 @@ void * lv_mem_buf_get(uint32_t size)
 {
     if(size == 0) return NULL;
 
+    MEM_TRACE("begin, getting %d bytes", size);
     /*Try small static buffers first*/
     uint8_t i;
     if(size <= MEM_BUF_SMALL_SIZE) {
         for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
             if(mem_buf_small[i].used == 0) {
                 mem_buf_small[i].used = 1;
+                MEM_TRACE("return using small static buffer");
                 return mem_buf_small[i].p;
             }
         }
@@ -483,6 +491,7 @@ void * lv_mem_buf_get(uint32_t size)
 
     if(i_guess >= 0) {
         LV_GC_ROOT(lv_mem_buf[i_guess]).used = 1;
+        MEM_TRACE("returning already allocated buffer (buffer id: %d, address: 0x%p)", i_guess, LV_GC_ROOT(lv_mem_buf[i_guess]).p);
         return LV_GC_ROOT(lv_mem_buf[i_guess]).p;
     }
 
@@ -493,14 +502,17 @@ void * lv_mem_buf_get(uint32_t size)
             void * buf = lv_mem_realloc(LV_GC_ROOT(lv_mem_buf[i]).p, size);
             LV_ASSERT_MSG(buf != NULL, "Out of memory, can't allocate a new buffer (increase your LV_MEM_SIZE/heap size)");
             if(buf == NULL) return NULL;
+
             LV_GC_ROOT(lv_mem_buf[i]).used = 1;
             LV_GC_ROOT(lv_mem_buf[i]).size = size;
             LV_GC_ROOT(lv_mem_buf[i]).p    = buf;
+            MEM_TRACE("allocated (buffer id: %d, address: 0x%p)", i, LV_GC_ROOT(lv_mem_buf[i]).p);
             return LV_GC_ROOT(lv_mem_buf[i]).p;
         }
     }
 
-    LV_ASSERT_MSG(false, "No free buffer. Increase LV_MEM_BUF_MAX_NUM.");
+    LV_LOG_ERROR("no more buffers. (increase LV_MEM_BUF_MAX_NUM)");
+    LV_ASSERT_MSG(false, "No more buffers. Increase LV_MEM_BUF_MAX_NUM.");
     return NULL;
 }
 
@@ -510,12 +522,14 @@ void * lv_mem_buf_get(uint32_t size)
  */
 void lv_mem_buf_release(void * p)
 {
+    MEM_TRACE("begin (address: 0x%p)", p);
     uint8_t i;
 
     /*Try small static buffers first*/
     for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
         if(mem_buf_small[i].p == p) {
             mem_buf_small[i].used = 0;
+            MEM_TRACE("released (buffer id: %d)", i);
             return;
         }
     }
@@ -527,7 +541,7 @@ void lv_mem_buf_release(void * p)
         }
     }
 
-    LV_LOG_ERROR("lv_mem_buf_release: p is not a known buffer")
+    LV_LOG_ERROR("p is not a known buffer")
 }
 
 /**
@@ -818,6 +832,16 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
         /* Set the new size for the original entry */
         e->header.s.d_size = size;
     }
+}
+
+static size_t get_size(void * data_p)
+{
+    if(data_p == NULL) return 0;
+    if(data_p == &zero_mem) return 0;
+
+    lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));
+
+    return e->header.s.d_size;
 }
 
 #endif

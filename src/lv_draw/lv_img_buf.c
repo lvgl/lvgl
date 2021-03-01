@@ -367,7 +367,7 @@ void lv_img_buf_free(lv_img_dsc_t * dsc)
 {
     if(dsc != NULL) {
         if(dsc->data != NULL)
-            lv_mem_free(dsc->data);
+            lv_mem_free((void*)dsc->data);
 
         lv_mem_free(dsc);
     }

@@ -65,6 +65,7 @@ const lv_obj_class_t lv_switch_class = {
  */
 lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_switch_class, parent, copy);
 }
 
@@ -74,16 +75,15 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("switch create started");
+    LV_TRACE_OBJ_CREATE("begin");
 
    if(copy == NULL) {
        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
        lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
        lv_obj_set_size(obj, LV_DPX(60), LV_DPX(35));
    }
 
-   LV_LOG_INFO("switch created");
+   LV_TRACE_OBJ_CREATE("finished");
 }
 
 static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

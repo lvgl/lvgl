@@ -48,7 +48,7 @@ static const char * lv_fs_get_real_path(const char * path);
 
 void _lv_fs_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_drv_ll), sizeof(lv_fs_drv_t));
+    _lv_ll_init(&LV_GC_ROOT(_lv_fsdrv_ll), sizeof(lv_fs_drv_t));
 }
 
 bool lv_fs_is_ready(char letter)
@@ -287,7 +287,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t * new_drv;
-    new_drv = _lv_ll_ins_head(&LV_GC_ROOT(_lv_drv_ll));
+    new_drv = _lv_ll_ins_head(&LV_GC_ROOT(_lv_fsdrv_ll));
     LV_ASSERT_MALLOC(new_drv);
     if(new_drv == NULL) return;
 
@@ -298,7 +298,7 @@ lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t * drv;
 
-    _LV_LL_READ(&LV_GC_ROOT(_lv_drv_ll), drv) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_fsdrv_ll), drv) {
         if(drv->letter == letter) {
             return drv;
         }
@@ -312,7 +312,7 @@ char * lv_fs_get_letters(char * buf)
     lv_fs_drv_t * drv;
     uint8_t i = 0;
 
-    _LV_LL_READ(&LV_GC_ROOT(_lv_drv_ll), drv) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_fsdrv_ll), drv) {
         buf[i] = drv->letter;
         i++;
     }

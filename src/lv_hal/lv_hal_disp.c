@@ -140,7 +140,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {
-        disp->theme = lv_theme_default_init(disp, LV_COLOR_PALETTE_BLUE_GREY, LV_COLOR_PALETTE_BLUE, LV_FONT_DEFAULT, LV_FONT_DEFAULT, LV_FONT_DEFAULT);
+        disp->theme = lv_theme_default_init(disp, LV_COLOR_PALETTE_BLUE, LV_COLOR_PALETTE_CYAN, LV_FONT_DEFAULT, LV_FONT_DEFAULT, LV_FONT_DEFAULT);
     }
 #endif
 

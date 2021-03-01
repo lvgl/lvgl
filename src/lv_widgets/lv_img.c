@@ -55,6 +55,7 @@ const lv_obj_class_t lv_img_class = {
 
 lv_obj_t * lv_img_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_img_class, parent, copy);
 }
 
@@ -91,7 +92,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMG_SRC_UNKNOWN) {
         LV_LOG_WARN("lv_img_set_src: unknown image type");
         if(img->src_type == LV_IMG_SRC_SYMBOL || img->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free(img->src);
+            lv_mem_free((void*)img->src);
         }
         img->src      = NULL;
         img->src_type = LV_IMG_SRC_UNKNOWN;
@@ -103,11 +104,9 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
 
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
-        LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_VARIABLE` type found");
-
         /*If memory was allocated because of the previous `src_type` then free it*/
         if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-            lv_mem_free(img->src);
+            lv_mem_free((void*)img->src);
         }
         img->src = src;
     }
@@ -127,7 +126,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
             strcpy(new_str, src);
             img->src = new_str;
 
-            if(old_src) lv_mem_free(old_src);
+            if(old_src) lv_mem_free((void*)old_src);
         }
     }
 
@@ -362,7 +361,7 @@ bool lv_img_get_antialias(lv_obj_t * obj)
 
 static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("lv_bar create started");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_img_t * img = (lv_img_t *)obj;
 
@@ -397,13 +396,15 @@ static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         img->pivot   = copy_img->pivot;
         lv_img_set_src(obj, copy_img->src);
     }
+
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_img_destructor(lv_obj_t * obj)
 {
     lv_img_t * img = (lv_img_t *)obj;
     if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-        lv_mem_free(img->src);
+        lv_mem_free((void*)img->src);
         img->src      = NULL;
         img->src_type = LV_IMG_SRC_UNKNOWN;
     }
@@ -499,8 +500,6 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         img_max_area.y2 -= pbottom;
 
         if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_VARIABLE) {
-            LV_LOG_TRACE("lv_img_draw: start to draw image");
-
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
             lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
@@ -535,7 +534,6 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             }
         }
         else if(img->src_type == LV_IMG_SRC_SYMBOL) {
-            LV_LOG_TRACE("lv_img_draw: start to draw symbol");
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);

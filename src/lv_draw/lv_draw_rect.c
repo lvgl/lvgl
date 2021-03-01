@@ -681,8 +681,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     has_com = _lv_area_intersect(&ca, &a, clip);
     if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         /*Avoid overlap in the middle with large radius*/
-        if(ca.y1 <= h_half) ca.y1 = h_half + 1;
-        if(ca.x1 <= w_half) ca.x1 = w_half + 1;
+        if(ca.y1 <= h_half) ca.y1 = h_half;
+        if(ca.x1 <= w_half) ca.x1 = w_half;
 
         lv_coord_t h = lv_area_get_height(&ca);
         lv_coord_t w = lv_area_get_width(&ca);

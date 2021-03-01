@@ -20,7 +20,6 @@
 /*********************
  *      DEFINES
  *********************/
-
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
@@ -52,6 +51,11 @@ static lv_obj_t * indev_obj_act = NULL;
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_INDEV
+#  define INDEV_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define INDEV_TRACE(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -59,7 +63,7 @@ static lv_obj_t * indev_obj_act = NULL;
 
 void lv_indev_read_task_cb(lv_timer_t * task)
 {
-    LV_LOG_TRACE("indev read task started");
+    INDEV_TRACE("begin");
 
     lv_indev_data_t data;
 
@@ -111,7 +115,7 @@ void lv_indev_read_task_cb(lv_timer_t * task)
     indev_act     = NULL;
     indev_obj_act = NULL;
 
-    LV_LOG_TRACE("indev read task finished");
+    INDEV_TRACE("finished");
 }
 
 void lv_indev_enable(lv_indev_t * indev, bool en)
@@ -183,7 +187,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x, indev->proc.types.pointer.act_point.y);
     lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING);
 }
 
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
@@ -387,6 +391,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_RELEASED) {
+        LV_LOG_INFO("%d key is pressed", data->key);
         i->proc.pr_timestamp = lv_tick_get();
 
         /*Simulate a press on the object if ENTER was pressed*/
@@ -478,6 +483,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
+        LV_LOG_INFO("%d key is released", data->key);
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
@@ -541,6 +547,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Button press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_RELEASED) {
+        LV_LOG_INFO("pressed");
 
         i->proc.pr_timestamp = lv_tick_get();
 
@@ -633,6 +640,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_RELEASED && last_state == LV_INDEV_STATE_PRESSED) {
+        LV_LOG_INFO("released");
 
         if(data->key == LV_KEY_ENTER) {
             bool editable = lv_obj_is_editable(indev_obj_act);
@@ -684,6 +692,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*if encoder steps or simulated steps via left/right keys*/
     if(data->enc_diff != 0) {
+        LV_LOG_INFO("rotated by %d", data->enc_diff);
         /*In edit mode send LEFT/RIGHT keys*/
         if(lv_group_get_editing(g)) {
             int32_t s;
@@ -717,12 +726,22 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
     /* Die gracefully if i->btn_points is NULL */
     if(i->btn_points == NULL) {
-        LV_LOG_WARN("indev_button_proc: btn_points was  NULL");
+        LV_LOG_WARN("btn_points is NULL");
         return;
     }
 
     lv_coord_t x = i->btn_points[data->btn_id].x;
     lv_coord_t y = i->btn_points[data->btn_id].y;
+
+    static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
+    if(prev_state != data->state) {
+        if(data->state == LV_INDEV_STATE_PRESSED) {
+            LV_LOG_INFO("button %d is pressed (x:%d y:%d)", data->btn_id, x, y);
+        }
+        else {
+            LV_LOG_INFO("button %d is released (x:%d y:%d)", data->btn_id, x, y);
+        }
+    }
 
     /*If a new point comes always make a release*/
     if(data->state == LV_INDEV_STATE_PRESSED) {
@@ -754,6 +773,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(lv_indev_proc_t * proc)
 {
+    LV_LOG_INFO("pressed at x:%d y:%d", proc->types.pointer.act_point.x, proc->types.pointer.act_point.y);
     indev_obj_act = proc->types.pointer.act_obj;
 
     if(proc->wait_until_release != 0) return;
@@ -911,6 +931,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
     /*Forget the act obj and send a released signal */
     if(indev_obj_act) {
+        LV_LOG_INFO("released");
 
         /*Send RELEASE signal and event*/
         lv_signal_send(indev_obj_act, LV_SIGNAL_RELEASED, indev_act);

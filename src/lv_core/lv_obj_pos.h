@@ -246,6 +246,9 @@ lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj);
 bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj);
 
 
+
+void lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff, bool ignore_floating);
+
 /**
  * Mark an area of an object as invalid.
  * The area will be truncated to the object's area and marked for redraw.

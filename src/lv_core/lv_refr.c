@@ -19,7 +19,7 @@
 #include "../lv_font/lv_font_fmt_txt.h"
 #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 
-#if LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
     #include "../lv_widgets/lv_label.h"
 #endif
 
@@ -45,6 +45,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 static void lv_refr_vdb_flush(void);
 static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -59,6 +60,11 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_DISP_REFR
+#  define TRACE_REFR(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define TRACE_REFR(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -179,7 +185,7 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  */
 void _lv_disp_refr_task(lv_timer_t * tmr)
 {
-    LV_LOG_TRACE("lv_refr_task: started");
+    TRACE_REFR("begin");
 
     uint32_t start = lv_tick_get();
     uint32_t elaps = 0;
@@ -196,6 +202,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
+        TRACE_REFR("finished (there were no invalid areas to redraw)");
         return;
     }
 
@@ -228,7 +235,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
-        lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
+        lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
         lv_obj_set_style_bg_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
         lv_obj_set_style_text_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
         lv_obj_set_style_pad_top(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
@@ -269,7 +276,35 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     }
 #endif
 
-    LV_LOG_TRACE("lv_refr_task: ready");
+#if LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
+    static lv_obj_t * mem_label = NULL;
+    if(mem_label == NULL) {
+        mem_label = lv_label_create(lv_layer_sys(), NULL);
+        lv_obj_set_style_bg_opa(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
+        lv_obj_set_style_bg_color(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
+        lv_obj_set_style_text_color(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
+        lv_obj_set_style_pad_top(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_bottom(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_left(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_pad_right(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_label_set_text(mem_label, "?");
+        lv_obj_align(mem_label, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    }
+
+    static uint32_t mem_last_time = 0;
+    if(lv_tick_elaps(mem_last_time) > 300) {
+        mem_last_time = lv_tick_get();
+        lv_mem_monitor_t mon;
+        lv_mem_monitor(&mon);
+        uint32_t used_size = mon.total_size - mon.free_size;;
+        uint32_t used_kb = used_size / 1024;
+        uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
+        lv_label_set_text_fmt(mem_label, "%d.%d kB used (%d %%)\n%d%% frag.", used_kb,  used_kb_tenth, mon.used_pct, mon.frag_pct);
+        lv_obj_align(mem_label, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    }
+#endif
+
+    TRACE_REFR("finished");
 }
 
 #if LV_USE_PERF_MONITOR
@@ -789,7 +824,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
     }
     if(drv->rotated == LV_DISP_ROT_180) {
         lv_refr_vdb_rotate_180(drv, area, color_p);
-        drv->flush_cb(drv, area, color_p);
+        call_flush_cb(drv, area, color_p);
     } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
         /*Allocate a temporary buffer to store rotated image */
         lv_color_t * rot_buf = NULL; 
@@ -838,7 +873,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
                 }
             }
             /*Flush the completed area to the display*/
-            drv->flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
+            call_flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
             /*FIXME: Rotation forces legacy behavior where rendering and flushing are done serially*/
             while(vdb->flushing) {
                 if(drv->wait_cb) drv->wait_cb(drv);
@@ -873,7 +908,7 @@ static void lv_refr_vdb_flush(void)
         if(disp->driver.rotated != LV_DISP_ROT_NONE && disp->driver.sw_rotate) {
             lv_refr_vdb_rotate(&vdb->area, vdb->buf_act);
         } else {
-            disp->driver.flush_cb(&disp->driver, &vdb->area, color_p);
+            call_flush_cb(&disp->driver, &vdb->area, color_p);
         }
     }
     if(vdb->buf1 && vdb->buf2) {
@@ -899,4 +934,10 @@ static lv_draw_res_t call_draw_cb(lv_obj_t * obj, const lv_area_t * clip_area, l
     if(class_p->draw_cb) res = class_p->draw_cb(obj, clip_area, mode);
 
     return res;
+}
+
+static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
+{
+    TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
+    drv->flush_cb(drv, area, color_p);
 }

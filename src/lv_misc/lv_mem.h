@@ -84,7 +84,7 @@ void * lv_mem_alloc(size_t size);
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
-void lv_mem_free(const void * data);
+void lv_mem_free(void * data);
 
 /**
  * Reallocate a memory with a new size. The old content will be kept.
@@ -113,12 +113,6 @@ lv_res_t lv_mem_test(void);
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p);
 
-/**
- * Give the size of an allocated memory
- * @param data pointer to an allocated memory
- * @return the size of data memory in bytes
- */
-uint32_t lv_mem_get_size(const void * data);
 
 /**
  * Get a temporal buffer with the given size.

@@ -80,7 +80,7 @@ minimal_monochrome = {
 
 minimal_16bit = {
   "LV_COLOR_DEPTH":16,
-  "LV_MEM_SIZE":64 * 1024,
+  "LV_MEM_CUSTOM":1,
   
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
@@ -202,6 +202,3 @@ build("Minimal config monochrome", minimal_monochrome)
 build("Minimal config, 16 bit color depth", minimal_16bit)
 build("Minimal config, 16 bit color depth swapped", minimal_16bit_swap)
 build("Full config, 32 bit color depth", full_32bit)
-#build("All objects, minimal features", all_obj_minimal_features)
-#build("All objects, all common features", all_obj_all_features)
-#build("All objects, with advanced features", advanced_features)

@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "calendar/lv_calendar.h"
 #include "calendar/lv_calendar_header_arrow.h"
+#include "calendar/lv_calendar_header_dropdown.h"
 #include "keyboard/lv_keyboard.h"
 #include "list/lv_list.h"
 #include "msgbox/lv_msgbox.h"

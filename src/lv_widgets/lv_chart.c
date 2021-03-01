@@ -70,6 +70,7 @@ const lv_obj_class_t lv_chart_class = {
 
 lv_obj_t * lv_chart_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_chart_class, parent, copy);
 }
 
@@ -325,6 +326,8 @@ void lv_chart_refresh(lv_obj_t * obj)
 
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_chart_axis_t axis)
 {
+    LV_LOG_INFO("begin")
+
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(axis != LV_CHART_AXIS_PRIMARY_Y && axis != LV_CHART_AXIS_SECONDARY_Y) {
@@ -493,7 +496,7 @@ int32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
 
 static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("chart create started");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_chart_t * chart = (lv_chart_t *) obj;
 
@@ -527,7 +530,7 @@ static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_memcpy_small(chart->ymin, chart_copy->ymin, sizeof(chart->ymin));
         lv_memcpy_small(chart->ymax, chart_copy->ymax, sizeof(chart->ymax));
     }
-    LV_LOG_INFO("chart created");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_chart_destructor(lv_obj_t * obj)

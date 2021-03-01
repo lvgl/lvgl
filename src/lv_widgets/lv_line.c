@@ -53,6 +53,7 @@ const lv_obj_class_t lv_line_class = {
 
 lv_obj_t * lv_line_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_line_class, parent, copy);
 }
 
@@ -104,7 +105,7 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
 
 static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("line create started");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_line_t * line = (lv_line_t *) obj;
 
@@ -126,7 +127,7 @@ static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     }
 
-    LV_LOG_INFO("line created");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)

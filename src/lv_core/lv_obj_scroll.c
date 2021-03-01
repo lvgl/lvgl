@@ -27,7 +27,6 @@
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -36,6 +35,7 @@ static void scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 static void scroll_x_anim(void * obj, int32_t v);
 static void scroll_y_anim(void * obj, int32_t v);
 static void scroll_anim_ready_cb(lv_anim_t * a);
+static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value, lv_anim_enable_t anim_en);
 
 /**********************
  *  STATIC VARIABLES
@@ -139,6 +139,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         child_res = LV_MAX(child_res, child->coords.y2);
     }
 
@@ -174,6 +175,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
     lv_coord_t x1 = LV_COORD_MAX;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
        lv_obj_t * child = lv_obj_get_child(obj, i);
+       if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         x1 = LV_MIN(x1, child->coords.x1);
 
     }
@@ -206,6 +208,7 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         child_res = LV_MAX(child_res, child->coords.x2);
     }
 
@@ -225,10 +228,10 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
 {
     lv_anim_t * a;
     a = lv_anim_get(obj, scroll_x_anim);
-    end->x = a ? -a->end : lv_obj_get_scroll_x(obj);
+    end->x = a ? -a->end_value : lv_obj_get_scroll_x(obj);
 
     a = lv_anim_get(obj, scroll_y_anim);
-    end->y = a ? -a->end : lv_obj_get_scroll_y(obj);
+    end->y = a ? -a->end_value : lv_obj_get_scroll_y(obj);
 }
 
 /*=====================
@@ -335,50 +338,18 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 
 void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    lv_dir_t scroll_dir = lv_obj_get_scroll_dir(parent);
-
-
-
-    lv_coord_t y_scroll = 0;
-    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
-    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(parent, LV_PART_MAIN);
-    lv_coord_t top_diff = parent->coords.y1 + ptop - obj->coords.y1;
-    lv_coord_t bottom_diff = -(parent->coords.y2 - pbottom - obj->coords.y2);
-    if((top_diff > 0 || bottom_diff > 0)) {
-        if(LV_ABS(top_diff) < LV_ABS(bottom_diff)) y_scroll = top_diff;
-        else y_scroll = -bottom_diff;
-    }
-
-    lv_coord_t x_scroll = 0;
-    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
-    lv_coord_t pright = lv_obj_get_style_pad_right(parent, LV_PART_MAIN);
-    lv_coord_t left_diff = parent->coords.x1 + pleft - obj->coords.x1;
-    lv_coord_t right_diff = -(parent->coords.x2 - pright - obj->coords.x2);
-    if((left_diff > 0 || right_diff > 0)) {
-        if(LV_ABS(left_diff) < LV_ABS(right_diff)) x_scroll = left_diff;
-        else x_scroll = -right_diff;
-    }
-
-    /* Remove any pending scroll animations.*/
-    lv_anim_del(parent, scroll_x_anim);
-    lv_anim_del(parent, scroll_y_anim);
-
-    if((scroll_dir & LV_DIR_LEFT) == 0 && x_scroll < 0) x_scroll = 0;
-    if((scroll_dir & LV_DIR_RIGHT) == 0 && x_scroll > 0) x_scroll = 0;
-    if((scroll_dir & LV_DIR_TOP) == 0 && y_scroll < 0) y_scroll = 0;
-    if((scroll_dir & LV_DIR_BOTTOM) == 0 && y_scroll > 0) y_scroll = 0;
-
-    lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
+    lv_point_t p = {0, 0};
+    scroll_area_into_view(&obj->coords, obj, &p, anim_en);
 }
 
 void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
-    lv_obj_t * parent = lv_obj_get_parent(obj);
+    lv_point_t p = {0, 0};
+    lv_obj_t * child = obj;
+    lv_obj_t * parent = lv_obj_get_parent(child);
     while(parent) {
-        lv_obj_scroll_to_view(obj, anim_en);
-        obj = parent;
+        scroll_area_into_view(&obj->coords, child, &p, anim_en);
+        child = parent;
         parent = lv_obj_get_parent(parent);
     }
 }
@@ -392,8 +363,8 @@ void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 
 void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t * ver_area)
 {
-    lv_area_set(hor_area, 0, 0, 0, 0);
-    lv_area_set(ver_area, 0, 0, 0, 0);
+    lv_area_set(hor_area, 0, 0, -1, -1);
+    lv_area_set(ver_area, 0, 0, -1, -1);
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
@@ -552,7 +523,7 @@ static void scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->spec_attr->scroll.x += x;
     obj->spec_attr->scroll.y += y;
 
-    lv_obj_move_children_by(obj, x, y);
+    lv_obj_move_children_by(obj, x, y, true);
     lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
     if(res != LV_RES_OK) return;
     lv_obj_invalidate(obj);
@@ -574,4 +545,90 @@ static void scroll_anim_ready_cb(lv_anim_t * a)
     if(res != LV_RES_OK) return;
 
     lv_event_send(a->var, LV_EVENT_SCROLL_END, NULL);
+}
+
+static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value, lv_anim_enable_t anim_en)
+{
+    lv_obj_t * parent = lv_obj_get_parent(child);
+    lv_dir_t scroll_dir = lv_obj_get_scroll_dir(parent);
+    lv_coord_t snap_goal = 0;
+    lv_coord_t act = 0;
+    const lv_area_t * area_tmp;
+
+    lv_coord_t y_scroll = 0;
+    lv_scroll_snap_t snap_y = lv_obj_get_scroll_snap_y(parent);
+    if(snap_y != LV_SCROLL_SNAP_NONE) area_tmp = &child->coords;
+    else area_tmp = area;
+
+    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
+    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(parent, LV_PART_MAIN);
+    lv_coord_t top_diff = parent->coords.y1 + ptop - area_tmp->y1 - scroll_value->y;
+    lv_coord_t bottom_diff = -(parent->coords.y2 - pbottom - area_tmp->y2 - scroll_value->y);
+    if((top_diff > 0 && bottom_diff > 0)) y_scroll = 0;
+    else if(top_diff > 0) y_scroll = top_diff;
+    else if(bottom_diff > 0)  y_scroll = -bottom_diff;
+
+    lv_coord_t parent_h = lv_obj_get_height(parent) - ptop - pbottom;
+    switch(snap_y) {
+    case LV_SCROLL_SNAP_START:
+        snap_goal = parent->coords.y1 + ptop;
+        act = area_tmp->y1 + y_scroll;
+        y_scroll += snap_goal - act;
+        break;
+    case LV_SCROLL_SNAP_END:
+        snap_goal = parent->coords.y2 - pbottom;
+        act = area_tmp->y2 + y_scroll;
+        y_scroll += snap_goal - act;
+        break;
+    case LV_SCROLL_SNAP_CENTER:
+        snap_goal = parent->coords.y1 + ptop + parent_h / 2;
+        act = lv_area_get_height(area_tmp) / 2 + area_tmp->y1 + y_scroll;
+        y_scroll += snap_goal - act;
+        break;
+    }
+
+    lv_coord_t x_scroll = 0;
+    lv_scroll_snap_t snap_x = lv_obj_get_scroll_snap_x(parent);
+    if(snap_x != LV_SCROLL_SNAP_NONE) area_tmp = &child->coords;
+    else area_tmp = area;
+
+    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
+    lv_coord_t pright = lv_obj_get_style_pad_right(parent, LV_PART_MAIN);
+    lv_coord_t left_diff = parent->coords.x1 + pleft - area_tmp->x1 - scroll_value->x;
+    lv_coord_t right_diff = -(parent->coords.x2 - pright - area_tmp->x2- scroll_value->x);
+    if((left_diff > 0 && right_diff > 0)) x_scroll = 0;
+    else if(left_diff > 0) x_scroll = left_diff;
+    else if(right_diff > 0)  x_scroll = -right_diff;
+
+    lv_coord_t parent_w = lv_obj_get_width(parent) - pleft - pright;
+    switch(snap_x) {
+    case LV_SCROLL_SNAP_START:
+        snap_goal = parent->coords.x1 + pleft;
+        act = area_tmp->x1 + x_scroll;
+        x_scroll += snap_goal - act;
+        break;
+    case LV_SCROLL_SNAP_END:
+        snap_goal = parent->coords.x2 - pright;
+        act = area_tmp->x2 + x_scroll;
+        x_scroll += snap_goal - act;
+        break;
+    case LV_SCROLL_SNAP_CENTER:
+        snap_goal = parent->coords.x1 + pleft + parent_w / 2;
+        act = lv_area_get_width(area_tmp) / 2 + area_tmp->x1 + x_scroll;
+        x_scroll += snap_goal - act;
+        break;
+    }
+
+    /* Remove any pending scroll animations.*/
+    lv_anim_del(parent, scroll_x_anim);
+    lv_anim_del(parent, scroll_y_anim);
+
+    if((scroll_dir & LV_DIR_LEFT) == 0 && x_scroll < 0) x_scroll = 0;
+    if((scroll_dir & LV_DIR_RIGHT) == 0 && x_scroll > 0) x_scroll = 0;
+    if((scroll_dir & LV_DIR_TOP) == 0 && y_scroll < 0) y_scroll = 0;
+    if((scroll_dir & LV_DIR_BOTTOM) == 0 && y_scroll > 0) y_scroll = 0;
+
+    scroll_value->x += anim_en == LV_ANIM_OFF ? 0 : x_scroll;
+    scroll_value->y += anim_en == LV_ANIM_OFF ? 0 : y_scroll;
+    lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
 }
