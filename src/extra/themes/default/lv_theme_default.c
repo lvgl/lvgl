@@ -185,8 +185,8 @@ static void style_init(void)
             0
     };
 
-    color_primary_accent =   lv_color_get_palette_accent_4(theme.palette_primary);
-    color_secondary_accent = lv_color_get_palette_accent_4(theme.palette_secondary);
+    color_primary_accent =   lv_color_get_palette_main(theme.palette_primary);
+    color_secondary_accent = lv_color_get_palette_main(theme.palette_secondary);
     color_primary_muted =    lv_color_get_palette_lighten_5(theme.palette_primary);
     color_secondary_muted =  lv_color_get_palette_lighten_5(theme.palette_secondary);
 
@@ -229,7 +229,7 @@ static void style_init(void)
     lv_style_set_radius(&styles->card, RADIUS_DEFAULT);
     lv_style_set_bg_opa(&styles->card, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->card, lv_color_white());
-    lv_style_set_border_color(&styles->card, color_primary_muted);
+    lv_style_set_border_color(&styles->card, COLOR_GREY);
     lv_style_set_border_width(&styles->card, BORDER_WIDTH);
     lv_style_set_border_post(&styles->card, true);
     lv_style_set_text_color(&styles->card, lv_color_grey_darken_4());
