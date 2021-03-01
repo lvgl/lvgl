@@ -203,6 +203,7 @@ enum {
     LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14), /**< Propagate the focus to the parent */
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners. */
     LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 16), /**< Make the object position-able by the layouts */
+    LV_OBJ_FLAG_FLOATING        = (1 << 17),
 
     LV_OBJ_FLAG_LAYOUT_1        = (1 << 23), /** Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1 << 24), /** Custom flag, free to use by layouts*/
@@ -376,14 +377,6 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
  */
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
-/**
- * Set the state (fully overwrite) of an object.
- * If specified in the styles, transition animations will be started from the previous state to the current.
- * @param obj       pointer to an object
- * @param state     the new state
- */
-void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
-
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
@@ -424,12 +417,21 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
  *======================*/
 
 /**
- * Check if a given flag or flags are set on an object.
+ * Check if a given flag or all the given flags are set on an object.
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: all flags are set; false: not all flags are set
  */
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
+
+/**
+ * Check if a given flag or any of the flags are set on an object.
+ * @param obj   pointer to an object
+ * @param f     the flag(s) to check (OR-ed values can be used)
+ * @return      true: at lest one flag flag is set; false: none of the flags are set
+ */
+bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
+
 
 /**
  * Get the base direction of the object
@@ -521,6 +523,12 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
 
 # else
 # define LV_ASSERT_OBJ(obj_p, obj_class) do{}while(0)
+#endif
+
+#if LV_LOG_TRACE_OBJ_CREATE
+#  define LV_TRACE_OBJ_CREATE(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define LV_TRACE_OBJ_CREATE(...)
 #endif
 
 

@@ -37,17 +37,18 @@ LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 
 typedef struct {
     lv_obj_t obj;
-    lv_obj_t * list;             /*The dropped down list*/
-    const char * text;           /*Text to display on the ddlist's button*/
-    const void * symbol;         /*Arrow or other icon when the drop-down list is closed*/
-    char * options;
-    lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/
-    uint16_t option_cnt;          /*Number of options*/
-    uint16_t sel_opt_id;          /*Index of the currently selected option*/
-    uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
-    uint16_t pr_opt_id;             /*Index of the currently pressed option*/
-    lv_dir_t dir         : 4;
-    uint8_t static_txt : 1;
+    lv_obj_t * list;                /**< The dropped down list*/
+    const char * text;              /**< Text to display on the ddlist's button*/
+    const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
+    char * options;                 /**< Options in a a '\n' separated list*/
+    lv_coord_t max_height;          /**< Maximal height of the list when opened. (0: no max.  height)*/
+    uint16_t option_cnt;            /**< Number of options*/
+    uint16_t sel_opt_id;            /**< Index of the currently selected option*/
+    uint16_t sel_opt_id_orig;       /**< Store the original index on focus*/
+    uint16_t pr_opt_id;             /**< Index of the currently pressed option*/
+    lv_dir_t dir              :4;   /**< Direction in which the list should open */
+    uint8_t static_txt        :1;   /**< 1: Only a pointer is saved in `options`*/
+    uint8_t selected_highlight:1;   /**< 1: Make the selected option highlighted in the list*/
 }lv_dropdown_t;
 
 typedef struct {
@@ -140,9 +141,16 @@ void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h);
  * @param obj       pointer to drop-down list object
  * @param symbol    a text like `LV_SYMBOL_DOWN`, an image (pointer or path) or NULL to not draw symbol icon
  * @note angle and zoom transformation can be applied if the symbol is an image.
- * E.g. when drop down is checked (opened) rotate the symbol by 180
+ * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
  */
 void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol);
+
+/**
+ * Set whether the selected option in the list should be highlighted or not
+ * @param obj       pointer to drop-down list object
+ * @param en        true: highlight enabled; false: disabled
+ */
+void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en);
 
 /*=====================
  * Getter functions
@@ -200,10 +208,17 @@ lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj);
 
 /**
  * Get the symbol on the drop-down list. Typically a down caret or arrow.
- * @param obj   pointer to drop-down list object
- * @return      the symbol or NULL if not enabled
+ * @param obj       pointer to drop-down list object
+ * @return          the symbol or NULL if not enabled
  */
 const char * lv_dropdown_get_symbol(lv_obj_t * obj);
+
+/**
+ * Get whether the selected option in the list should be highlighted or not
+ * @param obj       pointer to drop-down list object
+ * @return          true: highlight enabled; false: disabled
+ */
+bool lv_dropdown_get_selected_highlight(lv_obj_t * obj);
 
 /**
  * Get the direction of the drop-down list

@@ -48,8 +48,9 @@
 #  define LV_MEM_ADR          0     /*0: unused*/
 #else       /*LV_MEM_CUSTOM*/
 #  define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
-#  define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
-#  define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#  define LV_MEM_CUSTOM_ALLOC     malloc
+#  define LV_MEM_CUSTOM_FREE      free
+#  define LV_MEM_CUSTOM_REALLOC   realloc
 #endif     /*LV_MEM_CUSTOM*/
 
 /* Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster). */
@@ -144,12 +145,25 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * LV_LOG_LEVEL_INFO        Log important events
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
+ * LV_LOG_LEVEL_USER        Only logs added by the user
  * LV_LOG_LEVEL_NONE        Do not log anything */
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 
 /* 1: Print the log with 'printf';
  * 0: User need to register a callback with `lv_log_register_print_cb()`*/
 #  define LV_LOG_PRINTF   1
+
+/*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs */
+#  define LV_LOG_TRACE_MEM            1
+#  define LV_LOG_TRACE_TIMER          1
+#  define LV_LOG_TRACE_INDEV          1
+#  define LV_LOG_TRACE_DISP_REFR      1
+#  define LV_LOG_TRACE_EVENT          1
+#  define LV_LOG_TRACE_SIGNAL         1
+#  define LV_LOG_TRACE_OBJ_CREATE     1
+#  define LV_LOG_TRACE_LAYOUT         1
+#  define LV_LOG_TRACE_ANIM           1
+
 #endif  /*LV_USE_LOG*/
 
 /*-------------
@@ -175,6 +189,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /*1: Show CPU usage and FPS count in the right bottom corner*/
 #define LV_USE_PERF_MONITOR     0
 
+/*1: Show the used memory and the memory fragmentation  in the left bottom corner
+ * Requires LV_MEM_CUSTOM = 0*/
+#define LV_USE_MEM_MONITOR      0
+
 /*Change the built in (v)snprintf functions*/
 #define LV_SPRINTF_CUSTOM   0
 #if LV_SPRINTF_CUSTOM
@@ -195,8 +213,6 @@ typedef void * lv_user_data_t;
 #define LV_ENABLE_GC 0
 #if LV_ENABLE_GC != 0
 #  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#  define LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
-#  define LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
 #endif /* LV_ENABLE_GC */
 
 /*=====================
@@ -415,7 +431,8 @@ typedef void * lv_user_data_t;
 # endif
 
 # define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",  "June", "July", "August", "September", "October", "November", "December"}
-# define LV_USE_CALENDAR_HEADER_ARROW 1
+# define LV_USE_CALENDAR_HEADER_ARROW       1
+# define LV_USE_CALENDAR_HEADER_DROPDOWN    1
 #endif  /*LV_USE_CALENDAR*/
 
 #define LV_USE_COLORWHEEL   1

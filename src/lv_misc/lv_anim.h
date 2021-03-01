@@ -64,19 +64,23 @@ typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 /** Callback to call when the animation really stars (considering `delay`)*/
 typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
 
+/** Callback used when the animation values are relative to get the current value*/
+typedef int32_t (*lv_anim_get_value_cb_t)(void *);
+
 /** Describes an animation*/
 typedef struct _lv_anim_t {
-    void * var;                  /**<Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;  /**< Function to execute to animate*/
-    lv_anim_start_cb_t start_cb; /**< Call it when the animation is starts (considering `delay`)*/
-    lv_anim_ready_cb_t ready_cb; /**< Call it when the animation is ready*/
+    void * var;                          /**<Variable to animate*/
+    lv_anim_exec_xcb_t exec_cb;          /**< Function to execute to animate*/
+    lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
+    lv_anim_ready_cb_t ready_cb;         /**< Call it when the animation is ready*/
+    lv_anim_get_value_cb_t get_value_cb; /**< Get the current value in relative mode*/
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom user data*/
 #endif
     lv_anim_path_t path;         /**< Describe the path (curve) of animations*/
-    int32_t start;               /**< Start value*/
-    int32_t current;             /**< Current value */
-    int32_t end;                 /**< End value*/
+    int32_t start_value;               /**< Start value*/
+    int32_t current_value;             /**< Current value */
+    int32_t end_value;                 /**< End value*/
     int32_t time;                /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
@@ -160,9 +164,9 @@ static inline void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
  */
 static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
 {
-    a->start = start;
-    a->current = start;
-    a->end = end;
+    a->start_value = start;
+    a->current_value = start;
+    a->end_value = end;
 }
 
 /**
@@ -199,6 +203,17 @@ static inline void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_ready_cb_t start_
 }
 
 /**
+ * Set a function to use the current value of the variable and make start and end value
+ * relative the the returned current value.
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param get_value_cb a function call when the animation starts
+ */
+static inline void lv_anim_set_get_value_cb(lv_anim_t * a, lv_anim_get_value_cb_t get_value_cb)
+{
+    a->get_value_cb = get_value_cb;
+}
+
+/**
  * Set a function call when the animation is ready
  * @param a pointer to an initialized `lv_anim_t` variable
  * @param ready_cb a function call when the animation is ready
@@ -207,7 +222,6 @@ static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_
 {
     a->ready_cb = ready_cb;
 }
-
 /**
  * Make the animation to play back to when the forward direction is ready
  * @param a pointer to an initialized `lv_anim_t` variable
@@ -246,6 +260,17 @@ static inline void lv_anim_set_repeat_count(lv_anim_t * a, uint16_t cnt)
 static inline void lv_anim_set_repeat_delay(lv_anim_t * a, uint32_t delay)
 {
     a->repeat_delay = delay;
+}
+
+/**
+ * Set a whether the animation's should be applied immediately or only when the delay expired.
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param en true: apply the start value immediately in `lv_anim_start`;
+ *        false: apply the start value only when `delay` ms is elapsed and the animations really starts
+ */
+static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
+{
+    a->early_apply = en;
 }
 
 /**

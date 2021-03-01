@@ -104,11 +104,14 @@ void lv_group_del(lv_group_t * group)
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
+
+    LV_LOG_TRACE("begin");
+
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
     _LV_LL_READ(&group->obj_ll, obj_i) {
         if((*obj_i) == obj) {
-            LV_LOG_INFO("lv_group_add_obj: the object is already added to this group");
+            LV_LOG_INFO("the object is already added to this group");
             return;
         }
     }
@@ -119,7 +122,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
         if(obj->spec_attr->group_p && *(obj->spec_attr->group_p->obj_focus) == obj) {
             lv_group_refocus(group_cur);
 
-            LV_LOG_INFO("lv_group_add_obj: assign object to an other group");
+            LV_LOG_INFO("changing object's group");
         }
     }
 
@@ -136,6 +139,8 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     if(_lv_ll_get_head(&group->obj_ll) == next) {
         lv_group_refocus(group);
     }
+
+    LV_LOG_TRACE("finished");
 }
 
 /**
@@ -146,6 +151,8 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = lv_obj_get_group(obj);
     if(g == NULL) return;
+
+    LV_LOG_TRACE("begin");
 
     /*Focus on the next object*/
     if(*g->obj_focus == obj) {
@@ -178,6 +185,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
             break;
         }
     }
+    LV_LOG_TRACE("finished");
 }
 
 /**

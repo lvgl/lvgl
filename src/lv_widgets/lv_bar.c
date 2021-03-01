@@ -78,6 +78,7 @@ const lv_obj_class_t lv_bar_class = {
 
 lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_bar_class, parent, copy);
 }
 
@@ -201,7 +202,7 @@ lv_bar_type_t lv_bar_get_type(lv_obj_t * obj)
 
 static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("lv_bar create started");
+    LV_TRACE_OBJ_CREATE("begin");
 
     lv_bar_t * bar = (lv_bar_t *)obj;
     bar->min_value = 0;
@@ -228,7 +229,7 @@ static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
    }
-   LV_LOG_INFO("bar created");
+   LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_bar_destructor(lv_obj_t * obj)

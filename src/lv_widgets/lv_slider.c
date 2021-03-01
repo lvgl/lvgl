@@ -59,7 +59,7 @@ const lv_obj_class_t lv_slider_class = {
 
 lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_slider_class, parent, copy);
 }
 
@@ -87,7 +87,6 @@ static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_ext_click_area(obj, LV_DPX(8));
         lv_obj_set_height(obj, LV_DPX(10));

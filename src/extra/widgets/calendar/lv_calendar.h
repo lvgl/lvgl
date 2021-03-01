@@ -64,37 +64,38 @@ lv_obj_t * lv_calendar_create(lv_obj_t * parent);
 
 /**
  * Set the today's date
- * @param calendar pointer to a calendar object
- * @param today pointer to an `lv_calendar_date_t` variable containing the date of today. The value
- * will be saved it can be local variable too.
+ * @param obj  pointer to a calendar object
+ * @param year      today's year
+ * @param month     today's month [1..12]
+ * @param day       today's day [1..31]
  */
-void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today);
+void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, uint32_t day);
 
 /**
  * Set the currently showed
- * @param calendar pointer to a calendar object
- * @param showed pointer to an `lv_calendar_date_t` variable containing the date to show. The value
- * will be saved it can be local variable too.
+ * @param obj           pointer to a calendar object
+ * @param year          today's year
+ * @param month         today's month [1..12]
  */
-void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed);
+void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month);
 
 /**
  * Set the the highlighted dates
- * @param calendar pointer to a calendar object
- * @param highlighted pointer to an `lv_calendar_date_t` array containing the dates. ONLY A POINTER
- * WILL BE SAVED! CAN'T BE LOCAL ARRAY.
+ * @param obj           pointer to a calendar object
+ * @param highlighted   pointer to an `lv_calendar_date_t` array containing the dates.
+ *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
  * @param date_num number of dates in the array
  */
-void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t highlighted[], uint16_t date_num);
+void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], uint16_t date_num);
 
 /**
  * Set the name of the days
- * @param calendar pointer to a calendar object
- * @param day_names pointer to an array with the names. E.g. `const char * days[7] = {"Sun", "Mon",
- * ...}` Only the pointer will be saved so this variable can't be local which will be destroyed
- * later.
+ * @param obj           pointer to a calendar object
+ * @param day_names     pointer to an array with the names.
+ *                      E.g. `const char * days[7] = {"Sun", "Mon", ...}`
+ *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
  */
-void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names);
+void lv_calendar_set_day_names(lv_obj_t * obj, const char ** day_names);
 
 /*=====================
  * Getter functions

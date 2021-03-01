@@ -130,14 +130,21 @@
 #  ifdef CONFIG_LV_MEM_CUSTOM_ALLOC
 #    define LV_MEM_CUSTOM_ALLOC CONFIG_LV_MEM_CUSTOM_ALLOC
 #  else
-#    define  LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
+#    define  LV_MEM_CUSTOM_ALLOC     malloc
 #  endif
 #endif
 #ifndef LV_MEM_CUSTOM_FREE
 #  ifdef CONFIG_LV_MEM_CUSTOM_FREE
 #    define LV_MEM_CUSTOM_FREE CONFIG_LV_MEM_CUSTOM_FREE
 #  else
-#    define  LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#    define  LV_MEM_CUSTOM_FREE      free
+#  endif
+#endif
+#ifndef LV_MEM_CUSTOM_REALLOC
+#  ifdef CONFIG_LV_MEM_CUSTOM_REALLOC
+#    define LV_MEM_CUSTOM_REALLOC CONFIG_LV_MEM_CUSTOM_REALLOC
+#  else
+#    define  LV_MEM_CUSTOM_REALLOC   realloc
 #  endif
 #endif
 #endif     /*LV_MEM_CUSTOM*/
@@ -354,6 +361,72 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define  LV_LOG_PRINTF   1
 #  endif
 #endif
+
+/*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs */
+#ifndef LV_LOG_TRACE_MEM
+#  ifdef CONFIG_LV_LOG_TRACE_MEM
+#    define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
+#  else
+#    define  LV_LOG_TRACE_MEM            1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_TIMER
+#  ifdef CONFIG_LV_LOG_TRACE_TIMER
+#    define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
+#  else
+#    define  LV_LOG_TRACE_TIMER          1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_INDEV
+#  ifdef CONFIG_LV_LOG_TRACE_INDEV
+#    define LV_LOG_TRACE_INDEV CONFIG_LV_LOG_TRACE_INDEV
+#  else
+#    define  LV_LOG_TRACE_INDEV          1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_DISP_REFR
+#  ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
+#    define LV_LOG_TRACE_DISP_REFR CONFIG_LV_LOG_TRACE_DISP_REFR
+#  else
+#    define  LV_LOG_TRACE_DISP_REFR      1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_EVENT
+#  ifdef CONFIG_LV_LOG_TRACE_EVENT
+#    define LV_LOG_TRACE_EVENT CONFIG_LV_LOG_TRACE_EVENT
+#  else
+#    define  LV_LOG_TRACE_EVENT          1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_SIGNAL
+#  ifdef CONFIG_LV_LOG_TRACE_SIGNAL
+#    define LV_LOG_TRACE_SIGNAL CONFIG_LV_LOG_TRACE_SIGNAL
+#  else
+#    define  LV_LOG_TRACE_SIGNAL         1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_OBJ_CREATE
+#  ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#    define LV_LOG_TRACE_OBJ_CREATE CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#  else
+#    define  LV_LOG_TRACE_OBJ_CREATE     1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_LAYOUT
+#  ifdef CONFIG_LV_LOG_TRACE_LAYOUT
+#    define LV_LOG_TRACE_LAYOUT CONFIG_LV_LOG_TRACE_LAYOUT
+#  else
+#    define  LV_LOG_TRACE_LAYOUT         1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_ANIM
+#  ifdef CONFIG_LV_LOG_TRACE_ANIM
+#    define LV_LOG_TRACE_ANIM CONFIG_LV_LOG_TRACE_ANIM
+#  else
+#    define  LV_LOG_TRACE_ANIM           1
+#  endif
+#endif
+
 #endif  /*LV_USE_LOG*/
 
 /*-------------
@@ -427,6 +500,16 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
+/*1: Show the used memory and the memory fragmentation  in the left bottom corner
+ * Requires LV_MEM_CUSTOM = 0*/
+#ifndef LV_USE_MEM_MONITOR
+#  ifdef CONFIG_LV_USE_MEM_MONITOR
+#    define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
+#  else
+#    define  LV_USE_MEM_MONITOR      0
+#  endif
+#endif
+
 /*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
 #  ifdef CONFIG_LV_SPRINTF_CUSTOM
@@ -492,20 +575,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define LV_GC_INCLUDE CONFIG_LV_GC_INCLUDE
 #  else
 #    define  LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#  endif
-#endif
-#ifndef LV_MEM_CUSTOM_REALLOC
-#  ifdef CONFIG_LV_MEM_CUSTOM_REALLOC
-#    define LV_MEM_CUSTOM_REALLOC CONFIG_LV_MEM_CUSTOM_REALLOC
-#  else
-#    define  LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
-#  endif
-#endif
-#ifndef LV_MEM_CUSTOM_GET_SIZE
-#  ifdef CONFIG_LV_MEM_CUSTOM_GET_SIZE
-#    define LV_MEM_CUSTOM_GET_SIZE CONFIG_LV_MEM_CUSTOM_GET_SIZE
-#  else
-#    define  LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
 #  endif
 #endif
 #endif /* LV_ENABLE_GC */
@@ -1210,7 +1279,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  ifdef CONFIG_LV_USE_CALENDAR_HEADER_ARROW
 #    define LV_USE_CALENDAR_HEADER_ARROW CONFIG_LV_USE_CALENDAR_HEADER_ARROW
 #  else
-#    define  LV_USE_CALENDAR_HEADER_ARROW 1
+#    define  LV_USE_CALENDAR_HEADER_ARROW       1
+#  endif
+#endif
+#ifndef LV_USE_CALENDAR_HEADER_DROPDOWN
+#  ifdef CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+#    define LV_USE_CALENDAR_HEADER_DROPDOWN CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+#  else
+#    define  LV_USE_CALENDAR_HEADER_DROPDOWN    1
 #  endif
 #endif
 #endif  /*LV_USE_CALENDAR*/

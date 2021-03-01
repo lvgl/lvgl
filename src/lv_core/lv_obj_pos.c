@@ -26,7 +26,6 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 static void calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out);
 
 void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify);
-void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 
 /**********************
  *  STATIC VARIABLES
@@ -154,7 +153,7 @@ void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
 
 bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT)) return false;
+    if(lv_obj_has_flag_any(obj, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING)) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
@@ -188,15 +187,15 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
     switch(align) {
     case LV_ALIGN_CENTER:
-        x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2 - pleft;
-        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2- ptop;
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
     case LV_ALIGN_IN_TOP_LEFT:
         x = 0;
         y = 0;
         break;
     case LV_ALIGN_IN_TOP_MID:
-        x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2 - pleft;
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
         y = 0;
         break;
 
@@ -210,7 +209,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
         y = lv_obj_get_height_fit(base) - lv_obj_get_height(obj);
         break;
     case LV_ALIGN_IN_BOTTOM_MID:
-        x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2 - pleft;
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
         y = lv_obj_get_height_fit(base) - lv_obj_get_height(obj);
         break;
 
@@ -221,7 +220,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     case LV_ALIGN_IN_LEFT_MID:
         x = 0;
-        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2;
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_IN_RIGHT_MID:
@@ -449,7 +448,7 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     obj->coords.x2 += diff.x;
     obj->coords.y2 += diff.y;
 
-    lv_obj_move_children_by(obj, diff.x, diff.y);
+    lv_obj_move_children_by(obj, diff.x, diff.y, false);
 
     /*Inform the object about its new coordinates*/
     lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
@@ -466,17 +465,18 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
 }
 
-void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
+void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff, bool ignore_floating)
 {
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING)) continue;
         child->coords.x1 += x_diff;
         child->coords.y1 += y_diff;
         child->coords.x2 += x_diff;
         child->coords.y2 += y_diff;
 
-        lv_obj_move_children_by(child, x_diff, y_diff);
+        lv_obj_move_children_by(child, x_diff, y_diff, false);
     }
 }
 

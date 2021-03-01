@@ -277,15 +277,19 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
     /*Add the characters to the text area if set*/
     if(keyboard->ta == NULL) return;
 
-    if(strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0)
+    if(strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
         lv_textarea_add_char(keyboard->ta, '\n');
-    else if(strcmp(txt, LV_SYMBOL_LEFT) == 0)
+        if(lv_textarea_get_one_line(keyboard->ta)) {
+            lv_res_t res = lv_event_send(keyboard->ta, LV_EVENT_READY, NULL);
+            if(res != LV_RES_OK) return;
+        }
+    } else if(strcmp(txt, LV_SYMBOL_LEFT) == 0) {
         lv_textarea_cursor_left(keyboard->ta);
-    else if(strcmp(txt, LV_SYMBOL_RIGHT) == 0)
+    } else if(strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
         lv_textarea_cursor_right(keyboard->ta);
-    else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0)
+    } else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
         lv_textarea_del_char(keyboard->ta);
-    else if(strcmp(txt, "+/-") == 0) {
+    } else if(strcmp(txt, "+/-") == 0) {
         uint16_t cur        = lv_textarea_get_cursor_pos(keyboard->ta);
         const char * ta_txt = lv_textarea_get_text(keyboard->ta);
         if(ta_txt[0] == '-') {

@@ -160,7 +160,7 @@ void lv_textarea_set_cursor_click_pos(lv_obj_t * ta, bool en);
  * @param ta pointer to a text area object
  * @param en true: enable, false: disable
  */
-void lv_textarea_set_pwd_mode(lv_obj_t * ta, bool en);
+void lv_textarea_set_password_mode(lv_obj_t * ta, bool en);
 
 /**
  * Configure the text area to one line or back to normal
@@ -205,7 +205,7 @@ void lv_textarea_set_text_sel(lv_obj_t * ta, bool en);
  * @param ta pointer to Text area
  * @param time show time in milliseconds. 0: hide immediately.
  */
-void lv_textarea_set_pwd_show_time(lv_obj_t * ta, uint16_t time);
+void lv_textarea_set_password_show_time(lv_obj_t * ta, uint16_t time);
 
 /*=====================
  * Getter functions
@@ -258,7 +258,7 @@ bool lv_textarea_get_cursor_click_pos(lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return true: password mode is enabled, false: disabled
  */
-bool lv_textarea_get_pwd_mode(const lv_obj_t * ta);
+bool lv_textarea_get_password_mode(const lv_obj_t * ta);
 
 /**
  * Get the one line configuration attribute
@@ -300,7 +300,7 @@ bool lv_textarea_get_text_sel_en(lv_obj_t * ta);
  * @param ta pointer to Text area
  * @return show time in milliseconds. 0: hide immediately.
  */
-uint16_t lv_textarea_get_pwd_show_time(lv_obj_t * ta);
+uint16_t lv_textarea_get_password_show_time(lv_obj_t * ta);
 
 /*=====================
  * Other functions

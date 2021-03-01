@@ -31,6 +31,14 @@ const lv_obj_class_t lv_list_class = {
     .base_class = &lv_obj_class,
 };
 
+const lv_obj_class_t lv_list_btn_class = {
+    .base_class = &lv_btn_class,
+};
+
+const lv_obj_class_t lv_list_text_class = {
+    .base_class = &lv_label_class,
+};
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -54,7 +62,7 @@ lv_obj_t * lv_list_create(lv_obj_t * parent)
 
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
-    lv_obj_t * label = lv_label_create(list, NULL);
+    lv_obj_t * label = lv_obj_create_from_class(&lv_list_text_class, list, NULL);
     lv_label_set_text(label, txt);
     lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_width(label, LV_SIZE_PCT(100));
@@ -63,8 +71,8 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 
 lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt, lv_event_cb_t event_cb)
 {
-    lv_obj_t * btn = lv_btn_create(list, NULL);
-    lv_obj_set_width(btn, LV_SIZE_PCT(100));
+    lv_obj_t * btn = lv_obj_create_from_class(&lv_list_btn_class, list, NULL);
+    lv_obj_set_size(btn, LV_SIZE_PCT(100), LV_SIZE_CONTENT);
     lv_obj_add_event_cb(btn, event_cb, NULL);
     lv_obj_set_layout(btn, &lv_flex_inline);
 
@@ -83,8 +91,9 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt,
     return btn;
 }
 
-const char * lv_list_get_btn_text(lv_obj_t * btn)
+const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn)
 {
+    LV_UNUSED(list);
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(btn); i++) {
         lv_obj_t * child = lv_obj_get_child(btn, i);

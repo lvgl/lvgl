@@ -74,6 +74,7 @@ const lv_obj_class_t lv_btnmatrix_class = {
 
 lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
+    LV_LOG_INFO("begin")
     return lv_obj_create_from_class(&lv_btnmatrix_class, parent, copy);
 }
 
@@ -377,8 +378,7 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_btnmatrix_set_ctrl_map(obj, copy_btnm->ctrl_bits);
     }
 
-
-    LV_LOG_INFO("button matrix created");
+    LV_LOG_TRACE("finshed");
 }
 
 static void lv_btnmatrix_destructor(lv_obj_t * obj)
