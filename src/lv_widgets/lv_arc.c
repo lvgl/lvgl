@@ -732,6 +732,22 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             if(res != LV_RES_OK) return res;
         }
     }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        lv_coord_t bg_pad = LV_MAX4(bg_left, bg_right, bg_top, bg_bottom);
+
+        lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
+        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
+        lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
+        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+        lv_coord_t knob_pad = LV_MAX4(knob_left, knob_right, knob_top, knob_bottom) + 2;
+
+        lv_coord_t * s = param;
+        *s = LV_MAX(*s, knob_pad - bg_pad);
+    }
 
     return res;
 }

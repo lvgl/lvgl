@@ -571,7 +571,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         /*Header*/
         if(lv_obj_get_child_id(obj) == 0 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_grey);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_normal);
+            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_small);
             lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->text_align_center);
             return;
         }
