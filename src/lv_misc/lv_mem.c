@@ -228,16 +228,12 @@ void lv_mem_free(void * data)
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
-#if LV_ENABLE_GC == 0
-    /*e points to the header*/
+#if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
+    e->header.s.used = 0;
 #  if LV_MEM_ADD_JUNK
     lv_memset((void *)data, 0xbb, e->header.s.d_size);
 #  endif
-#endif
-
-#if LV_MEM_CUSTOM == 0
-    e->header.s.used = 0;
 
     static uint32_t defr = 0;
     defr++;
