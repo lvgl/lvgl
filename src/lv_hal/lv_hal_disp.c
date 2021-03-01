@@ -175,7 +175,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
     uint32_t i;
-    for(i = 0; disp->screens[i]; i++) {
+    for(i = 0; i < disp->screen_cnt; i++) {
         lv_obj_set_size(disp->screens[i], lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
     }
 
