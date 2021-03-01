@@ -62,11 +62,11 @@ bool lv_fs_is_ready(char letter)
     return drv->ready_cb(drv);
 }
 
-void * lv_fs_open(const char * path, lv_fs_mode_t mode)
+lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode)
 {
     if(path == NULL) {
         LV_LOG_WARN("Can't open file: path is NULL");
-        return NULL;
+        return LV_FS_RES_INV_PARAM;
     }
 
     char letter = path[0];
@@ -74,39 +74,32 @@ void * lv_fs_open(const char * path, lv_fs_mode_t mode)
 
     if(drv == NULL) {
         LV_LOG_WARN("Can't open file (%s): unknown driver letter", path);
-        return NULL;
+        return LV_FS_RES_NOT_EX;
     }
 
     if(drv->ready_cb) {
         if(drv->ready_cb(drv) == false) {
             LV_LOG_WARN("Can't open file (%s): driver not ready", path);
-            return NULL;
+            return LV_FS_RES_HW_ERR;
         }
     }
 
     if(drv->open_cb == NULL) {
         LV_LOG_WARN("Can't open file (%s): open function not exists", path);
-        return NULL;
+        return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_file_t * file_p = lv_mem_alloc(sizeof(lv_fs_file_t));
-    if(file_p == NULL) {
-        LV_LOG_WARN("Can't open file (%s): out of memory", path);
-        return NULL;
+    const char * real_path = lv_fs_get_real_path(path);
+    void *file_d = drv->open_cb(drv, real_path, mode);
+
+    if(file_d == NULL || file_d == (void*)(-1)) {
+        return LV_FS_RES_UNKNOWN;
     }
 
     file_p->drv = drv;
-    file_p->file_d = NULL;
+    file_p->file_d = file_d;
 
-    const char * real_path = lv_fs_get_real_path(path);
-    file_p->file_d = drv->open_cb(drv, real_path, mode);
-
-    if(file_p->file_d == NULL || file_p->file_d == (void*)(-1)) {
-        lv_mem_free(file_p);
-        return NULL;
-    }
-
-    return file_p;
+    return LV_FS_RES_OK;
 }
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
@@ -121,7 +114,8 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
-    lv_mem_free(file_p); /*Clean up*/
+    file_p->file_d = NULL;
+    file_p->drv    = NULL;
 
     return res;
 }
@@ -192,54 +186,36 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
 
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
-    rddir_p->drv   = NULL;
-    rddir_p->dir_d = NULL;
-
     if(path == NULL) return LV_FS_RES_INV_PARAM;
 
     char letter = path[0];
+    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
 
-    rddir_p->drv = lv_fs_get_drv(letter);
-
-    if(rddir_p->drv == NULL) {
+    if(drv == NULL) {
         return LV_FS_RES_NOT_EX;
     }
 
-    if(rddir_p->drv->ready_cb != NULL) {
-        if(rddir_p->drv->ready_cb(rddir_p->drv) == false) {
-            rddir_p->drv = NULL;
+    if(drv->ready_cb) {
+        if(drv->ready_cb(drv) == false) {
             return LV_FS_RES_HW_ERR;
         }
     }
 
-    if(rddir_p->drv->dir_open_cb == NULL) {
-        rddir_p->drv = NULL;
+    if(drv->dir_open_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
     const char * real_path = lv_fs_get_real_path(path);
+    void *dir_d = drv->dir_open_cb(drv, real_path);
 
-    if(rddir_p->drv->rddir_size == 0) {  /*Is dir_d zero size?*/
-        /*Pass dir_d's address to dir_open_cb, so the implementor can allocate memory byself*/
-        return rddir_p->drv->dir_open_cb(rddir_p->drv, &rddir_p->dir_d, real_path);
+    if(dir_d == NULL || dir_d == (void*)(-1)) {
+        return LV_FS_RES_UNKNOWN;
     }
 
-    rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
-    LV_ASSERT_MALLOC(rddir_p->dir_d);
-    if(rddir_p->dir_d == NULL) {
-        rddir_p->drv = NULL;
-        return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
-    }
+    rddir_p->drv = drv;
+    rddir_p->dir_d = dir_d;
 
-    lv_fs_res_t res = rddir_p->drv->dir_open_cb(rddir_p->drv, rddir_p->dir_d, real_path);
-
-    if(res != LV_FS_RES_OK) {
-        lv_mem_free(rddir_p->dir_d);
-        rddir_p->dir_d = NULL;
-        rddir_p->drv   = NULL;
-    }
-
-    return res;
+    return LV_FS_RES_OK;
 }
 
 lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
@@ -271,7 +247,6 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
 
     lv_fs_res_t res = rddir_p->drv->dir_close_cb(rddir_p->drv, rddir_p->dir_d);
 
-    lv_mem_free(rddir_p->dir_d); /*Clean up*/
     rddir_p->dir_d = NULL;
     rddir_p->drv   = NULL;
 

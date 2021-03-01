@@ -85,30 +85,27 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
  */
 lv_font_t * lv_font_load(const char * font_name)
 {
-    bool success = false;
+    lv_fs_file_t file;
+    lv_fs_res_t res = lv_fs_open(&file, font_name, LV_FS_MODE_RD);
+    if(res != LV_FS_RES_OK)
+        return NULL;
 
     lv_font_t * font = lv_mem_alloc(sizeof(lv_font_t));
-    memset(font, 0, sizeof(lv_font_t));
-
-    lv_fs_file_t * file;
-    file = lv_fs_open(font_name, LV_FS_MODE_RD);
-
-    if(file) {
-        success = lvgl_load_font(file, font);
+    if(font) {
+        memset(font, 0, sizeof(lv_font_t));
+        if(!lvgl_load_font(&file, font)) {
+            LV_LOG_WARN("Error loading font file: %s\n", font_name);
+            /*
+            * When `lvgl_load_font` fails it can leak some pointers.
+            * All non-null pointers can be assumed as allocated and
+            * `lv_font_free` should free them correctly.
+            */
+            lv_font_free(font);
+            font = NULL;
+        }
     }
 
-    if(!success) {
-        LV_LOG_WARN("Error loading font file: %s\n", font_name);
-        /*
-         * When `lvgl_load_font` fails it can leak some pointers.
-         * All non-null pointers can be assumed as allocated and
-         * `lv_font_free` should free them correctly.
-         */
-        lv_font_free(font);
-        font = NULL;
-    }
-
-    lv_fs_close(file);
+    lv_fs_close(&file);
 
     return font;
 }
