@@ -264,7 +264,15 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     MEM_TRACE("reallocating 0x%p with %d size", data_p, new_size);
     void * new_p = NULL;
 #if LV_MEM_CUSTOM
-    new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
+    if(new_size == 0) {
+        MEM_TRACE("using zero_mem");
+        LV_MEM_CUSTOM_FREE(data_p);
+        return &zero_mem;
+    }
+
+    if(data_p == &zero_mem) new_p = LV_MEM_CUSTOM_ALLOC(new_size);
+    else  new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
+
     if(new_p == NULL) {
         LV_LOG_ERROR("couldn't allocate memory");
         return NULL;
@@ -372,13 +380,12 @@ void lv_mem_defrag(void)
 
 lv_res_t lv_mem_test(void)
 {
-#if LV_MEM_CUSTOM == 0
-
     if(zero_mem != ZERO_MEM_SENTINEL) {
         LV_LOG_WARN("zero_mem is written");
         return LV_RES_INV;
     }
 
+#if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
