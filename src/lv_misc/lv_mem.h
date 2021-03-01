@@ -84,7 +84,7 @@ void * lv_mem_alloc(size_t size);
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
-void lv_mem_free(const void * data);
+void lv_mem_free(void * data);
 
 /**
  * Reallocate a memory with a new size. The old content will be kept.
