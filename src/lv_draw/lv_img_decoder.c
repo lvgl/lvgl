@@ -85,8 +85,8 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
+    _LV_LL_READ(&LV_GC_ROOT(_lv_img_defoder_ll), d) {
     _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
-        res = LV_RES_INV;
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
             if(res == LV_RES_OK) break;
@@ -424,7 +424,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     /*Alpha indexed images. */
     else if(cf == LV_IMG_CF_ALPHA_1BIT || cf == LV_IMG_CF_ALPHA_2BIT || cf == LV_IMG_CF_ALPHA_4BIT ||
             cf == LV_IMG_CF_ALPHA_8BIT) {
-        dsc->img_data = NULL;
         return LV_RES_OK; /*Nothing to process*/
     }
     /*Unknown format. Can't decode it.*/
@@ -591,6 +590,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     uint8_t * fs_buf = lv_mem_buf_get(w);
+    if (fs_buf == NULL) return LV_RES_INV;
 
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
@@ -659,6 +659,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
     uint8_t * fs_buf = lv_mem_buf_get(w);
+    if (fs_buf == NULL) return LV_RES_INV;
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;
