@@ -367,14 +367,63 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  ifdef CONFIG_LV_LOG_TRACE_MEM
 #    define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
 #  else
-#    define  LV_LOG_TRACE_MEM    0
+#    define  LV_LOG_TRACE_MEM            1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_TIMER
 #  ifdef CONFIG_LV_LOG_TRACE_TIMER
 #    define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
 #  else
-#    define  LV_LOG_TRACE_TIMER  0
+#    define  LV_LOG_TRACE_TIMER          1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_INDEV
+#  ifdef CONFIG_LV_LOG_TRACE_INDEV
+#    define LV_LOG_TRACE_INDEV CONFIG_LV_LOG_TRACE_INDEV
+#  else
+#    define  LV_LOG_TRACE_INDEV          1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_DISP_REFR
+#  ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
+#    define LV_LOG_TRACE_DISP_REFR CONFIG_LV_LOG_TRACE_DISP_REFR
+#  else
+#    define  LV_LOG_TRACE_DISP_REFR      1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_EVENT
+#  ifdef CONFIG_LV_LOG_TRACE_EVENT
+#    define LV_LOG_TRACE_EVENT CONFIG_LV_LOG_TRACE_EVENT
+#  else
+#    define  LV_LOG_TRACE_EVENT          1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_SIGNAL
+#  ifdef CONFIG_LV_LOG_TRACE_SIGNAL
+#    define LV_LOG_TRACE_SIGNAL CONFIG_LV_LOG_TRACE_SIGNAL
+#  else
+#    define  LV_LOG_TRACE_SIGNAL         1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_OBJ_CREATE
+#  ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#    define LV_LOG_TRACE_OBJ_CREATE CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#  else
+#    define  LV_LOG_TRACE_OBJ_CREATE     1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_LAYOUT
+#  ifdef CONFIG_LV_LOG_TRACE_LAYOUT
+#    define LV_LOG_TRACE_LAYOUT CONFIG_LV_LOG_TRACE_LAYOUT
+#  else
+#    define  LV_LOG_TRACE_LAYOUT         1
+#  endif
+#endif
+#ifndef LV_LOG_TRACE_ANIM
+#  ifdef CONFIG_LV_LOG_TRACE_ANIM
+#    define LV_LOG_TRACE_ANIM CONFIG_LV_LOG_TRACE_ANIM
+#  else
+#    define  LV_LOG_TRACE_ANIM           1
 #  endif
 #endif
 
