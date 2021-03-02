@@ -4,6 +4,7 @@
 
 ### New features
 - Add better screen orientation management with software rotation support
+- Decide text animation's direction based on base_dir (when using LV_USE_BIDI)
 
 ### Bugfixes
 - fix(gauge) fix needle invalidation

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_label.c
  *
  */
@@ -1034,7 +1034,26 @@ void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
+#if LV_USE_BIDI
+            lv_anim_value_t start, end;
+            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+
+            if (base_dir == LV_BIDI_DIR_AUTO)
+                base_dir = _lv_bidi_detect_base_dir(ext->text);
+
+            if (base_dir == LV_BIDI_DIR_RTL) {
+                start = lv_area_get_width(&txt_coords) - size.x;
+                end = 0;
+            }
+            else {
+                start = 0;
+                end = lv_area_get_width(&txt_coords) - size.x;
+            }
+
+            lv_anim_set_values(&a, start, end);
+#else
             lv_anim_set_values(&a, 0, lv_area_get_width(&txt_coords) - size.x);
+#endif
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
             lv_anim_set_time(&a, lv_anim_speed_to_time(ext->anim_speed, a.start, a.end));
             lv_anim_set_playback_time(&a, a.time);
@@ -1113,7 +1132,27 @@ void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
+#if LV_USE_BIDI
+            lv_anim_value_t start, end;
+            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+
+            if (base_dir == LV_BIDI_DIR_AUTO)
+                base_dir = _lv_bidi_detect_base_dir(ext->text);
+
+            if (base_dir == LV_BIDI_DIR_RTL) {
+                start = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+                end = 0;
+            }
+            else {
+                start = 0;
+                end = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            }
+
+            lv_anim_set_values(&a, start, end);
+#else
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
+#endif
+
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
             lv_anim_set_time(&a, lv_anim_speed_to_time(ext->anim_speed, a.start, a.end));
 
