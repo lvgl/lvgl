@@ -155,7 +155,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 /**
  * Set the align of the label (left or center)
  * @param label pointer to a label object
- * @param align 'LV_LABEL_ALIGN_LEFT' or 'LV_LABEL_ALIGN_LEFT'
+ * @param align LV_LABEL_ALIGN_LEFT/RIGHT/CENTER
  */
 void lv_label_set_align(lv_obj_t * label, lv_label_align_t align);
 
@@ -207,7 +207,7 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
 /**
  * Get the align attribute
  * @param label pointer to a label object
- * @return LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER
+ * @return LV_LABEL_ALIGN_LEFT/RIGHT/CENTER
  */
 lv_label_align_t lv_label_get_align(const lv_obj_t * label);
 
