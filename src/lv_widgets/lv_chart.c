@@ -718,6 +718,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
         hook_dsc.part = LV_PART_ITEMS;
         hook_dsc.line_dsc = &line_dsc_default;
         hook_dsc.rect_dsc = &point_dsc_default;
+        hook_dsc.sub_part_ptr = ser;
 
         for(i = 0; i < chart->point_cnt; i++) {
             p1.x = p2.x;
