@@ -304,6 +304,7 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
 
     lv_draw_arc_dsc_t arc_dsc;
     lv_draw_arc_dsc_init(&arc_dsc);
+    arc_dsc.rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_ITEMS);
 
     lv_coord_t r_out = lv_area_get_width(scale_area) / 2 ;
     lv_point_t scale_center;
@@ -311,10 +312,10 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
     scale_center.y = scale_area->y1 + r_out;
 
     lv_meter_scale_t * scale;
-    _LV_LL_READ(&meter->scale_ll, scale) {
+    _LV_LL_READ_BACK(&meter->scale_ll, scale) {
         lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
         lv_meter_indicator_t * indic;
-        _LV_LL_READ(&scale->indicator_ll, indic) {
+        _LV_LL_READ_BACK(&scale->indicator_ll, indic) {
             if(indic->type != LV_METER_INDICATOR_TYPE_ARC) continue;
 
             arc_dsc.color = indic->type_data.arc.color;
@@ -541,7 +542,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
 
     lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
 
-    _LV_LL_READ(&meter->scale_ll, scale) {
+    _LV_LL_READ_BACK(&meter->scale_ll, scale) {
         lv_meter_indicator_t * indic;
         _LV_LL_READ_BACK(&scale->indicator_ll, indic) {
             if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_LINE) {
@@ -557,6 +558,8 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
 
             }
             else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
+                if(indic->type_data.needle_img.src == NULL) continue;
+
                 int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
                 lv_img_header_t info;
                 lv_img_decoder_get_info(indic->type_data.needle_img.src, &info);
