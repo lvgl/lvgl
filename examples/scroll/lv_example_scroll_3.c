@@ -14,9 +14,6 @@ static void float_btn_event_cb(lv_obj_t * float_btn, lv_event_t e)
 
         lv_obj_move_foreground(float_btn);
 
-        /* Layouts are only recalculated later but we need to know the updated position of the new button
-         * to scroll to it. */
-        lv_obj_update_layout(list);
         lv_obj_scroll_to_view(list_btn, LV_ANIM_ON);
     }
 }

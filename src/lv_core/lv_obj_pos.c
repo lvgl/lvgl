@@ -188,8 +188,9 @@ void lv_obj_update_layout(lv_obj_t * obj)
     }while(scr->layout_inv);  /*Repeat until there where layout invalidations*/
 
     /* Restore the global state because other calls of this function needs this info too.
-     * Other calls might use different start object, but they need to know if there is dirty layout somewhere.*/
-    scr->layout_inv = 1;
+     * Other calls might use different start object, but they need to know if there is dirty layout somewhere.
+     * However if the screen was updated it's sure that all layouts are ready. */
+    if(obj != scr) scr->layout_inv = 1;
 
 }
 

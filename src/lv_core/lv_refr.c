@@ -203,15 +203,10 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     uint32_t i;
     for(i = 0; i < disp_refr->screen_cnt; i++) {
         lv_obj_update_layout(disp_refr->screens[i]);
-        disp_refr->screens[i]->layout_inv = 0;
     }
 
     lv_obj_update_layout(disp_refr->top_layer);
-    disp_refr->top_layer->layout_inv = 0;
-
     lv_obj_update_layout(disp_refr->sys_layer);
-    disp_refr->sys_layer->layout_inv = 0;
-
 
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
