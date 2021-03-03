@@ -24,7 +24,7 @@ extern "C" {
  **********************/
 struct _lv_obj_t;
 
-typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t * cont, struct _lv_obj_t * item);
+typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t * cont);
 
 /**
  * The base of all layouts descriptor.
@@ -127,13 +127,16 @@ void lv_obj_set_layout(struct _lv_obj_t * obj, const void * layout);
 bool lv_obj_is_layout_positioned(const struct _lv_obj_t * obj);
 
 /**
+ * Mark the object for layout update.
+ * @param obj      pointer to an object whose children needs to be updated
+ */
+void lv_obj_mark_layout_as_dirty(struct _lv_obj_t * obj);
+
+/**
  * Update the layout of an object.
  * @param obj      pointer to an object whose children needs to be updated
- * @param item      pointer to a child object that triggered the update. Set to `NULL` is not known.
- *                  If not `NULL` the update process can make some optimization
- *                  to update only the required parts of the layout
  */
-void lv_obj_update_layout(struct _lv_obj_t * obj, struct _lv_obj_t * item);
+void lv_obj_update_layout(struct _lv_obj_t * obj);
 
 
 /**

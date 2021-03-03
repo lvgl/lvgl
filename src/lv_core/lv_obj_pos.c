@@ -24,6 +24,7 @@
  **********************/
 static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 static void calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out);
+static void layout_update_core(lv_obj_t * obj);
 
 void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify);
 
@@ -148,7 +149,7 @@ void lv_obj_set_layout(lv_obj_t * obj, const void * layout)
     lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->layout_dsc = layout;
 
-    lv_obj_update_layout(obj, NULL);
+    lv_obj_mark_layout_as_dirty(obj);
 }
 
 bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
@@ -161,15 +162,35 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
     else return false;
 }
 
-void lv_obj_update_layout(lv_obj_t * obj, lv_obj_t * item)
+void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
-    if(obj->spec_attr == NULL) return;
-    if(obj->spec_attr->layout_dsc == NULL) return;
-    if(obj->spec_attr->child_cnt == 0) return;
+    obj->layout_inv = 1;
 
-    const lv_layout_dsc_t * layout = obj->spec_attr->layout_dsc;
-    if(layout->update_cb == NULL) return;
-    layout->update_cb(obj, item);
+    /*Mark the screen as dirty too to mark that there is an something to do on this screen*/
+    lv_obj_t * scr = lv_obj_get_screen(obj);
+    scr->layout_inv = 1;
+
+    /*Make the display refreshing*/
+    lv_disp_t * disp = lv_obj_get_disp(scr);
+    lv_timer_pause(disp->refr_timer, false);
+}
+
+void lv_obj_update_layout(lv_obj_t * obj)
+{
+    lv_obj_t * scr = lv_obj_get_screen(obj);
+
+    /*There are no dirty layouts on this screen*/
+    if(scr->layout_inv == 0) return;
+
+    do {
+        scr->layout_inv = 0;
+        layout_update_core(obj);
+    }while(scr->layout_inv);  /*Repeat until there where layout invalidations*/
+
+    /* Restore the global state because other calls of this function needs this info too.
+     * Other calls might use different start object, but they need to know if there is dirty layout somewhere.*/
+    scr->layout_inv = 1;
+
 }
 
 void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
@@ -694,5 +715,23 @@ static void calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_ou
         lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
         lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
         *h_out = lv_obj_get_height(obj) + scroll_bottom + scroll_top;
+    }
+}
+
+static void layout_update_core(lv_obj_t * obj)
+{
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        layout_update_core(child);
+    }
+
+    if(!obj->layout_inv) return;
+
+    const lv_layout_dsc_t * layout = obj->spec_attr ? obj->spec_attr->layout_dsc : NULL;
+    const lv_layout_update_cb_t update_cp = layout ? layout->update_cb : NULL;
+    if(update_cp != NULL && lv_obj_get_child_cnt(obj) > 0) {
+        obj->layout_inv = 0;
+        update_cp(obj);
     }
 }

@@ -43,9 +43,8 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_pare
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void grid_update(lv_obj_t * cont, lv_obj_t * item);
+static void grid_update(lv_obj_t * cont);
 static void full_refresh(lv_obj_t * cont);
-static void item_refr(lv_obj_t * item);
 static void calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
 static void calc_free(_lv_grid_calc_t * calc);
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c);
@@ -109,7 +108,7 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t hor_place, uint8_t col
     obj->x_set = LV_COORD_SET_LAYOUT(col_pos | (col_span << CELL_SHIFT) | (hor_place << (CELL_SHIFT * 2)));
     obj->y_set = LV_COORD_SET_LAYOUT(row_pos | (row_span << CELL_SHIFT) | (ver_place << (CELL_SHIFT * 2)));
 
-    lv_obj_update_layout(parent, obj);
+    lv_obj_mark_layout_as_dirty(parent);
 
 }
 
@@ -118,15 +117,14 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t hor_place, uint8_t col
  *   STATIC FUNCTIONS
  **********************/
 
-static void grid_update(lv_obj_t * cont, lv_obj_t * item)
+static void grid_update(lv_obj_t * cont)
 {
     if(cont->spec_attr == NULL) return;
     if(cont->spec_attr->layout_dsc == NULL) return;
 
     LV_LOG_INFO("update 0x%p container, triggered by 0x%p", cont, item);
 
-    if(item) item_refr(item);
-    else full_refresh(cont);
+    full_refresh(cont);
 
     LV_TRACE_LAYOUT("finished");
 }
@@ -161,27 +159,6 @@ static void full_refresh(lv_obj_t * cont)
             item_repos(item, &c, &hint);
         }
     }
-    calc_free(&c);
-
-    if(cont->w_set == LV_SIZE_CONTENT || cont->h_set == LV_SIZE_CONTENT) {
-        lv_obj_set_size(cont, cont->w_set, cont->h_set);
-    }
-}
-
-/**
- * Refresh the position of a grid item
- * @param item pointer to a grid item
- */
-static void item_refr(lv_obj_t * item)
-{
-    /*Calculate the grid*/
-    lv_obj_t * cont = lv_obj_get_parent(item);
-    if(cont == NULL) return;
-    _lv_grid_calc_t c;
-    calc(cont, &c);
-
-    item_repos(item, &c, NULL);
-
     calc_free(&c);
 
     if(cont->w_set == LV_SIZE_CONTENT || cont->h_set == LV_SIZE_CONTENT) {

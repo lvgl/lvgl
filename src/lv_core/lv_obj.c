@@ -336,7 +336,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
-		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
     }
 }
 
@@ -351,12 +351,12 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if(f & LV_OBJ_FLAG_HIDDEN) {
     	lv_obj_invalidate(obj);
     	if(lv_obj_is_layout_positioned(obj)) {
-    		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
+    	    lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
     	}
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
-		lv_obj_update_layout(lv_obj_get_parent(obj), obj);
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
     }
 }
 
@@ -933,7 +933,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                     lv_obj_set_size(child, child->w_set, child->h_set);
                 }
             }
-            lv_obj_update_layout(obj, NULL);
+            lv_obj_mark_layout_as_dirty(obj);
         }
 
 
@@ -966,7 +966,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_CHILD_CHG) {
-        lv_obj_update_layout(obj, param);
+        lv_obj_mark_layout_as_dirty(obj);
 
         if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
@@ -975,7 +975,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
         /* The layout might depend on the base dir.
          * E.g. the first is element is on the left or right*/
-        lv_obj_update_layout(obj, NULL);
+        lv_obj_mark_layout_as_dirty(obj);
     }
     else if(sign == LV_SIGNAL_SCROLL) {
         res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
@@ -993,7 +993,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         /* Padding might have changed so the layout should be recalculated*/
-        lv_obj_update_layout(obj, NULL);
+        lv_obj_mark_layout_as_dirty(obj);
 
         /*Reposition non grid objects on by one*/
         uint32_t i;

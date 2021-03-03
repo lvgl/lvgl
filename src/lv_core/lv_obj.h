@@ -268,6 +268,7 @@ typedef struct _lv_obj_t{
     lv_coord_t h_set;
     lv_obj_flag_t flags;
     lv_state_t state;
+    uint8_t layout_inv:1;
 }lv_obj_t;
 
 

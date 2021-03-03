@@ -199,10 +199,25 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_timer_pause(tmr, true);
 #endif
 
+    /*Refresh the screen's layout if required*/
+    uint32_t i;
+    for(i = 0; i < disp_refr->screen_cnt; i++) {
+        lv_obj_update_layout(disp_refr->screens[i]);
+        disp_refr->screens[i]->layout_inv = 0;
+    }
+
+    lv_obj_update_layout(disp_refr->top_layer);
+    disp_refr->top_layer->layout_inv = 0;
+
+    lv_obj_update_layout(disp_refr->sys_layer);
+    disp_refr->sys_layer->layout_inv = 0;
+
+
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
-        TRACE_REFR("finished (there were no invalid areas to redraw)");
+        LV_LOG_WARN("there is no active screen");
+        TRACE_REFR("finished");
         return;
     }
 
