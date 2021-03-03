@@ -302,7 +302,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
         if(found_p == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) {
             lv_obj_t * hidden_i = obj;
             while(hidden_i != NULL) {
-                if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == true) break;
+                if(lv_obj_has_flag(hidden_i, LV_OBJ_FLAG_HIDDEN) == true) break;
                 hidden_i = lv_obj_get_parent(hidden_i);
             }
             /*No parent found with hidden == true*/
