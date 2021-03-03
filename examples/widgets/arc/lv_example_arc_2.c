@@ -3,7 +3,7 @@
 #if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
- * An `lv_task` to call periodically to set the angles of the arc
+ * An `lv_timer` to call periodically to set the angles of the arc
  * @param t
  */
 static void arc_loader(lv_timer_t * t)
@@ -31,7 +31,7 @@ void lv_example_arc_2(void)
   lv_arc_set_angles(arc, 270, 270);
   lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
-  /* Create an `lv_task` to update the arc.
+  /* Create an `lv_timer` to update the arc.
    * Store the `arc` in the user data*/
   lv_timer_create(arc_loader, 20, arc);
 }

@@ -33,7 +33,7 @@ extern "C" {
  * Called periodically to read the input devices
  * @param param pointer to and input device to read
  */
-void lv_indev_read_task_cb(lv_timer_t * task);
+void lv_indev_read_timer_cb(lv_timer_t * timer);
 
 /**
  * Enable or disable an input devices
@@ -150,12 +150,12 @@ void lv_indev_wait_release(lv_indev_t * indev);
 lv_obj_t * lv_indev_get_obj_act(void);
 
 /**
- * Get a pointer to the indev read task to
- * modify its parameters with `lv_task_...` functions.
+ * Get a pointer to the indev read timer to
+ * modify its parameters with `lv_timer_...` functions.
  * @param indev pointer to an input device
- * @return pointer to the indev read refresher task. (NULL on error)
+ * @return pointer to the indev read refresher timer. (NULL on error)
  */
-lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev);
+lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev);
 
 /**
  * Search the most top, clickable object by a point

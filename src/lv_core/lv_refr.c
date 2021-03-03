@@ -80,8 +80,8 @@ void _lv_refr_init(void)
 
 /**
  * Redraw the invalidated areas now.
- * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process
- * can prevent the call of `lv_task_handler`. In this case if the GUI is updated in the process
+ * Normally the redrawing is periodically executed in `lv_timer_handler` but a long blocking process
+ * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process
  * (e.g. progress bar) this function can be called when the screen should be updated.
  * @param disp pointer to display to refresh. NULL to refresh all displays.
  */
@@ -90,13 +90,13 @@ void lv_refr_now(lv_disp_t * disp)
     lv_anim_refr_now();
 
     if(disp) {
-        _lv_disp_refr_task(disp->refr_timer);
+        _lv_disp_refr_timer(disp->refr_timer);
     }
     else {
         lv_disp_t * d;
         d = lv_disp_get_next(NULL);
         while(d) {
-            _lv_disp_refr_task(d->refr_timer);
+            _lv_disp_refr_timer(d->refr_timer);
             d = lv_disp_get_next(d);
         }
     }
@@ -181,9 +181,9 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
 
 /**
  * Called periodically to handle the refreshing
- * @param task pointer to the task itself
+ * @param tmr pointer to the timer itself
  */
-void _lv_disp_refr_task(lv_timer_t * tmr)
+void _lv_disp_refr_timer(lv_timer_t * tmr)
 {
     TRACE_REFR("begin");
 
@@ -193,7 +193,7 @@ void _lv_disp_refr_task(lv_timer_t * tmr)
     disp_refr = tmr->user_data;
 
 #if LV_USE_PERF_MONITOR == 0
-    /* Ensure the task does not run again automatically.
+    /* Ensure the timer does not run again automatically.
      * This is done before refreshing in case refreshing invalidates something else.
      */
     lv_timer_pause(tmr, true);

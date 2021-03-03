@@ -149,7 +149,7 @@ typedef struct _lv_disp_t {
     /**< Driver to the display*/
     lv_disp_drv_t driver;
 
-    /**< A task which periodically checks the dirty areas and refreshes them*/
+    /**< A timer which periodically checks the dirty areas and refreshes them*/
     lv_timer_t * refr_timer;
 
     /**< The theme assigned to the screen*/

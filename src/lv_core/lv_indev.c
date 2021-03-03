@@ -61,13 +61,13 @@ static lv_obj_t * indev_obj_act = NULL;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_indev_read_task_cb(lv_timer_t * task)
+void lv_indev_read_timer_cb(lv_timer_t * timer)
 {
     INDEV_TRACE("begin");
 
     lv_indev_data_t data;
 
-    indev_act = task->user_data;
+    indev_act = timer->user_data;
 
     /*Read and process all indevs*/
     if(indev_act->driver.disp == NULL) return; /*Not assigned to any displays*/
@@ -272,10 +272,10 @@ lv_obj_t * lv_indev_get_obj_act(void)
     return indev_obj_act;
 }
 
-lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev)
+lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev)
 {
     if(!indev) {
-        LV_LOG_WARN("lv_indev_get_read_task: indev was NULL");
+        LV_LOG_WARN("lv_indev_get_read_timer: indev was NULL");
         return NULL;
     }
 

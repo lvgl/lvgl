@@ -30,14 +30,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_task(lv_timer_t * param);
+static void anim_timer(lv_timer_t * param);
 static void anim_mark_list_change(void);
 static void anim_ready_handler(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t last_task_run;
+static uint32_t last_timer_run;
 static bool anim_list_changed;
 static bool anim_run_round;
 static lv_timer_t * _lv_anim_tmr;
@@ -63,8 +63,8 @@ const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    _lv_anim_tmr = lv_timer_create(anim_task, LV_DISP_DEF_REFR_PERIOD, NULL);
-    anim_mark_list_change(); /*Turn off the animation task*/
+    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DISP_DEF_REFR_PERIOD, NULL);
+    anim_mark_list_change(); /*Turn off the animation timer*/
     anim_list_changed = false;
 }
 
@@ -97,9 +97,9 @@ void lv_anim_start(lv_anim_t * a)
 
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
-    /*If the list is empty the anim task was suspended and it's last run measure is invalid*/
+    /*If the list is empty the anim timer was suspended and it's last run measure is invalid*/
     if(_lv_ll_is_empty(&LV_GC_ROOT(_lv_anim_ll))) {
-        last_task_run = lv_tick_get();
+        last_timer_run = lv_tick_get();
     }
 
     /*Add the new animation to the animation linked list*/
@@ -124,7 +124,7 @@ void lv_anim_start(lv_anim_t * a)
     }
 
     /* Creating an animation changed the linked list.
-     * It's important if it happens in a ready callback. (see `anim_task`)*/
+     * It's important if it happens in a ready callback. (see `anim_timer`)*/
     anim_mark_list_change();
 
     TRACE_ANIM("finished");
@@ -171,7 +171,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
         if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
             lv_mem_free(a);
-            anim_mark_list_change(); /*Read by `anim_task`. It need to know if a delete occurred in
+            anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
                                          the linked list*/
             del = true;
         }
@@ -236,12 +236,12 @@ uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
 /**
  * Manually refresh the state of the animations.
  * Useful to make the animations running in a blocking process where
- * `lv_task_handler` can't run for a while.
+ * `lv_timer_handler` can't run for a while.
  * Shouldn't be used directly because it is called in `lv_refr_now()`.
  */
 void lv_anim_refr_now(void)
 {
-    anim_task(NULL);
+    anim_timer(NULL);
 }
 
 /**
@@ -434,11 +434,11 @@ int32_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t * a)
  * Periodically handle the animations.
  * @param param unused
  */
-static void anim_task(lv_timer_t * param)
+static void anim_timer(lv_timer_t * param)
 {
     (void)param;
 
-    uint32_t elaps = lv_tick_elaps(last_task_run);
+    uint32_t elaps = lv_tick_elaps(last_timer_run);
 
     /*Flip the run round*/
     anim_run_round = anim_run_round ? false : true;
@@ -494,7 +494,7 @@ static void anim_task(lv_timer_t * param)
             a = _lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
     }
 
-    last_task_run = lv_tick_get();
+    last_timer_run = lv_tick_get();
 }
 
 /**

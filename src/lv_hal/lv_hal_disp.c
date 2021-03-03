@@ -122,8 +122,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_disp_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
-    /*Create a refresh task*/
-    disp->refr_timer = lv_timer_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, disp);
+    /*Create a refresh timer*/
+    disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DISP_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) return NULL;
 

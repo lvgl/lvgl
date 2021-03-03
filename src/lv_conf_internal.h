@@ -343,6 +343,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * LV_LOG_LEVEL_INFO        Log important events
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
+ * LV_LOG_LEVEL_USER        Only logs added by the user
  * LV_LOG_LEVEL_NONE        Do not log anything */
 #ifndef LV_LOG_LEVEL
 #  ifdef CONFIG_LV_LOG_LEVEL
@@ -601,12 +602,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-/* Define a custom attribute to `lv_task_handler` function */
-#ifndef LV_ATTRIBUTE_TASK_HANDLER
-#  ifdef CONFIG_LV_ATTRIBUTE_TASK_HANDLER
-#    define LV_ATTRIBUTE_TASK_HANDLER CONFIG_LV_ATTRIBUTE_TASK_HANDLER
+/* Define a custom attribute to `lv_timer_handler` function */
+#ifndef LV_ATTRIBUTE_TIMER_HANDLER
+#  ifdef CONFIG_LV_ATTRIBUTE_TIMER_HANDLER
+#    define LV_ATTRIBUTE_TIMER_HANDLER CONFIG_LV_ATTRIBUTE_TIMER_HANDLER
 #  else
-#    define  LV_ATTRIBUTE_TASK_HANDLER
+#    define  LV_ATTRIBUTE_TIMER_HANDLER
 #  endif
 #endif
 
