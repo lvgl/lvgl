@@ -26,7 +26,7 @@
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-void lv_indev_read_task_cb(lv_timer_t * task);
+void lv_indev_read_timer_cb(lv_timer_t * timer);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -93,12 +93,11 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     lv_memset_00(indev, sizeof(lv_indev_t));
     lv_memcpy(&indev->driver, driver, sizeof(lv_indev_drv_t));
 
-    indev->proc.reset_query = 1;
-    indev->cursor           = NULL;
-    indev->group            = NULL;
-    indev->btn_points       = NULL;
-
-    indev->driver.read_task = lv_timer_create(lv_indev_read_task_cb, LV_INDEV_DEF_READ_PERIOD, indev);
+    indev->proc.reset_query  = 1;
+    indev->cursor            = NULL;
+    indev->group             = NULL;
+    indev->btn_points        = NULL;
+    indev->driver.read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
 
     return indev;
 }

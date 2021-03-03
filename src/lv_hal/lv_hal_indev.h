@@ -120,7 +120,7 @@ typedef struct _lv_indev_drv_t {
     struct _lv_disp_t * disp;
 
     /**< Task to read the periodically read the input device*/
-    lv_timer_t * read_task;
+    lv_timer_t * read_timer;
 
     /**< Number of pixels to slide before actually drag the object*/
     uint8_t scroll_limit;

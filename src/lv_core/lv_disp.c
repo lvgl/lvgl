@@ -370,16 +370,16 @@ void lv_disp_clean_dcache(lv_disp_t * disp)
 }
 
 /**
- * Get a pointer to the screen refresher task to
- * modify its parameters with `lv_task_...` functions.
+ * Get a pointer to the screen refresher timer to
+ * modify its parameters with `lv_timer_...` functions.
  * @param disp pointer to a display
- * @return pointer to the display refresher task. (NULL on error)
+ * @return pointer to the display refresher timer. (NULL on error)
  */
-lv_timer_t * _lv_disp_get_refr_task(lv_disp_t * disp)
+lv_timer_t * _lv_disp_get_refr_timer(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
-        LV_LOG_WARN("lv_disp_get_refr_task: no display registered");
+        LV_LOG_WARN("lv_disp_get_refr_timer: no display registered");
         return NULL;
     }
 

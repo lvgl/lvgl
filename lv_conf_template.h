@@ -225,8 +225,8 @@ typedef void * lv_user_data_t;
 /* Define a custom attribute to `lv_tick_inc` function */
 #define LV_ATTRIBUTE_TICK_INC
 
-/* Define a custom attribute to `lv_task_handler` function */
-#define LV_ATTRIBUTE_TASK_HANDLER
+/* Define a custom attribute to `lv_timer_handler` function */
+#define LV_ATTRIBUTE_TIMER_HANDLER
 
 /* Define a custom attribute to `lv_disp_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
