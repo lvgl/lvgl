@@ -257,8 +257,7 @@ typedef struct {
 
     uint16_t prop1;
     uint8_t has_group;
-    uint8_t prop_cnt  :7;
-    uint8_t allocated :1;
+    uint8_t prop_cnt;
 } lv_style_t;
 
 /**********************
@@ -340,7 +339,7 @@ static inline bool lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t
 {
     if(style->prop_cnt == 0) return false;
 
-    if(style->allocated) {
+    if(style->prop_cnt > 1) {
         uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *)tmp;
         uint32_t i;
@@ -351,11 +350,9 @@ static inline bool lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t
                 return true;
             }
         }
-    } else {
-        if(style->prop1 == prop) {
-            *value = style->v_p.value1;
-            return true;
-        }
+    } else if(style->prop1 == prop) {
+        *value = style->v_p.value1;
+        return true;
     }
     return false;
 }

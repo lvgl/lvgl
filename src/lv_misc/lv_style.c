@@ -40,7 +40,7 @@
 void lv_style_init(lv_style_t * style)
 {
 #if LV_USE_ASSERT_STYLE
-    if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->allocated && style->v_p.values_and_props != NULL) {
+    if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->prop_cnt > 1) {
         LV_LOG_WARN("Style might be already inited. (Potential memory leak)")
     }
 #endif
@@ -55,7 +55,7 @@ void lv_style_reset(lv_style_t * style)
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->allocated) lv_mem_free(style->v_p.values_and_props);
+    if(style->prop_cnt > 1) lv_mem_free(style->v_p.values_and_props);
     lv_memset_00(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
@@ -74,7 +74,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
     LV_ASSERT_STYLE(style);
 
-    if(!style->allocated) {
+    if(style->prop_cnt <= 1) {
         if(style->prop1 == prop) {
             style->prop1 = LV_STYLE_PROP_INV;
             style->prop_cnt = 0;
@@ -84,33 +84,38 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
     }
 
     uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
-    uint16_t * props = (uint16_t *)tmp;
+    uint16_t * old_props = (uint16_t *)tmp;
     uint32_t i;
     for(i = 0; i < style->prop_cnt; i++) {
-        if(props[i] == prop) {
-            lv_style_value_t * values = (lv_style_value_t *)style->v_p.values_and_props;
+        if(old_props[i] == prop) {
+            lv_style_value_t * old_values = (lv_style_value_t *)style->v_p.values_and_props;
             style->prop_cnt--;
-            size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-            uint8_t * new_values_and_props = lv_mem_alloc(size);
-            if(new_values_and_props == NULL) return false;
 
-            tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
-            uint16_t * new_props = (uint16_t *)tmp;
-            lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
+            uint16_t * new_props = &style->prop1;
+            lv_style_value_t * new_values = &style->v_p.value1;
+
+            if(style->prop_cnt > 1) {
+                size_t size = style->prop_cnt * (sizeof(lv_style_value_t) + sizeof(uint16_t));
+                uint8_t * new_values_and_props = lv_mem_alloc(size);
+                if(new_values_and_props == NULL) return false;
+
+                tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
+                new_props = (uint16_t *)tmp;
+                new_values = (lv_style_value_t *)new_values_and_props;
+            }
 
             uint32_t j;
-            for(j = 0; j <= style->prop_cnt; j++) { /* <=: because prop_cnt already reduced but all the old props. needs to be checked. */
-                if(props[j] != prop) {
-                    *new_values = values[j];
-                    *new_props = props[j];
-
-                    new_values++;
-                    new_props++;
+            for(i = j = 0; j <= style->prop_cnt; j++) { /* <=: because prop_cnt already reduced but all the old props. needs to be checked. */
+                if(old_props[j] != prop) {
+                    new_values[i] = old_values[j];
+                    new_props[i++] = old_props[j];
                 }
             }
 
-            lv_mem_free(style->v_p.values_and_props);
-            style->v_p.values_and_props = new_values_and_props;
+            lv_mem_free(old_values);
+            if(style->prop_cnt > 1)
+                style->v_p.values_and_props = (uint8_t *)new_values;
+
             return true;
         }
     }
@@ -122,7 +127,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->allocated) {
+    if(style->prop_cnt > 1) {
         uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
         uint16_t * props = (uint16_t *)tmp;
         int32_t i;
@@ -173,8 +178,6 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         values[1] = value;
 
         style->v_p.values_and_props = values_and_props;
-
-        style->allocated = 1;
     } else if (style->prop_cnt == 0) {
         style->prop_cnt++;
         style->prop1 = prop;
