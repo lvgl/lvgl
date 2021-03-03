@@ -138,7 +138,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
         LV_ASSERT_OBJ(ta, &lv_textarea_class);
     }
 
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
     /*Hide the cursor of the old Text area if cursor management is enabled*/
     if(keyboard->ta) {
@@ -160,7 +160,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
  */
 void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
 {
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     if(keyboard->mode == mode) return;
 
     keyboard->mode = mode;
@@ -193,7 +193,7 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * m
  */
 lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
 {
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->ta;
 }
 
@@ -204,7 +204,7 @@ lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
  */
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
 {
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->mode;
 }
 
@@ -223,7 +223,7 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
 {
     if(event != LV_EVENT_VALUE_CHANGED) return;
 
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     uint16_t btn_id   = lv_btnmatrix_get_selected_btn(obj);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
     if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_HIDDEN | LV_BTNMATRIX_CTRL_DISABLED)) return;
@@ -325,7 +325,7 @@ static void lv_keyboard_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     keyboard->ta         = NULL;
     keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
 
@@ -345,7 +345,7 @@ static void lv_keyboard_constructor(lv_obj_t * obj, const lv_obj_t * copy)
  */
 static void lv_keyboard_update_map(lv_obj_t * obj)
 {
-    lv_keyboard_t * keyboard = (lv_keyboard_t *) obj;
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     lv_btnmatrix_set_map(obj, kb_map[keyboard->mode]);
     lv_btnmatrix_set_ctrl_map(obj, kb_ctrl[keyboard->mode]);
 }

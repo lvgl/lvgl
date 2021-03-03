@@ -117,60 +117,60 @@ lv_font_t * lv_font_load(const char * font_name)
 void lv_font_free(lv_font_t * font)
 {
     if(NULL != font) {
-        lv_font_fmt_txt_dsc_t * dsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
+        lv_font_fmt_txt_dsc_t * dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
 
         if(NULL != dsc) {
 
             if(dsc->kern_classes == 0) {
                 lv_font_fmt_txt_kern_pair_t * kern_dsc =
-                    (lv_font_fmt_txt_kern_pair_t *) dsc->kern_dsc;
+                    (lv_font_fmt_txt_kern_pair_t *)dsc->kern_dsc;
 
                 if(NULL != kern_dsc) {
                     if(kern_dsc->glyph_ids)
-                        lv_mem_free((void *) kern_dsc->glyph_ids);
+                        lv_mem_free((void *)kern_dsc->glyph_ids);
 
                     if(kern_dsc->values)
-                        lv_mem_free((void *) kern_dsc->values);
+                        lv_mem_free((void *)kern_dsc->values);
 
-                    lv_mem_free((void *) kern_dsc);
+                    lv_mem_free((void *)kern_dsc);
                 }
             }
             else {
                 lv_font_fmt_txt_kern_classes_t * kern_dsc =
-                    (lv_font_fmt_txt_kern_classes_t *) dsc->kern_dsc;
+                    (lv_font_fmt_txt_kern_classes_t *)dsc->kern_dsc;
 
                 if(NULL != kern_dsc) {
                     if(kern_dsc->class_pair_values)
-                        lv_mem_free((void *) kern_dsc->class_pair_values);
+                        lv_mem_free((void *)kern_dsc->class_pair_values);
 
                     if(kern_dsc->left_class_mapping)
-                        lv_mem_free((void *) kern_dsc->left_class_mapping);
+                        lv_mem_free((void *)kern_dsc->left_class_mapping);
 
                     if(kern_dsc->right_class_mapping)
-                        lv_mem_free((void *) kern_dsc->right_class_mapping);
+                        lv_mem_free((void *)kern_dsc->right_class_mapping);
 
-                    lv_mem_free((void *) kern_dsc);
+                    lv_mem_free((void *)kern_dsc);
                 }
             }
 
             lv_font_fmt_txt_cmap_t * cmaps =
-                (lv_font_fmt_txt_cmap_t *) dsc->cmaps;
+                (lv_font_fmt_txt_cmap_t *)dsc->cmaps;
 
             if(NULL != cmaps) {
                 for(int i = 0; i < dsc->cmap_num; ++i) {
                     if(NULL != cmaps[i].glyph_id_ofs_list)
-                        lv_mem_free((void *) cmaps[i].glyph_id_ofs_list);
+                        lv_mem_free((void *)cmaps[i].glyph_id_ofs_list);
                     if(NULL != cmaps[i].unicode_list)
-                        lv_mem_free((void *) cmaps[i].unicode_list);
+                        lv_mem_free((void *)cmaps[i].unicode_list);
                 }
                 lv_mem_free(cmaps);
             }
 
             if(NULL != dsc->glyph_bitmap) {
-                lv_mem_free((void *) dsc->glyph_bitmap);
+                lv_mem_free((void *)dsc->glyph_bitmap);
             }
             if(NULL != dsc->glyph_dsc) {
-                lv_mem_free((void *) dsc->glyph_dsc);
+                lv_mem_free((void *)dsc->glyph_dsc);
             }
             lv_mem_free(dsc);
         }
@@ -278,7 +278,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
             case LV_FONT_FMT_TXT_CMAP_SPARSE_FULL:
             case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY: {
                     uint32_t list_size = sizeof(uint16_t) * cmap_table[i].data_entries_count;
-                    uint16_t * unicode_list = (uint16_t *) lv_mem_alloc(list_size);
+                    uint16_t * unicode_list = (uint16_t *)lv_mem_alloc(list_size);
 
                     cmap->unicode_list = unicode_list;
                     cmap->list_length = cmap_table[i].data_entries_count;
@@ -414,7 +414,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         }
     }
 
-    uint8_t * glyph_bmp = (uint8_t *) lv_mem_alloc(sizeof(uint8_t) * cur_bmp_size);
+    uint8_t * glyph_bmp = (uint8_t *)lv_mem_alloc(sizeof(uint8_t) * cur_bmp_size);
 
     font_dsc->glyph_bitmap = glyph_bmp;
 

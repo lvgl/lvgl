@@ -422,7 +422,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 #endif
                 }
 
-                uint32_t * mask32 = (uint32_t *) mask_tmp_x;
+                uint32_t * mask32 = (uint32_t *)mask_tmp_x;
                 for(; x <= x_end4; x += 4) {
                     if(*mask32) {
                         if((*mask32) == 0xFFFFFFFF) {
@@ -820,7 +820,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 #endif
                 }
 
-                uint32_t * mask32 = (uint32_t *) mask_tmp_x;
+                uint32_t * mask32 = (uint32_t *)mask_tmp_x;
                 for(; x < x_end4; x += 4) {
                     if(*mask32) {
                         if((*mask32) == 0xFFFFFFFF) {

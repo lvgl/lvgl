@@ -88,7 +88,7 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
         return;
     }
 
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
     imgbtn->img_src_left[state] = src_left;
     imgbtn->img_src_mid[state] = src_mid;
@@ -112,7 +112,7 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
     return imgbtn->img_src_left[state];
 }
@@ -126,7 +126,7 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
 const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
     return imgbtn->img_src_mid[state];
 }
@@ -140,7 +140,7 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
 const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
     return imgbtn->img_src_right[state];
 }
@@ -154,7 +154,7 @@ static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
 
-   lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+   lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
    /*Initialize the allocated 'ext' */
    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
    lv_memset_00(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
@@ -166,7 +166,7 @@ static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DRAW_MODE_COVER_CHECK) {
         return LV_DRAW_RES_NOT_COVER;
@@ -293,7 +293,7 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
 static void refr_img(lv_obj_t * obj)
 {
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
     lv_img_header_t header;
 
@@ -332,7 +332,7 @@ static void refr_img(lv_obj_t * obj)
  */
 static lv_imgbtn_state_t suggest_state(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
-    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *) obj;
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     if(imgbtn->img_src_mid[state] == NULL) {
         switch(state) {
             case LV_IMGBTN_STATE_PRESSED:

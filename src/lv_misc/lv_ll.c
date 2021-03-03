@@ -382,7 +382,7 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
 {
     if(act == NULL) return; /*Can't set the prev node of `NULL`*/
 
-    uint8_t * act8 = (uint8_t *) act;
+    uint8_t * act8 = (uint8_t *)act;
 
     act8 += LL_PREV_P_OFFSET(ll_p);
 
@@ -401,7 +401,7 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
 static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * next)
 {
     if(act == NULL) return; /*Can't set the next node of `NULL`*/
-    uint8_t * act8 = (uint8_t *) act;
+    uint8_t * act8 = (uint8_t *)act;
 
     act8 += LL_NEXT_P_OFFSET(ll_p);
     lv_ll_node_t ** act_node_p = (lv_ll_node_t **) act8;

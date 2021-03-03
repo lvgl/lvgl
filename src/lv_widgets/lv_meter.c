@@ -212,7 +212,7 @@ static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_meter_t * meter = (lv_meter_t *) obj;
+    lv_meter_t * meter = (lv_meter_t *)obj;
 
     _lv_ll_init(&meter->scale_ll, sizeof(lv_meter_scale_t));
 

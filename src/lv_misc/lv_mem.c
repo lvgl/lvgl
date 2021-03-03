@@ -389,7 +389,7 @@ lv_res_t lv_mem_test(void)
             LV_LOG_WARN("failed");
             return LV_RES_INV;
         }
-        uint8_t * e8 = (uint8_t *) e;
+        uint8_t * e8 = (uint8_t *)e;
         if(e8 + e->header.s.d_size > work_mem + LV_MEM_SIZE) {
             LV_LOG_WARN("failed");
             return LV_RES_INV;
@@ -632,7 +632,7 @@ LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
 LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
 {
 
-    uint8_t * d8 = (uint8_t *) dst;
+    uint8_t * d8 = (uint8_t *)dst;
 
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
@@ -674,7 +674,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
  */
 LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len)
 {
-    uint8_t * d8 = (uint8_t *) dst;
+    uint8_t * d8 = (uint8_t *)dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
     /*Make the address aligned*/
@@ -712,7 +712,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len)
  */
 LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len)
 {
-    uint8_t * d8 = (uint8_t *) dst;
+    uint8_t * d8 = (uint8_t *)dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
     /*Make the address aligned*/

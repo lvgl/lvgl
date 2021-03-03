@@ -94,7 +94,7 @@ bool lv_colorwheel_set_hsv(lv_obj_t * obj, lv_color_hsv_t hsv)
     if(hsv.s > 100) hsv.s = 100;
     if(hsv.v > 100) hsv.v = 100;
 
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     if(colorwheel->hsv.h == hsv.h && colorwheel->hsv.s == hsv.s && colorwheel->hsv.v == hsv.v) return false;
 
@@ -128,7 +128,7 @@ bool lv_colorwheel_set_rgb(lv_obj_t * obj, lv_color_t color)
  */
 void lv_colorwheel_set_mode(lv_obj_t * obj, lv_colorwheel_mode_t mode)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     colorwheel->mode = mode;
     refr_knob_pos(obj);
@@ -142,7 +142,7 @@ void lv_colorwheel_set_mode(lv_obj_t * obj, lv_colorwheel_mode_t mode)
  */
 void lv_colorwheel_set_mode_fixed(lv_obj_t * obj, bool fixed)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     colorwheel->mode_fixed = fixed;
 }
@@ -159,7 +159,7 @@ void lv_colorwheel_set_mode_fixed(lv_obj_t * obj, bool fixed)
  */
 lv_color_hsv_t lv_colorwheel_get_hsv(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     return colorwheel->hsv;
 }
@@ -171,7 +171,7 @@ lv_color_hsv_t lv_colorwheel_get_hsv(lv_obj_t * obj)
  */
 lv_color_t lv_colorwheel_get_rgb(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     return lv_color_hsv_to_rgb(colorwheel->hsv.h, colorwheel->hsv.s, colorwheel->hsv.v);
 }
@@ -183,7 +183,7 @@ lv_color_t lv_colorwheel_get_rgb(lv_obj_t * obj)
  */
 lv_colorwheel_mode_t lv_colorwheel_get_color_mode(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     return colorwheel->mode;
 }
@@ -195,7 +195,7 @@ lv_colorwheel_mode_t lv_colorwheel_get_color_mode(lv_obj_t * obj)
  */
 bool lv_colorwheel_get_color_mode_fixed(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     return colorwheel->mode_fixed;
 }
@@ -212,7 +212,7 @@ static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
 
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     colorwheel->hsv.h = 0;
     colorwheel->hsv.s = 100;
     colorwheel->hsv.v = 100;
@@ -307,7 +307,7 @@ static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask)
 
 static void draw_knob(lv_obj_t * obj, const lv_area_t * mask)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);
@@ -333,7 +333,7 @@ static void invalidate_knob(lv_obj_t * obj)
 
 static lv_area_t get_knob_area(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     /*Get knob's radius*/
     uint16_t r = 0;
@@ -367,7 +367,7 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
 
     if(res != LV_RES_OK) return res;
 
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
@@ -536,7 +536,7 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
 
 static void next_color_mode(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     colorwheel->mode = (colorwheel->mode + 1) % 3;
     refr_knob_pos(obj);
     lv_obj_invalidate(obj);
@@ -546,7 +546,7 @@ static void refr_knob_pos(lv_obj_t * obj)
 {
     invalidate_knob(obj);
 
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     lv_coord_t w = lv_obj_get_width(obj);
 
     lv_coord_t scale_w = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
@@ -562,7 +562,7 @@ static void refr_knob_pos(lv_obj_t * obj)
 
 static lv_res_t double_click_reset(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     lv_indev_t * indev = lv_indev_get_act();
     /*Double clicked? Use long press time as double click time out*/
     if(lv_tick_elaps(colorwheel->last_click_time) < indev->driver.long_press_time) {
@@ -676,7 +676,7 @@ static lv_color_t angle_to_mode_color_fast(lv_obj_t * obj, uint16_t angle)
 
 static uint16_t get_angle(lv_obj_t * obj)
 {
-    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *) obj;
+    lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     uint16_t angle;
     switch(colorwheel->mode) {
         default:

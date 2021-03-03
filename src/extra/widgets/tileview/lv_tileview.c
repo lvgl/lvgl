@@ -76,7 +76,7 @@ void lv_obj_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_e
     lv_coord_t tx = lv_obj_get_x(tile_obj);
     lv_coord_t ty = lv_obj_get_y(tile_obj);
 
-    lv_tileview_tile_t * tile = (lv_tileview_tile_t *) tile_obj;
+    lv_tileview_tile_t * tile = (lv_tileview_tile_t *)tile_obj;
     lv_obj_set_scroll_dir(tv, tile->dir);
     lv_obj_scroll_to(tv, tx, ty, anim_en);
 }
@@ -125,7 +125,7 @@ static void lv_tileview_tile_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
     lv_obj_set_pos(obj, create_col_id * lv_obj_get_width_fit(parent),  create_row_id * lv_obj_get_height_fit(parent));
 
-    lv_tileview_tile_t * tile = (lv_tileview_tile_t *) obj;
+    lv_tileview_tile_t * tile = (lv_tileview_tile_t *)obj;
     tile->dir = create_dir;
 
     if(create_col_id == 0 && create_row_id == 0) {
@@ -155,7 +155,7 @@ static void tileview_event_cb(lv_obj_t * tv, lv_event_t e)
             lv_coord_t x = lv_obj_get_x(tile_obj);
             lv_coord_t y = lv_obj_get_y(tile_obj);
             if(x == tx && y == ty) {
-                lv_tileview_tile_t * tile = (lv_tileview_tile_t *) tile_obj;
+                lv_tileview_tile_t * tile = (lv_tileview_tile_t *)tile_obj;
                 dir = tile->dir;
                 break;
             }

@@ -74,7 +74,7 @@ lv_obj_t * lv_led_create(lv_obj_t * parent)
  */
 void lv_led_set_color(lv_obj_t * obj, lv_color_t color)
 {
-    lv_led_t * led = (lv_led_t *) obj;
+    lv_led_t * led = (lv_led_t *)obj;
     led->color = color;
     lv_obj_invalidate(obj);
 }
@@ -86,7 +86,7 @@ void lv_led_set_color(lv_obj_t * obj, lv_color_t color)
  */
 void lv_led_set_brightness(lv_obj_t * obj, uint8_t bright)
 {
-    lv_led_t * led = (lv_led_t *) obj;
+    lv_led_t * led = (lv_led_t *)obj;
     if(led->bright == bright) return;
 
     if(bright <= LV_LED_BRIGHT_MIN) bright = LV_LED_BRIGHT_MIN;
@@ -140,7 +140,7 @@ void lv_led_toggle(lv_obj_t * obj)
  */
 uint8_t lv_led_get_brightness(const lv_obj_t * obj)
 {
-    lv_led_t * led = (lv_led_t *) obj;
+    lv_led_t * led = (lv_led_t *)obj;
     return led->bright;
 }
 
@@ -151,7 +151,7 @@ uint8_t lv_led_get_brightness(const lv_obj_t * obj)
 static void lv_led_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
-    lv_led_t * led = (lv_led_t *) obj;
+    lv_led_t * led = (lv_led_t *)obj;
     led->color = lv_theme_get_color_primary(obj);
     led->bright = LV_LED_BRIGHT_MAX;
     led->bright = LV_LED_BRIGHT_MAX;
@@ -168,7 +168,7 @@ static lv_draw_res_t lv_led_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
     }
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         /*Make darker colors in a temporary style according to the brightness*/
-        lv_led_t * led = (lv_led_t *) obj;
+        lv_led_t * led = (lv_led_t *)obj;
 
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);

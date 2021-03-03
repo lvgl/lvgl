@@ -486,7 +486,7 @@ lv_coord_t * lv_chart_get_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 
 int32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
 {
-    lv_chart_t * chart = (lv_chart_t *) obj;
+    lv_chart_t * chart = (lv_chart_t *)obj;
     return chart->pressed_point_id;
 }
 
@@ -498,7 +498,7 @@ static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_chart_t * chart = (lv_chart_t *) obj;
+    lv_chart_t * chart = (lv_chart_t *)obj;
 
     _lv_ll_init(&chart->series_ll, sizeof(lv_chart_series_t));
 
@@ -535,7 +535,7 @@ static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 static void lv_chart_destructor(lv_obj_t * obj)
 {
-    lv_chart_t * chart = (lv_chart_t *) obj;
+    lv_chart_t * chart = (lv_chart_t *)obj;
     lv_chart_series_t * ser;
     while(chart->series_ll.head) {
         ser = _lv_ll_get_head(&chart->series_ll);

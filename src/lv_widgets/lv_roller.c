@@ -306,7 +306,7 @@ static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     }
     else {
         lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);
-        lv_roller_t * copy_roller = (lv_roller_t *) copy;
+        lv_roller_t * copy_roller = (lv_roller_t *)copy;
         roller->mode = copy_roller->mode;
         roller->option_cnt = copy_roller->option_cnt;
         roller->sel_opt_id = copy_roller->sel_opt_id;
