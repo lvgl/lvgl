@@ -65,7 +65,7 @@ void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint16_t poin
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_line_t * line = (lv_line_t *) obj;
+    lv_line_t * line = (lv_line_t *)obj;
     line->point_array    = points;
     line->point_num      = point_num;
 
@@ -78,7 +78,7 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_line_t * line = (lv_line_t *) obj;
+    lv_line_t * line = (lv_line_t *)obj;
     if(line->y_inv == en) return;
 
     line->y_inv = en == false ? 0 : 1;
@@ -94,7 +94,7 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_line_t * line = (lv_line_t *) obj;
+    lv_line_t * line = (lv_line_t *)obj;
 
     return line->y_inv == 0 ? false : true;
 }
@@ -107,7 +107,7 @@ static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_line_t * line = (lv_line_t *) obj;
+    lv_line_t * line = (lv_line_t *)obj;
 
     line->point_num   = 0;
     line->point_array = NULL;
@@ -121,7 +121,7 @@ static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
-        lv_line_t * copy_line = (lv_line_t *) copy;
+        lv_line_t * copy_line = (lv_line_t *)copy;
         lv_line_set_y_invert(obj, lv_line_get_y_invert(copy));
         lv_line_set_points(obj, copy_line->point_array, copy_line->point_num);
 
@@ -137,7 +137,7 @@ static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, l
         return LV_DRAW_RES_NOT_COVER;
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
         lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-        lv_line_t * line = (lv_line_t *) obj;
+        lv_line_t * line = (lv_line_t *)obj;
 
         if(line->point_num == 0 || line->point_array == NULL) return false;
 
@@ -192,7 +192,7 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(*s < line_width) *s = line_width;
     }
     else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_line_t * line = (lv_line_t *) obj;
+        lv_line_t * line = (lv_line_t *)obj;
 
         lv_point_t * p = param;
         lv_coord_t w = 0;

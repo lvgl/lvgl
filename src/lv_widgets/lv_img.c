@@ -388,7 +388,7 @@ static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         if(obj->parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     }
     else {
-        lv_img_t * copy_img = (lv_img_t *) copy;
+        lv_img_t * copy_img = (lv_img_t *)copy;
         img->zoom      = copy_img->zoom;
         img->angle     = copy_img->angle;
         img->antialias = copy_img->antialias;

@@ -54,7 +54,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 {
-    lv_tabview_t * tabview = (lv_tabview_t *) obj;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
     lv_obj_t * cont = lv_tabview_get_content(obj);
 
     lv_obj_t * page = lv_obj_create(cont, NULL);
@@ -109,7 +109,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
 void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
-    lv_tabview_t * tabview = (lv_tabview_t *) obj;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     if(id >= tabview->tab_cnt) {
         id = tabview->tab_cnt - 1;
@@ -127,7 +127,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 
 uint16_t lv_tabview_get_tab_act(lv_obj_t * obj)
 {
-    lv_tabview_t * tabview = (lv_tabview_t *) obj;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
     return tabview->tab_cur;
 }
 
@@ -148,7 +148,7 @@ lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv)
 static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_UNUSED(copy);
-    lv_tabview_t * tabview = (lv_tabview_t *) obj;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     tabview->tab_pos = tabpos_create;
     lv_flex_init(&tabview->flex);
@@ -210,7 +210,7 @@ static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 static void lv_tabview_destructor(lv_obj_t * obj)
 {
-    lv_tabview_t * tabview = (lv_tabview_t *) obj;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     uint32_t i;
     if(tabview->tab_pos & LV_DIR_VER) {

@@ -140,7 +140,7 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
     if(!lv_obj_is_layout_positioned(obj)) return;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent->spec_attr->layout_dsc->update_cb  != flex_update) return;
-    const lv_flex_t * f = (const lv_flex_t *) parent->spec_attr->layout_dsc;
+    const lv_flex_t * f = (const lv_flex_t *)parent->spec_attr->layout_dsc;
 
     if(f->dir == LV_FLEX_FLOW_ROW) lv_obj_set_width(obj, (LV_COORD_SET_LAYOUT(grow)));
     else lv_obj_set_height(obj, (LV_COORD_SET_LAYOUT(grow)));

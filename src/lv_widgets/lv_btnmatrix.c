@@ -373,7 +373,7 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
-        lv_btnmatrix_t * copy_btnm = (lv_btnmatrix_t *) copy;
+        lv_btnmatrix_t * copy_btnm = (lv_btnmatrix_t *)copy;
         lv_btnmatrix_set_map(obj, copy_btnm->map_p);
         lv_btnmatrix_set_ctrl_map(obj, copy_btnm->ctrl_bits);
     }

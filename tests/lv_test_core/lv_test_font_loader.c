@@ -75,8 +75,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     lv_test_assert_int_eq(f1->subpx, f2->subpx, "subpx");
 #endif
-    lv_font_fmt_txt_dsc_t * dsc1 = (lv_font_fmt_txt_dsc_t *) f1->dsc;
-    lv_font_fmt_txt_dsc_t * dsc2 = (lv_font_fmt_txt_dsc_t *) f2->dsc;
+    lv_font_fmt_txt_dsc_t * dsc1 = (lv_font_fmt_txt_dsc_t *)f1->dsc;
+    lv_font_fmt_txt_dsc_t * dsc2 = (lv_font_fmt_txt_dsc_t *)f2->dsc;
 
     lv_test_assert_int_eq(dsc1->kern_scale, dsc2->kern_scale, "kern_scale");
     lv_test_assert_int_eq(dsc1->cmap_num, dsc2->cmap_num, "cmap_num");
@@ -87,8 +87,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     // cmaps
     int total_glyphs = 0;
     for(int i = 0; i < dsc1->cmap_num; ++i) {
-        lv_font_fmt_txt_cmap_t * cmaps1 = (lv_font_fmt_txt_cmap_t *) &dsc1->cmaps[i];
-        lv_font_fmt_txt_cmap_t * cmaps2 = (lv_font_fmt_txt_cmap_t *) &dsc2->cmaps[i];
+        lv_font_fmt_txt_cmap_t * cmaps1 = (lv_font_fmt_txt_cmap_t *)&dsc1->cmaps[i];
+        lv_font_fmt_txt_cmap_t * cmaps2 = (lv_font_fmt_txt_cmap_t *)&dsc2->cmaps[i];
 
         lv_test_assert_int_eq(cmaps1->range_start, cmaps2->range_start, "range_start");
         lv_test_assert_int_eq(cmaps1->range_length, cmaps2->range_length, "range_length");
@@ -100,8 +100,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
             lv_test_assert_true(cmaps1->unicode_list && cmaps2->unicode_list, "unicode_list");
 
             lv_test_assert_array_eq(
-                    (uint8_t *) cmaps1->unicode_list,
-                    (uint8_t *) cmaps2->unicode_list,
+                    (uint8_t *)cmaps1->unicode_list,
+                    (uint8_t *)cmaps2->unicode_list,
                     sizeof(uint16_t) * cmaps1->list_length,
                     "unicode_list");
             total_glyphs += cmaps1->list_length;
@@ -112,8 +112,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
         }
 
         if(cmaps1->glyph_id_ofs_list != NULL && cmaps2->glyph_id_ofs_list != NULL) {
-            uint8_t * ids1 = (uint8_t *) cmaps1->glyph_id_ofs_list;
-            uint8_t * ids2 = (uint8_t *) cmaps2->glyph_id_ofs_list;
+            uint8_t * ids1 = (uint8_t *)cmaps1->glyph_id_ofs_list;
+            uint8_t * ids2 = (uint8_t *)cmaps2->glyph_id_ofs_list;
 
             lv_test_assert_array_eq(ids1, ids2, cmaps1->list_length, "glyph_id_ofs_list");
         }
@@ -124,27 +124,27 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
 
     // kern_dsc
     if (dsc1->kern_classes == 1 && dsc2->kern_classes == 1) {
-        lv_font_fmt_txt_kern_classes_t * kern1 = (lv_font_fmt_txt_kern_classes_t *) dsc1->kern_dsc;
-        lv_font_fmt_txt_kern_classes_t * kern2 = (lv_font_fmt_txt_kern_classes_t *) dsc2->kern_dsc;
+        lv_font_fmt_txt_kern_classes_t * kern1 = (lv_font_fmt_txt_kern_classes_t *)dsc1->kern_dsc;
+        lv_font_fmt_txt_kern_classes_t * kern2 = (lv_font_fmt_txt_kern_classes_t *)dsc2->kern_dsc;
         if (kern1 != NULL && kern2 != NULL) {
             lv_test_assert_int_eq(kern1->right_class_cnt, kern2->right_class_cnt, "right_class_cnt");
             lv_test_assert_int_eq(kern1->left_class_cnt, kern2->left_class_cnt, "left_class_cnt");
 
             lv_test_assert_array_eq(
-                    (uint8_t *) kern1->left_class_mapping,
-                    (uint8_t *) kern2->left_class_mapping,
+                    (uint8_t *)kern1->left_class_mapping,
+                    (uint8_t *)kern2->left_class_mapping,
                     kern1->left_class_cnt,
                     "left_class_mapping");
 
             lv_test_assert_array_eq(
-                    (uint8_t *) kern1->right_class_mapping,
-                    (uint8_t *) kern2->right_class_mapping,
+                    (uint8_t *)kern1->right_class_mapping,
+                    (uint8_t *)kern2->right_class_mapping,
                     kern1->right_class_cnt,
                     "right_class_mapping");
 
             lv_test_assert_array_eq(
-                    (uint8_t *) kern1->class_pair_values,
-                    (uint8_t *) kern2->class_pair_values,
+                    (uint8_t *)kern1->class_pair_values,
+                    (uint8_t *)kern2->class_pair_values,
                     kern1->right_class_cnt * kern1->left_class_cnt,
                     "class_pair_values");
         }
@@ -153,8 +153,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
         }
     }
     else if (dsc1->kern_classes == 0 && dsc2->kern_classes == 0) {
-        lv_font_fmt_txt_kern_pair_t * kern1 = (lv_font_fmt_txt_kern_pair_t *) dsc1->kern_dsc;
-        lv_font_fmt_txt_kern_pair_t * kern2 = (lv_font_fmt_txt_kern_pair_t *) dsc2->kern_dsc;
+        lv_font_fmt_txt_kern_pair_t * kern1 = (lv_font_fmt_txt_kern_pair_t *)dsc1->kern_dsc;
+        lv_font_fmt_txt_kern_pair_t * kern2 = (lv_font_fmt_txt_kern_pair_t *)dsc2->kern_dsc;
         if (kern1 != NULL && kern2 != NULL) {
             lv_test_assert_int_eq(kern1->glyph_ids_size, kern2->glyph_ids_size, "glyph_ids_size");
             lv_test_assert_int_eq(kern1->pair_cnt, kern2->pair_cnt, "pair_cnt");
@@ -177,8 +177,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
         }
     }
 
-    lv_font_fmt_txt_glyph_dsc_t * glyph_dsc1 = (lv_font_fmt_txt_glyph_dsc_t *) dsc1->glyph_dsc;
-    lv_font_fmt_txt_glyph_dsc_t * glyph_dsc2 = (lv_font_fmt_txt_glyph_dsc_t *) dsc2->glyph_dsc;
+    lv_font_fmt_txt_glyph_dsc_t * glyph_dsc1 = (lv_font_fmt_txt_glyph_dsc_t *)dsc1->glyph_dsc;
+    lv_font_fmt_txt_glyph_dsc_t * glyph_dsc2 = (lv_font_fmt_txt_glyph_dsc_t *)dsc2->glyph_dsc;
 
     for(int i = 0; i < total_glyphs; ++i) {
         if (i < total_glyphs - 1) {

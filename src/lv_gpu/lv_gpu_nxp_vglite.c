@@ -289,7 +289,7 @@ static lv_res_t init_vg_buf(vg_lite_buffer_t * dst, uint32_t width, uint32_t hei
 
     memset(&dst->yuv, 0, sizeof(dst->yuv));
 
-    dst->memory = (void *) ptr;
+    dst->memory = (void *)ptr;
     dst->address = (uint32_t) dst->memory;
     dst->handle = 0x0;
 

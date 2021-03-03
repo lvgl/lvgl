@@ -73,7 +73,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(txt);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
     if(col >= table->col_cnt) lv_table_set_col_cnt(obj, col + 1);
@@ -109,7 +109,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(fmt);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     if(col >= table->col_cnt) {
         LV_LOG_WARN("lv_table_set_cell_value: invalid column");
         return;
@@ -179,7 +179,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     uint16_t old_row_cnt = table->row_cnt;
     table->row_cnt         = row_cnt;
 
@@ -205,7 +205,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
     table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->row_h[0]));
@@ -249,7 +249,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
     if(col_id >= table->col_cnt) lv_table_set_col_cnt(obj, col_id + 1);
@@ -262,7 +262,7 @@ void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
     if(col >= table->col_cnt) lv_table_set_col_cnt(obj, col + 1);
@@ -286,7 +286,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_tab
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
     if(col >= table->col_cnt) lv_table_set_col_cnt(obj, col + 1);
@@ -314,7 +314,7 @@ const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
         LV_LOG_WARN("lv_table_set_cell_value: invalid row or column");
         return "";
@@ -330,7 +330,7 @@ uint16_t lv_table_get_row_cnt(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     return table->row_cnt;
 }
 
@@ -338,7 +338,7 @@ uint16_t lv_table_get_col_cnt(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     return table->col_cnt;
 }
 
@@ -346,7 +346,7 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     if(col >= table->col_cnt) {
         LV_LOG_WARN("lv_table_set_col_width: too big 'col_id'. Must be < LV_TABLE_COL_MAX.");
@@ -360,7 +360,7 @@ bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
         LV_LOG_WARN("lv_table_get_cell_crop: invalid row or column");
         return false;
@@ -373,7 +373,7 @@ bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
 
 void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 {
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     *row = table->row_act;
     *col = table->col_act;
 }
@@ -386,7 +386,7 @@ static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     /*Initialize the allocated 'ext' */
     table->cell_data     = NULL;
@@ -410,7 +410,7 @@ static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     }
     /*Copy an existing table*/
     else {
-        lv_table_t * copy_table = (lv_table_t *) copy;
+        lv_table_t * copy_table = (lv_table_t *)copy;
         lv_table_set_row_cnt(obj, copy_table->row_cnt);
         lv_table_set_col_cnt(obj, copy_table->col_cnt);
     }
@@ -420,7 +420,7 @@ static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 static void lv_table_destructor(lv_obj_t * obj)
 {
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     /*Free the cell texts*/
     uint16_t i;
     for(i = 0; i < table->col_cnt * table->row_cnt; i++) {
@@ -445,7 +445,7 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         /*Draw the background*/
         lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
-        lv_table_t * table = (lv_table_t *) obj;
+        lv_table_t * table = (lv_table_t *)obj;
 
         lv_point_t txt_size;
         lv_area_t cell_area;
@@ -637,7 +637,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         refr_size(obj);
@@ -719,7 +719,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
 static void refr_size(lv_obj_t * obj)
 {
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     uint32_t i;
 
@@ -744,7 +744,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
 {
-    lv_table_t * table = (lv_table_t *) obj;
+    lv_table_t * table = (lv_table_t *)obj;
     lv_point_t txt_size;
     lv_coord_t txt_w;
 
@@ -800,7 +800,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
 
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 {
-   lv_table_t * table = (lv_table_t *) obj;
+   lv_table_t * table = (lv_table_t *)obj;
 
     lv_indev_type_t type = lv_indev_get_type(lv_indev_get_act());
     if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {

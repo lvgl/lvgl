@@ -63,7 +63,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
-    lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+    lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     size_t len = _lv_txt_ap_calc_bytes_cnt(txt);
 #else
@@ -85,7 +85,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 {
-    lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+    lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     if(!cb->static_txt) lv_mem_free(cb->txt);
 
@@ -101,7 +101,7 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 
 const char * lv_checkbox_get_text(const lv_obj_t * obj)
 {
-    lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+    lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     return cb->txt;
 }
 
@@ -113,7 +113,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+    lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
@@ -132,7 +132,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 static void lv_checkbox_destructor(lv_obj_t * obj)
 {
-    lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+    lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     if(!cb->static_txt) {
         lv_mem_free(cb->txt);
         cb->txt = NULL;
@@ -148,7 +148,7 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
         /*Draw the background*/
         lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
 
-        lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+        lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         lv_coord_t font_h = lv_font_get_line_height(font);
@@ -217,7 +217,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 
     if (sign == LV_SIGNAL_GET_SELF_SIZE) {
         lv_point_t * p = param;
-        lv_checkbox_t * cb = (lv_checkbox_t *) obj;
+        lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         lv_coord_t font_h = lv_font_get_line_height(font);

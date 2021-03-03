@@ -144,7 +144,7 @@ void lv_init(void)
     /*Test if the IDE has UTF-8 encoding*/
     char * txt = "Á";
 
-    uint8_t * txt_u8 = (uint8_t *) txt;
+    uint8_t * txt_u8 = (uint8_t *)txt;
     if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
         LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.")
     }
