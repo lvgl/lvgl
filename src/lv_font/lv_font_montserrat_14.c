@@ -2107,8 +2107,10 @@ static const lv_font_fmt_txt_kern_classes_t kern_classes =
  *  ALL CUSTOM DATA
  *--------------------*/
 
+static  lv_font_fmt_txt_glyph_cache_t cache;
+
 /*Store all the custom data of the font*/
-static lv_font_fmt_txt_dsc_t font_dsc = {
+static const lv_font_fmt_txt_dsc_t font_dsc = {
     .glyph_bitmap = gylph_bitmap,
     .glyph_dsc = glyph_dsc,
     .cmaps = cmaps,
@@ -2117,7 +2119,8 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .cmap_num = 2,
     .bpp = 4,
     .kern_classes = 1,
-    .bitmap_format = 0
+    .bitmap_format = 0,
+    .cache = &cache
 };
 
 /*-----------------
@@ -2125,7 +2128,7 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
  *----------------*/
 
 /*Initialize a public general font descriptor*/
-lv_font_t lv_font_montserrat_14 = {
+const lv_font_t lv_font_montserrat_14 = {
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
     .line_height = 16,          /*The maximum line height required by the font*/
