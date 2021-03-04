@@ -584,6 +584,12 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
         lv_draw_res_t draw_res = call_draw_cb(obj, area_p, LV_DRAW_MODE_COVER_CHECK);
         if(draw_res == LV_DRAW_RES_MASKED) return NULL;
 
+        lv_draw_res_t event_draw_res = LV_DRAW_RES_OK;
+        lv_event_send(obj, LV_EVENT_COVER_CHECK, &event_draw_res);
+        if(event_draw_res == LV_DRAW_RES_MASKED) return NULL;
+        if(event_draw_res == LV_DRAW_RES_NOT_COVER) draw_res = LV_DRAW_RES_NOT_COVER;
+
+
         if(draw_res == LV_DRAW_RES_COVER && lv_obj_get_style_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) {
             draw_res = LV_DRAW_RES_NOT_COVER;
         }
