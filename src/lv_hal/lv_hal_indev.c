@@ -93,9 +93,6 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     lv_memcpy(&indev->driver, driver, sizeof(lv_indev_drv_t));
 
     indev->proc.reset_query  = 1;
-    indev->cursor            = NULL;
-    indev->group             = NULL;
-    indev->btn_points        = NULL;
     indev->driver.read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
 
     return indev;
@@ -150,7 +147,6 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     /*For compatibility assume that used button was enter (encoder push) */
     else if(indev->driver.type == LV_INDEV_TYPE_ENCODER) {
         data->key = LV_KEY_ENTER;
-        data->enc_diff = 0;
     }
 
     if(indev->driver.read_cb) {
