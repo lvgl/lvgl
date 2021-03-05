@@ -147,6 +147,12 @@ typedef struct _lv_indev_drv_t {
  */
 typedef struct _lv_indev_proc_t {
     lv_indev_state_t state; /**< Current state of the input device. */
+    /*Flags*/
+    uint8_t long_pr_sent : 1;
+    uint8_t reset_query : 1;
+    uint8_t disabled : 1;
+    uint8_t wait_until_release : 1;
+
     union {
         struct {
             /*Pointer and button data*/
@@ -162,10 +168,10 @@ typedef struct _lv_indev_proc_t {
             struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
             lv_area_t scroll_area;
 
-            lv_gesture_dir_t gesture_dir;
             lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
             /*Flags*/
             lv_indev_scroll_dir_t scroll_dir : 2;
+            lv_gesture_dir_t gesture_dir : 2;
             uint8_t gesture_sent : 1;
         } pointer;
         struct {
@@ -177,12 +183,6 @@ typedef struct _lv_indev_proc_t {
 
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
-
-    /*Flags*/
-    uint8_t long_pr_sent : 1;
-    uint8_t reset_query : 1;
-    uint8_t disabled : 1;
-    uint8_t wait_until_release : 1;
 } lv_indev_proc_t;
 
 /** The main input device descriptor with driver, runtime data ('proc') and some additional
