@@ -315,6 +315,26 @@ void lv_spinbox_step_prev(lv_obj_t * spinbox)
 }
 
 /**
+ * Select specific digit for edition
+ * @param spinbox pointer to spinbox
+ * @param pos the new cursor position in character index
+ *             <= 0 : index from the end of the spinbox
+ */
+void lv_spinbox_set_cursor_pos(lv_obj_t * spinbox, uint8_t pos)
+{
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
+    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+    int32_t step_limit;
+    step_limit       = LV_MATH_MAX(ext->range_max, (ext->range_min < 0 ? (-ext->range_min) : ext->range_min));
+    int32_t new_step = ext->step * exp10(pos);
+    if(_pos <= 0) ext->step = 1;
+	else if(new_step <= step_limit) ext->step = new_step; 
+	
+    lv_spinbox_updatevalue(spinbox);
+}
+
+/**
  * Increment spinbox value by one step
  * @param spinbox pointer to spinbox
  */
