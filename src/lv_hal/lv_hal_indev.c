@@ -26,7 +26,6 @@
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-void lv_indev_read_timer_cb(lv_timer_t * timer);
 
 /**********************
  *  STATIC PROTOTYPES

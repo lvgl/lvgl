@@ -54,6 +54,7 @@ extern "C" {
 
 struct _lv_obj_t;
 struct _lv_disp_t;
+struct _lv_group_t;
 struct _lv_indev_t;
 struct _lv_indev_drv_t;
 
@@ -183,9 +184,6 @@ typedef struct _lv_indev_proc_t {
     uint8_t disabled : 1;
     uint8_t wait_until_release : 1;
 } lv_indev_proc_t;
-
-struct _lv_obj_t;
-struct _lv_group_t;
 
 /** The main input device descriptor with driver, runtime data ('proc') and some additional
  * information*/
