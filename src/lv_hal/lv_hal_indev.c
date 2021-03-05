@@ -1,5 +1,5 @@
 /**
- * @file hal_indev.c
+ * @file lv_hal_indev.c
  *
  * @description Input device HAL interface
  *
@@ -60,8 +60,8 @@ void lv_indev_drv_init(lv_indev_drv_t * driver)
     lv_memset_00(driver, sizeof(lv_indev_drv_t));
 
     driver->type                 = LV_INDEV_TYPE_NONE;
-    driver->scroll_limit           = LV_INDEV_DEF_SCROLL_LIMIT;
-    driver->scroll_throw           = 3;//LV_INDEV_DEF_SCROLL_THROW;
+    driver->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
+    driver->scroll_throw         = 3;//LV_INDEV_DEF_SCROLL_THROW;
     driver->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
     driver->long_press_rep_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
     driver->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
@@ -138,7 +138,7 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     lv_memset_00(data, sizeof(lv_indev_data_t));
 
-    /* For touchpad sometimes users don't the last pressed coordinate on release.
+    /* For touchpad sometimes users don't set the last pressed coordinate on release.
      * So be sure a coordinates are initialized to the last point */
     if(indev->driver.type == LV_INDEV_TYPE_POINTER) {
         data->point.x = indev->proc.types.pointer.act_point.x;
