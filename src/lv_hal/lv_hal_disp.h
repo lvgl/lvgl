@@ -126,6 +126,9 @@ typedef struct _disp_drv_t {
     /** OPTIONAL: called to wait while the gpu is working */
     void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
 
+    /** OPTIONAL: called when driver parameters are updated */
+    void (*drv_update_cb)(struct _disp_drv_t * disp_drv);
+
 #if LV_USE_GPU
 
     /** OPTIONAL: Blend two memories using opacity (GPU only)*/
