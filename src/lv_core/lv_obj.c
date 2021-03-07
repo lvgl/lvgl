@@ -394,6 +394,37 @@ void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_dat
 
 }
 
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr == NULL) return false;
+
+    int i = 0;
+    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
+        if(obj->spec_attr->event_dsc[i].cb == event_cb) {
+            /*Check if user_data matches or if the requested user_data is NULL*/
+            if(user_data == NULL || obj->spec_attr->event_dsc[i].user_data == user_data) {
+                /*Found*/
+                break;
+            }
+        }
+    }
+    if(i >= obj->spec_attr->event_dsc_cnt) {
+        /*No event handler found*/
+        return false;
+    }
+
+    /*Shift the remaining event handlers forward*/
+    for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
+        obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
+        obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
+    }
+    obj->spec_attr->event_dsc_cnt--;
+    obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+    LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
+    return true;
+}
+
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
 {
     if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
