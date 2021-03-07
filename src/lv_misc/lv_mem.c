@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_mem.h"
-#include "lv_math.h"
+#include "lv_tlsf.h"
 #include "lv_gc.h"
 #include "lv_assert.h"
 #include <string.h>
@@ -23,74 +23,40 @@
  *********************/
 /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 #ifndef LV_MEM_ADD_JUNK
-#  define LV_MEM_ADD_JUNK 1
-#endif
-
-#ifndef LV_MEM_FULL_DEFRAG_CNT
-#  define LV_MEM_FULL_DEFRAG_CNT 64
+#  define LV_MEM_ADD_JUNK  1
 #endif
 
 #ifdef LV_ARCH_64
-#  define MEM_UNIT uint64_t
+#  define MEM_UNIT         uint64_t
+#  define ALIGN_MASK       0x7
 #else
-#  define MEM_UNIT uint32_t
+#  define MEM_UNIT         uint32_t
+#  define ALIGN_MASK       0x7
 #endif
+
+#define MEM_BUF_SMALL_SIZE 16
+
+#define ZERO_MEM_SENTINEL  0xa1b2c3d4
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-#if LV_ENABLE_GC == 0 /*gc custom allocations must not include header*/
-
-/*The size of this union must be 4/8 bytes (uint32_t/uint64_t)*/
-typedef union {
-    struct {
-        MEM_UNIT used : 1;    /* 1: if the entry is used*/
-        MEM_UNIT d_size : 31; /* Size of the data*/
-    } s;
-    MEM_UNIT header; /* The header (used + d_size)*/
-} lv_mem_header_t;
-
-typedef struct {
-    lv_mem_header_t header;
-    uint8_t first_data; /*First data byte in the allocated data (Just for easily create a pointer)*/
-} lv_mem_ent_t;
-
-#endif /* LV_ENABLE_GC */
-
-#ifdef LV_ARCH_64
-    #define ALIGN_MASK 0x7
-#else
-    #define ALIGN_MASK 0x3
-#endif
-
-#define MEM_BUF_SMALL_SIZE 16
-
-#define ZERO_MEM_SENTINEL   0xa1b2c3d4
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 #if LV_MEM_CUSTOM == 0
-    static void * alloc_core(size_t size);
-    static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e);
-    static inline void * ent_alloc(lv_mem_ent_t * e, size_t size);
-    static void ent_trunc(lv_mem_ent_t * e, size_t size);
-    static size_t get_size(void * data_p);
+    static void lv_mem_walker(void * ptr, size_t size, int used, void * user);
 #endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 #if LV_MEM_CUSTOM == 0
-    static uint8_t * work_mem;
+    static tlsf_t tlsf;
 #endif
 
 static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
-#if LV_MEM_CUSTOM == 0
-    static uint8_t * last_mem; /*Address of the last valid byte*/
-    static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/
-#endif
 
 static uint8_t mem_buf1_32[MEM_BUF_SMALL_SIZE];
 static uint8_t mem_buf2_32[MEM_BUF_SMALL_SIZE];
@@ -128,15 +94,10 @@ void lv_mem_init(void)
 #if LV_MEM_ADR == 0
     /*Allocate a large array to store the dynamically allocated data*/
     static LV_ATTRIBUTE_LARGE_RAM_ARRAY MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
-    work_mem = (uint8_t *)work_mem_int;
+    tlsf = tlsf_create_with_pool((void *)work_mem_int, LV_MEM_SIZE);
 #else
-    work_mem = (uint8_t *)LV_MEM_ADR;
+    tlsf = tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
-    last_mem = &work_mem[LV_MEM_SIZE - 1];
-    lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
-    full->header.s.used = 0;
-    /*The total mem size reduced by the first header and the close patterns */
-    full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 
 #if LV_MEM_ADD_JUNK
@@ -151,11 +112,8 @@ void lv_mem_init(void)
 void lv_mem_deinit(void)
 {
 #if LV_MEM_CUSTOM == 0
-    lv_memset_00(work_mem, (LV_MEM_SIZE / sizeof(MEM_UNIT)) * sizeof(MEM_UNIT));
-    lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
-    full->header.s.used = 0;
-    /*The total mem size reduced by the first header and the close patterns */
-    full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
+    tlsf_destroy(tlsf);
+    lv_mem_init();
 #endif
 }
 
@@ -172,24 +130,11 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
-    /*Round the size up to ALIGN_MASK*/
-    size = (size + ALIGN_MASK) & (~ALIGN_MASK);
-    void * alloc = NULL;
-
 #if LV_MEM_CUSTOM == 0
-    alloc = alloc_core(size);
-    if(alloc == NULL) {
-        LV_LOG_WARN("out of memory, trying to defrag");
-        lv_mem_defrag();
-        alloc = alloc_core(size);
-        if(alloc) {
-            LV_LOG_INFO("defrag made enough memory, memory allocated successfully");
-        }
-    }
-
+    void * alloc = tlsf_malloc(tlsf, size);
 #else
-    alloc = LV_MEM_CUSTOM_ALLOC(size);
-#endif                /* LV_MEM_CUSTOM */
+    void * alloc = LV_MEM_CUSTOM_ALLOC(size);
+#endif
 
 #if LV_MEM_ADD_JUNK
     if(alloc != NULL) lv_memset(alloc, 0xaa, size);
@@ -202,16 +147,6 @@ void * lv_mem_alloc(size_t size)
         LV_LOG_ERROR("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
                (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
                (int)mon.free_biggest_size);
-    }
-    else {
-#if LV_MEM_CUSTOM == 0
-        /* just a safety check, should always be true */
-        if((uintptr_t) alloc > (uintptr_t) work_mem) {
-            if((((uintptr_t) alloc - (uintptr_t) work_mem) + size) > mem_max_size) {
-                mem_max_size = ((uintptr_t) alloc - (uintptr_t) work_mem) + size;
-            }
-        }
-#endif
     }
 
     MEM_TRACE("allocated at 0x%p", alloc);
@@ -229,21 +164,11 @@ void lv_mem_free(void * data)
     if(data == NULL) return;
 
 #if LV_MEM_CUSTOM == 0
-    lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
-    e->header.s.used = 0;
 #  if LV_MEM_ADD_JUNK
-    lv_memset((void *)data, 0xbb, e->header.s.d_size);
+    lv_memset(data, 0xbb, tlsf_block_size(data));
 #  endif
-
-    static uint32_t defr = 0;
-    defr++;
-    if(defr > LV_MEM_FULL_DEFRAG_CNT) {
-        MEM_TRACE("performing auto defrag")
-        defr = 0;
-        lv_mem_defrag();
-    }
+    tlsf_free(tlsf, data);
 #else
-    /*e points to the header*/
     LV_MEM_CUSTOM_FREE(data);
 #endif
 }
@@ -258,120 +183,26 @@ void lv_mem_free(void * data)
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
     MEM_TRACE("reallocating 0x%p with %d size", data_p, new_size);
-    void * new_p = NULL;
-#if LV_MEM_CUSTOM
     if(new_size == 0) {
         MEM_TRACE("using zero_mem");
-        LV_MEM_CUSTOM_FREE(data_p);
+        lv_mem_free(data_p);
         return &zero_mem;
     }
 
-    if(data_p == &zero_mem) new_p = LV_MEM_CUSTOM_ALLOC(new_size);
-    else  new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
+    if(data_p == &zero_mem) return lv_mem_alloc(new_size);
 
-    if(new_p == NULL) {
-        LV_LOG_ERROR("couldn't allocate memory");
-        return NULL;
-    } else {
-        MEM_TRACE("allocated at 0x%p", new_p);
-        return new_p;
-    }
+#if LV_MEM_CUSTOM == 0
+    void * new_p = tlsf_realloc(tlsf, data_p, new_size);
 #else
-
-    /*Round the size up to ALIGN_MASK*/
-    new_size = (new_size + ALIGN_MASK) & (~ALIGN_MASK);
-
-    /*data_p could be previously freed pointer (in this case it is invalid)*/
-    if(data_p != NULL) {
-        lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));
-        if(e->header.s.used == 0) {
-            data_p = NULL;
-        }
-    }
-
-    uint32_t old_size = get_size(data_p);
-
-    if(old_size == new_size) {
-        MEM_TRACE("same size, using the original memory");
-        return data_p;
-    }
-
-    if(new_size == 0) {
-        lv_mem_free(data_p);
-        return &zero_mem;
-    }
-    /* Truncate the memory if the new size is smaller. */
-    if(new_size < old_size) {
-        lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));
-        ent_trunc(e, new_size);
-        MEM_TRACE("memory entry is truncated (same address 0x%p is used)", &e->first_data);
-        return &e->first_data;
-    }
-
-    new_p = lv_mem_alloc(new_size);
+    void * new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
+#endif
     if(new_p == NULL) {
         LV_LOG_ERROR("couldn't allocate memory");
         return NULL;
-    }
-
-    if(data_p != NULL) {
-        /*Copy the old data to the new. Use the smaller size*/
-        if(old_size != 0 && new_size != 0) {
-            lv_memcpy(new_p, data_p, LV_MIN(new_size, old_size));
-        }
-        lv_mem_free(data_p);
     }
 
     MEM_TRACE("allocated at 0x%p", new_p);
     return new_p;
-#endif
-}
-
-/**
- * Join the adjacent free memory blocks
- */
-void lv_mem_defrag(void)
-{
-    MEM_TRACE("begin");
-#if LV_MEM_CUSTOM == 0
-    lv_mem_ent_t * e_free;
-    lv_mem_ent_t * e_next;
-    e_free = ent_get_next(NULL);
-
-    while(1) {
-        /*Search the next free entry*/
-        while(e_free != NULL) {
-            if(e_free->header.s.used != 0) e_free = ent_get_next(e_free);
-            else break;
-        }
-
-        if(e_free == NULL) {
-            MEM_TRACE("finished");
-            return;
-        }
-
-        /*Joint the following free entries to the free*/
-        e_next = ent_get_next(e_free);
-        while(e_next != NULL) {
-            if(e_next->header.s.used == 0) {
-                e_free->header.s.d_size += e_next->header.s.d_size + sizeof(e_next->header);
-            }
-            else {
-                break;
-            }
-
-            e_next = ent_get_next(e_next);
-        }
-
-        if(e_next == NULL) {
-            MEM_TRACE("finished");
-            return;
-        }
-
-        /*Continue from the lastly checked entry*/
-        e_free = e_next;
-    }
-#endif
 }
 
 lv_res_t lv_mem_test(void)
@@ -382,19 +213,14 @@ lv_res_t lv_mem_test(void)
     }
 
 #if LV_MEM_CUSTOM == 0
-    lv_mem_ent_t * e;
-    e = ent_get_next(NULL);
-    while(e) {
-        if(e->header.s.d_size > LV_MEM_SIZE) {
-            LV_LOG_WARN("failed");
-            return LV_RES_INV;
-        }
-        uint8_t * e8 = (uint8_t *)e;
-        if(e8 + e->header.s.d_size > work_mem + LV_MEM_SIZE) {
-            LV_LOG_WARN("failed");
-            return LV_RES_INV;
-        }
-        e = ent_get_next(e);
+    if(tlsf_check(tlsf)) {
+        LV_LOG_WARN("failed");
+        return LV_RES_INV;
+    }
+
+    if (tlsf_check_pool(tlsf_get_pool(tlsf))) {
+        LV_LOG_WARN("pool failed");
+        return LV_RES_INV;
     }
 #endif
     MEM_TRACE("passed");
@@ -412,26 +238,10 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
 #if LV_MEM_CUSTOM == 0
     MEM_TRACE("begin");
-    lv_mem_ent_t * e;
 
-    e = ent_get_next(NULL);
+    tlsf_walk_pool(tlsf_get_pool(tlsf), lv_mem_walker, mon_p);
 
-    while(e != NULL) {
-        if(e->header.s.used == 0) {
-            mon_p->free_cnt++;
-            mon_p->free_size += e->header.s.d_size;
-            if(e->header.s.d_size > mon_p->free_biggest_size) {
-                mon_p->free_biggest_size = e->header.s.d_size;
-            }
-        }
-        else {
-            mon_p->used_cnt++;
-        }
-
-        e = ent_get_next(e);
-    }
     mon_p->total_size = LV_MEM_SIZE;
-    mon_p->max_used = mem_max_size;
     mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
     if(mon_p->free_size > 0) {
         mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
@@ -750,94 +560,19 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len)
  **********************/
 
 #if LV_MEM_CUSTOM == 0
-
-static void * alloc_core(size_t size)
+static void lv_mem_walker(void * ptr, size_t size, int used, void * user)
 {
-    lv_mem_ent_t * e = NULL;
+    LV_UNUSED(ptr);
 
-    /* Search for a appropriate entry*/
-    while(1) {
-        /* Get the next entry*/
-        e = ent_get_next(e);
-        if( e == NULL) break;
-
-        /*If there is next entry then try to allocate there*/
-        if(!e->header.s.used && e->header.s.d_size >= size)
-            return ent_alloc(e, size);
+    lv_mem_monitor_t * mon_p = user;
+    if(used) {
+        mon_p->used_cnt++;
     }
-
-    return NULL;
-}
-
-/**
- * Give the next entry after 'act_e'
- * @param act_e pointer to an entry
- * @return pointer to an entry after 'act_e'
- */
-static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
-{
-    /*NULL means: get the first entry; else get the next after `act_e`*/
-    if(act_e == NULL) return (lv_mem_ent_t *)work_mem;
     else {
-        uint8_t * data = &act_e->first_data;
-        lv_mem_ent_t * next_e = (lv_mem_ent_t *)&data[act_e->header.s.d_size];
-
-        if(&next_e->first_data > last_mem) return NULL;
-        else return next_e;
+        mon_p->free_cnt++;
+        mon_p->free_size += size;
+        if(size > mon_p->free_biggest_size)
+            mon_p->free_biggest_size = size;
     }
 }
-
-/**
- * Try to do the real allocation with a given size
- * @param e try to allocate to this entry
- * @param size size of the new memory in bytes
- * @return pointer to the allocated memory or NULL if not enough memory in the entry
- */
-static inline void * ent_alloc(lv_mem_ent_t * e, size_t size)
-{
-    /*Truncate the entry to the desired size */
-    ent_trunc(e, size);
-    e->header.s.used = 1;
-
-    /*Save the allocated data*/
-    return &e->first_data;
-}
-
-/**
- * Truncate the data of entry to the given size
- * @param e Pointer to an entry
- * @param size new size in bytes
- */
-static void ent_trunc(lv_mem_ent_t * e, size_t size)
-{
-    /*Round the size up to ALIGN_MASK*/
-    size = (size + ALIGN_MASK) & (~ALIGN_MASK);
-
-    /*Don't let empty space only for a header without data*/
-    if(e->header.s.d_size == size + sizeof(lv_mem_header_t)) {
-        size = e->header.s.d_size;
-    }
-
-    /* Create the new entry after the current if there is space for it */
-    if(e->header.s.d_size != size) {
-        uint8_t * e_data             = &e->first_data;
-        lv_mem_ent_t * after_new_e   = (lv_mem_ent_t *)&e_data[size];
-        after_new_e->header.s.used   = 0;
-        after_new_e->header.s.d_size = e->header.s.d_size - size - sizeof(lv_mem_header_t);
-
-        /* Set the new size for the original entry */
-        e->header.s.d_size = size;
-    }
-}
-
-static size_t get_size(void * data_p)
-{
-    if(data_p == NULL) return 0;
-    if(data_p == &zero_mem) return 0;
-
-    lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));
-
-    return e->header.s.d_size;
-}
-
 #endif

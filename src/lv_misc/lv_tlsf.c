@@ -1,3 +1,6 @@
+#include "../lv_conf_internal.h"
+#if LV_MEM_CUSTOM == 0
+
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
@@ -5,7 +8,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "tlsf.h"
+#include "lv_tlsf.h"
+
+#include "lv_log.h"
+#define printf LV_LOG_ERROR
+
+#define TLSF_MAX_POOL_SIZE LV_MEM_SIZE
+
+#if !defined(_DEBUG)
+#define _DEBUG 0
+#endif
 
 #if defined(__cplusplus)
 #define tlsf_decl inline
@@ -39,6 +51,29 @@
 	|| defined (_WIN64) || defined (__LP64__) || defined (__LLP64__)
 #define TLSF_64BIT
 #endif
+
+/*
+** Returns one plus the index of the most significant 1-bit of n,
+** or if n is zero, returns zero.
+*/
+#ifdef TLSF_64BIT
+#define TLSF_FLS(n) ((n) & 0xffffffff00000000ull ? 32 + TLSF_FLS32((size_t)(n) >> 32) : TLSF_FLS32(n))
+#else
+#define TLSF_FLS(n) TLSF_FLS32(n)
+#endif
+
+#define TLSF_FLS32(n) ((n) & 0xffff0000 ? 16 + TLSF_FLS16((n) >> 16) : TLSF_FLS16(n))
+#define TLSF_FLS16(n) ((n) & 0xff00     ?  8 + TLSF_FLS8 ((n) >>  8) : TLSF_FLS8 (n))
+#define TLSF_FLS8(n)  ((n) & 0xf0       ?  4 + TLSF_FLS4 ((n) >>  4) : TLSF_FLS4 (n))
+#define TLSF_FLS4(n)  ((n) & 0xc        ?  2 + TLSF_FLS2 ((n) >>  2) : TLSF_FLS2 (n))
+#define TLSF_FLS2(n)  ((n) & 0x2        ?  1 + TLSF_FLS1 ((n) >>  1) : TLSF_FLS1 (n))
+#define TLSF_FLS1(n)  ((n) & 0x1        ?  1 : 0)
+
+/*
+** Returns round up value of log2(n).
+** Note: it is used at compile time.
+*/
+#define TLSF_LOG2_CEIL(n) ((n) & (n - 1) ? TLSF_FLS(n) : TLSF_FLS(n) - 1)
 
 /*
 ** gcc 3.4 and above have builtin support, specialized for architecture.
@@ -147,29 +182,16 @@ tlsf_decl int tlsf_fls(unsigned int word)
 #else
 /* Fall back to generic implementation. */
 
-tlsf_decl int tlsf_fls_generic(unsigned int word)
-{
-	int bit = 32;
-
-	if (!word) bit -= 1;
-	if (!(word & 0xffff0000)) { word <<= 16; bit -= 16; }
-	if (!(word & 0xff000000)) { word <<= 8; bit -= 8; }
-	if (!(word & 0xf0000000)) { word <<= 4; bit -= 4; }
-	if (!(word & 0xc0000000)) { word <<= 2; bit -= 2; }
-	if (!(word & 0x80000000)) { word <<= 1; bit -= 1; }
-
-	return bit;
-}
-
 /* Implement ffs in terms of fls. */
 tlsf_decl int tlsf_ffs(unsigned int word)
 {
-	return tlsf_fls_generic(word & (~word + 1)) - 1;
+	const unsigned int reverse = word & (~word + 1);
+	return TLSF_FLS32(reverse) - 1;
 }
 
 tlsf_decl int tlsf_fls(unsigned int word)
 {
-	return tlsf_fls_generic(word) - 1;
+	return TLSF_FLS32(word) - 1;
 }
 
 #endif
@@ -234,7 +256,9 @@ enum tlsf_private
 	** blocks below that size into the 0th first-level list.
 	*/
 
-#if defined (TLSF_64BIT)
+#if defined (TLSF_MAX_POOL_SIZE)
+	FL_INDEX_MAX = TLSF_LOG2_CEIL(TLSF_MAX_POOL_SIZE),
+#elif defined (TLSF_64BIT)
 	/*
 	** TODO: We can increase this to support larger sizes, at the expense
 	** of more overhead in the TLSF structure.
@@ -898,7 +922,7 @@ int tlsf_check(tlsf_t tlsf)
 static void default_walker(void* ptr, size_t size, int used, void* user)
 {
 	(void)user;
-	printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, block_from_ptr(ptr));
+	printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, (void*)block_from_ptr(ptr));
 }
 
 void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
@@ -1262,3 +1286,5 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 
 	return p;
 }
+
+#endif /* LV_MEM_CUSTOM == 0 */

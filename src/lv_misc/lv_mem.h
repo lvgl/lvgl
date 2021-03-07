@@ -53,7 +53,7 @@ typedef struct {
 typedef struct {
     void * p;
     uint16_t size;
-    uint8_t used    : 1;
+    uint8_t used : 1;
 } lv_mem_buf_t;
 
 typedef lv_mem_buf_t lv_mem_buf_arr_t[LV_MEM_BUF_MAX_NUM];
@@ -94,11 +94,6 @@ void lv_mem_free(void * data);
  * @return pointer to the new memory
  */
 void * lv_mem_realloc(void * data_p, size_t new_size);
-
-/**
- * Join the adjacent free memory blocks
- */
-void lv_mem_defrag(void);
 
 /**
  *

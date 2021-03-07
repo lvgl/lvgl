@@ -12,6 +12,7 @@ CSRCS += lv_mem.c
 CSRCS += lv_printf.c
 CSRCS += lv_style.c
 CSRCS += lv_timer.c
+CSRCS += lv_tlsf.c
 CSRCS += lv_txt.c
 CSRCS += lv_txt_ap.c
 CSRCS += lv_utils.c

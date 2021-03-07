@@ -1,3 +1,6 @@
+#include "../lv_conf_internal.h"
+#if LV_MEM_CUSTOM == 0
+
 #ifndef INCLUDED_tlsf
 #define INCLUDED_tlsf
 
@@ -88,3 +91,5 @@ int tlsf_check_pool(pool_t pool);
 #endif
 
 #endif
+
+#endif /* LV_MEM_CUSTOM == 0 */
