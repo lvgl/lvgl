@@ -10,7 +10,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event)
 
 void lv_example_switch_1(void)
 {
-    lv_obj_set_layout(lv_scr_act(), &lv_flex_center_column);
+    lv_obj_set_layout(lv_scr_act(), &lv_flex_column_center);
 
     lv_obj_t * sw;
 

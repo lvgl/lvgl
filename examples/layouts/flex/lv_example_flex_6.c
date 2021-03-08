@@ -11,7 +11,7 @@ void lv_example_flex_6(void)
     lv_obj_set_base_dir(cont, LV_BIDI_DIR_RTL);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_layout(cont, &lv_flex_center_column);
+    lv_obj_set_layout(cont, &lv_flex_column_center);
 
     uint32_t i;
     for(i = 0; i < 20; i++) {

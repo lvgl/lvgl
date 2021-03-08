@@ -102,12 +102,12 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow);
 /**
  * Predefines flex layouts
  */
-extern const lv_flex_t lv_flex_inline;          /**< Just put the items next to each other with wrap*/
-extern const lv_flex_t lv_flex_center_row;      /**< Center in a row with wrap*/
-extern const lv_flex_t lv_flex_center_column;   /**< Center in a column with wrap*/
-extern const lv_flex_t lv_flex_stacked;         /**< Stack the items vertically without wrapping*/
-extern const lv_flex_t lv_flex_queue;           /**< Put the items next to each other without wrap*/
-extern const lv_flex_t lv_flex_even;            /**< Place the items evenly in row with wrapping and vertical centering*/
+extern const lv_flex_t lv_flex_row_wrap;          /**< Just put the items next to each other with wrap*/
+extern const lv_flex_t lv_flex_row_center;      /**< Center in a row with wrap*/
+extern const lv_flex_t lv_flex_column_center;   /**< Center in a column with wrap*/
+extern const lv_flex_t lv_flex_column_nowrap;         /**< Stack the items vertically without wrapping*/
+extern const lv_flex_t lv_flex_row_nowrap;           /**< Put the items next to each other without wrap*/
+extern const lv_flex_t lv_flex_row_even;            /**< Place the items evenly in row with wrapping and vertical centering*/
 
 /**********************
  *      MACROS

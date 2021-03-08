@@ -19,7 +19,7 @@ void lv_example_scroll_2(void)
     lv_obj_t * panel = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(panel, 280, 150);
     lv_obj_set_scroll_snap_x(panel, LV_SCROLL_SNAP_CENTER);
-    lv_obj_set_layout(panel, &lv_flex_queue);
+    lv_obj_set_layout(panel, &lv_flex_row_nowrap);
     lv_obj_center(panel);
 
     uint32_t i;

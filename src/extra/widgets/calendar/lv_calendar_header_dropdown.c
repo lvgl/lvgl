@@ -65,7 +65,7 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
 
     lv_coord_t w = lv_obj_get_width(calendar);
     lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
-    lv_obj_set_layout(header, &lv_flex_center_row);
+    lv_obj_set_layout(header, &lv_flex_row_center);
 
     lv_obj_t * year_dd = lv_dropdown_create(header, NULL);
     lv_dropdown_set_options(year_dd, year_list);

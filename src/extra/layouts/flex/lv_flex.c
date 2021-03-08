@@ -42,17 +42,7 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
  *  GLOBAL VARIABLES
  **********************/
 
-const lv_flex_t lv_flex_inline = {
-        .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_START,
-        .dir = LV_FLEX_FLOW_ROW,
-        .wrap = 1
-};
-
-
-const lv_flex_t lv_flex_center_row = {
+const lv_flex_t lv_flex_row_center = {
         .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_CENTER,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
@@ -61,7 +51,7 @@ const lv_flex_t lv_flex_center_row = {
         .wrap = 1
 };
 
-const lv_flex_t lv_flex_center_column = {
+const lv_flex_t lv_flex_column_center = {
         .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_CENTER,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
@@ -70,23 +60,16 @@ const lv_flex_t lv_flex_center_column = {
         .wrap = 1
 };
 
-const lv_flex_t lv_flex_stacked = {
+const lv_flex_t lv_flex_row_wrap = {
         .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_START,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
         .track_cross_place = LV_FLEX_PLACE_START,
-        .dir = LV_FLEX_FLOW_COLUMN
+        .dir = LV_FLEX_FLOW_ROW,
+        .wrap = 1
 };
 
-const lv_flex_t lv_flex_queue = {
-        .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_START,
-        .track_cross_place = LV_FLEX_PLACE_START,
-        .dir = LV_FLEX_FLOW_ROW
-};
-
-const lv_flex_t lv_flex_even = {
+const lv_flex_t lv_flex_row_even = {
         .base.update_cb = flex_update,
         .item_main_place = LV_FLEX_PLACE_SPACE_EVENLY,
         .item_cross_place = LV_FLEX_PLACE_CENTER,
@@ -94,6 +77,23 @@ const lv_flex_t lv_flex_even = {
         .dir = LV_FLEX_FLOW_ROW,
         .wrap = 1
 };
+
+const lv_flex_t lv_flex_column_nowrap = {
+        .base.update_cb = flex_update,
+        .item_main_place = LV_FLEX_PLACE_START,
+        .item_cross_place = LV_FLEX_PLACE_CENTER,
+        .track_cross_place = LV_FLEX_PLACE_START,
+        .dir = LV_FLEX_FLOW_COLUMN
+};
+
+const lv_flex_t lv_flex_row_nowrap = {
+        .base.update_cb = flex_update,
+        .item_main_place = LV_FLEX_PLACE_START,
+        .item_cross_place = LV_FLEX_PLACE_CENTER,
+        .track_cross_place = LV_FLEX_PLACE_START,
+        .dir = LV_FLEX_FLOW_ROW
+};
+
 
 /**********************
  *  STATIC VARIABLES

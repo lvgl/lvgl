@@ -202,7 +202,7 @@ static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
          break;
      }
 
-    lv_obj_set_layout(cont, &lv_flex_queue);
+    lv_obj_set_layout(cont, &lv_flex_row_nowrap);
     lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER);
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);

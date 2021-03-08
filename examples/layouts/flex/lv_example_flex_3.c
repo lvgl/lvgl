@@ -9,7 +9,7 @@ void lv_example_flex_3(void)
     lv_obj_t * cont = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_layout(cont, &lv_flex_queue);
+    lv_obj_set_layout(cont, &lv_flex_row_nowrap);
 
     lv_obj_t * obj;
     obj = lv_obj_create(cont, NULL);
