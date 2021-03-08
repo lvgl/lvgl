@@ -916,7 +916,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.x > lv_area_get_width(&txt_coords)) {
 #if LV_USE_BIDI
             int32_t start, end;
-            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
 
             if (base_dir == LV_BIDI_DIR_AUTO)
                 base_dir = _lv_bidi_detect_base_dir(label->text);
@@ -1014,7 +1014,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.x > lv_area_get_width(&txt_coords)) {
 #if LV_USE_BIDI
             int32_t start, end;
-            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
 
             if (base_dir == LV_BIDI_DIR_AUTO)
                 base_dir = _lv_bidi_detect_base_dir(label->text);
