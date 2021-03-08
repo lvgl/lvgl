@@ -101,3 +101,13 @@ os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_
 print("\nGenerating 16 px Hebrew, Persian")
 os.system("./built_in_font_gen.py --size 16 -o lv_font_dejavu_16_persian_hebrew.c --bpp 4 --font DejaVuSans.ttf -r 0x20-0x7f,0x5d0-0x5ea,0x600-0x6FF,0xFB50-0xFDFF,0xFE70-0xFEFF")
 os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_dejavu_16_persian_hebrew.c')
+
+print("\nGenerating 8 px unscii")
+os.system("lv_font_conv --no-compress --no-prefilter --bpp 1 --size 8 --font unscii-8.ttf -r 0x20-0x7F --format lvgl -o lv_font_unscii_8.c --force-fast-kern-format")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_unscii_8.c')
+
+print("\nGenerating 16 px unscii")
+os.system("lv_font_conv --no-compress --no-prefilter --bpp 1 --size 16 --font unscii-8.ttf -r 0x20-0x7F --format lvgl -o lv_font_unscii_16.c --force-fast-kern-format")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_unscii_16.c')
+
+
