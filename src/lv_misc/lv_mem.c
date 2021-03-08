@@ -34,8 +34,6 @@
 #  define ALIGN_MASK       0x7
 #endif
 
-#define MEM_BUF_SMALL_SIZE 16
-
 #define ZERO_MEM_SENTINEL  0xa1b2c3d4
 
 /**********************
@@ -57,13 +55,6 @@
 #endif
 
 static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
-
-static uint8_t mem_buf1_32[MEM_BUF_SMALL_SIZE];
-static uint8_t mem_buf2_32[MEM_BUF_SMALL_SIZE];
-
-static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_SIZE, .used = 0},
-    {.p = mem_buf2_32, .size = MEM_BUF_SMALL_SIZE, .used = 0}
-};
 
 /**********************
  *      MACROS
@@ -265,21 +256,10 @@ void * lv_mem_buf_get(uint32_t size)
     if(size == 0) return NULL;
 
     MEM_TRACE("begin, getting %d bytes", size);
-    /*Try small static buffers first*/
-    uint8_t i;
-    if(size <= MEM_BUF_SMALL_SIZE) {
-        for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
-            if(mem_buf_small[i].used == 0) {
-                mem_buf_small[i].used = 1;
-                MEM_TRACE("return using small static buffer");
-                return mem_buf_small[i].p;
-            }
-        }
-    }
 
     /*Try to find a free buffer with suitable size */
     int8_t i_guess = -1;
-    for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
+    for(uint8_t i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(lv_mem_buf[i]).used == 0 && LV_GC_ROOT(lv_mem_buf[i]).size >= size) {
             if(LV_GC_ROOT(lv_mem_buf[i]).size == size) {
                 LV_GC_ROOT(lv_mem_buf[i]).used = 1;
@@ -302,7 +282,7 @@ void * lv_mem_buf_get(uint32_t size)
     }
 
     /*Reallocate a free buffer*/
-    for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
+    for(uint8_t i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(lv_mem_buf[i]).used == 0) {
             /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
             void * buf = lv_mem_realloc(LV_GC_ROOT(lv_mem_buf[i]).p, size);
@@ -329,18 +309,8 @@ void * lv_mem_buf_get(uint32_t size)
 void lv_mem_buf_release(void * p)
 {
     MEM_TRACE("begin (address: 0x%p)", p);
-    uint8_t i;
 
-    /*Try small static buffers first*/
-    for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
-        if(mem_buf_small[i].p == p) {
-            mem_buf_small[i].used = 0;
-            MEM_TRACE("released (buffer id: %d)", i);
-            return;
-        }
-    }
-
-    for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
+    for(uint8_t i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(lv_mem_buf[i]).p == p) {
             LV_GC_ROOT(lv_mem_buf[i]).used = 0;
             return;
@@ -355,12 +325,7 @@ void lv_mem_buf_release(void * p)
  */
 void lv_mem_buf_free_all(void)
 {
-    uint8_t i;
-    for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
-        mem_buf_small[i].used = 0;
-    }
-
-    for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
+    for(uint8_t i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(lv_mem_buf[i]).p) {
             lv_mem_free(LV_GC_ROOT(lv_mem_buf[i]).p);
             LV_GC_ROOT(lv_mem_buf[i]).p = NULL;
