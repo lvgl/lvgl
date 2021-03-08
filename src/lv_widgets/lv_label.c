@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_label.c
  *
  */
@@ -914,10 +914,29 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
+#if LV_USE_BIDI
+            int32_t start, end;
+            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+
+            if (base_dir == LV_BIDI_DIR_AUTO)
+                base_dir = _lv_bidi_detect_base_dir(label->text);
+
+            if (base_dir == LV_BIDI_DIR_RTL) {
+                start = lv_area_get_width(&txt_coords) - size.x;
+                end = 0;
+            }
+            else {
+                start = 0;
+                end = lv_area_get_width(&txt_coords) - size.x;
+            }
+
+            lv_anim_set_values(&a, start, end);
+#else
             lv_anim_set_values(&a, 0, lv_area_get_width(&txt_coords) - size.x);
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
-            lv_anim_set_playback_time(&a, a.time);
+#endif
+            lv_anim_set_exec_cb(&a, set_ofs_x_anim);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = 0;
@@ -993,9 +1012,28 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
+#if LV_USE_BIDI
+            int32_t start, end;
+            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+
+            if (base_dir == LV_BIDI_DIR_AUTO)
+                base_dir = _lv_bidi_detect_base_dir(label->text);
+
+            if (base_dir == LV_BIDI_DIR_RTL) {
+                start = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+                end = 0;
+            }
+            else {
+                start = 0;
+                end = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            }
+
+            lv_anim_set_values(&a, start, end);
+#else
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
+#endif
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;

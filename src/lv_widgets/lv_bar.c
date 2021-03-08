@@ -369,17 +369,34 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         *axis1 += anim_start_value_x;
     }
     else {
-        *axis1 = *axis2 - anim_cur_value_x;
+        *axis1 = *axis2 - anim_cur_value_x + 1;
         *axis2 -= anim_start_value_x;
     }
     if(sym) {
-        lv_coord_t zero;
-        zero = *axis1 + (-bar->min_value * anim_length) / range;
-        if(*axis2 > zero)
-            *axis1 = zero;
-        else {
-            *axis1 = *axis2;
-            *axis2 = zero;
+        lv_coord_t zero, shift;
+        shift = (-bar->min_value * anim_length) / range;
+        if(hor) {
+            zero = *axis1 + shift;
+            if(*axis2 > zero)
+                *axis1 = zero;
+            else {
+                *axis1 = *axis2;
+                *axis2 = zero;
+            }
+        } else {
+            zero = *axis2 - shift + 1;
+            if(*axis1 > zero)
+                *axis2 = zero;
+            else {
+                *axis2 = *axis1;
+                *axis1 = zero;
+            }
+            if(*axis2 < *axis1) {
+                /* swap */
+                zero = *axis1;
+                *axis1 = *axis2;
+                *axis2 = zero;
+            }
         }
     }
 
@@ -419,7 +436,13 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 
 #if LV_DRAW_COMPLEX
     lv_draw_mask_radius_param_t mask_bg_param;
-    lv_draw_mask_radius_init(&mask_bg_param, &bar_coords, bg_radius, false);
+    lv_area_t bg_mask_area;
+    bg_mask_area.x1 = obj->coords.x1 + bg_left;
+    bg_mask_area.x2 = obj->coords.x2 - bg_right;
+    bg_mask_area.y1 = obj->coords.y1 + bg_top;
+    bg_mask_area.y2 = obj->coords.y2 - bg_bottom;
+
+    lv_draw_mask_radius_init(&mask_bg_param, &bg_mask_area, bg_radius, false);
     int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 #endif
 
@@ -493,6 +516,17 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Bg size is handled by lv_obj*/
         lv_coord_t * s = param;
         *s = LV_MAX(*s, indic_size);
+
+        /*Calculate the indicator area*/
+        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+        lv_coord_t pad = LV_MIN4(bg_left, bg_right, bg_top, bg_bottom);
+        if(pad < 0) {
+            *s = LV_MAX(*s, -pad);
+        }
     }
 
     return res;
