@@ -167,7 +167,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     entry_cnt = new_entry_cnt;
 
     /*Clean the cache*/
-    _lv_memset_00(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(lv_img_cache_entry_t));
+    lv_memset_00(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(lv_img_cache_entry_t));
 #endif
 }
 
@@ -189,7 +189,7 @@ void lv_img_cache_invalidate_src(const void * src)
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
 
-            _lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
+            lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
         }
     }
 #endif
