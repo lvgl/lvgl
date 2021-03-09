@@ -161,8 +161,20 @@ char * lv_label_get_text(const lv_obj_t * obj);
 
 /**
  * Get the long mode of a label
+<<<<<<< HEAD
  * @param obj       pointer to a label object
  * @return          the current long mode
+=======
+ * @param label pointer to a label object
+ * @return the long mode
+ */
+lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
+
+/**
+ * Get the align attribute
+ * @param label pointer to a label object
+ * @return LV_LABEL_ALIGN_LEFT/RIGHT/CENTER
+>>>>>>> master
  */
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
 

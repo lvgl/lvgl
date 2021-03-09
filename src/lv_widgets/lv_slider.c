@@ -171,8 +171,14 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                     dist_right = LV_ABS((slider->right_knob_area.x1 + (slider->right_knob_area.x2 - slider->right_knob_area.x1) / 2) - p.x);
 
                     /* Use whichever one is closer */
-                    if(dist_right < dist_left)slider->value_to_set = &slider->bar.cur_value;
-                    else slider->value_to_set = &slider->bar.start_value;
+                    if(dist_right < dist_left) {
+                        slider->value_to_set = &slider->bar.cur_value;
+                        slider->left_knob_focus = 0;
+                    }
+                    else {
+                        slider->value_to_set = &slider->bar.start_value;
+                        slider->left_knob_focus = 1;
+                    }
                 }
             }
             else {
@@ -188,8 +194,14 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                     dist_right = LV_ABS((slider->right_knob_area.y1 + (slider->right_knob_area.y2 - slider->right_knob_area.y1) / 2) - p.y);
 
                     /* Use whichever one is closer */
-                    if(dist_right < dist_left)slider->value_to_set = &slider->bar.cur_value;
-                    else slider->value_to_set = &slider->bar.start_value;
+                    if(dist_right < dist_left) {
+                        slider->value_to_set = &slider->bar.cur_value;
+                        slider->left_knob_focus = 0;
+                    }
+                    else {
+                        slider->value_to_set = &slider->bar.start_value;
+                        slider->left_knob_focus = 1;
+                    }
                 }
             }
         }
@@ -276,7 +288,10 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     }
     else if(sign == LV_SIGNAL_FOCUS) {
-        slider->left_knob_focus = 0;
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
+            slider->left_knob_focus = 0;
+        }
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
         /* The knob size depends on slider size.

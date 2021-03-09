@@ -149,7 +149,6 @@ enum {
     LV_STATE_PRESSED     =  0x20,
     LV_STATE_SCROLLED    =  0x40,
     LV_STATE_DISABLED    =  0x80,
-    _LV_STATE_RESERVED    =  0x80,
 
     LV_STATE_ANY = 0x1FF,    /**< Special value can be used in some functions to target all states */
 };
@@ -203,7 +202,7 @@ enum {
     LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14), /**< Propagate the focus to the parent */
     LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners. */
     LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 16), /**< Make the object position-able by the layouts */
-    LV_OBJ_FLAG_FLOATING        = (1 << 17),
+    LV_OBJ_FLAG_FLOATING        = (1 << 17), /**< Do not scroll the object when the parent scrolls and ignore layout */
 
     LV_OBJ_FLAG_LAYOUT_1        = (1 << 23), /** Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1 << 24), /** Custom flag, free to use by layouts*/

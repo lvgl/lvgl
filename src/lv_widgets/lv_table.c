@@ -36,7 +36,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
-static void refr_size(lv_obj_t * obj);
+static void refr_size(lv_obj_t * obj, uint32_t strat_row);
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 
 /**********************
@@ -101,7 +101,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
 #endif
 
     table->cell_data[cell][0] = ctrl;
-    refr_size(obj) ;
+    refr_size(obj, row);
 }
 
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...)
@@ -172,7 +172,20 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     va_end(ap2);
 
     table->cell_data[cell][0] = ctrl;
-    refr_size(obj) ;
+
+    /*Refresh the row height*/
+    lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+    lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+    lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+    lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+
+    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
+
+    table->row_h[row] = get_row_height(obj, row, font, letter_space, line_space,
+                                       cell_left, cell_right, cell_top, cell_bottom);
+
 }
 
 void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
@@ -198,7 +211,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
         lv_memset_00(&table->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(table->cell_data[0]));
     }
 
-    refr_size(obj) ;
+    refr_size(obj, 0) ;
 }
 
 void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
@@ -242,7 +255,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     table->cell_data = new_cell_data;
 
 
-    refr_size(obj) ;
+    refr_size(obj, 0) ;
 }
 
 void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
@@ -255,7 +268,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
     if(col_id >= table->col_cnt) lv_table_set_col_cnt(obj, col_id + 1);
 
     table->col_w[col_id] = w;
-    refr_size(obj) ;
+    refr_size(obj, 0) ;
 }
 
 void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl)
@@ -640,7 +653,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_table_t * table = (lv_table_t *)obj;
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        refr_size(obj);
+        refr_size(obj, 0);
     }
     else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
         lv_point_t * p = param;
@@ -717,7 +730,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 }
 
 
-static void refr_size(lv_obj_t * obj)
+static void refr_size(lv_obj_t * obj, uint32_t strat_row)
 {
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -732,7 +745,7 @@ static void refr_size(lv_obj_t * obj)
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
 
-    for(i = 0; i < table->row_cnt; i++) {
+    for(i = strat_row; i < table->row_cnt; i++) {
         table->row_h[i] = get_row_height(obj, i, font, letter_space, line_space,
                                        cell_left, cell_right, cell_top, cell_bottom);
     }

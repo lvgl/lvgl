@@ -27,10 +27,10 @@ extern "C" {
  *********************/
 
 /* Drag threshold in pixels */
-#define LV_INDEV_DEF_SCROLL_LIMIT           10
+#define LV_INDEV_DEF_SCROLL_LIMIT         10
 
 /* Drag throw slow-down in [%]. Greater value -> faster slow-down */
-#define LV_INDEV_DEF_SCROLL_THROW           10
+#define LV_INDEV_DEF_SCROLL_THROW         10
 
 /* Long press time in milliseconds.
  * Time to send `LV_EVENT_LONG_PRESSSED`) */
@@ -54,6 +54,7 @@ extern "C" {
 
 struct _lv_obj_t;
 struct _lv_disp_t;
+struct _lv_group_t;
 struct _lv_indev_t;
 struct _lv_indev_drv_t;
 
@@ -119,7 +120,7 @@ typedef struct _lv_indev_drv_t {
     /**< Pointer to the assigned display*/
     struct _lv_disp_t * disp;
 
-    /**< Task to read the periodically read the input device*/
+    /**< Timer to periodically read the input device*/
     lv_timer_t * read_timer;
 
     /**< Number of pixels to slide before actually drag the object*/
@@ -146,25 +147,31 @@ typedef struct _lv_indev_drv_t {
  */
 typedef struct _lv_indev_proc_t {
     lv_indev_state_t state; /**< Current state of the input device. */
+    /*Flags*/
+    uint8_t long_pr_sent : 1;
+    uint8_t reset_query : 1;
+    uint8_t disabled : 1;
+    uint8_t wait_until_release : 1;
+
     union {
         struct {
             /*Pointer and button data*/
             lv_point_t act_point; /**< Current point of input device. */
             lv_point_t last_point; /**< Last point of input device. */
             lv_point_t vect; /**< Difference between `act_point` and `last_point`. */
-            lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
+            lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
             lv_point_t scroll_throw_vect;
             lv_point_t scroll_throw_vect_ori;
             struct _lv_obj_t * act_obj;      /*The object being pressed*/
             struct _lv_obj_t * last_obj;     /*The last object which was pressed*/
-            struct _lv_obj_t * scroll_obj;      /*The object being scrolled*/
+            struct _lv_obj_t * scroll_obj;   /*The object being scrolled*/
             struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
             lv_area_t scroll_area;
 
-            lv_gesture_dir_t gesture_dir;
             lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
             /*Flags*/
-            lv_indev_scroll_dir_t scroll_dir  : 2;
+            lv_indev_scroll_dir_t scroll_dir : 2;
+            lv_gesture_dir_t gesture_dir : 2;
             uint8_t gesture_sent : 1;
         } pointer;
         struct {
@@ -176,16 +183,7 @@ typedef struct _lv_indev_proc_t {
 
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
-
-    /*Flags*/
-    uint8_t long_pr_sent : 1;
-    uint8_t reset_query : 1;
-    uint8_t disabled : 1;
-    uint8_t wait_until_release : 1;
 } lv_indev_proc_t;
-
-struct _lv_obj_t;
-struct _lv_group_t;
 
 /** The main input device descriptor with driver, runtime data ('proc') and some additional
  * information*/

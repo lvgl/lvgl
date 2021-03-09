@@ -3,13 +3,14 @@
 ## v7.11.0 (Planned for 19.02.2021)
 
 ### New features
-- Add better screen oriantetaion management with sowftware rotation support
+- Add better screen orientation management with software rotation support
+- Decide text animation's direction based on base_dir (when using LV_USE_BIDI)
 
 ### Bugfixes
 - fix(gauge) fix needle invalidation
+- fix(bar) correct symmetric handling for vertical sliders
 
-
-## v7.10.1
+## v7.10.1 (Planned for 16.02.2021)
 
 ### Bugfixes
 - fix(draw) overlap outline with background to prevent aliasing artifacts
