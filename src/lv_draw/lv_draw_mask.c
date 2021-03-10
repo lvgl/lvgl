@@ -190,6 +190,11 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
 {
     lv_memset_00(param, sizeof(lv_draw_mask_line_param_t));
 
+    if(p1y == p2y && side == LV_DRAW_MASK_LINE_SIDE_BOTTOM) {
+        p1y--;
+        p2y--;
+    }
+
     if(p1y > p2y) {
         lv_coord_t t;
         t = p2x;
