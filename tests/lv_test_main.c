@@ -98,7 +98,7 @@ static void hal_init(void)
 
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
-    disp_drv.buffer = &disp_buf;
+    disp_drv.draw_buf = &disp_buf;
     disp_drv.flush_cb = dummy_flush_cb;
     disp_drv.hor_res = HOR_RES;
     disp_drv.ver_res = VER_RES;
