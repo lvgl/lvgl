@@ -66,6 +66,7 @@ void lv_example_chart_2(void)
     lv_chart_set_type(chart1, LV_CHART_TYPE_LINE);   /*Show lines and points too*/
 
     lv_obj_add_event_cb(chart1, event_cb, NULL);
+    lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
 
     /*Add two data series*/
     ser1 = lv_chart_add_series(chart1, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);

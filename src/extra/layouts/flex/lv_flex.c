@@ -273,6 +273,8 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
+        if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUT_1)) break;
+
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             lv_coord_t main_size = (row ? item->w_set : item->h_set);
             if(_LV_FLEX_GET_GROW(main_size)) {
@@ -324,7 +326,6 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
  */
 static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t)
 {
-
     const lv_flex_t * f = (const lv_flex_t *)cont->spec_attr->layout_dsc;
     bool row = f->dir == LV_FLEX_FLOW_ROW ? true : false;
 
@@ -333,7 +334,6 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     lv_coord_t (*area_get_cross_size)(const lv_area_t *) = (!row ? lv_area_get_width : lv_area_get_height);
 
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
-
 
     lv_coord_t main_pos = 0;
 

@@ -396,7 +396,7 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_obj_draw_hook_dsc_t hook_dsc;
     lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
     hook_dsc.part = LV_PART_KNOB;
-    hook_dsc.sub_part_id = 0;
+    hook_dsc.id = 0;
 	hook_dsc.draw_area = &slider->right_knob_area;
 	hook_dsc.rect_dsc = &knob_rect_dsc;
 
@@ -426,7 +426,7 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
     	lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
 		hook_dsc.draw_area = &slider->left_knob_area;
 		hook_dsc.rect_dsc = &knob_rect_dsc;
-		hook_dsc.sub_part_id = 1;
+		hook_dsc.id = 1;
 
 		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
         lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);

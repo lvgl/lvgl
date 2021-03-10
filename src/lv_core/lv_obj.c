@@ -609,8 +609,6 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
             parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
         }
 
-        obj->parent = parent;
-
         lv_coord_t sl = lv_obj_get_scroll_left(parent);
         lv_coord_t st = lv_obj_get_scroll_top(parent);
 

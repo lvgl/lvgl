@@ -47,10 +47,9 @@ typedef struct
     const lv_point_t * p2;
     const lv_coord_t * radius;
     char text[16];
+    int32_t value;
     uint32_t id;
     uint32_t part   :8;
-    uint32_t sub_part_id :12;
-    uint32_t size       :12;
     const void * sub_part_ptr;
 }lv_obj_draw_hook_dsc_t;
 

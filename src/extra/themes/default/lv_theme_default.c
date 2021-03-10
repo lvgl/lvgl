@@ -392,6 +392,7 @@ static void style_init(void)
     style_init_reset(&styles->chart_bg);
     lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
     lv_style_set_line_dash_gap(&styles->chart_bg, LV_DPX(10));
+    lv_style_set_border_post(&styles->chart_bg, false);
 
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
