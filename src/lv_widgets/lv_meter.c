@@ -31,7 +31,7 @@ static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_meter_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_meter_draw(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
-static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
+static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 
 /**********************
@@ -270,7 +270,7 @@ static lv_draw_res_t lv_meter_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         scale_area.y2 -= lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
         draw_arcs(obj, clip_area, &scale_area);
-        draw_lines_and_labels(obj, clip_area, &scale_area);
+        draw_ticks_and_labels(obj, clip_area, &scale_area);
         draw_needles(obj, clip_area, &scale_area);
 
         lv_coord_t r_edge = lv_area_get_width(&scale_area) / 2;
@@ -329,7 +329,7 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
     }
 }
 
-static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
 {
     lv_meter_t * meter    = (lv_meter_t *)obj;
 
@@ -377,15 +377,15 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
         lv_area_t area_inner_major;
         area_inner_major.x1 = p_center.x - r_in_major;
         area_inner_major.y1 = p_center.y - r_in_major;
-        area_inner_major.x2 = p_center.x + r_in_major;
-        area_inner_major.y2 = p_center.y + r_in_major;
+        area_inner_major.x2 = p_center.x + r_in_major - 1;
+        area_inner_major.y2 = p_center.y + r_in_major - 1;
         lv_draw_mask_radius_init(&inner_major_mask, &area_inner_major, LV_RADIUS_CIRCLE, true);
 
         lv_area_t area_outer;
         area_outer.x1 = p_center.x - r_out;
         area_outer.y1 = p_center.y - r_out;
-        area_outer.x2 = p_center.x + r_out;
-        area_outer.y2 = p_center.y + r_out;
+        area_outer.x2 = p_center.x + r_out - 1;
+        area_outer.y2 = p_center.y + r_out - 1;
         lv_draw_mask_radius_init(&outer_mask, &area_outer, LV_RADIUS_CIRCLE, false);
         int16_t outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
 
@@ -414,7 +414,7 @@ static void draw_lines_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             lv_coord_t line_width = line_width_ori;
 
             lv_meter_indicator_t * indic;
-            _LV_LL_READ(&scale->indicator_ll, indic) {
+            _LV_LL_READ_BACK(&scale->indicator_ll, indic) {
                 if(indic->type != LV_METER_INDICATOR_TYPE_SCALE_LINES) continue;
                 if(value_of_line >= indic->start_value && value_of_line <= indic->end_value) {
                     line_width += indic->type_data.scale_lines.width_mod;
