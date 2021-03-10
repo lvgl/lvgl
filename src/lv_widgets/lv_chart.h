@@ -327,9 +327,9 @@ lv_coord_t * lv_chart_get_array(const lv_obj_t * obj, lv_chart_series_t * ser);
 /**
  * Get the index of the currently pressed point. It's the same for every series.
  * @param obj       pointer to a chart object
- * @return          -1: if no pointid being pressed or the index of the point [0 .. point count]
+ * @return          the index of the point [0 .. point count] or LV_CHART_POINT_ID_NONE if no point is being pressed
  */
-int32_t lv_chart_get_pressed_point(const lv_obj_t * obj);
+uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj);
 
 /**********************
  *      MACROS

@@ -484,7 +484,7 @@ lv_coord_t * lv_chart_get_array(const lv_obj_t * obj, lv_chart_series_t * ser)
     return ser->points;
 }
 
-int32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
+uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
 {
     lv_chart_t * chart = (lv_chart_t *)obj;
     return chart->pressed_point_id;

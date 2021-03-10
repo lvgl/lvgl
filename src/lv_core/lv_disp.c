@@ -365,8 +365,8 @@ void lv_disp_clean_dcache(lv_disp_t * disp)
         return;
     }
 
-    if(disp->driver.clean_dcache_cb)
-        disp->driver.clean_dcache_cb(&disp->driver);
+    if(disp->driver->clean_dcache_cb)
+        disp->driver->clean_dcache_cb(disp->driver);
 }
 
 /**

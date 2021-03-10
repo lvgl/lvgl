@@ -140,7 +140,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -421,7 +421,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
         lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-        lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+        lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
 
         /* Get clipped fill area which is the real draw area.
          * It is always the same or inside `fill_area` */
@@ -552,7 +552,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -1286,7 +1286,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     }
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */

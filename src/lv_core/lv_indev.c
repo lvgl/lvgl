@@ -325,14 +325,14 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
     lv_disp_t *disp = i->driver.disp;
-    if(disp->driver.rotated == LV_DISP_ROT_180 || disp->driver.rotated == LV_DISP_ROT_270) {
-        data->point.x = disp->driver.hor_res - data->point.x - 1;
-        data->point.y = disp->driver.ver_res - data->point.y - 1;
+    if(disp->driver->rotated == LV_DISP_ROT_180 || disp->driver->rotated == LV_DISP_ROT_270) {
+        data->point.x = disp->driver->hor_res - data->point.x - 1;
+        data->point.y = disp->driver->ver_res - data->point.y - 1;
     }
-    if(disp->driver.rotated == LV_DISP_ROT_90 || disp->driver.rotated == LV_DISP_ROT_270) {
+    if(disp->driver->rotated == LV_DISP_ROT_90 || disp->driver->rotated == LV_DISP_ROT_270) {
         lv_coord_t tmp = data->point.y;
         data->point.y = data->point.x;
-        data->point.x = disp->driver.ver_res - tmp - 1;
+        data->point.x = disp->driver->ver_res - tmp - 1;
     }
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&

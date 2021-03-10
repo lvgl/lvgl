@@ -59,7 +59,7 @@ typedef struct {
     volatile int flushing_last;
     volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
-} lv_disp_buf_t;
+} lv_disp_draw_buf_t;
 
 
 typedef enum {
@@ -70,26 +70,26 @@ typedef enum {
 } lv_disp_rot_t;
 
 /**
- * Display Driver structure to be registered by HAL
+ * Display Driver structure to be registered by HAL.
+ * Only its pointer will be saved in `lv_disp_t` so it should be declared as
+ * `static lv_disp_drv_t my_drv` or allocated dynamically.
  */
 typedef struct _lv_disp_drv_t {
 
     lv_coord_t hor_res; /**< Horizontal resolution. */
     lv_coord_t ver_res; /**< Vertical resolution. */
 
-    /** Pointer to a buffer initialized with `lv_disp_buf_init()`.
+    /** Pointer to a buffer initialized with `lv_disp_draw_buf_init()`.
      * LVGL will use this buffer(s) to draw the screens contents */
-    lv_disp_buf_t * buffer;
+    lv_disp_draw_buf_t * draw_buf;
 
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower) */
     uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display. */
     uint32_t rotated : 3; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
 
-#if LV_COLOR_SCREEN_TRANSP
     /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
      * Use only if required because it's slower.*/
     uint32_t screen_transp : 1;
-#endif
 
     /** DPI (dot per inch) of the display.
      * Set to `LV_DPI` from `lv_Conf.h` by default.
@@ -147,7 +147,7 @@ struct _lv_obj_t;
  */
 typedef struct _lv_disp_t {
     /**< Driver to the display*/
-    lv_disp_drv_t driver;
+    lv_disp_drv_t * driver;
 
     /**< A timer which periodically checks the dirty areas and refreshes them*/
     lv_timer_t * refr_timer;
@@ -212,12 +212,12 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
  * sent. Set to `NULL` if unused.
  * @param size_in_px_cnt size of the `buf1` and `buf2` in pixel count.
  */
-void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt);
+void lv_disp_draw_buf_init(lv_disp_draw_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt);
 
 /**
  * Register an initialized display driver.
  * Automatically set the first display as active.
- * @param driver pointer to an initialized 'lv_disp_drv_t' variable (can be local variable)
+ * @param driver pointer to an initialized 'lv_disp_drv_t' variable. Only its pointer is saved!
  * @return pointer to the new display or NULL on error
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver);
@@ -320,7 +320,7 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
  * @param disp pointer to a display
  * @return pointer to the internal buffers
  */
-lv_disp_buf_t * lv_disp_get_buf(lv_disp_t * disp);
+lv_disp_draw_buf_t * lv_disp_get_buf(lv_disp_t * disp);
 
 /**
  * Get the number of areas in the buffer

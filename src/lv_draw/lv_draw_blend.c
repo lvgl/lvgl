@@ -84,7 +84,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 #define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
     if(*mask_tmp_x) {          \
         if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[out_x] = color;                                 \
-        else if(disp->driver.screen_transp) lv_color_mix_with_alpha(disp_buf_first[out_x], disp_buf_first[out_x].ch.alpha,              \
+        else if(disp->driver->screen_transp) lv_color_mix_with_alpha(disp_buf_first[out_x], disp_buf_first[out_x].ch.alpha,              \
                                                                         color, *mask_tmp_x, &disp_buf_first[out_x], &disp_buf_first[out_x].ch.alpha);           \
         else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
     }                                                                                                      \
@@ -100,7 +100,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 #define MAP_NORMAL_MASK_PX_SCR_TRANSP(x)                        \
     if(*mask_tmp_x) {          \
         if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[x] = map_buf_first[x];                                 \
-        else if(disp->driver.screen_transp) lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha,              \
+        else if(disp->driver->screen_transp) lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha,              \
                                                                         map_buf_first[x], *mask_tmp_x, &disp_buf_first[x], &disp_buf_first[x].ch.alpha);                  \
         else disp_buf_first[x] = lv_color_mix(map_buf_first[x], disp_buf_first[x], *mask_tmp_x);            \
     }                                                                                               \
@@ -132,11 +132,11 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     if(mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
 
-    if(disp->driver.gpu_wait_cb) disp->driver.gpu_wait_cb(&disp->driver);
+    if(disp->driver->gpu_wait_cb) disp->driver->gpu_wait_cb(disp->driver);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -153,13 +153,13 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-    if(mask && disp->driver.antialiasing == 0 && mask) {
+    if(mask && disp->driver->antialiasing == 0 && mask) {
         int32_t mask_w = lv_area_get_width(&draw_area);
         int32_t i;
         for(i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
     }
 
-    if(disp->driver.set_px_cb) {
+    if(disp->driver->set_px_cb) {
         fill_set_px(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res);
     }
     else if(mode == LV_BLEND_MODE_NORMAL) {
@@ -202,11 +202,11 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     if(!is_common) return;
 
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
 
-    if(disp->driver.gpu_wait_cb) disp->driver.gpu_wait_cb(&disp->driver);
+    if(disp->driver->gpu_wait_cb) disp->driver->gpu_wait_cb(disp->driver);
 
     /* Now `draw_area` has absolute coordinates.
      * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
@@ -216,13 +216,13 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-    if(mask && disp->driver.antialiasing == 0)
+    if(mask && disp->driver->antialiasing == 0)
     {
         int32_t mask_w = lv_area_get_width(&draw_area);
         int32_t i;
         for(i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
     }
-    if(disp->driver.set_px_cb) {
+    if(disp->driver->set_px_cb) {
         map_set_px(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res);
     }
     else if(mode == LV_BLEND_MODE_NORMAL) {
@@ -255,7 +255,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
-                disp->driver.set_px_cb(&disp->driver, (void *)disp_buf, disp_w, x, y, color, opa);
+                disp->driver->set_px_cb(disp->driver, (void *)disp_buf, disp_w, x, y, color, opa);
             }
         }
     }
@@ -271,7 +271,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x]) {
-                    disp->driver.set_px_cb(&disp->driver, (void *)disp_buf, disp_w, x, y, color,
+                    disp->driver->set_px_cb(disp->driver, (void *)disp_buf, disp_w, x, y, color,
                                            (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
                 }
             }
@@ -335,8 +335,8 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
             }
 #endif
 
-            if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
-                disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
+            if(disp->driver->gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
+                disp->driver->gpu_fill_cb(disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
 
@@ -374,7 +374,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                         last_dest_color = disp_buf_first[x];
 
 #if LV_COLOR_SCREEN_TRANSP
-                        if(disp->driver.screen_transp) {
+                        if(disp->driver->screen_transp) {
                             lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha, color, opa, &last_res_color,
                                                     &last_res_color.ch.alpha);
                         }
@@ -473,7 +473,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                                                                    (uint32_t)((uint32_t)(*mask_tmp_x) * opa) >> 8;
                         if(*mask_tmp_x != last_mask || last_dest_color.full != disp_buf_first[x].full) {
 #if LV_COLOR_SCREEN_TRANSP
-                            if(disp->driver.screen_transp) {
+                            if(disp->driver->screen_transp) {
                                 lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha, color, opa_tmp, &last_res_color,
                                                         &last_res_color.ch.alpha);
                             }
@@ -616,7 +616,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
-                disp->driver.set_px_cb(&disp->driver, (void *)disp_buf, disp_w, x, y, map_buf_tmp[x], opa);
+                disp->driver->set_px_cb(disp->driver, (void *)disp_buf, disp_w, x, y, map_buf_tmp[x], opa);
             }
             map_buf_tmp += map_w;
         }
@@ -630,7 +630,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x]) {
-                    disp->driver.set_px_cb(&disp->driver, (void *)disp_buf, disp_w, x, y, map_buf_tmp[x],
+                    disp->driver->set_px_cb(disp->driver, (void *)disp_buf, disp_w, x, y, map_buf_tmp[x],
                                            (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
                 }
             }
@@ -782,7 +782,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
             for(y = 0; y < draw_area_h; y++) {
                 for(x = 0; x < draw_area_w; x++) {
 #if LV_COLOR_SCREEN_TRANSP
-                    if(disp->driver.screen_transp) {
+                    if(disp->driver->screen_transp) {
                         lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha, map_buf_first[x], opa, &disp_buf_first[x],
                                                 &disp_buf_first[x].ch.alpha);
                     }
@@ -868,7 +868,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                     if(mask[x]) {
                         lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
 #if LV_COLOR_SCREEN_TRANSP
-                        if(disp->driver.screen_transp) {
+                        if(disp->driver->screen_transp) {
                             lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha, map_buf_first[x], opa_tmp, &disp_buf_first[x],
                                                     &disp_buf_first[x].ch.alpha);
                         }

@@ -31,7 +31,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-
 static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_task_handler(void)
 {
     return lv_timer_handler();

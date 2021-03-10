@@ -581,23 +581,23 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_draw_buf_t disp_buf;
+    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
-    lv_disp_drv_init(&disp.driver);
+    lv_disp_drv_init(disp.driver);
 
-    disp.driver.buffer  = &disp_buf;
-    disp.driver.hor_res = dsc->header.w;
-    disp.driver.ver_res = dsc->header.h;
+    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->hor_res = dsc->header.w;
+    disp.driver->ver_res = dsc->header.h;
 
-    set_set_px_cb(&disp.driver, dsc->header.cf);
+    set_set_px_cb(disp.driver, dsc->header.cf);
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
        draw_dsc->bg_color.full == ctransp.full) {
-        disp.driver.antialiasing = 0;
+        disp.driver->antialiasing = 0;
     }
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
@@ -639,17 +639,17 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_draw_buf_t disp_buf;
+    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
-    lv_disp_drv_init(&disp.driver);
+    lv_disp_drv_init(disp.driver);
 
-    disp.driver.buffer  = &disp_buf;
-    disp.driver.hor_res = dsc->header.w;
-    disp.driver.ver_res = dsc->header.h;
+    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->hor_res = dsc->header.w;
+    disp.driver->ver_res = dsc->header.h;
 
-    set_set_px_cb(&disp.driver, dsc->header.cf);
+    set_set_px_cb(disp.driver, dsc->header.cf);
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
@@ -697,17 +697,17 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_draw_buf_t disp_buf;
+    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
-    lv_disp_drv_init(&disp.driver);
+    lv_disp_drv_init(disp.driver);
 
-    disp.driver.buffer  = &disp_buf;
-    disp.driver.hor_res = dsc->header.w;
-    disp.driver.ver_res = dsc->header.h;
+    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->hor_res = dsc->header.w;
+    disp.driver->ver_res = dsc->header.h;
 
-    set_set_px_cb(&disp.driver, dsc->header.cf);
+    set_set_px_cb(disp.driver, dsc->header.cf);
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
@@ -741,23 +741,23 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_draw_buf_t disp_buf;
+    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
-    lv_disp_drv_init(&disp.driver);
+    lv_disp_drv_init(disp.driver);
 
-    disp.driver.buffer  = &disp_buf;
-    disp.driver.hor_res = dsc->header.w;
-    disp.driver.ver_res = dsc->header.h;
+    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->hor_res = dsc->header.w;
+    disp.driver->ver_res = dsc->header.h;
 
-    set_set_px_cb(&disp.driver, dsc->header.cf);
+    set_set_px_cb(disp.driver, dsc->header.cf);
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
        draw_dsc->color.full == ctransp.full) {
-        disp.driver.antialiasing = 0;
+        disp.driver->antialiasing = 0;
     }
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
@@ -796,23 +796,23 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_draw_buf_t disp_buf;
+    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
-    lv_disp_drv_init(&disp.driver);
+    lv_disp_drv_init(disp.driver);
 
-    disp.driver.buffer  = &disp_buf;
-    disp.driver.hor_res = dsc->header.w;
-    disp.driver.ver_res = dsc->header.h;
+    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->hor_res = dsc->header.w;
+    disp.driver->ver_res = dsc->header.h;
 
-    set_set_px_cb(&disp.driver, dsc->header.cf);
+    set_set_px_cb(disp.driver, dsc->header.cf);
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
        draw_dsc->bg_color.full == ctransp.full) {
-        disp.driver.antialiasing = 0;
+        disp.driver->antialiasing = 0;
     }
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
@@ -849,23 +849,23 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_draw_buf_t disp_buf;
+    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
-    lv_disp_drv_init(&disp.driver);
+    lv_disp_drv_init(disp.driver);
 
-    disp.driver.buffer  = &disp_buf;
-    disp.driver.hor_res = dsc->header.w;
-    disp.driver.ver_res = dsc->header.h;
+    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->hor_res = dsc->header.w;
+    disp.driver->ver_res = dsc->header.h;
 
-    set_set_px_cb(&disp.driver, dsc->header.cf);
+    set_set_px_cb(disp.driver, dsc->header.cf);
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
        draw_dsc->color.full == ctransp.full) {
-        disp.driver.antialiasing = 0;
+        disp.driver->antialiasing = 0;
     }
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();

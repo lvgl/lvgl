@@ -60,7 +60,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->flush_cb         = NULL;
     driver->hor_res          = 320;
     driver->ver_res          = 240;
-    driver->buffer           = NULL;
+    driver->draw_buf           = NULL;
     driver->rotated          = LV_DISP_ROT_NONE;
     driver->sw_rotate        = 0;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
@@ -88,9 +88,9 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
  * sent. Set to `NULL` if unused.
  * @param size_in_px_cnt size of the `buf1` and `buf2` in pixel count.
  */
-void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt)
+void lv_disp_draw_buf_init(lv_disp_draw_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt)
 {
-    lv_memset_00(disp_buf, sizeof(lv_disp_buf_t));
+    lv_memset_00(disp_buf, sizeof(lv_disp_draw_buf_t));
 
     disp_buf->buf1    = buf1;
     disp_buf->buf2    = buf2;
@@ -101,7 +101,7 @@ void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32
 /**
  * Register an initialized display driver.
  * Automatically set the first display as active.
- * @param driver pointer to an initialized 'lv_disp_drv_t' variable (can be local variable)
+ * @param driver pointer to an initialized 'lv_disp_drv_t' variable. Only its pointer is saved!
  * @return pointer to the new display or NULL on error
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
@@ -113,7 +113,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     }
 
     lv_memset_00(disp, sizeof(lv_disp_t));
-    lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
+
+    disp->driver = driver;
 
     disp->last_activity_time = 0;
 
@@ -252,12 +253,12 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
     if(disp == NULL) {
         return 0;
     } else {
-        switch(disp->driver.rotated) {
+        switch(disp->driver->rotated) {
             case LV_DISP_ROT_90:
             case LV_DISP_ROT_270:
-                return disp->driver.ver_res;
+                return disp->driver->ver_res;
             default:
-                return disp->driver.hor_res;
+                return disp->driver->hor_res;
         }
     }
 }
@@ -274,12 +275,12 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
     if(disp == NULL) {
         return 0;
     } else {
-        switch(disp->driver.rotated) {
+        switch(disp->driver->rotated) {
             case LV_DISP_ROT_90:
             case LV_DISP_ROT_270:
-                return disp->driver.hor_res;
+                return disp->driver->hor_res;
             default:
-                return disp->driver.ver_res;
+                return disp->driver->ver_res;
         }
     }
 }
@@ -294,7 +295,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return false;
 
-    return disp->driver.antialiasing ? true : false;
+    return disp->driver->antialiasing ? true : false;
 }
 
 /**
@@ -306,7 +307,7 @@ lv_coord_t lv_disp_get_dpi(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
-    return disp->driver.dpi;
+    return disp->driver->dpi;
 }
 
 /**
@@ -318,12 +319,12 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
     if(disp_drv->screen_transp) {
-        lv_memset_00(disp_drv->buffer->buf_act, disp_drv->buffer->size * sizeof(lv_color32_t));
+        lv_memset_00(disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size * sizeof(lv_color32_t));
     }
 #endif
 
-    disp_drv->buffer->flushing = 0;
-    disp_drv->buffer->flushing_last = 0;
+    disp_drv->draw_buf->flushing = 0;
+    disp_drv->draw_buf->flushing_last = 0;
 }
 
 /**
@@ -334,7 +335,7 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
  */
 LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_drv_t * disp_drv)
 {
-    return disp_drv->buffer->flushing_last;
+    return disp_drv->draw_buf->flushing_last;
 }
 
 /**
@@ -355,9 +356,9 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
  * @param disp pointer to a display
  * @return pointer to the internal buffers
  */
-lv_disp_buf_t * lv_disp_get_buf(lv_disp_t * disp)
+lv_disp_draw_buf_t * lv_disp_get_buf(lv_disp_t * disp)
 {
-    return disp->driver.buffer;
+    return disp->driver->draw_buf;
 }
 
 /**
@@ -389,7 +390,7 @@ void _lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num)
  */
 bool lv_disp_is_double_buf(lv_disp_t * disp)
 {
-    if(disp->driver.buffer->buf1 && disp->driver.buffer->buf2)
+    if(disp->driver->draw_buf->buf1 && disp->driver->draw_buf->buf2)
         return true;
     else
         return false;
@@ -403,9 +404,9 @@ bool lv_disp_is_double_buf(lv_disp_t * disp)
  */
 bool lv_disp_is_true_double_buf(lv_disp_t * disp)
 {
-    uint32_t scr_size = disp->driver.hor_res * disp->driver.ver_res;
+    uint32_t scr_size = disp->driver->hor_res * disp->driver->ver_res;
 
-    if(lv_disp_is_double_buf(disp) && disp->driver.buffer->size == scr_size) {
+    if(lv_disp_is_double_buf(disp) && disp->driver->draw_buf->size == scr_size) {
         return true;
     }
     else {
@@ -422,8 +423,8 @@ void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rot_t rotation)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
-    disp->driver.rotated = rotation;
-    lv_disp_drv_update(disp, &disp->driver);
+    disp->driver->rotated = rotation;
+    lv_disp_drv_update(disp, disp->driver);
 }
 
 /**
@@ -435,7 +436,7 @@ lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
-    return disp->driver.rotated;
+    return disp->driver->rotated;
 }
 
 /**********************
