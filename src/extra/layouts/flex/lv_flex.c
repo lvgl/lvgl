@@ -273,7 +273,7 @@ static int32_t find_track_end(lv_obj_t * cont, int32_t item_start_id, lv_coord_t
 
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     while(item) {
-        if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_LAYOUT_1)) break;
+        if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)) break;
 
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             lv_coord_t main_size = (row ? item->w_set : item->h_set);
