@@ -248,14 +248,16 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 
     uint32_t col_fr_cnt = 0;
     lv_coord_t grid_w = 0;
-    bool auto_w = cont->w_set == LV_SIZE_CONTENT ? true : false;
 
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
-        if(IS_FR(x)) col_fr_cnt += GET_FR(x);
+        if(IS_FR(x)) {
+            col_fr_cnt += GET_FR(x);
+        }
         else if (IS_CONTENT(x)) {
             grid_w += c->w[i];
-        } else {
+        }
+        else {
             c->w[i] = x;
             grid_w += x;
         }
@@ -268,11 +270,8 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = grid->col_dsc[i];
         if(IS_FR(x)) {
-            if(auto_w) c->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
-            else {
-                lv_coord_t f = GET_FR(x);
-                c->w[i] = (free_w * f) / col_fr_cnt;
-            }
+            lv_coord_t f = GET_FR(x);
+            c->w[i] = (free_w * f) / col_fr_cnt;
         }
     }
 }
@@ -310,12 +309,11 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     uint32_t row_fr_cnt = 0;
     lv_coord_t grid_h = 0;
 
-    bool auto_h = cont->h_set == LV_SIZE_CONTENT ? true : false;
-
     for(i = 0; i < c->row_num; i++) {
         lv_coord_t x = grid->row_dsc[i];
-        if(IS_FR(x)) row_fr_cnt += GET_FR(x);
-        else if (IS_CONTENT(x)) {
+        if(IS_FR(x)) {
+            row_fr_cnt += GET_FR(x);
+        } else if (IS_CONTENT(x)) {
             grid_h += c->h[i];
         } else {
             c->h[i] = x;
@@ -330,11 +328,8 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     for(i = 0; i < grid->row_dsc_len; i++) {
         lv_coord_t x = grid->row_dsc[i];
         if(IS_FR(x)) {
-            if(auto_h) c->h[i] = 0;   /*Fr is considered zero if the obj has auto height*/
-            else {
-                lv_coord_t f = GET_FR(x);
-                c->h[i] = (free_h * f) / row_fr_cnt;
-            }
+            lv_coord_t f = GET_FR(x);
+            c->h[i] = (free_h * f) / row_fr_cnt;
         }
     }
 }
