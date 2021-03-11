@@ -252,8 +252,8 @@ static void style_init(void)
     style_init_reset(&styles->btn);
     lv_style_set_radius(&styles->btn, LV_DPX(16));
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->btn, lv_color_grey_lighten_1());
-    lv_style_set_shadow_color(&styles->btn, lv_color_grey_lighten_2());
+    lv_style_set_bg_color(&styles->btn, COLOR_GREY);
+    lv_style_set_shadow_color(&styles->btn, lv_color_grey_lighten_3());
     lv_style_set_shadow_width(&styles->btn, 1);
     lv_style_set_shadow_ofs_y(&styles->btn, LV_DPX(4));
     lv_style_set_text_color(&styles->btn, lv_color_grey_darken_4());
@@ -393,10 +393,11 @@ static void style_init(void)
     lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
     lv_style_set_line_dash_gap(&styles->chart_bg, LV_DPX(10));
     lv_style_set_border_post(&styles->chart_bg, false);
+    lv_style_set_pad_column(&styles->chart_bg, LV_DPX(10));
 
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
-    lv_style_set_radius(&styles->chart_series, LV_DPX(1));
+    lv_style_set_radius(&styles->chart_series, LV_DPX(3));
     lv_style_set_size(&styles->chart_series, LV_DPX(5));
     lv_style_set_pad_column(&styles->chart_series, LV_DPX(2));
 
@@ -529,6 +530,8 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_palette_t palette_
 
     inited = true;
 
+    if(disp == NULL || lv_disp_get_theme(disp) == &theme) lv_obj_report_style_change(NULL);
+
     return (lv_theme_t *)&theme;
 }
 
@@ -614,7 +617,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
             lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_primary);
             lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_primary);
-            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_FOCUSED, &styles->outline_primary);
+            lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_FOCUS_KEY, &styles->outline_primary);
             return;
         }
 #endif
@@ -720,8 +723,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_CHART
     else if(lv_obj_check_type(obj, &lv_chart_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_small);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->chart_series);

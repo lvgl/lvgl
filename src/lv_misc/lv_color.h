@@ -294,6 +294,7 @@ typedef enum {
     LV_COLOR_PALETTE_BROWN,
     LV_COLOR_PALETTE_BLUE_GREY,
     LV_COLOR_PALETTE_GREY,
+    _LV_COLOR_PALETTE_LAST
 }lv_color_palette_t;
 
 /**********************

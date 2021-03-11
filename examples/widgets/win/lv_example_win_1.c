@@ -5,7 +5,7 @@
 static void event_handler(lv_obj_t * obj, lv_event_t event)
 {
     if(event == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Button: %d\n", lv_obj_get_child_id(obj));
+        LV_LOG_USER("Button %d clicked", lv_obj_get_child_id(obj));
     }
 }
 
