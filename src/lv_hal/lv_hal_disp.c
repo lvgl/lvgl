@@ -173,6 +173,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
  */
 void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
 {
+    LV_UNUSED(new_drv);
+
     lv_coord_t w = lv_disp_get_hor_res(disp);
     lv_coord_t h = lv_disp_get_ver_res(disp);
     uint32_t i;
