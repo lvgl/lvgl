@@ -285,9 +285,9 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
     }
     else if(chart->type & LV_CHART_TYPE_BAR) {
         uint32_t ser_cnt = _lv_ll_get_len(&chart->series_ll);
-        uint32_t ser_gap = lv_obj_get_style_pad_column(obj, LV_PART_ITEMS); /*Gap between the column on the ~same X */
-        uint32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the column on ~adjacent X*/
-        lv_coord_t block_w = (w) / chart->point_cnt - block_gap;
+        int32_t ser_gap = (lv_obj_get_style_pad_column(obj, LV_PART_ITEMS) * chart->zoom_x) >> 8; /*Gap between the column on the ~same X */
+        int32_t block_gap = (lv_obj_get_style_pad_column(obj, LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
+        lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
         lv_coord_t col_w = block_w / ser_cnt;
 
         p_out->x = (int32_t)((int32_t)w * id) / chart->point_cnt;
@@ -811,10 +811,10 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
     int32_t y_tmp;
     lv_chart_series_t * ser;
     uint32_t ser_cnt = _lv_ll_get_len(&chart->series_ll);
-    uint32_t ser_gap = lv_obj_get_style_pad_column(obj, LV_PART_ITEMS); /*Gap between the column on the ~same X */
-    uint32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the column on ~adjacent X*/
-    lv_coord_t block_w = (w) / chart->point_cnt - block_gap;
+    int32_t block_gap = (lv_obj_get_style_pad_column(obj, LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
+    lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
     lv_coord_t col_w = block_w / ser_cnt;
+    int32_t ser_gap = (lv_obj_get_style_pad_column(obj, LV_PART_ITEMS) * chart->zoom_x) >> 8; /*Gap between the column on the ~same X */
     lv_coord_t x_ofs = pad_left - lv_obj_get_scroll_left(obj);
     lv_coord_t y_ofs = pad_top - lv_obj_get_scroll_top(obj);
 
@@ -865,6 +865,7 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
             	hook_dsc.draw_area = &col_a;
             	hook_dsc.rect_dsc = &col_dsc;
             	hook_dsc.sub_part_ptr = ser;
+                hook_dsc.value = ser->points[p_act];
             	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
                 lv_draw_rect(&col_a, &series_mask, &col_dsc);
             	lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
@@ -1021,10 +1022,10 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area)
 
     /* The columns ticks should be aligned to the center of blocks */
     if(chart->type == LV_CHART_TYPE_BAR) {
-        uint32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the columns on ~adjacent X*/
+        int32_t block_gap = (lv_obj_get_style_pad_column(obj, LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the columns on ~adjacent X*/
         lv_coord_t block_w = (w + block_gap) / (chart->point_cnt);
-        x_ofs += block_w / 2;
-        w -= block_w;
+        x_ofs += (block_w - block_gap) / 2;
+        w -= block_w - block_gap;
     }
 
     p1.y = y_ofs;
