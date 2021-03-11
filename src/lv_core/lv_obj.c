@@ -637,8 +637,6 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
-    obj->style_list.cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID;
-
     /*Copy the attributes if required*/
     if(copy != NULL) {
         lv_area_copy(&obj->coords, &copy->coords);
@@ -864,7 +862,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             uint32_t state = 0;
             char c = *((char *)param);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-                lv_obj_set_state(obj, LV_STATE_CHECKED);
+                lv_obj_add_state(obj, LV_STATE_CHECKED);
                 state = 1;
             }
             else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
@@ -1071,8 +1069,12 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_obj_invalidate(obj);
 
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
-    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) lv_obj_refresh_ext_draw_size(obj);
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
+    }
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+        lv_obj_refresh_ext_draw_size(obj);
+    }
 }
 
 

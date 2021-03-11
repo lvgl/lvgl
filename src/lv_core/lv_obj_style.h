@@ -19,7 +19,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJ_STYLE_CACHE_STATE_INVALID    LV_STATE_ANY
 
 /**********************
  *      TYPEDEFS
@@ -44,30 +43,8 @@ typedef struct {
 
 typedef struct {
     lv_obj_style_t * styles;
-    uint32_t skip_trans :1;
-    uint32_t style_cnt  :5;
-    uint32_t cache_state :10;
-
-    uint32_t cache_opa_set :1;
-    uint32_t cache_radius_zero:1;
-    uint32_t cache_pad_zero:1;
-    uint32_t cache_transform_zero:1;
-    uint32_t cache_blend_mode_zero:1;
-    uint32_t cache_filter_zero:1;
-    uint32_t cache_clip_corner_enable:1;
-
-    uint32_t cache_bg_opa_cover:1;
-
-    uint32_t cache_border_width_zero:1;
-    uint32_t cache_border_post_enable:1;
-
-    uint32_t cache_text_any_set:1;
-
-    uint32_t cache_img_opa_cover:1;
-    uint32_t cache_outline_width_zero:1;
-    uint32_t cache_shadow_width_zero:1;
-    uint32_t cache_content_text_zero:1;
-    uint32_t cache_bg_img_src_zero:1;
+    uint8_t style_cnt;
+    uint8_t skip_trans :1;
 }lv_obj_style_list_t;
 
 /**********************
@@ -124,6 +101,7 @@ void lv_obj_report_style_change(lv_style_t * style);
  * @param part      the part whose style was changed. E.g. `LV_PART_ANY`, `LV_PART_MAIN`
  * @param prop      `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property.
  *                  It is used to optimize what needs to be refreshed.
+ *                  `LV_STYLE_PROP_INV` to perform only a style cache update
  */
 void lv_obj_refresh_style(struct _lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 

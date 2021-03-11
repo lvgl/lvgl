@@ -477,6 +477,7 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
 
         lv_state_t state_ori = obj->state;
         obj->state = LV_STATE_DEFAULT;
+        obj->style_list.skip_trans = 1;
         lv_draw_rect_dsc_t rect_dsc_def;
         lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the draw_hook to modify it*/
         lv_draw_rect_dsc_init(&rect_dsc_def);
@@ -487,6 +488,7 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         lv_draw_label_dsc_init(&label_dsc_def);
         lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_def);
         obj->state = state_ori;
+        obj->style_list.skip_trans = 0;
 
         uint16_t col;
         uint16_t row;

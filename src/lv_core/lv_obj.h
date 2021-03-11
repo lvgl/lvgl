@@ -140,17 +140,22 @@ typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, voi
  * OR-ed values are possible
  */
 enum {
-    LV_STATE_DEFAULT     =  0x00,
-    LV_STATE_CHECKED     =  0x01,
-    LV_STATE_FOCUSED     =  0x02,
-    LV_STATE_FOCUS_KEY   =  0x04,
-    LV_STATE_EDITED      =  0x08,
-    LV_STATE_HOVERED     =  0x10,
-    LV_STATE_PRESSED     =  0x20,
-    LV_STATE_SCROLLED    =  0x40,
-    LV_STATE_DISABLED    =  0x80,
+    LV_STATE_DEFAULT     =  0x0000,
+    LV_STATE_CHECKED     =  0x0001,
+    LV_STATE_FOCUSED     =  0x0002,
+    LV_STATE_FOCUS_KEY   =  0x0004,
+    LV_STATE_EDITED      =  0x0008,
+    LV_STATE_HOVERED     =  0x0010,
+    LV_STATE_PRESSED     =  0x0020,
+    LV_STATE_SCROLLED    =  0x0040,
+    LV_STATE_DISABLED    =  0x0080,
 
-    LV_STATE_ANY = 0x1FF,    /**< Special value can be used in some functions to target all states */
+    LV_STATE_USER_1      =  0x1000,
+    LV_STATE_USER_2      =  0x2000,
+    LV_STATE_USER_3      =  0x4000,
+    LV_STATE_USER_4      =  0x8000,
+
+    LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states */
 };
 
 typedef uint16_t lv_state_t;
