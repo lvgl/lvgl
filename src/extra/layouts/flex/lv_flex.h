@@ -60,9 +60,9 @@ typedef struct {
     uint32_t dir          :2;
     uint32_t wrap         :1;
     uint32_t rev          :1;
-    uint32_t item_main_place   :3;
-    uint32_t track_cross_place  :3;
-    uint32_t item_cross_place   :3;
+    uint32_t main_place   :3;
+    uint32_t track_place  :3;
+    uint32_t cross_place   :3;
 }lv_flex_t;
 
 /**********************
@@ -85,11 +85,11 @@ void lv_flex_set_flow(lv_flex_t * flex, lv_flex_flow_t flow);
 /**
  * Set how to place (where to align) the items an tracks
  * @param flex pointer: to a flex layout descriptor
- * @param item_main_place: where to place the items on main axis (in their track). Any value of `lv_flex_place_t`.
- * @param item_cross_place: where to place the item in their track on the cross axis. `LV_FLEX_PLACE_START/END/CENTER`
- * @param track_place: how to place the tracks in the cross direction. Any value of `lv_flex_place_t`.
+ * @param main_place: where to place the items on main axis (in their track). Any value of `lv_flex_place_t`.
+ * @param cross_place: where to place the item in their track on the cross axis. `LV_FLEX_PLACE_START/END/CENTER`
+ * @param track_place: where to place the tracks in the cross direction. Any value of `lv_flex_place_t`.
  */
-void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_flex_place_t item_cross_place, lv_flex_place_t track_cross_place);
+void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t main_place, lv_flex_place_t cross_place, lv_flex_place_t track_cross_place);
 
 /**
  * Sets the width or height (on main axis) to grow the object in order fill the free space

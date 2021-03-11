@@ -44,53 +44,53 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
 
 const lv_flex_t lv_flex_row_center = {
         .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_CENTER,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_CENTER,
+        .main_place = LV_FLEX_PLACE_CENTER,
+        .cross_place = LV_FLEX_PLACE_CENTER,
+        .track_place = LV_FLEX_PLACE_CENTER,
         .dir = LV_FLEX_FLOW_ROW,
         .wrap = 1
 };
 
 const lv_flex_t lv_flex_column_center = {
         .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_CENTER,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_CENTER,
+        .main_place = LV_FLEX_PLACE_CENTER,
+        .cross_place = LV_FLEX_PLACE_CENTER,
+        .track_place = LV_FLEX_PLACE_CENTER,
         .dir = LV_FLEX_FLOW_COLUMN,
         .wrap = 1
 };
 
 const lv_flex_t lv_flex_row_wrap = {
         .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_START,
+        .main_place = LV_FLEX_PLACE_START,
+        .cross_place = LV_FLEX_PLACE_CENTER,
+        .track_place = LV_FLEX_PLACE_START,
         .dir = LV_FLEX_FLOW_ROW,
         .wrap = 1
 };
 
 const lv_flex_t lv_flex_row_even = {
         .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_SPACE_EVENLY,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_CENTER,
+        .main_place = LV_FLEX_PLACE_SPACE_EVENLY,
+        .cross_place = LV_FLEX_PLACE_CENTER,
+        .track_place = LV_FLEX_PLACE_CENTER,
         .dir = LV_FLEX_FLOW_ROW,
         .wrap = 1
 };
 
 const lv_flex_t lv_flex_column_nowrap = {
         .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_START,
+        .main_place = LV_FLEX_PLACE_START,
+        .cross_place = LV_FLEX_PLACE_CENTER,
+        .track_place = LV_FLEX_PLACE_START,
         .dir = LV_FLEX_FLOW_COLUMN
 };
 
 const lv_flex_t lv_flex_row_nowrap = {
         .base.update_cb = flex_update,
-        .item_main_place = LV_FLEX_PLACE_START,
-        .item_cross_place = LV_FLEX_PLACE_CENTER,
-        .track_cross_place = LV_FLEX_PLACE_START,
+        .main_place = LV_FLEX_PLACE_START,
+        .cross_place = LV_FLEX_PLACE_CENTER,
+        .track_place = LV_FLEX_PLACE_START,
         .dir = LV_FLEX_FLOW_ROW
 };
 
@@ -116,9 +116,9 @@ void lv_flex_init(lv_flex_t * flex)
     lv_memset_00(flex, sizeof(lv_flex_t));
     flex->base.update_cb = flex_update;
     flex->dir = LV_FLEX_FLOW_ROW;
-    flex->item_main_place = LV_FLEX_PLACE_START;
-    flex->track_cross_place = LV_FLEX_PLACE_START;
-    flex->item_cross_place = LV_FLEX_PLACE_START;
+    flex->main_place = LV_FLEX_PLACE_START;
+    flex->track_place = LV_FLEX_PLACE_START;
+    flex->cross_place = LV_FLEX_PLACE_START;
 }
 
 void lv_flex_set_flow(lv_flex_t * flex, lv_flex_flow_t flow)
@@ -128,11 +128,11 @@ void lv_flex_set_flow(lv_flex_t * flex, lv_flex_flow_t flow)
     flex->rev = flow & _LV_FLEX_REVERSE ? 1 : 0;
 }
 
-void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t item_main_place, lv_flex_place_t item_cross_place, lv_flex_place_t track_cross_place)
+void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t main_place, lv_flex_place_t cross_place, lv_flex_place_t track_place)
 {
-    flex->item_main_place = item_main_place;
-    flex->track_cross_place = track_cross_place;
-    flex->item_cross_place = item_cross_place;
+    flex->main_place = main_place;
+    flex->cross_place = cross_place;
+    flex->track_place = track_place;
 }
 
 void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
@@ -167,7 +167,7 @@ static void flex_update(lv_obj_t * cont)
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
-    lv_flex_place_t track_cross_place = f->track_cross_place;
+    lv_flex_place_t track_cross_place = f->track_place;
     lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
 
     if((row && cont->h_set == LV_SIZE_CONTENT) ||
@@ -200,18 +200,9 @@ static void flex_update(lv_obj_t * cont)
 
         if(track_cnt) total_track_cross_size -= track_gap;   /*No gap after the last track*/
 
-        /* Place the tracks to get the start position
-         * If the the height of the tracks is larger than the available space
-         * always use the gap = 0 and start position = 0 to avoid unintuitive scrolling*/
+        /* Place the tracks to get the start position */
         lv_coord_t max_cross_size = (row ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
-        if(total_track_cross_size < max_cross_size){
-            place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
-        }
-        else if(rtl && !row) {
-            /* For RTL columns set the cross_pos to the left side manually.
-             * It's not at x = 0 because with RTL the most right column is at cont->x2*/
-            *cross_pos = max_cross_size - total_track_cross_size + lv_obj_get_style_pad_left(cont, LV_PART_MAIN);
-        }
+        place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
     }
 
     track_first_item =  f->rev ? cont->spec_attr->child_cnt - 1 : 0;
@@ -338,7 +329,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
     lv_coord_t main_pos = 0;
 
     lv_coord_t place_gap = 0;
-    place_content(f->item_main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
+    place_content(f->main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
     if(row && rtl) main_pos += t->track_main_size;
 
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
@@ -364,7 +355,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
         }
 
         lv_coord_t cross_pos = 0;
-        switch(f->item_cross_place) {
+        switch(f->cross_place) {
         case LV_FLEX_PLACE_CENTER:
             /* Round up the cross size to avoid rounding error when dividing by 2
              * The issue comes up e,g, with column direction with center cross direction if an element's width changes*/
