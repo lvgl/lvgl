@@ -293,8 +293,9 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
+
 }
 
  lv_color_t lv_color_get_palette_lighten_1(lv_color_palette_t palette)
@@ -319,8 +320,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_1();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_1();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_1();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_lighten_2(lv_color_palette_t palette)
@@ -345,8 +346,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_2();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_2();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_2();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_lighten_3(lv_color_palette_t palette)
@@ -371,8 +372,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_3();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_3();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_3();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_lighten_4(lv_color_palette_t palette)
@@ -397,8 +398,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_4();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_4();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_4();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_lighten_5(lv_color_palette_t palette)
@@ -423,9 +424,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_lighten_5();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_lighten_5();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_lighten_5();
+        default:                            return lv_color_black();
     }
-
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_darken_1(lv_color_palette_t palette)
@@ -450,9 +450,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_1();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_1();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_1();
+        default:                            return lv_color_black();
     }
-
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_darken_2(lv_color_palette_t palette)
@@ -477,8 +476,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_2();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_2();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_2();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_darken_3(lv_color_palette_t palette)
@@ -503,8 +502,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_3();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_3();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_3();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
 
  lv_color_t lv_color_get_palette_darken_4(lv_color_palette_t palette)
@@ -529,6 +528,6 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
         case LV_COLOR_PALETTE_BROWN:        return lv_color_brown_darken_4();
         case LV_COLOR_PALETTE_BLUE_GREY:    return lv_color_blue_grey_darken_4();
         case LV_COLOR_PALETTE_GREY:         return lv_color_grey_darken_4();
+        default:                            return lv_color_black();
     }
-    return lv_color_black();
 }
