@@ -122,7 +122,7 @@ static void grid_update(lv_obj_t * cont)
     if(cont->spec_attr == NULL) return;
     if(cont->spec_attr->layout_dsc == NULL) return;
 
-    LV_LOG_INFO("update 0x%p container, triggered by 0x%p", cont, item);
+    LV_LOG_INFO("update 0x%p container", cont);
 
     full_refresh(cont);
 
