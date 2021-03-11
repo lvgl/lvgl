@@ -454,7 +454,6 @@ typedef int _keep_pedantic_happy;
 //    }
 //
 //    lv_test_assert_int_eq(LV_RES_OK, lv_mem_test(), "Memory integrity check");
-//    lv_mem_defrag();
 //    lv_mem_monitor(&mon_end);
 //    lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 //
@@ -478,7 +477,6 @@ typedef int _keep_pedantic_happy;
 //
 //    _lv_style_list_reset(&style_list);
 //    lv_test_assert_int_eq(LV_RES_OK, lv_mem_test(), "Memory integrity check");
-//    lv_mem_defrag();
 //    lv_mem_monitor(&mon_end);
 //    lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 //
@@ -505,7 +503,6 @@ typedef int _keep_pedantic_happy;
 //    }
 //
 //    lv_test_assert_int_eq(LV_RES_OK, lv_mem_test(), "Memory integrity check");
-//    lv_mem_defrag();
 //    lv_mem_monitor(&mon_end);
 //    lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 //
@@ -536,7 +533,6 @@ typedef int _keep_pedantic_happy;
 //     }
 //
 //     lv_test_assert_int_eq(LV_RES_OK, lv_mem_test(), "Memory integrity check");
-//     lv_mem_defrag();
 //     lv_mem_monitor(&mon_end);
 //     lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 //
@@ -616,7 +612,6 @@ typedef int _keep_pedantic_happy;
 //    lv_style_reset(&style3);
 //
 //    lv_test_assert_int_eq(LV_RES_OK, lv_mem_test(), "Memory integrity check");
-//    lv_mem_defrag();
 //    lv_mem_monitor(&mon_end);
 //    lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 //}
