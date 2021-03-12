@@ -262,7 +262,7 @@ uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * se
     LV_UNUSED(obj);
     LV_ASSERT_NULL(ser);
 
-    return(ser->last_point);
+    return ser->last_point;
 }
 
 void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_point_t * p_out)
@@ -446,8 +446,6 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t
 
         uint32_t next_point = (ser->last_point + 1) % chart->point_cnt; /*update the x for next incoming y*/
         ser->last_point = next_point;
-
-        ser->points[ser->last_point] = LV_CHART_POINT_DEF;
         invalidate_point(obj, next_point);
 
         lv_obj_invalidate(obj);
@@ -698,9 +696,12 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
     /*Do not bother with line ending is the point will over it*/
     if(point_size > line_dsc_default.width / 2) line_dsc_default.raw_end = 1;
 
+    /*If there are mire points than pixels draw only vertical lines*/
+    bool crowded_mode = chart->point_cnt >= w ? true : false;
+
     /*Go through all data lines*/
     _LV_LL_READ_BACK(&chart->series_ll, ser) {
-    	if (ser->hidden) continue;
+        if (ser->hidden) continue;
         line_dsc_default.color = ser->color;
         point_dsc_default.bg_color = ser->color;
 
@@ -722,13 +723,16 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
         hook_dsc.rect_dsc = &point_dsc_default;
         hook_dsc.sub_part_ptr = ser;
 
+        lv_coord_t y_min = p2.y;
+        lv_coord_t y_max = p2.y;
+
         for(i = 0; i < chart->point_cnt; i++) {
             p1.x = p2.x;
             p1.y = p2.y;
 
             point_size_act = p_act == chart->pressed_point_id ? point_size_pr : point_size;
 
-            if(p1.x > clip_area->x2 + point_size_act) break;
+            if(p1.x > clip_area->x2 + point_size_act + 1) break;
             p2.x = ((w * i) / (chart->point_cnt - 1)) + x_ofs;
 
             p_act = (start_point + i) % chart->point_cnt;
@@ -737,39 +741,57 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
             y_tmp = y_tmp / (chart->ymax[ser->y_axis] - chart->ymin[ser->y_axis]);
             p2.y  = h - y_tmp + y_ofs;
 
-            if(p2.x < clip_area->x1 - point_size_act) continue;
-
-
+            if(p2.x < clip_area->x1 - point_size_act - 1) {
+                p_prev = p_act;
+                continue;
+            }
 
             /*Don't draw the first point. A second point is also required to draw the line*/
             if(i != 0) {
+                if(crowded_mode) {
+                    if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
+                        /*Draw only one vertical line between the min an max y values on the same x value*/
+                        y_max = LV_MAX(y_max, p2.y);
+                        y_min = LV_MIN(y_min, p2.y);
+                        if(p1.x != p2.x) {
+                            lv_coord_t y_tmp = p2.y;
+                            p2.x--;         /*It's already on the next x value*/
+                            p1.x = p2.x;
+                            p1.y = y_min;
+                            p2.y = y_max;
+                            lv_draw_line(&p1, &p2, &series_mask, &line_dsc_default);
+                            p2.x++;         /*Compensate the previous x--*/
+                            y_min = y_tmp;  /*Start the line of the next x from the current last y*/
+                            y_max = y_tmp;
+                        }
+                    }
+                } else {
+                    lv_area_t point_area;
+                    point_area.x1 = p1.x - point_size_act;
+                    point_area.x2 = p1.x + point_size_act;
+                    point_area.y1 = p1.y - point_size_act;
+                    point_area.y2 = p1.y + point_size_act;
 
-                lv_area_t point_area;
-                point_area.x1 = p1.x - point_size_act;
-                point_area.x2 = p1.x + point_size_act;
-                point_area.y1 = p1.y - point_size_act;
-                point_area.y2 = p1.y + point_size_act;
+                    hook_dsc.id = i - 1;
+                    hook_dsc.p1 = ser->points[p_prev] != LV_CHART_POINT_DEF ? &p1 : NULL;
+                    hook_dsc.p2 = ser->points[p_act] != LV_CHART_POINT_DEF ? &p2 : NULL;
+                    hook_dsc.draw_area = &point_area;
+                    hook_dsc.value = ser->points[p_prev];
 
-                hook_dsc.id = i - 1;
-                hook_dsc.p1 = ser->points[p_prev] != LV_CHART_POINT_DEF ? &p1 : NULL;
-                hook_dsc.p2 = ser->points[p_act] != LV_CHART_POINT_DEF ? &p2 : NULL;
-                hook_dsc.draw_area = &point_area;
-                hook_dsc.value = ser->points[p_prev];
+                    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
 
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+                    if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
+                        lv_draw_line(&p1, &p2, &series_mask, &line_dsc_default);
+                    }
 
-                if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
-                    lv_draw_line(&p1, &p2, &series_mask, &line_dsc_default);
+                    if(point_size_act && ser->points[p_act] != LV_CHART_POINT_DEF) {
+                        lv_draw_rect(&point_area, &series_mask, &point_dsc_default);
+                    }
+
+                    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
                 }
 
-                if(point_size_act && ser->points[p_act] != LV_CHART_POINT_DEF) {
-                    lv_draw_rect(&point_area, &series_mask, &point_dsc_default);
-                }
-
-                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
             }
-
-
             p_prev = p_act;
         }
 
