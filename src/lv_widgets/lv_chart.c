@@ -695,6 +695,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
 
     /*Do not bother with line ending is the point will over it*/
     if(point_size > line_dsc_default.width / 2) line_dsc_default.raw_end = 1;
+    if(line_dsc_default.width == 1) line_dsc_default.raw_end = 1;
 
     /*If there are mire points than pixels draw only vertical lines*/
     bool crowded_mode = chart->point_cnt >= w ? true : false;
