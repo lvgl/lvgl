@@ -581,13 +581,13 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&disp_buf.area, &mask);
+    lv_disp_draw_buf_t draw_buf;
+    lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
-    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
@@ -639,13 +639,13 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&disp_buf.area, &mask);
+    lv_disp_draw_buf_t draw_buf;
+    lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
-    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
@@ -697,13 +697,13 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&disp_buf.area, &mask);
+    lv_disp_draw_buf_t draw_buf;
+    lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
-    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
@@ -741,13 +741,13 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&disp_buf.area, &mask);
+    lv_disp_draw_buf_t draw_buf;
+    lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
-    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
@@ -796,13 +796,13 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&disp_buf.area, &mask);
+    lv_disp_draw_buf_t draw_buf;
+    lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
-    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
@@ -849,13 +849,13 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     lv_disp_t disp;
     lv_memset_00(&disp, sizeof(lv_disp_t));
 
-    lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&disp_buf.area, &mask);
+    lv_disp_draw_buf_t draw_buf;
+    lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
-    disp.driver->draw_buf  = &disp_buf;
+    disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 

@@ -343,7 +343,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     lv_area_t draw_area;
     lv_area_copy(&draw_area, clip_area);
 
-    lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
     const lv_area_t * disp_area = &draw_buf->area;
 
