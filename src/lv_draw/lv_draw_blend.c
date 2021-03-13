@@ -132,7 +132,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     if(mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
 
@@ -202,7 +202,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     if(!is_common) return;
 
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
 
