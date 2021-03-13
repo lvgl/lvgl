@@ -409,6 +409,7 @@ bool lv_disp_is_true_double_buf(lv_disp_t * disp)
 void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rot_t rotation)
 {
     if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
 
     disp->driver->rotated = rotation;
     lv_disp_drv_update(disp, disp->driver);
@@ -422,7 +423,7 @@ void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rot_t rotation)
 lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
-
+    if(disp == NULL) return LV_DISP_ROT_NONE;
     return disp->driver->rotated;
 }
 
