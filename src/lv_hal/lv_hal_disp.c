@@ -107,15 +107,16 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     disp->driver = driver;
 
-    if(disp_def == NULL) disp_def = disp;
-
     lv_disp_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh timer*/
     disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DISP_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
-    if(disp->refr_timer == NULL) return NULL;
+    if(disp->refr_timer == NULL) {
+        lv_mem_free(disp);
+        return NULL;
+    }
 
     disp->bg_color = lv_color_white();
 #if LV_COLOR_SCREEN_TRANSP
@@ -144,6 +145,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_obj_invalidate(disp->act_scr);
 
     disp_def = disp_def_tmp; /*Revert the default display*/
+    if(disp_def == NULL) disp_def = disp; /*Initialize the default display*/
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
