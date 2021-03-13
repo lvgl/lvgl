@@ -1,6 +1,5 @@
-
 /**
- * @file hal_disp.c
+ * @file lv_hal_disp.c
  *
  * @description HAL layer for display driver
  *
@@ -224,7 +223,7 @@ void lv_disp_remove(lv_disp_t * disp)
 }
 
 /**
- * Set a default screen. The new screens will be created on it by default.
+ * Set a default display. The new screens will be created on it by default.
  * @param disp pointer to a display
  */
 void lv_disp_set_default(lv_disp_t * disp)

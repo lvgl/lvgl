@@ -55,7 +55,7 @@ typedef struct {
     lv_area_t area;
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
-    /*1: It was the last chunk to flush. (It can't be a bi tfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    /*1: It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing_last;
     volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
@@ -92,7 +92,7 @@ typedef struct _lv_disp_drv_t {
     uint32_t screen_transp : 1;
 
     /** DPI (dot per inch) of the display.
-     * Set to `LV_DPI` from `lv_Conf.h` by default.
+     * Set to `LV_DPI_DEF` from `lv_conf.h` by default.
      */
     uint32_t dpi : 10;
 
@@ -130,7 +130,7 @@ typedef struct _lv_disp_drv_t {
                         const lv_area_t * fill_area, lv_color_t color);
 
     /** On CHROMA_KEYED images this color will be transparent.
-     * `LV_COLOR_TRANSP` by default. (lv_conf.h)*/
+     * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
 #if LV_USE_USER_DATA
@@ -236,7 +236,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv);
 void lv_disp_remove(lv_disp_t * disp);
 
 /**
- * Set a default screen. The new screens will be created on it by default.
+ * Set a default display. The new screens will be created on it by default.
  * @param disp pointer to a display
  */
 void lv_disp_set_default(lv_disp_t * disp);
