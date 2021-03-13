@@ -56,20 +56,12 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
     lv_memset_00(driver, sizeof(lv_disp_drv_t));
 
-    driver->flush_cb         = NULL;
     driver->hor_res          = 320;
     driver->ver_res          = 240;
-    driver->draw_buf           = NULL;
-    driver->rotated          = LV_DISP_ROT_NONE;
-    driver->sw_rotate        = 0;
+    driver->antialiasing     = LV_COLOR_DEPTH > 8 ? 1: 0;
+    driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
+    driver->dpi              = LV_DPI_DEF;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
-    driver->dpi = LV_DPI_DEF;
-
-    driver->antialiasing = LV_COLOR_DEPTH > 8 ? 1: 0;
-
-#if LV_COLOR_SCREEN_TRANSP
-    driver->screen_transp = 1;
-#endif
 }
 
 /**
@@ -115,8 +107,6 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     disp->driver = driver;
 
-    disp->last_activity_time = 0;
-
     if(disp_def == NULL) disp_def = disp;
 
     lv_disp_t * disp_def_tmp = disp_def;
@@ -127,11 +117,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) return NULL;
 
-    disp->inv_p = 0;
-    disp->last_activity_time = 0;
-
     disp->bg_color = lv_color_white();
-    disp->bg_img = NULL;
 #if LV_COLOR_SCREEN_TRANSP
     disp->bg_opa = LV_OPA_TRANSP;
 #else
@@ -144,7 +130,6 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     }
 #endif
 
-    disp->prev_scr  = NULL;
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create sys layer on the display*/
