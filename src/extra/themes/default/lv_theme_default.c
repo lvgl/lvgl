@@ -28,7 +28,7 @@ static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
 
 #define COLOR_GREY  lv_color_grey_lighten_2()
 
-#define RADIUS_DEFAULT LV_DPX(12)
+#define RADIUS_DEFAULT (disp_size == DISP_LARGE ? LV_DPX(12) : LV_DPX(8))
 
 /*SCREEN*/
 #define COLOR_SCR        lv_color_grey_lighten_4()
@@ -38,7 +38,7 @@ static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(2)
 
-#define PAD_DEF     LV_DPX(24)
+#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : LV_DPX(12))
 #define PAD_SMALL   (PAD_DEF / 2 + 2)
 
 /**********************
@@ -139,6 +139,12 @@ typedef struct {
     uint8_t light :1;
 }my_theme_t;
 
+typedef enum {
+    DISP_SMALL = 3,
+    DISP_MEDIUM = 2,
+    DISP_LARGE = 1,
+}disp_size_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -150,7 +156,7 @@ static void style_init_reset(lv_style_t * style);
  **********************/
 static my_theme_styles_t * styles;
 static lv_theme_t theme;
-
+static disp_size_t disp_size;
 static bool inited;
 
 /**********************
@@ -222,8 +228,8 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, COLOR_SCR);
     lv_style_set_text_color(&styles->scr, COLOR_SCR_TEXT);
-    lv_style_set_pad_row(&styles->scr, PAD_SMALL);
-    lv_style_set_pad_column(&styles->scr, PAD_SMALL);
+    lv_style_set_pad_row(&styles->scr, PAD_SMALL * disp_size);
+    lv_style_set_pad_column(&styles->scr, PAD_SMALL * disp_size);
 
     style_init_reset(&styles->card);
     lv_style_set_radius(&styles->card, RADIUS_DEFAULT);
@@ -250,15 +256,15 @@ static void style_init(void)
     lv_style_set_outline_opa(&styles->outline_secondary, LV_OPA_50);
 
     style_init_reset(&styles->btn);
-    lv_style_set_radius(&styles->btn, LV_DPX(16));
+    lv_style_set_radius(&styles->btn, (disp_size == DISP_LARGE ? LV_DPX(16) : LV_DPX(12)));
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->btn, COLOR_GREY);
     lv_style_set_shadow_color(&styles->btn, lv_color_grey_lighten_3());
     lv_style_set_shadow_width(&styles->btn, 1);
     lv_style_set_shadow_ofs_y(&styles->btn, LV_DPX(4));
     lv_style_set_text_color(&styles->btn, lv_color_grey_darken_4());
-    lv_style_set_pad_hor(&styles->btn, LV_DPX(40));
-    lv_style_set_pad_ver(&styles->btn, LV_DPX(15));
+    lv_style_set_pad_hor(&styles->btn, LV_DPX(40) / disp_size);
+    lv_style_set_pad_ver(&styles->btn, LV_DPX(15) / disp_size);
     lv_style_set_pad_column(&styles->btn, LV_DPX(5));
     lv_style_set_pad_row(&styles->btn, LV_DPX(5));
 
@@ -517,6 +523,10 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_palette_t palette_
         LV_GC_ROOT(_lv_theme_default_styles) = lv_mem_alloc(sizeof(my_theme_styles_t));
         styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);
     }
+
+    if(LV_HOR_RES <= 240) disp_size = DISP_SMALL;
+    else if(LV_HOR_RES <= 800) disp_size = DISP_MEDIUM;
+    else disp_size = DISP_LARGE;
 
     theme.disp = disp;
     theme.palette_primary = palette_primary;

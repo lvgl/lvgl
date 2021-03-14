@@ -118,7 +118,8 @@ void lv_fs_drv_init(lv_fs_drv_t * drv);
 /**
  * Add a new drive
  * @param drv_p pointer to an lv_fs_drv_t structure which is inited with the
- * corresponding function pointers. The data will be copied so the variable can be local.
+ * corresponding function pointers.
+ * Only pointer is saved, so the driver should be static or dynamically allocated.
  */
 void lv_fs_drv_register(lv_fs_drv_t * drv_p);
 

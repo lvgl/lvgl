@@ -104,7 +104,7 @@ static void hal_init(void)
     disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
 
-    lv_fs_drv_t drv;
+    static lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
 
     drv.letter = 'F';                         /*An uppercase letter to identify the drive */
