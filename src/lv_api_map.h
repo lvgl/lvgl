@@ -41,7 +41,7 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_task_handler(void)
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_API_MAP_H*/

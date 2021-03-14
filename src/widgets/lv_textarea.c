@@ -150,7 +150,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
     lv_textarea_clear_selection(obj);                                                /*Clear selection*/
 
     if(ta->pwd_mode != 0) {
-        ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + strlen(letter_buf) + 1); /*+2: the new char + \0 */
+        ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + strlen(letter_buf) + 1); /*+2: the new char + \0*/
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
@@ -906,7 +906,7 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
         /*Get the letter index on the new cursor position and set it*/
         uint32_t new_cur_pos = lv_label_get_letter_on(ta->label, &pos);
 
-        lv_coord_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position */
+        lv_coord_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
         lv_textarea_set_cursor_pos(obj, new_cur_pos);
         ta->cursor.valid_x = cur_valid_x_tmp;
     }
@@ -935,7 +935,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
 
     /*Get the letter index on the new cursor position and set it*/
     uint32_t new_cur_pos       = lv_label_get_letter_on(ta->label, &pos);
-    lv_coord_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position */
+    lv_coord_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
     lv_textarea_set_cursor_pos(obj, new_cur_pos);
     ta->cursor.valid_x = cur_valid_x_tmp;
 }
@@ -1051,7 +1051,7 @@ static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_are
 static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
@@ -1402,7 +1402,7 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         }
         else if(ta->text_sel_in_prog && sign == LV_SIGNAL_PRESSING) {
-            /*Input device may be moving. Store the end position */
+            /*Input device may be moving. Store the end position*/
             ta->sel_end = char_id_at_click;
         }
         else if(ta->text_sel_in_prog && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
@@ -1438,7 +1438,7 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
                 lv_obj_invalidate(obj);
             }
         }
-        /*Finish selection if necessary */
+        /*Finish selection if necessary*/
         if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
             ta->text_sel_in_prog = 0;
         }

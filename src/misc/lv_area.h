@@ -30,7 +30,7 @@ typedef int32_t lv_coord_t;
 typedef int16_t lv_coord_t;
 #endif
 
-/*To allow some special values in the end reduce the max value */
+/*To allow some special values in the end reduce the max value*/
 #define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - _LV_COORD_MAX_REDUCE))
 #define LV_COORD_MIN (-LV_COORD_MAX)
 
@@ -49,7 +49,7 @@ typedef struct {
     lv_coord_t y;
 } lv_point_t;
 
-/** Represents an area of the screen. */
+/** Represents an area of the screen.*/
 typedef struct {
     lv_coord_t x1;
     lv_coord_t y1;
@@ -57,7 +57,7 @@ typedef struct {
     lv_coord_t y2;
 } lv_area_t;
 
-/** Alignments */
+/** Alignments*/
 enum {
     LV_ALIGN_CENTER = 0,
     LV_ALIGN_IN_TOP_LEFT,
@@ -252,7 +252,7 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
 #define LV_SIZE_LAYOUT    LV_COORD_SET_SPEC(1002) /*The size is managed by the layout therefore `lv_obj_set_width/height/size()` can't change is*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif

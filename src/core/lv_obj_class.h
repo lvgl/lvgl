@@ -43,7 +43,7 @@ typedef struct _lv_obj_class_t{
     void (*destructor_cb)(struct _lv_obj_t * obj);
     lv_signal_cb_t signal_cb;       /**< Object type specific signal function*/
     lv_draw_cb_t draw_cb;           /**< Object type specific draw function*/
-    uint32_t editable :2;           /**< Value from ::lv_obj_class_editable_t */
+    uint32_t editable :2;           /**< Value from ::lv_obj_class_editable_t*/
     uint32_t instance_size :20;
 }lv_obj_class_t;
 
@@ -74,7 +74,7 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj);
 
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_CLASS_H*/

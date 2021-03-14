@@ -170,7 +170,7 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
@@ -181,7 +181,7 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
-        /* The smaller size is the knob diameter*/
+        /*The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj), lv_obj_get_height(obj)) >> 1;
         knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/

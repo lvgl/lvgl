@@ -42,7 +42,7 @@ void lv_example_style_11(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_EXAMPLE_STYLE_H*/

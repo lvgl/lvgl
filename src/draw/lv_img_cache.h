@@ -29,11 +29,11 @@ extern "C" {
  * To avoid repeating this heavy load images can be cached.
  */
 typedef struct {
-    lv_img_decoder_dsc_t dec_dsc; /**< Image information */
+    lv_img_decoder_dsc_t dec_dsc; /**< Image information*/
 
     /** Count the cache entries's life. Add `time_to_open` to `life` when the entry is used.
      * Decrement all lifes by one every in every ::lv_img_cache_open.
-     * If life == 0 the entry can be reused */
+     * If life == 0 the entry can be reused*/
     int32_t life;
 } lv_img_cache_entry_t;
 
@@ -71,7 +71,7 @@ void lv_img_cache_invalidate_src(const void * src);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_IMG_CACHE_H*/

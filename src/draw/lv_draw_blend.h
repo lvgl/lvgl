@@ -44,7 +44,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_DRAW_BLEND_H*/

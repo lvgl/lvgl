@@ -130,7 +130,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     va_start(ap, fmt);
     va_copy(ap2, ap);
 
-    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12*/
     uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
 
@@ -164,7 +164,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
         return;
     }
 
-    table->cell_data[cell][len + 1] = 0; /* Ensure NULL termination */
+    table->cell_data[cell][len + 1] = 0; /*Ensure NULL termination*/
 
     lv_vsnprintf(&table->cell_data[cell][1], len + 1, fmt, ap2);
 #endif
@@ -401,7 +401,7 @@ static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_table_t * table = (lv_table_t *)obj;
 
-    /*Initialize the allocated 'ext' */
+    /*Initialize the allocated 'ext'*/
     table->cell_data     = NULL;
     table->col_cnt       = 0;
     table->row_cnt       = 0;
@@ -648,7 +648,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 

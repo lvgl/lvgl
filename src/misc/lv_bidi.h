@@ -21,8 +21,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/* Special non printable strong characters.
- * They can be inserted to texts to affect the run's direction*/
+/*Special non printable strong characters.
+ *They can be inserted to texts to affect the run's direction*/
 #define LV_BIDI_LRO  "\xE2\x80\xAD" /*U+202D*/
 #define LV_BIDI_RLO  "\xE2\x80\xAE" /*U+202E*/
 
@@ -113,7 +113,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
 #endif /*LV_USE_BIDI*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_BIDI_H*/

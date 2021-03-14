@@ -15,7 +15,7 @@
  *********************/
 /**
  * Some helper defines
- * */
+ */
 #define CELL_SHIFT        4
 #define CELL_POS_MASK     ((1 << CELL_SHIFT) - 1)
 #define CELL_SPAN_MASK    (CELL_POS_MASK << CELL_SHIFT)
@@ -145,8 +145,8 @@ static void full_refresh(lv_obj_t * cont)
     item_repos_hint_t hint;
     lv_memset_00(&hint, sizeof(hint));
 
-    /* Calculate the grids absolute x and y coordinates.
-     * It will be used as helper during item repositioning to avoid calculating this value for every children*/
+    /*Calculate the grids absolute x and y coordinates.
+     *It will be used as helper during item repositioning to avoid calculating this value for every children*/
     lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_PART_MAIN);
     lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_PART_MAIN);
     hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);

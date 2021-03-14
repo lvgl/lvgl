@@ -55,8 +55,8 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     lv_obj_construct(obj, parent, copy);
 
    if(parent) {
-       /* Send a signal to the parent to notify it about the new child.
-        * Also triggers layout update*/
+       /*Send a signal to the parent to notify it about the new child.
+        *Also triggers layout update*/
        lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
 
        /*Invalidate the area if not screen created*/
@@ -153,7 +153,7 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p)
     const lv_obj_class_t * base = class_p;
     while(base && base->instance_size == 0) base = base->base_class;
 
-    if(base == NULL) return 0;  /*Never happens: set at least in `lv_obj` class */
+    if(base == NULL) return 0;  /*Never happens: set at least in `lv_obj` class*/
 
     return base->instance_size;
 }

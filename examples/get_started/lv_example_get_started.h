@@ -34,7 +34,7 @@ void lv_example_get_started_3(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_EX_GET_STARTED_H*/

@@ -99,7 +99,7 @@ typedef struct {
     lv_draw_mask_common_dsc_t dsc;
 
     struct {
-        /*First point */
+        /*First point*/
         lv_point_t p1;
 
         /*Second point*/
@@ -112,23 +112,23 @@ typedef struct {
     /*A point of the line*/
     lv_point_t origo;
 
-    /* X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y?*/
+    /*X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y?*/
     int32_t xy_steep;
 
-    /* Y / (1024*X) steepness (Y is 0..1023 range). What is the change of Y in 1024 X?*/
+    /*Y / (1024*X) steepness (Y is 0..1023 range). What is the change of Y in 1024 X?*/
     int32_t yx_steep;
 
-    /*Helper which stores yx_steep for flat lines and xy_steep for steep (non flat) lines */
+    /*Helper which stores yx_steep for flat lines and xy_steep for steep (non flat) lines*/
     int32_t steep;
 
-    /*Steepness in 1 px in 0..255 range. Used only by flat lines. */
+    /*Steepness in 1 px in 0..255 range. Used only by flat lines.*/
     int32_t spx;
 
     /*1: It's a flat line? (Near to horizontal)*/
     uint8_t flat : 1;
 
-    /* Invert the mask. The default is: Keep the left part.
-     * It is used to select left/right/top/bottom*/
+    /*Invert the mask. The default is: Keep the left part.
+     *It is used to select left/right/top/bottom*/
     uint8_t inv: 1;
 } lv_draw_mask_line_param_t;
 
@@ -154,7 +154,7 @@ typedef struct {
     struct {
         lv_area_t rect;
         lv_coord_t radius;
-        /* Invert the mask. 0: Keep the pixels inside.*/
+        /*Invert the mask. 0: Keep the pixels inside.*/
         uint8_t outer: 1;
     } cfg;
     int32_t y_prev;
@@ -318,7 +318,7 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_DRAW_MASK_H*/

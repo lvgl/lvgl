@@ -25,7 +25,7 @@
 /*********************
  *      DEFINES
  *********************/
-/* Draw translucent random colored areas on the invalidated (redrawn) areas*/
+/*Draw translucent random colored areas on the invalidated (redrawn) areas*/
 #define MASK_AREA_DEBUG 0
 
 /**********************
@@ -192,7 +192,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     disp_refr = tmr->user_data;
 
 #if LV_USE_PERF_MONITOR == 0
-    /* Ensure the timer does not run again automatically.
+    /**
+     * Ensure the timer does not run again automatically.
      * This is done before refreshing in case refreshing invalidates something else.
      */
     lv_timer_pause(tmr, true);
@@ -561,8 +562,8 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     lv_refr_obj_and_children(lv_disp_get_layer_top(disp_refr), &start_mask);
     lv_refr_obj_and_children(lv_disp_get_layer_sys(disp_refr), &start_mask);
 
-    /* In true double buffered mode flush only once when all areas were rendered.
-     * In normal mode flush after every area */
+    /*In true double buffered mode flush only once when all areas were rendered.
+     *In normal mode flush after every area*/
     if(lv_disp_is_true_double_buf(disp_refr) == false) {
         draw_buf_flush();
     }
@@ -578,7 +579,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 {
     lv_obj_t * found_p = NULL;
 
-    /*If this object is fully cover the draw area check the children too */
+    /*If this object is fully cover the draw area check the children too*/
     if(_lv_area_is_in(area_p, &obj->coords, 0) && lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == false) {
         lv_draw_res_t draw_res = call_draw_cb(obj, area_p, LV_DRAW_MODE_COVER_CHECK);
         if(draw_res == LV_DRAW_RES_MASKED) return NULL;
@@ -622,16 +623,16 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
  */
 static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 {
-    /* Normally always will be a top_obj (at least the screen)
-     * but in special cases (e.g. if the screen has alpha) it won't.
-     * In this case use the screen directly */
+    /*Normally always will be a top_obj (at least the screen)
+     *but in special cases (e.g. if the screen has alpha) it won't.
+     *In this case use the screen directly*/
     if(top_p == NULL) top_p = lv_disp_get_scr_act(disp_refr);
     if(top_p == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/
     lv_refr_obj(top_p, mask_p);
 
-    /*Draw the 'younger' sibling objects because they can be on top_obj */
+    /*Draw the 'younger' sibling objects because they can be on top_obj*/
     lv_obj_t * par;
     lv_obj_t * border_p = top_p;
 
@@ -674,9 +675,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
-    bool union_ok; /* Store the return value of area_union */
-    /* Truncate the original mask to the coordinates of the parent
-     * because the parent and its children are visible only here */
+    bool union_ok; /*Store the return value of area_union*/
+    /*Truncate the original mask to the coordinates of the parent
+     *because the parent and its children are visible only here*/
     lv_area_t obj_mask;
     lv_area_t obj_ext_mask;
     lv_area_t obj_area;
@@ -690,7 +691,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
-        /* Redraw the object */
+        /*Redraw the object*/
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, &obj_ext_mask);
         call_draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_MAIN_DRAW);
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
@@ -721,11 +722,11 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
                 child_area.y1 -= ext_size;
                 child_area.x2 += ext_size;
                 child_area.y2 += ext_size;
-                /* Get the union (common parts) of original mask (from obj)
-                 * and its child */
+                /*Get the union (common parts) of original mask (from obj)
+                 *and its child*/
                 union_ok = _lv_area_intersect(&mask_child, &obj_mask, &child_area);
 
-                /*If the parent and the child has common area then refresh the child */
+                /*If the parent and the child has common area then refresh the child*/
                 if(union_ok) {
                     /*Refresh the next children*/
                     lv_refr_obj(child, &mask_child);
@@ -733,7 +734,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             }
         }
 
-        /* If all the children are redrawn make 'post draw' draw */
+        /*If all the children are redrawn make 'post draw' draw*/
         lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, &obj_ext_mask);
         call_draw_cb(obj, &obj_ext_mask, LV_DRAW_MODE_POST_DRAW);
         lv_event_send(obj, LV_EVENT_DRAW_POST_END, &obj_ext_mask);
@@ -744,7 +745,7 @@ static void draw_buf_rotate_180(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t 
     lv_coord_t area_w = lv_area_get_width(area);
     lv_coord_t area_h = lv_area_get_height(area);
     uint32_t total = area_w * area_h;
-    /* Swap the beginning and end values */
+    /*Swap the beginning and end values*/
     lv_color_t tmp;
     uint32_t i = total - 1, j = 0;
     while(i > j) {
@@ -835,7 +836,7 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
         draw_buf_rotate_180(drv, area, color_p);
         call_flush_cb(drv, area, color_p);
     } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
-        /*Allocate a temporary buffer to store rotated image */
+        /*Allocate a temporary buffer to store rotated image*/
         lv_color_t * rot_buf = NULL; 
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
         lv_coord_t area_w = lv_area_get_width(area);

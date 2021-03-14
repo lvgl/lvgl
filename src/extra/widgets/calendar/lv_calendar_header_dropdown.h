@@ -42,7 +42,7 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
 #endif /*LV_USE_CALENDAR_HEADER_ARROW*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_CALENDAR_H*/

@@ -141,7 +141,7 @@ uint32_t lv_obj_get_child_id(const struct _lv_obj_t * obj);
 
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_TREE_H*/

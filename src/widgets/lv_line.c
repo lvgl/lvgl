@@ -181,7 +181,7 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 

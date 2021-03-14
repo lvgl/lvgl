@@ -111,12 +111,12 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
         img->src = src;
     }
     else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
-        /* If the new and the old src are the same then it was only a refresh.*/
+        /*If the new and the old src are the same then it was only a refresh.*/
         if(img->src != src) {
             const void * old_src = NULL;
-            /* If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
-             * It's important to allocate first to be sure the new data will be on a new address.
-             * Else `img_cache` wouldn't see the change in source.*/
+            /*If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
+             *It's important to allocate first to be sure the new data will be on a new address.
+             *Else `img_cache` wouldn't see the change in source.*/
             if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
                 old_src = img->src;
             }
@@ -382,9 +382,9 @@ static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
 
-        /* Enable auto size for non screens
-         * because image screens are wallpapers
-         * and must be screen sized*/
+        /*Enable auto size for non screens
+         *because image screens are wallpapers
+         *and must be screen sized*/
         if(obj->parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     }
     else {
@@ -421,7 +421,7 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         /*Non true color format might have "holes"*/
         if(img->cf != LV_IMG_CF_TRUE_COLOR && img->cf != LV_IMG_CF_RAW) return LV_DRAW_RES_NOT_COVER;
 
-        /*With not LV_OPA_COVER images can't cover an area */
+        /*With not LV_OPA_COVER images can't cover an area*/
         if(lv_obj_get_style_img_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) return LV_DRAW_RES_NOT_COVER;
 
         int32_t angle_final = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
@@ -554,7 +554,7 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
@@ -575,7 +575,7 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
         transf_angle += img->angle;
 
-        /*If the image has angle provide enough room for the rotated corners */
+        /*If the image has angle provide enough room for the rotated corners*/
         if(transf_angle || transf_zoom != LV_IMG_ZOOM_NONE) {
             lv_area_t a;
             lv_coord_t w = lv_obj_get_width(obj);
@@ -596,8 +596,8 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
         angle += img->angle;
 
-        /* If the object is exactly image sized (not cropped, not mosaic) and transformed
-         * perform hit test on it's transformed area */
+        /*If the object is exactly image sized (not cropped, not mosaic) and transformed
+         *perform hit test on it's transformed area*/
         if(img->w == lv_obj_get_width(obj) && img->h == lv_obj_get_height(obj) &&
            (zoom != LV_IMG_ZOOM_NONE || angle != 0 || img->pivot.x != img->w / 2 || img->pivot.y != img->h / 2)) {
 

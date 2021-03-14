@@ -23,7 +23,7 @@ void lv_example_grid_2(void)
     lv_obj_t * label;
     lv_obj_t * obj;
 
-    /*Cell to 0;0 and align to to the start (left/top) horizontally and vertically too */
+    /*Cell to 0;0 and align to to the start (left/top) horizontally and vertically too*/
     obj = lv_obj_create(cont, NULL);
     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_grid_cell(obj, LV_GRID_START, 0, 1,
@@ -31,7 +31,7 @@ void lv_example_grid_2(void)
     label = lv_label_create(obj, NULL);
     lv_label_set_text(label, "c0, r0");
 
-    /*Cell to 1;0 and align to to the start (left) horizontally and center vertically too */
+    /*Cell to 1;0 and align to to the start (left) horizontally and center vertically too*/
     obj = lv_obj_create(cont, NULL);
     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_grid_cell(obj, LV_GRID_START, 1, 1,
@@ -39,7 +39,7 @@ void lv_example_grid_2(void)
     label = lv_label_create(obj, NULL);
     lv_label_set_text(label, "c1, r0");
 
-    /*Cell to 2;0 and align to to the start (left) horizontally and end (bottom) vertically too */
+    /*Cell to 2;0 and align to to the start (left) horizontally and end (bottom) vertically too*/
     obj = lv_obj_create(cont, NULL);
     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_grid_cell(obj, LV_GRID_START, 2, 1,
@@ -47,7 +47,7 @@ void lv_example_grid_2(void)
     label = lv_label_create(obj, NULL);
     lv_label_set_text(label, "c2, r0");
 
-    /*Cell to 1;1 but 2 column wide (span = 2).Set width and height to stretched. */
+    /*Cell to 1;1 but 2 column wide (span = 2).Set width and height to stretched.*/
     obj = lv_obj_create(cont, NULL);
     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_grid_cell(obj, LV_GRID_STRETCH, 1, 2,
@@ -55,7 +55,7 @@ void lv_example_grid_2(void)
     label = lv_label_create(obj, NULL);
     lv_label_set_text(label, "c1-2, r1");
 
-    /*Cell to 0;1 but 2 rows tall (span = 2).Set width and height to stretched. */
+    /*Cell to 0;1 but 2 rows tall (span = 2).Set width and height to stretched.*/
     obj = lv_obj_create(cont, NULL);
     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_grid_cell(obj, LV_GRID_STRETCH, 0, 1,

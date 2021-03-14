@@ -26,7 +26,7 @@ void lv_example_meter_2(void)
     lv_meter_set_scale_major_ticks(meter, scale, 1, 2, 30, lv_color_hex3(0xeee), 10);
     lv_meter_set_scale_range(meter, scale, 0, 100, 270, 90);
 
-    /*Add a three arc indicator */
+    /*Add a three arc indicator*/
     lv_meter_indicator_t * indic1 = lv_meter_add_arc(meter, scale, 10, lv_color_red(), 0);
     lv_meter_indicator_t * indic2 = lv_meter_add_arc(meter, scale, 10, lv_color_green(), -10);
     lv_meter_indicator_t * indic3 = lv_meter_add_arc(meter, scale, 10, lv_color_blue(), -20);

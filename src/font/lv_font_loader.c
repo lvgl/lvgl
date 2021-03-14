@@ -441,7 +441,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         int next_offset = (i < loca_count - 1) ? glyph_offset[i + 1] : (uint32_t)glyph_length;
         int bmp_size = next_offset - glyph_offset[i] - nbits / 8;
 
-        if(nbits % 8 == 0) {  /* Fast path */
+        if(nbits % 8 == 0) {  /*Fast path*/
             if(lv_fs_read(fp, &glyph_bmp[cur_bmp_size], bmp_size, NULL) != LV_FS_RES_OK) {
                 return -1;
             }
@@ -485,7 +485,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 
     font->dsc = font_dsc;
 
-    /* header */
+    /*header*/
     int32_t header_length = read_label(fp, 0, "head");
     if(header_length < 0) {
         return false;
@@ -508,14 +508,14 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font_dsc->kern_scale = font_header.kerning_scale;
     font_dsc->bitmap_format = font_header.compression_id;
 
-    /* cmaps */
+    /*cmaps*/
     uint32_t cmaps_start = header_length;
     int32_t cmaps_length = load_cmaps(fp, font_dsc, cmaps_start);
     if(cmaps_length < 0) {
         return false;
     }
 
-    /* loca */
+    /*loca*/
     uint32_t loca_start = cmaps_start + cmaps_length;
     int32_t loca_length = read_label(fp, loca_start, "loca");
     if(loca_length < 0) {
@@ -555,7 +555,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
         return false;
     }
 
-    /* glyph */
+    /*glyph*/
     uint32_t glyph_start = loca_start + loca_length;
     int32_t glyph_length = load_glyph(
                                fp, font_dsc, glyph_start, glyph_offset, loca_count, &font_header);
@@ -594,7 +594,7 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         return -1;
     }
 
-    if(0 == kern_format_type) { /* sorted pairs */
+    if(0 == kern_format_type) { /*sorted pairs*/
         lv_font_fmt_txt_kern_pair_t * kern_pair = lv_mem_alloc(sizeof(lv_font_fmt_txt_kern_pair_t));
 
         memset(kern_pair, 0, sizeof(lv_font_fmt_txt_kern_pair_t));
@@ -631,7 +631,7 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
             return -1;
         }
     }
-    else if(3 == kern_format_type) { /* array M*N of classes */
+    else if(3 == kern_format_type) { /*array M*N of classes*/
 
         lv_font_fmt_txt_kern_classes_t * kern_classes = lv_mem_alloc(sizeof(lv_font_fmt_txt_kern_classes_t));
 

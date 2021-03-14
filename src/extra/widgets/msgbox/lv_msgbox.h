@@ -67,7 +67,7 @@ void lv_msgbox_close(lv_obj_t * mbox);
 #endif /*LV_USE_MSGBOX*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_MSGBOX_H*/

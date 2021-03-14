@@ -78,7 +78,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
             pcnt++;
         }
     }
-    /*The first and the last points are also adjacent */
+    /*The first and the last points are also adjacent*/
     if(points[0].x != points[point_cnt - 1].x || points[0].y != points[point_cnt - 1].y) {
         p[pcnt] = points[point_cnt - 1];
         pcnt++;
@@ -133,7 +133,8 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     i_next_right = y_min_i + 1;
     if(i_next_right > point_cnt - 1) i_next_right = 0;
 
-    /* Check if the order of points is inverted or not.
+    /**
+     * Check if the order of points is inverted or not.
      * The normal case is when the left point is on `y_min_i - 1`
      * Explanation:
      *   if angle(p_left) < angle(p_right) -> inverted

@@ -34,7 +34,7 @@ void lv_example_scroll_3(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_EXAMPLE_SCROLL_H*/

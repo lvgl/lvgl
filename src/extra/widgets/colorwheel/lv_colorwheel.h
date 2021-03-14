@@ -135,7 +135,7 @@ bool lv_colorwheel_get_color_mode_fixed(lv_obj_t * obj);
 #endif  /*LV_USE_COLORWHEEL*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_COLORWHEEL_H*/

@@ -117,7 +117,7 @@ lv_bidi_dir_t _lv_bidi_detect_base_dir(const char * txt)
         if(dir == LV_BIDI_DIR_RTL || dir == LV_BIDI_DIR_LTR) return dir;
     }
 
-    /*If there were no strong char earlier return with the default base dir */
+    /*If there were no strong char earlier return with the default base dir*/
     if(LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_AUTO) return LV_BIDI_DIR_LTR;
     else return LV_BIDI_BASE_DIR_DEF;
 }
@@ -369,7 +369,7 @@ static bool lv_bidi_letter_is_rtl(uint32_t letter)
     if(letter >= 0x5d0 && letter <= 0x5ea) return true;
     if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
 
-    /* Check for Persian and Arabic characters [https://en.wikipedia.org/wiki/Arabic_script_in_Unicode]*/
+    /*Check for Persian and Arabic characters [https://en.wikipedia.org/wiki/Arabic_script_in_Unicode]*/
     if(letter >= 0x600 && letter <= 0x6FF) return true;
     if(letter >= 0xFB50 && letter <= 0xFDFF) return true;
     if(letter >= 0xFE70 && letter <= 0xFEFF) return true;
@@ -458,12 +458,12 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
 
         /*New dir found?*/
         if((next_dir == LV_BIDI_DIR_RTL || next_dir == LV_BIDI_DIR_LTR) && next_dir != run_dir) {
-            /*Include neutrals if `run_dir == base_dir` */
+            /*Include neutrals if `run_dir == base_dir`*/
             if(run_dir == base_dir) {
                 *len = i_prev;
                 *pos_conv_len = pos_conv_i_prev;
             }
-            /*Exclude neutrals if `run_dir != base_dir` */
+            /*Exclude neutrals if `run_dir != base_dir`*/
             else {
                 *len = i_last_strong;
                 *pos_conv_len = pos_conv_i_last_strong;
@@ -483,12 +483,12 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
 
     /*Handle end of of string. Apply `base_dir` on trailing neutrals*/
 
-    /*Include neutrals if `run_dir == base_dir` */
+    /*Include neutrals if `run_dir == base_dir`*/
     if(run_dir == base_dir) {
         *len = i_prev;
         *pos_conv_len = pos_conv_i_prev;
     }
-    /*Exclude neutrals if `run_dir != base_dir` */
+    /*Exclude neutrals if `run_dir != base_dir`*/
     else {
         *len = i_last_strong;
         *pos_conv_len = pos_conv_i_last_strong;
@@ -521,7 +521,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
 
                 /*No need to call `char_change_to_pair` because there not such chars here*/
 
-                /*Finish on non-weak char */
+                /*Finish on non-weak char*/
                 /*but treat number and currency related chars as weak*/
                 if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
                     _lv_txt_encoded_next(src, &i);   /*Rewind one letter*/
@@ -589,8 +589,8 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
     /*Is the letter an opening bracket?*/
     for(i = 0; bracket_left[i] != '\0'; i++) {
         if(bracket_left[i] == letter) {
-            /* If so find it's matching closing bracket.
-             * If a char with base dir. direction is found then the brackets will have `base_dir` direction*/
+            /*If so find it's matching closing bracket.
+             *If a char with base dir. direction is found then the brackets will have `base_dir` direction*/
             uint32_t txt_i = next_pos;
             while(txt_i < len) {
                 uint32_t letter_next = _lv_txt_encoded_next(txt, &txt_i);

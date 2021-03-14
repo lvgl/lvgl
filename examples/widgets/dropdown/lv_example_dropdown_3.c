@@ -33,7 +33,7 @@ void lv_example_dropdown_3(void)
     lv_dropdown_set_symbol(dropdown, &img_caret_down);
     lv_obj_set_style_transform_angle(dropdown, LV_PART_MAIN, LV_STATE_CHECKED, 1800);
 
-    /* In a menu we don't need to show the last clicked item*/
+    /*In a menu we don't need to show the last clicked item*/
     lv_dropdown_set_selected_highlight(dropdown, false);
 
     lv_obj_add_event_cb(dropdown, event_cb, NULL);

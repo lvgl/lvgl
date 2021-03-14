@@ -197,7 +197,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 #endif /*LV_USE_TABLE*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TABLE_H*/

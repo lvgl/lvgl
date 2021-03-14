@@ -141,7 +141,7 @@ static void lv_checkbox_destructor(lv_obj_t * obj)
 
 static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
-    /* A label never covers an area */
+    /*A label never covers an area*/
     if(mode == LV_DRAW_MODE_COVER_CHECK)
         return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
@@ -211,7 +211,7 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
 static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 

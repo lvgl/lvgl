@@ -182,19 +182,19 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
     if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
-    uint32_t i = 0, i_next = 0, i_next_next = 0;  /* Iterating index into txt */
-    uint32_t letter = 0;      /* Letter at i */
-    uint32_t letter_next = 0; /* Letter at i_next */
+    uint32_t i = 0, i_next = 0, i_next_next = 0;  /*Iterating index into txt*/
+    uint32_t letter = 0;      /*Letter at i*/
+    uint32_t letter_next = 0; /*Letter at i_next*/
     lv_coord_t letter_w;
-    lv_coord_t cur_w = 0;  /* Pixel Width of transversed string */
-    uint32_t word_len = 0;   /* Number of characters in the transversed word */
-    uint32_t break_index = NO_BREAK_FOUND; /* only used for "long" words */
-    uint32_t break_letter_count = 0; /* Number of characters up to the long word break point */
+    lv_coord_t cur_w = 0;  /*Pixel Width of transversed string*/
+    uint32_t word_len = 0;   /*Number of characters in the transversed word*/
+    uint32_t break_index = NO_BREAK_FOUND; /*only used for "long" words*/
+    uint32_t break_letter_count = 0; /*Number of characters up to the long word break point*/
 
     letter = _lv_txt_encoded_next(txt, &i_next);
     i_next_next = i_next;
 
-    /* Obtain the full word, regardless if it fits or not in max_width */
+    /*Obtain the full word, regardless if it fits or not in max_width*/
     while(txt[i] != '\0') {
         letter_next = _lv_txt_encoded_next(txt, &i_next_next);
         word_len++;
@@ -216,23 +216,23 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
             cur_w += letter_space;
         }
 
-        /* Test if this character fits within max_width */
+        /*Test if this character fits within max_width*/
         if(break_index == NO_BREAK_FOUND && (cur_w - letter_space) > max_width) {
             break_index = i;
             break_letter_count = word_len - 1;
-            /* break_index is now pointing at the character that doesn't fit */
+            /*break_index is now pointing at the character that doesn't fit*/
         }
 
         /*Check for new line chars and breakchars*/
         if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
-            /* Update the output width on the first character if it fits.
-             * Must do this here in case first letter is a break character. */
+            /*Update the output width on the first character if it fits.
+             *Must do this here in case first letter is a break character.*/
             if(i == 0 && break_index == NO_BREAK_FOUND && word_w_ptr != NULL) *word_w_ptr = cur_w;
             word_len--;
             break;
         }
 
-        /* Update the output width */
+        /*Update the output width*/
         if(word_w_ptr != NULL && break_index == NO_BREAK_FOUND) *word_w_ptr = cur_w;
 
         i = i_next;
@@ -240,32 +240,32 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         letter = letter_next;
     }
 
-    /* Entire Word fits in the provided space */
+    /*Entire Word fits in the provided space*/
     if(break_index == NO_BREAK_FOUND) {
         if(word_len == 0 || (letter == '\r' && letter_next == '\n')) i = i_next;
         return i;
     }
 
 #if LV_TXT_LINE_BREAK_LONG_LEN > 0
-    /* Word doesn't fit in provided space, but isn't "long" */
+    /*Word doesn't fit in provided space, but isn't "long"*/
     if(word_len < LV_TXT_LINE_BREAK_LONG_LEN) {
         if(force) return break_index;
-        if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
+        if(word_w_ptr != NULL) *word_w_ptr = 0; /*Return no word*/
         return 0;
     }
 
-    /* Word is "long," but insufficient amounts can fit in provided space */
+    /*Word is "long," but insufficient amounts can fit in provided space*/
     if(break_letter_count < LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN) {
         if(force) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0;
         return 0;
     }
 
-    /* Word is a "long", but letters may need to be better distributed */
+    /*Word is a "long", but letters may need to be better distributed*/
     {
         i = break_index;
         int32_t n_move = LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN - (word_len - break_letter_count);
-        /* Move pointer "i" backwards */
+        /*Move pointer "i" backwards*/
         for(; n_move > 0; n_move--) {
             _lv_txt_encoded_prev(txt, &i);
             // TODO: it would be appropriate to update the returned word width here
@@ -275,7 +275,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     return i;
 #else
     if(force) return break_index;
-    if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
+    if(word_w_ptr != NULL) *word_w_ptr = 0; /*Return no word*/
     (void) break_letter_count;
     return 0;
 #endif
@@ -299,8 +299,8 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
-    /* If max_width doesn't mater simply find the new line character
-     * without thinking about word wrapping*/
+    /*If max_width doesn't mater simply find the new line character
+     *without thinking about word wrapping*/
     if((flag & LV_TEXT_FLAG_EXPAND) || (flag & LV_TEXT_FLAG_FIT)) {
         uint32_t i;
         for(i = 0; txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
@@ -312,7 +312,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
     lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
-    uint32_t i = 0;                                        /* Iterating index into txt */
+    uint32_t i = 0;                                        /*Iterating index into txt*/
 
     while(txt[i] != '\0' && max_width > 0) {
         uint32_t word_w = 0;
@@ -329,13 +329,13 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         if(txt[0] == '\n' || txt[0] == '\r') break;
 
         if(txt[i] == '\n' || txt[i] == '\r') {
-            i++;  /* Include the following newline in the current line */
+            i++;  /*Include the following newline in the current line*/
             break;
         }
 
     }
 
-    /* Always step at least one to avoid infinite loops */
+    /*Always step at least one to avoid infinite loops*/
     if(i == 0) {
         _lv_txt_encoded_next(txt, &i);
     }
@@ -383,7 +383,7 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
 
         if(width > 0) {
             width -= letter_space; /*Trim the last letter space. Important if the text is center
-                                      aligned */
+                                      aligned*/
         }
     }
 
@@ -407,11 +407,11 @@ bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
             *state = LV_TEXT_CMD_STATE_PAR;
             ret    = true;
         }
-        /*Other start char in parameter is escaped cmd. char */
+        /*Other start char in parameter is escaped cmd. char*/
         else if(*state == LV_TEXT_CMD_STATE_PAR) {
             *state = LV_TEXT_CMD_STATE_WAIT;
         }
-        /*Command end */
+        /*Command end*/
         else if(*state == LV_TEXT_CMD_STATE_IN) {
             *state = LV_TEXT_CMD_STATE_WAIT;
             ret    = true;
@@ -451,7 +451,7 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
         txt_buf[i] = txt_buf[i - ins_len];
     }
 
-    /* Copy the text into the new space*/
+    /*Copy the text into the new space*/
     lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
 }
 
@@ -484,7 +484,7 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
  */
 char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 {
-    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12*/
     va_list ap_copy;
     va_copy(ap_copy, ap);
     uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap_copy);
@@ -517,7 +517,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     if(text == NULL) {
         return NULL;
     }
-    text[len] = 0; /* Ensure NULL termination */
+    text[len] = 0; /*Ensure NULL termination*/
 
     lv_vsnprintf(text, len + 1, fmt, ap);
 #endif
@@ -616,12 +616,13 @@ static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
  */
 static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
 {
-    /* Unicode to UTF-8
+    /**
+     * Unicode to UTF-8
      * 00000000 00000000 00000000 0xxxxxxx -> 0xxxxxxx
      * 00000000 00000000 00000yyy yyxxxxxx -> 110yyyyy 10xxxxxx
      * 00000000 00000000 zzzzyyyy yyxxxxxx -> 1110zzzz 10yyyyyy 10xxxxxx
      * 00000000 000wwwzz zzzzyyyy yyxxxxxx -> 11110www 10zzzzzz 10yyyyyy 10xxxxxx
-     * */
+     */
 
     uint32_t result = 0;
 
@@ -822,7 +823,7 @@ static uint32_t lv_txt_iso8859_1_conv_wc(uint32_t c)
  */
 static uint32_t lv_txt_iso8859_1_next(const char * txt, uint32_t * i)
 {
-    if(i == NULL) return txt[1]; /*Get the next char */
+    if(i == NULL) return txt[1]; /*Get the next char*/
 
     uint8_t letter = txt[*i];
     (*i)++;
@@ -837,7 +838,7 @@ static uint32_t lv_txt_iso8859_1_next(const char * txt, uint32_t * i)
  */
 static uint32_t lv_txt_iso8859_1_prev(const char * txt, uint32_t * i)
 {
-    if(i == NULL) return *(txt - 1); /*Get the prev. char */
+    if(i == NULL) return *(txt - 1); /*Get the prev. char*/
 
     (*i)--;
     uint8_t letter = txt[*i];

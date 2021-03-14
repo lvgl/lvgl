@@ -59,7 +59,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy);
 #endif /*LV_USE_SWITCH*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_SWITCH_H*/

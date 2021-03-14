@@ -204,7 +204,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     size_t ins_len = _lv_txt_ap_calc_bytes_cnt(option) + 1;
 #endif
 
-    size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
+    size_t new_len = ins_len + old_len + 2; /*+2 for terminating NULL and possible \n*/
     dropdown->options        = lv_mem_realloc(dropdown->options, new_len + 1);
     LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
@@ -228,7 +228,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         _lv_txt_ins(dropdown->options, _lv_txt_encoded_get_char_id(dropdown->options, insert_pos++), "\n");
 
     /*Insert the new option, adding \n if necessary*/
-    char * ins_buf = lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
+    char * ins_buf = lv_mem_buf_get(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
     LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
@@ -538,7 +538,7 @@ static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    /*Initialize the allocated 'ext' */
+    /*Initialize the allocated 'ext'*/
     dropdown->list          = NULL;
     dropdown->options     = NULL;
     dropdown->symbol         = LV_SYMBOL_DOWN;
@@ -736,8 +736,8 @@ static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * list_obj, const lv_area_t 
 
         /*Draw the box labels if the list is not being deleted*/
         if(dropdown->list) {
-            /* Clip area might be too large too to shadow but
-             * the selected option can be drawn on only the background*/
+            /*Clip area might be too large too to shadow but
+             *the selected option can be drawn on only the background*/
             lv_area_t clip_area_core;
             bool has_common;
             has_common = _lv_area_intersect(&clip_area_core, clip_area, &dropdown->list->coords);
@@ -787,7 +787,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
@@ -886,7 +886,7 @@ static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void 
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS_LIST, list, sign, param);
     if(res != LV_RES_OK) return res;
 
