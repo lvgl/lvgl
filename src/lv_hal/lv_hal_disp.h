@@ -38,6 +38,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct _lv_obj_t;
 struct _lv_disp_t;
 struct _lv_disp_drv_t;
 struct _lv_theme_t;
@@ -55,7 +56,7 @@ typedef struct {
     lv_area_t area;
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
-    /*1: It was the last chunk to flush. (It can't be a bi tfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    /*1: It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing_last;
     volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
@@ -85,14 +86,14 @@ typedef struct _lv_disp_drv_t {
 
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower) */
     uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display. */
-    uint32_t rotated : 3; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+    uint32_t rotated : 2; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
 
     /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
      * Use only if required because it's slower.*/
     uint32_t screen_transp : 1;
 
     /** DPI (dot per inch) of the display.
-     * Set to `LV_DPI` from `lv_Conf.h` by default.
+     * Set to `LV_DPI_DEF` from `lv_conf.h` by default.
      */
     uint32_t dpi : 10;
 
@@ -130,7 +131,7 @@ typedef struct _lv_disp_drv_t {
                         const lv_area_t * fill_area, lv_color_t color);
 
     /** On CHROMA_KEYED images this color will be transparent.
-     * `LV_COLOR_TRANSP` by default. (lv_conf.h)*/
+     * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
 #if LV_USE_USER_DATA
@@ -138,8 +139,6 @@ typedef struct _lv_disp_drv_t {
 #endif
 
 } lv_disp_drv_t;
-
-struct _lv_obj_t;
 
 /**
  * Display structure.
@@ -165,14 +164,14 @@ typedef struct _lv_disp_t {
     uint32_t screen_cnt;
     uint8_t del_prev  : 1;          /**< 1: Automatically delete the previous screen when the screen load animation is ready */
 
+    lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper */
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
     const void * bg_img;            /**< An image source to display as wallpaper*/
-    lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper */
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
-    uint32_t inv_p : 10;
+    uint16_t inv_p;
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display */
@@ -236,7 +235,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv);
 void lv_disp_remove(lv_disp_t * disp);
 
 /**
- * Set a default screen. The new screens will be created on it by default.
+ * Set a default display. The new screens will be created on it by default.
  * @param disp pointer to a display
  */
 void lv_disp_set_default(lv_disp_t * disp);
