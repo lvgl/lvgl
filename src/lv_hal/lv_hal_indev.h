@@ -188,7 +188,7 @@ typedef struct _lv_indev_proc_t {
 /** The main input device descriptor with driver, runtime data ('proc') and some additional
  * information*/
 typedef struct _lv_indev_t {
-    lv_indev_drv_t driver;
+    lv_indev_drv_t * driver;
     lv_indev_proc_t proc;
     struct _lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
     struct _lv_group_t * group;    /**< Keypad destination group*/

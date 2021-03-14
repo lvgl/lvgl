@@ -90,10 +90,10 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     }
 
     lv_memset_00(indev, sizeof(lv_indev_t));
-    lv_memcpy(&indev->driver, driver, sizeof(lv_indev_drv_t));
+    indev->driver = driver;
 
     indev->proc.reset_query  = 1;
-    indev->driver.read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
+    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
 
     return indev;
 }
@@ -136,22 +136,22 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
      * So be sure a coordinates are initialized to the last point */
-    if(indev->driver.type == LV_INDEV_TYPE_POINTER) {
+    if(indev->driver->type == LV_INDEV_TYPE_POINTER) {
         data->point.x = indev->proc.types.pointer.act_point.x;
         data->point.y = indev->proc.types.pointer.act_point.y;
     }
     /*Similarly set at least the last key in case of the user doesn't set it on release*/
-    else if(indev->driver.type == LV_INDEV_TYPE_KEYPAD) {
+    else if(indev->driver->type == LV_INDEV_TYPE_KEYPAD) {
         data->key = indev->proc.types.keypad.last_key;
     }
     /*For compatibility assume that used button was enter (encoder push) */
-    else if(indev->driver.type == LV_INDEV_TYPE_ENCODER) {
+    else if(indev->driver->type == LV_INDEV_TYPE_ENCODER) {
         data->key = LV_KEY_ENTER;
     }
 
-    if(indev->driver.read_cb) {
+    if(indev->driver->read_cb) {
         INDEV_TRACE("calling indev_read_cb");
-        cont = indev->driver.read_cb(&indev->driver, data);
+        cont = indev->driver->read_cb(indev->driver, data);
     }
     else {
         LV_LOG_WARN("indev_read_cb is not registered");

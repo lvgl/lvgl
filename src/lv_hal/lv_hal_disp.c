@@ -211,8 +211,8 @@ void lv_disp_remove(lv_disp_t * disp)
     lv_indev_t * indev;
     indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->driver.disp == disp) {
-            indev->driver.disp = NULL;
+        if(indev->driver->disp == disp) {
+            indev->driver->disp = NULL;
         }
         indev = lv_indev_get_next(indev);
     }

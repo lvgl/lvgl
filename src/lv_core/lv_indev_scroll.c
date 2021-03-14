@@ -101,7 +101,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
 
 
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_throw =  indev_act->driver.scroll_throw;
+    lv_coord_t scroll_throw =  indev_act->driver->scroll_throw;
 
     if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
         proc->types.pointer.scroll_throw_vect.y = 0;
@@ -220,7 +220,7 @@ lv_coord_t lv_indev_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
         return 0;
     }
 
-    lv_coord_t scroll_throw = indev->driver.scroll_throw;
+    lv_coord_t scroll_throw = indev->driver->scroll_throw;
     lv_coord_t sum = 0;
     while(v) {
         sum += v;
@@ -245,7 +245,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
     lv_obj_t * obj_candidate = NULL;
     lv_dir_t dir_candidate = LV_DIR_NONE;
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_limit =  indev_act->driver.scroll_limit;
+    lv_coord_t scroll_limit =  indev_act->driver->scroll_limit;
 
     /* Go until find an scrollable object in the current direction
      * More precisely:
@@ -535,7 +535,7 @@ static lv_coord_t scroll_throw_predict_y(lv_indev_proc_t * proc)
     lv_coord_t move = 0;
 
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_throw =  indev_act->driver.scroll_throw;
+    lv_coord_t scroll_throw =  indev_act->driver->scroll_throw;
 
     while(y) {
         move += y;
@@ -551,7 +551,7 @@ static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc)
     lv_coord_t move = 0;
 
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_throw =  indev_act->driver.scroll_throw;
+    lv_coord_t scroll_throw =  indev_act->driver->scroll_throw;
 
     while(x) {
         move += x;

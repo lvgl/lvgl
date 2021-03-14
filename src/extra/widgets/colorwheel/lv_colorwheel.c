@@ -456,7 +456,7 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
             lv_indev_get_point(indev, &p);
         }
 
-        lv_coord_t drag_limit = indev->driver.scroll_limit;
+        lv_coord_t drag_limit = indev->driver->scroll_limit;
         if((LV_ABS(p.x - colorwheel->last_press_point.x) > drag_limit) ||
            (LV_ABS(p.y - colorwheel->last_press_point.y) > drag_limit)) {
             colorwheel->last_change_time = lv_tick_get();
@@ -491,7 +491,7 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
 
         /*If the inner area is being pressed, go to the next color mode on long press*/
         uint32_t diff = lv_tick_elaps(colorwheel->last_change_time);
-        if(!on_ring && diff > indev->driver.long_press_time && !colorwheel->mode_fixed) {
+        if(!on_ring && diff > indev->driver->long_press_time && !colorwheel->mode_fixed) {
             next_color_mode(obj);
             lv_indev_wait_release(lv_indev_get_act());
             return res;
@@ -565,7 +565,7 @@ static lv_res_t double_click_reset(lv_obj_t * obj)
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     lv_indev_t * indev = lv_indev_get_act();
     /*Double clicked? Use long press time as double click time out*/
-    if(lv_tick_elaps(colorwheel->last_click_time) < indev->driver.long_press_time) {
+    if(lv_tick_elaps(colorwheel->last_click_time) < indev->driver->long_press_time) {
         lv_color_hsv_t hsv_cur;
         hsv_cur = colorwheel->hsv;
 

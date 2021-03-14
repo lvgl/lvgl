@@ -228,7 +228,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
-        if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, event);
+        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event);
     }
 
     uint32_t i = 0;

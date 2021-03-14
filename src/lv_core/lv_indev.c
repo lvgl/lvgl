@@ -70,7 +70,7 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     indev_act = timer->user_data;
 
     /*Read and process all indevs*/
-    if(indev_act->driver.disp == NULL) return; /*Not assigned to any displays*/
+    if(indev_act->driver->disp == NULL) return; /*Not assigned to any displays*/
 
     /*Handle reset query before processing the point*/
     indev_proc_reset_query_handler(indev_act);
@@ -89,22 +89,22 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
 
         /*Save the last activity time*/
         if(indev_act->proc.state == LV_INDEV_STATE_PRESSED) {
-            indev_act->driver.disp->last_activity_time = lv_tick_get();
+            indev_act->driver->disp->last_activity_time = lv_tick_get();
         }
-        else if(indev_act->driver.type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
-            indev_act->driver.disp->last_activity_time = lv_tick_get();
+        else if(indev_act->driver->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
+            indev_act->driver->disp->last_activity_time = lv_tick_get();
         }
 
-        if(indev_act->driver.type == LV_INDEV_TYPE_POINTER) {
+        if(indev_act->driver->type == LV_INDEV_TYPE_POINTER) {
             indev_pointer_proc(indev_act, &data);
         }
-        else if(indev_act->driver.type == LV_INDEV_TYPE_KEYPAD) {
+        else if(indev_act->driver->type == LV_INDEV_TYPE_KEYPAD) {
             indev_keypad_proc(indev_act, &data);
         }
-        else if(indev_act->driver.type == LV_INDEV_TYPE_ENCODER) {
+        else if(indev_act->driver->type == LV_INDEV_TYPE_ENCODER) {
             indev_encoder_proc(indev_act, &data);
         }
-        else if(indev_act->driver.type == LV_INDEV_TYPE_BUTTON) {
+        else if(indev_act->driver->type == LV_INDEV_TYPE_BUTTON) {
             indev_button_proc(indev_act, &data);
         }
         /*Handle reset query if it happened in during processing*/
@@ -134,7 +134,7 @@ lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
     if(indev == NULL) return LV_INDEV_TYPE_NONE;
 
-    return indev->driver.type;
+    return indev->driver->type;
 }
 
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
@@ -156,7 +156,7 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
             i->proc.reset_query = 1;
-            if((i->driver.type == LV_INDEV_TYPE_POINTER || i->driver.type == LV_INDEV_TYPE_KEYPAD) &&
+            if((i->driver->type == LV_INDEV_TYPE_POINTER || i->driver->type == LV_INDEV_TYPE_KEYPAD) &&
                (obj == NULL || i->proc.types.pointer.last_pressed == obj)) {
                 i->proc.types.pointer.last_pressed = NULL;
             }
@@ -181,10 +181,10 @@ void lv_indev_reset_long_press(lv_indev_t * indev)
 
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 {
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
+    if(indev->driver->type != LV_INDEV_TYPE_POINTER) return;
 
     indev->cursor = cur_obj;
-    lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
+    lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver->disp));
     lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x, indev->proc.types.pointer.act_point.y);
     lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING);
@@ -192,14 +192,14 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 {
-    if(indev->driver.type == LV_INDEV_TYPE_KEYPAD || indev->driver.type == LV_INDEV_TYPE_ENCODER) {
+    if(indev->driver->type == LV_INDEV_TYPE_KEYPAD || indev->driver->type == LV_INDEV_TYPE_ENCODER) {
         indev->group = group;
     }
 }
 
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[])
 {
-    if(indev->driver.type == LV_INDEV_TYPE_BUTTON) {
+    if(indev->driver->type == LV_INDEV_TYPE_BUTTON) {
         indev->btn_points = points;
     }
 }
@@ -211,7 +211,7 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
         point->y = 0;
         return;
     }
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
+    if(indev->driver->type != LV_INDEV_TYPE_POINTER && indev->driver->type != LV_INDEV_TYPE_BUTTON) {
         point->x = -1;
         point->y = -1;
     }
@@ -228,7 +228,7 @@ lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
 
 uint32_t lv_indev_get_key(const lv_indev_t * indev)
 {
-    if(indev->driver.type != LV_INDEV_TYPE_KEYPAD)
+    if(indev->driver->type != LV_INDEV_TYPE_KEYPAD)
         return 0;
     else
         return indev->proc.types.keypad.last_key;
@@ -237,14 +237,14 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev)
 lv_indev_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
 {
     if(indev == NULL) return false;
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return false;
+    if(indev->driver->type != LV_INDEV_TYPE_POINTER && indev->driver->type != LV_INDEV_TYPE_BUTTON) return false;
     return indev->proc.types.pointer.scroll_dir;
 }
 
 lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return NULL;
+    if(indev->driver->type != LV_INDEV_TYPE_POINTER && indev->driver->type != LV_INDEV_TYPE_BUTTON) return NULL;
     return indev->proc.types.pointer.scroll_obj;
 }
 
@@ -255,7 +255,7 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 
     if(indev == NULL) return;
 
-    if(indev->driver.type == LV_INDEV_TYPE_POINTER || indev->driver.type == LV_INDEV_TYPE_BUTTON) {
+    if(indev->driver->type == LV_INDEV_TYPE_POINTER || indev->driver->type == LV_INDEV_TYPE_BUTTON) {
         point->x = indev->proc.types.pointer.vect.x;
         point->y = indev->proc.types.pointer.vect.y;
     }
@@ -324,7 +324,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    lv_disp_t *disp = i->driver.disp;
+    lv_disp_t *disp = i->driver->disp;
     if(disp->driver->rotated == LV_DISP_ROT_180 || disp->driver->rotated == LV_DISP_ROT_270) {
         data->point.x = disp->driver->hor_res - data->point.x - 1;
         data->point.y = disp->driver->ver_res - data->point.y - 1;
@@ -439,7 +439,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
 
         /*Long press time has elapsed?*/
-        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
+        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver->long_press_time) {
             i->proc.long_pr_sent = 1;
             if(data->key == LV_KEY_ENTER) {
                 i->proc.longpr_rep_timestamp = lv_tick_get();
@@ -451,7 +451,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
         /*Long press repeated time has elapsed?*/
         else if(i->proc.long_pr_sent != 0 &&
-                lv_tick_elaps(i->proc.longpr_rep_timestamp) > i->driver.long_press_rep_time) {
+                lv_tick_elaps(i->proc.longpr_rep_timestamp) > i->driver->long_press_rep_time) {
 
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
@@ -585,7 +585,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
         /* Long press*/
-        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
+        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver->long_press_time) {
 
             i->proc.long_pr_sent = 1;
             i->proc.longpr_rep_timestamp = lv_tick_get();
@@ -612,7 +612,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.long_pr_sent = 1;
         }
         /*Long press repeated time has elapsed?*/
-        else if(i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > i->driver.long_press_rep_time) {
+        else if(i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > i->driver->long_press_rep_time) {
 
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
@@ -778,7 +778,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
     if(proc->wait_until_release != 0) return;
 
-    lv_disp_t * disp = indev_act->driver.disp;
+    lv_disp_t * disp = indev_act->driver->disp;
     bool new_obj_searched = false;
 
     /*If there is no last object then search*/
@@ -885,7 +885,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         /*If there is no scrolling then check for long press time*/
         if(proc->types.pointer.scroll_obj == NULL && proc->long_pr_sent == 0) {
             /*Send a signal about the long press if enough time elapsed*/
-            if(lv_tick_elaps(proc->pr_timestamp) > indev_act->driver.long_press_time) {
+            if(lv_tick_elaps(proc->pr_timestamp) > indev_act->driver->long_press_time) {
                 lv_signal_send(indev_obj_act, LV_SIGNAL_LONG_PRESS, indev_act);
                 if(indev_reset_check(proc)) return;
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED, NULL);
@@ -902,7 +902,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         /*Send long press repeated signal*/
         if(proc->types.pointer.scroll_obj == NULL && proc->long_pr_sent == 1) {
             /*Send a signal about the long press repeat if enough time elapsed*/
-            if(lv_tick_elaps(proc->longpr_rep_timestamp) > indev_act->driver.long_press_rep_time) {
+            if(lv_tick_elaps(proc->longpr_rep_timestamp) > indev_act->driver->long_press_rep_time) {
                 lv_signal_send(indev_obj_act, LV_SIGNAL_LONG_PRESS_REP, indev_act);
                 if(indev_reset_check(proc)) return;
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
@@ -1093,8 +1093,8 @@ void indev_gesture(lv_indev_proc_t * proc)
 
     if(gesture_obj == NULL) return;
 
-    if((LV_ABS(proc->types.pointer.vect.x) < indev_act->driver.gesture_min_velocity) &&
-       (LV_ABS(proc->types.pointer.vect.y) < indev_act->driver.gesture_min_velocity)) {
+    if((LV_ABS(proc->types.pointer.vect.x) < indev_act->driver->gesture_min_velocity) &&
+       (LV_ABS(proc->types.pointer.vect.y) < indev_act->driver->gesture_min_velocity)) {
         proc->types.pointer.gesture_sum.x = 0;
         proc->types.pointer.gesture_sum.y = 0;
     }
@@ -1103,8 +1103,8 @@ void indev_gesture(lv_indev_proc_t * proc)
     proc->types.pointer.gesture_sum.x += proc->types.pointer.vect.x;
     proc->types.pointer.gesture_sum.y += proc->types.pointer.vect.y;
 
-    if((LV_ABS(proc->types.pointer.gesture_sum.x) > indev_act->driver.gesture_limit) ||
-       (LV_ABS(proc->types.pointer.gesture_sum.y) > indev_act->driver.gesture_limit)) {
+    if((LV_ABS(proc->types.pointer.gesture_sum.x) > indev_act->driver->gesture_limit) ||
+       (LV_ABS(proc->types.pointer.gesture_sum.y) > indev_act->driver->gesture_limit)) {
 
         proc->types.pointer.gesture_sent = 1;
 
