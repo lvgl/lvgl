@@ -356,7 +356,7 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
  * @param disp pointer to a display
  * @return pointer to the internal buffers
  */
-lv_disp_draw_buf_t * lv_disp_get_buf(lv_disp_t * disp)
+lv_disp_draw_buf_t * lv_disp_get_draw_buf(lv_disp_t * disp)
 {
     return disp->driver->draw_buf;
 }

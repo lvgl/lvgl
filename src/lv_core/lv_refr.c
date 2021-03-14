@@ -409,7 +409,7 @@ static void lv_refr_area(const lv_area_t * area_p)
     /*True double buffering: there are two screen sized buffers. Just redraw directly into a
      * buffer*/
     if(lv_disp_is_true_double_buf(disp_refr)) {
-        lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp_refr);
+        lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp_refr);
         vdb->area.x1        = 0;
         vdb->area.x2        = lv_disp_get_hor_res(disp_refr) - 1;
         vdb->area.y1        = 0;
@@ -419,7 +419,7 @@ static void lv_refr_area(const lv_area_t * area_p)
     }
     /*The buffer is smaller: refresh the area in parts*/
     else {
-        lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp_refr);
+        lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp_refr);
         /*Calculate the max row num*/
         lv_coord_t w = lv_area_get_width(area_p);
         lv_coord_t h = lv_area_get_height(area_p);
@@ -494,7 +494,7 @@ static void lv_refr_area(const lv_area_t * area_p)
  */
 static void lv_refr_area_part(const lv_area_t * area_p)
 {
-    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp_refr);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp_refr);
 
     while(vdb->flushing) {
         if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
@@ -844,7 +844,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
     } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
         /*Allocate a temporary buffer to store rotated image */
         lv_color_t * rot_buf = NULL; 
-        lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp_refr);
+        lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp_refr);
         lv_coord_t area_w = lv_area_get_width(area);
         lv_coord_t area_h = lv_area_get_height(area);
         /*Determine the maximum number of rows that can be rotated at a time*/
@@ -907,7 +907,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
  */
 static void lv_refr_vdb_flush(void)
 {
-    lv_disp_draw_buf_t * vdb = lv_disp_get_buf(disp_refr);
+    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp_refr);
     lv_color_t * color_p = vdb->buf_act;
 
     vdb->flushing = 1;
