@@ -755,15 +755,15 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
                         y_max = LV_MAX(y_max, p2.y);
                         y_min = LV_MIN(y_min, p2.y);
                         if(p1.x != p2.x) {
-                            lv_coord_t y_tmp = p2.y;
+                            lv_coord_t y_cur = p2.y;
                             p2.x--;         /*It's already on the next x value*/
                             p1.x = p2.x;
                             p1.y = y_min;
                             p2.y = y_max;
                             lv_draw_line(&p1, &p2, &series_mask, &line_dsc_default);
                             p2.x++;         /*Compensate the previous x--*/
-                            y_min = y_tmp;  /*Start the line of the next x from the current last y*/
-                            y_max = y_tmp;
+                            y_min = y_cur;  /*Start the line of the next x from the current last y*/
+                            y_max = y_cur;
                         }
                     }
                 } else {
