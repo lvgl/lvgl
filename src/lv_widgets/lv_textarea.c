@@ -1171,7 +1171,7 @@ static void pwd_char_hider_anim_ready(lv_anim_t * a)
 
 /**
  * Hide all characters (convert them to '*')
- * @param ta: pointer to text area object
+ * @param ta pointer to text area object
  */
 static void pwd_char_hider(lv_obj_t * obj)
 {

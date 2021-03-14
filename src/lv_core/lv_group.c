@@ -317,7 +317,7 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
 /**
  * Manually set the current mode (edit or navigate).
  * @param group pointer to group
- * @param edit: true: edit mode; false: navigate mode
+ * @param edit true: edit mode; false: navigate mode
  */
 void lv_group_set_editing(lv_group_t * group, bool edit)
 {
@@ -341,7 +341,7 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
 /**
  * Set the `click_focus` attribute. If enabled then the object will be focused then it is clicked.
  * @param group pointer to group
- * @param en: true: enable `click_focus`
+ * @param en true: enable `click_focus`
  */
 void lv_group_set_click_focus(lv_group_t * group, bool en)
 {
@@ -356,7 +356,7 @@ void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t p
 /**
  * Set whether focus next/prev will allow wrapping from first->last or last->first.
  * @param group pointer to group
- * @param en: true: enable `wrap`
+ * @param en true: enable `wrap`
  */
 void lv_group_set_wrap(lv_group_t * group, bool en)
 {
@@ -412,7 +412,7 @@ bool lv_group_get_click_focus(const lv_group_t * group)
 /**
  * Get whether focus next/prev will allow wrapping from first->last or last->first object.
  * @param group pointer to group
- * @param en: true: wrapping enabled; false: wrapping disabled
+ * @param en true: wrapping enabled; false: wrapping disabled
  */
 bool lv_group_get_wrap(lv_group_t * group)
 {

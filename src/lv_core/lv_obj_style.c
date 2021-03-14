@@ -398,9 +398,9 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 /**
  * Get the local style of an object for a given part and for a given state.
  * If the local style for the part-state pair doesn't exist allocate and return it.
- * @param obj:   pointer to an object
- * @param part:  the part in whose local style to get
- * @param state: the state in whose local style to get
+ * @param obj   pointer to an object
+ * @param part  the part in whose local style to get
+ * @param state the state in whose local style to get
  * @return pointer to the local style
  */
 static lv_style_t * get_local_style(lv_obj_t * obj, uint32_t part, uint32_t state)
@@ -437,9 +437,9 @@ static lv_style_t * get_local_style(lv_obj_t * obj, uint32_t part, uint32_t stat
 /**
  * Get the transition style of an object for a given part and for a given state.
  * If the transition style for the part-state pair doesn't exist allocate and return it.
- * @param obj:   pointer to an object
- * @param part:  the part in whose local style to get
- * @param state: the state in whose local style to get
+ * @param obj   pointer to an object
+ * @param part  the part in whose local style to get
+ * @param state the state in whose local style to get
  * @return pointer to the transition style
  */
 static lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part)
