@@ -257,7 +257,7 @@ void * lv_mem_buf_get(uint32_t size)
 
     MEM_TRACE("begin, getting %d bytes", size);
 
-    /*Try to find a free buffer with suitable size */
+    /*Try to find a free buffer with suitable size*/
     int8_t i_guess = -1;
     for(uint8_t i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(lv_mem_buf[i]).used == 0 && LV_GC_ROOT(lv_mem_buf[i]).size >= size) {

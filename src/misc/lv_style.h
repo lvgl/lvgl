@@ -31,10 +31,10 @@ extern "C" {
 /**
  * Flags for style properties
  */
-#define LV_STYLE_PROP_INHERIT       (1 << 10)  /* Inherited*/
-#define LV_STYLE_PROP_EXT_DRAW      (1 << 11)  /* Requires ext. draw size update when changed */
-#define LV_STYLE_PROP_LAYOUT_REFR   (1 << 12)  /* Requires layout update when changed */
-#define LV_STYLE_PROP_FILTER        (1 << 13)  /* Apply color filter*/
+#define LV_STYLE_PROP_INHERIT       (1 << 10)  /*Inherited*/
+#define LV_STYLE_PROP_EXT_DRAW      (1 << 11)  /*Requires ext. draw size update when changed*/
+#define LV_STYLE_PROP_LAYOUT_REFR   (1 << 12)  /*Requires layout update when changed*/
+#define LV_STYLE_PROP_FILTER        (1 << 13)  /*Apply color filter*/
 
 /**
  * Other constants
@@ -88,9 +88,9 @@ typedef uint8_t lv_border_side_t;
  * The direction of the gradient.
  */
 enum {
-    LV_GRAD_DIR_NONE, /**< No gradient (the `grad_color` property is ignored) */
-    LV_GRAD_DIR_VER,  /**< Vertical (top to bottom) gradient */
-    LV_GRAD_DIR_HOR,  /**< Horizontal (left to right) gradient */
+    LV_GRAD_DIR_NONE, /**< No gradient (the `grad_color` property is ignored)*/
+    LV_GRAD_DIR_VER,  /**< Vertical (top to bottom) gradient*/
+    LV_GRAD_DIR_HOR,  /**< Horizontal (left to right) gradient*/
 };
 
 typedef uint8_t lv_grad_dir_t;
@@ -101,7 +101,7 @@ typedef uint8_t lv_grad_dir_t;
 typedef union {
     int32_t num;         /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
     const void * ptr;    /**< Constant pointers  (font, cone text, etc)*/
-    lv_color_t color;    /**< Colors */
+    lv_color_t color;    /**< Colors*/
 }lv_style_value_t;
 
 /**
@@ -227,7 +227,7 @@ typedef enum {
  * Descriptor for style transitions
  */
 typedef struct _lv_style_transiton_t{
-    const lv_style_prop_t * props; /**< An array with the properties to animate. */
+    const lv_style_prop_t * props; /**< An array with the properties to animate.*/
     const lv_anim_path_t * path;   /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
@@ -248,8 +248,8 @@ typedef struct {
     uint32_t sentinel;
 #endif
 
-    /* If there is only one property store it directly.
-     * For more properties allocate an array */
+    /*If there is only one property store it directly.
+     *For more properties allocate an array*/
     union {
         lv_style_value_t value1;
         uint8_t * values_and_props;
@@ -435,7 +435,7 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value) {
 #endif
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_STYLE_H*/

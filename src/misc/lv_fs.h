@@ -34,7 +34,7 @@ extern "C" {
 enum {
     LV_FS_RES_OK = 0,
     LV_FS_RES_HW_ERR,     /*Low level hardware error*/
-    LV_FS_RES_FS_ERR,     /*Error in the file system structure */
+    LV_FS_RES_FS_ERR,     /*Error in the file system structure*/
     LV_FS_RES_NOT_EX,     /*Driver, file or directory is not exists*/
     LV_FS_RES_FULL,       /*Disk full*/
     LV_FS_RES_LOCKED,     /*The file is already opened*/
@@ -84,7 +84,7 @@ typedef struct _lv_fs_drv_t {
     lv_fs_res_t (*dir_close_cb)(struct _lv_fs_drv_t * drv, void * rddir_p);
 
 #if LV_USE_USER_DATA
-    void * user_data; /**< Custom file user data */
+    void * user_data; /**< Custom file user data*/
 #endif
 } lv_fs_drv_t;
 
@@ -247,7 +247,7 @@ const char * lv_fs_get_last(const char * path);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_FS_H*/

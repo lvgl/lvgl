@@ -32,7 +32,7 @@ void lv_test_obj(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TEST_OBJ_H*/

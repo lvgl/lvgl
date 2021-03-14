@@ -23,7 +23,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/* Can't include lv_obj.h because it includes this header file */
+/*Can't include lv_obj.h because it includes this header file*/
 struct _lv_obj_t;
 
 typedef enum {
@@ -212,7 +212,7 @@ static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, uint32_t par
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TEMPL_H*/

@@ -85,7 +85,7 @@ const char * lv_checkbox_get_text(const lv_obj_t * obj);
 #endif /*LV_USE_CHECKBOX*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_CHECKBOX_H*/

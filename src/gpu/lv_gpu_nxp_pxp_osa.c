@@ -162,4 +162,4 @@ lv_nxp_pxp_cfg_t pxp_default_cfg = {
     .pxp_run = _lv_gpu_nxp_pxp_run
 };
 
-#endif /* LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT */
+#endif /*LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT*/

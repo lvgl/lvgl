@@ -45,7 +45,7 @@ lv_obj_t * lv_win_get_content(lv_obj_t * win);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_WIN_H*/

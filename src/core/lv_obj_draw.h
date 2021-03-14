@@ -25,9 +25,9 @@ extern "C" {
 
 struct _lv_obj_t;
 
-/** Design results */
+/** Design results*/
 typedef enum {
-    LV_DRAW_RES_OK,          /**< Draw ready */
+    LV_DRAW_RES_OK,          /**< Draw ready*/
     LV_DRAW_RES_COVER,       /**< Returned on `LV_DRAW_COVER_CHK` if the areas is fully covered*/
     LV_DRAW_RES_NOT_COVER,   /**< Returned on `LV_DRAW_COVER_CHK` if the areas is not covered*/
     LV_DRAW_RES_MASKED,      /**< Returned on `LV_DRAW_COVER_CHK` if the areas is masked out (children also not cover)*/
@@ -53,11 +53,11 @@ typedef struct
     const void * sub_part_ptr;
 }lv_obj_draw_dsc_t;
 
-/** Design modes */
+/** Design modes*/
 enum {
-    LV_DRAW_MODE_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_DRAW_MODE_MAIN_DRAW,            /**< Draw the main portion of the object */
-    LV_DRAW_MODE_POST_DRAW,            /**< Draw extras on the object */
+    LV_DRAW_MODE_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area*/
+    LV_DRAW_MODE_MAIN_DRAW,            /**< Draw the main portion of the object*/
+    LV_DRAW_MODE_POST_DRAW,            /**< Draw extras on the object*/
 };
 typedef uint8_t lv_draw_mode_t;
 
@@ -155,7 +155,7 @@ lv_coord_t _lv_obj_get_ext_draw_size(const struct _lv_obj_t * obj);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_DRAW_H*/

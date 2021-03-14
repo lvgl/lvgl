@@ -170,7 +170,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_INDEV_H*/

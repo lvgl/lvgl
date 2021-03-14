@@ -155,7 +155,7 @@ static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_UNUSED(copy);
 
    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-   /*Initialize the allocated 'ext' */
+   /*Initialize the allocated 'ext'*/
    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
    lv_memset_00(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
    lv_memset_00(imgbtn->img_src_right, sizeof(imgbtn->img_src_right));

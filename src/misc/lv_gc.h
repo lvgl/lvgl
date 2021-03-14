@@ -61,13 +61,13 @@ extern "C" {
 #if LV_ENABLE_GC == 1
 #if LV_MEM_CUSTOM != 1
 #error "GC requires CUSTOM_MEM"
-#endif /* LV_MEM_CUSTOM */
+#endif /*LV_MEM_CUSTOM*/
 #include LV_GC_INCLUDE
-#else  /* LV_ENABLE_GC */
+#else  /*LV_ENABLE_GC*/
 #define LV_GC_ROOT(x) x
 #define LV_EXTERN_ROOT(root_type, root_name) extern root_type root_name;
 LV_ITERATE_ROOTS(LV_EXTERN_ROOT)
-#endif /* LV_ENABLE_GC */
+#endif /*LV_ENABLE_GC*/
 
 /**********************
  *      TYPEDEFS
@@ -84,7 +84,7 @@ void _lv_gc_clear_roots(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_GC_H*/

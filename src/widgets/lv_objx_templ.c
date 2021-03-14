@@ -3,7 +3,8 @@
  *
  */
 
-/* TODO Remove these instructions
+/**
+ * TODO Remove these instructions
  * Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
  *                    templ -> object short name with lower case(e.g. btn, label etc)
  *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
@@ -60,7 +61,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("template create started");
 
     /*Create the ancestor of template*/
-    /*TODO modify it to the ancestor create function */
+    /*TODO modify it to the ancestor create function*/
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
     LV_ASSERT_MALLOC(new_templ);
     if(new_templ == NULL) return NULL;
@@ -76,7 +77,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_templ);
     if(ancestor_draw == NULL) ancestor_draw = lv_obj_get_draw_cb(new_templ);
 
-    /*Initialize the allocated 'ext' */
+    /*Initialize the allocated 'ext'*/
     ext->xyz = 0;
 
     /*The signal and draw functions are not copied so set them here*/
@@ -219,7 +220,7 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = ancestor_signal(templ, sign, param);
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, MY_CLASS);
@@ -231,8 +232,8 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
     return res;
 }
 
-#else /* Enable this file at the top */
+#else /*Enable this file at the top*/
 
-/* This dummy typedef exists purely to silence -Wpedantic. */
+/*This dummy typedef exists purely to silence -Wpedantic.*/
 typedef int keep_pedantic_happy;
 #endif

@@ -3,7 +3,8 @@
  *
  */
 
-/* TODO Remove these instructions
+/**
+ * TODO Remove these instructions
  * Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
  *                    templ -> object short name with lower case(e.g. btn, label etc)
  *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
@@ -36,7 +37,7 @@ extern "C" {
 /*Data of template*/
 typedef struct {
     lv_ANCESTOR_ext_t ANCESTOR; /*Ext. of ancestor*/
-    /*New data for this type */
+    /*New data for this type*/
 } lv_templ_ext_t;
 
 /*Styles*/
@@ -97,7 +98,7 @@ lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type);
 #endif /*LV_USE_TEMPL*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TEMPL_H*/

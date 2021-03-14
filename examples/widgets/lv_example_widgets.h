@@ -121,7 +121,7 @@ void lv_example_win_1(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_EX_WIDGETS_H*/

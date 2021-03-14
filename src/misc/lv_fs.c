@@ -17,7 +17,8 @@
  *      DEFINES
  *********************/
 
-/* "free" is used as a function pointer (in lv_fs_drv_t).
+/**
+ * "free" is used as a function pointer (in lv_fs_drv_t).
  * We must make sure "free" was not defined to a platform specific
  * free function, otherwise compilation would fail.
  */
@@ -309,7 +310,7 @@ const char * lv_fs_get_ext(const char * fn)
         }
     }
 
-    return ""; /*Empty string if no '.' in the file name. */
+    return ""; /*Empty string if no '.' in the file name.*/
 }
 
 char * lv_fs_up(char * path)

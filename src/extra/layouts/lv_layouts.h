@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_LAYOUTS_H*/

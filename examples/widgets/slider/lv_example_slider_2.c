@@ -19,7 +19,7 @@ void lv_example_slider_2(void)
     lv_style_set_content_opa(&style_pr, LV_OPA_COVER);
     lv_style_set_content_ofs_y(&style_pr, -15);
 
-    /* Create a slider in the center of the display */
+    /*Create a slider in the center of the display*/
     lv_obj_t * slider;
     slider = lv_slider_create(lv_scr_act(), NULL);
     lv_obj_align(slider, NULL, LV_ALIGN_CENTER, 0, 0);

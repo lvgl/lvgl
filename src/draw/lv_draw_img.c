@@ -248,8 +248,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 
         show_error(coords, clip_area, cdsc->dec_dsc.error_msg);
     }
-    /* The decoder could open the image and gave the entire uncompressed image.
-     * Just draw it!*/
+    /*The decoder could open the image and gave the entire uncompressed image.
+     *Just draw it!*/
     else if(cdsc->dec_dsc.img_data) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
@@ -276,7 +276,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 
         lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, draw_dsc, chroma_keyed, alpha_byte);
     }
-    /* The whole uncompressed image is not available. Try to read it line-by-line*/
+    /*The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
         lv_area_t mask_com; /*Common area of mask and coords*/
         bool union_ok;
@@ -339,7 +339,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                                               const lv_draw_img_dsc_t * draw_dsc,
                                               bool chroma_key, bool alpha_byte)
 {
-    /* Use the clip area as draw area*/
+    /*Use the clip area as draw area*/
     lv_area_t draw_area;
     lv_area_copy(&draw_area, clip_area);
 
@@ -347,8 +347,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
     const lv_area_t * disp_area = &draw_buf->area;
 
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    /*Now `draw_area` has absolute coordinates.
+     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -365,16 +365,16 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 #if LV_DRAW_COMPLEX
 
 #if LV_USE_GPU_NXP_PXP
-    /* Simple case without masking and transformations */
+    /*Simple case without masking and transformations*/
     else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
-            chroma_key == true && draw_dsc->recolor_opa == LV_OPA_TRANSP) { /* copy with color keying (+ alpha) */
+            chroma_key == true && draw_dsc->recolor_opa == LV_OPA_TRANSP) { /*copy with color keying (+ alpha)*/
         lv_gpu_nxp_pxp_enable_color_key();
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
                       draw_dsc->blend_mode);
         lv_gpu_nxp_pxp_disable_color_key();
     }
     else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
-            chroma_key == false && draw_dsc->recolor_opa != LV_OPA_TRANSP) { /* copy with recolor (+ alpha) */
+            chroma_key == false && draw_dsc->recolor_opa != LV_OPA_TRANSP) { /*copy with recolor (+ alpha)*/
         lv_gpu_nxp_pxp_enable_recolor(draw_dsc->recolor, draw_dsc->recolor_opa);
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
                       draw_dsc->blend_mode);

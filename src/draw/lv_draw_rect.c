@@ -142,8 +142,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
-    /* Get clipped fill area which is the real draw area.
-     * It is always the same or inside `fill_area` */
+    /*Get clipped fill area which is the real draw area.
+     *It is always the same or inside `fill_area`*/
     lv_area_t draw_area;
     bool is_common;
     is_common = _lv_area_intersect(&draw_area, &coords_bg, clip);
@@ -151,8 +151,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 
     const lv_area_t * disp_area = &draw_buf->area;
 
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    /*Now `draw_area` has absolute coordinates.
+     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -251,8 +251,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
                 grad_color = grad_get(dsc, lv_area_get_height(&coords_bg), y - coords_bg.y1);
             }
 
-            /* If there is not other mask and drawing the corner area split the drawing to corner and middle areas
-             * because it the middle mask shouldn't be taken into account (therefore its faster)*/
+            /*If there is not other mask and drawing the corner area split the drawing to corner and middle areas
+             *because it the middle mask shouldn't be taken into account (therefore its faster)*/
             if(simple_mode && split &&
                (y < coords_bg.y1 + rout + 1 ||
                 y > coords_bg.y2 - rout - 1)) {
@@ -423,8 +423,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         lv_disp_t * disp = _lv_refr_get_disp_refreshing();
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
-        /* Get clipped fill area which is the real draw area.
-         * It is always the same or inside `fill_area` */
+        /*Get clipped fill area which is the real draw area.
+         *It is always the same or inside `fill_area`*/
         lv_area_t draw_area;
         bool is_common;
         is_common = _lv_area_intersect(&draw_area, coords, clip);
@@ -432,8 +432,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
 
         const lv_area_t * disp_area = &draw_buf->area;
 
-        /* Now `draw_area` has absolute coordinates.
-         * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+        /*Now `draw_area` has absolute coordinates.
+         *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
         draw_area.x1 -= disp_area->x1;
         draw_area.y1 -= disp_area->y1;
         draw_area.x2 -= disp_area->x1;
@@ -554,8 +554,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
-    /* Get clipped fill area which is the real draw area.
-     * It is always the same or inside `fill_area` */
+    /*Get clipped fill area which is the real draw area.
+     *It is always the same or inside `fill_area`*/
     lv_area_t draw_area;
     bool is_common;
     is_common = _lv_area_intersect(&draw_area, &sh_area, clip);
@@ -563,8 +563,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 
     const lv_area_t * disp_area = &draw_buf->area;
 
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    /*Now `draw_area` has absolute coordinates.
+     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -598,7 +598,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
     }
     else {
-        /*A larger buffer is required for calculation */
+        /*A larger buffer is required for calculation*/
         sh_buf = lv_mem_buf_get(corner_size * corner_size * sizeof(uint16_t));
         shadow_draw_corner_buf(&sh_rect_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
 
@@ -1288,8 +1288,8 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
-    /* Get clipped fill area which is the real draw area.
-     * It is always the same or inside `fill_area` */
+    /*Get clipped fill area which is the real draw area.
+     *It is always the same or inside `fill_area`*/
     lv_area_t draw_area;
     bool is_common;
     is_common = _lv_area_intersect(&draw_area, area_outer, clip);
@@ -1297,8 +1297,8 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
 
     const lv_area_t * disp_area = &draw_buf->area;
 
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    /*Now `draw_area` has absolute coordinates.
+     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -1364,7 +1364,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
             fill_area.y2++;
         }
 
-        /*Draw the lower corner area */
+        /*Draw the lower corner area*/
         int32_t lower_corner_end = area_outer->y2 - disp_area->y1 - corner_size;
         if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
         fill_area.y1 = disp_area->y1 + lower_corner_end;

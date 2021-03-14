@@ -303,7 +303,7 @@ static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     lv_res_t res = LV_RES_OK;
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;

@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define SPLIT_RADIUS_LIMIT 10  /*With radius greater then this the arc will drawn in quarters. A quarter is drawn only if there is arc in it */
+#define SPLIT_RADIUS_LIMIT 10  /*With radius greater then this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
 #define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.*/
 
 /**********************
@@ -515,7 +515,7 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness
     cir_x = ((radius - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
     cir_y = ((radius - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
 
-    /* Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
+    /*Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
     if(cir_x > 0) {
         cir_x = (cir_x - pa) >> ps;
         res_area->x1 = cir_x - thick_half + thick_corr;

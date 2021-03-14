@@ -350,4 +350,4 @@ static void lv_keyboard_update_map(lv_obj_t * obj)
     lv_btnmatrix_set_ctrl_map(obj, kb_ctrl[keyboard->mode]);
 }
 
-#endif  /* LV_USE_KEYBOARD*/
+#endif  /*LV_USE_KEYBOARD*/

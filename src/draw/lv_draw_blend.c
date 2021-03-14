@@ -138,15 +138,15 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
 
     if(disp->driver->gpu_wait_cb) disp->driver->gpu_wait_cb(disp->driver);
 
-    /* Get clipped fill area which is the real draw area.
-     * It is always the same or inside `fill_area` */
+    /*Get clipped fill area which is the real draw area.
+     *It is always the same or inside `fill_area`*/
     lv_area_t draw_area;
     bool is_common;
     is_common = _lv_area_intersect(&draw_area, clip_area, fill_area);
     if(!is_common) return;
 
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    /*Now `draw_area` has absolute coordinates.
+     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -194,8 +194,8 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     if(opa < LV_OPA_MIN) return;
     if(mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
-    /* Get clipped fill area which is the real draw area.
-     * It is always the same or inside `fill_area` */
+    /*Get clipped fill area which is the real draw area.
+     *It is always the same or inside `fill_area`*/
     lv_area_t draw_area;
     bool is_common;
     is_common = _lv_area_intersect(&draw_area, clip_area, map_area);
@@ -208,8 +208,8 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
 
     if(disp->driver->gpu_wait_cb) disp->driver->gpu_wait_cb(disp->driver);
 
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    /*Now `draw_area` has absolute coordinates.
+     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -260,9 +260,9 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         }
     }
     else {
-        /* The mask is relative to the clipped area.
-         * In the cycles below mask will be indexed from `draw_area.x1`
-         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        /*The mask is relative to the clipped area.
+         *In the cycles below mask will be indexed from `draw_area.x1`
+         *but it corresponds to zero index. So prepare `mask_tmp` accordingly.*/
         const lv_opa_t * mask_tmp = mask - draw_area->x1;
 
         /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
@@ -326,7 +326,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 if(lv_gpu_nxp_vglite_fill(disp_buf, disp_w, lv_area_get_height(disp_area), draw_area, color, opa) == LV_RES_OK) {
                     return;
                 }
-                /* Fall down to SW render in case of error */
+                /*Fall down to SW render in case of error*/
             }
 #elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
@@ -358,7 +358,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 if(lv_gpu_nxp_vglite_fill(disp_buf, disp_w, lv_area_get_height(disp_area), draw_area, color, opa) == LV_RES_OK) {
                     return;
                 }
-                /* Fall down to SW render in case of error */
+                /*Fall down to SW render in case of error*/
             }
 #endif
             lv_color_t last_dest_color = lv_color_black();
@@ -558,9 +558,9 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
         int32_t draw_area_w = lv_area_get_width(draw_area);
 
-        /* The mask is relative to the clipped area.
-         * In the cycles below mask will be indexed from `draw_area.x1`
-         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        /*The mask is relative to the clipped area.
+         *In the cycles below mask will be indexed from `draw_area.x1`
+         *but it corresponds to zero index. So prepare `mask_tmp` accordingly.*/
         const lv_opa_t * mask_tmp = mask - draw_area->x1;
 
         /*Buffer the result color to avoid recalculating the same color*/
@@ -622,9 +622,9 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         }
     }
     else {
-        /* The mask is relative to the clipped area.
-         * In the cycles below mask will be indexed from `draw_area.x1`
-         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        /*The mask is relative to the clipped area.
+         *In the cycles below mask will be indexed from `draw_area.x1`
+         *but it corresponds to zero index. So prepare `mask_tmp` accordingly.*/
         const lv_opa_t * mask_tmp = mask - draw_area->x1;
 
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
@@ -718,7 +718,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 if(lv_gpu_nxp_vglite_blit(&blit) == LV_RES_OK) {
                     return;
                 }
-                /* Fall down to SW render in case of error */
+                /*Fall down to SW render in case of error*/
             }
 #elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
@@ -768,7 +768,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 if(lv_gpu_nxp_vglite_blit(&blit) == LV_RES_OK) {
                     return;
                 }
-                /* Fall down to SW render in case of error */
+                /*Fall down to SW render in case of error*/
             }
 #elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
@@ -801,7 +801,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
     else {
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
-            /*Go to the first pixel of the row */
+            /*Go to the first pixel of the row*/
 
             int32_t x_end4 = draw_area_w - 4;
 
@@ -941,9 +941,9 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     }
     /*Masked*/
     else {
-        /* The mask is relative to the clipped area.
-         * In the cycles below mask will be indexed from `draw_area.x1`
-         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        /*The mask is relative to the clipped area.
+         *In the cycles below mask will be indexed from `draw_area.x1`
+         *but it corresponds to zero index. So prepare `mask_tmp` accordingly.*/
         const lv_opa_t * mask_tmp = mask - draw_area->x1;
 
         map_buf_tmp -= draw_area->x1;

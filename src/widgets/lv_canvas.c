@@ -215,8 +215,8 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * img, int16_t angle, uint
                        required*/
                     else {
                         lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&canvas->dsc, x + offset_x, y + offset_y);
-                        /* Pick the foreground if it's fully opaque or the Background is fully
-                         * transparent*/
+                        /*Pick the foreground if it's fully opaque or the Background is fully
+                         *transparent*/
                         if(dsc.res.opa >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
                             lv_img_buf_set_px_color(&canvas->dsc, x + offset_x, y + offset_y, dsc.res.color);
                             lv_img_buf_set_px_alpha(&canvas->dsc, x + offset_x, y + offset_y, dsc.res.opa);
@@ -564,8 +564,8 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
         return;
     }
 
-    /* Create a dummy display to fool the lv_draw function.
-     * It will think it draws to real screen. */
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
     lv_area_t mask;
     mask.x1 = 0;
     mask.x2 = dsc->header.w - 1;
@@ -622,8 +622,8 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
         return;
     }
 
-    /* Create a dummy display to fool the lv_draw function.
-     * It will think it draws to real screen. */
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
     lv_area_t mask;
     mask.x1 = 0;
     mask.x2 = dsc->header.w - 1;
@@ -673,8 +673,8 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
         return;
     }
 
-    /* Create a dummy display to fool the lv_draw function.
-     * It will think it draws to real screen. */
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
     lv_area_t mask;
     mask.x1 = 0;
     mask.x2 = dsc->header.w - 1;
@@ -730,8 +730,8 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
         LV_LOG_WARN("lv_canvas_draw_line: can't draw to LV_IMG_CF_INDEXED canvas");
         return;
     }
-    /* Create a dummy display to fool the lv_draw function.
-     * It will think it draws to real screen. */
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
     lv_area_t mask;
     mask.x1 = 0;
     mask.x2 = dsc->header.w - 1;
@@ -785,8 +785,8 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
         return;
     }
 
-    /* Create a dummy display to fool the lv_draw function.
-     * It will think it draws to real screen. */
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
     lv_area_t mask;
     mask.x1 = 0;
     mask.x2 = dsc->header.w - 1;
@@ -838,8 +838,8 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
         return;
     }
 
-    /* Create a dummy display to fool the lv_draw function.
-     * It will think it draws to real screen. */
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
     lv_area_t mask;
     mask.x1 = 0;
     mask.x2 = dsc->header.w - 1;
@@ -899,7 +899,7 @@ static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
    lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-   /*Initialize the allocated 'ext' */
+   /*Initialize the allocated 'ext'*/
    canvas->dsc.header.always_zero = 0;
    canvas->dsc.header.cf          = LV_IMG_CF_TRUE_COLOR;
    canvas->dsc.header.h           = 0;

@@ -241,7 +241,8 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
     if(x >= max_in) return max_out;
     if(x <= min_in) return min_out;
 
-    /* The equation should be:
+    /**
+     * The equation should be:
      *   ((x - min_in) * delta_out) / delta in) + min_out
      * To avoid rounding error reorder the operations:
      *   (x - min_in) * (delta_out / delta_min) + min_out
@@ -257,7 +258,7 @@ uint32_t lv_rand(uint32_t min, uint32_t max)
 {
     static uint32_t a = 0x1234ABCD; /*Seed*/
 
-    /* Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs" */
+    /*Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs"*/
     uint32_t x = a;
     x ^= x << 13;
     x ^= x >> 17;

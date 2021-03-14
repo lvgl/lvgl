@@ -43,7 +43,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length)
 #endif /*LV_USE_SPINNER*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_SPINNER_H*/

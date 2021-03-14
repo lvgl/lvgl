@@ -86,7 +86,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 
     lv_obj_invalidate(obj);
 
-    /*If text is NULL then just refresh with the current text */
+    /*If text is NULL then just refresh with the current text*/
     if(text == NULL) text = label->text;
 
     if(label->text == text && label->static_txt == 0) {
@@ -149,7 +149,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     lv_obj_invalidate(obj);
     lv_label_t * label = (lv_label_t *)obj;
 
-    /*If text is NULL then refresh */
+    /*If text is NULL then refresh*/
     if(fmt == NULL) {
         lv_label_refr_text(obj);
         return;
@@ -324,7 +324,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
     uint32_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
 
-    /*Search the line of the index letter */;
+    /*Search the line of the index letter*/;
     while(txt[new_line_start] != '\0') {
         new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
         if(byte_id < new_line_start || txt[new_line_start] == '\0')
@@ -422,13 +422,13 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
 
-    /*Search the line of the index letter */;
+    /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
         new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
 
         if(pos.y <= y + letter_height) {
             /*The line is found (stored in 'line_start')*/
-            /* Include the NULL terminator in the last line */
+            /*Include the NULL terminator in the last line*/
             uint32_t tmp = new_line_start;
             uint32_t letter;
             letter = _lv_txt_encoded_prev(txt, &tmp);
@@ -469,7 +469,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
-            /* Get the current letter.*/
+            /*Get the current letter.*/
             uint32_t letter = _lv_txt_encoded_next(bidi_txt, &i);
 
             /*Get the next letter too for kerning*/
@@ -539,7 +539,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
 
-    /*Search the line of the index letter */;
+    /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
         new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
 
@@ -572,8 +572,8 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
     if(new_line_start > 0) {
         while(i <= new_line_start - 1) {
-            /* Get the current letter
-             * Be careful 'i' already points to the next character */
+            /*Get the current letter
+             *Be careful 'i' already points to the next character*/
             letter = _lv_txt_encoded_next(txt, &i);
 
             /*Get the next letter for kerning*/
@@ -740,7 +740,7 @@ static void lv_label_destructor(lv_obj_t * obj)
 
 static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
 {
-    /* A label never covers an area */
+    /*A label never covers an area*/
     if(mode == LV_DRAW_MODE_COVER_CHECK)
         return LV_DRAW_RES_NOT_COVER;
     else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
@@ -776,8 +776,8 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
             label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
         }
 
-        /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
-         * (In addition they will result misalignment is this case)*/
+        /*In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
+         *(In addition they will result misalignment is this case)*/
         if((label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) &&
            (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
             lv_point_t size;
@@ -804,7 +804,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
             lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                              LV_COORD_MAX, flag);
 
-            /*Draw the text again on label to the original to make an circular effect */
+            /*Draw the text again on label to the original to make an circular effect*/
             if(size.x > lv_area_get_width(&txt_coords)) {
                 label_draw_dsc.ofs_x = label->offset.x + size.x +
                                        lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
@@ -813,7 +813,7 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                 lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
             }
 
-            /*Draw the text again below the original to make an circular effect */
+            /*Draw the text again below the original to make an circular effect*/
             if(size.y > lv_area_get_height(&txt_coords)) {
                 label_draw_dsc.ofs_x = label->offset.x;
                 label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
@@ -839,7 +839,7 @@ static lv_res_t lv_label_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
     if(res != LV_RES_OK) return res;
 
@@ -1172,10 +1172,10 @@ static bool lv_label_set_dot_tmp(lv_obj_t * obj, char * data, uint32_t len)
 {
 
     lv_label_t * label = (lv_label_t *)obj;
-    lv_label_dot_tmp_free(obj); /* Deallocate any existing space */
+    lv_label_dot_tmp_free(obj); /*Deallocate any existing space*/
     if(len > sizeof(char *)) {
-        /* Memory needs to be allocated. Allocates an additional byte
-         * for a NULL-terminator so it can be copied. */
+        /*Memory needs to be allocated. Allocates an additional byte
+         *for a NULL-terminator so it can be copied.*/
         label->dot.tmp_ptr = lv_mem_alloc(len + 1);
         if(label->dot.tmp_ptr == NULL) {
             LV_LOG_ERROR("Failed to allocate memory for dot_tmp_ptr");
@@ -1186,7 +1186,7 @@ static bool lv_label_set_dot_tmp(lv_obj_t * obj, char * data, uint32_t len)
         label->dot_tmp_alloc    = true;
     }
     else {
-        /* Characters can be directly stored in object */
+        /*Characters can be directly stored in object*/
         label->dot_tmp_alloc = false;
         lv_memcpy(label->dot.tmp, data, len);
     }

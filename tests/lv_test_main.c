@@ -107,12 +107,12 @@ static void hal_init(void)
     static lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
 
-    drv.letter = 'F';                         /*An uppercase letter to identify the drive */
-    drv.open_cb = open_cb;                 /*Callback to open a file */
-    drv.close_cb = close_cb;               /*Callback to close a file */
-    drv.read_cb = read_cb;                 /*Callback to read a file */
-    drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor) */
-    drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position  */
+    drv.letter = 'F';                         /*An uppercase letter to identify the drive*/
+    drv.open_cb = open_cb;                 /*Callback to open a file*/
+    drv.close_cb = close_cb;               /*Callback to close a file*/
+    drv.read_cb = read_cb;                 /*Callback to read a file*/
+    drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor)*/
+    drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position*/
 
     lv_fs_drv_register(&drv);                 /*Finally register the drive*/
 }

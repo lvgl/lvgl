@@ -28,10 +28,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/** Roller mode. */
+/** Roller mode.*/
 enum {
-    LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options). */
-    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever). */
+    LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options).*/
+    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
 };
 
 typedef uint8_t lv_roller_mode_t;
@@ -129,7 +129,7 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj);
 #endif /*LV_USE_ROLLER*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_ROLLER_H*/

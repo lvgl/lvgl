@@ -31,7 +31,7 @@ LV_EXPORT_CONST_INT(LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
  *      TYPEDEFS
  **********************/
 
-/* Can't include lv_obj.h because it includes this header file */
+/*Can't include lv_obj.h because it includes this header file*/
 struct _lv_obj_t;
 
 typedef enum {
@@ -119,7 +119,7 @@ extern const lv_flex_t lv_flex_row_even;            /**< Place the items evenly 
 #endif  /*LV_USE_FLEX*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_FLEX_H*/

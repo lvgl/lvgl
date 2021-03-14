@@ -34,7 +34,7 @@ extern "C" {
 /*Data of spinbox*/
 typedef struct {
     lv_textarea_t ta;   /*Ext. of ancestor*/
-    /*New data for this type */
+    /*New data for this type*/
     int32_t value;
     int32_t range_max;
     int32_t range_min;
@@ -166,6 +166,6 @@ void lv_spinbox_decrement(lv_obj_t * obj);
 #endif /*LV_USE_SPINBOX*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 #endif /*LV_USE_SPINBOX*/

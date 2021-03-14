@@ -19,7 +19,7 @@
 
 #if defined(LV_USER_DATA_FREE_INCLUDE)
     #include LV_USER_DATA_FREE_INCLUDE
-#endif /* LV_USE_USER_DATA_FREE */
+#endif /*LV_USE_USER_DATA_FREE*/
 
 /**********************
  *      TYPEDEFS
@@ -349,7 +349,7 @@ static void obj_del_core(lv_obj_t * obj)
     lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
     lv_obj_enable_style_refresh(true);
 
-    /* Reset all input devices if the object to delete is used*/
+    /*Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
@@ -365,7 +365,7 @@ static void obj_del_core(lv_obj_t * obj)
         indev = lv_indev_get_next(indev);
     }
 
-    /* All children deleted. Now clean up the object specific data*/
+    /*All children deleted. Now clean up the object specific data*/
     _lv_obj_destruct(obj);
 
     /*Remove the screen for the screen list*/

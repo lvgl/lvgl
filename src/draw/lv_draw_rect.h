@@ -50,7 +50,7 @@ typedef struct {
     lv_color_t border_color;
     lv_coord_t border_width;
     lv_opa_t border_opa;
-    uint8_t border_post : 1;        /*There is a border it will be drawn later. */
+    uint8_t border_post : 1;        /*There is a border it will be drawn later.*/
     lv_border_side_t border_side :5;
 
     /*Outline*/
@@ -109,7 +109,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_dra
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_DRAW_RECT_H*/

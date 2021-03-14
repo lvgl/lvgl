@@ -23,7 +23,7 @@
 #define LV_IMG_CACHE_LIFE_GAIN 1
 
 /*Don't let life to be greater than this limit because it would require a lot of time to
- * "die" from very high values */
+ * "die" from very high values*/
 #define LV_IMG_CACHE_LIFE_LIMIT 1000
 
 /**********************
@@ -84,9 +84,9 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
     for(i = 0; i < entry_cnt; i++) {
         if(color.full == cache[i].dec_dsc.color.full &&
            lv_img_cache_match(src, cache[i].dec_dsc.src)) {
-            /* If opened increment its life.
-             * Image difficult to open should live longer to keep avoid frequent their recaching.
-             * Therefore increase `life` with `time_to_open`*/
+            /*If opened increment its life.
+             *Image difficult to open should live longer to keep avoid frequent their recaching.
+             *Therefore increase `life` with `time_to_open`*/
             cached_src = &cache[i];
             cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
             if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
@@ -123,7 +123,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
-        cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use  */
+        cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its us*/
         return NULL;
     }
 

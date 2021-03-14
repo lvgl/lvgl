@@ -81,7 +81,7 @@ typedef uint32_t lv_uintptr_t;
 #define LV_CONCAT3(x, y, z) _LV_CONCAT3(x, y, z)
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TYPES_H*/

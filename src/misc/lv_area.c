@@ -112,7 +112,7 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
  */
 bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
-    /* Get the smaller area from 'a1_p' and 'a2_p' */
+    /*Get the smaller area from 'a1_p' and 'a2_p'*/
     res_p->x1 = LV_MAX(a1_p->x1, a2_p->x1);
     res_p->y1 = LV_MAX(a1_p->y1, a2_p->y1);
     res_p->x2 = LV_MIN(a1_p->x2, a2_p->x2);
@@ -391,11 +391,11 @@ static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
 {
     lv_coord_t r = (area->x2 - area->x1) / 2;
 
-    /* Circle center */
+    /*Circle center*/
     lv_coord_t cx = area->x1 + r;
     lv_coord_t cy = area->y1 + r;
 
-    /*Simplify the code by moving everything to (0, 0) */
+    /*Simplify the code by moving everything to (0, 0)*/
     lv_coord_t px = p->x - cx;
     lv_coord_t py = p->y - cy;
 
