@@ -391,7 +391,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 /**
  * Draw a letter in the Virtual Display Buffer
  * @param pos_p left-top coordinate of the latter
- * @param mask_p the letter will be drawn only on this area  (truncated to VDB area)
+ * @param mask_p the letter will be drawn only on this area  (truncated to draw_buf area)
  * @param font_p pointer to font
  * @param letter a letter to draw
  * @param color color of letter
@@ -671,16 +671,16 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_draw_buf(disp);
+    lv_disp_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
-    int32_t vdb_width     = lv_area_get_width(&vdb->area);
-    lv_color_t * vdb_buf_tmp = vdb->buf_act;
+    int32_t draw_buf_width     = lv_area_get_width(&draw_buf->area);
+    lv_color_t * draw_buf_buf_tmp = draw_buf->buf_act;
 
-    /*Set a pointer on VDB to the first pixel of the letter*/
-    vdb_buf_tmp += ((pos_y - vdb->area.y1) * vdb_width) + pos_x - vdb->area.x1;
+    /*Set a pointer on draw_buf to the first pixel of the letter*/
+    draw_buf_buf_tmp += ((pos_y - draw_buf->area.y1) * draw_buf_width) + pos_x - draw_buf->area.x1;
 
-    /*If the letter is partially out of mask the move there on VDB*/
-    vdb_buf_tmp += (row_start * vdb_width) + col_start / 3;
+    /*If the letter is partially out of mask the move there on draw_buf*/
+    draw_buf_buf_tmp += (row_start * draw_buf_width) + col_start / 3;
 
     lv_area_t map_area;
     map_area.x1 = col_start / 3 + pos_x;
@@ -727,11 +727,11 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
                 lv_color_t res_color;
 #if LV_COLOR_16_SWAP == 0
-                uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red, vdb_buf_tmp->ch.green, vdb_buf_tmp->ch.blue};
+                uint8_t bg_rgb[3] = {draw_buf_buf_tmp->ch.red, draw_buf_buf_tmp->ch.green, draw_buf_buf_tmp->ch.blue};
 #else
-                uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red,
-                                     (vdb_buf_tmp->ch.green_h << 3) + vdb_buf_tmp->ch.green_l,
-                                     vdb_buf_tmp->ch.blue
+                uint8_t bg_rgb[3] = {draw_buf_buf_tmp->ch.red,
+                                     (draw_buf_buf_tmp->ch.green_h << 3) + draw_buf_buf_tmp->ch.green_l,
+                                     draw_buf_buf_tmp->ch.blue
                                     };
 #endif
 
@@ -761,7 +761,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
                 /*Next mask byte*/
                 mask_p++;
-                vdb_buf_tmp++;
+                draw_buf_buf_tmp++;
             }
 
             /*Go to the next column*/
@@ -801,8 +801,8 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
 
-        /*Next row in VDB*/
-        vdb_buf_tmp += vdb_width - (col_end - col_start) / 3;
+        /*Next row in draw_buf*/
+        draw_buf_buf_tmp += draw_buf_width - (col_end - col_start) / 3;
     }
 
     /*Flush the last part*/

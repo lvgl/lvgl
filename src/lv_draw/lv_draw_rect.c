@@ -140,7 +140,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
+    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -149,7 +149,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     is_common = _lv_area_intersect(&draw_area, &coords_bg, clip);
     if(is_common == false) return;
 
-    const lv_area_t * disp_area = &vdb->area;
+    const lv_area_t * disp_area = &draw_buf->area;
 
     /* Now `draw_area` has absolute coordinates.
      * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
@@ -222,7 +222,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         fill_area.y1 = disp_area->y1 + draw_area.y1;
         fill_area.y2 = fill_area.y1;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            int32_t y = h + vdb->area.y1;
+            int32_t y = h + draw_buf->area.y1;
 
             opa2 = opa;
 
@@ -232,13 +232,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
                 mask_res = LV_DRAW_MASK_RES_FULL_COVER;
                 if(simple_mode == false) {
                     lv_memset(mask_buf, opa, draw_area_w);
-                    mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                    mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
                 }
             }
             /*In corner areas apply the mask anyway*/
             else {
                 lv_memset(mask_buf, opa, draw_area_w);
-                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
             }
 
             /*If mask will taken into account its base opacity was already set by memset above*/
@@ -279,7 +279,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
                 fill_area2.x1 = coords_bg.x2 - rout + 1;
                 fill_area2.x2 = coords_bg.x2;
 
-                int32_t mask_ofs = (coords_bg.x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
+                int32_t mask_ofs = (coords_bg.x2 - rout + 1) - (draw_buf->area.x1 + draw_area.x1);
                 if(mask_ofs < 0) mask_ofs = 0;
                 _lv_blend_fill(clip, &fill_area2,
                                grad_color, mask_buf + mask_ofs, mask_res, opa2, dsc->blend_mode);
@@ -421,7 +421,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
         lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-        lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
+        lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
         /* Get clipped fill area which is the real draw area.
          * It is always the same or inside `fill_area` */
@@ -430,7 +430,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         is_common = _lv_area_intersect(&draw_area, coords, clip);
         if(is_common == false) return;
 
-        const lv_area_t * disp_area = &vdb->area;
+        const lv_area_t * disp_area = &draw_buf->area;
 
         /* Now `draw_area` has absolute coordinates.
          * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
@@ -491,7 +491,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
                (top_only && fill_area.y1 <= coords->y1 + corner_size) ||
                (bottom_only && fill_area.y1 >= coords->y2 - corner_size)) {
                 lv_memset_ff(mask_buf, draw_area_w);
-                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
                 _lv_blend_fill(clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
             }
             fill_area.y1++;
@@ -552,7 +552,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
+    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -561,7 +561,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     is_common = _lv_area_intersect(&draw_area, &sh_area, clip);
     if(is_common == false) return;
 
-    const lv_area_t * disp_area = &vdb->area;
+    const lv_area_t * disp_area = &draw_buf->area;
 
     /* Now `draw_area` has absolute coordinates.
      * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
@@ -1286,7 +1286,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     }
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
+    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -1295,7 +1295,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     is_common = _lv_area_intersect(&draw_area, area_outer, clip);
     if(is_common == false) return;
 
-    const lv_area_t * disp_area = &vdb->area;
+    const lv_area_t * disp_area = &draw_buf->area;
 
     /* Now `draw_area` has absolute coordinates.
      * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
@@ -1334,7 +1334,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
         fill_area.y2 = fill_area.y1;
         for(h = draw_area.y1; h <= upper_corner_end; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
             fill_area2.y1 = fill_area.y1;
@@ -1356,7 +1356,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
             fill_area2.x1 = area_outer->x2 - rout + 1;
             fill_area2.x2 = area_outer->x2;
 
-            int32_t mask_ofs = (area_outer->x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
+            int32_t mask_ofs = (area_outer->x2 - rout + 1) - (draw_buf->area.x1 + draw_area.x1);
             if(mask_ofs < 0) mask_ofs = 0;
             _lv_blend_fill(clip, &fill_area2, color, mask_buf + mask_ofs, mask_res, opa, blend_mode);
 
@@ -1371,7 +1371,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
         fill_area.y2 = fill_area.y1;
         for(h = lower_corner_end; h <= draw_area.y2; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
             fill_area2.x1 = area_outer->x1;
@@ -1391,7 +1391,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
             fill_area2.x1 = area_outer->x2 - rout + 1;
             fill_area2.x2 = area_outer->x2;
 
-            int32_t mask_ofs = (area_outer->x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
+            int32_t mask_ofs = (area_outer->x2 - rout + 1) - (draw_buf->area.x1 + draw_area.x1);
             if(mask_ofs < 0) mask_ofs = 0;
             _lv_blend_fill(clip, &fill_area2, color, mask_buf + mask_ofs, mask_res, opa, blend_mode);
 
@@ -1422,7 +1422,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
 
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
 
             _lv_blend_fill(clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
             fill_area.y1++;

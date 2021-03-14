@@ -328,7 +328,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 /**
  * Draw a color map to the display (image)
  * @param cords_p coordinates the color map
- * @param mask_p the map will drawn only on this area  (truncated to VDB area)
+ * @param mask_p the map will drawn only on this area  (truncated to draw_buf area)
  * @param map_p pointer to a lv_color_t array
  * @param draw_dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
@@ -344,8 +344,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     lv_area_copy(&draw_area, clip_area);
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
-    const lv_area_t * disp_area = &vdb->area;
+    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
+    const lv_area_t * disp_area = &draw_buf->area;
 
     /* Now `draw_area` has absolute coordinates.
      * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
@@ -356,7 +356,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
-    /*The simplest case just copy the pixels into the VDB*/
+    /*The simplest case just copy the pixels into the draw_buf*/
     if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
@@ -414,7 +414,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             /*Blend ARGB images directly*/
             if(lv_area_get_size(&draw_area) > 240) {
                 int32_t disp_w = lv_area_get_width(disp_area);
-                lv_color_t * disp_buf = vdb->buf_act;
+                lv_color_t * disp_buf = draw_buf->buf_act;
                 lv_color_t * disp_buf_first = disp_buf + disp_w * draw_area.y1 + draw_area.x1;
                 lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, (const lv_color_t *)map_buf_tmp, draw_dsc->opa, map_w, draw_area_w,
                                          draw_area_h);
@@ -582,7 +582,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 /*Apply the masks if any*/
                 if(other_mask_cnt) {
                     lv_draw_mask_res_t mask_res_sub;
-                    mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1,
+                    mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + draw_buf->area.x1, y + draw_area.y1 + draw_buf->area.y1,
                                                       lv_area_get_width(&draw_area));
                     if(mask_res_sub == LV_DRAW_MASK_RES_TRANSP) {
                         lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));

@@ -150,8 +150,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
     /*If there other mask apply it*/
     else {
         lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-        lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
-        const lv_area_t * disp_area = &vdb->area;
+        lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
+        const lv_area_t * disp_area = &draw_buf->area;
         /* Get clipped fill area which is the real draw area.
          * It is always the same or inside `fill_area` */
         bool is_common;
@@ -175,14 +175,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 
         lv_coord_t dash_start = 0;
         if(dashed) {
-            dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+            dash_start = (draw_buf->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
         }
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
 
             if(dashed) {
                 if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
@@ -251,8 +251,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
     /*If there other mask apply it*/
     else {
         lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-        lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
-        const lv_area_t * disp_area = &vdb->area;
+        lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
+        const lv_area_t * disp_area = &draw_buf->area;
         /* Get clipped fill area which is the real draw area.
          * It is always the same or inside `fill_area` */
         bool is_common;
@@ -261,10 +261,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 
         /* Now `draw_area` has absolute coordinates.
          * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
-        draw_area.x1 -= vdb->area.x1;
-        draw_area.y1 -= vdb->area.y1;
-        draw_area.x2 -= vdb->area.x1;
-        draw_area.y2 -= vdb->area.y1;
+        draw_area.x1 -= draw_buf->area.x1;
+        draw_area.y1 -= draw_buf->area.y1;
+        draw_area.x2 -= draw_buf->area.x1;
+        draw_area.y2 -= draw_buf->area.y1;
 
         int32_t draw_area_w = lv_area_get_width(&draw_area);
 
@@ -278,7 +278,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 
         lv_coord_t dash_start = 0;
         if(dashed) {
-            dash_start = (vdb->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
+            dash_start = (draw_buf->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
         }
 
         lv_coord_t dash_cnt = dash_start;
@@ -286,7 +286,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
 
             if(dashed) {
                 if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
@@ -362,7 +362,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     draw_area.y2 = LV_MAX(p1.y, p2.y) + w;
 
     /* Get the union of `coords` and `clip`*/
-    /* `clip` is already truncated to the `vdb` size
+    /* `clip` is already truncated to the `draw_buf` size
      * in 'lv_refr_area' function */
     bool is_common = _lv_area_intersect(&draw_area, &draw_area, clip);
     if(is_common == false) return;
@@ -408,11 +408,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     }
 
     lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * vdb = lv_disp_get_draw_buf(disp);
+    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
-    const lv_area_t * disp_area = &vdb->area;
+    const lv_area_t * disp_area = &draw_buf->area;
 
-    /*Store the coordinates of the `draw_a` relative to the VDB */
+    /*Store the coordinates of the `draw_a` relative to the draw_buf */
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
@@ -435,7 +435,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     fill_area.y1 = draw_area.y1 + disp_area->y1;
     fill_area.y2 = fill_area.y1;
 
-    int32_t x = vdb->area.x1 + draw_area.x1;
+    int32_t x = draw_buf->area.x1 + draw_area.x1;
 
     uint32_t mask_p = 0;
 
