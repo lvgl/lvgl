@@ -267,7 +267,7 @@ typedef struct {
 
 /**
  * Initialize a style
- * @param style: pointer to a style to initialize
+ * @param style pointer to a style to initialize
  * @note Do not call `lv_style_init` on styles that are already have some properties
  *       because this function won't free the used memory just set a default state for the style.
  *       In other words be sure to initialize styles only once!
@@ -276,7 +276,7 @@ void lv_style_init(lv_style_t * style);
 
 /**
  * Clear all properties from a style and free all allocated memories.
- * @param style: pointer to a style
+ * @param style pointer to a style
  */
 void lv_style_reset(lv_style_t * style);
 
@@ -297,8 +297,8 @@ lv_style_prop_t lv_style_register_prop(void);
 
 /**
  * Remove a property from a style
- * @param style: pointer to a style
- * @param prop:  a style property ORed with a state.
+ * @param style pointer to a style
+ * @param prop  a style property ORed with a state.
  * @return true: the property was found and removed; false: the property wasn't found
  */
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop);
@@ -307,17 +307,17 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop);
  * Set the value of property in a style.
  * This function shouldn't be used directly by the user.
  * Instead use `lv_style_set_<prop_name>()`. E.g. `lv_style_set_bg_color()`
- * @param style: pointer to style
- * @param prop: the ID of a property (e.g. `LV_STLYE_BG_COLOR`)
- * @param value: `lv_style_value_t` variable in which a filed is set according to the type of `prop`
+ * @param style pointer to style
+ * @param prop the ID of a property (e.g. `LV_STLYE_BG_COLOR`)
+ * @param value `lv_style_value_t` variable in which a filed is set according to the type of `prop`
  */
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
 
 /**
  * Get the value of a property
- * @param style: pointer to a style
- * @param prop:  the ID of a property
- * @param value: pointer to a `lv_style_value_t` variable to store the value
+ * @param style pointer to a style
+ * @param prop  the ID of a property
+ * @param value pointer to a `lv_style_value_t` variable to store the value
  * @return false: the property wsn't found in the style (`value` is unchanged)
  *         true: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
@@ -327,9 +327,9 @@ bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 /**
  * Get the value of a property
- * @param style: pointer to a style
- * @param prop:  the ID of a property
- * @param value: pointer to a `lv_style_value_t` variable to store the value
+ * @param style pointer to a style
+ * @param prop  the ID of a property
+ * @param value pointer to a `lv_style_value_t` variable to store the value
  * @return false: the property wsn't found in the style (`value` is unchanged)
  *         true: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
@@ -359,11 +359,11 @@ static inline bool lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t
 
 /**
  * Initialize a transition descriptor.
- * @param tr:    pointer to a transition descriptor to initialize
- * @param props: an array with the properties to transition. The last element must be zero.
- * @param path:  and animation path. If `NULL` a default liner path will be used.
- * @param time:  duration of the transition in [ms]
- * @param delay: delay before the transition in [ms]
+ * @param tr    pointer to a transition descriptor to initialize
+ * @param props an array with the properties to transition. The last element must be zero.
+ * @param path  and animation path. If `NULL` a default liner path will be used.
+ * @param time  duration of the transition in [ms]
+ * @param delay delay before the transition in [ms]
  * @example
  * const static lv_style_prop_t trans_props[] = { LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, 0 };
  *  static lv_style_transition_dsc_t trans1;
@@ -374,7 +374,7 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
 
 /**
  * Get the default value of a property
- * @param prop: the ID of a property
+ * @param prop the ID of a property
  * @return the default value
  */
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);

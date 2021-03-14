@@ -65,17 +65,17 @@ typedef struct {
 
 /**
  * Initialize a grid layout the default values
- * @param grid: pointer to a grid layout descriptor
+ * @param grid pointer to a grid layout descriptor
  */
 void lv_grid_init(lv_grid_t * grid);
 
 /**
  * Set the number of rows and columns and their sizes
- * @param grid: pointer to a grid layout descriptor
- * @param col_dsc: an array with the column widths
- * @param col_cnt: number of columns (max 16)
- * @param row_dsc: an array with the row heights
- * @param row_cnt: number of rows (max 16)
+ * @param grid pointer to a grid layout descriptor
+ * @param col_dsc an array with the column widths
+ * @param col_cnt number of columns (max 16)
+ * @param row_dsc an array with the row heights
+ * @param row_cnt number of rows (max 16)
  * @note `LV_GRID_FR(x)` can be used as track size.
  */
 void lv_grid_set_template(lv_grid_t * grid, const lv_coord_t * col_dsc, uint8_t col_cnt, const lv_coord_t * row_dsc, uint8_t row_cnt);
@@ -90,13 +90,13 @@ void lv_grid_set_place(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
 
 /**
  * Set the cell of an object. The object's parent needs to have grid layout, else nothing will happen
- * @param obj: pointer to an object
- * @param hor_place: the vertical alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
- * @param col_pos: column ID
- * @param col_span: number of columns to take (>= 1)
+ * @param obj pointer to an object
+ * @param hor_place the vertical alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
+ * @param col_pos column ID
+ * @param col_span number of columns to take (>= 1)
  * @param ver_place the horizontal alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
- * @param row_pos: row ID
- * @param row_span: number of rows to take (>= 1)
+ * @param row_pos row ID
+ * @param row_span number of rows to take (>= 1)
  */
 void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_grid_place_t hor_place, uint8_t col_pos, uint8_t col_span,
                                           lv_grid_place_t ver_place, uint8_t row_pos, uint8_t row_span);

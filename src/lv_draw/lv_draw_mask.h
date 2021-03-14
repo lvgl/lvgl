@@ -286,7 +286,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
  * @param param param pointer to a `lv_draw_mask_param_t` to initialize
  * @param rect coordinates of the rectangle to affect (absolute coordinates)
  * @param radius radius of the rectangle
- * @param inv: true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
+ * @param inv true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
  */
 void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
 

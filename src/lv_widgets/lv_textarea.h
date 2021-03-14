@@ -144,7 +144,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos);
 /**
  * Hide/Unhide the cursor.
  * @param ta pointer to a text area object
- * @param hide: true: hide the cursor
+ * @param hide true: hide the cursor
  */
 void lv_textarea_set_cursor_hidden(lv_obj_t * ta, bool hide);
 

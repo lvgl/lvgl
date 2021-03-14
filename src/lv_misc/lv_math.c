@@ -103,7 +103,7 @@ uint32_t lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
  * Get the square root of a number
  * @param x integer which square root should be calculated
  * @param q store the result here. q->i: integer part, q->f: fractional part in 1/256 unit
- * @param mask: optional to skip some iterations if the magnitude of the root is known.
+ * @param mask optional to skip some iterations if the magnitude of the root is known.
  * Set to 0x8000 by default.
  * If root < 16: mask = 0x80
  * If root < 256: mask = 0x800
