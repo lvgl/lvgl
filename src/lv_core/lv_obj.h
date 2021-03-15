@@ -169,16 +169,21 @@ typedef uint16_t lv_state_t;
 enum {
     LV_PART_MAIN,        /**< A background like rectangle*/
     LV_PART_SCROLLBAR,   /**< The scrollbar(s)*/
-    LV_PART_INDICATOR,   /**< Indicator, e.g. for slider, bar, switch, */
+    LV_PART_INDICATOR,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox */
     LV_PART_KNOB,        /**< Like handle to grab to adjust the value */
     LV_PART_SELECTED,    /**< Indicate the currently selected option or section*/
     LV_PART_ITEMS,       /**< Used if the widget has multiple similar elements (e.g. tabel cells)*/
-    LV_PART_MARKER,      /**< Tick box of a check box, cursor of a text area or anything used to mark something*/
+    LV_PART_TICKS,       /**< Ticks on scale e.g. for a chart or meter*/
+    LV_PART_CURSOR,      /**< Mark a specific place e.g. for text area's cursor or on a chart*/
 
-    LV_PART_CUSTOM_1,    /**< Extension point for custom widgets*/
-    LV_PART_CUSTOM_2,    /**< Extension point for custom widgets*/
-    LV_PART_CUSTOM_3,    /**< Extension point for custom widgets*/
-    LV_PART_CUSTOM_4,    /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_1 = 0x40,    /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_2,           /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_3,           /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_4,           /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_5,           /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_6,           /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_7,           /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_8,           /**< Extension point for custom widgets*/
 
     LV_PART_ANY = 0xFF,  /**< Special value can be used in some functions to target all parts */
 };

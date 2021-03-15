@@ -342,12 +342,12 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &line_dsc);
     line_dsc.raw_end = 1;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
-    lv_obj_init_draw_label_dsc(obj, LV_PART_MARKER, &label_dsc);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_TICKS, &label_dsc);
 
     lv_meter_scale_t * scale;
 

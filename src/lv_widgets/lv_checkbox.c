@@ -157,17 +157,17 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
         lv_coord_t bg_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
         lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
-        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
-        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
-        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
+        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
 
-        lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MARKER);
-        lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
+        lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_INDICATOR);
+        lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_INDICATOR);
 
         lv_draw_rect_dsc_t marker_dsc;
         lv_draw_rect_dsc_init(&marker_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_MARKER, &marker_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &marker_dsc);
         lv_area_t marker_area;
         marker_area.x1 = obj->coords.x1 + bg_leftp;
         marker_area.x2 = marker_area.x1 + font_h + marker_leftp + marker_rightp - 1;
@@ -229,10 +229,10 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 
 
         lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
-        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
-        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
-        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
+        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
         lv_point_t marker_size;
         marker_size.x = font_h + marker_leftp + marker_rightp;
         marker_size.y = font_h + marker_topp + marker_bottomp;
@@ -242,7 +242,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
         lv_coord_t *s = param;
-        lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_MARKER);
+        lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
         *s = LV_MAX(*s, m);
     }
     else if(sign == LV_SIGNAL_RELEASED) {

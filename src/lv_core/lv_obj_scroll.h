@@ -239,6 +239,13 @@ void lv_obj_scroll_to_view(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
 void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
 
 /**
+ * Tell whether an object is being scrolled or not at this moment
+ * @param obj   pointer to an object
+ * @return      true: `obj` is being scrolled
+ */
+bool lv_obj_is_scrolling(const struct _lv_obj_t * obj);
+
+/**
  * Check the children of `obj` and scroll `obj` to fulfill the scroll_snap settings
  * @param obj       an object whose children needs to checked and snapped
  * @param anim_en   LV_ANIM_ON/OFF

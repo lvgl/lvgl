@@ -1242,7 +1242,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
 static void start_cursor_blink(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    uint32_t blink_time = lv_obj_get_style_anim_time(obj, LV_PART_MARKER);
+    uint32_t blink_time = lv_obj_get_style_anim_time(obj, LV_PART_CURSOR);
     if(blink_time == 0) {
         lv_anim_del(obj, cursor_blink_anim_cb);
         ta->cursor.show = 1;
@@ -1317,10 +1317,10 @@ static void refr_cursor_area(lv_obj_t * obj)
     ta->cursor.txt_byte_pos = byte_pos;
 
     /*Calculate the cursor according to its type*/
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
-    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
+    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
+    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR);
+    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
+    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR);
 
     lv_area_t cur_area;
     cur_area.x1 = letter_pos.x - left;
@@ -1511,7 +1511,7 @@ static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_draw_rect_dsc_t cur_dsc;
     lv_draw_rect_dsc_init(&cur_dsc);
-    lv_obj_init_draw_rect_dsc(obj, LV_PART_MARKER, &cur_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_CURSOR, &cur_dsc);
 
     /*Draw he cursor according to the type*/
     lv_area_t cur_area;
@@ -1528,14 +1528,14 @@ static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_memcpy(letter_buf, &txt[ta->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ta->cursor.txt_byte_pos]));
 
     if(cur_dsc.bg_opa == LV_OPA_COVER) {
-        lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
-        lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
+        lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
+        lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
         cur_area.x1 += left;
         cur_area.y1 += top;
 
         lv_draw_label_dsc_t cur_label_dsc;
         lv_draw_label_dsc_init(&cur_label_dsc);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_MARKER, &cur_label_dsc);
+        lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
         lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
     }
 }

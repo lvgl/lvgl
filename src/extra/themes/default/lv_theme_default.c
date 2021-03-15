@@ -701,16 +701,16 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_gap);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->cb_bg_outline_pad);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DISABLED, &styles->disabled);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->cb_marker);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->cb_marker_checked);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DISABLED, &styles->disabled);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->cb_marker);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_CHECKED, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_CHECKED, &styles->cb_marker_checked);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_PRESSED, &styles->pressed);
 #if LV_THEME_DEFAULT_GROW
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_PRESSED, &styles->grow);
 #endif
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->transition_normal);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->transition_delayed);
     }
 #endif
 
@@ -739,7 +739,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->chart_series);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->bg_color_primary);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->chart_ticks);
+        lv_obj_add_style(obj, LV_PART_TICKS, LV_STATE_DEFAULT, &styles->chart_ticks);
+        lv_obj_add_style(obj, LV_PART_CURSOR, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
 
@@ -802,7 +803,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_FOCUSED, &styles->ta_cursor);
+        lv_obj_add_style(obj, LV_PART_CURSOR, LV_STATE_FOCUSED, &styles->ta_cursor);
         lv_obj_add_style(obj, LV_PART_TEXTAREA_PLACEHOLDER, LV_STATE_DEFAULT, &styles->ta_placeholder);
     }
 #endif
@@ -867,7 +868,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_small);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_FOCUSED, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_CURSOR, LV_STATE_FOCUSED, &styles->bg_color_primary);
     }
 #endif
 #if LV_USE_TILEVIEW

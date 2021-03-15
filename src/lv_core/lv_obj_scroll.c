@@ -360,6 +360,17 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
     }
 }
 
+bool lv_obj_is_scrolling(const lv_obj_t * obj)
+{
+    lv_indev_t * indev = lv_indev_get_next(NULL);
+    while(indev) {
+        if(lv_indev_get_scroll_obj(indev) == obj) return true;
+        indev = lv_indev_get_next(indev);
+    }
+
+    return false;
+}
+
 void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_point_t p;

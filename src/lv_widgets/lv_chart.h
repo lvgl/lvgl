@@ -25,11 +25,8 @@ extern "C" {
  *********************/
 
 /**Default value of points. Can be used to not draw a point*/
-#define LV_CHART_POINT_DEF (LV_COORD_MIN)
-LV_EXPORT_CONST_INT(LV_CHART_POINT_DEF);
-
-#define LV_CHART_POINT_ID_NONE     0xFFFF
-LV_EXPORT_CONST_INT(LV_CHART_POINT_ID_NONE);
+#define LV_CHART_POINT_NONE (LV_COORD_MAX)
+LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 
 /**********************
  *      TYPEDEFS
@@ -78,6 +75,12 @@ typedef struct {
 } lv_chart_series_t;
 
 typedef struct {
+    lv_point_t point;
+    lv_color_t color;
+    lv_dir_t dir;
+} lv_chart_cursor_t;
+
+typedef struct {
     lv_coord_t major_len;
     lv_coord_t minor_len;
     lv_coord_t draw_size;
@@ -88,7 +91,8 @@ typedef struct {
 
 typedef struct {
     lv_obj_t obj;
-    lv_ll_t series_ll;     /**< Linked list for the data line pointers (stores lv_chart_series_t)*/
+    lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
+    lv_ll_t cursor_ll;     /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
     lv_chart_tick_dsc_t tick[_LV_CHART_AXIS_LAST];
     lv_coord_t ymin[2];
     lv_coord_t ymax[2];
@@ -277,6 +281,38 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint16_
  * @return          the next series or NULL if thre is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser);
+
+
+
+/*=====================
+ * Cursor
+ *====================*/
+
+/**
+ * Add a cursor with a given color
+ * @param obj       pointer to chart object
+ * @param color     color of the cursor
+ * @param dir       direction of the cursor. `LV_DIR_RIGHT/LEFT/TOP/DOWN/HOR/VER/ALL`. OR-ed values are possible
+ * @return          pointer to the created cursor
+ */
+lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir);
+
+/**
+ * Set the coordinate of the cursor with respect to the paddings
+ * @param obj       pointer to a chart object
+ * @param cursor    pointer to the cursor
+ * @param point     the new coordinate of cursor relative to paddings of the background
+ */
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point);
+
+
+/**
+ * Get the coordinate of the cursor with respect to the paddings
+ * @param obj       pointer to a chart object
+ * @param cursor    pointer to cursor
+ * @return          coordinate of the cursor as lv_point_t
+ */
+lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
 
 /*=====================
  * Set/Get value(s)
