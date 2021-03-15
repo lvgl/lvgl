@@ -13,7 +13,7 @@ static void event_cb(lv_obj_t * chart, lv_event_t e)
     }
     else if(e == LV_EVENT_DRAW_POST_END) {
         int32_t id = lv_chart_get_pressed_point(chart);
-        if(id == LV_CHART_POINT_ID_NONE) return;
+        if(id == LV_CHART_POINT_NONE) return;
 
         LV_LOG_USER("Selected point %d\n", id);
 
