@@ -177,13 +177,6 @@ typedef struct _lv_disp_t {
     uint32_t last_activity_time;        /**< Last time when there was activity on this display */
 } lv_disp_t;
 
-typedef enum {
-    LV_DISP_SIZE_SMALL,
-    LV_DISP_SIZE_MEDIUM,
-    LV_DISP_SIZE_LARGE,
-    LV_DISP_SIZE_EXTRA_LARGE,
-} lv_disp_size_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

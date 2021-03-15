@@ -38,8 +38,8 @@ static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(2)
 
-#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : LV_DPX(12))
-#define PAD_SMALL   (PAD_DEF / 2 + 2)
+#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(16))
+#define PAD_SMALL   (disp_size == DISP_LARGE ? LV_DPX(14) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(12))
 
 /**********************
  *      TYPEDEFS
@@ -524,7 +524,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_palette_t palette_
         styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);
     }
 
-    if(LV_HOR_RES <= 240) disp_size = DISP_SMALL;
+    if(LV_HOR_RES <= 320) disp_size = DISP_SMALL;
     else if(LV_HOR_RES <= 800) disp_size = DISP_MEDIUM;
     else disp_size = DISP_LARGE;
 
@@ -824,7 +824,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_KEYBOARD
     else if(lv_obj_check_type(obj, &lv_keyboard_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->scr);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_small);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->btn);
