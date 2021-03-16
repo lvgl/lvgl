@@ -836,7 +836,6 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
 
             lv_obj_invalidate_area(obj, &inv_area);
         }
-
     }
     else if(start_quarter == 0 && end_quarter == 1) {
         inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;

@@ -21,10 +21,10 @@
  *      DEFINES
  *********************/
 
-static lv_color_t color_primary_accent;//    lv_color_indigo_accent_3()
-static lv_color_t color_secondary_accent;//    lv_color_red_accent_3()
-static lv_color_t color_primary_muted;//  lv_color_indigo_lighten_5()
-static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
+static lv_color_t color_primary_accent;
+static lv_color_t color_secondary_accent;
+static lv_color_t color_primary_muted;
+static lv_color_t color_secondary_muted;
 
 #define COLOR_GREY  lv_color_grey_lighten_2()
 
@@ -40,7 +40,7 @@ static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
 
 #define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(20))
 #define PAD_SMALL   (disp_size == DISP_LARGE ? LV_DPX(14) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(12))
-#define PAD_TINY   (disp_size == DISP_LARGE ? LV_DPX(8) : disp_size == DISP_MEDIUM ? LV_DPX(4) : LV_DPX(2))
+#define PAD_TINY   (disp_size == DISP_LARGE ? LV_DPX(8) : disp_size == DISP_MEDIUM ? LV_DPX(6) : LV_DPX(2))
 
 /**********************
  *      TYPEDEFS

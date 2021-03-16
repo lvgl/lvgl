@@ -241,7 +241,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_mem_buf_free_all();
     _lv_font_clean_up_fmt_txt();
 
-#if LV_USE_PERF_MONITOR && LV_USE_LABEL
+#if 0 && LV_USE_PERF_MONITOR && LV_USE_LABEL
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
@@ -286,7 +286,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
-#if LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
+#if 0 && LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
     static lv_obj_t * mem_label = NULL;
     if(mem_label == NULL) {
         mem_label = lv_label_create(lv_layer_sys(), NULL);
@@ -697,21 +697,15 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
 
 #if MASK_AREA_DEBUG
-        static lv_color_t debug_color = lv_color_red();
+        lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         draw_dsc.bg_color.full = debug_color.full;
         draw_dsc.bg_opa = LV_OPA_20;
-        draw_dsc.border_width = 2;
-        draw_dsc.border_opa = LV_OPA_70;
-        draw_dsc.border_color.full = (debug_color.full + 0x13) * 9;
-
+        draw_dsc.border_width = 1;
+        draw_dsc.border_opa = LV_OPA_30;
+        draw_dsc.border_color = debug_color;
         lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
-        debug_color.full *= 17;
-        debug_color.full += 0xA1;
-#if LV_COLOR_DEPTH == 32
-        debug_color.ch.alpha = 0xff;
-#endif
 #endif
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);
