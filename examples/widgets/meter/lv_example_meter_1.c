@@ -23,8 +23,18 @@ void lv_example_meter_1(void)
 
     lv_meter_indicator_t * indic;
 
+    /*Add a blue arc to the start */
+    indic = lv_meter_add_arc(meter, scale, 3, lv_color_blue(), 0);
+    lv_meter_set_indicator_start_value(meter, indic, 0);
+    lv_meter_set_indicator_end_value(meter, indic, 20);
+
+    /*Make the tick lines blue at the start of the scale*/
+    indic = lv_meter_add_scale_lines(meter, scale, lv_color_blue(), lv_color_blue(), false, 0);
+    lv_meter_set_indicator_start_value(meter, indic, 0);
+    lv_meter_set_indicator_end_value(meter, indic, 20);
+
     /*Add a red arc to the end */
-    indic = lv_meter_add_arc(meter, scale, 3, lv_color_red(), 1);
+    indic = lv_meter_add_arc(meter, scale, 3, lv_color_red(), 0);
     lv_meter_set_indicator_start_value(meter, indic, 80);
     lv_meter_set_indicator_end_value(meter, indic, 100);
 
