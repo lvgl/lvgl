@@ -10,9 +10,9 @@
 #include "../../lvgl.h"
 #if LV_BUILD_TEST
 #include "../lv_test_assert.h"
-#include "../../src/lv_font/lv_font_fmt_txt.h"
-#include "../../src/lv_font/lv_font.h"
-#include "../../src/lv_font/lv_font_loader.h"
+#include "../../src/font/lv_font_fmt_txt.h"
+#include "../../src/font/lv_font.h"
+#include "../../src/font/lv_font_loader.h"
 
 #include "lv_test_font_loader.h" 
 
