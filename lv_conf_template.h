@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v7.10.1
+ * Configuration file for v7.11.0
  */
 
 /*
@@ -68,6 +68,9 @@
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 typedef int16_t lv_coord_t;
+
+/* Maximum buffer size to allocate for rotation. Only used if software rotation is enabled. */
+#define LV_DISP_ROT_MAX_BUF  (10U * 1024U)
 
 /*=========================
    Memory manager settings

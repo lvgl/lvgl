@@ -293,7 +293,6 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
      * It will be restored when the list is focused again.*/
     if(btn) ext->last_sel_btn = btn;
 #endif
-
     /*Focus the new button*/
     ext->act_sel_btn = btn;
 
@@ -741,7 +740,6 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 #endif
     }
     else if(sign == LV_SIGNAL_CONTROL) {
-
 #if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
@@ -833,6 +831,12 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
         lv_obj_t * sel  = lv_list_get_btn_selected(list);
         if(sel == btn) lv_list_focus_btn(list, lv_list_get_next_btn(list, btn));
         if(ext->last_sel_btn == btn) ext->last_sel_btn = NULL;
+#endif
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+#if LV_USE_GROUP
+        lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_list_focus_btn(list, btn);
 #endif
     }
 

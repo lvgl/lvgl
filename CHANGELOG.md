@@ -1,13 +1,25 @@
 # Changelog
 
+## v7.11.0 (Planned for 19.02.2021)
+
+### New features
+- Add better screen orientation management with software rotation support
+- Decide text animation's direction based on base_dir (when using LV_USE_BIDI)
+
+### Bugfixes
+- fix(gauge) fix needle invalidation
+- fix(bar) correct symmetric handling for vertical sliders
+
 ## v7.10.1 (Planned for 16.02.2021)
 
 ### Bugfixes
 - fix(draw) overlap outline with background to prevent aliasing artifacts
 - fix(indev) clear the indev's `act_obj` in `lv_indev_reset`
 - fix(text) fix out of bounds read in `_lv_txt_get_width`
+- fix(list) scroll list when button is focused using LV_KEY_NEXT/PREV
 - fix(text) improve Arabic contextual analysis by adding hyphen processing and proper handling of lam-alef sequence
 - fix(delete) delete animation after the children are deleted
+- fix(gauge) consider paddigns for needle images
 
 ## v7.10.0
 

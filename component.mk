@@ -1,8 +1,23 @@
 # ESP-IDF component file for make based commands
 
-ifdef $(IDF_VER)
-
 COMPONENT_SRCDIRS := .
-COMPONENT_ADD_INCLUDEDIRS := .
+COMPONENT_SRCDIRS += src
+COMPONENT_SRCDIRS += src/lv_core
+COMPONENT_SRCDIRS += src/lv_draw
+COMPONENT_SRCDIRS += src/lv_font
+COMPONENT_SRCDIRS += src/lv_gpu
+COMPONENT_SRCDIRS += src/lv_hal
+COMPONENT_SRCDIRS += src/lv_misc
+COMPONENT_SRCDIRS += src/lv_themes
+COMPONENT_SRCDIRS += src/lv_widgets
 
-endif
+COMPONENT_ADD_INCLUDEDIRS := .
+COMPONENT_ADD_INCLUDEDIRS += src
+COMPONENT_ADD_INCLUDEDIRS += src/lv_core
+COMPONENT_ADD_INCLUDEDIRS += src/lv_draw
+COMPONENT_ADD_INCLUDEDIRS += src/lv_font
+COMPONENT_ADD_INCLUDEDIRS += src/lv_gpu
+COMPONENT_ADD_INCLUDEDIRS += src/lv_hal
+COMPONENT_ADD_INCLUDEDIRS += src/lv_misc
+COMPONENT_ADD_INCLUDEDIRS += src/lv_themes
+COMPONENT_ADD_INCLUDEDIRS += src/lv_widgets
