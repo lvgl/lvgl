@@ -479,12 +479,12 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         obj->state = LV_STATE_DEFAULT;
         obj->style_list.skip_trans = 1;
         lv_draw_rect_dsc_t rect_dsc_def;
-        lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the draw_hook to modify it*/
+        lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the dsc to modify it*/
         lv_draw_rect_dsc_init(&rect_dsc_def);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_def);
 
         lv_draw_label_dsc_t label_dsc_def;
-        lv_draw_label_dsc_t label_dsc_act;  /*Passed to the draw_hook to modify it*/
+        lv_draw_label_dsc_t label_dsc_act;  /*Passed to the dsc to modify it*/
         lv_draw_label_dsc_init(&label_dsc_def);
         lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_def);
         obj->state = state_ori;
@@ -499,11 +499,11 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         bool rtl = lv_obj_get_base_dir(obj)  == LV_BIDI_DIR_RTL ? true : false;
 
         /*Handle custom drawer*/
-        lv_obj_draw_hook_dsc_t hook_dsc;
-        lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
-        hook_dsc.part = LV_PART_ITEMS;
-        hook_dsc.rect_dsc = &rect_dsc_act;
-        hook_dsc.label_dsc = &label_dsc_act;
+        lv_obj_draw_dsc_t dsc;
+        lv_obj_draw_dsc_init(&dsc, clip_area);
+        dsc.part = LV_PART_ITEMS;
+        dsc.rect_dsc = &rect_dsc_act;
+        dsc.label_dsc = &label_dsc_act;
 
         for(row = 0; row < table->row_cnt; row++) {
             lv_coord_t h_row = table->row_h[row];
@@ -594,9 +594,9 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                     obj->style_list.skip_trans = 0;
                 }
 
-                hook_dsc.draw_area = &cell_area_border;
-                hook_dsc.id = row * table->col_cnt + col;
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+                dsc.draw_area = &cell_area_border;
+                dsc.id = row * table->col_cnt + col;
+                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
 
                 lv_draw_rect(&cell_area_border, clip_area, &rect_dsc_act);
 
@@ -629,7 +629,7 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
                     }
                 }
 
-                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
+                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
 
                 cell += col_merge + 1;
                 col += col_merge;

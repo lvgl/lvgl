@@ -17,8 +17,8 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
         }
     }
     else if(e == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_hook_dsc_t * hook_dsc = lv_event_get_param();
-        if(hook_dsc->part == LV_PART_CURSOR && hook_dsc->p1 && hook_dsc->p2 && hook_dsc->p1->y == hook_dsc->p2->y && last_id >= 0) {
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+        if(dsc->part == LV_PART_CURSOR && dsc->p1 && dsc->p2 && dsc->p1->y == dsc->p2->y && last_id >= 0) {
             lv_coord_t * data_array = lv_chart_get_array(chart, ser);
             lv_coord_t v = data_array[last_id];
             char buf[16];
@@ -28,9 +28,9 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             lv_txt_get_size(&size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t a;
-            a.y2 = hook_dsc->p1->y - 5;
+            a.y2 = dsc->p1->y - 5;
             a.y1 = a.y2 - size.y - 10;
-            a.x1 = hook_dsc->p1->x + 10;
+            a.x1 = dsc->p1->x + 10;
             a.x2 = a.x1 + size.x + 10;
 
             lv_draw_rect_dsc_t draw_rect_dsc;
@@ -38,7 +38,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             draw_rect_dsc.bg_color = lv_color_blue();
             draw_rect_dsc.radius = 3;
 
-            lv_draw_rect(&a, hook_dsc->clip_area, &draw_rect_dsc);
+            lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
 
             lv_draw_label_dsc_t draw_label_dsc;
             lv_draw_label_dsc_init(&draw_label_dsc);
@@ -47,7 +47,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             a.x2 -= 5;
             a.y1 += 5;
             a.y2 -= 5;
-            lv_draw_label(&a, hook_dsc->clip_area, &draw_label_dsc, buf, NULL);
+            lv_draw_label(&a, dsc->clip_area, &draw_label_dsc, buf, NULL);
         }
     }
 }

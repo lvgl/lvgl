@@ -393,25 +393,25 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
     position_knob(obj, &knob_area, knob_size, hor);
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
-    lv_obj_draw_hook_dsc_t hook_dsc;
-    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
-    hook_dsc.part = LV_PART_KNOB;
-    hook_dsc.id = 0;
-	hook_dsc.draw_area = &slider->right_knob_area;
-	hook_dsc.rect_dsc = &knob_rect_dsc;
+    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_dsc_init(&dsc, clip_area);
+    dsc.part = LV_PART_KNOB;
+    dsc.id = 0;
+    dsc.draw_area = &slider->right_knob_area;
+    dsc.rect_dsc = &knob_rect_dsc;
 
     if(lv_slider_get_type(obj) != LV_SLIDER_TYPE_RANGE) {
-		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
-		lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
-		lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+        lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
     } else {
-    	/*Save the draw dsc. because it can be modified in the hook*/
-    	lv_draw_rect_dsc_t knob_rect_dsc_tmp;
-    	lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
+        /*Save the draw dsc. because it can be modified in the describer*/
+        lv_draw_rect_dsc_t knob_rect_dsc_tmp;
+        lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
 
-		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
-		lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
-		lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+        lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
 
         /* Draw a second knob for the start_value side */
         if(hor) {
@@ -423,14 +423,14 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
         position_knob(obj, &knob_area, knob_size, hor);
         lv_area_copy(&slider->left_knob_area, &knob_area);
 
-    	lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
-		hook_dsc.draw_area = &slider->left_knob_area;
-		hook_dsc.rect_dsc = &knob_rect_dsc;
-		hook_dsc.id = 1;
+        lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
+        dsc.draw_area = &slider->left_knob_area;
+        dsc.rect_dsc = &knob_rect_dsc;
+        dsc.id = 1;
 
-		lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
         lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
-		lv_event_send(obj, LV_EVENT_DRAW_PART_END, &hook_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
     }
 
 }

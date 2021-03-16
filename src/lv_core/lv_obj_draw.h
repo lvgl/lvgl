@@ -51,7 +51,7 @@ typedef struct
     uint32_t id;
     uint32_t part   :8;
     const void * sub_part_ptr;
-}lv_obj_draw_hook_dsc_t;
+}lv_obj_draw_dsc_t;
 
 /** Design modes */
 enum {
@@ -130,11 +130,11 @@ void lv_obj_init_draw_arc_dsc(struct _lv_obj_t * obj, uint8_t part, lv_draw_arc_
 lv_coord_t lv_obj_calculate_ext_draw_size(struct _lv_obj_t * obj, uint8_t part);
 
 /**
- * Initialize a draw hook.
- * @param hook_dsc pointer to a raw hook. Later it should be passed as parameter to an `LV_EEVNT_DRAW_PART_BEGIN/END` event.
+ * Initialize a draw describer.
+ * @param dsc pointer to a draw describer. Later it should be passed as parameter to an `LV_EEVNT_DRAW_PART_BEGIN/END` event.
  * @param clip_area the current clip area of the drawing
  */
-void lv_obj_draw_hook_dsc_init(lv_obj_draw_hook_dsc_t * hook_dsc, const lv_area_t * clip_area);
+void lv_obj_draw_dsc_init(lv_obj_draw_dsc_t * dsc, const lv_area_t * clip_area);
 
 /**
  * Send a 'LV_SIGNAL_REFR_EXT_DRAW_SIZE' signal to the object to refresh the value of the extended draw size.

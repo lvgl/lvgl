@@ -441,11 +441,11 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
         char * txt_ap = lv_mem_buf_get(txt_ap_size);
 #endif
 
-        lv_obj_draw_hook_dsc_t hook_dsc;
-        lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
-        hook_dsc.part = LV_PART_ITEMS;
-        hook_dsc.rect_dsc = &draw_rect_dsc_act;
-        hook_dsc.label_dsc = &draw_label_dsc_act;
+        lv_obj_draw_dsc_t dsc;
+        lv_obj_draw_dsc_init(&dsc, clip_area);
+        dsc.part = LV_PART_ITEMS;
+        dsc.rect_dsc = &draw_rect_dsc_act;
+        dsc.label_dsc = &draw_label_dsc_act;
 
         for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
@@ -492,9 +492,9 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
                 obj->style_list.skip_trans = 0;
             }
 
-            hook_dsc.draw_area = &btn_area;
-            hook_dsc.id = btn_i;
-            lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+            dsc.draw_area = &btn_area;
+            dsc.id = btn_i;
+            lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &dsc);
 
             /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
             if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
@@ -536,7 +536,7 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
             lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
 
 
-            lv_event_send(obj,LV_EVENT_DRAW_PART_END, &hook_dsc);
+            lv_event_send(obj,LV_EVENT_DRAW_PART_END, &dsc);
         }
 
         obj->style_list.skip_trans = 0;

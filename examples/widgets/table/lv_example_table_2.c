@@ -6,10 +6,10 @@
 static void event_cb(lv_obj_t * obj, lv_event_t e)
 {
     if(e == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_hook_dsc_t * hook_dsc = lv_event_get_param();
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
         /*If the cells are drawn...*/
-        if(hook_dsc->part == LV_PART_ITEMS) {
-            bool chk = lv_table_has_cell_ctrl(obj, hook_dsc->id, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+        if(dsc->part == LV_PART_ITEMS) {
+            bool chk = lv_table_has_cell_ctrl(obj, dsc->id, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
 
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
@@ -17,11 +17,11 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             rect_dsc.radius = LV_RADIUS_CIRCLE;
 
             lv_area_t sw_area;
-            sw_area.x1 = hook_dsc->draw_area->x2 - 50;
+            sw_area.x1 = dsc->draw_area->x2 - 50;
             sw_area.x2 = sw_area.x1 + 40;
-            sw_area.y1 =  hook_dsc->draw_area->y1 + lv_area_get_height(hook_dsc->draw_area) / 2 - 10;
+            sw_area.y1 =  dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
             sw_area.y2 = sw_area.y1 + 20;
-            lv_draw_rect(&sw_area, hook_dsc->clip_area, &rect_dsc);
+            lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
 
             rect_dsc.bg_color = lv_color_white();
             if(chk) {
@@ -33,7 +33,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             }
             sw_area.y1 += 2;
             sw_area.y2 -= 2;
-            lv_draw_rect(&sw_area, hook_dsc->clip_area, &rect_dsc);
+            lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
         }
     }
     else if(e == LV_EVENT_VALUE_CHANGED) {

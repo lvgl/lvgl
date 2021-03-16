@@ -375,10 +375,10 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint8_t part)
     return s;
 }
 
-void lv_obj_draw_hook_dsc_init(lv_obj_draw_hook_dsc_t * hook_dsc, const lv_area_t * clip_area)
+void lv_obj_draw_dsc_init(lv_obj_draw_dsc_t * dsc, const lv_area_t * clip_area)
 {
-    lv_memset_00(hook_dsc, sizeof(lv_obj_draw_hook_dsc_t));
-    hook_dsc->clip_area = clip_area;
+    lv_memset_00(dsc, sizeof(lv_obj_draw_dsc_t));
+    dsc->clip_area = clip_area;
 }
 
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
