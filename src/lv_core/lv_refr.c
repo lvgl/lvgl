@@ -241,7 +241,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_mem_buf_free_all();
     _lv_font_clean_up_fmt_txt();
 
-#if 0 && LV_USE_PERF_MONITOR && LV_USE_LABEL
+#if LV_USE_PERF_MONITOR && LV_USE_LABEL
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys(), NULL);
@@ -286,7 +286,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
-#if 0 && LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
+#if LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
     static lv_obj_t * mem_label = NULL;
     if(mem_label == NULL) {
         mem_label = lv_label_create(lv_layer_sys(), NULL);
