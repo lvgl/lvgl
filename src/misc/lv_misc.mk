@@ -17,7 +17,7 @@ CSRCS += lv_txt.c
 CSRCS += lv_txt_ap.c
 CSRCS += lv_utils.c
 
-DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_misc
-VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_misc
+DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/misc
+VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/misc
 
-CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_misc"
+CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/misc"

@@ -3,7 +3,7 @@ CSRCS += lv_gpu_nxp_pxp_osa.c
 CSRCS += lv_gpu_nxp_vglite.c
 CSRCS += lv_gpu_stm32_dma2d.c
 
-DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_gpu
-VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_gpu
+DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/gpu
+VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/gpu
 
-CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_gpu"
+CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/gpu"
