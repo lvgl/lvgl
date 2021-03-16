@@ -183,6 +183,15 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 }
 
 /**
+ * Delete all the animations animation
+ */
+void lv_anim_del_all(void)
+{
+    _lv_ll_clear(&LV_GC_ROOT(_lv_anim_ll));
+    anim_mark_list_change();
+}
+
+/**
  * Get the animation of a variable and its `exec_cb`.
  * @param var pointer to variable
  * @param exec_cb a function pointer which is animating 'var',

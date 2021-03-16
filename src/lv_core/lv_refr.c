@@ -818,7 +818,7 @@ static void draw_buf_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * color
                     &color_p[inv_j * w + i]
                 );
             }
-            
+
         }
     }
 }
@@ -848,7 +848,8 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
         if(drv->rotated == LV_DISP_ROT_90) {
             area->y2 = drv->ver_res - area->x1 - 1;
             area->y1 = area->y2 - area_w + 1;
-        } else {
+        }
+        else {
             area->y1 = area->x1;
             area->y2 = area->y1 + area_w - 1;
         }
@@ -864,20 +865,23 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
                 draw_buf_rotate_90_sqr(drv->rotated == LV_DISP_ROT_270, area_w, color_p);
                 if(drv->rotated == LV_DISP_ROT_90) {
                     area->x1 = init_y_off;
-                    area->x2 = init_y_off+area_w-1;
-                } else {
+                    area->x2 = init_y_off + area_w - 1;
+                }
+                else {
                     area->x2 = drv->hor_res - 1 - init_y_off;
                     area->x1 = area->x2 - area_w + 1;
                 }
-            } else {
+            }
+            else {
                 /*Rotate other areas using a maximum buffer size*/
                 if(rot_buf == NULL) rot_buf = lv_mem_buf_get(LV_DISP_ROT_MAX_BUF);
                 draw_buf_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, height, color_p, rot_buf);
                 
                 if(drv->rotated == LV_DISP_ROT_90) {
-                    area->x1 = init_y_off+row;
-                    area->x2 = init_y_off+row+height-1;
-                } else {
+                    area->x1 = init_y_off + row;
+                    area->x2 = init_y_off + row + height - 1;
+                }
+                else {
                     area->x2 = drv->hor_res - 1 - init_y_off - row;
                     area->x1 = area->x2 - height + 1;
                 }

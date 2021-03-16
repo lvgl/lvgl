@@ -383,7 +383,8 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
                 *axis1 = *axis2;
                 *axis2 = zero;
             }
-        } else {
+        }
+        else {
             zero = *axis2 - shift + 1;
             if(*axis1 > zero)
                 *axis2 = zero;
