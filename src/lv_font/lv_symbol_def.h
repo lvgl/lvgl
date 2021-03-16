@@ -36,7 +36,9 @@ extern "C" {
 #define LV_SYMBOL_VOLUME_MID      "\xef\x80\xa7" /*61479, 0xF027*/
 #define LV_SYMBOL_VOLUME_MAX      "\xef\x80\xa8" /*61480, 0xF028*/
 #define LV_SYMBOL_IMAGE           "\xef\x80\xbe" /*61502, 0xF03E*/
+#define LV_SYMBOL_ENVELOPE        "\xef\x83\xa0" /*61664, 0xF0E0*/
 #define LV_SYMBOL_EDIT            "\xef\x8C\x84" /*62212, 0xF304*/
+#define LV_SYMBOL_TINT            "\xef\x81\x83" /*61507, 0xF043*/
 #define LV_SYMBOL_PREV            "\xef\x81\x88" /*61512, 0xF048*/
 #define LV_SYMBOL_PLAY            "\xef\x81\x8b" /*61515, 0xF04B*/
 #define LV_SYMBOL_PAUSE           "\xef\x81\x8c" /*61516, 0xF04C*/
@@ -74,7 +76,7 @@ extern "C" {
 #define LV_SYMBOL_BATTERY_EMPTY   "\xef\x89\x84" /*62020, 0xF244*/
 #define LV_SYMBOL_USB             "\xef\x8a\x87" /*62087, 0xF287*/
 #define LV_SYMBOL_BLUETOOTH       "\xef\x8a\x93" /*62099, 0xF293*/
-#define LV_SYMBOL_TRASH           "\xef\x8B\xAD" /*62189, 0xF2ED*/
+#define LV_SYMBOL_TRASH           "\xef\x8B\xad" /*62189, 0xF2ED*/
 #define LV_SYMBOL_BACKSPACE       "\xef\x95\x9A" /*62810, 0xF55A*/
 #define LV_SYMBOL_SD_CARD         "\xef\x9F\x82" /*63426, 0xF7C2*/
 #define LV_SYMBOL_NEW_LINE        "\xef\xA2\xA2" /*63650, 0xF8A2*/
