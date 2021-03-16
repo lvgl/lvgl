@@ -171,7 +171,7 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
         }
 
         lv_style_t * local_style = get_alloc_local_style(list_dest);
-        if (local_style)
+        if(local_style)
             lv_style_copy(local_style, get_alloc_local_style((lv_style_list_t *)list_src));
     }
 }

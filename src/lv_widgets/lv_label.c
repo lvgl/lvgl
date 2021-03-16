@@ -1038,10 +1038,10 @@ void lv_label_refr_text(lv_obj_t * label)
             lv_anim_value_t start, end;
             lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
 
-            if (base_dir == LV_BIDI_DIR_AUTO)
+            if(base_dir == LV_BIDI_DIR_AUTO)
                 base_dir = _lv_bidi_detect_base_dir(ext->text);
 
-            if (base_dir == LV_BIDI_DIR_RTL) {
+            if(base_dir == LV_BIDI_DIR_RTL) {
                 start = lv_area_get_width(&txt_coords) - size.x;
                 end = 0;
             }
@@ -1136,10 +1136,10 @@ void lv_label_refr_text(lv_obj_t * label)
             lv_anim_value_t start, end;
             lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
 
-            if (base_dir == LV_BIDI_DIR_AUTO)
+            if(base_dir == LV_BIDI_DIR_AUTO)
                 base_dir = _lv_bidi_detect_base_dir(ext->text);
 
-            if (base_dir == LV_BIDI_DIR_RTL) {
+            if(base_dir == LV_BIDI_DIR_RTL) {
                 start = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 end = 0;
             }

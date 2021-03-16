@@ -741,7 +741,8 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     }
 }
 
-static void lv_refr_vdb_rotate_180(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t *color_p) {
+static void lv_refr_vdb_rotate_180(lv_disp_drv_t * drv, lv_area_t * area, lv_color_t * color_p)
+{
     lv_coord_t area_w = lv_area_get_width(area);
     lv_coord_t area_h = lv_area_get_height(area);
     uint32_t total = area_w * area_h;
@@ -764,8 +765,10 @@ static void lv_refr_vdb_rotate_180(lv_disp_drv_t *drv, lv_area_t *area, lv_color
     area->x1 = drv->hor_res - tmp_coord - 1;
 }
 
-static LV_ATTRIBUTE_FAST_MEM void lv_refr_vdb_rotate_90(bool invert_i, lv_coord_t area_w, lv_coord_t area_h, lv_color_t *orig_color_p, lv_color_t *rot_buf) {
-    
+static LV_ATTRIBUTE_FAST_MEM void lv_refr_vdb_rotate_90(bool invert_i, lv_coord_t area_w, lv_coord_t area_h,
+                                                        lv_color_t * orig_color_p, lv_color_t * rot_buf)
+{
+
     uint32_t invert = (area_w * area_h) - 1;
     uint32_t initial_i = ((area_w - 1) * area_h);
     for(lv_coord_t y = 0; y < area_h; y++) {
@@ -785,7 +788,8 @@ static LV_ATTRIBUTE_FAST_MEM void lv_refr_vdb_rotate_90(bool invert_i, lv_coord_
 /**
  * Helper function for lv_refr_vdb_rotate_90_sqr. Given a list of four numbers, rotate the entire list to the left.
  */
-static inline void lv_vdb_rotate4(lv_color_t *a, lv_color_t *b, lv_color_t * c, lv_color_t * d) {
+static inline void lv_vdb_rotate4(lv_color_t * a, lv_color_t * b, lv_color_t * c, lv_color_t * d)
+{
     lv_color_t tmp;
     tmp = *a;
     *a = *b;
@@ -798,9 +802,10 @@ static inline void lv_vdb_rotate4(lv_color_t *a, lv_color_t *b, lv_color_t * c, 
  * Rotate a square image 90/270 degrees in place.
  * @note inspired by https://stackoverflow.com/a/43694906
  */
-static void lv_refr_vdb_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * color_p) {
-    for(lv_coord_t i = 0; i < w/2; i++) {
-        for(lv_coord_t j = 0; j < (w + 1)/2; j++) {
+static void lv_refr_vdb_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * color_p)
+{
+    for(lv_coord_t i = 0; i < w / 2; i++) {
+        for(lv_coord_t j = 0; j < (w + 1) / 2; j++) {
             lv_coord_t inv_i = (w - 1) - i;
             lv_coord_t inv_j = (w - 1) - j;
             if(is_270) {
@@ -810,7 +815,8 @@ static void lv_refr_vdb_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * co
                     &color_p[inv_i * w + inv_j],
                     &color_p[j * w + inv_i]
                 );
-            } else {
+            }
+            else {
                 lv_vdb_rotate4(
                     &color_p[i * w + j],
                     &color_p[j * w + inv_i],
@@ -818,7 +824,7 @@ static void lv_refr_vdb_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * co
                     &color_p[inv_j * w + i]
                 );
             }
-            
+
         }
     }
 }
@@ -826,7 +832,8 @@ static void lv_refr_vdb_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * co
 /**
  * Rotate the VDB to the display's native orientation.
  */
-static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
+static void lv_refr_vdb_rotate(lv_area_t * area, lv_color_t * color_p)
+{
     lv_disp_drv_t * drv = &disp_refr->driver;
     if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate) {
         LV_LOG_ERROR("cannot rotate a true double-buffered display!");
@@ -835,20 +842,22 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
     if(drv->rotated == LV_DISP_ROT_180) {
         lv_refr_vdb_rotate_180(drv, area, color_p);
         drv->flush_cb(drv, area, color_p);
-    } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
+    }
+    else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
         /*Allocate a temporary buffer to store rotated image */
-        lv_color_t * rot_buf = NULL; 
+        lv_color_t * rot_buf = NULL;
         lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
         lv_coord_t area_w = lv_area_get_width(area);
         lv_coord_t area_h = lv_area_get_height(area);
         /*Determine the maximum number of rows that can be rotated at a time*/
-        lv_coord_t max_row = LV_MATH_MIN((lv_coord_t)((LV_DISP_ROT_MAX_BUF/sizeof(lv_color_t)) / area_w), area_h);
+        lv_coord_t max_row = LV_MATH_MIN((lv_coord_t)((LV_DISP_ROT_MAX_BUF / sizeof(lv_color_t)) / area_w), area_h);
         lv_coord_t init_y_off;
         init_y_off = area->y1;
         if(drv->rotated == LV_DISP_ROT_90) {
             area->y2 = drv->ver_res - area->x1 - 1;
             area->y1 = area->y2 - area_w + 1;
-        } else {
+        }
+        else {
             area->y1 = area->x1;
             area->y2 = area->y1 + area_w - 1;
         }
@@ -856,7 +865,7 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
         /*Rotate the screen in chunks, flushing after each one*/
         lv_coord_t row = 0;
         while(row < area_h) {
-            lv_coord_t height = LV_MATH_MIN(max_row, area_h-row);
+            lv_coord_t height = LV_MATH_MIN(max_row, area_h - row);
             vdb->flushing = 1;
             if((row == 0) && (area_h >= area_w)) {
                 /*Rotate the initial area as a square*/
@@ -864,21 +873,24 @@ static void lv_refr_vdb_rotate(lv_area_t *area, lv_color_t *color_p) {
                 lv_refr_vdb_rotate_90_sqr(drv->rotated == LV_DISP_ROT_270, area_w, color_p);
                 if(drv->rotated == LV_DISP_ROT_90) {
                     area->x1 = init_y_off;
-                    area->x2 = init_y_off+area_w-1;
-                } else {
+                    area->x2 = init_y_off + area_w - 1;
+                }
+                else {
                     area->x2 = drv->hor_res - 1 - init_y_off;
                     area->x1 = area->x2 - area_w + 1;
                 }
-            } else {
+            }
+            else {
                 /*Rotate other areas using a maximum buffer size*/
                 if(rot_buf == NULL)
                     rot_buf = _lv_mem_buf_get(LV_DISP_ROT_MAX_BUF);
                 lv_refr_vdb_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, height, color_p, rot_buf);
-                
+
                 if(drv->rotated == LV_DISP_ROT_90) {
-                    area->x1 = init_y_off+row;
-                    area->x2 = init_y_off+row+height-1;
-                } else {
+                    area->x1 = init_y_off + row;
+                    area->x2 = init_y_off + row + height - 1;
+                }
+                else {
                     area->x2 = drv->hor_res - 1 - init_y_off - row;
                     area->x1 = area->x2 - height + 1;
                 }
@@ -927,7 +939,8 @@ static void lv_refr_vdb_flush(void)
         /*Rotate the buffer to the display's native orientation if necessary*/
         if(disp->driver.rotated != LV_DISP_ROT_NONE && disp->driver.sw_rotate) {
             lv_refr_vdb_rotate(&vdb->area, vdb->buf_act);
-        } else {
+        }
+        else {
             disp->driver.flush_cb(&disp->driver, &vdb->area, color_p);
         }
     }

@@ -34,7 +34,7 @@
  *  STATIC PROTOTYPES
  **********************/
 #if LV_IMG_CACHE_DEF_SIZE
-static bool lv_img_cache_match(const void * src1, const void * src2);
+    static bool lv_img_cache_match(const void * src1, const void * src2);
 #endif
 
 #if LV_IMG_CACHE_DEF_SIZE == 0
