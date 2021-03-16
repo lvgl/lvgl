@@ -390,6 +390,16 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
     lv_chart_refresh(chart);
 }
 
+
+void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color)
+{
+    LV_ASSERT_OBJ(chart, MY_CLASS);
+    LV_ASSERT_NULL(series);
+
+    series->color = color;
+    lv_chart_refresh(chart);
+}
+
 void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

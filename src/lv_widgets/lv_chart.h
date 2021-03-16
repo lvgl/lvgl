@@ -266,6 +266,14 @@ void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series);
 void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide);
 
 /**
+ * Change the color of a series
+ * @param obj       pointer to a chart object.
+ * @param series    pointer to a series object
+ * @param color     the new color of the series
+ */
+void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color);
+
+/**
  * Set the index of the x-axis start point in the data array.
  * This point will be considers the first (left) point and the other points will be drawn after it.
  * @param obj       pointer to a chart object
