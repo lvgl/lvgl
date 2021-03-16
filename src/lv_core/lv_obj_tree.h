@@ -65,8 +65,8 @@ void lv_obj_del_async(struct _lv_obj_t * obj);
 /**
  * Move the parent of an object. The relative coordinates will be kept.
  *
- * @param obj:    pointer to an object whose parent needs to be changed
- * @param parent: pointer to the new parent
+ * @param obj    pointer to an object whose parent needs to be changed
+ * @param parent pointer to the new parent
  */
 void lv_obj_set_parent(struct _lv_obj_t * obj, struct _lv_obj_t * parent);
 
@@ -74,7 +74,7 @@ void lv_obj_set_parent(struct _lv_obj_t * obj, struct _lv_obj_t * parent);
  * Move the object to the foreground.
  * It will look like if it was created as the last child of its parent.
  * It also means it can cover any of the siblings.
- * @param obj:pointer to an object
+ * @param obj pointer to an object
  */
 void lv_obj_move_foreground(struct _lv_obj_t * obj);
 
@@ -82,35 +82,35 @@ void lv_obj_move_foreground(struct _lv_obj_t * obj);
  * Move the object to the background.
  * It will look like if it was created as the first child of its parent.
  * It also means any of the siblings can cover the object.
- * @param obj:pointer to an object
+ * @param obj pointer to an object
  */
 void lv_obj_move_background(struct _lv_obj_t * obj);
 
 /**
  * Get the screen of an object
- * @param obj: pointer to an object
+ * @param obj pointer to an object
  * @return pointer to the obejct's screen
  */
 struct _lv_obj_t * lv_obj_get_screen(const struct _lv_obj_t * obj);
 
 /**
  * Get the display of the object
- * @param obj: pointer to an object
+ * @param obj pointer to an object
  * @return pointer to the obejct's display
  */
 lv_disp_t * lv_obj_get_disp(const struct _lv_obj_t * obj);
 
 /**
  * Get the parent of an object
- * @param obj: pointer to an object
+ * @param obj pointer to an object
  * @return the parent of the object. (NULL if `obj` was a screen)
  */
 struct _lv_obj_t * lv_obj_get_parent(const struct _lv_obj_t * obj);
 
 /**
  * Get the child of an object by the child's index.
- * @param obj: pointer to an object whose child should be get
- * @param id:  the index of the child.
+ * @param obj pointer to an object whose child should be get
+ * @param id  the index of the child.
  *             0: the oldest (firstly created) child
  *             1: the second oldest
  *             child count-1: the youngest
@@ -122,14 +122,14 @@ struct _lv_obj_t * lv_obj_get_child(const struct _lv_obj_t * obj, int32_t id);
 
 /**
  * Get the number of children
- * @param obj: pointer to an object
+ * @param obj pointer to an object
  * @return the number of children
  */
 uint32_t lv_obj_get_child_cnt(const struct _lv_obj_t * obj);
 
 /**
  * Get the index of a child.
- * @param obj: pointer to an obejct
+ * @param obj pointer to an obejct
  * @return the child index of the object.
  *          E.g. 0: the oldest (firstly created child)
  */

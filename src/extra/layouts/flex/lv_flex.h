@@ -71,30 +71,30 @@ typedef struct {
 
 /**
  * Initialize a felx layout the default values
- * @param flex: pointer to a flex layout descriptor
+ * @param flex pointer to a flex layout descriptor
  */
 void lv_flex_init(lv_flex_t * flex);
 
 /**
  * Set hot the item should flow
- * @param flex: pointer to a flex layout descriptor
- * @param flow: an element of `lv_flex_flow_t`.
+ * @param flex pointer to a flex layout descriptor
+ * @param flow an element of `lv_flex_flow_t`.
  */
 void lv_flex_set_flow(lv_flex_t * flex, lv_flex_flow_t flow);
 
 /**
  * Set how to place (where to align) the items an tracks
  * @param flex pointer: to a flex layout descriptor
- * @param main_place: where to place the items on main axis (in their track). Any value of `lv_flex_place_t`.
- * @param cross_place: where to place the item in their track on the cross axis. `LV_FLEX_PLACE_START/END/CENTER`
- * @param track_place: where to place the tracks in the cross direction. Any value of `lv_flex_place_t`.
+ * @param main_place where to place the items on main axis (in their track). Any value of `lv_flex_place_t`.
+ * @param cross_place where to place the item in their track on the cross axis. `LV_FLEX_PLACE_START/END/CENTER`
+ * @param track_place where to place the tracks in the cross direction. Any value of `lv_flex_place_t`.
  */
 void lv_flex_set_place(lv_flex_t * flex, lv_flex_place_t main_place, lv_flex_place_t cross_place, lv_flex_place_t track_cross_place);
 
 /**
  * Sets the width or height (on main axis) to grow the object in order fill the free space
- * @param obj: pointer to an object. The parent must have flex layout else nothing will happen.
- * @param grow: a value to set how much free space to take proportionally to other growing items.
+ * @param obj pointer to an object. The parent must have flex layout else nothing will happen.
+ * @param grow a value to set how much free space to take proportionally to other growing items.
  */
 void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow);
 

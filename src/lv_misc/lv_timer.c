@@ -243,7 +243,7 @@ void lv_timer_reset(lv_timer_t * timer)
 
 /**
  * Enable or disable the whole lv_timer handling
- * @param en: true: lv_timer handling is running, false: lv_timer handling is suspended
+ * @param en true: lv_timer handling is running, false: lv_timer handling is suspended
  */
 void lv_timer_enable(bool en)
 {
