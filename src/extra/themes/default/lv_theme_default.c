@@ -38,8 +38,9 @@ static lv_color_t color_secondary_muted;//  lv_color_indigo_lighten_5()
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(2)
 
-#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(16))
+#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(20))
 #define PAD_SMALL   (disp_size == DISP_LARGE ? LV_DPX(14) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(12))
+#define PAD_TINY   (disp_size == DISP_LARGE ? LV_DPX(8) : disp_size == DISP_MEDIUM ? LV_DPX(4) : LV_DPX(2))
 
 /**********************
  *      TYPEDEFS
@@ -60,6 +61,7 @@ typedef struct {
     lv_style_t pressed;
     lv_style_t disabled;
     lv_style_t pad_zero;
+    lv_style_t pad_tiny;
     lv_style_t pad_small;
     lv_style_t pad_normal;
     lv_style_t pad_gap;
@@ -256,15 +258,15 @@ static void style_init(void)
     lv_style_set_outline_opa(&styles->outline_secondary, LV_OPA_50);
 
     style_init_reset(&styles->btn);
-    lv_style_set_radius(&styles->btn, (disp_size == DISP_LARGE ? LV_DPX(16) : LV_DPX(12)));
+    lv_style_set_radius(&styles->btn, (disp_size == DISP_LARGE ? LV_DPX(16) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(8)));
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->btn, COLOR_GREY);
     lv_style_set_shadow_color(&styles->btn, lv_color_grey_lighten_3());
     lv_style_set_shadow_width(&styles->btn, 1);
     lv_style_set_shadow_ofs_y(&styles->btn, LV_DPX(4));
     lv_style_set_text_color(&styles->btn, lv_color_grey_darken_4());
-    lv_style_set_pad_hor(&styles->btn, LV_DPX(40) / disp_size);
-    lv_style_set_pad_ver(&styles->btn, LV_DPX(15) / disp_size);
+    lv_style_set_pad_hor(&styles->btn, PAD_DEF);
+    lv_style_set_pad_ver(&styles->btn, PAD_SMALL);
     lv_style_set_pad_column(&styles->btn, LV_DPX(5));
     lv_style_set_pad_row(&styles->btn, LV_DPX(5));
 
@@ -309,6 +311,11 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->pad_zero, 0);
     lv_style_set_pad_row(&styles->pad_zero, 0);
     lv_style_set_pad_column(&styles->pad_zero, 0);
+
+    style_init_reset(&styles->pad_tiny);
+    lv_style_set_pad_all(&styles->pad_tiny, PAD_TINY);
+    lv_style_set_pad_row(&styles->pad_tiny, PAD_TINY);
+    lv_style_set_pad_column(&styles->pad_tiny, PAD_TINY);
 
     style_init_reset(&styles->bg_color_primary);
     lv_style_set_bg_color(&styles->bg_color_primary, color_primary_accent);
@@ -396,21 +403,21 @@ static void style_init(void)
 
 #if LV_USE_CHART
     style_init_reset(&styles->chart_bg);
-    lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
-    lv_style_set_line_dash_gap(&styles->chart_bg, LV_DPX(10));
     lv_style_set_border_post(&styles->chart_bg, false);
     lv_style_set_pad_column(&styles->chart_bg, LV_DPX(10));
+    lv_style_set_line_color(&styles->chart_bg, COLOR_GREY);
 
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
     lv_style_set_radius(&styles->chart_series, LV_DPX(3));
-    lv_style_set_size(&styles->chart_series, LV_DPX(5));
+    lv_style_set_size(&styles->chart_series, LV_DPX(4));
     lv_style_set_pad_column(&styles->chart_series, LV_DPX(2));
 
     style_init_reset(&styles->chart_ticks);
     lv_style_set_line_width(&styles->chart_ticks, LV_DPX(1));
     lv_style_set_line_color(&styles->chart_ticks, COLOR_SCR_TEXT);
     lv_style_set_pad_all(&styles->chart_ticks, LV_DPX(2));
+    lv_style_set_text_color(&styles->chart_ticks, lv_color_grey());
 #endif
 
 #if LV_USE_METER
@@ -525,7 +532,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_palette_t palette_
     }
 
     if(LV_HOR_RES <= 320) disp_size = DISP_SMALL;
-    else if(LV_HOR_RES <= 800) disp_size = DISP_MEDIUM;
+    else if(LV_HOR_RES < 720) disp_size = DISP_MEDIUM;
     else disp_size = DISP_LARGE;
 
     theme.disp = disp;
@@ -824,7 +831,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_KEYBOARD
     else if(lv_obj_check_type(obj, &lv_keyboard_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->scr);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, disp_size == DISP_LARGE ? &styles->pad_small : &styles->pad_tiny);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->btn);
