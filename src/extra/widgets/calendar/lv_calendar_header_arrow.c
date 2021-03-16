@@ -10,8 +10,8 @@
 #if LV_USE_CALENDAR_HEADER_ARROW
 
 #include "lv_calendar.h"
-#include "../../../lv_widgets/lv_btn.h"
-#include "../../../lv_widgets/lv_label.h"
+#include "../../../widgets/lv_btn.h"
+#include "../../../widgets/lv_label.h"
 #include "../../layouts/flex/lv_flex.h"
 
 /*********************
