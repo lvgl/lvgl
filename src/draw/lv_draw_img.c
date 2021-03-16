@@ -14,9 +14,9 @@
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
 #if LV_USE_GPU_STM32_DMA2D
-    #include "../gpu/gpu_stm32_dma2d.h"
+    #include "../gpu/lv_gpu_stm32_dma2d.h"
 #elif LV_USE_GPU_NXP_PXP
-    #include "../gpu/gpu_nxp_pxp.h"
+    #include "../gpu/lv_gpu_nxp_pxp.h"
 #endif
 
 /*********************

@@ -26,7 +26,7 @@
 #include <string.h>
 
 #if LV_USE_GPU_STM32_DMA2D
-    #include "../gpu/gpu_stm32_dma2d.h"
+    #include "../gpu/lv_gpu_stm32_dma2d.h"
 #endif
 
 /*********************

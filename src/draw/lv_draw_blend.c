@@ -13,11 +13,11 @@
 #include "../core/lv_refr.h"
 
 #if LV_USE_GPU_NXP_PXP
-    #include "../gpu/gpu_nxp_pxp.h"
+    #include "../gpu/lv_gpu_nxp_pxp.h"
 #elif LV_USE_GPU_NXP_VG_LITE
-    #include "../gpu/gpu_nxp_vglite.h"
+    #include "../gpu/lv_gpu_nxp_vglite.h"
 #elif LV_USE_GPU_STM32_DMA2D
-    #include "../gpu/gpu_stm32_dma2d.h"
+    #include "../gpu/lv_gpu_stm32_dma2d.h"
 #endif
 
 /*********************
