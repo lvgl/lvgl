@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_core/lv_obj.h"
+#include "../../../core/lv_obj.h"
 #if LV_USE_CALENDAR_HEADER_ARROW
 
 /*********************

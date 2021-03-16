@@ -10,7 +10,7 @@
 #if LV_USE_CALENDAR_HEADER_DROPDOWN
 
 #include "lv_calendar.h"
-#include "../../../lv_widgets/lv_dropdown.h"
+#include "../../../widgets/lv_dropdown.h"
 #include "../../layouts/flex/lv_flex.h"
 
 /*********************

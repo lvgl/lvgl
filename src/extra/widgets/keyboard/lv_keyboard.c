@@ -10,7 +10,7 @@
 #include "lv_keyboard.h"
 #if LV_USE_KEYBOARD
 
-#include "../../../lv_widgets/lv_textarea.h"
+#include "../../../widgets/lv_textarea.h"
 
 /*********************
  *      DEFINES

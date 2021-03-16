@@ -11,7 +11,7 @@
 #if LV_USE_THEME_DEFAULT
 
 #include "lv_theme_default.h"
-#include "../../../lv_misc/lv_gc.h"
+#include "../../../misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
