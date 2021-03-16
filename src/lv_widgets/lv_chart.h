@@ -25,7 +25,7 @@ extern "C" {
  *********************/
 
 /**Default value of points. Can be used to not draw a point*/
-#define LV_CHART_POINT_NONE (LV_COORD_MAX)
+#define LV_CHART_POINT_NONE (INT16_MAX)
 LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 
 /**********************
