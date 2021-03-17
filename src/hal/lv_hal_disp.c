@@ -182,6 +182,8 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
     disp->inv_p = 0;
     if(disp->act_scr != NULL) lv_obj_invalidate(disp->act_scr);
+
+    if(disp->driver.drv_update_cb) disp->driver.drv_update_cb(&disp->driver);
 }
 
 /**

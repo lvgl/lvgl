@@ -126,6 +126,9 @@ typedef struct _lv_disp_drv_t {
     /** OPTIONAL: called to wait while the gpu is working */
     void (*gpu_wait_cb)(struct _lv_disp_drv_t * disp_drv);
 
+    /** OPTIONAL: called when driver parameters are updated */
+    void (*drv_update_cb)(struct _lv_disp_drv_t * disp_drv);
+
     /** OPTIONAL: Fill a memory with a color (GPU only)*/
     void (*gpu_fill_cb)(struct _lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                         const lv_area_t * fill_area, lv_color_t color);
