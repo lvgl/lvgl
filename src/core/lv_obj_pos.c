@@ -674,6 +674,9 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
  */
 static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent == NULL) return false;
+
     /* If the size is managed by the layout don't let to overwrite it.*/
     if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
     if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
@@ -690,8 +693,6 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     /*Save the original coordinates*/
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
 
     /*Check if the object inside the parent or not*/
     lv_area_t parent_fit_area;
