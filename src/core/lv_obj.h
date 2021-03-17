@@ -405,14 +405,25 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
 /**
- * Add a an event handler function for an object.
+ * Add an event handler function for an object.
  * Used by the user to react on event which happens with the object.
- * An object can have multiple event handler. They will be called in the same the order as they were  added.
+ * An object can have multiple event handler. They will be called in the same order as they were added.
  * @param obj       pointer to an object
  * @param event_cb  the new event function
  * @param user_data custom data data will be available in `event_cb`
  */
 void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
+
+/**
+ * Remove an event handler function for an object.
+ * Used by the user to react on event which happens with the object.
+ * An object can have multiple event handler. They will be called in the same order as they were added.
+ * @param obj       pointer to an object
+ * @param event_cb  the event function to remove
+ * @param user_data if NULL, remove the first event handler with the same cb, otherwise remove the first event handler with the same cb and user_data
+ * @return true if any event handlers were removed
+ */
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
 
 /**
  * Set the base direction of the object
