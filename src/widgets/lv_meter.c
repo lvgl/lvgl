@@ -385,8 +385,8 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 
     lv_meter_scale_t * scale;
 
-    lv_obj_draw_hook_dsc_t hook_dsc;
-    lv_obj_draw_hook_dsc_init(&hook_dsc, clip_area);
+    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_dsc_init(&dsc, clip_area);
 
 #if LV_DRAW_COMPLEX
     lv_draw_mask_radius_param_t inner_minor_mask;
@@ -525,13 +525,13 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 lv_draw_label_dsc_t label_dsc_tmp;
                 lv_memcpy(&label_dsc_tmp, &label_dsc, sizeof(label_dsc_tmp));
 
-                hook_dsc.id = value_of_line;
-                hook_dsc.label_dsc = &label_dsc_tmp;
-                lv_snprintf(hook_dsc.text, sizeof(hook_dsc.text), "%d", value_of_line);
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &hook_dsc);
+                dsc.id = value_of_line;
+                dsc.label_dsc = &label_dsc_tmp;
+                lv_snprintf(dsc.text, sizeof(dsc.text), "%d", value_of_line);
+                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
 
                 lv_point_t label_size;
-                lv_txt_get_size(&label_size, hook_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                lv_txt_get_size(&label_size, dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                         LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
                 lv_area_t label_cord;
@@ -540,7 +540,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 label_cord.x2 = label_cord.x1 + label_size.x;
                 label_cord.y2 = label_cord.y1 + label_size.y;
 
-                lv_draw_label(&label_cord, clip_area, &label_dsc, hook_dsc.text, NULL);
+                lv_draw_label(&label_cord, clip_area, &label_dsc, dsc.text, NULL);
 
 #if LV_DRAW_COMPLEX
                 outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);

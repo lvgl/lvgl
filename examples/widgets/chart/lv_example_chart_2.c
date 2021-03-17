@@ -9,13 +9,13 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
 {
     /*Add the faded area before the lines are drawn */
     if(e == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_hook_dsc_t * hook_dsc = lv_event_get_param();
-        if(hook_dsc->part != LV_PART_ITEMS) return;
-        if(!hook_dsc->p1 || !hook_dsc->p2) return;
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+        if(dsc->part != LV_PART_ITEMS) return;
+        if(!dsc->p1 || !dsc->p2) return;
 
         /*Add  a line mask that keeps the area below the line*/
         lv_draw_mask_line_param_t line_mask_param;
-        lv_draw_mask_line_points_init(&line_mask_param, hook_dsc->p1->x, hook_dsc->p1->y, hook_dsc->p2->x, hook_dsc->p2->y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
+        lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
         int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
 
         /*Add a fade effect: transparent bottom covering top*/
@@ -28,14 +28,14 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
         lv_draw_rect_dsc_t draw_rect_dsc;
         lv_draw_rect_dsc_init(&draw_rect_dsc);
         draw_rect_dsc.bg_opa = LV_OPA_20;
-        draw_rect_dsc.bg_color = hook_dsc->line_dsc->color;
+        draw_rect_dsc.bg_color = dsc->line_dsc->color;
 
         lv_area_t a;
-        a.x1 = hook_dsc->p1->x;
-        a.x2 = hook_dsc->p2->x - 1;
-        a.y1 = LV_MIN(hook_dsc->p1->y, hook_dsc->p2->y);
+        a.x1 = dsc->p1->x;
+        a.x2 = dsc->p2->x - 1;
+        a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
         a.y2 = obj->coords.y2;
-        lv_draw_rect(&a, hook_dsc->clip_area, &draw_rect_dsc);
+        lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
 
         /*Remove the masks*/
         lv_draw_mask_remove_id(line_mask_id);

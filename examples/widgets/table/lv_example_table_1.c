@@ -4,27 +4,27 @@
 static void event_cb(lv_obj_t * obj, lv_event_t e)
 {
     if(e == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_hook_dsc_t * hook_dsc = lv_event_get_param();
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
         /*If the cells are drawn...*/
-        if(hook_dsc->part == LV_PART_ITEMS) {
-            uint32_t row = hook_dsc->id /  lv_table_get_col_cnt(obj);
-            uint32_t col = hook_dsc->id - row * lv_table_get_col_cnt(obj);
+        if(dsc->part == LV_PART_ITEMS) {
+            uint32_t row = dsc->id /  lv_table_get_col_cnt(obj);
+            uint32_t col = dsc->id - row * lv_table_get_col_cnt(obj);
 
             /*Make the texts in the first cell center aligned*/
             if(row == 0) {
-                hook_dsc->label_dsc->align = LV_TEXT_ALIGN_CENTER;
-                hook_dsc->rect_dsc->bg_color = lv_color_mix(lv_color_blue(), hook_dsc->rect_dsc->bg_color, LV_OPA_20);
-                hook_dsc->rect_dsc->bg_opa = LV_OPA_COVER;
+                dsc->label_dsc->align = LV_TEXT_ALIGN_CENTER;
+                dsc->rect_dsc->bg_color = lv_color_mix(lv_color_blue(), dsc->rect_dsc->bg_color, LV_OPA_20);
+                dsc->rect_dsc->bg_opa = LV_OPA_COVER;
             }
             /*In the first column align the texts to the right*/
             else if(col == 0) {
-                hook_dsc->label_dsc->flag = LV_TEXT_ALIGN_RIGHT;
+                dsc->label_dsc->flag = LV_TEXT_ALIGN_RIGHT;
             }
 
             /*MAke every 2nd row grayish*/
             if((row != 0 && row % 2) == 0) {
-                hook_dsc->rect_dsc->bg_color = lv_color_mix(lv_color_grey(), hook_dsc->rect_dsc->bg_color, LV_OPA_10);
-                hook_dsc->rect_dsc->bg_opa = LV_OPA_COVER;
+                dsc->rect_dsc->bg_color = lv_color_mix(lv_color_grey(), dsc->rect_dsc->bg_color, LV_OPA_10);
+                dsc->rect_dsc->bg_opa = LV_OPA_COVER;
             }
         }
     }
