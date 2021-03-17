@@ -6,12 +6,17 @@
 #include <lv_examples.h> */
 
 TFT_eSPI tft = TFT_eSPI(); /* TFT instance */
-static lv_disp_buf_t disp_buf;
-static lv_color_t buf[LV_HOR_RES_MAX * 10];
 
 /* Change to your screen resolution */
 static uint32_t screenWidth = 320;
 static uint32_t screenHeight = 240;
+
+<<<<<<< HEAD
+static lv_disp_buf_t disp_buf;
+=======
+static lv_draw_buf_t draw_buf;
+>>>>>>> xiaoxiang781216-disp
+static lv_color_t buf[screenWidth * 10];
 
 #if LV_USE_LOG != 0
 /* Serial debugging */
@@ -81,16 +86,16 @@ void setup()
     uint16_t calData[5] = {275, 3620, 264, 3532, 1};
     tft.setTouch(calData);
 
-    lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
+    lv_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
 
     /* Initialize the display */
     lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
     /* Change the following line to your display resolution */
-    disp_drv.hor_res = 320;
-    disp_drv.ver_res = 240;
+    disp_drv.hor_res = screenWidth;
+    disp_drv.ver_res = screenHeight;
     disp_drv.flush_cb = my_disp_flush;
-    disp_drv.buffer = &disp_buf;
+    disp_drv.draw_buf = &draw_buf;
     lv_disp_drv_register(&disp_drv);
 
     /* Initialize the (dummy) input device driver */
@@ -102,7 +107,7 @@ void setup()
 
     /* Try an example from the lv_examples Arduino library
        make sure to include it as written above.
-    lv_ex_btn_1(); */
+    lv_example_btn_1(); */
 }
 
 void loop()
