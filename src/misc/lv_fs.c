@@ -368,25 +368,14 @@ const char * lv_fs_get_last(const char * path)
  **********************/
 
 /**
- * Leave the driver letters and / or \ letters from beginning of the path
+ * Skip the driver letter and the possible : after the letter
  * @param path path string (E.g. S:/folder/file.txt)
- * @return pointer to the beginning of the real path (E.g. folder/file.txt)
+ * @return pointer to the beginning of the real path (E.g. /folder/file.txt)
  */
 static const char * lv_fs_get_real_path(const char * path)
 {
-    /* Example path: "S:/folder/file.txt"
-     * Leave the letter and the : / \ characters*/
-
     path++; /*Ignore the driver letter*/
-
-    while(*path != '\0') {
-        if(*path == ':' || *path == '\\' || *path == '/') {
-            path++;
-        }
-        else {
-            break;
-        }
-    }
+    if(*path == ':') path++;
 
     return path;
 }
