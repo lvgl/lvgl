@@ -555,7 +555,7 @@ static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     if(copy == NULL) {
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-        lv_obj_set_width(obj, LV_DPX(150));
+        lv_obj_set_size(obj, LV_DPX(150), LV_SIZE_CONTENT);
         lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
     }
     /*Copy an existing drop down list*/
@@ -839,11 +839,10 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
     else if(sign == LV_SIGNAL_COORD_CHG) {
         if(dropdown->list) lv_dropdown_close(obj);
     }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
+        lv_point_t * p = param;
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_obj_set_height(obj, top + bottom + lv_font_get_line_height(font));
+        p->y = lv_font_get_line_height(font);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);

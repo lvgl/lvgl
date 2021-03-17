@@ -178,7 +178,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     lv_obj_invalidate(obj);
 
     if(prop == LV_STYLE_PROP_ALL ||
-      ((prop & LV_STYLE_PROP_INHERIT) && (prop & LV_STYLE_PROP_EXT_DRAW) && (prop & LV_STYLE_PROP_LAYOUT_REFR)))
+      ((prop & LV_STYLE_PROP_INHERIT) && ((prop & LV_STYLE_PROP_EXT_DRAW) || (prop & LV_STYLE_PROP_LAYOUT_REFR))))
     {
         if(part != LV_PART_SCROLLBAR) {
             refresh_children_style(obj);
