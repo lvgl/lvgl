@@ -106,7 +106,7 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
  */
 void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
 {
-    memcpy(&indev->driver, new_drv, sizeof(lv_indev_drv_t));
+    indev->driver = new_drv;
 }
 
 /**
