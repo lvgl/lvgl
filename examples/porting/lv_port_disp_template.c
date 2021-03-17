@@ -75,21 +75,21 @@ void lv_port_disp_init(void)
      * */
 
     /* Example for 1) */
-    static lv_disp_buf_t draw_buf_dsc_1;
-    static lv_color_t draw_buf_1[MY_DISP_HOR_RES * 10];                          /*A buffer for 10 rows*/
-    lv_disp_buf_init(&draw_buf_dsc_1, draw_buf_1, NULL, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
+    static lv_draw_buf_t draw_buf_dsc_1;
+    static lv_color_t buf_1[MY_DISP_HOR_RES * 10];                          /*A buffer for 10 rows*/
+    lv_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
 
     /* Example for 2) */
-    static lv_disp_buf_t draw_buf_dsc_2;
-    static lv_color_t draw_buf_2_1[MY_DISP_HOR_RES * 10];                        /*A buffer for 10 rows*/
-    static lv_color_t draw_buf_2_1[MY_DISP_HOR_RES * 10];                        /*An other buffer for 10 rows*/
-    lv_disp_buf_init(&draw_buf_dsc_2, draw_buf_2_1, draw_buf_2_1, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
+    static lv_draw_buf_t draw_buf_dsc_2;
+    static lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];                        /*A buffer for 10 rows*/
+    static lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];                        /*An other buffer for 10 rows*/
+    lv_draw_buf_init(&draw_buf_dsc_2, buf_2_1, buf_2_1, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
 
     /* Example for 3) */
-    static lv_disp_buf_t draw_buf_dsc_3;
-    static lv_color_t draw_buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];            /*A screen sized buffer*/
-    static lv_color_t draw_buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];            /*An other screen sized buffer*/
-    lv_disp_buf_init(&draw_buf_dsc_3, draw_buf_3_1, draw_buf_3_2, MY_DISP_VER_RES * LV_VER_RES_MAX);   /*Initialize the display buffer*/
+    static lv_draw_buf_t draw_buf_dsc_3;
+    static lv_color_t buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];            /*A screen sized buffer*/
+    static lv_color_t buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];            /*An other screen sized buffer*/
+    lv_draw_buf_init(&draw_buf_dsc_3, buf_3_1, buf_3_2, MY_DISP_VER_RES * LV_VER_RES_MAX);   /*Initialize the display buffer*/
 
     /*-----------------------------------
      * Register the display in LVGL
@@ -108,7 +108,7 @@ void lv_port_disp_init(void)
     disp_drv.flush_cb = disp_flush;
 
     /*Set a display buffer*/
-    disp_drv.buffer = &draw_buf_dsc_1;
+    disp_drv.draw_buf = &draw_buf_dsc_1;
 
 #if LV_USE_GPU
     /*Fill a memory array with a color*/

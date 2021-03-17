@@ -191,7 +191,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
 
 /**
  * Initialize a display buffer
- * @param disp_buf pointer `lv_disp_buf_t` variable to initialize
+ * @param draw_buf pointer `lv_draw_buf_t` variable to initialize
  * @param buf1 A buffer to be used by LVGL to draw the image.
  *             Always has to specified and can't be NULL.
  *             Can be an array allocated by the user. E.g. `static lv_color_t disp_buf1[1024 * 10]`
@@ -204,7 +204,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
  * sent. Set to `NULL` if unused.
  * @param size_in_px_cnt size of the `buf1` and `buf2` in pixel count.
  */
-void lv_disp_draw_buf_init(lv_disp_draw_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt);
+void lv_disp_draw_buf_init(lv_disp_draw_buf_t * draw_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt);
 
 /**
  * Register an initialized display driver.
