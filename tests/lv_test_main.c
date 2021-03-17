@@ -91,14 +91,14 @@ static lv_fs_res_t tell_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * 
 
 static void hal_init(void)
 {
-    static lv_disp_draw_buf_t disp_buf;
+    static lv_disp_draw_buf_t draw_buf;
     lv_color_t * disp_buf1 = (lv_color_t *)malloc(LV_HOR_RES * LV_VER_RES * sizeof(lv_color_t));
 
-    lv_disp_draw_buf_init(&disp_buf, disp_buf1, NULL, LV_HOR_RES * LV_VER_RES);
+    lv_disp_draw_buf_init(&draw_buf, disp_buf1, NULL, LV_HOR_RES * LV_VER_RES);
 
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
-    disp_drv.draw_buf = &disp_buf;
+    disp_drv.draw_buf = &draw_buf;
     disp_drv.flush_cb = dummy_flush_cb;
     disp_drv.hor_res = HOR_RES;
     disp_drv.ver_res = VER_RES;

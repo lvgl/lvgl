@@ -149,7 +149,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 #if LV_DRAW_COMPLEX
     /*If there other mask apply it*/
     else {
-        lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
+        lv_disp_t * disp = _lv_refr_get_disp_refreshing();
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
         const lv_area_t * disp_area = &draw_buf->area;
         /* Get clipped fill area which is the real draw area.
@@ -250,7 +250,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 #if LV_DRAW_COMPLEX
     /*If there other mask apply it*/
     else {
-        lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
+        lv_disp_t * disp = _lv_refr_get_disp_refreshing();
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
         const lv_area_t * disp_area = &draw_buf->area;
         /* Get clipped fill area which is the real draw area.
@@ -407,7 +407,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
         mask_bottom_id = lv_draw_mask_add(&mask_bottom_param, NULL);
     }
 
-    lv_disp_t * disp    = _lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
     const lv_area_t * disp_area = &draw_buf->area;
