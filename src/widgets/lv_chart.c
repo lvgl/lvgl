@@ -645,6 +645,10 @@ static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
                      chart->tick[LV_CHART_AXIS_PRIMARY_Y].draw_size, chart->tick[LV_CHART_AXIS_SECONDARY_Y].draw_size);
+    } else if(e == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param();
+        p->x = (lv_obj_get_width_fit(obj) * chart->zoom_x) >> 8;
+        p->y = (lv_obj_get_height_fit(obj) * chart->zoom_y) >> 8;
     } else if(e == LV_EVENT_DRAW_MAIN) {
         const lv_area_t * clip_area = lv_event_get_param();
         draw_div_lines(obj, clip_area);
