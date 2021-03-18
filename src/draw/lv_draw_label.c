@@ -671,7 +671,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
 
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
+    lv_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
 
     int32_t disp_buf_width = lv_area_get_width(&draw_buf->area);
     lv_color_t * disp_buf_buf_tmp = draw_buf->buf_act;
