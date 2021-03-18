@@ -105,7 +105,7 @@ const lv_obj_class_t lv_obj_class = {
 
 void lv_init(void)
 {
-    /* Do nothing if already initialized */
+    /*Do nothing if already initialized*/
     if(lv_initialized) {
         LV_LOG_WARN("lv_init: already inited");
         return;
@@ -200,9 +200,9 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     EVENT_TRACE("Sending event %d to 0x%p with 0x%p param", event, obj, param);
 
-    /* Build a simple linked list from the objects used in the events
-     * It's important to know if an this object was deleted by a nested event
-     * called from this `event_cb`. */
+    /*Build a simple linked list from the objects used in the events
+     *It's important to know if an this object was deleted by a nested event
+     *called from this `event_cb`.*/
     lv_event_temp_data_t event_temp_data;
     event_temp_data.obj     = obj;
     event_temp_data.deleted = false;
@@ -213,8 +213,8 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
     }
     event_temp_data_head = &event_temp_data;
 
-    /* There could be nested event sending with different param.
-     * It needs to be saved for the current event context because `lv_event_get_data` returns a global param. */
+    /*There could be nested event sending with different param.
+     *It needs to be saved for the current event context because `lv_event_get_data` returns a global param.*/
     void * event_act_param_save = event_act_param;
     event_act_param = param;
 
@@ -458,8 +458,8 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
     obj->spec_attr->base_dir = dir;
     lv_event_send(obj, LV_EVENT_BASE_DIR_CHANGED, NULL);
 
-    /* Notify the children about the parent base dir has changed.
-     * (The children might have `LV_BIDI_DIR_INHERIT`)*/
+    /*Notify the children about the parent base dir has changed.
+     *(The children might have `LV_BIDI_DIR_INHERIT`)*/
     base_dir_refr_children(obj);
 }
 
@@ -700,7 +700,7 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         }
         /*Add to the same group*/
         if(copy->spec_attr && copy->spec_attr->group_p) {
-            obj->spec_attr->group_p = NULL; /*It was simply copied */
+            obj->spec_attr->group_p = NULL; /*It was simply copied*/
             lv_group_add_obj(copy->spec_attr->group_p, obj);
         }
 
@@ -1036,8 +1036,8 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
         }
     }
     else if(e == LV_EVENT_BASE_DIR_CHANGED) {
-        /* The layout might depend on the base dir.
-         * E.g. the first is element is on the left or right*/
+        /*The layout might depend on the base dir.
+         *E.g. the first is element is on the left or right*/
         lv_obj_mark_layout_as_dirty(obj);
     }
     else if(e == LV_EVENT_SCROLL_END) {
@@ -1051,7 +1051,7 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
         *s = LV_MAX(*s, d);
     }
     else if(e == LV_EVENT_STYLE_CHANGED) {
-        /* Padding might have changed so the layout should be recalculated*/
+        /*Padding might have changed so the layout should be recalculated*/
         lv_obj_mark_layout_as_dirty(obj);
 
         /*Reposition non grid objects on by one*/

@@ -195,7 +195,7 @@ void lv_disp_remove(lv_disp_t * disp)
     bool was_default = false;
     if(disp == lv_disp_get_default()) was_default = true;
 
-    /*Detach the input devices */
+    /*Detach the input devices*/
     lv_indev_t * indev;
     indev = lv_indev_get_next(NULL);
     while(indev) {

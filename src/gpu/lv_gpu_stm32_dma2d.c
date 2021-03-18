@@ -62,7 +62,7 @@ static void wait_finish(void);
  */
 void lv_gpu_stm32_dma2d_init(void)
 {
-    /* Enable DMA2D clock */
+    /*Enable DMA2D clock*/
 #if defined(STM32F4) || defined(STM32F7)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
@@ -71,13 +71,13 @@ void lv_gpu_stm32_dma2d_init(void)
 # warning "LVGL can't enable the clock of DMA2D"
 #endif
 
-    /* Wait for hardware access to complete */
+    /*Wait for hardware access to complete*/
     __asm volatile("DSB\n");
 
-    /* Delay after setting peripheral clock */
+    /*Delay after setting peripheral clock*/
     volatile uint32_t temp = RCC->AHB1ENR;
 
-    /* set output colour mode */
+    /*set output colour mode*/
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
 }
 
@@ -96,12 +96,12 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
 
     DMA2D->CR = 0x30000;
     DMA2D->OMAR = (uint32_t)buf;
-    /* as input color mode is same as output we don't need to convert here do we? */
+    /*as input color mode is same as output we don't need to convert here do we?*/
     DMA2D->OCOLR = color.full;
     DMA2D->OOR = buf_w - fill_w;
     DMA2D->NLR = (fill_w << DMA2D_NLR_PL_Pos) | (fill_h << DMA2D_NLR_NL_Pos);
 
-    /* start transfer */
+    /*start transfer*/
     DMA2D->CR |= DMA2D_CR_START_Msk;
 
     wait_finish();
@@ -124,12 +124,12 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
 #if 0
     invalidate_cache();
 
-    /* Configure the DMA2D Mode, Color Mode and line output offset */
+    /*Configure the DMA2D Mode, Color Mode and line output offset*/
     hdma2d.Init.Mode         = DMA2D_M2M_BLEND;
     hdma2d.Init.ColorMode    = DMA2D_OUTPUT_FORMAT;
     hdma2d.Init.OutputOffset = buf_w - fill_w;
 
-    /* Configure the foreground -> The character */
+    /*Configure the foreground -> The character*/
     lv_color32_t c32;
     c32.full = lv_color_to32(color);
     c32.ch.alpha = opa;
@@ -138,13 +138,13 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
     hdma2d.LayerCfg[1].InputColorMode  = DMA2D_INPUT_A8;
     hdma2d.LayerCfg[1].InputOffset     = 0;
 
-    /* Configure the background -> Display buffer */
+    /*Configure the background -> Display buffer*/
     hdma2d.LayerCfg[0].AlphaMode       = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[0].InputAlpha      = 0x00;
     hdma2d.LayerCfg[0].InputColorMode  = DMA2D_INPUT_FORMAT;
     hdma2d.LayerCfg[0].InputOffset     = buf_w - fill_w;
 
-    /* DMA2D Initialization */
+    /*DMA2D Initialization*/
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 0);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
@@ -169,7 +169,7 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
     invalidate_cache();
 
     DMA2D->CR = 0;
-    /* copy output colour mode, this register controls both input and output colour format */
+    /*copy output colour mode, this register controls both input and output colour format*/
     DMA2D->FGPFCCR = LV_DMA2D_COLOR_FORMAT;
     DMA2D->FGMAR = (uint32_t)map;
     DMA2D->FGOR = map_w - copy_w;
@@ -177,7 +177,7 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
     DMA2D->OOR = buf_w - copy_w;
     DMA2D->NLR = (copy_w << DMA2D_NLR_PL_Pos) | (copy_h << DMA2D_NLR_NL_Pos);
 
-    /* start transfer */
+    /*start transfer*/
     DMA2D->CR |= DMA2D_CR_START_Msk;
     wait_finish();
 }
@@ -204,9 +204,9 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
     DMA2D->BGOR = buf_w - copy_w;
 
     DMA2D->FGPFCCR = (uint32_t)LV_DMA2D_COLOR_FORMAT
-                     /* alpha mode 2, replace with foreground * alpha value */
+                     /*alpha mode 2, replace with foreground * alpha value*/
                      | (2 << DMA2D_FGPFCCR_AM_Pos)
-                     /* alpha value */
+                     /*alpha value*/
                      | (opa << DMA2D_FGPFCCR_ALPHA_Pos);
     DMA2D->FGMAR = (uint32_t)map;
     DMA2D->FGOR = map_w - copy_w;
@@ -215,7 +215,7 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
     DMA2D->OOR = buf_w - copy_w;
     DMA2D->NLR = (copy_w << DMA2D_NLR_PL_Pos) | (copy_h << DMA2D_NLR_NL_Pos);
 
-    /* start transfer */
+    /*start transfer*/
     DMA2D->CR |= DMA2D_CR_START_Msk;
     wait_finish();
 }

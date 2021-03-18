@@ -97,7 +97,7 @@ void _lv_disp_refr_timer(lv_timer_t * timer);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_REFR_H*/

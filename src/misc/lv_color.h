@@ -70,14 +70,15 @@ enum {
 #error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
 #endif
 
-/* Adjust color mix functions rounding.
+/**
+ * Adjust color mix functions rounding.
  * GPUs might calculate color mix (blending) differently.
  * Should be in range of 0..254
  * 0: no adjustment, get the integer part of the result (round down)
  * 64: round up from x.75
  * 128: round up from half
  * 192: round up from x.25
- * 254: round up */
+ * 254: round up*/
 #ifndef LV_COLOR_MIX_ROUND_OFS
 #if LV_COLOR_DEPTH == 32
 #define LV_COLOR_MIX_ROUND_OFS 0
@@ -93,7 +94,7 @@ enum {
 * so we use _MSC_VER macro instead of __cplusplus
 */
 #ifdef _MSC_VER
-#if _MSC_VER >= 1900 /* Visual Studio 2015 */
+#if _MSC_VER >= 1900 /*Visual Studio 2015*/
 #define _LV_COLOR_HAS_MODERN_CPP 1
 #endif
 #else
@@ -101,14 +102,14 @@ enum {
 #define _LV_COLOR_HAS_MODERN_CPP 1
 #endif
 #endif
-#endif /* __cplusplus */
+#endif /*__cplusplus*/
 
 #ifndef _LV_COLOR_HAS_MODERN_CPP
 #define _LV_COLOR_HAS_MODERN_CPP 0
 #endif
 
 #if _LV_COLOR_HAS_MODERN_CPP
-/* Fix msvc compiler error C4576 inside C++ code */
+/*Fix msvc compiler error C4576 inside C++ code*/
 #define _LV_COLOR_MAKE_TYPE_HELPER lv_color_t
 #else
 #define _LV_COLOR_MAKE_TYPE_HELPER (lv_color_t)
@@ -207,7 +208,7 @@ enum {
  **********************/
 
 typedef union {
-    uint8_t full; /*must be declared first to set all bits of byte via initializer list */
+    uint8_t full; /*must be declared first to set all bits of byte via initializer list*/
     union {
         uint8_t blue : 1;
         uint8_t green : 1;
@@ -353,15 +354,15 @@ static inline uint8_t lv_color_to8(lv_color_t color)
     return color.full;
 #elif LV_COLOR_DEPTH == 16
     lv_color8_t ret;
-    LV_COLOR_SET_R8(ret, LV_COLOR_GET_R(color) >> 2); /* 5 - 3  = 2*/
-    LV_COLOR_SET_G8(ret, LV_COLOR_GET_G(color) >> 3); /* 6 - 3  = 3*/
-    LV_COLOR_SET_B8(ret, LV_COLOR_GET_B(color) >> 3); /* 5 - 2  = 3*/
+    LV_COLOR_SET_R8(ret, LV_COLOR_GET_R(color) >> 2); /*5 - 3  = 2*/
+    LV_COLOR_SET_G8(ret, LV_COLOR_GET_G(color) >> 3); /*6 - 3  = 3*/
+    LV_COLOR_SET_B8(ret, LV_COLOR_GET_B(color) >> 3); /*5 - 2  = 3*/
     return ret.full;
 #elif LV_COLOR_DEPTH == 32
     lv_color8_t ret;
-    LV_COLOR_SET_R8(ret, LV_COLOR_GET_R(color) >> 5); /* 8 - 3  = 5*/
-    LV_COLOR_SET_G8(ret, LV_COLOR_GET_G(color) >> 5); /* 8 - 3  = 5*/
-    LV_COLOR_SET_B8(ret, LV_COLOR_GET_B(color) >> 6); /* 8 - 2  = 6*/
+    LV_COLOR_SET_R8(ret, LV_COLOR_GET_R(color) >> 5); /*8 - 3  = 5*/
+    LV_COLOR_SET_G8(ret, LV_COLOR_GET_G(color) >> 5); /*8 - 3  = 5*/
+    LV_COLOR_SET_B8(ret, LV_COLOR_GET_B(color) >> 6); /*8 - 2  = 6*/
     return ret.full;
 #endif
 }
@@ -383,9 +384,9 @@ static inline uint16_t lv_color_to16(lv_color_t color)
     return color.full;
 #elif LV_COLOR_DEPTH == 32
     lv_color16_t ret;
-    LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) >> 3); /* 8 - 5  = 3*/
-    LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) >> 2); /* 8 - 6  = 2*/
-    LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) >> 3); /* 8 - 5  = 3*/
+    LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) >> 3); /*8 - 5  = 3*/
+    LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) >> 2); /*8 - 6  = 2*/
+    LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) >> 3); /*8 - 5  = 3*/
     return ret.full;
 #endif
 }
@@ -534,7 +535,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
                                                                  lv_color_t fg_color, lv_opa_t fg_opa,
                                                                  lv_color_t * res_color, lv_opa_t * res_opa)
 {
-    /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
+    /*Pick the foreground if it's fully opaque or the Background is fully transparent*/
     if(fg_opa >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
         res_color->full = fg_color.full;
         *res_opa = fg_opa;
@@ -677,7 +678,7 @@ lv_color_t lv_color_get_palette_darken_4(lv_color_palette_t palette);
 /**********************
  *  PREDEFINED COLORS
  **********************/
-/* Source: https://vuetifyjs.com/en/styles/colors/#material-colors */
+/*Source: https://vuetifyjs.com/en/styles/colors/#material-colors*/
 
 static inline lv_color_t lv_color_red(void)             { return lv_color_hex(0xF44336); }
 static inline lv_color_t lv_color_red_lighten_5(void)   { return lv_color_hex(0xFFEBEE); }
@@ -896,7 +897,7 @@ static inline lv_color_t lv_color_black(void)            { return lv_color_hex(0
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_COLOR_H*/

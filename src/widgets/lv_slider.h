@@ -44,7 +44,7 @@ typedef struct {
     lv_bar_t bar;       /*Add the ancestor's type first*/
     lv_area_t left_knob_area;
     lv_area_t right_knob_area;
-    int16_t * value_to_set; /* Which bar value to set */
+    int16_t * value_to_set; /*Which bar value to set*/
     uint8_t dragging : 1;       /*1: the slider is being dragged*/
     uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
 }lv_slider_t;
@@ -182,7 +182,7 @@ static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 #endif /*LV_USE_SLIDER*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_SLIDER_H*/

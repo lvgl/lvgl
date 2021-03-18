@@ -90,10 +90,9 @@ static void lv_switch_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
-
 
     if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
@@ -101,7 +100,7 @@ static void lv_switch_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
-        /* The smaller size is the knob diameter*/
+        /*The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj), lv_obj_get_height(obj)) >> 1;
         knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/

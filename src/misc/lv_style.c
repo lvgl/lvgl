@@ -105,7 +105,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
             }
 
             uint32_t j;
-            for(i = j = 0; j <= style->prop_cnt; j++) { /* <=: because prop_cnt already reduced but all the old props. needs to be checked. */
+            for(i = j = 0; j <= style->prop_cnt; j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
                 if(old_props[j] != prop) {
                     new_values[i] = old_values[j];
                     new_props[i++] = old_props[j];

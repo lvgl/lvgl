@@ -258,7 +258,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
 
     switch(anim_type) {
         case LV_SCR_LOAD_ANIM_NONE:
-            /* Create a dummy animation to apply the delay*/
+            /*Create a dummy animation to apply the delay*/
             lv_anim_set_exec_cb(&a_new, set_x_anim);
             lv_anim_set_values(&a_new, 0, 0);
             break;

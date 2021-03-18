@@ -32,7 +32,7 @@
 /** Bar animation end value.  (Not the real value of the Bar just indicates process animation)*/
 #define LV_BAR_ANIM_STATE_END   256
 
-/** Mark no animation is in progress */
+/** Mark no animation is in progress*/
 #define LV_BAR_ANIM_STATE_INV   -1
 
 /** log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
@@ -337,7 +337,7 @@ static void draw_indic(lv_obj_t * obj)
 
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
     if(hor && base_dir == LV_BIDI_DIR_RTL) {
-        /* Swap axes */
+        /*Swap axes*/
         lv_coord_t * tmp;
         tmp = axis1;
         axis1 = axis2;
@@ -346,7 +346,7 @@ static void draw_indic(lv_obj_t * obj)
         anim_start_value_x = -anim_start_value_x;
     }
 
-    /* Set the indicator length */
+    /*Set the indicator length*/
     if(hor) {
         *axis2 = *axis1 + anim_cur_value_x;
         *axis1 += anim_start_value_x;
@@ -376,7 +376,7 @@ static void draw_indic(lv_obj_t * obj)
                 *axis1 = zero;
             }
             if(*axis2 < *axis1) {
-                /* swap */
+                /*swap*/
                 zero = *axis1;
                 *axis1 = *axis2;
                 *axis2 = zero;
@@ -398,9 +398,9 @@ static void draw_indic(lv_obj_t * obj)
     lv_area_t indic_area;
     lv_area_copy(&indic_area, &bar->indic_area);
 
-    /* Draw only the shadow if the indicator is long enough.
-     * The radius of the bg and the indicator can make a strange shape where
-     * it'd be very difficult to draw shadow. */
+    /*Draw only the shadow if the indicator is long enough.
+     *The radius of the bg and the indicator can make a strange shape where
+     *it'd be very difficult to draw shadow.*/
     if((hor && lv_area_get_width(&bar->indic_area) > bg_radius * 2) ||
        (!hor && lv_area_get_height(&bar->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
@@ -489,7 +489,7 @@ static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 
@@ -556,7 +556,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_
             anim_info->anim_end   = new_value;
         }
         *value_ptr = new_value;
-        /* Stop the previous animation if it exists */
+        /*Stop the previous animation if it exists*/
         lv_anim_del(anim_info, NULL);
 
         lv_anim_t a;

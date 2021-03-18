@@ -395,8 +395,8 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     if(obj->spec_attr) {
         obj->spec_attr->ext_draw_size = s_new;
     }
-    /* Allocate spec. attrs. only if the result is not zero.
-     * Zero is the default value if the spec. attr. are not defined. */
+    /*Allocate spec. attrs. only if the result is not zero.
+     *Zero is the default value if the spec. attr. are not defined.*/
     else if(s_new != 0) {
         lv_obj_allocate_spec_attr(obj);
         obj->spec_attr->ext_draw_size = s_new;

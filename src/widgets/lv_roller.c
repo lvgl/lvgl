@@ -148,9 +148,9 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    /* Set the value even if it's the same as the current value because
-     * if moving to the next option with an animation which was just deleted in the PRESS signal
-     * nothing will continue the animation. */
+    /*Set the value even if it's the same as the current value because
+     *if moving to the next option with an animation which was just deleted in the PRESS signal
+     *nothing will continue the animation.*/
 
     lv_roller_t * roller = (lv_roller_t*)obj;
 
@@ -159,9 +159,9 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
         int32_t sel_opt_signed = sel_opt;
         uint16_t page = roller->sel_opt_id / LV_ROLLER_INF_PAGES;
 
-        /* `sel_opt` should be less than the number of options set by the user.
-         * If it's more then probably it's a reference from not the first page
-         * so normalize `sel_opt` */
+        /*`sel_opt` should be less than the number of options set by the user.
+         *If it's more then probably it's a reference from not the first page
+         *so normalize `sel_opt`*/
         if(page != 0) {
             sel_opt_signed -= page * LV_ROLLER_INF_PAGES;
         }
@@ -317,7 +317,7 @@ static void lv_roller_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 
@@ -587,8 +587,8 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_coord_t h                   = lv_obj_get_height_fit(obj);
     uint16_t anim_time             = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
-    /* Normally the animation's `end_cb` sets correct position of the roller if infinite.
-     * But without animations do it manually*/
+    /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
+     *But without animations do it manually*/
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         inf_normalize(obj);
     }

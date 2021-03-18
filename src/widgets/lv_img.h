@@ -188,7 +188,7 @@ bool lv_img_get_antialias(lv_obj_t * obj);
 #endif /*LV_USE_IMG*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_IMG_H*/

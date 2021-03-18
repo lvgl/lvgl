@@ -209,7 +209,7 @@ static void my_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_UNUSED(copy);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
-    /*Initialize the allocated 'ext' */
+    /*Initialize the allocated 'ext'*/
     calendar->today.year  = 2020;
     calendar->today.month = 1;
     calendar->today.day   = 1;
@@ -365,4 +365,4 @@ static void highlight_update(lv_obj_t * obj)
     }
 }
 
-#endif  /* LV_USE_CALENDAR*/
+#endif  /*LV_USE_CALENDAR*/

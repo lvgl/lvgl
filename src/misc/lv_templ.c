@@ -15,8 +15,8 @@
  *      TYPEDEFS
  **********************/
 
-/* This typedef exists purely to keep -Wpedantic happy when the file is empty. */
-/* It can be removed. */
+/*This typedef exists purely to keep -Wpedantic happy when the file is empty.*/
+/*It can be removed.*/
 typedef int _keep_pedantic_happy;
 
 /**********************

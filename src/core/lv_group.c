@@ -134,8 +134,8 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     if(next == NULL) return;
     *next = obj;
 
-    /* If the head and the tail is equal then there is only one object in the linked list.
-     * In this case automatically activate it*/
+    /*If the head and the tail is equal then there is only one object in the linked list.
+     *In this case automatically activate it*/
     if(_lv_ll_get_head(&group->obj_ll) == next) {
         lv_group_refocus(group);
     }
@@ -168,14 +168,14 @@ void lv_group_remove_obj(lv_obj_t * obj)
         }
     }
 
-    /* If the focuses object is still the same then it was the only object in the group but it will
-     * be deleted. Set the `obj_focus` to NULL to get back to the initial state of the group with
-     * zero objects*/
+    /*If the focuses object is still the same then it was the only object in the group but it will
+     *be deleted. Set the `obj_focus` to NULL to get back to the initial state of the group with
+     *zero objects*/
     if(*g->obj_focus == obj) {
         g->obj_focus = NULL;
     }
 
-    /*Search the object and remove it from its group */
+    /*Search the object and remove it from its group*/
     lv_obj_t ** i;
     _LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {

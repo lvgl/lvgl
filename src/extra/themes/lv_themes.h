@@ -32,7 +32,7 @@ extern "C" {
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_THEMES_H*/

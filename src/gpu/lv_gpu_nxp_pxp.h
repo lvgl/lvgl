@@ -45,29 +45,29 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/** PXP module instance to use */
+/** PXP module instance to use*/
 #define LV_GPU_NXP_PXP_ID PXP
 
-/** PXP interrupt line ID  */
+/** PXP interrupt line I*/
 #define LV_GPU_NXP_PXP_IRQ_ID PXP_IRQn
 
 #ifndef LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT
-/** Minimum area (in pixels) for image copy with 100% opacity to be handled by PXP */
+/** Minimum area (in pixels) for image copy with 100% opacity to be handled by PXP*/
 #define LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT 32
 #endif
 
 #ifndef LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT
-/** Minimum area (in pixels) for image copy with transparency to be handled by PXP */
+/** Minimum area (in pixels) for image copy with transparency to be handled by PXP*/
 #define LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT 16
 #endif
 
 #ifndef LV_GPU_NXP_PXP_FILL_SIZE_LIMIT
-/** Minimum area (in pixels) to be filled by PXP with 100% opacity */
+/** Minimum area (in pixels) to be filled by PXP with 100% opacity*/
 #define LV_GPU_NXP_PXP_FILL_SIZE_LIMIT 64
 #endif
 
 #ifndef LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT
-/** Minimum area (in pixels) to be filled by PXP with transparency */
+/** Minimum area (in pixels) to be filled by PXP with transparency*/
 #define LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT 32
 #endif
 
@@ -79,13 +79,13 @@ extern "C" {
  * interrupt init/wait/deinit.
  */
 typedef struct {
-    /** Callback for PXP interrupt initialization */
+    /** Callback for PXP interrupt initialization*/
     lv_res_t (*pxp_interrupt_init)(void);
 
-    /** Callback for PXP interrupt de-initialization */
+    /** Callback for PXP interrupt de-initialization*/
     void (*pxp_interrupt_deinit)(void);
 
-    /** Callback that should start PXP and wait for operation complete */
+    /** Callback that should start PXP and wait for operation complete*/
     void (*pxp_run)(void);
 } lv_nxp_pxp_cfg_t;
 
@@ -176,7 +176,7 @@ void lv_gpu_nxp_pxp_disable_recolor(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
-#endif /* LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_ */
+#endif /*LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_*/

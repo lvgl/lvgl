@@ -241,7 +241,7 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
 #endif /*LV_USE_METER*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_METER_H*/

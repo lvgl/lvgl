@@ -65,7 +65,7 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
 #endif /*LV_USE_TILEVIEW*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TILEVIEW_H*/

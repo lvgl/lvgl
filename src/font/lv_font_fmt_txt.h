@@ -26,18 +26,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/** This describes a glyph. */
+/** This describes a glyph.*/
 typedef struct {
 #if LV_FONT_FMT_TXT_LARGE == 0
-    uint32_t bitmap_index : 20;     /**< Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w : 12;            /**< Draw the next glyph after this width. 8.4 format (real_value * 16 is stored). */
+    uint32_t bitmap_index : 20;     /**< Start index of the bitmap. A font can be max 1 MB.*/
+    uint32_t adv_w : 12;            /**< Draw the next glyph after this width. 8.4 format (real_value * 16 is stored).*/
     uint8_t box_w;                  /**< Width of the glyph's bounding box*/
     uint8_t box_h;                  /**< Height of the glyph's bounding box*/
     int8_t ofs_x;                   /**< x offset of the bounding box*/
     int8_t ofs_y;                   /**< y offset of the bounding box. Measured from the top of the line*/
 #else
-    uint32_t bitmap_index;          /**< Start index of the bitmap. A font can be max 4 GB. */
-    uint32_t adv_w;                 /**< Draw the next glyph after this width. 28.4 format (real_value * 16 is stored). */
+    uint32_t bitmap_index;          /**< Start index of the bitmap. A font can be max 4 GB.*/
+    uint32_t adv_w;                 /**< Draw the next glyph after this width. 28.4 format (real_value * 16 is stored).*/
     uint16_t box_w;                 /**< Width of the glyph's bounding box*/
     uint16_t box_h;                 /**< Height of the glyph's bounding box*/
     int16_t ofs_x;                  /**< x offset of the bounding box*/
@@ -45,7 +45,7 @@ typedef struct {
 #endif
 } lv_font_fmt_txt_glyph_dsc_t;
 
-/** Format of font character map. */
+/** Format of font character map.*/
 enum {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
     LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,
@@ -55,19 +55,20 @@ enum {
 
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 
-/* Map codepoints to a `glyph_dsc`s
+/**
+ * Map codepoints to a `glyph_dsc`s
  * Several formats are supported to optimize memory usage
  * See https://github.com/lvgl/lv_font_conv/blob/master/doc/font_spec.md
  */
 typedef struct {
-    /** First Unicode character for this range */
+    /** First Unicode character for this range*/
     uint32_t range_start;
 
     /** Number of Unicode characters related to this range.
      * Last Unicode character = range_start + range_length - 1*/
     uint16_t range_length;
 
-    /** First glyph ID (array index of `glyph_dsc`) for this range */
+    /** First glyph ID (array index of `glyph_dsc`) for this range*/
     uint16_t glyph_id_start;
 
     /*
@@ -155,7 +156,7 @@ typedef struct {
     uint32_t last_glyph_id;
 }lv_font_fmt_txt_glyph_cache_t;
 
-/*Describe store additional data for fonts */
+/*Describe store additional data for fonts*/
 typedef struct {
     /*The bitmaps of all glyphs*/
     const uint8_t * glyph_bitmap;
@@ -163,11 +164,12 @@ typedef struct {
     /*Describe the glyphs*/
     const lv_font_fmt_txt_glyph_dsc_t * glyph_dsc;
 
-    /* Map the glyphs to Unicode characters.
-     * Array of `lv_font_cmap_fmt_txt_t` variables*/
+    /*Map the glyphs to Unicode characters.
+     *Array of `lv_font_cmap_fmt_txt_t` variables*/
     const lv_font_fmt_txt_cmap_t * cmaps;
 
-    /* Store kerning values.
+    /**
+     * Store kerning values.
      * Can be  `lv_font_fmt_txt_kern_pair_t *  or `lv_font_kern_classes_fmt_txt_t *`
      * depending on `kern_classes`
      */
@@ -232,7 +234,7 @@ void _lv_font_clean_up_fmt_txt(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_FONT_FMT_TXT_H*/

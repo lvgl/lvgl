@@ -35,7 +35,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/** Current keyboard mode. */
+/** Current keyboard mode.*/
 enum {
     LV_KEYBOARD_MODE_TEXT_LOWER,
     LV_KEYBOARD_MODE_TEXT_UPPER,
@@ -144,10 +144,10 @@ void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);
  *      MACROS
  **********************/
 
-#endif  /* LV_USE_KEYBOARD*/
+#endif  /*LV_USE_KEYBOARD*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_KEYBOARD_H*/

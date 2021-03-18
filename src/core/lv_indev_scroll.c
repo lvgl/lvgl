@@ -156,7 +156,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
         }
     }
 
-    /*Check if the scroll has finished */
+    /*Check if the scroll has finished*/
     if(proc->types.pointer.scroll_throw_vect.x == 0 && proc->types.pointer.scroll_throw_vect.y == 0) {
         /*Revert if scrolled in*/
         /*If vertically scrollable and not controlled by snap*/
@@ -243,13 +243,13 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
     lv_indev_t * indev_act = lv_indev_get_act();
     lv_coord_t scroll_limit =  indev_act->driver->scroll_limit;
 
-    /* Go until find an scrollable object in the current direction
-     * More precisely:
-     *  1. Check the pressed object and all of its ancestors and try to find an object which is scrollable
-     *  2. Scrollable means it has some content out of it's area
-     *  3. If an object can be scrolled into the current direction then use it ("real match"")
-     *  4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
-     *  5. Use the last candidate. Always the "deepest" parent or the object from point 3 */
+    /*Go until find an scrollable object in the current direction
+     *More precisely:
+     * 1. Check the pressed object and all of its ancestors and try to find an object which is scrollable
+     * 2. Scrollable means it has some content out of it's area
+     * 3. If an object can be scrolled into the current direction then use it ("real match"")
+     * 4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
+     * 5. Use the last candidate. Always the "deepest" parent or the object from point 3*/
     lv_obj_t * obj_act = proc->types.pointer.act_obj;
     while(obj_act) {
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
@@ -282,16 +282,16 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
         if((scroll_dir & LV_DIR_TOP) == 0) up_en = false;
         if((scroll_dir & LV_DIR_BOTTOM) == 0) down_en = false;
 
-        /*The object is scrollable to a direction if its content overflow in that direction. */
+        /*The object is scrollable to a direction if its content overflow in that direction.*/
         lv_coord_t st = lv_obj_get_scroll_top(obj_act);
         lv_coord_t sb = lv_obj_get_scroll_bottom(obj_act);
         lv_coord_t sl = lv_obj_get_scroll_left(obj_act);
         lv_coord_t sr = lv_obj_get_scroll_right(obj_act);
 
-        /* If this object is scrollable into the current scroll direction then save it as a candidate.
-         * It's important only to be scrollable on the current axis (hor/ver) because if the scroll
-         * is propagated to this object it can show at least elastic scroll effect.
-         * But if not hor/ver scrollable do not scroll it at all (so it's not a good candidate) */
+        /*If this object is scrollable into the current scroll direction then save it as a candidate.
+         *It's important only to be scrollable on the current axis (hor/ver) because if the scroll
+         *is propagated to this object it can show at least elastic scroll effect.
+         *But if not hor/ver scrollable do not scroll it at all (so it's not a good candidate)*/
         if((st > 0 || sb > 0)  &&
                 ((up_en    && proc->types.pointer.scroll_sum.y >= scroll_limit) ||
                         (down_en  && proc->types.pointer.scroll_sum.y <= - scroll_limit)))
@@ -313,7 +313,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
         if(sl <= 0) left_en = false;
         if(sr <= 0) right_en = false;
 
-        /*If the object really can be scrolled into the current direction the use it. */
+        /*If the object really can be scrolled into the current direction the use it.*/
         if((left_en  && proc->types.pointer.scroll_sum.x >=   scroll_limit) ||
                 (right_en && proc->types.pointer.scroll_sum.x <= - scroll_limit) ||
                 (up_en    && proc->types.pointer.scroll_sum.y >=   scroll_limit) ||
@@ -326,7 +326,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
         /*If this object don't want to chain the scroll ot the parent stop searching*/
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
 
-        /*Try the parent */
+        /*Try the parent*/
         obj_act = lv_obj_get_parent(obj_act);
     }
 
@@ -559,8 +559,8 @@ static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc)
 static lv_coord_t elastic_diff(lv_obj_t * scroll_obj, lv_coord_t diff, lv_coord_t scroll_start, lv_coord_t scroll_end, lv_dir_t dir)
 {
     if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
-        /* If there is snapping in the current direction don't use the elastic factor because
-         * it's natural that the first and last items are scrolled (snapped) in. */
+        /*If there is snapping in the current direction don't use the elastic factor because
+         *it's natural that the first and last items are scrolled (snapped) in.*/
         lv_scroll_snap_t snap;
         snap = dir == LV_DIR_HOR ? lv_obj_get_scroll_snap_x(scroll_obj) : lv_obj_get_scroll_snap_y(scroll_obj);
 

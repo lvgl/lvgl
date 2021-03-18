@@ -113,8 +113,8 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     /*Calculate the position of each row*/
     lv_coord_t max_h_no_gap = max_h - (prow * (row_cnt - 1));
 
-    /* Count the units and the buttons in a line
-     * (A button can be 1,2,3... unit wide)*/
+    /*Count the units and the buttons in a line
+     *(A button can be 1,2,3... unit wide)*/
     uint32_t txt_tot_i = 0; /*Act. index in the str map*/
     uint32_t btn_tot_i = 0; /*Act. index of button areas*/
     const char ** map_row = map;
@@ -318,8 +318,8 @@ const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
     uint16_t txt_i = 0;
     uint16_t btn_i = 0;
 
-    /* Search the text of btnm->btn_pr the buttons text in the map
-     * Skip "\n"-s*/
+    /*Search the text of btnm->btn_pr the buttons text in the map
+     *Skip "\n"-s*/
     while(btn_i != btn_id) {
         btn_i++;
         txt_i++;
@@ -393,7 +393,7 @@ static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 
@@ -464,7 +464,7 @@ static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
                button_is_inactive(btnm->ctrl_bits[btn_pr]) == false &&
                button_is_hidden(btnm->ctrl_bits[btn_pr]) == false) {
                 invalidate_button_area(obj, btn_pr);
-                /* Send VALUE_CHANGED for the newly pressed button */
+                /*Send VALUE_CHANGED for the newly pressed button*/
                 if(button_is_click_trig(btnm->ctrl_bits[btn_pr]) == false) {
                     uint32_t b = btn_pr;
                     res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
@@ -941,12 +941,12 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     lv_area_copy(&btn_area, &btnm->button_areas[btn_idx]);
     lv_obj_get_coords(obj, &obj_area);
 
-    /* The buttons might have outline and shadow so make the invalidation larger with the gaps between the buttons.
-     * It assumes that the outline or shadow is smaller then the gaps*/
+    /*The buttons might have outline and shadow so make the invalidation larger with the gaps between the buttons.
+     *It assumes that the outline or shadow is smaller then the gaps*/
     lv_coord_t row_gap = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-    /* Convert relative coordinates to absolute */
+    /*Convert relative coordinates to absolute*/
     btn_area.x1 += obj_area.x1 - row_gap;
     btn_area.y1 += obj_area.y1 - col_gap;
     btn_area.x2 += obj_area.x1 + row_gap;

@@ -36,8 +36,8 @@ void lv_example_canvas_1(void)
 
     lv_canvas_draw_text(canvas, 40, 20, 100, &label_dsc, "Some text on text canvas");
 
-    /* Test the rotation. It requires an other buffer where the orignal image is stored.
-     * So copy the current image to buffer and rotate it to the canvas */
+    /*Test the rotation. It requires an other buffer where the orignal image is stored.
+     *So copy the current image to buffer and rotate it to the canvas*/
     static lv_color_t cbuf_tmp[CANVAS_WIDTH * CANVAS_HEIGHT];
     memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));
     lv_img_dsc_t img;

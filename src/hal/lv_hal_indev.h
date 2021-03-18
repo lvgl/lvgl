@@ -26,25 +26,25 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/* Drag threshold in pixels */
+/*Drag threshold in pixels*/
 #define LV_INDEV_DEF_SCROLL_LIMIT         10
 
-/* Drag throw slow-down in [%]. Greater value -> faster slow-down */
+/*Drag throw slow-down in [%]. Greater value -> faster slow-down*/
 #define LV_INDEV_DEF_SCROLL_THROW         10
 
-/* Long press time in milliseconds.
- * Time to send `LV_EVENT_LONG_PRESSSED`) */
+/*Long press time in milliseconds.
+ *Time to send `LV_EVENT_LONG_PRESSSED`)*/
 #define LV_INDEV_DEF_LONG_PRESS_TIME      400
 
-/* Repeated trigger period in long press [ms]
- * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
+/*Repeated trigger period in long press [ms]
+ *Time between `LV_EVENT_LONG_PRESSED_REPEAT*/
 #define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
 
 
-/* Gesture threshold in pixels */
+/*Gesture threshold in pixels*/
 #define LV_INDEV_DEF_GESTURE_LIMIT        50
 
-/* Gesture min velocity at release before swipe (pixels)*/
+/*Gesture min velocity at release before swipe (pixels)*/
 #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
 
 
@@ -81,14 +81,14 @@ enum {
 typedef uint8_t lv_indev_scroll_dir_t;
 
 enum {
-    LV_GESTURE_DIR_TOP,     /**< Gesture dir up. */
-    LV_GESTURE_DIR_BOTTOM,  /**< Gesture dir down. */
-    LV_GESTURE_DIR_LEFT,    /**< Gesture dir left. */
-    LV_GESTURE_DIR_RIGHT,   /**< Gesture dir right. */
+    LV_GESTURE_DIR_TOP,     /**< Gesture dir up.*/
+    LV_GESTURE_DIR_BOTTOM,  /**< Gesture dir down.*/
+    LV_GESTURE_DIR_LEFT,    /**< Gesture dir left.*/
+    LV_GESTURE_DIR_RIGHT,   /**< Gesture dir right.*/
 };
 typedef uint8_t lv_gesture_dir_t;
 
-/** Data structure passed to an input driver to fill */
+/** Data structure passed to an input driver to fill*/
 typedef struct {
     lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
     uint32_t key;     /**< For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
@@ -106,7 +106,7 @@ typedef struct _lv_indev_drv_t {
 
     /**< Function pointer to read input device data.
      * Return 'true' if there is more data to be read (buffered).
-     * Most drivers can safely return 'false' */
+     * Most drivers can safely return 'false'*/
     bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 
     /** Called when an action happened on the input device.
@@ -126,19 +126,19 @@ typedef struct _lv_indev_drv_t {
     /**< Number of pixels to slide before actually drag the object*/
     uint8_t scroll_limit;
 
-    /**< Drag throw slow-down in [%]. Greater value means faster slow-down */
+    /**< Drag throw slow-down in [%]. Greater value means faster slow-down*/
     uint8_t scroll_throw;
 
-    /**< At least this difference should between two points to evaluate as gesture */
+    /**< At least this difference should between two points to evaluate as gesture*/
     uint8_t gesture_min_velocity;
 
-    /**< At least this difference should be to send a gesture */
+    /**< At least this difference should be to send a gesture*/
     uint8_t gesture_limit;
 
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;
 
-    /**< Repeated trigger period in long press [ms] */
+    /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_rep_time;
 } lv_indev_drv_t;
 
@@ -146,7 +146,7 @@ typedef struct _lv_indev_drv_t {
  * Internally used by the library, you should not need to touch it.
  */
 typedef struct _lv_indev_proc_t {
-    lv_indev_state_t state; /**< Current state of the input device. */
+    lv_indev_state_t state; /**< Current state of the input device.*/
     /*Flags*/
     uint8_t long_pr_sent : 1;
     uint8_t reset_query : 1;
@@ -156,9 +156,9 @@ typedef struct _lv_indev_proc_t {
     union {
         struct {
             /*Pointer and button data*/
-            lv_point_t act_point; /**< Current point of input device. */
-            lv_point_t last_point; /**< Last point of input device. */
-            lv_point_t vect; /**< Difference between `act_point` and `last_point`. */
+            lv_point_t act_point; /**< Current point of input device.*/
+            lv_point_t last_point; /**< Last point of input device.*/
+            lv_point_t vect; /**< Difference between `act_point` and `last_point`.*/
             lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
             lv_point_t scroll_throw_vect;
             lv_point_t scroll_throw_vect_ori;
@@ -243,7 +243,7 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif

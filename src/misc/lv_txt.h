@@ -46,7 +46,7 @@ enum {
 typedef uint8_t lv_text_flag_t;
 
 /**
- * State machine for text renderer. */
+ * State machine for text renderer.*/
 enum {
     LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
     LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
@@ -56,10 +56,10 @@ typedef uint8_t lv_text_cmd_state_t;
 
 /** Label align policy*/
 enum {
-    LV_TEXT_ALIGN_LEFT, /**< Align text to left */
-    LV_TEXT_ALIGN_CENTER, /**< Align text to center */
-    LV_TEXT_ALIGN_RIGHT, /**< Align text to right */
-    LV_TEXT_ALIGN_AUTO, /**<  */
+    LV_TEXT_ALIGN_LEFT, /**< Align text to left*/
+    LV_TEXT_ALIGN_CENTER, /**< Align text to center*/
+    LV_TEXT_ALIGN_RIGHT, /**< Align text to right*/
+    LV_TEXT_ALIGN_AUTO, /**< Align text auto*/
 };
 typedef uint8_t lv_text_align_t;
 
@@ -217,7 +217,7 @@ extern uint32_t (*_lv_txt_get_encoded_length)(const char *);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*USE_TXT*/

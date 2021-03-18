@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* Can't include lv_obj.h because it includes this header file */
+/*Can't include lv_obj.h because it includes this header file*/
 struct _lv_obj_t;
 
 typedef enum {
@@ -129,7 +129,7 @@ extern const lv_grid_t grid_12;
 #endif /*LV_USE_GRID*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_GRID_H*/

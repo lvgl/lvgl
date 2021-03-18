@@ -33,9 +33,9 @@ extern "C" {
  * General types
  *-----------------*/
 
-/** Describes the properties of a glyph. */
+/** Describes the properties of a glyph.*/
 typedef struct {
-    uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width. */
+    uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w;  /**< Width of the glyph's bounding box*/
     uint16_t box_h;  /**< Height of the glyph's bounding box*/
     int16_t ofs_x;   /**< x offset of the bounding box*/
@@ -43,7 +43,7 @@ typedef struct {
     uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
 } lv_font_glyph_dsc_t;
 
-/** The bitmaps might be upscaled by 3 to achieve subpixel rendering. */
+/** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
 enum {
     LV_FONT_SUBPX_NONE,
     LV_FONT_SUBPX_HOR,
@@ -71,7 +71,7 @@ typedef struct _lv_font_struct {
 
     const void * dsc;                     /**< Store implementation specific or run_time data or caching here*/
 #if LV_USE_USER_DATA
-    void * user_data;               /**< Custom user data for font. */
+    void * user_data;               /**< Custom user data for font.*/
 #endif
 
 } lv_font_t;
@@ -238,7 +238,7 @@ LV_FONT_CUSTOM_DECLARE
 #endif
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*USE_FONT*/

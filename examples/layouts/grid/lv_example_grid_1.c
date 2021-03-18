@@ -28,8 +28,8 @@ void lv_example_grid_1(void)
         uint8_t row = i / 3;
 
         obj = lv_obj_create(cont, NULL);
-        /* Stretch the cell horizontally and vertically too
-         * Set span to 1 to make the cell 1 column/row sized */
+        /*Stretch the cell horizontally and vertically too
+         *Set span to 1 to make the cell 1 column/row sized*/
         lv_obj_set_grid_cell(obj, LV_GRID_STRETCH, col, 1,
                                   LV_GRID_STRETCH, row, 1);
 

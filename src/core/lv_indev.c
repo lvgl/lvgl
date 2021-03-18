@@ -379,13 +379,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Save the last key to compare it with the current latter on RELEASE*/
     uint32_t prev_key = i->proc.types.keypad.last_key;
 
-    /* Save the last key.
-     * It must be done here else `lv_indev_get_key` will return the last key in events and signals*/
+    /*Save the last key.
+     *It must be done here else `lv_indev_get_key` will return the last key in events and signals*/
     i->proc.types.keypad.last_key = data->key;
 
-    /* Save the previous state so we can detect state changes below and also set the last state now
-     * so if any signal/event handler on the way returns `LV_RES_INV` the last state is remembered
-     * for the next time*/
+    /*Save the previous state so we can detect state changes below and also set the last state now
+     *so if any signal/event handler on the way returns `LV_RES_INV` the last state is remembered
+     *for the next time*/
     uint32_t prev_state             = i->proc.types.keypad.last_state;
     i->proc.types.keypad.last_state = data->state;
 
@@ -514,8 +514,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.types.keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
     }
 
-    /* Save the last keys before anything else.
-     * They need to be already saved if the function returns for any reason*/
+    /*Save the last keys before anything else.
+     *They need to be already saved if the function returns for any reason*/
     lv_indev_state_t last_state     = i->proc.types.keypad.last_state;
     i->proc.types.keypad.last_state = data->state;
     i->proc.types.keypad.last_key   = data->key;
@@ -571,7 +571,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
-        /* Long press*/
+        /*Long press*/
         if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver->long_press_time) {
 
             i->proc.long_pr_sent = 1;
@@ -640,7 +640,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(indev_reset_check(&i->proc)) return;
 
             }
-            /*An object is being edited and the button is released. */
+            /*An object is being edited and the button is released.*/
             else if(g->editing) {
                 /*Ignore long pressed enter release because it comes from mode switch*/
                 if(!i->proc.long_pr_sent || _lv_ll_get_len(&g->obj_ll) <= 1) {
@@ -703,7 +703,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    /* Die gracefully if i->btn_points is NULL */
+    /*Die gracefully if i->btn_points is NULL*/
     if(i->btn_points == NULL) {
         LV_LOG_WARN("btn_points is NULL");
         return;
@@ -806,7 +806,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         proc->types.pointer.last_obj = indev_obj_act;
 
         if(indev_obj_act != NULL) {
-            /* Save the time when the obj pressed to count long press time.*/
+            /*Save the time when the obj pressed to count long press time.*/
             proc->pr_timestamp                 = lv_tick_get();
             proc->long_pr_sent                 = 0;
             proc->types.pointer.scroll_sum.x     = 0;
@@ -897,7 +897,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     indev_obj_act = proc->types.pointer.act_obj;
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
 
-    /*Forget the act obj and send a released signal */
+    /*Forget the act obj and send a released signal*/
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
@@ -971,7 +971,7 @@ static void indev_click_focus(lv_indev_proc_t * proc)
         lv_group_t * g_act = lv_obj_get_group(obj_to_focus);
         lv_group_t * g_prev = proc->types.pointer.last_pressed ? lv_obj_get_group(proc->types.pointer.last_pressed) : NULL;
 
-        /*If both the last and act. obj. are in the same group (or no group but it's also the same) */
+        /*If both the last and act. obj. are in the same group (or no group but it's also the same)*/
         if(g_act == g_prev) {
             /*The objects are in a group*/
             if(g_act) {

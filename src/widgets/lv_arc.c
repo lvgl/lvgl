@@ -358,7 +358,7 @@ void lv_arc_set_range(lv_obj_t * obj, int16_t min, int16_t max)
        arc->value = max;
     }
 
-    value_update(obj); /* value has changed relative to the new range */
+    value_update(obj); /*value has changed relative to the new range*/
 }
 
 /**
@@ -486,7 +486,7 @@ static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-   /*Initialize the allocated 'ext' */
+   /*Initialize the allocated 'ext'*/
    arc->rotation = 0;
    arc->bg_angle_start = 135;
    arc->bg_angle_end   = 45;
@@ -533,7 +533,7 @@ static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 
@@ -592,9 +592,9 @@ static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
         int16_t last_angle_rel =arc->last_angle -arc->bg_angle_start;
         int16_t delta_angle = angle - last_angle_rel;
 
-        /* Do not allow big jumps.
-         * It's mainly to avoid jumping to the opposite end if the "dead" range between min. an max. is crossed.
-         * Check which and was closer on the last valid press (arc->min_close) and prefer that end */
+        /*Do not allow big jumps.
+         *It's mainly to avoid jumping to the opposite end if the "dead" range between min. an max. is crossed.
+         *Check which and was closer on the last valid press (arc->min_close) and prefer that end*/
         if(LV_ABS(delta_angle) > 180) {
             if(arc->min_close) angle = 0;
             else angle = deg_range;
@@ -645,7 +645,7 @@ static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
     else if(e == LV_EVENT_RELEASED || e == LV_EVENT_PRESS_LOST) {
        arc->dragging = false;
 
-        /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
+        /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());

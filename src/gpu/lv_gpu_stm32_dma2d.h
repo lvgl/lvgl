@@ -103,7 +103,7 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_disp_drv_t * drv);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_GPU_STM32_DMA2D_H*/

@@ -7,7 +7,7 @@ static lv_chart_series_t * ser2;
 
 static void event_cb(lv_obj_t * obj, lv_event_t e)
 {
-    /*Add the faded area before the lines are drawn */
+    /*Add the faded area before the lines are drawn*/
     if(e == LV_EVENT_DRAW_PART_BEGIN) {
         lv_obj_draw_dsc_t * dsc = lv_event_get_param();
         if(dsc->part != LV_PART_ITEMS) return;

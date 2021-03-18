@@ -31,7 +31,7 @@ void lv_example_meter_3(void)
 
     LV_IMG_DECLARE(img_hand)
 
-    /*Add a the hands from images */
+    /*Add a the hands from images*/
     lv_meter_indicator_t * indic_min = lv_meter_add_needle_img(meter, scale_min, &img_hand, 5, 5);
     lv_meter_indicator_t * indic_hour = lv_meter_add_needle_img(meter, scale_min, &img_hand, 5, 5);
 

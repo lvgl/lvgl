@@ -110,12 +110,12 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
         img->src = src;
     }
     else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
-        /* If the new and the old src are the same then it was only a refresh.*/
+        /*If the new and the old src are the same then it was only a refresh.*/
         if(img->src != src) {
             const void * old_src = NULL;
-            /* If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
-             * It's important to allocate first to be sure the new data will be on a new address.
-             * Else `img_cache` wouldn't see the change in source.*/
+            /*If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
+             *It's important to allocate first to be sure the new data will be on a new address.
+             *Else `img_cache` wouldn't see the change in source.*/
             if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
                 old_src = img->src;
             }
@@ -381,9 +381,9 @@ static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
 
-        /* Enable auto size for non screens
-         * because image screens are wallpapers
-         * and must be screen sized*/
+        /*Enable auto size for non screens
+         *because image screens are wallpapers
+         *and must be screen sized*/
         if(obj->parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     }
     else {
@@ -413,7 +413,7 @@ static void lv_img_event(lv_obj_t * obj, lv_event_t e)
 {
     /*Ancestor events will be called during drawing*/
     if(e != LV_EVENT_DRAW_MAIN && e != LV_EVENT_DRAW_POST) {
-        /* Include the ancient signal function */
+        /*Include the ancient signal function*/
         lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
         if(res != LV_RES_OK) return;
     }
@@ -435,7 +435,7 @@ static void lv_img_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
         transf_angle += img->angle;
 
-        /*If the image has angle provide enough room for the rotated corners */
+        /*If the image has angle provide enough room for the rotated corners*/
         if(transf_angle || transf_zoom != LV_IMG_ZOOM_NONE) {
             lv_area_t a;
             lv_coord_t w = lv_obj_get_width(obj);
@@ -456,8 +456,8 @@ static void lv_img_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
         angle += img->angle;
 
-        /* If the object is exactly image sized (not cropped, not mosaic) and transformed
-         * perform hit test on it's transformed area */
+        /*If the object is exactly image sized (not cropped, not mosaic) and transformed
+         *perform hit test on it's transformed area*/
         if(img->w == lv_obj_get_width(obj) && img->h == lv_obj_get_height(obj) &&
            (zoom != LV_IMG_ZOOM_NONE || angle != 0 || img->pivot.x != img->w / 2 || img->pivot.y != img->h / 2)) {
 

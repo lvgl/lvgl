@@ -44,7 +44,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
     static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
     static inline void rle_init(const uint8_t * in,  uint8_t bpp);
     static inline uint8_t rle_next(void);
-#endif /* LV_USE_FONT_COMPRESSED */
+#endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************
  *  STATIC VARIABLES
@@ -56,7 +56,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
     static uint8_t rle_prev_v;
     static uint8_t rle_cnt;
     static rle_state_t rle_state;
-#endif /* LV_USE_FONT_COMPRESSED */
+#endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -123,7 +123,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_decompr_buf), gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
         return LV_GC_ROOT(_lv_font_decompr_buf);
-#else /* !LV_USE_FONT_COMPRESSED */
+#else /*!LV_USE_FONT_COMPRESSED*/
         return NULL;
 #endif
     }
@@ -271,8 +271,8 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
         /*Kern pairs*/
         const lv_font_fmt_txt_kern_pair_t * kdsc = fdsc->kern_dsc;
         if(kdsc->glyph_ids_size == 0) {
-            /* Use binary search to find the kern value.
-             * The pairs are ordered left_id first, then right_id secondly. */
+            /*Use binary search to find the kern value.
+             *The pairs are ordered left_id first, then right_id secondly.*/
             const uint16_t * g_ids = kdsc->glyph_ids;
             uint16_t g_id_both = (gid_right << 8) + gid_left; /*Create one number from the ids*/
             uint16_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
@@ -284,8 +284,8 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
             }
         }
         else if(kdsc->glyph_ids_size == 1) {
-            /* Use binary search to find the kern value.
-             * The pairs are ordered left_id first, then right_id secondly. */
+            /*Use binary search to find the kern value.
+             *The pairs are ordered left_id first, then right_id secondly.*/
             const uint32_t * g_ids = kdsc->glyph_ids;
             uint32_t g_id_both = (gid_right << 16) + gid_left; /*Create one number from the ids*/
             uint32_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
@@ -307,8 +307,8 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
         uint8_t left_class = kdsc->left_class_mapping[gid_left];
         uint8_t right_class = kdsc->right_class_mapping[gid_right];
 
-        /* If class = 0, kerning not exist for that glyph
-         * else got the value form `class_pair_values` 2D array*/
+        /*If class = 0, kerning not exist for that glyph
+         *else got the value form `class_pair_values` 2D array*/
         if(left_class > 0 && right_class > 0) {
             value = kdsc->class_pair_values[(left_class - 1) * kdsc->right_class_cnt + (right_class - 1)];
         }
@@ -567,7 +567,7 @@ static inline uint8_t rle_next(void)
 
     return ret;
 }
-#endif /* LV_USE_FONT_COMPRESSED */
+#endif /*LV_USE_FONT_COMPRESSED*/
 
 /** Code Comparator.
  *

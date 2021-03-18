@@ -15,7 +15,7 @@
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
+#endif /*LV_ENABLE_GC*/
 
 /*********************
  *      DEFINES
@@ -523,9 +523,9 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_palette_t palette_
                                    const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_large)
 {
 
-    /* This trick is required only to avoid the garbage collection of
-     * styles' data if LVGL is used in a binding (e.g. Micropython)
-     * In a general case styles could be in simple `static lv_style_t my_style...` variables*/
+    /*This trick is required only to avoid the garbage collection of
+     *styles' data if LVGL is used in a binding (e.g. Micropython)
+     *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!inited) {
         LV_GC_ROOT(_lv_theme_default_styles) = lv_mem_alloc(sizeof(my_theme_styles_t));
         styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);

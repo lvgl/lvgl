@@ -33,7 +33,7 @@ static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next);
  **********************/
 
 const ap_chars_map_t ap_chars_map[] = {
-    /* {Key Offset, End, Beginning, Middle, Isolated, {conjunction}} */
+    /*{Key Offset, End, Beginning, Middle, Isolated, {conjunction}}*/
     {1, 0xFE84, -1, 0, -1,  {1, 0}},    // أ
     {2, 0xFE86, -1, 0, -1,  {1, 0}},    // ؤ
     {3, 0xFE88, -1, 0, -1,  {1, 0}},    // ﺇ

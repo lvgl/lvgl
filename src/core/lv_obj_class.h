@@ -42,7 +42,7 @@ typedef struct _lv_obj_class_t{
     void (*constructor_cb)(struct _lv_obj_t * obj, const struct _lv_obj_t * copy);
     void (*destructor_cb)(struct _lv_obj_t * obj);
     lv_event_cb_t event_cb;         /**< Object type specific event function*/
-    uint32_t editable :2;           /**< Value from ::lv_obj_class_editable_t */
+    uint32_t editable :2;           /**< Value from ::lv_obj_class_editable_t*/
     uint32_t instance_size :20;
 }lv_obj_class_t;
 
@@ -69,7 +69,7 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj);
 
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_CLASS_H*/

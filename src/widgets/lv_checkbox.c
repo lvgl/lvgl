@@ -141,7 +141,7 @@ static void lv_checkbox_destructor(lv_obj_t * obj)
 static void lv_checkbox_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
-    /* Include the ancient signal function */
+    /*Include the ancient signal function*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 

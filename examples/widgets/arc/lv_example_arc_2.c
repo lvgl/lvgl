@@ -31,8 +31,8 @@ void lv_example_arc_2(void)
   lv_arc_set_angles(arc, 270, 270);
   lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
-  /* Create an `lv_timer` to update the arc.
-   * Store the `arc` in the user data*/
+  /*Create an `lv_timer` to update the arc.
+   *Store the `arc` in the user data*/
   lv_timer_create(arc_loader, 20, arc);
 }
 

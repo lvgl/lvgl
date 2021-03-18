@@ -23,18 +23,18 @@ fout.write(
 
 #ifndef LV_CONF_INTERNAL_H
 #define LV_CONF_INTERNAL_H
-/* clang-format off */
+/*clang-format off*/
 
 #include <stdint.h>
 
-/* Handle special Kconfig options */
+/*Handle special Kconfig options*/
 #include "lv_conf_kconfig.h"
 
 #ifdef CONFIG_LV_CONF_SKIP
 #define LV_CONF_SKIP
 #endif
 
-/* If "lv_conf.h" is available from here try to use it later.*/
+/*If "lv_conf.h" is available from here try to use it later.*/
 #if defined __has_include
 #  if __has_include("lv_conf.h")
 #   ifndef LV_CONF_INCLUDE_SIMPLE
@@ -54,7 +54,7 @@ fout.write(
 #  elif defined(LV_CONF_INCLUDE_SIMPLE)        /*Or simply include lv_conf.h is enabled*/
 #    include "lv_conf.h"
 #  else
-#    include "../../lv_conf.h"                 /*Else assume lv_conf.h is next to the lvgl folder */
+#    include "../../lv_conf.h"                 /*Else assume lv_conf.h is next to the lvgl folder*/
 #  endif
 #endif
 
@@ -113,7 +113,7 @@ fout.write(
   typedef void * lv_obj_user_data_t;
 # endif
 
-# if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
+# if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
 #  define _CRT_SECURE_NO_WARNINGS
 # endif
 

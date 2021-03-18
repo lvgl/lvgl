@@ -12,7 +12,7 @@
 
 #if defined(LV_GC_INCLUDE)
     #include LV_GC_INCLUDE
-#endif /* LV_ENABLE_GC */
+#endif /*LV_ENABLE_GC*/
 
 /*********************
  *      DEFINES
@@ -89,7 +89,7 @@ void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_
         break;
     }
 
-    /*Now `i` is at the first normal style. Insert the new style before this */
+    /*Now `i` is at the first normal style. Insert the new style before this*/
 
     /*Allocate space for the new style and shift the rest of the style to the end*/
     obj->style_list.style_cnt++;
@@ -141,8 +141,8 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
         obj->style_list.styles = lv_mem_realloc(obj->style_list.styles, obj->style_list.style_cnt * sizeof(lv_obj_style_t));
 
         deleted = true;
-        /* The style from the current `i` index is removed, so `i` points to the next style.
-         * Therefore it doesn't needs to be incremented*/
+        /*The style from the current `i` index is removed, so `i` points to the next style.
+         *Therefore it doesn't needs to be incremented*/
     }
     if(deleted) {
         lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
@@ -266,7 +266,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
     obj->state = new_state;
 
     lv_obj_style_t * style_trans = get_trans_style(obj, part);
-    lv_style_set_prop(style_trans->style, prop, v1);   /*Be sure `trans_style` has a valid value */
+    lv_style_set_prop(style_trans->style, prop, v1);   /*Be sure `trans_style` has a valid value*/
 
     if(prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
@@ -419,8 +419,8 @@ static lv_style_t * get_local_style(lv_obj_t * obj, uint32_t part, uint32_t stat
     obj->style_list.styles = lv_mem_realloc(obj->style_list.styles, obj->style_list.style_cnt * sizeof(lv_obj_style_t));
 
     for(i = obj->style_list.style_cnt - 1; i > 0 ; i--) {
-        /* Copy only normal styles (not local and transition).
-         * The new local style will be added as the last local style*/
+        /*Copy only normal styles (not local and transition).
+         *The new local style will be added as the last local style*/
         if(obj->style_list.styles[i - 1].is_local || obj->style_list.styles[i - 1].is_trans) break;
         obj->style_list.styles[i] = obj->style_list.styles[i - 1];
     }
@@ -497,8 +497,8 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
 
         if((obj_style->style->has_group & group) == 0) continue;
 
-        /* Be sure the style not specifies other state than the requested.
-         * E.g. For HOVER+PRESS object state, HOVER style only is OK, but HOVER+FOCUS style is not*/
+        /*Be sure the style not specifies other state than the requested.
+         *E.g. For HOVER+PRESS object state, HOVER style only is OK, but HOVER+FOCUS style is not*/
         if((obj_style->state & state_inv)) continue;
 
         /*Check only better candidates*/
@@ -598,8 +598,8 @@ static bool trans_del(lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, trans_
         tr_prev = _lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
         if(tr->obj == obj && (part == tr->part || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ALL)) {
-            /* Remove the transitioned property from trans. style
-             * to allow changing it by normal styles*/
+            /*Remove the transitioned property from trans. style
+             *to allow changing it by normal styles*/
             uint32_t i;
             for(i = 0; i < obj->style_list.style_cnt; i++) {
                 if(obj->style_list.styles[i].is_trans && (part == LV_PART_ANY || obj->style_list.styles[i].part == part)) {
@@ -695,7 +695,7 @@ static void trans_anim_start_cb(lv_anim_t * a)
     tr->prop = prop_tmp;
 
     lv_obj_style_t * style_trans = get_trans_style(tr->obj, tr->part);
-    lv_style_set_prop(style_trans->style, tr->prop, tr->start_value);   /*Be sure `trans_style` has a valid value */
+    lv_style_set_prop(style_trans->style, tr->prop, tr->start_value);   /*Be sure `trans_style` has a valid value*/
 
 }
 
@@ -705,9 +705,9 @@ static void trans_anim_ready_cb(lv_anim_t * a)
     lv_obj_t * obj = tr->obj;
     lv_style_prop_t prop = tr->prop;
 
-    /* Remove the transitioned property from trans. style
-     * if there no more transitions for this property
-     * It allows changing it by normal styles*/
+    /*Remove the transitioned property from trans. style
+     *if there no more transitions for this property
+     *It allows changing it by normal styles*/
     bool running = false;
     trans_t * tr_i;
     _LV_LL_READ(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr_i) {

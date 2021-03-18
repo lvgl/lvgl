@@ -93,7 +93,7 @@ void lv_anim_init(lv_anim_t * a)
 void lv_anim_start(lv_anim_t * a)
 {
     TRACE_ANIM("begin");
-    /* Do not let two animations for the same 'var' with the same 'fp'*/
+    /*Do not let two animations for the same 'var' with the same 'fp'*/
 
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
@@ -123,8 +123,8 @@ void lv_anim_start(lv_anim_t * a)
         if(new_anim->exec_cb && new_anim->var) new_anim->exec_cb(new_anim->var, new_anim->start_value);
     }
 
-    /* Creating an animation changed the linked list.
-     * It's important if it happens in a ready callback. (see `anim_timer`)*/
+    /*Creating an animation changed the linked list.
+     *It's important if it happens in a ready callback. (see `anim_timer`)*/
     anim_mark_list_change();
 
     TRACE_ANIM("finished");
@@ -265,8 +265,8 @@ int32_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a)
     /*Calculate the current step*/
     int32_t step = lv_map(a->act_time, 0, a->time, 0, LV_ANIM_RESOLUTION);
 
-    /* Get the new value which will be proportional to `step`
-     * and the `start` and `end` values*/
+    /*Get the new value which will be proportional to `step`
+     *and the `start` and `end` values*/
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
     new_value = new_value >> LV_ANIM_RES_SHIFT;
@@ -495,8 +495,8 @@ static void anim_timer(lv_timer_t * param)
             }
         }
 
-        /* If the linked list changed due to anim. delete then it's not safe to continue
-         * the reading of the list from here -> start from the head*/
+        /*If the linked list changed due to anim. delete then it's not safe to continue
+         *the reading of the list from here -> start from the head*/
         if(anim_list_changed)
             a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
         else
@@ -520,7 +520,7 @@ static void anim_ready_handler(lv_anim_t * a)
 
     /*Delete the animation if
      * - no repeat left and no play back (simple one shot animation)
-     * - no repeat, play back is enabled and play back is ready */
+     * - no repeat, play back is enabled and play back is ready*/
     if(a->repeat_cnt == 0 && ((a->playback_time == 0) || (a->playback_time && a->playback_now == 1))) {
 
         /*Create copy from the animation and delete the animation from the list.
@@ -529,10 +529,10 @@ static void anim_ready_handler(lv_anim_t * a)
         lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
         _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
-        /*Flag that the list has changed */
+        /*Flag that the list has changed*/
         anim_mark_list_change();
 
-        /* Call the callback function at the end*/
+        /*Call the callback function at the end*/
         if(a_tmp.ready_cb != NULL) a_tmp.ready_cb(&a_tmp);
     }
     /*If the animation is not deleted then restart it*/

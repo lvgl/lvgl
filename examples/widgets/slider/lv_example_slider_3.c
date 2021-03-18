@@ -9,7 +9,7 @@ static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
  */
 void lv_example_slider_3(void)
 {
-    /* Create a slider in the center of the display */
+    /*Create a slider in the center of the display*/
     lv_obj_t * slider;
     slider = lv_slider_create(lv_scr_act(), NULL);
     lv_obj_align(slider, NULL, LV_ALIGN_CENTER, 0, 0);

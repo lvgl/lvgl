@@ -158,8 +158,8 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    /* Normally can't scroll the object out on the left.
-     * So simply use the current scroll position as "left size"*/
+    /*Normally can't scroll the object out on the left.
+     *So simply use the current scroll position as "left size"*/
     if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
         if(obj->spec_attr == NULL) return 0;
         return -obj->spec_attr->scroll.x;
@@ -196,8 +196,8 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    /* With RTL base dir can't scroll to the object out on the right.
-     * So simply use the current scroll position as "right size"*/
+    /*With RTL base dir can't scroll to the object out on the right.
+     *So simply use the current scroll position as "right size"*/
     if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
         if(obj->spec_attr == NULL) return 0;
         return obj->spec_attr->scroll.x;
@@ -627,7 +627,7 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
         break;
     }
 
-    /* Remove any pending scroll animations.*/
+    /*Remove any pending scroll animations.*/
     lv_anim_del(parent, scroll_x_anim);
     lv_anim_del(parent, scroll_y_anim);
 

@@ -457,7 +457,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 }
             }
 
-            /* `* 256` for extra precision*/
+            /*`* 256` for extra precision*/
             int32_t angle_upscale = ((i * scale->angle_range) << 8) / (scale->tick_cnt - 1);
 
             int32_t angle_low = (angle_upscale >> 8);
@@ -477,14 +477,14 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             line_dsc.color = line_color;
             line_dsc.width = line_width;
 #if LV_DRAW_COMPLEX
-            /* Use the interpolated angle to get the outer x and y coordinates.
-             * Draw a little bit longer lines to be sure the mask will clip them correctly*/
+            /*Use the interpolated angle to get the outer x and y coordinates.
+             *Draw a little bit longer lines to be sure the mask will clip them correctly*/
             lv_point_t p_outer;
             p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
             p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
             lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
 #else
-            /* Use the interpolated angle to get the outer and inner x and y coordinates.*/
+            /*Use the interpolated angle to get the outer and inner x and y coordinates.*/
             lv_point_t p_outer;
             p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
             p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;

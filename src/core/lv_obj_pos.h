@@ -327,7 +327,7 @@ bool lv_obj_hit_test(struct _lv_obj_t * obj, const lv_point_t * point);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_POS_H*/

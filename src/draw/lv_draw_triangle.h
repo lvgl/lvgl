@@ -50,7 +50,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_DRAW_TRIANGLE_H*/

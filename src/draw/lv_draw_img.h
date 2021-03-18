@@ -90,7 +90,7 @@ bool lv_img_cf_is_chroma_keyed(lv_img_cf_t cf);
 bool lv_img_cf_has_alpha(lv_img_cf_t cf);
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_DRAW_IMG_H*/
