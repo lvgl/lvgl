@@ -169,7 +169,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
         lv_obj_get_coords(disp->screens[i], &prev_coords);
         lv_area_set_width(&disp->screens[i]->coords, w);
         lv_area_set_height(&disp->screens[i]->coords, h);
-        lv_signal_send(disp->screens[i], LV_SIGNAL_COORD_CHG, &prev_coords);
+        lv_event_send(disp->screens[i], LV_EVENT_COORD_CHANGED, &prev_coords);
     }
 
     /*
@@ -195,7 +195,7 @@ void lv_disp_remove(lv_disp_t * disp)
     bool was_default = false;
     if(disp == lv_disp_get_default()) was_default = true;
 
-    /*Detach the input devices */
+    /*Detach the input devices*/
     lv_indev_t * indev;
     indev = lv_indev_get_next(NULL);
     while(indev) {

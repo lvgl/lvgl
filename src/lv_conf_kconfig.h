@@ -83,7 +83,8 @@ extern "C" {
  * FONT SELECTION
  *******************/
 
-/* NOTE: In Kconfig instead of `LV_THEME_DEFAULT_FONT_SMALL`
+/**
+ * NOTE: In Kconfig instead of `LV_THEME_DEFAULT_FONT_SMALL`
  *       `CONFIG_LV_THEME_DEFAULT_FONT_SMALL_<font_name>` is defined
  *       hence the large selection with if-s
  */
@@ -414,7 +415,7 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_CONF_KCONFIG_H*/

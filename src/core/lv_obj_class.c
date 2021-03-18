@@ -55,9 +55,9 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     lv_obj_construct(obj, parent, copy);
 
    if(parent) {
-       /* Send a signal to the parent to notify it about the new child.
-        * Also triggers layout update*/
-       lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+       /*Send a Call the ancestor's event handler to the parent to notify it about the new child.
+        *Also triggers layout update*/
+       lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
        /*Invalidate the area if not screen created*/
        lv_obj_invalidate(obj);
@@ -81,35 +81,6 @@ void _lv_obj_destruct(lv_obj_t * obj)
         /*Call the base class's destructor too*/
         _lv_obj_destruct(obj);
     }
-}
-
-
-lv_res_t lv_obj_signal_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_signal_t sign, void * param)
-{
-    if(class_p == NULL) return LV_RES_OK;
-
-    /*Find a base in which signal_cb is set*/
-    const lv_obj_class_t * base = class_p->base_class;
-    while(base && base->signal_cb == NULL) base = base->base_class;
-
-    if(base == NULL) return LV_RES_OK;
-    if(base->signal_cb == NULL) return LV_RES_OK;
-
-    return base->signal_cb(obj, sign, param);
-}
-
-lv_draw_res_t lv_obj_draw_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(class_p == NULL) return LV_DRAW_RES_OK;
-
-    /*Find a base in which draw_cb is set*/
-    const lv_obj_class_t * base = class_p->base_class;
-    while(base && base->draw_cb == NULL) base = base->base_class;
-
-    if(base == NULL) return LV_DRAW_RES_OK;
-    if(base->draw_cb == NULL) return LV_DRAW_RES_OK;
-
-    return base->draw_cb(obj, clip_area, mode);
 }
 
 bool lv_obj_is_editable(struct _lv_obj_t * obj)
@@ -153,7 +124,7 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p)
     const lv_obj_class_t * base = class_p;
     while(base && base->instance_size == 0) base = base->base_class;
 
-    if(base == NULL) return 0;  /*Never happens: set at least in `lv_obj` class */
+    if(base == NULL) return 0;  /*Never happens: set at least in `lv_obj` class*/
 
     return base->instance_size;
 }

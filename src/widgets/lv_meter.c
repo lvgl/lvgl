@@ -29,7 +29,7 @@
  **********************/
 static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_meter_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_meter_draw(lv_obj_t * lmeter, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void lv_meter_event(lv_obj_t * obj, lv_event_t e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -43,7 +43,7 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
 const lv_obj_class_t lv_meter_class = {
     .constructor_cb = lv_meter_constructor,
     .destructor_cb = lv_meter_destructor,
-    .draw_cb = lv_meter_draw,
+    .event_cb = lv_meter_event,
     .instance_size = sizeof(lv_meter_t),
     .base_class = &lv_obj_class
 };
@@ -290,16 +290,13 @@ static void lv_meter_destructor(lv_obj_t * obj)
 
 }
 
-static lv_draw_res_t lv_meter_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+static void lv_meter_event(lv_obj_t * obj, lv_event_t e)
 {
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
+    lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
+    if(e == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param();
         lv_area_t scale_area;
         lv_obj_get_coords_fit(obj, &scale_area);
 
@@ -323,14 +320,7 @@ static lv_draw_res_t lv_meter_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
         nm_cord.y2 = scale_center.y + size;
         lv_draw_rect(&nm_cord, clip_area, &mid_dsc);
     }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
 }
-
 
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
 {
@@ -467,7 +457,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 }
             }
 
-            /* `* 256` for extra precision*/
+            /*`* 256` for extra precision*/
             int32_t angle_upscale = ((i * scale->angle_range) << 8) / (scale->tick_cnt - 1);
 
             int32_t angle_low = (angle_upscale >> 8);
@@ -487,14 +477,14 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             line_dsc.color = line_color;
             line_dsc.width = line_width;
 #if LV_DRAW_COMPLEX
-            /* Use the interpolated angle to get the outer x and y coordinates.
-             * Draw a little bit longer lines to be sure the mask will clip them correctly*/
+            /*Use the interpolated angle to get the outer x and y coordinates.
+             *Draw a little bit longer lines to be sure the mask will clip them correctly*/
             lv_point_t p_outer;
             p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
             p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
             lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
 #else
-            /* Use the interpolated angle to get the outer and inner x and y coordinates.*/
+            /*Use the interpolated angle to get the outer and inner x and y coordinates.*/
             lv_point_t p_outer;
             p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
             p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;

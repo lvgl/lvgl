@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* Can't include lv_obj.h because it includes this header file */
+/*Can't include lv_obj.h because it includes this header file*/
 struct _lv_obj_t;
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
@@ -37,12 +37,12 @@ enum {
 typedef uint8_t lv_scrollbar_mode_t;
 
 
-/** Scroll span align options. Tells where to align the snapable children when scroll stops. */
+/** Scroll span align options. Tells where to align the snapable children when scroll stops.*/
 enum {
-    LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is */
-    LV_SCROLL_SNAP_START,   /**< Align to to the left/top */
-    LV_SCROLL_SNAP_END,     /**< Align to to the right/bottom */
-    LV_SCROLL_SNAP_CENTER   /**< Align to to the center */
+    LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is*/
+    LV_SCROLL_SNAP_START,   /**< Align to to the left/top*/
+    LV_SCROLL_SNAP_END,     /**< Align to to the right/bottom*/
+    LV_SCROLL_SNAP_CENTER   /**< Align to to the center*/
 };
 typedef uint8_t lv_scroll_snap_t;
 
@@ -271,7 +271,7 @@ void lv_obj_scrollbar_invalidate(struct _lv_obj_t * obj);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_SCROLL_H*/

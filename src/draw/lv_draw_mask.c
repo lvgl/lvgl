@@ -282,10 +282,10 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
 void lv_draw_mask_line_angle_init(lv_draw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t py, int16_t angle,
                                   lv_draw_mask_line_side_t side)
 {
-    /* Find an optimal degree.
-     * lv_mask_line_points_init will swap the points to keep the smaller y in p1
-     * Theoretically a line with `angle` or `angle+180` is the same only the points are swapped
-     * Find the degree which keeps the origo in place */
+    /*Find an optimal degree.
+     *lv_mask_line_points_init will swap the points to keep the smaller y in p1
+     *Theoretically a line with `angle` or `angle+180` is the same only the points are swapped
+     *Find the degree which keeps the origo in place*/
     if(angle > 180) angle -= 180; /*> 180 will swap the origo*/
 
     int32_t p2x;
@@ -311,7 +311,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     lv_draw_mask_line_side_t start_side;
     lv_draw_mask_line_side_t end_side;
 
-    /* Constrain the input angles */
+    /*Constrain the input angles*/
     if(start_angle < 0)
         start_angle = 0;
     else if(start_angle > 359)
@@ -345,7 +345,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
     else
-        start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /* silence compiler */
+        start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /*silence compiler*/
 
     LV_ASSERT_MSG(end_angle >= 0 && start_angle <= 360, "Unexpected end angle");
 
@@ -356,7 +356,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
         end_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
     else
-        end_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /* silence compiler */
+        end_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /*silence compiler*/
 
     lv_draw_mask_line_angle_init(&param->start_line, vertex_x, vertex_y, start_angle, start_side);
     lv_draw_mask_line_angle_init(&param->end_line, vertex_x, vertex_y, end_angle, end_side);
@@ -514,8 +514,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
         }
     }
 
-    /* At the end of the mask if the limit line is smaller then the mask's y.
-     * Then the mask is in the "good" area*/
+    /*At the end of the mask if the limit line is smaller then the mask's y.
+     *Then the mask is in the "good" area*/
     y_at_x = (int32_t)((int32_t)p->yx_steep * (abs_x + len)) >> 10;
     if(p->yx_steep > 0) {
         if(y_at_x < abs_y) {
@@ -607,8 +607,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
 {
     int32_t k;
     int32_t x_at_y;
-    /* At the beginning of the mask if the limit line is greater then the mask's y.
-     * Then the mask is in the "wrong" area*/
+    /*At the beginning of the mask if the limit line is greater then the mask's y.
+     *Then the mask is in the "wrong" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * abs_y) >> 10;
     if(p->xy_steep > 0) x_at_y++;
     if(x_at_y < abs_x) {
@@ -620,8 +620,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
         }
     }
 
-    /* At the end of the mask if the limit line is smaller then the mask's y.
-     * Then the mask is in the "good" area*/
+    /*At the end of the mask if the limit line is smaller then the mask's y.
+     *Then the mask is in the "good" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * (abs_y)) >> 10;
     if(x_at_y > abs_x + len) {
         if(p->inv) {
@@ -758,7 +758,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
 
-        /*Start angle mask can work only from the end of end angle mask */
+        /*Start angle mask can work only from the end of end angle mask*/
         int32_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
         int32_t start_angle_last = ((rel_y + 1) * p->start_line.xy_steep) >> 10;
 
@@ -800,7 +800,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
 
-        /*Start angle mask can work only from the end of end angle mask */
+        /*Start angle mask can work only from the end of end angle mask*/
         int32_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
         int32_t start_angle_last = ((rel_y + 1) * p->start_line.xy_steep) >> 10;
 
@@ -950,14 +950,14 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
 
         lv_sqrt_res_t x0;
         lv_sqrt_res_t x1;
-        /* y = 0 should mean the top of the circle */
+        /*y = 0 should mean the top of the circle*/
         int32_t y;
         if(abs_y < radius) {
             y = radius - abs_y;
 
-            /* Get the x intersection points for `abs_y` and `abs_y-1`
-             * Use the circle's equation x = sqrt(r^2 - y^2)
-             * Try to use the values from the previous run*/
+            /*Get the x intersection points for `abs_y` and `abs_y-1`
+             *Use the circle's equation x = sqrt(r^2 - y^2)
+             *Try to use the values from the previous run*/
             if(y == p->y_prev) {
                 x0.f = p->y_prev_x.f;
                 x0.i = p->y_prev_x.i;
@@ -973,9 +973,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
         else {
             y = radius - (h - abs_y) + 1;
 
-            /* Get the x intersection points for `abs_y` and `abs_y-1`
-             * Use the circle's equation x = sqrt(r^2 - y^2)
-             * Try to use the values from the previous run*/
+            /*Get the x intersection points for `abs_y` and `abs_y-1`
+             *Use the circle's equation x = sqrt(r^2 - y^2)
+             *Try to use the values from the previous run*/
             if((y - 1) == p->y_prev) {
                 x1.f = p->y_prev_x.f;
                 x1.i = p->y_prev_x.i;
@@ -990,8 +990,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             p->y_prev_x.i = x0.i;
         }
 
-        /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
-         * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
+        /*If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
+         *then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
         if(x0.i == x1.i - 1 && x1.f == 0) {
             x1.i--;
             x1.f = 0xFF;
@@ -1089,8 +1089,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
 
             /*Set all points which are crossed by the circle*/
             for(; i <= x1.i; i++) {
-                /* These values are very close to each other. It's enough to approximate sqrt
-                 * The non-approximated version is lv_sqrt(r2 - (i * i), &y_next, sqrt_mask); */
+                /*These values are very close to each other. It's enough to approximate sqrt
+                 *The non-approximated version is lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);*/
                 sqrt_approx(&y_next, &y_prev, r2 - (i * i));
 
                 m = (y_prev.f + y_next.f) >> 1;

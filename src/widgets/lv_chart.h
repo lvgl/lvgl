@@ -102,7 +102,7 @@ typedef struct {
     uint16_t point_cnt;    /**< Point number in a data line*/
     uint16_t zoom_x;
     uint16_t zoom_y;
-    lv_chart_type_t type :2; /**< Line or column chart */
+    lv_chart_type_t type :2; /**< Line or column chart*/
     lv_chart_update_mode_t update_mode : 1;
 }lv_chart_t;
 
@@ -382,7 +382,7 @@ uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj);
 #endif /*LV_USE_CHART*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_CHART_H*/

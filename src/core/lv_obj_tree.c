@@ -19,7 +19,7 @@
 
 #if defined(LV_USER_DATA_FREE_INCLUDE)
     #include LV_USER_DATA_FREE_INCLUDE
-#endif /* LV_USE_USER_DATA_FREE */
+#endif /*LV_USE_USER_DATA_FREE*/
 
 /**********************
  *      TYPEDEFS
@@ -64,7 +64,7 @@ void lv_obj_del(lv_obj_t * obj)
 
     obj_del_core(obj);
 
-    /*Send a signal to the parent to notify it about the child delete*/
+    /*Send a Call the ancestor's event handler to the parent to notify it about the child delete*/
     if(par) {
         /*Just to remove scroll animations if any*/
         lv_obj_scroll_to(par, 0, 0, LV_ANIM_OFF);
@@ -72,7 +72,7 @@ void lv_obj_del(lv_obj_t * obj)
                 par->spec_attr->scroll.x = 0;
                 par->spec_attr->scroll.y = 0;
             }
-        lv_signal_send(par, LV_SIGNAL_CHILD_CHG, NULL);
+        lv_event_send(par, LV_EVENT_CHILD_CHANGED, NULL);
     }
 
     /*Handle if the active screen was deleted*/
@@ -178,10 +178,10 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     }
 
     /*Notify the original parent because one of its children is lost*/
-    lv_signal_send(old_parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(old_parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     lv_obj_invalidate(obj);
 }
@@ -201,7 +201,7 @@ void lv_obj_move_foreground(lv_obj_t * obj)
     parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     lv_obj_invalidate(parent);
 }
@@ -221,7 +221,7 @@ void lv_obj_move_background(lv_obj_t * obj)
     parent->spec_attr->children[0] = obj;
 
     /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     lv_obj_invalidate(parent);
 }
@@ -349,7 +349,7 @@ static void obj_del_core(lv_obj_t * obj)
     lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
     lv_obj_enable_style_refresh(true);
 
-    /* Reset all input devices if the object to delete is used*/
+    /*Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
@@ -365,7 +365,7 @@ static void obj_del_core(lv_obj_t * obj)
         indev = lv_indev_get_next(indev);
     }
 
-    /* All children deleted. Now clean up the object specific data*/
+    /*All children deleted. Now clean up the object specific data*/
     _lv_obj_destruct(obj);
 
     /*Remove the screen for the screen list*/

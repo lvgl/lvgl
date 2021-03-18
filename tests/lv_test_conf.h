@@ -36,7 +36,7 @@ typedef void * lv_user_data_t;
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TEST_CONF_H*/

@@ -37,7 +37,7 @@ typedef struct {
 /*Data of calendar*/
 typedef struct {
     lv_btnmatrix_t btnm;
-    /*New data for this type */
+    /*New data for this type*/
     lv_calendar_date_t today;               /*Date of today*/
     lv_calendar_date_t showed_date;         /*Currently visible month (day is ignored)*/
     lv_calendar_date_t * highlighted_dates; /*Apply different style on these days (pointer to an array defined by the user)*/
@@ -145,10 +145,10 @@ bool lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t 
  *      MACROS
  **********************/
 
-#endif  /* LV_USE_CALENDAR*/
+#endif  /*LV_USE_CALENDAR*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_CALENDAR_H*/

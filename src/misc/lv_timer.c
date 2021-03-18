@@ -83,15 +83,15 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     uint32_t handler_start = lv_tick_get();
 
-    /* Run all timer from the list*/
+    /*Run all timer from the list*/
     lv_timer_t * next;
     do {
         timer_deleted             = false;
         timer_created             = false;
         LV_GC_ROOT(_lv_timer_act) = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
         while(LV_GC_ROOT(_lv_timer_act)) {
-            /* The timer might be deleted if it runs only once ('repeat_count = 1')
-             * So get next element until the current is surely valid*/
+            /*The timer might be deleted if it runs only once ('repeat_count = 1')
+             *So get next element until the current is surely valid*/
             next = _lv_ll_get_next(&LV_GC_ROOT(_lv_timer_ll), LV_GC_ROOT(_lv_timer_act));
 
             if(lv_timer_exec(LV_GC_ROOT(_lv_timer_act))) {

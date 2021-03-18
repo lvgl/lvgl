@@ -30,17 +30,17 @@ extern "C" {
  **********************/
 
 /**
- * Source of image. */
+ * Source of image.*/
 enum {
-    LV_IMG_SRC_VARIABLE, /** Binary/C variable */
-    LV_IMG_SRC_FILE, /** File in filesystem */
-    LV_IMG_SRC_SYMBOL, /** Symbol (@ref lv_symbol_def.h) */
-    LV_IMG_SRC_UNKNOWN, /** Unknown source */
+    LV_IMG_SRC_VARIABLE, /** Binary/C variable*/
+    LV_IMG_SRC_FILE, /** File in filesystem*/
+    LV_IMG_SRC_SYMBOL, /** Symbol (@ref lv_symbol_def.h)*/
+    LV_IMG_SRC_UNKNOWN, /** Unknown source*/
 };
 
 typedef uint8_t lv_img_src_t;
 
-/* Decoder function definitions */
+/*Decoder function definitions*/
 
 struct _lv_img_decoder;
 struct _lv_img_decoder_dsc;
@@ -120,7 +120,7 @@ typedef struct _lv_img_decoder_dsc {
     uint32_t time_to_open;
 
     /**A text to display instead of the image when the image can't be opened.
-     * Can be set in `open` function or set NULL. */
+     * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
     /**Store any custom data here is required*/
@@ -263,7 +263,7 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_IMG_DECODER_H*/

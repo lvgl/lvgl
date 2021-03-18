@@ -51,7 +51,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 
 /**
  * Initialize the image decoder module
- * */
+ */
 void _lv_img_decoder_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_img_decoder_ll), sizeof(lv_img_decoder_t));
@@ -298,11 +298,11 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
     }
     else if(src_type == LV_IMG_SRC_SYMBOL) {
         /*The size depend on the font but it is unknown here. It should be handled outside of the
-         * function*/
+         *function*/
         header->w = 1;
         header->h = 1;
-        /* Symbols always have transparent parts. Important because of cover check in the draw
-         * function. The actual value doesn't matter because lv_draw_label will draw it*/
+        /*Symbols always have transparent parts. Important because of cover check in the draw
+         *function. The actual value doesn't matter because lv_draw_label will draw it*/
         header->cf = LV_IMG_CF_ALPHA_1BIT;
     }
     else {
@@ -358,8 +358,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     /*Process true color formats*/
     if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
-            /* In case of uncompressed formats the image stored in the ROM/RAM.
-             * So simply give its pointer*/
+            /*In case of uncompressed formats the image stored in the ROM/RAM.
+             *So simply give its pointer*/
             dsc->img_data = ((lv_img_dsc_t *)dsc->src)->data;
             return LV_RES_OK;
         }
@@ -420,7 +420,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
         return LV_RES_OK;
     }
-    /*Alpha indexed images. */
+    /*Alpha indexed images.*/
     else if(cf == LV_IMG_CF_ALPHA_1BIT || cf == LV_IMG_CF_ALPHA_2BIT || cf == LV_IMG_CF_ALPHA_4BIT ||
             cf == LV_IMG_CF_ALPHA_8BIT) {
         return LV_RES_OK; /*Nothing to process*/
@@ -455,8 +455,8 @@ lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_de
 
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
        dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
-        /* For TRUE_COLOR images read line required only for files.
-         * For variables the image data was returned in `open`*/
+        /*For TRUE_COLOR images read line required only for files.
+         *For variables the image data was returned in `open`*/
         if(dsc->src_type == LV_IMG_SRC_FILE) {
             res = lv_img_decoder_built_in_line_true_color(dsc, x, y, len, buf);
         }

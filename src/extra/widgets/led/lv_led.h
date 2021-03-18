@@ -93,7 +93,7 @@ uint8_t lv_led_get_brightness(const lv_obj_t * obj);
 #endif /*LV_USE_LED*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 

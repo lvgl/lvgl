@@ -31,8 +31,8 @@
  **********************/
 
 static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_arc_draw(lv_obj_t * arc, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
+static void lv_arc_draw(lv_obj_t * obj);
+static void lv_arc_event(lv_obj_t * obj, lv_event_t e);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
 static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
@@ -43,8 +43,7 @@ static void value_update(lv_obj_t * arc);
  **********************/
 const lv_obj_class_t lv_arc_class  = {
     .constructor_cb = lv_arc_constructor,
-    .signal_cb = lv_arc_signal,
-    .draw_cb = lv_arc_draw,
+    .event_cb = lv_arc_event,
     .instance_size = sizeof(lv_arc_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class
@@ -359,7 +358,7 @@ void lv_arc_set_range(lv_obj_t * obj, int16_t min, int16_t max)
        arc->value = max;
     }
 
-    value_update(obj); /* value has changed relative to the new range */
+    value_update(obj); /*value has changed relative to the new range*/
 }
 
 /**
@@ -487,7 +486,7 @@ static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-   /*Initialize the allocated 'ext' */
+   /*Initialize the allocated 'ext'*/
    arc->rotation = 0;
    arc->bg_angle_start = 135;
    arc->bg_angle_end   = 45;
@@ -530,83 +529,22 @@ static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        lv_arc_t * arc = (lv_arc_t *)obj;
-
-        lv_point_t center;
-        lv_coord_t arc_r;
-        get_center(obj, &center, &arc_r);
-
-        /*Draw the background arc*/
-        lv_draw_arc_dsc_t arc_dsc;
-        if(arc_r > 0) {
-            lv_draw_arc_dsc_init(&arc_dsc);
-            lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
-
-            lv_draw_arc(center.x, center.y, arc_r,arc->bg_angle_start +arc->rotation,
-                       arc->bg_angle_end + arc->rotation, clip_area,
-                        &arc_dsc);
-        }
-
-        /*make the indicator arc smaller or larger according to its greatest padding value*/
-        lv_coord_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-        lv_coord_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-        lv_coord_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-        lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
-        lv_coord_t indic_r = arc_r - LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
-
-        if(indic_r > 0) {
-            lv_draw_arc_dsc_init(&arc_dsc);
-            lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
-
-            lv_draw_arc(center.x, center.y, indic_r,arc->indic_angle_start +arc->rotation,
-                       arc->indic_angle_end +arc->rotation, clip_area,
-                        &arc_dsc);
-        }
-
-        lv_area_t knob_area;
-        get_knob_area(obj, &center, arc_r, &knob_area);
-
-        lv_draw_rect_dsc_t knob_rect_dsc;
-        lv_draw_rect_dsc_init(&knob_rect_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
-
-        lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
-
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
-static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    /*Call the ancestor's event handler*/
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_arc_t * arc = (lv_arc_t *)obj;
-    if(sign == LV_SIGNAL_PRESSING) {
+    if(e == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
-        if(indev == NULL) return res;
+        if(indev == NULL) return;
 
         /*Handle only pointers here*/
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
-        if(indev_type != LV_INDEV_TYPE_POINTER) return res;
+        if(indev_type != LV_INDEV_TYPE_POINTER) return;
 
         lv_point_t p;
         lv_indev_get_point(indev, &p);
@@ -631,10 +569,10 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
 
         /*It must be in "dragging" mode to turn the arc*/
-        if(arc->dragging == false) return res;
+        if(arc->dragging == false) return;
 
         /*No angle can be determined if exactly the middle of the arc is being pressed*/
-        if(p.x == 0 && p.y == 0) return res;
+        if(p.x == 0 && p.y == 0) return;
 
         /*Calculate the angle of the pressed point*/
         int16_t angle;
@@ -654,9 +592,9 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         int16_t last_angle_rel =arc->last_angle -arc->bg_angle_start;
         int16_t delta_angle = angle - last_angle_rel;
 
-        /* Do not allow big jumps.
-         * It's mainly to avoid jumping to the opposite end if the "dead" range between min. an max. is crossed.
-         * Check which and was closer on the last valid press (arc->min_close) and prefer that end */
+        /*Do not allow big jumps.
+         *It's mainly to avoid jumping to the opposite end if the "dead" range between min. an max. is crossed.
+         *Check which and was closer on the last valid press (arc->min_close) and prefer that end*/
         if(LV_ABS(delta_angle) > 180) {
             if(arc->min_close) angle = 0;
             else angle = deg_range;
@@ -695,7 +633,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_arc_set_value(obj, new_value); /*set_value caches the last_angle for the next iteration*/
             if(new_value != old_value) {
                 res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
+                if(res != LV_RES_OK) return;
             }
         }
 
@@ -704,10 +642,10 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
            arc->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
         }
     }
-    else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
+    else if(e == LV_EVENT_RELEASED || e == LV_EVENT_PRESS_LOST) {
        arc->dragging = false;
 
-        /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
+        /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -716,8 +654,8 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
 
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
-        char c = *((char *)param);
+    else if(e == LV_EVENT_KEY) {
+        char c = *((char *)lv_event_get_param());
 
         int16_t old_value =arc->value;
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -729,10 +667,10 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
         if(old_value !=arc->value) {
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if(res != LV_RES_OK) return;
         }
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
         lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
         lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -745,11 +683,58 @@ static lv_res_t lv_arc_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
         lv_coord_t knob_pad = LV_MAX4(knob_left, knob_right, knob_top, knob_bottom) + 2;
 
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_pad - bg_pad);
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        lv_arc_draw(obj);
+    }
+}
+
+static void lv_arc_draw(lv_obj_t * obj)
+{
+    lv_arc_t * arc = (lv_arc_t *)obj;
+
+    const lv_area_t * clip_area = lv_event_get_param();
+
+    lv_point_t center;
+    lv_coord_t arc_r;
+    get_center(obj, &center, &arc_r);
+
+    /*Draw the background arc*/
+    lv_draw_arc_dsc_t arc_dsc;
+    if(arc_r > 0) {
+        lv_draw_arc_dsc_init(&arc_dsc);
+        lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
+
+        lv_draw_arc(center.x, center.y, arc_r,arc->bg_angle_start +arc->rotation,
+                   arc->bg_angle_end + arc->rotation, clip_area,
+                    &arc_dsc);
     }
 
-    return res;
+    /*make the indicator arc smaller or larger according to its greatest padding value*/
+    lv_coord_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+    lv_coord_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+    lv_coord_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+    lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_r = arc_r - LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+
+    if(indic_r > 0) {
+        lv_draw_arc_dsc_init(&arc_dsc);
+        lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
+
+        lv_draw_arc(center.x, center.y, indic_r,arc->indic_angle_start +arc->rotation,
+                   arc->indic_angle_end +arc->rotation, clip_area,
+                    &arc_dsc);
+    }
+
+    lv_area_t knob_area;
+    get_knob_area(obj, &center, arc_r, &knob_area);
+
+    lv_draw_rect_dsc_t knob_rect_dsc;
+    lv_draw_rect_dsc_init(&knob_rect_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
+
+    lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
 }
 
 static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angle, uint8_t part)

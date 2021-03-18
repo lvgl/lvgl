@@ -152,7 +152,7 @@ lv_bar_type_t lv_bar_get_type(lv_obj_t * obj);
 #endif /*LV_USE_BAR*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_BAR_H*/

@@ -80,8 +80,8 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     obj->w_set = w;
     obj->h_set = h;
 
-    /* If the width or height is set to special layout related value save them in w_set and h_set
-     * but use the current size on the object width*/
+    /*If the width or height is set to special layout related value save them in w_set and h_set
+     *but use the current size on the object width*/
     if(LV_COORD_IS_LAYOUT(w)) w = lv_obj_get_width(obj);
     if(LV_COORD_IS_LAYOUT(h)) h = lv_obj_get_height(obj);
 
@@ -187,9 +187,9 @@ void lv_obj_update_layout(lv_obj_t * obj)
         layout_update_core(obj);
     }while(scr->layout_inv);  /*Repeat until there where layout invalidations*/
 
-    /* Restore the global state because other calls of this function needs this info too.
-     * Other calls might use different start object, but they need to know if there is dirty layout somewhere.
-     * However if the screen was updated it's sure that all layouts are ready. */
+    /*Restore the global state because other calls of this function needs this info too.
+     *Other calls might use different start object, but they need to know if there is dirty layout somewhere.
+     *However if the screen was updated it's sure that all layouts are ready.*/
     if(obj != scr) scr->layout_inv = 1;
 
 }
@@ -435,14 +435,14 @@ lv_coord_t lv_obj_get_width_visible(const lv_obj_t * obj)
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
-    lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.x;
 }
 
 lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
-    lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.y;
 }
 
@@ -472,9 +472,9 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     diff.x = x - obj->coords.x1;
     diff.y = y - obj->coords.y1;
 
-    /* Do nothing if the position is not changed */
-    /* It is very important else recursive positioning can
-     * occur without position change*/
+    /*Do nothing if the position is not changed*/
+    /*It is very important else recursive positioning can
+     *occur without position change*/
     if(diff.x == 0 && diff.y == 0) return;
 
     /*Invalidate the original area*/
@@ -490,8 +490,8 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     if(parent) {
         lv_obj_get_coords_fit(parent, &parent_fit_area);
 
-        /* If the object is already out of the parent and its position is changes
-        * surely the scrollbars also changes so invalidate them*/
+        /*If the object is already out of the parent and its position is changes
+         *surely the scrollbars also changes so invalidate them*/
         on1 = _lv_area_is_in(&ori, &parent_fit_area, 0);
         if(!on1) lv_obj_scrollbar_invalidate(parent);
     }
@@ -504,16 +504,16 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     lv_obj_move_children_by(obj, diff.x, diff.y, false);
 
     /*Inform the object about its new coordinates*/
-    lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
+    lv_event_send(obj, LV_EVENT_COORD_CHANGED, &ori);
 
-    /*Send a signal to the parent too*/
-    if(parent && notify) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    /*Send a Call the ancestor's event handler to the parent too*/
+    if(parent && notify) lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
 
-    /* If the object was out of the parent invalidate the new scrollbar area too.
-     * If it wasn't out of the parent but out now, also invalidate the srollbars*/
+    /*If the object was out of the parent invalidate the new scrollbar area too.
+     *If it wasn't out of the parent but out now, also invalidate the srollbars*/
     if(parent) {
         bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
         if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
@@ -652,7 +652,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.result = true;
-        lv_signal_send(obj, LV_SIGNAL_HIT_TEST, &hit_info);
+        lv_event_send(obj, LV_EVENT_HIT_TEST, &hit_info);
         return hit_info.result;
     }
 
@@ -677,13 +677,13 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
 
-    /* If the size is managed by the layout don't let to overwrite it.*/
+    /*If the size is managed by the layout don't let to overwrite it.*/
     if(obj->w_set == LV_SIZE_LAYOUT) w = lv_obj_get_width(obj);
     if(obj->h_set == LV_SIZE_LAYOUT) h = lv_obj_get_height(obj);
 
-    /* Do nothing if the size is not changed */
-    /* It is very important else recursive resizing can
-     * occur without size change*/
+    /*Do nothing if the size is not changed*/
+    /*It is very important else recursive resizing can
+     *occur without size change*/
     if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) {
         return false;
     }
@@ -698,13 +698,13 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_area_t parent_fit_area;
     lv_obj_get_coords_fit(parent, &parent_fit_area);
 
-    /* If the object is already out of the parent and its position is changes
-     * surely the scrollbars also changes so invalidate them*/
+    /*If the object is already out of the parent and its position is changes
+     *surely the scrollbars also changes so invalidate them*/
     bool on1 = _lv_area_is_in(&ori, &parent_fit_area, 0);
     if(!on1) lv_obj_scrollbar_invalidate(parent);
 
-    /* Set the length and height
-     * Be sure the content is not scrolled in an invalid position on the new size*/
+    /*Set the length and height
+     *Be sure the content is not scrolled in an invalid position on the new size*/
     obj->coords.y2 = obj->coords.y1 + h - 1;
     if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
         obj->coords.x1 = obj->coords.x2 - w + 1;
@@ -713,17 +713,17 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
         obj->coords.x2 = obj->coords.x1 + w - 1;
     }
 
-    /*Send a signal to the object with its new coordinates*/
-    lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
+    /*Send a Call the ancestor's event handler to the object with its new coordinates*/
+    lv_event_send(obj, LV_EVENT_COORD_CHANGED, &ori);
 
-    /*Send a signal to the parent too*/
-    if(parent != NULL) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    /*Send a Call the ancestor's event handler to the parent too*/
+    if(parent != NULL) lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
 
-    /* If the object was out of the parent invalidate the new scrollbar area too.
-     * If it wasn't out of the parent but out now, also invalidate the srollbars*/
+    /*If the object was out of the parent invalidate the new scrollbar area too.
+     *If it wasn't out of the parent but out now, also invalidate the srollbars*/
     bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
     if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
     return true;

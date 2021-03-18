@@ -77,35 +77,36 @@ enum {
     LV_IMG_CF_ALPHA_4BIT, /**< Can have one color but 16 different alpha value*/
     LV_IMG_CF_ALPHA_8BIT, /**< Can have one color but 256 different alpha value*/
 
-    LV_IMG_CF_RESERVED_15,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_16,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_17,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_18,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_19,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_20,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_21,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_22,              /**< Reserved for further use. */
-    LV_IMG_CF_RESERVED_23,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_15,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_16,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_17,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_18,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_19,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_20,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_21,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_22,              /**< Reserved for further use.*/
+    LV_IMG_CF_RESERVED_23,              /**< Reserved for further use.*/
 
-    LV_IMG_CF_USER_ENCODED_0,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_1,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_2,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_3,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_4,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_5,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_6,          /**< User holder encoding format. */
-    LV_IMG_CF_USER_ENCODED_7,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_0,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_1,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_2,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_3,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_4,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_5,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_6,          /**< User holder encoding format.*/
+    LV_IMG_CF_USER_ENCODED_7,          /**< User holder encoding format.*/
 };
 typedef uint8_t lv_img_cf_t;
 
 /**
  * LVGL image header
  */
-/* The first 8 bit is very important to distinguish the different source types.
+/**
+ * The first 8 bit is very important to distinguish the different source types.
  * For more info see `lv_img_get_src_type()` in lv_img.c
  * On big endian systems the order is reversed so cf and always_zero must be at
  * the end of the struct.
- * */
+ */
 #if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
 
@@ -114,13 +115,13 @@ typedef struct {
     uint32_t reserved : 2; /*Reserved to be used later*/
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
-    uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
+    uint32_t cf : 5;          /*Color format: See `lv_img_color_format_t`*/
 
 } lv_img_header_t;
 #else
 typedef struct {
 
-    uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
+    uint32_t cf : 5;          /*Color format: See `lv_img_color_format_t`*/
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
 
@@ -145,7 +146,7 @@ typedef struct {
         lv_coord_t src_w;           /*width of the image source*/
         lv_coord_t src_h;           /*height of the image source*/
         lv_coord_t pivot_x;         /*pivot x*/
-        lv_coord_t pivot_y;         /* pivot y*/
+        lv_coord_t pivot_y;         /*pivot y*/
         int16_t angle;              /*angle to rotate*/
         uint16_t zoom;              /*256 no zoom, 128 half size, 512 double size*/
         lv_color_t color;           /*a color used for `LV_IMG_CF_INDEXED_1/2/4/8BIT` color formats*/
@@ -304,7 +305,7 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_IMG_BUF_H*/

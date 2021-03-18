@@ -135,8 +135,8 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     lv_memset_00(data, sizeof(lv_indev_data_t));
 
-    /* For touchpad sometimes users don't set the last pressed coordinate on release.
-     * So be sure a coordinates are initialized to the last point */
+    /*For touchpad sometimes users don't set the last pressed coordinate on release.
+     *So be sure a coordinates are initialized to the last point*/
     if(indev->driver->type == LV_INDEV_TYPE_POINTER) {
         data->point.x = indev->proc.types.pointer.act_point.x;
         data->point.y = indev->proc.types.pointer.act_point.y;
@@ -145,7 +145,7 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     else if(indev->driver->type == LV_INDEV_TYPE_KEYPAD) {
         data->key = indev->proc.types.keypad.last_key;
     }
-    /*For compatibility assume that used button was enter (encoder push) */
+    /*For compatibility assume that used button was enter (encoder push)*/
     else if(indev->driver->type == LV_INDEV_TYPE_ENCODER) {
         data->key = LV_KEY_ENTER;
     }

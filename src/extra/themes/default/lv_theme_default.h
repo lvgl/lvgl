@@ -49,7 +49,7 @@ bool lv_theme_default_is_inited(void);
 #endif
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_THEME_DEFAULT_H*/

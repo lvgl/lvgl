@@ -34,7 +34,7 @@ void lv_font_free(lv_font_t * font);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_FONT_LOADER_H*/

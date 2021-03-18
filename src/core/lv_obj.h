@@ -42,40 +42,49 @@ struct _lv_obj_t;
  * Type of event being sent to the object.
  */
 typedef enum {
+    /** Input device events*/
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
     LV_EVENT_PRESSING,            /**< The object is being pressed (called continuously while pressing)*/
-    LV_EVENT_PRESS_LOST,          /**< User is still pressing but slid cursor/finger off of the object */
-    LV_EVENT_SHORT_CLICKED,       /**< User pressed object for a short period of time, then released it. Not called if scrolled. */
+    LV_EVENT_PRESS_LOST,          /**< User is still being pressed but slid cursor/finger off of the object */
+    LV_EVENT_SHORT_CLICKED,       /**< User pressed object for a short period of time, then released it. Not called if scrolled.*/
     LV_EVENT_LONG_PRESSED,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if scrolled.*/
-    LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every
-                                       `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
+    LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
     LV_EVENT_CLICKED,             /**< Called on release if not scrolled (regardless to long press)*/
     LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/
-    LV_EVENT_SCROLL_BEGIN,
-    LV_EVENT_SCROLL_END,
-    LV_EVENT_SCROLL,
-    LV_EVENT_GESTURE,           /**< The object has been gesture*/
-    LV_EVENT_KEY,
-    LV_EVENT_FOCUSED,
-    LV_EVENT_DEFOCUSED,
-    LV_EVENT_LEAVE,
-    LV_EVENT_VALUE_CHANGED,      /**< The object's value has changed (i.e. slider moved) */
-    LV_EVENT_INSERT,
-    LV_EVENT_REFRESH,
-    LV_EVENT_DELETE, /**< Object is being deleted */
+    LV_EVENT_SCROLL_BEGIN,        /**< Scrolling begins*/
+    LV_EVENT_SCROLL_END,          /**< Scrolling ends*/
+    LV_EVENT_SCROLL,              /**< Scrolling*/
+    LV_EVENT_GESTURE,             /**< Gesture detected*/
+    LV_EVENT_KEY,                 /**< A key is sent to the object*/
+    LV_EVENT_FOCUSED,             /**< Focused */
+    LV_EVENT_DEFOCUSED,           /**< Defocused*/
+    LV_EVENT_LEAVE,               /**< Defocused but still selected*/
+    LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing*/
 
-    LV_EVENT_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_EVENT_REFR_EXT_DRAW_SIZE,   /**< Draw extras on the object */
+    /** Drawing events*/
+    LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area*/
+    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow)*/
+    LV_EVENT_DRAW_MAIN_BEGIN,    /**< Starting the main drawing phase*/
+    LV_EVENT_DRAW_MAIN,          /**< Perform the main drawing*/
+    LV_EVENT_DRAW_MAIN_END,      /**< Finishing the main drawing phase*/
+    LV_EVENT_DRAW_POST_BEGIN,    /**< Starting the post draw phase (when all children are drawn)*/
+    LV_EVENT_DRAW_POST,          /**< Perform the post draw phase (when all children are drawn)*/
+    LV_EVENT_DRAW_POST_END,      /**< Finishing the post draw phase (when all children are drawn)*/
+    LV_EVENT_DRAW_PART_BEGIN,    /**< Starting to draw a part*/
+    LV_EVENT_DRAW_PART_END,      /**< Finishing to draw a part*/
 
-    LV_EVENT_DRAW_MAIN_BEGIN,
-    LV_EVENT_DRAW_MAIN_END,
-    LV_EVENT_DRAW_POST_BEGIN,
-    LV_EVENT_DRAW_POST_END,
-    LV_EVENT_DRAW_PART_BEGIN,
-    LV_EVENT_DRAW_PART_END,
-
-    LV_EVENT_READY,             /**< A process has finished */
-    LV_EVENT_CANCEL,             /**< A process has been cancelled */
+    /** General events*/
+    LV_EVENT_VALUE_CHANGED,       /**< The object's value has changed (i.e. slider moved)*/
+    LV_EVENT_INSERT,              /**< A text is inserted to the object*/
+    LV_EVENT_REFRESH,             /**< Notify the object to refresh something on it (for the user)*/
+    LV_EVENT_DELETE,              /**< Object is being deleted*/
+    LV_EVENT_READY,               /**< A process has finished*/
+    LV_EVENT_CANCEL,              /**< A process has been cancelled */
+    LV_EVENT_CHILD_CHANGED,       /**< Child was removed/added*/
+    LV_EVENT_COORD_CHANGED,       /**< Object coordinates/size have changed*/
+    LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed*/
+    LV_EVENT_BASE_DIR_CHANGED,    /**< The base dir has changed*/
+    LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     _LV_EVENT_LAST /** Number of default events*/
 }lv_event_t;
@@ -95,45 +104,6 @@ typedef struct {
 /*---------------------
  *       EVENTS
  *---------------------*/
-
-
-/** Signals are for use by the object itself or to extend the object's functionality.
- * They determine a widget with a given type should behave.
- * Applications should use ::lv_obj_set_event_cb to be notified of events that occur
- * on the object. */
-typedef enum {
-    /*General signals*/
-    LV_SIGNAL_CHILD_CHG,          /**< Child was removed/added */
-    LV_SIGNAL_COORD_CHG,          /**< Object coordinates/size have changed */
-    LV_SIGNAL_STYLE_CHG,          /**< Object's style has changed */
-    LV_SIGNAL_BASE_DIR_CHG,       /**< The base dir has changed*/
-    LV_SIGNAL_REFR_EXT_DRAW_SIZE, /**< Object's extra padding has changed */
-    LV_SIGNAL_GET_SELF_SIZE,      /**< Get the internal size of a widget*/
-
-    /*Input device related*/
-    LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
-    LV_SIGNAL_PRESSED,           /**< The object has been pressed*/
-    LV_SIGNAL_PRESSING,          /**< The object is being pressed (called continuously while pressing)*/
-    LV_SIGNAL_PRESS_LOST,        /**< User is still pressing but slid cursor/finger off of the object */
-    LV_SIGNAL_RELEASED,          /**< User pressed object for a short period of time, then released it. Not called if scrolled. */
-    LV_SIGNAL_LONG_PRESS,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if scrolled.*/
-    LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
-    LV_SIGNAL_SCROLL_BEGIN,      /**< The scrolling has just begun  */
-    LV_SIGNAL_SCROLL,            /**< The object has been scrolled */
-    LV_SIGNAL_SCROLL_END,        /**< The scrolling has ended */
-    LV_SIGNAL_GESTURE,           /**< The object has been gesture*/
-    LV_SIGNAL_LEAVE,             /**< Another object is clicked or chosen via an input device */
-    LV_SIGNAL_FOCUS,             /**< The object was focused */
-    LV_SIGNAL_DEFOCUS,           /**< The object was de-focused */
-    LV_SIGNAL_CONTROL,           /**< Send a (control) character to the widget */
-} lv_signal_t;
-
-/**
- * @brief Signal callback.
- * Signals are used to notify the widget of the action related to the object.
- * For details, see ::lv_signal_t.
- */
-typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**
  * Possible states of a widget.
@@ -155,7 +125,7 @@ enum {
     LV_STATE_USER_3      =  0x4000,
     LV_STATE_USER_4      =  0x8000,
 
-    LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states */
+    LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
 };
 
 typedef uint16_t lv_state_t;
@@ -169,8 +139,8 @@ typedef uint16_t lv_state_t;
 enum {
     LV_PART_MAIN,        /**< A background like rectangle*/
     LV_PART_SCROLLBAR,   /**< The scrollbar(s)*/
-    LV_PART_INDICATOR,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox */
-    LV_PART_KNOB,        /**< Like handle to grab to adjust the value */
+    LV_PART_INDICATOR,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
+    LV_PART_KNOB,        /**< Like handle to grab to adjust the value*/
     LV_PART_SELECTED,    /**< Indicate the currently selected option or section*/
     LV_PART_ITEMS,       /**< Used if the widget has multiple similar elements (e.g. tabel cells)*/
     LV_PART_TICKS,       /**< Ticks on scale e.g. for a chart or meter*/
@@ -185,7 +155,7 @@ enum {
     LV_PART_CUSTOM_7,           /**< Extension point for custom widgets*/
     LV_PART_CUSTOM_8,           /**< Extension point for custom widgets*/
 
-    LV_PART_ANY = 0xFF,  /**< Special value can be used in some functions to target all parts */
+    LV_PART_ANY = 0xFF,  /**< Special value can be used in some functions to target all parts*/
 };
 
 typedef uint16_t lv_part_t;
@@ -195,24 +165,24 @@ typedef uint16_t lv_part_t;
  * OR-ed values are possible
  */
 enum {
-    LV_OBJ_FLAG_HIDDEN          = (1 << 0),  /**< Make the object hidden. (Like it wasn't there at all) */
-    LV_OBJ_FLAG_CLICKABLE       = (1 << 1),  /**< Make the object clickable by the input devices */
-    LV_OBJ_FLAG_CLICK_FOCUSABLE = (1 << 2),  /**< Add focused state to the object when clicked */
-    LV_OBJ_FLAG_CHECKABLE       = (1 << 3),  /**< Toggle checked state when the object is clicked */
+    LV_OBJ_FLAG_HIDDEN          = (1 << 0),  /**< Make the object hidden. (Like it wasn't there at all)*/
+    LV_OBJ_FLAG_CLICKABLE       = (1 << 1),  /**< Make the object clickable by the input devices*/
+    LV_OBJ_FLAG_CLICK_FOCUSABLE = (1 << 2),  /**< Add focused state to the object when clicked*/
+    LV_OBJ_FLAG_CHECKABLE       = (1 << 3),  /**< Toggle checked state when the object is clicked*/
     LV_OBJ_FLAG_SCROLLABLE      = (1 << 4),  /**< Make the object scrollable*/
     LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 5),  /**< Allow scrolling inside but with slower speed*/
     LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),  /**< Make the object scroll further when "thrown"*/
     LV_OBJ_FLAG_SCROLL_ONE      = (1 << 7),   /**< Allow scrolling only one snapable children*/
-    LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8),  /**< Allow propagating the scroll to a parent */
+    LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8),  /**< Allow propagating the scroll to a parent*/
     LV_OBJ_FLAG_SCROLL_ON_FOCUS = (1 << 9),  /**< Automatically scroll object to make it visible when focused*/
     LV_OBJ_FLAG_SNAPABLE        = (1 << 10), /**< If scroll snap is enabled on the parent it can snap to this object*/
-    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 11), /**< Keep the object pressed even if the press slid from the object */
-    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 12), /**< Propagate the events to the parent too */
-    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13), /**< Propagate the gestures to the parent */
-    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14), /**< Propagate the focus to the parent */
-    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners. */
-    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 16), /**< Make the object position-able by the layouts */
-    LV_OBJ_FLAG_FLOATING        = (1 << 17), /**< Do not scroll the object when the parent scrolls and ignore layout */
+    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 11), /**< Keep the object pressed even if the press slid from the object*/
+    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 12), /**< Propagate the events to the parent too*/
+    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13), /**< Propagate the gestures to the parent*/
+    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14), /**< Propagate the focus to the parent*/
+    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
+    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 16), /**< Make the object position-able by the layouts*/
+    LV_OBJ_FLAG_FLOATING        = (1 << 17), /**< Do not scroll the object when the parent scrolls and ignore layout*/
 
     LV_OBJ_FLAG_LAYOUT_1        = (1 << 23), /** Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1 << 24), /** Custom flag, free to use by layouts*/
@@ -246,23 +216,23 @@ extern const lv_obj_class_t lv_obj_class;
  */
 typedef struct {
     struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
-    uint32_t child_cnt;                 /**< Number of children */
+    uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
 
     const lv_layout_dsc_t * layout_dsc; /**< Pointer to the layout descriptor*/
 
-    lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array */
+    lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
     lv_point_t scroll;                      /**< The current X/Y scroll offset*/
 
-    uint8_t ext_click_pad;      /**< Extra click padding in all direction */
-    lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing. */
+    uint8_t ext_click_pad;      /**< Extra click padding in all direction*/
+    lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
     lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/
     lv_scroll_snap_t scroll_snap_x : 2;      /**< Where to align the snapable children horizontally*/
     lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snapable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
-    lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
-    uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array */
+    lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object*/
+    uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array*/
 }lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t{
@@ -285,6 +255,11 @@ typedef struct {
     const lv_point_t * point;
     bool result;
 } lv_hit_test_info_t;
+
+typedef struct {
+    lv_draw_res_t res;
+    const lv_area_t * clip_area;
+} lv_cover_check_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -329,6 +304,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
  */
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param);
 
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_event_t e);
+
 /**
  * Get the `param` parameter of the current event
  * @return      the `param` parameter
@@ -360,14 +337,6 @@ uint32_t lv_event_register_id(void);
  * @param obj pointer to an obejct to mark as deleted
  */
 void _lv_event_mark_deleted(lv_obj_t * obj);
-
-/**
- * Send an event to the object
- * @param obj       pointer to an object
- * @param event     the type of the event from `lv_event_t`.
- * @return LV_RES_OK or LV_RES_INV
- */
-lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
 
 /*=====================
  * Setter functions
@@ -554,7 +523,7 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
 
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_H*/

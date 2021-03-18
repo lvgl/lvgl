@@ -32,7 +32,7 @@
 /** Bar animation end value.  (Not the real value of the Bar just indicates process animation)*/
 #define LV_BAR_ANIM_STATE_END   256
 
-/** Mark no animation is in progress */
+/** Mark no animation is in progress*/
 #define LV_BAR_ANIM_STATE_INV   -1
 
 /** log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
@@ -47,9 +47,8 @@
  **********************/
 static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_bar_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_bar_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
-static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
+static void lv_bar_event(lv_obj_t * bar, lv_event_t e);
+static void draw_indic(lv_obj_t * bar);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
@@ -62,8 +61,7 @@ static void lv_bar_anim_ready(lv_anim_t * a);
 const lv_obj_class_t lv_bar_class = {
     .constructor_cb = lv_bar_constructor,
     .destructor_cb = lv_bar_destructor,
-    .signal_cb = lv_bar_signal,
-    .draw_cb = lv_bar_draw,
+    .event_cb = lv_bar_event,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj_class
 };
@@ -240,26 +238,11 @@ static void lv_bar_destructor(lv_obj_t * obj)
     lv_anim_del(&bar->start_value_anim, NULL);
 }
 
-static lv_draw_res_t lv_bar_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        /*Return false if the object is not covers the mask area*/
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        /*Draw the background*/
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-        draw_indic(obj, clip_area);
-    }
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    return LV_DRAW_RES_OK;
-}
-
-static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
+static void draw_indic(lv_obj_t * obj)
 {
     lv_bar_t * bar = (lv_bar_t *)obj;
+
+    const lv_area_t * clip_area = lv_event_get_param();
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
@@ -354,7 +337,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
     if(hor && base_dir == LV_BIDI_DIR_RTL) {
-        /* Swap axes */
+        /*Swap axes*/
         lv_coord_t * tmp;
         tmp = axis1;
         axis1 = axis2;
@@ -363,7 +346,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         anim_start_value_x = -anim_start_value_x;
     }
 
-    /* Set the indicator length */
+    /*Set the indicator length*/
     if(hor) {
         *axis2 = *axis1 + anim_cur_value_x;
         *axis1 += anim_start_value_x;
@@ -393,7 +376,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
                 *axis1 = zero;
             }
             if(*axis2 < *axis1) {
-                /* swap */
+                /*swap*/
                 zero = *axis1;
                 *axis1 = *axis2;
                 *axis2 = zero;
@@ -415,9 +398,9 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_area_t indic_area;
     lv_area_copy(&indic_area, &bar->indic_area);
 
-    /* Draw only the shadow if the indicator is long enough.
-     * The radius of the bg and the indicator can make a strange shape where
-     * it'd be very difficult to draw shadow. */
+    /*Draw only the shadow if the indicator is long enough.
+     *The radius of the bg and the indicator can make a strange shape where
+     *it'd be very difficult to draw shadow.*/
     if((hor && lv_area_get_width(&bar->indic_area) > bg_radius * 2) ||
        (!hor && lv_area_get_height(&bar->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
@@ -501,21 +484,21 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 }
 
-static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res;
 
-    /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    /*Call the ancestor's event handler*/
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t indic_size;
         indic_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
 
         /*Bg size is handled by lv_obj*/
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, indic_size);
 
         /*Calculate the indicator area*/
@@ -528,9 +511,9 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(pad < 0) {
             *s = LV_MAX(*s, -pad);
         }
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_indic(obj);
     }
-
-    return res;
 }
 
 static void lv_bar_anim(void * var, int32_t value)
@@ -573,7 +556,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_
             anim_info->anim_end   = new_value;
         }
         *value_ptr = new_value;
-        /* Stop the previous animation if it exists */
+        /*Stop the previous animation if it exists*/
         lv_anim_del(anim_info, NULL);
 
         lv_anim_t a;

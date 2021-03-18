@@ -47,7 +47,7 @@ void lv_test_assert_array_eq(const uint8_t *p_ref, const uint8_t *p_act, int32_t
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TEST_ASSERT_H*/

@@ -41,7 +41,7 @@ extern lv_nxp_pxp_cfg_t pxp_default_cfg;
 #endif
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
-#endif /* LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_ */
+#endif /*LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_*/

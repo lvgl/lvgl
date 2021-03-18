@@ -57,16 +57,16 @@ uint32_t lv_tick_get(void)
 {
 #if LV_TICK_CUSTOM == 0
 
-    /* If `lv_tick_inc` is called from an interrupt while `sys_time` is read
-     * the result might be corrupted.
-     * This loop detects if `lv_tick_inc` was called while reading `sys_time`.
-     * If `tick_irq_flag` was cleared in `lv_tick_inc` try to read again
-     * until `tick_irq_flag` remains `1`. */
+    /*If `lv_tick_inc` is called from an interrupt while `sys_time` is read
+     *the result might be corrupted.
+     *This loop detects if `lv_tick_inc` was called while reading `sys_time`.
+     *If `tick_irq_flag` was cleared in `lv_tick_inc` try to read again
+     *until `tick_irq_flag` remains `1`.*/
     uint32_t result;
     do {
         tick_irq_flag = 1;
         result        = sys_time;
-    } while(!tick_irq_flag); /*Continue until see a non interrupted cycle */
+    } while(!tick_irq_flag); /*Continue until see a non interrupted cycle*/
 
     return result;
 #else

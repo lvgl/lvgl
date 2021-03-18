@@ -114,7 +114,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_THEME_H*/

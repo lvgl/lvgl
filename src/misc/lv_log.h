@@ -28,7 +28,7 @@ extern "C" {
 #define LV_LOG_LEVEL_ERROR 3 /**< Only critical issue, when the system may fail*/
 #define LV_LOG_LEVEL_USER  4 /**< Custom logs from the user*/
 #define LV_LOG_LEVEL_NONE  5 /**< Do not log anything*/
-#define _LV_LOG_LEVEL_NUM  6 /**< Number of log levels */
+#define _LV_LOG_LEVEL_NUM  6 /**< Number of log levels*/
 
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_TRACE);
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_INFO);
@@ -118,7 +118,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
 #endif /*LV_USE_LOG*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_LOG_H*/

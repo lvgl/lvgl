@@ -61,7 +61,7 @@ uint32_t lv_tick_elaps(uint32_t prev_tick);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_HAL_TICK_H*/

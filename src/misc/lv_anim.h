@@ -78,7 +78,7 @@ typedef struct _lv_anim_t {
 #endif
     lv_anim_path_t path;         /**< Describe the path (curve) of animations*/
     int32_t start_value;               /**< Start value*/
-    int32_t current_value;             /**< Current value */
+    int32_t current_value;             /**< Current value*/
     int32_t end_value;                 /**< End value*/
     int32_t time;                /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
@@ -86,7 +86,7 @@ typedef struct _lv_anim_t {
     uint32_t playback_time;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
-    uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay` */
+    uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay`*/
 
     /*Animation system use these - user shouldn't set*/
     uint8_t playback_now : 1; /**< Play back is in progress*/
@@ -436,7 +436,7 @@ extern const lv_anim_path_t lv_anim_path_def;
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_ANIM_H*/

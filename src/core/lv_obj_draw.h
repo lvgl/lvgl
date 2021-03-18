@@ -25,9 +25,9 @@ extern "C" {
 
 struct _lv_obj_t;
 
-/** Design results */
+/** Design results*/
 typedef enum {
-    LV_DRAW_RES_OK,          /**< Draw ready */
+    LV_DRAW_RES_OK,          /**< Draw ready*/
     LV_DRAW_RES_COVER,       /**< Returned on `LV_DRAW_COVER_CHK` if the areas is fully covered*/
     LV_DRAW_RES_NOT_COVER,   /**< Returned on `LV_DRAW_COVER_CHK` if the areas is not covered*/
     LV_DRAW_RES_MASKED,      /**< Returned on `LV_DRAW_COVER_CHK` if the areas is masked out (children also not cover)*/
@@ -52,20 +52,6 @@ typedef struct
     uint32_t part   :8;
     const void * sub_part_ptr;
 }lv_obj_draw_dsc_t;
-
-/** Design modes */
-enum {
-    LV_DRAW_MODE_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_DRAW_MODE_MAIN_DRAW,            /**< Draw the main portion of the object */
-    LV_DRAW_MODE_POST_DRAW,            /**< Draw extras on the object */
-};
-typedef uint8_t lv_draw_mode_t;
-
-/**
- * The draw callback is used to draw the object on the screen.
- * It accepts the object, a mask area, and the mode in which to draw the object.
- */
-typedef lv_draw_res_t (*lv_draw_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -137,7 +123,7 @@ lv_coord_t lv_obj_calculate_ext_draw_size(struct _lv_obj_t * obj, uint8_t part);
 void lv_obj_draw_dsc_init(lv_obj_draw_dsc_t * dsc, const lv_area_t * clip_area);
 
 /**
- * Send a 'LV_SIGNAL_REFR_EXT_DRAW_SIZE' signal to the object to refresh the value of the extended draw size.
+ * Send a 'LV_EVENT_REFR_EXT_DRAW_SIZE' Call the ancestor's event handler to the object to refresh the value of the extended draw size.
  * The result will be saved in `obj`.
  * @param obj pointer to an object
  */
@@ -155,7 +141,7 @@ lv_coord_t _lv_obj_get_ext_draw_size(const struct _lv_obj_t * obj);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_OBJ_DRAW_H*/

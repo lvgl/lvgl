@@ -191,7 +191,7 @@ static void flex_update(lv_obj_t * cont)
         track_first_item = f->rev ? cont->spec_attr->child_cnt - 1 : 0;
         track_t t;
         while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
-            /*Search the first item of the next row */
+            /*Search the first item of the next row*/
             next_track_first_item = find_track_end(cont, track_first_item, max_main_size, item_gap, &t);
             total_track_cross_size += t.track_cross_size + track_gap;
             track_cnt++;
@@ -200,7 +200,7 @@ static void flex_update(lv_obj_t * cont)
 
         if(track_cnt) total_track_cross_size -= track_gap;   /*No gap after the last track*/
 
-        /* Place the tracks to get the start position */
+        /*Place the tracks to get the start position*/
         lv_coord_t max_cross_size = (row ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
         place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
     }
@@ -213,7 +213,7 @@ static void flex_update(lv_obj_t * cont)
 
     while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
         track_t t;
-        /*Search the first item of the next row */
+        /*Search the first item of the next row*/
         next_track_first_item = find_track_end(cont, track_first_item, max_main_size, item_gap, &t);
 
         if(rtl && !row) {
@@ -349,7 +349,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
 
             if(lv_area_get_height(&old_coords) != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
-                lv_signal_send(item, LV_SIGNAL_COORD_CHG, &old_coords);
+                lv_event_send(item, LV_EVENT_COORD_CHANGED, &old_coords);
                 lv_obj_invalidate(item);
             }
         }
@@ -357,8 +357,8 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
         lv_coord_t cross_pos = 0;
         switch(f->cross_place) {
         case LV_FLEX_PLACE_CENTER:
-            /* Round up the cross size to avoid rounding error when dividing by 2
-             * The issue comes up e,g, with column direction with center cross direction if an element's width changes*/
+            /*Round up the cross size to avoid rounding error when dividing by 2
+             *The issue comes up e,g, with column direction with center cross direction if an element's width changes*/
             cross_pos = (((t->track_cross_size + 1) & (~1)) - area_get_cross_size(&item->coords)) / 2;
             break;
         case LV_FLEX_PLACE_END:

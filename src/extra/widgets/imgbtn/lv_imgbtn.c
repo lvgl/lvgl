@@ -24,8 +24,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * param);
+static void draw_main(lv_obj_t * obj);
+static void lv_imgbtn_event(lv_obj_t * imgbtn, lv_event_t e);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
@@ -37,8 +37,7 @@ const lv_obj_class_t lv_imgbtn_class = {
         .base_class = &lv_obj_class,
         .instance_size = sizeof(lv_imgbtn_t),
         .constructor_cb = lv_imgbtn_constructor,
-        .signal_cb = lv_imgbtn_signal,
-        .draw_cb = lv_imgbtn_draw,
+        .event_cb = lv_imgbtn_event,
 };
 
 /**********************
@@ -155,7 +154,7 @@ static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_UNUSED(copy);
 
    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-   /*Initialize the allocated 'ext' */
+   /*Initialize the allocated 'ext'*/
    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
    lv_memset_00(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
    lv_memset_00(imgbtn->img_src_right, sizeof(imgbtn->img_src_right));
@@ -164,131 +163,104 @@ static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 }
 
 
-static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+static void lv_imgbtn_event(lv_obj_t * obj, lv_event_t e)
+{
+    lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, obj, e);
+    if(res != LV_RES_OK) return;
+
+    if(e == LV_EVENT_PRESSED || e == LV_EVENT_RELEASED || e == LV_EVENT_PRESS_LOST) {
+        refr_img(obj);
+    }
+    else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_main(obj);
+    }
+    else if(e == LV_EVENT_COVER_CHECK) {
+        lv_cover_check_info_t * info = lv_event_get_param();
+        if(info->res != LV_DRAW_RES_MASKED) info->res = LV_DRAW_RES_NOT_COVER;
+    }
+}
+
+static void draw_main(lv_obj_t * obj)
 {
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return LV_DRAW_RES_NOT_COVER;
+    const lv_area_t * clip_area = lv_event_get_param();
 
-        lv_draw_res_t cover = lv_obj_draw_base(&lv_imgbtn_class, obj, clip_area, mode);
-        if(cover != LV_DRAW_RES_COVER) return cover;
+    /*Just draw_main an image*/
+    lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
 
-        if(imgbtn->act_cf == LV_IMG_CF_TRUE_COLOR || imgbtn->act_cf == LV_IMG_CF_RAW) {
-            cover = _lv_area_is_in(clip_area, &obj->coords, 0) ? LV_DRAW_RES_COVER : LV_DRAW_RES_NOT_COVER;
-        } else {
-            cover = LV_DRAW_RES_NOT_COVER;
-        }
-
-        return cover;
+    /*Simply draw the middle src if no tiled*/
+    const void * src = imgbtn->img_src_left[state];
+    if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
+        LV_LOG_WARN("lv_imgbtn_draw: SYMBOLS are not supported in tiled mode")
+                            return;
     }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
 
-        lv_obj_draw_base(&lv_imgbtn_class, obj, clip_area, mode);
+    lv_coord_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    lv_area_t coords;
+    lv_area_copy(&coords, &obj->coords);
+    coords.x1 -= tw;
+    coords.x2 += tw;
+    coords.y1 -= th;
+    coords.y2 += th;
 
-        /*Just draw an image*/
-        lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
+    lv_draw_img_dsc_t img_dsc;
+    lv_draw_img_dsc_init(&img_dsc);
+    lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
 
-        /*Simply draw the middle src if no tiled*/
-        const void * src = imgbtn->img_src_left[state];
-        if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
-            LV_LOG_WARN("lv_imgbtn_draw: SYMBOLS are not supported in tiled mode")
-                        return LV_DRAW_RES_OK;
-        }
+    lv_img_header_t header;
+    lv_area_t coords_part;
+    lv_coord_t left_w = 0;
+    lv_coord_t right_w = 0;
 
-        lv_coord_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
-        coords.x1 -= tw;
-        coords.x2 += tw;
-        coords.y1 -= th;
-        coords.y2 += th;
+    if(src) {
+        lv_img_decoder_get_info(src, &header);
+        left_w = header.w;
+        coords_part.x1 = coords.x1;
+        coords_part.y1 = coords.y1;
+        coords_part.x2 = coords.x1 + header.w - 1;
+        coords_part.y2 = coords.y1 + header.h - 1;
+        lv_draw_img(&coords_part, clip_area, src, &img_dsc);
+    }
 
-        lv_draw_img_dsc_t img_dsc;
-        lv_draw_img_dsc_init(&img_dsc);
-        lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
+    src = imgbtn->img_src_right[state];
+    if(src) {
+        lv_img_decoder_get_info(src, &header);
+        right_w = header.w;
+        coords_part.x1 = coords.x2 - header.w + 1;
+        coords_part.y1 = coords.y1;
+        coords_part.x2 = coords.x2;
+        coords_part.y2 = coords.y1 + header.h - 1;
+        lv_draw_img(&coords_part, clip_area, src, &img_dsc);
+    }
 
-        lv_img_header_t header;
-        lv_area_t coords_part;
-        lv_coord_t left_w = 0;
-        lv_coord_t right_w = 0;
+    src = imgbtn->img_src_mid[state];
+    if(src) {
+        lv_area_t clip_center_area;
+        clip_center_area.x1 = coords.x1 + left_w;
+        clip_center_area.x2 = coords.x2 - right_w;
+        clip_center_area.y1 = coords.y1;
+        clip_center_area.y2 = coords.y2;
 
-        if(src) {
+        bool comm_res;
+        comm_res = _lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
+        if(comm_res) {
+            lv_coord_t i;
             lv_img_decoder_get_info(src, &header);
-            left_w = header.w;
-            coords_part.x1 = coords.x1;
+
+            coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
-            coords_part.x2 = coords.x1 + header.w - 1;
-            coords_part.y2 = coords.y1 + header.h - 1;
-            lv_draw_img(&coords_part, clip_area, src, &img_dsc);
-        }
+            coords_part.x2 = coords_part.x1 + header.w - 1;
+            coords_part.y2 = coords_part.y1 + header.h - 1;
 
-        src = imgbtn->img_src_right[state];
-        if(src) {
-            lv_img_decoder_get_info(src, &header);
-            right_w = header.w;
-            coords_part.x1 = coords.x2 - header.w + 1;
-            coords_part.y1 = coords.y1;
-            coords_part.x2 = coords.x2;
-            coords_part.y2 = coords.y1 + header.h - 1;
-            lv_draw_img(&coords_part, clip_area, src, &img_dsc);
-        }
+            for(i = 0; i < clip_center_area.x2 + header.w - 1; i += header.w) {
 
-        src = imgbtn->img_src_mid[state];
-        if(src) {
-            lv_area_t clip_center_area;
-            clip_center_area.x1 = coords.x1 + left_w;
-            clip_center_area.x2 = coords.x2 - right_w;
-            clip_center_area.y1 = coords.y1;
-            clip_center_area.y2 = coords.y2;
-
-            bool comm_res;
-            comm_res = _lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
-            if(comm_res) {
-                lv_coord_t i;
-                lv_img_decoder_get_info(src, &header);
-
-                coords_part.x1 = coords.x1 + left_w;
-                coords_part.y1 = coords.y1;
-                coords_part.x2 = coords_part.x1 + header.w - 1;
-                coords_part.y2 = coords_part.y1 + header.h - 1;
-
-                for(i = 0; i < clip_center_area.x2 + header.w - 1; i += header.w) {
-
-                    lv_draw_img(&coords_part, &clip_center_area, src, &img_dsc);
-                    coords_part.x1 = coords_part.x2 + 1;
-                    coords_part.x2 += header.w;
-                }
+                lv_draw_img(&coords_part, &clip_center_area, src, &img_dsc);
+                coords_part.x1 = coords_part.x2 + 1;
+                coords_part.x2 += header.w;
             }
         }
     }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(&lv_imgbtn_class, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
-/**
- * Signal function of the image button
- * @param imgbtn pointer to a image button object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_imgbtn_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
-{
-    lv_res_t res = lv_obj_signal_base(&lv_imgbtn_class, obj, sign, param);
-    if(res != LV_RES_OK) return res;
-
-    if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-        refr_img(obj);
-    }
-
-    return res;
 }
 
 static void refr_img(lv_obj_t * obj)

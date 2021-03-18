@@ -240,7 +240,7 @@ bool lv_arc_get_adjustable(lv_obj_t * obj);
 #endif /*LV_USE_ARC*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_ARC_H*/

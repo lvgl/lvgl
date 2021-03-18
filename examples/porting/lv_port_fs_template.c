@@ -19,17 +19,17 @@
  *      TYPEDEFS
  **********************/
 
-/* Create a type to store the required data about your file.
- * If you are using a File System library
- * it already should have a File type.
- * For example FatFS has `FIL`. In this case use `typedef FIL file_t`*/
+/*Create a type to store the required data about your file.
+ *If you are using a File System library
+ *it already should have a File type.
+ *For example FatFS has `FIL`. In this case use `typedef FIL file_t`*/
 typedef struct {
     /*Add the data you need to store about a file*/
     uint32_t dummy1;
     uint32_t dummy2;
 }file_t;
 
-/*Similarly to `file_t` create a type for directory reading too */
+/*Similarly to `file_t` create a type for directory reading too*/
 typedef struct {
     /*Add the data you need to store about directory reading*/
     uint32_t dummy1;
@@ -83,7 +83,7 @@ void lv_port_fs_init(void)
      * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
-    /* Add a simple drive to open images */
+    /*Add a simple drive to open images*/
     lv_fs_drv_t fs_drv;
     lv_fs_drv_init(&fs_drv);
 
@@ -114,7 +114,7 @@ void lv_port_fs_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-/* Initialize your Storage device and File system. */
+/*Initialize your Storage device and File system.*/
 static void fs_init(void)
 {
     /*E.g. for FatFS initialize the SD card and FatFS itself*/
@@ -138,19 +138,19 @@ static lv_fs_res_t fs_open (lv_fs_drv_t * drv, void * file_p, const char * path,
     {
         /*Open a file for write*/
 
-        /* Add your code here*/
+        /*Add your code here*/
     }
     else if(mode == LV_FS_MODE_RD)
     {
         /*Open a file for read*/
 
-        /* Add your code here*/
+        /*Add your code here*/
     }
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
     {
         /*Open a file for read and write*/
 
-        /* Add your code here*/
+        /*Add your code here*/
     }
 
     return res;
@@ -167,7 +167,7 @@ static lv_fs_res_t fs_close (lv_fs_drv_t * drv, void * file_p)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -186,7 +186,7 @@ static lv_fs_res_t fs_read (lv_fs_drv_t * drv, void * file_p, void * buf, uint32
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -204,7 +204,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -221,7 +221,7 @@ static lv_fs_res_t fs_seek (lv_fs_drv_t * drv, void * file_p, uint32_t pos)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -237,7 +237,7 @@ static lv_fs_res_t fs_size (lv_fs_drv_t * drv, void * file_p, uint32_t * size_p)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -253,7 +253,7 @@ static lv_fs_res_t fs_tell (lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -268,7 +268,7 @@ static lv_fs_res_t fs_remove (lv_fs_drv_t * drv, const char *path)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -284,7 +284,7 @@ static lv_fs_res_t fs_trunc (lv_fs_drv_t * drv, void * file_p)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -300,7 +300,7 @@ static lv_fs_res_t fs_rename (lv_fs_drv_t * drv, const char * oldname, const cha
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -317,7 +317,7 @@ static lv_fs_res_t fs_free (lv_fs_drv_t * drv, uint32_t * total_p, uint32_t * fr
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -333,7 +333,7 @@ static lv_fs_res_t fs_dir_open (lv_fs_drv_t * drv, void * rddir_p, const char *p
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -350,7 +350,7 @@ static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * rddir_p, char *fn)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
@@ -365,13 +365,13 @@ static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * rddir_p)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
-    /* Add your code here*/
+    /*Add your code here*/
 
     return res;
 }
 
-#else /* Enable this file at the top */
+#else /*Enable this file at the top*/
 
-/* This dummy typedef exists purely to silence -Wpedantic. */
+/*This dummy typedef exists purely to silence -Wpedantic.*/
 typedef int keep_pedantic_happy;
 #endif

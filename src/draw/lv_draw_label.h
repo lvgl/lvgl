@@ -59,7 +59,7 @@ typedef struct {
     int32_t y;
 
     /** The 'y1' coordinate of the label when the hint was saved.
-     * Used to invalidate the hint if the label has moved too much. */
+     * Used to invalidate the hint if the label has moved too much.*/
     int32_t coord_y;
 } lv_draw_label_hint_t;
 
@@ -99,7 +99,7 @@ extern const uint8_t _lv_bpp8_opa_table[];
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_DRAW_LABEL_H*/

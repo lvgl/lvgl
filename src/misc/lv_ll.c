@@ -281,8 +281,8 @@ void * _lv_ll_get_tail(const lv_ll_t * ll_p)
  */
 void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 {
-    /* Pointer to the next node is stored in the end of this node.
-     * Go there and return the address found there */
+    /*Pointer to the next node is stored in the end of this node.
+     *Go there and return the address found there*/
     const lv_ll_node_t * n_act_d = n_act;
     n_act_d += LL_NEXT_P_OFFSET(ll_p);
     return *((lv_ll_node_t **)n_act_d);
@@ -296,8 +296,8 @@ void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
  */
 void * _lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 {
-    /* Pointer to the prev. node is stored in the end of this node.
-     * Go there and return the address found there */
+    /*Pointer to the prev. node is stored in the end of this node.
+     *Go there and return the address found there*/
     const lv_ll_node_t * n_act_d = n_act;
     n_act_d += LL_PREV_P_OFFSET(ll_p);
     return *((lv_ll_node_t **)n_act_d);

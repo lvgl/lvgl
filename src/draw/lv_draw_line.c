@@ -152,14 +152,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
         lv_disp_t * disp = _lv_refr_get_disp_refreshing();
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
         const lv_area_t * disp_area = &draw_buf->area;
-        /* Get clipped fill area which is the real draw area.
-         * It is always the same or inside `fill_area` */
+        /*Get clipped fill area which is the real draw area.
+         *It is always the same or inside `fill_area`*/
         bool is_common;
         is_common = _lv_area_intersect(&draw_area, clip, &draw_area);
         if(!is_common) return;
 
-        /* Now `draw_area` has absolute coordinates.
-         * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+        /*Now `draw_area` has absolute coordinates.
+         *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
         draw_area.x1 -= disp_area->x1;
         draw_area.y1 -= disp_area->y1;
         draw_area.x2 -= disp_area->x1;
@@ -253,14 +253,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
         lv_disp_t * disp = _lv_refr_get_disp_refreshing();
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
         const lv_area_t * disp_area = &draw_buf->area;
-        /* Get clipped fill area which is the real draw area.
-         * It is always the same or inside `fill_area` */
+        /*Get clipped fill area which is the real draw area.
+         *It is always the same or inside `fill_area`*/
         bool is_common;
         is_common = _lv_area_intersect(&draw_area, clip, &draw_area);
         if(!is_common) return;
 
-        /* Now `draw_area` has absolute coordinates.
-         * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+        /*Now `draw_area` has absolute coordinates.
+         *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
         draw_area.x1 -= draw_buf->area.x1;
         draw_area.y1 -= draw_buf->area.y1;
         draw_area.x2 -= draw_buf->area.x1;
@@ -361,9 +361,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     draw_area.y1 = LV_MIN(p1.y, p2.y) - w;
     draw_area.y2 = LV_MAX(p1.y, p2.y) + w;
 
-    /* Get the union of `coords` and `clip`*/
-    /* `clip` is already truncated to the `draw_buf` size
-     * in 'lv_refr_area' function */
+    /*Get the union of `coords` and `clip`*/
+    /*`clip` is already truncated to the `draw_buf` size
+     *in 'lv_refr_area' function*/
     bool is_common = _lv_area_intersect(&draw_area, &draw_area, clip);
     if(is_common == false) return;
 
@@ -412,15 +412,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     const lv_area_t * disp_area = &draw_buf->area;
 
-    /*Store the coordinates of the `draw_a` relative to the draw_buf */
+    /*Store the coordinates of the `draw_a` relative to the draw_buf*/
     draw_area.x1 -= disp_area->x1;
     draw_area.y1 -= disp_area->y1;
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    /* The real draw area is around the line.
-     * It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
-     * So deal with it only with steep lines. */
+    /*The real draw area is around the line.
+     *It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
+     *So deal with it only with steep lines.*/
     int32_t draw_area_w = lv_area_get_width(&draw_area);
 
     /*Draw the background line by line*/

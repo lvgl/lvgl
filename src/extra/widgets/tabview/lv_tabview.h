@@ -60,7 +60,7 @@ uint16_t lv_tabview_get_tab_act(lv_obj_t * tv);
 #endif /*LV_USE_TABVIEW*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TABVIEW_H*/

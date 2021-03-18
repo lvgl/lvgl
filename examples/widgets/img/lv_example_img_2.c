@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_IMG && LV_BUILD_EXAMPLES
+#if LV_USE_IMG && LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 static lv_obj_t * create_slider(lv_color_t color);
 static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
@@ -29,7 +29,7 @@ void lv_example_img_2(void)
     lv_obj_align(blue_slider, green_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
     lv_obj_align(intense_slider, blue_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
 
-    /* Now create the actual image */
+    /*Now create the actual image*/
     LV_IMG_DECLARE(img_cogwheel_argb)
     img1 = lv_img_create(lv_scr_act(), NULL);
     lv_img_set_src(img1, &img_cogwheel_argb);
@@ -43,7 +43,7 @@ static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
     LV_UNUSED(slider);
 
     if(event == LV_EVENT_VALUE_CHANGED) {
-        /* Recolor the image based on the sliders' values */
+        /*Recolor the image based on the sliders' values*/
         lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider), lv_slider_get_value(blue_slider));
         lv_opa_t intense = lv_slider_get_value(intense_slider);
         lv_obj_set_style_img_recolor_opa(img1, LV_PART_MAIN, LV_STATE_DEFAULT, intense);

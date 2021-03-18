@@ -48,7 +48,7 @@ const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn);
 #endif /*LV_USE_LIST*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_LIST_H*/

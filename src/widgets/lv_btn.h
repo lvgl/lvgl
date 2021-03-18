@@ -52,7 +52,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy);
 #endif /*LV_USE_BTN*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_BTN_H*/

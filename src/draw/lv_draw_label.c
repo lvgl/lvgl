@@ -274,10 +274,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                         cmd_state = CMD_STATE_PAR;
                         continue;
                     }
-                    else if(cmd_state == CMD_STATE_PAR) {   /*Other start char in parameter escaped cmd. char */
+                    else if(cmd_state == CMD_STATE_PAR) {   /*Other start char in parameter escaped cmd. char*/
                         cmd_state = CMD_STATE_WAIT;
                     }
-                    else if(cmd_state == CMD_STATE_IN) {   /*Command end */
+                    else if(cmd_state == CMD_STATE_IN) {   /*Command end*/
                         cmd_state = CMD_STATE_WAIT;
                         continue;
                     }
@@ -413,21 +413,21 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(font_p, &g, letter, '\0');
     if(g_ret == false)  {
-        /* Add warning if the dsc is not found
-         * but do not print warning for non printable ASCII chars (e.g. '\n')*/
+        /*Add warning if the dsc is not found
+         *but do not print warning for non printable ASCII chars (e.g. '\n')*/
         if(letter >= 0x20) {
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found");
         }
         return;
     }
 
-    /* Don't draw anything if the character is empty. E.g. space */
+    /*Don't draw anything if the character is empty. E.g. space*/
     if((g.box_h == 0) || (g.box_w == 0)) return;
 
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
-    /*If the letter is completely out of mask don't draw it */
+    /*If the letter is completely out of mask don't draw it*/
     if(pos_x + g.box_w < clip_area->x1 ||
        pos_x > clip_area->x2 ||
        pos_y + g.box_h < clip_area->y1 ||
@@ -509,7 +509,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     int32_t box_h = g->box_h;
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
-    /* Calculate the col/row start/end on the map*/
+    /*Calculate the col/row start/end on the map*/
     int32_t col_start = pos_x >= clip_area->x1 ? 0 : clip_area->x1 - pos_x;
     int32_t col_end   = pos_x + box_w <= clip_area->x2 ? box_w : clip_area->x2 - pos_x + 1;
     int32_t row_start = pos_y >= clip_area->y1 ? 0 : clip_area->y1 - pos_y;
@@ -521,7 +521,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
     uint8_t letter_px;
     uint32_t col_bit;
-    col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
+    col_bit = bit_ofs & 0x7; /*"& 0x7" equals to "% 8" just faster*/
 
     lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
     uint32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : box_w * box_h;
@@ -649,7 +649,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     int32_t box_h = g->box_h;
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
-    /* Calculate the col/row start/end on the map*/
+    /*Calculate the col/row start/end on the map*/
     int32_t col_start = pos_x >= clip_area->x1 ? 0 : (clip_area->x1 - pos_x) * 3;
     int32_t col_end   = pos_x + box_w / 3 <= clip_area->x2 ? box_w : (clip_area->x2 - pos_x + 1) * 3;
     int32_t row_start = pos_y >= clip_area->y1 ? 0 : clip_area->y1 - pos_y;
@@ -662,7 +662,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     uint8_t letter_px;
     lv_opa_t px_opa;
     int32_t col_bit;
-    col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
+    col_bit = bit_ofs & 0x7; /*"& 0x7" equals to "% 8" just faster*/
 
     int32_t mask_buf_size = box_w * box_h > _LV_MASK_BUF_MAX_SIZE ? _LV_MASK_BUF_MAX_SIZE : g->box_w * g->box_h;
     lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);

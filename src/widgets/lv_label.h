@@ -40,7 +40,7 @@ LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SEL_OFF);
  *      TYPEDEFS
  **********************/
 
-/** Long mode behaviors. Used in 'lv_label_ext_t' */
+/** Long mode behaviors. Used in 'lv_label_ext_t'*/
 enum {
     LV_LABEL_LONG_EXPAND,           /**< Expand the object size to the text size*/
     LV_LABEL_LONG_WRAP,             /**< Keep the object width, wrap the too long lines and expand the object height*/
@@ -55,8 +55,8 @@ typedef struct {
     lv_obj_t obj;
     char * text;
     union {
-        char * tmp_ptr; /* Pointer to the allocated memory containing the character replaced by dots*/
-        char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */
+        char * tmp_ptr; /*Pointer to the allocated memory containing the character replaced by dots*/
+        char tmp[LV_LABEL_DOT_NUM + 1]; /*Directly store the characters if <=4 characters*/
     } dot;
     uint32_t dot_end;  /*The real text length, used in dot mode*/
 
@@ -73,7 +73,7 @@ typedef struct {
     uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
     uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/
-    uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters */
+    uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters*/
 }lv_label_t;
 
 extern const lv_obj_class_t lv_label_class;
@@ -254,7 +254,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt);
 #endif /*LV_USE_LABEL*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_LABEL_H*/

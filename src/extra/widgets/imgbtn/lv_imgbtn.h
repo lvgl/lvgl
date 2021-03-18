@@ -120,7 +120,7 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_imgbtn_state_t state)
 #endif /*LV_USE_IMGBTN*/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_IMGBTN_H*/
