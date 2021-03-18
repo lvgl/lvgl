@@ -12,6 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define MY_CLASS &lv_led_class
 
 #define LV_LED_WIDTH_DEF (LV_DPI_DEF / 5)
 #define LV_LED_HEIGHT_DEF (LV_DPI_DEF / 5)
@@ -32,7 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_led_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_led_draw(lv_obj_t * led, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void lv_led_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
  *  STATIC VARIABLES
@@ -40,7 +41,7 @@ static lv_draw_res_t lv_led_draw(lv_obj_t * led, const lv_area_t * clip_area, lv
 const lv_obj_class_t lv_led_class  = {
         .base_class = &lv_obj_class,
         .constructor_cb = lv_led_constructor,
-        .draw_cb = lv_led_draw,
+        .event_cb = lv_led_event,
         .instance_size = sizeof(lv_led_t),
 };
 
@@ -159,14 +160,15 @@ static void lv_led_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     lv_obj_set_size(obj, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
 }
 
-
-static lv_draw_res_t lv_led_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+static void lv_led_event(lv_obj_t * obj, lv_event_t e)
 {
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        /*Return false if the object is not covers the clip_area area*/
-        return lv_obj_draw_base(&lv_led_class, obj, clip_area, mode);
-    }
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
+
+    if(e == LV_EVENT_DRAW_MAIN) {
         /*Make darker colors in a temporary style according to the brightness*/
         lv_led_t * led = (lv_led_t *)obj;
 
@@ -191,12 +193,13 @@ static lv_draw_res_t lv_led_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/
         rect_dsc.shadow_width = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_width) /
-                                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
+                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
         rect_dsc.shadow_spread = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
-                                 (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
+                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
+        const lv_area_t * clip_area = lv_event_get_param();
         lv_draw_rect(&obj->coords, clip_area, &rect_dsc);
     }
-    return LV_DRAW_RES_OK;
 }
+
 #endif

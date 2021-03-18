@@ -38,7 +38,6 @@
  **********************/
 static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_chart_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_chart_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_chart_event(lv_obj_t * obj, lv_event_t e);
 
 static void draw_div_lines(lv_obj_t * obj , const lv_area_t * mask);
@@ -56,7 +55,6 @@ const lv_obj_class_t lv_chart_class = {
     .constructor_cb = lv_chart_constructor,
     .destructor_cb = lv_chart_destructor,
     .event_cb = lv_chart_event,
-    .draw_cb = lv_chart_draw,
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj_class
 };
@@ -619,29 +617,6 @@ static void lv_chart_destructor(lv_obj_t * obj)
     _lv_ll_clear(&chart->series_ll);
 }
 
-static lv_draw_res_t lv_chart_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        draw_div_lines(obj, clip_area);
-        draw_axes(obj, clip_area);
-
-        lv_chart_t * chart  = (lv_chart_t *)obj;
-        if(chart->type & LV_CHART_TYPE_LINE) draw_series_line(obj, clip_area);
-        else if(chart->type & LV_CHART_TYPE_BAR) draw_series_bar(obj, clip_area);
-
-        draw_cursors(obj, clip_area);
-    }
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    return LV_DRAW_RES_OK;
-}
-
 static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
 {
     /* Include the ancient signal function */
@@ -670,6 +645,16 @@ static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
                      chart->tick[LV_CHART_AXIS_PRIMARY_Y].draw_size, chart->tick[LV_CHART_AXIS_SECONDARY_Y].draw_size);
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param();
+        draw_div_lines(obj, clip_area);
+        draw_axes(obj, clip_area);
+
+        lv_chart_t * chart  = (lv_chart_t *)obj;
+        if(chart->type & LV_CHART_TYPE_LINE) draw_series_line(obj, clip_area);
+        else if(chart->type & LV_CHART_TYPE_BAR) draw_series_bar(obj, clip_area);
+
+        draw_cursors(obj, clip_area);
     }
 }
 

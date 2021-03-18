@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_IMG && LV_BUILD_EXAMPLES
+#if LV_USE_IMG && LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 static lv_obj_t * create_slider(lv_color_t color);
 static void slider_event_cb(lv_obj_t * slider, lv_event_t event);

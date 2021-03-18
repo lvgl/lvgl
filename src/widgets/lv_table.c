@@ -31,8 +31,8 @@
  **********************/
 static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_table_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_table_event(lv_obj_t * obj, lv_event_t e);
+static void draw_main(lv_obj_t * obj);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
@@ -46,7 +46,6 @@ const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
     .event_cb = lv_table_event,
-    .draw_cb = lv_table_draw,
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_table_t),
 };
@@ -447,203 +446,6 @@ static void lv_table_destructor(lv_obj_t * obj)
     if(table->row_h) lv_mem_free(table->row_h);
 }
 
-static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        /*Draw the background*/
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        lv_table_t * table = (lv_table_t *)obj;
-
-        lv_point_t txt_size;
-        lv_area_t cell_area;
-        lv_area_t txt_area;
-        lv_text_flag_t txt_flags;
-
-        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-
-        lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-        lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-        lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-        lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
-
-        lv_state_t state_ori = obj->state;
-        obj->state = LV_STATE_DEFAULT;
-        obj->style_list.skip_trans = 1;
-        lv_draw_rect_dsc_t rect_dsc_def;
-        lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the event to modify it*/
-        lv_draw_rect_dsc_init(&rect_dsc_def);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_def);
-
-        lv_draw_label_dsc_t label_dsc_def;
-        lv_draw_label_dsc_t label_dsc_act;  /*Passed to the event to modify it*/
-        lv_draw_label_dsc_init(&label_dsc_def);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_def);
-        obj->state = state_ori;
-        obj->style_list.skip_trans = 0;
-
-        uint16_t col;
-        uint16_t row;
-        uint16_t cell = 0;
-
-        cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) ;
-        lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
-        bool rtl = lv_obj_get_base_dir(obj)  == LV_BIDI_DIR_RTL ? true : false;
-
-        /*Handle custom drawer*/
-        lv_obj_draw_dsc_t dsc;
-        lv_obj_draw_dsc_init(&dsc, clip_area);
-        dsc.part = LV_PART_ITEMS;
-        dsc.rect_dsc = &rect_dsc_act;
-        dsc.label_dsc = &label_dsc_act;
-
-        for(row = 0; row < table->row_cnt; row++) {
-            lv_coord_t h_row = table->row_h[row];
-
-            cell_area.y1 = cell_area.y2 + 1;
-            cell_area.y2 = cell_area.y1 + h_row - 1;
-
-            if(cell_area.y1 > clip_area->y2) return LV_DRAW_RES_OK;
-
-            if(rtl) cell_area.x1 = obj->coords.x2 - bg_right - 1 - scroll_x;
-            else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x;
-
-            for(col = 0; col < table->col_cnt; col++) {
-                lv_table_cell_ctrl_t ctrl = 0;
-                if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
-
-                if(rtl) {
-                    cell_area.x2 = cell_area.x1 - 1;
-                    cell_area.x1 = cell_area.x2 - table->col_w[col] + 1;
-                }
-                else {
-                    cell_area.x1 = cell_area.x2 + 1;
-                    cell_area.x2 = cell_area.x1 + table->col_w[col] - 1;
-                }
-
-                uint16_t col_merge = 0;
-                for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-                    if(table->cell_data[cell + col_merge]) {
-                        char * next_cell_data = table->cell_data[cell + col_merge];
-                        if(next_cell_data) ctrl = next_cell_data[0];
-                        if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
-                            if(rtl) cell_area.x1 -= table->col_w[col + col_merge + 1];
-                            else cell_area.x2 += table->col_w[col + col_merge + 1];
-                        else {
-                            break;
-                        }
-                    }
-                    else {
-                        break;
-                    }
-                }
-
-                if(cell_area.y2 < clip_area->y1) {
-                    cell += col_merge + 1;
-                    col += col_merge;
-                    continue;
-                }
-
-                /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
-                lv_area_t cell_area_border;
-                lv_area_copy(&cell_area_border, &cell_area);
-                if((rect_dsc_def.border_side & LV_BORDER_SIDE_LEFT) && cell_area_border.x1 > obj->coords.x1 + bg_left) {
-                    cell_area_border.x1 -= rect_dsc_def.border_width / 2;
-                }
-                if((rect_dsc_def.border_side & LV_BORDER_SIDE_TOP) && cell_area_border.y1 > obj->coords.y1 + bg_top) {
-                    cell_area_border.y1 -= rect_dsc_def.border_width / 2;
-                }
-                if((rect_dsc_def.border_side & LV_BORDER_SIDE_RIGHT) && cell_area_border.x2 < obj->coords.x2 - bg_right - 1) {
-                    cell_area_border.x2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
-                }
-                if((rect_dsc_def.border_side & LV_BORDER_SIDE_BOTTOM) &&
-                   cell_area_border.y2 < obj->coords.y2 - bg_bottom - 1) {
-                   cell_area_border.y2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
-                }
-
-                lv_state_t cell_state = LV_STATE_DEFAULT;
-                if(row == table->row_act && col == table->col_act) {
-                    if(obj->state & LV_STATE_PRESSED) cell_state |= LV_STATE_PRESSED;
-                    if(obj->state & LV_STATE_FOCUSED) cell_state |= LV_STATE_FOCUSED;
-                    if(obj->state & LV_STATE_FOCUS_KEY) cell_state |= LV_STATE_FOCUS_KEY;
-                    if(obj->state & LV_STATE_EDITED) cell_state |= LV_STATE_EDITED;
-                }
-
-                /*Set up the draw descriptors*/
-                if(cell_state == LV_STATE_DEFAULT) {
-                    lv_memcpy(&rect_dsc_act, &rect_dsc_def, sizeof(lv_draw_rect_dsc_t));
-                    lv_memcpy(&label_dsc_act, &label_dsc_def, sizeof(lv_draw_label_dsc_t));
-                }
-                /*In other cases get the styles directly without caching them*/
-                else {
-                    obj->state = cell_state;
-                    obj->style_list.skip_trans = 1;
-                    lv_draw_rect_dsc_init(&rect_dsc_act);
-                    lv_draw_label_dsc_init(&label_dsc_act);
-                    lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_act);
-                    lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_act);
-                    obj->state = state_ori;
-                    obj->style_list.skip_trans = 0;
-                }
-
-                dsc.draw_area = &cell_area_border;
-                dsc.id = row * table->col_cnt + col;
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
-
-                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc_act);
-
-                if(table->cell_data[cell]) {
-                    txt_area.x1 = cell_area.x1 + cell_left;
-                    txt_area.x2 = cell_area.x2 - cell_right;
-                    txt_area.y1 = cell_area.y1 + cell_top;
-                    txt_area.y2 = cell_area.y2 - cell_bottom;
-
-                    /*Align the content to the middle if not cropped*/
-                    bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP ? true : false;
-                    if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
-                    else txt_flags = LV_TEXT_FLAG_NONE;
-
-                    lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
-                                     label_dsc_act.letter_space, label_dsc_act.line_space,
-                                     lv_area_get_width(&txt_area), txt_flags);
-
-                    /*Align the content to the middle if not cropped*/
-                    if(!crop) {
-                        txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
-                        txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
-                    }
-
-                    lv_area_t label_mask;
-                    bool label_mask_ok;
-                    label_mask_ok = _lv_area_intersect(&label_mask, clip_area, &cell_area);
-                    if(label_mask_ok) {
-                        lv_draw_label(&txt_area, &label_mask, &label_dsc_act, table->cell_data[cell] + 1, NULL);
-                    }
-                }
-
-                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
-
-                cell += col_merge + 1;
-                col += col_merge;
-            }
-        }
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
 static void lv_table_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
@@ -726,9 +528,193 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_main(obj);
     }
 }
 
+
+static void draw_main(lv_obj_t * obj)
+{
+    lv_table_t * table = (lv_table_t *)obj;
+    const lv_area_t * clip_area = lv_event_get_param();
+
+    lv_point_t txt_size;
+    lv_area_t cell_area;
+    lv_area_t txt_area;
+    lv_text_flag_t txt_flags;
+
+    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+
+    lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+    lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+    lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+    lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+
+    lv_state_t state_ori = obj->state;
+    obj->state = LV_STATE_DEFAULT;
+    obj->style_list.skip_trans = 1;
+    lv_draw_rect_dsc_t rect_dsc_def;
+    lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the event to modify it*/
+    lv_draw_rect_dsc_init(&rect_dsc_def);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_def);
+
+    lv_draw_label_dsc_t label_dsc_def;
+    lv_draw_label_dsc_t label_dsc_act;  /*Passed to the event to modify it*/
+    lv_draw_label_dsc_init(&label_dsc_def);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_def);
+    obj->state = state_ori;
+    obj->style_list.skip_trans = 0;
+
+    uint16_t col;
+    uint16_t row;
+    uint16_t cell = 0;
+
+    cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) ;
+    lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
+    bool rtl = lv_obj_get_base_dir(obj)  == LV_BIDI_DIR_RTL ? true : false;
+
+    /*Handle custom drawer*/
+    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_dsc_init(&dsc, clip_area);
+    dsc.part = LV_PART_ITEMS;
+    dsc.rect_dsc = &rect_dsc_act;
+    dsc.label_dsc = &label_dsc_act;
+
+    for(row = 0; row < table->row_cnt; row++) {
+        lv_coord_t h_row = table->row_h[row];
+
+        cell_area.y1 = cell_area.y2 + 1;
+        cell_area.y2 = cell_area.y1 + h_row - 1;
+
+        if(cell_area.y1 > clip_area->y2) return;
+
+        if(rtl) cell_area.x1 = obj->coords.x2 - bg_right - 1 - scroll_x;
+        else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x;
+
+        for(col = 0; col < table->col_cnt; col++) {
+            lv_table_cell_ctrl_t ctrl = 0;
+            if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
+
+            if(rtl) {
+                cell_area.x2 = cell_area.x1 - 1;
+                cell_area.x1 = cell_area.x2 - table->col_w[col] + 1;
+            }
+            else {
+                cell_area.x1 = cell_area.x2 + 1;
+                cell_area.x2 = cell_area.x1 + table->col_w[col] - 1;
+            }
+
+            uint16_t col_merge = 0;
+            for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
+                if(table->cell_data[cell + col_merge]) {
+                    char * next_cell_data = table->cell_data[cell + col_merge];
+                    if(next_cell_data) ctrl = next_cell_data[0];
+                    if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
+                        if(rtl) cell_area.x1 -= table->col_w[col + col_merge + 1];
+                        else cell_area.x2 += table->col_w[col + col_merge + 1];
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+
+            if(cell_area.y2 < clip_area->y1) {
+                cell += col_merge + 1;
+                col += col_merge;
+                continue;
+            }
+
+            /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
+            lv_area_t cell_area_border;
+            lv_area_copy(&cell_area_border, &cell_area);
+            if((rect_dsc_def.border_side & LV_BORDER_SIDE_LEFT) && cell_area_border.x1 > obj->coords.x1 + bg_left) {
+                cell_area_border.x1 -= rect_dsc_def.border_width / 2;
+            }
+            if((rect_dsc_def.border_side & LV_BORDER_SIDE_TOP) && cell_area_border.y1 > obj->coords.y1 + bg_top) {
+                cell_area_border.y1 -= rect_dsc_def.border_width / 2;
+            }
+            if((rect_dsc_def.border_side & LV_BORDER_SIDE_RIGHT) && cell_area_border.x2 < obj->coords.x2 - bg_right - 1) {
+                cell_area_border.x2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
+            }
+            if((rect_dsc_def.border_side & LV_BORDER_SIDE_BOTTOM) &&
+                    cell_area_border.y2 < obj->coords.y2 - bg_bottom - 1) {
+                cell_area_border.y2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
+            }
+
+            lv_state_t cell_state = LV_STATE_DEFAULT;
+            if(row == table->row_act && col == table->col_act) {
+                if(obj->state & LV_STATE_PRESSED) cell_state |= LV_STATE_PRESSED;
+                if(obj->state & LV_STATE_FOCUSED) cell_state |= LV_STATE_FOCUSED;
+                if(obj->state & LV_STATE_FOCUS_KEY) cell_state |= LV_STATE_FOCUS_KEY;
+                if(obj->state & LV_STATE_EDITED) cell_state |= LV_STATE_EDITED;
+            }
+
+            /*Set up the draw descriptors*/
+            if(cell_state == LV_STATE_DEFAULT) {
+                lv_memcpy(&rect_dsc_act, &rect_dsc_def, sizeof(lv_draw_rect_dsc_t));
+                lv_memcpy(&label_dsc_act, &label_dsc_def, sizeof(lv_draw_label_dsc_t));
+            }
+            /*In other cases get the styles directly without caching them*/
+            else {
+                obj->state = cell_state;
+                obj->style_list.skip_trans = 1;
+                lv_draw_rect_dsc_init(&rect_dsc_act);
+                lv_draw_label_dsc_init(&label_dsc_act);
+                lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_act);
+                lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_act);
+                obj->state = state_ori;
+                obj->style_list.skip_trans = 0;
+            }
+
+            dsc.draw_area = &cell_area_border;
+            dsc.id = row * table->col_cnt + col;
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+
+            lv_draw_rect(&cell_area_border, clip_area, &rect_dsc_act);
+
+            if(table->cell_data[cell]) {
+                txt_area.x1 = cell_area.x1 + cell_left;
+                txt_area.x2 = cell_area.x2 - cell_right;
+                txt_area.y1 = cell_area.y1 + cell_top;
+                txt_area.y2 = cell_area.y2 - cell_bottom;
+
+                /*Align the content to the middle if not cropped*/
+                bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP ? true : false;
+                if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
+                else txt_flags = LV_TEXT_FLAG_NONE;
+
+                lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
+                        label_dsc_act.letter_space, label_dsc_act.line_space,
+                        lv_area_get_width(&txt_area), txt_flags);
+
+                /*Align the content to the middle if not cropped*/
+                if(!crop) {
+                    txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
+                    txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
+                }
+
+                lv_area_t label_mask;
+                bool label_mask_ok;
+                label_mask_ok = _lv_area_intersect(&label_mask, clip_area, &cell_area);
+                if(label_mask_ok) {
+                    lv_draw_label(&txt_area, &label_mask, &label_dsc_act, table->cell_data[cell] + 1, NULL);
+                }
+            }
+
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
+
+            cell += col_merge + 1;
+            col += col_merge;
+        }
+    }
+}
 
 static void refr_size(lv_obj_t * obj, uint32_t strat_row)
 {

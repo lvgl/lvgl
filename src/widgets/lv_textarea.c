@@ -47,7 +47,6 @@
  **********************/
 static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_textarea_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_textarea_event(lv_obj_t * obj, lv_event_t e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
@@ -58,8 +57,8 @@ static void start_cursor_blink(lv_obj_t * obj);
 static void refr_cursor_area(lv_obj_t * obj);
 static void update_cursor_position_on_click(lv_obj_t * obj, lv_event_t e);
 static lv_res_t insert_handler(lv_obj_t * obj, const char * txt);
-static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area);
-static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
+static void draw_placeholder(lv_obj_t * obj);
+static void draw_cursor(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -68,7 +67,6 @@ const lv_obj_class_t lv_textarea_class = {
     .constructor_cb = lv_textarea_constructor,
     .destructor_cb = lv_textarea_destructor,
     .event_cb = lv_textarea_event,
-    .draw_cb = lv_textarea_draw,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class
 };
@@ -1022,25 +1020,6 @@ static void lv_textarea_destructor(lv_obj_t * obj)
     }
 }
 
-static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        /*Return false if the object is not covers the mask_p area*/
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        /*Draw the object*/
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-        draw_placeholder(obj, clip_area);
-
-    }
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-        draw_cursor(obj, clip_area);
-    }
-    return LV_DRAW_RES_OK;
-}
-
 static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
@@ -1116,6 +1095,12 @@ static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
     else if(e == LV_EVENT_PRESSED || e == LV_EVENT_PRESSING || e == LV_EVENT_PRESS_LOST ||
             e == LV_EVENT_RELEASED) {
         update_cursor_position_on_click(obj, e);
+    }
+    else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_placeholder(obj);
+    }
+    else if(e == LV_EVENT_DRAW_POST) {
+        draw_cursor(obj);
     }
 }
 
@@ -1471,9 +1456,10 @@ static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
     return LV_RES_OK;
 }
 
-static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area)
+static void draw_placeholder(lv_obj_t * obj)
 {
-     lv_textarea_t * ta = (lv_textarea_t *)obj;
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    const lv_area_t * clip_area = lv_event_get_param();
     const char * txt = lv_label_get_text(ta->label);
 
     /*Draw the place holder*/
@@ -1496,9 +1482,10 @@ static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area)
     }
 }
 
-static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area)
+static void draw_cursor(lv_obj_t * obj)
 {
-     lv_textarea_t * ta = (lv_textarea_t *)obj;
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    const lv_area_t * clip_area = lv_event_get_param();
     const char * txt = lv_label_get_text(ta->label);
 
     if(ta->cursor.show == 0) return;

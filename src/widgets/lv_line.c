@@ -29,7 +29,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_line_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
@@ -38,7 +37,6 @@ static void lv_line_event(lv_obj_t * obj, lv_event_t e);
 const lv_obj_class_t lv_line_class = {
     .constructor_cb = lv_line_constructor,
     .event_cb = lv_line_event,
-    .draw_cb = lv_line_draw,
     .instance_size = sizeof(lv_line_t),
     .base_class = &lv_obj_class
 };
@@ -130,53 +128,6 @@ static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /*A line never covers an area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK)
-        return LV_DRAW_RES_NOT_COVER;
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-        lv_line_t * line = (lv_line_t *)obj;
-
-        if(line->point_num == 0 || line->point_array == NULL) return false;
-
-        lv_area_t area;
-        lv_obj_get_coords(obj, &area);
-        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
-        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
-        lv_point_t p1;
-        lv_point_t p2;
-        lv_coord_t h = lv_obj_get_height(obj);
-        uint16_t i;
-
-        lv_draw_line_dsc_t line_dsc;
-        lv_draw_line_dsc_init(&line_dsc);
-        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
-
-        /*Read all points and draw the lines*/
-        for(i = 0; i < line->point_num - 1; i++) {
-
-            p1.x = line->point_array[i].x + x_ofs;
-            p2.x = line->point_array[i + 1].x + x_ofs;
-
-            if(line->y_inv == 0) {
-                p1.y = line->point_array[i].y + y_ofs;
-                p2.y = line->point_array[i + 1].y + y_ofs;
-            }
-            else {
-                p1.y = h - line->point_array[i].y + y_ofs;
-                p2.y = h - line->point_array[i + 1].y + y_ofs;
-            }
-            lv_draw_line(&p1, &p2, clip_area, &line_dsc);
-            line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
-        }
-    } else if (mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    return LV_DRAW_RES_OK;
-}
-
 static void lv_line_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
@@ -209,6 +160,42 @@ static void lv_line_event(lv_obj_t * obj, lv_event_t e)
             h += line_width;
             p->x = w;
             p->y = h;
+        }
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        lv_line_t * line = (lv_line_t *)obj;
+        const lv_area_t * clip_area = lv_event_get_param();
+
+        if(line->point_num == 0 || line->point_array == NULL) return;
+
+        lv_area_t area;
+        lv_obj_get_coords(obj, &area);
+        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
+        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
+        lv_point_t p1;
+        lv_point_t p2;
+        lv_coord_t h = lv_obj_get_height(obj);
+        uint16_t i;
+
+        lv_draw_line_dsc_t line_dsc;
+        lv_draw_line_dsc_init(&line_dsc);
+        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
+
+        /*Read all points and draw the lines*/
+        for(i = 0; i < line->point_num - 1; i++) {
+
+            p1.x = line->point_array[i].x + x_ofs;
+            p2.x = line->point_array[i + 1].x + x_ofs;
+
+            if(line->y_inv == 0) {
+                p1.y = line->point_array[i].y + y_ofs;
+                p2.y = line->point_array[i + 1].y + y_ofs;
+            }
+            else {
+                p1.y = h - line->point_array[i].y + y_ofs;
+                p2.y = h - line->point_array[i + 1].y + y_ofs;
+            }
+            lv_draw_line(&p1, &p2, clip_area, &line_dsc);
+            line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
     }
 }

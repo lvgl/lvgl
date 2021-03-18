@@ -83,20 +83,6 @@ void _lv_obj_destruct(lv_obj_t * obj)
     }
 }
 
-lv_draw_res_t lv_obj_draw_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(class_p == NULL) return LV_DRAW_RES_OK;
-
-    /*Find a base in which draw_cb is set*/
-    const lv_obj_class_t * base = class_p->base_class;
-    while(base && base->draw_cb == NULL) base = base->base_class;
-
-    if(base == NULL) return LV_DRAW_RES_OK;
-    if(base->draw_cb == NULL) return LV_DRAW_RES_OK;
-
-    return base->draw_cb(obj, clip_area, mode);
-}
-
 bool lv_obj_is_editable(struct _lv_obj_t * obj)
 {
     const lv_obj_class_t * class_p = obj->class_p;

@@ -47,9 +47,8 @@
  **********************/
 static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_bar_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_bar_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_bar_event(lv_obj_t * bar, lv_event_t e);
-static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
+static void draw_indic(lv_obj_t * bar);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
@@ -63,7 +62,6 @@ const lv_obj_class_t lv_bar_class = {
     .constructor_cb = lv_bar_constructor,
     .destructor_cb = lv_bar_destructor,
     .event_cb = lv_bar_event,
-    .draw_cb = lv_bar_draw,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj_class
 };
@@ -240,26 +238,11 @@ static void lv_bar_destructor(lv_obj_t * obj)
     lv_anim_del(&bar->start_value_anim, NULL);
 }
 
-static lv_draw_res_t lv_bar_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        /*Return false if the object is not covers the mask area*/
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        /*Draw the background*/
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-        draw_indic(obj, clip_area);
-    }
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    return LV_DRAW_RES_OK;
-}
-
-static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
+static void draw_indic(lv_obj_t * obj)
 {
     lv_bar_t * bar = (lv_bar_t *)obj;
+
+    const lv_area_t * clip_area = lv_event_get_param();
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
@@ -528,6 +511,8 @@ static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
         if(pad < 0) {
             *s = LV_MAX(*s, -pad);
         }
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_indic(obj);
     }
 }
 

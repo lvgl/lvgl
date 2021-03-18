@@ -53,20 +53,6 @@ typedef struct
     const void * sub_part_ptr;
 }lv_obj_draw_dsc_t;
 
-/** Design modes */
-enum {
-    LV_DRAW_MODE_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_DRAW_MODE_MAIN_DRAW,            /**< Draw the main portion of the object */
-    LV_DRAW_MODE_POST_DRAW,            /**< Draw extras on the object */
-};
-typedef uint8_t lv_draw_mode_t;
-
-/**
- * The draw callback is used to draw the object on the screen.
- * It accepts the object, a mask area, and the mode in which to draw the object.
- */
-typedef lv_draw_res_t (*lv_draw_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

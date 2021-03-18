@@ -39,6 +39,7 @@ void lv_example_scroll_2(void)
     }
     lv_obj_update_snap(panel, LV_ANIM_ON);
 
+#if LV_USE_SWITCH
     /*Switch between "One scroll" and "Normal scroll" mode*/
     lv_obj_t * sw = lv_switch_create(lv_scr_act(), NULL);
     lv_obj_align(sw, NULL, LV_ALIGN_IN_TOP_RIGHT, -20, 10);
@@ -46,6 +47,7 @@ void lv_example_scroll_2(void)
     lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);
     lv_label_set_text(label, "One scroll");
     lv_obj_align(label, sw, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
+#endif
 }
 
 #endif

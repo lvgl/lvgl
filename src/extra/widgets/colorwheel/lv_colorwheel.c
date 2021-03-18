@@ -32,11 +32,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_colorwheel_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e);
 
-static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask);
-static void draw_knob(lv_obj_t * obj, const lv_area_t * mask);
+static void draw_disc_grad(lv_obj_t * obj);
+static void draw_knob(lv_obj_t * obj);
 static void invalidate_knob(lv_obj_t * obj);
 static lv_area_t get_knob_area(lv_obj_t * obj);
 
@@ -51,7 +50,6 @@ static uint16_t get_angle(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_colorwheel_class = {.instance_size = sizeof(lv_colorwheel_t), .base_class = &lv_obj_class,
         .constructor_cb = lv_colorwheel_constructor,
-        .draw_cb = lv_colorwheel_draw,
         .event_cb = lv_colorwheel_event,
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
 };
@@ -227,26 +225,9 @@ static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     refr_knob_pos(obj);
 }
 
-static lv_draw_res_t lv_colorwheel_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+static void draw_disc_grad(lv_obj_t * obj)
 {
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK)  {
-        return LV_DRAW_RES_NOT_COVER;
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        draw_disc_grad(obj, clip_area);
-        draw_knob(obj, clip_area);
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
-static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask)
-{
+    const lv_area_t * clip_area = lv_event_get_param();
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_coord_t cx = obj->coords.x1 + w / 2;
@@ -296,7 +277,7 @@ static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask)
         p[1].x = cx + ((r - cir_w - cir_w_extra) * lv_trigo_sin(angle_trigo) >> LV_TRIGO_SHIFT);
         p[1].y = cy + ((r - cir_w - cir_w_extra) * lv_trigo_cos(angle_trigo) >> LV_TRIGO_SHIFT);
 
-        lv_draw_line(&p[0], &p[1], mask, &line_dsc);
+        lv_draw_line(&p[0], &p[1], clip_area, &line_dsc);
     }
 
 #if LV_DRAW_COMPLEX
@@ -305,8 +286,9 @@ static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask)
 #endif
 }
 
-static void draw_knob(lv_obj_t * obj, const lv_area_t * mask)
+static void draw_knob(lv_obj_t * obj)
 {
+    const lv_area_t * clip_area = lv_event_get_param();
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     lv_draw_rect_dsc_t cir_dsc;
@@ -321,7 +303,7 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * mask)
 
     lv_area_t knob_area = get_knob_area(obj);
 
-    lv_draw_rect(&knob_area, mask, &cir_dsc);
+    lv_draw_rect(&knob_area, clip_area, &cir_dsc);
 }
 
 static void invalidate_knob(lv_obj_t * obj)
@@ -521,6 +503,14 @@ static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e)
 
         /*Valid clicks can be only in the circle*/
         info->result = _lv_area_is_point_on(&obj->coords, info->point, LV_RADIUS_CIRCLE);
+    }
+    else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_disc_grad(obj);
+        draw_knob(obj);
+    }
+    else if(e == LV_EVENT_COVER_CHECK) {
+        lv_cover_check_info_t * info = lv_event_get_param();
+        if(info->res != LV_DRAW_RES_MASKED) info->res = LV_DRAW_RES_NOT_COVER;
     }
 }
 

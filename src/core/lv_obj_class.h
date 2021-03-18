@@ -42,7 +42,6 @@ typedef struct _lv_obj_class_t{
     void (*constructor_cb)(struct _lv_obj_t * obj, const struct _lv_obj_t * copy);
     void (*destructor_cb)(struct _lv_obj_t * obj);
     lv_event_cb_t event_cb;         /**< Object type specific event function*/
-    lv_draw_cb_t draw_cb;           /**< Object type specific draw function*/
     uint32_t editable :2;           /**< Value from ::lv_obj_class_editable_t */
     uint32_t instance_size :20;
 }lv_obj_class_t;
@@ -61,8 +60,6 @@ typedef struct _lv_obj_class_t{
 struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
 
 void _lv_obj_destruct(struct _lv_obj_t * obj);
-
-lv_draw_res_t lv_obj_draw_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 bool lv_obj_is_editable(struct _lv_obj_t * obj);
 

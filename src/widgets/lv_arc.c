@@ -31,7 +31,7 @@
  **********************/
 
 static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void lv_arc_draw(lv_obj_t * obj);
 static void lv_arc_event(lv_obj_t * obj, lv_event_t e);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
 static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
@@ -44,7 +44,6 @@ static void value_update(lv_obj_t * arc);
 const lv_obj_class_t lv_arc_class  = {
     .constructor_cb = lv_arc_constructor,
     .event_cb = lv_arc_event,
-    .draw_cb = lv_arc_draw,
     .instance_size = sizeof(lv_arc_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class
@@ -530,67 +529,6 @@ static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static lv_draw_res_t lv_arc_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        lv_arc_t * arc = (lv_arc_t *)obj;
-
-        lv_point_t center;
-        lv_coord_t arc_r;
-        get_center(obj, &center, &arc_r);
-
-        /*Draw the background arc*/
-        lv_draw_arc_dsc_t arc_dsc;
-        if(arc_r > 0) {
-            lv_draw_arc_dsc_init(&arc_dsc);
-            lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
-
-            lv_draw_arc(center.x, center.y, arc_r,arc->bg_angle_start +arc->rotation,
-                       arc->bg_angle_end + arc->rotation, clip_area,
-                        &arc_dsc);
-        }
-
-        /*make the indicator arc smaller or larger according to its greatest padding value*/
-        lv_coord_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-        lv_coord_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-        lv_coord_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-        lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
-        lv_coord_t indic_r = arc_r - LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
-
-        if(indic_r > 0) {
-            lv_draw_arc_dsc_init(&arc_dsc);
-            lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
-
-            lv_draw_arc(center.x, center.y, indic_r,arc->indic_angle_start +arc->rotation,
-                       arc->indic_angle_end +arc->rotation, clip_area,
-                        &arc_dsc);
-        }
-
-        lv_area_t knob_area;
-        get_knob_area(obj, &center, arc_r, &knob_area);
-
-        lv_draw_rect_dsc_t knob_rect_dsc;
-        lv_draw_rect_dsc_init(&knob_rect_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
-
-        lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
-
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
 static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
@@ -747,7 +685,57 @@ static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
 
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_pad - bg_pad);
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param();
+        lv_arc_draw(obj);
     }
+}
+
+static void lv_arc_draw(lv_obj_t * obj)
+{
+    lv_arc_t * arc = (lv_arc_t *)obj;
+
+    const lv_area_t * clip_area = lv_event_get_param();
+
+    lv_point_t center;
+    lv_coord_t arc_r;
+    get_center(obj, &center, &arc_r);
+
+    /*Draw the background arc*/
+    lv_draw_arc_dsc_t arc_dsc;
+    if(arc_r > 0) {
+        lv_draw_arc_dsc_init(&arc_dsc);
+        lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
+
+        lv_draw_arc(center.x, center.y, arc_r,arc->bg_angle_start +arc->rotation,
+                   arc->bg_angle_end + arc->rotation, clip_area,
+                    &arc_dsc);
+    }
+
+    /*make the indicator arc smaller or larger according to its greatest padding value*/
+    lv_coord_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+    lv_coord_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+    lv_coord_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+    lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_r = arc_r - LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+
+    if(indic_r > 0) {
+        lv_draw_arc_dsc_init(&arc_dsc);
+        lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
+
+        lv_draw_arc(center.x, center.y, indic_r,arc->indic_angle_start +arc->rotation,
+                   arc->indic_angle_end +arc->rotation, clip_area,
+                    &arc_dsc);
+    }
+
+    lv_area_t knob_area;
+    get_knob_area(obj, &center, arc_r, &knob_area);
+
+    lv_draw_rect_dsc_t knob_rect_dsc;
+    lv_draw_rect_dsc_init(&knob_rect_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
+
+    lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
 }
 
 static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angle, uint8_t part)

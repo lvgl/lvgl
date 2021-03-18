@@ -38,8 +38,6 @@ struct _lv_obj_t;
  *       EVENTS
  *---------------------*/
 
-
-
 /**
  * Type of event being sent to the object.
  */
@@ -70,8 +68,10 @@ typedef enum {
     LV_EVENT_REFR_EXT_DRAW_SIZE,   /**< Draw extras on the object */
 
     LV_EVENT_DRAW_MAIN_BEGIN,
+    LV_EVENT_DRAW_MAIN,
     LV_EVENT_DRAW_MAIN_END,
     LV_EVENT_DRAW_POST_BEGIN,
+    LV_EVENT_DRAW_POST,
     LV_EVENT_DRAW_POST_END,
     LV_EVENT_DRAW_PART_BEGIN,
     LV_EVENT_DRAW_PART_END,
@@ -258,6 +258,11 @@ typedef struct {
     const lv_point_t * point;
     bool result;
 } lv_hit_test_info_t;
+
+typedef struct {
+    lv_draw_res_t res;
+    const lv_area_t * clip_area;
+} lv_cover_check_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES

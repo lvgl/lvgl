@@ -35,7 +35,7 @@
  **********************/
 static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_switch_event(lv_obj_t * obj, lv_event_t e);
-static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void draw_main(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -43,7 +43,6 @@ static lv_draw_res_t lv_switch_draw(lv_obj_t * sw, const lv_area_t * clip_area, 
 const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
     .event_cb = lv_switch_event,
-    .draw_cb = lv_switch_draw,
     .instance_size = sizeof(lv_switch_t),
     .base_class = &lv_obj_class
 };
@@ -86,85 +85,6 @@ static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy)
    LV_TRACE_OBJ_CREATE("finished");
 }
 
-static lv_draw_res_t lv_switch_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return LV_DRAW_RES_NOT_COVER;
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        /*The ancestor draw function will draw the background.*/
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
-
-        /*Calculate the indicator area*/
-        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
-        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
-        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
-        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
-        bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
-        /*Draw the indicator in checked state*/
-        if(chk) {
-            /*Respect the background's padding*/
-            lv_area_t indic_area;
-            lv_area_copy(&indic_area, &obj->coords);
-            indic_area.x1 += bg_left;
-            indic_area.x2 -= bg_right;
-            indic_area.y1 += bg_top;
-            indic_area.y2 -= bg_bottom;
-
-            lv_draw_rect_dsc_t draw_indic_dsc;
-            lv_draw_rect_dsc_init(&draw_indic_dsc);
-            lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-            lv_draw_rect(&indic_area, clip_area, &draw_indic_dsc);
-        }
-
-        /*Draw the knob*/
-        lv_coord_t objh = lv_obj_get_height(obj);
-        lv_coord_t knob_size = objh;
-        lv_area_t knob_area;
-
-        /*Left*/
-        if((base_dir != LV_BIDI_DIR_RTL && !chk) || (base_dir == LV_BIDI_DIR_RTL && chk)) {
-            knob_area.x1 = obj->coords.x1 + bg_left;
-            knob_area.x2 = knob_area.x1 + knob_size;
-        }
-        else {
-            knob_area.x2 = obj->coords.x2 - bg_right;
-            knob_area.x1 = knob_area.x2 - knob_size;
-        }
-
-        knob_area.y1 = obj->coords.y1 + bg_top;
-        knob_area.y2 = obj->coords.y2 - bg_bottom;
-
-        lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-        lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
-
-        /*Apply the paddings on the knob area*/
-        knob_area.x1 -= knob_left;
-        knob_area.x2 += knob_right;
-        knob_area.y1 -= knob_top;
-        knob_area.y2 += knob_bottom;
-
-        lv_draw_rect_dsc_t knob_rect_dsc;
-        lv_draw_rect_dsc_init(&knob_rect_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
-
-        lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
-
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
 
 static void lv_switch_event(lv_obj_t * obj, lv_event_t e)
 {
@@ -201,6 +121,74 @@ static void lv_switch_event(lv_obj_t * obj, lv_event_t e)
 
         lv_obj_invalidate(obj);
     }
+    else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_main(obj);
+    }
+}
+
+static void draw_main(lv_obj_t * obj)
+{
+    const lv_area_t * clip_area = lv_event_get_param();
+    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+
+    /*Calculate the indicator area*/
+    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
+    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
+    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
+    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+    bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
+    /*Draw the indicator in checked state*/
+    if(chk) {
+        /*Respect the background's padding*/
+        lv_area_t indic_area;
+        lv_area_copy(&indic_area, &obj->coords);
+        indic_area.x1 += bg_left;
+        indic_area.x2 -= bg_right;
+        indic_area.y1 += bg_top;
+        indic_area.y2 -= bg_bottom;
+
+        lv_draw_rect_dsc_t draw_indic_dsc;
+        lv_draw_rect_dsc_init(&draw_indic_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
+        lv_draw_rect(&indic_area, clip_area, &draw_indic_dsc);
+    }
+
+    /*Draw the knob*/
+    lv_coord_t objh = lv_obj_get_height(obj);
+    lv_coord_t knob_size = objh;
+    lv_area_t knob_area;
+
+    /*Left*/
+    if((base_dir != LV_BIDI_DIR_RTL && !chk) || (base_dir == LV_BIDI_DIR_RTL && chk)) {
+        knob_area.x1 = obj->coords.x1 + bg_left;
+        knob_area.x2 = knob_area.x1 + knob_size;
+    }
+    else {
+        knob_area.x2 = obj->coords.x2 - bg_right;
+        knob_area.x1 = knob_area.x2 - knob_size;
+    }
+
+    knob_area.y1 = obj->coords.y1 + bg_top;
+    knob_area.y2 = obj->coords.y2 - bg_bottom;
+
+    lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
+    lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
+    lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
+    lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+
+    /*Apply the paddings on the knob area*/
+    knob_area.x1 -= knob_left;
+    knob_area.x2 += knob_right;
+    knob_area.y1 -= knob_top;
+    knob_area.y2 += knob_bottom;
+
+    lv_draw_rect_dsc_t knob_rect_dsc;
+    lv_draw_rect_dsc_init(&knob_rect_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
+
+    lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
+
 }
 
 #endif

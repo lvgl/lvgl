@@ -36,8 +36,8 @@
  **********************/
 static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_label_destructor(lv_obj_t * obj);
-static void lv_label_event_cb(lv_obj_t * label, lv_event_t e);
-static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e);
+static void draw_main(lv_obj_t * obj);
 
 static void lv_label_refr_text(lv_obj_t * obj);
 static void lv_label_revert_dots(lv_obj_t * label);
@@ -56,7 +56,6 @@ const lv_obj_class_t lv_label_class = {
     .constructor_cb = lv_label_constructor,
     .destructor_cb = lv_label_destructor,
     .event_cb = lv_label_event_cb,
-    .draw_cb = lv_label_draw,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class
 };
@@ -738,103 +737,6 @@ static void lv_label_destructor(lv_obj_t * obj)
     label->text = NULL;
 }
 
-static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /* A label never covers an area */
-    if(mode == LV_DRAW_MODE_COVER_CHECK)
-        return LV_DRAW_RES_NOT_COVER;
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        lv_label_t * label = (lv_label_t *)obj;
-        lv_area_t txt_coords;
-        get_txt_coords(obj, &txt_coords);
-
-        lv_area_t txt_clip;
-        bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
-        if(!is_common) return LV_DRAW_RES_OK;
-
-        lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-        lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-        if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
-        if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-        if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
-
-        lv_draw_label_dsc_t label_draw_dsc;
-        lv_draw_label_dsc_init(&label_draw_dsc);
-
-        label_draw_dsc.ofs_x = label->offset.x;
-        label_draw_dsc.ofs_y = label->offset.y;
-        label_draw_dsc.flag = flag;
-        lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
-
-        label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
-        label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
-        if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-            label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_SELECTED);
-            label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
-        }
-
-        /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
-         * (In addition they will result misalignment is this case)*/
-        if((label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) &&
-           (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
-            lv_point_t size;
-            lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                             LV_COORD_MAX, flag);
-            if(size.x > lv_area_get_width(&txt_coords)) {
-                label_draw_dsc.align = LV_TEXT_ALIGN_LEFT;
-            }
-        }
-#if LV_LABEL_LONG_TXT_HINT
-        lv_draw_label_hint_t * hint = &label->hint;
-        if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
-            hint = NULL;
-
-#else
-        /*Just for compatibility*/
-        lv_draw_label_hint_t * hint = NULL;
-#endif
-
-        lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-
-        if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
-            lv_point_t size;
-            lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                             LV_COORD_MAX, flag);
-
-            /*Draw the text again on label to the original to make an circular effect */
-            if(size.x > lv_area_get_width(&txt_coords)) {
-                label_draw_dsc.ofs_x = label->offset.x + size.x +
-                                       lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
-                label_draw_dsc.ofs_y = label->offset.y;
-
-                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-            }
-
-            /*Draw the text again below the original to make an circular effect */
-            if(size.y > lv_area_get_height(&txt_coords)) {
-                label_draw_dsc.ofs_x = label->offset.x;
-                label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
-
-                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-            }
-        }
-    } else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
-}
-
-/**
- * Signal function of the label
- * @param label pointer to a label object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
 static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
@@ -862,8 +764,91 @@ static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
         if(label->static_txt == 0) lv_label_set_text(obj, NULL);
 #endif
     }
+    else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_main(obj);
+    }
 }
 
+
+static void draw_main(lv_obj_t * obj)
+{
+    lv_label_t * label = (lv_label_t *)obj;
+    const lv_area_t * clip_area = lv_event_get_param();
+
+    lv_area_t txt_coords;
+    get_txt_coords(obj, &txt_coords);
+
+    lv_area_t txt_clip;
+    bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
+    if(!is_common) return;
+
+    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
+    lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
+    if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
+    if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
+    if(label->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TEXT_FLAG_FIT;
+
+    lv_draw_label_dsc_t label_draw_dsc;
+    lv_draw_label_dsc_init(&label_draw_dsc);
+
+    label_draw_dsc.ofs_x = label->offset.x;
+    label_draw_dsc.ofs_y = label->offset.y;
+    label_draw_dsc.flag = flag;
+    lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
+
+    label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
+    label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
+    if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
+        label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_SELECTED);
+        label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
+    }
+
+    /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
+     * (In addition they will result misalignment is this case)*/
+    if((label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) &&
+       (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
+        lv_point_t size;
+        lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+                         LV_COORD_MAX, flag);
+        if(size.x > lv_area_get_width(&txt_coords)) {
+            label_draw_dsc.align = LV_TEXT_ALIGN_LEFT;
+        }
+    }
+#if LV_LABEL_LONG_TXT_HINT
+    lv_draw_label_hint_t * hint = &label->hint;
+    if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
+        hint = NULL;
+
+#else
+    /*Just for compatibility*/
+    lv_draw_label_hint_t * hint = NULL;
+#endif
+
+    lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
+
+    if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
+        lv_point_t size;
+        lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+                         LV_COORD_MAX, flag);
+
+        /*Draw the text again on label to the original to make an circular effect */
+        if(size.x > lv_area_get_width(&txt_coords)) {
+            label_draw_dsc.ofs_x = label->offset.x + size.x +
+                                   lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            label_draw_dsc.ofs_y = label->offset.y;
+
+            lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
+        }
+
+        /*Draw the text again below the original to make an circular effect */
+        if(size.y > lv_area_get_height(&txt_coords)) {
+            label_draw_dsc.ofs_x = label->offset.x;
+            label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
+
+            lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
+        }
+    }
+}
 
 /**
  * Refresh the label with its text stored in its labelended data

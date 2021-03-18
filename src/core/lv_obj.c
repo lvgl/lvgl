@@ -61,7 +61,7 @@ typedef struct {
  **********************/
 static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_obj_destructor(lv_obj_t * obj);
-static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void lv_obj_draw(lv_obj_t * obj, lv_event_t e);
 static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
@@ -80,7 +80,6 @@ const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
     .event_cb = lv_obj_event_cb,
-    .draw_cb = lv_obj_draw,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
 };
@@ -225,12 +224,12 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
         if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event);
     }
 
-    lv_obj_event_base(NULL, obj, event);
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
+    lv_res_t res = LV_RES_OK;
+    res = lv_obj_event_base(NULL, obj, event);
 
     uint32_t i = 0;
-    lv_res_t res = LV_RES_OK;
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
-    while(event_dsc) {
+    while(event_dsc && res == LV_RES_OK) {
         if(event_dsc->cb) {
             void * event_act_user_data_cb_save = event_act_user_data_cb;
             event_act_user_data_cb = event_dsc->user_data;
@@ -735,10 +734,15 @@ static void lv_obj_destructor(lv_obj_t * p)
 
 }
 
-static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
+static void lv_obj_draw(lv_obj_t * obj, lv_event_t e)
 {
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) return LV_DRAW_RES_MASKED;
+    if(e == LV_EVENT_COVER_CHECK) {
+        lv_cover_check_info_t * info = lv_event_get_param();
+        if(info->res == LV_DRAW_RES_MASKED) return;
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+            info->res = LV_DRAW_RES_MASKED;
+            return;
+        }
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
@@ -751,19 +755,32 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         coords.y1 -= h;
         coords.y2 += h;
 
-        if(_lv_area_is_in(clip_area, &coords, r) == false) return LV_DRAW_RES_NOT_COVER;
+        if(_lv_area_is_in(info->clip_area, &coords, r) == false) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+           return;
+        }
 
-        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+            return;
+        }
 
 #if LV_DRAW_COMPLEX
-        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+            return;
+        }
 #endif
-        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return LV_DRAW_RES_NOT_COVER;
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+            return;
+        }
 
-        return  LV_DRAW_RES_COVER;
+        info->res = LV_DRAW_RES_COVER;
 
     }
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
+    else if(e == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param();
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -794,7 +811,8 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
         }
 #endif
     }
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
+    else if(e == LV_EVENT_DRAW_POST) {
+        const lv_area_t * clip_area = lv_event_get_param();
         draw_scrollbar(obj, clip_area);
 
 #if LV_DRAW_COMPLEX
@@ -825,8 +843,6 @@ static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
             lv_draw_rect(&coords, clip_area, &draw_dsc);
         }
     }
-
-    return LV_DRAW_RES_OK;
 }
 
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
@@ -1051,6 +1067,9 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
         lv_obj_refresh_ext_draw_size(obj);
+    }
+    else if(e == LV_EVENT_DRAW_MAIN || e == LV_EVENT_DRAW_POST || e == LV_EVENT_COVER_CHECK) {
+        lv_obj_draw(obj, e);
     }
 }
 

@@ -35,7 +35,7 @@
 static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_btnmatrix_destructor(lv_obj_t * obj);
 static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e);
-static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
+static void draw_main(lv_obj_t * obj);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -58,7 +58,6 @@ const lv_obj_class_t lv_btnmatrix_class = {
         .constructor_cb = lv_btnmatrix_constructor,
         .destructor_cb = lv_btnmatrix_destructor,
         .event_cb = lv_btnmatrix_event,
-        .draw_cb = lv_btnmatrix_draw,
         .instance_size = sizeof(lv_btnmatrix_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
         .base_class = &lv_obj_class
@@ -390,166 +389,6 @@ static void lv_btnmatrix_destructor(lv_obj_t * obj)
     btnm->ctrl_bits = NULL;
 }
 
-static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-        if(btnm->btn_cnt == 0) return LV_DRAW_RES_OK;
-
-        obj->style_list.skip_trans = 1;
-
-        lv_area_t area_obj;
-        lv_obj_get_coords(obj, &area_obj);
-
-        lv_area_t btn_area;
-
-        uint16_t btn_i = 0;
-        uint16_t txt_i = 0;
-
-        lv_draw_rect_dsc_t draw_rect_dsc_act;
-        lv_draw_label_dsc_t draw_label_dsc_act;
-
-        lv_draw_rect_dsc_t draw_rect_dsc_def;
-        lv_draw_label_dsc_t draw_label_dsc_def;
-
-        lv_text_flag_t recolor_flag = btnm->recolor ? LV_TEXT_FLAG_RECOLOR : 0;
-
-        lv_state_t state_ori = obj->state;
-        obj->state = LV_STATE_DEFAULT;
-        obj->style_list.skip_trans = 1;
-        lv_draw_rect_dsc_init(&draw_rect_dsc_def);
-        lv_draw_label_dsc_init(&draw_label_dsc_def);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_def);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_def);
-        draw_label_dsc_act.flag |= recolor_flag;
-        obj->style_list.skip_trans = 0;
-        obj->state = state_ori;
-
-        lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-        lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-
-#if LV_USE_ARABIC_PERSIAN_CHARS
-        const size_t txt_ap_size = 256 ;
-        char * txt_ap = lv_mem_buf_get(txt_ap_size);
-#endif
-
-        lv_obj_draw_dsc_t dsc;
-        lv_obj_draw_dsc_init(&dsc, clip_area);
-        dsc.part = LV_PART_ITEMS;
-        dsc.rect_dsc = &draw_rect_dsc_act;
-        dsc.label_dsc = &draw_label_dsc_act;
-
-        for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
-            /*Search the next valid text in the map*/
-            while(strcmp(btnm->map_p[txt_i], "\n") == 0) {
-                txt_i++;
-            }
-
-            /*Skip hidden buttons*/
-            if(button_is_hidden(btnm->ctrl_bits[btn_i])) continue;
-
-            /*Get the state of the button*/
-            lv_state_t btn_state = LV_STATE_DEFAULT;
-            if(button_get_checked(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_CHECKED;
-            if(button_is_inactive(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_DISABLED;
-            if(btn_i == btnm->btn_id_sel) {
-                if(state_ori & LV_STATE_PRESSED) btn_state |= LV_STATE_PRESSED;
-                if(state_ori & LV_STATE_FOCUSED) btn_state |= LV_STATE_FOCUSED;
-                if(state_ori & LV_STATE_FOCUS_KEY) btn_state |= LV_STATE_FOCUS_KEY;
-                if(state_ori & LV_STATE_EDITED) btn_state |= LV_STATE_EDITED;
-            }
-
-            /*Get the button's area*/
-            lv_area_copy(&btn_area, &btnm->button_areas[btn_i]);
-            btn_area.x1 += area_obj.x1;
-            btn_area.y1 += area_obj.y1;
-            btn_area.x2 += area_obj.x1;
-            btn_area.y2 += area_obj.y1;
-
-            /*Set up the draw descriptors*/
-            if(btn_state == LV_STATE_DEFAULT) {
-                lv_memcpy(&draw_rect_dsc_act, &draw_rect_dsc_def, sizeof(lv_draw_rect_dsc_t));
-                lv_memcpy(&draw_label_dsc_act, &draw_label_dsc_def, sizeof(lv_draw_label_dsc_t));
-            }
-            /*In other cases get the styles directly without caching them*/
-            else {
-                obj->state = btn_state;
-                obj->style_list.skip_trans = 1;
-                lv_draw_rect_dsc_init(&draw_rect_dsc_act);
-                lv_draw_label_dsc_init(&draw_label_dsc_act);
-                lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
-                lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
-                draw_label_dsc_act.flag = recolor_flag;
-                obj->state = state_ori;
-                obj->style_list.skip_trans = 0;
-            }
-
-            dsc.draw_area = &btn_area;
-            dsc.id = btn_i;
-            lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &dsc);
-
-            /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
-            if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
-                draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
-                if(btn_area.x1 == obj->coords.x1 + pleft) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_LEFT;
-                if(btn_area.x2 == obj->coords.x2 - pright) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_RIGHT;
-                if(btn_area.y1 == obj->coords.y1 + ptop) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_TOP;
-                if(btn_area.y2 == obj->coords.y2 - pbottom) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_BOTTOM;
-            }
-
-            /*Draw the background*/
-            lv_draw_rect(&btn_area, clip_area, &draw_rect_dsc_act);
-
-            /*Calculate the size of the text*/
-            const lv_font_t * font = draw_label_dsc_act.font;
-            lv_coord_t letter_space = draw_label_dsc_act.letter_space;
-            lv_coord_t line_space = draw_label_dsc_act.line_space;
-            const char * txt = btnm->map_p[txt_i];
-
-#if LV_USE_ARABIC_PERSIAN_CHARS
-            /*Get the size of the Arabic text and process it*/
-            size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
-            if(len_ap < txt_ap_size) {
-                _lv_txt_ap_proc(txt, txt_ap);
-                txt = txt_ap;
-            }
-#endif
-
-            lv_point_t txt_size;
-            lv_txt_get_size(&txt_size, txt, font, letter_space,
-                             line_space, lv_area_get_width(&area_obj), recolor_flag);
-
-            btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
-            btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;
-            btn_area.x2 = btn_area.x1 + txt_size.x;
-            btn_area.y2 = btn_area.y1 + txt_size.y;
-
-            /*Draw the text*/
-            lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
-
-
-            lv_event_send(obj,LV_EVENT_DRAW_PART_END, &dsc);
-        }
-
-        obj->style_list.skip_trans = 0;
-#if LV_USE_ARABIC_PERSIAN_CHARS
-        lv_mem_buf_release(txt_ap);
-#endif
-    }
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-    return LV_DRAW_RES_OK;
-}
-
 static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
@@ -795,9 +634,160 @@ static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
         }
 
         invalidate_button_area(obj, btnm->btn_id_sel);
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        draw_main(obj);
     }
+
 }
 
+static void draw_main(lv_obj_t * obj)
+{
+    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
+    if(btnm->btn_cnt == 0) return;
+
+    const lv_area_t * clip_area = lv_event_get_param();
+    obj->style_list.skip_trans = 1;
+
+    lv_area_t area_obj;
+    lv_obj_get_coords(obj, &area_obj);
+
+    lv_area_t btn_area;
+
+    uint16_t btn_i = 0;
+    uint16_t txt_i = 0;
+
+    lv_draw_rect_dsc_t draw_rect_dsc_act;
+    lv_draw_label_dsc_t draw_label_dsc_act;
+
+    lv_draw_rect_dsc_t draw_rect_dsc_def;
+    lv_draw_label_dsc_t draw_label_dsc_def;
+
+    lv_text_flag_t recolor_flag = btnm->recolor ? LV_TEXT_FLAG_RECOLOR : 0;
+
+    lv_state_t state_ori = obj->state;
+    obj->state = LV_STATE_DEFAULT;
+    obj->style_list.skip_trans = 1;
+    lv_draw_rect_dsc_init(&draw_rect_dsc_def);
+    lv_draw_label_dsc_init(&draw_label_dsc_def);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_def);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_def);
+    draw_label_dsc_act.flag |= recolor_flag;
+    obj->style_list.skip_trans = 0;
+    obj->state = state_ori;
+
+    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    const size_t txt_ap_size = 256 ;
+    char * txt_ap = lv_mem_buf_get(txt_ap_size);
+#endif
+
+    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_dsc_init(&dsc, clip_area);
+    dsc.part = LV_PART_ITEMS;
+    dsc.rect_dsc = &draw_rect_dsc_act;
+    dsc.label_dsc = &draw_label_dsc_act;
+
+    for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
+        /*Search the next valid text in the map*/
+        while(strcmp(btnm->map_p[txt_i], "\n") == 0) {
+            txt_i++;
+        }
+
+        /*Skip hidden buttons*/
+        if(button_is_hidden(btnm->ctrl_bits[btn_i])) continue;
+
+        /*Get the state of the button*/
+        lv_state_t btn_state = LV_STATE_DEFAULT;
+        if(button_get_checked(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_CHECKED;
+        if(button_is_inactive(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_DISABLED;
+        if(btn_i == btnm->btn_id_sel) {
+            if(state_ori & LV_STATE_PRESSED) btn_state |= LV_STATE_PRESSED;
+            if(state_ori & LV_STATE_FOCUSED) btn_state |= LV_STATE_FOCUSED;
+            if(state_ori & LV_STATE_FOCUS_KEY) btn_state |= LV_STATE_FOCUS_KEY;
+            if(state_ori & LV_STATE_EDITED) btn_state |= LV_STATE_EDITED;
+        }
+
+        /*Get the button's area*/
+        lv_area_copy(&btn_area, &btnm->button_areas[btn_i]);
+        btn_area.x1 += area_obj.x1;
+        btn_area.y1 += area_obj.y1;
+        btn_area.x2 += area_obj.x1;
+        btn_area.y2 += area_obj.y1;
+
+        /*Set up the draw descriptors*/
+        if(btn_state == LV_STATE_DEFAULT) {
+            lv_memcpy(&draw_rect_dsc_act, &draw_rect_dsc_def, sizeof(lv_draw_rect_dsc_t));
+            lv_memcpy(&draw_label_dsc_act, &draw_label_dsc_def, sizeof(lv_draw_label_dsc_t));
+        }
+        /*In other cases get the styles directly without caching them*/
+        else {
+            obj->state = btn_state;
+            obj->style_list.skip_trans = 1;
+            lv_draw_rect_dsc_init(&draw_rect_dsc_act);
+            lv_draw_label_dsc_init(&draw_label_dsc_act);
+            lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
+            lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
+            draw_label_dsc_act.flag = recolor_flag;
+            obj->state = state_ori;
+            obj->style_list.skip_trans = 0;
+        }
+
+        dsc.draw_area = &btn_area;
+        dsc.id = btn_i;
+        lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &dsc);
+
+        /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
+        if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
+            draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
+            if(btn_area.x1 == obj->coords.x1 + pleft) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_LEFT;
+            if(btn_area.x2 == obj->coords.x2 - pright) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_RIGHT;
+            if(btn_area.y1 == obj->coords.y1 + ptop) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_TOP;
+            if(btn_area.y2 == obj->coords.y2 - pbottom) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_BOTTOM;
+        }
+
+        /*Draw the background*/
+        lv_draw_rect(&btn_area, clip_area, &draw_rect_dsc_act);
+
+        /*Calculate the size of the text*/
+        const lv_font_t * font = draw_label_dsc_act.font;
+        lv_coord_t letter_space = draw_label_dsc_act.letter_space;
+        lv_coord_t line_space = draw_label_dsc_act.line_space;
+        const char * txt = btnm->map_p[txt_i];
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        /*Get the size of the Arabic text and process it*/
+        size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
+        if(len_ap < txt_ap_size) {
+            _lv_txt_ap_proc(txt, txt_ap);
+            txt = txt_ap;
+        }
+#endif
+
+        lv_point_t txt_size;
+        lv_txt_get_size(&txt_size, txt, font, letter_space,
+                line_space, lv_area_get_width(&area_obj), recolor_flag);
+
+        btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
+        btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;
+        btn_area.x2 = btn_area.x1 + txt_size.x;
+        btn_area.y2 = btn_area.y1 + txt_size.y;
+
+        /*Draw the text*/
+        lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
+
+
+        lv_event_send(obj,LV_EVENT_DRAW_PART_END, &dsc);
+    }
+
+    obj->style_list.skip_trans = 0;
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    lv_mem_buf_release(txt_ap);
+#endif
+}
 /**
  * Create the required number of buttons and control bytes according to a map
  * @param obj pointer to button matrix object

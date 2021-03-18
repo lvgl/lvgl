@@ -32,10 +32,9 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static void lv_slider_event(lv_obj_t * obj, lv_event_t e);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
-static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area);
+static void draw_knob(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -43,7 +42,6 @@ static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area);
 const lv_obj_class_t lv_slider_class = {
     .constructor_cb = lv_slider_constructor,
     .event_cb = lv_slider_event,
-    .draw_cb = lv_slider_draw,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar_class
@@ -96,29 +94,6 @@ static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_area_copy(&slider->right_knob_area, &copy_slider->right_knob_area);
     }
 
-}
-
-static lv_draw_res_t lv_slider_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode)
-{
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DRAW_MODE_COVER_CHECK) {
-        return LV_DRAW_RES_NOT_COVER;
-    }
-    /*Draw the object*/
-    else if(mode == LV_DRAW_MODE_MAIN_DRAW) {
-        /* The ancestor draw function will draw the background and the indicator.
-         * It also sets slider->bar.indic_area*/
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-
-        draw_knob(obj, clip_area);
-
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DRAW_MODE_POST_DRAW) {
-        lv_obj_draw_base(MY_CLASS, obj, clip_area, mode);
-    }
-
-    return LV_DRAW_RES_OK;
 }
 
 static void lv_slider_event(lv_obj_t * obj, lv_event_t e)
@@ -340,12 +315,16 @@ static void lv_slider_event(lv_obj_t * obj, lv_event_t e)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
+    } else if(e == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param();
+        draw_knob(obj);
     }
 }
 
-static void draw_knob(lv_obj_t * obj, const lv_area_t * clip_area)
+static void draw_knob(lv_obj_t * obj)
 {
     lv_slider_t * slider = (lv_slider_t *)obj;
+    const lv_area_t * clip_area = lv_event_get_param();
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
 
     lv_coord_t objw = lv_obj_get_width(obj);
