@@ -38,6 +38,8 @@ struct _lv_obj_t;
  *       EVENTS
  *---------------------*/
 
+
+
 /**
  * Type of event being sent to the object.
  */
@@ -77,6 +79,16 @@ typedef enum {
     LV_EVENT_READY,             /**< A process has finished */
     LV_EVENT_CANCEL,             /**< A process has been cancelled */
 
+    /*General signals*/
+    LV_EVENT_CHILD_CHG,          /**< Child was removed/added */
+    LV_EVENT_COORD_CHG,          /**< Object coordinates/size have changed */
+    LV_EVENT_STYLE_CHG,          /**< Object's style has changed */
+    LV_EVENT_BASE_DIR_CHG,       /**< The base dir has changed*/
+    LV_EVENT_GET_SELF_SIZE,      /**< Get the internal size of a widget*/
+
+    /*Input device related*/
+    LV_EVENT_HIT_TEST,          /**< Advanced hit-testing */
+
     _LV_EVENT_LAST /** Number of default events*/
 }lv_event_t;
 
@@ -95,45 +107,6 @@ typedef struct {
 /*---------------------
  *       EVENTS
  *---------------------*/
-
-
-/** Signals are for use by the object itself or to extend the object's functionality.
- * They determine a widget with a given type should behave.
- * Applications should use ::lv_obj_set_event_cb to be notified of events that occur
- * on the object. */
-typedef enum {
-    /*General signals*/
-    LV_SIGNAL_CHILD_CHG,          /**< Child was removed/added */
-    LV_SIGNAL_COORD_CHG,          /**< Object coordinates/size have changed */
-    LV_SIGNAL_STYLE_CHG,          /**< Object's style has changed */
-    LV_SIGNAL_BASE_DIR_CHG,       /**< The base dir has changed*/
-    LV_SIGNAL_REFR_EXT_DRAW_SIZE, /**< Object's extra padding has changed */
-    LV_SIGNAL_GET_SELF_SIZE,      /**< Get the internal size of a widget*/
-
-    /*Input device related*/
-    LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
-    LV_SIGNAL_PRESSED,           /**< The object has been pressed*/
-    LV_SIGNAL_PRESSING,          /**< The object is being pressed (called continuously while pressing)*/
-    LV_SIGNAL_PRESS_LOST,        /**< User is still pressing but slid cursor/finger off of the object */
-    LV_SIGNAL_RELEASED,          /**< User pressed object for a short period of time, then released it. Not called if scrolled. */
-    LV_SIGNAL_LONG_PRESS,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if scrolled.*/
-    LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
-    LV_SIGNAL_SCROLL_BEGIN,      /**< The scrolling has just begun  */
-    LV_SIGNAL_SCROLL,            /**< The object has been scrolled */
-    LV_SIGNAL_SCROLL_END,        /**< The scrolling has ended */
-    LV_SIGNAL_GESTURE,           /**< The object has been gesture*/
-    LV_SIGNAL_LEAVE,             /**< Another object is clicked or chosen via an input device */
-    LV_SIGNAL_FOCUS,             /**< The object was focused */
-    LV_SIGNAL_DEFOCUS,           /**< The object was de-focused */
-    LV_SIGNAL_CONTROL,           /**< Send a (control) character to the widget */
-} lv_signal_t;
-
-/**
- * @brief Signal callback.
- * Signals are used to notify the widget of the action related to the object.
- * For details, see ::lv_signal_t.
- */
-typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**
  * Possible states of a widget.
@@ -329,6 +302,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
  */
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param);
 
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_event_t e);
+
 /**
  * Get the `param` parameter of the current event
  * @return      the `param` parameter
@@ -360,14 +335,6 @@ uint32_t lv_event_register_id(void);
  * @param obj pointer to an obejct to mark as deleted
  */
 void _lv_event_mark_deleted(lv_obj_t * obj);
-
-/**
- * Send an event to the object
- * @param obj       pointer to an object
- * @param event     the type of the event from `lv_event_t`.
- * @return LV_RES_OK or LV_RES_INV
- */
-lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
 
 /*=====================
  * Setter functions

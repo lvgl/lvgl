@@ -48,7 +48,7 @@
 static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_bar_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_bar_draw(lv_obj_t * bar, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
+static void lv_bar_event(lv_obj_t * bar, lv_event_t e);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
@@ -62,7 +62,7 @@ static void lv_bar_anim_ready(lv_anim_t * a);
 const lv_obj_class_t lv_bar_class = {
     .constructor_cb = lv_bar_constructor,
     .destructor_cb = lv_bar_destructor,
-    .signal_cb = lv_bar_signal,
+    .event_cb = lv_bar_event,
     .draw_cb = lv_bar_draw,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj_class
@@ -501,21 +501,21 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 }
 
-static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t indic_size;
         indic_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
 
         /*Bg size is handled by lv_obj*/
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, indic_size);
 
         /*Calculate the indicator area*/
@@ -529,8 +529,6 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             *s = LV_MAX(*s, -pad);
         }
     }
-
-    return res;
 }
 
 static void lv_bar_anim(void * var, int32_t value)

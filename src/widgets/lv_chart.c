@@ -39,7 +39,7 @@
 static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_chart_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_chart_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_chart_event(lv_obj_t * obj, lv_event_t e);
 
 static void draw_div_lines(lv_obj_t * obj , const lv_area_t * mask);
 static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area);
@@ -55,7 +55,7 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i);
 const lv_obj_class_t lv_chart_class = {
     .constructor_cb = lv_chart_constructor,
     .destructor_cb = lv_chart_destructor,
-    .signal_cb = lv_chart_signal,
+    .event_cb = lv_chart_event,
     .draw_cb = lv_chart_draw,
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj_class
@@ -642,19 +642,16 @@ static lv_draw_res_t lv_chart_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
 {
     /* Include the ancient signal function */
     lv_res_t res;
 
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
-    if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_point_t * p = param;
-        p->x = (lv_obj_get_width_fit(obj) * chart->zoom_x) >> 8;
-        p->y = (lv_obj_get_height_fit(obj) * chart->zoom_y) >> 8;
-    } else if(sign == LV_SIGNAL_PRESSED) {
+    if(e == LV_EVENT_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();
         lv_point_t p;
         lv_indev_get_point(indev, &p);
@@ -667,15 +664,13 @@ static lv_res_t lv_chart_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             chart->pressed_point_id = id;
             lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
         }
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    } else if(e == LV_EVENT_RELEASED) {
         chart->pressed_point_id = LV_CHART_POINT_NONE;
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = param;
+    } else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
                      chart->tick[LV_CHART_AXIS_PRIMARY_Y].draw_size, chart->tick[LV_CHART_AXIS_SECONDARY_Y].draw_size);
     }
-
-    return res;
 }
 
 static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)

@@ -25,7 +25,7 @@
  **********************/
 static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * imgbtn, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * param);
+static void lv_imgbtn_event(lv_obj_t * imgbtn, lv_event_t e);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
@@ -37,7 +37,7 @@ const lv_obj_class_t lv_imgbtn_class = {
         .base_class = &lv_obj_class,
         .instance_size = sizeof(lv_imgbtn_t),
         .constructor_cb = lv_imgbtn_constructor,
-        .signal_cb = lv_imgbtn_signal,
+        .event_cb = lv_imgbtn_event,
         .draw_cb = lv_imgbtn_draw,
 };
 
@@ -272,23 +272,14 @@ static lv_draw_res_t lv_imgbtn_draw(lv_obj_t * obj, const lv_area_t * clip_area,
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the image button
- * @param imgbtn pointer to a image button object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_imgbtn_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_imgbtn_event(lv_obj_t * obj, lv_event_t e)
 {
-    lv_res_t res = lv_obj_signal_base(&lv_imgbtn_class, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, obj, e);
+    if(res != LV_RES_OK) return;
 
-    if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
+    if(e == LV_EVENT_PRESSED || e == LV_EVENT_RELEASED || e == LV_EVENT_PRESS_LOST) {
         refr_img(obj);
     }
-
-    return res;
 }
 
 static void refr_img(lv_obj_t * obj)

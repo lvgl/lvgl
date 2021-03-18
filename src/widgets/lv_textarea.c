@@ -48,7 +48,7 @@
 static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_textarea_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_textarea_event(lv_obj_t * obj, lv_event_t e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
 static void pwd_char_hider_anim_ready(lv_anim_t * a);
@@ -56,7 +56,7 @@ static void pwd_char_hider(lv_obj_t * obj);
 static bool char_is_accepted(lv_obj_t * obj, uint32_t c);
 static void start_cursor_blink(lv_obj_t * obj);
 static void refr_cursor_area(lv_obj_t * obj);
-static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv_indev_t * click_source);
+static void update_cursor_position_on_click(lv_obj_t * obj, lv_event_t e);
 static lv_res_t insert_handler(lv_obj_t * obj, const char * txt);
 static void draw_placeholder(lv_obj_t * obj, const lv_area_t * clip_area);
 static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
@@ -67,7 +67,7 @@ static void draw_cursor(lv_obj_t * obj, const lv_area_t * clip_area);
 const lv_obj_class_t lv_textarea_class = {
     .constructor_cb = lv_textarea_constructor,
     .destructor_cb = lv_textarea_destructor,
-    .signal_cb = lv_textarea_signal,
+    .event_cb = lv_textarea_event,
     .draw_cb = lv_textarea_draw,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class
@@ -1041,23 +1041,16 @@ static lv_draw_res_t lv_textarea_draw(lv_obj_t * obj, const lv_area_t * clip_are
     return LV_DRAW_RES_OK;
 }
 
-/**
- * Signal function of the text area
- * @param ta pointer to a text area object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    if(sign == LV_SIGNAL_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHG) {
         if(ta->label) {
             if(ta->one_line) {
                 lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -1080,12 +1073,13 @@ static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * para
             start_cursor_blink(obj);
         }
     }
-    else if(sign == LV_SIGNAL_FOCUS) {
+    else if(e == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ta->label) {
+            void * param = lv_event_get_param();
             if(lv_obj_get_width(obj) != lv_area_get_width(param) || lv_obj_get_height(obj) != lv_area_get_height(param)) {
                 lv_obj_set_width(ta->label, lv_obj_get_width_fit(obj));
                 lv_obj_set_pos(ta->label, 0, 0);
@@ -1095,8 +1089,8 @@ static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * para
             }
         }
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
-        uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
+    else if(e == LV_EVENT_KEY) {
+        uint32_t c = *((uint32_t *)lv_event_get_param()); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT)
             lv_textarea_cursor_right(obj);
         else if(c == LV_KEY_LEFT)
@@ -1119,11 +1113,10 @@ static lv_res_t lv_textarea_signal(lv_obj_t * obj, lv_signal_t sign, void * para
             lv_textarea_add_char(obj, c);
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||
-            sign == LV_SIGNAL_RELEASED) {
-        update_cursor_position_on_click(obj, sign, (lv_indev_t *)param);
+    else if(e == LV_EVENT_PRESSED || e == LV_EVENT_PRESSING || e == LV_EVENT_PRESS_LOST ||
+            e == LV_EVENT_RELEASED) {
+        update_cursor_position_on_click(obj, e);
     }
-    return res;
 }
 
 /**
@@ -1347,8 +1340,9 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_obj_invalidate_area(obj, &area_tmp);
 }
 
-static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv_indev_t * click_source)
+static void update_cursor_position_on_click(lv_obj_t * obj, lv_event_t e)
 {
+    lv_indev_t * click_source = lv_indev_get_act();
     if(click_source == NULL) return;
 
      lv_textarea_t * ta = (lv_textarea_t *)obj;
@@ -1394,24 +1388,24 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
     }
 
     if(ta->text_sel_en) {
-        if(!ta->text_sel_in_prog && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
+        if(!ta->text_sel_in_prog && !click_outside_label && e == LV_EVENT_PRESSED) {
             /*Input device just went down. Store the selection start position*/
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SEL_OFF;
             ta->text_sel_in_prog = 1;
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         }
-        else if(ta->text_sel_in_prog && sign == LV_SIGNAL_PRESSING) {
+        else if(ta->text_sel_in_prog && e == LV_EVENT_PRESSING) {
             /*Input device may be moving. Store the end position */
             ta->sel_end = char_id_at_click;
         }
-        else if(ta->text_sel_in_prog && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
+        else if(ta->text_sel_in_prog && (e == LV_EVENT_PRESS_LOST || e == LV_EVENT_RELEASED)) {
             /*Input device is released. Check if anything was selected.*/
             lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         }
     }
 
-    if(ta->text_sel_in_prog || sign == LV_SIGNAL_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
+    if(ta->text_sel_in_prog || e == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
 
     if(ta->text_sel_in_prog) {
         /*If the selected area has changed then update the real values and*/
@@ -1439,7 +1433,7 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
             }
         }
         /*Finish selection if necessary */
-        if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+        if(e == LV_EVENT_PRESS_LOST || e == LV_EVENT_RELEASED) {
             ta->text_sel_in_prog = 0;
         }
     }
@@ -1456,7 +1450,7 @@ static void update_cursor_position_on_click(lv_obj_t * obj, lv_signal_t sign, lv
         char_id_at_click = lv_label_get_letter_on(ta->label, &rel_pos);
     }
 
-    if(sign == LV_SIGNAL_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
+    if(e == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
 #endif
 }
 

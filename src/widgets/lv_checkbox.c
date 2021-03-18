@@ -29,7 +29,7 @@
 static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_checkbox_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_checkbox_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
  *  STATIC VARIABLES
@@ -37,7 +37,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
 const lv_obj_class_t lv_checkbox_class = {
     .constructor_cb = lv_checkbox_constructor,
     .destructor_cb = lv_checkbox_destructor,
-    .signal_cb = lv_checkbox_signal,
+    .event_cb = lv_checkbox_event,
     .draw_cb = lv_checkbox_draw,
     .instance_size = sizeof(lv_checkbox_t),
     .base_class = &lv_obj_class
@@ -208,15 +208,15 @@ static lv_draw_res_t lv_checkbox_draw(lv_obj_t * obj, const lv_area_t * clip_are
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_checkbox_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
-    if (sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_point_t * p = param;
+    if (e == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param();
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
@@ -240,20 +240,18 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         p->x = marker_size.x + txt_size.x + bg_colp;
         p->y = LV_MAX(marker_size.y, txt_size.y);
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t *s = param;
+    else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t *s = lv_event_get_param();;
         lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
         *s = LV_MAX(*s, m);
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(e == LV_EVENT_RELEASED) {
         uint32_t v = lv_obj_get_state(obj) & LV_STATE_CHECKED ? 1 : 0;
         res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &v);
-        if(res != LV_RES_OK) return res;
+        if(res != LV_RES_OK) return;
 
         lv_obj_invalidate(obj);
     }
-
-    return res;
 }
 
 #endif

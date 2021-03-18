@@ -62,7 +62,7 @@ typedef struct {
 static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_obj_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_obj_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
@@ -79,7 +79,7 @@ static void * event_act_user_data_cb;
 const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
-    .signal_cb = lv_obj_signal,
+    .event_cb = lv_obj_event_cb,
     .draw_cb = lv_obj_draw,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
@@ -201,12 +201,6 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     EVENT_TRACE("Sending event %d to 0x%p with 0x%p param", event, obj, param);
 
-    /*Nothing to do if no event function and not bubbled*/
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
-    if(event_dsc == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) == false) {
-        return LV_RES_OK;
-    }
-
     /* Build a simple linked list from the objects used in the events
      * It's important to know if an this object was deleted by a nested event
      * called from this `event_cb`. */
@@ -231,8 +225,11 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
         if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event);
     }
 
+    lv_obj_event_base(NULL, obj, event);
+
     uint32_t i = 0;
     lv_res_t res = LV_RES_OK;
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
     while(event_dsc) {
         if(event_dsc->cb) {
             void * event_act_user_data_cb_save = event_act_user_data_cb;
@@ -269,6 +266,48 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
     return res;
 }
 
+
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_event_t e)
+{
+    const lv_obj_class_t * base;
+    if(class_p == NULL) base = obj->class_p;
+    else base = class_p->base_class;
+
+    /*Find a base in which signal_cb is set*/
+    while(base && base->event_cb == NULL) base = base->base_class;
+
+    if(base == NULL) return LV_RES_OK;
+    if(base->event_cb == NULL) return LV_RES_OK;
+
+
+    /* Build a simple linked list from the objects used in the events
+     * It's important to know if an this object was deleted by a nested event
+     * called from this `event_cb`. */
+    lv_event_temp_data_t event_temp_data;
+    event_temp_data.obj     = obj;
+    event_temp_data.deleted = false;
+    event_temp_data.prev    = NULL;
+
+    if(event_temp_data_head) {
+        event_temp_data.prev = event_temp_data_head;
+    }
+    event_temp_data_head = &event_temp_data;
+
+    /*Call the actual event callback*/
+    base->event_cb(obj, e);
+
+    lv_res_t res = LV_RES_OK;
+    /*Stop if the object is deleted*/
+    if(event_temp_data.deleted) res = LV_RES_INV;
+
+    /*Remove this element from the list*/
+    event_temp_data_head = event_temp_data_head->prev;
+
+    return res;
+
+}
+
+
 void * lv_event_get_param(void)
 {
     return event_act_param;
@@ -294,23 +333,6 @@ void _lv_event_mark_deleted(lv_obj_t * obj)
         if(t->obj == obj) t->deleted = true;
         t = t->prev;
     }
-}
-
-lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
-{
-    if(obj == NULL) return LV_RES_OK;
-
-    SIGNAL_TRACE("Sending signal %d to 0x%p with 0x%p param", signal, obj, param);
-
-    const lv_obj_class_t * class_p = obj->class_p;
-    while(class_p && class_p->signal_cb == NULL) class_p = class_p->base_class;
-
-    if(class_p == NULL) return LV_RES_OK;
-
-    lv_res_t res = LV_RES_OK;
-    if(class_p->signal_cb) res = class_p->signal_cb(obj, signal, param);
-
-    return res;
 }
 
 /*=====================
@@ -435,7 +457,7 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
 
     lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->base_dir = dir;
-    lv_signal_send(obj, LV_SIGNAL_BASE_DIR_CHG, NULL);
+    lv_event_send(obj, LV_EVENT_BASE_DIR_CHG, NULL);
 
     /* Notify the children about the parent base dir has changed.
      * (The children might have `LV_BIDI_DIR_INHERIT`)*/
@@ -868,29 +890,27 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 }
 
 
-static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
 {
-    lv_res_t res = LV_RES_OK;
-
-    if(sign == LV_SIGNAL_PRESSED) {
+    if(e == LV_EVENT_PRESSED) {
         lv_obj_add_state(obj, LV_STATE_PRESSED);
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(e == LV_EVENT_RELEASED) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
-
+        void * param = lv_event_get_param();
         /*Go the checked state if enabled*/
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
             else lv_obj_clear_state(obj, LV_STATE_CHECKED);
         }
     }
-    else if(sign == LV_SIGNAL_PRESS_LOST) {
+    else if(e == LV_EVENT_PRESS_LOST) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
+    else if(e == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             uint32_t state = 0;
-            char c = *((char *)param);
+            char c = *((char *)lv_event_get_param());
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
                 state = 1;
@@ -899,11 +919,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 lv_obj_clear_state(obj, LV_STATE_CHECKED);
                 state = 0;
             }
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &state);
-            if(res != LV_RES_OK) return res;
+            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &state);
+            if(res != LV_RES_OK) return;
         }
     }
-    else if(sign == LV_SIGNAL_FOCUS) {
+    else if(e == LV_EVENT_FOCUSED) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
             lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
         }
@@ -929,21 +949,22 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     }
-    else if(sign == LV_SIGNAL_SCROLL_BEGIN) {
+    else if(e == LV_EVENT_SCROLL_BEGIN) {
         lv_obj_add_state(obj, LV_STATE_SCROLLED);
     }
-    else if(sign == LV_SIGNAL_SCROLL_END) {
+    else if(e == LV_EVENT_SCROLL_END) {
         lv_obj_clear_state(obj, LV_STATE_SCROLLED);
     }
-    else if(sign == LV_SIGNAL_DEFOCUS) {
+    else if(e == LV_EVENT_DEFOCUSED) {
         /*if using focus mode, change target to parent*/
         obj = lv_obj_get_focused_obj(obj);
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
         bool w_new = true;
         bool h_new = true;
+        void * param = lv_event_get_param();
         if(param) {
             if(lv_area_get_width(param) == lv_obj_get_width(obj)) w_new = false;
             if(lv_area_get_height(param) == lv_obj_get_height(obj)) h_new = false;
@@ -991,33 +1012,29 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             }
         }
     }
-    else if(sign == LV_SIGNAL_CHILD_CHG) {
+    else if(e == LV_EVENT_CHILD_CHG) {
         lv_obj_mark_layout_as_dirty(obj);
 
         if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
     }
-    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+    else if(e == LV_EVENT_BASE_DIR_CHG) {
         /* The layout might depend on the base dir.
          * E.g. the first is element is on the left or right*/
         lv_obj_mark_layout_as_dirty(obj);
     }
-    else if(sign == LV_SIGNAL_SCROLL) {
-        res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
-        if(res != LV_RES_OK) return res;
-    }
-    else if(sign == LV_SIGNAL_SCROLL_END) {
+    else if(e == LV_EVENT_SCROLL_END) {
         if(lv_obj_get_scrollbar_mode(obj) == LV_SCROLLBAR_MODE_ACTIVE) {
             lv_obj_invalidate(obj);
         }
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = param;
+    else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t * s = lv_event_get_param();
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         *s = LV_MAX(*s, d);
     }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
+    else if(e == LV_EVENT_STYLE_CHG) {
         /* Padding might have changed so the layout should be recalculated*/
         lv_obj_mark_layout_as_dirty(obj);
 
@@ -1035,7 +1052,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
         lv_obj_refresh_ext_draw_size(obj);
     }
-    return res;
 }
 
 /**
@@ -1114,7 +1130,7 @@ static void base_dir_refr_children(lv_obj_t * obj)
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
-            lv_signal_send(child, LV_SIGNAL_BASE_DIR_CHG, NULL);
+            lv_event_send(child, LV_EVENT_BASE_DIR_CHG, NULL);
             base_dir_refr_children(child);
         }
     }

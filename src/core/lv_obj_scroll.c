@@ -254,9 +254,6 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
 
         if(x) {
             lv_res_t res;
-            res = lv_signal_send(obj, LV_SIGNAL_SCROLL_BEGIN, NULL);
-            if(res != LV_RES_OK) return;
-
             res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
             if(res != LV_RES_OK) return;
 
@@ -273,9 +270,6 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
 
         if(y) {
             lv_res_t res;
-            res = lv_signal_send(obj, LV_SIGNAL_SCROLL_BEGIN, NULL);
-            if(res != LV_RES_OK) return;
-
             res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
             if(res != LV_RES_OK) return;
 
@@ -541,7 +535,7 @@ static void scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->spec_attr->scroll.y += y;
 
     lv_obj_move_children_by(obj, x, y, true);
-    lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
+    lv_res_t res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
     if(res != LV_RES_OK) return;
     lv_obj_invalidate(obj);
 }
@@ -558,9 +552,6 @@ static void scroll_y_anim(void * obj, int32_t v)
 
 static void scroll_anim_ready_cb(lv_anim_t * a)
 {
-    lv_res_t res = lv_signal_send(a->var, LV_SIGNAL_SCROLL_END, NULL);
-    if(res != LV_RES_OK) return;
-
     lv_event_send(a->var, LV_EVENT_SCROLL_END, NULL);
 }
 

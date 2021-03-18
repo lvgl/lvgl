@@ -36,7 +36,7 @@
  **********************/
 static void lv_label_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_label_destructor(lv_obj_t * obj);
-static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
+static void lv_label_event_cb(lv_obj_t * label, lv_event_t e);
 static lv_draw_res_t lv_label_draw(lv_obj_t * label, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 static void lv_label_refr_text(lv_obj_t * obj);
@@ -55,7 +55,7 @@ static void set_ofs_y_anim(void * obj, int32_t v);
 const lv_obj_class_t lv_label_class = {
     .constructor_cb = lv_label_constructor,
     .destructor_cb = lv_label_destructor,
-    .signal_cb = lv_label_signal,
+    .event_cb = lv_label_event_cb,
     .draw_cb = lv_label_draw,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class
@@ -835,34 +835,33 @@ static lv_draw_res_t lv_label_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_label_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
-    if(sign == LV_SIGNAL_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHG) {
         /*Revert dots for proper refresh*/
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
+        void * param = lv_event_get_param();
         if(lv_area_get_width(&obj->coords) != lv_area_get_width(param) ||
            lv_area_get_height(&obj->coords) != lv_area_get_height(param)) {
             lv_label_revert_dots(obj);
             lv_label_refr_text(obj);
         }
     }
-    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+    else if(e == LV_EVENT_BASE_DIR_CHG) {
 #if LV_USE_BIDI
         lv_label_t * label = (lv_label_t *)obj;
         if(label->static_txt == 0) lv_label_set_text(obj, NULL);
 #endif
     }
-
-    return res;
 }
 
 

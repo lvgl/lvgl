@@ -23,7 +23,7 @@
  **********************/
 
 static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
 /**********************
@@ -31,7 +31,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_spinbox_class = {
     .constructor_cb = lv_spinbox_constructor,
-    .signal_cb = lv_spinbox_signal,
+    .event_cb = lv_spinbox_event,
     .instance_size = sizeof(lv_spinbox_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_textarea_class
@@ -301,15 +301,15 @@ static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_LOG_TRACE("Spinbox constructor finished");
 }
 
-static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e)
 {
     /* Include the ancient signal function */
     lv_res_t res = LV_RES_OK;
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
-    if(sign == LV_SIGNAL_RELEASED) {
+    if(e == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
@@ -359,10 +359,10 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param
             for(i = 0; i < pos; i++) spinbox->step *= 10;
         }
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
+    else if(e == LV_EVENT_KEY) {
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
-        uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
+        uint32_t c = *((uint32_t *)lv_event_get_param()); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT) {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
                 lv_spinbox_increment(obj);
@@ -385,8 +385,6 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * obj, lv_signal_t sign, void * param
             lv_textarea_add_char(obj, c);
         }
     }
-
-    return res;
 }
 
 static void lv_spinbox_updatevalue(lv_obj_t * obj)

@@ -30,14 +30,14 @@
  **********************/
 static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_line_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_line_class = {
     .constructor_cb = lv_line_constructor,
-    .signal_cb = lv_line_signal,
+    .event_cb = lv_line_event,
     .draw_cb = lv_line_draw,
     .instance_size = sizeof(lv_line_t),
     .base_class = &lv_obj_class
@@ -177,24 +177,24 @@ static lv_draw_res_t lv_line_draw(lv_obj_t * obj, const lv_area_t * clip_area, l
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_line_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*The corner of the skew lines is out of the intended area*/
         lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         if(*s < line_width) *s = line_width;
     }
-    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
+    else if(e == LV_EVENT_GET_SELF_SIZE) {
         lv_line_t * line = (lv_line_t *)obj;
 
-        lv_point_t * p = param;
+        lv_point_t * p = lv_event_get_param();
         lv_coord_t w = 0;
         lv_coord_t h = 0;
         if(line->point_num > 0) {
@@ -211,7 +211,5 @@ static lv_res_t lv_line_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             p->y = h;
         }
     }
-
-    return res;
 }
 #endif

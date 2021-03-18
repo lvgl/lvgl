@@ -34,7 +34,7 @@
  **********************/
 static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_btnmatrix_destructor(lv_obj_t * obj);
-static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e);
 static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -57,7 +57,7 @@ static const char * lv_btnmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn
 const lv_obj_class_t lv_btnmatrix_class = {
         .constructor_cb = lv_btnmatrix_constructor,
         .destructor_cb = lv_btnmatrix_destructor,
-        .signal_cb = lv_btnmatrix_signal,
+        .event_cb = lv_btnmatrix_event,
         .draw_cb = lv_btnmatrix_draw,
         .instance_size = sizeof(lv_btnmatrix_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
@@ -550,28 +550,30 @@ static lv_draw_res_t lv_btnmatrix_draw(lv_obj_t * obj, const lv_area_t * clip_ar
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     lv_point_t p;
 
-    if(sign == LV_SIGNAL_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHG) {
         lv_btnmatrix_set_map(obj, btnm->map_p);
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
+        void * param = lv_event_get_param();
         if(param &&
            (lv_obj_get_width(obj) != lv_area_get_width(param) || lv_obj_get_height(obj) != lv_area_get_height(param)))
         {
             lv_btnmatrix_set_map(obj, btnm->map_p);
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    else if(e == LV_EVENT_PRESSED) {
+        void * param = lv_event_get_param();
         invalidate_button_area(obj, btnm->btn_id_sel);
 
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -596,16 +598,17 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
                 res        = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
-                if(res != LV_RES_OK) return res;
+                if(res != LV_RES_OK) return;
             }
         }
     }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    else if(e == LV_EVENT_PRESSING) {
+        void * param = lv_event_get_param();
         uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
         /*Search the pressed area*/
         lv_indev_t * indev = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
-        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return LV_RES_OK;
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return;
 
         lv_indev_get_point(indev, &p);
         btn_pr = get_button_from_point(obj, &p);
@@ -626,12 +629,12 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
                 if(button_is_click_trig(btnm->ctrl_bits[btn_pr]) == false) {
                     uint32_t b = btn_pr;
                     res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
-                    if(res != LV_RES_OK) return res;
+                    if(res != LV_RES_OK) return;
                 }
             }
         }
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(e == LV_EVENT_RELEASED) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
             /*Toggle the button if enabled*/
             if(button_is_tgl_enabled(btnm->ctrl_bits[btnm->btn_id_sel]) &&
@@ -651,7 +654,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
                 res        = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
-                if(res != LV_RES_OK) return res;
+                if(res != LV_RES_OK) return;
             }
         }
 
@@ -663,22 +666,22 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
         }
     }
-    else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
+    else if(e == LV_EVENT_LONG_PRESSED_REPEAT) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
             if(button_is_repeat_disabled(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
                 res        = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
-                if(res != LV_RES_OK) return res;
+                if(res != LV_RES_OK) return;
             }
         }
     }
-    else if(sign == LV_SIGNAL_PRESS_LOST) {
+    else if(e == LV_EVENT_PRESS_LOST) {
         invalidate_button_area(obj, btnm->btn_id_sel);
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
-    else if(sign == LV_SIGNAL_FOCUS) {
+    else if(e == LV_EVENT_FOCUSED) {
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
@@ -707,15 +710,15 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
             btnm->btn_id_sel = b;
         }
     }
-    else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
+    else if(e == LV_EVENT_DEFOCUSED || e == LV_EVENT_LEAVE) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) invalidate_button_area(obj, btnm->btn_id_sel);
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
+    else if(e == LV_EVENT_KEY) {
 
         invalidate_button_area(obj, btnm->btn_id_sel);
 
-        char c = *((char *)param);
+        char c = *((char *)lv_event_get_param());
         if(c == LV_KEY_RIGHT) {
             if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE)  btnm->btn_id_sel = 0;
             else btnm->btn_id_sel++;
@@ -793,7 +796,6 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * obj, lv_signal_t sign, void * par
 
         invalidate_button_area(obj, btnm->btn_id_sel);
     }
-    return res;
 }
 
 /**

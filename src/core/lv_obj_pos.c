@@ -435,14 +435,14 @@ lv_coord_t lv_obj_get_width_visible(const lv_obj_t * obj)
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
-    lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.x;
 }
 
 lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
-    lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.y;
 }
 
@@ -504,10 +504,10 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     lv_obj_move_children_by(obj, diff.x, diff.y, false);
 
     /*Inform the object about its new coordinates*/
-    lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
+    lv_event_send(obj, LV_EVENT_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    if(parent && notify) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent && notify) lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -652,7 +652,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.result = true;
-        lv_signal_send(obj, LV_SIGNAL_HIT_TEST, &hit_info);
+        lv_event_send(obj, LV_EVENT_HIT_TEST, &hit_info);
         return hit_info.result;
     }
 
@@ -714,10 +714,10 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     }
 
     /*Send a signal to the object with its new coordinates*/
-    lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
+    lv_event_send(obj, LV_EVENT_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    if(parent != NULL) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent != NULL) lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);

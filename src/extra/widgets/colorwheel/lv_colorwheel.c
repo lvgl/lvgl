@@ -33,7 +33,7 @@
  **********************/
 static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_colorwheel_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e);
 
 static void draw_disc_grad(lv_obj_t * obj, const lv_area_t * mask);
 static void draw_knob(lv_obj_t * obj, const lv_area_t * mask);
@@ -52,7 +52,7 @@ static uint16_t get_angle(lv_obj_t * obj);
 const lv_obj_class_t lv_colorwheel_class = {.instance_size = sizeof(lv_colorwheel_t), .base_class = &lv_obj_class,
         .constructor_cb = lv_colorwheel_constructor,
         .draw_cb = lv_colorwheel_draw,
-        .signal_cb = lv_colorwheel_signal,
+        .event_cb = lv_colorwheel_event,
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
 };
 
@@ -353,45 +353,39 @@ static lv_area_t get_knob_area(lv_obj_t * obj)
     return knob_area;
 }
 
-/**
- * Signal function of the color_picker
- * @param colorwheel pointer to a color_picker object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e)
 {
     /* Include the ancient signal function */
-    lv_res_t res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
+    lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
 
-    if(res != LV_RES_OK) return res;
+    if(res != LV_RES_OK) return;
 
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
         lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
         lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         lv_coord_t knob_pad = LV_MAX4(left, right, top, bottom) + 2;
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_pad);
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
+        void * param = lv_event_get_param();
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(obj) != lv_area_get_width(param) ||
            lv_obj_get_height(obj) != lv_area_get_height(param)) {
             refr_knob_pos(obj);
         }
     }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
+    else if(e == LV_EVENT_STYLE_CHG) {
         /*Refresh extended draw area to make knob visible*/
         refr_knob_pos(obj);
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
-        uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
+    else if(e == LV_EVENT_KEY) {
+        uint32_t c = *((uint32_t *)lv_event_get_param()); /*uint32_t because can be UTF-8*/
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_color_hsv_t hsv_cur;
@@ -411,7 +405,7 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
                 res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
+                if(res != LV_RES_OK) return;
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
@@ -432,19 +426,19 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
                 res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
+                if(res != LV_RES_OK) return;
             }
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    else if(e == LV_EVENT_PRESSED) {
         colorwheel->last_change_time = lv_tick_get();
         lv_indev_get_point(lv_indev_get_act(), &colorwheel->last_press_point);
         res = double_click_reset(obj);
-        if(res != LV_RES_OK) return res;
+        if(res != LV_RES_OK) return;
     }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    else if(e == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
-        if(indev == NULL) return res;
+        if(indev == NULL) return;
 
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         lv_point_t p;
@@ -494,11 +488,11 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
         if(!on_ring && diff > indev->driver->long_press_time && !colorwheel->mode_fixed) {
             next_color_mode(obj);
             lv_indev_wait_release(lv_indev_get_act());
-            return res;
+            return;
         }
 
         /*Set the angle only if pressed on the ring*/
-        if(!on_ring) return res;
+        if(!on_ring) return;
 
         angle = lv_atan2(p.x, p.y) % 360;
 
@@ -519,17 +513,15 @@ static lv_res_t lv_colorwheel_signal(lv_obj_t * obj, lv_signal_t sign, void * pa
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if(res != LV_RES_OK) return;
         }
     }
-    else if(sign == LV_SIGNAL_HIT_TEST) {
-        lv_hit_test_info_t * info = param;
+    else if(e == LV_EVENT_HIT_TEST) {
+        lv_hit_test_info_t * info = lv_event_get_param();;
 
         /*Valid clicks can be only in the circle*/
         info->result = _lv_area_is_point_on(&obj->coords, info->point, LV_RADIUS_CIRCLE);
     }
-
-    return res;
 }
 
 

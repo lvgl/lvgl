@@ -32,7 +32,7 @@
 static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_table_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_table_event(lv_obj_t * obj, lv_event_t e);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
@@ -45,7 +45,7 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
-    .signal_cb = lv_table_signal,
+    .event_cb = lv_table_event,
     .draw_cb = lv_table_draw,
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_table_t),
@@ -644,21 +644,21 @@ static lv_draw_res_t lv_table_draw(lv_obj_t * obj, const lv_area_t * clip_area, 
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_table_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_table_t * table = (lv_table_t *)obj;
 
-    if(sign == LV_SIGNAL_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHG) {
         refr_size(obj, 0);
     }
-    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_point_t * p = param;
+    else if(e == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param();
         uint32_t i;
         lv_coord_t w = 0;
         for(i = 0; i < table->col_cnt; i++) w += table->col_w[i];
@@ -669,7 +669,7 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         p->x = w;
         p->y = h;
     }
-    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING) {
+    else if(e == LV_EVENT_PRESSED || e == LV_EVENT_PRESSING) {
         uint16_t col;
         uint16_t row;
         get_pressed_cell(obj, &row, &col);
@@ -680,12 +680,12 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_invalidate(obj);
         }
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(e == LV_EVENT_RELEASED) {
         lv_indev_t * indev = lv_indev_get_act();
         lv_obj_t * scroll_obj = lv_indev_get_scroll_obj(indev);
         if(table->col_act != 0xFFFF && table->row_act != 0xFFFF && scroll_obj == NULL) {
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if(res != LV_RES_OK) return;
         }
 
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -695,8 +695,8 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_invalidate(obj);
         }
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
-        int32_t c = *((int32_t *)param);
+    else if(e == LV_EVENT_KEY) {
+        int32_t c = *((int32_t *)lv_event_get_param());
         int32_t col = table->col_act;
         int32_t row = table->row_act;
         if(c == LV_KEY_LEFT) col--;
@@ -724,11 +724,9 @@ static lv_res_t lv_table_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_invalidate(obj);
 
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if(res != LV_RES_OK) return;
         }
     }
-
-    return res;
 }
 
 

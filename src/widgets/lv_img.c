@@ -31,7 +31,7 @@
 static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_img_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_img_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
  *  STATIC VARIABLES
@@ -39,7 +39,7 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 const lv_obj_class_t lv_img_class = {
          .constructor_cb = lv_img_constructor,
          .destructor_cb = lv_img_destructor,
-         .signal_cb = lv_img_signal,
+         .event_cb = lv_img_event,
          .draw_cb = lv_img_draw,
          .instance_size = sizeof(lv_img_t),
          .base_class = &lv_obj_class
@@ -550,25 +550,23 @@ static lv_draw_res_t lv_img_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_img_event(lv_obj_t * obj, lv_event_t e)
 {
-    lv_res_t res;
-
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
    lv_img_t * img = (lv_img_t *)obj;
 
-  if(sign == LV_SIGNAL_STYLE_CHG) {
+  if(e == LV_EVENT_STYLE_CHG) {
         /*Refresh the file name to refresh the symbol text size*/
         if(img->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(obj, img->src);
         }
     }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
 
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
         transf_zoom = (transf_zoom * img->zoom) >> 8;
 
@@ -588,8 +586,8 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             *s = LV_MAX(*s, pad_ori + a.y2 - h);
         }
     }
-    else if(sign == LV_SIGNAL_HIT_TEST) {
-        lv_hit_test_info_t * info = param;
+    else if(e == LV_EVENT_HIT_TEST) {
+        lv_hit_test_info_t * info = lv_event_get_param();
         lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
         zoom = (zoom * img->zoom) >> 8;
 
@@ -618,13 +616,11 @@ static lv_res_t lv_img_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             info->result = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
-    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_point_t * p = param;
+    else if(e == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param();;
         p->x = img->w;
         p->y = img->h;
     }
-
-    return res;
 }
 
 #endif

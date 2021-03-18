@@ -31,8 +31,8 @@
 static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static lv_draw_res_t lv_roller_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
 static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label_obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
-static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
+static void lv_roller_event(lv_obj_t * obj, lv_event_t e);
+static void lv_roller_label_event(lv_obj_t * label, lv_event_t e);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
 static lv_res_t release_handler(lv_obj_t * obj);
 static void inf_normalize(lv_obj_t * obj_scrl);
@@ -46,7 +46,7 @@ static void set_y_anim(void * obj, int32_t v);
  **********************/
 const lv_obj_class_t lv_roller_class = {
         .constructor_cb = lv_roller_constructor,
-        .signal_cb = lv_roller_signal,
+        .event_cb = lv_roller_event,
         .draw_cb = lv_roller_draw,
         .instance_size = sizeof(lv_roller_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
@@ -54,7 +54,7 @@ const lv_obj_class_t lv_roller_class = {
 };
 
 const lv_obj_class_t lv_roller_label_class  = {
-        .signal_cb = lv_roller_label_signal,
+        .event_cb = lv_roller_label_event,
         .draw_cb = lv_roller_label_draw,
         .instance_size = sizeof(lv_label_t),
         .base_class = &lv_label_class
@@ -448,39 +448,40 @@ static lv_draw_res_t lv_roller_label_draw(lv_obj_t * label_obj, const lv_area_t 
     return LV_DRAW_RES_OK;
 }
 
-static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_roller_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_roller_t * roller = (lv_roller_t*)obj;
 
-    if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_point_t * p = param;
+    if(e == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param();
         p->x =  get_selected_label_width(obj);
     }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
+    else if(e == LV_EVENT_STYLE_CHG) {
         lv_obj_t * label = get_label(obj);
         /*Be sure the label's style is updated before processing the roller*/
-        if(label) lv_signal_send(label, LV_SIGNAL_STYLE_CHG, NULL);
+        if(label) lv_event_send(label, LV_EVENT_STYLE_CHG, NULL);
         lv_obj_handle_self_size_chg(obj);
         refr_position(obj, false);
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
+        void * param = lv_event_get_param();
         if(lv_obj_get_width(obj) != lv_area_get_width(param) ||
            lv_obj_get_height(obj) != lv_area_get_height(param))
         {
             refr_position(obj, false);
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    else if(e == LV_EVENT_PRESSED) {
         roller->moved = 0;
         lv_anim_del(get_label(obj), set_y_anim);
     }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    else if(e == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         lv_point_t p;
         lv_indev_get_vect(indev, &p);
@@ -490,10 +491,10 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             roller->moved = 1;
         }
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(e == LV_EVENT_RELEASED) {
         release_handler(obj);
     }
-    else if(sign == LV_SIGNAL_FOCUS) {
+    else if(e == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -517,15 +518,15 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                                                                     ENTER won't be pressed*/
         }
     }
-    else if(sign == LV_SIGNAL_DEFOCUS) {
+    else if(e == LV_EVENT_DEFOCUSED) {
         /*Revert the original state*/
         if(roller->sel_opt_id != roller->sel_opt_id_ori) {
             roller->sel_opt_id = roller->sel_opt_id_ori;
             refr_position(obj, true);
         }
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
-        char c = *((char *)param);
+    else if(e == LV_EVENT_KEY) {
+        char c = *((char *)lv_event_get_param());
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(roller->sel_opt_id + 1 < roller->option_cnt) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
@@ -542,35 +543,24 @@ static lv_res_t lv_roller_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             }
         }
     }
-
-    return res;
 }
 
-/**
- * Signal function of the roller's label
- * @param label pointer to a roller's label object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
+static void lv_roller_label_event(lv_obj_t * label, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS_LABEL, label, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS_LABEL, label, e);
+    if(res != LV_RES_OK) return;
 
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_SIZE) {
+    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*If the selected text has a larger font it needs some extra space to draw it*/
-        lv_coord_t * s = param;
+        lv_coord_t * s = lv_event_get_param();
         lv_obj_t * obj = lv_obj_get_parent(label);
         lv_coord_t sel_w = get_selected_label_width(obj);
         lv_coord_t label_w = lv_obj_get_width(label);
         *s = LV_MAX(*s, sel_w - label_w);
     }
-
-    return res;
 }
 
 /**

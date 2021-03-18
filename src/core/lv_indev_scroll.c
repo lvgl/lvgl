@@ -56,8 +56,6 @@ void _lv_indev_scroll_handler(lv_indev_proc_t * proc)
         init_scroll_limits(proc);
 
         lv_indev_t * indev_act = lv_indev_get_act();
-        lv_signal_send(scroll_obj, LV_SIGNAL_SCROLL_BEGIN, indev_act);
-        if(proc->reset_query) return;
         lv_event_send(scroll_obj, LV_EVENT_SCROLL_BEGIN, indev_act);
         if(proc->reset_query) return;
     }
@@ -189,8 +187,6 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
             }
         }
 
-        lv_signal_send(scroll_obj, LV_SIGNAL_SCROLL_END, indev_act);
-        if(proc->reset_query) return;
         lv_event_send(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(proc->reset_query) return;
 

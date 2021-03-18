@@ -39,12 +39,12 @@ static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * co
 static void lv_dropdown_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_dropdown_destructor(lv_obj_t * obj);
 static lv_draw_res_t lv_dropdown_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void lv_dropdown_event(lv_obj_t * obj, lv_event_t e);
 
 static void lv_dropdown_list_constructor(lv_obj_t * obj, const lv_obj_t * copy);
 static void lv_dropdown_list_destructor(lv_obj_t * list_obj);
 static lv_draw_res_t lv_dropdown_list_draw(lv_obj_t * obj, const lv_area_t * clip_area, lv_draw_mode_t mode);
-static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+static void lv_dropdown_list_event(lv_obj_t * list, lv_event_t e);
 
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
@@ -60,7 +60,7 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
 const lv_obj_class_t lv_dropdown_class = {
     .constructor_cb = lv_dropdown_constructor,
     .destructor_cb = lv_dropdown_destructor,
-    .signal_cb = lv_dropdown_signal,
+    .event_cb = lv_dropdown_event,
     .draw_cb = lv_dropdown_draw,
     .instance_size = sizeof(lv_dropdown_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
@@ -70,7 +70,7 @@ const lv_obj_class_t lv_dropdown_class = {
 const lv_obj_class_t lv_dropdown_list_class = {
     .constructor_cb = lv_dropdown_list_constructor,
     .destructor_cb = lv_dropdown_list_destructor,
-    .signal_cb = lv_dropdown_list_signal,
+    .event_cb = lv_dropdown_list_event,
     .draw_cb = lv_dropdown_list_draw,
     .instance_size = sizeof(lv_dropdown_list_t),
     .base_class = &lv_obj_class
@@ -783,17 +783,17 @@ static void lv_dropdown_list_destructor(lv_obj_t * list_obj)
     dropdown->list = NULL;
 }
 
-static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+static void lv_dropdown_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS, obj, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS, obj, e);
+    if(res != LV_RES_OK) return;
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    if(sign == LV_SIGNAL_FOCUS) {
+    if(e == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -807,10 +807,10 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
                 lv_dropdown_close(obj);
         }
     }
-    else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
+    else if(e == LV_EVENT_DEFOCUSED || e == LV_EVENT_LEAVE) {
         lv_dropdown_close(obj);
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(e == LV_EVENT_RELEASED) {
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_scroll_obj(indev) == NULL) {
             if(dropdown->list) {
@@ -819,7 +819,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
                     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
                     uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
                     res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &id);
-                    if(res != LV_RES_OK) return res;
+                    if(res != LV_RES_OK) return;
                     lv_obj_invalidate(obj);
                 }
                 lv_indev_type_t indev_type = lv_indev_get_type(indev);
@@ -836,16 +836,16 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
             lv_obj_invalidate(obj);
         }
     }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHG) {
         if(dropdown->list) lv_dropdown_close(obj);
     }
-    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
-        lv_point_t * p = param;
+    else if(e == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param();
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         p->y = lv_font_get_line_height(font);
     }
-    else if(sign == LV_SIGNAL_CONTROL) {
-        char c = *((char *)param);
+    else if(e == LV_EVENT_KEY) {
+        char c = *((char *)lv_event_get_param());
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(dropdown->list == NULL) {
                 lv_dropdown_open(obj);
@@ -870,8 +870,6 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
             lv_dropdown_close(obj);
         }
     }
-
-    return res;
 }
 
 /**
@@ -881,30 +879,29 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * para
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
+static void lv_dropdown_list_event(lv_obj_t * list, lv_event_t e)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_obj_signal_base(MY_CLASS_LIST, list, sign, param);
-    if(res != LV_RES_OK) return res;
+    res = lv_obj_event_base(MY_CLASS_LIST, list, e);
+    if(res != LV_RES_OK) return;
 
     lv_obj_t * dropdown_obj = ((lv_dropdown_list_t *)list)->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
-    if(sign == LV_SIGNAL_RELEASED) {
+    if(e == LV_EVENT_RELEASED) {
         if(lv_indev_get_scroll_obj(lv_indev_get_act()) == NULL) {
             list_release_handler(list);
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    else if(e == LV_EVENT_PRESSED) {
         page_press_handler(list);
     }
-    else if(sign == LV_SIGNAL_SCROLL_BEGIN) {
+    else if(e == LV_EVENT_SCROLL_BEGIN) {
         dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
         lv_obj_invalidate(list);
     }
-    return res;
 }
 
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state)

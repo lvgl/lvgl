@@ -72,7 +72,7 @@ void lv_obj_del(lv_obj_t * obj)
                 par->spec_attr->scroll.x = 0;
                 par->spec_attr->scroll.y = 0;
             }
-        lv_signal_send(par, LV_SIGNAL_CHILD_CHG, NULL);
+        lv_event_send(par, LV_EVENT_CHILD_CHG, NULL);
     }
 
     /*Handle if the active screen was deleted*/
@@ -178,10 +178,10 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     }
 
     /*Notify the original parent because one of its children is lost*/
-    lv_signal_send(old_parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(old_parent, LV_EVENT_CHILD_CHG, obj);
 
     /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
 
     lv_obj_invalidate(obj);
 }
@@ -201,7 +201,7 @@ void lv_obj_move_foreground(lv_obj_t * obj)
     parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
 
     lv_obj_invalidate(parent);
 }
@@ -221,7 +221,7 @@ void lv_obj_move_background(lv_obj_t * obj)
     parent->spec_attr->children[0] = obj;
 
     /*Notify the new parent about the child*/
-    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
 
     lv_obj_invalidate(parent);
 }
