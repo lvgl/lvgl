@@ -1068,6 +1068,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+#ifndef LV_USE_ANIMIMG
+#  ifdef CONFIG_LV_USE_ANIMIMG
+#    define LV_USE_ANIMIMG CONFIG_LV_USE_ANIMIMG
+#  else
+#    define  LV_USE_ANIMIMG      1
+#  endif
+#endif
+
 #ifndef LV_USE_BAR
 #  ifdef CONFIG_LV_USE_BAR
 #    define LV_USE_BAR CONFIG_LV_USE_BAR
