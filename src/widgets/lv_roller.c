@@ -149,7 +149,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*Set the value even if it's the same as the current value because
-     *if moving to the next option with an animation which was just deleted in the PRESS signal
+     *if moving to the next option with an animation which was just deleted in the PRESS Call the ancestor's event handler
      *nothing will continue the animation.*/
 
     lv_roller_t * roller = (lv_roller_t*)obj;
@@ -317,7 +317,7 @@ static void lv_roller_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /*Include the ancient signal function*/
+    /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 
@@ -419,7 +419,7 @@ static void lv_roller_label_event(lv_obj_t * label, lv_event_t e)
 
     /*LV_EVENT_DRAW_MAIN will be called in the draw function*/
     if(e != LV_EVENT_DRAW_MAIN) {
-        /* Include the ancient signal function */
+        /* Call the ancestor's event handler */
         res = lv_obj_event_base(MY_CLASS_LABEL, label, e);
         if(res != LV_RES_OK) return;
     }

@@ -93,12 +93,6 @@ const lv_obj_class_t lv_obj_class = {
 #  define EVENT_TRACE(...)
 #endif
 
-#if LV_LOG_TRACE_SIGNAL
-#  define SIGNAL_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
-#else
-#  define SIGNAL_TRACE(...)
-#endif
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -272,7 +266,7 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, struct _lv_obj_t * ob
     if(class_p == NULL) base = obj->class_p;
     else base = class_p->base_class;
 
-    /*Find a base in which signal_cb is set*/
+    /*Find a base in which Call the ancestor's event handler_cb is set*/
     while(base && base->event_cb == NULL) base = base->base_class;
 
     if(base == NULL) return LV_RES_OK;

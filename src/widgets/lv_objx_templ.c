@@ -220,7 +220,7 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
 {
     lv_res_t res;
 
-    /*Include the ancient signal function*/
+    /*Call the ancestor's event handler*/
     res = ancestor_signal(templ, sign, param);
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, MY_CLASS);

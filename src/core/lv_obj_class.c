@@ -55,7 +55,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     lv_obj_construct(obj, parent, copy);
 
    if(parent) {
-       /*Send a signal to the parent to notify it about the new child.
+       /*Send a Call the ancestor's event handler to the parent to notify it about the new child.
         *Also triggers layout update*/
        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 

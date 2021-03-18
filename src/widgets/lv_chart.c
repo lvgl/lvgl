@@ -619,7 +619,7 @@ static void lv_chart_destructor(lv_obj_t * obj)
 
 static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
 {
-    /*Include the ancient signal function*/
+    /*Call the ancestor's event handler*/
     lv_res_t res;
 
     res = lv_obj_event_base(MY_CLASS, obj, e);

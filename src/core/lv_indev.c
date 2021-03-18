@@ -380,11 +380,11 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     uint32_t prev_key = i->proc.types.keypad.last_key;
 
     /*Save the last key.
-     *It must be done here else `lv_indev_get_key` will return the last key in events and signals*/
+     *It must be done here else `lv_indev_get_key` will return the last key in events*/
     i->proc.types.keypad.last_key = data->key;
 
     /*Save the previous state so we can detect state changes below and also set the last state now
-     *so if any signal/event handler on the way returns `LV_RES_INV` the last state is remembered
+     *so if any event handler on the way returns `LV_RES_INV` the last state is remembered
      *for the next time*/
     uint32_t prev_state             = i->proc.types.keypad.last_state;
     i->proc.types.keypad.last_state = data->state;
@@ -587,7 +587,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                     }
                 }
-                /*If not editable then just send a long press signal*/
+                /*If not editable then just send a long press Call the ancestor's event handler*/
                 else {
                     lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED, NULL);
                     if(indev_reset_check(&i->proc)) return;
@@ -788,14 +788,14 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
     }
 
-    /*If a new object was found reset some variables and send a pressed signal*/
+    /*If a new object was found reset some variables and send a pressed Call the ancestor's event handler*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
         proc->types.pointer.last_point.x = proc->types.pointer.act_point.x;
         proc->types.pointer.last_point.y = proc->types.pointer.act_point.y;
 
-        /*If a new object found the previous was lost, so send a signal*/
+        /*If a new object found the previous was lost, so send a Call the ancestor's event handler*/
         if(proc->types.pointer.act_obj != NULL) {
-            /*Save the obj because in special cases `act_obj` can change in the signal function*/
+            /*Save the obj because in special cases `act_obj` can change in the Call the ancestor's event handler function*/
             lv_obj_t * last_obj = proc->types.pointer.act_obj;
 
             lv_event_send(last_obj, LV_EVENT_PRESS_LOST, NULL);
@@ -818,7 +818,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->types.pointer.vect.x         = 0;
             proc->types.pointer.vect.y         = 0;
 
-            /*Send a signal about the press*/
+            /*Send a Call the ancestor's event handler about the press*/
             lv_event_send(indev_obj_act, LV_EVENT_PRESSED, NULL);
             if(indev_reset_check(proc)) return;
 
@@ -856,12 +856,12 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
         /*If there is no scrolling then check for long press time*/
         if(proc->types.pointer.scroll_obj == NULL && proc->long_pr_sent == 0) {
-            /*Send a signal about the long press if enough time elapsed*/
+            /*Send a Call the ancestor's event handler about the long press if enough time elapsed*/
             if(lv_tick_elaps(proc->pr_timestamp) > indev_act->driver->long_press_time) {
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED, NULL);
                 if(indev_reset_check(proc)) return;
 
-                /*Mark the signal sending to do not send it again*/
+                /*Mark the Call the ancestor's event handler sending to do not send it again*/
                 proc->long_pr_sent = 1;
 
                 /*Save the long press time stamp for the long press repeat handler*/
@@ -869,9 +869,9 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             }
         }
 
-        /*Send long press repeated signal*/
+        /*Send long press repeated Call the ancestor's event handler*/
         if(proc->types.pointer.scroll_obj == NULL && proc->long_pr_sent == 1) {
-            /*Send a signal about the long press repeat if enough time elapsed*/
+            /*Send a Call the ancestor's event handler about the long press repeat if enough time elapsed*/
             if(lv_tick_elaps(proc->longpr_rep_timestamp) > indev_act->driver->long_press_rep_time) {
                 lv_event_send(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
                 if(indev_reset_check(proc)) return;
@@ -897,11 +897,11 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     indev_obj_act = proc->types.pointer.act_obj;
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
 
-    /*Forget the act obj and send a released signal*/
+    /*Forget the act obj and send a released Call the ancestor's event handler*/
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
-        /*Send RELEASE signal and event*/
+        /*Send RELEASE Call the ancestor's event handler and event*/
         lv_event_send(indev_obj_act, LV_EVENT_RELEASED, NULL);
         if(indev_reset_check(proc)) return;
 
@@ -922,7 +922,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
     }
 
-    /*The reset can be set in the signal function.
+    /*The reset can be set in the Call the ancestor's event handler function.
      * In case of reset query ignore the remaining parts.*/
     if(scroll_obj) {
         _lv_indev_scroll_throw_handler(proc);

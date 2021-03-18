@@ -132,7 +132,7 @@ static void lv_line_event(lv_obj_t * obj, lv_event_t e)
 {
     lv_res_t res;
 
-    /*Include the ancient signal function*/
+    /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 

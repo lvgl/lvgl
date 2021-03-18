@@ -413,7 +413,7 @@ static void lv_img_event(lv_obj_t * obj, lv_event_t e)
 {
     /*Ancestor events will be called during drawing*/
     if(e != LV_EVENT_DRAW_MAIN && e != LV_EVENT_DRAW_POST) {
-        /*Include the ancient signal function*/
+        /*Call the ancestor's event handler*/
         lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
         if(res != LV_RES_OK) return;
     }

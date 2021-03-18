@@ -137,7 +137,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*Enable the log module*/
-#define LV_USE_LOG      1
+#define LV_USE_LOG      0
 #if LV_USE_LOG
 
 /*How important log should be added:
@@ -151,7 +151,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*1: Print the log with 'printf';
  *0: User need to register a callback with `lv_log_register_print_cb()`*/
-#  define LV_LOG_PRINTF   1
+#  define LV_LOG_PRINTF   0
 
 /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
 #  define LV_LOG_TRACE_MEM            1
@@ -159,7 +159,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  define LV_LOG_TRACE_INDEV          1
 #  define LV_LOG_TRACE_DISP_REFR      1
 #  define LV_LOG_TRACE_EVENT          1
-#  define LV_LOG_TRACE_SIGNAL         1
 #  define LV_LOG_TRACE_OBJ_CREATE     1
 #  define LV_LOG_TRACE_LAYOUT         1
 #  define LV_LOG_TRACE_ANIM           1
@@ -174,9 +173,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *If LV_USE_LOG is enabled an error message will be printed on failure*/
 #define LV_USE_ASSERT_NULL          1   /*Check if the parameter is NULL. (Very fast, recommended)*/
 #define LV_USE_ASSERT_MALLOC        1   /*Checks is the memory is successfully allocated or no. (Very fast, recommended)*/
-#define LV_USE_ASSERT_STYLE         1   /*Check if the styles are properly initialized. (Very fast, recommended)*/
-#define LV_USE_ASSERT_MEM_INTEGRITY 1   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
-#define LV_USE_ASSERT_OBJ           1   /*Check the object's type and existence (e.g. not deleted). (Slow)*/
+#define LV_USE_ASSERT_STYLE         0   /*Check if the styles are properly initialized. (Very fast, recommended)*/
+#define LV_USE_ASSERT_MEM_INTEGRITY 0   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
+#define LV_USE_ASSERT_OBJ           0   /*Check the object's type and existence (e.g. not deleted). (Slow)*/
 
 /*Add a custom handler when assert happens e.g. to restart the MCU*/
 #define LV_ASSERT_HANDLER_INCLUDE   <stdint.h>

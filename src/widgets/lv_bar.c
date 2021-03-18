@@ -489,7 +489,7 @@ static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res;
 
-    /*Include the ancient signal function*/
+    /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 

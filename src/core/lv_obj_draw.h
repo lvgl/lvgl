@@ -123,7 +123,7 @@ lv_coord_t lv_obj_calculate_ext_draw_size(struct _lv_obj_t * obj, uint8_t part);
 void lv_obj_draw_dsc_init(lv_obj_draw_dsc_t * dsc, const lv_area_t * clip_area);
 
 /**
- * Send a 'LV_SIGNAL_REFR_EXT_DRAW_SIZE' signal to the object to refresh the value of the extended draw size.
+ * Send a 'LV_EVENT_REFR_EXT_DRAW_SIZE' Call the ancestor's event handler to the object to refresh the value of the extended draw size.
  * The result will be saved in `obj`.
  * @param obj pointer to an object
  */
