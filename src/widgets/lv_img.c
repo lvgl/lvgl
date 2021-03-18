@@ -420,7 +420,7 @@ static void lv_img_event(lv_obj_t * obj, lv_event_t e)
 
    lv_img_t * img = (lv_img_t *)obj;
 
-  if(e == LV_EVENT_STYLE_CHG) {
+  if(e == LV_EVENT_STYLE_CHANGED) {
         /*Refresh the file name to refresh the symbol text size*/
         if(img->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(obj, img->src);

@@ -269,7 +269,7 @@ static void lv_slider_event(lv_obj_t * obj, lv_event_t e)
             slider->left_knob_focus = 0;
         }
     }
-    else if(e == LV_EVENT_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHANGED) {
         /* The knob size depends on slider size.
          * During the drawing method the obj. size is used by the knob so refresh the obj. size.*/
         void * param = lv_event_get_param();
@@ -316,7 +316,6 @@ static void lv_slider_event(lv_obj_t * obj, lv_event_t e)
             if(res != LV_RES_OK) return;
         }
     } else if(e == LV_EVENT_DRAW_MAIN) {
-        const lv_area_t * clip_area = lv_event_get_param();
         draw_knob(obj);
     }
 }

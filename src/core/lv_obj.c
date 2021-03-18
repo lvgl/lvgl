@@ -456,7 +456,7 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
 
     lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->base_dir = dir;
-    lv_event_send(obj, LV_EVENT_BASE_DIR_CHG, NULL);
+    lv_event_send(obj, LV_EVENT_BASE_DIR_CHANGED, NULL);
 
     /* Notify the children about the parent base dir has changed.
      * (The children might have `LV_BIDI_DIR_INHERIT`)*/
@@ -977,7 +977,7 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
-    else if(e == LV_EVENT_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHANGED) {
         bool w_new = true;
         bool h_new = true;
         void * param = lv_event_get_param();
@@ -1028,14 +1028,14 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
             }
         }
     }
-    else if(e == LV_EVENT_CHILD_CHG) {
+    else if(e == LV_EVENT_CHILD_CHANGED) {
         lv_obj_mark_layout_as_dirty(obj);
 
         if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
     }
-    else if(e == LV_EVENT_BASE_DIR_CHG) {
+    else if(e == LV_EVENT_BASE_DIR_CHANGED) {
         /* The layout might depend on the base dir.
          * E.g. the first is element is on the left or right*/
         lv_obj_mark_layout_as_dirty(obj);
@@ -1050,7 +1050,7 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         *s = LV_MAX(*s, d);
     }
-    else if(e == LV_EVENT_STYLE_CHG) {
+    else if(e == LV_EVENT_STYLE_CHANGED) {
         /* Padding might have changed so the layout should be recalculated*/
         lv_obj_mark_layout_as_dirty(obj);
 
@@ -1149,7 +1149,7 @@ static void base_dir_refr_children(lv_obj_t * obj)
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
-            lv_event_send(child, LV_EVENT_BASE_DIR_CHG, NULL);
+            lv_event_send(child, LV_EVENT_BASE_DIR_CHANGED, NULL);
             base_dir_refr_children(child);
         }
     }

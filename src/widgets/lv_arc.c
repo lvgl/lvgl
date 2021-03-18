@@ -686,7 +686,6 @@ static void lv_arc_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_pad - bg_pad);
     } else if(e == LV_EVENT_DRAW_MAIN) {
-        const lv_area_t * clip_area = lv_event_get_param();
         lv_arc_draw(obj);
     }
 }

@@ -171,7 +171,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 
     lv_obj_invalidate(obj);
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
-        lv_event_send(obj, LV_EVENT_STYLE_CHG, NULL); /*To update layout*/
+        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout*/
     } else if(prop & LV_STYLE_PROP_EXT_DRAW) {
         lv_obj_refresh_ext_draw_size(obj);
     }
@@ -569,7 +569,7 @@ static void refresh_children_style(lv_obj_t * obj)
     for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         lv_obj_invalidate(child);
-        lv_event_send(child, LV_EVENT_STYLE_CHG, NULL);
+        lv_event_send(child, LV_EVENT_STYLE_CHANGED, NULL);
         lv_obj_invalidate(child);
 
         refresh_children_style(child); /*Check children too*/

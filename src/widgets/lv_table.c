@@ -456,7 +456,7 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
 
     lv_table_t * table = (lv_table_t *)obj;
 
-    if(e == LV_EVENT_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHANGED) {
         refr_size(obj, 0);
     }
     else if(e == LV_EVENT_GET_SELF_SIZE) {

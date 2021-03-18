@@ -42,52 +42,49 @@ struct _lv_obj_t;
  * Type of event being sent to the object.
  */
 typedef enum {
+    /** Input device events*/
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
     LV_EVENT_PRESSING,            /**< The object is being pressed (called continuously while pressing)*/
-    LV_EVENT_PRESS_LOST,          /**< User is still pressing but slid cursor/finger off of the object */
+    LV_EVENT_PRESS_LOST,          /**< User is still being pressed but slid cursor/finger off of the object */
     LV_EVENT_SHORT_CLICKED,       /**< User pressed object for a short period of time, then released it. Not called if scrolled. */
     LV_EVENT_LONG_PRESSED,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if scrolled.*/
-    LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every
-                                       `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
+    LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
     LV_EVENT_CLICKED,             /**< Called on release if not scrolled (regardless to long press)*/
     LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/
-    LV_EVENT_SCROLL_BEGIN,
-    LV_EVENT_SCROLL_END,
-    LV_EVENT_SCROLL,
-    LV_EVENT_GESTURE,           /**< The object has been gesture*/
-    LV_EVENT_KEY,
-    LV_EVENT_FOCUSED,
-    LV_EVENT_DEFOCUSED,
-    LV_EVENT_LEAVE,
-    LV_EVENT_VALUE_CHANGED,      /**< The object's value has changed (i.e. slider moved) */
-    LV_EVENT_INSERT,
-    LV_EVENT_REFRESH,
-    LV_EVENT_DELETE, /**< Object is being deleted */
+    LV_EVENT_SCROLL_BEGIN,        /**< Scrolling begins*/
+    LV_EVENT_SCROLL_END,          /**< Scrolling ends*/
+    LV_EVENT_SCROLL,              /**< Scrolling*/
+    LV_EVENT_GESTURE,             /**< Gesture detected*/
+    LV_EVENT_KEY,                 /**< A key is sent to the object */
+    LV_EVENT_FOCUSED,             /**< Focused */
+    LV_EVENT_DEFOCUSED,           /**< Defocused*/
+    LV_EVENT_LEAVE,               /**< Defocused but still selected*/
+    LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing */
 
-    LV_EVENT_COVER_CHECK,      /**< Check if the object fully covers the 'mask_p' area */
-    LV_EVENT_REFR_EXT_DRAW_SIZE,   /**< Draw extras on the object */
+    /** Drawing events*/
+    LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area */
+    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow) */
+    LV_EVENT_DRAW_MAIN_BEGIN,    /**< Starting the main drawing phase*/
+    LV_EVENT_DRAW_MAIN,          /**< Perform the main drawing*/
+    LV_EVENT_DRAW_MAIN_END,      /**< Finishing the main drawing phase*/
+    LV_EVENT_DRAW_POST_BEGIN,    /**< Starting the post draw phase (when all children are drawn)*/
+    LV_EVENT_DRAW_POST,          /**< Perform the post draw phase (when all children are drawn)*/
+    LV_EVENT_DRAW_POST_END,      /**< Finishing the post draw phase (when all children are drawn)*/
+    LV_EVENT_DRAW_PART_BEGIN,    /**< Starting to draw a part. */
+    LV_EVENT_DRAW_PART_END,      /**< Finishing to draw a part. */
 
-    LV_EVENT_DRAW_MAIN_BEGIN,
-    LV_EVENT_DRAW_MAIN,
-    LV_EVENT_DRAW_MAIN_END,
-    LV_EVENT_DRAW_POST_BEGIN,
-    LV_EVENT_DRAW_POST,
-    LV_EVENT_DRAW_POST_END,
-    LV_EVENT_DRAW_PART_BEGIN,
-    LV_EVENT_DRAW_PART_END,
-
-    LV_EVENT_READY,             /**< A process has finished */
-    LV_EVENT_CANCEL,             /**< A process has been cancelled */
-
-    /*General signals*/
-    LV_EVENT_CHILD_CHG,          /**< Child was removed/added */
-    LV_EVENT_COORD_CHG,          /**< Object coordinates/size have changed */
-    LV_EVENT_STYLE_CHG,          /**< Object's style has changed */
-    LV_EVENT_BASE_DIR_CHG,       /**< The base dir has changed*/
-    LV_EVENT_GET_SELF_SIZE,      /**< Get the internal size of a widget*/
-
-    /*Input device related*/
-    LV_EVENT_HIT_TEST,          /**< Advanced hit-testing */
+    /** General events*/
+    LV_EVENT_VALUE_CHANGED,       /**< The object's value has changed (i.e. slider moved) */
+    LV_EVENT_INSERT,              /**< A text is inserted to the object */
+    LV_EVENT_REFRESH,             /**< Notify the object to refresh something on it (for the user)*/
+    LV_EVENT_DELETE,              /**< Object is being deleted */
+    LV_EVENT_READY,               /**< A process has finished */
+    LV_EVENT_CANCEL,              /**< A process has been cancelled */
+    LV_EVENT_CHILD_CHANGED,       /**< Child was removed/added */
+    LV_EVENT_COORD_CHANGED,       /**< Object coordinates/size have changed */
+    LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed */
+    LV_EVENT_BASE_DIR_CHANGED,    /**< The base dir has changed*/
+    LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     _LV_EVENT_LAST /** Number of default events*/
 }lv_event_t;

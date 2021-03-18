@@ -349,7 +349,7 @@ static void children_repos(lv_obj_t * cont, int32_t item_first_id, int32_t item_
 
             if(lv_area_get_height(&old_coords) != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
-                lv_event_send(item, LV_EVENT_COORD_CHG, &old_coords);
+                lv_event_send(item, LV_EVENT_COORD_CHANGED, &old_coords);
                 lv_obj_invalidate(item);
             }
         }

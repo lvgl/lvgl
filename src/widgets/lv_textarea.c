@@ -1029,7 +1029,7 @@ static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    if(e == LV_EVENT_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHANGED) {
         if(ta->label) {
             if(ta->one_line) {
                 lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -1055,7 +1055,7 @@ static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
     else if(e == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);
     }
-    else if(e == LV_EVENT_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHANGED) {
         /*Set the label width according to the text area width*/
         if(ta->label) {
             void * param = lv_event_get_param();

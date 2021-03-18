@@ -421,7 +421,7 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
         lv_area_set_width(&item->coords, item_w);
         lv_area_set_height(&item->coords, item_h);
         lv_obj_invalidate(item);
-        lv_event_send(item, LV_EVENT_COORD_CHG, &old_coords);
+        lv_event_send(item, LV_EVENT_COORD_CHANGED, &old_coords);
 
     }
     bool moved = true;

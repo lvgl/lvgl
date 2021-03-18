@@ -57,7 +57,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
    if(parent) {
        /* Send a signal to the parent to notify it about the new child.
         * Also triggers layout update*/
-       lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
+       lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
        /*Invalidate the area if not screen created*/
        lv_obj_invalidate(obj);

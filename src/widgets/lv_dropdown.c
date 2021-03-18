@@ -662,7 +662,7 @@ static void lv_dropdown_event(lv_obj_t * obj, lv_event_t e)
             lv_obj_invalidate(obj);
         }
     }
-    else if(e == LV_EVENT_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHANGED) {
         if(dropdown->list) lv_dropdown_close(obj);
     }
     else if(e == LV_EVENT_GET_SELF_SIZE) {

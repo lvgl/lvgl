@@ -745,12 +745,12 @@ static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
     res = lv_obj_event_base(MY_CLASS, obj, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHANGED) {
         /*Revert dots for proper refresh*/
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(e == LV_EVENT_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHANGED) {
         void * param = lv_event_get_param();
         if(lv_area_get_width(&obj->coords) != lv_area_get_width(param) ||
            lv_area_get_height(&obj->coords) != lv_area_get_height(param)) {
@@ -758,7 +758,7 @@ static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
             lv_label_refr_text(obj);
         }
     }
-    else if(e == LV_EVENT_BASE_DIR_CHG) {
+    else if(e == LV_EVENT_BASE_DIR_CHANGED) {
 #if LV_USE_BIDI
         lv_label_t * label = (lv_label_t *)obj;
         if(label->static_txt == 0) lv_label_set_text(obj, NULL);

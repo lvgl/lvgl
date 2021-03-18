@@ -504,10 +504,10 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify)
     lv_obj_move_children_by(obj, diff.x, diff.y, false);
 
     /*Inform the object about its new coordinates*/
-    lv_event_send(obj, LV_EVENT_COORD_CHG, &ori);
+    lv_event_send(obj, LV_EVENT_COORD_CHANGED, &ori);
 
     /*Send a signal to the parent too*/
-    if(parent && notify) lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
+    if(parent && notify) lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -714,10 +714,10 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     }
 
     /*Send a signal to the object with its new coordinates*/
-    lv_event_send(obj, LV_EVENT_COORD_CHG, &ori);
+    lv_event_send(obj, LV_EVENT_COORD_CHANGED, &ori);
 
     /*Send a signal to the parent too*/
-    if(parent != NULL) lv_event_send(parent, LV_EVENT_CHILD_CHG, obj);
+    if(parent != NULL) lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);

@@ -400,10 +400,10 @@ static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     lv_point_t p;
 
-    if(e == LV_EVENT_STYLE_CHG) {
+    if(e == LV_EVENT_STYLE_CHANGED) {
         lv_btnmatrix_set_map(obj, btnm->map_p);
     }
-    else if(e == LV_EVENT_COORD_CHG) {
+    else if(e == LV_EVENT_COORD_CHANGED) {
         void * param = lv_event_get_param();
         if(param &&
            (lv_obj_get_width(obj) != lv_area_get_width(param) || lv_obj_get_height(obj) != lv_area_get_height(param)))
