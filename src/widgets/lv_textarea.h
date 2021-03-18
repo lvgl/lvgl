@@ -142,13 +142,6 @@ void lv_textarea_set_placeholder_text(lv_obj_t * ta, const char * txt);
 void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos);
 
 /**
- * Hide/Unhide the cursor.
- * @param ta pointer to a text area object
- * @param hide true: hide the cursor
- */
-void lv_textarea_set_cursor_hidden(lv_obj_t * ta, bool hide);
-
-/**
  * Enable/Disable the positioning of the cursor by clicking the text on the text area.
  * @param ta pointer to a text area object
  * @param en true: enable click positions; false: disable
@@ -238,13 +231,6 @@ lv_obj_t * lv_textarea_get_label(const lv_obj_t * ta);
  * @return the cursor position
  */
 uint32_t lv_textarea_get_cursor_pos(const lv_obj_t * ta);
-
-/**
- * Get whether the cursor is hidden or not
- * @param ta pointer to a text area object
- * @return true: the cursor is hidden
- */
-bool lv_textarea_get_cursor_hidden(const lv_obj_t * ta);
 
 /**
  * Get whether the cursor click positioning is enabled or not.
