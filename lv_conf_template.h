@@ -477,6 +477,9 @@ typedef void * lv_user_data_t;
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80
 #endif /*LV_USE_THEME_DEFAULT*/
 
+ /*An very simple them that is a good starting point for a custom theme*/
+ #define LV_USE_THEME_BASIC    1
+
 /*-----------
  * Layouts
  *----------*/

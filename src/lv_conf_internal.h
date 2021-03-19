@@ -1424,6 +1424,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif /*LV_USE_THEME_DEFAULT*/
 
+ /*An very simple them that is a good starting point for a custom theme*/
+#ifndef LV_USE_THEME_BASIC
+#  ifdef CONFIG_LV_USE_THEME_BASIC
+#    define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
+#  else
+#    define  LV_USE_THEME_BASIC    1
+#  endif
+#endif
+
 /*-----------
  * Layouts
  *----------*/
