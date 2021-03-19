@@ -475,9 +475,9 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
     else if(e == LV_EVENT_PRESSED || e == LV_EVENT_PRESSING) {
         uint16_t col;
         uint16_t row;
-        lv_res_t res = get_pressed_cell(obj, &row, &col);
+        lv_res_t pr_res = get_pressed_cell(obj, &row, &col);
 
-        if(res == LV_RES_OK && (table->col_act != col || table->row_act != row)) {
+        if(pr_res == LV_RES_OK && (table->col_act != col || table->row_act != row)) {
             table->col_act = col;
             table->row_act = row;
         }
