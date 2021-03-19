@@ -101,13 +101,11 @@ static void lv_switch_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj), lv_obj_get_height(obj)) >> 1;
-        knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
+        lv_coord_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
         knob_size += 2;         /*For rounding error*/
-
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
-        knob_size = (knob_size - lv_obj_get_height(obj)) / 2;
+//        knob_size = (knob_size - lv_obj_get_height(obj)) / 2;
 
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_size);
