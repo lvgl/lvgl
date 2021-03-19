@@ -25,8 +25,6 @@
 /*********************
  *      DEFINES
  *********************/
-/*Draw translucent random colored areas on the invalidated (redrawn) areas*/
-#define MASK_AREA_DEBUG 0
 
 /**********************
  *      TYPEDEFS
@@ -688,7 +686,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         lv_event_send(obj, LV_EVENT_DRAW_MAIN, &obj_ext_mask);
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
 
-#if MASK_AREA_DEBUG
+#if LV_USE_REFR_DEBUG
         lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);

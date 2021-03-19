@@ -504,6 +504,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+/*1: Draw random colored rectangles over the redrawn areas*/
+#ifndef LV_USE_REFR_DEBUG
+#  ifdef CONFIG_LV_USE_REFR_DEBUG
+#    define LV_USE_REFR_DEBUG CONFIG_LV_USE_REFR_DEBUG
+#  else
+#    define  LV_USE_REFR_DEBUG       0
+#  endif
+#endif
+
 /*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
 #  ifdef CONFIG_LV_SPRINTF_CUSTOM
