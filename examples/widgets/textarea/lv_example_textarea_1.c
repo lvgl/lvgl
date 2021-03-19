@@ -18,10 +18,9 @@ static void btnm_event_handler(lv_obj_t * obj, lv_event_t event)
 void lv_example_textarea_1(void)
 {
     lv_obj_t * ta = lv_textarea_create(lv_scr_act(), NULL);
+    lv_textarea_set_one_line(ta, true);
     lv_obj_align(ta, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
     lv_obj_add_state(ta, LV_STATE_FOCUSED); /*To be sure the cursor is visible*/
-
-    lv_obj_set_style_text_align(lv_textarea_get_label(ta), LV_PART_MAIN, LV_STATE_DEFAULT, LV_TEXT_ALIGN_CENTER);
 
     static const char * btnm_map[] = {"1", "2", "3", "\n",
                                "4", "5", "6", "\n",
