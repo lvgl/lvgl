@@ -135,8 +135,6 @@ void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
         lv_obj_get_child_cnt(disp->screens[2]) == 0)
     {
         lv_theme_apply(disp->screens[0]);
-        lv_theme_apply(disp->screens[1]);
-        lv_theme_apply(disp->screens[2]);
     }
 }
 /**
