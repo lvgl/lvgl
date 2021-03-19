@@ -68,6 +68,7 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 static void base_dir_refr_children(lv_obj_t * obj);
+static bool event_is_bubbled(lv_event_t e);
 
 /**********************
  *  STATIC VARIABLES
@@ -249,7 +250,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
 
-    if(res == LV_RES_OK) {
+    if(res == LV_RES_OK && event_is_bubbled(event)) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
             res = lv_event_send(obj->parent, event, param);
             if(res != LV_RES_OK) return LV_RES_INV;
@@ -1171,3 +1172,30 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
     }
     return false;
 }
+
+static bool event_is_bubbled(lv_event_t e)
+{
+    switch(e) {
+    case LV_EVENT_HIT_TEST:
+    case LV_EVENT_COVER_CHECK:
+    case LV_EVENT_REFR_EXT_DRAW_SIZE:
+    case LV_EVENT_DRAW_MAIN_BEGIN:
+    case LV_EVENT_DRAW_MAIN:
+    case LV_EVENT_DRAW_MAIN_END:
+    case LV_EVENT_DRAW_POST_BEGIN:
+    case LV_EVENT_DRAW_POST:
+    case LV_EVENT_DRAW_POST_END:
+    case LV_EVENT_DRAW_PART_BEGIN:
+    case LV_EVENT_DRAW_PART_END:
+    case LV_EVENT_REFRESH:
+    case LV_EVENT_DELETE:
+    case LV_EVENT_CHILD_CHANGED:
+    case LV_EVENT_COORD_CHANGED:
+    case LV_EVENT_STYLE_CHANGED:
+    case LV_EVENT_GET_SELF_SIZE:
+        return false;
+    default:
+        return true;
+    }
+}
+

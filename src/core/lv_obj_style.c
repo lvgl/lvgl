@@ -357,7 +357,11 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_CONTENT_LETTER_SPACE, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_CONTENT_OPA, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else {
-                if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+                if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+                    if(res != _LV_STYLE_STATE_CMP_SAME && (obj->styles[i].part == LV_PART_MAIN || obj->styles[i].part != LV_PART_SCROLLBAR)) {
+                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+                    }
+                }
             }
         }
     }

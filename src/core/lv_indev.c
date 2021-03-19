@@ -585,6 +585,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
                     if(_lv_ll_get_len(&g->obj_ll) > 1) {
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
+                        lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                     }
                 }
                 /*If not editable then just send a long press Call the ancestor's event handler*/
@@ -655,6 +656,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
 
                     lv_group_send_data(g, LV_KEY_ENTER);
+                } else {
+                    lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                 }
             }
             /*If the focused object is editable and now in navigate mode then on enter switch edit

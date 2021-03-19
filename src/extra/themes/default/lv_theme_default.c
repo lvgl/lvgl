@@ -124,6 +124,10 @@ typedef struct {
     lv_style_t msgbox_btns_bg;
 #endif
 
+#if LV_USE_KEYBOARD
+    lv_style_t keyboard_btn_bg;
+#endif
+
 #if LV_USE_LIST
     lv_style_t list_bg, list_btn, list_item_grow, list_label;
 #endif
@@ -253,7 +257,7 @@ static void style_init(void)
     lv_style_set_outline_opa(&styles->outline_primary, LV_OPA_50);
 
     style_init_reset(&styles->outline_secondary);
-    lv_style_set_outline_color(&styles->outline_secondary, color_secondary_muted);
+    lv_style_set_outline_color(&styles->outline_secondary, color_secondary_accent);
     lv_style_set_outline_width(&styles->outline_secondary, OUTLINE_WIDTH);
     lv_style_set_outline_opa(&styles->outline_secondary, LV_OPA_50);
 
@@ -475,6 +479,11 @@ static void style_init(void)
     style_init_reset(&styles->msgbox_btns_bg);
     lv_style_set_pad_all(&styles->msgbox_btns_bg, OUTLINE_WIDTH);
 #endif
+#if LV_USE_KEYBOARD
+    style_init_reset(&styles->keyboard_btn_bg);
+    lv_style_set_shadow_width(&styles->keyboard_btn_bg, 0);
+    lv_style_set_radius(&styles->keyboard_btn_bg, disp_size == DISP_SMALL ? RADIUS_DEFAULT / 2 : RADIUS_DEFAULT);
+#endif
 
 #if LV_USE_TABVIEW
     style_init_reset(&styles->tab_btn);
@@ -650,10 +659,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->btn);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_primary);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_FOCUS_KEY, &styles->outline_primary);
+        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_EDITED, &styles->outline_secondary);
     }
 #endif
 
@@ -672,8 +683,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_slider_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_primary_muted);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
@@ -692,6 +701,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->no_radius);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_FOCUS_KEY, &styles->outline_primary);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_white);
@@ -825,6 +836,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DISABLED, &styles->disabled);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_FOCUS_KEY, &styles->outline_primary);
+        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_EDITED, &styles->outline_secondary);
     }
 #endif
 
@@ -836,6 +848,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_EDITED, &styles->outline_secondary);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->btn);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->bg_color_white);
+        lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_DEFAULT, &styles->keyboard_btn_bg);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_CHECKED, &styles->bg_color_grey);
         lv_obj_add_style(obj, LV_PART_ITEMS, LV_STATE_FOCUSED, &styles->outline_primary);

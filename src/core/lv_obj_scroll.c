@@ -572,11 +572,21 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     lv_coord_t pbottom = lv_obj_get_style_pad_bottom(parent, LV_PART_MAIN);
     lv_coord_t top_diff = parent->coords.y1 + ptop - area_tmp->y1 - scroll_value->y;
     lv_coord_t bottom_diff = -(parent->coords.y2 - pbottom - area_tmp->y2 - scroll_value->y);
-    if((top_diff > 0 && bottom_diff > 0)) y_scroll = 0;
-    else if(top_diff > 0) y_scroll = top_diff;
-    else if(bottom_diff > 0)  y_scroll = -bottom_diff;
-
     lv_coord_t parent_h = lv_obj_get_height(parent) - ptop - pbottom;
+    if((top_diff > 0 && bottom_diff > 0)) y_scroll = 0;
+    else if(top_diff > 0) {
+        y_scroll = top_diff;
+        /*Do not let scrolling in*/
+        lv_coord_t st = lv_obj_get_scroll_top(parent);
+        if(st - y_scroll < 0) y_scroll = 0;
+    }
+    else if(bottom_diff > 0) {
+        y_scroll = -bottom_diff;
+        /*Do not let scrolling in*/
+        lv_coord_t sb = lv_obj_get_scroll_bottom(parent);
+        if(sb + y_scroll < 0) y_scroll = 0;
+    }
+
     switch(snap_y) {
     case LV_SCROLL_SNAP_START:
         snap_goal = parent->coords.y1 + ptop;
@@ -605,8 +615,18 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     lv_coord_t left_diff = parent->coords.x1 + pleft - area_tmp->x1 - scroll_value->x;
     lv_coord_t right_diff = -(parent->coords.x2 - pright - area_tmp->x2- scroll_value->x);
     if((left_diff > 0 && right_diff > 0)) x_scroll = 0;
-    else if(left_diff > 0) x_scroll = left_diff;
-    else if(right_diff > 0)  x_scroll = -right_diff;
+    else if(left_diff > 0) {
+        x_scroll = left_diff;
+        /*Do not let scrolling in*/
+        lv_coord_t sl = lv_obj_get_scroll_left(parent);
+        if(sl + x_scroll > 0) x_scroll = 0;
+    }
+    else if(right_diff > 0) {
+        x_scroll = -right_diff;
+        /*Do not let scrolling in*/
+        lv_coord_t sr = lv_obj_get_scroll_right(parent);
+        if(sr + x_scroll < 0) x_scroll = 0;
+    }
 
     lv_coord_t parent_w = lv_obj_get_width(parent) - pleft - pright;
     switch(snap_x) {

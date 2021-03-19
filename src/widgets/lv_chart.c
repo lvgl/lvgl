@@ -640,6 +640,7 @@ static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
             lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
         }
     } else if(e == LV_EVENT_RELEASED) {
+        invalidate_point(obj, chart->pressed_point_id);
         chart->pressed_point_id = LV_CHART_POINT_NONE;
     } else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = lv_event_get_param();
@@ -918,7 +919,6 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_obj_draw_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, &series_mask);
 	dsc.part = LV_PART_ITEMS;
-
 
     /*Go through all points*/
     for(i = 0; i < chart->point_cnt; i++) {
@@ -1276,13 +1276,13 @@ static uint32_t get_index_from_x(lv_obj_t * obj, lv_coord_t x)
 
 static void invalidate_point(lv_obj_t * obj, uint16_t i)
 {
-    /*FIXME*/
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(i >= chart->point_cnt) return;
 
-    lv_coord_t w  = lv_obj_get_width(obj);
+    lv_coord_t w  = (lv_obj_get_width_fit(obj) * chart->zoom_x) >> 8;
+    lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
     if(chart->type == LV_CHART_TYPE_LINE) {
-        lv_coord_t x_ofs = obj->coords.x1;
+        lv_coord_t x_ofs = obj->coords.x1 + lv_obj_get_style_pad_left(obj, LV_PART_MAIN) - scroll_left;
         lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
         lv_coord_t point_radius = lv_obj_get_style_size(obj, LV_PART_ITEMS);
 
@@ -1305,18 +1305,19 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i)
     }
     else if(chart->type == LV_CHART_TYPE_BAR) {
         lv_area_t col_a;
-        lv_coord_t col_w = w / ((_lv_ll_get_len(&chart->series_ll) + 1) * chart->point_cnt); /*Suppose + 1 series as separator*/
-        lv_coord_t x_ofs = col_w / 2;                                    /*Shift with a half col.*/
+        int32_t block_gap = (lv_obj_get_style_pad_column(obj, LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
+        lv_coord_t block_w = (w + block_gap) / chart->point_cnt;
 
         lv_coord_t x_act;
-        x_act = (int32_t)((int32_t)w * i) / chart->point_cnt;
-        x_act += obj->coords.x1 + x_ofs;
+        x_act = (int32_t)((int32_t)(block_w) * i) ;
+        x_act += obj->coords.x1 + lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
 
         lv_obj_get_coords(obj, &col_a);
-        col_a.x1 = x_act;
-        col_a.x2 = col_a.x1 + col_w;
+        col_a.x1 = x_act - scroll_left;
+        col_a.x2 = col_a.x1 + block_w;
+        col_a.x1 -= block_gap;
 
-        _lv_inv_area(lv_obj_get_disp(obj), &col_a);
+        lv_obj_invalidate_area(obj, &col_a);
     } else {
         lv_obj_invalidate(obj);
     }

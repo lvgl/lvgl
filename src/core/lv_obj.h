@@ -27,6 +27,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define _LV_EVENT_FLAG_BUBBLED 0x80
 
 /**********************
  *      TYPEDEFS
