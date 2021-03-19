@@ -127,6 +127,7 @@ minimal_16bit_swap = {
   
   "LV_FONT_UNSCII_8":1,
   
+  "LV_USE_FONT_SUBPX": 1,
   "LV_USE_BIDI": 0,
   "LV_USE_ARABIC_PERSIAN_CHARS":0,
   
@@ -147,6 +148,7 @@ full_32bit = {
   
   "LV_USE_LOG":1,
   "LV_LOG_PRINTF":1,
+  "LV_USE_FONT_SUBPX": 1,
   "LV_FONT_SUBPX_BGR":1,
   "LV_USE_PERF_MONITOR":1,
   
@@ -188,7 +190,7 @@ full_32bit = {
   "LV_FONT_UNSCII_8":1,
   "LV_FONT_UNSCII_16":1,
   "LV_FONT_FMT_TXT_LARGE":1,
-  "LV_FONT_FMT_TXT_LARGE":1,
+  "LV_USE_FONT_COMPRESSED":1,
 
   "LV_USE_BIDI": 1,
   "LV_USE_ARABIC_PERSIAN_CHARS":1,

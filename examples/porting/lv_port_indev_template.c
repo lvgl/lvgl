@@ -80,7 +80,7 @@ void lv_port_indev_init(void)
      *  You should shape them according to your hardware
      */
 
-    lv_indev_drv_t indev_drv;
+    static lv_indev_drv_t indev_drv;
 
     /*------------------
      * Touchpad

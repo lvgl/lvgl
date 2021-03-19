@@ -66,7 +66,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 
 /**
  * Initialize a display buffer
- * @param draw_buf pointer `lv_draw_buf_t` variable to initialize
+ * @param draw_buf pointer `lv_disp_draw_buf_t` variable to initialize
  * @param buf1 A buffer to be used by LVGL to draw the image.
  *             Always has to specified and can't be NULL.
  *             Can be an array allocated by the user. E.g. `static lv_color_t disp_buf1[1024 * 10]`

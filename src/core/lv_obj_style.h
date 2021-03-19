@@ -4,7 +4,7 @@
  */
 
 #ifndef LV_OBJ_STYLE_H
-#define LV_OB_STYLE_H
+#define LV_OBJ_STYLE_H
 
 #ifdef __cplusplus
 extern "C" {
