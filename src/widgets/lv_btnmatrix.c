@@ -646,7 +646,7 @@ static void draw_main(lv_obj_t * obj)
     if(btnm->btn_cnt == 0) return;
 
     const lv_area_t * clip_area = lv_event_get_param();
-    obj->style_list.skip_trans = 1;
+    obj->skip_trans = 1;
 
     lv_area_t area_obj;
     lv_obj_get_coords(obj, &area_obj);
@@ -666,13 +666,13 @@ static void draw_main(lv_obj_t * obj)
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
-    obj->style_list.skip_trans = 1;
+    obj->skip_trans = 1;
     lv_draw_rect_dsc_init(&draw_rect_dsc_def);
     lv_draw_label_dsc_init(&draw_label_dsc_def);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_def);
     lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_def);
     draw_label_dsc_act.flag |= recolor_flag;
-    obj->style_list.skip_trans = 0;
+    obj->skip_trans = 0;
     obj->state = state_ori;
 
     lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -726,14 +726,14 @@ static void draw_main(lv_obj_t * obj)
         /*In other cases get the styles directly without caching them*/
         else {
             obj->state = btn_state;
-            obj->style_list.skip_trans = 1;
+            obj->skip_trans = 1;
             lv_draw_rect_dsc_init(&draw_rect_dsc_act);
             lv_draw_label_dsc_init(&draw_label_dsc_act);
             lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
             lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
             draw_label_dsc_act.flag = recolor_flag;
             obj->state = state_ori;
-            obj->style_list.skip_trans = 0;
+            obj->skip_trans = 0;
         }
 
         dsc.draw_area = &btn_area;
@@ -783,7 +783,7 @@ static void draw_main(lv_obj_t * obj)
         lv_event_send(obj,LV_EVENT_DRAW_PART_END, &dsc);
     }
 
-    obj->style_list.skip_trans = 0;
+    obj->skip_trans = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     lv_mem_buf_release(txt_ap);
 #endif

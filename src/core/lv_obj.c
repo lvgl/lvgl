@@ -1087,11 +1087,11 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
     trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
-    lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
+    lv_memset_00(ts, sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
-    for(i = 0; i < obj->style_list.style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
-        lv_obj_style_t * obj_style = &obj->style_list.styles[i];
+    for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
+        lv_obj_style_t * obj_style = &obj->styles[i];
         if(obj_style->state & (~new_state)) continue; /*Skip unrelated styles*/
         if(obj_style->is_trans) continue;
 

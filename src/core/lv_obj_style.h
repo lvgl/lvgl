@@ -41,12 +41,6 @@ typedef struct {
     uint8_t is_trans :1;
 }lv_obj_style_t;
 
-typedef struct {
-    lv_obj_style_t * styles;
-    uint8_t style_cnt;
-    uint8_t skip_trans :1;
-}lv_obj_style_list_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

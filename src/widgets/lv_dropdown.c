@@ -874,7 +874,7 @@ static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint1
 
     if(state != list_obj->state) {
         list_obj->state = state;
-        list_obj->style_list.skip_trans = 1;
+        list_obj->skip_trans = 1;
     }
 
     /*Draw a rectangle under the selected item*/
@@ -899,7 +899,7 @@ static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint1
     lv_draw_rect(&rect_area, clip_area, &sel_rect);
 
     list_obj->state = state_ori;
-    list_obj->style_list.skip_trans = 0;
+    list_obj->skip_trans = 0;
 }
 
 static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
@@ -912,7 +912,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area,
 
     if(state != list_obj->state) {
         list_obj->state =  state;
-        list_obj->style_list.skip_trans = 1;
+        list_obj->skip_trans = 1;
     }
 
     lv_draw_label_dsc_t label_dsc;
@@ -941,7 +941,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area,
         lv_draw_label(&label->coords, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
     }
     list_obj->state = state_orig;
-    list_obj->style_list.skip_trans = 0;
+    list_obj->skip_trans = 0;
 }
 
 /**

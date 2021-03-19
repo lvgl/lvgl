@@ -239,7 +239,7 @@ typedef struct _lv_obj_t{
     const lv_obj_class_t * class_p;
     struct _lv_obj_t * parent;
     lv_obj_spec_attr_t * spec_attr;
-    lv_obj_style_list_t  style_list;
+    lv_obj_style_t * styles;
     lv_area_t coords;
     lv_coord_t x_set;
     lv_coord_t y_set;
@@ -247,7 +247,9 @@ typedef struct _lv_obj_t{
     lv_coord_t h_set;
     lv_obj_flag_t flags;
     lv_state_t state;
-    uint8_t layout_inv:1;
+    uint8_t layout_inv :1;
+    uint8_t skip_trans :1;
+    uint8_t style_cnt  :6;
 }lv_obj_t;
 
 

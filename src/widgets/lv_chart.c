@@ -732,7 +732,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
-    obj->style_list.skip_trans = 1;
+    obj->skip_trans = 1;
     lv_draw_line_dsc_t line_dsc_default;
     lv_draw_line_dsc_init(&line_dsc_default);
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc_default);
@@ -747,7 +747,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t point_size_pr = lv_obj_get_style_size(obj, LV_PART_ITEMS);
 
     obj->state = state_ori;
-    obj->style_list.skip_trans = 0;
+    obj->skip_trans = 0;
 
     lv_coord_t point_size_act;
 

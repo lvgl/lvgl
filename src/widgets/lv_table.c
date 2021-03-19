@@ -556,7 +556,7 @@ static void draw_main(lv_obj_t * obj)
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
-    obj->style_list.skip_trans = 1;
+    obj->skip_trans = 1;
     lv_draw_rect_dsc_t rect_dsc_def;
     lv_draw_rect_dsc_t rect_dsc_act; /*Passed to the event to modify it*/
     lv_draw_rect_dsc_init(&rect_dsc_def);
@@ -567,7 +567,7 @@ static void draw_main(lv_obj_t * obj)
     lv_draw_label_dsc_init(&label_dsc_def);
     lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_def);
     obj->state = state_ori;
-    obj->style_list.skip_trans = 0;
+    obj->skip_trans = 0;
 
     uint16_t col;
     uint16_t row;
@@ -664,13 +664,13 @@ static void draw_main(lv_obj_t * obj)
             /*In other cases get the styles directly without caching them*/
             else {
                 obj->state = cell_state;
-                obj->style_list.skip_trans = 1;
+                obj->skip_trans = 1;
                 lv_draw_rect_dsc_init(&rect_dsc_act);
                 lv_draw_label_dsc_init(&label_dsc_act);
                 lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &rect_dsc_act);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &label_dsc_act);
                 obj->state = state_ori;
-                obj->style_list.skip_trans = 0;
+                obj->skip_trans = 0;
             }
 
             dsc.draw_area = &cell_area_border;
