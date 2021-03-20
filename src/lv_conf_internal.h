@@ -1992,7 +1992,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 
 
-
 /*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
 
