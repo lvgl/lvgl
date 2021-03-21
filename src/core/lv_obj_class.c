@@ -44,6 +44,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", class_p, parent);
     uint32_t s = get_instance_size(class_p);
     lv_obj_t * obj = lv_mem_alloc(s);
+    if(obj == NULL) return NULL;
     lv_memset_00(obj, s);
     obj->class_p = class_p;
     obj->parent = parent;
