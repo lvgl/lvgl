@@ -193,7 +193,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    EVENT_TRACE("Sending event %d to 0x%p with 0x%p param", event, obj, param);
+    EVENT_TRACE("Sending event %d to %p with %p param", event, obj, param);
 
     /*Build a simple linked list from the objects used in the events
      *It's important to know if an this object was deleted by a nested event

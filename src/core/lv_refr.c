@@ -925,6 +925,6 @@ static void draw_buf_flush(void)
 
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with 0x%p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
+    TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2, color_p);
     drv->flush_cb(drv, area, color_p);
 }

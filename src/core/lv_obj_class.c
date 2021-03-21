@@ -42,7 +42,7 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p);
 
 lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_TRACE_OBJ_CREATE("Creating object with 0x%p class on 0x%p parent", class_p, parent);
+    LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", class_p, parent);
     uint32_t s = get_instance_size(class_p);
     lv_obj_t * obj = lv_mem_alloc(s);
     lv_memset_00(obj, s);
@@ -66,7 +66,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     if(!copy) lv_theme_apply(obj);
 //    else lv_style_list_copy(&checkbox->style_indic, &checkbox_copy->style_indic);
 
-    LV_TRACE_OBJ_CREATE("Object created at 0x%p address with 0x%p class on 0x%p parent", obj, class_p, parent);
+    LV_TRACE_OBJ_CREATE("Object created at %p address with %p class on %p parent", obj, class_p, parent);
     return obj;
 }
 
