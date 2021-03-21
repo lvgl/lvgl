@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_construct(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_obj_construct(lv_obj_t * obj, const lv_obj_t * copy);
 static uint32_t get_instance_size(const lv_obj_class_t * class_p);
 
 /**********************
@@ -49,7 +49,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     obj->class_p = class_p;
     obj->parent = parent;
 
-    lv_obj_construct(obj, parent, copy);
+    lv_obj_construct(obj, copy);
 
    if(parent) {
        /*Send a Call the ancestor's event handler to the parent to notify it about the new child.
@@ -95,7 +95,7 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_construct(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+static void lv_obj_construct(lv_obj_t * obj, const lv_obj_t * copy)
 {
     const lv_obj_class_t * original_class_p = obj->class_p;
 
@@ -104,7 +104,7 @@ static void lv_obj_construct(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t *
         obj->class_p = obj->class_p->base_class;
 
         /*Construct the base first*/
-        lv_obj_construct(obj, parent, copy);
+        lv_obj_construct(obj, copy);
     }
 
     /*Restore the original class*/
