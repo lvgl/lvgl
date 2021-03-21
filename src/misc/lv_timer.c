@@ -286,9 +286,9 @@ static bool lv_timer_exec(lv_timer_t * timer)
     bool exec = false;
     if(lv_timer_time_remaining(timer) == 0) {
         timer->last_run = lv_tick_get();
-        TIMER_TRACE("calling timer callback: 0x%p", timer->timer_cb);
+        TIMER_TRACE("calling timer callback: %p", timer->timer_cb);
         if(timer->timer_cb) timer->timer_cb(timer);
-        TIMER_TRACE("timer callback 0x%p finished", timer->timer_cb);
+        TIMER_TRACE("timer callback %p finished", timer->timer_cb);
         LV_ASSERT_MEM_INTEGRITY();
 
         /*Delete if it was a one shot lv_timer*/
@@ -297,7 +297,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
                 timer->repeat_count--;
             }
             if(timer->repeat_count == 0) {
-                TIMER_TRACE("deleting timer with 0x%p callback because the repeat count is over", timer->timer_cb);
+                TIMER_TRACE("deleting timer with %p callback because the repeat count is over", timer->timer_cb);
                 lv_timer_del(timer);
             }
         }

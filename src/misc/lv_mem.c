@@ -140,7 +140,7 @@ void * lv_mem_alloc(size_t size)
                (int)mon.free_biggest_size);
     }
 
-    MEM_TRACE("allocated at 0x%p", alloc);
+    MEM_TRACE("allocated at %p", alloc);
     return alloc;
 }
 
@@ -150,7 +150,7 @@ void * lv_mem_alloc(size_t size)
  */
 void lv_mem_free(void * data)
 {
-    MEM_TRACE("freeing 0x%p", data);
+    MEM_TRACE("freeing %p", data);
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
@@ -173,7 +173,7 @@ void lv_mem_free(void * data)
  */
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
-    MEM_TRACE("reallocating 0x%p with %d size", data_p, new_size);
+    MEM_TRACE("reallocating %p with %d size", data_p, new_size);
     if(new_size == 0) {
         MEM_TRACE("using zero_mem");
         lv_mem_free(data_p);
@@ -192,7 +192,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
         return NULL;
     }
 
-    MEM_TRACE("allocated at 0x%p", new_p);
+    MEM_TRACE("allocated at %p", new_p);
     return new_p;
 }
 
@@ -277,7 +277,7 @@ void * lv_mem_buf_get(uint32_t size)
 
     if(i_guess >= 0) {
         LV_GC_ROOT(lv_mem_buf[i_guess]).used = 1;
-        MEM_TRACE("returning already allocated buffer (buffer id: %d, address: 0x%p)", i_guess, LV_GC_ROOT(lv_mem_buf[i_guess]).p);
+        MEM_TRACE("returning already allocated buffer (buffer id: %d, address: %p)", i_guess, LV_GC_ROOT(lv_mem_buf[i_guess]).p);
         return LV_GC_ROOT(lv_mem_buf[i_guess]).p;
     }
 
@@ -292,7 +292,7 @@ void * lv_mem_buf_get(uint32_t size)
             LV_GC_ROOT(lv_mem_buf[i]).used = 1;
             LV_GC_ROOT(lv_mem_buf[i]).size = size;
             LV_GC_ROOT(lv_mem_buf[i]).p    = buf;
-            MEM_TRACE("allocated (buffer id: %d, address: 0x%p)", i, LV_GC_ROOT(lv_mem_buf[i]).p);
+            MEM_TRACE("allocated (buffer id: %d, address: %p)", i, LV_GC_ROOT(lv_mem_buf[i]).p);
             return LV_GC_ROOT(lv_mem_buf[i]).p;
         }
     }
@@ -308,7 +308,7 @@ void * lv_mem_buf_get(uint32_t size)
  */
 void lv_mem_buf_release(void * p)
 {
-    MEM_TRACE("begin (address: 0x%p)", p);
+    MEM_TRACE("begin (address: %p)", p);
 
     for(uint8_t i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(lv_mem_buf[i]).p == p) {
