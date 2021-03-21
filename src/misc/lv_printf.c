@@ -679,12 +679,24 @@ static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, cons
             case 'u' :
             case 'x' :
             case 'X' :
+            case 'p' :
+            case 'P' :
             case 'o' :
             case 'b' : {
                     // set the base
                     unsigned int base;
                     if(*format == 'x' || *format == 'X') {
                         base = 16U;
+                    }
+                    else if(*format == 'p' || *format == 'P') {
+                        base = 16U;
+                        flags |= FLAGS_HASH;   // always hash for pointer format
+#if defined(PRINTF_SUPPORT_LONG_LONG)
+                        if(sizeof(uintptr_t) == sizeof(long long))
+                            flags |= FLAGS_LONG_LONG;
+                        else
+#endif
+                            flags |= FLAGS_LONG;
                     }
                     else if(*format == 'o') {
                         base =  8U;
@@ -697,7 +709,7 @@ static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, cons
                         flags &= ~FLAGS_HASH;   // no hash for dec format
                     }
                     // uppercase
-                    if(*format == 'X') {
+                    if(*format == 'X' || *format == 'P') {
                         flags |= FLAGS_UPPERCASE;
                     }
 
@@ -813,25 +825,6 @@ static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, cons
                             out(' ', buffer, idx++, maxlen);
                         }
                     }
-                    format++;
-                    break;
-                }
-
-            case 'p' : {
-                    width = sizeof(void *) * 2U;
-                    flags |= FLAGS_ZEROPAD | FLAGS_UPPERCASE;
-#if defined(PRINTF_SUPPORT_LONG_LONG)
-                    const bool is_ll = sizeof(uintptr_t) == sizeof(long long);
-                    if(is_ll) {
-                        idx = _ntoa_long_long(out, buffer, idx, maxlen, (uintptr_t)va_arg(va, void *), false, 16U, precision, width, flags);
-                    }
-                    else {
-#endif
-                        idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned long)((uintptr_t)va_arg(va, void *)), false, 16U, precision, width,
-                                         flags);
-#if defined(PRINTF_SUPPORT_LONG_LONG)
-                    }
-#endif
                     format++;
                     break;
                 }
