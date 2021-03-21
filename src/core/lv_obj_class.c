@@ -48,9 +48,6 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     lv_memset_00(obj, s);
     obj->class_p = class_p;
     obj->parent = parent;
-    const lv_obj_class_t * class_start = class_p;
-
-    while(class_start && class_start->constructor_cb == NULL) class_start = class_start->base_class;
 
     lv_obj_construct(obj, parent, copy);
 
