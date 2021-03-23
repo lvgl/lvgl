@@ -10,7 +10,7 @@ props = [
 {'name': 'TRANSFORM_ZOOM',            'style_type': 'num',   'var_type': 'lv_coord_t' },
 {'name': 'TRANSFORM_ANGLE',           'style_type': 'num',   'var_type': 'lv_coord_t' },
 {'name': 'OPA',                       'style_type': 'num',   'var_type': 'lv_opa_t' },
-{'name': 'COLOR_FILTER_CB',           'style_type': 'func',  'var_type': 'lv_color_filter_cb_t' },
+{'name': 'COLOR_FILTER_DSC',          'style_type': 'ptr',   'var_type': 'const lv_color_filter_dsc_t *' },
 {'name': 'COLOR_FILTER_OPA',          'style_type': 'num',   'var_type': 'lv_opa_t' },
 {'name': 'ANIM_TIME',                 'style_type': 'num',   'var_type': 'uint32_t' },
 {'name': 'TRANSITION',                'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' },
@@ -104,9 +104,7 @@ def obj_style_get(p):
 
 def get_func_cast(style):
   func_cast = ""
-  if style == 'func':
-    func_cast = "(void (*)(void))"
-  elif style == 'num':
+  if style == 'num':
     func_cast = "(int32_t)"
   return func_cast
 
