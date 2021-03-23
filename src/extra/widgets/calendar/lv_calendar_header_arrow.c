@@ -56,7 +56,8 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
 
     lv_coord_t w = lv_obj_get_width(calendar);
     lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
-    lv_obj_set_layout(header, &lv_flex_row_center);
+    lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_place(header, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_START);
 
     lv_obj_t * mo_prev = lv_btn_create(header, NULL);
     lv_obj_set_style_content_text(mo_prev,  LV_PART_MAIN, LV_STATE_DEFAULT,  LV_SYMBOL_LEFT);

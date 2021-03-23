@@ -6,18 +6,16 @@
  */
 void lv_example_grid_1(void)
 {
-    static lv_coord_t col_dsc[3] = {70, 70, 70};
-    static lv_coord_t row_dsc[3] = {50, 50, 50};
-
-    static lv_grid_t grid;
-    lv_grid_init(&grid);
-    lv_grid_set_template(&grid, col_dsc, 3, row_dsc, 3);
+    static lv_coord_t col_dsc[] = {70, 70, 70, LV_COORD_MAX};
+    static lv_coord_t row_dsc[] = {50, 50, 50, LV_COORD_MAX};
 
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_set_style_grid_column_template(cont, LV_PART_MAIN, LV_STATE_DEFAULT, col_dsc);
+    lv_obj_set_style_grid_row_template(cont, LV_PART_MAIN, LV_STATE_DEFAULT, row_dsc);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_layout(cont, &grid);
+    lv_obj_set_layout(cont, LV_LAYOUT_GRID);
 
     lv_obj_t * label;
     lv_obj_t * obj;

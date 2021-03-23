@@ -197,10 +197,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 #endif
 
     /*Refresh the screen's layout if required*/
-    uint32_t i;
-    for(i = 0; i < disp_refr->screen_cnt; i++) {
-        lv_obj_update_layout(disp_refr->screens[i]);
-    }
+    lv_obj_update_layout(disp_refr->act_scr);
+    if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
 
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);

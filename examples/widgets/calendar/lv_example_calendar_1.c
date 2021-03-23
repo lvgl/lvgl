@@ -37,7 +37,6 @@ void lv_example_calendar_1(void)
 
     lv_calendar_set_highlighted_dates(calendar, highlighted_days, 3);
 
-    lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, -20);
 #if LV_USE_CALENDAR_HEADER_DROPDOWN
     lv_calendar_header_dropdown_create(lv_scr_act(), calendar);
 #elif LV_USE_CALENDAR_HEADER_ARROW

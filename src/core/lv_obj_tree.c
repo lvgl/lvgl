@@ -64,7 +64,7 @@ void lv_obj_del(lv_obj_t * obj)
 
     obj_del_core(obj);
 
-    /*Send a Call the ancestor's event handler to the parent to notify it about the child delete*/
+    /*Call the ancestor's event handler to the parent to notify it about the child delete*/
     if(par) {
         /*Just to remove scroll animations if any*/
         lv_obj_scroll_to(par, 0, 0, LV_ANIM_OFF);

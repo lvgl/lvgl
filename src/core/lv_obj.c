@@ -298,7 +298,6 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, struct _lv_obj_t * ob
     event_temp_data_head = event_temp_data_head->prev;
 
     return res;
-
 }
 
 
@@ -612,64 +611,16 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_obj_t * parent = obj->parent;
-    /*Create a screen*/
-    if(parent == NULL) {
-        LV_TRACE_OBJ_CREATE("creating a screen");
-        lv_disp_t * disp = lv_disp_get_default();
-        if(!disp) {
-            LV_LOG_WARN("No display created to so far. No place to assign the new screen");
-            return;
-        }
-
-        if(disp->screens == NULL) {
-            disp->screens = lv_mem_alloc(sizeof(lv_obj_t *));
-            disp->screens[0] = obj;
-            disp->screen_cnt = 1;
-        } else {
-            disp->screen_cnt++;
-            disp->screens = lv_mem_realloc(disp->screens, sizeof(lv_obj_t *) * disp->screen_cnt);
-            disp->screens[disp->screen_cnt - 1] = obj;
-        }
-
-        /*Set coordinates to full screen size*/
-        obj->coords.x1 = 0;
-        obj->coords.y1 = 0;
-        obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
-        obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
-    }
-    /*Create a normal object*/
-    else {
-        LV_TRACE_OBJ_CREATE("creating normal object");
-        LV_ASSERT_OBJ(parent, MY_CLASS);
-        if(parent->spec_attr == NULL) {
-            lv_obj_allocate_spec_attr(parent);
-        }
-
-        if(parent->spec_attr->children == NULL) {
-            parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *));
-            parent->spec_attr->children[0] = obj;
-            parent->spec_attr->child_cnt = 1;
-        } else {
-            parent->spec_attr->child_cnt++;
-            parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
-            parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
-        }
-
+    if(parent) {
         lv_coord_t sl = lv_obj_get_scroll_left(parent);
         lv_coord_t st = lv_obj_get_scroll_top(parent);
 
         obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top(parent, LV_PART_MAIN) - st;
-        obj->coords.y2 = obj->coords.y1 + LV_OBJ_DEF_HEIGHT;
-        if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
-            obj->coords.x2  = parent->coords.x2 - lv_obj_get_style_pad_right(parent, LV_PART_MAIN) - sl;
-            obj->coords.x1  = obj->coords.x2 - LV_OBJ_DEF_WIDTH;
-        }
-        else {
-            obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left(parent, LV_PART_MAIN) - sl;
-            obj->coords.x2  = obj->coords.x1 + LV_OBJ_DEF_WIDTH;
-        }
-        obj->w_set = lv_area_get_width(&obj->coords);
-        obj->h_set = lv_area_get_height(&obj->coords);
+        obj->coords.y2 = obj->coords.y1 - 1;
+        obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left(parent, LV_PART_MAIN) - sl;
+        obj->coords.x2  = obj->coords.x1 - 1;
+
+        lv_obj_set_size(obj, LV_OBJ_DEF_WIDTH, LV_OBJ_DEF_HEIGHT);
     }
 
     /*Set attributes*/
@@ -682,30 +633,6 @@ static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
     obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
-
-    /*Copy the attributes if required*/
-    if(copy != NULL) {
-        lv_area_copy(&obj->coords, &copy->coords);
-
-        obj->flags  = copy->flags;
-        if(copy->spec_attr) {
-            lv_obj_allocate_spec_attr(obj);
-            lv_memcpy_small(obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
-            obj->spec_attr->children = NULL;    /*Make the child list empty*/
-        }
-        /*Add to the same group*/
-        if(copy->spec_attr && copy->spec_attr->group_p) {
-            obj->spec_attr->group_p = NULL; /*It was simply copied*/
-            lv_group_add_obj(copy->spec_attr->group_p, obj);
-        }
-
-        /*Set the same coordinates for non screen objects*/
-        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
-            lv_obj_set_pos(obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
-            lv_obj_set_size(obj, lv_obj_get_width(copy), lv_obj_get_height(copy));
-
-        }
-    }
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -900,6 +827,7 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 #endif
 }
 
+#include "lvgl/lvgl.h"
 
 static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
 {
@@ -972,62 +900,22 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
-        bool w_new = true;
-        bool h_new = true;
-        void * param = lv_event_get_param();
-        if(param) {
-            if(lv_area_get_width(param) == lv_obj_get_width(obj)) w_new = false;
-            if(lv_area_get_height(param) == lv_obj_get_height(obj)) h_new = false;
+    else if(e == LV_EVENT_SIZE_CHANGED) {
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+
+            lv_obj_refr_size(child);
         }
 
-        if(w_new || h_new) {
-            uint32_t i = 0;
-            for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-                lv_obj_t * child = lv_obj_get_child(obj, i);
-                if((LV_COORD_IS_PCT(child->w_set) && w_new) ||
-                   (LV_COORD_IS_PCT(child->h_set) && h_new))
-                {
-                    lv_obj_set_size(child, child->w_set, child->h_set);
-                }
-            }
+        if(lv_obj_get_style_layout(obj, LV_PART_MAIN)) {
             lv_obj_mark_layout_as_dirty(obj);
-        }
-
-
-        if(h_new) {
-            /*Be sure the bottom side is not remains scrolled in*/
-            lv_coord_t st = lv_obj_get_scroll_top(obj);
-            lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
-            if(sb < 0 && st > 0) {
-                sb = LV_MIN(st, -sb);
-                lv_obj_scroll_by(obj, 0, sb, LV_ANIM_OFF);
-            }
-        }
-
-        if(w_new) {
-            lv_coord_t sl = lv_obj_get_scroll_left(obj);
-            lv_coord_t sr = lv_obj_get_scroll_right(obj);
-            if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
-                /*Be sure the left side is not remains scrolled in*/
-                if(sr < 0 && sl > 0) {
-                    sr = LV_MIN(sl, -sr);
-                    lv_obj_scroll_by(obj, 0, sr, LV_ANIM_OFF);
-                }
-            } else {
-                /*Be sure the right side is not remains scrolled in*/
-                if(sl < 0 && sr > 0) {
-                    sr = LV_MIN(sr, -sl);
-                    lv_obj_scroll_by(obj, 0, sl, LV_ANIM_OFF);
-                }
-            }
         }
     }
     else if(e == LV_EVENT_CHILD_CHANGED) {
-        lv_obj_mark_layout_as_dirty(obj);
-
-        if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
-            lv_obj_set_size(obj, obj->w_set, obj->h_set);
+//        lv_obj_mark_layout_as_dirty(obj);
+        if(lv_obj_get_style_layout(obj, LV_PART_MAIN)) {
+            lv_obj_mark_layout_as_dirty(obj);
         }
     }
     else if(e == LV_EVENT_BASE_DIR_CHANGED) {
@@ -1047,20 +935,18 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
     }
     else if(e == LV_EVENT_STYLE_CHANGED) {
         /*Padding might have changed so the layout should be recalculated*/
-        lv_obj_mark_layout_as_dirty(obj);
-
-        /*Reposition non grid objects on by one*/
         uint32_t i;
         for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-           lv_obj_t * child = lv_obj_get_child(obj, i);
-            if(LV_COORD_IS_PX(child->x_set) || LV_COORD_IS_PX(child->y_set)) {
-                lv_obj_set_pos(child, child->x_set, child->y_set);
-            }
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+
+            lv_obj_refr_size(child);
+            lv_obj_refr_pos(child);
         }
 
-        if(obj->w_set == LV_SIZE_CONTENT || obj->h_set == LV_SIZE_CONTENT) {
-            lv_obj_set_size(obj, obj->w_set, obj->h_set);
+        if(lv_obj_get_style_layout(obj, LV_PART_MAIN)) {
+            lv_obj_mark_layout_as_dirty(obj);
         }
+
         lv_obj_refresh_ext_draw_size(obj);
     }
     else if(e == LV_EVENT_DRAW_MAIN || e == LV_EVENT_DRAW_POST || e == LV_EVENT_COVER_CHECK) {
@@ -1190,7 +1076,7 @@ static bool event_is_bubbled(lv_event_t e)
     case LV_EVENT_REFRESH:
     case LV_EVENT_DELETE:
     case LV_EVENT_CHILD_CHANGED:
-    case LV_EVENT_COORD_CHANGED:
+    case LV_EVENT_SIZE_CHANGED:
     case LV_EVENT_STYLE_CHANGED:
     case LV_EVENT_GET_SELF_SIZE:
         return false;

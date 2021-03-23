@@ -429,6 +429,8 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         ((lv_dropdown_list_t*) list_obj)->dropdown = dropdown_obj;
         dropdown->list = list_obj;
         lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+        lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_obj_update_layout(dropdown->list);
     }
 
     lv_obj_t * label = get_label(dropdown_obj);
@@ -440,7 +442,6 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
        (dropdown->dir == LV_DIR_TOP || dropdown->dir == LV_DIR_BOTTOM)) {
         lv_obj_set_width(dropdown->list, lv_obj_get_width(dropdown_obj));
     }
-
 
     lv_coord_t label_h = lv_obj_get_height(label);
     lv_coord_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN);
@@ -490,9 +491,12 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     else if(dir == LV_DIR_LEFT)  lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
     else if(dir == LV_DIR_RIGHT) lv_obj_align(dropdown->list, dropdown_obj, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
+
     if(dropdown->dir == LV_DIR_LEFT || dropdown->dir == LV_DIR_RIGHT) {
-        if(dropdown->list->coords.y2 >= LV_VER_RES) {
-            lv_obj_set_y(dropdown->list, lv_obj_get_y(dropdown->list) - (dropdown->list->coords.y2 - LV_VER_RES) - 1);
+        lv_coord_t y1 = lv_obj_get_y(dropdown->list);
+        lv_coord_t y2 = lv_obj_get_y2(dropdown->list);
+        if(y2 >= LV_VER_RES) {
+            lv_obj_set_y(dropdown->list, y1 - (y2 - LV_VER_RES) - 1);
         }
     }
 
@@ -662,7 +666,7 @@ static void lv_dropdown_event(lv_obj_t * obj, lv_event_t e)
             lv_obj_invalidate(obj);
         }
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
+    else if(e == LV_EVENT_SIZE_CHANGED) {
         if(dropdown->list) lv_dropdown_close(obj);
     }
     else if(e == LV_EVENT_GET_SELF_SIZE) {

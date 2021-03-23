@@ -60,7 +60,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     if(w > 2 * LV_DPI_DEF) w = 2 * LV_DPI_DEF;
 
     lv_obj_set_size(mbox, w, LV_SIZE_CONTENT);
-    lv_obj_set_layout(mbox, &lv_flex_row_wrap);
+    lv_obj_set_flex_flow(mbox, LV_FLEX_FLOW_ROW);
 
     lv_obj_t * label;
     label = lv_label_create(mbox, NULL);

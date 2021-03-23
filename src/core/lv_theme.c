@@ -49,14 +49,9 @@ void lv_theme_apply(lv_obj_t * obj)
     lv_theme_t * th = lv_theme_get_from_obj(obj);
     if(th == NULL) return;
 
-    lv_obj_enable_style_refresh(false);
-
     lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
 
     apply_theme(th, obj);    /*Apply the theme including the base theme(s)*/
-
-    lv_obj_enable_style_refresh(true);
-    lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
 }
 
 /**

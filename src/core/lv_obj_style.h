@@ -128,6 +128,8 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, uint8_t par
  */
 void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t value);
 
+lv_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t * value);
+
 /**
  * Remove a local style property from a part of an object with a given state.
  * @param obj       pointer to an object

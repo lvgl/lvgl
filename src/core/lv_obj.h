@@ -82,7 +82,7 @@ typedef enum {
     LV_EVENT_READY,               /**< A process has finished*/
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
     LV_EVENT_CHILD_CHANGED,       /**< Child was removed/added*/
-    LV_EVENT_COORD_CHANGED,       /**< Object coordinates/size have changed*/
+    LV_EVENT_SIZE_CHANGED,       /**< Object coordinates/size have changed*/
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed*/
     LV_EVENT_BASE_DIR_CHANGED,    /**< The base dir has changed*/
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
@@ -220,8 +220,6 @@ typedef struct {
     uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
 
-    const lv_layout_dsc_t * layout_dsc; /**< Pointer to the layout descriptor*/
-
     lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
     lv_point_t scroll;                      /**< The current X/Y scroll offset*/
 
@@ -242,15 +240,13 @@ typedef struct _lv_obj_t {
     lv_obj_spec_attr_t * spec_attr;
     lv_obj_style_t * styles;
     lv_area_t coords;
-    lv_coord_t x_set;
-    lv_coord_t y_set;
-    lv_coord_t w_set;
-    lv_coord_t h_set;
     lv_obj_flag_t flags;
     lv_state_t state;
-    uint8_t layout_inv :1;
-    uint8_t skip_trans :1;
-    uint8_t style_cnt  :6;
+    uint16_t layout_inv :1;
+    uint16_t skip_trans :1;
+    uint16_t style_cnt  :6;
+    uint16_t h_layout   :1;
+    uint16_t w_layout   :1;
 }lv_obj_t;
 
 

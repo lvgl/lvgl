@@ -30,6 +30,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*Original repository: https://github.com/mpaland/printf*/
+
 #include "lv_printf.h"
 
 #if LV_SPRINTF_CUSTOM == 0

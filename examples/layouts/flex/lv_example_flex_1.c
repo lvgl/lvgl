@@ -6,25 +6,17 @@
  */
 void lv_example_flex_1(void)
 {
-    static lv_flex_t flex_row;
-    lv_flex_init(&flex_row);
-    lv_flex_set_flow(&flex_row, LV_FLEX_FLOW_ROW);
-
-    static lv_flex_t flex_col;
-    lv_flex_init(&flex_col);
-    lv_flex_set_flow(&flex_col, LV_FLEX_FLOW_COLUMN);
-
     /*Create a container with ROW flex direction*/
     lv_obj_t * cont_row = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(cont_row, 300, 75);
     lv_obj_align(cont_row, NULL, LV_ALIGN_IN_TOP_MID, 0, 5);
-    lv_obj_set_layout(cont_row, &flex_row);
+    lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);
 
     /*Create a container with COLUMN flex direction*/
     lv_obj_t * cont_col = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(cont_col, 200, 150);
     lv_obj_align(cont_col, cont_row, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
-    lv_obj_set_layout(cont_col, &flex_col);
+    lv_obj_set_flex_flow(cont_col, LV_FLEX_FLOW_COLUMN);
 
     uint32_t i;
     for(i = 0; i < 10; i++) {

@@ -179,7 +179,7 @@ static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color
 static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t color, lv_opa_t opa)
 {
     LV_UNUSED(f);
-    return lv_color_mix(lv_color_white(), color, opa);
+    return lv_color_mix(lv_color_grey_lighten_2(), color, opa);
 }
 
 static void style_init(void)
@@ -230,8 +230,8 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, COLOR_SCR);
     lv_style_set_text_color(&styles->scr, COLOR_SCR_TEXT);
-    lv_style_set_pad_row(&styles->scr, PAD_SMALL * disp_size);
-    lv_style_set_pad_column(&styles->scr, PAD_SMALL * disp_size);
+    lv_style_set_pad_row(&styles->scr, PAD_SMALL);
+    lv_style_set_pad_column(&styles->scr, PAD_SMALL);
 
     style_init_reset(&styles->card);
     lv_style_set_radius(&styles->card, RADIUS_DEFAULT);
@@ -269,6 +269,13 @@ static void style_init(void)
     lv_style_set_pad_ver(&styles->btn, PAD_SMALL);
     lv_style_set_pad_column(&styles->btn, LV_DPX(5));
     lv_style_set_pad_row(&styles->btn, LV_DPX(5));
+#if LV_USE_FLEX
+    lv_style_set_layout(&styles->btn, LV_LAYOUT_FLEX);
+    lv_style_set_flex_flow(&styles->btn, LV_FLEX_FLOW_ROW);
+    lv_style_set_flex_main_place(&styles->btn, LV_FLEX_PLACE_CENTER);
+    lv_style_set_flex_cross_place(&styles->btn, LV_FLEX_PLACE_CENTER);
+    lv_style_set_flex_track_place(&styles->btn, LV_FLEX_PLACE_CENTER);
+#endif
 
 
     static lv_color_filter_dsc_t dark_filter;
@@ -283,7 +290,7 @@ static void style_init(void)
 
     style_init_reset(&styles->disabled);
     lv_style_set_color_filter_dsc(&styles->disabled, &grey_filter);
-    lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_70);
+    lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_50);
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, true);
@@ -501,6 +508,8 @@ static void style_init(void)
     lv_style_set_border_side(&styles->list_btn, LV_BORDER_SIDE_BOTTOM);
     lv_style_set_pad_all(&styles->list_btn, PAD_SMALL);
     lv_style_set_pad_column(&styles->list_btn, PAD_SMALL);
+    lv_style_set_flex_flow(&styles->list_btn, LV_FLEX_FLOW_ROW);
+    lv_style_set_layout(&styles->list_btn, LV_LAYOUT_FLEX);
 
     style_init_reset(&styles->list_item_grow);
     lv_style_set_transform_width(&styles->list_item_grow, PAD_DEF);

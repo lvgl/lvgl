@@ -151,25 +151,23 @@ static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     tabview->tab_pos = tabpos_create;
-    lv_flex_init(&tabview->flex);
 
     switch(tabview->tab_pos) {
     case LV_DIR_TOP:
-        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
         break;
     case LV_DIR_BOTTOM:
-        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_COLUMN_REVERSE);
+        lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN_REVERSE);
         break;
     case LV_DIR_LEFT:
-        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_ROW);
+        lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
         break;
     case LV_DIR_RIGHT:
-        lv_flex_set_flow(&tabview->flex, LV_FLEX_FLOW_ROW_REVERSE);
+        lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW_REVERSE);
         break;
     }
 
     lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
-    lv_obj_set_layout(obj, &tabview->flex);
 
     lv_obj_t * btnm;
     lv_obj_t * cont;
@@ -202,7 +200,7 @@ static void lv_tabview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
          break;
      }
 
-    lv_obj_set_layout(cont, &lv_flex_row_nowrap);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
     lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER);
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);

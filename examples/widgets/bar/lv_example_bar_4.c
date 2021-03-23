@@ -19,7 +19,7 @@ void lv_example_bar_4(void)
 
     lv_obj_set_size(bar, 260, 20);
     lv_obj_align(bar, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_bar_set_type(bar, LV_BAR_TYPE_RANGE);
+    lv_bar_set_mode(bar, LV_BAR_MODE_RANGE);
     lv_bar_set_value(bar, 90, LV_ANIM_OFF);
     lv_bar_set_start_value(bar, 20, LV_ANIM_OFF);
 }

@@ -150,6 +150,48 @@ static inline void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, v);
 }
 
+static inline void lv_style_set_width(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_WIDTH, v);
+}
+
+static inline void lv_style_set_height(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_HEIGHT, v);
+}
+
+
+static inline void lv_style_set_x(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_X, v);
+}
+
+static inline void lv_style_set_y(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_Y, v);
+}
+
+
+static inline void lv_style_set_layout(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_LAYOUT, v);
+}
+
 static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value)
 {
     lv_style_value_t v = {

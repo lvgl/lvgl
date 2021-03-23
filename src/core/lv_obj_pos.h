@@ -23,17 +23,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 struct _lv_obj_t;
-
-typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t * cont);
-
-/**
- * The base of all layouts descriptor.
- * Every custom layout descriptor needs to extend this struct
- * by adding `lv_layout_dsc_t` as the first element.
- */
-typedef struct {
-    lv_layout_update_cb_t update_cb;
-}lv_layout_dsc_t;
+typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t *);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -73,6 +63,8 @@ void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
  *                                      x should be in [0..1000]% range
  */
 void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+
+void lv_obj_refr_size(struct _lv_obj_t * obj);
 
 /**
  * Set the width of an object
@@ -117,7 +109,7 @@ void lv_obj_set_content_height(struct _lv_obj_t * obj, lv_coord_t h);
  * @param obj       pointer to an object
  * @param layout    pointer to a layout descriptor to set
  */
-void lv_obj_set_layout(struct _lv_obj_t * obj, const void * layout);
+void lv_obj_set_layout(struct _lv_obj_t * obj, uint32_t layout);
 
 /**
  * Test whether the and object is positioned by a layout or not
@@ -138,6 +130,12 @@ void lv_obj_mark_layout_as_dirty(struct _lv_obj_t * obj);
  */
 void lv_obj_update_layout(struct _lv_obj_t * obj);
 
+/**
+ * Regsiter a new layout
+ * @param cb        the layout update callback
+ * @return          the ID of the new layout
+ */
+uint32_t lv_layout_register(lv_layout_update_cb_t cb);
 
 /**
  * Align an object to an other object.
@@ -179,6 +177,16 @@ void lv_obj_get_coords(const struct _lv_obj_t * obj, lv_area_t * coords);
 lv_coord_t lv_obj_get_x(const struct _lv_obj_t * obj);
 
 /**
+ * Get the x2 coordinate of object.
+ * @param obj       pointer to an object
+ * @return          distance of `obj` from the right side of its parent plus the parent's right padding
+ * @note            Zero return value means the object is on the right padding of the parent, and not on the right edge.
+ * @note            Scrolling of the parent doesn't change the returned value.
+ * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
+ */
+lv_coord_t lv_obj_get_x2(const struct _lv_obj_t * obj);
+
+/**
  * Get the y coordinate of object.
  * @param obj       pointer to an object
  * @return          distance of `obj` from the top side of its parent plus the parent's top padding
@@ -187,6 +195,16 @@ lv_coord_t lv_obj_get_x(const struct _lv_obj_t * obj);
  * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
 lv_coord_t lv_obj_get_y(const struct _lv_obj_t * obj);
+
+/**
+ * Get the y2 coordinate of object.
+ * @param obj       pointer to an object
+ * @return          distance of `obj` from the bottom side of its parent plus the parent's bottom padding
+ * @note            Zero return value means the object is on the bottom padding of the parent, and not on the bottom edge.
+ * @note            Scrolling of the parent doesn't change the returned value.
+ * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
+ */
+lv_coord_t lv_obj_get_y2(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of an object
@@ -266,6 +284,9 @@ lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj);
  */
 bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj);
 
+void lv_obj_refr_pos(struct _lv_obj_t * obj);
+
+void lv_obj_move_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 
 void lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff, bool ignore_floating);

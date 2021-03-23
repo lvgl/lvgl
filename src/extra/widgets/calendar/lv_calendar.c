@@ -221,7 +221,7 @@ static void my_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     calendar->highlighted_dates      = NULL;
     calendar->highlighted_dates_num  = 0;
 
-    lv_obj_set_size(obj, LV_DPX(240), LV_DPX(240));
+    lv_obj_set_size(obj, LV_DPX(180), LV_DPX(180));
 
     lv_memset_00(calendar->nums, sizeof(calendar->nums));
     uint8_t i;

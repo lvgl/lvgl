@@ -31,11 +31,11 @@ extern "C" {
  **********************/
 
 enum {
-    LV_BAR_TYPE_NORMAL,
-    LV_BAR_TYPE_SYMMETRICAL,
-    LV_BAR_TYPE_RANGE
+    LV_BAR_MODE_NORMAL,
+    LV_BAR_MODE_SYMMETRICAL,
+    LV_BAR_MODE_RANGE
 };
-typedef uint8_t lv_bar_type_t;
+typedef uint8_t lv_bar_mode_t;
 
 typedef struct {
     lv_obj_t * bar;
@@ -53,7 +53,7 @@ typedef struct {
     lv_area_t indic_area;       /**< Save the indicator area. Might be used by derived types*/
     lv_bar_anim_t cur_value_anim;
     lv_bar_anim_t start_value_anim;
-    lv_bar_type_t type : 2;     /**< Type of bar*/
+    lv_bar_mode_t mode : 2;     /**< Type of bar*/
 }lv_bar_t;
 
 extern const lv_obj_class_t lv_bar_class;
@@ -102,9 +102,9 @@ void lv_bar_set_range(lv_obj_t * obj, int16_t min, int16_t max);
 /**
  * Set the type of bar.
  * @param obj       pointer to bar object
- * @param type      bar type from ::lv_bar_type_t
+ * @param mode      bar type from ::lv_bar_mode_t
  */
-void lv_bar_set_type(lv_obj_t * obj, lv_bar_type_t type);
+void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode);
 
 /*=====================
  * Getter functions
@@ -141,9 +141,9 @@ int16_t lv_bar_get_max_value(const lv_obj_t * obj);
 /**
  * Get the type of bar.
  * @param obj       pointer to bar object
- * @return          bar type from ::lv_bar_type_t
+ * @return          bar type from ::lv_bar_mode_t
  */
-lv_bar_type_t lv_bar_get_type(lv_obj_t * obj);
+lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj);
 
 /**********************
  *      MACROS

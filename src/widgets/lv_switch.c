@@ -105,8 +105,6 @@ static void lv_switch_event(lv_obj_t * obj, lv_event_t e)
         knob_size += 2;         /*For rounding error*/
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
-//        knob_size = (knob_size - lv_obj_get_height(obj)) / 2;
-
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_size);
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));

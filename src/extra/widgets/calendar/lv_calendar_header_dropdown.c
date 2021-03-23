@@ -65,21 +65,20 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
 
     lv_coord_t w = lv_obj_get_width(calendar);
     lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
-    lv_obj_set_layout(header, &lv_flex_row_center);
+    lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_place(header, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_START);
 
     lv_obj_t * year_dd = lv_dropdown_create(header, NULL);
     lv_dropdown_set_options(year_dd, year_list);
     lv_dropdown_set_selected(year_dd, 2023 - cur_date->year);
     lv_obj_add_event_cb(year_dd, year_event_cb, calendar);
     lv_obj_set_flex_grow(year_dd, 1);
-    lv_obj_clear_flag(year_dd, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_t * month_dd = lv_dropdown_create(header, NULL);
     lv_dropdown_set_options(month_dd, month_list);
     lv_dropdown_set_selected(month_dd, cur_date->month - 1);
     lv_obj_add_event_cb(month_dd, month_event_cb, calendar);
     lv_obj_set_flex_grow(month_dd, 1);
-    lv_obj_clear_flag(month_dd, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_align(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
 

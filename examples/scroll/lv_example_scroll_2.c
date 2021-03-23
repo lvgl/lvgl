@@ -1,5 +1,5 @@
 #include "../../lvgl.h"
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES && LV_USE_FLEX
 
 static void sw_event_cb(lv_obj_t * sw, lv_event_t e)
 {
@@ -19,7 +19,7 @@ void lv_example_scroll_2(void)
     lv_obj_t * panel = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(panel, 280, 150);
     lv_obj_set_scroll_snap_x(panel, LV_SCROLL_SNAP_CENTER);
-    lv_obj_set_layout(panel, &lv_flex_row_nowrap);
+    lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_ROW);
     lv_obj_center(panel);
 
     uint32_t i;

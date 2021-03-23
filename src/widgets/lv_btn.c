@@ -60,10 +60,6 @@ static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
         lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-
-#if LV_USE_FLEX
-        lv_obj_set_layout(obj, &lv_flex_row_center);
-#endif
     }
 
     LV_TRACE_OBJ_CREATE("finished");

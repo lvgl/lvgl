@@ -334,13 +334,8 @@ static void lv_roller_event(lv_obj_t * obj, lv_event_t e)
         lv_obj_handle_self_size_chg(obj);
         refr_position(obj, false);
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
-        void * param = lv_event_get_param();
-        if(lv_obj_get_width(obj) != lv_area_get_width(param) ||
-           lv_obj_get_height(obj) != lv_area_get_height(param))
-        {
-            refr_position(obj, false);
-        }
+    else if(e == LV_EVENT_SIZE_CHANGED) {
+        refr_position(obj, false);
     }
     else if(e == LV_EVENT_PRESSED) {
         roller->moved = 0;

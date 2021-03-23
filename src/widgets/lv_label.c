@@ -750,13 +750,9 @@ static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
-        void * param = lv_event_get_param();
-        if(lv_area_get_width(&obj->coords) != lv_area_get_width(param) ||
-           lv_area_get_height(&obj->coords) != lv_area_get_height(param)) {
-            lv_label_revert_dots(obj);
-            lv_label_refr_text(obj);
-        }
+    else if(e == LV_EVENT_SIZE_CHANGED) {
+        lv_label_revert_dots(obj);
+        lv_label_refr_text(obj);
     }
     else if(e == LV_EVENT_BASE_DIR_CHANGED) {
 #if LV_USE_BIDI

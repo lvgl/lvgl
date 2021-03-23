@@ -85,11 +85,11 @@ static void lv_win_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     LV_UNUSED(copy);
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, lv_obj_get_width(parent), lv_obj_get_height(parent));
-    lv_obj_set_layout(obj, &lv_flex_column_nowrap);
+    lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
     lv_obj_t * header = lv_obj_create(obj, NULL);
     lv_obj_set_size(header, LV_SIZE_PCT(100), create_header_height);
-    lv_obj_set_layout(header, &lv_flex_row_wrap);
+    lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
 
     lv_obj_t * cont = lv_obj_create(obj, NULL);
     lv_obj_set_flex_grow(cont, 1);

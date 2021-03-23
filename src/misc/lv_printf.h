@@ -29,6 +29,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*Original repository: https://github.com/mpaland/printf*/
+
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 

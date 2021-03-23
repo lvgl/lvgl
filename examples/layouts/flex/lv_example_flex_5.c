@@ -19,7 +19,7 @@ void lv_example_flex_5(void)
     lv_obj_t * cont = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_layout(cont, &lv_flex_row_wrap);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW_WRAP);
 
     uint32_t i;
     for(i = 0; i < 9; i++) {

@@ -223,6 +223,22 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, 
     lv_obj_refresh_style(obj, part, prop);
 }
 
+
+lv_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop, lv_style_value_t * value)
+{
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt; i++) {
+        if(obj->styles[i].is_local &&
+           obj->styles[i].part == part &&
+           obj->styles[i].state == state)
+        {
+            return lv_style_get_prop(obj->styles[i].style, prop, value);
+        }
+    }
+
+    return LV_RES_INV;
+}
+
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -416,6 +432,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj, uint32_t part, uint32_t stat
 
     obj->style_cnt++;
     obj->styles = lv_mem_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    LV_ASSERT_MALLOC(obj->styles);
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
         /*Copy only normal styles (not local and transition).

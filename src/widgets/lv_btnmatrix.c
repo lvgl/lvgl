@@ -84,7 +84,7 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent, const lv_obj_t * copy)
 void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(map);
+    if(map == NULL) return;
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
 
@@ -403,13 +403,8 @@ static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)
     if(e == LV_EVENT_STYLE_CHANGED) {
         lv_btnmatrix_set_map(obj, btnm->map_p);
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
-        void * param = lv_event_get_param();
-        if(param &&
-           (lv_obj_get_width(obj) != lv_area_get_width(param) || lv_obj_get_height(obj) != lv_area_get_height(param)))
-        {
-            lv_btnmatrix_set_map(obj, btnm->map_p);
-        }
+    else if(e == LV_EVENT_SIZE_CHANGED) {
+        lv_btnmatrix_set_map(obj, btnm->map_p);
     }
     else if(e == LV_EVENT_PRESSED) {
         void * param = lv_event_get_param();

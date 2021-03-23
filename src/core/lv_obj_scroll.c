@@ -333,7 +333,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     /*Be sure the screens layout is correct*/
-    lv_obj_update_layout(lv_obj_get_screen(obj));
+    lv_obj_update_layout(obj);
 
     lv_point_t p = {0, 0};
     scroll_area_into_view(&obj->coords, obj, &p, anim_en);
@@ -342,7 +342,7 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     /*Be sure the screens layout is correct*/
-    lv_obj_update_layout(lv_obj_get_screen(obj));
+    lv_obj_update_layout(obj);
 
     lv_point_t p = {0, 0};
     lv_obj_t * child = obj;

@@ -97,6 +97,9 @@ static void style_init(void)
     lv_style_set_line_color(&styles->light, COLOR_MID);
     lv_style_set_arc_width(&styles->light, LV_DPX(2));
     lv_style_set_arc_color(&styles->light, COLOR_MID);
+    lv_style_set_width(&styles->light, 100);
+    lv_style_set_height(&styles->light, 60);
+
 
     style_init_reset(&styles->dark);
     lv_style_set_bg_opa(&styles->dark, LV_OPA_COVER);
@@ -109,6 +112,8 @@ static void style_init(void)
     lv_style_set_line_color(&styles->dark, COLOR_DIM);
     lv_style_set_arc_width(&styles->dark, LV_DPX(2));
     lv_style_set_arc_color(&styles->dark, COLOR_DIM);
+    lv_style_set_width(&styles->dark, 100);
+    lv_style_set_height(&styles->dark, 60);
 
     static lv_color_filter_dsc_t dark_filter;
     lv_color_filter_dsc_init(&dark_filter, dark_color_filter_cb);

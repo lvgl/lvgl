@@ -355,7 +355,7 @@ static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e)
         lv_coord_t * s = lv_event_get_param();
         *s = LV_MAX(*s, knob_pad);
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
+    else if(e == LV_EVENT_SIZE_CHANGED) {
         void * param = lv_event_get_param();
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(obj) != lv_area_get_width(param) ||

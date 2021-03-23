@@ -14,7 +14,7 @@ void lv_example_slider_3(void)
     slider = lv_slider_create(lv_scr_act(), NULL);
     lv_obj_align(slider, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(slider, slider_event_cb, NULL);
-    lv_slider_set_type(slider, LV_SLIDER_TYPE_RANGE);
+    lv_slider_set_mode(slider, LV_SLIDER_MODE_RANGE);
 
     lv_slider_set_value(slider, 70, LV_ANIM_OFF);
     lv_slider_set_left_value(slider, 20, LV_ANIM_OFF);

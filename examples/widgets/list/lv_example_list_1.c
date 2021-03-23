@@ -12,8 +12,20 @@ void lv_example_list_1(void)
 {
     /*Create a list*/
     list1 = lv_list_create(lv_scr_act());
+    lv_obj_set_size(list1, 180, 220);
     lv_obj_align(list1, NULL, LV_ALIGN_CENTER, 0, 0);
 
+
+    uint32_t t = lv_tick_get();
+    int i;
+    for(i = 0; i < 3; i++) {
+//        lv_btn_create(lv_scr_act(), NULL);
+        lv_list_add_btn(list1, LV_SYMBOL_FILE, "New", event_handler);
+    }
+
+    printf("%d\n", t);
+
+    return;
     /*Add buttons to the list*/
     lv_list_add_text(list1, "File");
     lv_list_add_btn(list1, LV_SYMBOL_FILE, "New", event_handler);

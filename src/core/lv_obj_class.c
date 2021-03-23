@@ -49,20 +49,18 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     obj->class_p = class_p;
     obj->parent = parent;
 
+    lv_theme_apply(obj);
     lv_obj_construct(obj, copy);
 
-   if(parent) {
-       /*Send a Call the ancestor's event handler to the parent to notify it about the new child.
-        *Also triggers layout update*/
-       lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
+    if(parent) {
+        /*Call the ancestor's event handler to the parent to notify it about the new child.
+         *Also triggers layout update*/
+        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
 
-       /*Invalidate the area if not screen created*/
-       lv_obj_invalidate(obj);
-   }
+        /*Invalidate the area if not screen created*/
+        lv_obj_invalidate(obj);
+    }
 
-    if(!copy) lv_theme_apply(obj);
-
-    LV_TRACE_OBJ_CREATE("Object created at %p address with %p class on %p parent", obj, class_p, parent);
     return obj;
 }
 

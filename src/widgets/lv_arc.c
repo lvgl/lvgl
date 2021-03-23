@@ -502,8 +502,6 @@ static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
    arc->last_tick = lv_tick_get();
    arc->last_angle =arc->indic_angle_end;
 
-   lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF);
-
     /*Init the new arc arc*/
     if(copy == NULL) {
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);

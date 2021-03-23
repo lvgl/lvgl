@@ -1055,17 +1055,14 @@ static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
     else if(e == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);
     }
-    else if(e == LV_EVENT_COORD_CHANGED) {
+    else if(e == LV_EVENT_SIZE_CHANGED) {
         /*Set the label width according to the text area width*/
         if(ta->label) {
-            void * param = lv_event_get_param();
-            if(lv_obj_get_width(obj) != lv_area_get_width(param) || lv_obj_get_height(obj) != lv_area_get_height(param)) {
-                lv_obj_set_width(ta->label, lv_obj_get_width_fit(obj));
-                lv_obj_set_pos(ta->label, 0, 0);
-                lv_label_set_text(ta->label, NULL); /*Refresh the label*/
+            lv_obj_set_width(ta->label, lv_obj_get_width_fit(obj));
+            lv_obj_set_pos(ta->label, 0, 0);
+            lv_label_set_text(ta->label, NULL); /*Refresh the label*/
 
-                refr_cursor_area(obj);
-            }
+            refr_cursor_area(obj);
         }
     }
     else if(e == LV_EVENT_KEY) {
