@@ -236,7 +236,7 @@ typedef struct {
     uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array*/
 }lv_obj_spec_attr_t;
 
-typedef struct _lv_obj_t{
+typedef struct _lv_obj_t {
     const lv_obj_class_t * class_p;
     struct _lv_obj_t * parent;
     lv_obj_spec_attr_t * spec_attr;

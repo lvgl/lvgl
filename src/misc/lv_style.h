@@ -226,7 +226,7 @@ typedef enum {
 /**
  * Descriptor for style transitions
  */
-typedef struct _lv_style_transiton_t{
+typedef struct _lv_style_transiton_t {
     const lv_style_prop_t * props; /**< An array with the properties to animate.*/
     const lv_anim_path_t * path;   /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
