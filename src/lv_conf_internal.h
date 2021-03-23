@@ -11,10 +11,11 @@
 #include <stdint.h>
 
 /* Handle special Kconfig options */
-#include "lv_conf_kconfig.h"
-
-#ifdef CONFIG_LV_CONF_SKIP
-#define LV_CONF_SKIP
+#ifndef LV_KCONFIG_IGNORE
+#   include "lv_conf_kconfig.h"
+#   ifdef CONFIG_LV_CONF_SKIP
+#       define LV_CONF_SKIP
+#   endif
 #endif
 
 /* If "lv_conf.h" is available from here try to use it later.*/
