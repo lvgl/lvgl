@@ -108,7 +108,7 @@ void lv_init(void)
 
     LV_LOG_INFO("begin");
 
-    /*Initialize the lv_misc modules*/
+    /*Initialize the misc modules*/
     lv_mem_init();
 
     _lv_timer_core_init();

@@ -66,7 +66,7 @@ menu "LVGL configuration"
         range 0x000000 0xFFFFFF
         default 0x00FF00
         help
-            See lv_misc/lv_color.h for some color values examples.
+            See misc/lv_color.h for some color values examples.
 
     config LV_ANTIALIAS
         bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
@@ -844,7 +844,7 @@ menu "LVGL configuration"
             default 0xFF0000 if !LV_THEME_DEFAULT_INIT_MONO
             default 0x000000 if LV_THEME_DEFAULT_INIT_MONO
             help
-                See lv_misc/lv_color.h for some color values examples.
+                See misc/lv_color.h for some color values examples.
                 When using LV_THEME_MONO the suggested values to use are
                 0x000000 (LV_COLOR_BLACK) or 0xFFFFFF (LV_COLOR_WHITE).
                 If LV_THEME_DEFAULT_COLOR_PRIMARY is 0x000000 (LV_COLOR_BLACK)
@@ -857,7 +857,7 @@ menu "LVGL configuration"
             default 0x0000FF if !LV_THEME_DEFAULT_INIT_MONO
             default 0xFFFFFF if LV_THEME_DEFAULT_INIT_MONO
             help
-                See lv_misc/lv_color.h for some color values examples.
+                See misc/lv_color.h for some color values examples.
                 When using LV_THEME_MONO the suggested values to use are
                 0x000000 (LV_COLOR_BLACK) or 0xFFFFFF (LV_COLOR_WHITE).
                 If LV_THEME_DEFAULT_COLOR_PRIMARY is 0x000000 (LV_COLOR_BLACK)
