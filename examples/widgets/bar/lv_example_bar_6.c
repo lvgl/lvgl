@@ -1,11 +1,11 @@
-//#include "../../../lvgl.h"
-//#if LV_USE_BAR && LV_BUILD_EXAMPLES
-//
+#include "../../../lvgl.h"
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
+
 //static void set_value(void *bar, int32_t v)
 //{
 //    lv_bar_set_value(bar, v, LV_ANIM_OFF);
 //}
-//
+
 //static void event_cb(lv_obj_t * obj, lv_event_t e)
 //{
 //    if(e == LV_EVENT_DRAW_POST_END) {
@@ -42,12 +42,12 @@
 //        lv_draw_label(&txt_area, clip_area, &dsc, buf, NULL);
 //    }
 //}
-//
-///**
-// * Custom drawer on bar to display the current value
-// */
-//void lv_example_bar_6(void)
-//{
+
+/**
+ * Custom drawer on bar to display the current value
+ */
+void lv_example_bar_6(void)
+{
 //    static lv_style_t style_bg;
 //    lv_style_init(&style_bg);
 //    lv_style_set_content_ofs_y(&style_bg, -3);
@@ -67,7 +67,7 @@
 //    lv_anim_set_playback_time(&a, 2000);
 //    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 //    lv_anim_start(&a);
-//
-//}
-//
-//#endif
+
+}
+
+#endif

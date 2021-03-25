@@ -1,4 +1,4 @@
-//#include "../../../lvgl.h"
+#include "../../../lvgl.h"
 //#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
@@ -9,8 +9,8 @@
 ///**
 // * Show the current value when the slider if pressed using a fancy style transition.
 // */
-//void lv_example_slider_2(void)
-//{
+void lv_example_slider_2(void)
+{
 //    lv_style_init(&style_def);
 //    lv_style_set_content_opa(&style_def, LV_OPA_TRANSP);
 //    lv_style_set_content_align(&style_def, LV_ALIGN_OUT_TOP_MID);
@@ -27,7 +27,7 @@
 //
 //    lv_obj_add_style(slider, LV_PART_KNOB, LV_STATE_DEFAULT, &style_def);
 //    lv_obj_add_style(slider, LV_PART_KNOB, LV_STATE_PRESSED, &style_pr);
-//}
+}
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 //{

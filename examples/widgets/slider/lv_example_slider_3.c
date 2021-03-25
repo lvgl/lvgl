@@ -1,4 +1,4 @@
-//#include "../../../lvgl.h"
+#include "../../../lvgl.h"
 //#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
@@ -7,8 +7,8 @@
 // * Show the current value when the slider if pressed (using only styles).
 // *
 // */
-//void lv_example_slider_3(void)
-//{
+void lv_example_slider_3(void)
+{
 //    /*Create a slider in the center of the display*/
 //    lv_obj_t * slider;
 //    slider = lv_slider_create(lv_scr_act());
@@ -25,7 +25,7 @@
 //
 //    /*To update the value text*/
 //    lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
-//}
+}
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 //{

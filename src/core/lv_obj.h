@@ -483,12 +483,20 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 
 /**
- * Check if any object has a given type
+ * Check if any object has a given class (type).
+ * It checks the ancestor classes too.
  * @param obj       pointer to an object
- * @param obj_type  type of the object. (e.g. "lv_btn")
- * @return          true: valid
+ * @param class_p   a class to check (e.g. `lv_slider_class`)
+ * @return          true: `obj` has the given class
  */
 bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p);
+
+/**
+ * Get the class (type) of the object
+ * @param obj       pointer to an object
+ * @return the class (type) of the object
+ */
+const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 
 /**
  * Check if any object is still "alive", and part of the hierarchy

@@ -65,6 +65,8 @@ extern lv_style_prop_t LV_STYLE_GRID_CELL_ROW_PLACE;
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_grid_init(void);
+
 void lv_obj_set_grid_template(lv_obj_t * obj, const lv_coord_t * col_templ, const lv_coord_t * row_templ);
 
 void lv_obj_set_grid_place(lv_obj_t * obj, lv_grid_place_t hor_place, lv_grid_place_t ver_place);

@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/src/core/lv_obj.h>
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 

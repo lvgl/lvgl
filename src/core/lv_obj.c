@@ -22,6 +22,7 @@
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../hal/lv_hal.h"
+#include "../extra/layouts/lv_layouts.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -154,6 +155,9 @@ void lv_init(void)
 #if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
     LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
 #endif
+
+    lv_grid_init();
+    lv_flex_init();
 
     lv_initialized = true;
 
@@ -583,6 +587,11 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
     }
 
     return false;
+}
+
+const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
+{
+    return obj->class_p;
 }
 
 bool lv_obj_is_valid(const lv_obj_t * obj)
