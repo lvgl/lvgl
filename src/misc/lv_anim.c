@@ -115,7 +115,7 @@ void lv_anim_start(lv_anim_t * a)
     /*Set the start value*/
     if(new_anim->early_apply) {
         if(new_anim->get_value_cb) {
-            int32_t v_ofs  = new_anim->get_value_cb(a->var);
+            int32_t v_ofs  = new_anim->get_value_cb(a);
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
         }
@@ -468,7 +468,7 @@ static void anim_timer(lv_timer_t * param)
             int32_t new_act_time = a->act_time + elaps;
             if(a->act_time <= 0 && new_act_time >= 0) {
                 if(a->early_apply == 0 && a->get_value_cb) {
-                    int32_t v_ofs  = a->get_value_cb(a->var);
+                    int32_t v_ofs  = a->get_value_cb(a);
                     a->start_value += v_ofs;
                     a->end_value += v_ofs;
                 }

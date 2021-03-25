@@ -64,7 +64,7 @@ typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
 
 /** Callback used when the animation values are relative to get the current value*/
-typedef int32_t (*lv_anim_get_value_cb_t)(void *);
+typedef int32_t (*lv_anim_get_value_cb_t)(struct _lv_anim_t *);
 
 /** Describes an animation*/
 typedef struct _lv_anim_t {
