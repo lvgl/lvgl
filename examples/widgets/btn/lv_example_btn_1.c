@@ -26,7 +26,7 @@ void lv_example_btn_1(void)
 
     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
     lv_obj_add_event_cb(btn2, event_handler, NULL);
-    lv_obj_center(btn2);
+    lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 40);
     lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_set_height(btn2, LV_SIZE_CONTENT);
 
