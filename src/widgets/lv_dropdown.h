@@ -57,7 +57,7 @@ typedef struct {
 }lv_dropdown_list_t;
 
 extern const  lv_obj_class_t lv_dropdown_class;
-extern const  lv_obj_class_t lv_dropdown_list_class;
+extern const  lv_obj_class_t lv_dropdownlist_class;
 
 /**********************
  * GLOBAL PROTOTYPES

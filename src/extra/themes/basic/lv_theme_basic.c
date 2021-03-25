@@ -305,7 +305,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->light);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
     }
-    else if(lv_obj_check_type(obj, &lv_dropdown_list_class)) {
+    else if(lv_obj_check_type(obj, &lv_dropdownlist_class)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->light);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SELECTED, LV_STATE_DEFAULT, &styles->light);

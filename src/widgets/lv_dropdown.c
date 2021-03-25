@@ -25,7 +25,7 @@
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_dropdown_class
-#define MY_CLASS_LIST &lv_dropdown_list_class
+#define MY_CLASS_LIST &lv_dropdownlist_class
 
 #define LV_DROPDOWN_PR_NONE 0xFFFF
 
@@ -42,8 +42,8 @@ static void lv_dropdown_destructor(lv_obj_t * obj);
 static void lv_dropdown_event(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
 
-static void lv_dropdown_list_constructor(lv_obj_t * obj);
-static void lv_dropdown_list_destructor(lv_obj_t * list_obj);
+static void lv_dropdownlist_constructor(lv_obj_t * obj);
+static void lv_dropdownlist_destructor(lv_obj_t * list_obj);
 static void lv_dropdown_list_event(lv_obj_t * list, lv_event_t e);
 static void draw_list(lv_obj_t * obj);
 
@@ -67,9 +67,9 @@ const lv_obj_class_t lv_dropdown_class = {
     .base_class = &lv_obj_class
 };
 
-const lv_obj_class_t lv_dropdown_list_class = {
-    .constructor_cb = lv_dropdown_list_constructor,
-    .destructor_cb = lv_dropdown_list_destructor,
+const lv_obj_class_t lv_dropdownlist_class = {
+    .constructor_cb = lv_dropdownlist_constructor,
+    .destructor_cb = lv_dropdownlist_destructor,
     .event_cb = lv_dropdown_list_event,
     .instance_size = sizeof(lv_dropdown_list_t),
     .base_class = &lv_obj_class
@@ -532,7 +532,7 @@ void lv_dropdown_close(lv_obj_t * obj)
 
 static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent)
 {
-    return lv_obj_create_from_class(&lv_dropdown_list_class, parent);
+    return lv_obj_create_from_class(&lv_dropdownlist_class, parent);
 }
 
 static void lv_dropdown_constructor(lv_obj_t * obj)
@@ -577,7 +577,7 @@ static void lv_dropdown_destructor(lv_obj_t * obj)
     }
 }
 
-static void lv_dropdown_list_constructor(lv_obj_t * obj)
+static void lv_dropdownlist_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -587,7 +587,7 @@ static void lv_dropdown_list_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_dropdown_list_destructor(lv_obj_t * list_obj)
+static void lv_dropdownlist_destructor(lv_obj_t * list_obj)
 {
     lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
     lv_obj_t * dropdown_obj = list->dropdown;
