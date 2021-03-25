@@ -39,7 +39,7 @@ typedef enum {
  */
 typedef struct _lv_obj_class_t {
     const struct _lv_obj_class_t * base_class;
-    void (*constructor_cb)(struct _lv_obj_t * obj, const struct _lv_obj_t * copy);
+    void (*constructor_cb)(struct _lv_obj_t * obj);
     void (*destructor_cb)(struct _lv_obj_t * obj);
     lv_event_cb_t event_cb;         /**< Object type specific event function*/
     uint32_t editable : 2;          /**< Value from ::lv_obj_class_editable_t*/
@@ -54,10 +54,9 @@ typedef struct _lv_obj_class_t {
  * Create an object form a class descriptor
  * @param class_p pointer to a class
  * @param parent pointer to an object where the new object should be created
- * @param copy pointer to an other object with the same type to copy (DEPRECATED will be removed in v9)
  * @return pointer to the created object
  */
-struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent, const struct _lv_obj_t * copy);
+struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent);
 
 void _lv_obj_destruct(struct _lv_obj_t * obj);
 

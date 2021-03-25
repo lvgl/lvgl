@@ -53,7 +53,7 @@ const lv_obj_class_t lv_list_text_class = {
 
 lv_obj_t * lv_list_create(lv_obj_t * parent)
 {
-    lv_obj_t * list = lv_obj_create_from_class(&lv_list_class, parent, NULL);
+    lv_obj_t * list = lv_obj_create_from_class(&lv_list_class, parent);
     lv_obj_set_size(list, LV_DPX(200), LV_DPX(300));
     lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
 
@@ -62,7 +62,7 @@ lv_obj_t * lv_list_create(lv_obj_t * parent)
 
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
-    lv_obj_t * label = lv_obj_create_from_class(&lv_list_text_class, list, NULL);
+    lv_obj_t * label = lv_obj_create_from_class(&lv_list_text_class, list);
     lv_label_set_text(label, txt);
     lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_width(label, LV_SIZE_PCT(100));
@@ -71,17 +71,17 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 
 lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt, lv_event_cb_t event_cb)
 {
-    lv_obj_t * btn = lv_obj_create_from_class(&lv_list_btn_class, list, NULL);
+    lv_obj_t * btn = lv_obj_create_from_class(&lv_list_btn_class, list);
     lv_obj_set_size(btn, LV_SIZE_PCT(100), LV_SIZE_CONTENT);
     lv_obj_add_event_cb(btn, event_cb, NULL);
 
     if(icon) {
-        lv_obj_t * img = lv_img_create(btn, NULL);
+        lv_obj_t * img = lv_img_create(btn);
         lv_img_set_src(img, icon);
     }
 
     if(txt) {
-        lv_obj_t * label = lv_label_create(btn, NULL);
+        lv_obj_t * label = lv_label_create(btn);
         lv_label_set_text(label, txt);
         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
         lv_obj_set_flex_grow(label, 1);

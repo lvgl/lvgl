@@ -67,10 +67,9 @@ extern const lv_obj_class_t lv_table_class;
 /**
  * Create a table object
  * @param parent        pointer to an object, it will be the parent of the new table
- * @param copy          pointer to a table object, if not NULL then the new object will be copied from it
  * @return              pointer to the created table
  */
-lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_table_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

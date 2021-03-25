@@ -57,7 +57,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
  */
 void lv_example_chart_6(void)
 {
-    chart = lv_chart_create(lv_scr_act(), NULL);
+    chart = lv_chart_create(lv_scr_act());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, NULL, LV_ALIGN_CENTER, 0, -10);
 
@@ -77,7 +77,7 @@ void lv_example_chart_6(void)
 
     lv_chart_set_zoom_x(chart, 500);
 
-    lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Click on a point");
     lv_obj_align(label, chart, LV_ALIGN_OUT_TOP_MID, 0, -5);
 

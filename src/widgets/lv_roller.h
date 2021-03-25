@@ -54,12 +54,10 @@ extern const lv_obj_class_t lv_roller_class;
 
 /**
  * Create a roller objects
- * @param parent    pointer to an object, it will be the parent of the new roller
- * @param copy      DEPRECATED, will be removed in v9.
- *                  Pointer to an other roller to copy.
+ * @param parent    pointer to an object, it will be the parent of the new roller.
  * @return          pointer to the created roller
  */
-lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_roller_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

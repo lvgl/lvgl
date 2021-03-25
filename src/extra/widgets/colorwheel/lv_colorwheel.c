@@ -32,7 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_colorwheel_constructor(lv_obj_t * obj);
 static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e);
 
 static void draw_disc_grad(lv_obj_t * obj);
@@ -68,13 +68,12 @@ static bool create_knob_recolor;
 /**
  * Create a color_picker object
  * @param par pointer to an object, it will be the parent of the new color_picker
- * @param copy pointer to a color_picker object, if not NULL then the new object will be copied from it
  * @return pointer to the created color_picker
  */
 lv_obj_t * lv_colorwheel_create(lv_obj_t * parent, bool knob_recolor)
 {
     create_knob_recolor = knob_recolor;
-    return lv_obj_create_from_class(&lv_colorwheel_class, parent, NULL);
+    return lv_obj_create_from_class(&lv_colorwheel_class, parent);
 }
 
 /*=====================
@@ -207,10 +206,8 @@ bool lv_colorwheel_get_color_mode_fixed(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_colorwheel_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_colorwheel_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
-
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     colorwheel->hsv.h = 0;
     colorwheel->hsv.s = 100;

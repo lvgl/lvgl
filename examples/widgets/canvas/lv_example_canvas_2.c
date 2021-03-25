@@ -10,13 +10,13 @@
 void lv_example_canvas_2(void)
 {
     /*Create a button to better see the transparency*/
-    lv_btn_create(lv_scr_act(), NULL);
+    lv_btn_create(lv_scr_act());
 
     /*Create a buffer for the canvas*/
     static lv_color_t cbuf[LV_CANVAS_BUF_SIZE_INDEXED_1BIT(CANVAS_WIDTH, CANVAS_HEIGHT)];
 
     /*Create a canvas and initialize its the palette*/
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act(), NULL);
+    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_IMG_CF_INDEXED_1BIT);
     lv_canvas_set_palette(canvas, 0, LV_COLOR_CHROMA_KEY);
     lv_canvas_set_palette(canvas, 1, lv_color_red());

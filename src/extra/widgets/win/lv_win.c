@@ -21,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_win_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_win_constructor(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -39,13 +39,13 @@ static lv_coord_t create_header_height;
 lv_obj_t * lv_win_create(lv_obj_t * parent, lv_coord_t header_height)
 {
     create_header_height = header_height;
-    return lv_obj_create_from_class(&lv_win_class, parent, NULL);
+    return lv_obj_create_from_class(&lv_win_class, parent);
 }
 
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
 {
     lv_obj_t * header = lv_win_get_header(win);
-    lv_obj_t * title = lv_label_create(header, NULL);
+    lv_obj_t * title = lv_label_create(header);
     lv_label_set_long_mode(title, LV_LABEL_LONG_DOT);
     lv_label_set_text(title, txt);
     lv_obj_set_flex_grow(title, 1);
@@ -55,11 +55,11 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
 lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * icon, lv_coord_t btn_w, lv_event_cb_t event_cb)
 {
     lv_obj_t * header = lv_win_get_header(win);
-    lv_obj_t * btn = lv_btn_create(header, NULL);
+    lv_obj_t * btn = lv_btn_create(header);
     lv_obj_set_size(btn, btn_w, LV_SIZE_PCT(100));
     lv_obj_add_event_cb(btn, event_cb, NULL);
 
-    lv_obj_t * img = lv_img_create(btn, NULL);
+    lv_obj_t * img = lv_img_create(btn);
     lv_img_set_src(img, icon);
     lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
 
@@ -80,18 +80,17 @@ lv_obj_t * lv_win_get_content(lv_obj_t * win)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_win_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_win_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, lv_obj_get_width(parent), lv_obj_get_height(parent));
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
-    lv_obj_t * header = lv_obj_create(obj, NULL);
+    lv_obj_t * header = lv_obj_create(obj);
     lv_obj_set_size(header, LV_SIZE_PCT(100), create_header_height);
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
 
-    lv_obj_t * cont = lv_obj_create(obj, NULL);
+    lv_obj_t * cont = lv_obj_create(obj);
     lv_obj_set_flex_grow(cont, 1);
     lv_obj_set_width(cont, LV_SIZE_PCT(100));
 }

@@ -8,7 +8,7 @@ static lv_obj_t * kb;
 void lv_example_textarea_2(void)
 {
     /*Create the password box*/
-    lv_obj_t * pwd_ta = lv_textarea_create(lv_scr_act(), NULL);
+    lv_obj_t * pwd_ta = lv_textarea_create(lv_scr_act());
     lv_textarea_set_text(pwd_ta, "");
     lv_textarea_set_password_mode(pwd_ta, true);
     lv_textarea_set_one_line(pwd_ta, true);
@@ -17,18 +17,18 @@ void lv_example_textarea_2(void)
     lv_obj_add_event_cb(pwd_ta, ta_event_cb, NULL);
 
     /*Create a label and position it above the text box*/
-    lv_obj_t * pwd_label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t * pwd_label = lv_label_create(lv_scr_act());
     lv_label_set_text(pwd_label, "Password:");
     lv_obj_align(pwd_label, pwd_ta, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
 
     /*Create the one-line mode text area*/
-    lv_obj_t * oneline_ta = lv_textarea_create(lv_scr_act(), pwd_ta);
+    lv_obj_t * oneline_ta = lv_textarea_create(lv_scr_act());
     lv_textarea_set_password_mode(oneline_ta, false);
     lv_obj_align(oneline_ta, NULL, LV_ALIGN_IN_TOP_RIGHT, -5, 20);
 
 
     /*Create a label and position it above the text box*/
-    lv_obj_t * oneline_label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t * oneline_label = lv_label_create(lv_scr_act());
     lv_label_set_text(oneline_label, "Text:");
     lv_obj_align(oneline_label, oneline_ta, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
 

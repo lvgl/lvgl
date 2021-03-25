@@ -42,7 +42,6 @@ extern const lv_obj_class_t lv_led_class;
 /**
  * Create a led objects
  * @param par pointer to an object, it will be the parent of the new led
- * @param copy pointer to a led object, if not NULL then the new object will be copied from it
  * @return pointer to the created led
  */
 lv_obj_t * lv_led_create(lv_obj_t * parent);

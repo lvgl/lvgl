@@ -41,11 +41,9 @@ extern const lv_obj_class_t lv_checkbox_class;
 /**
  * Create a check box object
  * @param parent    pointer to an object, it will be the parent of the new button
- * @param copy      DEPRECATED, will be removed in v9.
- *                  Pointer to an other check box to copy.
  * @return          pointer to the created check box
  */
-lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_checkbox_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

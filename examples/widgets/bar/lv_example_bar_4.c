@@ -14,7 +14,7 @@ void lv_example_bar_4(void)
     lv_style_set_bg_img_tiled(&style_indic, true);
     lv_style_set_bg_img_opa(&style_indic, LV_OPA_30);
 
-    lv_obj_t * bar = lv_bar_create(lv_scr_act(), NULL);
+    lv_obj_t * bar = lv_bar_create(lv_scr_act());
     lv_obj_add_style(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, &style_indic);
 
     lv_obj_set_size(bar, 260, 20);

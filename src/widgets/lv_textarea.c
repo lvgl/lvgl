@@ -45,7 +45,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_textarea_constructor(lv_obj_t * obj);
 static void lv_textarea_destructor(lv_obj_t * obj);
 static void lv_textarea_event(lv_obj_t * obj, lv_event_t e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
@@ -84,13 +84,12 @@ static const char * ta_insert_replace;
 /**
  * Create a text area objects
  * @param par pointer to an object, it will be the parent of the new text area
- * @param copy pointer to a text area object, if not NULL then the new object will be copied from it
  * @return pointer to the created text area
  */
-lv_obj_t * lv_textarea_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_textarea_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-  return lv_obj_create_from_class(&lv_textarea_class, parent, copy);
+  return lv_obj_create_from_class(&lv_textarea_class, parent);
 }
 
 /*======================
@@ -942,7 +941,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_textarea_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -964,42 +963,11 @@ static void lv_textarea_constructor(lv_obj_t * obj, const lv_obj_t * copy)
       ta->label       = NULL;
       ta->placeholder_txt = NULL;
 
-      /*Init the new text area object*/
-      if(copy == NULL) {
-          ta->label = lv_label_create(obj, NULL);
-          lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
-          lv_label_set_text(ta->label, "");
-          lv_obj_set_size(obj, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
-          lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-      }
-      /*Copy an existing object*/
-      else {
-
-          lv_textarea_t * copy_ta = (lv_textarea_t *)copy;
-          ta->label             = lv_label_create(obj, copy_ta->label);
-          ta->pwd_mode          = copy_ta->pwd_mode;
-          ta->accepted_chars    = copy_ta->accepted_chars;
-          ta->max_length        = copy_ta->max_length;
-          ta->cursor.pos        = copy_ta->cursor.pos;
-          ta->cursor.valid_x    = copy_ta->cursor.valid_x;
-
-          if(ta->pwd_mode != 0) pwd_char_hider(obj);
-
-          if(copy_ta->placeholder_txt) {
-              lv_textarea_set_placeholder_text(obj, copy_ta->placeholder_txt);
-          }
-
-          if(copy_ta->pwd_tmp) {
-              uint32_t len = strlen(copy_ta->pwd_tmp) + 1;
-              ta->pwd_tmp = lv_mem_alloc(len);
-              LV_ASSERT_MALLOC(ta->pwd_tmp);
-              if(ta->pwd_tmp == NULL) return;
-
-              lv_memcpy(ta->pwd_tmp, copy_ta->pwd_tmp, len);
-          }
-
-          if(copy_ta->one_line) lv_textarea_set_one_line(obj, true);
-      }
+      ta->label = lv_label_create(obj);
+      lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
+      lv_label_set_text(ta->label, "");
+      lv_obj_set_size(obj, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
+      lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
       start_cursor_blink(obj);
 

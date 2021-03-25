@@ -21,7 +21,7 @@ void lv_example_bar_2(void)
     lv_style_set_bg_color(&style_indic, lv_color_blue());
     lv_style_set_radius(&style_indic, 3);
 
-    lv_obj_t * bar = lv_bar_create(lv_scr_act(), NULL);
+    lv_obj_t * bar = lv_bar_create(lv_scr_act());
     lv_obj_remove_style(bar, LV_PART_ANY, LV_STATE_ANY, NULL);  /*To have a clean start*/
     lv_obj_add_style(bar, LV_PART_MAIN, LV_STATE_DEFAULT, &style_bg);
     lv_obj_add_style(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, &style_indic);

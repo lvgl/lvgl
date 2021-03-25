@@ -36,7 +36,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_chart_constructor(lv_obj_t * obj);
 static void lv_chart_destructor(lv_obj_t * obj);
 static void lv_chart_event(lv_obj_t * obj, lv_event_t e);
 
@@ -67,10 +67,10 @@ const lv_obj_class_t lv_chart_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_chart_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_chart_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_chart_class, parent, copy);
+    return lv_obj_create_from_class(&lv_chart_class, parent);
 }
 
 void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
@@ -562,7 +562,7 @@ uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_chart_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -585,20 +585,8 @@ static void lv_chart_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     chart->zoom_x      = LV_IMG_ZOOM_NONE;
     chart->zoom_y      = LV_IMG_ZOOM_NONE;
 
-    /*Init the new chart background object*/
-    if(copy == NULL) {
-        lv_obj_set_size(obj, LV_DPI_DEF * 3, LV_DPI_DEF * 2);
-    }
-    else {
-        lv_chart_t * chart_copy = (lv_chart_t*)copy;
+    lv_obj_set_size(obj, LV_DPI_DEF * 3, LV_DPI_DEF * 2);
 
-        chart->type       = chart_copy->type;
-        chart->hdiv_cnt   = chart_copy->hdiv_cnt;
-        chart->vdiv_cnt   = chart_copy->vdiv_cnt;
-        chart->point_cnt  = chart_copy->point_cnt;
-        lv_memcpy_small(chart->ymin, chart_copy->ymin, sizeof(chart->ymin));
-        lv_memcpy_small(chart->ymax, chart_copy->ymax, sizeof(chart->ymax));
-    }
     LV_TRACE_OBJ_CREATE("finished");
 }
 

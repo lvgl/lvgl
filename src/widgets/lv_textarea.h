@@ -77,11 +77,10 @@ enum {
 
 /**
  * Create a text area objects
- * @param par pointer to an object, it will be the parent of the new text area
- * @param copy pointer to a text area object, if not NULL then the new object will be copied from it
- * @return pointer to the created text area
+ * @param parent    pointer to an object, it will be the parent of the new text area
+ * @return          pointer to the created text area
  */
-lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_textarea_create(lv_obj_t * parent);
 
 /*======================
  * Add/remove functions

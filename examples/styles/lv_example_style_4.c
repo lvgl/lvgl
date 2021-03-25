@@ -21,7 +21,7 @@ void lv_example_style_4(void)
     lv_style_set_shadow_ofs_y(&style, 20);
 
     /*Create an object with the new style*/
-    lv_obj_t * obj = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
     lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
     lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
 }

@@ -7,7 +7,7 @@ static void set_temp(void * bar, int32_t temp)
 
     static char buf[10];    /*Only the pointer t saved so must be static*/
     lv_snprintf(buf, sizeof(buf), "%d°C", temp);
-    lv_obj_set_style_content_text(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, buf);
+//    lv_obj_set_style_content_text(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, buf);
 }
 
 /**
@@ -22,11 +22,11 @@ void lv_example_bar_3(void)
     lv_style_set_bg_color(&style_indic, lv_color_red());
     lv_style_set_bg_grad_color(&style_indic, lv_color_blue());
     lv_style_set_bg_grad_dir(&style_indic, LV_GRAD_DIR_VER);
-    lv_style_set_content_align(&style_indic, LV_ALIGN_OUT_LEFT_TOP);
-    lv_style_set_content_ofs_x(&style_indic, -3);
-    lv_style_set_content_color(&style_indic, lv_color_grey());
+//    lv_style_set_content_align(&style_indic, LV_ALIGN_OUT_LEFT_TOP);
+//    lv_style_set_content_ofs_x(&style_indic, -3);
+//    lv_style_set_content_color(&style_indic, lv_color_grey());
 
-    lv_obj_t * bar = lv_bar_create(lv_scr_act(), NULL);
+    lv_obj_t * bar = lv_bar_create(lv_scr_act());
     lv_obj_add_style(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, &style_indic);
     lv_obj_set_size(bar, 20, 200);
     lv_obj_align(bar, NULL, LV_ALIGN_CENTER, 0, 0);

@@ -16,7 +16,7 @@ void lv_example_dropdown_1(void)
 {
 
     /*Create a normal drop down list*/
-    lv_obj_t * dd = lv_dropdown_create(lv_scr_act(), NULL);
+    lv_obj_t * dd = lv_dropdown_create(lv_scr_act());
     lv_dropdown_set_options(dd, "Apple\n"
                                 "Banana\n"
                                 "Orange\n"

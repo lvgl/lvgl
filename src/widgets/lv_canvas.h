@@ -40,11 +40,10 @@ typedef struct {
 
 /**
  * Create a canvas object
- * @param par pointer to an object, it will be the parent of the new canvas
- * @param copy pointer to a canvas object, if not NULL then the new object will be copied from it
- * @return pointer to the created canvas
+ * @param parent     pointer to an object, it will be the parent of the new canvas
+ * @return           pointer to the created canvas
  */
-lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_canvas_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

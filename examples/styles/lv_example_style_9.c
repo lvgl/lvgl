@@ -23,7 +23,7 @@ void lv_example_style_9(void)
     lv_style_set_transform_angle(&style, 300);
 
     /*Create an object with the new style*/
-    lv_obj_t * obj = lv_img_create(lv_scr_act(), NULL);
+    lv_obj_t * obj = lv_img_create(lv_scr_act());
     lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
 
     LV_IMG_DECLARE(img_cogwheel_argb);

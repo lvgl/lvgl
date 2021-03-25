@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_keyboard_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_keyboard_constructor(lv_obj_t * obj);
 
 static void lv_keyboard_update_map(lv_obj_t * obj);
 
@@ -115,12 +115,11 @@ static const lv_btnmatrix_ctrl_t * kb_ctrl[5] = {
 /**
  * Create a keyboard objects
  * @param par pointer to an object, it will be the parent of the new keyboard
- * @param copy pointer to a keyboard object, if not NULL then the new object will be copied from it
  * @return pointer to the created keyboard
  */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
 {
-    return lv_obj_create_from_class(&lv_keyboard_class, parent, NULL);
+    return lv_obj_create_from_class(&lv_keyboard_class, parent);
 }
 
 /*=====================
@@ -319,10 +318,8 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_keyboard_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_keyboard_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
-
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;

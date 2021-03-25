@@ -41,6 +41,7 @@ typedef struct {
 
     /*Background img*/
     const void * bg_img_src;
+    const void * bg_img_symbol_font;
     lv_color_t bg_img_recolor;
     lv_opa_t bg_img_opa;
     lv_opa_t bg_img_recolor_opa;
@@ -66,18 +67,6 @@ typedef struct {
     lv_coord_t shadow_ofs_y;
     lv_coord_t shadow_spread;
     lv_opa_t shadow_opa;
-
-    /*Content*/
-    const void * content_text;
-    const lv_font_t * content_font;
-    lv_coord_t content_letter_space;
-    lv_coord_t content_line_space;
-    lv_coord_t content_ofs_x;
-    lv_coord_t content_ofs_y;
-    lv_color_t content_color;
-    lv_opa_t content_opa;
-    lv_align_t content_align : 5;
-
 } lv_draw_rect_dsc_t;
 
 /**********************

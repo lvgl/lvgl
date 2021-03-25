@@ -57,12 +57,10 @@ extern const lv_obj_class_t lv_slider_class;
 
 /**
  * Create a slider objects
- * @param parent    pointer to an object, it will be the parent of the new slider
- * @param copy      DEPRECATED, will be removed in v9.
- *                  Pointer to an other slider to copy.
+ * @param parent    pointer to an object, it will be the parent of the new slider.
  * @return          pointer to the created slider
  */
-lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_slider_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

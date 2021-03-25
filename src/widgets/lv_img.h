@@ -52,11 +52,9 @@ extern const lv_obj_class_t lv_img_class;
 /**
  * Create a image objects
  * @param parent pointer to an object, it will be the parent of the new image
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other bar to copy.
  * @return pointer to the created image
  */
-lv_obj_t * lv_img_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_img_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

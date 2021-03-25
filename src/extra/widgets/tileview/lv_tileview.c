@@ -20,8 +20,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_tileview_constructor(lv_obj_t * obj, const lv_obj_t * copy);
-static void lv_tileview_tile_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_tileview_constructor(lv_obj_t * obj);
+static void lv_tileview_tile_constructor(lv_obj_t * obj);
 static void tileview_event_cb(lv_obj_t * tv, lv_event_t e);
 
 /**********************
@@ -48,15 +48,9 @@ static uint32_t create_row_id;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a tileview object
- * @param par pointer to an object, it will be the parent of the new tileview
- * @param copy pointer to a tileview object, if not NULL then the new object will be copied from it
- * @return pointer to the created tileview
- */
 lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 {
-   return lv_obj_create_from_class(&lv_tileview_class, parent, NULL);
+   return lv_obj_create_from_class(&lv_tileview_class, parent);
 }
 
 /*======================
@@ -68,7 +62,7 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
     create_dir = dir;
     create_col_id = col_id;
     create_row_id = row_id;
-    return lv_obj_create_from_class(&lv_tileview_tile_class, tv, NULL);
+    return lv_obj_create_from_class(&lv_tileview_tile_class, tv);
 }
 
 void lv_obj_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)
@@ -107,9 +101,8 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_tileview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_tileview_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
     lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
     lv_obj_add_event_cb(obj, tileview_event_cb, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
@@ -118,9 +111,8 @@ static void lv_tileview_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
 }
 
-static void lv_tileview_tile_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_tileview_tile_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
     lv_obj_set_pos(obj, create_col_id * lv_obj_get_width_fit(parent),  create_row_id * lv_obj_get_height_fit(parent));

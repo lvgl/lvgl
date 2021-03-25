@@ -94,26 +94,14 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         if(draw_dsc->bg_img_src) {
             draw_dsc->bg_img_opa = lv_obj_get_style_bg_img_opa(obj, part);
             if(draw_dsc->bg_img_opa > LV_OPA_MIN) {
-                draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor(obj, part);
-                draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
-                draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
-            }
-        }
-    }
-
-    if(draw_dsc->content_opa != LV_OPA_TRANSP) {
-        draw_dsc->content_text = lv_obj_get_style_content_text(obj, part);
-        if(draw_dsc->content_text) {
-
-            draw_dsc->content_opa = lv_obj_get_style_content_opa(obj, part);
-            if(draw_dsc->content_opa > LV_OPA_MIN) {
-                draw_dsc->content_ofs_y = lv_obj_get_style_content_ofs_y(obj, part);
-                draw_dsc->content_ofs_x = lv_obj_get_style_content_ofs_x(obj, part);
-                draw_dsc->content_align = lv_obj_get_style_content_align(obj, part);
-                draw_dsc->content_font = lv_obj_get_style_content_font(obj, part);
-                draw_dsc->content_color = lv_obj_get_style_content_color_filtered(obj, part);
-                draw_dsc->content_letter_space = lv_obj_get_style_content_letter_space(obj, part);
-                draw_dsc->content_line_space = lv_obj_get_style_content_line_space(obj, part);
+                if(lv_img_src_get_type(draw_dsc->bg_img_src) == LV_IMG_SRC_SYMBOL) {
+                    draw_dsc->bg_img_symbol_font= lv_obj_get_style_text_font(obj, part);
+                    draw_dsc->bg_img_recolor = lv_obj_get_style_text_color(obj, part);
+                } else {
+                    draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor(obj, part);
+                    draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
+                    draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
+                }
             }
         }
     }
@@ -141,7 +129,6 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa) >> 8;
         draw_dsc->border_opa = (uint16_t)((uint16_t)draw_dsc->border_opa * opa) >> 8;
         draw_dsc->shadow_opa = (uint16_t)((uint16_t)draw_dsc->shadow_opa * opa) >> 8;
-        draw_dsc->content_opa = (uint16_t)((uint16_t)draw_dsc->content_opa * opa) >> 8;
         draw_dsc->outline_opa = (uint16_t)((uint16_t)draw_dsc->outline_opa * opa) >> 8;
     }
 #else /*LV_DRAW_COMPLEX*/
@@ -329,41 +316,6 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint8_t part)
         if(outline_opa > LV_OPA_MIN) {
             lv_coord_t outline_pad = lv_obj_get_style_outline_pad(obj, part);
             s = LV_MAX(s, outline_pad + outline_width);
-        }
-    }
-
-    const void * content_text = lv_obj_get_style_content_text(obj, part);
-    if(content_text) {
-        lv_opa_t content_opa;
-        lv_point_t content_size;
-        content_opa = lv_obj_get_style_text_opa(obj, part);
-        if(content_opa > 0) {
-            lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, part);
-            lv_coord_t line_space = lv_obj_get_style_text_letter_space(obj, part);
-            const lv_font_t * font = lv_obj_get_style_text_font(obj, part);
-            lv_txt_get_size(&content_size, content_text, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-            lv_area_t content_area;
-            content_area.x1 = 0;
-            content_area.y1 = 0;
-            content_area.x2 = content_size.x - 1;
-            content_area.y2 = content_size.y - 1;
-
-            lv_align_t align = lv_obj_get_style_content_align(obj, part);
-            lv_coord_t xofs = lv_obj_get_style_content_ofs_x(obj, part);
-            lv_coord_t yofs = lv_obj_get_style_content_ofs_y(obj, part);
-            lv_point_t p_align;
-            _lv_area_align(&obj->coords, &content_area, align, &p_align);
-
-            content_area.x1 += p_align.x + xofs;
-            content_area.y1 += p_align.y + yofs;
-            content_area.x2 += p_align.x + xofs;
-            content_area.y2 += p_align.y + yofs;
-
-            s = LV_MAX(s, obj->coords.x1 - content_area.x1);
-            s = LV_MAX(s, obj->coords.y1 - content_area.y1);
-            s = LV_MAX(s, content_area.x2 - obj->coords.x2);
-            s = LV_MAX(s, content_area.y2 - obj->coords.y2);
         }
     }
 

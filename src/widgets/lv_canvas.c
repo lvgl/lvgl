@@ -27,7 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_canvas_constructor(lv_obj_t * obj);
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
 static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
@@ -65,10 +65,10 @@ const lv_obj_class_t lv_canvas_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_canvas_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_canvas_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_canvas_class, parent, copy);
+    return lv_obj_create_from_class(&lv_canvas_class, parent);
 }
 
 /*=====================
@@ -892,14 +892,12 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_canvas_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_canvas_constructor(lv_obj_t * obj)
 {
-   LV_UNUSED(copy);
    LV_TRACE_OBJ_CREATE("begin");
 
    lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-   /*Initialize the allocated 'ext'*/
    canvas->dsc.header.always_zero = 0;
    canvas->dsc.header.cf          = LV_IMG_CF_TRUE_COLOR;
    canvas->dsc.header.h           = 0;

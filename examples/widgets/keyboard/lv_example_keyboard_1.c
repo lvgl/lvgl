@@ -22,12 +22,12 @@ void lv_example_keyboard_1(void)
 
     /*Create a text area. The keyboard will write here*/
     lv_obj_t * ta;
-    ta = lv_textarea_create(lv_scr_act(), NULL);
+    ta = lv_textarea_create(lv_scr_act());
     lv_obj_align(ta, NULL, LV_ALIGN_IN_TOP_LEFT, 10, 10);
     lv_obj_add_event_cb(ta, ta_event_cb, kb);
     lv_textarea_set_placeholder_text(ta, "Hello");
 
-    ta = lv_textarea_create(lv_scr_act(), NULL);
+    ta = lv_textarea_create(lv_scr_act());
     lv_obj_align(ta, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, 10);
     lv_obj_add_event_cb(ta, ta_event_cb, kb);
 

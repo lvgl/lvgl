@@ -1,6 +1,6 @@
 #include "../../../lvgl.h"
 #include <stdio.h>
-#if LV_USE_BTN
+#if LV_BUILD_EXAMPLES && LV_USE_BTN
 
 /**
  * Create a style transition on a button to act like a gum when clicked
@@ -9,7 +9,7 @@ void lv_example_btn_3(void)
 {
     /*Properties to transition*/
     static lv_style_prop_t props[] = {
-            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_CONTENT_LETTER_SPACE, 0
+            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_TEXT_LETTER_SPACE, 0
     };
 
     /*Define animation paths*/
@@ -42,16 +42,15 @@ void lv_example_btn_3(void)
     lv_style_init(&style_pr);
     lv_style_set_transform_width(&style_pr, 10);
     lv_style_set_transform_height(&style_pr, -10);
-    lv_style_set_content_letter_space(&style_pr, 10);
+    lv_style_set_text_letter_space(&style_pr, 10);
     lv_style_set_transition(&style_pr, &transition_dsc_pr);
 
-
-    lv_obj_t * btn1 = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
     lv_obj_align(btn1, NULL, LV_ALIGN_CENTER, 0, -80);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style_def);
 
-    /*Instead of creating a label add a values string*/
-    lv_obj_set_style_content_text(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, "Gum");
+    lv_obj_t * label = lv_label_create(btn1);
+    lv_label_set_text(label, "Gum");
 }
 #endif

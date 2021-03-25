@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_roller_constructor(lv_obj_t * obj);
 static void lv_roller_event(lv_obj_t * obj, lv_event_t e);
 static void lv_roller_label_event(lv_obj_t * label, lv_event_t e);
 static void draw_main(lv_obj_t * obj, lv_event_t e);
@@ -69,13 +69,12 @@ const lv_obj_class_t lv_roller_label_class  = {
 /**
  * Create a roller object
  * @param par pointer to an object, it will be the parent of the new roller
- * @param copy pointer to a roller object, if not NULL then the new object will be copied from it
  * @return pointer to the created roller
  */
-lv_obj_t * lv_roller_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_roller_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_roller_class, parent, copy);
+    return lv_obj_create_from_class(&lv_roller_class, parent);
 }
 
 /*=====================
@@ -282,7 +281,7 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
  **********************/
 
 
-static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_roller_constructor(lv_obj_t * obj)
 {
     lv_roller_t * roller = (lv_roller_t*)obj;
 
@@ -291,24 +290,13 @@ static void lv_roller_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     roller->sel_opt_id = 0;
     roller->sel_opt_id_ori = 0;
 
-    /*Init the new roller roller*/
-    if(copy == NULL) {
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
-        lv_obj_set_width(obj, LV_SIZE_CONTENT);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+    lv_obj_set_width(obj, LV_SIZE_CONTENT);
 
-        lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);
-        lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
-        lv_obj_set_height(obj, LV_DPI_DEF);
-    }
-    else {
-        lv_obj_create_from_class(&lv_roller_label_class, obj, NULL);
-        lv_roller_t * copy_roller = (lv_roller_t *)copy;
-        roller->mode = copy_roller->mode;
-        roller->option_cnt = copy_roller->option_cnt;
-        roller->sel_opt_id = copy_roller->sel_opt_id;
-        roller->sel_opt_id_ori = copy_roller->sel_opt_id;
-    }
+    lv_obj_create_from_class(&lv_roller_label_class, obj);
+    lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_height(obj, LV_DPI_DEF);
 
     LV_LOG_TRACE("finshed");
 }

@@ -27,7 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_meter_constructor(lv_obj_t * obj);
 static void lv_meter_destructor(lv_obj_t * obj);
 static void lv_meter_event(lv_obj_t * obj, lv_event_t e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -56,10 +56,10 @@ const lv_obj_class_t lv_meter_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_meter_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_meter_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_meter_class, parent, copy);
+    return lv_obj_create_from_class(&lv_meter_class, parent);
 }
 
 /*=====================
@@ -246,7 +246,7 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_meter_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -254,19 +254,7 @@ static void lv_meter_constructor(lv_obj_t * obj, const lv_obj_t * copy)
 
     _lv_ll_init(&meter->scale_ll, sizeof(lv_meter_scale_t));
 
-    /*Init the new line meter line meter*/
-    if(copy == NULL) {
-        lv_obj_set_size(obj, 3 * LV_DPI_DEF / 2, 3 * LV_DPI_DEF / 2);
-    }
-    /*Copy an existing line meter*/
-    else {
-//        lv_meter_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-//        meter->scale_angle           = copy_meter->scale_angle;
-//        meter->line_cnt              = copy_meter->line_cnt;
-//        meter->min_value             = copy_meter->min_value;
-//        meter->max_value             = copy_meter->max_value;
-//        meter->cur_value             = copy_meter->cur_value;
-    }
+    lv_obj_set_size(obj, 3 * LV_DPI_DEF / 2, 3 * LV_DPI_DEF / 2);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

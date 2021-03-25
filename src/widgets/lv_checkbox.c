@@ -26,7 +26,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_checkbox_constructor(lv_obj_t * obj);
 static void lv_checkbox_destructor(lv_obj_t * obj);
 static void lv_checkbox_event(lv_obj_t * obj, lv_event_t e);
 static void lv_checkbox_draw(lv_obj_t * obj);
@@ -50,10 +50,10 @@ const lv_obj_class_t lv_checkbox_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_checkbox_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_checkbox_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_checkbox_class, parent, copy);
+    return lv_obj_create_from_class(&lv_checkbox_class, parent);
 }
 
 /*=====================
@@ -108,23 +108,17 @@ const char * lv_checkbox_get_text(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_checkbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_checkbox_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
-    /*Init the new checkbox object*/
-    if(copy == NULL) {
-        cb->txt = "Check box";
-        cb->static_txt = 1;
-        lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-        lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    }
-    else {
-//        const lv_checkbox_t * copy_ext = (const lv_checkbox_t *)copy;
-    }
+    cb->txt = "Check box";
+    cb->static_txt = 1;
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

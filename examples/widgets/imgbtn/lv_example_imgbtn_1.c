@@ -33,7 +33,7 @@ void lv_example_imgbtn_1(void)
     lv_obj_align(imgbtn1, NULL, LV_ALIGN_CENTER, 0, 0);
 
     /*Create a label on the image button*/
-    lv_obj_t * label = lv_label_create(imgbtn1, NULL);
+    lv_obj_t * label = lv_label_create(imgbtn1);
     lv_label_set_text(label, "Button");
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, -4);
 }

@@ -19,7 +19,7 @@ void lv_example_list_1(void)
     uint32_t t = lv_tick_get();
     int i;
     for(i = 0; i < 3; i++) {
-//        lv_btn_create(lv_scr_act(), NULL);
+//        lv_btn_create(lv_scr_act());
         lv_list_add_btn(list1, LV_SYMBOL_FILE, "New", event_handler);
     }
 

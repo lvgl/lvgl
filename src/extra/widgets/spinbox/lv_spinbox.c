@@ -22,7 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_spinbox_constructor(lv_obj_t * obj);
 static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
@@ -44,15 +44,9 @@ const lv_obj_class_t lv_spinbox_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a spinbox object
- * @param par pointer to an object, it will be the parent of the new spinbox
- * @param copy pointer to a spinbox object, if not NULL then the new object will be copied from it
- * @return pointer to the created spinbox
- */
 lv_obj_t * lv_spinbox_create(lv_obj_t * parent)
 {
-   return lv_obj_create_from_class(&lv_spinbox_class, parent, NULL);
+   return lv_obj_create_from_class(&lv_spinbox_class, parent);
 }
 
 /*=====================
@@ -275,10 +269,8 @@ void lv_spinbox_decrement(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_spinbox_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_spinbox_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
-
     LV_LOG_TRACE("begin");
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;

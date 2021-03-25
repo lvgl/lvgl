@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_line_constructor(lv_obj_t * obj);
 static void lv_line_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
@@ -49,10 +49,10 @@ const lv_obj_class_t lv_line_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_line_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_line_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_line_class, parent, copy);
+    return lv_obj_create_from_class(&lv_line_class, parent);
 }
 
 /*=====================
@@ -101,7 +101,7 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_line_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -111,19 +111,8 @@ static void lv_line_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     line->point_array = NULL;
     line->y_inv       = 0;
 
-
-    /*Init the new line*/
-    if(copy == NULL) {
-        lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    }
-    /*Copy an existing object*/
-    else {
-        lv_line_t * copy_line = (lv_line_t *)copy;
-        lv_line_set_y_invert(obj, lv_line_get_y_invert(copy));
-        lv_line_set_points(obj, copy_line->point_array, copy_line->point_num);
-
-    }
+    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

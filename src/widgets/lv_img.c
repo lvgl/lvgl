@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_img_constructor(lv_obj_t * obj);
 static void lv_img_destructor(lv_obj_t * obj);
 static void lv_img_event(lv_obj_t * obj, lv_event_t e);
 static void draw_img(lv_obj_t * obj, lv_event_t e);
@@ -52,10 +52,10 @@ const lv_obj_class_t lv_img_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_img_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_img_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_img_class, parent, copy);
+    return lv_obj_create_from_class(&lv_img_class, parent);
 }
 
 /*=====================
@@ -358,7 +358,7 @@ bool lv_img_get_antialias(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_img_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -377,24 +377,10 @@ static void lv_img_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     img->pivot.x = 0;
     img->pivot.y = 0;
 
-    if(copy == NULL) {
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
 
-        /*Enable auto size for non screens
-         *because image screens are wallpapers
-         *and must be screen sized*/
-        if(obj->parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    }
-    else {
-        lv_img_t * copy_img = (lv_img_t *)copy;
-        img->zoom      = copy_img->zoom;
-        img->angle     = copy_img->angle;
-        img->antialias = copy_img->antialias;
-        img->offset  = copy_img->offset;
-        img->pivot   = copy_img->pivot;
-        lv_img_set_src(obj, copy_img->src);
-    }
+    if(obj->parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

@@ -46,7 +46,7 @@ extern const lv_obj_class_t lv_line_class;
  * @param par pointer to an object, it will be the parent of the new line
  * @return pointer to the created line
  */
-lv_obj_t * lv_line_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_line_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

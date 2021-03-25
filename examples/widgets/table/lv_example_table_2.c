@@ -58,7 +58,7 @@ void lv_example_table_2(void)
 
     uint32_t t = lv_tick_get();
 
-    lv_obj_t * table = lv_table_create(lv_scr_act(), NULL);
+    lv_obj_t * table = lv_table_create(lv_scr_act());
 
     /*Set a smaller height to the table. It'll make it scrollable*/
     lv_obj_set_size(table, 150, 200);
@@ -87,7 +87,7 @@ void lv_example_table_2(void)
 
     uint32_t elaps = lv_tick_elaps(t);
 
-    lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text_fmt(label, "%d bytes are used by the table\n"
                                   "and %d items were added in %d ms",
                                   mem_used, ITEM_CNT, elaps);

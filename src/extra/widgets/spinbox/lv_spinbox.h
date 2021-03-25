@@ -53,7 +53,6 @@ extern const lv_obj_class_t lv_spinbox_class;
 /**
  * Create a spinbox objects
  * @param par pointer to an object, it will be the parent of the new spinbox
- * @param copy pointer to a spinbox object, if not NULL then the new object will be copied from it
  * @return pointer to the created spinbox
  */
 lv_obj_t * lv_spinbox_create(lv_obj_t * parent);

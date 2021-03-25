@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_imgbtn_constructor(lv_obj_t * obj);
 static void draw_main(lv_obj_t * obj);
 static void lv_imgbtn_event(lv_obj_t * imgbtn, lv_event_t e);
 static void refr_img(lv_obj_t * imgbtn);
@@ -51,13 +51,11 @@ const lv_obj_class_t lv_imgbtn_class = {
 /**
  * Create a image button object
  * @param par pointer to an object, it will be the parent of the new image button
- * @param copy pointer to a image button object, if not NULL then the new object will be copied from
- * it
  * @return pointer to the created image button
  */
 lv_obj_t * lv_imgbtn_create(lv_obj_t * parent)
 {
-   return lv_obj_create_from_class(&lv_imgbtn_class, parent, NULL);
+   return lv_obj_create_from_class(&lv_imgbtn_class, parent);
 }
 
 /*=====================
@@ -149,10 +147,8 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_imgbtn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_imgbtn_constructor(lv_obj_t * obj)
 {
-    LV_UNUSED(copy);
-
    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
    /*Initialize the allocated 'ext'*/
    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));

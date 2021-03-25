@@ -34,7 +34,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_spinner_create(lv_obj_t * par, uint32_t time, uint32_t arc_length);
+lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_length);
 
 /**********************
  *      MACROS

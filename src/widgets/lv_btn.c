@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_btn_constructor(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,25 +42,23 @@ const lv_obj_class_t lv_btn_class  = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_btn_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-     return lv_obj_create_from_class(&lv_btn_class, parent, copy);
+     return lv_obj_create_from_class(&lv_btn_class, parent);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_btn_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_btn_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    if(copy == NULL) {
-        lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    }
+    lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

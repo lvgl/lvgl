@@ -29,7 +29,7 @@ typedef int _keep_pedantic_happy;
 //    lv_style_set_transition_prop_1(&style, LV_STATE_DEFAULT, LV_STYLE_BG_COLOR);
 //
 //    /*Create an object with the new style*/
-//    lv_obj_t * obj = lv_obj_create(lv_scr_act(), NULL);
+//    lv_obj_t * obj = lv_obj_create(lv_scr_act());
 //    lv_obj_add_style(obj, LV_OBJ_PART_MAIN, &style);
 //    lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
 //}

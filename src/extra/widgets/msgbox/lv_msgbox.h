@@ -42,8 +42,6 @@ extern const lv_obj_class_t lv_msgbox_class;
 /**
  * Create a message box objects
  * @param par pointer to an object, it will be the parent of the new message box
- * @param copy pointer to a message box object, if not NULL then the new object will be copied from
- * it
  * @return pointer to the created message box
  */
 lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * btn_txts[], bool add_close_btn);

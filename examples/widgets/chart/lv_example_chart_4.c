@@ -26,15 +26,15 @@ static void event_cb(lv_obj_t * chart, lv_event_t e)
             lv_coord_t value = y_array[id];
 
             char buf[16];
-            lv_snprintf(buf, sizeof(buf), "$%d", value);
+            lv_snprintf(buf, sizeof(buf), LV_SYMBOL_DUMMY"$%d", value);
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
             draw_rect_dsc.bg_color = lv_color_black();
             draw_rect_dsc.bg_opa = LV_OPA_50;
             draw_rect_dsc.radius = 3;
-            draw_rect_dsc.content_text = buf;
-            draw_rect_dsc.content_color = lv_color_white();
+            draw_rect_dsc.bg_img_src = buf;
+            draw_rect_dsc.bg_img_recolor = lv_color_white();
 
             lv_area_t a;
             a.x1 = chart->coords.x1 + p.x - 20;
@@ -57,7 +57,7 @@ void lv_example_chart_4(void)
 {
     /*Create a chart*/
     lv_obj_t * chart;
-    chart = lv_chart_create(lv_scr_act(), NULL);
+    chart = lv_chart_create(lv_scr_act());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, NULL, LV_ALIGN_CENTER, 0, 0);
 

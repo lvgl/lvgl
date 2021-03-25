@@ -33,7 +33,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_switch_constructor(lv_obj_t * obj);
 static void lv_switch_event(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
 
@@ -55,32 +55,23 @@ const lv_obj_class_t lv_switch_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a switch objects
- * @param parent pointer to an object, it will be the parent of the new switch
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other switch to copy.
- * @return pointer to the created switch
- */
-lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_switch_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_switch_class, parent, copy);
+    return lv_obj_create_from_class(&lv_switch_class, parent);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_switch_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_switch_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-   if(copy == NULL) {
-       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-       lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-       lv_obj_set_size(obj, LV_DPX(60), LV_DPX(35));
-   }
+   lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+   lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+   lv_obj_set_size(obj, LV_DPX(60), LV_DPX(35));
 
    LV_TRACE_OBJ_CREATE("finished");
 }

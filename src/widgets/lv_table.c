@@ -29,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_table_constructor(lv_obj_t * obj);
 static void lv_table_destructor(lv_obj_t * obj);
 static void lv_table_event(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
@@ -58,10 +58,10 @@ const lv_obj_class_t lv_table_class  = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_table_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_table_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_table_class, parent, copy);
+    return lv_obj_create_from_class(&lv_table_class, parent);
 }
 
 /*=====================
@@ -395,38 +395,22 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_table_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_table_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_table_t * table = (lv_table_t *)obj;
 
-    /*Initialize the allocated 'ext'*/
-    table->cell_data     = NULL;
-    table->col_cnt       = 0;
-    table->row_cnt       = 0;
-    table->row_h         = NULL;
-    table->col_w         = NULL;
+    table->col_cnt = 1;
+    table->row_cnt = 1;
+    table->col_w = lv_mem_alloc(table->col_cnt * sizeof(table->col_w[0]));
+    table->row_h = lv_mem_alloc(table->row_cnt * sizeof(table->row_h[0]));
+    table->col_w[0] = LV_DPI_DEF;
+    table->row_h[0] = LV_DPI_DEF;
+    table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
+    table->cell_data[0] = NULL;
 
-    /*Init the new table table*/
-    if(copy == NULL) {
-        table->col_cnt = 1;
-        table->row_cnt = 1;
-        table->col_w = lv_mem_alloc(table->col_cnt * sizeof(table->col_w[0]));
-        table->row_h = lv_mem_alloc(table->row_cnt * sizeof(table->row_h[0]));
-        table->col_w[0] = LV_DPI_DEF;
-        table->row_h[0] = LV_DPI_DEF;
-        table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
-        table->cell_data[0] = NULL;
-
-        lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    }
-    /*Copy an existing table*/
-    else {
-        lv_table_t * copy_table = (lv_table_t *)copy;
-        lv_table_set_row_cnt(obj, copy_table->row_cnt);
-        lv_table_set_col_cnt(obj, copy_table->col_cnt);
-    }
+    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

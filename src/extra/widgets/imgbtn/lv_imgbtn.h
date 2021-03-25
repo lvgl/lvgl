@@ -51,8 +51,6 @@ extern const lv_obj_class_t lv_imgbtn_class;
 /**
  * Create a image button objects
  * @param par pointer to an object, it will be the parent of the new image button
- * @param copy pointer to a image button object, if not NULL then the new object will be copied from
- * it
  * @return pointer to the created image button
  */
 lv_obj_t * lv_imgbtn_create(lv_obj_t * parent);

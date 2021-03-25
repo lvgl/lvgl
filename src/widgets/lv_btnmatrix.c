@@ -32,7 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_btnmatrix_constructor(lv_obj_t * obj);
 static void lv_btnmatrix_destructor(lv_obj_t * obj);
 static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
@@ -71,10 +71,10 @@ const lv_obj_class_t lv_btnmatrix_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_btnmatrix_class, parent, copy);
+    return lv_obj_create_from_class(&lv_btnmatrix_class, parent);
 }
 
 /*=====================
@@ -354,7 +354,7 @@ bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_btnmatrix_constructor(lv_obj_t * obj)
 {
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     btnm->btn_cnt        = 0;
@@ -365,17 +365,8 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     btnm->recolor        = 0;
     btnm->one_check      = 0;
 
-    /*Init the new button matrix object*/
-    if(copy == NULL) {
-        lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
-        lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF * 1);
-    }
-    /*Copy an existing object*/
-    else {
-        lv_btnmatrix_t * copy_btnm = (lv_btnmatrix_t *)copy;
-        lv_btnmatrix_set_map(obj, copy_btnm->map_p);
-        lv_btnmatrix_set_ctrl_map(obj, copy_btnm->ctrl_bits);
-    }
+    lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
+    lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF * 1);
 
     LV_LOG_TRACE("finshed");
 }

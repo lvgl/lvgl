@@ -45,7 +45,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_bar_constructor(lv_obj_t * obj);
 static void lv_bar_destructor(lv_obj_t * obj);
 static void lv_bar_event(lv_obj_t * bar, lv_event_t e);
 static void draw_indic(lv_obj_t * bar);
@@ -74,10 +74,10 @@ const lv_obj_class_t lv_bar_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_bar_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_bar_class, parent, copy);
+    return lv_obj_create_from_class(&lv_bar_class, parent);
 }
 
 /*=====================
@@ -198,7 +198,7 @@ lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_bar_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -212,22 +212,12 @@ static void lv_bar_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);
 
-   if(copy == NULL) {
-       lv_obj_clear_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-       lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF / 10);
-       lv_bar_set_value(obj, 0, LV_ANIM_OFF);
-   } else {
-       lv_bar_t * copy_bar = (lv_bar_t *)copy;
-       bar->min_value   = copy_bar->min_value;
-       bar->start_value = copy_bar->start_value;
-       bar->max_value   = copy_bar->max_value;
-       bar->cur_value   = copy_bar->cur_value;
-       bar->mode        = copy_bar->mode;
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF / 10);
+    lv_bar_set_value(obj, 0, LV_ANIM_OFF);
 
-       lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
-   }
-   LV_TRACE_OBJ_CREATE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_bar_destructor(lv_obj_t * obj)
@@ -406,16 +396,13 @@ static void draw_indic(lv_obj_t * obj)
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t bg_img_opa = draw_indic_dsc.bg_img_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
-        lv_opa_t content_opa = draw_indic_dsc.content_opa;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.content_opa = LV_OPA_TRANSP;
         lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
         draw_indic_dsc.bg_opa = bg_opa;
         draw_indic_dsc.bg_img_opa = bg_img_opa;
         draw_indic_dsc.border_opa = border_opa;
-        draw_indic_dsc.content_opa = content_opa;
     }
 
 #if LV_DRAW_COMPLEX
@@ -433,10 +420,8 @@ static void draw_indic(lv_obj_t * obj)
     /*Draw_only the background and background image*/
     lv_opa_t shadow_opa = draw_indic_dsc.shadow_opa;
     lv_opa_t border_opa = draw_indic_dsc.border_opa;
-    lv_opa_t content_opa = draw_indic_dsc.content_opa;
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.content_opa = LV_OPA_TRANSP;
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
@@ -464,24 +449,17 @@ static void draw_indic(lv_obj_t * obj)
     lv_draw_rect(&mask_indic_max_area, clip_area, &draw_indic_dsc);
     draw_indic_dsc.border_opa = border_opa;
     draw_indic_dsc.shadow_opa = shadow_opa;
-    draw_indic_dsc.content_opa = content_opa;
 
     /*Draw the border*/
     draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
     draw_indic_dsc.bg_img_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.content_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
 #if LV_DRAW_COMPLEX
     lv_draw_mask_remove_id(mask_indic_id);
     lv_draw_mask_remove_id(mask_bg_id);
 #endif
-
-    /*When not masks draw the content*/
-    draw_indic_dsc.content_opa = content_opa;
-    draw_indic_dsc.border_opa = LV_OPA_TRANSP;
-    lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 }
 
 static void lv_bar_event(lv_obj_t * obj, lv_event_t e)

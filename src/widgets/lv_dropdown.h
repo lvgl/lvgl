@@ -66,11 +66,9 @@ extern const  lv_obj_class_t lv_dropdown_list_class;
 /**
  * Create a drop-down list objects
  * @param parent pointer to an object, it will be the parent of the new drop-down list
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other drop-down list to copy.
  * @return pointer to the created drop-down list
  */
-lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
 
 /*=====================
  * Setter functions

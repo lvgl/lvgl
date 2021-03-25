@@ -31,7 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_slider_constructor(lv_obj_t * obj);
 static void lv_slider_event(lv_obj_t * obj, lv_event_t e);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
 static void draw_knob(lv_obj_t * obj);
@@ -55,10 +55,10 @@ const lv_obj_class_t lv_slider_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_slider_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_slider_class, parent, copy);
+    return lv_obj_create_from_class(&lv_slider_class, parent);
 }
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
@@ -73,7 +73,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_slider_constructor(lv_obj_t * obj)
 {
     lv_slider_t * slider = (lv_slider_t *)obj;
 
@@ -82,18 +82,10 @@ static void lv_slider_constructor(lv_obj_t * obj, const lv_obj_t * copy)
     slider->dragging = 0;
     slider->left_knob_focus = 0;
 
-    /*Init the new slider slider*/
-    if(copy == NULL) {
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_ext_click_area(obj, LV_DPX(8));
-        lv_obj_set_height(obj, LV_DPX(10));
-    } else {
-        lv_slider_t * copy_slider = (lv_slider_t * ) copy;
-        lv_area_copy(&slider->left_knob_area, &copy_slider->left_knob_area);
-        lv_area_copy(&slider->right_knob_area, &copy_slider->right_knob_area);
-    }
-
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_ext_click_area(obj, LV_DPX(8));
+    lv_obj_set_height(obj, LV_DPX(10));
 }
 
 static void lv_slider_event(lv_obj_t * obj, lv_event_t e)

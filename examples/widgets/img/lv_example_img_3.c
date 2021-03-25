@@ -20,7 +20,7 @@ void lv_example_img_3(void)
     LV_IMG_DECLARE(img_cogwheel_argb);
 
     /*Now create the actual image*/
-    lv_obj_t * img = lv_img_create(lv_scr_act(), NULL);
+    lv_obj_t * img = lv_img_create(lv_scr_act());
     lv_img_set_src(img, &img_cogwheel_argb);
     lv_obj_align(img, NULL, LV_ALIGN_CENTER, 50, 50);
     lv_img_set_pivot(img, 0, 0);    /*Rotate around the top left corner*/

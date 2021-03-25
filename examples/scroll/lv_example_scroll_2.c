@@ -16,7 +16,7 @@ static void sw_event_cb(lv_obj_t * sw, lv_event_t e)
  */
 void lv_example_scroll_2(void)
 {
-    lv_obj_t * panel = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_t * panel = lv_obj_create(lv_scr_act());
     lv_obj_set_size(panel, 280, 150);
     lv_obj_set_scroll_snap_x(panel, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_ROW);
@@ -24,10 +24,10 @@ void lv_example_scroll_2(void)
 
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_obj_t * btn = lv_btn_create(panel, NULL);
+        lv_obj_t * btn = lv_btn_create(panel);
         lv_obj_set_size(btn, 150, 100);
 
-        lv_obj_t * label = lv_label_create(btn, NULL);
+        lv_obj_t * label = lv_label_create(btn);
         if(i == 3) {
             lv_label_set_text_fmt(label, "Panel %d\nno snap", i);
             lv_obj_clear_flag(btn, LV_OBJ_FLAG_SNAPABLE);
@@ -41,10 +41,10 @@ void lv_example_scroll_2(void)
 
 #if LV_USE_SWITCH
     /*Switch between "One scroll" and "Normal scroll" mode*/
-    lv_obj_t * sw = lv_switch_create(lv_scr_act(), NULL);
+    lv_obj_t * sw = lv_switch_create(lv_scr_act());
     lv_obj_align(sw, NULL, LV_ALIGN_IN_TOP_RIGHT, -20, 10);
     lv_obj_add_event_cb(sw, sw_event_cb, panel);
-    lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "One scroll");
     lv_obj_align(label, sw, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
 #endif

@@ -37,19 +37,19 @@ void lv_example_get_started_2(void)
     lv_style_set_bg_grad_color(&style_btn_red, lv_color_blue_darken_3());
 
     /*Create a button and use the new styles*/
-    lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);     /*Add a button the current screen*/
+    lv_obj_t * btn = lv_btn_create(lv_scr_act());     /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
     lv_obj_remove_style(btn, LV_PART_ANY, LV_STATE_ANY, NULL); /*Remove the styles coming from the theme*/
     lv_obj_add_style(btn, LV_PART_MAIN, LV_STATE_DEFAULT, &style_btn);
     lv_obj_add_style(btn, LV_PART_MAIN, LV_STATE_PRESSED, &style_btn_pressed);
 
-    lv_obj_t * label = lv_label_create(btn, NULL);          /*Add a label to the button*/
+    lv_obj_t * label = lv_label_create(btn);          /*Add a label to the button*/
     lv_label_set_text(label, "Button");                     /*Set the labels text*/
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
 
     /*Create an other button and use the red style too*/
-    lv_obj_t * btn2 = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
     lv_obj_set_pos(btn2, 10, 80);
     lv_obj_set_size(btn2, 120, 50);                            /*Set its size*/
     lv_obj_remove_style(btn2, LV_PART_ANY, LV_STATE_ANY, NULL); /*Remove the styles coming from the theme*/
@@ -58,7 +58,7 @@ void lv_example_get_started_2(void)
     lv_obj_add_style(btn2, LV_PART_MAIN, LV_STATE_PRESSED, &style_btn_pressed);
     lv_obj_set_style_radius(btn2, LV_PART_MAIN, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE); /*Add a local style*/
 
-    label = lv_label_create(btn2, NULL);          /*Add a label to the button*/
+    label = lv_label_create(btn2);          /*Add a label to the button*/
     lv_label_set_text(label, "Button 2");         /*Set the labels text*/
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
 }

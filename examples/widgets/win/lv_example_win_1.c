@@ -18,7 +18,7 @@ void lv_example_win_1(void)
     lv_win_add_btn(win, LV_SYMBOL_CLOSE, 60, event_handler);
 
     lv_obj_t * cont = lv_win_get_content(win);  /*Content can be aded here*/
-    lv_obj_t * label =  lv_label_create(cont, NULL);
+    lv_obj_t * label =  lv_label_create(cont);
     lv_label_set_text(label, "This is\n"
                              "a pretty\n"
                              "long text\n"

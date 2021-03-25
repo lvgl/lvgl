@@ -43,7 +43,6 @@ extern const lv_obj_class_t lv_tileview_tile_class;
 /**
  * Create a tileview objects
  * @param par pointer to an object, it will be the parent of the new tileview
- * @param copy pointer to a tileview object, if not NULL then the new object will be copied from it
  * @return pointer to the created tileview
  */
 lv_obj_t * lv_tileview_create(lv_obj_t * parent);

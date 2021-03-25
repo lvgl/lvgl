@@ -21,7 +21,7 @@ void lv_example_style_1(void)
     lv_style_set_bg_grad_stop(&style, 192);
 
     /*Create an object with the new style*/
-    lv_obj_t * obj = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
     lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
     lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
 }

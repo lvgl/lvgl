@@ -5,7 +5,7 @@ void lv_example_chart_1(void)
 {
     /*Create a chart*/
     lv_obj_t * chart;
-    chart = lv_chart_create(lv_scr_act(), NULL);
+    chart = lv_chart_create(lv_scr_act());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);   /*Show lines and points too*/

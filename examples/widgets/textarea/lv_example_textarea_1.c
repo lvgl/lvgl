@@ -17,7 +17,7 @@ static void btnm_event_handler(lv_obj_t * obj, lv_event_t event)
 
 void lv_example_textarea_1(void)
 {
-    lv_obj_t * ta = lv_textarea_create(lv_scr_act(), NULL);
+    lv_obj_t * ta = lv_textarea_create(lv_scr_act());
     lv_textarea_set_one_line(ta, true);
     lv_obj_align(ta, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
     lv_obj_add_state(ta, LV_STATE_FOCUSED); /*To be sure the cursor is visible*/
@@ -27,7 +27,7 @@ void lv_example_textarea_1(void)
                                "7", "8", "9", "\n",
                                LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_NEW_LINE, ""};
 
-    lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act(), NULL);
+    lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act());
     lv_obj_set_size(btnm, 200, 150);
     lv_obj_align(btnm, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -10);
     lv_obj_add_event_cb(btnm, btnm_event_handler, ta);

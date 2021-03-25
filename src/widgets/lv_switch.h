@@ -46,11 +46,9 @@ extern const lv_obj_class_t lv_switch_class;
 /**
  * Create a switch objects
  * @param parent pointer to an object, it will be the parent of the new switch
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other switch to copy.
  * @return pointer to the created switch
  */
-lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_switch_create(lv_obj_t * parent);
 
 /**********************
  *      MACROS

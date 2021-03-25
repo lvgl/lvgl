@@ -283,11 +283,9 @@ void lv_deinit(void);
 /**
  * Create a base object (a rectangle)
  * @param parent    pointer to a parent object. If NULL then a screen will be created.
- * @param copy      DEPRECATED, will be removed in v9.
- *                  Pointer to an other base object to copy.
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_obj_create(lv_obj_t * parent);
 
 
 /*---------------------

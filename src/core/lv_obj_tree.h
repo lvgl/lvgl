@@ -32,20 +32,8 @@ struct _lv_obj_class_t;
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Create a basic object
- * @param parent pointer to a parent object.
- *                  If NULL then a screen will be created
- * @param copy pointer to a base object, if not NULL then the new object will be copied from it
- * @return pointer to the new object
- */
 void lv_obj_del(struct _lv_obj_t * obj);
 
-/**
- * Delete 'obj' and all of its children
- * @param obj pointer to an object to delete
- * @return LV_RES_INV because the object is deleted
- */
 void lv_obj_clean(struct _lv_obj_t * obj);
 
 /**

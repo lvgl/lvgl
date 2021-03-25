@@ -61,10 +61,9 @@ extern const lv_obj_class_t lv_arc_class;
 /**
  * Create a arc objects
  * @param par pointer to an object, it will be the parent of the new arc
- * @param copy pointer to a arc object, if not NULL then the new object will be copied from it
  * @return pointer to the created arc
  */
-lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_arc_create(lv_obj_t * parent);
 
 /*======================
  * Add/remove functions

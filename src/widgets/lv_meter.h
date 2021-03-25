@@ -101,12 +101,10 @@ extern const lv_obj_class_t lv_meter_class;
 
 /**
  * Create a meter objects
- * @param parent pointer to an object, it will be the parent of the new bar
- * @param copy DEPRECATED, will be removed in v9.
- *             Pointer to an other meter to copy.
+ * @param parent pointer to an object, it will be the parent of the new bar.
  * @return pointer to the created meter
  */
-lv_obj_t * lv_meter_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_meter_create(lv_obj_t * parent);
 
 /*=====================
  * Add scale

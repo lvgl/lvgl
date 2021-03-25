@@ -63,7 +63,7 @@ typedef int _keep_pedantic_happy;
 //    lv_test_print("Create a label");
 //    lv_test_print("---------------------------");
 //
-//    lv_label_create(lv_scr_act(), NULL);
+//    lv_label_create(lv_scr_act());
 //#if LV_COLOR_DEPTH == 32
 //    lv_test_assert_img_eq("lv_test_img32_label_1.png", "Create a label and leave the default settings");
 //#endif

@@ -62,7 +62,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
  */
 void lv_example_btnmatrix_2(void)
 {
-    lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act(), NULL);
+    lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act());
     lv_obj_add_event_cb(btnm, event_cb, NULL);
     lv_obj_align(btnm, NULL, LV_ALIGN_CENTER, 0, 0);
 }

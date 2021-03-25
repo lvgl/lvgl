@@ -32,16 +32,16 @@ void lv_example_spinbox_1(void)
 
     lv_coord_t h = lv_obj_get_height(spinbox);
 
-    lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_t * btn = lv_btn_create(lv_scr_act());
     lv_obj_set_size(btn, h, h);
     lv_obj_align(btn, spinbox, LV_ALIGN_OUT_RIGHT_MID, 5, 0);
-    lv_obj_set_style_content_text(btn, LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+    lv_obj_set_style_bg_img_src(btn, LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
     lv_obj_add_event_cb(btn, lv_spinbox_increment_event_cb, NULL);
 
-    btn = lv_btn_create(lv_scr_act(), NULL);
+    btn = lv_btn_create(lv_scr_act());
     lv_obj_set_size(btn, h, h);
     lv_obj_align(btn, spinbox, LV_ALIGN_OUT_LEFT_MID, -5, 0);
-    lv_obj_set_style_content_text(btn, LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+    lv_obj_set_style_bg_img_src(btn, LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
     lv_obj_add_event_cb(btn, lv_spinbox_decrement_event_cb, NULL);
 }
 

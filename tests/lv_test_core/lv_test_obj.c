@@ -61,7 +61,7 @@ static void create_delete_change_parent(void)
     lv_test_print("Create an object on the default screen");
     lv_test_assert_int_eq(0, lv_obj_get_child_cnt(lv_scr_act()), "Screen's children count before creation");
 
-    lv_obj_t * obj = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
     lv_test_assert_int_eq(1, lv_obj_get_child_cnt(lv_scr_act()), "Screen's children count after creation");
     lv_test_assert_int_eq(0, lv_obj_get_child_cnt(obj), "New object's children count after creation");
 
@@ -71,8 +71,8 @@ static void create_delete_change_parent(void)
     lv_test_assert_int_eq(0, lv_obj_get_child_cnt(lv_scr_act()), "Screen's children count after delete");
 
     lv_test_print("Create two objects");
-    lv_obj_t * obj_parent = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_t * obj_child = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_t * obj_parent = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj_child = lv_obj_create(lv_scr_act());
     lv_test_assert_int_eq(2, lv_obj_get_child_cnt(lv_scr_act()), "Screen's children count after creation");
 
     lv_test_print("Change the parent of the second object to the first");

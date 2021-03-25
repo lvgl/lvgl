@@ -115,11 +115,9 @@ extern const lv_obj_class_t lv_chart_class;
 /**
  * Create a chart objects
  * @param parent    pointer to an object, it will be the parent of the new button
- * @param copy      DEPRECATED, will be removed in v9.
- *                  Pointer to an other chart to copy.
  * @return          pointer to the created chart
  */
-lv_obj_t * lv_chart_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_chart_create(lv_obj_t * parent);
 
 /**
  * Set a new type for a chart

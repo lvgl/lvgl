@@ -31,7 +31,6 @@ extern "C" {
 /**
  * Create a calendar objects
  * @param par pointer to an object, it will be the parent of the new calendar
- * @param copy pointer to a calendar object, if not NULL then the new object will be copied from it
  * @return pointer to the created calendar
  */
 lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * calendar);

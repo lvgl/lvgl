@@ -42,7 +42,7 @@ static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
 
 lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calendar, lv_coord_t btn_size)
 {
-    lv_obj_t * header = lv_obj_create(parent, NULL);
+    lv_obj_t * header = lv_obj_create(parent);
 
     /*Use the same paddings as the calendar*/
     lv_obj_set_style_pad_left(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_pad_left(calendar, LV_PART_MAIN));
@@ -59,20 +59,20 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_place(header, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_START);
 
-    lv_obj_t * mo_prev = lv_btn_create(header, NULL);
-    lv_obj_set_style_content_text(mo_prev,  LV_PART_MAIN, LV_STATE_DEFAULT,  LV_SYMBOL_LEFT);
+    lv_obj_t * mo_prev = lv_btn_create(header);
+    lv_obj_set_style_bg_img_src(mo_prev,  LV_PART_MAIN, LV_STATE_DEFAULT,  LV_SYMBOL_LEFT);
     lv_obj_set_size(mo_prev, btn_size, btn_size);
     lv_obj_add_event_cb(mo_prev, month_event_cb, calendar);
     lv_obj_clear_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
-    lv_obj_t * label = lv_label_create(header, NULL);
+    lv_obj_t * label = lv_label_create(header);
     lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_style_text_align(label,  LV_PART_MAIN, LV_STATE_DEFAULT,  LV_TEXT_ALIGN_CENTER);
     lv_obj_set_flex_grow(label, 1);
     lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);
 
-    lv_obj_t * mo_next = lv_btn_create(header, NULL);
-    lv_obj_set_style_content_text(mo_next,  LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_RIGHT);
+    lv_obj_t * mo_next = lv_btn_create(header);
+    lv_obj_set_style_bg_img_src(mo_next,  LV_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_RIGHT);
     lv_obj_set_size(mo_next, btn_size, btn_size);
     lv_obj_add_event_cb(mo_next, month_event_cb, calendar);
     lv_obj_clear_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);

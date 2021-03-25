@@ -59,7 +59,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_obj_constructor(lv_obj_t * obj);
 static void lv_obj_destructor(lv_obj_t * obj);
 static void lv_obj_draw(lv_obj_t * obj, lv_event_t e);
 static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e);
@@ -178,9 +178,9 @@ void lv_deinit(void)
 }
 #endif
 
-lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
-    return lv_obj_create_from_class(&lv_obj_class, parent, copy);
+    return lv_obj_create_from_class(&lv_obj_class, parent);
 }
 
 /*---------------------
@@ -606,7 +606,7 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_obj_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -751,7 +751,6 @@ static void lv_obj_draw(lv_obj_t * obj, lv_event_t e)
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.outline_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
-            draw_dsc.content_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
             lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);

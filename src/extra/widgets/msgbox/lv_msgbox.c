@@ -39,20 +39,18 @@ const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class};
 /**
  * Create a message box objects
  * @param par pointer to an object, it will be the parent of the new message box
- * @param copy pointer to a message box object, if not NULL then the new object will be copied from
- * it
  * @return pointer to the created message box
  */
 lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
 {
-    lv_obj_t * parent = lv_obj_create(lv_layer_top(), NULL);
+    lv_obj_t * parent = lv_obj_create(lv_layer_top());
     lv_obj_set_size(parent, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
 
     lv_obj_remove_style(parent, LV_PART_ANY, LV_STATE_ANY, NULL);
     lv_obj_set_style_bg_color(parent, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_grey());
     lv_obj_set_style_bg_opa(parent, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
 
-    lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent, NULL);
+    lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent);
     LV_ASSERT_MALLOC(mbox);
     if(mbox == NULL) return NULL;
 
@@ -63,29 +61,29 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     lv_obj_set_flex_flow(mbox, LV_FLEX_FLOW_ROW);
 
     lv_obj_t * label;
-    label = lv_label_create(mbox, NULL);
+    label = lv_label_create(mbox);
     lv_label_set_text(label, title);
     lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     if(add_close_btn) lv_obj_set_flex_grow(label, 1);
     else lv_obj_set_width(label, LV_SIZE_PCT(100));
 
     if(add_close_btn) {
-        lv_obj_t * close_btn = lv_btn_create(mbox, NULL);
+        lv_obj_t * close_btn = lv_btn_create(mbox);
         lv_obj_set_ext_click_area(close_btn, LV_DPX(10));
         lv_obj_add_event_cb(close_btn, msgbox_close_event_cb, NULL);
-        label = lv_label_create(close_btn, NULL);
+        label = lv_label_create(close_btn);
         lv_label_set_text(label, LV_SYMBOL_CLOSE);
         lv_coord_t close_btn_size = LV_MAX(lv_obj_get_width(label), lv_obj_get_height(label)) + LV_DPX(10);
         lv_obj_set_size(close_btn, close_btn_size, close_btn_size);
         lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
     }
 
-    label = lv_label_create(mbox, NULL);
+    label = lv_label_create(mbox);
     lv_label_set_text(label, txt);
     lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(label, LV_SIZE_PCT(100));
 
-    lv_obj_t * btns = lv_btnmatrix_create(mbox, NULL);
+    lv_obj_t * btns = lv_btnmatrix_create(mbox);
     lv_btnmatrix_set_map(btns, btn_txts);
     lv_btnmatrix_set_btn_ctrl_all(btns, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
 

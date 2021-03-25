@@ -30,7 +30,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_arc_constructor(lv_obj_t * obj);
 static void lv_arc_draw(lv_obj_t * obj);
 static void lv_arc_event(lv_obj_t * obj, lv_event_t e);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
@@ -60,13 +60,12 @@ const lv_obj_class_t lv_arc_class  = {
 /**
  * Create a arc object
  * @param par pointer to an object, it will be the parent of the new arc
- * @param copy pointer to a arc object, if not NULL then the new object will be copied from it
  * @return pointer to the created arc
  */
-lv_obj_t * lv_arc_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_arc_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_arc_class, parent, copy);
+    return lv_obj_create_from_class(&lv_arc_class, parent);
 }
 
 /*======================
@@ -480,7 +479,7 @@ lv_arc_type_t lv_arc_get_type(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_arc_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -502,27 +501,9 @@ static void lv_arc_constructor(lv_obj_t * obj, const lv_obj_t * copy)
    arc->last_tick = lv_tick_get();
    arc->last_angle =arc->indic_angle_end;
 
-    /*Init the new arc arc*/
-    if(copy == NULL) {
-        lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
-    }
-    /*Copy an existing arc*/
-    else {
-        lv_arc_t * copy_arc = (lv_arc_t *)copy;
-       arc->indic_angle_start = copy_arc->indic_angle_start;
-       arc->indic_angle_end   = copy_arc->indic_angle_end;
-       arc->bg_angle_start  = copy_arc->bg_angle_start;
-       arc->bg_angle_end    = copy_arc->bg_angle_end;
-       arc->type = copy_arc->type;
-       arc->value = copy_arc->value;
-       arc->min_value = copy_arc->min_value;
-       arc->max_value = copy_arc->max_value;
-       arc->dragging = copy_arc->dragging;
-       arc->chg_rate = copy_arc->chg_rate;
-       arc->last_tick = copy_arc->last_tick;
-       arc->last_angle = copy_arc->last_angle;
-    }
+   lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+   lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
+
 
     LV_TRACE_OBJ_CREATE("finished");
 }

@@ -37,13 +37,13 @@ void lv_example_btn_2(void)
     lv_style_set_bg_color(&style_pr, lv_color_blue_darken_2());
     lv_style_set_bg_grad_color(&style_pr, lv_color_blue_darken_4());
 
-    lv_obj_t * btn1 = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
     lv_obj_remove_style(btn1, LV_PART_ANY, LV_STATE_ANY, NULL);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
     lv_obj_align(btn1, NULL, LV_ALIGN_CENTER, 0, 0);
 
-    lv_obj_t * label = lv_label_create(btn1, NULL);
+    lv_obj_t * label = lv_label_create(btn1);
     lv_label_set_text(label, "Button");
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
 

@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_construct(lv_obj_t * obj, const lv_obj_t * copy);
+static void lv_obj_construct(lv_obj_t * obj);
 static uint32_t get_instance_size(const lv_obj_class_t * class_p);
 
 /**********************
@@ -39,7 +39,7 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * parent)
 {
     LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", class_p, parent);
     uint32_t s = get_instance_size(class_p);
@@ -49,8 +49,53 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     obj->class_p = class_p;
     obj->parent = parent;
 
+    /*Create a screen*/
+    if(parent == NULL) {
+        LV_TRACE_OBJ_CREATE("creating a screen");
+        lv_disp_t * disp = lv_disp_get_default();
+        if(!disp) {
+            LV_LOG_WARN("No display created to so far. No place to assign the new screen");
+            return NULL;
+        }
+
+        if(disp->screens == NULL) {
+            disp->screens = lv_mem_alloc(sizeof(lv_obj_t *));
+            disp->screens[0] = obj;
+            disp->screen_cnt = 1;
+        } else {
+            disp->screen_cnt++;
+            disp->screens = lv_mem_realloc(disp->screens, sizeof(lv_obj_t *) * disp->screen_cnt);
+            disp->screens[disp->screen_cnt - 1] = obj;
+        }
+
+        /*Set coordinates to full screen size*/
+        obj->coords.x1 = 0;
+        obj->coords.y1 = 0;
+        obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
+        obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
+    }
+    /*Create a normal object*/
+    else {
+        LV_TRACE_OBJ_CREATE("creating normal object");
+        LV_ASSERT_OBJ(parent, MY_CLASS);
+        if(parent->spec_attr == NULL) {
+            lv_obj_allocate_spec_attr(parent);
+        }
+
+        if(parent->spec_attr->children == NULL) {
+            parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *));
+            parent->spec_attr->children[0] = obj;
+            parent->spec_attr->child_cnt = 1;
+        } else {
+            parent->spec_attr->child_cnt++;
+            parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
+            parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
+        }
+    }
+
+
     lv_theme_apply(obj);
-    lv_obj_construct(obj, copy);
+    lv_obj_construct(obj);
 
     if(parent) {
         /*Call the ancestor's event handler to the parent to notify it about the new child.
@@ -93,7 +138,7 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_construct(lv_obj_t * obj, const lv_obj_t * copy)
+static void lv_obj_construct(lv_obj_t * obj)
 {
     const lv_obj_class_t * original_class_p = obj->class_p;
 
@@ -102,13 +147,13 @@ static void lv_obj_construct(lv_obj_t * obj, const lv_obj_t * copy)
         obj->class_p = obj->class_p->base_class;
 
         /*Construct the base first*/
-        lv_obj_construct(obj, copy);
+        lv_obj_construct(obj);
     }
 
     /*Restore the original class*/
     obj->class_p = original_class_p;
 
-    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(obj, copy);
+    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(obj);
 }
 
 static uint32_t get_instance_size(const lv_obj_class_t * class_p)

@@ -60,7 +60,6 @@ extern const lv_obj_class_t lv_keyboard_class;
 /**
  * Create a keyboard objects
  * @param par pointer to an object, it will be the parent of the new keyboard
- * @param copy pointer to a keyboard object, if not NULL then the new object will be copied from it
  * @return pointer to the created keyboard
  */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent);
