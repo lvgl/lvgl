@@ -33,6 +33,5 @@ void lv_example_btn_1(void)
     label = lv_label_create(btn2);
     lv_label_set_text(label, "Toggle");
     lv_obj_center(label);
-    lv_label_set_text(label, "Togglasdasasdasdase");
 }
 #endif
