@@ -37,7 +37,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_misc/lv_area.h"
+#include "misc/lv_area.h"
 
 /*********************
  *      DEFINES

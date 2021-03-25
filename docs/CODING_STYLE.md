@@ -1,7 +1,7 @@
 # Coding style
 
 ## File format
-Use [lv_misc/lv_templ.c](https://github.com/lvgl/lvgl/blob/master/src/lv_misc/lv_templ.c) and [lv_misc/lv_templ.h](https://github.com/lvgl/lvgl/blob/master/src/lv_misc/lv_templ.h)
+Use [misc/lv_templ.c](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.c) and [misc/lv_templ.h](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.h)
 
 ## Naming conventions
 * Words are separated by '_'

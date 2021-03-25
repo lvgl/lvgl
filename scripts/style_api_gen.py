@@ -133,7 +133,7 @@ def local_style_set(p):
   print("")
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-sys.stdout = open(base_dir + '/../src/lv_core/lv_obj_style_gen.h', 'w')
+sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
 
 for p in props:
   obj_style_get(p)
@@ -141,7 +141,7 @@ for p in props:
 for p in props:
   local_style_set(p)
 
-sys.stdout = open(base_dir + '/../src/lv_misc/lv_style_gen.h', 'w')
+sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.h', 'w')
 
 for p in props:
   style_set(p)
