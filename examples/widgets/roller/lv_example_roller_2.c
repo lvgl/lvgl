@@ -30,7 +30,7 @@ void lv_example_roller_2(void)
     lv_obj_set_width(roller, 100);
     lv_obj_add_style(roller, LV_PART_SELECTED, LV_STATE_DEFAULT, &style_sel);
     lv_obj_set_style_text_align(roller, LV_PART_MAIN, LV_STATE_DEFAULT, LV_TEXT_ALIGN_LEFT);
-    lv_obj_align(roller, NULL, LV_ALIGN_IN_LEFT_MID, 10, 0);
+    lv_obj_align(roller, LV_ALIGN_LEFT_MID, 10, 0);
     lv_obj_add_event_cb(roller, event_handler, NULL);
     lv_roller_set_selected(roller, 2, LV_ANIM_OFF);
 
@@ -39,7 +39,7 @@ void lv_example_roller_2(void)
     lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
     lv_roller_set_visible_row_count(roller, 3);
     lv_obj_add_style(roller, LV_PART_SELECTED, LV_STATE_DEFAULT, &style_sel);
-    lv_obj_align(roller, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(roller, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(roller, event_handler, NULL);
     lv_roller_set_selected(roller, 5, LV_ANIM_OFF);
 
@@ -50,7 +50,7 @@ void lv_example_roller_2(void)
     lv_obj_set_width(roller, 80);
     lv_obj_add_style(roller, LV_PART_SELECTED, LV_STATE_DEFAULT, &style_sel);
     lv_obj_set_style_text_align(roller, LV_PART_MAIN, LV_STATE_DEFAULT, LV_TEXT_ALIGN_RIGHT);
-    lv_obj_align(roller, NULL, LV_ALIGN_IN_RIGHT_MID, -10, 0);
+    lv_obj_align(roller, LV_ALIGN_RIGHT_MID, -10, 0);
     lv_obj_add_event_cb(roller, event_handler, NULL);
     lv_roller_set_selected(roller, 8, LV_ANIM_OFF);
 }

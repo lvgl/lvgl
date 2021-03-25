@@ -14,7 +14,7 @@ void lv_example_msgbox_1(void)
 
     lv_obj_t * mbox1 = lv_msgbox_create("Hello", "This is a message box with two buttons.", btns, true);
     lv_obj_add_event_cb(mbox1, event_cb, NULL);
-    lv_obj_align(mbox1, NULL, LV_ALIGN_CENTER, 0, 0); /*Align to the corner*/
+    lv_obj_center(mbox1);
 }
 
 #endif

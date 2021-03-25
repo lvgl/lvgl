@@ -14,7 +14,7 @@ void lv_example_grid_1(void)
     lv_obj_set_style_grid_column_template(cont, LV_PART_MAIN, LV_STATE_DEFAULT, col_dsc);
     lv_obj_set_style_grid_row_template(cont, LV_PART_MAIN, LV_STATE_DEFAULT, row_dsc);
     lv_obj_set_size(cont, 300, 220);
-    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(cont);
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
 
     lv_obj_t * label;
@@ -33,7 +33,7 @@ void lv_example_grid_1(void)
 
         label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "c%d, r%d", col, row);
-        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_center(label);
     }
 }
 

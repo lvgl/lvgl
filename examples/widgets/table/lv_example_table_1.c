@@ -57,7 +57,7 @@ void lv_example_table_1(void)
 
     /*Set a smaller height to the table. It'll make it scrollable*/
     lv_obj_set_height(table, 200);
-    lv_obj_align(table, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(table);
 
     /*Add an event callback to to apply some custom drawing*/
     lv_obj_add_event_cb(table, event_cb, NULL);

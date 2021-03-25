@@ -46,7 +46,7 @@ void lv_example_btn_3(void)
     lv_style_set_transition(&style_pr, &transition_dsc_pr);
 
     lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
-    lv_obj_align(btn1, NULL, LV_ALIGN_CENTER, 0, -80);
+    lv_obj_align(btn1, LV_ALIGN_CENTER, 0, -80);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style_def);
 

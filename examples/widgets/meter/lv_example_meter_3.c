@@ -15,7 +15,7 @@ static void set_value(void * indic, int32_t v)
 void lv_example_meter_3(void)
 {
     meter = lv_meter_create(lv_scr_act());
-    lv_obj_align(meter, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(meter);
 
     /*Create a scale for the minutes*/
     /*61 ticks in a 360 degrees range (the last and the first line overlaps)*/

@@ -269,11 +269,11 @@ static void style_init(void)
     lv_style_set_pad_column(&styles->btn, LV_DPX(5));
     lv_style_set_pad_row(&styles->btn, LV_DPX(5));
 #if LV_USE_FLEX
-    lv_style_set_layout(&styles->btn, LV_LAYOUT_FLEX);
-    lv_style_set_flex_flow(&styles->btn, LV_FLEX_FLOW_ROW);
-    lv_style_set_flex_main_place(&styles->btn, LV_FLEX_PLACE_CENTER);
-    lv_style_set_flex_cross_place(&styles->btn, LV_FLEX_PLACE_CENTER);
-    lv_style_set_flex_track_place(&styles->btn, LV_FLEX_PLACE_CENTER);
+//    lv_style_set_layout(&styles->btn, LV_LAYOUT_FLEX);
+//    lv_style_set_flex_flow(&styles->btn, LV_FLEX_FLOW_ROW);
+//    lv_style_set_flex_main_place(&styles->btn, LV_FLEX_PLACE_CENTER);
+//    lv_style_set_flex_cross_place(&styles->btn, LV_FLEX_PLACE_CENTER);
+//    lv_style_set_flex_track_place(&styles->btn, LV_FLEX_PLACE_CENTER);
 #endif
 
 

@@ -328,7 +328,7 @@ static void lv_keyboard_constructor(lv_obj_t * obj)
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, lv_obj_get_width_fit(parent), lv_obj_get_height_fit(parent) / 2);
-    lv_obj_align(obj, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+    lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, NULL);
     lv_obj_set_base_dir(obj, LV_BIDI_DIR_LTR);
 

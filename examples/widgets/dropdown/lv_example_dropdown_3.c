@@ -17,7 +17,7 @@ void lv_example_dropdown_3(void)
 {
     /*Create a drop down list*/
     lv_obj_t * dropdown = lv_dropdown_create(lv_scr_act());
-    lv_obj_align(dropdown, NULL, LV_ALIGN_IN_TOP_LEFT, 10, 10);
+    lv_obj_align(dropdown, LV_ALIGN_TOP_LEFT, 10, 10);
     lv_dropdown_set_options(dropdown, "New project\n"
                                       "New file\n"
                                       "Open project\n"

@@ -59,7 +59,7 @@ void lv_example_chart_4(void)
     lv_obj_t * chart;
     chart = lv_chart_create(lv_scr_act());
     lv_obj_set_size(chart, 200, 150);
-    lv_obj_align(chart, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(chart);
 
     lv_obj_add_event_cb(chart, event_cb, NULL);
     lv_obj_refresh_ext_draw_size(chart);

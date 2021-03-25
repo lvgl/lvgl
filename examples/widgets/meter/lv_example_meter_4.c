@@ -7,7 +7,7 @@
 void lv_example_meter_4(void)
 {
     lv_obj_t * meter = lv_meter_create(lv_scr_act());
-    lv_obj_align(meter, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(meter);
 
     /*Remove the background and the circle from the middle*/
     lv_obj_remove_style(meter, LV_PART_MAIN, LV_STATE_ANY, NULL);

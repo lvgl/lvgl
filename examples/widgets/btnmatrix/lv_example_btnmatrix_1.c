@@ -23,7 +23,7 @@ void lv_example_btnmatrix_1(void)
     lv_btnmatrix_set_btn_width(btnm1, 10, 2);        /*Make "Action1" twice as wide as "Action2"*/
     lv_btnmatrix_set_btn_ctrl(btnm1, 10, LV_BTNMATRIX_CTRL_CHECKABLE);
     lv_btnmatrix_set_btn_ctrl(btnm1, 11, LV_BTNMATRIX_CTRL_CHECKED);
-    lv_obj_align(btnm1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(btnm1, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(btnm1, event_handler, NULL);
 }
 

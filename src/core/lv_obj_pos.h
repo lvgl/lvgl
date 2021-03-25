@@ -140,13 +140,22 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb);
 /**
  * Align an object to an other object.
  * @param obj       pointer to an object to align
+ * @param align     type of alignment (see 'lv_align_t' enum) `LV_ALIGN_OUT_...` can't be used.
+ * @param x_ofs     x coordinate offset after alignment
+ * @param y_ofs     y coordinate offset after alignment
+ */
+void lv_obj_align(struct _lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
+/**
+ * Align an object to an other object.
+ * @param obj       pointer to an object to align
  * @param base      pointer to an other object (if NULL `obj`s parent is used). 'obj' will be aligned to it.
  * @param align     type of alignment (see 'lv_align_t' enum)
  * @param x_ofs     x coordinate offset after alignment
  * @param y_ofs     y coordinate offset after alignment
  * @note            if the position or size of `base` changes `obj` needs to be aligned manually again
  */
-void lv_obj_align(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+void lv_obj_align_to(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
 /**
  * Align an object to the center on its parent.
@@ -155,7 +164,7 @@ void lv_obj_align(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_alig
  */
 static inline void lv_obj_center(struct _lv_obj_t * obj)
 {
-    lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
 
 

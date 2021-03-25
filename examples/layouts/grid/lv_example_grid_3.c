@@ -19,7 +19,7 @@ void lv_example_grid_3(void)
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_scr_act());
     lv_obj_set_size(cont, 300, 220);
-    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(cont);
     lv_obj_set_grid_template(cont, col_dsc, row_dsc);
 
     lv_obj_t * label;
@@ -37,7 +37,7 @@ void lv_example_grid_3(void)
 
         label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%d,%d", col, row);
-        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_center(label);
     }
 }
 

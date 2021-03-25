@@ -14,7 +14,7 @@ void lv_example_tileview_1(void)
     lv_obj_t * tile1 = lv_tileview_add_tile(tv, 0, 0, LV_DIR_BOTTOM);
     lv_obj_t * label = lv_label_create(tile1);
     lv_label_set_text(label, "Scroll down");
-    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(label);
 
 
     /*Tile2: a button*/
@@ -26,7 +26,7 @@ void lv_example_tileview_1(void)
     lv_label_set_text(label, "Scroll up or right");
 
     lv_obj_set_size(btn, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_align(btn, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(btn);
 
     /*Tile3: a list*/
     lv_obj_t * tile3 =  lv_tileview_add_tile(tv, 1, 1, LV_DIR_LEFT);

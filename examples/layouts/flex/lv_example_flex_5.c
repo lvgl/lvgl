@@ -18,7 +18,7 @@ void lv_example_flex_5(void)
 {
     lv_obj_t * cont = lv_obj_create(lv_scr_act());
     lv_obj_set_size(cont, 300, 220);
-    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(cont);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW_WRAP);
 
     uint32_t i;
@@ -28,7 +28,7 @@ void lv_example_flex_5(void)
 
         lv_obj_t * label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%d", i);
-        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_center(label);
     }
 
     lv_anim_t a;

@@ -29,7 +29,7 @@ void lv_example_canvas_1(void)
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR);
-    lv_obj_align(canvas, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(canvas);
     lv_canvas_fill_bg(canvas, lv_color_grey_lighten_3(), LV_OPA_COVER);
 
     lv_canvas_draw_rect(canvas, 70, 60, 100, 70, &rect_dsc);

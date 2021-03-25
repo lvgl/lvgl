@@ -27,7 +27,7 @@ void lv_example_style_7(void)
     lv_label_set_text(obj, "Text of\n"
                             "a label");
 
-    lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(obj);
 }
 
 #endif

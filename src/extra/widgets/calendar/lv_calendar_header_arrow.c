@@ -77,7 +77,7 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
     lv_obj_add_event_cb(mo_next, month_event_cb, calendar);
     lv_obj_clear_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
-    lv_obj_align(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
+    lv_obj_align_to(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
 
     return header;
 }

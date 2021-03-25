@@ -75,7 +75,7 @@ void lv_example_table_2(void)
         lv_table_set_cell_value_fmt(table, i, 0, "Item %d", i + 1);
     }
 
-    lv_obj_align(table, NULL, LV_ALIGN_CENTER, 0, -20);
+    lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
 
     /*Add an event callback to to apply some custom drawing*/
     lv_obj_add_event_cb(table, event_cb, NULL);
@@ -92,7 +92,7 @@ void lv_example_table_2(void)
                                   "and %d items were added in %d ms",
                                   mem_used, ITEM_CNT, elaps);
 
-    lv_obj_align(label, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -10);
+    lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
 
 }
 

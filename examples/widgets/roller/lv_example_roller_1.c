@@ -32,7 +32,7 @@ void lv_example_roller_1(void)
                         LV_ROLLER_MODE_INFINITE);
 
     lv_roller_set_visible_row_count(roller1, 4);
-    lv_obj_align(roller1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(roller1);
     lv_obj_add_event_cb(roller1, event_handler, NULL);
 }
 

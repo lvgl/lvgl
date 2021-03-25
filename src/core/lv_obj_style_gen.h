@@ -136,9 +136,15 @@ static inline lv_coord_t lv_obj_get_style_y(const struct _lv_obj_t * obj, uint32
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_layout(const struct _lv_obj_t * obj, uint32_t part)
+static inline uint16_t lv_obj_get_style_layout(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LAYOUT);
+    return (lv_align_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_align(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ALIGN);
     return (lv_coord_t)v.num;
 }
 
@@ -668,7 +674,8 @@ static inline void lv_obj_set_style_y(struct _lv_obj_t * obj, uint32_t part, uin
     };
     lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_Y, v);
 }
-static inline void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value)
+
+static inline void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_align_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -676,6 +683,13 @@ static inline void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint32_t part
     lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_LAYOUT, v);
 }
 
+static inline void lv_obj_set_style_align(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_ALIGN, v);
+}
 
 static inline void lv_obj_set_style_bg_color(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_color_t value)
 {

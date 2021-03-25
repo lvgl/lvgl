@@ -46,7 +46,7 @@ void lv_example_get_started_2(void)
 
     lv_obj_t * label = lv_label_create(btn);          /*Add a label to the button*/
     lv_label_set_text(label, "Button");                     /*Set the labels text*/
-    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(label);
 
     /*Create an other button and use the red style too*/
     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
@@ -60,7 +60,7 @@ void lv_example_get_started_2(void)
 
     label = lv_label_create(btn2);          /*Add a label to the button*/
     lv_label_set_text(label, "Button 2");         /*Set the labels text*/
-    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(label);
 }
 
 #endif

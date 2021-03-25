@@ -28,7 +28,7 @@ void lv_example_dropdown_1(void)
                                 "Lemon\n"
                                 "Nuts");
 
-    lv_obj_align(dd, NULL, LV_ALIGN_IN_TOP_MID, 0, 20);
+    lv_obj_align(dd, LV_ALIGN_TOP_MID, 0, 20);
     lv_obj_add_event_cb(dd, event_handler, NULL);
 }
 

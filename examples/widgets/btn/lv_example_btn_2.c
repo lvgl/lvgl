@@ -41,11 +41,11 @@ void lv_example_btn_2(void)
     lv_obj_remove_style(btn1, LV_PART_ANY, LV_STATE_ANY, NULL);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
     lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
-    lv_obj_align(btn1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(btn1);
 
     lv_obj_t * label = lv_label_create(btn1);
     lv_label_set_text(label, "Button");
-    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(label);
 
 }
 #endif

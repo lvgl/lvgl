@@ -139,6 +139,7 @@ typedef enum {
     LV_STYLE_X                       = 24 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_Y                       = 25 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_LAYOUT                  = 26 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_ALIGN                   = 27 | LV_STYLE_PROP_LAYOUT_REFR,
 
     /*Group 2*/
     LV_STYLE_BG_COLOR                = 32,
@@ -210,9 +211,6 @@ typedef enum {
     LV_STYLE_TEXT_LINE_SPACE         = 91 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_TEXT_DECOR              = 92 | LV_STYLE_PROP_INHERIT,
     LV_STYLE_TEXT_ALIGN              = 93 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
-
-    /*Group 6*/
-    LV_STYLE_CONTENT_TEXT            = 96  | LV_STYLE_PROP_EXT_DRAW,
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
 

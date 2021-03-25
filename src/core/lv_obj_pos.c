@@ -45,7 +45,6 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 
     lv_obj_set_x(obj, x);
     lv_obj_set_y(obj, y);
-
 }
 
 void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
@@ -162,8 +161,6 @@ void lv_obj_refr_size(lv_obj_t * obj)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
-
-    /*Calculate the required auto sizes*/
 
     /*If the object was out of the parent invalidate the new scrollbar area too.
      *If it wasn't out of the parent but out now, also invalidate the srollbars*/
@@ -291,7 +288,13 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb)
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+void lv_obj_align(lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+{
+    lv_obj_set_style_align(obj, LV_PART_MAIN, LV_STATE_DEFAULT, align);
+    lv_obj_set_pos(obj, x_ofs, y_ofs);
+}
+
+void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -310,40 +313,40 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
         x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
         y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
-    case LV_ALIGN_IN_TOP_LEFT:
+    case LV_ALIGN_TOP_LEFT:
         x = 0;
         y = 0;
         break;
-    case LV_ALIGN_IN_TOP_MID:
+    case LV_ALIGN_TOP_MID:
         x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
         y = 0;
         break;
 
-    case LV_ALIGN_IN_TOP_RIGHT:
+    case LV_ALIGN_TOP_RIGHT:
         x = lv_obj_get_width_fit(base) - lv_obj_get_width(obj);
         y = 0;
         break;
 
-    case LV_ALIGN_IN_BOTTOM_LEFT:
+    case LV_ALIGN_BOTTOM_LEFT:
         x = 0;
         y = lv_obj_get_height_fit(base) - lv_obj_get_height(obj);
         break;
-    case LV_ALIGN_IN_BOTTOM_MID:
+    case LV_ALIGN_BOTTOM_MID:
         x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
         y = lv_obj_get_height_fit(base) - lv_obj_get_height(obj);
         break;
 
-    case LV_ALIGN_IN_BOTTOM_RIGHT:
+    case LV_ALIGN_BOTTOM_RIGHT:
         x = lv_obj_get_width_fit(base) - lv_obj_get_width(obj);
         y = lv_obj_get_height_fit(base) - lv_obj_get_height(obj);
         break;
 
-    case LV_ALIGN_IN_LEFT_MID:
+    case LV_ALIGN_LEFT_MID:
         x = 0;
         y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
-    case LV_ALIGN_IN_RIGHT_MID:
+    case LV_ALIGN_RIGHT_MID:
         x = lv_obj_get_width_fit(base) - lv_obj_get_width(obj);
         y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
@@ -411,8 +414,9 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     x += x_ofs + base->coords.x1 - parent->coords.x1 + lv_obj_get_scroll_left(parent);
     y += y_ofs + base->coords.y1 - parent->coords.y1 + lv_obj_get_scroll_top(parent);
-
+    lv_obj_set_style_align(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_ALIGN_TOP_LEFT);
     lv_obj_set_pos(obj, x, y);
+
 }
 
 void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
@@ -570,9 +574,58 @@ bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 
 void lv_obj_refr_pos(lv_obj_t * obj)
 {
+    lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
     lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
-    lv_obj_move_to(obj, x, y);
+    if(parent == NULL) {
+        lv_obj_move_to(obj, x, y);
+        return;
+    }
+
+    lv_align_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+    if(align == LV_ALIGN_TOP_LEFT) {
+        lv_obj_move_to(obj, x, y);
+    }
+    else {
+        lv_coord_t pw = lv_obj_get_width_fit(parent);
+        lv_coord_t ph = lv_obj_get_height_fit(parent);
+        lv_coord_t w = lv_obj_get_width(obj);
+        lv_coord_t h = lv_obj_get_height(obj);
+
+        switch(align) {
+        case LV_ALIGN_TOP_MID:
+            x += pw / 2 - w / 2;
+            break;
+        case LV_ALIGN_TOP_RIGHT:
+            x += pw - w;
+            break;
+        case LV_ALIGN_LEFT_MID:
+            y += ph / 2 - h / 2;
+            break;
+        case LV_ALIGN_BOTTOM_LEFT:
+            y += ph - h;
+            break;
+        case LV_ALIGN_BOTTOM_MID:
+            x += pw / 2 - w / 2;
+            y += ph - h;
+            break;
+        case LV_ALIGN_BOTTOM_RIGHT:
+            x += pw - w;
+            y += ph - h;
+            break;
+        case LV_ALIGN_RIGHT_MID:
+            x += pw - w;
+            y += ph / 2 - h / 2;
+            break;
+        case LV_ALIGN_CENTER:
+            x += pw / 2 - w / 2;
+            y += ph / 2 - h / 2;
+            break;
+        default:
+            break;
+        }
+        lv_obj_move_to(obj, x, y);
+    }
 }
 
 void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)

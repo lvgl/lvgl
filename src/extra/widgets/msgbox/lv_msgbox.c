@@ -75,7 +75,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
         lv_label_set_text(label, LV_SYMBOL_CLOSE);
         lv_coord_t close_btn_size = LV_MAX(lv_obj_get_width(label), lv_obj_get_height(label)) + LV_DPX(10);
         lv_obj_set_size(close_btn, close_btn_size, close_btn_size);
-        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
     }
 
     label = lv_label_create(mbox);

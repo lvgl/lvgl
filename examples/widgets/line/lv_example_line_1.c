@@ -18,7 +18,7 @@ void lv_example_line_1(void)
     line1 = lv_line_create(lv_scr_act());
     lv_line_set_points(line1, line_points, 5);     /*Set the points*/
     lv_obj_add_style(line1, LV_PART_MAIN, LV_STATE_DEFAULT, &style_line);     /*Set the points*/
-    lv_obj_align(line1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(line1);
 }
 
 #endif

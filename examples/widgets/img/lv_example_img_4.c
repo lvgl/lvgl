@@ -24,7 +24,7 @@ void lv_example_img_4(void)
     lv_obj_add_style(img, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
     lv_img_set_src(img, &img_skew_strip);
     lv_obj_set_size(img, 150, 100);
-    lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(img);
 
     lv_anim_t a;
     lv_anim_init(&a);

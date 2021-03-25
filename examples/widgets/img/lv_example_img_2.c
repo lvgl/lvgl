@@ -24,16 +24,16 @@ void lv_example_img_2(void)
     lv_slider_set_value(blue_slider, LV_OPA_60, LV_ANIM_OFF);
     lv_slider_set_value(intense_slider, LV_OPA_50, LV_ANIM_OFF);
 
-    lv_obj_align(red_slider, NULL, LV_ALIGN_IN_LEFT_MID, 25, 0);
-    lv_obj_align(green_slider, red_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
-    lv_obj_align(blue_slider, green_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
-    lv_obj_align(intense_slider, blue_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
+    lv_obj_align(red_slider, LV_ALIGN_LEFT_MID, 25, 0);
+    lv_obj_align_to(green_slider, red_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
+    lv_obj_align_to(blue_slider, green_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
+    lv_obj_align_to(intense_slider, blue_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
 
     /*Now create the actual image*/
     LV_IMG_DECLARE(img_cogwheel_argb)
     img1 = lv_img_create(lv_scr_act());
     lv_img_set_src(img1, &img_cogwheel_argb);
-    lv_obj_align(img1, NULL, LV_ALIGN_IN_RIGHT_MID, -20, 0);
+    lv_obj_align(img1, LV_ALIGN_RIGHT_MID, -20, 0);
 
     lv_event_send(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
 }

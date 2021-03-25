@@ -16,7 +16,7 @@ void lv_example_style_11(void)
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_arc_create(lv_scr_act());
     lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
-    lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(obj);
 }
 #endif
 

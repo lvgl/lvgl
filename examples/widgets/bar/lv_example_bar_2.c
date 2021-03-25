@@ -27,7 +27,7 @@ void lv_example_bar_2(void)
     lv_obj_add_style(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, &style_indic);
 
     lv_obj_set_size(bar, 200, 20);
-    lv_obj_align(bar, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(bar);
     lv_bar_set_value(bar, 100, LV_ANIM_ON);
 }
 

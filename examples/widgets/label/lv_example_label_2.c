@@ -27,10 +27,10 @@ void lv_example_label_2(void)
     lv_label_set_text(shadow_label, lv_label_get_text(main_label));
 
     /*Position the main label*/
-    lv_obj_align(main_label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(main_label, LV_ALIGN_CENTER, 0, 0);
 
     /*Shift the second label down and to the right by 2 pixel*/
-    lv_obj_align(shadow_label, main_label, LV_ALIGN_IN_TOP_LEFT, 2, 2);
+    lv_obj_align_to(shadow_label, main_label, LV_ALIGN_TOP_LEFT, 2, 2);
 }
 
 #endif

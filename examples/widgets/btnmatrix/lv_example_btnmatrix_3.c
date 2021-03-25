@@ -62,7 +62,7 @@ void lv_example_btnmatrix_3(void)
     lv_btnmatrix_set_one_checked(btnm, true);
     lv_btnmatrix_set_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED);
 
-    lv_obj_align(btnm, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(btnm);
 
 }
 

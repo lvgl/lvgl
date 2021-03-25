@@ -59,7 +59,7 @@ void lv_example_chart_6(void)
 {
     chart = lv_chart_create(lv_scr_act());
     lv_obj_set_size(chart, 200, 150);
-    lv_obj_align(chart, NULL, LV_ALIGN_CENTER, 0, -10);
+    lv_obj_align(chart, LV_ALIGN_CENTER, 0, -10);
 
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 40);
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_X, 10, 5, 10, 1, true, 30);
@@ -79,7 +79,7 @@ void lv_example_chart_6(void)
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Click on a point");
-    lv_obj_align(label, chart, LV_ALIGN_OUT_TOP_MID, 0, -5);
+    lv_obj_align_to(label, chart, LV_ALIGN_OUT_TOP_MID, 0, -5);
 
 }
 

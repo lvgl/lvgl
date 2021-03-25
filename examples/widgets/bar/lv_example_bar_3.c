@@ -29,7 +29,7 @@ void lv_example_bar_3(void)
     lv_obj_t * bar = lv_bar_create(lv_scr_act());
     lv_obj_add_style(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, &style_indic);
     lv_obj_set_size(bar, 20, 200);
-    lv_obj_align(bar, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(bar);
     lv_bar_set_range(bar, -20, 40);
 
     lv_anim_t a;

@@ -280,40 +280,40 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
             res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
             break;
 
-        case LV_ALIGN_IN_TOP_LEFT:
+        case LV_ALIGN_TOP_LEFT:
             res->x = 0;
             res->y = 0;
             break;
-        case LV_ALIGN_IN_TOP_MID:
+        case LV_ALIGN_TOP_MID:
             res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
             res->y = 0;
             break;
 
-        case LV_ALIGN_IN_TOP_RIGHT:
+        case LV_ALIGN_TOP_RIGHT:
             res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
             res->y = 0;
             break;
 
-        case LV_ALIGN_IN_BOTTOM_LEFT:
+        case LV_ALIGN_BOTTOM_LEFT:
             res->x = 0;
             res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
             break;
-        case LV_ALIGN_IN_BOTTOM_MID:
+        case LV_ALIGN_BOTTOM_MID:
             res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
             res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
             break;
 
-        case LV_ALIGN_IN_BOTTOM_RIGHT:
+        case LV_ALIGN_BOTTOM_RIGHT:
             res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
             res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
             break;
 
-        case LV_ALIGN_IN_LEFT_MID:
+        case LV_ALIGN_LEFT_MID:
             res->x = 0;
             res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
             break;
 
-        case LV_ALIGN_IN_RIGHT_MID:
+        case LV_ALIGN_RIGHT_MID:
             res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
             res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
             break;

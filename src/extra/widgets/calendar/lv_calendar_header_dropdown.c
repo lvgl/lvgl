@@ -80,7 +80,7 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
     lv_obj_add_event_cb(month_dd, month_event_cb, calendar);
     lv_obj_set_flex_grow(month_dd, 1);
 
-    lv_obj_align(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
+    lv_obj_align_to(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
 
     return header;
 }

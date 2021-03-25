@@ -183,13 +183,20 @@ static inline void lv_style_set_y(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_Y, v);
 }
 
-
-static inline void lv_style_set_layout(lv_style_t * style, lv_coord_t value)
+static inline void lv_style_set_layout(lv_style_t * style, uint16_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
     lv_style_set_prop(style, LV_STYLE_LAYOUT, v);
+}
+
+static inline void lv_style_set_align(lv_style_t * style, lv_align_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ALIGN, v);
 }
 
 static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value)

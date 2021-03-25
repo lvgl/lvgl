@@ -16,8 +16,6 @@ void lv_example_style_9(void)
     lv_style_set_border_width(&style, 2);
     lv_style_set_border_color(&style, lv_color_blue());
 
-//    lv_style_set_pad_all(&style, 10);
-
     lv_style_set_img_recolor(&style, lv_color_blue());
     lv_style_set_img_recolor_opa(&style, LV_OPA_50);
     lv_style_set_transform_angle(&style, 300);
@@ -28,9 +26,8 @@ void lv_example_style_9(void)
 
     LV_IMG_DECLARE(img_cogwheel_argb);
     lv_img_set_src(obj, &img_cogwheel_argb);
-    lv_obj_align(obj, NULL, LV_ALIGN_CENTER, 0, 0);
 
-//    lv_obj_set_width(obj, 200);
+    lv_obj_center(obj);
 }
 
 #endif
