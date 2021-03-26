@@ -22,7 +22,7 @@
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../hal/lv_hal.h"
-#include "../extra/layouts/lv_layouts.h"
+#include "../extra/lv_extra.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -156,8 +156,7 @@ void lv_init(void)
     LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
 #endif
 
-    lv_grid_init();
-    lv_flex_init();
+    lv_extra_init();
 
     lv_initialized = true;
 
