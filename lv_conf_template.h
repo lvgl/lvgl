@@ -79,7 +79,7 @@
 #define LV_DPI_DEF                  130     /*[px/inch]*/
 
 /*=======================
- * FEATURE CONFIGURATION
+ * FEATURE SETTINGS
  *=======================*/
 
 /*-------------
@@ -205,10 +205,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  define LV_SPRINTF_USE_FLOAT 0
 #endif  /*LV_SPRINTF_CUSTOM*/
 
+/*Add `void * user_data` to objects, animations, files systems*/
 #define LV_USE_USER_DATA      1
-#if LV_USE_USER_DATA
-typedef void * lv_user_data_t;
-#endif
 
 /*Garbage Collector settings
  *Used if lvgl is binded to higher level language and the memory is managed by that language*/
@@ -304,7 +302,7 @@ typedef void * lv_user_data_t;
 #define LV_FONT_CUSTOM_DECLARE
 
 /*Always set a default font*/
-#define LV_FONT_DEFAULT &lv_font_montserrat_14
+#define LV_FONT_DEFAULT         &lv_font_montserrat_14
 
 /*Enable handling large font and/or fonts with a lot of characters.
  *The limit depends on the font size, font face and bpp.
@@ -408,14 +406,14 @@ typedef void * lv_user_data_t;
 
 #define LV_USE_SLIDER       1   /*Requires: lv_bar*/
 
-#define LV_USE_SWITCH    1
+#define LV_USE_SWITCH       1
 
-#define LV_USE_TEXTAREA   1     /*Requires: lv_label*/
+#define LV_USE_TEXTAREA     1     /*Requires: lv_label*/
 #if LV_USE_TEXTAREA != 0
 #  define LV_TEXTAREA_DEF_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
-#define LV_USE_TABLE  1
+#define LV_USE_TABLE    1
 
 /*==================
  * EXTRA COMPONENTS
@@ -466,9 +464,6 @@ typedef void * lv_user_data_t;
 /*A simple, impressive and very complete theme*/
 #define LV_USE_THEME_DEFAULT    1
 #if LV_USE_THEME_DEFAULT
-
-/*1: Light mode; 0: Dark mode*/
-# define LV_THEME_DEFAULT_PALETTE_LIGHT     1
 
 /*1: Enable grow on press*/
 # define LV_THEME_DEFAULT_GROW        		1
