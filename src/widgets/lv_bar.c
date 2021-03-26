@@ -489,6 +489,9 @@ static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
         if(pad < 0) {
             *s = LV_MAX(*s, -pad);
         }
+    } else if(e == LV_EVENT_PRESSED || e == LV_EVENT_RELEASED) {
+        lv_bar_t * bar = (lv_bar_t *)obj;
+        lv_obj_invalidate_area(obj, &bar->indic_area);
     } else if(e == LV_EVENT_DRAW_MAIN) {
         draw_indic(obj);
     }
