@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 /**
- * Initilaize the extra components
+ * Initialize the extra components
  */
 void lv_extra_init(void);
 
