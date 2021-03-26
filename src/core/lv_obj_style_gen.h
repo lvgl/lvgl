@@ -550,7 +550,7 @@ static inline void lv_obj_set_style_opa(struct _lv_obj_t * obj, uint32_t part, u
 static inline void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, uint32_t part, uint32_t state, const lv_color_filter_dsc_t * value)
 {
     lv_style_value_t v = {
-        .ptr = (void *)value
+        .ptr = value
     };
     lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_COLOR_FILTER_DSC, v);
 }
