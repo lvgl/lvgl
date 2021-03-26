@@ -156,8 +156,12 @@ void lv_init(void)
     LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
 #endif
 
+#if LV_USE_GRID
     lv_grid_init();
+#endif
+#if LV_USE_FLEX
     lv_flex_init();
+#endif
 
     lv_initialized = true;
 
