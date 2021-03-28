@@ -100,63 +100,23 @@ menu "LVGL configuration"
         bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
         default y if !LV_CONF_MINIMAL
 
-    config LV_DISP_DEF_REFR_PERIOD
-        int "Default display refresh period (ms)."
-        default 30
-        help
-            Can be changed in the display driver (`lv_disp_drv_t`).
+    menu "HAL Settings"
+        config LV_DISP_DEF_REFR_PERIOD
+            int "Default display refresh period (ms)."
+            default 30
+            help
+                Can be changed in the display driver (`lv_disp_drv_t`).
 
-    config LV_DPI
-        int "DPI (Dots per inch in px)."
-        default 130
-
-    config LV_DISP_SMALL_LIMIT
-        int "Small display limit"
-        default 30
-        help
-            According to the width of the display (hor. res. / dpi) the
-            displays fall in 4 categories. This is the upper limit for small
-            displays.
-
-    config LV_DISP_MEDIUM_LIMIT
-        int "Medium display limit"
-        default 50
-        help
-            According to the width of the display (hor. res. / dpi) the
-            displays fall in 4 categories. This is the upper limit for medium
-            displays.
-
-    config LV_DISP_LARGE_LIMIT
-        int "Large display limit"
-        default 70
-        help
-            According to the width of the display (hor. res. / dpi) the
-            displays fall in 4 categories. This is the upper limit for large
-            displays.
-
-    menu "Indev device settings"
         config LV_INDEV_DEF_READ_PERIOD
             int "Input device read period [ms]."
             default 30
-        config LV_INDEV_DEF_DRAG_LIMIT
-            int "Drag threshold in pixels."
-            default 10
-        config LV_INDEV_DEF_DRAG_THROW
-            int "Drag throw slow-down in [%]. Greater value -> faster slow down."
-            default 10
-        config LV_INDEV_DEF_LONG_PRESS_TIME
-            int "Long press time [ms]. Time to send 'LV_EVENT_LONG_PRESSED'."
-            default 400
-        config LV_INDEV_DEF_LONG_PRESS_REP_TIME
-            int "Repeated trigger period in long press [ms]. Time between 'LV_EVENT_LONG_PRESSED_REPEAT'."
-            default 100
-        config LV_INDEV_DEF_GESTURE_LIMIT
-            int "Gesture threshold in pixels."
-            default 50
-        config LV_INDEV_DEF_GESTURE_MIN_VELOCITY
-            int "Gesture min velocity at release before swipe (pixels)."
-            default 3
 
+        config LV_DPI_DEF
+            int "Default Dots Per Inch (in px)."
+            default 130
+            help
+                Used to initialize default sizes such as widgets sized, style paddings.
+                (Not so important, you can adjust it to modify default sizes and spaces)
     endmenu
 
     menu "Feature usage"
