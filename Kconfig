@@ -159,9 +159,6 @@ menu "LVGL configuration"
     endmenu
 
     menu "Feature usage"
-        config LV_USE_ANIMATION
-            bool "Enable the Animations."
-            default y if !LV_CONF_MINIMAL
         config LV_USE_SHADOW
             bool "Enable shadow drawing."
             default y if !LV_CONF_MINIMAL
