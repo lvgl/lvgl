@@ -17,48 +17,50 @@ menu "LVGL configuration"
         bool
         default y
 
-    choice
-        prompt "Color depth."
-        default LV_COLOR_DEPTH_16
-        help
-            Color depth to be used.
+    menu "Color settings"
+        choice
+            prompt "Color depth."
+            default LV_COLOR_DEPTH_16
+            help
+                Color depth to be used.
 
-        config LV_COLOR_DEPTH_32
-            bool "32: ARGB8888"
-        config LV_COLOR_DEPTH_16
-            bool "16: RGB565"
-        config LV_COLOR_DEPTH_8
-            bool "8: RGB232"
-        config LV_COLOR_DEPTH_1
-            bool "1: 1 byte per pixel"
-    endchoice
+            config LV_COLOR_DEPTH_32
+                bool "32: ARGB8888"
+            config LV_COLOR_DEPTH_16
+                bool "16: RGB565"
+            config LV_COLOR_DEPTH_8
+                bool "8: RGB232"
+            config LV_COLOR_DEPTH_1
+                bool "1: 1 byte per pixel"
+        endchoice
 
-    config LV_COLOR_DEPTH
-        int
-        default 1 if LV_COLOR_DEPTH_1
-        default 8 if LV_COLOR_DEPTH_8
-        default 16 if LV_COLOR_DEPTH_16
-        default 32 if LV_COLOR_DEPTH_32
+        config LV_COLOR_DEPTH
+            int
+            default 1 if LV_COLOR_DEPTH_1
+            default 8 if LV_COLOR_DEPTH_8
+            default 16 if LV_COLOR_DEPTH_16
+            default 32 if LV_COLOR_DEPTH_32
 
-    config LV_COLOR_16_SWAP
-        bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
-        depends on LV_COLOR_DEPTH_16
+        config LV_COLOR_16_SWAP
+            bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
+            depends on LV_COLOR_DEPTH_16
 
-    config LV_COLOR_SCREEN_TRANSP
-        bool "Enable screen transparency."
-        depends on LV_COLOR_DEPTH_32
-        help
-            Useful for OSD or other overlapping GUIs.
-            Requires `LV_COLOR_DEPTH = 32` colors and the screen's style
-            should be modified: `style.body.opa = ...`.
-
-    config LV_COLOR_TRANSP_HEX
-        hex "Images pixels with this color will not be drawn (with chroma keying)."
-        depends on LV_COLOR_SCREEN_TRANSP
-        range 0x000000 0xFFFFFF
-        default 0x00FF00
-        help
-            See misc/lv_color.h for some color values examples.
+        config LV_COLOR_SCREEN_TRANSP
+            bool "Enable more complex drawing routines to manage screens transmarency."
+            depends on LV_COLOR_DEPTH_32
+            help
+                Can be used if the UI is above another layer, e.g. an OSD menu or video player.
+                Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to
+                non LV_OPA_COVER value
+    
+        config LV_COLOR_CHROMA_KEY
+            hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
+            depends on LV_COLOR_SCREEN_TRANSP
+            range 0x000000 0xFFFFFF
+            default 0x00FF00
+            help
+                See misc/lv_color.h for some color values examples.
+    endmenu
 
     config LV_ANTIALIAS
         bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
