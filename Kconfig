@@ -216,9 +216,6 @@ menu "LVGL configuration"
                 lv_init().
         config LV_USE_GPU_NXP_VG_LITE
             bool "Use VG-Lite for CPU off-load on NXP RTxxx platforms."
-        config LV_USE_FILESYSTEM
-            bool "Enable file system (might be required for images."
-            default y if !LV_CONF_MINIMAL
         config LV_USE_USER_DATA
             bool "Add a 'user_data' to drivers and objects."
         config LV_USE_USER_DATA_FREE
