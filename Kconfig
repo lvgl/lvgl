@@ -233,6 +233,8 @@ menu "LVGL configuration"
             bool "Show CPU usage and FPS count in the right bottom corner."
         config LV_USE_MEM_MONITOR
             bool "Show the used memory and the memory fragmentation in the left bottom corner. Requires LV_MEM_CUSTOM = 0"
+        config LV_USE_REFR_MONITOR
+            bool "Draw random colored rectangles over the redrawn areas."
         config LV_USE_API_EXTENSION_V6
             bool "Use the functions and types from the older (v6) API if possible."
             default y if !LV_CONF_MINIMAL
