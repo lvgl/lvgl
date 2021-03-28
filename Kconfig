@@ -1205,4 +1205,13 @@ menu "LVGL configuration"
            default y if !LV_CONF_MINIMAL
     endmenu
 
+    menu "Layouts"
+        config LV_USE_FLEX
+            bool "Use flex"
+            default y
+        config LV_USE_GRID
+            bool "Use grid"
+            default y
+    endmenu
+
 endmenu
