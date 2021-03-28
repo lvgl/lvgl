@@ -115,37 +115,43 @@ menu "LVGL configuration"
                 (Not so important, you can adjust it to modify default sizes and spaces)
     endmenu
 
-    menu "Feature usage"
-        config LV_USE_SHADOW
-            bool "Enable shadow drawing."
-            default y if !LV_CONF_MINIMAL
-        config LV_SHADOW_CACHE_SIZE
-            int "Shadow cache size"
-            depends on LV_USE_SHADOW
-            default 0
-            help
-                Allow buffering some shadow calculation
-                LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer,
-                where shadow size is `shadow_width + radius`
-                Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
-        config LV_USE_OUTLINE
-            bool "Enable outline drawing on rectangles."
-            default y if !LV_CONF_MINIMAL
-        config LV_USE_PATTERN
-            bool "Enable pattern drawing on rectangles."
-            default y if !LV_CONF_MINIMAL
-        config LV_USE_VALUE_STR
-            bool "Enable value string drawing on rectangles."
-            default y if !LV_CONF_MINIMAL
-        config LV_USE_BLEND_MODES
-            bool "Use other blend modes then normal (LV_BLEND_MODE_...)."
-            default y if !LV_CONF_MINIMAL
-        config LV_USE_OPA_SCALE
-            bool "Use the 'opa_scale' style property to set the opacity of an object and it's children at once."
-            default y if !LV_CONF_MINIMAL
-        config LV_USE_IMG_TRANSFORM
-            bool "Use image zoom and rotation."
-            default y if !LV_CONF_MINIMAL
+    menu "Feature configuration"
+
+        menu "Drawing"
+            config LV_DRAW_COMPLEX
+                bool "Enable complex draw engine"
+                default y
+                help
+                    Required to draw shadow, gradient, rounded corners, circles, arc, skew lines,
+                    image transformations or any masks.
+
+            config LV_SHADOW_CACHE_SIZE
+                int "Allow buffering some shadow calculation"
+                depends on LV_DRAW_COMPLEX
+                default 0
+                help
+                    LV_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
+                    shadow size is `shadow_width + radius`.
+                    Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
+
+            config LV_IMG_CACHE_DEF_SIZE
+                int "Default image cache size. 0 to disable caching."
+                default 0
+                help
+                    If only the built-in image formats are used there is no real advantage of caching.
+                    (I.e. no new image decoder is added).
+
+                    With complex image decoders (e.g. PNG or JPG) caching can
+                    save the continuous open/decode of images.
+                    However the opened images might consume additional RAM.
+
+            config LV_DISP_ROT_MAX_BUF
+                int "Maximum buffer size to allocate for rotation"
+                default 10240
+                help
+                    Only used if software rotation is enabled in the display driver.
+        endmenu
+
         config LV_USE_GPU
             bool "Enable GPU interface (only enabled 'gpu_fill_cb' and 'gpu_blend_cb' in the disp. drv."
             default y if !LV_CONF_MINIMAL
@@ -207,17 +213,6 @@ menu "LVGL configuration"
         config LV_IMG_CF_ALPHA
             bool "Enable alpha indexed images."
             default y if !LV_CONF_MINIMAL
-        config LV_IMG_CACHE_DEF_SIZE
-            int "Default image cache size."
-            default 1
-            help
-                Image caching keeps the images opened. If only the built-in
-                image formats are used there is no real advantage of caching.
-                (I.e. no new image decoder is added)
-
-                With complex image decoders (e.g. PNG or JPG) caching can
-                save the continuous open/decode of images.
-                However the opened images might consume additional RAM.
     endmenu
 
     menu "Compiler Settings"
