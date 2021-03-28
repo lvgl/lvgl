@@ -790,81 +790,25 @@ menu "LVGL configuration"
         endchoice
     endmenu
 
-    menu "Theme usage"
-    menu "Enable theme usage, always enable at least one theme"
-            config LV_THEME_EMPTY
-                bool "Empty: No theme, you can apply your styles as you need."
-                default y if LV_CONF_MINIMAL
-            config LV_THEME_TEMPLATE
-                bool "Template: Simple to create your theme based on it."
-            config LV_THEME_MATERIAL
-                bool "Material: A fast and impressive theme."
-                default y if !LV_CONF_MINIMAL
-            config LV_THEME_MONO
-                bool "Mono: Mono-color theme for monochrome displays"
-    endmenu
-
-        choice LV_THEME_DEFAULT_INIT
-            prompt "Select theme default init"
-            default LV_THEME_DEFAULT_INIT_MATERIAL if !LV_CONF_MINIMAL
-            default LV_THEME_DEFAULT_INIT_EMPTY if LV_CONF_MINIMAL
-            help
-                Select theme default init
-
-            config LV_THEME_DEFAULT_INIT_EMPTY
-                bool "Default init for empty theme"
-                select LV_THEME_EMPTY
-            config LV_THEME_DEFAULT_INIT_TEMPLATE
-                bool "Default init for template theme"
-                select LV_THEME_TEMPLATE
-            config LV_THEME_DEFAULT_INIT_MATERIAL
-                bool "Default init for material theme"
-                select LV_THEME_MATERIAL
-            config LV_THEME_DEFAULT_INIT_MONO
-                bool "Default init for mono theme"
-                select LV_THEME_MONO
-        endchoice
-
-        config LV_THEME_DEFAULT_COLOR_PRIMARY
-            hex "Select theme default primary color"
-            range 0x000000 0xFFFFFF
-            default 0xFF0000 if !LV_THEME_DEFAULT_INIT_MONO
-            default 0x000000 if LV_THEME_DEFAULT_INIT_MONO
-            help
-                See misc/lv_color.h for some color values examples.
-                When using LV_THEME_MONO the suggested values to use are
-                0x000000 (LV_COLOR_BLACK) or 0xFFFFFF (LV_COLOR_WHITE).
-                If LV_THEME_DEFAULT_COLOR_PRIMARY is 0x000000 (LV_COLOR_BLACK)
-                the texts and borders will be black and the background will be
-                white, otherwise the colors are inverted.
-
-        config LV_THEME_DEFAULT_COLOR_SECONDARY
-            hex "Select theme default secondary color"
-            range 0x000000 0xFFFFFF
-            default 0x0000FF if !LV_THEME_DEFAULT_INIT_MONO
-            default 0xFFFFFF if LV_THEME_DEFAULT_INIT_MONO
-            help
-                See misc/lv_color.h for some color values examples.
-                When using LV_THEME_MONO the suggested values to use are
-                0x000000 (LV_COLOR_BLACK) or 0xFFFFFF (LV_COLOR_WHITE).
-                If LV_THEME_DEFAULT_COLOR_PRIMARY is 0x000000 (LV_COLOR_BLACK)
-                the texts and borders will be black and the background will be
-                white, otherwise the colors are inverted.
-
-        choice LV_THEME_DEFAULT_FLAG
-            depends on LV_THEME_MATERIAL
-
-            prompt "Select theme default flag"
-            default LV_THEME_DEFAULT_FLAG_LIGHT
-            help
-                Select theme default flag
-
-            config LV_THEME_DEFAULT_FLAG_LIGHT
-                bool "Light theme"
-            config LV_THEME_DEFAULT_FLAG_DARK
-                bool "Dark theme"
-        endchoice
-
+    menu "Themes"
+        config LV_USE_THEME_DEFAULT
+            bool "A simple, impressive and very complete theme"
+            default y
+        config LV_THEME_DEFAULT_PALETTE_LIGHT
+            bool "Yes to set light mode, No to set dark mode"
+            default y
+            depends on LV_USE_THEME_DEFAULT
+        config LV_THEME_DEFAULT_GROW
+            bool "Enable grow on press"
+            default y
+            depends on LV_USE_THEME_DEFAULT
+        config LV_THEME_DEFAULT_TRANSITION_TIME
+            int "Default transition time in [ms]"
+            default 80
+            depends on LV_USE_THEME_DEFAULT
+        config LV_USE_THEME_BASIC
+            bool "A very simple theme that is a good starting point for a custom theme"
+            default y
     endmenu
 
     menu "Text Settings"
