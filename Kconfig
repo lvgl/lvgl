@@ -62,6 +62,40 @@ menu "LVGL configuration"
                 See misc/lv_color.h for some color values examples.
     endmenu
 
+    menu "Memory settings"
+        config LV_MEM_CUSTOM
+            bool "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc()` and `lv_mem_free()`"
+
+        config LV_MEM_SIZE_KILOBYTES
+            int "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
+            range 2 128
+            default 32
+            depends on !LV_MEM_CUSTOM
+
+        config LV_MEM_CUSTOM_INCLUDE
+            string "Header to include for the custom memory function"
+            default "stdlib.h"
+            depends on LV_MEM_CUSTOM
+
+        config LV_MEM_CUSTOM_ALLOC
+            string "Wrapper to malloc"
+            default "malloc"
+            depends on LV_MEM_CUSTOM
+
+        config LV_MEM_CUSTOM_FREE
+            string "Wrapper to free"
+            default "free"
+            depends on LV_MEM_CUSTOM
+
+        config LV_MEM_CUSTOM_REALLOC
+            string "Wrapper to realloc"
+            default "realloc"
+            depends on LV_MEM_CUSTOM
+
+        config LV_MEMCPY_MEMSET_STD
+            bool "Use the standard memcpy and memset instead of LVGL's own functions"
+    endmenu
+
     config LV_ANTIALIAS
         bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
         default y if !LV_CONF_MINIMAL
@@ -99,41 +133,6 @@ menu "LVGL configuration"
             According to the width of the display (hor. res. / dpi) the
             displays fall in 4 categories. This is the upper limit for large
             displays.
-
-    menu "Memory manager settings"
-    config LV_MEM_CUSTOM
-        bool
-        prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
-
-    config LV_MEM_CUSTOM_INCLUDE
-        string
-        prompt "Header to include for the custom memory function"
-        default "stdlib.h"
-        depends on LV_MEM_CUSTOM
-
-    config LV_MEM_CUSTOM_ALLOC
-        string
-        prompt "Wrapper to malloc"
-        default "malloc"
-        depends on LV_MEM_CUSTOM
-
-    config LV_MEM_CUSTOM_FREE
-        string
-        prompt "Wrapper to free"
-        default "free"
-        depends on LV_MEM_CUSTOM
-
-    config LV_MEM_SIZE_KILOBYTES
-        int
-        prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
-        range 2 128
-        default 32
-        depends on !LV_MEM_CUSTOM
-
-    config LV_MEMCPY_MEMSET_STD
-        bool
-        prompt "Use the standard memcpy and memset instead of LVGL's own functions"
-    endmenu
 
     menu "Indev device settings"
         config LV_INDEV_DEF_READ_PERIOD
