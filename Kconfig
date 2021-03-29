@@ -260,7 +260,26 @@ menu "LVGL configuration"
                 default y
                 depends on LV_USE_LOG
         endmenu
-        
+
+        menu "Asserts"
+            config LV_USE_ASSERT_NULL
+                bool "Check if the parameter is NULL. (Very fast, recommended)"
+                default y if !LV_CONF_MINIMAL
+
+            config LV_USE_ASSERT_MALLOC
+                bool "Checks if the memory is successfully allocated or no. (Very fast, recommended)"
+                default y if !LV_CONF_MINIMAL
+
+            config LV_USE_ASSERT_STYLE
+                bool "Check if the styles are properly initialized. (Very fast, recommended)"
+
+            config LV_USE_ASSERT_MEM_INTEGRITY
+                bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
+
+            config LV_USE_ASSERT_OBJ
+                bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)."
+        endmenu
+
         config LV_USE_USER_DATA
             bool "Add a 'user_data' to drivers and objects."
         config LV_USE_USER_DATA_FREE
@@ -318,35 +337,6 @@ menu "LVGL configuration"
             prompt "Expression evaluating to current system time in ms"
             default "millis()"
             depends on LV_TICK_CUSTOM
-    endmenu
-
-    menu "Debug Settings"
-        config LV_USE_DEBUG
-            bool "Enable Debug"
-
-        config LV_USE_ASSERT_NULL
-            bool "Check if the parameter is NULL. (Quite fast)"
-            default y if !LV_CONF_MINIMAL
-
-        config LV_USE_ASSERT_MEM
-            bool "Checks is the memory is successfully allocated or no. (Quite fast)"
-            default y if !LV_CONF_MINIMAL
-
-        config LV_USE_ASSERT_MEM_INTEGRITY
-            bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
-
-        config LV_USE_ASSERT_STR
-            bool "Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)"
-            help
-                If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled).
-
-        config LV_USE_ASSERT_OBJ
-            bool "Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)."
-            help
-                If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled)
-
-        config LV_USE_ASSERT_STYLE
-            bool "Check if the styles are properly initialized. (Fast)"
     endmenu
 
     menu "Font usage"
