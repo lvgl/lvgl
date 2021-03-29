@@ -346,24 +346,6 @@ menu "LVGL configuration"
     endmenu
 
     menu "Font usage"
-        config LV_FONT_FMT_TXT_LARGE
-            bool "Enable it if you have fonts with a lot of characters."
-            help
-                The limit depends on the font size, font face and bpp
-                but with > 10,000 characters if you see issues probably you
-                need to enable it.
-
-        config LV_USE_FONT_SUBPX
-            bool "Enable subpixel rendering."
-
-        config LV_FONT_SUBPX_BGR
-            bool "Use BGR instead RGB for sub-pixel rendering."
-            depends on LV_USE_FONT_SUBPX
-            help
-                Set the pixel order of the display.
-                Important only if "subpx fonts" are used.
-                With "normal" font it doesn't matter.
-
         menu "Enable built-in fonts"
             config LV_FONT_MONTSERRAT_8
                 bool "Enable Montserrat 8"
@@ -408,11 +390,13 @@ menu "LVGL configuration"
                 bool "Enable Montserrat 46"
             config LV_FONT_MONTSERRAT_48
                 bool "Enable Montserrat 48"
+
             config LV_FONT_UNSCII_8
                 bool "Enable UNSCII 8 (Perfect monospace font)"
                 default y if LV_CONF_MINIMAL
             config LV_FONT_UNSCII_16
                 bool "Enable UNSCII 16 (Perfect monospace font)"
+
             config LV_FONT_MONTSERRAT12SUBPX
                 bool "Enable Montserrat 12 sub-pixel"
             config LV_FONT_MONTSERRAT28COMPRESSED
@@ -422,6 +406,27 @@ menu "LVGL configuration"
             config LV_FONT_SIMSUN_16_CJK
                 bool "Enable Simsun 16 CJK"
         endmenu
+
+        config LV_FONT_FMT_TXT_LARGE
+            bool "Enable it if you have fonts with a lot of characters."
+            help
+                The limit depends on the font size, font face and bpp
+                but with > 10,000 characters if you see issues probably you
+                need to enable it.
+
+        config LV_USE_FONT_COMPRESSED
+            bool "Sets support for compressed fonts."
+
+        config LV_USE_FONT_SUBPX
+            bool "Enable subpixel rendering."
+
+        config LV_FONT_SUBPX_BGR
+            bool "Use BGR instead RGB for sub-pixel rendering."
+            depends on LV_USE_FONT_SUBPX
+            help
+                Set the pixel order of the display.
+                Important only if "subpx fonts" are used.
+                With "normal" font it doesn't matter.
 
         choice LV_FONT_DEFAULT_SMALL
             prompt "Select theme default small font"
