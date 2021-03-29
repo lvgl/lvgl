@@ -882,7 +882,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Pixel perfect monospace fonts
- *http://pelulamu.net/unscii/*/
+ *http://pelulamu.net/unscii/ */
 #ifndef LV_FONT_UNSCII_8
 #  ifdef CONFIG_LV_FONT_UNSCII_8
 #    define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8

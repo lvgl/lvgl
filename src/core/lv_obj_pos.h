@@ -128,7 +128,7 @@ void lv_obj_mark_layout_as_dirty(struct _lv_obj_t * obj);
  * Update the layout of an object.
  * @param obj      pointer to an object whose children needs to be updated
  */
-void lv_obj_update_layout(struct _lv_obj_t * obj);
+void lv_obj_update_layout(const struct _lv_obj_t * obj);
 
 /**
  * Regsiter a new layout
