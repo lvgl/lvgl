@@ -302,6 +302,14 @@ menu "LVGL configuration"
                 default y
         endmenu
 
+        menu "Compiler settings"
+            config LV_BIG_ENDIAN_SYSTEM
+                bool "For big endian systems set to 1"
+
+            config LV_USE_LARGE_COORD
+                bool "Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t"
+        endmenu
+
         config LV_USE_USER_DATA_FREE
             bool "Free the user data field upon object deletion"
             depends on LV_USE_USER_DATA
@@ -328,11 +336,6 @@ menu "LVGL configuration"
         config LV_IMG_CF_ALPHA
             bool "Enable alpha indexed images."
             default y if !LV_CONF_MINIMAL
-    endmenu
-
-    menu "Compiler Settings"
-        config LV_BIG_ENDIAN_SYSTEM
-            bool "For big endian systems set to 1"
     endmenu
 
     menu "HAL Settings"
