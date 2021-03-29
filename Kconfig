@@ -107,6 +107,22 @@ menu "LVGL configuration"
             int "Input device read period [ms]."
             default 30
 
+        config LV_TICK_CUSTOM
+            bool
+            prompt "Use a custom tick source"
+
+        config LV_TICK_CUSTOM_INCLUDE
+            string
+            prompt "Header for the system time function"
+            default "Arduino.h"
+            depends on LV_TICK_CUSTOM
+
+        config LV_TICK_CUSTOM_SYS_TIME_EXPR
+            string
+            prompt "Expression evaluating to current system time in ms"
+            default "millis()"
+            depends on LV_TICK_CUSTOM
+
         config LV_DPI_DEF
             int "Default Dots Per Inch (in px)."
             default 130
@@ -327,24 +343,6 @@ menu "LVGL configuration"
         config LV_USE_API_EXTENSION_V7
             bool "Use the functions and types from the older (v7) API if possible."
             default y if !LV_CONF_MINIMAL
-    endmenu
-
-    menu "HAL Settings"
-        config LV_TICK_CUSTOM
-            bool
-            prompt "Use a custom tick source"
-
-        config LV_TICK_CUSTOM_INCLUDE
-            string
-            prompt "Header for the system time function"
-            default "Arduino.h"
-            depends on LV_TICK_CUSTOM
-
-        config LV_TICK_CUSTOM_SYS_TIME_EXPR
-            string
-            prompt "Expression evaluating to current system time in ms"
-            default "millis()"
-            depends on LV_TICK_CUSTOM
     endmenu
 
     menu "Font usage"
