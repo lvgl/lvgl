@@ -956,9 +956,7 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e)
             lv_obj_refr_pos(child);
         }
 
-        if(lv_obj_get_style_layout(obj, LV_PART_MAIN)) {
-            lv_obj_mark_layout_as_dirty(obj);
-        }
+        lv_obj_mark_layout_as_dirty(obj);
 
         lv_obj_refresh_ext_draw_size(obj);
     }
