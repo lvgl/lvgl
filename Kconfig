@@ -180,6 +180,86 @@ menu "LVGL configuration"
             config LV_USE_GPU_NXP_VG_LITE
                 bool "Use NXP's VG-Lite GPU iMX RTxxx platforms."
         endmenu
+
+        menu "Logging"
+            config LV_USE_LOG
+                bool "Enable the log module"
+
+            choice
+                bool "Default log verbosity" if LV_USE_LOG
+                default LV_LOG_LEVEL_WARN
+                help
+                    Specify how important log should be added.
+
+                config LV_LOG_LEVEL_TRACE
+                    bool "A lot of logs to give detailed information"
+                config LV_LOG_LEVEL_INFO
+                    bool "Log important events"
+                config LV_LOG_LEVEL_WARN
+                    bool "Log if something unwanted happened but didn't cause a problem"
+                config LV_LOG_LEVEL_ERROR
+                    bool "Only critical issues, when the system may fail"
+                config LV_LOG_LEVEL_USER
+                    bool "Only logs added by the user"
+                config LV_LOG_LEVEL_NONE
+                    bool "Do not log anything"
+            endchoice
+
+            config LV_LOG_LEVEL
+                int
+                default 0 if LV_LOG_LEVEL_TRACE
+                default 1 if LV_LOG_LEVEL_INFO
+                default 2 if LV_LOG_LEVEL_WARN
+                default 3 if LV_LOG_LEVEL_ERROR
+                default 4 if LV_LOG_LEVEL_USER
+                default 5 if LV_LOG_LEVEL_NONE
+
+            config LV_LOG_PRINTF
+                bool "Print the log with 'printf'" if LV_USE_LOG
+                help
+                    Use printf for log output.
+                    If not set the user needs to register a callback with `lv_log_register_print_cb`.
+
+            config LV_LOG_TRACE_MEM
+                bool "Enable/Disable LV_LOG_TRACE in mem module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_TIMER
+                bool "Enable/Disable LV_LOG_TRACE in timer module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_INDEV
+                bool "Enable/Disable LV_LOG_TRACE in indev module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_DISP_REFR
+                bool "Enable/Disable LV_LOG_TRACE in disp refr module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_EVENT
+                bool "Enable/Disable LV_LOG_TRACE in event module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_OBJ_CREATE
+                bool "Enable/Disable LV_LOG_TRACE in obj create module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_LAYOUT
+                bool "Enable/Disable LV_LOG_TRACE in layout module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_ANIM
+                bool "Enable/Disable LV_LOG_TRACE in anim module"
+                default y
+                depends on LV_USE_LOG
+        endmenu
         
         config LV_USE_USER_DATA
             bool "Add a 'user_data' to drivers and objects."
@@ -238,45 +318,6 @@ menu "LVGL configuration"
             prompt "Expression evaluating to current system time in ms"
             default "millis()"
             depends on LV_TICK_CUSTOM
-    endmenu
-
-    menu "Log Settings"
-        config LV_USE_LOG
-            bool "Enable the log module"
-
-        choice
-            bool "Default log verbosity" if LV_USE_LOG
-            default LV_LOG_LEVEL_INFO
-            help
-                Specify how important log should be added.
-
-            config LV_LOG_LEVEL_TRACE
-                bool "Trace - Detailed information"
-            config LV_LOG_LEVEL_INFO
-                bool "Info  - Log important events"
-            config LV_LOG_LEVEL_WARN
-                bool "Warn  - Log if something unwanted happened"
-            config LV_LOG_LEVEL_ERROR
-                bool "Error - Only critical issues"
-            config LV_LOG_LEVEL_NONE
-                bool "None  - Do not log anything"
-        endchoice
-
-        config LV_LOG_LEVEL
-            int
-            default 0 if LV_LOG_LEVEL_TRACE
-            default 1 if LV_LOG_LEVEL_INFO
-            default 2 if LV_LOG_LEVEL_WARN
-            default 3 if LV_LOG_LEVEL_ERROR
-            default 4 if LV_LOG_LEVEL_USER
-            default 5 if LV_LOG_LEVEL_NONE
-
-        config LV_LOG_PRINTF
-            bool "Print the log with 'printf'" if LV_USE_LOG
-            help
-                Use printf for log output.
-                If not set the user needs to register a callback with `lv_log_register_print_cb`.
-
     endmenu
 
     menu "Debug Settings"
