@@ -256,7 +256,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
     lv_timer_pause(disp->refr_timer, false);
 }
 
-void lv_obj_update_layout(lv_obj_t * obj)
+void lv_obj_update_layout(const lv_obj_t * obj)
 {
     static bool mutex = false;
     if(mutex) {
