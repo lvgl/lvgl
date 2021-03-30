@@ -477,13 +477,17 @@ typedef void * lv_user_data_t;
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80
 #endif /*LV_USE_THEME_DEFAULT*/
 
- /*An very simple them that is a good starting point for a custom theme*/
+/*An very simple them that is a good starting point for a custom theme*/
  #define LV_USE_THEME_BASIC    1
 
 /*-----------
  * Layouts
  *----------*/
+
+/*A layout similar to Flexbox in CSS.*/
 #define LV_USE_FLEX     1
+
+/*A layout similar to Grid in CSS.*/
 #define LV_USE_GRID     1
 
 /*==================

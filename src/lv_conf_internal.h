@@ -882,7 +882,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Pixel perfect monospace fonts
- *http://pelulamu.net/unscii/ */
+ *http://pelulamu.net/unscii/*/
 #ifndef LV_FONT_UNSCII_8
 #  ifdef CONFIG_LV_FONT_UNSCII_8
 #    define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8
@@ -1425,7 +1425,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif /*LV_USE_THEME_DEFAULT*/
 
- /*An very simple them that is a good starting point for a custom theme*/
+/*An very simple them that is a good starting point for a custom theme*/
 #ifndef LV_USE_THEME_BASIC
 #  ifdef CONFIG_LV_USE_THEME_BASIC
 #    define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
@@ -1437,6 +1437,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*-----------
  * Layouts
  *----------*/
+
+/*A layout similar to Flexbox in CSS.*/
 #ifndef LV_USE_FLEX
 #  ifdef CONFIG_LV_USE_FLEX
 #    define LV_USE_FLEX CONFIG_LV_USE_FLEX
@@ -1444,6 +1446,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define  LV_USE_FLEX     1
 #  endif
 #endif
+
+/*A layout similar to Grid in CSS.*/
 #ifndef LV_USE_GRID
 #  ifdef CONFIG_LV_USE_GRID
 #    define LV_USE_GRID CONFIG_LV_USE_GRID
