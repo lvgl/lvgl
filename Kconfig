@@ -952,12 +952,40 @@ menu "LVGL configuration"
     endmenu
 
     menu "Extra components"
-       config LV_USE_CALENDAR
-           bool "Calendar."
-           default y if !LV_CONF_MINIMAL
-       config LV_CALENDAR_WEEK_STARTS_MONDAY
-           bool "Calendar week starts monday."
-           depends on LV_USE_CALENDAR
+        config LV_USE_CALENDAR
+            bool "Calendar."
+            default y if !LV_CONF_MINIMAL
+        config LV_CALENDAR_WEEK_STARTS_MONDAY
+            bool "Calendar week starts monday."
+            depends on LV_USE_CALENDAR
+        config LV_USE_CALENDAR_HEADER_ARROW
+            bool "Use calendar header arrow"
+            default y
+        config LV_USE_CALENDAR_HEADER_DROPDOWN
+            bool "Use calendar header dropdown"
+            default y
+        config LV_USE_COLORWHEEL
+            bool "Colorwheel."
+        config LV_USE_IMGBTN
+            bool "Imgbtn."
+        config LV_USE_KEYBOARD
+            bool "Keyboard."
+        config LV_USE_LED
+            bool "LED."
+        config LV_USE_LIST
+            bool "List."
+        config LV_USE_MSGBOX
+            bool "Msgbox."
+        config LV_USE_SPINBOX
+            bool "Spinbox."
+        config LV_USE_SPINNER
+            bool "Spinner."
+        config LV_USE_TABVIEW
+            bool "Tabview."
+        config LV_USE_TILEVIEW
+            bool "Tileview"
+        config LV_USE_WIN
+            bool "Win"
     endmenu
 
     menu "Layouts"
