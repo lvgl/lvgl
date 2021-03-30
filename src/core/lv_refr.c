@@ -751,7 +751,7 @@ static void draw_buf_rotate_180(lv_disp_drv_t *drv, lv_area_t *area, lv_color_t 
 }
 
 static LV_ATTRIBUTE_FAST_MEM void draw_buf_rotate_90(bool invert_i, lv_coord_t area_w, lv_coord_t area_h, lv_color_t *orig_color_p, lv_color_t *rot_buf) {
-    
+
     uint32_t invert = (area_w * area_h) - 1;
     uint32_t initial_i = ((area_w - 1) * area_h);
     for(lv_coord_t y = 0; y < area_h; y++) {
@@ -823,7 +823,7 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
         call_flush_cb(drv, area, color_p);
     } else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
         /*Allocate a temporary buffer to store rotated image*/
-        lv_color_t * rot_buf = NULL; 
+        lv_color_t * rot_buf = NULL;
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
         lv_coord_t area_w = lv_area_get_width(area);
         lv_coord_t area_h = lv_area_get_height(area);
@@ -862,7 +862,7 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
                 /*Rotate other areas using a maximum buffer size*/
                 if(rot_buf == NULL) rot_buf = lv_mem_buf_get(LV_DISP_ROT_MAX_BUF);
                 draw_buf_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, height, color_p, rot_buf);
-                
+
                 if(drv->rotated == LV_DISP_ROT_90) {
                     area->x1 = init_y_off + row;
                     area->x2 = init_y_off + row + height - 1;

@@ -6,7 +6,7 @@ static void set_temp(void * bar, int32_t temp)
     lv_bar_set_value(bar, temp, LV_ANIM_ON);
 
     static char buf[10];    /*Only the pointer t saved so must be static*/
-    lv_snprintf(buf, sizeof(buf), "%d°C", temp);
+    lv_snprintf(buf, sizeof(buf), "%dÂ°C", temp);
 //    lv_obj_set_style_content_text(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, buf);
 }
 

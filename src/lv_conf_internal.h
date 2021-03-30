@@ -29,7 +29,7 @@
 
 /*If lv_conf.h is not skipped include it*/
 #if !defined(LV_CONF_SKIP)
-#  if defined(LV_CONF_PATH)											/*If there is a path defined for lv_conf.h use it*/
+#  if defined(LV_CONF_PATH)                                         /*If there is a path defined for lv_conf.h use it*/
 #    define __LV_TO_STR_AUX(x) #x
 #    define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
 #    include __LV_TO_STR(LV_CONF_PATH)
@@ -1411,7 +1411,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_THEME_DEFAULT_GROW
 #    define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
 #  else
-#    define  LV_THEME_DEFAULT_GROW        		1
+#    define  LV_THEME_DEFAULT_GROW              1
 #  endif
 #endif
 
