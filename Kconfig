@@ -77,21 +77,6 @@ menu "LVGL configuration"
             default "stdlib.h"
             depends on LV_MEM_CUSTOM
 
-        config LV_MEM_CUSTOM_ALLOC
-            string "Wrapper to malloc"
-            default "malloc"
-            depends on LV_MEM_CUSTOM
-
-        config LV_MEM_CUSTOM_FREE
-            string "Wrapper to free"
-            default "free"
-            depends on LV_MEM_CUSTOM
-
-        config LV_MEM_CUSTOM_REALLOC
-            string "Wrapper to realloc"
-            default "realloc"
-            depends on LV_MEM_CUSTOM
-
         config LV_MEMCPY_MEMSET_STD
             bool "Use the standard memcpy and memset instead of LVGL's own functions"
     endmenu
@@ -115,12 +100,6 @@ menu "LVGL configuration"
             string
             prompt "Header for the system time function"
             default "Arduino.h"
-            depends on LV_TICK_CUSTOM
-
-        config LV_TICK_CUSTOM_SYS_TIME_EXPR
-            string
-            prompt "Expression evaluating to current system time in ms"
-            default "millis()"
             depends on LV_TICK_CUSTOM
 
         config LV_DPI_DEF
