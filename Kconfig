@@ -852,7 +852,7 @@ menu "LVGL configuration"
 
         config LV_USE_BIDI
             bool "Support bidirectional texts"
-            help
+            helip
                 Allows mixing Left-to-Right and Right-to-Left texts.
                 The direction will be processed according to the Unicode Bidirectional Algorithm:
                 https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
@@ -877,266 +877,87 @@ menu "LVGL configuration"
                 an other form based on their position in the text.
     endmenu
 
-    menu "Widgets"
-        config LV_USE_OBJ_REALIGN
-            bool "Enable `lv_obj_realign()` based on `lv_obj_align()` parameters."
-            default y if !LV_CONF_MINIMAL
-
-        choice
-            prompt "Enable to make the object clickable on a larger area."
-            default LV_USE_EXT_CLICK_AREA_TINY
-
-            config LV_USE_EXT_CLICK_AREA_OFF
-                bool "Disable this feature."
-            config LV_USE_EXT_CLICK_AREA_TINY
-                bool "The extra area can be adjusted horizontally and vertically (0..255px)."
-            config LV_USE_EXT_CLICK_AREA_FULL
-                bool "The extra area can be adjusted in all 4 directions (-32k..+32k px)."
-        endchoice
-
+    menu "Widget usage"
         config LV_USE_ARC
             bool "Arc."
             default y if !LV_CONF_MINIMAL
         config LV_USE_BAR
             bool "Bar."
             default y if !LV_CONF_MINIMAL
-       config LV_USE_BTN
-           bool "Button. Dependencies: lv_cont."
-           select LV_USE_CONT
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_BTNMATRIX
-           bool "Button matrix."
-           default y if !LV_CONF_MINIMAL
+        config LV_USE_BTN
+            bool "Button."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_BTNMATRIX
+            bool "Button matrix."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_CANVAS
+            bool "Canvas. Dependencies: lv_img."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_CHECKBOX
+            bool "Check Box"
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_CHART
+            bool "Chart."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_DROPDOWN
+            bool "Drop down list. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_IMG
+            bool "Image. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_LABEL
+            bool "Label."
+            default y if !LV_CONF_MINIMAL
+        config LV_LABEL_TEXT_SEL
+            bool "Enable selecting text of the label."
+            depends on LV_USE_LABEL
+        config LV_LABEL_LONG_TXT_HINT
+            bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
+            depends on LV_USE_LABEL
+        config LV_USE_LINE
+            bool "Line."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_METER
+            bool "Meter."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_ROLLER
+            bool "Roller. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_ROLLER_INF_PAGES
+            int "Number of extra 'pages' when the controller is infinite."
+            default 7
+            depends on LV_USE_ROLLER
+        config LV_USE_SLIDER
+            bool "Slider. Requires: lv_bar."
+            select LV_USE_BAR
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_SWITCH
+            bool "Switch. Dependencies: lv_slider."
+            select LV_USE_SLIDER
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_TEXTAREA
+            bool "Text area. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_TEXTAREA_DEF_PWN_SHOW_TIME
+            int "Text area def. pwn show time [ms]."
+            default 1500
+            depends on LV_USE_TEXTAREA
+        config LV_USE_TABLE
+            bool "Table."
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "Extra components"
        config LV_USE_CALENDAR
            bool "Calendar."
            default y if !LV_CONF_MINIMAL
        config LV_CALENDAR_WEEK_STARTS_MONDAY
            bool "Calendar week starts monday."
            depends on LV_USE_CALENDAR
-       config LV_USE_CANVAS
-           bool "Canvas. Dependencies: lv_img."
-           select LV_USE_IMG
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_CHECKBOX
-           bool "Check Box. Dependencies: lv_btn, lv_label."
-           select LV_USE_BTN
-           select LV_USE_LABEL
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_CHART
-           bool "Chart."
-           default y if !LV_CONF_MINIMAL
-       config LV_CHART_AXIS_TICK_MAX_LEN
-           int "Chart axis tick label max len."
-           depends on LV_USE_CHART
-           default 256
-       config LV_USE_CONT
-           bool "Container."
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_CPICKER
-           bool "Color picker."
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_DROPDOWN
-           bool "Drop down list. Dependencies: lv_page, lv_label, lv_symbol_def.h."
-           select LV_USE_PAGE
-           select LV_USE_LABEL
-           default y if !LV_CONF_MINIMAL
-       config LV_DROPDOWN_DEF_ANIM_TIME
-           int "Drop down animation time. 0: no animation."
-           depends on LV_USE_DROPDOWN
-           default 200
-       config LV_USE_GAUGE
-           bool "Gauge. Dependencies: lv_bar, lv_linemeter."
-           select LV_USE_BAR
-           select LV_USE_LINEMETER
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_IMG
-           bool "Image. Dependencies: lv_label."
-           select LV_USE_LABEL
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_IMGBTN
-           bool "Image button. Dependencies: lv_btn."
-           select LV_USE_BTN
-           default y if !LV_CONF_MINIMAL
-       config LV_IMGBTN_TILED
-           bool "Use imgbtn tiled."
-           depends on LV_USE_IMGBTN
-       config LV_USE_KEYBOARD
-           bool "Keyboard. Dependencies: lv_btnm."
-           select LV_USE_BTNM
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_LABEL
-           bool "Label."
-           default y if !LV_CONF_MINIMAL
-       config LV_LABEL_DEF_SCROLL_SPEED
-           int "Hor. or ver. scroll speed [px/sec] in LV_LABEL_LONG_ROLL/ROLL_CIRC mode."
-           default 25
-           depends on LV_USE_LABEL
-       config LV_LABEL_WAIT_CHAR_COUNT
-           int "Waiting period at beginning/end of animation cycle."
-           default 3
-           depends on LV_USE_LABEL
-       config LV_LABEL_TEXT_SEL
-           bool "Enable selecting text of the label."
-           depends on LV_USE_LABEL
-       config LV_LABEL_LONG_TXT_HINT
-           bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
-           depends on LV_USE_LABEL
-       config LV_USE_LED
-           bool "LED."
-           default y if !LV_CONF_MINIMAL
-       config LV_LED_BRIGHT_MIN
-           int "LED minimal brightness."
-           range 0 255
-           default 120
-           depends on LV_USE_LED
-       config LV_LED_BRIGHT_MAX
-           int "LED maximal brightness."
-           range 0 255
-           default 255
-           depends on LV_USE_LED
-       config LV_USE_LINE
-           bool "Line."
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_LIST
-           bool "List. Dependencies: lv_page, lv_btn, lv_label, lv_img."
-           select LV_USE_PAGE
-           select LV_USE_BTN
-           select LV_USE_LABEL
-           select LV_USE_IMG
-           default y if !LV_CONF_MINIMAL
-       config LV_LIST_DEF_ANIM_TIME
-           int "List default animation time of focusing to a list element [ms]. 0: no animation."
-           default 100
-           depends on LV_USE_LIST
-       config LV_USE_LINEMETER
-           bool "Line meter."
-           default y if !LV_CONF_MINIMAL
-       choice
-           prompt "Draw line more precisely at cost of performance."
-           default LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
-           depends on LV_USE_LINEMETER
-           config LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
-               bool "0: No extra precision."
-           config LV_LINEMETER_PRECISE_SOME_EXTRA_PRECISION
-               bool "1: Some extra precision."
-           config LV_LINEMETER_PRECISE_BEST_PRECISION
-               bool "2: Best precision."
-       endchoice
-       config LV_USE_OBJMASK
-           bool "Mask."
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_MSGBOX
-           bool "Message box. Dependencies: lv_rect, lv_btnm, lv_label."
-           select LV_USE_RECT
-           select LV_USE_BTNM
-           select LV_USE_LABEL
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_PAGE
-           bool "Page. Dependencies: lv_cont."
-           select LV_USE_CONT
-           default y if !LV_CONF_MINIMAL
-       config LV_PAGE_DEF_ANIM_TIME
-           int "Focus default animation time [ms]. 0: No animation."
-           default 100
-           depends on LV_USE_PAGE
-       config LV_USE_SPINNER
-           bool "Spinner. Dependencies: lv_arc, lv_anim."
-           select LV_USE_ARC
-           select LV_USE_ANIM
-           default y if !LV_CONF_MINIMAL
-       config LV_SPINNER_DEF_ARC_LENGTH
-           int "Spinner def. arc length [deg]."
-           default 60
-           depends on LV_USE_SPINNER
-       config LV_SPINNER_DEF_SPIN_TIME
-           int "Spinner def. spin time [ms]."
-           default 1000
-           depends on LV_USE_SPINNER
-       choice
-           prompt "Type of spinner (animation type)."
-           default LV_SPINNER_TYPE_SPINNING_ARC
-           depends on LV_USE_SPINNER
-           config LV_SPINNER_TYPE_SPINNING_ARC
-               bool "0: Spinner type spinning arc."
-           config LV_SPINNER_TYPE_FILLSPIN_ARC
-               bool "0: Spinner type fillspin arc."
-           config LV_SPINNER_TYPE_CONSTANT_ARC
-               bool "0: Spinner type constant arc."
-       endchoice
-       config LV_USE_ROLLER
-           bool "Roller. Dependencies: lv_page."
-           select LV_USE_PAGE
-           default y if !LV_CONF_MINIMAL
-       config LV_ROLLER_DEF_ANIM_TIME
-           int "Focus animation time [ms]. 0: no animation."
-           default 200
-           depends on LV_USE_ROLLER
-       config LV_ROLLER_INF_PAGES
-           int "Number of extra 'pages' when the controller is infinite."
-           default 7
-           depends on LV_USE_ROLLER
-       config LV_USE_SLIDER
-           bool "Slider. Dependencies: lv_bar."
-           select LV_USE_BAR
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_SPINBOX
-           bool "Spinbox. Dependencies: lv_ta."
-           select LV_USE_TEXTAREA
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_SWITCH
-           bool "Switch. Dependencies: lv_slider."
-           select LV_USE_SLIDER
-           default y if !LV_CONF_MINIMAL
-       config LV_USE_TEXTAREA
-           bool "Text area. Dependencies: lv_label, lv_page."
-           select LV_USE_LABEL
-           select LV_USE_PAGE
-           default y if !LV_CONF_MINIMAL
-       config LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
-           int "Text area def. cursor blink time [ms]."
-           default 400
-           depends on LV_USE_TEXTAREA
-       config LV_TEXTAREA_DEF_PWN_SHOW_TIME
-           int "Text area def. pwn show time [ms]."
-           default 1500
-           depends on LV_USE_TEXTAREA
-       config LV_USE_TABLE
-           bool "Table. Dependencies: lv_label."
-           select LV_USE_LABEL
-           default y if !LV_CONF_MINIMAL
-       config LV_TABLE_COL_MAX
-           int "Table col max."
-           default 12
-           depends on LV_USE_TABLE
-       config LV_TABLE_CELL_STYLE_CNT
-           int "Table cell style count."
-           default 4
-           depends on LV_USE_TABLE
-       config LV_USE_TABVIEW
-           bool "Tab. Dependencies: lv_page, lv_btnm."
-           select LV_USE_PAGE
-           select LV_USE_BTNM
-           default y if !LV_CONF_MINIMAL
-       config LV_TABVIEW_DEF_ANIM_TIME
-           int "Time of slide animation [ms]. 0: No animation."
-           default 300
-           depends on LV_USE_TABVIEW
-       config LV_USE_TILEVIEW
-           bool "Tileview. Dependencies: lv_page."
-           select LV_USE_PAGE
-           default y if !LV_CONF_MINIMAL
-       config LV_TILEVIEW_DEF_ANIM_TIME
-           int "Time of slide animation [ms]. 0: No animation."
-           default 300
-           depends on LV_USE_TILEVIEW
-       config LV_USE_WIN
-           bool "Window. Dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page."
-           select LV_USE_CONT
-           select LV_USE_BTN
-           select LV_USE_LABEL
-           select LV_USE_IMG
-           select LV_USE_PAGE
-           default y if !LV_CONF_MINIMAL
     endmenu
 
     menu "Layouts"
