@@ -143,20 +143,6 @@ extern "C" {
 #endif
 #endif
 
-/*------------------
- * SPINNER DEF ANIM
- *-----------------*/
-
-#ifndef LV_SPINNER_DEF_ANIM
-#ifdef CONFIG_LV_SPINNER_TYPE_SPINNING_ARC
-#define CONFIG_LV_SPINNER_DEF_ANIM   LV_SPINNER_TYPE_SPINNING_ARC
-#elif defined CONFIG_LV_SPINNER_TYPE_FILLSPIN_ARC
-#define CONFIG_LV_SPINNER_DEF_ANIM   LV_SPINNER_TYPE_FILLSPIN_ARC
-#elif defined CONFIG_LV_SPINNER_TYPE_CONSTANT_ARC
-#define CONFIG_LV_SPINNER_DEF_ANIM   LV_SPINNER_TYPE_CONSTANT_ARC
-#endif
-#endif
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
