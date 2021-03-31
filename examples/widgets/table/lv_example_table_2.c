@@ -68,7 +68,7 @@ void lv_example_table_2(void)
     lv_table_set_col_cnt(table, 1);
 
     /*Don't make the cell pressed, we will draw something different in the event*/
-    lv_obj_remove_style(table, LV_PART_ITEMS, LV_STATE_PRESSED, NULL);
+    lv_obj_remove_style(table, NULL, LV_PART_ITEMS | LV_STATE_PRESSED);
 
     uint32_t i;
     for(i = 0; i < ITEM_CNT; i++) {

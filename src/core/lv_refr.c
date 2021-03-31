@@ -240,14 +240,14 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
         perf_label = lv_label_create(lv_layer_sys());
-        lv_obj_set_style_bg_opa(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
-        lv_obj_set_style_bg_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
-        lv_obj_set_style_text_color(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
-        lv_obj_set_style_pad_top(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_pad_bottom(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_pad_left(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_pad_right(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_text_align(perf_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_TEXT_ALIGN_RIGHT);
+        lv_obj_set_style_bg_opa(perf_label, LV_OPA_50, 0);
+        lv_obj_set_style_bg_color(perf_label, lv_color_black(), 0);
+        lv_obj_set_style_text_color(perf_label, lv_color_white(), 0);
+        lv_obj_set_style_pad_top(perf_label, 3, 0);
+        lv_obj_set_style_pad_bottom(perf_label, 3, 0);
+        lv_obj_set_style_pad_left(perf_label, 3, 0);
+        lv_obj_set_style_pad_right(perf_label, 3, 0);
+        lv_obj_set_style_text_align(perf_label, LV_TEXT_ALIGN_RIGHT, 0);
         lv_label_set_text(perf_label, "?");
         lv_obj_align(perf_label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
     }
@@ -284,13 +284,13 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     static lv_obj_t * mem_label = NULL;
     if(mem_label == NULL) {
         mem_label = lv_label_create(lv_layer_sys());
-        lv_obj_set_style_bg_opa(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_50);
-        lv_obj_set_style_bg_color(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_black());
-        lv_obj_set_style_text_color(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, lv_color_white());
-        lv_obj_set_style_pad_top(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_pad_bottom(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_pad_left(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
-        lv_obj_set_style_pad_right(mem_label, LV_PART_MAIN, LV_STATE_DEFAULT, 3);
+        lv_obj_set_style_bg_opa(mem_label, LV_OPA_50, 0);
+        lv_obj_set_style_bg_color(mem_label, lv_color_black(), 0);
+        lv_obj_set_style_text_color(mem_label, lv_color_white(), 0);
+        lv_obj_set_style_pad_top(mem_label, 3, 0);
+        lv_obj_set_style_pad_bottom(mem_label, 3, 0);
+        lv_obj_set_style_pad_left(mem_label, 3, 0);
+        lv_obj_set_style_pad_right(mem_label, 3, 0);
         lv_label_set_text(mem_label, "?");
         lv_obj_align(mem_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
     }

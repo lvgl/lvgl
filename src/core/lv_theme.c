@@ -49,7 +49,7 @@ void lv_theme_apply(lv_obj_t * obj)
     lv_theme_t * th = lv_theme_get_from_obj(obj);
     if(th == NULL) return;
 
-    lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
+    lv_obj_remove_style_all(obj);
 
     apply_theme(th, obj);    /*Apply the theme including the base theme(s)*/
 }

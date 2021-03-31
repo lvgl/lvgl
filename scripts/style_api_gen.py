@@ -116,12 +116,12 @@ def style_set(p):
 
 def local_style_set(p):
   func_cast = get_func_cast(p['style_type'])
-  print("static inline void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, uint32_t part, uint32_t state, " + p['var_type'] +" value)")
+  print("static inline void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
   print("{")
   print("    lv_style_value_t v = {")
   print("        ." + p['style_type'] +" = " + func_cast + "value")
   print("    };")
-  print("    lv_obj_set_local_style_prop(obj, part, state, LV_STYLE_" + p['name'] +", v);")
+  print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] +", v, selector);")
   print("}")
   print("")
 

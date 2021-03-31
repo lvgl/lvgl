@@ -15,7 +15,7 @@ void lv_example_style_8(void)
 
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_line_create(lv_scr_act());
-    lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
+    lv_obj_add_style(obj, &style, 0);
 
     static lv_point_t p[] = {{10, 30}, {30, 50}, {100, 0}};
     lv_line_set_points(obj, p, 3);

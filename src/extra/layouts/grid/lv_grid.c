@@ -115,15 +115,15 @@ void lv_grid_init(void)
 
 void lv_obj_set_grid_template(lv_obj_t * obj, const lv_coord_t * col_templ, const lv_coord_t * row_templ)
 {
-    lv_obj_set_style_grid_column_template(obj, LV_PART_MAIN, LV_STATE_DEFAULT, col_templ);
-    lv_obj_set_style_grid_row_template(obj, LV_PART_MAIN, LV_STATE_DEFAULT, row_templ);
-    lv_obj_set_style_layout(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_LAYOUT_GRID);
+    lv_obj_set_style_grid_column_template(obj, col_templ, 0);
+    lv_obj_set_style_grid_row_template(obj, row_templ, 0);
+    lv_obj_set_style_layout(obj, LV_LAYOUT_GRID, 0);
 }
 
 void lv_obj_set_grid_place(lv_obj_t * obj, lv_grid_place_t hor_place, lv_grid_place_t ver_place)
 {
-    lv_obj_set_style_grid_column_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, hor_place);
-    lv_obj_set_style_grid_row_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, ver_place);
+    lv_obj_set_style_grid_column_place(obj, hor_place, 0);
+    lv_obj_set_style_grid_row_place(obj, ver_place, 0);
 
 }
 
@@ -131,12 +131,12 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t hor_place, uint8_t col
                                           lv_grid_place_t ver_place, uint8_t row_pos, uint8_t row_span)
 
 {
-    lv_obj_set_style_grid_cell_column_pos(obj, LV_PART_MAIN, LV_STATE_DEFAULT, col_pos);
-    lv_obj_set_style_grid_cell_row_pos(obj, LV_PART_MAIN, LV_STATE_DEFAULT, row_pos);
-    lv_obj_set_style_grid_cell_x_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, hor_place);
-    lv_obj_set_style_grid_cell_column_span(obj, LV_PART_MAIN, LV_STATE_DEFAULT, col_span);
-    lv_obj_set_style_grid_cell_row_span(obj, LV_PART_MAIN, LV_STATE_DEFAULT, row_span);
-    lv_obj_set_style_grid_cell_y_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, ver_place);
+    lv_obj_set_style_grid_cell_column_pos(obj, col_pos, 0);
+    lv_obj_set_style_grid_cell_row_pos(obj, row_pos, 0);
+    lv_obj_set_style_grid_cell_x_place(obj, hor_place, 0);
+    lv_obj_set_style_grid_cell_column_span(obj, col_span, 0);
+    lv_obj_set_style_grid_cell_row_span(obj, row_span, 0);
+    lv_obj_set_style_grid_cell_y_place(obj, ver_place, 0);
 
     lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
 }

@@ -14,7 +14,7 @@ void lv_example_label_2(void)
 
     /*Create a label for the shadow first (it's in the background)*/
     lv_obj_t * shadow_label = lv_label_create(lv_scr_act());
-    lv_obj_add_style(shadow_label, LV_PART_MAIN, LV_STATE_DEFAULT, &style_shadow);
+    lv_obj_add_style(shadow_label, &style_shadow, 0);
 
     /*Create the main label*/
     lv_obj_t * main_label = lv_label_create(lv_scr_act());

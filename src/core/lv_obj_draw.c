@@ -36,7 +36,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t * draw_dsc)
+void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
 
 #if LV_DRAW_COMPLEX
@@ -179,7 +179,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 #endif
 }
 
-void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_t * draw_dsc)
+void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
 {
     draw_dsc->opa = lv_obj_get_style_text_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
@@ -211,7 +211,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     }
 }
 
-void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc)
+void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc)
 {
     draw_dsc->opa = lv_obj_get_style_img_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
@@ -236,7 +236,7 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
 #endif
 }
 
-void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc)
+void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t * draw_dsc)
 {
     draw_dsc->width = lv_obj_get_style_line_width(obj, part);
     if(draw_dsc->width == 0) return;
@@ -265,7 +265,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
 #endif
 }
 
-void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint8_t part, lv_draw_arc_dsc_t * draw_dsc)
+void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
     draw_dsc->width = lv_obj_get_style_arc_width(obj, part);
     if(draw_dsc->width == 0) return;
@@ -289,7 +289,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint8_t part, lv_draw_arc_dsc_t * 
 #endif
 }
 
-lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint8_t part)
+lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
 {
     lv_coord_t s = 0;
 

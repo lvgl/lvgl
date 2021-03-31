@@ -49,7 +49,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_leng
 
     lv_obj_set_size(spinner, LV_DPI_DEF, LV_DPI_DEF);
 
-    lv_obj_remove_style(spinner, LV_PART_KNOB, LV_STATE_ANY, NULL);
+    lv_obj_remove_style(spinner, NULL, LV_PART_KNOB | LV_STATE_ANY);
 
     lv_anim_path_t path;
     lv_anim_path_init(&path);

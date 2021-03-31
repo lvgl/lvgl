@@ -22,7 +22,7 @@ void lv_example_style_9(void)
 
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_img_create(lv_scr_act());
-    lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
+    lv_obj_add_style(obj, &style, 0);
 
     LV_IMG_DECLARE(img_cogwheel_argb);
     lv_img_set_src(obj, &img_cogwheel_argb);

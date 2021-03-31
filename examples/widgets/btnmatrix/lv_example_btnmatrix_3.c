@@ -49,8 +49,8 @@ void lv_example_btnmatrix_3(void)
 
     lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act());
     lv_btnmatrix_set_map(btnm, map);
-    lv_obj_add_style(btnm, LV_PART_MAIN, LV_STATE_DEFAULT, &style_bg);
-    lv_obj_add_style(btnm, LV_PART_ITEMS, LV_STATE_DEFAULT, &style_btn);
+    lv_obj_add_style(btnm, &style_bg, 0);
+    lv_obj_add_style(btnm, &style_btn, LV_PART_ITEMS);
     lv_obj_add_event_cb(btnm, event_cb, NULL);
     lv_obj_set_size(btnm, 225, 35);
 

@@ -16,7 +16,7 @@ void lv_example_obj_1(void)
 
     lv_obj_t * obj3;
     obj3 = lv_obj_create(lv_scr_act());
-    lv_obj_add_style(obj3, LV_PART_MAIN, LV_STATE_DEFAULT, &style_shadow);
+    lv_obj_add_style(obj3, &style_shadow, 0);
     lv_obj_align(obj3, LV_ALIGN_CENTER, 60, 30);
 }
 #endif

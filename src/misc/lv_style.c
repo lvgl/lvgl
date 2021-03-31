@@ -74,7 +74,9 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->prop_cnt <= 1) {
+    if(style->prop_cnt == 0)  return false;
+
+    if(style->prop_cnt == 1) {
         if(style->prop1 == prop) {
             style->prop1 = LV_STYLE_PROP_INV;
             style->prop_cnt = 0;
@@ -103,6 +105,10 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
                 new_props = (uint16_t *)tmp;
                 new_values = (lv_style_value_t *)new_values_and_props;
+            } else {
+                style->prop_cnt = 1;
+                style->prop1 = i == 0 ? old_props[1] : old_props[0];
+                style->v_p.value1 = i == 0 ? old_values[1] : old_values[0];
             }
 
             uint32_t j;
@@ -166,6 +172,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         size_t size = (style->prop_cnt + 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
         uint8_t * values_and_props = lv_mem_alloc(size);
         if(values_and_props == NULL) return;
+        lv_style_value_t value_tmp = style->v_p.value1;
         style->v_p.values_and_props = values_and_props;
         style->prop_cnt++;
 
@@ -174,7 +181,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         lv_style_value_t * values = (lv_style_value_t *)values_and_props;
         props[0] = style->prop1;
         props[1] = prop;
-        values[0] = style->v_p.value1;
+        values[0] = value_tmp;
         values[1] = value;
     } else {
         style->prop_cnt = 1;

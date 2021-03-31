@@ -27,7 +27,7 @@ void lv_example_bar_3(void)
 //    lv_style_set_content_color(&style_indic, lv_color_grey());
 
     lv_obj_t * bar = lv_bar_create(lv_scr_act());
-    lv_obj_add_style(bar, LV_PART_INDICATOR, LV_STATE_DEFAULT, &style_indic);
+    lv_obj_add_style(bar, &style_indic, LV_PART_INDICATOR);
     lv_obj_set_size(bar, 20, 200);
     lv_obj_center(bar);
     lv_bar_set_range(bar, -20, 40);

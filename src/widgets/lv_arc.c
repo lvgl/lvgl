@@ -33,7 +33,7 @@
 static void lv_arc_constructor(lv_obj_t * obj);
 static void lv_arc_draw(lv_obj_t * obj);
 static void lv_arc_event(lv_obj_t * obj, lv_event_t e);
-static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, uint8_t part);
+static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, lv_part_t part);
 static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
 static void value_update(lv_obj_t * arc);
@@ -716,7 +716,7 @@ static void lv_arc_draw(lv_obj_t * obj)
     lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
 }
 
-static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angle, uint8_t part)
+static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angle, lv_part_t part)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;

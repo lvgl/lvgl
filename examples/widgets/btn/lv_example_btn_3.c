@@ -47,8 +47,8 @@ void lv_example_btn_3(void)
 
     lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
     lv_obj_align(btn1, LV_ALIGN_CENTER, 0, -80);
-    lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
-    lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style_def);
+    lv_obj_add_style(btn1, &style_pr, LV_STATE_PRESSED);
+    lv_obj_add_style(btn1, &style_def, 0);
 
     lv_obj_t * label = lv_label_create(btn1);
     lv_label_set_text(label, "Gum");

@@ -18,7 +18,7 @@ void lv_example_meter_2(void)
     lv_obj_center(meter);
 
     /*Remove the circle from the middle*/
-    lv_obj_remove_style(meter, LV_PART_INDICATOR, LV_STATE_ANY, NULL);
+    lv_obj_remove_style(meter, NULL, LV_PART_INDICATOR);
 
     /*Add a scale first*/
     lv_meter_scale_t * scale = lv_meter_add_scale(meter);

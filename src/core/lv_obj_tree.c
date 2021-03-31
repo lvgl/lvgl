@@ -346,7 +346,7 @@ static void obj_del_core(lv_obj_t * obj)
 
     /*Remove all style*/
     lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
-    lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL);
+    lv_obj_remove_style_all(obj);
     lv_obj_enable_style_refresh(true);
 
     /*Reset all input devices if the object to delete is used*/

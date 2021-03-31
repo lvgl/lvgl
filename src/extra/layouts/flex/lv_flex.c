@@ -86,21 +86,21 @@ void lv_flex_init(void)
 
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
 {
-    lv_obj_set_style_flex_flow(obj, LV_PART_MAIN, LV_STATE_DEFAULT, flow);
-    lv_obj_set_style_layout(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_LAYOUT_FLEX);
+    lv_obj_set_style_flex_flow(obj, flow, 0);
+    lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, 0);
 }
 
 void lv_obj_set_flex_place(lv_obj_t * obj, lv_flex_place_t main_place, lv_flex_place_t cross_place, lv_flex_place_t track_place)
 {
-    lv_obj_set_style_flex_main_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, main_place);
-    lv_obj_set_style_flex_cross_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, cross_place);
-    lv_obj_set_style_flex_track_place(obj, LV_PART_MAIN, LV_STATE_DEFAULT, track_place);
-    lv_obj_set_style_layout(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_LAYOUT_FLEX);
+    lv_obj_set_style_flex_main_place(obj, main_place, 0);
+    lv_obj_set_style_flex_cross_place(obj, cross_place, 0);
+    lv_obj_set_style_flex_track_place(obj, track_place, 0);
+    lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, 0);
 }
 
 void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
 {
-    lv_obj_set_style_flex_grow(obj, LV_PART_MAIN, LV_STATE_DEFAULT, grow);
+    lv_obj_set_style_flex_grow(obj, grow, 0);
 }
 
 /**********************

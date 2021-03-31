@@ -552,7 +552,7 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time)
 
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
-    lv_obj_set_style_text_align(obj, LV_PART_MAIN, LV_STATE_DEFAULT, align);
+    lv_obj_set_style_text_align(obj, align, 0);
 
     switch(align) {
     default:

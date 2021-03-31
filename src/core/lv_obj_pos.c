@@ -57,10 +57,10 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
     lv_res_t res_x;
     lv_style_value_t v_x;
 
-    res_x = lv_obj_get_local_style_prop(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_STYLE_X, &v_x);
+    res_x = lv_obj_get_local_style_prop(obj, LV_STYLE_X, &v_x, 0);
 
     if((res_x == LV_RES_OK && v_x.num != x) || res_x == LV_RES_INV) {
-        lv_obj_set_style_x(obj, LV_PART_MAIN, LV_STATE_DEFAULT, x);
+        lv_obj_set_style_x(obj, x, 0);
     }
 
     lv_obj_refr_pos(obj);
@@ -76,10 +76,10 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
     lv_res_t res_y;
     lv_style_value_t v_y;
 
-    res_y = lv_obj_get_local_style_prop(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_STYLE_Y, &v_y);
+    res_y = lv_obj_get_local_style_prop(obj, LV_STYLE_Y, &v_y, 0);
 
     if((res_y == LV_RES_OK && v_y.num != y) || res_y == LV_RES_INV) {
-        lv_obj_set_style_y(obj, LV_PART_MAIN, LV_STATE_DEFAULT, y);
+        lv_obj_set_style_y(obj, y, 0);
     }
 
     lv_obj_refr_pos(obj);
@@ -182,10 +182,10 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
     lv_res_t res_w;
     lv_style_value_t v_w;
 
-    res_w = lv_obj_get_local_style_prop(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_STYLE_WIDTH, &v_w);
+    res_w = lv_obj_get_local_style_prop(obj, LV_STYLE_WIDTH, &v_w, 0);
 
     if((res_w == LV_RES_OK && v_w.num != w) || res_w == LV_RES_INV) {
-        lv_obj_set_style_width(obj, LV_PART_MAIN, LV_STATE_DEFAULT, w);
+        lv_obj_set_style_width(obj, w, 0);
     }
 
     lv_obj_refr_size(obj);
@@ -197,10 +197,10 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
     lv_res_t res_h;
     lv_style_value_t v_h;
 
-    res_h = lv_obj_get_local_style_prop(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_STYLE_HEIGHT, &v_h);
+    res_h = lv_obj_get_local_style_prop(obj, LV_STYLE_HEIGHT, &v_h, 0);
 
     if((res_h == LV_RES_OK && v_h.num != h) || res_h == LV_RES_INV) {
-        lv_obj_set_style_height(obj, LV_PART_MAIN, LV_STATE_DEFAULT, h);
+        lv_obj_set_style_height(obj, h, 0);
     }
 
     lv_obj_refr_size(obj);
@@ -226,7 +226,7 @@ void lv_obj_set_layout(lv_obj_t * obj, uint32_t layout)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_set_style_layout(obj, LV_PART_MAIN, LV_STATE_DEFAULT, layout);
+    lv_obj_set_style_layout(obj, layout, 0);
 
     lv_obj_mark_layout_as_dirty(obj);
 }
@@ -290,7 +290,7 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb)
 
 void lv_obj_align(lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
-    lv_obj_set_style_align(obj, LV_PART_MAIN, LV_STATE_DEFAULT, align);
+    lv_obj_set_style_align(obj, align, 0);
     lv_obj_set_pos(obj, x_ofs, y_ofs);
 }
 
@@ -414,7 +414,7 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
 
     x += x_ofs + base->coords.x1 - parent->coords.x1 + lv_obj_get_scroll_left(parent);
     y += y_ofs + base->coords.y1 - parent->coords.y1 + lv_obj_get_scroll_top(parent);
-    lv_obj_set_style_align(obj, LV_PART_MAIN, LV_STATE_DEFAULT, LV_ALIGN_TOP_LEFT);
+    lv_obj_set_style_align(obj, LV_ALIGN_TOP_LEFT, 0);
     lv_obj_set_pos(obj, x, y);
 
 }

@@ -51,8 +51,7 @@ typedef struct _lv_event_temp_data {
 typedef struct {
     uint16_t time;
     uint16_t delay;
-    lv_part_t part;
-    lv_state_t state;
+    lv_style_selector_t selector;
     lv_style_prop_t prop;
     const lv_anim_path_t * path;
 }trans_set_t;
@@ -990,7 +989,8 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     uint32_t i;
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
         lv_obj_style_t * obj_style = &obj->styles[i];
-        if(obj_style->state & (~new_state)) continue; /*Skip unrelated styles*/
+        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        if(state_act & (~new_state)) continue; /*Skip unrelated styles*/
         if(obj_style->is_trans) continue;
 
         lv_style_value_t v;
@@ -1002,7 +1002,8 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
             uint32_t t;
             for(t = 0; t < tsi; t++) {
-                if(ts[t].prop == tr->props[j] && ts[t].state >= obj_style->state) break;
+                lv_state_t state_tr = lv_obj_style_get_selector_state(ts[t].selector);
+                if(ts[t].prop == tr->props[j] && state_tr >= state_act) break;
             }
 
             /*If not found  add it*/
@@ -1011,15 +1012,15 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
                 ts[tsi].delay = tr->delay;
                 ts[tsi].path = tr->path;
                 ts[tsi].prop = tr->props[j];
-                ts[tsi].part = obj_style->part;
-                ts[tsi].state = obj_style->state;
+                ts[tsi].selector = obj_style->selector;
                 tsi++;
             }
         }
     }
 
     for(i = 0;i < tsi; i++) {
-        _lv_obj_style_create_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
+        lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
+        _lv_obj_style_create_transition(obj, ts[i].prop, part_act, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
     }
 
     lv_mem_buf_release(ts);

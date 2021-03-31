@@ -46,8 +46,8 @@ static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
         /*Recolor the image based on the sliders' values*/
         lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider), lv_slider_get_value(blue_slider));
         lv_opa_t intense = lv_slider_get_value(intense_slider);
-        lv_obj_set_style_img_recolor_opa(img1, LV_PART_MAIN, LV_STATE_DEFAULT, intense);
-        lv_obj_set_style_img_recolor(img1, LV_PART_MAIN, LV_STATE_DEFAULT, color);
+        lv_obj_set_style_img_recolor_opa(img1, intense, 0);
+        lv_obj_set_style_img_recolor(img1, color, 0);
     }
 }
 
@@ -56,11 +56,10 @@ static lv_obj_t * create_slider(lv_color_t color)
     lv_obj_t * slider = lv_slider_create(lv_scr_act());
     lv_slider_set_range(slider, 0, 255);
     lv_obj_set_size(slider, 10, 200);
-    lv_obj_set_style_bg_color(slider, LV_PART_KNOB, LV_STATE_DEFAULT, color);
-    lv_obj_set_style_bg_color(slider, LV_PART_INDICATOR, LV_STATE_DEFAULT, lv_color_darken(color, LV_OPA_40));
+    lv_obj_set_style_bg_color(slider, color, LV_PART_KNOB);
+    lv_obj_set_style_bg_color(slider, lv_color_darken(color, LV_OPA_40), LV_PART_INDICATOR);
     lv_obj_add_event_cb(slider, slider_event_cb, NULL);
     return slider;
-
 }
 
 #endif

@@ -75,7 +75,7 @@ void lv_example_chart_5(void)
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, -1000, 1000);
 
     /*Do not display points on the data*/
-    lv_obj_set_style_size(chart, LV_PART_ITEMS, LV_STATE_DEFAULT, 0);
+    lv_obj_set_style_size(chart, 0, LV_PART_ITEMS);
 
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
 

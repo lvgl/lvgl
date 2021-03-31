@@ -51,8 +51,8 @@ void lv_example_btn_2(void)
 
     lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
 //    lv_obj_remove_style(btn1, LV_PART_ANY, LV_STATE_ANY, NULL);
-    lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style);
-    lv_obj_add_style(btn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
+    lv_obj_add_style(btn1, &style, 0);
+    lv_obj_add_style(btn1, &style_pr, LV_STATE_PRESSED);
     lv_obj_set_size(btn1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_center(btn1);
 

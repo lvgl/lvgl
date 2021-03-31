@@ -54,12 +54,12 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
     lv_obj_t * header = lv_obj_create(parent);
 
     /*Use the same paddings as the calendar*/
-    lv_obj_set_style_pad_left(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_pad_left(calendar, LV_PART_MAIN));
-    lv_obj_set_style_pad_right(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_pad_right(calendar, LV_PART_MAIN));
-    lv_obj_set_style_pad_top(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_pad_top(calendar, LV_PART_MAIN));
-    lv_obj_set_style_pad_bottom(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_pad_bottom(calendar, LV_PART_MAIN));
-    lv_obj_set_style_pad_column(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_pad_column(calendar, LV_PART_MAIN));
-    lv_obj_set_style_radius(header, LV_PART_MAIN, LV_STATE_DEFAULT, lv_obj_get_style_radius(calendar, LV_PART_MAIN));
+    lv_obj_set_style_pad_left(header,lv_obj_get_style_pad_left(calendar, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_right(header,lv_obj_get_style_pad_right(calendar, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_top(header,lv_obj_get_style_pad_top(calendar, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_bottom(header,lv_obj_get_style_pad_bottom(calendar, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_column(header,lv_obj_get_style_pad_column(calendar, LV_PART_MAIN), 0);
+    lv_obj_set_style_radius(header,lv_obj_get_style_radius(calendar, LV_PART_MAIN), 0);
 
     const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
 

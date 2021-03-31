@@ -40,9 +40,9 @@ void lv_example_get_started_2(void)
     lv_obj_t * btn = lv_btn_create(lv_scr_act());     /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
-    lv_obj_remove_style(btn, LV_PART_ANY, LV_STATE_ANY, NULL); /*Remove the styles coming from the theme*/
-    lv_obj_add_style(btn, LV_PART_MAIN, LV_STATE_DEFAULT, &style_btn);
-    lv_obj_add_style(btn, LV_PART_MAIN, LV_STATE_PRESSED, &style_btn_pressed);
+    lv_obj_remove_style_all(btn); /*Remove the styles coming from the theme*/
+    lv_obj_add_style(btn, &style_btn, 0);
+    lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
 
     lv_obj_t * label = lv_label_create(btn);          /*Add a label to the button*/
     lv_label_set_text(label, "Button");                     /*Set the labels text*/
@@ -52,11 +52,11 @@ void lv_example_get_started_2(void)
     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
     lv_obj_set_pos(btn2, 10, 80);
     lv_obj_set_size(btn2, 120, 50);                            /*Set its size*/
-    lv_obj_remove_style(btn2, LV_PART_ANY, LV_STATE_ANY, NULL); /*Remove the styles coming from the theme*/
-    lv_obj_add_style(btn2, LV_PART_MAIN, LV_STATE_DEFAULT, &style_btn);
-    lv_obj_add_style(btn2, LV_PART_MAIN, LV_STATE_DEFAULT, &style_btn_red);
-    lv_obj_add_style(btn2, LV_PART_MAIN, LV_STATE_PRESSED, &style_btn_pressed);
-    lv_obj_set_style_radius(btn2, LV_PART_MAIN, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE); /*Add a local style*/
+    lv_obj_remove_style_all(btn2); /*Remove the styles coming from the theme*/
+    lv_obj_add_style(btn2, &style_btn, 0);
+    lv_obj_add_style(btn2, &style_btn_red, 0);
+    lv_obj_add_style(btn2, &style_btn_pressed, LV_STATE_PRESSED);
+    lv_obj_set_style_radius(btn2, LV_RADIUS_CIRCLE, 0); /*Add a local style*/
 
     label = lv_label_create(btn2);          /*Add a label to the button*/
     lv_label_set_text(label, "Button 2");         /*Set the labels text*/

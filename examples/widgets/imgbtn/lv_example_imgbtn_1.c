@@ -27,8 +27,8 @@ void lv_example_imgbtn_1(void)
     /*Create an image button*/
     lv_obj_t * imgbtn1 = lv_imgbtn_create(lv_scr_act());
     lv_imgbtn_set_src(imgbtn1, LV_IMGBTN_STATE_RELEASED, &imgbtn_left, &imgbtn_mid, &imgbtn_right);
-    lv_obj_add_style(imgbtn1, LV_PART_MAIN, LV_STATE_DEFAULT, &style_def);
-    lv_obj_add_style(imgbtn1, LV_PART_MAIN, LV_STATE_PRESSED, &style_pr);
+    lv_obj_add_style(imgbtn1, &style_def, 0);
+    lv_obj_add_style(imgbtn1, &style_pr, LV_STATE_PRESSED);
 
     lv_obj_align(imgbtn1, LV_ALIGN_CENTER, 0, 0);
 
