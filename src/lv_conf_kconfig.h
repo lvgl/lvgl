@@ -47,22 +47,6 @@ extern "C" {
 #endif
 #endif
 
-/*******************
- * THEME SELECTION
- *******************/
-
-#ifndef LV_THEME_DEFAULT_INIT
-#if defined (CONFIG_LV_THEME_DEFAULT_INIT_EMPTY)
-#define CONFIG_LV_THEME_DEFAULT_INIT               lv_theme_empty_init
-#elif defined (CONFIG_LV_THEME_DEFAULT_INIT_TEMPLATE)
-#define CONFIG_LV_THEME_DEFAULT_INIT               lv_theme_template_init
-#elif defined (CONFIG_LV_THEME_DEFAULT_INIT_MATERIAL)
-#define CONFIG_LV_THEME_DEFAULT_INIT               lv_theme_material_init
-#elif defined (CONFIG_LV_THEME_DEFAULT_INIT_MONO)
-#define LV_THEME_DEFAULT_INIT                      lv_theme_mono_init
-#endif
-#endif
-
 /********************
  * FONT SELECTION
  *******************/
