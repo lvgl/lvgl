@@ -253,7 +253,7 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     if(t->track_main_size > 0) t->track_main_size -= item_gap; /*There is no gap after the last item*/
 
     if(grow_item_cnt && grow_sum) {
-        lv_coord_t s = max_main_size - t->track_main_size;	/*The remaining size for grow items*/
+        lv_coord_t s = max_main_size - t->track_main_size;  /*The remaining size for grow items*/
         t->grow_unit =  s / grow_sum;
         t->track_main_size = max_main_size;  /*If there is at least one "grow item" the track takes the full space*/
     } else {

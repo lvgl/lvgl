@@ -87,9 +87,14 @@ props = [
 {'name': 'ARC_IMG_SRC',               'style_type': 'ptr',   'var_type': 'const void *' },
 ]
 
+def style_get_cast(style_type, var_type):
+  cast = ""
+  if style_type != 'color':
+    cast = "(" + var_type + ")"
+  return cast
+
 def obj_style_get(p):
-  is_struct = p['style_type'] == 'color'
-  cast = "(" + p['var_type'] + ")" if not is_struct else ""
+  cast = style_get_cast(p['style_type'], p['var_type'])
   print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part)")
   print("{")
   print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
@@ -97,29 +102,29 @@ def obj_style_get(p):
   print("}")
   print("")
 
-def get_func_cast(style):
-  func_cast = ""
-  if style == 'num':
-    func_cast = "(int32_t)"
-  return func_cast
+def style_set_cast(style_type):
+  cast = ""
+  if style_type == 'num':
+    cast = "(int32_t)"
+  return cast
 
 def style_set(p):
-  func_cast = get_func_cast(p['style_type'])
+  cast = style_set_cast(p['style_type'])
   print("static inline void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
   print("{")
   print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + func_cast + "value")
+  print("        ." + p['style_type'] +" = " + cast + "value")
   print("    };")
   print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
   print("")
 
 def local_style_set(p):
-  func_cast = get_func_cast(p['style_type'])
+  cast = style_set_cast(p['style_type'])
   print("static inline void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
   print("{")
   print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + func_cast + "value")
+  print("        ." + p['style_type'] +" = " + cast + "value")
   print("    };")
   print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] +", v, selector);")
   print("}")
