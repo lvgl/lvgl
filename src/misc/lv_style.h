@@ -158,7 +158,6 @@ typedef enum {
     LV_STYLE_BG_IMG_RECOLOR_OPA      = 41,
     LV_STYLE_BG_IMG_TILED            = 42,
 
-
     /*Group 3*/
     LV_STYLE_BORDER_COLOR            = 48,
     LV_STYLE_BORDER_COLOR_FILTERED   = 48 | LV_STYLE_PROP_FILTER,
@@ -346,7 +345,7 @@ static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_pr
         }
     } else if(style->prop1 == prop) {
         *value = style->v_p.value1;
-        return true;
+        return LV_RES_OK;
     }
     return LV_RES_INV;
 }
