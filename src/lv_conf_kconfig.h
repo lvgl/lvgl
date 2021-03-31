@@ -160,20 +160,6 @@ extern "C" {
 #endif
 
 /*------------------
- * LINEMETER PRECISE
- *-----------------*/
-
-#ifndef LV_LINEMETER_PRECISE
-#ifdef CONFIG_LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
-#define CONFIG_LV_LINEMETER_PRECISE   0
-#elif defined CONFIG_LV_LINEMETER_PRECISE_SOME_EXTRA_PRECISION
-#define CONFIG_LV_LINEMETER_PRECISE   1
-#elif defined CONFIG_LV_LINEMETER_PRECISE_BEST_PRECISION
-#define CONFIG_LV_LINEMETER_PRECISE   2
-#endif
-#endif
-
-/*------------------
  * SPINNER DEF ANIM
  *-----------------*/
 
