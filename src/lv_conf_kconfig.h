@@ -63,22 +63,6 @@ extern "C" {
 #endif
 #endif
 
-/*******************
- * COLOR SELECTION
- *******************/
-
-#ifndef LV_THEME_DEFAULT_COLOR_PRIMARY
-#ifdef CONFIG_LV_THEME_DEFAULT_COLOR_PRIMARY
-#define LV_THEME_DEFAULT_COLOR_PRIMARY lv_color_hex(CONFIG_LV_THEME_DEFAULT_COLOR_PRIMARY)
-#endif
-#endif
-
-#ifndef LV_THEME_DEFAULT_COLOR_SECONDARY
-#ifdef CONFIG_LV_THEME_DEFAULT_COLOR_SECONDARY
-#define LV_THEME_DEFAULT_COLOR_SECONDARY lv_color_hex(CONFIG_LV_THEME_DEFAULT_COLOR_SECONDARY)
-#endif
-#endif
-
 /********************
  * FONT SELECTION
  *******************/
