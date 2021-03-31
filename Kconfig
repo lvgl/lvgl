@@ -969,10 +969,10 @@ menu "LVGL configuration"
 
     menu "Layouts"
         config LV_USE_FLEX
-            bool "Use flex"
+            bool "A layout similar to Flexbox in CSS."
             default y
         config LV_USE_GRID
-            bool "Use grid"
+            bool "A layout similar to Grid in CSS."
             default y
     endmenu
 
