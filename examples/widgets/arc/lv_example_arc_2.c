@@ -1,4 +1,4 @@
-#include "../../../lvgl.h" 
+#include "../../../lvgl.h"
 
 #if LV_USE_ARC && LV_BUILD_EXAMPLES
 

@@ -471,7 +471,7 @@ typedef void * lv_user_data_t;
 # define LV_THEME_DEFAULT_PALETTE_LIGHT     1
 
 /*1: Enable grow on press*/
-# define LV_THEME_DEFAULT_GROW        		1
+# define LV_THEME_DEFAULT_GROW              1
 
 /*Default transition time in [ms]*/
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80
