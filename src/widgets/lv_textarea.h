@@ -199,6 +199,15 @@ void lv_textarea_set_text_sel(lv_obj_t * ta, bool en);
  */
 void lv_textarea_set_password_show_time(lv_obj_t * ta, uint16_t time);
 
+/**
+ * Set the label's alignment.
+ * It sets where the label is aligned (in one line mode it can be smaller than the text area)
+ * and how the lines of the area align in case of multiline text area
+ * @param obj       pointer to a textarea obejct
+ * @param align     the align mode from ::lv_text_align_t
+ */
+void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align);
+
 /*=====================
  * Getter functions
  *====================*/

@@ -634,6 +634,31 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time)
     ta->pwd_show_time = time;
 }
 
+/**
+ * Set the label's alignment.
+ * It sets where the label is aligned (in one line mode it can be smaller than the text area)
+ * and how the lines of the area align in case of multiline text area
+ * @param obj       pointer to a textarea obejct
+ * @param align     the align mode from ::lv_text_align_t
+ */
+void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
+{
+    lv_obj_set_style_text_align(obj, LV_PART_MAIN, LV_STATE_DEFAULT, align);
+
+    switch(align) {
+    default:
+    case LV_TEXT_ALIGN_LEFT:
+        lv_obj_align(lv_textarea_get_label(obj), LV_ALIGN_TOP_LEFT, 0, 0);
+        break;
+    case LV_TEXT_ALIGN_RIGHT:
+        lv_obj_align(lv_textarea_get_label(obj), LV_ALIGN_TOP_RIGHT, 0, 0);
+        break;
+    case LV_TEXT_ALIGN_CENTER:
+        lv_obj_align(lv_textarea_get_label(obj), LV_ALIGN_TOP_MID, 0, 0);
+        break;
+    }
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -999,22 +1024,6 @@ static void lv_textarea_event(lv_obj_t * obj, lv_event_t e)
 
     if(e == LV_EVENT_STYLE_CHANGED) {
         if(ta->label) {
-            if(ta->one_line) {
-                lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-                lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-                const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-
-                /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
-                lv_coord_t font_h              = lv_font_get_line_height(font);
-                lv_obj_set_height(ta->label, font_h);
-                lv_obj_set_height(obj, font_h + top + bottom);
-            }
-            else {
-                /*In not one line mode refresh the Label width because 'hpad' can modify it*/
-                lv_obj_set_width(ta->label, lv_obj_get_width_fit(obj));
-                lv_obj_set_pos(ta->label, 0, 0); /*Be sure the Label is in the correct position*/
-
-            }
             lv_label_set_text(ta->label, NULL);
             refr_cursor_area(obj);
             start_cursor_blink(obj);
