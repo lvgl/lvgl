@@ -2,7 +2,7 @@
  * @file lvgl.h
  * Include all LVGL related headers
  */
- 
+
 #ifndef LVGL_H
 #define LVGL_H
 
