@@ -702,7 +702,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *===================*/
 
 /*Montserrat fonts with ASCII range and some symbols using bpp = 4
- *https://fonts.google.com/specimen/Montserrat*/
+ *fonts.google.com/specimen/Montserrat*/
 #ifndef LV_FONT_MONTSERRAT_8
 #  ifdef CONFIG_LV_FONT_MONTSERRAT_8
 #    define LV_FONT_MONTSERRAT_8 CONFIG_LV_FONT_MONTSERRAT_8
@@ -882,7 +882,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Pixel perfect monospace fonts
- *http://pelulamu.net/unscii/*/
+ *pelulamu.net/unscii/*/
 #ifndef LV_FONT_UNSCII_8
 #  ifdef CONFIG_LV_FONT_UNSCII_8
 #    define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8
@@ -1025,7 +1025,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*Support bidirectional texts. Allows mixing Left-to-Right and Right-to-Left texts.
  *The direction will be processed according to the Unicode Bidirectioanl Algorithm:
- *https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
+ *www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #  ifdef CONFIG_LV_USE_BIDI
 #    define LV_USE_BIDI CONFIG_LV_USE_BIDI
@@ -1061,7 +1061,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *  WIDGET USAGE
  *================*/
 
-/*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
+/*Documentation of the widgets: docs.lvgl.io/latest/en/html/widgets/index.html*/
 
 #ifndef LV_USE_ARC
 #  ifdef CONFIG_LV_USE_ARC
@@ -1411,7 +1411,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_THEME_DEFAULT_GROW
 #    define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
 #  else
-#    define  LV_THEME_DEFAULT_GROW        		1
+#    define  LV_THEME_DEFAULT_GROW              1
 #  endif
 #endif
 
