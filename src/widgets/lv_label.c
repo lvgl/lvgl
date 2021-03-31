@@ -1234,4 +1234,3 @@ static void set_ofs_y_anim(void * obj, int32_t v)
 
 
 #endif
-f
