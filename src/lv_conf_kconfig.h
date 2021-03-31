@@ -160,20 +160,6 @@ extern "C" {
 #endif
 
 /*------------------
- * EXT CLICK AREA
- *-----------------*/
-
-#ifndef LV_USE_EXT_CLICK_AREA
-#ifdef CONFIG_LV_USE_EXT_CLICK_AREA_OFF
-#define CONFIG_LV_USE_EXT_CLICK_AREA LV_EXT_CLICK_AREA_OFF
-#elif defined CONFIG_LV_USE_EXT_CLICK_AREA_TINY
-#define CONFIG_LV_USE_EXT_CLICK_AREA LV_EXT_CLICK_AREA_TINY
-#elif defined CONFIG_LV_USE_EXT_CLICK_AREA_FULL
-#define CONFIG_LV_USE_EXT_CLICK_AREA LV_EXT_CLICK_AREA_FULL
-#endif
-#endif
-
-/*------------------
  * LINEMETER PRECISE
  *-----------------*/
 
