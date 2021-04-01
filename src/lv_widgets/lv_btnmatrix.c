@@ -97,6 +97,7 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->map_p          = NULL;
     ext->recolor        = 0;
     ext->one_check      = 0;
+    ext->align          = LV_LABEL_ALIGN_LEFT;
     lv_style_list_init(&ext->style_btn);
     ext->style_btn.ignore_trans = 1;
 

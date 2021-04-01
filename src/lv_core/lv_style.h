@@ -100,7 +100,7 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_TRANSFORM_HEIGHT,   0x0, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_TRANSFORM_ANGLE,    0x0, LV_STYLE_ID_VALUE + 6, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_TRANSFORM_ZOOM,     0x0, LV_STYLE_ID_VALUE + 7, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_OPA_SCALE,          0x0, LV_STYLE_ID_OPA + 0,   LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_OPA_SCALE,          0x0, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_INHERIT),
 
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_TOP,            0x1, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_BOTTOM,         0x1, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -127,11 +127,11 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_COLOR,       0x3, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_OPA,         0x3, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 
-    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_WIDTH,       0x4, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_PAD,         0x4, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_BLEND_MODE,  0x4, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_COLOR,       0x4, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_OPA,         0x4, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_WIDTH,      0x4, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_PAD,        0x4, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_BLEND_MODE, 0x4, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_COLOR,      0x4, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_OUTLINE_OPA,        0x4, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_WIDTH,       0x5, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OFS_X,       0x5, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -141,33 +141,33 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_COLOR,       0x5, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OPA,         0x5, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_BLEND_MODE,    0x6, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_REPEAT,        0x6, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR,       0x6, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_OPA,           0x6, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR_OPA,   0x6, LV_STYLE_ID_OPA   + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_IMAGE,         0x6, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_BLEND_MODE, 0x6, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_REPEAT,     0x6, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR,    0x6, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_OPA,        0x6, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR_OPA, 0x6, LV_STYLE_ID_OPA   + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_IMAGE,      0x6, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_NONE),
 
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_LETTER_SPACE,  0x7, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_LINE_SPACE,    0x7, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_BLEND_MODE,    0x7, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_OFS_X,         0x7, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_OFS_Y,         0x7, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_ALIGN,         0x7, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_COLOR,         0x7, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_OPA,           0x7, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_FONT,          0x7, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_STR,           0x7, LV_STYLE_ID_PTR   + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_LETTER_SPACE, 0x7, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_LINE_SPACE,   0x7, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_BLEND_MODE,   0x7, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_OFS_X,        0x7, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_OFS_Y,        0x7, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_ALIGN,        0x7, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_COLOR,        0x7, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_OPA,          0x7, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_FONT,         0x7, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_VALUE_STR,          0x7, LV_STYLE_ID_PTR   + 1, LV_STYLE_ATTR_NONE),
 
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_LETTER_SPACE,   0x8, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_LINE_SPACE,     0x8, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_DECOR,          0x8, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_BLEND_MODE,     0x8, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_COLOR,          0x8, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_SEL_COLOR,      0x8, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_SEL_BG_COLOR,   0x8, LV_STYLE_ID_COLOR + 2, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_OPA,            0x8, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_INHERIT),
-    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_FONT,           0x8, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_LETTER_SPACE,  0x8, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_LINE_SPACE,    0x8, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_DECOR,         0x8, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_BLEND_MODE,    0x8, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_COLOR,         0x8, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_SEL_COLOR,     0x8, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_SEL_BG_COLOR,  0x8, LV_STYLE_ID_COLOR + 2, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_OPA,           0x8, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_FONT,          0x8, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_INHERIT),
 
     LV_STYLE_PROP_INIT(LV_STYLE_LINE_WIDTH,         0x9, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_LINE_BLEND_MODE,    0x9, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -190,7 +190,7 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_PROP_4,  0xB, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_PROP_5,  0xB, LV_STYLE_ID_VALUE + 6, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_PROP_6,  0xB, LV_STYLE_ID_VALUE + 7, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_PATH,    0xB, LV_STYLE_ID_PTR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_PATH,    0xB, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_SCALE_WIDTH,            0xC, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SCALE_BORDER_WIDTH,     0xC, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -231,9 +231,9 @@ typedef struct {
     uint32_t ignore_cache  : 1;      /*1: Ignore cache while getting value of properties*/
 
     uint32_t radius_zero : 1;
-    uint32_t opa_scale_cover      : 1;
-    uint32_t clip_corner_off       : 1;
-    uint32_t transform_all_zero  : 1;
+    uint32_t opa_scale_cover : 1;
+    uint32_t clip_corner_off : 1;
+    uint32_t transform_all_zero : 1;
     uint32_t pad_all_zero : 1;
     uint32_t margin_all_zero : 1;
     uint32_t blend_mode_all_normal : 1;
@@ -405,7 +405,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
  *       For example: `lv_style_get_border_width()`
  * @note for performance reasons it's not checked if the property really has integer type
  */
-int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
 
 /**
  * Get a color typed property from a style.
@@ -420,7 +420,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, vo
  *       For example: `lv_style_get_border_color()`
  * @note for performance reasons it's not checked if the property really has color type
  */
-int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 
 /**
  * Get an opacity typed property from a style.
@@ -435,7 +435,7 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
  *       For example: `lv_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 
 /**
  * Get a pointer typed property from a style.
@@ -450,7 +450,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
  *       For example: `lv_style_get_text_font()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * res);
+int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, const void ** res);
 
 /**
  * Get the local style of a style list
@@ -461,7 +461,7 @@ lv_style_t * lv_style_list_get_local_style(lv_style_list_t * list);
 
 /**
  * Get the transition style of a style list
- * @param list pointer to a style list where the local property should be set
+ * @param list pointer to a style list where the transition property should be set
  * @return pointer to the transition style if exists else `NULL`.
  */
 lv_style_t * _lv_style_list_get_transition_style(lv_style_list_t * list);
@@ -574,7 +574,7 @@ bool lv_debug_check_style(const lv_style_t * style);
 
 /**
  * Check whether a style list is valid (initialized correctly)
- * @param style pointer to a style
+ * @param list pointer to a style list
  * @return true: valid
  */
 bool lv_debug_check_style_list(const lv_style_list_t * list);
@@ -596,7 +596,7 @@ bool lv_debug_check_style_list(const lv_style_list_t * list);
  *     lv_style_init(&my_style);
  *     lv_style_copy(&my_style, &style_to_copy);
  */
-#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy_p);
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy_p)
 
 #if LV_USE_DEBUG
 
