@@ -539,9 +539,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
         }
     }
 
-    if(abs_y < 0) {
-        printf("asd\n");
-    }
     int32_t xe;
     if(p->yx_steep > 0) xe = ((abs_y * 256) * p->xy_steep) >> 10;
     else xe = (((abs_y + 1) * 256) * p->xy_steep) >> 10;
