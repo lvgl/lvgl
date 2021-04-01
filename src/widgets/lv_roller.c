@@ -47,6 +47,8 @@ static void set_y_anim(void * obj, int32_t v);
 const lv_obj_class_t lv_roller_class = {
         .constructor_cb = lv_roller_constructor,
         .event_cb = lv_roller_event,
+        .width_def = LV_SIZE_CONTENT,
+        .height_def = LV_DPI_DEF,
         .instance_size = sizeof(lv_roller_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
         .base_class = &lv_obj_class
@@ -292,11 +294,9 @@ static void lv_roller_constructor(lv_obj_t * obj)
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
-    lv_obj_set_width(obj, LV_SIZE_CONTENT);
 
     lv_obj_create_from_class(&lv_roller_label_class, obj);
     lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
-    lv_obj_set_height(obj, LV_DPI_DEF);
 
     LV_LOG_TRACE("finshed");
 }

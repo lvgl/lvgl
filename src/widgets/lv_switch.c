@@ -43,6 +43,8 @@ static void draw_main(lv_obj_t * obj);
 const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
     .event_cb = lv_switch_event,
+    .width_def =  (5 * LV_DPI_DEF) / 11,
+    .height_def = LV_DPI_DEF / 4,
     .instance_size = sizeof(lv_switch_t),
     .base_class = &lv_obj_class
 };
@@ -71,7 +73,6 @@ static void lv_switch_constructor(lv_obj_t * obj)
 
    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-   lv_obj_set_size(obj, LV_DPX(60), LV_DPX(35));
 
    LV_TRACE_OBJ_CREATE("finished");
 }

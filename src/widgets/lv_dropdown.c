@@ -62,6 +62,8 @@ const lv_obj_class_t lv_dropdown_class = {
     .constructor_cb = lv_dropdown_constructor,
     .destructor_cb = lv_dropdown_destructor,
     .event_cb = lv_dropdown_event,
+    .width_def = LV_DPI_DEF,
+    .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_dropdown_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class
@@ -556,7 +558,6 @@ static void lv_dropdown_constructor(lv_obj_t * obj)
     dropdown->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_set_size(obj, LV_DPX(150), LV_SIZE_CONTENT);
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
 
     LV_TRACE_OBJ_CREATE("finished");

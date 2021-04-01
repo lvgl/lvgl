@@ -32,6 +32,8 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_keyboard_class = {
     .constructor_cb = lv_keyboard_constructor,
+    .width_def = LV_SIZE_PCT(100),
+    .height_def = LV_SIZE_PCT(50),
     .instance_size = sizeof(lv_keyboard_t),
     .editable = 1,
     .base_class = &lv_btnmatrix_class
@@ -327,7 +329,6 @@ static void lv_keyboard_constructor(lv_obj_t * obj)
     keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_obj_set_size(obj, lv_obj_get_width_fit(parent), lv_obj_get_height_fit(parent) / 2);
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, NULL);
     lv_obj_set_base_dir(obj, LV_BIDI_DIR_LTR);

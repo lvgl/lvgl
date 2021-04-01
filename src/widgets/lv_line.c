@@ -37,6 +37,8 @@ static void lv_line_event(lv_obj_t * obj, lv_event_t e);
 const lv_obj_class_t lv_line_class = {
     .constructor_cb = lv_line_constructor,
     .event_cb = lv_line_event,
+    .width_def = LV_SIZE_CONTENT,
+    .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_line_t),
     .base_class = &lv_obj_class
 };
@@ -111,7 +113,6 @@ static void lv_line_constructor(lv_obj_t * obj)
     line->point_array = NULL;
     line->y_inv       = 0;
 
-    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     LV_TRACE_OBJ_CREATE("finished");

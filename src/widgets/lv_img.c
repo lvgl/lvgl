@@ -40,6 +40,8 @@ const lv_obj_class_t lv_img_class = {
          .constructor_cb = lv_img_constructor,
          .destructor_cb = lv_img_destructor,
          .event_cb = lv_img_event,
+         .width_def = LV_SIZE_CONTENT,
+         .height_def = LV_SIZE_CONTENT,
          .instance_size = sizeof(lv_img_t),
          .base_class = &lv_obj_class
      };
@@ -379,8 +381,6 @@ static void lv_img_constructor(lv_obj_t * obj)
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
-
-    if(obj->parent) lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

@@ -26,7 +26,13 @@ static void lv_win_constructor(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_win_class = {.constructor_cb = lv_win_constructor, .base_class = &lv_obj_class, .instance_size = sizeof(lv_win_t)};
+const lv_obj_class_t lv_win_class = {
+        .constructor_cb = lv_win_constructor,
+        .width_def = LV_SIZE_PCT(100),
+        .height_def = LV_SIZE_PCT(100),
+        .base_class = &lv_obj_class,
+        .instance_size = sizeof(lv_win_t)
+};
 static lv_coord_t create_header_height;
 /**********************
  *      MACROS

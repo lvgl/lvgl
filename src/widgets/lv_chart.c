@@ -55,6 +55,8 @@ const lv_obj_class_t lv_chart_class = {
     .constructor_cb = lv_chart_constructor,
     .destructor_cb = lv_chart_destructor,
     .event_cb = lv_chart_event,
+    .width_def = LV_SIZE_PCT(100),
+    .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj_class
 };
@@ -584,8 +586,6 @@ static void lv_chart_constructor(lv_obj_t * obj)
     chart->update_mode = LV_CHART_UPDATE_MODE_SHIFT;
     chart->zoom_x      = LV_IMG_ZOOM_NONE;
     chart->zoom_y      = LV_IMG_ZOOM_NONE;
-
-    lv_obj_set_size(obj, LV_DPI_DEF * 3, LV_DPI_DEF * 2);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

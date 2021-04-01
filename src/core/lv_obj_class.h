@@ -42,6 +42,8 @@ typedef struct _lv_obj_class_t {
     void (*constructor_cb)(struct _lv_obj_t * obj);
     void (*destructor_cb)(struct _lv_obj_t * obj);
     lv_event_cb_t event_cb;         /**< Object type specific event function*/
+    lv_coord_t width_def;
+    lv_coord_t height_def;
     uint32_t editable : 2;          /**< Value from ::lv_obj_class_editable_t*/
     uint32_t instance_size : 20;
 }lv_obj_class_t;

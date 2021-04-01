@@ -58,6 +58,8 @@ const lv_obj_class_t lv_btnmatrix_class = {
         .constructor_cb = lv_btnmatrix_constructor,
         .destructor_cb = lv_btnmatrix_destructor,
         .event_cb = lv_btnmatrix_event,
+        .width_def = LV_DPI_DEF * 2,
+        .height_def = LV_DPI_DEF,
         .instance_size = sizeof(lv_btnmatrix_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
         .base_class = &lv_obj_class
@@ -366,7 +368,6 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj)
     btnm->one_check      = 0;
 
     lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
-    lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF * 1);
 
     LV_LOG_TRACE("finshed");
 }

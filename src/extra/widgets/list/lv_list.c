@@ -29,6 +29,8 @@
 
 const lv_obj_class_t lv_list_class = {
     .base_class = &lv_obj_class,
+    .width_def = (LV_DPI_DEF * 3) / 2,
+    .height_def = LV_DPI_DEF * 2
 };
 
 const lv_obj_class_t lv_list_btn_class = {
@@ -54,7 +56,6 @@ const lv_obj_class_t lv_list_text_class = {
 lv_obj_t * lv_list_create(lv_obj_t * parent)
 {
     lv_obj_t * list = lv_obj_create_from_class(&lv_list_class, parent);
-    lv_obj_set_size(list, LV_DPX(200), LV_DPX(300));
     lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
 
     return list;

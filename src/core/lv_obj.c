@@ -81,6 +81,8 @@ const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
     .event_cb = lv_obj_event_cb,
+    .width_def = LV_DPI_DEF,
+    .height_def = LV_DPI_DEF,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
 };
@@ -626,8 +628,6 @@ static void lv_obj_constructor(lv_obj_t * obj)
         obj->coords.y2 = obj->coords.y1 - 1;
         obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left(parent, LV_PART_MAIN) - sl;
         obj->coords.x2  = obj->coords.x1 - 1;
-
-        lv_obj_set_size(obj, LV_OBJ_DEF_WIDTH, LV_OBJ_DEF_HEIGHT);
     }
 
     /*Set attributes*/

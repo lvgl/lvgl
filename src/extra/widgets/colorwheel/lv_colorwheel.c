@@ -52,6 +52,8 @@ static uint16_t get_angle(lv_obj_t * obj);
 const lv_obj_class_t lv_colorwheel_class = {.instance_size = sizeof(lv_colorwheel_t), .base_class = &lv_obj_class,
         .constructor_cb = lv_colorwheel_constructor,
         .event_cb = lv_colorwheel_event,
+        .width_def = LV_DPI_DEF * 2,
+        .height_def = LV_DPI_DEF * 2,
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
 };
 
@@ -218,7 +220,6 @@ static void lv_colorwheel_constructor(lv_obj_t * obj)
     colorwheel->last_change_time = 0;
     colorwheel->knob.recolor = create_knob_recolor;
 
-    lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF * 2);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
     refr_knob_pos(obj);
 }

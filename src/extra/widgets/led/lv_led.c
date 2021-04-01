@@ -14,9 +14,6 @@
  *********************/
 #define MY_CLASS &lv_led_class
 
-#define LV_LED_WIDTH_DEF (LV_DPI_DEF / 5)
-#define LV_LED_HEIGHT_DEF (LV_DPI_DEF / 5)
-
 #ifndef LV_LED_BRIGHT_MIN
 # define LV_LED_BRIGHT_MIN 80
 #endif
@@ -41,6 +38,8 @@ static void lv_led_event(lv_obj_t * obj, lv_event_t e);
 const lv_obj_class_t lv_led_class  = {
         .base_class = &lv_obj_class,
         .constructor_cb = lv_led_constructor,
+        .width_def = LV_DPI_DEF / 5,
+        .height_def = LV_DPI_DEF / 5,
         .event_cb = lv_led_event,
         .instance_size = sizeof(lv_led_t),
 };
@@ -154,8 +153,6 @@ static void lv_led_constructor(lv_obj_t * obj)
     led->color = lv_theme_get_color_primary(obj);
     led->bright = LV_LED_BRIGHT_MAX;
     led->bright = LV_LED_BRIGHT_MAX;
-
-    lv_obj_set_size(obj, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
 }
 
 static void lv_led_event(lv_obj_t * obj, lv_event_t e)

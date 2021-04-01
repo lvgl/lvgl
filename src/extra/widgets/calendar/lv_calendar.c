@@ -36,6 +36,8 @@ static void highlight_update(lv_obj_t * calendar);
  **********************/
 const lv_obj_class_t lv_calendar_class = {
     .constructor_cb = my_constructor,
+    .width_def = (LV_DPI_DEF * 3) / 2,
+    .height_def =(LV_DPI_DEF * 3) / 2,
     .instance_size = sizeof(lv_calendar_t),
     .base_class = &lv_btnmatrix_class
 };
@@ -219,8 +221,6 @@ static void my_constructor(lv_obj_t * obj)
 
     calendar->highlighted_dates      = NULL;
     calendar->highlighted_dates_num  = 0;
-
-    lv_obj_set_size(obj, LV_DPX(180), LV_DPX(180));
 
     lv_memset_00(calendar->nums, sizeof(calendar->nums));
     uint8_t i;

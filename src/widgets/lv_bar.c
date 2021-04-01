@@ -62,6 +62,8 @@ const lv_obj_class_t lv_bar_class = {
     .constructor_cb = lv_bar_constructor,
     .destructor_cb = lv_bar_destructor,
     .event_cb = lv_bar_event,
+    .width_def = LV_DPI_DEF * 2,
+    .height_def = LV_DPI_DEF / 10,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj_class
 };
@@ -214,7 +216,6 @@ static void lv_bar_constructor(lv_obj_t * obj)
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_DPI_DEF / 10);
     lv_bar_set_value(obj, 0, LV_ANIM_OFF);
 
     LV_TRACE_OBJ_CREATE("finished");

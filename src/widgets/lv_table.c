@@ -46,6 +46,8 @@ const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
     .event_cb = lv_table_event,
+    .width_def = LV_SIZE_CONTENT,
+    .height_def = LV_SIZE_CONTENT,
     .base_class = &lv_obj_class,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_table_t),
@@ -409,8 +411,6 @@ static void lv_table_constructor(lv_obj_t * obj)
     table->row_h[0] = LV_DPI_DEF;
     table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
     table->cell_data[0] = NULL;
-
-    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

@@ -254,8 +254,6 @@ static void lv_meter_constructor(lv_obj_t * obj)
 
     _lv_ll_init(&meter->scale_ll, sizeof(lv_meter_scale_t));
 
-    lv_obj_set_size(obj, 3 * LV_DPI_DEF / 2, 3 * LV_DPI_DEF / 2);
-
     LV_TRACE_OBJ_CREATE("finished");
 }
 

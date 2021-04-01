@@ -33,9 +33,6 @@
     #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500 /*ms*/
 #endif
 
-#define LV_TEXTAREA_DEF_WIDTH (2 * LV_DPI_DEF)
-#define LV_TEXTAREA_DEF_HEIGHT (1 * LV_DPI_DEF)
-
 #define LV_TEXTAREA_PWD_BULLET_UNICODE      0x2022
 
 /**********************
@@ -67,6 +64,8 @@ const lv_obj_class_t lv_textarea_class = {
     .constructor_cb = lv_textarea_constructor,
     .destructor_cb = lv_textarea_destructor,
     .event_cb = lv_textarea_event,
+    .width_def = LV_DPI_DEF * 2,
+    .height_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class
 };
@@ -495,7 +494,7 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
         ta->one_line = 0;
         lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
 
-        lv_obj_set_height(obj, LV_TEXTAREA_DEF_HEIGHT);
+        lv_obj_set_height(obj, LV_DPI_DEF);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
 }
@@ -820,7 +819,6 @@ static void lv_textarea_constructor(lv_obj_t * obj)
       ta->label = lv_label_create(obj);
       lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
       lv_label_set_text(ta->label, "");
-      lv_obj_set_size(obj, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
       lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
       start_cursor_blink(obj);

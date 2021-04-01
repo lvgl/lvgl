@@ -217,7 +217,16 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
         obj = lv_obj_get_parent(obj);
     }
 
-    if(!found) value_act = lv_style_prop_get_default(prop);
+    if(!found) {
+        if(prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT) {
+            const lv_obj_class_t * cls = obj->class_p;
+            while(cls == NULL) cls = cls->base_class;
+
+            value_act.num = prop == LV_STYLE_WIDTH ? cls->width_def : cls->height_def;
+        } else {
+            value_act = lv_style_prop_get_default(prop);
+        }
+    }
     if(filter) value_act = apply_color_filter(obj, part, value_act);
     return value_act;
 }

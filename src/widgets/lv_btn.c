@@ -30,6 +30,8 @@ static void lv_btn_constructor(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_btn_class  = {
     .constructor_cb = lv_btn_constructor,
+    .width_def = LV_DPI_DEF,
+    .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_btn_t),
     .base_class = &lv_obj_class
 };
@@ -56,7 +58,6 @@ static void lv_btn_constructor(lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_obj_set_size(obj, LV_DPI_DEF, LV_DPI_DEF / 3);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 

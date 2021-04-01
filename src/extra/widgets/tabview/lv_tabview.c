@@ -31,6 +31,8 @@ static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
 const lv_obj_class_t lv_tabview_class = {
         .constructor_cb = lv_tabview_constructor,
         .destructor_cb = lv_tabview_destructor,
+        .width_def = LV_SIZE_PCT(100),
+        .height_def = LV_SIZE_PCT(100),
         .base_class = &lv_obj_class,
         .instance_size = sizeof(lv_tabview_t)};
 
@@ -58,10 +60,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     lv_obj_t * cont = lv_tabview_get_content(obj);
 
     lv_obj_t * page = lv_obj_create(cont);
+    lv_obj_set_size(page, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
     lv_obj_clear_flag(page, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     uint32_t tab_id = lv_obj_get_child_cnt(cont);
-
-    lv_obj_set_size(page, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
 
