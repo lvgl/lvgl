@@ -561,7 +561,7 @@ menu "LVGL configuration"
 
         config LV_USE_BIDI
             bool "Support bidirectional texts"
-            helip
+            help
                 Allows mixing Left-to-Right and Right-to-Left texts.
                 The direction will be processed according to the Unicode Bidirectional Algorithm:
                 https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
