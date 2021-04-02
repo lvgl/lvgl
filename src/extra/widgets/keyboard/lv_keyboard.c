@@ -328,7 +328,6 @@ static void lv_keyboard_constructor(lv_obj_t * obj)
     keyboard->ta         = NULL;
     keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
 
-    lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, NULL);
     lv_obj_set_base_dir(obj, LV_BIDI_DIR_LTR);
