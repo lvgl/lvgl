@@ -881,8 +881,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*Pixel perfect monospace fonts
- *http://pelulamu.net/unscii/*/
+/*Pixel perfect monospace fonts*/
 #ifndef LV_FONT_UNSCII_8
 #  ifdef CONFIG_LV_FONT_UNSCII_8
 #    define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8
@@ -1411,7 +1410,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_THEME_DEFAULT_GROW
 #    define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
 #  else
-#    define  LV_THEME_DEFAULT_GROW        		1
+#    define  LV_THEME_DEFAULT_GROW              1
 #  endif
 #endif
 

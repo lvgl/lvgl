@@ -293,8 +293,7 @@ typedef void * lv_user_data_t;
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
 #define LV_FONT_SIMSUN_16_CJK            0  /*1000 most common CJK radicals*/
 
-/*Pixel perfect monospace fonts
- *http://pelulamu.net/unscii/*/
+/*Pixel perfect monospace fonts*/
 #define LV_FONT_UNSCII_8        0
 #define LV_FONT_UNSCII_16       0
 
