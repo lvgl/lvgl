@@ -27,10 +27,22 @@ typedef struct {
 }flex_t;
 
 typedef struct {
-    lv_coord_t grow_unit;
+    lv_obj_t * item;
+    lv_coord_t min_size;
+    lv_coord_t max_size;
+    lv_coord_t final_size;
+    uint32_t grow_value;
+    uint32_t clamped :1;
+}grow_dsc_t;
+
+typedef struct {
     lv_coord_t track_cross_size;
-    lv_coord_t track_main_size;
+    lv_coord_t track_main_size;         /*For all items*/
+    lv_coord_t track_fix_main_size;     /*For non grow items*/
     uint32_t item_cnt;
+    grow_dsc_t * grow_dsc;
+    uint32_t grow_item_cnt;
+    uint32_t grow_dsc_calc :1;
 }track_t;
 
 
@@ -155,6 +167,7 @@ static void flex_update(lv_obj_t * cont)
         track_t t;
         while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
             /*Search the first item of the next row*/
+            t.grow_dsc_calc = 0;
             next_track_first_item = find_track_end(cont, &f, track_first_item, max_main_size, item_gap, &t);
             total_track_cross_size += t.track_cross_size + track_gap;
             track_cnt++;
@@ -176,6 +189,7 @@ static void flex_update(lv_obj_t * cont)
 
     while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
         track_t t;
+        t.grow_dsc_calc = 1;
         /*Search the first item of the next row*/
         next_track_first_item = find_track_end(cont, &f, track_first_item, max_main_size, item_gap, &t);
 
@@ -184,7 +198,8 @@ static void flex_update(lv_obj_t * cont)
         }
         children_repos(cont, &f, track_first_item, next_track_first_item, abs_x, abs_y, max_main_size, item_gap, &t);
         track_first_item = next_track_first_item;
-
+        lv_mem_buf_release(t.grow_dsc);
+        t.grow_dsc = NULL;
         if(rtl && !f.row) {
             *cross_pos -= gap + track_gap;
         } else {
@@ -217,10 +232,11 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
 
     lv_coord_t grow_sum = 0;
     t->track_main_size = 0;
-    uint32_t grow_item_cnt = 0;
+    t->track_fix_main_size = 0;
+    t->grow_item_cnt = 0;
     t->track_cross_size = 0;
-    t->grow_unit = 0;
     t->item_cnt = 0;
+    t->grow_dsc = NULL;
 
     int32_t item_id = item_start_id;
 
@@ -229,15 +245,29 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
         if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)) break;
 
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
-            uint8_t grow_size = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
-            if(grow_size) {
-                grow_sum += grow_size;
-                grow_item_cnt++;
-                t->track_main_size += item_gap;
+            uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
+            if(grow_value) {
+                grow_sum += grow_value;
+                t->grow_item_cnt++;
+                t->track_fix_main_size += item_gap;
+                if(t->grow_dsc_calc) {
+                    grow_dsc_t * new_dsc = lv_mem_buf_get(sizeof(grow_dsc_t) * (t->grow_item_cnt));
+                    LV_ASSERT_MALLOC(new_dsc);
+                    if(new_dsc == NULL) return item_id;
+
+                    lv_memcpy(new_dsc, t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt - 1));
+                    lv_mem_buf_release(t->grow_dsc);
+                    new_dsc[t->grow_item_cnt - 1].item = item;
+                    new_dsc[t->grow_item_cnt - 1].min_size = f->row ? lv_obj_get_style_min_width(item, LV_PART_MAIN) : lv_obj_get_style_min_height(item, LV_PART_MAIN);
+                    new_dsc[t->grow_item_cnt - 1].max_size = f->row ? lv_obj_get_style_max_width(item, LV_PART_MAIN) : lv_obj_get_style_max_height(item, LV_PART_MAIN);
+                    new_dsc[t->grow_item_cnt - 1].grow_value = grow_value;
+                    new_dsc[t->grow_item_cnt - 1].clamped = 0;
+                    t->grow_dsc = new_dsc;
+                }
             } else {
                 lv_coord_t item_size = get_main_size(item);
-                if(f->wrap && t->track_main_size + item_size > max_main_size) break;
-                t->track_main_size += item_size + item_gap;
+                if(f->wrap && t->track_fix_main_size + item_size > max_main_size) break;
+                t->track_fix_main_size += item_size + item_gap;
             }
 
 
@@ -250,15 +280,10 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
         item = lv_obj_get_child(cont, item_id);
     }
 
-    if(t->track_main_size > 0) t->track_main_size -= item_gap; /*There is no gap after the last item*/
+    if(t->track_fix_main_size > 0) t->track_fix_main_size -= item_gap; /*There is no gap after the last item*/
 
-    if(grow_item_cnt && grow_sum) {
-        lv_coord_t s = max_main_size - t->track_main_size;  /*The remaining size for grow items*/
-        t->grow_unit =  s / grow_sum;
-        t->track_main_size = max_main_size;  /*If there is at least one "grow item" the track takes the full space*/
-    } else {
-        t->grow_unit = 0;
-    }
+    /*If there is at least one "grow item" the track takes the full space*/
+    t->track_main_size = t->grow_item_cnt ? max_main_size : t->track_fix_main_size;
 
     /*Have at least one item in a row*/
     if(item && item_id == item_start_id) {
@@ -283,6 +308,40 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     lv_coord_t (*area_get_main_size)(const lv_area_t *) = (f->row ? lv_area_get_width : lv_area_get_height);
     lv_coord_t (*area_get_cross_size)(const lv_area_t *) = (!f->row ? lv_area_get_width : lv_area_get_height);
 
+    /*Calculate the size of grow items first*/
+    uint32_t i;
+    bool grow_reiterate  = true;
+    while(grow_reiterate) {
+        grow_reiterate = false;
+        lv_coord_t grow_value_sum = 0;
+        lv_coord_t grow_max_size = t->track_main_size - t->track_fix_main_size;
+        for(i = 0; i < t->grow_item_cnt; i++) {
+            if(t->grow_dsc[i].clamped == 0) {
+                grow_value_sum += t->grow_dsc[i].grow_value;
+            } else {
+                grow_max_size -= t->grow_dsc[i].final_size;
+            }
+        }
+        lv_coord_t grow_unit;
+
+        for(i = 0; i < t->grow_item_cnt; i++) {
+            if(t->grow_dsc[i].clamped == 0) {
+                grow_unit = grow_max_size / grow_value_sum;
+                lv_coord_t size = grow_unit * t->grow_dsc[i].grow_value;
+                lv_coord_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
+
+                if(size_clamp != size) {
+                    t->grow_dsc[i].clamped = 1;
+                    grow_reiterate = true;
+                }
+                t->grow_dsc[i].final_size = size_clamp;
+                grow_value_sum -= t->grow_dsc[i].grow_value;
+                grow_max_size  -= t->grow_dsc[i].final_size;
+            }
+        }
+    }
+
+
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
 
     lv_coord_t main_pos = 0;
@@ -298,12 +357,15 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
             item = get_next_item(cont, f->rev, &item_first_id);
             continue;
         }
-        uint8_t grow_size = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
+        lv_coord_t grow_size = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
         if(grow_size) {
+            lv_coord_t s = 0;
+            for(i = 0; i < t->grow_item_cnt; i++) {
+                if(t->grow_dsc[i].item == item) s = t->grow_dsc[i].final_size;
+            }
             lv_area_t old_coords;
             lv_area_copy(&old_coords, &item->coords);
 
-            lv_coord_t s = grow_size * t->grow_unit;
             area_set_main_size(&item->coords, s);
 
             if(f->row) item->w_layout = 1;
