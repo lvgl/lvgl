@@ -158,12 +158,44 @@ static inline void lv_style_set_width(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_WIDTH, v);
 }
 
+static inline void lv_style_set_min_width(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MIN_WIDTH, v);
+}
+
+static inline void lv_style_set_max_width(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MAX_WIDTH, v);
+}
+
 static inline void lv_style_set_height(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
     lv_style_set_prop(style, LV_STYLE_HEIGHT, v);
+}
+
+static inline void lv_style_set_min_height(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MIN_HEIGHT, v);
+}
+
+static inline void lv_style_set_max_height(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MAX_HEIGHT, v);
 }
 
 static inline void lv_style_set_x(lv_style_t * style, lv_coord_t value)

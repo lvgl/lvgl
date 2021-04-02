@@ -123,6 +123,14 @@ void lv_obj_refr_size(lv_obj_t * obj)
     if(pct_w) w = (LV_COORD_GET_PCT(w) * parent_w) / 100;
     if(pct_h) h = (LV_COORD_GET_PCT(h) * parent_h) / 100;
 
+    lv_coord_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
+    lv_coord_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
+    w = LV_CLAMP(minw, w, maxw);
+
+    lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
+    lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+    h = LV_CLAMP(minh, h, maxh);
+
     /*Do nothing if the size is not changed*/
     /*It is very important else recursive resizing can occur without size change*/
     if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) return;
@@ -836,7 +844,6 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Calculate the "auto size". It's `auto_size = max(children_size, self_size)`

@@ -135,11 +135,15 @@ typedef enum {
     LV_STYLE_PAD_COLUMN              = 21 | LV_STYLE_PROP_LAYOUT_REFR,
 
     LV_STYLE_WIDTH                   = 22 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_HEIGHT                  = 23 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_X                       = 24 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_Y                       = 25 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_LAYOUT                  = 26 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_ALIGN                   = 27 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MIN_WIDTH               = 23 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MAX_WIDTH               = 24 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_HEIGHT                  = 25 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MIN_HEIGHT              = 26 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MAX_HEIGHT              = 27 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_X                       = 28 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_Y                       = 29 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_LAYOUT                  = 30 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_ALIGN                   = 31 | LV_STYLE_PROP_LAYOUT_REFR,
 
     /*Group 2*/
     LV_STYLE_BG_COLOR                = 32,
