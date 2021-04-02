@@ -131,6 +131,7 @@ typedef struct _lv_indev_proc_t {
             /*Pointer and button data*/
             lv_point_t act_point; /**< Current point of input device. */
             lv_point_t last_point; /**< Last point of input device. */
+            lv_point_t last_raw_point; /**< Last point read from read_cb. */
             lv_point_t vect; /**< Difference between `act_point` and `last_point`. */
             lv_point_t drag_sum; /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
             lv_point_t drag_throw_vect;
