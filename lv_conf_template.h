@@ -264,7 +264,7 @@ typedef void * lv_user_data_t;
  *===================*/
 
 /*Montserrat fonts with ASCII range and some symbols using bpp = 4
- *fonts.google.com/specimen/Montserrat*/
+ *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8     0
 #define LV_FONT_MONTSERRAT_10    0
 #define LV_FONT_MONTSERRAT_12    0
@@ -294,7 +294,7 @@ typedef void * lv_user_data_t;
 #define LV_FONT_SIMSUN_16_CJK            0  /*1000 most common CJK radicals*/
 
 /*Pixel perfect monospace fonts
- *pelulamu.net/unscii/*/
+ *http://pelulamu.net/unscii/*/
 #define LV_FONT_UNSCII_8        0
 #define LV_FONT_UNSCII_16       0
 
@@ -353,7 +353,7 @@ typedef void * lv_user_data_t;
 
 /*Support bidirectional texts. Allows mixing Left-to-Right and Right-to-Left texts.
  *The direction will be processed according to the Unicode Bidirectioanl Algorithm:
- *www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
+ *https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #define LV_USE_BIDI         0
 #if LV_USE_BIDI
 /*Set the default direction. Supported values:
@@ -371,7 +371,7 @@ typedef void * lv_user_data_t;
  *  WIDGET USAGE
  *================*/
 
-/*Documentation of the widgets: docs.lvgl.io/latest/en/html/widgets/index.html*/
+/*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
 #define LV_USE_ARC          1
 
