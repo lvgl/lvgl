@@ -34,6 +34,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
 /**
  * Options for text rendering.
  */
