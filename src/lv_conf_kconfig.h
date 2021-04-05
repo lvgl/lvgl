@@ -1,7 +1,4 @@
-/**
- * @file lv_conf_kconfig.h
- * Configs that needs special handling when LVGL is used with Kconfig
- */
+/** * @file lv_conf_kconfig.h * Configs that needs special handling when LVGL is used with Kconfig */
 
 #ifndef LV_CONF_KCONFIG_H
 #define LV_CONF_KCONFIG_H
@@ -36,14 +33,14 @@ extern "C" {
 #endif
 
 /*******************
- * LV COLOR TRANSP
+ * LV COLOR CHROMA KEY
  *******************/
 
-#ifndef LV_COLOR_TRANSP
-#if defined (CONFIG_LV_COLOR_TRANSP_HEX)
-#define CONFIG_LV_COLOR_TRANSP    lv_color_hex(CONFIG_LV_COLOR_TRANSP_HEX)
+#ifndef LV_COLOR_CHROMA_KEY
+#if defined (CONFIG_LV_COLOR_CHROMA_KEY_HEX)
+#define CONFIG_LV_COLOR_CHROMA_KEY  lv_color_hex(CONFIG_LV_COLOR_CHROMA_KEY_HEX)
 #else
-#define CONFIG_LV_COLOR_TRANSP    LV_COLOR_LIME
+#define CONFIG_LV_COLOR_CHROMA_KEY  lv_color_hex(0x00ff00)  /* pure green */
 #endif
 #endif
 
