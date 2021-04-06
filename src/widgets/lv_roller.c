@@ -32,7 +32,7 @@ static void lv_roller_constructor(lv_obj_t * obj);
 static void lv_roller_event(lv_obj_t * obj, lv_event_t e);
 static void lv_roller_label_event(lv_obj_t * label, lv_event_t e);
 static void draw_main(lv_obj_t * obj, lv_event_t e);
-static void draw_label(lv_obj_t * label_obj, lv_event_t e);
+static void draw_label(lv_obj_t * label_obj);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
 static lv_res_t release_handler(lv_obj_t * obj);
 static void inf_normalize(lv_obj_t * obj_scrl);
@@ -415,8 +415,11 @@ static void lv_roller_label_event(lv_obj_t * label, lv_event_t e)
         lv_coord_t label_w = lv_obj_get_width(label);
         *s = LV_MAX(*s, sel_w - label_w);
     }
+    else if(e == LV_EVENT_SIZE_CHANGED) {
+        refr_position(lv_obj_get_parent(label), LV_ANIM_OFF);
+    }
     else if(e == LV_EVENT_DRAW_MAIN) {
-        draw_label(label, e);
+        draw_label(label);
     }
 }
 
@@ -500,13 +503,16 @@ static void draw_main(lv_obj_t * obj, lv_event_t e)
     }
 }
 
-static void draw_label(lv_obj_t * label_obj, lv_event_t e)
+static void draw_label(lv_obj_t * label_obj)
 {
     /* Split the drawing of the label into  an upper (above the selected area)
      * and a lower (below the selected area)*/
     lv_obj_t * roller = lv_obj_get_parent(label_obj);
-    const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_PART_MAIN);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(roller, LV_PART_MAIN);
+    lv_draw_label_dsc_t label_draw_dsc;
+    lv_draw_label_dsc_init(&label_draw_dsc);
+    lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
+    const lv_font_t * font = label_draw_dsc.font;
+    lv_coord_t line_space = label_draw_dsc.line_space;
     lv_coord_t font_h        = lv_font_get_line_height(font);
     const lv_area_t * clip_area = lv_event_get_param();
 
@@ -526,7 +532,7 @@ static void draw_label(lv_obj_t * label_obj, lv_event_t e)
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = rect_area.y1;
     if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
-        lv_obj_event_base(MY_CLASS_LABEL, label_obj, e);
+        lv_draw_label(&label_obj->coords, &clip2, &label_draw_dsc, lv_label_get_text(label_obj), NULL);
     }
 
     clip2.x1 = label_obj->coords.x1;
@@ -534,7 +540,7 @@ static void draw_label(lv_obj_t * label_obj, lv_event_t e)
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = label_obj->coords.y2;
     if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
-        lv_obj_event_base(MY_CLASS_LABEL, label_obj, e);
+        lv_draw_label(&label_obj->coords, &clip2, &label_draw_dsc, lv_label_get_text(label_obj), NULL);
     }
 }
 
