@@ -32,19 +32,6 @@ extern "C" {
  *  - For example:
  *      `lv_obj_set_style_local_border_width(btn1, LV_BTN_PART_MAIN, LV_STATE_PRESSED, 2);`
  *
- * Get a local style property's value of an object in a given state
- * ----------------------------------------------------------------
- *  - Return the best matching property in the given state.
- *  - E.g. if `state` parameter is LV_STATE_PRESSED | LV_STATE_CHECKED` but the property defined only in
- *    `LV_STATE_PRESSED` and `LV_STATE_DEFAULT` the best matching state is `LV_STATE_PRESSED`
- *    (because it has higher precedence) and it will be returned.
- *  - If the property is not found even in `LV_STATE_DEFAULT` `-1` is returned.
- *  - For example:
- *      `//Type of result should be lv_style_int_t/lv_opa_t/lv_color_t/const void * according to the type of the property`
- *      `lv_style_int_t result;`
- *      `lv_obj_get_style_local_border_width(btn1, LV_BTN_PART_MAIN, LV_STATE_PRESSED, &result);`
- *      `if(weight > 0) ...the property is found and loaded into result...`
- *
  * Get the value from a style in a given state
  * -------------------------------------------
  * - The same rules applies to the return value then for "lv_obj_get_style_local_...()" above
