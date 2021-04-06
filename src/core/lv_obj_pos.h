@@ -352,6 +352,26 @@ void lv_obj_get_click_area(const struct _lv_obj_t * obj, lv_area_t * area);
  */
 bool lv_obj_hit_test(struct _lv_obj_t * obj, const lv_point_t * point);
 
+/**
+ * Clamp a width between min and max width. If the min/max width is in percentage value use the ref_width
+ * @param width         width to clamp
+ * @param min_width     the minimal width
+ * @param max_width     the maximal width
+ * @param ref_width     the reference width used when min/max width is in percentage
+ * @return              the clampled width
+ */
+lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max_width, lv_coord_t ref_width);
+
+/**
+ * Clamp a height between min and max height. If the min/max height is in percentage value use the ref_height
+ * @param height         height to clamp
+ * @param min_height     the minimal height
+ * @param max_height     the maximal height
+ * @param ref_height     the reference height used when min/max height is in percentage
+ * @return              the clampled height
+ */
+lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t max_height, lv_coord_t ref_height);
+
 /**********************
  *      MACROS
  **********************/

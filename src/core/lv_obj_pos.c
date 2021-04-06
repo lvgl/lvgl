@@ -127,11 +127,11 @@ void lv_obj_refr_size(lv_obj_t * obj)
 
     lv_coord_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
     lv_coord_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
-    w = LV_CLAMP(minw, w, maxw);
+    w = lv_clamp_width(w, minw, maxw, parent_w);
 
     lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
     lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
-    h = LV_CLAMP(minh, h, maxh);
+    h = lv_clamp_width(h, minh, maxh, parent_h);
 
     /*calc_auto_size set the scroll x/y to 0 so revert the original value*/
     if(w_content || h_content) {
@@ -851,6 +851,21 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 
     return res;
 }
+
+lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max_width, lv_coord_t ref_width)
+{
+    if(LV_COORD_IS_PCT(min_width)) min_width = (ref_width * LV_COORD_GET_PCT(min_width)) / 100;
+    if(LV_COORD_IS_PCT(max_width)) max_width = (ref_width * LV_COORD_GET_PCT(max_width)) / 100;
+    return LV_CLAMP(min_width, width, max_width);
+}
+
+lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t max_height, lv_coord_t ref_height)
+{
+    if(LV_COORD_IS_PCT(min_height)) min_height = (ref_height * LV_COORD_GET_PCT(min_height)) / 100;
+    if(LV_COORD_IS_PCT(max_height)) max_height = (ref_height * LV_COORD_GET_PCT(max_height)) / 100;
+    return LV_CLAMP(min_height, height, max_height);
+}
+
 
 
 /**********************
