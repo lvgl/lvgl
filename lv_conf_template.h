@@ -206,9 +206,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif  /*LV_SPRINTF_CUSTOM*/
 
 #define LV_USE_USER_DATA      1
-#if LV_USE_USER_DATA
-typedef void * lv_user_data_t;
-#endif
 
 /*Garbage Collector settings
  *Used if lvgl is binded to higher level language and the memory is managed by that language*/

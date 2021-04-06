@@ -561,8 +561,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define  LV_USE_USER_DATA      1
 #  endif
 #endif
-#if LV_USE_USER_DATA
-#endif
 
 /*Garbage Collector settings
  *Used if lvgl is binded to higher level language and the memory is managed by that language*/
