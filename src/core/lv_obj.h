@@ -232,6 +232,9 @@ typedef struct _lv_obj_t {
     struct _lv_obj_t * parent;
     lv_obj_spec_attr_t * spec_attr;
     lv_obj_style_t * styles;
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
     lv_area_t coords;
     lv_obj_flag_t flags;
     lv_state_t state;
