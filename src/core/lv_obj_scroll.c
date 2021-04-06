@@ -16,9 +16,9 @@
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
-#define SCROLL_ANIM_TIME_MIN 200    /*ms*/
-#define SCROLL_ANIM_TIME_MAX 400    /*ms*/
-#define SCROLLBAR_MIN_SIZE (LV_DPX(10))
+#define SCROLL_ANIM_TIME_MIN    200    /*ms*/
+#define SCROLL_ANIM_TIME_MAX    400    /*ms*/
+#define SCROLLBAR_MIN_SIZE      (LV_DPX(10))
 
 /**********************
  *      TYPEDEFS
