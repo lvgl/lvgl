@@ -16,7 +16,7 @@ extern "C" {
 #define LVGL_VERSION_MAJOR 8
 #define LVGL_VERSION_MINOR 0
 #define LVGL_VERSION_PATCH 0
-#define LVGL_VERSION_INFO ""
+#define LVGL_VERSION_INFO "dev"
 
 /*********************
  *      INCLUDES
@@ -71,8 +71,6 @@ extern "C" {
 #include "src/extra/widgets/lv_widgets.h"
 #include "src/extra/layouts/lv_layouts.h"
 #include "src/extra/themes/lv_themes.h"
-
-#include "examples/lv_examples.h"
 
 /*********************
  *      DEFINES
