@@ -192,7 +192,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
     lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
 
-    table->row_h[row] = LV_CLAMP(minh, table->row_h[row], maxh);
+    table->row_h[row] = LV_CLAMP(minh, h, maxh);
 }
 
 void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
