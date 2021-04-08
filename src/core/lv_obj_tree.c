@@ -30,6 +30,7 @@
  **********************/
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
+static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -311,6 +312,12 @@ uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
     return 0xFFFFFFFF; /*Shouldn't happen*/
 }
 
+
+void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
+{
+    walk_core(start_obj, cb, user_data);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -397,4 +404,21 @@ static void obj_del_core(lv_obj_t * obj)
 
     /*Free the object itself*/
     lv_mem_free(obj);
+}
+
+
+static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data)
+{
+    lv_obj_tree_walk_res_t res = cb(obj, user_data);
+
+    if(res == LV_OBJ_TREE_WALK_END) return LV_OBJ_TREE_WALK_END;
+
+    if(res != LV_OBJ_TREE_WALK_SKIP_CHILDREN) {
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+            res = walk_core(lv_obj_get_child(obj, i), cb, user_data);
+            if(res == LV_OBJ_TREE_WALK_END) return LV_OBJ_TREE_WALK_END;
+        }
+    }
+    return LV_OBJ_TREE_WALK_NEXT;
 }
