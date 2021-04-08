@@ -97,6 +97,11 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
 
     lv_theme_apply(obj);
     lv_obj_construct(obj);
+    lv_group_t * def_group = lv_group_get_default();
+    if(def_group && lv_obj_is_group_def(obj)) {
+
+        lv_group_add_obj(def_group, obj);
+    }
 
     if(parent) {
         /*Call the ancestor's event handler to the parent to notify it about the new child.
@@ -135,6 +140,17 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj)
     return class_p->editable == LV_OBJ_CLASS_EDITABLE_TRUE ? true : false;
 }
 
+bool lv_obj_is_group_def(struct _lv_obj_t * obj)
+{
+    const lv_obj_class_t * class_p = obj->class_p;
+
+    /*Find a base in which group_def is set*/
+    while(class_p && class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_INHERIT) class_p = class_p->base_class;
+
+    if(class_p == NULL) return false;
+
+    return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE ? true : false;
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -45,6 +45,7 @@ const lv_obj_class_t lv_switch_class = {
     .event_cb = lv_switch_event,
     .width_def =  (5 * LV_DPI_DEF) / 11,
     .height_def = LV_DPI_DEF / 4,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_switch_t),
     .base_class = &lv_obj_class
 };

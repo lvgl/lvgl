@@ -40,6 +40,7 @@ const lv_obj_class_t lv_checkbox_class = {
     .event_cb = lv_checkbox_event,
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_checkbox_t),
     .base_class = &lv_obj_class
 };
@@ -120,6 +121,7 @@ static void lv_checkbox_constructor(lv_obj_t * obj)
     cb->static_txt = 1;
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

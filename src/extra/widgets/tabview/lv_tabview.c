@@ -200,6 +200,9 @@ static void lv_tabview_constructor(lv_obj_t * obj)
          break;
      }
 
+    lv_group_t * g = lv_group_get_default();
+    if(g) lv_group_add_obj(g, btnm);
+
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
     lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER);
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);

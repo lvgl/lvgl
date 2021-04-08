@@ -33,6 +33,12 @@ typedef enum {
     LV_OBJ_CLASS_EDITABLE_FALSE,
 }lv_obj_class_editable_t;
 
+typedef enum {
+    LV_OBJ_CLASS_GROUP_DEF_INHERIT,      /**< Check the base class. Must have 0 value to let zero initialized class inherit*/
+    LV_OBJ_CLASS_GROUP_DEF_TRUE,
+    LV_OBJ_CLASS_GROUP_DEF_FALSE,
+}lv_obj_class_group_def_t;
+
 /**
  * Describe the common methods of every object.
  * Similar to a C++ class.
@@ -45,7 +51,8 @@ typedef struct _lv_obj_class_t {
     lv_coord_t width_def;
     lv_coord_t height_def;
     uint32_t editable : 2;          /**< Value from ::lv_obj_class_editable_t*/
-    uint32_t instance_size : 20;
+    uint32_t group_def : 2;          /**< Value from ::lv_obj_class_group_def_t*/
+    uint32_t instance_size : 16;
 }lv_obj_class_t;
 
 /**********************
@@ -63,6 +70,8 @@ struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class
 void _lv_obj_destruct(struct _lv_obj_t * obj);
 
 bool lv_obj_is_editable(struct _lv_obj_t * obj);
+
+bool lv_obj_is_group_def(struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS

@@ -43,6 +43,7 @@ const lv_obj_class_t lv_slider_class = {
     .constructor_cb = lv_slider_constructor,
     .event_cb = lv_slider_event,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar_class
 };

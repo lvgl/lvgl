@@ -64,6 +64,7 @@ const lv_obj_class_t lv_textarea_class = {
     .constructor_cb = lv_textarea_constructor,
     .destructor_cb = lv_textarea_destructor,
     .event_cb = lv_textarea_event,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .width_def = LV_DPI_DEF * 2,
     .height_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_textarea_t),

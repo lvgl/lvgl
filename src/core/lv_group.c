@@ -30,6 +30,7 @@ static void lv_group_refocus(lv_group_t * g);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_group_t * default_group;
 
 /**********************
  *      MACROS
@@ -39,18 +40,11 @@ static void lv_group_refocus(lv_group_t * g);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Init. the group module
- */
 void _lv_group_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_group_ll), sizeof(lv_group_t));
 }
 
-/**
- * Create a new object group
- * @return pointer to the new object group
- */
 lv_group_t * lv_group_create(void)
 {
     lv_group_t * group = _lv_ll_ins_head(&LV_GC_ROOT(_lv_group_ll));
@@ -61,7 +55,6 @@ lv_group_t * lv_group_create(void)
     group->obj_focus      = NULL;
     group->frozen         = 0;
     group->focus_cb       = NULL;
-    group->click_focus    = 1;
     group->editing        = 0;
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
@@ -73,10 +66,6 @@ lv_group_t * lv_group_create(void)
     return group;
 }
 
-/**
- * Delete a group object
- * @param group pointer to a group
- */
 void lv_group_del(lv_group_t * group)
 {
     /*Defocus the currently focused object*/
@@ -96,11 +85,16 @@ void lv_group_del(lv_group_t * group)
     lv_mem_free(group);
 }
 
-/**
- * Add an object to a group
- * @param group pointer to a group
- * @param obj pointer to an object to add
- */
+void lv_group_set_default(lv_group_t * group)
+{
+    default_group = group;
+}
+
+lv_group_t * lv_group_get_default(void)
+{
+    return default_group;
+}
+
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
@@ -143,10 +137,6 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     LV_LOG_TRACE("finished");
 }
 
-/**
- * Remove an object from its group
- * @param obj pointer to an object to remove
- */
 void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = lv_obj_get_group(obj);
@@ -188,10 +178,6 @@ void lv_group_remove_obj(lv_obj_t * obj)
     LV_LOG_TRACE("finished");
 }
 
-/**
- * Remove all objects from a group
- * @param group pointer to a group
- */
 void lv_group_remove_all_objs(lv_group_t * group)
 {
     /*Defocus the currently focused object*/
@@ -210,10 +196,6 @@ void lv_group_remove_all_objs(lv_group_t * group)
     _lv_ll_clear(&(group->obj_ll));
 }
 
-/**
- * Focus on an object (defocus the current)
- * @param obj pointer to an object to focus on
- */
 void lv_group_focus_obj(lv_obj_t * obj)
 {
     if(obj == NULL) return;
@@ -222,7 +204,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
     if(g->frozen != 0) return;
 
-    if(g->obj_focus != NULL && obj == *g->obj_focus) return;
+//    if(g->obj_focus != NULL && obj == *g->obj_focus) return;
 
     /*On defocus edit mode must be leaved*/
     lv_group_set_editing(g, false);
@@ -249,29 +231,16 @@ void lv_group_focus_obj(lv_obj_t * obj)
     }
 }
 
-/**
- * Focus the next object in a group (defocus the current)
- * @param group pointer to a group
- */
 void lv_group_focus_next(lv_group_t * group)
 {
     focus_next_core(group, _lv_ll_get_head, _lv_ll_get_next);
 }
 
-/**
- * Focus the previous object in a group (defocus the current)
- * @param group pointer to a group
- */
 void lv_group_focus_prev(lv_group_t * group)
 {
     focus_next_core(group, _lv_ll_get_tail, _lv_ll_get_prev);
 }
 
-/**
- * Do not let to change the focus from the current object
- * @param group pointer to a group
- * @param en true: freeze, false: release freezing (normal mode)
- */
 void lv_group_focus_freeze(lv_group_t * group, bool en)
 {
     if(en == false)
@@ -280,12 +249,6 @@ void lv_group_focus_freeze(lv_group_t * group, bool en)
         group->frozen = 1;
 }
 
-/**
- * Send a control character to the focuses object of a group
- * @param group pointer to a group
- * @param c a character (use LV_KEY_.. to navigate)
- * @return result of focused object in group.
- */
 lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
 {
     lv_obj_t * act = lv_group_get_focused(group);
@@ -299,21 +262,11 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
     return res;
 }
 
-/**
- * Set a function for a group which will be called when a new object is focused
- * @param group pointer to a group
- * @param focus_cb the call back function or NULL if unused
- */
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
 {
     group->focus_cb = focus_cb;
 }
 
-/**
- * Manually set the current mode (edit or navigate).
- * @param group pointer to group
- * @param edit true: edit mode; false: navigate mode
- */
 void lv_group_set_editing(lv_group_t * group, bool edit)
 {
     if(group == NULL) return;
@@ -332,36 +285,16 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
     }
 }
 
-/**
- * Set the `click_focus` attribute. If enabled then the object will be focused then it is clicked.
- * @param group pointer to group
- * @param en true: enable `click_focus`
- */
-void lv_group_set_click_focus(lv_group_t * group, bool en)
-{
-    group->click_focus = en ? 1 : 0;
-}
-
 void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t policy)
 {
     group->refocus_policy = policy & 0x01;
 }
 
-/**
- * Set whether focus next/prev will allow wrapping from first->last or last->first.
- * @param group pointer to group
- * @param en true: enable `wrap`
- */
 void lv_group_set_wrap(lv_group_t * group, bool en)
 {
     group->wrap = en ? 1 : 0;
 }
 
-/**
- * Get the focused object or NULL if there isn't one
- * @param group pointer to a group
- * @return pointer to the focused object
- */
 lv_obj_t * lv_group_get_focused(const lv_group_t * group)
 {
     if(!group) return NULL;
@@ -370,44 +303,18 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
     return *group->obj_focus;
 }
 
-/**
- * Get the focus callback function of a group
- * @param group pointer to a group
- * @return the call back function or NULL if not set
- */
 lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
 {
     if(!group) return NULL;
     return group->focus_cb;
 }
 
-/**
- * Get the current mode (edit or navigate).
- * @param group pointer to group
- * @return true: edit mode; false: navigate mode
- */
 bool lv_group_get_editing(const lv_group_t * group)
 {
     if(!group) return false;
     return group->editing ? true : false;
 }
 
-/**
- * Get the `click_focus` attribute.
- * @param group pointer to group
- * @return true: `click_focus` is enabled; false: disabled
- */
-bool lv_group_get_click_focus(const lv_group_t * group)
-{
-    if(!group) return false;
-    return group->click_focus ? true : false;
-}
-
-/**
- * Get whether focus next/prev will allow wrapping from first->last or last->first object.
- * @param group pointer to group
- * @param en true: wrapping enabled; false: wrapping disabled
- */
 bool lv_group_get_wrap(lv_group_t * group)
 {
     if(!group) return false;

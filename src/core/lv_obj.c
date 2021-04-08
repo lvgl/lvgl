@@ -83,6 +83,8 @@ const lv_obj_class_t lv_obj_class = {
     .event_cb = lv_obj_event_cb,
     .width_def = LV_DPI_DEF,
     .height_def = LV_DPI_DEF,
+    .editable = LV_OBJ_CLASS_EDITABLE_FALSE,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_FALSE,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
 };

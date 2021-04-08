@@ -52,6 +52,7 @@ typedef struct {
     lv_style_t bg_color_primary;
     lv_style_t bg_color_primary_muted;
     lv_style_t bg_color_secondary;
+    lv_style_t bg_color_secondary_muted;
     lv_style_t bg_color_grey;
     lv_style_t bg_color_white;
     lv_style_t pressed;
@@ -63,6 +64,7 @@ typedef struct {
     lv_style_t pad_gap;
     lv_style_t line_space_large;
     lv_style_t text_align_center;
+    lv_style_t text_underline;
     lv_style_t outline_primary;
     lv_style_t outline_secondary;
     lv_style_t circle;
@@ -268,14 +270,6 @@ static void style_init(void)
     lv_style_set_pad_ver(&styles->btn, PAD_SMALL);
     lv_style_set_pad_column(&styles->btn, LV_DPX(5));
     lv_style_set_pad_row(&styles->btn, LV_DPX(5));
-#if LV_USE_FLEX
-//    lv_style_set_layout(&styles->btn, LV_LAYOUT_FLEX);
-//    lv_style_set_flex_flow(&styles->btn, LV_FLEX_FLOW_ROW);
-//    lv_style_set_flex_main_place(&styles->btn, LV_FLEX_PLACE_CENTER);
-//    lv_style_set_flex_cross_place(&styles->btn, LV_FLEX_PLACE_CENTER);
-//    lv_style_set_flex_track_place(&styles->btn, LV_FLEX_PLACE_CENTER);
-#endif
-
 
     static lv_color_filter_dsc_t dark_filter;
     lv_color_filter_dsc_init(&dark_filter, dark_color_filter_cb);
@@ -313,6 +307,9 @@ static void style_init(void)
     style_init_reset(&styles->text_align_center);
     lv_style_set_text_align(&styles->text_align_center, LV_TEXT_ALIGN_CENTER);
 
+    style_init_reset(&styles->text_underline);
+    lv_style_set_text_decor(&styles->text_underline, LV_TEXT_DECOR_UNDERLINE);
+
     style_init_reset(&styles->pad_zero);
     lv_style_set_pad_all(&styles->pad_zero, 0);
     lv_style_set_pad_row(&styles->pad_zero, 0);
@@ -337,6 +334,11 @@ static void style_init(void)
     lv_style_set_bg_color(&styles->bg_color_secondary, color_secondary_accent);
     lv_style_set_text_color(&styles->bg_color_secondary, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_secondary, LV_OPA_COVER);
+
+    style_init_reset(&styles->bg_color_secondary_muted);
+    lv_style_set_bg_color(&styles->bg_color_secondary_muted, color_secondary_muted);
+    lv_style_set_text_color(&styles->bg_color_secondary_muted, color_secondary_accent);
+    lv_style_set_bg_opa(&styles->bg_color_secondary_muted, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_grey);
     lv_style_set_bg_color(&styles->bg_color_grey, COLOR_GREY);
@@ -623,6 +625,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->transition_delayed, 0);
         lv_obj_add_style(obj, &styles->pressed, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &styles->transition_normal, LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
 #if LV_THEME_DEFAULT_GROW
         lv_obj_add_style(obj, &styles->grow, LV_STATE_PRESSED);
 #endif
@@ -657,6 +660,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
             lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_PART_ITEMS | LV_STATE_CHECKED);
             lv_obj_add_style(obj, &styles->tab_btn, LV_PART_ITEMS | LV_STATE_CHECKED);
+            lv_obj_add_style(obj, &styles->text_underline, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+            lv_obj_add_style(obj, &styles->bg_color_secondary_muted, LV_PART_ITEMS | LV_STATE_EDITED | LV_STATE_CHECKED);
             return;
         }
 #endif
