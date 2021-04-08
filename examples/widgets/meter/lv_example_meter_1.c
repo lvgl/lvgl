@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #if LV_USE_METER && LV_BUILD_EXAMPLES
 
 static lv_obj_t * meter;

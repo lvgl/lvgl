@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #if LV_USE_ROLLER && LV_BUILD_EXAMPLES
 
 static void event_handler(lv_obj_t * obj, lv_event_t event)

@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 //#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event);

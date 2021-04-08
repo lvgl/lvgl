@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #if LV_USE_IMG && LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 static lv_obj_t * create_slider(lv_color_t color);

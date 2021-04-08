@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #if LV_USE_LINE && LV_BUILD_EXAMPLES
 
 void lv_example_line_1(void)

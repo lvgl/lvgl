@@ -1,4 +1,4 @@
-#include "../../lvgl.h"
+#include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_SLIDER
 
 static lv_obj_t * label;

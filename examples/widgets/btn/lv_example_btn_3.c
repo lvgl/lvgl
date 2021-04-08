@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #include <stdio.h>
 #if LV_BUILD_EXAMPLES && LV_USE_BTN
 

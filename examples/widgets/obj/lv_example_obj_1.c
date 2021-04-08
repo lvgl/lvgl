@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #if LV_BUILD_EXAMPLES
 
 void lv_example_obj_1(void)

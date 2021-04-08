@@ -1,4 +1,4 @@
-#include "../../lvgl.h"
+#include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_BTN
 
 static void btn_event_cb(lv_obj_t * btn, lv_event_t event)

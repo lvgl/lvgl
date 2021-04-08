@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
