@@ -85,6 +85,10 @@ typedef struct {
     lv_style_t arc_knob;
 #endif
 
+#if LV_USE_LINE
+    lv_style_t line;
+#endif
+
 #if LV_USE_BAR
     lv_style_t bar_bg;
     lv_style_t bar_indic;
@@ -376,6 +380,8 @@ static void img_init(void)
 static void line_init(void)
 {
 #if LV_USE_LINE != 0
+    lv_style_reset(&styles->line);
+    lv_style_set_line_width(&styles->line, LV_STATE_DEFAULT, 1);
 
 #endif
 }
@@ -1052,6 +1058,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_LINE
         case LV_THEME_LINE:
+            list = lv_obj_get_style_list(obj, LV_LINE_PART_MAIN);
+            _lv_style_list_add_style(list, &styles->line);
             break;
 #endif
 
