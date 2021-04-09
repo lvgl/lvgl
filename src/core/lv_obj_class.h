@@ -47,6 +47,9 @@ typedef struct _lv_obj_class_t {
     const struct _lv_obj_class_t * base_class;
     void (*constructor_cb)(struct _lv_obj_t * obj);
     void (*destructor_cb)(struct _lv_obj_t * obj);
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
     lv_event_cb_t event_cb;         /**< Object type specific event function*/
     lv_coord_t width_def;
     lv_coord_t height_def;
