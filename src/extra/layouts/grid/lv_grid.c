@@ -281,6 +281,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     lv_coord_t col_gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
     cont_w -= col_gap * (c->col_num - 1);
     lv_coord_t free_w = cont_w - grid_w;
+    if(free_w < 0) free_w = 0;
 
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = col_templ[i];
@@ -338,6 +339,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
     lv_coord_t cont_h = lv_obj_get_height_fit(cont) - row_gap * (c->row_num - 1);
     lv_coord_t free_h = cont_h - grid_h;
+    if(free_h < 0) free_h = 0;
 
     for(i = 0; i < c->row_num; i++) {
         lv_coord_t x = row_templ[i];
