@@ -32,7 +32,7 @@ static lv_color_t color_secondary_muted;
 
 #define TRANSITION_TIME         LV_THEME_DEFAULT_TRANSITON_TIME
 #define BORDER_WIDTH            LV_DPX(2)
-#define OUTLINE_WIDTH           LV_DPX(2)
+#define OUTLINE_WIDTH           LV_DPX(4)
 
 #define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(20))
 #define PAD_SMALL   (disp_size == DISP_LARGE ? LV_DPX(14) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(12))

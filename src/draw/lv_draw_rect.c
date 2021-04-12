@@ -1193,11 +1193,10 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const
     lv_area_t area_outer;
     lv_area_copy(&area_outer, &area_inner);
 
-    lv_coord_t width = (dsc->outline_pad == 0 ? (dsc->outline_width + 1) : dsc->outline_width);
-    area_outer.x1 -= width;
-    area_outer.x2 += width;
-    area_outer.y1 -= width;
-    area_outer.y2 += width;
+    area_outer.x1 -= dsc->outline_width;
+    area_outer.x2 += dsc->outline_width;
+    area_outer.y1 -= dsc->outline_width;
+    area_outer.y2 += dsc->outline_width;
 
     draw_full_border(&area_inner, &area_outer, clip, dsc->radius, true, dsc->outline_color, dsc->outline_opa,
                      dsc->blend_mode);
