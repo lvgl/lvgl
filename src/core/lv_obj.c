@@ -56,6 +56,11 @@ typedef struct {
     const lv_anim_path_t * path;
 }trans_set_t;
 
+typedef struct _lv_event_dsc_t{
+    lv_event_cb_t cb;
+    void * user_data;
+}lv_event_dsc_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/

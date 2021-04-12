@@ -34,6 +34,7 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
+struct _lv_event_dsc_t;
 
 /*---------------------
  *       EVENTS
@@ -96,11 +97,6 @@ typedef enum {
  * For details, see ::lv_event_t.
  */
 typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
-
-typedef struct {
-    lv_event_cb_t cb;
-    void * user_data;
-}lv_event_dsc_t;
 
 /*---------------------
  *       EVENTS
@@ -213,7 +209,7 @@ typedef struct {
     uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
 
-    lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
+    struct _lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
     lv_point_t scroll;                      /**< The current X/Y scroll offset*/
 
     uint8_t ext_click_pad;      /**< Extra click padding in all direction*/
@@ -444,7 +440,7 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
  * @param id    the index of the event callback. 0: the firstly added
  * @return      the event descriptor
  */
-lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id);
+struct _lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id);
 
 /**
  * Get the group of the object
