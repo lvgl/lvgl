@@ -92,7 +92,7 @@ static inline lv_coord_t lv_grid_fr(uint8_t x)
     return LV_GRID_FR(x);
 }
 
-static inline void lv_style_set_grid_row_template(lv_style_t * style, const lv_coord_t * value)
+static inline void lv_style_set_grid_row_template(lv_style_t * style, const lv_coord_t value[])
 {
     lv_style_value_t v = {
         .ptr = (const void *)value
@@ -100,7 +100,7 @@ static inline void lv_style_set_grid_row_template(lv_style_t * style, const lv_c
     lv_style_set_prop(style, LV_STYLE_GRID_ROW_TEMPLATE, v);
 }
 
-static inline void lv_style_set_grid_column_template(lv_style_t * style, const lv_coord_t * value)
+static inline void lv_style_set_grid_column_template(lv_style_t * style, const lv_coord_t value[])
 {
     lv_style_value_t v = {
         .ptr = (const void *)value
@@ -173,7 +173,7 @@ static inline void lv_style_set_grid_cell_y_place(lv_style_t * style, lv_coord_t
     lv_style_set_prop(style, LV_STYLE_GRID_CELL_ROW_PLACE, v);
 }
 
-static inline void lv_obj_set_style_grid_row_template(lv_obj_t * obj, const lv_coord_t * value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_grid_row_template(lv_obj_t * obj, const lv_coord_t value[], lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = (const void *)value
@@ -181,7 +181,7 @@ static inline void lv_obj_set_style_grid_row_template(lv_obj_t * obj, const lv_c
     lv_obj_set_local_style_prop(obj,LV_STYLE_GRID_ROW_TEMPLATE, v, selector);
 }
 
-static inline void lv_obj_set_style_grid_column_template(lv_obj_t * obj, const lv_coord_t * value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_grid_column_template(lv_obj_t * obj, const lv_coord_t value[], lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = (const void *)value
