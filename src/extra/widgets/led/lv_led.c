@@ -29,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_led_constructor(lv_obj_t * obj);
+static void lv_led_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_led_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
@@ -147,8 +147,9 @@ uint8_t lv_led_get_brightness(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_led_constructor(lv_obj_t * obj)
+static void lv_led_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_led_t * led = (lv_led_t *)obj;
     led->color = lv_theme_get_color_primary(obj);
     led->bright = LV_LED_BRIGHT_MAX;

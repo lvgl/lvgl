@@ -373,7 +373,7 @@ static void obj_del_core(lv_obj_t * obj)
     }
 
     /*All children deleted. Now clean up the object specific data*/
-    _lv_obj_destruct(obj);
+    _lv_obj_destructor(obj);
 
     /*Remove the screen for the screen list*/
     if(obj->parent == NULL) {

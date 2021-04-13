@@ -29,8 +29,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_table_constructor(lv_obj_t * obj);
-static void lv_table_destructor(lv_obj_t * obj);
+static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_table_event(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
@@ -402,8 +402,9 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_table_constructor(lv_obj_t * obj)
+static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_table_t * table = (lv_table_t *)obj;
@@ -420,8 +421,9 @@ static void lv_table_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_table_destructor(lv_obj_t * obj)
+static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_table_t * table = (lv_table_t *)obj;
     /*Free the cell texts*/
     uint16_t i;

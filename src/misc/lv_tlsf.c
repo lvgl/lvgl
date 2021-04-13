@@ -818,7 +818,7 @@ static void* block_prepare_used(control_t* control, block_header_t* block, size_
 }
 
 /* Clear structure and point all empty lists at the null block. */
-static void control_construct(control_t* control)
+static void control_constructor(control_t* control)
 {
 	int i, j;
 
@@ -1113,7 +1113,7 @@ tlsf_t tlsf_create(void* mem)
 		return 0;
 	}
 
-	control_construct(tlsf_cast(control_t*, mem));
+	control_constructor(tlsf_cast(control_t*, mem));
 
 	return tlsf_cast(tlsf_t, mem);
 }

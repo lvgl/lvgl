@@ -36,8 +36,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_chart_constructor(lv_obj_t * obj);
-static void lv_chart_destructor(lv_obj_t * obj);
+static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_chart_event(lv_obj_t * obj, lv_event_t e);
 
 static void draw_div_lines(lv_obj_t * obj , const lv_area_t * mask);
@@ -564,8 +564,9 @@ uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_chart_constructor(lv_obj_t * obj)
+static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_chart_t * chart = (lv_chart_t *)obj;
@@ -590,8 +591,11 @@ static void lv_chart_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_chart_destructor(lv_obj_t * obj)
+static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
+    LV_TRACE_OBJ_CREATE("begin");
+
     lv_chart_t * chart = (lv_chart_t *)obj;
     lv_chart_series_t * ser;
     while(chart->series_ll.head) {
@@ -603,6 +607,8 @@ static void lv_chart_destructor(lv_obj_t * obj)
         lv_mem_free(ser);
     }
     _lv_ll_clear(&chart->series_ll);
+
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_chart_event(lv_obj_t * obj, lv_event_t e)

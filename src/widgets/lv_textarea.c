@@ -42,8 +42,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_textarea_constructor(lv_obj_t * obj);
-static void lv_textarea_destructor(lv_obj_t * obj);
+static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_event(lv_obj_t * obj, lv_event_t e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
@@ -795,40 +795,42 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_textarea_constructor(lv_obj_t * obj)
+static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-      ta->pwd_mode          = 0;
-      ta->pwd_tmp           = NULL;
-      ta->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
-      ta->accepted_chars    = NULL;
-      ta->max_length        = 0;
-      ta->cursor.show      = 1;
-      ta->cursor.pos        = 0;
-      ta->cursor.click_pos  = 1;
-      ta->cursor.valid_x    = 0;
-      ta->one_line          = 0;
-  #if LV_LABEL_TEXT_SEL
-      ta->text_sel_en = 0;
-  #endif
-      ta->label       = NULL;
-      ta->placeholder_txt = NULL;
+    ta->pwd_mode          = 0;
+    ta->pwd_tmp           = NULL;
+    ta->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
+    ta->accepted_chars    = NULL;
+    ta->max_length        = 0;
+    ta->cursor.show      = 1;
+    ta->cursor.pos        = 0;
+    ta->cursor.click_pos  = 1;
+    ta->cursor.valid_x    = 0;
+    ta->one_line          = 0;
+#if LV_LABEL_TEXT_SEL
+    ta->text_sel_en = 0;
+#endif
+    ta->label       = NULL;
+    ta->placeholder_txt = NULL;
 
-      ta->label = lv_label_create(obj);
-      lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
-      lv_label_set_text(ta->label, "");
-      lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    ta->label = lv_label_create(obj);
+    lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(ta->label, "");
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
-      start_cursor_blink(obj);
+    start_cursor_blink(obj);
 
-      LV_TRACE_OBJ_CREATE("finished");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_textarea_destructor(lv_obj_t * obj)
+static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->pwd_tmp != NULL) {

@@ -34,8 +34,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_label_constructor(lv_obj_t * obj);
-static void lv_label_destructor(lv_obj_t * obj);
+static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
 
@@ -692,8 +692,9 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_label_constructor(lv_obj_t * obj)
+static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_label_t * label = (lv_label_t *)obj;
@@ -727,8 +728,9 @@ static void lv_label_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_label_destructor(lv_obj_t * obj)
+static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_label_t * label = (lv_label_t *)obj;
 
     lv_label_dot_tmp_free(obj);

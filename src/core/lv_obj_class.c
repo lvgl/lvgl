@@ -115,16 +115,16 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     return obj;
 }
 
-void _lv_obj_destruct(lv_obj_t * obj)
+void _lv_obj_destructor(lv_obj_t * obj)
 {
-    if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj);
+    if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
     if(obj->class_p->base_class) {
         /*Don't let the descendant methods run during destructing the ancestor type*/
         obj->class_p = obj->class_p->base_class;
 
         /*Call the base class's destructor too*/
-        _lv_obj_destruct(obj);
+        _lv_obj_destructor(obj);
     }
 }
 
@@ -170,7 +170,7 @@ static void lv_obj_construct(lv_obj_t * obj)
     /*Restore the original class*/
     obj->class_p = original_class_p;
 
-    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(obj);
+    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(obj->class_p, obj);
 }
 
 static uint32_t get_instance_size(const lv_obj_class_t * class_p)

@@ -28,8 +28,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_img_constructor(lv_obj_t * obj);
-static void lv_img_destructor(lv_obj_t * obj);
+static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_event(lv_obj_t * obj, lv_event_t e);
 static void draw_img(lv_obj_t * obj, lv_event_t e);
 
@@ -360,8 +360,9 @@ bool lv_img_get_antialias(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_img_constructor(lv_obj_t * obj)
+static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_img_t * img = (lv_img_t *)obj;
@@ -385,8 +386,9 @@ static void lv_img_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_img_destructor(lv_obj_t * obj)
+static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_img_t * img = (lv_img_t *)obj;
     if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
         lv_mem_free((void*)img->src);

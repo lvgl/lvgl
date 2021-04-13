@@ -64,8 +64,8 @@ typedef struct _lv_event_dsc_t{
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_constructor(lv_obj_t * obj);
-static void lv_obj_destructor(lv_obj_t * obj);
+static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_draw(lv_obj_t * obj, lv_event_t e);
 static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
@@ -575,8 +575,9 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_constructor(lv_obj_t * obj)
+static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_obj_t * parent = obj->parent;
@@ -604,9 +605,10 @@ static void lv_obj_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_obj_destructor(lv_obj_t * p)
+static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    lv_obj_t * obj = p;
+    LV_UNUSED(class_p);
+
     if(obj->spec_attr) {
         if(obj->spec_attr->children) {
             lv_mem_free(obj->spec_attr->children);

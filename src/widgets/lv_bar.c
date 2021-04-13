@@ -45,8 +45,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_bar_constructor(lv_obj_t * obj);
-static void lv_bar_destructor(lv_obj_t * obj);
+static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_event(lv_obj_t * bar, lv_event_t e);
 static void draw_indic(lv_obj_t * bar);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
@@ -200,8 +200,9 @@ lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_bar_constructor(lv_obj_t * obj)
+static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -221,8 +222,9 @@ static void lv_bar_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_bar_destructor(lv_obj_t * obj)
+static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     lv_anim_del(&bar->cur_value_anim, NULL);

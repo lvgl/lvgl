@@ -27,8 +27,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_meter_constructor(lv_obj_t * obj);
-static void lv_meter_destructor(lv_obj_t * obj);
+static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_event(lv_obj_t * obj, lv_event_t e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -246,8 +246,9 @@ void lv_meter_set_indicator_end_value(lv_obj_t * obj, lv_meter_indicator_t * ind
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_meter_constructor(lv_obj_t * obj)
+static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_meter_t * meter = (lv_meter_t *)obj;
@@ -257,8 +258,9 @@ static void lv_meter_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_meter_destructor(lv_obj_t * obj)
+static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_scale_t * scale;
     scale = _lv_ll_get_head(&meter->scale_ll);

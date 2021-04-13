@@ -22,7 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_spinbox_constructor(lv_obj_t * obj);
+static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
@@ -269,8 +269,9 @@ void lv_spinbox_decrement(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_spinbox_constructor(lv_obj_t * obj)
+static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_LOG_TRACE("begin");
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;

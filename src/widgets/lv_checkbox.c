@@ -26,8 +26,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_checkbox_constructor(lv_obj_t * obj);
-static void lv_checkbox_destructor(lv_obj_t * obj);
+static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_checkbox_event(lv_obj_t * obj, lv_event_t e);
 static void lv_checkbox_draw(lv_obj_t * obj);
 
@@ -111,8 +111,9 @@ const char * lv_checkbox_get_text(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_checkbox_constructor(lv_obj_t * obj)
+static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
@@ -126,13 +127,17 @@ static void lv_checkbox_constructor(lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_checkbox_destructor(lv_obj_t * obj)
+static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
+    LV_TRACE_OBJ_CREATE("begin");
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     if(!cb->static_txt) {
         lv_mem_free(cb->txt);
         cb->txt = NULL;
     }
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_checkbox_event(lv_obj_t * obj, lv_event_t e)

@@ -45,8 +45,8 @@ typedef enum {
  */
 typedef struct _lv_obj_class_t {
     const struct _lv_obj_class_t * base_class;
-    void (*constructor_cb)(struct _lv_obj_t * obj);
-    void (*destructor_cb)(struct _lv_obj_t * obj);
+    void (*constructor_cb)(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * obj);
+    void (*destructor_cb)(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * obj);
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
@@ -70,7 +70,7 @@ typedef struct _lv_obj_class_t {
  */
 struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent);
 
-void _lv_obj_destruct(struct _lv_obj_t * obj);
+void _lv_obj_destructor(struct _lv_obj_t * obj);
 
 bool lv_obj_is_editable(struct _lv_obj_t * obj);
 

@@ -21,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_win_constructor(lv_obj_t * obj);
+static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -86,8 +86,9 @@ lv_obj_t * lv_win_get_content(lv_obj_t * win)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_win_constructor(lv_obj_t * obj)
+static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, lv_obj_get_width(parent), lv_obj_get_height(parent));
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);

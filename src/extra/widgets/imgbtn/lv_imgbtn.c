@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_imgbtn_constructor(lv_obj_t * obj);
+static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void draw_main(lv_obj_t * obj);
 static void lv_imgbtn_event(lv_obj_t * imgbtn, lv_event_t e);
 static void refr_img(lv_obj_t * imgbtn);
@@ -147,8 +147,9 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_imgbtn_constructor(lv_obj_t * obj)
+static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
    /*Initialize the allocated 'ext'*/
    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));

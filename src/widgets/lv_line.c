@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_line_constructor(lv_obj_t * obj);
+static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_line_event(lv_obj_t * obj, lv_event_t e);
 
 /**********************
@@ -103,8 +103,9 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_line_constructor(lv_obj_t * obj)
+static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_line_t * line = (lv_line_t *)obj;

@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_keyboard_constructor(lv_obj_t * obj);
+static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 static void lv_keyboard_update_map(lv_obj_t * obj);
 
@@ -320,8 +320,9 @@ void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_keyboard_constructor(lv_obj_t * obj)
+static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;

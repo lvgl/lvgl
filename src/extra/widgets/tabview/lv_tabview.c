@@ -20,8 +20,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_tabview_constructor(lv_obj_t * obj);
-static void lv_tabview_destructor(lv_obj_t * obj);
+static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void btns_event_cb(lv_obj_t * btns, lv_event_t e);
 static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
 
@@ -146,8 +146,9 @@ lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_tabview_constructor(lv_obj_t * obj)
+static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     tabview->tab_pos = tabpos_create;
@@ -209,8 +210,9 @@ static void lv_tabview_constructor(lv_obj_t * obj)
     lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 }
 
-static void lv_tabview_destructor(lv_obj_t * obj)
+static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     uint32_t i;

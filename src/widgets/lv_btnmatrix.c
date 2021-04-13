@@ -32,8 +32,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_btnmatrix_constructor(lv_obj_t * obj);
-static void lv_btnmatrix_destructor(lv_obj_t * obj);
+static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e);
 static void draw_main(lv_obj_t * obj);
 
@@ -356,8 +356,10 @@ bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_btnmatrix_constructor(lv_obj_t * obj)
+static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
+    LV_TRACE_OBJ_CREATE("begin");
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     btnm->btn_cnt        = 0;
     btnm->btn_id_sel     = LV_BTNMATRIX_BTN_NONE;
@@ -369,16 +371,19 @@ static void lv_btnmatrix_constructor(lv_obj_t * obj)
 
     lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
 
-    LV_LOG_TRACE("finshed");
+    LV_TRACE_OBJ_CREATE("finshed");
 }
 
-static void lv_btnmatrix_destructor(lv_obj_t * obj)
+static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_TRACE_OBJ_CREATE("begin");
+    LV_UNUSED(class_p);
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     lv_mem_free(btnm->button_areas);
     lv_mem_free(btnm->ctrl_bits);
     btnm->button_areas = NULL;
     btnm->ctrl_bits = NULL;
+    LV_TRACE_OBJ_CREATE("finshed");
 }
 
 static void lv_btnmatrix_event(lv_obj_t * obj, lv_event_t e)

@@ -31,7 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_slider_constructor(lv_obj_t * obj);
+static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_slider_event(lv_obj_t * obj, lv_event_t e);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
 static void draw_knob(lv_obj_t * obj);
@@ -74,8 +74,9 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_slider_constructor(lv_obj_t * obj)
+static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     /*Initialize the allocated 'slider'*/
