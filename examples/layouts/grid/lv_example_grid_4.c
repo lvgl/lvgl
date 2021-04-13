@@ -15,7 +15,7 @@ void lv_example_grid_4(void)
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_scr_act());
     lv_obj_set_grid_place(cont, LV_GRID_SPACE_BETWEEN, LV_GRID_END);
-    lv_obj_set_grid_template(cont, col_dsc, row_dsc);
+    lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_center(cont);
 
