@@ -71,6 +71,7 @@ static void lv_obj_event_cb(lv_obj_t * obj, lv_event_t e);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
+static lv_res_t event_send_core(lv_obj_t * obj, lv_event_t event, void * param);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 static void base_dir_refr_children(lv_obj_t * obj);
 static bool event_is_bubbled(lv_event_t e);
@@ -82,6 +83,7 @@ static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static void * event_act_param;
 static void * event_act_user_data_cb;
+static lv_obj_t * event_original_target;
 const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
@@ -204,69 +206,15 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    EVENT_TRACE("Sending event %d to %p with %p param", event, obj, param);
+    /*Save the original target first in tmp variable because nested `lv_event_send` calls can overwrite it*/
+    lv_obj_t * event_original_target_tmp = event_original_target;
+    event_original_target = obj;
 
-    /*Build a simple linked list from the objects used in the events
-     *It's important to know if an this object was deleted by a nested event
-     *called from this `event_cb`.*/
-    lv_event_temp_data_t event_temp_data;
-    event_temp_data.obj     = obj;
-    event_temp_data.deleted = false;
-    event_temp_data.prev    = NULL;
+    /*Send the event*/
+    lv_res_t res = event_send_core(obj, event, param);
 
-    if(event_temp_data_head) {
-        event_temp_data.prev = event_temp_data_head;
-    }
-    event_temp_data_head = &event_temp_data;
-
-    /*There could be nested event sending with different param.
-     *It needs to be saved for the current event context because `lv_event_get_data` returns a global param.*/
-    void * event_act_param_save = event_act_param;
-    event_act_param = param;
-
-    /*Call the input device's feedback callback if set*/
-    lv_indev_t * indev_act = lv_indev_get_act();
-    if(indev_act) {
-        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event);
-    }
-
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
-    lv_res_t res = LV_RES_OK;
-    res = lv_obj_event_base(NULL, obj, event);
-
-    uint32_t i = 0;
-    while(event_dsc && res == LV_RES_OK) {
-        if(event_dsc->cb) {
-            void * event_act_user_data_cb_save = event_act_user_data_cb;
-            event_act_user_data_cb = event_dsc->user_data;
-
-            event_dsc->cb(obj, event);
-
-            event_act_user_data_cb = event_act_user_data_cb_save;
-
-            /*Stop if the object is deleted*/
-            if(event_temp_data.deleted) {
-                res = LV_RES_INV;
-                break;
-            }
-        }
-
-        i++;
-        event_dsc = lv_obj_get_event_dsc(obj, i);
-    }
-
-    /*Restore the event param*/
-    event_act_param = event_act_param_save;
-
-    /*Remove this element from the list*/
-    event_temp_data_head = event_temp_data_head->prev;
-
-    if(res == LV_RES_OK && event_is_bubbled(event)) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-            res = lv_event_send(obj->parent, event, param);
-            if(res != LV_RES_OK) return LV_RES_INV;
-        }
-    }
+    /*Restore the original target*/
+    event_original_target = event_original_target_tmp;
 
     return res;
 }
@@ -320,6 +268,11 @@ void * lv_event_get_param(void)
 void * lv_event_get_user_data(void)
 {
     return event_act_user_data_cb;
+}
+
+lv_obj_t * lv_event_get_original_target(void)
+{
+    return event_original_target;
 }
 
 uint32_t lv_event_register_id(void)
@@ -691,7 +644,7 @@ static void lv_obj_draw(lv_obj_t * obj, lv_event_t e)
         coords.y1 -= h;
         coords.y2 += h;
 
-        if(_lv_area_is_in(info->clip_area, &coords, r) == false) {
+        if(_lv_area_is_in(info->area, &coords, r) == false) {
             info->res = LV_DRAW_RES_NOT_COVER;
            return;
         }
@@ -1076,6 +1029,75 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
         }
     }
     return false;
+}
+
+static lv_res_t event_send_core(lv_obj_t * obj, lv_event_t event, void * param)
+{
+    EVENT_TRACE("Sending event %d to %p with %p param", event, obj, param);
+
+    /*Build a simple linked list from the objects used in the events
+     *It's important to know if an this object was deleted by a nested event
+     *called from this `event_cb`.*/
+    lv_event_temp_data_t event_temp_data;
+    event_temp_data.obj     = obj;
+    event_temp_data.deleted = false;
+    event_temp_data.prev    = NULL;
+
+    if(event_temp_data_head) {
+        event_temp_data.prev = event_temp_data_head;
+    }
+    event_temp_data_head = &event_temp_data;
+
+    /*There could be nested event sending with different param.
+     *It needs to be saved for the current event context because `lv_event_get_data` returns a global param.*/
+    void * event_act_param_save = event_act_param;
+    event_act_param = param;
+
+    /*Call the input device's feedback callback if set*/
+    lv_indev_t * indev_act = lv_indev_get_act();
+    if(indev_act) {
+        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event);
+    }
+
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
+    lv_res_t res = LV_RES_OK;
+    res = lv_obj_event_base(NULL, obj, event);
+
+    uint32_t i = 0;
+    while(event_dsc && res == LV_RES_OK) {
+        if(event_dsc->cb) {
+            void * event_act_user_data_cb_save = event_act_user_data_cb;
+            event_act_user_data_cb = event_dsc->user_data;
+
+            event_dsc->cb(obj, event);
+
+            event_act_user_data_cb = event_act_user_data_cb_save;
+
+            /*Stop if the object is deleted*/
+            if(event_temp_data.deleted) {
+                res = LV_RES_INV;
+                break;
+            }
+        }
+
+        i++;
+        event_dsc = lv_obj_get_event_dsc(obj, i);
+    }
+
+    /*Restore the event param*/
+    event_act_param = event_act_param_save;
+
+    /*Remove this element from the list*/
+    event_temp_data_head = event_temp_data_head->prev;
+
+    if(res == LV_RES_OK && event_is_bubbled(event)) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
+            res = event_send_core(obj->parent, event, param);
+            if(res != LV_RES_OK) return LV_RES_INV;
+        }
+    }
+
+    return LV_RES_OK;
 }
 
 static bool event_is_bubbled(lv_event_t e)

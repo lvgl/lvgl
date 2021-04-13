@@ -139,7 +139,7 @@ typedef struct _lv_indev_drv_t {
     uint16_t long_press_time;
 
     /**< Repeated trigger period in long press [ms]*/
-    uint16_t long_press_rep_time;
+    uint16_t long_press_repeat_time;
 } lv_indev_drv_t;
 
 /** Run time data of input devices

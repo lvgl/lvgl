@@ -576,7 +576,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     if(_lv_area_is_in(area_p, &obj->coords, 0) && lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == false) {
         lv_cover_check_info_t info;
         info.res = LV_DRAW_RES_COVER;
-        info.clip_area = area_p;
+        info.area = area_p;
         lv_event_send(obj, LV_EVENT_COVER_CHECK, &info);
         if(info.res == LV_DRAW_RES_MASKED) return NULL;
 

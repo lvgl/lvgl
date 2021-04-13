@@ -47,48 +47,50 @@ typedef enum {
     /** Input device events*/
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
     LV_EVENT_PRESSING,            /**< The object is being pressed (called continuously while pressing)*/
-    LV_EVENT_PRESS_LOST,          /**< User is still being pressed but slid cursor/finger off of the object */
-    LV_EVENT_SHORT_CLICKED,       /**< User pressed object for a short period of time, then released it. Not called if scrolled.*/
-    LV_EVENT_LONG_PRESSED,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if scrolled.*/
-    LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if scrolled.*/
+    LV_EVENT_PRESS_LOST,          /**< The object is still being pressed but slid cursor/finger off of the object */
+    LV_EVENT_SHORT_CLICKED,       /**< The object was pressed for a short period of time, then released it. Not called if scrolled.*/
+    LV_EVENT_LONG_PRESSED,        /**< Object has been pressed for at least `long_press_time`.  Not called if scrolled.*/
+    LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.*/
     LV_EVENT_CLICKED,             /**< Called on release if not scrolled (regardless to long press)*/
     LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/
     LV_EVENT_SCROLL_BEGIN,        /**< Scrolling begins*/
     LV_EVENT_SCROLL_END,          /**< Scrolling ends*/
     LV_EVENT_SCROLL,              /**< Scrolling*/
-    LV_EVENT_GESTURE,             /**< Gesture detected*/
-    LV_EVENT_KEY,                 /**< A key is sent to the object*/
-    LV_EVENT_FOCUSED,             /**< Focused */
-    LV_EVENT_DEFOCUSED,           /**< Defocused*/
-    LV_EVENT_LEAVE,               /**< Defocused but still selected*/
+    LV_EVENT_GESTURE,             /**< A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());` */
+    LV_EVENT_KEY,                 /**< A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_get_act());`*/
+    LV_EVENT_FOCUSED,             /**< The object is focused*/
+    LV_EVENT_DEFOCUSED,           /**< The object is defocused*/
+    LV_EVENT_LEAVE,               /**< The object is defocused but still selected*/
     LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing*/
 
     /** Drawing events*/
-    LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area*/
-    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow)*/
+    LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.*/
+    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `lv_coord_t *` to store the size.*/
     LV_EVENT_DRAW_MAIN_BEGIN,    /**< Starting the main drawing phase*/
     LV_EVENT_DRAW_MAIN,          /**< Perform the main drawing*/
     LV_EVENT_DRAW_MAIN_END,      /**< Finishing the main drawing phase*/
     LV_EVENT_DRAW_POST_BEGIN,    /**< Starting the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST,          /**< Perform the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST_END,      /**< Finishing the post draw phase (when all children are drawn)*/
-    LV_EVENT_DRAW_PART_BEGIN,    /**< Starting to draw a part*/
-    LV_EVENT_DRAW_PART_END,      /**< Finishing to draw a part*/
+    LV_EVENT_DRAW_PART_BEGIN,    /**< Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. */
+    LV_EVENT_DRAW_PART_END,      /**< Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. */
 
-    /** General events*/
+    /** Special events*/
     LV_EVENT_VALUE_CHANGED,       /**< The object's value has changed (i.e. slider moved)*/
-    LV_EVENT_INSERT,              /**< A text is inserted to the object*/
+    LV_EVENT_INSERT,              /**< A text is inserted to the object. The event data is `char *` being inserted.*/
     LV_EVENT_REFRESH,             /**< Notify the object to refresh something on it (for the user)*/
-    LV_EVENT_DELETE,              /**< Object is being deleted*/
     LV_EVENT_READY,               /**< A process has finished*/
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
+
+    /** Other events*/
+    LV_EVENT_DELETE,              /**< Object is being deleted*/
     LV_EVENT_CHILD_CHANGED,       /**< Child was removed/added*/
     LV_EVENT_SIZE_CHANGED,       /**< Object coordinates/size have changed*/
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed*/
     LV_EVENT_BASE_DIR_CHANGED,    /**< The base dir has changed*/
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
-    _LV_EVENT_LAST /** Number of default events*/
+    _LV_EVENT_LAST                /** Number of default events*/
 }lv_event_t;
 
 /**
@@ -247,9 +249,17 @@ typedef struct {
     bool result;
 } lv_hit_test_info_t;
 
+/**
+ * Used as the event parameter of ::LV_EVENT_COVER_CHECK to check if an area is covered by the object or not.
+ * `res` should be set like this:
+ *   - If there is a draw mask on the object set to ::LV_DRAW_RES_MASKED
+ *   - If there is no draw mask but the object simply not covers the area and `res` is not set to ::LV_DRAW_RES_MASKED set to ::LV_DRAW_RES_NOT_COVER
+ *     E.g. `if(cover == false && info->res != LV_DRAW_RES_MASKED) info->res = LV_DRAW_RES_NOT_COVER;`
+ *   - If the area is fully covered by the object leave `res` unchanged.
+ */
 typedef struct {
-    lv_draw_res_t res;
-    const lv_area_t * clip_area;
+    lv_draw_res_t res;              /**< Set to ::LV_DRAW_RES_NOT_COVER or ::LV_DRAW_RES_MASKED. */
+    const lv_area_t * area;         /**< The area to check */
 } lv_cover_check_info_t;
 
 /**********************
@@ -306,6 +316,12 @@ void * lv_event_get_param(void);
  * @return      the user data parameter
  */
 void * lv_event_get_user_data(void);
+
+/**
+ * Get the original target of the event. It's different than the "normal" target if the event is bubbled.
+ * @return      pointer to the object the originally received the event before bubbling it to the parents
+ */
+lv_obj_t * lv_event_get_original_target(void);
 
 /**
  * Register a new, custom event ID.
@@ -368,7 +384,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
  * An object can have multiple event handler. They will be called in the same order as they were added.
  * @param obj       pointer to an object
  * @param event_cb  the new event function
- * @param user_data custom data data will be available in `event_cb`
+ * @param           user_data custom data data will be available in `event_cb`
  */
 void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
 
@@ -379,7 +395,7 @@ void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_dat
  * @param obj       pointer to an object
  * @param event_cb  the event function to remove
  * @param user_data if NULL, remove the first event handler with the same cb, otherwise remove the first event handler with the same cb and user_data
- * @return true if any event handlers were removed
+ * @return          true if any event handlers were removed
  */
 bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
 
