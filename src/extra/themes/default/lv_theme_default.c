@@ -98,6 +98,10 @@ typedef struct {
     lv_style_t switch_knob;
 #endif
 
+#if LV_USE_LINE
+    lv_style_t line;
+#endif
+
 #if LV_USE_TABLE
     lv_style_t table_cell;
 #endif
@@ -404,6 +408,12 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->switch_knob, - LV_DPX(4));
 #endif
 
+#if LV_USE_LINE
+    style_init_reset(&styles->line);
+    lv_style_set_line_width(&styles->line, 1);
+    lv_style_set_line_color(&styles->line, COLOR_SCR_TEXT);
+#endif
+
 #if LV_USE_CHART
     style_init_reset(&styles->chart_bg);
     lv_style_set_border_post(&styles->chart_bg, false);
@@ -636,7 +646,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_LINE
     else if(lv_obj_check_type(obj, &lv_line_class)) {
-        lv_obj_add_style(obj, &styles->card, 0);
+        lv_obj_add_style(obj, &styles->line, 0);
     }
 #endif
 
