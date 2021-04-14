@@ -2,16 +2,19 @@
 #if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 
-static void event_cb(lv_obj_t * chart, lv_event_t e)
+static void event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * chart = lv_event_get_target(e);
+
+    if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_invalidate(chart);
     }
-    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param();
+    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, 20);
     }
-    else if(e == LV_EVENT_DRAW_POST_END) {
+    else if(code == LV_EVENT_DRAW_POST_END) {
         int32_t id = lv_chart_get_pressed_point(chart);
         if(id == LV_CHART_POINT_NONE) return;
 
@@ -42,7 +45,7 @@ static void event_cb(lv_obj_t * chart, lv_event_t e)
             a.y1 = chart->coords.y1 + p.y - 30;
             a.y2 = chart->coords.y1 + p.y - 10;
 
-            const lv_area_t * clip_area = lv_event_get_param();
+            const lv_area_t * clip_area = lv_event_get_param(e);
             lv_draw_rect(&a, clip_area, &draw_rect_dsc);
 
             ser = lv_chart_get_series_next(chart, ser);

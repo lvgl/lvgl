@@ -176,7 +176,7 @@ There are 2 custom pointer that are available in the events:
 - `user_data`: set when the event is registered. 
 - `event_param`: set when the event is sent in `lv_event_send`
 
-In any event callback these pointer can be get with `lv_event_get_user_data()` and `lv_event_get_param()`.
+In any event callback these pointer can be get with `lv_event_get_user_data(e)` and `lv_event_get_param(e)`.
 
 
 ## Event bubbling

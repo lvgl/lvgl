@@ -220,15 +220,17 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
  * @param kb pointer to a  keyboard
  * @param event the triggering event
  */
-void lv_keyboard_def_event_cb(lv_obj_t * obj, lv_event_t event)
+void lv_keyboard_def_event_cb(lv_event_t * e)
 {
-    if(event != LV_EVENT_VALUE_CHANGED) return;
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code != LV_EVENT_VALUE_CHANGED) return;
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     uint16_t btn_id   = lv_btnmatrix_get_selected_btn(obj);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
     if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_HIDDEN | LV_BTNMATRIX_CTRL_DISABLED)) return;
-    if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_NO_REPEAT) && event == LV_EVENT_LONG_PRESSED_REPEAT) return;
+    if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_NO_REPEAT) && code == LV_EVENT_LONG_PRESSED_REPEAT) return;
 
     const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
     if(txt == NULL) return;

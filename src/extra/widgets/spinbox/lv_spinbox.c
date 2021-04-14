@@ -23,7 +23,7 @@
  **********************/
 
 static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e);
+static void lv_spinbox_event(lv_event_t * e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
 /**********************
@@ -294,15 +294,17 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_LOG_TRACE("Spinbox constructor finished");
 }
 
-static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e)
+static void lv_spinbox_event(lv_event_t * e)
 {
     /*Call the ancestor's event handler*/
     lv_res_t res = LV_RES_OK;
-    res = lv_obj_event_base(MY_CLASS, obj, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
-    if(e == LV_EVENT_RELEASED) {
+    if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
@@ -352,10 +354,10 @@ static void lv_spinbox_event(lv_obj_t * obj, lv_event_t e)
             for(i = 0; i < pos; i++) spinbox->step *= 10;
         }
     }
-    else if(e == LV_EVENT_KEY) {
+    else if(code == LV_EVENT_KEY) {
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
-        uint32_t c = *((uint32_t *)lv_event_get_param()); /*uint32_t because can be UTF-8*/
+        uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT) {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
                 lv_spinbox_increment(obj);

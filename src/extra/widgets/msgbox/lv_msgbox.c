@@ -21,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void msgbox_close_event_cb(lv_obj_t * btn, lv_event_t e);
+static void msgbox_close_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -138,9 +138,11 @@ void lv_msgbox_close(lv_obj_t * mbox)
  *   STATIC FUNCTIONS
  **********************/
 
-static void msgbox_close_event_cb(lv_obj_t * btn, lv_event_t e)
+static void msgbox_close_event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * btn = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED) {
         lv_obj_t * mbox = lv_obj_get_parent(btn);
         lv_msgbox_close(mbox);
     }

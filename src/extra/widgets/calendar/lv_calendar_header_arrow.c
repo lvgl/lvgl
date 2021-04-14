@@ -25,7 +25,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void month_event_cb(lv_obj_t * btn, lv_event_t e);
+static void month_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -86,12 +86,16 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
  *  STATIC FUNCTIONS
  **********************/
 
-static void month_event_cb(lv_obj_t * btn, lv_event_t e)
+static void month_event_cb(lv_event_t * e)
 {
-    if(e != LV_EVENT_CLICKED) return;
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * btn = lv_event_get_target(e);
+
+    if(code != LV_EVENT_CLICKED) return;
+
 
     lv_obj_t * header = lv_obj_get_parent(btn);
-    lv_obj_t * calendar = lv_event_get_user_data();
+    lv_obj_t * calendar = lv_event_get_user_data(e);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);

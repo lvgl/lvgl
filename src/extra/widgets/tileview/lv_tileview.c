@@ -22,7 +22,7 @@
  **********************/
 static void lv_tileview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void tileview_event_cb(lv_obj_t * tv, lv_event_t e);
+static void tileview_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -127,9 +127,11 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
     }
 }
 
-static void tileview_event_cb(lv_obj_t * tv, lv_event_t e)
+static void tileview_event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_SCROLL_END) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * tv = lv_event_get_target(e);
+    if(code == LV_EVENT_SCROLL_END) {
         lv_coord_t w = lv_obj_get_width_fit(tv);
         lv_coord_t h = lv_obj_get_height_fit(tv);
 

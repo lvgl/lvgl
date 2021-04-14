@@ -38,7 +38,7 @@
  **********************/
 static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_chart_event(lv_obj_t * obj, lv_event_t e);
+static void lv_chart_event(lv_event_t * e);
 
 static void draw_div_lines(lv_obj_t * obj , const lv_area_t * mask);
 static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area);
@@ -611,16 +611,19 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
+static void lv_chart_event(lv_event_t * e)
 {
     /*Call the ancestor's event handler*/
     lv_res_t res;
 
-    res = lv_obj_event_base(MY_CLASS, obj, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+
     lv_chart_t * chart  = (lv_chart_t *)obj;
-    if(e == LV_EVENT_PRESSED) {
+    if(code == LV_EVENT_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();
         lv_point_t p;
         lv_indev_get_point(indev, &p);
@@ -633,19 +636,19 @@ static void lv_chart_event(lv_obj_t * obj, lv_event_t e)
             chart->pressed_point_id = id;
             lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
         }
-    } else if(e == LV_EVENT_RELEASED) {
+    } else if(code == LV_EVENT_RELEASED) {
         invalidate_point(obj, chart->pressed_point_id);
         chart->pressed_point_id = LV_CHART_POINT_NONE;
-    } else if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param();
+    } else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
                      chart->tick[LV_CHART_AXIS_PRIMARY_Y].draw_size, chart->tick[LV_CHART_AXIS_SECONDARY_Y].draw_size);
-    } else if(e == LV_EVENT_GET_SELF_SIZE) {
-        lv_point_t * p = lv_event_get_param();
+    } else if(code == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param(e);
         p->x = (lv_obj_get_width_fit(obj) * chart->zoom_x) >> 8;
         p->y = (lv_obj_get_height_fit(obj) * chart->zoom_y) >> 8;
-    } else if(e == LV_EVENT_DRAW_MAIN) {
-        const lv_area_t * clip_area = lv_event_get_param();
+    } else if(code == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param(e);
         draw_div_lines(obj, clip_area);
         draw_axes(obj, clip_area);
 
