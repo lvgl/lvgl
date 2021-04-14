@@ -47,9 +47,10 @@ typedef struct {
  * The image is closed if a new image is opened and the new image takes its place in the cache.
  * @param src source of the image. Path to file or pointer to an `lv_img_dsc_t` variable
  * @param color The color of the image with `LV_IMG_CF_ALPHA_...`
+ * @param frame_id the index of the frame. Used only with animated images, set 0 for normal images
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color);
+lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id);
 
 /**
  * Set the number of images to be cached.

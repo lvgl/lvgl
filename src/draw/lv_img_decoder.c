@@ -95,24 +95,13 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
     return res;
 }
 
-/**
- * Open an image.
- * Try the created image decoder one by one. Once one is able to open the image that decoder is save in `dsc`
- * @param dsc describe a decoding session. Simply a pointer to an `lv_img_decoder_dsc_t` variable.
- * @param src the image source. Can be
- *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_add_drv()`)
- *  2) Variable: Pointer to an `lv_img_dsc_t` variable
- *  3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param color The color of the image with `LV_IMG_CF_ALPHA_...`
- * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
- *         LV_RES_INV: none of the registered image decoders were able to open the image.
- */
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color)
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id)
 {
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
     dsc->color    = color;
     dsc->src_type = lv_img_src_get_type(src);
+    dsc->frame_id = frame_id;
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         size_t fnlen = strlen(src);
@@ -130,16 +119,16 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 
     lv_res_t res = LV_RES_INV;
 
-    lv_img_decoder_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
+    lv_img_decoder_t * decoder;
+    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), decoder) {
         /*Info and Open callbacks are required*/
-        if(d->info_cb == NULL || d->open_cb == NULL) continue;
+        if(decoder->info_cb == NULL || decoder->open_cb == NULL) continue;
 
-        res = d->info_cb(d, src, &dsc->header);
+        res = decoder->info_cb(decoder, src, &dsc->header);
         if(res != LV_RES_OK) continue;
 
-        dsc->decoder = d;
-        res = d->open_cb(d, dsc);
+        dsc->decoder = decoder;
+        res = decoder->open_cb(decoder, dsc);
 
         /*Opened successfully. It is a good decoder to for this image source*/
         if(res == LV_RES_OK) return res;

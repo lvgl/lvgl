@@ -236,7 +236,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
-    lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor);
+    lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
 
     if(cdsc == NULL) return LV_RES_INV;
 
