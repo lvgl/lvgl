@@ -127,8 +127,8 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     suc = _lv_area_intersect(&com_area, area_p, &scr_area);
     if(suc == false)  return; /*Out of the screen*/
 
-    /*If there were at least 1 invalid area in true double buffered mode, redraw the whole screen*/
-    if(lv_disp_is_true_double_buf(disp)) {
+    /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
+    if(disp->driver->full_refresh) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         lv_timer_pause(disp->refr_timer, false);
@@ -217,7 +217,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        if(lv_disp_is_true_double_buf(disp_refr)) {
+        if(disp_refr->driver->full_refresh) {
             draw_buf_flush();
         }
 
@@ -399,9 +399,8 @@ static void lv_refr_areas(void)
  */
 static void lv_refr_area(const lv_area_t * area_p)
 {
-    /*True double buffering: there are two screen sized buffers. Just redraw directly into a
-     * buffer*/
-    if(lv_disp_is_true_double_buf(disp_refr)) {
+    /*With full refresh just redraw directly into the buffer*/
+    if(disp_refr->driver->full_refresh) {
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
         draw_buf->area.x1        = 0;
         draw_buf->area.x2        = lv_disp_get_hor_res(disp_refr) - 1;
@@ -410,7 +409,7 @@ static void lv_refr_area(const lv_area_t * area_p)
         disp_refr->driver->draw_buf->last_part = 1;
         lv_refr_area_part(area_p);
     }
-    /*The buffer is smaller: refresh the area in parts*/
+    /*Normal refresh: draw the area in parts*/
     else {
         lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
         /*Calculate the max row num*/
@@ -557,7 +556,7 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 
     /*In true double buffered mode flush only once when all areas were rendered.
      *In normal mode flush after every area*/
-    if(lv_disp_is_true_double_buf(disp_refr) == false) {
+    if(disp_refr->driver->full_refresh == false) {
         draw_buf_flush();
     }
 }
@@ -814,8 +813,8 @@ static void draw_buf_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * color
  */
 static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
     lv_disp_drv_t * drv = disp_refr->driver;
-    if(lv_disp_is_true_double_buf(disp_refr) && drv->sw_rotate) {
-        LV_LOG_ERROR("cannot rotate a true double-buffered display!");
+    if(disp_refr->driver->full_refresh && drv->sw_rotate) {
+        LV_LOG_ERROR("cannot rotate a full refreshed display!");
         return;
     }
     if(drv->rotated == LV_DISP_ROT_180) {
