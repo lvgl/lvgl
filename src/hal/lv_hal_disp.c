@@ -361,28 +361,6 @@ lv_disp_draw_buf_t * lv_disp_get_draw_buf(lv_disp_t * disp)
 }
 
 /**
- * Get the number of areas in the buffer
- * @return number of invalid areas
- */
-uint16_t lv_disp_get_inv_buf_size(lv_disp_t * disp)
-{
-    return disp->inv_p;
-}
-
-/**
- * Pop (delete) the last 'num' invalidated areas from the buffer
- * @param num number of areas to delete
- */
-void _lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num)
-{
-
-    if(disp->inv_p < num)
-        disp->inv_p = 0;
-    else
-        disp->inv_p -= num;
-}
-
-/**
  * Set the rotation of this display.
  * @param disp pointer to a display (NULL to use the default display)
  * @param rotation rotation angle
