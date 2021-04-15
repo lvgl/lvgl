@@ -468,7 +468,6 @@ static void draw_indic(lv_event_t * e)
 
 static void lv_bar_event(lv_event_t * e)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
