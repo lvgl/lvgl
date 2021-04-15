@@ -9,6 +9,7 @@
 #include "lv_obj.h"
 #include "lv_disp.h"
 #include "lv_refr.h"
+#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -28,7 +29,6 @@ static void layout_update_core(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_layout_update_cb_t * layouts;
 static uint32_t layout_cnt;
 
 /**********************
@@ -296,10 +296,10 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 uint32_t lv_layout_register(lv_layout_update_cb_t cb)
 {
     layout_cnt++;
-    layouts = lv_mem_realloc(layouts, layout_cnt * sizeof(lv_layout_update_cb_t));
-    LV_ASSERT_MALLOC(layouts);
+    LV_GC_ROOT(_lv_layout_list) = lv_mem_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_update_cb_t));
+    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
 
-    layouts[layout_cnt - 1] = cb;
+    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1] = cb;
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
@@ -937,7 +937,7 @@ static void layout_update_core(lv_obj_t * obj)
     if(lv_obj_get_child_cnt(obj) > 0) {
         uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout_id > 0 && layout_id <= layout_cnt) {
-            layouts[layout_id -1](obj);
+            LV_GC_ROOT(_lv_layout_list)[layout_id -1](obj);
         }
     }
 }
