@@ -1,11 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_BUILD_EXAMPLES
 
-static void event_cb(lv_obj_t * chart, lv_event_t e)
+static void event_cb(lv_event_t * e)
 {
-    LV_UNUSED(chart);
-    if(e == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_DRAW_PART_BEGIN) {
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
         if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_X) {
             const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
             lv_snprintf(dsc->text, sizeof(dsc->text), "%s", month[dsc->value]);

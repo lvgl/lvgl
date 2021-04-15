@@ -1,9 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_CHECKBOX && LV_BUILD_EXAMPLES
 
-static void event_handler(lv_obj_t * obj, lv_event_t event)
+static void event_handler(lv_event_t * e)
 {
-    if(event == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         const char * txt = lv_checkbox_get_text(obj);
         const char * state = lv_obj_get_state(obj) & LV_STATE_CHECKED ? "Checked" : "Unchecked";
         LV_LOG_USER("%s: %s\n", txt, state);

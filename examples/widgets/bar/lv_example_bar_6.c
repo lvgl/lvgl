@@ -8,7 +8,7 @@
 
 //static void event_cb(lv_obj_t * obj, lv_event_t e)
 //{
-//    if(e == LV_EVENT_DRAW_POST_END) {
+//    if(code == LV_EVENT_DRAW_POST_END) {
 //        lv_bar_t * bar = (lv_bar_t *)obj;
 //
 //        lv_draw_label_dsc_t dsc;
@@ -38,7 +38,7 @@
 //        txt_area.y1 = bar->indic_area.y1 + (lv_area_get_height(&bar->indic_area) - txt_size.y) / 2;
 //        txt_area.y2 = txt_area.y1 + txt_size.y - 1;
 //
-//        const lv_area_t * clip_area = lv_event_get_param();
+//        const lv_area_t * clip_area = lv_event_get_param(e);
 //        lv_draw_label(&txt_area, clip_area, &dsc, buf, NULL);
 //    }
 //}

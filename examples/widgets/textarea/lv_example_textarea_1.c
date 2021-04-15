@@ -2,10 +2,12 @@
 #if LV_USE_TEXTAREA && LV_BUILD_EXAMPLES
 
 
-static void btnm_event_handler(lv_obj_t * obj, lv_event_t event)
+static void btnm_event_handler(lv_event_t * e)
 {
-    if(event == LV_EVENT_VALUE_CHANGED) {
-        lv_obj_t * ta = lv_event_get_user_data();
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t * ta = lv_event_get_user_data(e);
         const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
 
         if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) lv_textarea_del_char(ta);

@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_TEXTAREA && LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
-static void ta_event_cb(lv_obj_t * ta, lv_event_t event);
+static void ta_event_cb(lv_event_t * e);
 
 static lv_obj_t * kb;
 
@@ -26,9 +26,11 @@ void lv_example_textarea_3(void)
     lv_keyboard_set_textarea(kb, ta);
 }
 
-static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
+static void ta_event_cb(lv_event_t * e)
 {
-    if(event == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * ta = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         const char * txt = lv_textarea_get_text(ta);
         if(txt[0] >= '0' && txt[0] <= '9' &&
             txt[1] >= '0' && txt[1] <= '9' &&

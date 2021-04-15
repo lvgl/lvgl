@@ -22,8 +22,8 @@
  **********************/
 static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void btns_event_cb(lv_obj_t * btns, lv_event_t e);
-static void cont_event_cb(lv_obj_t * cont, lv_event_t e);
+static void btns_event_cb(lv_event_t * e);
+static void cont_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -228,17 +228,23 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     tabview->map = NULL;
 }
 
-static void btns_event_cb(lv_obj_t * btns, lv_event_t e)
+static void btns_event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * btns = lv_event_get_target(e);
+
+    if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * tv = lv_obj_get_parent(btns);
         uint32_t id = lv_btnmatrix_get_selected_btn(btns);
         lv_tabview_set_act(tv, id, LV_ANIM_ON);
     }
 }
-static void cont_event_cb(lv_obj_t * cont, lv_event_t e)
+static void cont_event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_SCROLL_END) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * cont = lv_event_get_target(e);
+
+    if(code == LV_EVENT_SCROLL_END) {
         lv_obj_t * tv = lv_obj_get_parent(cont);
 
         lv_point_t p;

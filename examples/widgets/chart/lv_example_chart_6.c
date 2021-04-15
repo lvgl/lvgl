@@ -5,10 +5,13 @@ static lv_obj_t * chart;
 static lv_chart_series_t * ser;
 static lv_chart_cursor_t * cursor;
 
-static void event_cb(lv_obj_t * obj, lv_event_t e)
+static void event_cb(lv_event_t * e)
 {
     static int32_t last_id = -1;
-    if(e == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+
+    if(code == LV_EVENT_VALUE_CHANGED) {
         last_id = lv_chart_get_pressed_point(obj);
         if(last_id != LV_CHART_POINT_NONE) {
             lv_point_t p;
@@ -16,8 +19,8 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             lv_chart_set_cursor_point(obj, cursor, &p);
         }
     }
-    else if(e == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+    else if(code == LV_EVENT_DRAW_PART_END) {
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
         if(dsc->part == LV_PART_CURSOR && dsc->p1 && dsc->p2 && dsc->p1->y == dsc->p2->y && last_id >= 0) {
             lv_coord_t * data_array = lv_chart_get_array(chart, ser);
             lv_coord_t v = data_array[last_id];

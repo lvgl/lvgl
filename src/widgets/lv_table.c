@@ -31,8 +31,8 @@
  **********************/
 static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_table_event(lv_obj_t * obj, lv_event_t e);
-static void draw_main(lv_obj_t * obj);
+static void lv_table_event(lv_event_t * e);
+static void draw_main(lv_event_t * e);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
@@ -438,21 +438,23 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(table->row_h) lv_mem_free(table->row_h);
 }
 
-static void lv_table_event(lv_obj_t * obj, lv_event_t e)
+static void lv_table_event(lv_event_t * e)
 {
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS, obj, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_table_t * table = (lv_table_t *)obj;
 
-    if(e == LV_EVENT_STYLE_CHANGED) {
+    if(code == LV_EVENT_STYLE_CHANGED) {
         refr_size(obj, 0);
     }
-    else if(e == LV_EVENT_GET_SELF_SIZE) {
-        lv_point_t * p = lv_event_get_param();
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param(e);
         uint32_t i;
         lv_coord_t w = 0;
         for(i = 0; i < table->col_cnt; i++) w += table->col_w[i];
@@ -463,7 +465,7 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
         p->x = w;
         p->y = h;
     }
-    else if(e == LV_EVENT_PRESSED || e == LV_EVENT_PRESSING) {
+    else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING) {
         uint16_t col;
         uint16_t row;
         lv_res_t pr_res = get_pressed_cell(obj, &row, &col);
@@ -474,7 +476,7 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
         }
         lv_obj_invalidate(obj);
     }
-    else if(e == LV_EVENT_RELEASED) {
+    else if(code == LV_EVENT_RELEASED) {
         lv_obj_invalidate(obj);
         lv_indev_t * indev = lv_indev_get_act();
         lv_obj_t * scroll_obj = lv_indev_get_scroll_obj(indev);
@@ -489,10 +491,10 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
             table->row_act = LV_TABLE_CELL_NONE;
         }
     }
-    else if(e == LV_EVENT_FOCUSED) {
+    else if(code == LV_EVENT_FOCUSED) {
         lv_obj_invalidate(obj);
-    } else if(e == LV_EVENT_KEY) {
-        int32_t c = *((int32_t *)lv_event_get_param());
+    } else if(code == LV_EVENT_KEY) {
+        int32_t c = *((int32_t *)lv_event_get_param(e));
         int32_t col = table->col_act;
         int32_t row = table->row_act;
         if(col == LV_TABLE_CELL_NONE || row == LV_TABLE_CELL_NONE) {
@@ -541,16 +543,17 @@ static void lv_table_event(lv_obj_t * obj, lv_event_t e)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
-    } else if(e == LV_EVENT_DRAW_MAIN) {
-        draw_main(obj);
+    } else if(code == LV_EVENT_DRAW_MAIN) {
+        draw_main(e);
     }
 }
 
 
-static void draw_main(lv_obj_t * obj)
+static void draw_main(lv_event_t * e)
 {
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_table_t * table = (lv_table_t *)obj;
-    const lv_area_t * clip_area = lv_event_get_param();
+    const lv_area_t * clip_area = lv_event_get_param(e);
 
     lv_point_t txt_size;
     lv_area_t cell_area;

@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_TEXTAREA && LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
-static void ta_event_cb(lv_obj_t * ta, lv_event_t event);
+static void ta_event_cb(lv_event_t * e);
 
 static lv_obj_t * kb;
 
@@ -39,16 +39,18 @@ void lv_example_textarea_2(void)
     lv_keyboard_set_textarea(kb, pwd_ta); /*Focus it on one of the text areas to start*/
 }
 
-static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
+static void ta_event_cb(lv_event_t * e)
 {
-    if(event == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * ta = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED) {
         /*Focus on the clicked text area*/
         if(kb != NULL)
             lv_keyboard_set_textarea(kb, ta);
     }
 
-    else if(event == LV_EVENT_INSERT) {
-        const char * str = lv_event_get_param();
+    else if(code == LV_EVENT_INSERT) {
+        const char * str = lv_event_get_param(e);
         if(str[0] == '\n') {
             LV_LOG_USER("Ready\n");
         }

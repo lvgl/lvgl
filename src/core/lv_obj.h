@@ -91,6 +91,15 @@ typedef enum {
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     _LV_EVENT_LAST                /** Number of default events*/
+}lv_event_code_t;
+
+
+typedef struct {
+    struct _lv_obj_t * target;
+    struct _lv_obj_t * original_target;
+    lv_event_code_t code;
+    void * user_data;
+    void * param;
 }lv_event_t;
 
 /**
@@ -98,7 +107,7 @@ typedef enum {
  * Events are used to notify the user of some action being taken on the object.
  * For details, see ::lv_event_t.
  */
-typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
+typedef void (*lv_event_cb_t)(lv_event_t * e);
 
 /*---------------------
  *       EVENTS
@@ -301,21 +310,17 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
  * @param param arbitrary data depending on the object type and the event. (Usually `NULL`)
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, void * param);
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event, void * param);
 
-lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, struct _lv_obj_t * obj, lv_event_t e);
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
 
-/**
- * Get the `param` parameter of the current event
- * @return      the `param` parameter
- */
-void * lv_event_get_param(void);
+lv_obj_t * lv_event_get_target(lv_event_t * e);
 
-/**
- * Get the user data of the event callback. (Set when the callback is registered)
- * @return      the user data parameter
- */
-void * lv_event_get_user_data(void);
+lv_event_code_t lv_event_get_code(lv_event_t * e);
+
+void * lv_event_get_param(lv_event_t * e);
+
+void * lv_event_get_user_data(lv_event_t * e);
 
 /**
  * Get the original target of the event. It's different than the "normal" target if the event is bubbled.

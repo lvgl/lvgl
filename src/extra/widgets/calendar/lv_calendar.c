@@ -24,7 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void draw_event_cb(lv_obj_t * obj, lv_event_t e);
+static void draw_event_cb(lv_event_t * e);
 
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static uint8_t get_month_length(int32_t year, int32_t month);
@@ -252,10 +252,12 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 }
 
-static void draw_event_cb(lv_obj_t * obj, lv_event_t e)
+static void draw_event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_DRAW_PART_BEGIN) {
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
         if(dsc->part == LV_PART_ITEMS) {
             /*Day name styles*/
             if(dsc->id < 7) {

@@ -29,7 +29,7 @@
  **********************/
 static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_meter_event(lv_obj_t * obj, lv_event_t e);
+static void lv_meter_event(lv_event_t * e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -278,13 +278,15 @@ static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 }
 
-static void lv_meter_event(lv_obj_t * obj, lv_event_t e)
+static void lv_meter_event(lv_event_t * e)
 {
-    lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
+    lv_res_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_DRAW_MAIN) {
-        const lv_area_t * clip_area = lv_event_get_param();
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param(e);
         lv_area_t scale_area;
         lv_obj_get_coords_fit(obj, &scale_area);
 

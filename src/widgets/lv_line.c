@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_line_event(lv_obj_t * obj, lv_event_t e);
+static void lv_line_event(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -119,24 +119,27 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_line_event(lv_obj_t * obj, lv_event_t e)
+static void lv_line_event(lv_event_t * e)
 {
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS, obj, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+
+    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*The corner of the skew lines is out of the intended area*/
         lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        lv_coord_t * s = lv_event_get_param();
+        lv_coord_t * s = lv_event_get_param(e);
         if(*s < line_width) *s = line_width;
     }
-    else if(e == LV_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_line_t * line = (lv_line_t *)obj;
 
-        lv_point_t * p = lv_event_get_param();
+        lv_point_t * p = lv_event_get_param(e);
         lv_coord_t w = 0;
         lv_coord_t h = 0;
         if(line->point_num > 0) {
@@ -152,9 +155,9 @@ static void lv_line_event(lv_obj_t * obj, lv_event_t e)
             p->x = w;
             p->y = h;
         }
-    } else if(e == LV_EVENT_DRAW_MAIN) {
+    } else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
-        const lv_area_t * clip_area = lv_event_get_param();
+        const lv_area_t * clip_area = lv_event_get_param(e);
 
         if(line->point_num == 0 || line->point_array == NULL) return;
 

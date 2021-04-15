@@ -2,7 +2,7 @@
 #if LV_USE_IMG && LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 static lv_obj_t * create_slider(lv_color_t color);
-static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
+static void slider_event_cb(lv_event_t * e);
 
 static lv_obj_t * red_slider, * green_slider, * blue_slider, * intense_slider;
 static lv_obj_t * img1;
@@ -38,11 +38,11 @@ void lv_example_img_2(void)
     lv_event_send(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
-static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
+static void slider_event_cb(lv_event_t * e)
 {
-    LV_UNUSED(slider);
 
-    if(event == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         /*Recolor the image based on the sliders' values*/
         lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider), lv_slider_get_value(blue_slider));
         lv_opa_t intense = lv_slider_get_value(intense_slider);

@@ -33,10 +33,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_colorwheel_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e);
+static void lv_colorwheel_event(lv_event_t * e);
 
-static void draw_disc_grad(lv_obj_t * obj);
-static void draw_knob(lv_obj_t * obj);
+static void draw_disc_grad(lv_event_t * e);
+static void draw_knob(lv_event_t * e);
 static void invalidate_knob(lv_obj_t * obj);
 static lv_area_t get_knob_area(lv_obj_t * obj);
 
@@ -225,9 +225,10 @@ static void lv_colorwheel_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     refr_knob_pos(obj);
 }
 
-static void draw_disc_grad(lv_obj_t * obj)
+static void draw_disc_grad(lv_event_t * e)
 {
-    const lv_area_t * clip_area = lv_event_get_param();
+    lv_obj_t * obj = lv_event_get_target(e);
+    const lv_area_t * clip_area = lv_event_get_param(e);
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_coord_t cx = obj->coords.x1 + w / 2;
@@ -286,9 +287,10 @@ static void draw_disc_grad(lv_obj_t * obj)
 #endif
 }
 
-static void draw_knob(lv_obj_t * obj)
+static void draw_knob(lv_event_t * e)
 {
-    const lv_area_t * clip_area = lv_event_get_param();
+    lv_obj_t * obj = lv_event_get_target(e);
+    const lv_area_t * clip_area = lv_event_get_param(e);
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     lv_draw_rect_dsc_t cir_dsc;
@@ -335,39 +337,41 @@ static lv_area_t get_knob_area(lv_obj_t * obj)
     return knob_area;
 }
 
-static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e)
+static void lv_colorwheel_event(lv_event_t * e)
 {
     /*Call the ancestor's event handler*/
-    lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
+    lv_res_t res = lv_obj_event_base(MY_CLASS, e);
 
     if(res != LV_RES_OK) return;
 
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
-    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
         lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
         lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         lv_coord_t knob_pad = LV_MAX4(left, right, top, bottom) + 2;
-        lv_coord_t * s = lv_event_get_param();
+        lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, knob_pad);
     }
-    else if(e == LV_EVENT_SIZE_CHANGED) {
-        void * param = lv_event_get_param();
+    else if(code == LV_EVENT_SIZE_CHANGED) {
+        void * param = lv_event_get_param(e);
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(obj) != lv_area_get_width(param) ||
            lv_obj_get_height(obj) != lv_area_get_height(param)) {
             refr_knob_pos(obj);
         }
     }
-    else if(e == LV_EVENT_STYLE_CHANGED) {
+    else if(code == LV_EVENT_STYLE_CHANGED) {
         /*Refresh extended draw area to make knob visible*/
         refr_knob_pos(obj);
     }
-    else if(e == LV_EVENT_KEY) {
-        uint32_t c = *((uint32_t *)lv_event_get_param()); /*uint32_t because can be UTF-8*/
+    else if(code == LV_EVENT_KEY) {
+        uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_color_hsv_t hsv_cur;
@@ -412,13 +416,13 @@ static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e)
             }
         }
     }
-    else if(e == LV_EVENT_PRESSED) {
+    else if(code == LV_EVENT_PRESSED) {
         colorwheel->last_change_time = lv_tick_get();
         lv_indev_get_point(lv_indev_get_act(), &colorwheel->last_press_point);
         res = double_click_reset(obj);
         if(res != LV_RES_OK) return;
     }
-    else if(e == LV_EVENT_PRESSING) {
+    else if(code == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return;
 
@@ -498,18 +502,18 @@ static void lv_colorwheel_event(lv_obj_t * obj, lv_event_t e)
             if(res != LV_RES_OK) return;
         }
     }
-    else if(e == LV_EVENT_HIT_TEST) {
-        lv_hit_test_info_t * info = lv_event_get_param();;
+    else if(code == LV_EVENT_HIT_TEST) {
+        lv_hit_test_info_t * info = lv_event_get_param(e);;
 
         /*Valid clicks can be only in the circle*/
         info->result = _lv_area_is_point_on(&obj->coords, info->point, LV_RADIUS_CIRCLE);
     }
-    else if(e == LV_EVENT_DRAW_MAIN) {
-        draw_disc_grad(obj);
-        draw_knob(obj);
+    else if(code == LV_EVENT_DRAW_MAIN) {
+        draw_disc_grad(e);
+        draw_knob(e);
     }
-    else if(e == LV_EVENT_COVER_CHECK) {
-        lv_cover_check_info_t * info = lv_event_get_param();
+    else if(code == LV_EVENT_COVER_CHECK) {
+        lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res != LV_DRAW_RES_MASKED) info->res = LV_DRAW_RES_NOT_COVER;
     }
 }

@@ -1,9 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_MSGBOX && LV_BUILD_EXAMPLES
 
-static void event_cb(lv_obj_t * obj, lv_event_t event)
+static void event_cb(lv_event_t * e)
 {
-    if(event == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         LV_LOG_USER("Button %s clicked", lv_msgbox_get_active_btn_text(obj));
     }
 }

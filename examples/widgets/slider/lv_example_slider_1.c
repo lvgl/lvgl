@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
-static void slider_event_cb(lv_obj_t * slider, lv_event_t event);
+static void slider_event_cb(lv_event_t * e);
 static lv_obj_t * slider_label;
 
 /**
@@ -21,9 +21,11 @@ void lv_example_slider_1(void)
     lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 }
 
-static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
+static void slider_event_cb(lv_event_t * e)
 {
-    if(event == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * slider = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d%%", lv_slider_get_value(slider));
         lv_label_set_text(slider_label, buf);
