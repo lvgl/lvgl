@@ -174,7 +174,13 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
         lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout*/
-    } else if(prop & LV_STYLE_PROP_EXT_DRAW) {
+        if(obj->parent) obj->parent->layout_inv = 1;
+    }
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        if(parent) lv_obj_mark_layout_as_dirty(parent);
+    }
+    else if(prop & LV_STYLE_PROP_EXT_DRAW) {
         lv_obj_refresh_ext_draw_size(obj);
     }
     lv_obj_invalidate(obj);

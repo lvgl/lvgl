@@ -31,10 +31,11 @@ extern "C" {
 /**
  * Flags for style properties
  */
-#define LV_STYLE_PROP_INHERIT       (1 << 10)  /*Inherited*/
-#define LV_STYLE_PROP_EXT_DRAW      (1 << 11)  /*Requires ext. draw size update when changed*/
-#define LV_STYLE_PROP_LAYOUT_REFR   (1 << 12)  /*Requires layout update when changed*/
-#define LV_STYLE_PROP_FILTER        (1 << 13)  /*Apply color filter*/
+#define LV_STYLE_PROP_INHERIT               (1 << 10)  /*Inherited*/
+#define LV_STYLE_PROP_EXT_DRAW              (1 << 11)  /*Requires ext. draw size update when changed*/
+#define LV_STYLE_PROP_LAYOUT_REFR           (1 << 12)  /*Requires layout update when changed*/
+#define LV_STYLE_PROP_PARENT_LAYOUT_REFR    (1 << 13)  /*Requires layout update on parent when changed*/
+#define LV_STYLE_PROP_FILTER                (1 << 14)  /*Apply color filter*/
 
 /**
  * Other constants
@@ -115,16 +116,18 @@ typedef enum {
     LV_STYLE_CLIP_CORNER             = 2,
     LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_ZOOM          = 5 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_ANGLE         = 6 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OPA                     = 7 | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_TRANSFORM_X             = 5 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_Y             = 6 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_ZOOM          = 7 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_TRANSFORM_ANGLE         = 8 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_OPA                     = 9 | LV_STYLE_PROP_INHERIT,
 
-    LV_STYLE_COLOR_FILTER_DSC        = 8,
-    LV_STYLE_COLOR_FILTER_OPA        = 9,
-    LV_STYLE_ANIM_TIME               = 10,
-    LV_STYLE_TRANSITION              = 11,
-    LV_STYLE_SIZE                    = 12,
-    LV_STYLE_BLEND_MODE              = 13,
+    LV_STYLE_COLOR_FILTER_DSC        = 10,
+    LV_STYLE_COLOR_FILTER_OPA        = 11,
+    LV_STYLE_ANIM_TIME               = 12,
+    LV_STYLE_TRANSITION              = 13,
+    LV_STYLE_SIZE                    = 14,
+    LV_STYLE_BLEND_MODE              = 15,
 
     /*Group 1*/
     LV_STYLE_PAD_TOP                 = 16 | LV_STYLE_PROP_LAYOUT_REFR,

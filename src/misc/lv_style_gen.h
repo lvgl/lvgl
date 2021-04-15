@@ -30,6 +30,22 @@ static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t 
     lv_style_set_prop(style, LV_STYLE_TRANSFORM_HEIGHT, v);
 }
 
+static inline void lv_style_set_transform_x(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_X, v);
+}
+
+static inline void lv_style_set_transform_y(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_Y, v);
+}
+
 static inline void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {

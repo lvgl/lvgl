@@ -399,8 +399,8 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         if(f->row && rtl) main_pos -= area_get_main_size(&item->coords);
 
 
-        lv_coord_t diff_x = abs_x - item->coords.x1;
-        lv_coord_t diff_y = abs_y - item->coords.y1;
+        lv_coord_t diff_x = abs_x - item->coords.x1 + lv_obj_get_style_transform_x(item, 0);
+        lv_coord_t diff_y = abs_y - item->coords.y1 + lv_obj_get_style_transform_y(item, 0);
         diff_x += f->row ? main_pos : cross_pos;
         diff_y += f->row ? cross_pos : main_pos;
 

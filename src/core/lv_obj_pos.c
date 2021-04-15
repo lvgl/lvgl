@@ -589,9 +589,11 @@ bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 
 void lv_obj_refr_pos(lv_obj_t * obj)
 {
+    if(lv_obj_is_layout_positioned(obj)) return;
+
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
-    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN) + lv_obj_get_style_transform_x(obj, LV_PART_MAIN);
+    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN) + lv_obj_get_style_transform_y(obj, LV_PART_MAIN);
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
         return;
@@ -645,8 +647,6 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 
 void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
-    if(lv_obj_is_layout_positioned(obj)) return;
-
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * parent = obj->parent;
 
@@ -924,13 +924,13 @@ static void layout_update_core(lv_obj_t * obj)
         /*Be sure the left side is not remains scrolled in*/
         if(sr < 0 && sl > 0) {
             sr = LV_MIN(sl, -sr);
-            lv_obj_scroll_by(obj, 0, sr, LV_ANIM_OFF);
+            lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
         }
     } else {
         /*Be sure the right side is not remains scrolled in*/
         if(sl < 0 && sr > 0) {
             sr = LV_MIN(sr, -sl);
-            lv_obj_scroll_by(obj, 0, sl, LV_ANIM_OFF);
+            lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
         }
     }
 

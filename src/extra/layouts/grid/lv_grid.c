@@ -444,6 +444,10 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
         lv_event_send(lv_obj_get_parent(item), LV_EVENT_CHILD_CHANGED, item);
 
     }
+
+    x += lv_obj_get_style_transform_x(item, LV_PART_MAIN);
+    y += lv_obj_get_style_transform_y(item, LV_PART_MAIN);
+
     lv_coord_t diff_x = hint->grid_abs.x + x - item->coords.x1;
     lv_coord_t diff_y = hint->grid_abs.y + y - item->coords.y1;
     if(diff_x || diff_y) {

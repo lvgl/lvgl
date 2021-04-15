@@ -22,6 +22,18 @@ static inline lv_coord_t lv_obj_get_style_transform_height(const struct _lv_obj_
     return (lv_coord_t)v.num;
 }
 
+static inline lv_coord_t lv_obj_get_style_transform_x(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_X);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_transform_y(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_Y);
+    return (lv_coord_t)v.num;
+}
+
 static inline lv_coord_t lv_obj_get_style_transform_zoom(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_ZOOM);
@@ -544,6 +556,22 @@ static inline void lv_obj_set_style_transform_height(struct _lv_obj_t * obj, lv_
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_HEIGHT, v, selector);
+}
+
+static inline void lv_obj_set_style_transform_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_X, v, selector);
+}
+
+static inline void lv_obj_set_style_transform_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_Y, v, selector);
 }
 
 static inline void lv_obj_set_style_transform_zoom(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
