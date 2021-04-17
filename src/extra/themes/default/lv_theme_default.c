@@ -589,13 +589,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_t * parent = lv_obj_get_parent(obj);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class)) {
-            lv_obj_add_style(obj, &styles->bg_color_grey, 0);
-            lv_obj_add_style(obj, &styles->pad_gap, 0);
             return;
         }
         /*Tabview pages*/
         else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
-            lv_obj_add_style(obj, &styles->scr, 0);
             lv_obj_add_style(obj, &styles->pad_normal, 0);
             lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
             lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
@@ -912,6 +909,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_tileview_tile_class)) {
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+    }
+#endif
+
+#if LV_USE_TABVIEW
+    if(lv_obj_check_type(obj, &lv_tabview_class)) {
+        lv_obj_add_style(obj, &styles->scr, 0);
+        return;
     }
 #endif
 
