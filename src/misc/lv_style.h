@@ -227,16 +227,13 @@ typedef enum {
  */
 typedef struct _lv_style_transiton_t {
     const lv_style_prop_t * props; /**< An array with the properties to animate.*/
-    const lv_anim_path_t * path;   /**< A path for the animation.*/
+#if LV_USE_USER_DATA
+    void * user_data;              /**< A custom user data that will be passed to the animation's user_data */
+#endif
+    lv_anim_path_cb_t path_cb;     /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
 }lv_style_transition_dsc_t;
-
-#if LV_USE_ASSERT_STYLE
-#  define _LV_STYLE_SENTINEL uint32_t sentinel;
-#else
-#  define _LV_STYLE_SENTINEL
-#endif
 
 /**
  * Descriptor of a style (a collection of properties and values).
@@ -358,18 +355,18 @@ static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_pr
 
 /**
  * Initialize a transition descriptor.
- * @param tr    pointer to a transition descriptor to initialize
- * @param props an array with the properties to transition. The last element must be zero.
- * @param path  and animation path. If `NULL` a default liner path will be used.
- * @param time  duration of the transition in [ms]
- * @param delay delay before the transition in [ms]
+ * @param tr        pointer to a transition descriptor to initialize
+ * @param props     an array with the properties to transition. The last element must be zero.
+ * @param path_cb   and animation path (ease) callback. If `NULL` liner path will be used.
+ * @param time      duration of the transition in [ms]
+ * @param delay     delay before the transition in [ms]
  * @example
  * const static lv_style_prop_t trans_props[] = { LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, 0 };
  *  static lv_style_transition_dsc_t trans1;
  *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0);
  * @note For performance reasons there are no sanity check on `style`
  */
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay);
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
 
 /**
  * Get the default value of a property

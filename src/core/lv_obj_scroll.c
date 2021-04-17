@@ -248,10 +248,6 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_set_var(&a, obj);
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
 
-        lv_anim_path_t path;
-        lv_anim_path_init(&path);
-        lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
-
         if(x) {
             lv_res_t res;
             res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
@@ -264,7 +260,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_coord_t sx = lv_obj_get_scroll_x(obj);
             lv_anim_set_values(&a, -sx, -sx + x);
             lv_anim_set_exec_cb(&a, scroll_x_anim);
-            lv_anim_set_path(&a, &path);
+            lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
             lv_anim_start(&a);
         }
 
@@ -280,7 +276,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_coord_t sy = lv_obj_get_scroll_y(obj);
             lv_anim_set_values(&a, -sy, -sy + y);
             lv_anim_set_exec_cb(&a,  scroll_y_anim);
-            lv_anim_set_path(&a, &path);
+            lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
             lv_anim_start(&a);
         }
     } else {
@@ -517,7 +513,6 @@ void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 
     if(lv_area_get_size(&hor_area) <= 0 && lv_area_get_size(&ver_area) <= 0) return;
 
-    printf("h: %d\n", hor_area.x2);
     if(lv_area_get_size(&hor_area) > 0) lv_obj_invalidate_area(obj, &hor_area);
     if(lv_area_get_size(&ver_area) > 0) lv_obj_invalidate_area(obj, &ver_area);
 }

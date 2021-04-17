@@ -41,7 +41,6 @@ static uint32_t last_timer_run;
 static bool anim_list_changed;
 static bool anim_run_round;
 static lv_timer_t * _lv_anim_tmr;
-const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 
 /**********************
  *      MACROS
@@ -82,8 +81,8 @@ void lv_anim_init(lv_anim_t * a)
     a->time    = 500;
     a->start_value   = 0;
     a->end_value     = 100;
-    lv_memcpy_small(&a->path, &lv_anim_path_def, sizeof(lv_anim_path_cb_t));
     a->repeat_cnt = 1;
+    a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
 }
 /**
@@ -128,27 +127,6 @@ void lv_anim_start(lv_anim_t * a)
     anim_mark_list_change();
 
     TRACE_ANIM("finished");
-}
-
-/**
- * Initialize an animation path
- * @param path pointer to path
- */
-void lv_anim_path_init(lv_anim_path_t * path)
-{
-    lv_memset_00(path, sizeof(lv_anim_path_t));
-}
-
-
-/**
- * Set the path (curve) of the animation.
- * @param a pointer to an initialized `lv_anim_t` variable
- * @param path_cb a function the get the current value of the animation.
- *                The built in functions starts with `lv_anim_path_...`
- */
-void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path)
-{
-    lv_memcpy_small(&a->path, path, sizeof(lv_anim_path_t));
 }
 
 /**
@@ -258,10 +236,8 @@ void lv_anim_refr_now(void)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_linear(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     /*Calculate the current step*/
     int32_t step = lv_map(a->act_time, 0, a->time, 0, LV_ANIM_RESOLUTION);
 
@@ -280,12 +256,9 @@ int32_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     /*Calculate the current step*/
-
     uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = lv_bezier3(t, 0, 50, 100, 1024);
 
@@ -302,10 +275,8 @@ int32_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_t * a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     /*Calculate the current step*/
     uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = lv_bezier3(t, 0, 900, 950, 1024);
@@ -323,10 +294,8 @@ int32_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim_t * a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     /*Calculate the current step*/
     uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = lv_bezier3(t, 0, 50, 952, 1024);
@@ -344,12 +313,9 @@ int32_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_anim_t * 
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     /*Calculate the current step*/
-
     uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t step = lv_bezier3(t, 0, 1000, 1300, 1024);
 
@@ -366,12 +332,9 @@ int32_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_anim_t * a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_bounce(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     /*Calculate the current step*/
-
     uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
     int32_t diff = (a->end_value - a->start_value);
 
@@ -425,10 +388,8 @@ int32_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t * a)
+int32_t lv_anim_path_step(const lv_anim_t * a)
 {
-    LV_UNUSED(path);
-
     if(a->act_time >= a->time)
         return a->end_value;
     else
@@ -479,8 +440,7 @@ static void anim_timer(lv_timer_t * param)
                 if(a->act_time > a->time) a->act_time = a->time;
 
                 int32_t new_value;
-                if(a->path.cb) new_value = a->path.cb(&a->path, a);
-                else new_value = lv_anim_path_linear(&a->path, a);
+                new_value = a->path_cb(a);
 
                 if(new_value != a->current_value) {
                     a->current_value = new_value;

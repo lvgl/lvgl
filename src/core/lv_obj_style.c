@@ -284,28 +284,27 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
     return lv_style_remove_prop(obj->styles[i].style, prop);
 }
 
-void _lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, lv_part_t part, lv_state_t prev_state,
-                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path)
+void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t prev_state, lv_state_t new_state, const _lv_obj_style_transition_dsc_t * tr_dsc)
 {
     trans_t * tr;
 
     /*Get the previous and current values*/
     obj->skip_trans = 1;
     obj->state = prev_state;
-    lv_style_value_t v1 = lv_obj_get_style_prop(obj, part, prop);
+    lv_style_value_t v1 = lv_obj_get_style_prop(obj, part, tr_dsc->prop);
     obj->state = new_state;
-    lv_style_value_t v2 = lv_obj_get_style_prop(obj, part, prop);
+    lv_style_value_t v2 = lv_obj_get_style_prop(obj, part, tr_dsc->prop);
     obj->skip_trans = 0;
 
     if(v1.ptr == v2.ptr && v1.num == v2.num && v1.color.full == v2.color.full)  return;
     obj->state = prev_state;
-    v1 = lv_obj_get_style_prop(obj, part, prop);
+    v1 = lv_obj_get_style_prop(obj, part, tr_dsc->prop);
     obj->state = new_state;
 
     lv_obj_style_t * style_trans = get_trans_style(obj, part);
-    lv_style_set_prop(style_trans->style, prop, v1);   /*Be sure `trans_style` has a valid value*/
+    lv_style_set_prop(style_trans->style, tr_dsc->prop, v1);   /*Be sure `trans_style` has a valid value*/
 
-    if(prop == LV_STYLE_RADIUS) {
+    if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
             lv_coord_t whalf = lv_obj_get_width(obj) / 2;
             lv_coord_t hhalf = lv_obj_get_width(obj) / 2;
@@ -322,7 +321,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, lv_pa
 
     if(tr) {
         tr->obj = obj;
-        tr->prop = prop;
+        tr->prop = tr_dsc->prop;
         tr->selector = part;
 
         lv_anim_t a;
@@ -332,10 +331,11 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_style_prop_t prop, lv_pa
         lv_anim_set_start_cb(&a, trans_anim_start_cb);
         lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
         lv_anim_set_values(&a, 0x00, 0xFF);
-        lv_anim_set_time(&a, time);
-        lv_anim_set_delay(&a, delay);
-        lv_anim_set_path(&a, path);
-        a.early_apply = 0;
+        lv_anim_set_time(&a, tr_dsc->time);
+        lv_anim_set_delay(&a, tr_dsc->delay);
+        lv_anim_set_path_cb(&a, tr_dsc->path_cb);
+        lv_anim_set_early_apply(&a, false);
+        a.user_data = tr_dsc->user_data;
         lv_anim_start(&a);
     }
 }

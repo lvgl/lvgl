@@ -275,12 +275,13 @@ static void lv_slider_event(lv_event_t * e)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        lv_coord_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_KNOB);
+        lv_coord_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_KNOB);
+        lv_coord_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_KNOB);
         lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
+        knob_size = (knob_size * zoom) >> 8;
         knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
-
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
         /*Indic. size is handled by bar*/
@@ -401,7 +402,6 @@ static void draw_knob(lv_event_t * e)
         lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
     }
-
 }
 
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor)
@@ -419,6 +419,9 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob
         knob_area->x1 = obj->coords.x1;
         knob_area->x2 = obj->coords.x2;
     }
+
+    lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_KNOB);
+    lv_area_zoom(zoom, knob_area, knob_area);
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);

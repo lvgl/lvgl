@@ -147,17 +147,13 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
             pwd_char_hider(obj);
         }
         else {
-            lv_anim_path_t path;
-            lv_anim_path_init(&path);
-            lv_anim_path_set_cb(&path, lv_anim_path_step);
-
             lv_anim_t a;
             lv_anim_init(&a);
             lv_anim_set_var(&a, ta);
             lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
             lv_anim_set_time(&a, ta->pwd_show_time);
             lv_anim_set_values(&a, 0, 1);
-            lv_anim_set_path(&a, &path);
+            lv_anim_set_path_cb(&a, lv_anim_path_step);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
         }
@@ -213,17 +209,13 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
             pwd_char_hider(obj);
         }
         else {
-            lv_anim_path_t path;
-            lv_anim_path_init(&path);
-            lv_anim_path_set_cb(&path, lv_anim_path_step);
-
             lv_anim_t a;
             lv_anim_init(&a);
             lv_anim_set_var(&a, ta);
             lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
             lv_anim_set_time(&a, ta->pwd_show_time);
             lv_anim_set_values(&a, 0, 1);
-            lv_anim_set_path(&a, &path);
+            lv_anim_set_path_cb(&a, lv_anim_path_step);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
         }
@@ -337,17 +329,13 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
             pwd_char_hider(obj);
         }
         else {
-            lv_anim_path_t path;
-            lv_anim_path_init(&path);
-            lv_anim_path_set_cb(&path, lv_anim_path_step);
-
             lv_anim_t a;
             lv_anim_init(&a);
             lv_anim_set_var(&a, ta);
             lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
             lv_anim_set_time(&a, ta->pwd_show_time);
             lv_anim_set_values(&a, 0, 1);
-            lv_anim_set_path(&a, &path);
+            lv_anim_set_path_cb(&a, lv_anim_path_step);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
         }
@@ -1031,10 +1019,6 @@ static void start_cursor_blink(lv_obj_t * obj)
         lv_anim_del(obj, cursor_blink_anim_cb);
         ta->cursor.show = 1;
     } else {
-        lv_anim_path_t path;
-        lv_anim_path_init(&path);
-        lv_anim_path_set_cb(&path, lv_anim_path_step);
-
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
@@ -1042,7 +1026,7 @@ static void start_cursor_blink(lv_obj_t * obj)
         lv_anim_set_time(&a, blink_time);
         lv_anim_set_playback_time(&a, blink_time);
         lv_anim_set_values(&a, 1, 0);
-        lv_anim_set_path(&a, &path);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
         lv_anim_start(&a);
     }

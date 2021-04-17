@@ -208,10 +208,10 @@ static void style_init(void)
     theme.color_secondary = color_secondary_accent;
 
     static lv_style_transition_dsc_t trans_delayed;
-    lv_style_transition_dsc_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, 70);
+    lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70);
 
     static lv_style_transition_dsc_t trans_normal;
-    lv_style_transition_dsc_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
+    lv_style_transition_dsc_init(&trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0);
 
     style_init_reset(&styles->transition_delayed);
     lv_style_set_transition(&styles->transition_delayed, &trans_delayed); /*Go back to default state with delay*/
@@ -363,8 +363,7 @@ static void style_init(void)
 
 #if LV_THEME_DEFAULT_GROW
     style_init_reset(&styles->grow);
-    lv_style_set_transform_width(&styles->grow, 20);
-    lv_style_set_transform_height(&styles->grow, 20);
+    lv_style_set_transform_zoom(&styles->grow, 400);
 #endif
 
     style_init_reset(&styles->knob);
@@ -424,7 +423,7 @@ static void style_init(void)
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
     lv_style_set_radius(&styles->chart_series, LV_DPX(3));
-    lv_style_set_size(&styles->chart_series, LV_DPX(4));
+    lv_style_set_size(&styles->chart_series, LV_DPX(8));
     lv_style_set_pad_column(&styles->chart_series, LV_DPX(2));
 
     style_init_reset(&styles->chart_ticks);

@@ -590,7 +590,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         inf_normalize(obj);
     }
 
-
     int32_t id = roller->sel_opt_id;
     lv_coord_t sel_y1 = id * (font_h + line_space);
     lv_coord_t mid_y1 = h / 2 - font_h / 2;
@@ -602,9 +601,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         lv_obj_set_y(label, new_y);
     }
     else {
-        lv_anim_path_t path;
-        lv_anim_path_init(&path);
-        lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
@@ -612,7 +608,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         lv_anim_set_values(&a, lv_obj_get_y(label), new_y);
         lv_anim_set_time(&a, anim_time);
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
-        lv_anim_set_path(&a, &path);
+        lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
         lv_anim_start(&a);
     }
 }

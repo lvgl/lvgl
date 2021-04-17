@@ -42,6 +42,17 @@ typedef struct {
     uint32_t is_trans :1;
 }lv_obj_style_t;
 
+typedef struct {
+    uint16_t time;
+    uint16_t delay;
+    lv_style_selector_t selector;
+    lv_style_prop_t prop;
+    lv_anim_path_cb_t path_cb;
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
+}_lv_obj_style_transition_dsc_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -144,16 +155,12 @@ bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop
 /**
  * Used internally to create a style tarnsition
  * @param obj
- * @param prop
  * @param part
  * @param prev_state
  * @param new_state
- * @param time
- * @param delay
- * @param path
+ * @param tr
  */
-void _lv_obj_style_create_transition(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_part_t part, lv_state_t prev_state,
-                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path);
+void _lv_obj_style_create_transition(struct _lv_obj_t * obj, lv_part_t part, lv_state_t prev_state, lv_state_t new_state, const _lv_obj_style_transition_dsc_t * tr);
 
 /**
  * Used internally to compare the appearance of an object in 2 states

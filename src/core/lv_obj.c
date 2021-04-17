@@ -48,14 +48,6 @@ typedef struct _lv_event_temp_data {
     struct _lv_event_temp_data * prev;
 } lv_event_temp_data_t;
 
-typedef struct {
-    uint16_t time;
-    uint16_t delay;
-    lv_style_selector_t selector;
-    lv_style_prop_t prop;
-    const lv_anim_path_t * path;
-}trans_set_t;
-
 typedef struct _lv_event_dsc_t{
     lv_event_cb_t cb;
     void * user_data;
@@ -953,8 +945,8 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
-    trans_set_t * ts = lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
-    lv_memset_00(ts, sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
+    _lv_obj_style_transition_dsc_t * ts = lv_mem_buf_get(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    lv_memset_00(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
@@ -980,8 +972,11 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             if(t == tsi) {
                 ts[tsi].time = tr->time;
                 ts[tsi].delay = tr->delay;
-                ts[tsi].path = tr->path;
+                ts[tsi].path_cb = tr->path_cb;
                 ts[tsi].prop = tr->props[j];
+#if LV_USE_USER_DATA
+                ts[tsi].user_data = tr->user_data;
+#endif
                 ts[tsi].selector = obj_style->selector;
                 tsi++;
             }
@@ -990,7 +985,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     for(i = 0;i < tsi; i++) {
         lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
-        _lv_obj_style_create_transition(obj, ts[i].prop, part_act, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
+        _lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
     }
 
     lv_mem_buf_release(ts);
