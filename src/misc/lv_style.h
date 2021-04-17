@@ -114,10 +114,10 @@ typedef enum {
     /*Group 0*/
     LV_STYLE_RADIUS                  = 1,
     LV_STYLE_CLIP_CORNER             = 2,
-    LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_X             = 5 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_Y             = 6 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_X             = 5 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_Y             = 6 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
     LV_STYLE_TRANSFORM_ZOOM          = 7 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_TRANSFORM_ANGLE         = 8 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_OPA                     = 9 | LV_STYLE_PROP_INHERIT,
@@ -126,8 +126,7 @@ typedef enum {
     LV_STYLE_COLOR_FILTER_OPA        = 11,
     LV_STYLE_ANIM_TIME               = 12,
     LV_STYLE_TRANSITION              = 13,
-    LV_STYLE_SIZE                    = 14,
-    LV_STYLE_BLEND_MODE              = 15,
+    LV_STYLE_BLEND_MODE              = 14,
 
     /*Group 1*/
     LV_STYLE_PAD_TOP                 = 16 | LV_STYLE_PROP_LAYOUT_REFR,
@@ -416,6 +415,11 @@ static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value) {
 static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value) {
     lv_style_set_pad_row(style, value);
     lv_style_set_pad_column(style, value);
+}
+
+static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value) {
+    lv_style_set_width(style, value);
+    lv_style_set_height(style, value);
 }
 
 

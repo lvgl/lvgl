@@ -302,12 +302,13 @@ static void lv_meter_event(lv_event_t * e)
         lv_draw_rect_dsc_t mid_dsc;
         lv_draw_rect_dsc_init(&mid_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &mid_dsc);
-        lv_coord_t size = lv_obj_get_style_size(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
         lv_area_t nm_cord;
-        nm_cord.x1 = scale_center.x - size;
-        nm_cord.y1 = scale_center.y - size;
-        nm_cord.x2 = scale_center.x + size;
-        nm_cord.y2 = scale_center.y + size;
+        nm_cord.x1 = scale_center.x - point_w;
+        nm_cord.y1 = scale_center.y - point_w;
+        nm_cord.x2 = scale_center.x + point_h;
+        nm_cord.y2 = scale_center.y + point_h;
         lv_draw_rect(&nm_cord, clip_area, &mid_dsc);
     }
 }

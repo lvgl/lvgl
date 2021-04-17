@@ -76,12 +76,6 @@ static inline const lv_style_transition_dsc_t * lv_obj_get_style_transition(cons
     return (const lv_style_transition_dsc_t *)v.ptr;
 }
 
-static inline lv_coord_t lv_obj_get_style_size(const struct _lv_obj_t * obj, uint32_t part)
-{
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_SIZE);
-    return (lv_coord_t)v.num;
-}
-
 static inline lv_blend_mode_t lv_obj_get_style_blend_mode(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BLEND_MODE);
@@ -628,14 +622,6 @@ static inline void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_
         .ptr = value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSITION, v, selector);
-}
-
-static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_SIZE, v, selector);
 }
 
 static inline void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector)

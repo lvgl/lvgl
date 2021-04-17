@@ -315,11 +315,6 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
         }
     }
 
-    lv_coord_t w = lv_obj_get_style_transform_width(obj, part);
-    lv_coord_t h = lv_obj_get_style_transform_height(obj, part);
-    lv_coord_t wh = LV_MAX(w, h);
-    if(wh > 0) s += wh;
-
     return s;
 }
 

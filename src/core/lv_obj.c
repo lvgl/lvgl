@@ -649,14 +649,9 @@ static void lv_obj_draw(lv_event_t * e)
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
         lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
-        coords.x1 -= w;
-        coords.x2 += w;
-        coords.y1 -= h;
-        coords.y2 += h;
+        lv_area_zoom(zoom, &obj->coords, &coords);
 
         if(_lv_area_is_in(info->area, &coords, r) == false) {
             info->res = LV_DRAW_RES_NOT_COVER;
@@ -693,14 +688,9 @@ static void lv_obj_draw(lv_event_t * e)
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
         lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
-        coords.x1 -= w;
-        coords.x2 += w;
-        coords.y1 -= h;
-        coords.y2 += h;
+        lv_area_zoom(zoom, &obj->coords, &coords);
 
         lv_draw_rect(&coords, clip_area, &draw_dsc);
 
@@ -734,14 +724,10 @@ static void lv_obj_draw(lv_event_t * e)
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-            lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-            lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+            lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
             lv_area_t coords;
-            lv_area_copy(&coords, &obj->coords);
-            coords.x1 -= w;
-            coords.x2 += w;
-            coords.y1 -= h;
-            coords.y2 += h;
+            lv_area_zoom(zoom, &obj->coords, &coords);
+
             lv_draw_rect(&coords, clip_area, &draw_dsc);
         }
     }
@@ -920,6 +906,14 @@ static void lv_obj_event_cb(lv_event_t * e)
         lv_coord_t * s = lv_event_get_param(e);
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         *s = LV_MAX(*s, d);
+
+
+        lv_area_t zoomed_coords;
+        lv_area_zoom(lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN), &obj->coords, &zoomed_coords);
+        *s = LV_MAX(*s, obj->coords.x1 - zoomed_coords.x1);
+        *s = LV_MAX(*s, obj->coords.y1 - zoomed_coords.y1);
+        *s = LV_MAX(*s, zoomed_coords.x2 - obj->coords.x2);
+        *s = LV_MAX(*s, zoomed_coords.x2 - obj->coords.x2);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
         /*Padding might have changed so the layout should be recalculated*/
@@ -1140,7 +1134,6 @@ static bool event_is_bubbled(lv_event_code_t e)
     case LV_EVENT_DELETE:
     case LV_EVENT_CHILD_CHANGED:
     case LV_EVENT_SIZE_CHANGED:
-    case LV_EVENT_STYLE_CHANGED:
     case LV_EVENT_GET_SELF_SIZE:
         return false;
     default:

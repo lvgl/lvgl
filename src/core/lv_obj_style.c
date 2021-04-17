@@ -173,8 +173,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
-        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout*/
-        if(obj->parent) obj->parent->layout_inv = 1;
+        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout and sizes*/
     }
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -224,7 +223,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     }
 
     if(!found) {
-        if(prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT) {
+        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
             const lv_obj_class_t * cls = obj->class_p;
             while(cls) {
                 if(prop == LV_STYLE_WIDTH) {

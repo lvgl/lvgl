@@ -238,17 +238,8 @@ static void draw_indic(lv_event_t * e)
 
     const lv_area_t * clip_area = lv_event_get_param(e);
 
-    lv_area_t bar_coords;
-    lv_obj_get_coords(obj, &bar_coords);
-
-    lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-    lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-    bar_coords.x1 -= transf_w;
-    bar_coords.x2 += transf_w;
-    bar_coords.y1 -= transf_h;
-    bar_coords.y2 += transf_h;
-    lv_coord_t barw = lv_area_get_width(&bar_coords);
-    lv_coord_t barh = lv_area_get_height(&bar_coords);
+    lv_coord_t barw = lv_obj_get_width(obj);
+    lv_coord_t barh = lv_obj_get_height(obj);
     int32_t range = bar->max_value - bar->min_value;
     bool hor = barw >= barh ? true : false;
     bool sym = false;
@@ -261,7 +252,7 @@ static void draw_indic(lv_event_t * e)
     lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
     lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     /*Respect padding and minimum width/height too*/
-    lv_area_copy(&bar->indic_area, &bar_coords);
+    lv_area_copy(&bar->indic_area, &obj->coords);
     bar->indic_area.x1 += bg_left;
     bar->indic_area.x2 -= bg_right;
     bar->indic_area.y1 += bg_top;
@@ -429,7 +420,7 @@ static void draw_indic(lv_event_t * e)
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
-    lv_area_copy(&mask_indic_max_area, &bar_coords);
+    lv_area_copy(&mask_indic_max_area, &obj->coords);
     mask_indic_max_area.x1 += bg_left;
     mask_indic_max_area.y1 += bg_top;
     mask_indic_max_area.x2 -= bg_right;

@@ -208,6 +208,11 @@ static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj,  lv_coord_t 
     lv_obj_set_style_pad_column(obj, value, selector);
 }
 
+static inline void lv_obj_set_style_size(struct _lv_obj_t * obj,  lv_coord_t value, lv_style_selector_t selector) {
+    lv_obj_set_style_width(obj, value, selector);
+    lv_obj_set_style_height(obj, value, selector);
+}
+
 /**********************
  *      MACROS
  **********************/

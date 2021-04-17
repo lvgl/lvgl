@@ -125,6 +125,9 @@ void lv_obj_refr_size(lv_obj_t * obj)
     if(pct_w) w = (LV_COORD_GET_PCT(w) * parent_w) / 100;
     if(pct_h) h = (LV_COORD_GET_PCT(h) * parent_h) / 100;
 
+    w += lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    h += lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+
     lv_coord_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
     lv_coord_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
     w = lv_clamp_width(w, minw, maxw, parent_w);

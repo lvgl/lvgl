@@ -180,6 +180,9 @@ static void grid_update(lv_obj_t * cont)
         lv_obj_refr_size(cont);
     }
 
+    /*To update e.g. scrollbars */
+    lv_obj_invalidate(cont);
+
     LV_TRACE_LAYOUT("finished");
 }
 

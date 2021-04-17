@@ -107,7 +107,7 @@ typedef struct {
 #endif
 
 #if LV_USE_METER
-    lv_style_t meter_marker, meter_indic;
+    lv_style_t meter_indic;
 #endif
 
 #if LV_USE_TEXTAREA
@@ -225,7 +225,7 @@ static void style_init(void)
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_right(&styles->scrollbar, LV_DPX(7));
     lv_style_set_pad_top(&styles->scrollbar,  LV_DPX(7));
-    lv_style_set_size(&styles->scrollbar,  LV_DPX(5));
+    lv_style_set_width(&styles->scrollbar,  LV_DPX(5));
     lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_40);
     lv_style_set_transition(&styles->scrollbar, &trans_normal);
 
@@ -363,8 +363,8 @@ static void style_init(void)
 
 #if LV_THEME_DEFAULT_GROW
     style_init_reset(&styles->grow);
-    lv_style_set_transform_width(&styles->grow, LV_DPX(3));
-    lv_style_set_transform_height(&styles->grow, LV_DPX(3));
+    lv_style_set_transform_width(&styles->grow, 20);
+    lv_style_set_transform_height(&styles->grow, 20);
 #endif
 
     style_init_reset(&styles->knob);
@@ -435,17 +435,12 @@ static void style_init(void)
 #endif
 
 #if LV_USE_METER
-    style_init_reset(&styles->meter_marker);
-    lv_style_set_line_width(&styles->meter_marker, LV_DPX(5));
-    lv_style_set_line_color(&styles->meter_marker, lv_color_grey_darken_4());
-    lv_style_set_size(&styles->meter_marker, LV_DPX(20));
-    lv_style_set_pad_left(&styles->meter_marker, LV_DPX(15));
-
     style_init_reset(&styles->meter_indic);
     lv_style_set_radius(&styles->meter_indic, LV_RADIUS_CIRCLE);
     lv_style_set_bg_color(&styles->meter_indic, lv_color_grey_darken_4());
     lv_style_set_bg_opa(&styles->meter_indic, LV_OPA_COVER);
-    lv_style_set_size(&styles->meter_indic, LV_DPX(15));
+    lv_style_set_width(&styles->meter_indic, LV_DPX(15));
+    lv_style_set_height(&styles->meter_indic, LV_DPX(15));
 #endif
 
 #if LV_USE_TABLE
