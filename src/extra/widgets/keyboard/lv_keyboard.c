@@ -32,8 +32,8 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_keyboard_class = {
     .constructor_cb = lv_keyboard_constructor,
-    .width_def = LV_SIZE_PCT(100),
-    .height_def = LV_SIZE_PCT(50),
+    .width_def = LV_PCT(100),
+    .height_def = LV_PCT(50),
     .instance_size = sizeof(lv_keyboard_t),
     .editable = 1,
     .base_class = &lv_btnmatrix_class

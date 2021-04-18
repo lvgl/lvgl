@@ -104,7 +104,7 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
 static void lv_tileview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-    lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
+    lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_add_event_cb(obj, tileview_event_cb, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_set_scroll_snap_x(obj, LV_SCROLL_SNAP_CENTER);
@@ -116,7 +116,7 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
 {
     LV_UNUSED(class_p);
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_PCT(100));
+    lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_pos(obj, create_col_id * lv_obj_get_width_fit(parent),  create_row_id * lv_obj_get_height_fit(parent));
 
     lv_tileview_tile_t * tile = (lv_tileview_tile_t *)obj;

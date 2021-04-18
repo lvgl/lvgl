@@ -25,7 +25,7 @@ void lv_example_flex_1(void)
 
         /*Add items to the row*/
         obj= lv_btn_create(cont_row);
-        lv_obj_set_size(obj, 100, LV_SIZE_PCT(100));
+        lv_obj_set_size(obj, 100, LV_PCT(100));
 
         label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "Item: %d", i);
@@ -33,7 +33,7 @@ void lv_example_flex_1(void)
 
         /*Add items to the column*/
         obj = lv_btn_create(cont_col);
-        lv_obj_set_size(obj, LV_SIZE_PCT(100), LV_SIZE_CONTENT);
+        lv_obj_set_size(obj, LV_PCT(100), LV_SIZE_CONTENT);
 
         label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "Item: %d", i);
