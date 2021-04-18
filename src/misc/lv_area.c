@@ -90,25 +90,22 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
 
 void lv_area_zoom(int32_t zoom, const lv_area_t * area_in, lv_area_t * area_out)
 {
-    if(zoom == 0) {
+    if(zoom == 256) {
         lv_area_copy(area_out, area_in);
         return;
     } else {
-        lv_coord_t w_extra;
-        lv_coord_t h_extra;
-        if(LV_COORD_IS_PCT(zoom)) {
-            lv_coord_t w = lv_area_get_width(area_in);
-            lv_coord_t h = lv_area_get_height(area_in);
-            w_extra = (w * zoom) / 100;
-            h_extra = (h * zoom) / 100;
-
-        } else {
-            w_extra = zoom;
-            h_extra = zoom;
-        }
+        /* Zoom symmetrically
+         * extra_width_on_left = (((w * zoom) >> 8) - w) / 2
+         * extra_width_on_left = (w * (zoom >> 8) - 1) / 2
+         * extra_width_on_left = (w * (zoom - 256) >> 8) / 2   */
+        lv_coord_t w = lv_area_get_width(area_in);
+        lv_coord_t h = lv_area_get_height(area_in);
+        lv_coord_t w_extra = (w * (zoom - 256) >> 8) / 2;
+        lv_coord_t h_extra = (h * (zoom - 256) >> 8) / 2;
 
         lv_area_copy(area_out, area_in);
         lv_area_increase(area_out, w_extra, h_extra);
+
     }
 }
 
