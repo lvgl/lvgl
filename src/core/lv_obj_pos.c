@@ -609,8 +609,12 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     if(lv_obj_is_layout_positioned(obj)) return;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN) + lv_obj_get_style_transform_x(obj, LV_PART_MAIN);
-    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN) + lv_obj_get_style_transform_y(obj, LV_PART_MAIN);
+    lv_coord_t tr_x = lv_obj_get_style_transform_x(obj, LV_PART_MAIN);
+    lv_coord_t tr_y = lv_obj_get_style_transform_y(obj, LV_PART_MAIN);
+    if(LV_COORD_IS_PCT(tr_x)) tr_x = (lv_obj_get_width(obj) * LV_COORD_GET_PCT(tr_x)) / 100;
+    if(LV_COORD_IS_PCT(tr_y)) tr_y = (lv_obj_get_height(obj) * LV_COORD_GET_PCT(tr_y)) / 100;
+    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN) + tr_x;
+    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN) + tr_y;
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
         return;

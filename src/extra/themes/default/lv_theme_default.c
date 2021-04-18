@@ -363,7 +363,7 @@ static void style_init(void)
 
 #if LV_THEME_DEFAULT_GROW
     style_init_reset(&styles->grow);
-    lv_style_set_transform_zoom(&styles->grow, 400);
+    lv_style_set_transform_zoom(&styles->grow, 5);
 #endif
 
     style_init_reset(&styles->knob);
@@ -915,6 +915,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_TABVIEW
     if(lv_obj_check_type(obj, &lv_tabview_class)) {
         lv_obj_add_style(obj, &styles->scr, 0);
+        lv_obj_add_style(obj, &styles->pad_zero, 0);
         return;
     }
 #endif
