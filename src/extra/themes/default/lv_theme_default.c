@@ -87,7 +87,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CHART
-    lv_style_t chart_series, chart_ticks, chart_bg;
+    lv_style_t chart_series, chart_indic, chart_ticks, chart_bg;
 #endif
 
 #if LV_USE_CHECKBOX
@@ -426,6 +426,12 @@ static void style_init(void)
     lv_style_set_radius(&styles->chart_series, LV_DPX(3));
     lv_style_set_size(&styles->chart_series, LV_DPX(8));
     lv_style_set_pad_column(&styles->chart_series, LV_DPX(2));
+
+    style_init_reset(&styles->chart_indic);
+    lv_style_set_radius(&styles->chart_indic,LV_RADIUS_CIRCLE);
+    lv_style_set_size(&styles->chart_indic, LV_DPX(8));
+    lv_style_set_bg_color(&styles->chart_indic, theme.color_primary);
+    lv_style_set_bg_opa(&styles->chart_indic, LV_OPA_COVER);
 
     style_init_reset(&styles->chart_ticks);
     lv_style_set_line_width(&styles->chart_ticks, LV_DPX(1));
@@ -772,7 +778,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
         lv_obj_add_style(obj, &styles->chart_series, LV_PART_ITEMS);
-        lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_ITEMS | LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &styles->chart_indic, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &styles->chart_ticks, LV_PART_TICKS);
         lv_obj_add_style(obj, &styles->chart_series, LV_PART_CURSOR);
     }

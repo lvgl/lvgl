@@ -734,12 +734,10 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_draw_rect_dsc_t point_dsc_default;
     lv_draw_rect_dsc_init(&point_dsc_default);
-    lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &point_dsc_default);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &point_dsc_default);
 
-    lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_ITEMS) / 2;
-    lv_coord_t point_h = lv_obj_get_style_height(obj, LV_PART_ITEMS) / 2;
-
-
+    lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+    lv_coord_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
 
     /*Do not bother with line ending is the point will over it*/
     if(LV_MIN(point_w, point_h) > line_dsc_default.width / 2) line_dsc_default.raw_end = 1;
@@ -1268,22 +1266,22 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i)
     if(chart->type == LV_CHART_TYPE_LINE) {
         lv_coord_t x_ofs = obj->coords.x1 + lv_obj_get_style_pad_left(obj, LV_PART_MAIN) - scroll_left;
         lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
-        lv_coord_t point_radius = lv_obj_get_style_width(obj, LV_PART_ITEMS);
+        lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR);
 
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
-        coords.y1 -= line_width + point_radius;
-        coords.y2 += line_width + point_radius;
+        coords.y1 -= line_width + point_w;
+        coords.y2 += line_width + point_w;
 
         if(i < chart->point_cnt - 1) {
-            coords.x1 = ((w * i) / (chart->point_cnt - 1)) + x_ofs - line_width - point_radius;
-            coords.x2 = ((w * (i + 1)) / (chart->point_cnt - 1)) + x_ofs + line_width + point_radius;
+            coords.x1 = ((w * i) / (chart->point_cnt - 1)) + x_ofs - line_width - point_w;
+            coords.x2 = ((w * (i + 1)) / (chart->point_cnt - 1)) + x_ofs + line_width + point_w;
             lv_obj_invalidate_area(obj, &coords);
         }
 
         if(i > 0) {
-            coords.x1 = ((w * (i - 1)) / (chart->point_cnt - 1)) + x_ofs - line_width - point_radius;
-            coords.x2 = ((w * i) / (chart->point_cnt - 1)) + x_ofs + line_width + point_radius;
+            coords.x1 = ((w * (i - 1)) / (chart->point_cnt - 1)) + x_ofs - line_width - point_w;
+            coords.x2 = ((w * i) / (chart->point_cnt - 1)) + x_ofs + line_width + point_w;
             lv_obj_invalidate_area(obj, &coords);
         }
     }

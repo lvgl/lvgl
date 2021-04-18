@@ -173,6 +173,10 @@ void _lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y);
  */
 uint32_t lv_area_get_size(const lv_area_t * area_p);
 
+void lv_area_increase(lv_area_t * area, lv_coord_t w_extra, lv_coord_t h_extra);
+
+void lv_area_move(lv_area_t * area, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
 /**
  * Get the common parts of two areas
  * @param res_p pointer to an area, the result will be stored her
