@@ -785,7 +785,11 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 #endif
 }
 
+#ifdef ARDUINO
+   #include "lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 
 static void lv_obj_event_cb(lv_event_t * e)
 {

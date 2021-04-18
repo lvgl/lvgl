@@ -1,4 +1,4 @@
-#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE) || defined( ARDUINO )
 #include "lvgl.h"
 #else
 #include "lvgl/lvgl.h"

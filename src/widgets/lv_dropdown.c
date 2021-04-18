@@ -6,7 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#ifdef ARDUINO
+   #include "../core/lv_obj.h"
+#else
 #include <lvgl/src/core/lv_obj.h>
+#endif
+
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 

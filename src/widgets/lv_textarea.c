@@ -1165,7 +1165,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
     }
 
     if(ta->text_sel_en) {
-        if(!ta->text_sel_in_prog && !click_outside_label && e == LV_EVENT_PRESSED) {
+        if(!ta->text_sel_in_prog && !click_outside_label && e->code == LV_EVENT_PRESSED) {
             /*Input device just went down. Store the selection start position*/
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SEL_OFF;
@@ -1182,7 +1182,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         }
     }
 
-    if(ta->text_sel_in_prog || e == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
+    if(ta->text_sel_in_prog || e->code == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
 
     if(ta->text_sel_in_prog) {
         /*If the selected area has changed then update the real values and*/
