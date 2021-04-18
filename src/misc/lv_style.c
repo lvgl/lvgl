@@ -237,6 +237,9 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_TEXT_FONT:
             value.ptr = LV_FONT_DEFAULT;
             break;
+        case LV_STYLE_SIZE:
+            value.num = 5;
+            break;
         case LV_STYLE_MAX_WIDTH:
         case LV_STYLE_MAX_HEIGHT:
             value.num = LV_COORD_MAX;

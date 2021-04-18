@@ -206,15 +206,11 @@ static void flex_update(lv_obj_t * cont)
             *cross_pos += t.track_cross_size + gap + track_gap;
         }
     }
+    LV_ASSERT_MEM_INTEGRITY();
 
     if(w_set == LV_SIZE_CONTENT || h_set == LV_SIZE_CONTENT) {
         lv_obj_refr_size(cont);
     }
-
-    /*To update e.g. scrollbars */
-    lv_obj_invalidate(cont);
-
-    LV_ASSERT_MEM_INTEGRITY();
 
     LV_TRACE_LAYOUT("finished");
 }

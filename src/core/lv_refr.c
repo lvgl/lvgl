@@ -191,7 +191,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 #if LV_USE_PERF_MONITOR == 0
     /**
      * Ensure the timer does not run again automatically.
-     * This is done before refreshing because invalidations later should restart the timer.
+     * This is done before refreshing in case refreshing invalidates something else.
      */
     lv_timer_pause(tmr, true);
 #endif

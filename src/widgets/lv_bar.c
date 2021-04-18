@@ -239,9 +239,14 @@ static void draw_indic(lv_event_t * e)
     const lv_area_t * clip_area = lv_event_get_param(e);
 
     lv_area_t bar_coords;
-    lv_area_zoom(lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN), &obj->coords, &bar_coords);
     lv_obj_get_coords(obj, &bar_coords);
 
+    lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    bar_coords.x1 -= transf_w;
+    bar_coords.x2 += transf_w;
+    bar_coords.y1 -= transf_h;
+    bar_coords.y2 += transf_h;
     lv_coord_t barw = lv_area_get_width(&bar_coords);
     lv_coord_t barh = lv_area_get_height(&bar_coords);
     int32_t range = bar->max_value - bar->min_value;

@@ -159,17 +159,19 @@ void lv_area_set_width(lv_area_t * area_p, lv_coord_t w);
 void lv_area_set_height(lv_area_t * area_p, lv_coord_t h);
 
 /**
+ * Set the position of an area (width and height will be kept)
+ * @param area_p pointer to an area
+ * @param x the new x coordinate of the area
+ * @param y the new y coordinate of the area
+ */
+void _lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y);
+
+/**
  * Return with area of an area (x * y)
  * @param area_p pointer to an area
  * @return size of area
  */
 uint32_t lv_area_get_size(const lv_area_t * area_p);
-
-void lv_area_zoom(int32_t zoom, const lv_area_t * area_in, lv_area_t * area_out);
-
-void lv_area_increase(lv_area_t * area, lv_coord_t w_extra, lv_coord_t h_extra);
-
-void lv_area_move(lv_area_t * area, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
 /**
  * Get the common parts of two areas

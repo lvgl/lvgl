@@ -420,9 +420,6 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob
         knob_area->x2 = obj->coords.x2;
     }
 
-    lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_KNOB);
-    lv_area_zoom(zoom, knob_area, knob_area);
-
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
     lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);

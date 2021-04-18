@@ -425,45 +425,43 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     lv_coord_t hor_req_space = hor_draw ? tickness + side_space : 0;
     lv_coord_t rem;
 
-
     if(lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR) < LV_OPA_MIN &&
        lv_obj_get_style_border_opa(obj, LV_PART_SCROLLBAR) < LV_OPA_MIN) {
         return;
     }
 
-
     /*Draw horizontal scrollbar if the mode is ON or can be scrolled in this direction*/
     lv_coord_t content_h = obj_h + st + sb;
     if(ver_draw && content_h) {
-        ver_area->y1 = obj->coords.y1;
-        ver_area->y2 = obj->coords.y2;
-        ver_area->x2 = obj->coords.x2 - side_space;
-        ver_area->x1 = ver_area->x2 - tickness;
+       ver_area->y1 = obj->coords.y1;
+       ver_area->y2 = obj->coords.y2;
+       ver_area->x2 = obj->coords.x2 - side_space;
+       ver_area->x1 =ver_area->x2 - tickness;
 
         lv_coord_t sb_h = ((obj_h - end_space * 2 - hor_req_space) * obj_h) / content_h;
         sb_h = LV_MAX(sb_h, SCROLLBAR_MIN_SIZE);
         rem = (obj_h - end_space * 2 - hor_req_space) - sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
         lv_coord_t scroll_h = content_h - obj_h; /*The size of the content which can be really scrolled*/
         if(scroll_h <= 0) {
-            ver_area->y1 = obj->coords.y1 + end_space;
-            ver_area->y2 = obj->coords.y2 - end_space - hor_req_space - 1;
-            ver_area->x2 = obj->coords.x2 - side_space;
-            ver_area->x1 = ver_area->x2 - tickness + 1;
+           ver_area->y1 = obj->coords.y1 + end_space;
+           ver_area->y2 = obj->coords.y2 - end_space - hor_req_space - 1;
+           ver_area->x2 = obj->coords.x2 - side_space;
+           ver_area->x1 =ver_area->x2 - tickness + 1;
         } else {
             lv_coord_t sb_y = (rem * sb) / scroll_h;
             sb_y = rem - sb_y;
 
-            ver_area->y1 = obj->coords.y1 + sb_y + end_space;
-            ver_area->y2 = ver_area->y1 + sb_h - 1;
-            ver_area->x2 = obj->coords.x2 - side_space;
-            ver_area->x1 = ver_area->x2 - tickness;
-            if(ver_area->y1 < obj->coords.y1 + end_space) {
-                ver_area->y1 = obj->coords.y1 + end_space;
-                if(ver_area->y1 + SCROLLBAR_MIN_SIZE > ver_area->y2) ver_area->y2 = ver_area->y1 + SCROLLBAR_MIN_SIZE;
+           ver_area->y1 = obj->coords.y1 + sb_y + end_space;
+           ver_area->y2 =ver_area->y1 + sb_h - 1;
+           ver_area->x2 = obj->coords.x2 - side_space;
+           ver_area->x1 =ver_area->x2 - tickness;
+            if(hor_area->y1 < obj->coords.y1 + end_space) {
+               ver_area->y1 = obj->coords.y1 + end_space;
+                if(hor_area->y1 + SCROLLBAR_MIN_SIZE >ver_area->y2)ver_area->y2 =ver_area->y1 + SCROLLBAR_MIN_SIZE;
             }
-            if(ver_area->y2 > obj->coords.y2 - hor_req_space - end_space) {
-                ver_area->y2 = obj->coords.y2 - hor_req_space - end_space;
-                if(ver_area->y2 - SCROLLBAR_MIN_SIZE < ver_area->y1) ver_area->y1 = ver_area->y2 - SCROLLBAR_MIN_SIZE;
+            if(hor_area->y2 > obj->coords.y2 - hor_req_space - end_space) {
+               ver_area->y2 = obj->coords.y2 - hor_req_space - end_space;
+                if(hor_area->y2 - SCROLLBAR_MIN_SIZE <ver_area->y1)ver_area->y1 =ver_area->y2 - SCROLLBAR_MIN_SIZE;
             }
         }
     }

@@ -73,6 +73,21 @@ void lv_area_set_height(lv_area_t * area_p, lv_coord_t h)
     area_p->y2 = area_p->y1 + h - 1;
 }
 
+/**
+ * Set the position of an area (width and height will be kept)
+ * @param area_p pointer to an area
+ * @param x the new x coordinate of the area
+ * @param y the new y coordinate of the area
+ */
+void _lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y)
+{
+    lv_coord_t w = lv_area_get_width(area_p);
+    lv_coord_t h = lv_area_get_height(area_p);
+    area_p->x1   = x;
+    area_p->y1   = y;
+    lv_area_set_width(area_p, w);
+    lv_area_set_height(area_p, h);
+}
 
 /**
  * Return with area of an area (x * y)
@@ -86,43 +101,6 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
     size = (uint32_t)(area_p->x2 - area_p->x1 + 1) * (area_p->y2 - area_p->y1 + 1);
 
     return size;
-}
-
-void lv_area_zoom(int32_t zoom, const lv_area_t * area_in, lv_area_t * area_out)
-{
-    if(zoom == 256) {
-        lv_area_copy(area_out, area_in);
-        return;
-    } else {
-        /* Zoom symmetrically
-         * extra_width_on_left = (((w * zoom) >> 8) - w) / 2
-         * extra_width_on_left = (w * (zoom >> 8) - 1) / 2
-         * extra_width_on_left = (w * (zoom - 256) >> 8) / 2   */
-        lv_coord_t w = lv_area_get_width(area_in);
-        lv_coord_t h = lv_area_get_height(area_in);
-        lv_coord_t w_extra = (w * (zoom - 256) >> 8) / 2;
-        lv_coord_t h_extra = (h * (zoom - 256) >> 8) / 2;
-
-        lv_area_copy(area_out, area_in);
-        lv_area_increase(area_out, w_extra, h_extra);
-
-    }
-}
-
-void lv_area_increase(lv_area_t * area, lv_coord_t w_extra, lv_coord_t h_extra)
-{
-    area->x1 -= w_extra;
-    area->x2 += w_extra;
-    area->y1 -= h_extra;
-    area->y2 += h_extra;
-}
-
-void lv_area_move(lv_area_t * area, lv_coord_t x_ofs, lv_coord_t y_ofs)
-{
-    area->x1 += x_ofs;
-    area->x2 += x_ofs;
-    area->y1 += y_ofs;
-    area->y2 += y_ofs;
 }
 
 /**
