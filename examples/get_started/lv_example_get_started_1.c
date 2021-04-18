@@ -1,9 +1,11 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_BTN
 
-static void btn_event_cb(lv_obj_t * btn, lv_event_t event)
+static void btn_event_cb(lv_event_t * e)
 {
-    if(event == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * btn = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED) {
         static uint8_t cnt = 0;
         cnt++;
 

@@ -24,8 +24,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void year_event_cb(lv_obj_t * btn, lv_event_t e);
-static void month_event_cb(lv_obj_t * btn, lv_event_t e);
+static void year_event_cb(lv_event_t * e);
+static void month_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -89,11 +89,13 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
  *  STATIC FUNCTIONS
  **********************/
 
-static void month_event_cb(lv_obj_t * dropdown, lv_event_t e)
+static void month_event_cb(lv_event_t * e)
 {
-    if(e != LV_EVENT_VALUE_CHANGED) return;
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code != LV_EVENT_VALUE_CHANGED) return;
 
-    lv_obj_t * calendar = lv_event_get_user_data();
+    lv_obj_t * dropdown = lv_event_get_target(e);
+    lv_obj_t * calendar = lv_event_get_user_data(e);
 
     uint16_t sel = lv_dropdown_get_selected(dropdown);
 
@@ -104,11 +106,13 @@ static void month_event_cb(lv_obj_t * dropdown, lv_event_t e)
 
     lv_calendar_set_showed_date(calendar, newd.year, newd.month);
 }
-static void year_event_cb(lv_obj_t * dropdown, lv_event_t e)
+static void year_event_cb(lv_event_t * e)
 {
-    if(e != LV_EVENT_VALUE_CHANGED) return;
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code != LV_EVENT_VALUE_CHANGED) return;
 
-    lv_obj_t * calendar = lv_event_get_user_data();
+    lv_obj_t * dropdown = lv_event_get_target(e);
+    lv_obj_t * calendar = lv_event_get_user_data(e);
 
     uint16_t sel = lv_dropdown_get_selected(dropdown);
 

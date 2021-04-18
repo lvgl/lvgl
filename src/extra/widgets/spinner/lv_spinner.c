@@ -49,10 +49,6 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_leng
 
     lv_obj_remove_style(spinner, NULL, LV_PART_KNOB | LV_STATE_ANY);
 
-    lv_anim_path_t path;
-    lv_anim_path_init(&path);
-    lv_anim_path_set_cb(&path, lv_anim_path_ease_in_out);
-
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, spinner);
@@ -62,7 +58,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_leng
     lv_anim_set_values(&a, arc_length, 360 + arc_length);
     lv_anim_start(&a);
 
-    lv_anim_set_path(&a, &path);
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_values(&a, 0, 360);
     lv_anim_set_exec_cb(&a, arc_anim_start_angle);
     lv_anim_start(&a);

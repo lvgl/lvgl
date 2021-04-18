@@ -20,6 +20,7 @@ extern "C" {
 #include "lv_timer.h"
 #include "../draw/lv_img_cache.h"
 #include "../draw/lv_draw_mask.h"
+#include "../core/lv_obj_pos.h"
 
 /*********************
  *      DEFINES
@@ -47,6 +48,7 @@ extern "C" {
     LV_DISPATCH(f, lv_ll_t, _lv_group_ll)                                                   \
     LV_DISPATCH(f, lv_ll_t, _lv_img_decoder_ll)                                             \
     LV_DISPATCH(f, lv_ll_t, _lv_obj_style_trans_ll)                                         \
+    LV_DISPATCH(f, lv_layout_update_cb_t *, _lv_layout_list)      \
     LV_DISPATCH_COND(f, lv_img_cache_entry_t*, _lv_img_cache_array, LV_IMG_CACHE_DEF, 1)    \
     LV_DISPATCH_COND(f, lv_img_cache_entry_t, _lv_img_cache_single, LV_IMG_CACHE_DEF, 0)    \
     LV_DISPATCH(f, lv_timer_t*, _lv_timer_act)                                              \

@@ -117,7 +117,7 @@ lv_obj_set_event_cb(btn, btn_event_cb);                 /*Assign a callback to t
 
 void btn_event_cb(lv_obj_t * btn, lv_event_t event)
 {
-    if(event == LV_EVENT_CLICKED) {
+    if(code == LV_EVENT_CLICKED) {
         printf("Clicked\n");
     }
 }

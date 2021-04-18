@@ -47,8 +47,8 @@
  **********************/
 static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_bar_event(lv_obj_t * bar, lv_event_t e);
-static void draw_indic(lv_obj_t * bar);
+static void lv_bar_event(lv_event_t * e);
+static void draw_indic(lv_event_t * e);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
@@ -231,11 +231,12 @@ static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_anim_del(&bar->start_value_anim, NULL);
 }
 
-static void draw_indic(lv_obj_t * obj)
+static void draw_indic(lv_event_t * e)
 {
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    const lv_area_t * clip_area = lv_event_get_param();
+    const lv_area_t * clip_area = lv_event_get_param(e);
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
@@ -465,21 +466,23 @@ static void draw_indic(lv_obj_t * obj)
 #endif
 }
 
-static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
+static void lv_bar_event(lv_event_t * e)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS, obj, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+
+    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t indic_size;
         indic_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
 
         /*Bg size is handled by lv_obj*/
-        lv_coord_t * s = lv_event_get_param();
+        lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, indic_size);
 
         /*Calculate the indicator area*/
@@ -492,11 +495,11 @@ static void lv_bar_event(lv_obj_t * obj, lv_event_t e)
         if(pad < 0) {
             *s = LV_MAX(*s, -pad);
         }
-    } else if(e == LV_EVENT_PRESSED || e == LV_EVENT_RELEASED) {
+    } else if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
         lv_bar_t * bar = (lv_bar_t *)obj;
         lv_obj_invalidate_area(obj, &bar->indic_area);
-    } else if(e == LV_EVENT_DRAW_MAIN) {
-        draw_indic(obj);
+    } else if(code == LV_EVENT_DRAW_MAIN) {
+        draw_indic(e);
     }
 }
 

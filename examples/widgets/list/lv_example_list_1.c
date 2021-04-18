@@ -2,9 +2,11 @@
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
 static lv_obj_t * list1;
 
-static void event_handler(lv_obj_t * obj, lv_event_t event)
+static void event_handler(lv_event_t * e)
 {
-    if(event == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED) {
         LV_LOG_USER("Clicked: %s", lv_list_get_btn_text(list1, obj));
     }
 }

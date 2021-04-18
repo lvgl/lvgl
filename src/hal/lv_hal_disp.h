@@ -77,25 +77,21 @@ typedef enum {
  */
 typedef struct _lv_disp_drv_t {
 
-    lv_coord_t hor_res; /**< Horizontal resolution.*/
-    lv_coord_t ver_res; /**< Vertical resolution.*/
+    lv_coord_t hor_res;         /**< Horizontal resolution.*/
+    lv_coord_t ver_res;         /**< Vertical resolution.*/
 
     /** Pointer to a buffer initialized with `lv_disp_draw_buf_init()`.
      * LVGL will use this buffer(s) to draw the screens contents*/
     lv_disp_draw_buf_t * draw_buf;
 
-    uint32_t sw_rotate : 1; /**< 1: use software rotation (slower)*/
-    uint32_t antialiasing : 1; /**< 1: anti-aliasing is enabled on this display.*/
-    uint32_t rotated : 2; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+    uint32_t full_refresh : 1;       /**< 1: Always make the whole screen redrawn*/
+    uint32_t sw_rotate : 1;          /**< 1: use software rotation (slower)*/
+    uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
+    uint32_t rotated : 2;            /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+    uint32_t screen_transp : 1;      /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
+                                       * Use only if required because it's slower.*/
 
-    /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.
-     * Use only if required because it's slower.*/
-    uint32_t screen_transp : 1;
-
-    /** DPI (dot per inch) of the display.
-     * Set to `LV_DPI_DEF` from `lv_conf.h` by default.
-     */
-    uint32_t dpi : 10;
+    uint32_t dpi : 10;              /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished*/
@@ -316,33 +312,6 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
  * @return pointer to the internal buffers
  */
 lv_disp_draw_buf_t * lv_disp_get_draw_buf(lv_disp_t * disp);
-
-/**
- * Get the number of areas in the buffer
- * @return number of invalid areas
- */
-uint16_t lv_disp_get_inv_buf_size(lv_disp_t * disp);
-
-/**
- * Pop (delete) the last 'num' invalidated areas from the buffer
- * @param num number of areas to delete
- */
-void _lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num);
-
-/**
- * Check the driver configuration if it's double buffered (both `buf1` and `buf2` are set)
- * @param disp pointer to to display to check
- * @return true: double buffered; false: not double buffered
- */
-bool lv_disp_is_double_buf(lv_disp_t * disp);
-
-/**
- * Check the driver configuration if it's TRUE double buffered (both `buf1` and `buf2` are set and
- * `size` is screen sized)
- * @param disp pointer to to display to check
- * @return true: double buffered; false: not double buffered
- */
-bool lv_disp_is_true_double_buf(lv_disp_t * disp);
 
 /**********************
  *      MACROS

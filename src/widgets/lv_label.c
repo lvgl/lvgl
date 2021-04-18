@@ -36,8 +36,8 @@
  **********************/
 static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e);
-static void draw_main(lv_obj_t * obj);
+static void lv_label_event_cb(lv_event_t * e);
+static void draw_main(lv_event_t * e);
 
 static void lv_label_refr_text(lv_obj_t * obj);
 static void lv_label_revert_dots(lv_obj_t * label);
@@ -738,39 +738,43 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->text = NULL;
 }
 
-static void lv_label_event_cb(lv_obj_t * obj, lv_event_t e)
+static void lv_label_event_cb(lv_event_t * e)
 {
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS, obj, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_STYLE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+
+    if(code == LV_EVENT_STYLE_CHANGED) {
         /*Revert dots for proper refresh*/
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(e == LV_EVENT_SIZE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED) {
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(e == LV_EVENT_BASE_DIR_CHANGED) {
+    else if(code == LV_EVENT_BASE_DIR_CHANGED) {
 #if LV_USE_BIDI
         lv_label_t * label = (lv_label_t *)obj;
         if(label->static_txt == 0) lv_label_set_text(obj, NULL);
 #endif
     }
-    else if(e == LV_EVENT_DRAW_MAIN) {
-        draw_main(obj);
+    else if(code == LV_EVENT_DRAW_MAIN) {
+        draw_main(e);
     }
 }
 
 
-static void draw_main(lv_obj_t * obj)
+static void draw_main(lv_event_t * e)
 {
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_label_t * label = (lv_label_t *)obj;
-    const lv_area_t * clip_area = lv_event_get_param();
+    const lv_area_t * clip_area = lv_event_get_param(e);
 
     lv_area_t txt_coords;
     get_txt_coords(obj, &txt_coords);

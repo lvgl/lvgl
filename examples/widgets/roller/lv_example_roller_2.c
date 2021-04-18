@@ -1,9 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_ROLLER && LV_FONT_MONTSERRAT_22 && LV_BUILD_EXAMPLES
 
-static void event_handler(lv_obj_t * obj, lv_event_t event)
+static void event_handler(lv_event_t * e)
 {
-    if(event == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         char buf[32];
         lv_roller_get_selected_str(obj, buf, sizeof(buf));
         LV_LOG_USER("Selected value: %s\n", buf);

@@ -5,11 +5,14 @@ static lv_obj_t * chart1;
 static lv_chart_series_t * ser1;
 static lv_chart_series_t * ser2;
 
-static void event_cb(lv_obj_t * obj, lv_event_t e)
+static void event_cb(lv_event_t * e)
 {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+
     /*Add the faded area before the lines are drawn*/
-    if(e == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+    if(code == LV_EVENT_DRAW_PART_BEGIN) {
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
         if(dsc->part != LV_PART_ITEMS) return;
         if(!dsc->p1 || !dsc->p2) return;
 

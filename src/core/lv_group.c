@@ -145,7 +145,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     LV_LOG_TRACE("begin");
 
     /*Focus on the next object*/
-    if(g->obj_focus && *g->obj_focus == obj) {
+    if(*g->obj_focus == obj) {
         if(g->frozen) g->frozen = 0;
 
         /*If this is the only object in the group then focus to nothing.*/
@@ -161,7 +161,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     /*If the focuses object is still the same then it was the only object in the group but it will
      *be deleted. Set the `obj_focus` to NULL to get back to the initial state of the group with
      *zero objects*/
-    if(g->obj_focus && *g->obj_focus == obj) {
+    if(*g->obj_focus == obj) {
         g->obj_focus = NULL;
     }
 

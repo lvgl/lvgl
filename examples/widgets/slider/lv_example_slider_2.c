@@ -31,7 +31,7 @@ void lv_example_slider_2(void)
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 //{
-//    if(event == LV_EVENT_VALUE_CHANGED) {
+//    if(code == LV_EVENT_VALUE_CHANGED) {
 //        static char buf[8];
 //        lv_snprintf(buf, sizeof(buf), "%u", lv_slider_get_value(slider));
 //        lv_obj_set_style_content_text(slider, LV_PART_KNOB, LV_STATE_DEFAULT, buf);

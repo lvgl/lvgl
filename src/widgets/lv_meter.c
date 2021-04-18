@@ -29,7 +29,7 @@
  **********************/
 static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_meter_event(lv_obj_t * obj, lv_event_t e);
+static void lv_meter_event(lv_event_t * e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -278,13 +278,15 @@ static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 }
 
-static void lv_meter_event(lv_obj_t * obj, lv_event_t e)
+static void lv_meter_event(lv_event_t * e)
 {
-    lv_res_t res = lv_obj_event_base(MY_CLASS, obj, e);
+    lv_res_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_DRAW_MAIN) {
-        const lv_area_t * clip_area = lv_event_get_param();
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param(e);
         lv_area_t scale_area;
         lv_obj_get_coords_fit(obj, &scale_area);
 
@@ -300,12 +302,13 @@ static void lv_meter_event(lv_obj_t * obj, lv_event_t e)
         lv_draw_rect_dsc_t mid_dsc;
         lv_draw_rect_dsc_init(&mid_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &mid_dsc);
-        lv_coord_t size = lv_obj_get_style_size(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
         lv_area_t nm_cord;
-        nm_cord.x1 = scale_center.x - size;
-        nm_cord.y1 = scale_center.y - size;
-        nm_cord.x2 = scale_center.x + size;
-        nm_cord.y2 = scale_center.y + size;
+        nm_cord.x1 = scale_center.x - w;
+        nm_cord.y1 = scale_center.y - h;
+        nm_cord.x2 = scale_center.x + w;
+        nm_cord.y2 = scale_center.y + h;
         lv_draw_rect(&nm_cord, clip_area, &mid_dsc);
     }
 }

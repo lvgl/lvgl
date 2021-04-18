@@ -9,6 +9,7 @@
 #include "lv_obj.h"
 #include "lv_disp.h"
 #include "lv_refr.h"
+#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -28,7 +29,6 @@ static void layout_update_core(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_layout_update_cb_t * layouts;
 static uint32_t layout_cnt;
 
 /**********************
@@ -96,42 +96,55 @@ void lv_obj_refr_size(lv_obj_t * obj)
     if(parent == NULL) return;
 
     lv_coord_t w;
-    lv_coord_t h;
-    if(obj->w_layout) w = lv_obj_get_width(obj);
-    else w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    if(obj->h_layout) h = lv_obj_get_height(obj);
-    else h = lv_obj_get_style_height(obj, LV_PART_MAIN);
-
-    /*Calculate the required auto sizes*/
-    bool w_content = w == LV_SIZE_CONTENT ? true : false;
-    bool h_content = h == LV_SIZE_CONTENT ? true : false;
-
-    /*Be sure the object is not scrolled when it has auto size*/
     lv_coord_t sl_ori = lv_obj_get_scroll_left(obj);
-    if(w_content) lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+    bool w_content = false;
+    if(obj->w_layout) {
+        w = lv_obj_get_width(obj);
+    } else {
+        w = lv_obj_get_style_width(obj, LV_PART_MAIN);
+        w_content = w == LV_SIZE_CONTENT ? true : false;
+
+        /*Be sure the object is not scrolled when it has auto size*/
+        if(w_content) {
+            lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+            calc_auto_size(obj, &w, NULL);
+        }
+
+        /*Calculate the sizes in percentage*/
+        bool pct_w = LV_COORD_IS_PCT(w) ? true : false;
+
+        lv_coord_t parent_w = lv_obj_get_width_fit(parent);
+        if(pct_w) w = (LV_COORD_GET_PCT(w) * parent_w) / 100;
+
+        lv_coord_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
+        lv_coord_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
+        w = lv_clamp_width(w, minw, maxw, parent_w);
+    }
+
+    lv_coord_t h;
     lv_coord_t st_ori = lv_obj_get_scroll_top(obj);
-    if(h_content) lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+    bool h_content = false;
+    if(obj->h_layout) {
+        h = lv_obj_get_height(obj);
+    } else {
+        h = lv_obj_get_style_height(obj, LV_PART_MAIN);
+        h_content = h == LV_SIZE_CONTENT ? true : false;
 
-    if(w_content && h_content) calc_auto_size(obj, &w, &h);
-    else if(w_content) calc_auto_size(obj, &w, NULL);
-    else if(h_content) calc_auto_size(obj, NULL, &h);
+        /*Be sure the object is not scrolled when it has auto size*/
+        if(h_content) {
+            lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+            calc_auto_size(obj, NULL, &h);
+        }
 
-    /*Calculate the required auto sizes*/
-    bool pct_w = LV_COORD_IS_PCT(w) ? true : false;
-    bool pct_h = LV_COORD_IS_PCT(h) ? true : false;
+        /*Calculate the sizes in percentage*/
+        bool pct_h = LV_COORD_IS_PCT(h) ? true : false;
+        lv_coord_t parent_h = lv_obj_get_height_fit(parent);
+        if(pct_h) h = (LV_COORD_GET_PCT(h) * parent_h) / 100;
 
-    lv_coord_t parent_w = lv_obj_get_width_fit(parent);
-    lv_coord_t parent_h = lv_obj_get_height_fit(parent);
-    if(pct_w) w = (LV_COORD_GET_PCT(w) * parent_w) / 100;
-    if(pct_h) h = (LV_COORD_GET_PCT(h) * parent_h) / 100;
-
-    lv_coord_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
-    lv_coord_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
-    w = lv_clamp_width(w, minw, maxw, parent_w);
-
-    lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
-    lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
-    h = lv_clamp_width(h, minh, maxh, parent_h);
+        lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
+        lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+        h = lv_clamp_width(h, minh, maxh, parent_h);
+    }
 
     /*calc_auto_size set the scroll x/y to 0 so revert the original value*/
     if(w_content || h_content) {
@@ -296,10 +309,10 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 uint32_t lv_layout_register(lv_layout_update_cb_t cb)
 {
     layout_cnt++;
-    layouts = lv_mem_realloc(layouts, layout_cnt * sizeof(lv_layout_update_cb_t));
-    LV_ASSERT_MALLOC(layouts);
+    LV_GC_ROOT(_lv_layout_list) = lv_mem_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_update_cb_t));
+    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
 
-    layouts[layout_cnt - 1] = cb;
+    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1] = cb;
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
@@ -589,9 +602,11 @@ bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 
 void lv_obj_refr_pos(lv_obj_t * obj)
 {
+    if(lv_obj_is_layout_positioned(obj)) return;
+
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
-    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN) + lv_obj_get_style_transform_x(obj, LV_PART_MAIN);
+    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN) + lv_obj_get_style_transform_y(obj, LV_PART_MAIN);
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
         return;
@@ -645,8 +660,6 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 
 void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
-    if(lv_obj_is_layout_positioned(obj)) return;
-
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * parent = obj->parent;
 
@@ -924,20 +937,20 @@ static void layout_update_core(lv_obj_t * obj)
         /*Be sure the left side is not remains scrolled in*/
         if(sr < 0 && sl > 0) {
             sr = LV_MIN(sl, -sr);
-            lv_obj_scroll_by(obj, 0, sr, LV_ANIM_OFF);
+            lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
         }
     } else {
         /*Be sure the right side is not remains scrolled in*/
         if(sl < 0 && sr > 0) {
             sr = LV_MIN(sr, -sl);
-            lv_obj_scroll_by(obj, 0, sl, LV_ANIM_OFF);
+            lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
         }
     }
 
     if(lv_obj_get_child_cnt(obj) > 0) {
         uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout_id > 0 && layout_id <= layout_cnt) {
-            layouts[layout_id -1](obj);
+            LV_GC_ROOT(_lv_layout_list)[layout_id -1](obj);
         }
     }
 }

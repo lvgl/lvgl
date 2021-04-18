@@ -3,10 +3,12 @@
 
 #define ITEM_CNT 200
 
-static void event_cb(lv_obj_t * obj, lv_event_t e)
+static void event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_DRAW_PART_END) {
+        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
         /*If the cells are drawn...*/
         if(dsc->part == LV_PART_ITEMS) {
             bool chk = lv_table_has_cell_ctrl(obj, dsc->id, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
@@ -36,7 +38,7 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
             lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
         }
     }
-    else if(e == LV_EVENT_VALUE_CHANGED) {
+    else if(code == LV_EVENT_VALUE_CHANGED) {
         uint16_t col;
         uint16_t row;
         lv_table_get_selected_cell(obj, &row, &col);

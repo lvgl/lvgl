@@ -24,8 +24,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void draw_main(lv_obj_t * obj);
-static void lv_imgbtn_event(lv_obj_t * imgbtn, lv_event_t e);
+static void draw_main(lv_event_t * e);
+static void lv_imgbtn_event(lv_event_t * e);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
@@ -160,27 +160,30 @@ static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 }
 
 
-static void lv_imgbtn_event(lv_obj_t * obj, lv_event_t e)
+static void lv_imgbtn_event(lv_event_t * e)
 {
-    lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, obj, e);
+    lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, e);
     if(res != LV_RES_OK) return;
 
-    if(e == LV_EVENT_PRESSED || e == LV_EVENT_RELEASED || e == LV_EVENT_PRESS_LOST) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
         refr_img(obj);
     }
-    else if(e == LV_EVENT_DRAW_MAIN) {
-        draw_main(obj);
+    else if(code == LV_EVENT_DRAW_MAIN) {
+        draw_main(e);
     }
-    else if(e == LV_EVENT_COVER_CHECK) {
-        lv_cover_check_info_t * info = lv_event_get_param();
+    else if(code == LV_EVENT_COVER_CHECK) {
+        lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res != LV_DRAW_RES_MASKED) info->res = LV_DRAW_RES_NOT_COVER;
     }
 }
 
-static void draw_main(lv_obj_t * obj)
+static void draw_main(lv_event_t * e)
 {
+    lv_obj_t * obj = lv_event_get_target(e);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-    const lv_area_t * clip_area = lv_event_get_param();
+    const lv_area_t * clip_area = lv_event_get_param(e);
 
     /*Just draw_main an image*/
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));

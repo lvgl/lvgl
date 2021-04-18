@@ -29,7 +29,7 @@ void lv_example_slider_3(void)
 //
 //static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 //{
-//    if(event == LV_EVENT_VALUE_CHANGED) {
+//    if(code == LV_EVENT_VALUE_CHANGED) {
 //        static char buf[8];
 //        lv_snprintf(buf, sizeof(buf), "%d - %d", lv_slider_get_value(slider), lv_slider_get_left_value(slider));
 //        lv_obj_set_style_content_text(slider, LV_PART_INDICATOR, LV_STATE_DEFAULT, buf);

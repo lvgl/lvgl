@@ -1,9 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
-static void event_cb(lv_obj_t * dropdown, lv_event_t e)
+static void event_cb(lv_event_t * e)
 {
-    if(e == LV_EVENT_VALUE_CHANGED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * dropdown = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
         char buf[64];
         lv_dropdown_get_selected_str(dropdown, buf, sizeof(buf));
         LV_LOG_USER("'%s' is selected", buf);

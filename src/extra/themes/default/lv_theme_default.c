@@ -87,7 +87,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CHART
-    lv_style_t chart_series, chart_ticks, chart_bg;
+    lv_style_t chart_series, chart_indic, chart_ticks, chart_bg;
 #endif
 
 #if LV_USE_CHECKBOX
@@ -96,6 +96,10 @@ typedef struct {
 
 #if LV_USE_SWITCH
     lv_style_t switch_knob;
+#endif
+
+#if LV_USE_LINE
+    lv_style_t line;
 #endif
 
 #if LV_USE_TABLE
@@ -189,6 +193,7 @@ static void style_init(void)
     static const lv_style_prop_t trans_props[] = {
             LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
             LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
+            LV_STYLE_TRANSFORM_Y, LV_STYLE_TRANSFORM_X,
             LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,
             LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
             0
@@ -203,10 +208,10 @@ static void style_init(void)
     theme.color_secondary = color_secondary_accent;
 
     static lv_style_transition_dsc_t trans_delayed;
-    lv_style_transition_dsc_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, 70);
+    lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70);
 
     static lv_style_transition_dsc_t trans_normal;
-    lv_style_transition_dsc_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
+    lv_style_transition_dsc_init(&trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0);
 
     style_init_reset(&styles->transition_delayed);
     lv_style_set_transition(&styles->transition_delayed, &trans_delayed); /*Go back to default state with delay*/
@@ -404,6 +409,12 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->switch_knob, - LV_DPX(4));
 #endif
 
+#if LV_USE_LINE
+    style_init_reset(&styles->line);
+    lv_style_set_line_width(&styles->line, 1);
+    lv_style_set_line_color(&styles->line, COLOR_SCR_TEXT);
+#endif
+
 #if LV_USE_CHART
     style_init_reset(&styles->chart_bg);
     lv_style_set_border_post(&styles->chart_bg, false);
@@ -413,8 +424,14 @@ static void style_init(void)
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
     lv_style_set_radius(&styles->chart_series, LV_DPX(3));
-    lv_style_set_size(&styles->chart_series, LV_DPX(4));
+    lv_style_set_size(&styles->chart_series, LV_DPX(8));
     lv_style_set_pad_column(&styles->chart_series, LV_DPX(2));
+
+    style_init_reset(&styles->chart_indic);
+    lv_style_set_radius(&styles->chart_indic,LV_RADIUS_CIRCLE);
+    lv_style_set_size(&styles->chart_indic, LV_DPX(8));
+    lv_style_set_bg_color(&styles->chart_indic, theme.color_primary);
+    lv_style_set_bg_opa(&styles->chart_indic, LV_OPA_COVER);
 
     style_init_reset(&styles->chart_ticks);
     lv_style_set_line_width(&styles->chart_ticks, LV_DPX(1));
@@ -584,13 +601,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_t * parent = lv_obj_get_parent(obj);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class)) {
-            lv_obj_add_style(obj, &styles->bg_color_grey, 0);
-            lv_obj_add_style(obj, &styles->pad_gap, 0);
             return;
         }
         /*Tabview pages*/
         else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
-            lv_obj_add_style(obj, &styles->scr, 0);
             lv_obj_add_style(obj, &styles->pad_normal, 0);
             lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
             lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
@@ -636,7 +650,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_LINE
     else if(lv_obj_check_type(obj, &lv_line_class)) {
-        lv_obj_add_style(obj, &styles->card, 0);
+        lv_obj_add_style(obj, &styles->line, 0);
     }
 #endif
 
@@ -764,7 +778,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
         lv_obj_add_style(obj, &styles->chart_series, LV_PART_ITEMS);
-        lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_ITEMS | LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &styles->chart_indic, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &styles->chart_ticks, LV_PART_TICKS);
         lv_obj_add_style(obj, &styles->chart_series, LV_PART_CURSOR);
     }
@@ -907,6 +921,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_tileview_tile_class)) {
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+    }
+#endif
+
+#if LV_USE_TABVIEW
+    if(lv_obj_check_type(obj, &lv_tabview_class)) {
+        lv_obj_add_style(obj, &styles->scr, 0);
+        return;
     }
 #endif
 

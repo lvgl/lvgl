@@ -38,12 +38,7 @@ typedef enum {
 struct _lv_anim_t;
 struct _lv_anim_path_t;
 /** Get the current value during an animation*/
-typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_path_t *, const struct _lv_anim_t *);
-
-typedef struct _lv_anim_path_t {
-    lv_anim_path_cb_t cb;
-    void * user_data;
-} lv_anim_path_t;
+typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
 
 /** Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
@@ -76,7 +71,7 @@ typedef struct _lv_anim_t {
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom user data*/
 #endif
-    lv_anim_path_t path;         /**< Describe the path (curve) of animations*/
+    lv_anim_path_cb_t path_cb;         /**< Describe the path (curve) of animations*/
     int32_t start_value;               /**< Start value*/
     int32_t current_value;             /**< Current value*/
     int32_t end_value;                 /**< End value*/
@@ -186,10 +181,12 @@ static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec
 /**
  * Set the path (curve) of the animation.
  * @param a pointer to an initialized `lv_anim_t` variable
- * @param path a function the get the current value of the animation.
- *             The built in functions starts with `lv_anim_path_...`
+ * @param path_cb a function the get the current value of the animation.
  */
-void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path);
+static inline void lv_anim_set_path_cb(lv_anim_t * a, lv_anim_path_cb_t path_cb)
+{
+    a->path_cb = path_cb;
+}
 
 /**
  * Set a function call when the animation really starts (considering `delay`)
@@ -279,32 +276,6 @@ static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
 void lv_anim_start(lv_anim_t * a);
 
 /**
- * Initialize an animation path
- * @param path pointer to path
- */
-void lv_anim_path_init(lv_anim_path_t * path);
-
-/**
- * Set a callback for a path
- * @param path pointer to an initialized path
- * @param cb the callback
- */
-static inline void lv_anim_path_set_cb(lv_anim_path_t * path, lv_anim_path_cb_t cb)
-{
-    path->cb = cb;
-}
-
-/**
- * Set a user data for a path
- * @param path pointer to an initialized path
- * @param user_data pointer to the user data
- */
-static inline void lv_anim_path_set_user_data(lv_anim_path_t * path, void * user_data)
-{
-    path->user_data = user_data;
-}
-
-/**
  * Get a delay before starting the animation
  * @param a pointer to an initialized `lv_anim_t` variable
  * @return delay before the animation in milliseconds
@@ -381,42 +352,42 @@ void lv_anim_refr_now(void);
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_linear(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation slowing down the start phase
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_ease_in(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation slowing down the end phase
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_ease_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying an "S" characteristic (cosine)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_ease_in_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation with overshoot at the end
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_overshoot(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation with 3 bounces
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_bounce(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying step characteristic.
@@ -424,12 +395,11 @@ int32_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a);
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t * a);
+int32_t lv_anim_path_step(const lv_anim_t * a);
 
 /**********************
  *   GLOBAL VARIABLES
  **********************/
-extern const lv_anim_path_t lv_anim_path_def;
 
 /**********************
  *      MACROS
