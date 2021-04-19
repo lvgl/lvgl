@@ -549,34 +549,6 @@ void lv_obj_get_coords_fit(const lv_obj_t * obj, lv_area_t * area)
 
 }
 
-lv_coord_t lv_obj_get_height_visible(const lv_obj_t * obj)
-{
-    lv_obj_update_layout(obj);
-
-    lv_coord_t h = LV_COORD_MAX;
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    while(parent) {
-        h = LV_MIN(lv_obj_get_height_fit(parent), h);
-        parent = lv_obj_get_parent(parent);
-    }
-
-    return h == LV_COORD_MAX ? LV_DPI_DEF : h;
-}
-
-lv_coord_t lv_obj_get_width_visible(const lv_obj_t * obj)
-{
-    lv_obj_update_layout(obj);
-
-    lv_coord_t w = LV_COORD_MAX;
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    while(parent) {
-        w = LV_MIN(lv_obj_get_width_fit(parent), w);
-        parent = lv_obj_get_parent(parent);
-    }
-
-    return w == LV_COORD_MAX ? LV_DPI_DEF : w;
-}
-
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
