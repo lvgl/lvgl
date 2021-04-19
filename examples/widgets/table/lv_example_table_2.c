@@ -80,7 +80,7 @@ void lv_example_table_2(void)
     lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_PART_END, NULL);
     lv_obj_add_event_cb(table, change_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_mem_monitor_t mon2;
@@ -91,9 +91,9 @@ void lv_example_table_2(void)
     uint32_t elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(label, "%d bytes are used by the table\n"
-                                  "and %d items were added in %d ms",
-                                  mem_used, ITEM_CNT, elaps);
+    lv_label_set_text_fmt(label, "%d items were created in %d ms\n"
+                                  "using %d bytes of memory",
+                                  ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
 
