@@ -310,6 +310,15 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
     }
 
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
+        /*Free the unused cells*/
+        if(old_row_cnt > row_cnt) {
+            uint16_t old_cell_cnt = old_row_cnt * ext->col_cnt;
+            uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
+            uint32_t i;
+            for(i = new_cell_cnt; i < old_cell_cnt; i++) {
+                lv_mem_free(ext->cell_data[i]);
+            }
+        }
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
         LV_ASSERT_MEM(ext->cell_data);
         if(ext->cell_data == NULL) return;
@@ -320,6 +329,7 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
             _lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
+
     }
     else {
         lv_mem_free(ext->cell_data);
@@ -348,6 +358,16 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
     ext->col_cnt         = col_cnt;
 
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
+        /*Free the unused cells*/
+        if(old_col_cnt > col_cnt) {
+           uint16_t old_cell_cnt = old_col_cnt * ext->row_cnt;
+           uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
+           uint32_t i;
+           for(i = new_cell_cnt; i < old_cell_cnt; i++) {
+               lv_mem_free(ext->cell_data[i]);
+           }
+       }
+
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
         LV_ASSERT_MEM(ext->cell_data);
         if(ext->cell_data == NULL) return;
@@ -358,7 +378,6 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
             _lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
-
     }
     else {
         lv_mem_free(ext->cell_data);
