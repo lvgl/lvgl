@@ -42,11 +42,6 @@ fout.write(
 #    define LV_CONF_INCLUDE_SIMPLE
 #   endif
 #  endif
-#  if __has_include("lvgl.h")
-#   ifndef LV_LVGL_H_INCLUDE_SIMPLE
-#    define LV_LVGL_H_INCLUDE_SIMPLE
-#   endif
-#  endif
 #endif
 
 /*If lv_conf.h is not skipped include it*/
