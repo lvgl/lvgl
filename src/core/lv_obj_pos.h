@@ -256,24 +256,6 @@ lv_coord_t lv_obj_get_height_fit(const struct _lv_obj_t * obj);
 void lv_obj_get_coords_fit(const struct _lv_obj_t * obj, lv_area_t * area);
 
 /**
- * Get the height which is visible on the the given object without causing overflow.
- * If there are smaller grand parents than their height will be considered.
- * Useful on nested scrollable objects to get a height that fills the entire visible height.
- * @param obj       pointer to an object
- * @return          the visible height
- */
-lv_coord_t lv_obj_get_height_visible(const struct _lv_obj_t * obj);
-
-/**
- * Get the widht which is visible on the the given object without causing overflow.
- * If there are smaller grand parents than their width will be considered.
- * Useful on nested scrollable objects to get a width that fills the entire visible width.
- * @param obj       pointer to an object
- * @return          the visible width
- */
-lv_coord_t lv_obj_get_width_visible(const struct _lv_obj_t * obj);
-
-/**
  * Get the width occupied by the "parts" of the widget. E.g. the width of all columns of a table.
  * @param obj       pointer to an objects
  * @return          the width of the virtually drawn content

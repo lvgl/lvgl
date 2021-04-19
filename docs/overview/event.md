@@ -12,58 +12,34 @@ Events are triggered in LVGL when something happens which might be interesting t
 
 ## Add events to the object
 
-The user can assign callback functions to an object to see these events. In practice, it looks like this:
+The user can assign callback functions to an object to see its events. In practice, it looks like this:
 ```c
 lv_obj_t * btn = lv_btn_create(lv_scr_act());
-lv_obj_add_event_cb(btn, my_event_cb, NULL);   /*Assign an event callback*/
+lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
 
 ...
 
-static void my_event_cb(lv_obj_t * obj, lv_event_t event)
+static void my_event_cb(lv_event_t * event)
 {
-    switch(event) {
-        case LV_EVENT_PRESSED:
-            printf("Pressed\n");
-            break;
-
-        case LV_EVENT_SHORT_CLICKED:
-            printf("Short clicked\n");
-            break;
-
-        case LV_EVENT_CLICKED:
-            printf("Clicked\n");
-            break;
-
-        case LV_EVENT_LONG_PRESSED:
-            printf("Long press\n");
-            break;
-
-        case LV_EVENT_LONG_PRESSED_REPEAT:
-            printf("Long press repeat\n");
-            break;
-
-        case LV_EVENT_RELEASED:
-            printf("Released\n");
-            break;
-    }
-
-    /*Etc.*/
+    printf("Clicked\n");
 }
 ```
+In the example `LV_EVENT_CLICKED` means that only the click event will call `my_event_cb`. See the [list of event codes](#event-codes) for all the options.
+`LV_EVENT_ALL` can be used to receive all the events.
 
 The last parameter of `lv_obj_add_event_cb` is a pointer to any custom data that will be available in the event. It will be described later in more detail.
 
 More events can be added to an object, like this:
 ```c
-lv_obj_add_event_cb(obj, my_event_cb_1, NULL);
-lv_obj_add_event_cb(obj, my_event_cb_2, NULL);
-lv_obj_add_event_cb(obj, my_event_cb_3, NULL);
+lv_obj_add_event_cb(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
+lv_obj_add_event_cb(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
+lv_obj_add_event_cb(obj, my_event_cb_3, LV_EVENT_ALL, NULL);		/*No filtering, receive all events*/
 ```
 
 Even the same event callback can be used on an object with different `user_data`. For example:
 ```c
-lv_obj_add_event_cb(obj, increment_on_click, &num1);
-lv_obj_add_event_cb(obj, increment_on_click, &num2);
+lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
+lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
 ```
 
 The events will be called in the order as they were added. 
@@ -74,7 +50,7 @@ More objects can use the same *event callback*.
 
 ## Remove event(s) from an object
 
-Events can be removed fro man object with the `lv_obj_remove_event_cb(obj, event_cb, user_data)` function. If `user_data = NULL` the first matching `event_cb` will be removed regardless its `user_data`.
+Events can be removed from an object with the `lv_obj_remove_event_cb(obj, event_cb)` function or `lv_obj_remove_event_dsc(obj, event_dsc)`. `event_dsc` is a pointer returned by `lv_obj_add_event_cb`. 
 
 ## Event codes
 
@@ -87,11 +63,11 @@ The event codes can be grouped into these categories:
 
 All objects (such as Buttons/Labels/Sliders etc.) regardless their type receive the *Input device*, *Drawing* and *Other* events. 
 
-However the *Special events* are specific to a particular object type. See the [widgets' documentation](/widgets/index) to learn when they are sent, 
+However the *Special events* are specific to a particular widget type. See the [widgets' documentation](/widgets/index) to learn when they are sent, 
 
-*Custom events* are added by the user and therefore these are never sent by LVGL
+*Custom events* are added by the user and therefore these are never sent by LVGL.
 
-The following event types exist:
+The following event codes exist:
 
 ### Input device events
 - `LV_EVENT_PRESSED`      The object has been pressed
@@ -142,18 +118,13 @@ The following event types exist:
 
 
 ### Custom events
-Any custom event can be added from `_LV_EVENT_LAST`. For example:
-```c
-#define MY_EVENT_1 (_LV_EVENT_LAST + 0)
-#define MY_EVENT_2 (_LV_EVENT_LAST + 1)
-#define MY_EVENT_3 (_LV_EVENT_LAST + 2)
-```
+Any custom event codes can be registered by `uint32_t MY_EVENT_1 = lv_event_register_id();` 
 
 And can be sent to any object with `lv_event_send(obj, MY_EVENT_1, &some_data)`
 
 ## Sending events
 
-To manually send events to an object, use `lv_event_send(obj, LV_EVENT_..., &some_data)`.
+To manually send events to an object, use `lv_event_send(obj, <EVENT_CODE> &some_data)`.
 
 For example, it can be used to manually close a message box by simulating a button press (although there are simpler ways of doing this):
 ```c
@@ -170,19 +141,19 @@ lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 - enable a button if some conditions are met (e.g. the correct PIN is entered)
 - add/remove styles to/from an object if a limit is exceeded, etc
 
+## Fields of lv_event_t
 
-## User data and event parameter
-There are 2 custom pointer that are available in the events:
-- `user_data`: set when the event is registered. 
-- `event_param`: set when the event is sent in `lv_event_send`
-
-In any event callback these pointer can be get with `lv_event_get_user_data(e)` and `lv_event_get_param(e)`.
+`lv_event_t` is the only parameter passed to event callback and it contains all the data about the event. The following values can be get from it:
+- `lv_event_get_code(e)` get the event code
+- `lv_event_get_target(e)` get the object to which the event is sent
+- `lv_event_get_original_target(e)` get the object to which the event is sent originally sent (different from `lv_event_get_target` if [event bubbling](event-bubbling) is enabled)
+- `lv_event_get_user_data(e)` get the pointer passed as the last parameter of `lv_obj_add_event_cb`.
+- `lv_event_get_param(e)` get the parameter passed as the last parameter of `lv_event_send` 
 
 
 ## Event bubbling
 
 If `lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE)` is enabled all events will be sent to the object's parent too. If the parent also has `LV_OBJ_FLAG_EVENT_BUBBLE` enabled the event will be sent to its parent too, and so on. 
 
-The `lv_obj_t * obj` argument of the event handler is always the current target object, not the original object. To get the original target call `lv_event_get_original_target()` in the event handler.  
-
+The *target* parameter of the event is always the current target object, not the original object. To get the original target call `lv_event_get_original_target(e)` in the event handler.  
 
