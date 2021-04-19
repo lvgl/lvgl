@@ -276,7 +276,6 @@ typedef struct _lv_color_filter_dsc_t {
 
 
 typedef enum {
-    LV_COLOR_PALETTE_NONE,
     LV_COLOR_PALETTE_RED,
     LV_COLOR_PALETTE_PINK,
     LV_COLOR_PALETTE_PURPLE,
@@ -296,7 +295,8 @@ typedef enum {
     LV_COLOR_PALETTE_BROWN,
     LV_COLOR_PALETTE_BLUE_GREY,
     LV_COLOR_PALETTE_GREY,
-    _LV_COLOR_PALETTE_LAST
+    _LV_COLOR_PALETTE_LAST,
+    LV_COLOR_PALETTE_NONE = 0xff,
 }lv_color_palette_t;
 
 /**********************

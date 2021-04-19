@@ -51,6 +51,7 @@ typedef struct _lv_event_temp_data {
 typedef struct _lv_event_dsc_t{
     lv_event_cb_t cb;
     void * user_data;
+    lv_event_code_t filter :8;
 }lv_event_dsc_t;
 
 /**********************
@@ -361,7 +362,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
+struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
@@ -371,6 +372,7 @@ struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event
     LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
 
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
+    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].filter = filter;
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].user_data = user_data;
 
     return &obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1];
@@ -1100,7 +1102,7 @@ static lv_res_t event_send_core(lv_obj_t * obj, lv_event_code_t event_code, void
 
     uint32_t i = 0;
     while(event_dsc && res == LV_RES_OK) {
-        if(event_dsc->cb) {
+        if(event_dsc->cb && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == event_code)) {
             void * event_act_user_data_cb_save = event_act_user_data_cb;
             event_act_user_data_cb = event_dsc->user_data;
 

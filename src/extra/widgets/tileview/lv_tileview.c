@@ -105,7 +105,7 @@ static void lv_tileview_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 {
     LV_UNUSED(class_p);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
-    lv_obj_add_event_cb(obj, tileview_event_cb, NULL);
+    lv_obj_add_event_cb(obj, tileview_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_set_scroll_snap_x(obj, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_scroll_snap_y(obj, LV_SCROLL_SNAP_CENTER);

@@ -71,13 +71,13 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
     lv_obj_t * year_dd = lv_dropdown_create(header);
     lv_dropdown_set_options(year_dd, year_list);
     lv_dropdown_set_selected(year_dd, 2023 - cur_date->year);
-    lv_obj_add_event_cb(year_dd, year_event_cb, calendar);
+    lv_obj_add_event_cb(year_dd, year_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
     lv_obj_set_flex_grow(year_dd, 1);
 
     lv_obj_t * month_dd = lv_dropdown_create(header);
     lv_dropdown_set_options(month_dd, month_list);
     lv_dropdown_set_selected(month_dd, cur_date->month - 1);
-    lv_obj_add_event_cb(month_dd, month_event_cb, calendar);
+    lv_obj_add_event_cb(month_dd, month_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
     lv_obj_set_flex_grow(month_dd, 1);
 
     lv_obj_align_to(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
@@ -91,9 +91,6 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * cale
 
 static void month_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code != LV_EVENT_VALUE_CHANGED) return;
-
     lv_obj_t * dropdown = lv_event_get_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
 
@@ -108,9 +105,6 @@ static void month_event_cb(lv_event_t * e)
 }
 static void year_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code != LV_EVENT_VALUE_CHANGED) return;
-
     lv_obj_t * dropdown = lv_event_get_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
 

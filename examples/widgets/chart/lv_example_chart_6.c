@@ -67,7 +67,7 @@ void lv_example_chart_6(void)
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 40);
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_X, 10, 5, 10, 1, true, 30);
 
-    lv_obj_add_event_cb(chart, event_cb, NULL);
+    lv_obj_add_event_cb(chart, event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(chart);
 
     cursor = lv_chart_add_cursor(chart, lv_color_blue(), LV_DIR_LEFT | LV_DIR_BOTTOM);

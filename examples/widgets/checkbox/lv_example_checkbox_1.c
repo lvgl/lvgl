@@ -20,22 +20,22 @@ void lv_example_checkbox_1(void)
     lv_obj_t * cb;
     cb = lv_checkbox_create(lv_scr_act());
     lv_checkbox_set_text(cb, "Apple");
-    lv_obj_add_event_cb(cb, event_handler, NULL);
+    lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
     cb = lv_checkbox_create(lv_scr_act());
     lv_checkbox_set_text(cb, "Banana");
     lv_obj_add_state(cb, LV_STATE_CHECKED);
-    lv_obj_add_event_cb(cb, event_handler, NULL);
+    lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
     cb = lv_checkbox_create(lv_scr_act());
     lv_checkbox_set_text(cb, "Lemon");
     lv_obj_add_state(cb, LV_STATE_DISABLED);
-    lv_obj_add_event_cb(cb, event_handler, NULL);
+    lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
     cb = lv_checkbox_create(lv_scr_act());
     lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
     lv_checkbox_set_text(cb, "Melon");
-    lv_obj_add_event_cb(cb, event_handler, NULL);
+    lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

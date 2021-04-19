@@ -18,19 +18,19 @@ void lv_example_switch_1(void)
     lv_obj_t * sw;
 
     sw = lv_switch_create(lv_scr_act());
-    lv_obj_add_event_cb(sw, event_handler, NULL);
+    lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
 
     sw = lv_switch_create(lv_scr_act());
     lv_obj_add_state(sw, LV_STATE_CHECKED);
-    lv_obj_add_event_cb(sw, event_handler, NULL);
+    lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
 
     sw = lv_switch_create(lv_scr_act());
     lv_obj_add_state(sw, LV_STATE_DISABLED);
-    lv_obj_add_event_cb(sw, event_handler, NULL);
+    lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
 
     sw = lv_switch_create(lv_scr_act());
     lv_obj_add_state(sw, LV_STATE_CHECKED | LV_STATE_DISABLED);
-    lv_obj_add_event_cb(sw, event_handler, NULL);
+    lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

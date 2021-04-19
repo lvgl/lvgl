@@ -40,7 +40,7 @@ void lv_example_scroll_3(void)
     lv_obj_set_size(float_btn, 50, 50);
     lv_obj_add_flag(float_btn, LV_OBJ_FLAG_FLOATING);
     lv_obj_align(float_btn, LV_ALIGN_BOTTOM_RIGHT, 0, -lv_obj_get_style_pad_right(list, LV_PART_MAIN));
-    lv_obj_add_event_cb(float_btn, float_btn_event_cb, list);
+    lv_obj_add_event_cb(float_btn, float_btn_event_cb, LV_EVENT_ALL, list);
     lv_obj_set_style_radius(float_btn, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_img_src(float_btn, LV_SYMBOL_PLUS, 0);
     lv_obj_set_style_text_font(float_btn, lv_theme_get_font_large(float_btn), 0);
