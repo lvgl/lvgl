@@ -361,7 +361,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
+struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
@@ -372,9 +372,11 @@ void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_dat
 
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].user_data = user_data;
+
+    return &obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1];
 }
 
-bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     if(obj->spec_attr == NULL) return false;
@@ -382,27 +384,44 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_
     int32_t i = 0;
     for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
         if(obj->spec_attr->event_dsc[i].cb == event_cb) {
-            /*Check if user_data matches or if the requested user_data is NULL*/
-            if(user_data == NULL || obj->spec_attr->event_dsc[i].user_data == user_data) {
-                /*Found*/
-                break;
+            /*Shift the remaining event handlers forward*/
+            for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
+                obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
+                obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
             }
+            obj->spec_attr->event_dsc_cnt--;
+            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
+            return true;
         }
     }
-    if(i >= obj->spec_attr->event_dsc_cnt) {
-        /*No event handler found*/
-        return false;
+
+    /*No event handler found*/
+    return false;
+}
+
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr == NULL) return false;
+
+    int32_t i = 0;
+    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
+        if(&obj->spec_attr->event_dsc[i] == event_dsc) {
+            /*Shift the remaining event handlers forward*/
+            for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
+                obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
+                obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
+            }
+            obj->spec_attr->event_dsc_cnt--;
+            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
+            return true;
+        }
     }
 
-    /*Shift the remaining event handlers forward*/
-    for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
-        obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
-        obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
-    }
-    obj->spec_attr->event_dsc_cnt--;
-    obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
-    LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
-    return true;
+    /*No event handler found*/
+    return false;
 }
 
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
