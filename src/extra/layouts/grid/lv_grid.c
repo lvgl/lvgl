@@ -48,7 +48,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void grid_update(lv_obj_t * cont);
+static void grid_update(lv_obj_t * cont, void * user_data);
 static void calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
 static void calc_free(_lv_grid_calc_t * calc);
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c);
@@ -98,7 +98,7 @@ lv_style_prop_t LV_STYLE_GRID_CELL_ROW_PLACE;
 
 void lv_grid_init(void)
 {
-    LV_LAYOUT_GRID = lv_layout_register(grid_update);
+    LV_LAYOUT_GRID = lv_layout_register(grid_update, NULL);
 
     LV_STYLE_GRID_COLUMN_DSC_ARRAY = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
     LV_STYLE_GRID_ROW_DSC_ARRAY = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
@@ -146,9 +146,10 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_place_t hor_place, uint8_t col
  *   STATIC FUNCTIONS
  **********************/
 
-static void grid_update(lv_obj_t * cont)
+static void grid_update(lv_obj_t * cont, void * user_data)
 {
     LV_LOG_INFO("update %p container", cont);
+    LV_UNUSED(user_data);
 
     const lv_coord_t * col_templ = get_col_dsc(cont);
     const lv_coord_t * row_templ = get_row_dsc(cont);
@@ -445,8 +446,16 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
 
     }
 
-    x += lv_obj_get_style_transform_x(item, LV_PART_MAIN);
-    y += lv_obj_get_style_transform_y(item, LV_PART_MAIN);
+    /*Handle percentage value of translate*/
+    lv_coord_t tr_x = lv_obj_get_style_transform_x(item, LV_PART_MAIN);
+    lv_coord_t tr_y = lv_obj_get_style_transform_y(item, LV_PART_MAIN);
+    lv_coord_t w = lv_obj_get_width(item);
+    lv_coord_t h = lv_obj_get_height(item);
+    if(LV_COORD_IS_PCT(tr_x)) tr_x = (w * LV_COORD_GET_PCT(tr_x)) / 100;
+    if(LV_COORD_IS_PCT(tr_y)) tr_y = (h * LV_COORD_GET_PCT(tr_y)) / 100;
+
+    x += tr_x;
+    y += tr_y;
 
     lv_coord_t diff_x = hint->grid_abs.x + x - item->coords.x1;
     lv_coord_t diff_y = hint->grid_abs.y + y - item->coords.y1;

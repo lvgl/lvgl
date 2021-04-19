@@ -53,7 +53,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void flex_update(lv_obj_t * cont);
+static void flex_update(lv_obj_t * cont, void * user_data);
 static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id, lv_coord_t item_gap, lv_coord_t max_main_size, track_t * t);
 static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t);
 static void place_content(lv_flex_place_t place, lv_coord_t max_size, lv_coord_t content_size, lv_coord_t item_cnt, lv_coord_t * start_pos, lv_coord_t * gap);
@@ -88,7 +88,7 @@ lv_style_prop_t LV_STYLE_FLEX_GROW;
 
 void lv_flex_init(void)
 {
-    LV_LAYOUT_FLEX = lv_layout_register(flex_update);
+    LV_LAYOUT_FLEX = lv_layout_register(flex_update, NULL);
 
     LV_STYLE_FLEX_FLOW = lv_style_register_prop();
     LV_STYLE_FLEX_MAIN_PLACE = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
@@ -119,9 +119,10 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
  *   STATIC FUNCTIONS
  **********************/
 
-static void flex_update(lv_obj_t * cont)
+static void flex_update(lv_obj_t * cont, void * user_data)
 {
     LV_LOG_INFO("update %p container", cont);
+    LV_UNUSED(user_data);
 
     flex_t f;
     lv_flex_flow_t flow = lv_obj_get_style_flex_flow(cont, LV_PART_MAIN);
@@ -399,8 +400,16 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         if(f->row && rtl) main_pos -= area_get_main_size(&item->coords);
 
 
-        lv_coord_t diff_x = abs_x - item->coords.x1 + lv_obj_get_style_transform_x(item, 0);
-        lv_coord_t diff_y = abs_y - item->coords.y1 + lv_obj_get_style_transform_y(item, 0);
+        /*Handle percentage value of translate*/
+        lv_coord_t tr_x = lv_obj_get_style_transform_x(item, LV_PART_MAIN);
+        lv_coord_t tr_y = lv_obj_get_style_transform_y(item, LV_PART_MAIN);
+        lv_coord_t w = lv_obj_get_width(item);
+        lv_coord_t h = lv_obj_get_height(item);
+        if(LV_COORD_IS_PCT(tr_x)) tr_x = (w * LV_COORD_GET_PCT(tr_x)) / 100;
+        if(LV_COORD_IS_PCT(tr_y)) tr_y = (h * LV_COORD_GET_PCT(tr_y)) / 100;
+
+        lv_coord_t diff_x = abs_x - item->coords.x1 + tr_x;
+        lv_coord_t diff_y = abs_y - item->coords.y1 + tr_y;
         diff_x += f->row ? main_pos : cross_pos;
         diff_y += f->row ? cross_pos : main_pos;
 
