@@ -91,7 +91,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CHECKBOX
-    lv_style_t cb_marker, cb_marker_checked, cb_bg_outline_pad;
+    lv_style_t cb_marker, cb_marker_checked;
 #endif
 
 #if LV_USE_SWITCH
@@ -256,6 +256,7 @@ static void style_init(void)
     style_init_reset(&styles->outline_primary);
     lv_style_set_outline_color(&styles->outline_primary, color_primary_accent);
     lv_style_set_outline_width(&styles->outline_primary, OUTLINE_WIDTH);
+    lv_style_set_outline_pad(&styles->outline_primary, OUTLINE_WIDTH);
     lv_style_set_outline_opa(&styles->outline_primary, LV_OPA_50);
 
     style_init_reset(&styles->outline_secondary);
@@ -399,9 +400,6 @@ static void style_init(void)
     lv_style_set_bg_img_src(&styles->cb_marker_checked, LV_SYMBOL_OK);
     lv_style_set_text_color(&styles->cb_marker_checked, lv_color_white());
     lv_style_set_text_font(&styles->cb_marker_checked, theme.font_small);
-
-    style_init_reset(&styles->cb_bg_outline_pad);
-    lv_style_set_outline_pad(&styles->cb_bg_outline_pad, LV_DPX(5));
 #endif
 
 #if LV_USE_SWITCH
@@ -740,7 +738,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_checkbox_class)) {
         lv_obj_add_style(obj, &styles->pad_gap, 0);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &styles->cb_bg_outline_pad, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->disabled, LV_PART_INDICATOR | LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->cb_marker, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_INDICATOR | LV_STATE_CHECKED);
