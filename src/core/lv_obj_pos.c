@@ -313,9 +313,7 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
 
     LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].cb = cb;
-#if LV_USE_USER_DATA
     LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].user_data = user_data;
-#endif
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
