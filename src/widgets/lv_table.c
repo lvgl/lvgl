@@ -207,6 +207,16 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     LV_ASSERT_MALLOC(table->row_h);
     if(table->row_h == NULL) return;
 
+    /*Free the unused cells*/
+    if(old_row_cnt > row_cnt) {
+        uint16_t old_cell_cnt = old_row_cnt * table->col_cnt;
+        uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
+        uint32_t i;
+        for(i = new_cell_cnt; i < old_cell_cnt; i++) {
+            lv_mem_free(table->cell_data[i]);
+        }
+    }
+
     table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
     LV_ASSERT_MALLOC(table->cell_data);
     if(table->cell_data == NULL) return;
@@ -231,6 +241,16 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->row_h[0]));
     LV_ASSERT_MALLOC(table->col_w);
     if(table->col_w == NULL) return;
+
+    /*Free the unused cells*/
+    if(old_col_cnt > col_cnt) {
+       uint16_t old_cell_cnt = old_col_cnt * table->row_cnt;
+       uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
+       uint32_t i;
+       for(i = new_cell_cnt; i < old_cell_cnt; i++) {
+           lv_mem_free(table->cell_data[i]);
+       }
+   }
 
     char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
     LV_ASSERT_MALLOC(new_cell_data);
