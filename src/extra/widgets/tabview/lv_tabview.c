@@ -22,8 +22,8 @@
  **********************/
 static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void btns_event_cb(lv_event_t * e);
-static void cont_event_cb(lv_event_t * e);
+static void btns_value_changed_event_cb(lv_event_t * e);
+static void cont_scroll_end_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -180,10 +180,10 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     tabview->map = lv_mem_alloc(sizeof(const char *));
     tabview->map[0] = "";
     lv_btnmatrix_set_map(btnm, (const char **)tabview->map);
-    lv_obj_add_event_cb(btnm, btns_event_cb, NULL);
+    lv_obj_add_event_cb(btnm, btns_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_obj_add_event_cb(cont, cont_event_cb, NULL);
+    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_SCROLL_END, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
     switch(tabview->tab_pos) {
@@ -228,32 +228,26 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     tabview->map = NULL;
 }
 
-static void btns_event_cb(lv_event_t * e)
+static void btns_value_changed_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * btns = lv_event_get_target(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        lv_obj_t * tv = lv_obj_get_parent(btns);
-        uint32_t id = lv_btnmatrix_get_selected_btn(btns);
-        lv_tabview_set_act(tv, id, LV_ANIM_ON);
-    }
+    lv_obj_t * tv = lv_obj_get_parent(btns);
+    uint32_t id = lv_btnmatrix_get_selected_btn(btns);
+    lv_tabview_set_act(tv, id, LV_ANIM_ON);
 }
-static void cont_event_cb(lv_event_t * e)
+static void cont_scroll_end_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * cont = lv_event_get_target(e);
 
-    if(code == LV_EVENT_SCROLL_END) {
-        lv_obj_t * tv = lv_obj_get_parent(cont);
+    lv_obj_t * tv = lv_obj_get_parent(cont);
 
-        lv_point_t p;
-        lv_obj_get_scroll_end(cont, &p);
+    lv_point_t p;
+    lv_obj_get_scroll_end(cont, &p);
 
-        lv_coord_t w = lv_obj_get_width_fit(cont);
-        lv_coord_t t = (p.x + w/ 2) / w;
-        if(t < 0) t = 0;
-        lv_tabview_set_act(tv, t, LV_ANIM_ON);
-    }
+    lv_coord_t w = lv_obj_get_width_fit(cont);
+    lv_coord_t t = (p.x + w/ 2) / w;
+    if(t < 0) t = 0;
+    lv_tabview_set_act(tv, t, LV_ANIM_ON);
 }
 #endif /*LV_USE_TABVIEW*/

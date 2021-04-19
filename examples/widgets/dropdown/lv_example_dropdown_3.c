@@ -3,13 +3,10 @@
 
 static void event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * dropdown = lv_event_get_target(e);
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        char buf[64];
-        lv_dropdown_get_selected_str(dropdown, buf, sizeof(buf));
-        LV_LOG_USER("'%s' is selected", buf);
-    }
+    char buf[64];
+    lv_dropdown_get_selected_str(dropdown, buf, sizeof(buf));
+    LV_LOG_USER("'%s' is selected", buf);
 }
 
 /**
@@ -38,7 +35,7 @@ void lv_example_dropdown_3(void)
     /*In a menu we don't need to show the last clicked item*/
     lv_dropdown_set_selected_highlight(dropdown, false);
 
-    lv_obj_add_event_cb(dropdown, event_cb, NULL);
+    lv_obj_add_event_cb(dropdown, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 #endif

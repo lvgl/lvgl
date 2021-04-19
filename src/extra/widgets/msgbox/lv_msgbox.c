@@ -21,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void msgbox_close_event_cb(lv_event_t * e);
+static void msgbox_close_click_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -70,7 +70,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     if(add_close_btn) {
         lv_obj_t * close_btn = lv_btn_create(mbox);
         lv_obj_set_ext_click_area(close_btn, LV_DPX(10));
-        lv_obj_add_event_cb(close_btn, msgbox_close_event_cb, NULL);
+        lv_obj_add_event_cb(close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
         label = lv_label_create(close_btn);
         lv_label_set_text(label, LV_SYMBOL_CLOSE);
         lv_coord_t close_btn_size = LV_MAX(lv_obj_get_width(label), lv_obj_get_height(label)) + LV_DPX(10);
@@ -138,14 +138,11 @@ void lv_msgbox_close(lv_obj_t * mbox)
  *   STATIC FUNCTIONS
  **********************/
 
-static void msgbox_close_event_cb(lv_event_t * e)
+static void msgbox_close_click_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * btn = lv_event_get_target(e);
-    if(code == LV_EVENT_CLICKED) {
-        lv_obj_t * mbox = lv_obj_get_parent(btn);
-        lv_msgbox_close(mbox);
-    }
+    lv_obj_t * mbox = lv_obj_get_parent(btn);
+    lv_msgbox_close(mbox);
 }
 
 #endif /*LV_USE_MSGBOX*/

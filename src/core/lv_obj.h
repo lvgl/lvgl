@@ -44,6 +44,8 @@ struct _lv_event_dsc_t;
  * Type of event being sent to the object.
  */
 typedef enum {
+    LV_EVENT_ALL = 0,
+
     /** Input device events*/
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
     LV_EVENT_PRESSING,            /**< The object is being pressed (called continuously while pressing)*/
@@ -388,21 +390,28 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
  * Used by the user to react on event which happens with the object.
  * An object can have multiple event handler. They will be called in the same order as they were added.
  * @param obj       pointer to an object
+ * @param filter    and event code (e.g. `LV_EVENT_CLICKED`) on which the event should be called. `LV_EVENT_ALL` can be sued the receive all the events.
  * @param event_cb  the new event function
  * @param           user_data custom data data will be available in `event_cb`
+ * @return          a pointer the event descriptor. Can be used in ::lv_obj_remove_event_dsc
  */
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
+struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
 /**
  * Remove an event handler function for an object.
- * Used by the user to react on event which happens with the object.
- * An object can have multiple event handler. They will be called in the same order as they were added.
  * @param obj       pointer to an object
  * @param event_cb  the event function to remove
- * @param user_data if NULL, remove the first event handler with the same cb, otherwise remove the first event handler with the same cb and user_data
  * @return          true if any event handlers were removed
  */
-bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
+
+/**
+ * Remove an event handler function for an object.
+ * @param obj       pointer to an object
+ * @param event_dsc pointer to an event descriptor to remove (returned by ::lv_obj_add_event_cb)
+ * @return          true if any event handlers were removed
+ */
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc);
 
 /**
  * Set the base direction of the object

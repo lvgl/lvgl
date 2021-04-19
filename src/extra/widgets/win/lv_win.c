@@ -63,7 +63,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * icon, lv_coord_t btn_w, l
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * btn = lv_btn_create(header);
     lv_obj_set_size(btn, btn_w, LV_PCT(100));
-    lv_obj_add_event_cb(btn, event_cb, NULL);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_ALL, NULL);
 
     lv_obj_t * img = lv_img_create(btn);
     lv_img_set_src(img, icon);

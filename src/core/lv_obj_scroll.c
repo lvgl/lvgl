@@ -455,13 +455,13 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
            ver_area->y2 =ver_area->y1 + sb_h - 1;
            ver_area->x2 = obj->coords.x2 - side_space;
            ver_area->x1 =ver_area->x2 - tickness;
-            if(hor_area->y1 < obj->coords.y1 + end_space) {
+            if(ver_area->y1 < obj->coords.y1 + end_space) {
                ver_area->y1 = obj->coords.y1 + end_space;
-                if(hor_area->y1 + SCROLLBAR_MIN_SIZE >ver_area->y2)ver_area->y2 =ver_area->y1 + SCROLLBAR_MIN_SIZE;
+                if(ver_area->y1 + SCROLLBAR_MIN_SIZE >ver_area->y2)ver_area->y2 =ver_area->y1 + SCROLLBAR_MIN_SIZE;
             }
-            if(hor_area->y2 > obj->coords.y2 - hor_req_space - end_space) {
+            if(ver_area->y2 > obj->coords.y2 - hor_req_space - end_space) {
                ver_area->y2 = obj->coords.y2 - hor_req_space - end_space;
-                if(hor_area->y2 - SCROLLBAR_MIN_SIZE <ver_area->y1)ver_area->y1 =ver_area->y2 - SCROLLBAR_MIN_SIZE;
+                if(ver_area->y2 - SCROLLBAR_MIN_SIZE <ver_area->y1)ver_area->y1 =ver_area->y2 - SCROLLBAR_MIN_SIZE;
             }
         }
     }

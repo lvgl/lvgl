@@ -197,6 +197,7 @@ full_32bit = {
   "LV_USE_PERF_MONITOR":1,
   "LV_USE_MEM_MONITOR":1,
 
+  "LV_LABEL_TEXT_SEL":1,
 
   "LV_BUILD_EXAMPLES":1,
   

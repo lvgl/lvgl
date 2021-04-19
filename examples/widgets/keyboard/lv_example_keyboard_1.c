@@ -26,12 +26,12 @@ void lv_example_keyboard_1(void)
     lv_obj_t * ta;
     ta = lv_textarea_create(lv_scr_act());
     lv_obj_align(ta, LV_ALIGN_TOP_LEFT, 10, 10);
-    lv_obj_add_event_cb(ta, ta_event_cb, kb);
+    lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
     lv_textarea_set_placeholder_text(ta, "Hello");
 
     ta = lv_textarea_create(lv_scr_act());
     lv_obj_align(ta, LV_ALIGN_TOP_RIGHT, -10, 10);
-    lv_obj_add_event_cb(ta, ta_event_cb, kb);
+    lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
 
     lv_keyboard_set_textarea(kb, ta);
 }

@@ -306,13 +306,14 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     mutex = false;
 }
 
-uint32_t lv_layout_register(lv_layout_update_cb_t cb)
+uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
     layout_cnt++;
-    LV_GC_ROOT(_lv_layout_list) = lv_mem_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_update_cb_t));
+    LV_GC_ROOT(_lv_layout_list) = lv_mem_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_dsc_t));
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
 
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1] = cb;
+    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].cb = cb;
+    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].user_data = user_data;
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
@@ -605,22 +606,37 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     if(lv_obj_is_layout_positioned(obj)) return;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN) + lv_obj_get_style_transform_x(obj, LV_PART_MAIN);
-    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN) + lv_obj_get_style_transform_y(obj, LV_PART_MAIN);
+    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
+    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
         return;
     }
+
+    /*Handle percentage value*/
+    lv_coord_t pw = lv_obj_get_width_fit(parent);
+    lv_coord_t ph = lv_obj_get_height_fit(parent);
+    if(LV_COORD_IS_PCT(x)) x = (pw * LV_COORD_GET_PCT(x)) / 100;
+    if(LV_COORD_IS_PCT(y)) y = (ph * LV_COORD_GET_PCT(y)) / 100;
+
+    /*Handle percentage value of translate*/
+    lv_coord_t tr_x = lv_obj_get_style_transform_x(obj, LV_PART_MAIN);
+    lv_coord_t tr_y = lv_obj_get_style_transform_y(obj, LV_PART_MAIN);
+    lv_coord_t w = lv_obj_get_width(obj);
+    lv_coord_t h = lv_obj_get_height(obj);
+    if(LV_COORD_IS_PCT(tr_x)) tr_x = (w * LV_COORD_GET_PCT(tr_x)) / 100;
+    if(LV_COORD_IS_PCT(tr_y)) tr_y = (h * LV_COORD_GET_PCT(tr_y)) / 100;
+
+    /*Use the translation*/
+    x += tr_x;
+    y += tr_y;
 
     lv_align_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
     if(align == LV_ALIGN_TOP_LEFT) {
         lv_obj_move_to(obj, x, y);
     }
     else {
-        lv_coord_t pw = lv_obj_get_width_fit(parent);
-        lv_coord_t ph = lv_obj_get_height_fit(parent);
-        lv_coord_t w = lv_obj_get_width(obj);
-        lv_coord_t h = lv_obj_get_height(obj);
 
         switch(align) {
         case LV_ALIGN_TOP_MID:
@@ -950,7 +966,8 @@ static void layout_update_core(lv_obj_t * obj)
     if(lv_obj_get_child_cnt(obj) > 0) {
         uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout_id > 0 && layout_id <= layout_cnt) {
-            LV_GC_ROOT(_lv_layout_list)[layout_id -1](obj);
+            void  * user_data = LV_GC_ROOT(_lv_layout_list)[layout_id -1].user_data;
+            LV_GC_ROOT(_lv_layout_list)[layout_id -1].cb(obj, user_data);
         }
     }
 }

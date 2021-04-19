@@ -23,7 +23,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 struct _lv_obj_t;
-typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t *);
+typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t *, void * user_data);
+typedef struct {
+    lv_layout_update_cb_t cb;
+    void * user_data;
+}lv_layout_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -133,9 +137,10 @@ void lv_obj_update_layout(const struct _lv_obj_t * obj);
 /**
  * Regsiter a new layout
  * @param cb        the layout update callback
+ * @param user_data custom data that will be passed to `cb`
  * @return          the ID of the new layout
  */
-uint32_t lv_layout_register(lv_layout_update_cb_t cb);
+uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data);
 
 /**
  * Align an object to an other object.
