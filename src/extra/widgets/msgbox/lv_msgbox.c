@@ -53,7 +53,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
     LV_ASSERT_MALLOC(mbox);
     if(mbox == NULL) return NULL;
 
-    lv_coord_t w = lv_obj_get_width_fit(parent);
+    lv_coord_t w = lv_obj_get_content_width(parent);
     if(w > 2 * LV_DPI_DEF) w = 2 * LV_DPI_DEF;
 
     lv_obj_set_size(mbox, w, LV_SIZE_CONTENT);

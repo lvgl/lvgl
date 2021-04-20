@@ -294,10 +294,10 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
                 pos->x = 0;
                 break;
             case LV_TEXT_ALIGN_RIGHT:
-                pos->x = lv_obj_get_width_fit(obj);
+                pos->x = lv_obj_get_content_width(obj);
                 break;
             case LV_TEXT_ALIGN_CENTER:
-                pos->x = lv_obj_get_width_fit(obj) / 2;
+                pos->x = lv_obj_get_content_width(obj) / 2;
                 break;
         }
         return;

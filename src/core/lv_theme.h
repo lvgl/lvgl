@@ -40,6 +40,7 @@ typedef struct _lv_theme_t {
     const lv_font_t * font_small;
     const lv_font_t * font_normal;
     const lv_font_t * font_large;
+    uint32_t flags;                 /*Any custom flag used by the theme*/
 } lv_theme_t;
 
 /**********************

@@ -103,8 +103,8 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     lv_coord_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-    lv_coord_t max_w            = lv_obj_get_width_fit(obj);
-    lv_coord_t max_h            = lv_obj_get_height_fit(obj);
+    lv_coord_t max_w            = lv_obj_get_content_width(obj);
+    lv_coord_t max_h            = lv_obj_get_content_height(obj);
 
     /*Count the lines to calculate button height*/
     uint8_t row_cnt = 1;

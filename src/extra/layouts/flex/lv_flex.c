@@ -136,7 +136,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
     bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     lv_coord_t track_gap = !f.row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
     lv_coord_t item_gap = f.row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
-    lv_coord_t max_main_size = (f.row ? lv_obj_get_width_fit(cont) : lv_obj_get_height_fit(cont));
+    lv_coord_t max_main_size = (f.row ? lv_obj_get_content_width(cont) : lv_obj_get_content_height(cont));
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
@@ -178,7 +178,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
         if(track_cnt) total_track_cross_size -= track_gap;   /*No gap after the last track*/
 
         /*Place the tracks to get the start position*/
-        lv_coord_t max_cross_size = (f.row ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
+        lv_coord_t max_cross_size = (f.row ? lv_obj_get_content_height(cont) : lv_obj_get_content_width(cont));
         place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
     }
 
@@ -401,8 +401,8 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
 
         /*Handle percentage value of translate*/
-        lv_coord_t tr_x = lv_obj_get_style_transform_x(item, LV_PART_MAIN);
-        lv_coord_t tr_y = lv_obj_get_style_transform_y(item, LV_PART_MAIN);
+        lv_coord_t tr_x = lv_obj_get_style_translate_x(item, LV_PART_MAIN);
+        lv_coord_t tr_y = lv_obj_get_style_translate_y(item, LV_PART_MAIN);
         lv_coord_t w = lv_obj_get_width(item);
         lv_coord_t h = lv_obj_get_height(item);
         if(LV_COORD_IS_PCT(tr_x)) tr_x = (w * LV_COORD_GET_PCT(tr_x)) / 100;

@@ -288,7 +288,7 @@ static void lv_meter_event(lv_event_t * e)
     if(code == LV_EVENT_DRAW_MAIN) {
         const lv_area_t * clip_area = lv_event_get_param(e);
         lv_area_t scale_area;
-        lv_obj_get_coords_fit(obj, &scale_area);
+        lv_obj_get_content_coords(obj, &scale_area);
 
         draw_arcs(obj, clip_area, &scale_area);
         draw_ticks_and_labels(obj, clip_area, &scale_area);
@@ -617,7 +617,7 @@ static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_va
     bool rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_ITEMS);
 
     lv_area_t scale_area;
-    lv_obj_get_coords_fit(obj, &scale_area);
+    lv_obj_get_content_coords(obj, &scale_area);
 
     lv_coord_t r_out = lv_area_get_width(&scale_area) / 2;
     lv_point_t scale_center;
@@ -639,7 +639,7 @@ static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_va
 static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value)
 {
     lv_area_t scale_area;
-    lv_obj_get_coords_fit(obj, &scale_area);
+    lv_obj_get_content_coords(obj, &scale_area);
 
     lv_coord_t r_out = lv_area_get_width(&scale_area) / 2;
     lv_point_t scale_center;

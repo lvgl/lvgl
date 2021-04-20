@@ -511,10 +511,10 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_set_x(label, 0);
         break;
     case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_set_x(label, lv_obj_get_width_fit(dropdown->list) - lv_obj_get_width(label));
+        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) - lv_obj_get_width(label));
         break;
     case LV_TEXT_ALIGN_CENTER:
-        lv_obj_set_x(label, lv_obj_get_width_fit(dropdown->list) / 2 - lv_obj_get_width(label) / 2);
+        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) / 2 - lv_obj_get_width(label) / 2);
         break;
 
     }
@@ -1029,7 +1029,7 @@ static void position_to_selected(lv_obj_t * dropdown_obj)
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
 
-    if(lv_obj_get_height(label) <= lv_obj_get_height_fit(dropdown_obj)) return;
+    if(lv_obj_get_height(label) <= lv_obj_get_content_height(dropdown_obj)) return;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);

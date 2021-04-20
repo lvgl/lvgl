@@ -567,10 +567,10 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
     switch(align) {
     case LV_TEXT_ALIGN_CENTER:
-        lv_obj_set_x(label, (lv_obj_get_width_fit(obj) - lv_obj_get_width(label)) / 2);
+        lv_obj_set_x(label, (lv_obj_get_content_width(obj) - lv_obj_get_width(label)) / 2);
         break;
     case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_set_x(label, lv_obj_get_width_fit(obj) - lv_obj_get_width(label));
+        lv_obj_set_x(label, lv_obj_get_content_width(obj) - lv_obj_get_width(label));
         break;
     case LV_TEXT_ALIGN_LEFT:
         lv_obj_set_x(label, 0);
@@ -582,7 +582,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_coord_t h                   = lv_obj_get_height_fit(obj);
+    lv_coord_t h                   = lv_obj_get_content_height(obj);
     uint16_t anim_time             = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
     /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
@@ -707,7 +707,7 @@ static void inf_normalize(lv_obj_t * obj)
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
         lv_coord_t font_h              = lv_font_get_line_height(font);
-        lv_coord_t h                   = lv_obj_get_height_fit(obj);
+        lv_coord_t h                   = lv_obj_get_content_height(obj);
 
         lv_obj_t * label = get_label(obj);
 
