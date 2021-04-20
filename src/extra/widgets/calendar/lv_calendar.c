@@ -38,6 +38,7 @@ const lv_obj_class_t lv_calendar_class = {
     .constructor_cb = lv_calendar_constructor,
     .width_def = (LV_DPI_DEF * 3) / 2,
     .height_def =(LV_DPI_DEF * 3) / 2,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_calendar_t),
     .base_class = &lv_btnmatrix_class
 };
