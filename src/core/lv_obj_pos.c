@@ -916,28 +916,33 @@ static void layout_update_core(lv_obj_t * obj)
     lv_obj_refr_size(obj);
     lv_obj_refr_pos(obj);
 
-    if()
+
     /*Be sure the bottom side is not remains scrolled in*/
-    lv_coord_t st = lv_obj_get_scroll_top(obj);
-    lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
-    if(sb < 0 && st > 0) {
-        sb = LV_MIN(st, -sb);
-        lv_obj_scroll_by(obj, 0, sb, LV_ANIM_OFF);
+    /*With snapping the content can't be scrolled in*/
+    if(lv_obj_get_scroll_snap_y(obj) == LV_SCROLL_SNAP_NONE) {
+        lv_coord_t st = lv_obj_get_scroll_top(obj);
+        lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
+        if(sb < 0 && st > 0) {
+            sb = LV_MIN(st, -sb);
+            lv_obj_scroll_by(obj, 0, sb, LV_ANIM_OFF);
+        }
     }
 
-    lv_coord_t sl = lv_obj_get_scroll_left(obj);
-    lv_coord_t sr = lv_obj_get_scroll_right(obj);
-    if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
-        /*Be sure the left side is not remains scrolled in*/
-        if(sr < 0 && sl > 0) {
-            sr = LV_MIN(sl, -sr);
-            lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
-        }
-    } else {
-        /*Be sure the right side is not remains scrolled in*/
-        if(sl < 0 && sr > 0) {
-            sr = LV_MIN(sr, -sl);
-            lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
+    if(lv_obj_get_scroll_snap_x(obj) == LV_SCROLL_SNAP_NONE) {
+        lv_coord_t sl = lv_obj_get_scroll_left(obj);
+        lv_coord_t sr = lv_obj_get_scroll_right(obj);
+        if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
+            /*Be sure the left side is not remains scrolled in*/
+            if(sr < 0 && sl > 0) {
+                sr = LV_MIN(sl, -sr);
+                lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
+            }
+        } else {
+            /*Be sure the right side is not remains scrolled in*/
+            if(sl < 0 && sr > 0) {
+                sr = LV_MIN(sr, -sl);
+                lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
+            }
         }
     }
 
