@@ -916,6 +916,7 @@ static void layout_update_core(lv_obj_t * obj)
     lv_obj_refr_size(obj);
     lv_obj_refr_pos(obj);
 
+    if()
     /*Be sure the bottom side is not remains scrolled in*/
     lv_coord_t st = lv_obj_get_scroll_top(obj);
     lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
