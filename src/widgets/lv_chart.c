@@ -38,7 +38,7 @@
  **********************/
 static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_chart_event(lv_event_t * e);
+static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 static void draw_div_lines(lv_obj_t * obj , const lv_area_t * mask);
 static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area);
@@ -611,8 +611,10 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_chart_event(lv_event_t * e)
+static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     /*Call the ancestor's event handler*/
     lv_res_t res;
 

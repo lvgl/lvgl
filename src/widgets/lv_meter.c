@@ -29,7 +29,7 @@
  **********************/
 static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_meter_event(lv_event_t * e);
+static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -278,8 +278,10 @@ static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 }
 
-static void lv_meter_event(lv_event_t * e)
+static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 

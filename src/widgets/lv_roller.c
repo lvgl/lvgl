@@ -29,8 +29,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_roller_event(lv_event_t * e);
-static void lv_roller_label_event(lv_event_t * e);
+static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
@@ -303,8 +303,10 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_LOG_TRACE("finshed");
 }
 
-static void lv_roller_event(lv_event_t * e)
+static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
@@ -400,8 +402,10 @@ static void lv_roller_event(lv_event_t * e)
     }
 }
 
-static void lv_roller_label_event(lv_event_t * e)
+static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     lv_event_code_t code = lv_event_get_code(e);

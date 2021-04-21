@@ -23,7 +23,7 @@
  **********************/
 
 static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_spinbox_event(lv_event_t * e);
+static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
 /**********************
@@ -294,8 +294,10 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_LOG_TRACE("Spinbox constructor finished");
 }
 
-static void lv_spinbox_event(lv_event_t * e)
+static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     /*Call the ancestor's event handler*/
     lv_res_t res = LV_RES_OK;
     res = lv_obj_event_base(MY_CLASS, e);

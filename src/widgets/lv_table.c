@@ -31,7 +31,7 @@
  **********************/
 static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_table_event(lv_event_t * e);
+static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
@@ -459,8 +459,10 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(table->row_h) lv_mem_free(table->row_h);
 }
 
-static void lv_table_event(lv_event_t * e)
+static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/

@@ -36,7 +36,7 @@
  **********************/
 static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_label_event_cb(lv_event_t * e);
+static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 static void lv_label_refr_text(lv_obj_t * obj);
@@ -55,7 +55,7 @@ static void set_ofs_y_anim(void * obj, int32_t v);
 const lv_obj_class_t lv_label_class = {
     .constructor_cb = lv_label_constructor,
     .destructor_cb = lv_label_destructor,
-    .event_cb = lv_label_event_cb,
+    .event_cb = lv_label_event,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class
 };
@@ -738,8 +738,10 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->text = NULL;
 }
 
-static void lv_label_event_cb(lv_event_t * e)
+static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/

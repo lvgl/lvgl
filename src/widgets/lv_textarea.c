@@ -44,7 +44,7 @@
  **********************/
 static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_textarea_event(lv_event_t * e);
+static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
 static void pwd_char_hider_anim_ready(lv_anim_t * a);
@@ -831,8 +831,10 @@ static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 }
 
-static void lv_textarea_event(lv_event_t * e)
+static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);

@@ -32,7 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_slider_event(lv_event_t * e);
+static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
 static void draw_knob(lv_event_t * e);
 
@@ -90,8 +90,10 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_obj_set_height(obj, LV_DPX(10));
 }
 
-static void lv_slider_event(lv_event_t * e)
+static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/

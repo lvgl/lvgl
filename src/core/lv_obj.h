@@ -27,7 +27,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define _LV_EVENT_FLAG_BUBBLED 0x80
 
 /**********************
  *      TYPEDEFS
@@ -96,7 +95,7 @@ typedef enum {
 }lv_event_code_t;
 
 
-typedef struct {
+typedef struct _lv_event_t {
     struct _lv_obj_t * target;
     struct _lv_obj_t * original_target;
     lv_event_code_t code;

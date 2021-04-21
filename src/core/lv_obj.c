@@ -60,7 +60,7 @@ typedef struct _lv_event_dsc_t{
 static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_draw(lv_event_t * e);
-static void lv_obj_event_cb(lv_event_t * e);
+static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
@@ -80,7 +80,7 @@ static lv_obj_t * event_original_target;
 const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
-    .event_cb = lv_obj_event_cb,
+    .event_cb = lv_obj_event,
     .width_def = LV_DPI_DEF,
     .height_def = LV_DPI_DEF,
     .editable = LV_OBJ_CLASS_EDITABLE_FALSE,
@@ -250,7 +250,7 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 
     /*Call the actual event callback*/
     e->user_data = NULL;
-    base->event_cb(e);
+    base->event_cb(base, e);
 
     lv_res_t res = LV_RES_OK;
     /*Stop if the object is deleted*/
@@ -830,10 +830,10 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 #endif
 }
 
-#include "lvgl/lvgl.h"
-
-static void lv_obj_event_cb(lv_event_t * e)
+static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_PRESSED) {

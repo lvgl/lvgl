@@ -33,7 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_colorwheel_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_colorwheel_event(lv_event_t * e);
+static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 static void draw_disc_grad(lv_event_t * e);
 static void draw_knob(lv_event_t * e);
@@ -337,8 +337,10 @@ static lv_area_t get_knob_area(lv_obj_t * obj)
     return knob_area;
 }
 
-static void lv_colorwheel_event(lv_event_t * e)
+static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     /*Call the ancestor's event handler*/
     lv_res_t res = lv_obj_event_base(MY_CLASS, e);
 
