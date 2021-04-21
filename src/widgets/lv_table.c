@@ -50,6 +50,7 @@ const lv_obj_class_t lv_table_class  = {
     .height_def = LV_SIZE_CONTENT,
     .base_class = &lv_obj_class,
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_table_t),
 };
 /**********************

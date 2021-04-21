@@ -252,6 +252,19 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
 #define LV_COORD_GET_PCT(x)  _LV_COORD_PLAIN(x)
 #define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(1001)
 
+LV_EXPORT_CONST_INT(LV_SIZE_CONTENT);
+
+/**
+ * Convert a percentage value to `lv_coord_t`.
+ * Percentage values are stored in special range
+ * @param x the percentage (0..1000)
+ * @return a coordinate that stores the percentage
+ */
+static inline lv_coord_t lv_pct(lv_coord_t x)
+{
+    return LV_PCT(x);
+}
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

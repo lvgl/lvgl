@@ -43,12 +43,11 @@ const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class};
  */
 lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
 {
-    lv_obj_t * parent = lv_obj_create(lv_layer_top());
-    lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
-
+    lv_obj_t * parent = lv_obj_create(lv_scr_act());
     lv_obj_remove_style_all(parent);
     lv_obj_set_style_bg_color(parent, lv_color_grey(), 0);
     lv_obj_set_style_bg_opa(parent, LV_OPA_50, 0);
+    lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
 
     lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent);
     LV_ASSERT_MALLOC(mbox);

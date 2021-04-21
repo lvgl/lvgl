@@ -51,6 +51,7 @@ const lv_obj_class_t lv_roller_class = {
         .height_def = LV_DPI_DEF,
         .instance_size = sizeof(lv_roller_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
+        .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
         .base_class = &lv_obj_class
 };
 
@@ -484,8 +485,8 @@ static void draw_main(lv_event_t * e)
             lv_coord_t roller_h = lv_obj_get_height(obj);
             int32_t label_y_prop = label->coords.y1 - (roller_h / 2 +
                     obj->coords.y1); /*label offset from the middle line of the roller*/
-            label_y_prop = (label_y_prop << 14) / lv_obj_get_height(
-                               label); /*Proportional position from the middle line (upscaled)*/
+            label_y_prop = (label_y_prop * 16384) / lv_obj_get_height(
+                               label); /*Proportional position from the middle line (upscaled by << 14)*/
 
             /*Apply a correction with different line heights*/
             const lv_font_t * normal_label_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);

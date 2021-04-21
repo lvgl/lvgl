@@ -147,6 +147,16 @@ void lv_init(void)
         LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.")
     }
 
+    uint32_t endianess_test = 0x11223344;
+    uint8_t * endianess_test_p = (uint8_t*) &endianess_test;
+    bool big_endian = endianess_test_p[0] == 0x11 ? true : false;
+
+    if(big_endian) {
+        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1, "It's a big endian system but LV_BIG_ENDIAN_SYSTEM is not enabled in lv_conf.h");
+    } else {
+        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 0, "It's a little endian system but LV_BIG_ENDIAN_SYSTEM is enabled in lv_conf.h");
+    }
+
 #if LV_USE_ASSERT_MEM_INTEGRITY
     LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower")
 #endif

@@ -62,6 +62,7 @@ const lv_obj_class_t lv_btnmatrix_class = {
         .height_def = LV_DPI_DEF,
         .instance_size = sizeof(lv_btnmatrix_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
+        .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
         .base_class = &lv_obj_class
     };
 

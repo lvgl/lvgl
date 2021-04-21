@@ -667,7 +667,9 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     bool mask_ret = _lv_area_intersect(&series_mask, &obj->coords, clip_area);
     if(mask_ret == false) return;
 
-    uint16_t i;
+    int16_t i;
+    int16_t i_start;
+    int16_t i_end;
     lv_point_t p1;
     lv_point_t p2;
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
@@ -679,13 +681,25 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
+    lv_opa_t border_opa = lv_obj_get_style_border_opa(obj, LV_PART_MAIN);
+    lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, LV_PART_MAIN);
+
     lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
     lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
     if(chart->hdiv_cnt != 0) {
         lv_coord_t y_ofs = obj->coords.y1 + pad_top - scroll_top;
         p1.x = obj->coords.x1;
         p2.x = obj->coords.x2;
-        for(i = 0; i < chart->hdiv_cnt; i++) {
+
+        i_start = 0;
+        i_end = chart->hdiv_cnt;
+        if(border_opa > LV_OPA_MIN && border_w > 0) {
+            if(border_side & LV_BORDER_SIDE_TOP) i_start++;
+            if(border_side & LV_BORDER_SIDE_BOTTOM) i_end--;
+        }
+
+        for(i = i_start; i < i_end; i++) {
             p1.y = (int32_t)((int32_t)(h - line_dsc.width) * i) / (chart->hdiv_cnt - 1);
             p1.y += y_ofs;
             p2.y = p1.y;
@@ -697,7 +711,14 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
         lv_coord_t x_ofs = obj->coords.x1 + pad_left - scroll_left;
         p1.y = obj->coords.y1;
         p2.y = obj->coords.y2;
-        for(i = 0; i < chart->vdiv_cnt; i++) {
+        i_start = 0;
+        i_end = chart->vdiv_cnt;
+        if(border_opa > LV_OPA_MIN && border_w > 0) {
+            if(border_side & LV_BORDER_SIDE_LEFT) i_start++;
+            if(border_side & LV_BORDER_SIDE_RIGHT) i_end--;
+        }
+
+        for(i = i_start; i < i_end; i++) {
             p1.x = (int32_t)((int32_t)(w - line_dsc.width) * i) / (chart->vdiv_cnt - 1);
             p1.x += x_ofs;
             p2.x = p1.x;
