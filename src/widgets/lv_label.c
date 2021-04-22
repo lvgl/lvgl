@@ -505,8 +505,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
         logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL,
                                                txt_len, lv_obj_get_base_dir(obj), cid, &is_rtl);
         if(is_rtl) logical_pos++;
-        lv_mem_buf_release(bidi_txt);
     }
+	lv_mem_buf_release(bidi_txt);
 #else
     logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif

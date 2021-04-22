@@ -395,24 +395,26 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 
     ta->cursor.pos = pos;
 
-    /*Position the label to make the cursor show*/
-    lv_point_t cur_pos;
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_area_t label_cords;
-    lv_area_t ta_cords;
-    lv_label_get_letter_pos(ta->label, pos, &cur_pos);
-    lv_obj_get_coords(obj, &ta_cords);
-    lv_obj_get_coords(ta->label, &label_cords);
+    /*Position the label to make the cursor visible*/
+	lv_point_t cur_pos;
+	const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+	lv_area_t label_cords;
+	lv_area_t ta_cords;
+	lv_label_get_letter_pos(ta->label, pos, &cur_pos);
+	lv_obj_get_coords(obj, &ta_cords);
+	lv_obj_get_coords(ta->label, &label_cords);
 
-    /*Check the top*/
-    lv_coord_t font_h = lv_font_get_line_height(font);
-    if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
-        lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
-    }
-    /*Check the bottom*/
-    lv_coord_t h = lv_obj_get_content_height(obj);
-    if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
-        lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE)) {
+		/*Check the top*/
+		lv_coord_t font_h = lv_font_get_line_height(font);
+		if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
+			lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
+		}
+		/*Check the bottom*/
+		lv_coord_t h = lv_obj_get_content_height(obj);
+		if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
+			lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+		}
     }
 
     ta->cursor.valid_x = cur_pos.x;

@@ -127,6 +127,7 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
  */
 void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
 {
+	if(disp == NULL) disp = lv_disp_get_default();
     disp->theme = th;
 
     if(disp->screen_cnt == 3 &&
