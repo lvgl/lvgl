@@ -22,7 +22,7 @@
 #define COLOR_MID     lv_color_grey_lighten_1()
 #define COLOR_DARK    lv_color_grey()
 #define COLOR_DIM     lv_color_grey_darken_2()
-#define PAD_DEF       LV_DPX(10)
+#define PAD_DEF       LV_DPX(5)
 
 /**********************
  *      TYPEDEFS
@@ -35,6 +35,9 @@ typedef struct {
     lv_style_t pressed;
     lv_style_t disabled;
     lv_style_t pad_zero;
+#if LV_USE_TEXTAREA
+    lv_style_t ta_cursor;
+#endif
 } my_theme_styles_t;
 
 
@@ -77,7 +80,7 @@ static void style_init(void)
     style_init_reset(&styles->scrollbar);
     lv_style_set_bg_opa(&styles->scrollbar, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scrollbar, lv_color_grey_darken_2());
-    lv_style_set_size(&styles->scrollbar,  PAD_DEF / 2);
+    lv_style_set_width(&styles->scrollbar,  PAD_DEF);
 
     style_init_reset(&styles->scr);
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
@@ -132,6 +135,15 @@ static void style_init(void)
     style_init_reset(&styles->pad_zero);
     lv_style_set_pad_all(&styles->pad_zero, 0);
     lv_style_set_pad_gap(&styles->pad_zero, 0);
+
+#if LV_USE_TEXTAREA
+    style_init_reset(&styles->ta_cursor);
+    lv_style_set_border_side(&styles->ta_cursor, LV_BORDER_SIDE_LEFT);
+    lv_style_set_border_color(&styles->ta_cursor, COLOR_DIM);
+    lv_style_set_border_width(&styles->ta_cursor, 2);
+    lv_style_set_bg_opa(&styles->ta_cursor, LV_OPA_TRANSP);
+    lv_style_set_anim_time(&styles->ta_cursor, 500);
+#endif
 }
 
 
@@ -334,7 +346,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
         lv_obj_add_style(obj, &styles->light, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
-        lv_obj_add_style(obj, &styles->dark, LV_PART_CURSOR);
+        lv_obj_add_style(obj, &styles->ta_cursor, LV_PART_CURSOR);
         lv_obj_add_style(obj, &styles->light, LV_PART_TEXTAREA_PLACEHOLDER);
     }
 #endif
