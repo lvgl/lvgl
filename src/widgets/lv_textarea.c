@@ -44,7 +44,7 @@
  **********************/
 static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_textarea_event(lv_event_t * e);
+static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
 static void pwd_char_hider_anim_ready(lv_anim_t * a);
@@ -410,7 +410,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
         lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
     }
     /*Check the bottom*/
-    lv_coord_t h = lv_obj_get_height_fit(obj);
+    lv_coord_t h = lv_obj_get_content_height(obj);
     if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
         lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
     }
@@ -831,8 +831,10 @@ static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 }
 
-static void lv_textarea_event(lv_event_t * e)
+static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
@@ -855,7 +857,7 @@ static void lv_textarea_event(lv_event_t * e)
     else if(code == LV_EVENT_SIZE_CHANGED) {
         /*Set the label width according to the text area width*/
         if(ta->label) {
-            lv_obj_set_width(ta->label, lv_obj_get_width_fit(obj));
+            lv_obj_set_width(ta->label, lv_obj_get_content_width(obj));
             lv_obj_set_pos(ta->label, 0, 0);
             lv_label_set_text(ta->label, NULL); /*Refresh the label*/
 

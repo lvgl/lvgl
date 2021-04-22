@@ -34,7 +34,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_switch_event(lv_event_t * e);
+static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 /**********************
@@ -80,8 +80,10 @@ static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 }
 
 
-static void lv_switch_event(lv_event_t * e)
+static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/

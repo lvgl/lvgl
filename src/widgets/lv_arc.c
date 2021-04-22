@@ -32,7 +32,7 @@
 
 static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_arc_draw(lv_event_t * e);
-static void lv_arc_event(lv_event_t * e);
+static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, lv_part_t part);
 static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
@@ -509,8 +509,10 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_arc_event(lv_event_t * e)
+static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/

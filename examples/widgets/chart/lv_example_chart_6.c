@@ -83,7 +83,6 @@ void lv_example_chart_6(void)
     lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Click on a point");
     lv_obj_align_to(label, chart, LV_ALIGN_OUT_TOP_MID, 0, -5);
-
 }
 
 #endif

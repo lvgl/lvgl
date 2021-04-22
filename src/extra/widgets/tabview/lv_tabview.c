@@ -245,7 +245,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
     lv_point_t p;
     lv_obj_get_scroll_end(cont, &p);
 
-    lv_coord_t w = lv_obj_get_width_fit(cont);
+    lv_coord_t w = lv_obj_get_content_width(cont);
     lv_coord_t t = (p.x + w/ 2) / w;
     if(t < 0) t = 0;
     lv_tabview_set_act(tv, t, LV_ANIM_ON);

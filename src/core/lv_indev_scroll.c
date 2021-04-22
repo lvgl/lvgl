@@ -437,6 +437,9 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
             case LV_SCROLL_SNAP_CENTER:
                 x_child = child->coords.x1 + lv_area_get_width(&child->coords) / 2;
                 x_parent = obj->coords.x1 + pad_left + (lv_area_get_width(&obj->coords) - pad_left - pad_right) / 2;
+                break;
+            default:
+                continue;
             }
 
             x_child += ofs;
@@ -487,6 +490,9 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
             case LV_SCROLL_SNAP_CENTER:
                 y_child = child->coords.y1 + lv_area_get_height(&child->coords) / 2;
                 y_parent = obj->coords.y1 + pad_top + (lv_area_get_height(&obj->coords) - pad_top - pad_bottom) / 2;
+                break;
+            default:
+                continue;
             }
 
             y_child += ofs;

@@ -208,11 +208,11 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     lv_coord_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
     bool auto_w = w_set == LV_SIZE_CONTENT ? true : false;
-    lv_coord_t cont_w = lv_obj_get_width_fit(cont);
+    lv_coord_t cont_w = lv_obj_get_content_width(cont);
     calc_out->grid_w = grid_place(cont_w, auto_w, get_grid_col_place(cont), col_gap, calc_out->col_num, calc_out->w, calc_out->x, rev);
 
     bool auto_h = h_set == LV_SIZE_CONTENT ? true : false;
-    lv_coord_t cont_h = lv_obj_get_height_fit(cont);
+    lv_coord_t cont_h = lv_obj_get_content_height(cont);
     calc_out->grid_h = grid_place(cont_h, auto_h, get_grid_row_place(cont), row_gap, calc_out->row_num, calc_out->h, calc_out->y, false);
 
     LV_ASSERT_MEM_INTEGRITY();
@@ -233,7 +233,7 @@ static void calc_free(_lv_grid_calc_t * calc)
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
     const lv_coord_t * col_templ = get_col_dsc(cont);
-    lv_coord_t cont_w = lv_obj_get_width_fit(cont);
+    lv_coord_t cont_w = lv_obj_get_content_width(cont);
 
     c->col_num = count_tracks(col_templ);
     c->x = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
@@ -338,7 +338,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     }
 
     lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
-    lv_coord_t cont_h = lv_obj_get_height_fit(cont) - row_gap * (c->row_num - 1);
+    lv_coord_t cont_h = lv_obj_get_content_height(cont) - row_gap * (c->row_num - 1);
     lv_coord_t free_h = cont_h - grid_h;
     if(free_h < 0) free_h = 0;
 
@@ -447,8 +447,8 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     }
 
     /*Handle percentage value of translate*/
-    lv_coord_t tr_x = lv_obj_get_style_transform_x(item, LV_PART_MAIN);
-    lv_coord_t tr_y = lv_obj_get_style_transform_y(item, LV_PART_MAIN);
+    lv_coord_t tr_x = lv_obj_get_style_translate_x(item, LV_PART_MAIN);
+    lv_coord_t tr_y = lv_obj_get_style_translate_y(item, LV_PART_MAIN);
     lv_coord_t w = lv_obj_get_width(item);
     lv_coord_t h = lv_obj_get_height(item);
     if(LV_COORD_IS_PCT(tr_x)) tr_x = (w * LV_COORD_GET_PCT(tr_x)) / 100;

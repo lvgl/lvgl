@@ -47,7 +47,7 @@
  **********************/
 static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_bar_event(lv_event_t * e);
+static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_indic(lv_event_t * e);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
@@ -466,8 +466,10 @@ static void draw_indic(lv_event_t * e)
 #endif
 }
 
-static void lv_bar_event(lv_event_t * e)
+static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/

@@ -198,11 +198,11 @@ lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_va
    return lv_style_get_prop_inlined(style, prop, value);
 }
 
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, lv_anim_path_cb_t path_xcb, uint32_t time, uint32_t delay)
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay)
 {
     lv_memset_00(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
-    tr->path_cb = path_xcb == NULL ? lv_anim_path_linear : path_xcb;
+    tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
     tr->time = time;
     tr->delay = delay;
 }
@@ -211,7 +211,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 {
     lv_style_value_t value;
     switch(prop) {
-        case LV_STYLE_TRANSFORM_ZOOM:
+        case LV_STYLE_TRANSLATE_ZOOM:
             value.num = LV_IMG_ZOOM_NONE;
             break;
         case LV_STYLE_BG_COLOR:

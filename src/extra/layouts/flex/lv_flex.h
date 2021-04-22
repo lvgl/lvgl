@@ -97,8 +97,6 @@ void lv_obj_set_flex_place(lv_obj_t * obj, lv_flex_place_t main_place, lv_flex_p
  */
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow);
 
-
-
 static inline void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value)
 {
     lv_style_value_t v = {

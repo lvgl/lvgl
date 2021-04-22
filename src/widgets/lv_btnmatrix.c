@@ -34,7 +34,7 @@
  **********************/
 static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_btnmatrix_event(lv_event_t * e);
+static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -103,8 +103,8 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     lv_coord_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-    lv_coord_t max_w            = lv_obj_get_width_fit(obj);
-    lv_coord_t max_h            = lv_obj_get_height_fit(obj);
+    lv_coord_t max_w            = lv_obj_get_content_width(obj);
+    lv_coord_t max_h            = lv_obj_get_content_height(obj);
 
     /*Count the lines to calculate button height*/
     uint8_t row_cnt = 1;
@@ -387,8 +387,10 @@ static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_TRACE_OBJ_CREATE("finshed");
 }
 
-static void lv_btnmatrix_event(lv_event_t * e)
+static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
