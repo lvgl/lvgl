@@ -829,7 +829,10 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
         lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
         lv_obj_t * sel  = lv_list_get_btn_selected(list);
-        if(sel == btn) lv_list_focus_btn(list, lv_list_get_next_btn(list, btn));
+        if(sel == btn) {
+            ext->act_sel_btn = NULL;
+            lv_list_focus_btn(list, lv_list_get_next_btn(list, btn));
+        }
         if(ext->last_sel_btn == btn) ext->last_sel_btn = NULL;
 #endif
     }
