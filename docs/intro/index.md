@@ -1,0 +1,222 @@
+```eval_rst
+.. include:: /header.rst 
+:github_url: |github_link_base|/intro/index.md
+```
+
+# Introduction
+
+LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
+
+
+## Key features
+- Powerful building blocks such as buttons, charts, lists, sliders, images etc.
+- Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
+- Various input devices such as touchpad, mouse, keyboard, encoder etc.
+- Multi-language support with UTF-8 encoding
+- Multi-display support, i.e. use more TFT, monochrome displays simultaneously
+- Fully customizable graphic elements
+- Hardware independent to use with any microcontroller or display
+- Scalable to operate with little memory (64 kB Flash, 16 kB RAM)
+- OS, External memory and GPU supported but not required
+- Single frame buffer operation even with advanced graphical effects
+- Written in C for maximal compatibility (C++ compatible)
+- Simulator to start embedded GUI design on a PC without embedded hardware
+- Binding to MicroPython
+- Tutorials, examples, themes for rapid GUI design
+- Documentation is available as online and offline
+- Free and open-source under MIT license
+
+## Requirements
+Basically, every modern controller  (which is able to drive a display) is suitable to run LVGL. The minimal requirements are:
+<ul>
+<li> 16, 32 or 64 bit microcontroller or processor</li>
+<li>&gt; 16 MHz clock speed is recommended</li>
+<li> Flash/ROM: &gt; 64 kB for the very essential components (&gt; 180 kB is recommended)</li>
+<li> RAM: 
+  <ul>
+    <li> Static RAM usage: ~2 kB depending on the used features and objects types</li>
+    <li> Stack: &gt; 2kB (&gt; 8 kB is recommended)</li>
+    <li> Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects).
+	    Set by <em>LV_MEM_SIZE</em> in <em>lv_conf.h</em>. </li>
+    <li> Display buffer:  &gt; <em>"Horizontal resolution"</em> pixels (&gt; 10 &times; <em>"Horizontal resolution"</em> is recommended) </li>
+    <li> One frame buffer in the MCU or in external display controller</li>
+	</ul>
+</li>
+<li> C99 or newer compiler</li>
+<li> Basic C (or C++) knowledge: 
+          <a href="https://www.tutorialspoint.com/cprogramming/c_pointers.htm">pointers</a>, 
+          <a href="https://www.tutorialspoint.com/cprogramming/c_structures.htm">structs</a>, 
+          <a href="https://www.geeksforgeeks.org/callbacks-in-c/">callbacks</a></li>
+</ul>
+<em>Note that the memory usage might vary depending on the architecture, compiler and build options.</em>
+
+## License
+The LVGL project (including all repositories) is licensed under [MIT license](https://github.com/lvgl/lvgl/blob/master/LICENCE.txt). 
+It means you can use it even in commercial projects.
+
+It's not mandatory but we highly appreciate it if you write a few words about your project in the [My projects](https://forum.lvgl.io/c/my-projects/10) category of the Forum or a private message from [lvgl.io](https://lvgl.io/#contact).
+
+Although you can get LVGL for free there is a huge work behind it. It's created by a group of volunteers who made it available for you in their free time.
+
+To make the LVGL project sustainable, please consider [Contributing](/contributing/index) to the project. 
+You can choose from [many ways of contributions](/contributing/index) such as simply writing a tweet about you are using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
+
+## Repository layout
+All repositories of the LVGL project are hosted n GitHub: https://github.com/lvgl
+
+You fill these repositories there:
+- [lvgl](https://github.com/lvgl/lvgl) The library itself
+- [lv_examples](https://github.com/lvgl/lv_examples) Examples and demos
+- [lv_drivers](https://github.com/lvgl/lv_drivers) Display and input device drivers
+- [docs](https://github.com/lvgl/docs) Source of the documentation's site (https://docs.lvgl.io)
+- [blog](https://github.com/lvgl/blog) Source of the blog's site (https://blog.lvgl.io)
+- [sim](https://github.com/lvgl/sim) Source of the online simulator's site (https://sim.lvgl.io)
+- [lv_sim_...](https://github.com/lvgl?q=lv_sim&type=&language=) Simulator projects for various IDEs and platforms
+- [lv_port_...](https://github.com/lvgl?q=lv_port&type=&language=) LVGL ports to development boards
+- [lv_binding_..](https://github.com/lvgl?q=lv_binding&type=&language=l) Bindings to other languages
+- [lv_...](https://github.com/lvgl?q=lv_&type=&language=) Ports to other platforms
+
+The [lvgl](https://github.com/lvgl/lvgl),  [lv_examples](https://github.com/lvgl/lv_examples) and [lv_drivers](https://github.com/lvgl/lv_drivers) are the core repositories which gets the most attentions regarding maintenance. 
+
+## Release policy
+
+The core repositories follow the rules of [Semantic versioning](https://semver.org/):
+- Major versions for incompatible API changes. E.g. v5.0.0, v6.0.0
+- Minor version for new but backward-compatible functionalities. E.g. v6.1.0, v6.2.0
+- Patch version for backward-compatible bug fixes. E.g. v6.1.1, v6.1.2
+
+### Branches
+The core repositories have at least the following branches:
+- `master` latest version, patches are merged directly here. 
+- `dev` merge new features here until they are merged into `master`.
+- `release/vX` stable versions of the major releases
+
+### Release cycle
+
+LVGL has 2 weeks release cycle. On every first and third Tuesday of a month:
+1. A major, minor or bug fix release is created (based on the new features) from the `master` branch
+2. `master` is merged into `release/vX`
+3. Immediately after the release `dev` is merged into `master` 
+4. In the upcoming 2 weeks the new features in `master` can be tested
+5. Bug fixes are merged directly into `master`
+6. After 2 weeks start again from the first point
+
+### Tags
+
+Tags like `vX.Y.Z` are created for every release.
+
+### Changelog
+
+The changes are recorded in [CHANGELOG.md](https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md).
+
+### Side projects
+The [docs](https://github.com/lvgl/docs) is rebuilt on every release. By default, the `latest` documentation is displayed which is for the current `master` branch of lvgl. 
+The documentation of earlier versions is available from the menu on the left. 
+
+The simulator, porting, and other projects are updated with best effort. Pull requests are welcome if you updated one of them.
+
+### Version support
+In the core repositories each major version has a branch (e.g. `release/v6`). All the minor and patch releases of that major version are merged there. 
+
+It makes possible to add fixed older versions without bothering the newer ones.
+
+All major versions are officially supported for 1 year.
+
+
+## FAQ
+
+### Where can I ask questions?
+You can ask questions in the Forum: [https://forum.lvgl.io/](https://forum.lvgl.io/).
+
+We use [GitHub issues](https://github.com/lvgl/lvgl/issues) for development related discussion. 
+So you should use them only if your question or issue is tightly related to the development of the library. 
+
+### Is my MCU/hardware supported?
+Every MCU which is capable of driving a display via Parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](#requirements) is supported by LLVGL.
+
+It includes:
+- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32 etc. 
+- Bluetooth, GSM, WiFi modules like Nordic NRF and Espressif ESP32
+- Linux frame buffer like /dev/fb0 which includes Single-board computers too like Raspberry Pi
+- And anything else with a strong enough MCU and a periphery to drive a display
+
+### Is my display supported?
+LVGL needs just one simple driver function to copy an array of pixels into a given area of the display. 
+If you can do this with your display then you can use that display with LVGL.
+
+Some examples of the supported display types:
+- TFTs with 16 or 24 bit color depth 
+- Monitors with HDMI port
+- Small monochrome displays
+- Gray-scale displays
+- even LED matrices
+- or any other display where you can control the color/state of the pixels
+
+See the [Porting](/porting/display) section to learn more.
+
+### Nothing happens, my display driver is not called. What have I missed?
+Be sure you are calling `lv_tick_inc(x)` in an interrupt and `lv_task_handler()` in your main `while(1)`.
+
+Learn more in the [Tick](/porting/tick) and [Task handler](/porting/task-handler) section.
+
+### Why the display driver is called only once? Only the upper part of the display is refreshed. 
+Be sure you are calling `lv_disp_flush_ready(drv)` at the end of your "*display flush callback*". 
+
+### Why I see only garbage on the screen?
+Probably there a bug in your display driver. Try the following code without using LVGL. You should see a square with red-blue gradient
+
+```c
+#define BUF_W 20
+#define BUF_H 10
+
+lv_color_t buf[BUF_W * BUF_H];
+lv_color_t * buf_p = buf;
+uint16_t x, y;
+for(y = 0; y &lt; BUF_H; y++) {
+    lv_color_t c = lv_color_mix(LV_COLOR_BLUE, LV_COLOR_RED, (y * 255) / BUF_H);
+    for(x = 0; x &lt; BUF_W; x++){
+        (*buf_p) =  c;
+        buf_p++;
+    }
+}
+
+lv_area_t a;
+a.x1 = 10;
+a.y1 = 40;
+a.x2 = a.x1 + BUF_W - 1;
+a.y2 = a.y1 + BUF_H - 1;
+my_flush_cb(NULL, &a, buf);
+```
+
+### Why I see non-sense colors on the screen? 
+Probably LVGL's color format is not compatible with your displays color format. Check `LV_COLOR_DEPTH` in *lv_conf.h*.
+
+If you are using 16 bit colors with SPI (or other byte-oriented interface) probably you need to set `LV_COLOR_16_SWAP  1` in *lv_conf.h*. 
+It swaps the upper and lower bytes of the pixels.
+
+### How to speed up my UI?
+- Turn on compiler optimization and enable cache if your MCU has
+- Increase the size of the display buffer
+- Use 2 display buffers and flush the buffer with DMA (or similar periphery) in the background 
+- Increase the clock speed of the SPI or Parallel port if you use them to drive the display
+- If your display has SPI port consider changing to a model with parallel because it has much higher throughput
+- Keep the display buffer in the internal RAM (not in external SRAM) because LVGL uses it a lot and it should have a small access time
+ 
+### How to reduce flash/ROM usage?
+You can disable all the unused features (such as animations, file system, GPU etc.) and object types in *lv_conf.h*.
+
+If you are using GCC you can add 
+- `-fdata-sections -ffunction-sections` compiler flags 
+- `--gc-sections` linker flag
+
+to remove unused functions and variables from the final binary
+
+### How to reduce the RAM usage
+- Lower the size of the *Display buffer* 
+- Reduce `LV_MEM_SIZE` in *lv_conf.h*. This memory used when you create objects like buttons, labels, etc.
+- To work with lower `LV_MEM_SIZE` you can create the objects only when required and deleted them when they are not required anymore
+ 
+### How to work with an operating system?
+
+To work with an operating system where tasks can interrupt each other (preemptive) you should protect LVGL related function calls with a mutex.
+See the [Operating system and interrupts](/porting/os) section to learn more.

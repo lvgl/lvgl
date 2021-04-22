@@ -159,6 +159,7 @@ void lv_test_assert_ptr_eq(const void * p_ref, const void * p_act, const char * 
 
 void lv_test_assert_color_eq(lv_color_t c_ref, lv_color_t c_act, const char * s)
 {
+#if LV_COLOR_16_SWAP == 0
     if(c_ref.full != c_act.full) {
         lv_test_error("   FAIL: %s. (Expected:  R:%02x, G:%02x, B:%02x, Actual: R:%02x, G:%02x, B:%02x)",  s,
                 c_ref.ch.red, c_ref.ch.green, c_ref.ch.blue,
@@ -167,6 +168,12 @@ void lv_test_assert_color_eq(lv_color_t c_ref, lv_color_t c_act, const char * s)
         lv_test_print("   PASS: %s. (Expected: R:%02x, G:%02x, B:%02x)", s,
                 c_ref.ch.red, c_ref.ch.green, c_ref.ch.blue);
     }
+#else
+    LV_UNUSED(c_ref);
+    LV_UNUSED(c_act);
+    LV_UNUSED(s);
+    lv_test_print("   SKIP");
+#endif
 }
 
 void lv_test_assert_img_eq(const char * fn_ref, const char * s)
@@ -176,10 +183,10 @@ void lv_test_assert_img_eq(const char * fn_ref, const char * s)
     return;
 #endif
 
-#if LV_HOR_RES_MAX != 800 || LV_VER_RES_MAX != 480
-    lv_test_print("   SKIP: Can't compare '%s' because the resolution needs to be 800x480 (LV_HOR_RES_MAX, LV_VER_RES_MAX)", fn_ref);
+if (LV_HOR_RES != 800 || LV_VER_RES != 480) {
+    lv_test_print("   SKIP: Can't compare '%s' because the resolution needs to be 800x480", fn_ref);
     return;
-#endif
+}
 
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
@@ -240,7 +247,7 @@ static void read_png_file(png_img_t * p, const char* file_name)
 {
     char header[8];    // 8 is the maximum size that can be checked
 
-    /* open file and test for it being a png */
+    /*open file and test for it being a png*/
     FILE *fp = fopen(file_name, "rb");
     if (!fp)
         lv_test_exit("[read_png_file] File %s could not be opened for reading", file_name);
@@ -248,7 +255,7 @@ static void read_png_file(png_img_t * p, const char* file_name)
     if (rcnt != 8 || png_sig_cmp((png_const_bytep)header, 0, 8))
         lv_test_exit("[read_png_file] File %s is not recognized as a PNG file", file_name);
 
-    /* initialize stuff */
+    /*initialize stuff*/
     p->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
     if (!p->png_ptr)
@@ -274,7 +281,7 @@ static void read_png_file(png_img_t * p, const char* file_name)
     p->number_of_passes = png_set_interlace_handling(p->png_ptr);
     png_read_update_info(p->png_ptr, p->info_ptr);
 
-    /* read file */
+    /*read file*/
     if (setjmp(png_jmpbuf(p->png_ptr)))
         lv_test_exit("[read_png_file] Error during read_image");
 
@@ -292,13 +299,13 @@ static void read_png_file(png_img_t * p, const char* file_name)
 //
 //static void write_png_file(png_img_t * p, const char* file_name)
 //{
-//    /* create file */
+//    /*create file*/
 //    FILE *fp = fopen(file_name, "wb");
 //    if (!fp)
 //        lv_test_exit("[write_png_file] File %s could not be opened for writing", file_name);
 //
 //
-//    /* initialize stuff */
+//    /*initialize stuff*/
 //    p->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 //
 //    if (!p->png_ptr)
@@ -314,7 +321,7 @@ static void read_png_file(png_img_t * p, const char* file_name)
 //    png_init_io(p->png_ptr, fp);
 //
 //
-//    /* write header */
+//    /*write header*/
 //    if (setjmp(png_jmpbuf(p->png_ptr)))
 //        lv_test_exit("[write_png_file] Error during writing header");
 //
@@ -325,14 +332,14 @@ static void read_png_file(png_img_t * p, const char* file_name)
 //    png_write_info(p->png_ptr, p->info_ptr);
 //
 //
-//    /* write bytes */
+//    /*write bytes*/
 //    if (setjmp(png_jmpbuf(p->png_ptr)))
 //        lv_test_exit("[write_png_file] Error during writing bytes");
 //
 //    png_write_image(p->png_ptr, p->row_pointers);
 //
 //
-//    /* end write */
+//    /*end write*/
 //    if (setjmp(png_jmpbuf(p->png_ptr)))
 //        lv_test_exit("[write_png_file] Error during end of write");
 //
@@ -367,7 +374,7 @@ static void png_release(png_img_t * p)
 //            printf("Pixel at position [ %d - %d ] has RGBA values: %d - %d - %d - %d\n",
 //                    x, y, ptr[0], ptr[1], ptr[2], ptr[3]);
 //
-//            /* set red value to 0 and green value to the blue one */
+//            /*set red value to 0 and green value to the blue one*/
 //            ptr[0] = 0;
 //            ptr[1] = ptr[2];
 //        }

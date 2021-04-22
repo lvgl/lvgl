@@ -32,7 +32,7 @@ void lv_test_font_loader(void);
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TEST_FONT_LOADER_H*/

@@ -1,0 +1,1176 @@
+/**
+ * @file lv_obj.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+#include "lv_obj.h"
+#include "lv_indev.h"
+#include "lv_refr.h"
+#include "lv_group.h"
+#include "lv_disp.h"
+#include "lv_theme.h"
+#include "../misc/lv_assert.h"
+#include "../draw/lv_draw.h"
+#include "../misc/lv_anim.h"
+#include "../misc/lv_timer.h"
+#include "../misc/lv_async.h"
+#include "../misc/lv_fs.h"
+#include "../misc/lv_gc.h"
+#include "../misc/lv_math.h"
+#include "../misc/lv_log.h"
+#include "../hal/lv_hal.h"
+#include "../extra/lv_extra.h"
+#include <stdint.h>
+#include <string.h>
+
+#if LV_USE_GPU_STM32_DMA2D
+    #include "../gpu/lv_gpu_stm32_dma2d.h"
+#endif
+
+/*********************
+ *      DEFINES
+ *********************/
+#define MY_CLASS &lv_obj_class
+#define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
+#define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
+#define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
+#define STYLE_TRANSITION_MAX 32
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+typedef struct _lv_event_temp_data {
+    lv_obj_t * obj;
+    bool deleted;
+    struct _lv_event_temp_data * prev;
+} lv_event_temp_data_t;
+
+typedef struct _lv_event_dsc_t{
+    lv_event_cb_t cb;
+    void * user_data;
+    lv_event_code_t filter :8;
+}lv_event_dsc_t;
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_obj_draw(lv_event_t * e);
+static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
+static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
+static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
+static lv_res_t event_send_core(lv_obj_t * obj, lv_event_code_t event_code, void * param);
+static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
+static void base_dir_refr_children(lv_obj_t * obj);
+static bool event_is_bubbled(lv_event_code_t e);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+static bool lv_initialized = false;
+static lv_event_temp_data_t * event_temp_data_head;
+static void * event_act_param;
+static void * event_act_user_data_cb;
+static lv_obj_t * event_original_target;
+const lv_obj_class_t lv_obj_class = {
+    .constructor_cb = lv_obj_constructor,
+    .destructor_cb = lv_obj_destructor,
+    .event_cb = lv_obj_event,
+    .width_def = LV_DPI_DEF,
+    .height_def = LV_DPI_DEF,
+    .editable = LV_OBJ_CLASS_EDITABLE_FALSE,
+    .group_def = LV_OBJ_CLASS_GROUP_DEF_FALSE,
+    .instance_size = (sizeof(lv_obj_t)),
+    .base_class = NULL,
+};
+
+/**********************
+ *      MACROS
+ **********************/
+#if LV_LOG_TRACE_EVENT
+#  define EVENT_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+#else
+#  define EVENT_TRACE(...)
+#endif
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+void lv_init(void)
+{
+    /*Do nothing if already initialized*/
+    if(lv_initialized) {
+        LV_LOG_WARN("lv_init: already inited");
+        return;
+    }
+
+    LV_LOG_INFO("begin");
+
+    /*Initialize the misc modules*/
+    lv_mem_init();
+
+    _lv_timer_core_init();
+
+    _lv_fs_init();
+
+    _lv_anim_core_init();
+
+    _lv_group_init();
+
+#if LV_USE_GPU_STM32_DMA2D
+    /*Initialize DMA2D GPU*/
+    lv_gpu_stm32_dma2d_init();
+#endif
+
+    _lv_obj_style_init();
+    _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
+
+    /*Initialize the screen refresh system*/
+    _lv_refr_init();
+
+    _lv_img_decoder_init();
+#if LV_IMG_CACHE_DEF_SIZE
+    lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
+#endif
+    /*Test if the IDE has UTF-8 encoding*/
+    char * txt = "Á";
+
+    uint8_t * txt_u8 = (uint8_t *)txt;
+    if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
+        LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.")
+    }
+
+    uint32_t endianess_test = 0x11223344;
+    uint8_t * endianess_test_p = (uint8_t*) &endianess_test;
+    bool big_endian = endianess_test_p[0] == 0x11 ? true : false;
+
+    if(big_endian) {
+        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1, "It's a big endian system but LV_BIG_ENDIAN_SYSTEM is not enabled in lv_conf.h");
+    } else {
+        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 0, "It's a little endian system but LV_BIG_ENDIAN_SYSTEM is enabled in lv_conf.h");
+    }
+
+#if LV_USE_ASSERT_MEM_INTEGRITY
+    LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower")
+#endif
+
+#if LV_USE_ASSERT_OBJ
+    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower")
+#endif
+
+#if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
+    LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
+#endif
+
+    lv_extra_init();
+
+    lv_initialized = true;
+
+    LV_LOG_TRACE("finished");
+}
+
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+
+void lv_deinit(void)
+{
+    _lv_gc_clear_roots();
+
+    lv_disp_set_default(NULL);
+    lv_mem_deinit();
+    lv_initialized = false;
+
+    LV_LOG_INFO("lv_deinit done");
+
+#if LV_USE_LOG
+    lv_log_register_print_cb(NULL);
+#endif
+}
+#endif
+
+lv_obj_t * lv_obj_create(lv_obj_t * parent)
+{
+    return lv_obj_create_from_class(&lv_obj_class, parent);
+}
+
+/*---------------------
+ * Event/Signal sending
+ *---------------------*/
+
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event, void * param)
+{
+    if(obj == NULL) return LV_RES_OK;
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    /*Save the original target first in tmp variable because nested `lv_event_send` calls can overwrite it*/
+    lv_obj_t * event_original_target_tmp = event_original_target;
+    event_original_target = obj;
+
+    /*Send the event*/
+    lv_res_t res = event_send_core(obj, event, param);
+
+    /*Restore the original target*/
+    event_original_target = event_original_target_tmp;
+
+    return res;
+}
+
+
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
+{
+    const lv_obj_class_t * base;
+    if(class_p == NULL) base = e->target->class_p;
+    else base = class_p->base_class;
+
+    /*Find a base in which Call the ancestor's event handler_cb is set*/
+    while(base && base->event_cb == NULL) base = base->base_class;
+
+    if(base == NULL) return LV_RES_OK;
+    if(base->event_cb == NULL) return LV_RES_OK;
+
+    /* Build a simple linked list from the objects used in the events
+     * It's important to know if an this object was deleted by a nested event
+     * called from this `event_cb`. */
+    lv_event_temp_data_t event_temp_data;
+    event_temp_data.obj     = e->target;
+    event_temp_data.deleted = false;
+    event_temp_data.prev    = NULL;
+
+    if(event_temp_data_head) {
+        event_temp_data.prev = event_temp_data_head;
+    }
+    event_temp_data_head = &event_temp_data;
+
+    /*Call the actual event callback*/
+    e->user_data = NULL;
+    base->event_cb(base, e);
+
+    lv_res_t res = LV_RES_OK;
+    /*Stop if the object is deleted*/
+    if(event_temp_data.deleted) res = LV_RES_INV;
+
+    /*Remove this element from the list*/
+    event_temp_data_head = event_temp_data_head->prev;
+
+    return res;
+}
+
+
+lv_obj_t * lv_event_get_target(lv_event_t * e)
+{
+    return e->target;
+}
+
+lv_event_code_t lv_event_get_code(lv_event_t * e)
+{
+    return e->code;
+}
+
+void * lv_event_get_param(lv_event_t * e)
+{
+    return e->param;
+}
+
+void * lv_event_get_user_data(lv_event_t * e)
+{
+    return e->user_data;
+}
+
+lv_obj_t * lv_event_get_original_target(void)
+{
+    return event_original_target;
+}
+
+uint32_t lv_event_register_id(void)
+{
+    static uint32_t last_id = _LV_EVENT_LAST;
+    last_id ++;
+    return last_id;
+}
+
+void _lv_event_mark_deleted(lv_obj_t * obj)
+{
+    lv_event_temp_data_t * t = event_temp_data_head;
+
+    while(t) {
+        if(t->obj == obj) t->deleted = true;
+        t = t->prev;
+    }
+}
+
+/*=====================
+ * Setter functions
+ *====================*/
+
+/*-----------------
+ * Attribute set
+ *----------------*/
+
+void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    bool was_on_layout = lv_obj_is_layout_positioned(obj);
+
+    if(f & LV_OBJ_FLAG_HIDDEN) lv_obj_invalidate(obj);
+
+    obj->flags |= f;
+
+    if(f & LV_OBJ_FLAG_HIDDEN) {
+        lv_obj_invalidate(obj);
+    }
+
+    if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+    }
+}
+
+void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    bool was_on_layout = lv_obj_is_layout_positioned(obj);
+
+    obj->flags &= (~f);
+
+    if(f & LV_OBJ_FLAG_HIDDEN) {
+        lv_obj_invalidate(obj);
+        if(lv_obj_is_layout_positioned(obj)) {
+            lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        }
+    }
+
+    if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+    }
+}
+
+void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_state_t new_state = obj->state | state;
+    if(obj->state != new_state) {
+        lv_obj_set_state(obj, new_state);
+    }
+}
+
+void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_state_t new_state = obj->state & (~state);
+    if(obj->state != new_state) {
+        lv_obj_set_state(obj, new_state);
+    }
+}
+
+struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_obj_allocate_spec_attr(obj);
+
+    obj->spec_attr->event_dsc_cnt++;
+    obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+    LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
+
+    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
+    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].filter = filter;
+    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].user_data = user_data;
+
+    return &obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1];
+}
+
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr == NULL) return false;
+
+    int32_t i = 0;
+    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
+        if(obj->spec_attr->event_dsc[i].cb == event_cb) {
+            /*Shift the remaining event handlers forward*/
+            for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
+                obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
+                obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
+            }
+            obj->spec_attr->event_dsc_cnt--;
+            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
+            return true;
+        }
+    }
+
+    /*No event handler found*/
+    return false;
+}
+
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr == NULL) return false;
+
+    int32_t i = 0;
+    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
+        if(&obj->spec_attr->event_dsc[i] == event_dsc) {
+            /*Shift the remaining event handlers forward*/
+            for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
+                obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
+                obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
+            }
+            obj->spec_attr->event_dsc_cnt--;
+            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
+            return true;
+        }
+    }
+
+    /*No event handler found*/
+    return false;
+}
+
+void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
+{
+    if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
+       dir != LV_BIDI_DIR_AUTO && dir != LV_BIDI_DIR_INHERIT) {
+
+        LV_LOG_WARN("lv_obj_set_base_dir: invalid base direction: %d", dir);
+        return;
+    }
+
+    lv_obj_allocate_spec_attr(obj);
+    obj->spec_attr->base_dir = dir;
+    lv_event_send(obj, LV_EVENT_BASE_DIR_CHANGED, NULL);
+
+    /*Notify the children about the parent base dir has changed.
+     *(The children might have `LV_BIDI_DIR_INHERIT`)*/
+    base_dir_refr_children(obj);
+}
+
+
+/*=======================
+ * Getter functions
+ *======================*/
+
+bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return (obj->flags & f)  == f ? true : false;
+}
+
+bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return (obj->flags & f) ? true : false;
+}
+
+lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+#if LV_USE_BIDI
+    if(obj->spec_attr == NULL) return LV_BIDI_DIR_LTR;
+    const lv_obj_t * parent = obj;
+
+    while(parent) {
+        /*If the base dir set use it. If not set assume INHERIT so got the next parent*/
+        if(parent->spec_attr) {
+            if(parent->spec_attr->base_dir != LV_BIDI_DIR_INHERIT) return parent->spec_attr->base_dir;
+        }
+
+        parent = lv_obj_get_parent(parent);
+    }
+
+    return LV_BIDI_BASE_DIR_DEF;
+#else
+    (void) obj;  /*Unused*/
+    return LV_BIDI_DIR_LTR;
+#endif
+}
+
+lv_state_t lv_obj_get_state(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return obj->state;
+}
+
+
+bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return obj->state & state ? true : false;
+}
+
+lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(!obj->spec_attr) return NULL;
+    if(id >= obj->spec_attr->event_dsc_cnt) return NULL;
+
+    return &obj->spec_attr->event_dsc[id];
+}
+
+void * lv_obj_get_group(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(obj->spec_attr) return obj->spec_attr->group_p;
+    else return NULL;
+}
+
+/*-------------------
+ * OTHER FUNCTIONS
+ *------------------*/
+
+void lv_obj_allocate_spec_attr(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(obj->spec_attr == NULL) {
+        static uint32_t x = 0;
+        x++;
+        obj->spec_attr = lv_mem_alloc(sizeof(lv_obj_spec_attr_t));
+        LV_ASSERT_MALLOC(obj->spec_attr);
+        if(obj->spec_attr == NULL) return;
+
+        lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
+
+        obj->spec_attr->scroll_dir = LV_DIR_ALL;
+        obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
+        obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
+
+    }
+}
+
+lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
+{
+    if(obj == NULL) return NULL;
+    const lv_obj_t * focus_obj = obj;
+    while(lv_obj_has_flag(focus_obj, LV_OBJ_FLAG_FOCUS_BUBBLE) != false && focus_obj != NULL) {
+        focus_obj = lv_obj_get_parent(focus_obj);
+    }
+
+    return (lv_obj_t *)focus_obj;
+}
+
+bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
+{
+    if(obj == NULL) return false;
+    return obj->class_p == class_p ? true : false;
+}
+
+bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
+{
+    const lv_obj_class_t * obj_class = obj->class_p;
+    while(obj_class) {
+        if(obj_class == class_p) return true;
+        obj_class = obj_class->base_class;
+    }
+
+    return false;
+}
+
+const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
+{
+    return obj->class_p;
+}
+
+bool lv_obj_is_valid(const lv_obj_t * obj)
+{
+    lv_disp_t * disp = lv_disp_get_next(NULL);
+    while(disp) {
+        uint32_t i;
+        for(i = 0; i < disp->screen_cnt; i++) {
+            if(disp->screens[i] == obj) return true;
+            bool found = obj_valid_child(disp->screens[i], obj);
+            if(found) return true;
+        }
+
+        disp = lv_disp_get_next(disp);
+    }
+
+    return false;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+    LV_TRACE_OBJ_CREATE("begin");
+
+    lv_obj_t * parent = obj->parent;
+    if(parent) {
+        lv_coord_t sl = lv_obj_get_scroll_left(parent);
+        lv_coord_t st = lv_obj_get_scroll_top(parent);
+
+        obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top(parent, LV_PART_MAIN) - st;
+        obj->coords.y2 = obj->coords.y1 - 1;
+        obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left(parent, LV_PART_MAIN) - sl;
+        obj->coords.x2  = obj->coords.x1 - 1;
+    }
+
+    /*Set attributes*/
+    obj->flags = LV_OBJ_FLAG_CLICKABLE;
+    obj->flags |= LV_OBJ_FLAG_SNAPABLE;
+    if(parent) obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
+    if(parent) obj->flags |= LV_OBJ_FLAG_SCROLL_CHAIN;
+    obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
+    obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
+    obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
+    obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
+    if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
+
+    LV_TRACE_OBJ_CREATE("finished");
+}
+
+static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+
+    if(obj->spec_attr) {
+        if(obj->spec_attr->children) {
+            lv_mem_free(obj->spec_attr->children);
+            obj->spec_attr->children = NULL;
+        }
+        if(obj->spec_attr->event_dsc) {
+            lv_mem_free(obj->spec_attr->event_dsc);
+            obj->spec_attr->event_dsc = NULL;
+        }
+
+        lv_mem_free(obj->spec_attr);
+        obj->spec_attr = NULL;
+    }
+
+}
+
+static void lv_obj_draw(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_COVER_CHECK) {
+        lv_cover_check_info_t * info = lv_event_get_param(e);
+        if(info->res == LV_DRAW_RES_MASKED) return;
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+            info->res = LV_DRAW_RES_MASKED;
+            return;
+        }
+
+        /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
+        lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_area_t coords;
+        lv_area_copy(&coords, &obj->coords);
+        coords.x1 -= w;
+        coords.x2 += w;
+        coords.y1 -= h;
+        coords.y2 += h;
+
+        if(_lv_area_is_in(info->area, &coords, r) == false) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+           return;
+        }
+
+        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+            return;
+        }
+
+#if LV_DRAW_COMPLEX
+        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+            return;
+        }
+#endif
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_DRAW_RES_NOT_COVER;
+            return;
+        }
+
+        info->res = LV_DRAW_RES_COVER;
+
+    }
+    else if(code == LV_EVENT_DRAW_MAIN) {
+        const lv_area_t * clip_area = lv_event_get_param(e);
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
+        /*If the border is drawn later disable loading its properties*/
+        if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
+            draw_dsc.border_post = 1;
+        }
+
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
+
+        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_area_t coords;
+        lv_area_copy(&coords, &obj->coords);
+        coords.x1 -= w;
+        coords.x2 += w;
+        coords.y1 -= h;
+        coords.y2 += h;
+
+        lv_draw_rect(&coords, clip_area, &draw_dsc);
+
+#if LV_DRAW_COMPLEX
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+            lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+            lv_draw_mask_radius_init(mp, &obj->coords, r, false);
+            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
+            lv_draw_mask_add(mp, obj + 8);
+        }
+#endif
+    }
+    else if(code == LV_EVENT_DRAW_POST) {
+        const lv_area_t * clip_area = lv_event_get_param(e);
+        draw_scrollbar(obj, clip_area);
+
+#if LV_DRAW_COMPLEX
+        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+            lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
+            lv_mem_buf_release(param);
+        }
+#endif
+
+        /*If the border is drawn later disable loading other properties*/
+        if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
+            lv_draw_rect_dsc_t draw_dsc;
+            lv_draw_rect_dsc_init(&draw_dsc);
+            draw_dsc.bg_opa = LV_OPA_TRANSP;
+            draw_dsc.outline_opa = LV_OPA_TRANSP;
+            draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
+
+            lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+            lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+            lv_area_t coords;
+            lv_area_copy(&coords, &obj->coords);
+            coords.x1 -= w;
+            coords.x2 += w;
+            coords.y1 -= h;
+            coords.y2 += h;
+            lv_draw_rect(&coords, clip_area, &draw_dsc);
+        }
+    }
+}
+
+static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
+{
+
+    lv_area_t hor_area;
+    lv_area_t ver_area;
+    lv_obj_get_scrollbar_area(obj, &hor_area, &ver_area);
+
+    if(lv_area_get_size(&hor_area) <= 0 && lv_area_get_size(&ver_area) <= 0) return;
+
+    lv_draw_rect_dsc_t draw_dsc;
+    lv_res_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
+    if(sb_res != LV_RES_OK) return;
+
+    if(lv_area_get_size(&hor_area) > 0) lv_draw_rect(&hor_area, clip_area, &draw_dsc);
+    if(lv_area_get_size(&ver_area) > 0) lv_draw_rect(&ver_area, clip_area, &draw_dsc);
+}
+
+/**
+ * Initialize the draw descriptor for the scrollbar
+ * @param obj pointer to an object
+ * @param dsc the draw descriptor to initialize
+ * @return LV_RES_OK: the scrollbar is visible; LV_RES_INV: the scrollbar is not visible
+ */
+static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc)
+{
+    lv_draw_rect_dsc_init(dsc);
+    dsc->bg_opa = lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR);
+    if(dsc->bg_opa > LV_OPA_MIN) {
+        dsc->bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR);
+    }
+
+    dsc->border_opa = lv_obj_get_style_border_opa(obj, LV_PART_SCROLLBAR);
+    if(dsc->border_opa > LV_OPA_MIN) {
+        dsc->border_width = lv_obj_get_style_border_width(obj, LV_PART_SCROLLBAR);
+        if(dsc->border_width > 0) {
+            dsc->border_color = lv_obj_get_style_border_color(obj, LV_PART_SCROLLBAR);
+        } else {
+            dsc->border_opa = LV_OPA_TRANSP;
+        }
+    }
+
+#if LV_DRAW_COMPLEX
+    lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
+    if(opa < LV_OPA_MAX) {
+        dsc->bg_opa = (dsc->bg_opa * opa) >> 8;
+        dsc->border_opa = (dsc->bg_opa * opa) >> 8;
+    }
+
+    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) {
+        dsc->radius = lv_obj_get_style_radius(obj, LV_PART_SCROLLBAR);
+        return LV_RES_OK;
+    } else {
+        return LV_RES_INV;
+    }
+#else
+    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) return LV_RES_OK;
+    else return LV_RES_INV;
+#endif
+}
+
+static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
+{
+    LV_UNUSED(class_p);
+
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_PRESSED) {
+        lv_obj_add_state(obj, LV_STATE_PRESSED);
+    }
+    else if(code == LV_EVENT_RELEASED) {
+        lv_obj_clear_state(obj, LV_STATE_PRESSED);
+        void * param = lv_event_get_param(e);
+        /*Go the checked state if enabled*/
+        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+            if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
+            else lv_obj_clear_state(obj, LV_STATE_CHECKED);
+        }
+    }
+    else if(code == LV_EVENT_PRESS_LOST) {
+        lv_obj_clear_state(obj, LV_STATE_PRESSED);
+    }
+    else if(code == LV_EVENT_KEY) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+            uint32_t state = 0;
+            char c = *((char *)lv_event_get_param(e));
+            if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
+                lv_obj_add_state(obj, LV_STATE_CHECKED);
+                state = 1;
+            }
+            else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
+                lv_obj_clear_state(obj, LV_STATE_CHECKED);
+                state = 0;
+            }
+            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &state);
+            if(res != LV_RES_OK) return;
+        }
+    }
+    else if(code == LV_EVENT_FOCUSED) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
+            lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
+        }
+
+        bool editing = false;
+        editing = lv_group_get_editing(lv_obj_get_group(obj));
+        lv_state_t state = LV_STATE_FOCUSED;
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) state |= LV_STATE_FOCUS_KEY;
+        if(editing) {
+            state |= LV_STATE_EDITED;
+
+            /*if using focus mode, change target to parent*/
+            obj = lv_obj_get_focused_obj(obj);
+
+            lv_obj_add_state(obj, state);
+        }
+        else {
+            /*if using focus mode, change target to parent*/
+            obj = lv_obj_get_focused_obj(obj);
+
+            lv_obj_add_state(obj, state);
+            lv_obj_clear_state(obj, LV_STATE_EDITED);
+        }
+    }
+    else if(code == LV_EVENT_SCROLL_BEGIN) {
+        lv_obj_add_state(obj, LV_STATE_SCROLLED);
+    }
+    else if(code == LV_EVENT_SCROLL_END) {
+        lv_obj_clear_state(obj, LV_STATE_SCROLLED);
+    }
+    else if(code == LV_EVENT_DEFOCUSED) {
+        /*if using focus mode, change target to parent*/
+        obj = lv_obj_get_focused_obj(obj);
+
+        lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
+    }
+    else if(code == LV_EVENT_SIZE_CHANGED) {
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+
+            lv_obj_refr_size(child);
+            lv_obj_refr_pos(child);
+        }
+
+        lv_coord_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+        uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
+        if(layout || align) {
+            lv_obj_mark_layout_as_dirty(obj);
+        }
+    }
+    else if(code == LV_EVENT_CHILD_CHANGED) {
+        lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
+        lv_coord_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+        uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
+        if(layout || align || w == LV_SIZE_CONTENT || h == LV_SIZE_CONTENT) {
+            lv_obj_mark_layout_as_dirty(obj);
+        }
+    }
+    else if(code == LV_EVENT_BASE_DIR_CHANGED) {
+        /*The layout might depend on the base dir.
+         *E.g. the first is element is on the left or right*/
+        lv_obj_mark_layout_as_dirty(obj);
+    }
+    else if(code == LV_EVENT_SCROLL_END) {
+        if(lv_obj_get_scrollbar_mode(obj) == LV_SCROLLBAR_MODE_ACTIVE) {
+            lv_obj_invalidate(obj);
+        }
+    }
+    else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_coord_t * s = lv_event_get_param(e);
+        lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
+        *s = LV_MAX(*s, d);
+    }
+    else if(code == LV_EVENT_STYLE_CHANGED) {
+        /*Padding might have changed so the layout should be recalculated*/
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+
+            lv_obj_refr_size(child);
+            lv_obj_refr_pos(child);
+        }
+
+        lv_obj_mark_layout_as_dirty(obj);
+
+        lv_obj_refresh_ext_draw_size(obj);
+    }
+    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
+        lv_obj_draw(e);
+    }
+}
+
+/**
+ * Set the state (fully overwrite) of an object.
+ * If specified in the styles, transition animations will be started from the previous state to the current.
+ * @param obj       pointer to an object
+ * @param state     the new state
+ */
+static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
+{
+    if(obj->state == new_state) return;
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_state_t prev_state = obj->state;
+    obj->state = new_state;
+
+    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
+    /*If there is no difference in styles there is nothing else to do*/
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
+
+    _lv_obj_style_transition_dsc_t * ts = lv_mem_buf_get(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    lv_memset_00(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    uint32_t tsi = 0;
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
+        lv_obj_style_t * obj_style = &obj->styles[i];
+        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        if(state_act & (~new_state)) continue; /*Skip unrelated styles*/
+        if(obj_style->is_trans) continue;
+
+        lv_style_value_t v;
+        if(lv_style_get_prop_inlined(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
+        const lv_style_transition_dsc_t * tr = v.ptr;
+
+        /*Add the props t the set is not added yet or added but with smaller weight*/
+        uint32_t j;
+        for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
+            uint32_t t;
+            for(t = 0; t < tsi; t++) {
+                lv_state_t state_tr = lv_obj_style_get_selector_state(ts[t].selector);
+                if(ts[t].prop == tr->props[j] && state_tr >= state_act) break;
+            }
+
+            /*If not found  add it*/
+            if(t == tsi) {
+                ts[tsi].time = tr->time;
+                ts[tsi].delay = tr->delay;
+                ts[tsi].path_cb = tr->path_xcb;
+                ts[tsi].prop = tr->props[j];
+#if LV_USE_USER_DATA
+                ts[tsi].user_data = tr->user_data;
+#endif
+                ts[tsi].selector = obj_style->selector;
+                tsi++;
+            }
+        }
+    }
+
+    for(i = 0;i < tsi; i++) {
+        lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
+        _lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
+    }
+
+    lv_mem_buf_release(ts);
+
+    lv_obj_invalidate(obj);
+
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
+    }
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+        lv_obj_refresh_ext_draw_size(obj);
+    }
+}
+
+
+static void base_dir_refr_children(lv_obj_t * obj)
+{
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
+            lv_event_send(child, LV_EVENT_BASE_DIR_CHANGED, NULL);
+            base_dir_refr_children(child);
+        }
+    }
+}
+
+
+static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
+{
+
+    /*Check all children of `parent`*/
+    uint32_t child_cnt = 0;
+    if(parent->spec_attr) child_cnt = parent->spec_attr->child_cnt;
+    uint32_t i;
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = parent->spec_attr->children[i];
+        if(child == obj_to_find) {
+            return true;
+        }
+
+        /*Check the children*/
+        bool found = obj_valid_child(child, obj_to_find);
+        if(found) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static lv_res_t event_send_core(lv_obj_t * obj, lv_event_code_t event_code, void * param)
+{
+    EVENT_TRACE("Sending event %d to %p with %p param", event_code, obj, param);
+
+    /*Build a simple linked list from the objects used in the events
+     *It's important to know if an this object was deleted by a nested event
+     *called from this `event_cb`.*/
+    lv_event_temp_data_t event_temp_data;
+    event_temp_data.obj     = obj;
+    event_temp_data.deleted = false;
+    event_temp_data.prev    = NULL;
+
+    if(event_temp_data_head) {
+        event_temp_data.prev = event_temp_data_head;
+    }
+    event_temp_data_head = &event_temp_data;
+
+    /*There could be nested event sending with different param.
+     *It needs to be saved for the current event context because `lv_event_get_data` returns a global param.*/
+    void * event_act_param_save = event_act_param;
+    event_act_param = param;
+
+    /*Call the input device's feedback callback if set*/
+    lv_indev_t * indev_act = lv_indev_get_act();
+    if(indev_act) {
+        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event_code);
+    }
+
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
+    lv_res_t res = LV_RES_OK;
+    lv_event_t e;
+    e.code = event_code;
+    e.target = obj;
+    e.original_target = obj;
+    e.param = param;
+    res = lv_obj_event_base(NULL, &e);
+
+    uint32_t i = 0;
+    while(event_dsc && res == LV_RES_OK) {
+        if(event_dsc->cb && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == event_code)) {
+            void * event_act_user_data_cb_save = event_act_user_data_cb;
+            event_act_user_data_cb = event_dsc->user_data;
+
+            e.user_data = event_dsc->user_data;
+            event_dsc->cb(&e);
+
+            event_act_user_data_cb = event_act_user_data_cb_save;
+
+            /*Stop if the object is deleted*/
+            if(event_temp_data.deleted) {
+                res = LV_RES_INV;
+                break;
+            }
+        }
+
+        i++;
+        event_dsc = lv_obj_get_event_dsc(obj, i);
+    }
+
+    /*Restore the event_code param*/
+    event_act_param = event_act_param_save;
+
+    /*Remove this element from the list*/
+    event_temp_data_head = event_temp_data_head->prev;
+
+    if(res == LV_RES_OK && event_is_bubbled(event_code)) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
+            res = event_send_core(obj->parent, event_code, param);
+            if(res != LV_RES_OK) return LV_RES_INV;
+        }
+    }
+
+    return res;
+}
+
+static bool event_is_bubbled(lv_event_code_t e)
+{
+    switch(e) {
+    case LV_EVENT_HIT_TEST:
+    case LV_EVENT_COVER_CHECK:
+    case LV_EVENT_REFR_EXT_DRAW_SIZE:
+    case LV_EVENT_DRAW_MAIN_BEGIN:
+    case LV_EVENT_DRAW_MAIN:
+    case LV_EVENT_DRAW_MAIN_END:
+    case LV_EVENT_DRAW_POST_BEGIN:
+    case LV_EVENT_DRAW_POST:
+    case LV_EVENT_DRAW_POST_END:
+    case LV_EVENT_DRAW_PART_BEGIN:
+    case LV_EVENT_DRAW_PART_END:
+    case LV_EVENT_REFRESH:
+    case LV_EVENT_DELETE:
+    case LV_EVENT_CHILD_CHANGED:
+    case LV_EVENT_SIZE_CHANGED:
+    case LV_EVENT_STYLE_CHANGED:
+    case LV_EVENT_GET_SELF_SIZE:
+        return false;
+    default:
+        return true;
+    }
+}
+

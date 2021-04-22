@@ -4,13 +4,16 @@
 #include "lv_test_core/lv_test_core.h"
 #include "lv_test_widgets/lv_test_label.h"
 
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST && !defined(LV_BUILD_TEST_NO_MAIN)
 #include <sys/time.h>
+
+#define HOR_RES 800
+#define VER_RES 480
 
 static void hal_init(void);
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
-lv_color_t test_fb[LV_HOR_RES_MAX * LV_VER_RES_MAX];
+lv_color_t test_fb[HOR_RES * VER_RES];
 
 int main(void)
 {
@@ -20,30 +23,27 @@ int main(void)
     hal_init();
 
     lv_test_core();
-    lv_test_label();
+//    lv_test_label();
 
     printf("Exit with success!\n");
     return 0;
 }
 
-#if LV_USE_FILESYSTEM
-static lv_fs_res_t open_cb(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode)
+static void * open_cb(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     (void) drv;
     (void) mode;
 
     FILE * fp = fopen(path, "rb"); // only reading is supported
 
-    *((FILE **)file_p) = fp;
-    return NULL == fp ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+    return fp;
 }
 
 static lv_fs_res_t close_cb(struct _lv_fs_drv_t * drv, void * file_p)
 {
     (void) drv;
 
-    FILE * fp = *((FILE **) file_p);
-    fclose(fp);
+    fclose(file_p);
     return LV_FS_RES_OK;
 }
 
@@ -51,17 +51,30 @@ static lv_fs_res_t read_cb(struct _lv_fs_drv_t * drv, void * file_p, void * buf,
 {
     (void) drv;
 
-    FILE * fp = *((FILE **) file_p);
-    *br = fread(buf, 1, btr, fp);
+    *br = fread(buf, 1, btr, file_p);
     return (*br <= 0) ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
-static lv_fs_res_t seek_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos)
+static lv_fs_res_t seek_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t w)
 {
     (void) drv;
 
-    FILE * fp = *((FILE **) file_p);
-    fseek (fp, pos, SEEK_SET);
+    uint32_t w2;
+    switch(w) {
+    case LV_FS_SEEK_SET:
+        w2 = SEEK_SET;
+        break;
+    case LV_FS_SEEK_CUR:
+        w2 = SEEK_CUR;
+        break;
+    case LV_FS_SEEK_END:
+        w2 = SEEK_END;
+        break;
+    default:
+        w2 = SEEK_SET;
+    }
+
+    fseek (file_p, pos, w2);
 
     return LV_FS_RES_OK;
 }
@@ -70,47 +83,38 @@ static lv_fs_res_t tell_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * 
 {
     (void) drv;
 
-    FILE * fp = *((FILE **) file_p);
-    *pos_p = ftell(fp);
+    *pos_p = ftell(file_p);
 
     return LV_FS_RES_OK;
 }
 
-static bool ready_cb(struct _lv_fs_drv_t * drv)
-{
-    (void) drv;
-    return true;
-}
-#endif
 
 static void hal_init(void)
 {
-    static lv_disp_buf_t disp_buf;
+    static lv_disp_draw_buf_t draw_buf;
     lv_color_t * disp_buf1 = (lv_color_t *)malloc(LV_HOR_RES * LV_VER_RES * sizeof(lv_color_t));
 
-    lv_disp_buf_init(&disp_buf, disp_buf1, NULL, LV_HOR_RES * LV_VER_RES);
+    lv_disp_draw_buf_init(&draw_buf, disp_buf1, NULL, LV_HOR_RES * LV_VER_RES);
 
-    lv_disp_drv_t disp_drv;
+    static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
-    disp_drv.buffer = &disp_buf;
+    disp_drv.draw_buf = &draw_buf;
     disp_drv.flush_cb = dummy_flush_cb;
+    disp_drv.hor_res = HOR_RES;
+    disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
 
-#if LV_USE_FILESYSTEM
-    lv_fs_drv_t drv;
+    static lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
 
-    drv.letter = 'f';                         /*An uppercase letter to identify the drive */
-    drv.file_size = sizeof(FILE *);   /*Size required to store a file object*/
-    drv.ready_cb = ready_cb;               /*Callback to tell if the drive is ready to use */
-    drv.open_cb = open_cb;                 /*Callback to open a file */
-    drv.close_cb = close_cb;               /*Callback to close a file */
-    drv.read_cb = read_cb;                 /*Callback to read a file */
-    drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor) */
-    drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position  */
+    drv.letter = 'F';                         /*An uppercase letter to identify the drive*/
+    drv.open_cb = open_cb;                 /*Callback to open a file*/
+    drv.close_cb = close_cb;               /*Callback to close a file*/
+    drv.read_cb = read_cb;                 /*Callback to read a file*/
+    drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor)*/
+    drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position*/
 
     lv_fs_drv_register(&drv);                 /*Finally register the drive*/
-#endif
 }
 #include <stdio.h>
 
