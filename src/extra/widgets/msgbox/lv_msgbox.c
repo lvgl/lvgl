@@ -45,7 +45,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
 {
     lv_obj_t * parent = lv_obj_create(lv_scr_act());
     lv_obj_remove_style_all(parent);
-    lv_obj_set_style_bg_color(parent, lv_color_grey(), 0);
+    lv_obj_set_style_bg_color(parent, lv_palette_main(LV_PALETTE_GREY), 0);
     lv_obj_set_style_bg_opa(parent, LV_OPA_50, 0);
     lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
 

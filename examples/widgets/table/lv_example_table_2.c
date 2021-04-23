@@ -13,7 +13,7 @@ static void draw_event_cb(lv_event_t * e)
 
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_color_grey_lighten_2();
+        rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_palette_lighten(LV_PALETTE_GREY, 2);
         rect_dsc.radius = LV_RADIUS_CIRCLE;
 
         lv_area_t sw_area;

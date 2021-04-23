@@ -287,7 +287,7 @@ void lv_style_reset(lv_style_t * style);
  * ...
  * MY_PROP = lv_style_register_prop();
  * ...
- * lv_style_set_my_prop(&style1, lv_color_red());
+ * lv_style_set_my_prop(&style1, lv_palette_main(LV_PALETTE_RED));
  */
 lv_style_prop_t lv_style_register_prop(void);
 

@@ -12,8 +12,8 @@ void lv_example_style_1(void)
 
     /*Make a gradient*/
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
-    lv_style_set_bg_color(&style, lv_color_grey_lighten_3());
-    lv_style_set_bg_grad_color(&style, lv_color_blue());
+    lv_style_set_bg_color(&style, lv_palette_lighten(LV_PALETTE_GREY, 3));
+    lv_style_set_bg_grad_color(&style, lv_palette_main(LV_PALETTE_BLUE));
     lv_style_set_bg_grad_dir(&style, LV_GRAD_DIR_VER);
 
     /*Shift the gradient to the bottom*/

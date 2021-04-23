@@ -10,7 +10,7 @@ void lv_example_line_1(void)
     static lv_style_t style_line;
     lv_style_init(&style_line);
     lv_style_set_line_width(&style_line, 8);
-    lv_style_set_line_color(&style_line, lv_color_blue());
+    lv_style_set_line_color(&style_line, lv_palette_main(LV_PALETTE_BLUE));
     lv_style_set_line_rounded(&style_line, true);
 
     /*Create a line and apply the new style*/

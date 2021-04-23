@@ -276,28 +276,28 @@ typedef struct _lv_color_filter_dsc_t {
 
 
 typedef enum {
-    LV_COLOR_PALETTE_RED,
-    LV_COLOR_PALETTE_PINK,
-    LV_COLOR_PALETTE_PURPLE,
-    LV_COLOR_PALETTE_DEEP_PURPLE,
-    LV_COLOR_PALETTE_INDIGO,
-    LV_COLOR_PALETTE_BLUE,
-    LV_COLOR_PALETTE_LIGHT_BLUE,
-    LV_COLOR_PALETTE_CYAN,
-    LV_COLOR_PALETTE_TEAL,
-    LV_COLOR_PALETTE_GREEN,
-    LV_COLOR_PALETTE_LIGHT_GREEN,
-    LV_COLOR_PALETTE_LIME,
-    LV_COLOR_PALETTE_YELLOW,
-    LV_COLOR_PALETTE_AMBER,
-    LV_COLOR_PALETTE_ORANGE,
-    LV_COLOR_PALETTE_DEEP_ORANGE,
-    LV_COLOR_PALETTE_BROWN,
-    LV_COLOR_PALETTE_BLUE_GREY,
-    LV_COLOR_PALETTE_GREY,
-    _LV_COLOR_PALETTE_LAST,
-    LV_COLOR_PALETTE_NONE = 0xff,
-}lv_color_palette_t;
+    LV_PALETTE_RED,
+    LV_PALETTE_PINK,
+    LV_PALETTE_PURPLE,
+    LV_PALETTE_DEEP_PURPLE,
+    LV_PALETTE_INDIGO,
+    LV_PALETTE_BLUE,
+    LV_PALETTE_LIGHT_BLUE,
+    LV_PALETTE_CYAN,
+    LV_PALETTE_TEAL,
+    LV_PALETTE_GREEN,
+    LV_PALETTE_LIGHT_GREEN,
+    LV_PALETTE_LIME,
+    LV_PALETTE_YELLOW,
+    LV_PALETTE_AMBER,
+    LV_PALETTE_ORANGE,
+    LV_PALETTE_DEEP_ORANGE,
+    LV_PALETTE_BROWN,
+    LV_PALETTE_BLUE_GREY,
+    LV_PALETTE_GREY,
+    _LV_PALETTE_LAST,
+    LV_PALETTE_NONE = 0xff,
+}lv_palette_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -656,243 +656,36 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
  */
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
-lv_color_t lv_color_get_palette_main(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_main(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_lighten_1(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_lighten_1(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_lighten_2(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_lighten_2(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_lighten_3(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_lighten_3(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_lighten_4(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_lighten_4(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_lighten_5(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_lighten_5(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_darken_1(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_darken_1(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_darken_2(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_darken_2(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_darken_3(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_darken_3(lv_palette_t palette);
 
-lv_color_t lv_color_get_palette_darken_4(lv_color_palette_t palette);
+lv_color_t lv_color_get_palette_darken_4(lv_palette_t palette);
 
 /**********************
  *  PREDEFINED COLORS
  **********************/
 /*Source: https://vuetifyjs.com/en/styles/colors/#material-colors*/
 
-static inline lv_color_t lv_color_red(void)             { return lv_color_hex(0xF44336); }
-static inline lv_color_t lv_color_red_lighten_5(void)   { return lv_color_hex(0xFFEBEE); }
-static inline lv_color_t lv_color_red_lighten_4(void)   { return lv_color_hex(0xFFCDD2); }
-static inline lv_color_t lv_color_red_lighten_3(void)   { return lv_color_hex(0xEF9A9A); }
-static inline lv_color_t lv_color_red_lighten_2(void)   { return lv_color_hex(0xE57373); }
-static inline lv_color_t lv_color_red_lighten_1(void)   { return lv_color_hex(0xEF5350); }
-static inline lv_color_t lv_color_red_darken_1(void)    { return lv_color_hex(0xE53935); }
-static inline lv_color_t lv_color_red_darken_2(void)    { return lv_color_hex(0xD32F2F); }
-static inline lv_color_t lv_color_red_darken_3(void)    { return lv_color_hex(0xC62828); }
-static inline lv_color_t lv_color_red_darken_4(void)    { return lv_color_hex(0xB71C1C); }
-
-static inline lv_color_t lv_color_pink(void)            { return lv_color_hex(0xE91E63); }
-static inline lv_color_t lv_color_pink_lighten_5(void)  { return lv_color_hex(0xFCE4EC); }
-static inline lv_color_t lv_color_pink_lighten_4(void)  { return lv_color_hex(0xF8BBD0); }
-static inline lv_color_t lv_color_pink_lighten_3(void)  { return lv_color_hex(0xF48FB1); }
-static inline lv_color_t lv_color_pink_lighten_2(void)  { return lv_color_hex(0xF06292); }
-static inline lv_color_t lv_color_pink_lighten_1(void)  { return lv_color_hex(0xEC407A); }
-static inline lv_color_t lv_color_pink_darken_1(void)   { return lv_color_hex(0xD81B60); }
-static inline lv_color_t lv_color_pink_darken_2(void)   { return lv_color_hex(0xC2185B); }
-static inline lv_color_t lv_color_pink_darken_3(void)   { return lv_color_hex(0xAD1457); }
-static inline lv_color_t lv_color_pink_darken_4(void)   { return lv_color_hex(0x880E4F); }
-
-static inline lv_color_t lv_color_purple(void)              { return lv_color_hex(0x9C27B0); }
-static inline lv_color_t lv_color_purple_lighten_5(void)    { return lv_color_hex(0xF3E5F5); }
-static inline lv_color_t lv_color_purple_lighten_4(void)    { return lv_color_hex(0xE1BEE7); }
-static inline lv_color_t lv_color_purple_lighten_3(void)    { return lv_color_hex(0xCE93D8); }
-static inline lv_color_t lv_color_purple_lighten_2(void)    { return lv_color_hex(0xBA68C8); }
-static inline lv_color_t lv_color_purple_lighten_1(void)    { return lv_color_hex(0xAB47BC); }
-static inline lv_color_t lv_color_purple_darken_1(void)     { return lv_color_hex(0x8E24AA); }
-static inline lv_color_t lv_color_purple_darken_2(void)     { return lv_color_hex(0x7B1FA2); }
-static inline lv_color_t lv_color_purple_darken_3(void)     { return lv_color_hex(0x6A1B9A); }
-static inline lv_color_t lv_color_purple_darken_4(void)     { return lv_color_hex(0x4A148C); }
-
-static inline lv_color_t lv_color_deep_purple(void)             { return lv_color_hex(0x673AB7); }
-static inline lv_color_t lv_color_deep_purple_lighten_5(void)   { return lv_color_hex(0xEDE7F6); }
-static inline lv_color_t lv_color_deep_purple_lighten_4(void)   { return lv_color_hex(0xD1C4E9); }
-static inline lv_color_t lv_color_deep_purple_lighten_3(void)   { return lv_color_hex(0xB39DDB); }
-static inline lv_color_t lv_color_deep_purple_lighten_2(void)   { return lv_color_hex(0x9575CD); }
-static inline lv_color_t lv_color_deep_purple_lighten_1(void)   { return lv_color_hex(0x7E57C2); }
-static inline lv_color_t lv_color_deep_purple_darken_1(void)    { return lv_color_hex(0x5E35B1); }
-static inline lv_color_t lv_color_deep_purple_darken_2(void)    { return lv_color_hex(0x512DA8); }
-static inline lv_color_t lv_color_deep_purple_darken_3(void)    { return lv_color_hex(0x4527A0); }
-static inline lv_color_t lv_color_deep_purple_darken_4(void)    { return lv_color_hex(0x311B92); }
-
-static inline lv_color_t lv_color_indigo(void)              { return lv_color_hex(0x3F51B5); }
-static inline lv_color_t lv_color_indigo_lighten_5(void)    { return lv_color_hex(0xE8EAF6); }
-static inline lv_color_t lv_color_indigo_lighten_4(void)    { return lv_color_hex(0xC5CAE9); }
-static inline lv_color_t lv_color_indigo_lighten_3(void)    { return lv_color_hex(0x9FA8DA); }
-static inline lv_color_t lv_color_indigo_lighten_2(void)    { return lv_color_hex(0x7986CB); }
-static inline lv_color_t lv_color_indigo_lighten_1(void)    { return lv_color_hex(0x5C6BC0); }
-static inline lv_color_t lv_color_indigo_darken_1(void)     { return lv_color_hex(0x3949AB); }
-static inline lv_color_t lv_color_indigo_darken_2(void)     { return lv_color_hex(0x303F9F); }
-static inline lv_color_t lv_color_indigo_darken_3(void)     { return lv_color_hex(0x283593); }
-static inline lv_color_t lv_color_indigo_darken_4(void)     { return lv_color_hex(0x1A237E); }
-
-static inline lv_color_t lv_color_blue(void)            { return lv_color_hex(0x2196F3); }
-static inline lv_color_t lv_color_blue_lighten_5(void)  { return lv_color_hex(0xE3F2FD); }
-static inline lv_color_t lv_color_blue_lighten_4(void)  { return lv_color_hex(0xBBDEFB); }
-static inline lv_color_t lv_color_blue_lighten_3(void)  { return lv_color_hex(0x90CAF9); }
-static inline lv_color_t lv_color_blue_lighten_2(void)  { return lv_color_hex(0x64B5F6); }
-static inline lv_color_t lv_color_blue_lighten_1(void)  { return lv_color_hex(0x42A5F5); }
-static inline lv_color_t lv_color_blue_darken_1(void)   { return lv_color_hex(0x1E88E5); }
-static inline lv_color_t lv_color_blue_darken_2(void)   { return lv_color_hex(0x1976D2); }
-static inline lv_color_t lv_color_blue_darken_3(void)   { return lv_color_hex(0x1565C0); }
-static inline lv_color_t lv_color_blue_darken_4(void)   { return lv_color_hex(0x0D47A1); }
-
-static inline lv_color_t lv_color_light_blue(void)              { return lv_color_hex(0x03A9F4); }
-static inline lv_color_t lv_color_light_blue_lighten_5(void)    { return lv_color_hex(0xE1F5FE); }
-static inline lv_color_t lv_color_light_blue_lighten_4(void)    { return lv_color_hex(0xB3E5FC); }
-static inline lv_color_t lv_color_light_blue_lighten_3(void)    { return lv_color_hex(0x81D4FA); }
-static inline lv_color_t lv_color_light_blue_lighten_2(void)    { return lv_color_hex(0x4FC3F7); }
-static inline lv_color_t lv_color_light_blue_lighten_1(void)    { return lv_color_hex(0x29B6F6); }
-static inline lv_color_t lv_color_light_blue_darken_1(void)     { return lv_color_hex(0x039BE5); }
-static inline lv_color_t lv_color_light_blue_darken_2(void)     { return lv_color_hex(0x0288D1); }
-static inline lv_color_t lv_color_light_blue_darken_3(void)     { return lv_color_hex(0x0277BD); }
-static inline lv_color_t lv_color_light_blue_darken_4(void)     { return lv_color_hex(0x01579B); }
-
-static inline lv_color_t lv_color_cyan(void)            { return lv_color_hex(0x00BCD4); }
-static inline lv_color_t lv_color_cyan_lighten_5(void)  { return lv_color_hex(0xE0F7FA); }
-static inline lv_color_t lv_color_cyan_lighten_4(void)  { return lv_color_hex(0xB2EBF2); }
-static inline lv_color_t lv_color_cyan_lighten_3(void)  { return lv_color_hex(0x80DEEA); }
-static inline lv_color_t lv_color_cyan_lighten_2(void)  { return lv_color_hex(0x4DD0E1); }
-static inline lv_color_t lv_color_cyan_lighten_1(void)  { return lv_color_hex(0x26C6DA); }
-static inline lv_color_t lv_color_cyan_darken_1(void)   { return lv_color_hex(0x00ACC1); }
-static inline lv_color_t lv_color_cyan_darken_2(void)   { return lv_color_hex(0x0097A7); }
-static inline lv_color_t lv_color_cyan_darken_3(void)   { return lv_color_hex(0x00838F); }
-static inline lv_color_t lv_color_cyan_darken_4(void)   { return lv_color_hex(0x006064); }
-
-static inline lv_color_t lv_color_teal(void)            { return lv_color_hex(0x009688); }
-static inline lv_color_t lv_color_teal_lighten_5(void)  { return lv_color_hex(0xE0F2F1); }
-static inline lv_color_t lv_color_teal_lighten_4(void)  { return lv_color_hex(0xB2DFDB); }
-static inline lv_color_t lv_color_teal_lighten_3(void)  { return lv_color_hex(0x80CBC4); }
-static inline lv_color_t lv_color_teal_lighten_2(void)  { return lv_color_hex(0x4DB6AC); }
-static inline lv_color_t lv_color_teal_lighten_1(void)  { return lv_color_hex(0x26A69A); }
-static inline lv_color_t lv_color_teal_darken_1(void)   { return lv_color_hex(0x00897B); }
-static inline lv_color_t lv_color_teal_darken_2(void)   { return lv_color_hex(0x00796B); }
-static inline lv_color_t lv_color_teal_darken_3(void)   { return lv_color_hex(0x00695C); }
-static inline lv_color_t lv_color_teal_darken_4(void)   { return lv_color_hex(0x004D40); }
-
-static inline lv_color_t lv_color_green(void)           { return lv_color_hex(0x4CAF50); }
-static inline lv_color_t lv_color_green_lighten_5(void) { return lv_color_hex(0xE8F5E9); }
-static inline lv_color_t lv_color_green_lighten_4(void) { return lv_color_hex(0xC8E6C9); }
-static inline lv_color_t lv_color_green_lighten_3(void) { return lv_color_hex(0xA5D6A7); }
-static inline lv_color_t lv_color_green_lighten_2(void) { return lv_color_hex(0x81C784); }
-static inline lv_color_t lv_color_green_lighten_1(void) { return lv_color_hex(0x66BB6A); }
-static inline lv_color_t lv_color_green_darken_1(void)  { return lv_color_hex(0x43A047); }
-static inline lv_color_t lv_color_green_darken_2(void)  { return lv_color_hex(0x388E3C); }
-static inline lv_color_t lv_color_green_darken_3(void)  { return lv_color_hex(0x2E7D32); }
-static inline lv_color_t lv_color_green_darken_4(void)  { return lv_color_hex(0x1B5E20); }
-
-static inline lv_color_t lv_color_light_green(void)             { return lv_color_hex(0x8BC34A); }
-static inline lv_color_t lv_color_light_green_lighten_5(void)   { return lv_color_hex(0xF1F8E9); }
-static inline lv_color_t lv_color_light_green_lighten_4(void)   { return lv_color_hex(0xDCEDC8); }
-static inline lv_color_t lv_color_light_green_lighten_3(void)   { return lv_color_hex(0xC5E1A5); }
-static inline lv_color_t lv_color_light_green_lighten_2(void)   { return lv_color_hex(0xAED581); }
-static inline lv_color_t lv_color_light_green_lighten_1(void)   { return lv_color_hex(0x9CCC65); }
-static inline lv_color_t lv_color_light_green_darken_1(void)    { return lv_color_hex(0x7CB342); }
-static inline lv_color_t lv_color_light_green_darken_2(void)    { return lv_color_hex(0x689F38); }
-static inline lv_color_t lv_color_light_green_darken_3(void)    { return lv_color_hex(0x558B2F); }
-static inline lv_color_t lv_color_light_green_darken_4(void)    { return lv_color_hex(0x33691E); }
-
-static inline lv_color_t lv_color_lime(void)            { return lv_color_hex(0xCDDC39); }
-static inline lv_color_t lv_color_lime_lighten_5(void)  { return lv_color_hex(0xF9FBE7); }
-static inline lv_color_t lv_color_lime_lighten_4(void)  { return lv_color_hex(0xF0F4C3); }
-static inline lv_color_t lv_color_lime_lighten_3(void)  { return lv_color_hex(0xE6EE9C); }
-static inline lv_color_t lv_color_lime_lighten_2(void)  { return lv_color_hex(0xDCE775); }
-static inline lv_color_t lv_color_lime_lighten_1(void)  { return lv_color_hex(0xD4E157); }
-static inline lv_color_t lv_color_lime_darken_1(void)   { return lv_color_hex(0xC0CA33); }
-static inline lv_color_t lv_color_lime_darken_2(void)   { return lv_color_hex(0xAFB42B); }
-static inline lv_color_t lv_color_lime_darken_3(void)   { return lv_color_hex(0x9E9D24); }
-static inline lv_color_t lv_color_lime_darken_4(void)   { return lv_color_hex(0x827717); }
-
-static inline lv_color_t lv_color_yellow(void)              { return lv_color_hex(0xFFEB3B); }
-static inline lv_color_t lv_color_yellow_lighten_5(void)    { return lv_color_hex(0xFFFDE7); }
-static inline lv_color_t lv_color_yellow_lighten_4(void)    { return lv_color_hex(0xFFF9C4); }
-static inline lv_color_t lv_color_yellow_lighten_3(void)    { return lv_color_hex(0xFFF59D); }
-static inline lv_color_t lv_color_yellow_lighten_2(void)    { return lv_color_hex(0xFFF176); }
-static inline lv_color_t lv_color_yellow_lighten_1(void)    { return lv_color_hex(0xFFEE58); }
-static inline lv_color_t lv_color_yellow_darken_1(void)     { return lv_color_hex(0xFDD835); }
-static inline lv_color_t lv_color_yellow_darken_2(void)     { return lv_color_hex(0xFBC02D); }
-static inline lv_color_t lv_color_yellow_darken_3(void)     { return lv_color_hex(0xF9A825); }
-static inline lv_color_t lv_color_yellow_darken_4(void)     { return lv_color_hex(0xF57F17); }
-
-static inline lv_color_t lv_color_amber(void)           { return lv_color_hex(0xFFC107); }
-static inline lv_color_t lv_color_amber_lighten_5(void) { return lv_color_hex(0xFFF8E1); }
-static inline lv_color_t lv_color_amber_lighten_4(void) { return lv_color_hex(0xFFECB3); }
-static inline lv_color_t lv_color_amber_lighten_3(void) { return lv_color_hex(0xFFE082); }
-static inline lv_color_t lv_color_amber_lighten_2(void) { return lv_color_hex(0xFFD54F); }
-static inline lv_color_t lv_color_amber_lighten_1(void) { return lv_color_hex(0xFFCA28); }
-static inline lv_color_t lv_color_amber_darken_1(void)  { return lv_color_hex(0xFFB300); }
-static inline lv_color_t lv_color_amber_darken_2(void)  { return lv_color_hex(0xFFA000); }
-static inline lv_color_t lv_color_amber_darken_3(void)  { return lv_color_hex(0xFF8F00); }
-static inline lv_color_t lv_color_amber_darken_4(void)  { return lv_color_hex(0xFF6F00); }
-
-static inline lv_color_t lv_color_orange(void)              { return lv_color_hex(0xFF9800); }
-static inline lv_color_t lv_color_orange_lighten_5(void)    { return lv_color_hex(0xFFF3E0); }
-static inline lv_color_t lv_color_orange_lighten_4(void)    { return lv_color_hex(0xFFE0B2); }
-static inline lv_color_t lv_color_orange_lighten_3(void)    { return lv_color_hex(0xFFCC80); }
-static inline lv_color_t lv_color_orange_lighten_2(void)    { return lv_color_hex(0xFFB74D); }
-static inline lv_color_t lv_color_orange_lighten_1(void)    { return lv_color_hex(0xFFA726); }
-static inline lv_color_t lv_color_orange_darken_1(void)     { return lv_color_hex(0xFB8C00); }
-static inline lv_color_t lv_color_orange_darken_2(void)     { return lv_color_hex(0xF57C00); }
-static inline lv_color_t lv_color_orange_darken_3(void)     { return lv_color_hex(0xEF6C00); }
-static inline lv_color_t lv_color_orange_darken_4(void)     { return lv_color_hex(0xE65100); }
-
-static inline lv_color_t lv_color_deep_orange(void)             { return lv_color_hex(0xFF5722); }
-static inline lv_color_t lv_color_deep_orange_lighten_5(void)   { return lv_color_hex(0xFBE9E7); }
-static inline lv_color_t lv_color_deep_orange_lighten_4(void)   { return lv_color_hex(0xFFCCBC); }
-static inline lv_color_t lv_color_deep_orange_lighten_3(void)   { return lv_color_hex(0xFFAB91); }
-static inline lv_color_t lv_color_deep_orange_lighten_2(void)   { return lv_color_hex(0xFF8A65); }
-static inline lv_color_t lv_color_deep_orange_lighten_1(void)   { return lv_color_hex(0xFF7043); }
-static inline lv_color_t lv_color_deep_orange_darken_1(void)    { return lv_color_hex(0xF4511E); }
-static inline lv_color_t lv_color_deep_orange_darken_2(void)    { return lv_color_hex(0xE64A19); }
-static inline lv_color_t lv_color_deep_orange_darken_3(void)    { return lv_color_hex(0xD84315); }
-static inline lv_color_t lv_color_deep_orange_darken_4(void)    { return lv_color_hex(0xBF360C); }
-
-static inline lv_color_t lv_color_brown(void)           { return lv_color_hex(0x795548); }
-static inline lv_color_t lv_color_brown_lighten_5(void) { return lv_color_hex(0xEFEBE9); }
-static inline lv_color_t lv_color_brown_lighten_4(void) { return lv_color_hex(0xD7CCC8); }
-static inline lv_color_t lv_color_brown_lighten_3(void) { return lv_color_hex(0xBCAAA4); }
-static inline lv_color_t lv_color_brown_lighten_2(void) { return lv_color_hex(0xA1887F); }
-static inline lv_color_t lv_color_brown_lighten_1(void) { return lv_color_hex(0x8D6E63); }
-static inline lv_color_t lv_color_brown_darken_1(void)  { return lv_color_hex(0x6D4C41); }
-static inline lv_color_t lv_color_brown_darken_2(void)  { return lv_color_hex(0x5D4037); }
-static inline lv_color_t lv_color_brown_darken_3(void)  { return lv_color_hex(0x4E342E); }
-static inline lv_color_t lv_color_brown_darken_4(void)  { return lv_color_hex(0x3E2723); }
-
-static inline lv_color_t lv_color_blue_grey(void)           { return lv_color_hex(0x607D8B); }
-static inline lv_color_t lv_color_blue_grey_lighten_5(void) { return lv_color_hex(0xECEFF1); }
-static inline lv_color_t lv_color_blue_grey_lighten_4(void) { return lv_color_hex(0xCFD8DC); }
-static inline lv_color_t lv_color_blue_grey_lighten_3(void) { return lv_color_hex(0xB0BEC5); }
-static inline lv_color_t lv_color_blue_grey_lighten_2(void) { return lv_color_hex(0x90A4AE); }
-static inline lv_color_t lv_color_blue_grey_lighten_1(void) { return lv_color_hex(0x78909C); }
-static inline lv_color_t lv_color_blue_grey_darken_1(void)  { return lv_color_hex(0x546E7A); }
-static inline lv_color_t lv_color_blue_grey_darken_2(void)  { return lv_color_hex(0x455A64); }
-static inline lv_color_t lv_color_blue_grey_darken_3(void)  { return lv_color_hex(0x37474F); }
-static inline lv_color_t lv_color_blue_grey_darken_4(void)  { return lv_color_hex(0x263238); }
-
-static inline lv_color_t lv_color_grey(void)            { return lv_color_hex(0x9E9E9E); }
-static inline lv_color_t lv_color_grey_lighten_5(void)  { return lv_color_hex(0xFAFAFA); }
-static inline lv_color_t lv_color_grey_lighten_4(void)  { return lv_color_hex(0xF5F5F5); }
-static inline lv_color_t lv_color_grey_lighten_3(void)  { return lv_color_hex(0xEEEEEE); }
-static inline lv_color_t lv_color_grey_lighten_2(void)  { return lv_color_hex(0xE0E0E0); }
-static inline lv_color_t lv_color_grey_lighten_1(void)  { return lv_color_hex(0xBDBDBD); }
-static inline lv_color_t lv_color_grey_darken_1(void)   { return lv_color_hex(0x757575); }
-static inline lv_color_t lv_color_grey_darken_2(void)   { return lv_color_hex(0x616161); }
-static inline lv_color_t lv_color_grey_darken_3(void)   { return lv_color_hex(0x424242); }
-static inline lv_color_t lv_color_grey_darken_4(void)   { return lv_color_hex(0x212121); }
-
-static inline lv_color_t lv_color_white(void)            { return lv_color_hex(0xFFFFFF); }
-static inline lv_color_t lv_color_black(void)            { return lv_color_hex(0x000000); }
-
+lv_color_t lv_palette_main(lv_palette_t p);
+static inline lv_color_t lv_color_white(void) { return LV_COLOR_MAKE(0xff, 0xff, 0xff);};
+static inline lv_color_t lv_color_black(void) { return LV_COLOR_MAKE(0x00, 0x0, 0x00);};
+lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl);
+lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl);
 /**********************
  *      MACROS
  **********************/

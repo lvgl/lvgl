@@ -76,7 +76,7 @@ void lv_example_chart_5(void)
     /*Do not display points on the data*/
     lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
 
-    lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
 
     uint32_t pcnt = sizeof(ecg_sample) / sizeof(ecg_sample[0]);
     lv_chart_set_point_count(chart, pcnt);

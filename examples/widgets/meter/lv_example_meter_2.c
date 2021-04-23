@@ -22,14 +22,14 @@ void lv_example_meter_2(void)
 
     /*Add a scale first*/
     lv_meter_scale_t * scale = lv_meter_add_scale(meter);
-    lv_meter_set_scale_ticks(meter, scale, 11, 2, 10, lv_color_grey());
+    lv_meter_set_scale_ticks(meter, scale, 11, 2, 10, lv_palette_main(LV_PALETTE_GREY));
     lv_meter_set_scale_major_ticks(meter, scale, 1, 2, 30, lv_color_hex3(0xeee), 10);
     lv_meter_set_scale_range(meter, scale, 0, 100, 270, 90);
 
     /*Add a three arc indicator*/
-    lv_meter_indicator_t * indic1 = lv_meter_add_arc(meter, scale, 10, lv_color_red(), 0);
-    lv_meter_indicator_t * indic2 = lv_meter_add_arc(meter, scale, 10, lv_color_green(), -10);
-    lv_meter_indicator_t * indic3 = lv_meter_add_arc(meter, scale, 10, lv_color_blue(), -20);
+    lv_meter_indicator_t * indic1 = lv_meter_add_arc(meter, scale, 10, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_meter_indicator_t * indic2 = lv_meter_add_arc(meter, scale, 10, lv_palette_main(LV_PALETTE_GREEN), -10);
+    lv_meter_indicator_t * indic3 = lv_meter_add_arc(meter, scale, 10, lv_palette_main(LV_PALETTE_BLUE), -20);
 
     /*Create an animation to set the value*/
     lv_anim_t a;

@@ -14,8 +14,8 @@ void lv_example_get_started_2(void)
     lv_style_init(&style_btn);
     lv_style_set_radius(&style_btn, 10);
     lv_style_set_bg_opa(&style_btn, LV_OPA_COVER);
-    lv_style_set_bg_color(&style_btn, lv_color_grey_lighten_3());
-    lv_style_set_bg_grad_color(&style_btn, lv_color_grey());
+    lv_style_set_bg_color(&style_btn, lv_palette_lighten(LV_PALETTE_GREY, 3));
+    lv_style_set_bg_grad_color(&style_btn, lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_bg_grad_dir(&style_btn, LV_GRAD_DIR_VER);
 
     /*Add a border*/
@@ -28,13 +28,13 @@ void lv_example_get_started_2(void)
 
     /*Create a red style. Change only some colors.*/
     lv_style_init(&style_btn_red);
-    lv_style_set_bg_color(&style_btn_red, lv_color_light_blue());
-    lv_style_set_bg_grad_color(&style_btn_red, lv_color_light_blue_darken_3());
+    lv_style_set_bg_color(&style_btn_red, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_bg_grad_color(&style_btn_red, lv_palette_lighten(LV_PALETTE_RED, 2));
 
-    /*Create a style for the pressed state. Add color filter to make every color darker*/
+    /*Create a style for the pressed state.*/
     lv_style_init(&style_btn_pressed);
-    lv_style_set_bg_color(&style_btn_red, lv_color_blue());
-    lv_style_set_bg_grad_color(&style_btn_red, lv_color_blue_darken_3());
+    lv_style_set_bg_color(&style_btn_pressed, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_bg_grad_color(&style_btn_pressed, lv_palette_darken(LV_PALETTE_RED, 3));
 
     /*Create a button and use the new styles*/
     lv_obj_t * btn = lv_btn_create(lv_scr_act());     /*Add a button the current screen*/

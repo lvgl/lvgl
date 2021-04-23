@@ -69,8 +69,8 @@ void lv_example_chart_2(void)
     lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
 
     /*Add two data series*/
-    ser1 = lv_chart_add_series(chart1, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
-    ser2 = lv_chart_add_series(chart1, lv_color_blue(), LV_CHART_AXIS_SECONDARY_Y);
+    ser1 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+    ser2 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
 
     uint32_t i;
     for(i = 0; i < 10; i++) {

@@ -20,7 +20,7 @@
 #define COLOR_WHITE   lv_color_white()
 #define COLOR_LIGHT   lv_color_grey_lighten_3()
 #define COLOR_MID     lv_color_grey_lighten_1()
-#define COLOR_DARK    lv_color_grey()
+#define COLOR_DARK    lv_palette_main(LV_PALETTE_GREY)
 #define COLOR_DIM     lv_color_grey_darken_2()
 #define PAD_DEF       LV_DPX(5)
 
@@ -163,8 +163,8 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
     }
 
     theme.disp = disp;
-    theme.palette_primary = LV_COLOR_PALETTE_NONE;
-    theme.palette_secondary = LV_COLOR_PALETTE_NONE;
+    theme.palette_primary = LV_PALETTE_NONE;
+    theme.palette_secondary = LV_PALETTE_NONE;
     theme.font_small = LV_FONT_DEFAULT;
     theme.font_normal = LV_FONT_DEFAULT;
     theme.font_large = LV_FONT_DEFAULT;
