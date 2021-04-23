@@ -12,13 +12,13 @@ static inline bool lv_obj_get_style_clip_corner(const struct _lv_obj_t * obj, ui
 
 static inline lv_coord_t lv_obj_get_style_transform_width(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSLATE_WIDTH);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_WIDTH);
     return (lv_coord_t)v.num;
 }
 
 static inline lv_coord_t lv_obj_get_style_transform_height(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSLATE_HEIGHT);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_HEIGHT);
     return (lv_coord_t)v.num;
 }
 
@@ -36,13 +36,13 @@ static inline lv_coord_t lv_obj_get_style_translate_y(const struct _lv_obj_t * o
 
 static inline lv_coord_t lv_obj_get_style_transform_zoom(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSLATE_ZOOM);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_ZOOM);
     return (lv_coord_t)v.num;
 }
 
 static inline lv_coord_t lv_obj_get_style_transform_angle(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSLATE_ANGLE);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_ANGLE);
     return (lv_coord_t)v.num;
 }
 
@@ -541,7 +541,7 @@ static inline void lv_obj_set_style_transform_width(struct _lv_obj_t * obj, lv_c
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_WIDTH, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_WIDTH, v, selector);
 }
 
 static inline void lv_obj_set_style_transform_height(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -549,7 +549,7 @@ static inline void lv_obj_set_style_transform_height(struct _lv_obj_t * obj, lv_
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_HEIGHT, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_HEIGHT, v, selector);
 }
 
 static inline void lv_obj_set_style_translate_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -573,7 +573,7 @@ static inline void lv_obj_set_style_transform_zoom(struct _lv_obj_t * obj, lv_co
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_ZOOM, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_ZOOM, v, selector);
 }
 
 static inline void lv_obj_set_style_transform_angle(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -581,7 +581,7 @@ static inline void lv_obj_set_style_transform_angle(struct _lv_obj_t * obj, lv_c
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_ANGLE, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_ANGLE, v, selector);
 }
 
 static inline void lv_obj_set_style_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)

@@ -384,6 +384,8 @@ def local_style_set(p):
   print("}")
   print("")
 
+
+
 def docs(p):
   if "dsc" not in p: return  
   
@@ -398,7 +400,9 @@ def docs(p):
   e = "No"
   if p["ext_draw"]: e = "Yes"
   
-  print("### " + p["name"])
+  li_style = "style='display:inline; margin-right: 20px"
+ 
+  print("<h3>" + p["name"].lower() + "</h3>")
   print(p["dsc"])
   
   print("<ul>")

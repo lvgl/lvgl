@@ -19,7 +19,7 @@ static inline void lv_style_set_transform_width(lv_style_t * style, lv_coord_t v
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_WIDTH, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_WIDTH, v);
 }
 
 static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t value)
@@ -27,7 +27,7 @@ static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t 
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_HEIGHT, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_HEIGHT, v);
 }
 
 static inline void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value)
@@ -51,7 +51,7 @@ static inline void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t va
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_ZOOM, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ZOOM, v);
 }
 
 static inline void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value)
@@ -59,7 +59,7 @@ static inline void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t v
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_ANGLE, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, v);
 }
 
 static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value)

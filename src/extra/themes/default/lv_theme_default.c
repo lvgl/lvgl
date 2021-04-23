@@ -199,9 +199,9 @@ static void style_init(void)
 {
     static const lv_style_prop_t trans_props[] = {
             LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
-            LV_STYLE_TRANSLATE_WIDTH, LV_STYLE_TRANSLATE_HEIGHT,
+            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
             LV_STYLE_TRANSLATE_Y, LV_STYLE_TRANSLATE_X,
-            LV_STYLE_TRANSLATE_ZOOM, LV_STYLE_TRANSLATE_ANGLE,
+            LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,
             LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
             0
     };
