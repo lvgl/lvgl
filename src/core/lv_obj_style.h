@@ -76,9 +76,8 @@ void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selec
 /**
  * Add a style to an object.
  * @param obj       pointer to an object
- * @param part      a part of the object from which the style should be removed E.g. `LV_PART_MAIN` or `LV_PART_KNOB`
- * @param state     a state or combination of states from which the style should be removed
- * @param style     pointer to a style to remove
+ * @param style     pointer to a style to remove. Can be NULL to check only the selector
+ * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
  * @example lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, &style); //Remove a specific style
  * @example lv_obj_remove_style(obj, LV_PART_MAIN, LV_STATE_ANY, &style); //Remove all styles from the main part
  * @example lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL); //Remove all styles
@@ -105,7 +104,7 @@ void lv_obj_report_style_change(lv_style_t * style);
  * Notify an object and its children about its style is modified.
  * @param obj       pointer to an object
  * @param part      the part whose style was changed. E.g. `LV_PART_ANY`, `LV_PART_MAIN`
- * @param prop      `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property.
+ * @param prop      `LV_STYLE_PROP_ANY` or an `LV_STYLE_...` property.
  *                  It is used to optimize what needs to be refreshed.
  *                  `LV_STYLE_PROP_INV` to perform only a style cache update
  */

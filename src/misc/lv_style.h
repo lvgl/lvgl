@@ -126,7 +126,6 @@ typedef enum {
     LV_STYLE_COLOR_FILTER_OPA        = 11,
     LV_STYLE_ANIM_TIME               = 12,
     LV_STYLE_TRANSITION              = 13,
-    LV_STYLE_SIZE                    = 14,
     LV_STYLE_BLEND_MODE              = 15,
 
     /*Group 1*/
@@ -220,7 +219,7 @@ typedef enum {
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
 
-    LV_STYLE_PROP_ALL                = 0xFFFF
+    LV_STYLE_PROP_ANY                = 0xFFFF
 }lv_style_prop_t;
 
 /**

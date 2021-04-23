@@ -1030,7 +1030,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_obj_invalidate(obj);
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
-        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
         lv_obj_refresh_ext_draw_size(obj);

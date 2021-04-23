@@ -93,20 +93,20 @@ lv_obj_set_x(obj1, -30);	/*Move the child a little bit off the parent*/
 
 ### Create and delete objects
 
-In LVGL objects can be created and deleted dynamically in run time. It means only the currently created (exisiting) objects consume RAM.
+In LVGL objects can be created and deleted dynamically in run time. It means only the currently created (existing) objects consume RAM.
 
 It allows to create a screen just when a button is clicked to open it. A delete the screen when a new screen is loaded.
 
-Or the UI can be created based on the current enviroment of the device. For example create meter, charts, bars, slider etc according to the currently attached sensors.
+Or the UI can be created based on the current environment of the device. For example create meter, charts, bars, slider etc according to the currently attached sensors.
  
-Every widget has its own **create** function with a protype like this:
+Every widget has its own **create** function with a prototype like this:
 ```c
 lv_obj_t * lv_<widget>_create(lv_obj_t * parent, <other paramaters if any>);
 ```
 
-In most of the cases the create functions have only a *parent* paramter that tells on which object create the new widget.
+In most of the cases the create functions have only a *parent* parameter that tells on which object create the new widget.
 
-The return value is a poinr to the created oject with `lv_obj_t *` type.
+The return value is a pointer to the created object with `lv_obj_t *` type.
 
 
 There is a common **delete** function for all object types. It deletes the object and all of its children.
@@ -163,7 +163,7 @@ Visit [Multi-display support](/overview/display) to learn more.
 
 ## Parts
 
-The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main aand scrollbar parts but a [Slider](/widgets/slider) uses the main, the indicator and the knob parts. 
+The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scroll bar parts but a [Slider](/widgets/slider) uses the main, the indicator and the knob parts. 
 Parts are similar to *pseudo elements* in CSS.
 
 The following predefined parts exist in LVGL:
@@ -177,8 +177,8 @@ The following predefined parts exist in LVGL:
 - `LV_PART_CURSOR` Mark a specific place e.g. text area's or chart's cursor
 - `LV_PART_CUSTOM_FIRST` Custom parts can be added from here.
 
-The main purpose of parts to allow styleing the "components" of the widgets. 
-Therefore the parts are described in more dteal in the [Style overview](/overview/style) section.
+The main purpose of parts to allow styling the "components" of the widgets. 
+Therefore the parts are described in more detail in the [Style overview](/overview/style) section.
 
 ## States
 The object can be in a combinations of the following states:
