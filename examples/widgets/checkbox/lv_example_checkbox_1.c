@@ -36,6 +36,8 @@ void lv_example_checkbox_1(void)
     lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
     lv_checkbox_set_text(cb, "Melon");
     lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+
+    lv_obj_update_layout(cb);
 }
 
 #endif

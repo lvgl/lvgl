@@ -277,7 +277,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
     /*Mark the screen as dirty too to mark that there is an something to do on this screen*/
     lv_obj_t * scr = lv_obj_get_screen(obj);
-    scr->layout_inv = 1;
+    scr->scr_layout_inv = 1;
 
     /*Make the display refreshing*/
     lv_disp_t * disp = lv_obj_get_disp(scr);
@@ -296,11 +296,11 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     lv_obj_t * scr = lv_obj_get_screen(obj);
 
     /*Repeat until there where layout invalidations*/
-    while(scr->layout_inv) {
-        LV_LOG_INFO("Start layout update")
-        scr->layout_inv = 0;
+    while(scr->scr_layout_inv) {
+        LV_LOG_INFO("Layout update begin")
+        scr->scr_layout_inv = 0;
         layout_update_core(scr);
-        LV_LOG_TRACE("Layout update finished")
+        LV_LOG_TRACE("Layout update end")
     }
 
     mutex = false;
