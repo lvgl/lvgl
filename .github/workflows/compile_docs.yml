@@ -1,0 +1,34 @@
+name: Build docs
+on: push
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install requirements
+        run: |
+          pip install --upgrade --upgrade-strategy eager sphinx recommonmark commonmark breathe sphinx-rtd-theme sphinx-markdown-tables sphinx-sitemap
+      - name: Build docs
+        run: docs/build.py
+      - name: Retrieve version
+        run: |
+          echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
+        id: version
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACCESS_TOKEN: ${{ secrets.LVGL_BOT_TOKEN }}
+          REPOSITORY_NAME: lvgl/docs_compiled
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: out_html  # The folder the action should deploy.
+          TARGET_FOLDER: ${{ steps.version.outputs.VERSION_NAME }}
+          PRESERVE: true
