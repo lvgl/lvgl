@@ -662,8 +662,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 /*Source: https://vuetifyjs.com/en/styles/colors/#material-colors*/
 
 lv_color_t lv_palette_main(lv_palette_t p);
-static inline lv_color_t lv_color_white(void) { return LV_COLOR_MAKE(0xff, 0xff, 0xff);};
-static inline lv_color_t lv_color_black(void) { return LV_COLOR_MAKE(0x00, 0x0, 0x00);};
+static inline lv_color_t lv_color_white(void) { return LV_COLOR_MAKE(0xff, 0xff, 0xff);}
+static inline lv_color_t lv_color_black(void) { return LV_COLOR_MAKE(0x00, 0x0, 0x00);}
 lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl);
 lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl);
 /**********************
