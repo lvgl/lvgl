@@ -58,7 +58,7 @@ lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * b
 
     lv_obj_set_size(mbox, w, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(mbox, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_place(mbox, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_START);
+    lv_obj_set_flex_align(mbox, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
     lv_obj_t * label;
     label = lv_label_create(mbox);

@@ -15,7 +15,7 @@ static void event_handler(lv_event_t * e)
 void lv_example_checkbox_1(void)
 {
     lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_place(lv_scr_act(), LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER);
+    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * cb;
     cb = lv_checkbox_create(lv_scr_act());
