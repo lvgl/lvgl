@@ -130,7 +130,7 @@ enum {
 # define LV_COLOR_GET_A1(c) 0xFF
 
 # define _LV_COLOR_ZERO_INITIALIZER1 {0x00}
-# define LV_COLOR_MAKE1(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{(uint8_t)((b8 >> 7) | (g8 >> 7) | (r8 >> 7))})
+# define LV_COLOR_MAKE1(r8, g8, b8)  {(uint8_t)((b8 >> 7) | (g8 >> 7) | (r8 >> 7))}
 
 # define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)((v) & 0x7U)
 # define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)((v) & 0x7U)
@@ -142,8 +142,8 @@ enum {
 # define LV_COLOR_GET_B8(c) (c).ch.blue
 # define LV_COLOR_GET_A8(c) 0xFF
 
-# define _LV_COLOR_ZERO_INITIALIZER8 {{0x00, 0x00, 0x00}}
-# define LV_COLOR_MAKE8(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}})
+# define _LV_COLOR_ZERO_INITIALIZER8 _LV_COLOR_MAKE_TYPE_HELPER {{0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE8(r8, g8, b8) _LV_COLOR_MAKE_TYPE_HELPER  {{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}}
 
 # define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)((v) & 0x1FU)
 #if LV_COLOR_16_SWAP == 0
@@ -164,11 +164,11 @@ enum {
 # define LV_COLOR_GET_A16(c) 0xFF
 
 #if LV_COLOR_16_SWAP == 0
-# define _LV_COLOR_ZERO_INITIALIZER16 {{0x00, 0x00, 0x00}}
-# define LV_COLOR_MAKE16(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x3FU), (uint8_t)((r8 >> 3) & 0x1FU)}})
+# define _LV_COLOR_ZERO_INITIALIZER16  {{0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE16(r8, g8, b8) {{(uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x3FU), (uint8_t)((r8 >> 3) & 0x1FU)}}
 #else
 # define _LV_COLOR_ZERO_INITIALIZER16 {{0x00, 0x00, 0x00, 0x00}}
-# define LV_COLOR_MAKE16(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 3) & 0x1FU), (uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x7U)}})
+# define LV_COLOR_MAKE16(r8, g8, b8) {{(uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 3) & 0x1FU), (uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x7U)}}
 #endif
 
 # define LV_COLOR_SET_R32(c, v) (c).ch.red = (uint8_t)((v) & 0xFF)
@@ -181,8 +181,8 @@ enum {
 # define LV_COLOR_GET_B32(c) (c).ch.blue
 # define LV_COLOR_GET_A32(c) (c).ch.alpha
 
-# define _LV_COLOR_ZERO_INITIALIZER32 {{0x00, 0x00, 0x00, 0x00}}
-# define LV_COLOR_MAKE32(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{b8, g8, r8, 0xff}}) /*Fix 0xff alpha*/
+# define _LV_COLOR_ZERO_INITIALIZER32  {{0x00, 0x00, 0x00, 0x00}}
+# define LV_COLOR_MAKE32(r8, g8, b8) {{b8, g8, r8, 0xff}} /*Fix 0xff alpha*/
 
 /*---------------------------------------
  * Macros for the current color depth
@@ -601,7 +601,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 
 static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 {
-    return LV_COLOR_MAKE(r, g, b);
+    return _LV_COLOR_MAKE_TYPE_HELPER LV_COLOR_MAKE(r, g, b);
 }
 
 static inline lv_color_t lv_color_hex(uint32_t c)
@@ -662,8 +662,8 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 /*Source: https://vuetifyjs.com/en/styles/colors/#material-colors*/
 
 lv_color_t lv_palette_main(lv_palette_t p);
-static inline lv_color_t lv_color_white(void) { return LV_COLOR_MAKE(0xff, 0xff, 0xff);}
-static inline lv_color_t lv_color_black(void) { return LV_COLOR_MAKE(0x00, 0x0, 0x00);}
+static inline lv_color_t lv_color_white(void) { return lv_color_make(0xff, 0xff, 0xff);}
+static inline lv_color_t lv_color_black(void) { return lv_color_make(0x00, 0x0, 0x00);}
 lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl);
 lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl);
 /**********************

@@ -4,9 +4,8 @@
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
-
 #include "lv_tlsf.h"
-
+#include "lv_mem.h"
 #include "lv_log.h"
 #define printf LV_LOG_ERROR
 
