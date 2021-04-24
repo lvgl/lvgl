@@ -972,7 +972,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
-    lv_obj_t * obj_to_focus = lv_obj_get_focused_obj(indev_obj_act);
+    lv_obj_t * obj_to_focus = indev_obj_act;
     if(lv_obj_has_flag(obj_to_focus, LV_OBJ_FLAG_CLICK_FOCUSABLE) &&
        proc->types.pointer.last_pressed != obj_to_focus) {
         lv_group_t * g_act = lv_obj_get_group(obj_to_focus);
