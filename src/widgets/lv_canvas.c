@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdlib.h>
 #include "lv_canvas.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_math.h"

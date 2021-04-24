@@ -13,7 +13,6 @@
 #include "../draw/lv_draw.h"
 #include "../misc/lv_anim.h"
 #include "../misc/lv_math.h"
-#include <stdio.h>
 
 /*********************
  *      DEFINES

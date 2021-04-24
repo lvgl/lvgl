@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
 #include <stdbool.h>
 #include "lv_draw_mask.h"
 #include "lv_draw_blend.h"

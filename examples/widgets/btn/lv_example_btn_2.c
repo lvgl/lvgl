@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#include <stdio.h>
 #if LV_USE_BTN && LV_BUILD_EXAMPLES
 
 /**

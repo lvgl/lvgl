@@ -660,7 +660,7 @@ static lv_color_t angle_to_mode_color_fast(lv_obj_t * obj, uint16_t angle)
             fast_hsv2rgb(h, s, angle, &r, &g, &b);
             break;
     }
-    return LV_COLOR_MAKE(r, g, b);
+    return (lv_color_t)LV_COLOR_MAKE(r, g, b);
 }
 
 static uint16_t get_angle(lv_obj_t * obj)
