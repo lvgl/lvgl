@@ -656,26 +656,6 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
  */
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
-lv_color_t lv_color_get_palette_main(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_lighten_1(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_lighten_2(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_lighten_3(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_lighten_4(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_lighten_5(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_darken_1(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_darken_2(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_darken_3(lv_palette_t palette);
-
-lv_color_t lv_color_get_palette_darken_4(lv_palette_t palette);
-
 /**********************
  *  PREDEFINED COLORS
  **********************/

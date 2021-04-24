@@ -18,10 +18,10 @@
  *********************/
 
 #define COLOR_WHITE   lv_color_white()
-#define COLOR_LIGHT   lv_color_grey_lighten_3()
-#define COLOR_MID     lv_color_grey_lighten_1()
+#define COLOR_LIGHT   lv_palette_lighten(LV_PALETTE_GREY, 3)
+#define COLOR_MID     lv_palette_lighten(LV_PALETTE_GREY, 1)
 #define COLOR_DARK    lv_palette_main(LV_PALETTE_GREY)
-#define COLOR_DIM     lv_color_grey_darken_2()
+#define COLOR_DIM     lv_palette_darken(LV_PALETTE_GREY, 2)
 #define PAD_DEF       LV_DPX(5)
 
 /**********************
@@ -79,7 +79,7 @@ static void style_init(void)
 {
     style_init_reset(&styles->scrollbar);
     lv_style_set_bg_opa(&styles->scrollbar, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->scrollbar, lv_color_grey_darken_2());
+    lv_style_set_bg_color(&styles->scrollbar, lv_palette_darken(LV_PALETTE_GREY, 2));
     lv_style_set_width(&styles->scrollbar,  PAD_DEF);
 
     style_init_reset(&styles->scr);
