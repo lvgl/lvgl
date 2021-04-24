@@ -687,13 +687,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_SPINNER
         case LV_THEME_SPINNER:
             list = lv_obj_get_style_list(obj, LV_SPINNER_PART_BG);
-            _lv_style_list_add_style(list, &styles->bg);
-            _lv_style_list_add_style(list, &styles->tick_line);
+            _lv_style_list_add_style(list, &styles->arc_bg);
 
             list = lv_obj_get_style_list(obj, LV_SPINNER_PART_INDIC);
-            _lv_style_list_add_style(list, &styles->bg);
-            _lv_style_list_add_style(list, &styles->fg_color);
-            _lv_style_list_add_style(list, &styles->tick_line);
+            _lv_style_list_add_style(list, &styles->arc_indic);
             break;
 #endif
 
