@@ -1,12 +1,12 @@
 /**
- * @file lv_ddlist.c
+ * @file lv_dropdown.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/core/lv_obj.h>
+#include "../core/lv_obj.h"
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 
