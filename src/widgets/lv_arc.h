@@ -81,7 +81,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * parent);
 void lv_arc_set_start_angle(lv_obj_t * arc, uint16_t start);
 
 /**
- * Set the start angle of an arc. 0 deg: right, 90 bottom, etc.
+ * Set the end angle of an arc. 0 deg: right, 90 bottom, etc.
  * @param arc pointer to an arc object
  * @param end the end angle
  */
