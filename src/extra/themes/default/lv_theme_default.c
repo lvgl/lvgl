@@ -230,8 +230,7 @@ static void style_init(void)
     lv_style_set_transition(&styles->transition_normal, &trans_normal); /*Go back to default state with delay*/
 
     style_init_reset(&styles->scrollbar);
-    lv_style_set_bg_opa(&styles->scrollbar, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->scrollbar, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 3) : lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_right(&styles->scrollbar, LV_DPX(7));
     lv_style_set_pad_top(&styles->scrollbar,  LV_DPX(7));
