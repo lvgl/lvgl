@@ -320,7 +320,7 @@ lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl)
      }
 
      if(lvl == 0 || lvl > 5) {
-         LV_LOG_WARN("Invalid level: %d. Most be 1..5", lvl);
+         LV_LOG_WARN("Invalid level: %d. Must be 1..5", lvl);
          return lv_color_black();
      }
 
@@ -358,8 +358,8 @@ lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl)
          return lv_color_black();
      }
 
-     if(lvl == 0 || lvl > 5) {
-         LV_LOG_WARN("Invalid level: %d. Most be 1..4", lvl);
+     if(lvl == 0 || lvl > 4) {
+         LV_LOG_WARN("Invalid level: %d. Must be 1..4", lvl);
          return lv_color_black();
      }
 
