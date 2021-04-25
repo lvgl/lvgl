@@ -130,6 +130,11 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
     LV_ASSERT_STYLE(style);
+    
+    if(style->is_const) {
+        LV_LOG_ERROR("Cannot set property of constant style");
+        return;
+    }
 
     if(style->prop_cnt > 1) {
         uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
