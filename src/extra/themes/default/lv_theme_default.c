@@ -24,10 +24,10 @@
 #define LIGHT_COLOR_CARD       lv_color_white()
 #define LIGHT_COLOR_TEXT       lv_palette_darken(LV_PALETTE_GREY, 4)
 #define LIGHT_COLOR_GREY       lv_palette_lighten(LV_PALETTE_GREY, 2)
-#define DARK_COLOR_SCR         lv_palette_darken(LV_PALETTE_GREY, 4)
-#define DARK_COLOR_CARD        lv_palette_darken(LV_PALETTE_GREY, 3)
+#define DARK_COLOR_SCR         lv_color_hex(0x22252a)
+#define DARK_COLOR_CARD        lv_color_hex(0x282b30)
 #define DARK_COLOR_TEXT        lv_palette_lighten(LV_PALETTE_GREY, 5)
-#define DARK_COLOR_GREY        lv_palette_darken(LV_PALETTE_GREY, 1)
+#define DARK_COLOR_GREY        lv_color_hex(0x2f3237)
 
 #define TRANSITION_TIME         LV_THEME_DEFAULT_TRANSITON_TIME
 #define BORDER_WIDTH            LV_DPX(2)
@@ -404,7 +404,7 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
     lv_style_set_border_width(&styles->cb_marker, BORDER_WIDTH);
     lv_style_set_border_color(&styles->cb_marker, color_primary);
-    lv_style_set_bg_color(&styles->cb_marker, lv_color_white());
+    lv_style_set_bg_color(&styles->cb_marker, color_card);
     lv_style_set_bg_opa(&styles->cb_marker, LV_OPA_COVER);
     lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
 
@@ -481,7 +481,7 @@ static void style_init(void)
     lv_style_set_anim_time(&styles->ta_cursor, 400);
 
     style_init_reset(&styles->ta_placeholder);
-    lv_style_set_text_color(&styles->ta_placeholder, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_text_color(&styles->ta_placeholder, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 2) : lv_palette_lighten(LV_PALETTE_GREY, 1));
 #endif
 
 #if LV_USE_CALENDAR
@@ -493,6 +493,7 @@ static void style_init(void)
     style_init_reset(&styles->calendar_day);
     lv_style_set_border_width(&styles->calendar_day, LV_DPX(1));
     lv_style_set_border_color(&styles->calendar_day, color_grey);
+    lv_style_set_bg_color(&styles->calendar_day, color_card);
     lv_style_set_bg_opa(&styles->calendar_day, LV_OPA_20);
 #endif
 
