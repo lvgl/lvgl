@@ -81,7 +81,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
     if(style->is_const) {
         LV_LOG_ERROR("Cannot remove prop from const style");
-        return;
+        return false;
     }
 
     if(style->prop_cnt == 0)  return false;
