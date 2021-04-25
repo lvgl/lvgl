@@ -329,13 +329,6 @@ void lv_style_reset(lv_style_t * style);
 uint16_t _lv_style_get_mem_size(const lv_style_t * style);
 
 /**
- * Copy a style to an other
- * @param dest pointer to the destination style
- * @param src pointer to the source style
- */
-void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
-
-/**
  * Remove a property from a style
  * @param style pointer to a style
  * @param prop a style property ORed with a state.
