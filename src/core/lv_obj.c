@@ -352,17 +352,6 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
     }
 }
 
-lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
-{
-    if(obj == NULL) return NULL;
-    const lv_obj_t * focus_obj = obj;
-    while(lv_obj_has_flag(focus_obj, LV_OBJ_FLAG_FOCUS_BUBBLE) != false && focus_obj != NULL) {
-        focus_obj = lv_obj_get_parent(focus_obj);
-    }
-
-    return (lv_obj_t *)focus_obj;
-}
-
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
     if(obj == NULL) return false;
@@ -677,16 +666,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) state |= LV_STATE_FOCUS_KEY;
         if(editing) {
             state |= LV_STATE_EDITED;
-
-            /*if using focus mode, change target to parent*/
-            obj = lv_obj_get_focused_obj(obj);
-
             lv_obj_add_state(obj, state);
         }
         else {
-            /*if using focus mode, change target to parent*/
-            obj = lv_obj_get_focused_obj(obj);
-
             lv_obj_add_state(obj, state);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
@@ -698,9 +680,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_clear_state(obj, LV_STATE_SCROLLED);
     }
     else if(code == LV_EVENT_DEFOCUSED) {
-        /*if using focus mode, change target to parent*/
-        obj = lv_obj_get_focused_obj(obj);
-
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {

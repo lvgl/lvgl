@@ -101,10 +101,9 @@ enum {
     LV_OBJ_FLAG_PRESS_LOCK      = (1 << 11), /**< Keep the object pressed even if the press slid from the object*/
     LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 12), /**< Propagate the events to the parent too*/
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13), /**< Propagate the gestures to the parent*/
-    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 14), /**< Propagate the focus to the parent*/
-    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
-    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 16), /**< Make the object position-able by the layouts*/
-    LV_OBJ_FLAG_FLOATING        = (1 << 17), /**< Do not scroll the object when the parent scrolls and ignore layout*/
+    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 14), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
+    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1 << 15), /**< Make the object position-able by the layouts*/
+    LV_OBJ_FLAG_FLOATING        = (1 << 16), /**< Do not scroll the object when the parent scrolls and ignore layout*/
 
     LV_OBJ_FLAG_LAYOUT_1        = (1 << 23), /** Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1 << 24), /** Custom flag, free to use by layouts*/
@@ -323,13 +322,6 @@ void * lv_obj_get_group(const lv_obj_t * obj);
  * @param obj   pointer to an object
  */
 void lv_obj_allocate_spec_attr(lv_obj_t * obj);
-
-/**
- * Get the focused object by taking `LV_OBJ_FLAG_FOCUS_BUBBLE` into account.
- * @param obj   the start object
- * @return      the object to to really focus
- */
-lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
 
 /**
  * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
