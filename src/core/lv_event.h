@@ -84,10 +84,12 @@ typedef enum {
 
 typedef struct _lv_event_t {
     struct _lv_obj_t * target;
-    struct _lv_obj_t * original_target;
+    struct _lv_obj_t * current_target;
     lv_event_code_t code;
     void * user_data;
     void * param;
+    struct _lv_event_t * prev;
+    uint8_t deleted :1;
 }lv_event_t;
 
 /**
@@ -103,28 +105,57 @@ typedef void (*lv_event_cb_t)(lv_event_t * e);
 
 /**
  * Send an event to the object
- * @param obj pointer to an object
- * @param event the type of the event from `lv_event_t`
- * @param param arbitrary data depending on the object type and the event. (Usually `NULL`)
- * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
+ * @param obj           pointer to an object
+ * @param event_code    the type of the event from `lv_event_t`
+ * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
+ * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event_code
  */
-lv_res_t lv_event_send(struct _lv_obj_t * obj, lv_event_code_t event, void * param);
-
-lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
-
-struct _lv_obj_t * lv_event_get_target(lv_event_t * e);
-
-lv_event_code_t lv_event_get_code(lv_event_t * e);
-
-void * lv_event_get_param(lv_event_t * e);
-
-void * lv_event_get_user_data(lv_event_t * e);
+lv_res_t lv_event_send(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
- * Get the original target of the event. It's different than the "normal" target if the event is bubbled.
- * @return      pointer to the object the originally received the event before bubbling it to the parents
+ * Used by the widgets internally to call the ancestor widget types's event handler
+ * @param class_p   pointer to the class of the widget (NOT the ancestor class)
+ * @param e         pointer to the event descriptor
+ * @return          LV_RES_OK: the taget object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
  */
-struct _lv_obj_t * lv_event_get_original_target(void);
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
+
+/**
+ * Get the object originally targeted by the event. It's the same even if the event is bubbled.
+ * @param e     pointer to the event descriptor
+ * @return      the target of the event_code
+ */
+struct _lv_obj_t * lv_event_get_target(lv_event_t * e);
+
+/**
+ * Get the current target of the event. It's the object which event handler being called.
+ * If the event is not bubbled it's the same as "normal" target.
+ * @param e     pointer to the event descriptor
+ * @return      pointer to the current target of the event_code
+ */
+struct _lv_obj_t * lv_event_get_current_target(lv_event_t * e);
+
+/**
+ * Get the event code of an event
+ * @param e     pointer to the event descriptor
+ * @return      the event code. (E.g. `LV_EVENT_CLICKED`, `LV_EVENT_FOCUSED`, etc)
+ */
+lv_event_code_t lv_event_get_code(lv_event_t * e);
+
+/**
+ * Get the parameter passed when the event was sent
+ * @param e     pointer to the event descriptor
+ * @return      pointer to the parameter
+ */
+void * lv_event_get_param(lv_event_t * e);
+
+/**
+ * Get the user_data passed when the event was registered on the object
+ * @param e     pointer to the event descriptor
+ * @return      pointer to the user_data
+ */
+void * lv_event_get_user_data(lv_event_t * e);
+
 
 /**
  * Register a new, custom event ID.

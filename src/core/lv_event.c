@@ -17,11 +17,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_event_temp_data {
-    lv_obj_t * obj;
-    bool deleted;
-    struct _lv_event_temp_data * prev;
-} lv_event_temp_data_t;
 
 typedef struct _lv_event_dsc_t{
     lv_event_cb_t cb;
@@ -33,16 +28,13 @@ typedef struct _lv_event_dsc_t{
  *  STATIC PROTOTYPES
  **********************/
 static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id);
-static lv_res_t event_send_core(lv_obj_t * obj, lv_event_code_t event_code, void * param);
+static lv_res_t event_send_core(lv_event_t * e);
 static bool event_is_bubbled(lv_event_code_t e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_event_temp_data_t * event_temp_data_head;
-static void * event_act_param;
-static void * event_act_user_data_cb;
-static lv_obj_t * event_original_target;
+static lv_event_t * event_head;
 
 /**********************
  *      MACROS
@@ -57,21 +49,32 @@ static lv_obj_t * event_original_target;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event, void * param)
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
     if(obj == NULL) return LV_RES_OK;
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    /*Save the original target first in tmp variable because nested `lv_event_send` calls can overwrite it*/
-    lv_obj_t * event_original_target_tmp = event_original_target;
-    event_original_target = obj;
+    lv_event_t e;
+    e.target = obj;
+    e.current_target = obj;
+    e.code = event_code;
+    e.user_data = NULL;
+    e.param = param;
+    e.deleted = 0;
+
+
+    /*Build a simple linked list from the objects used in the events
+     *It's important to know if an this object was deleted by a nested event
+     *called from this `event_cb`.*/
+    e.prev = event_head;
+    event_head = &e;
 
     /*Send the event*/
-    lv_res_t res = event_send_core(obj, event, param);
+    lv_res_t res = event_send_core(&e);
 
-    /*Restore the original target*/
-    event_original_target = event_original_target_tmp;
+    /*Remove this element from the list*/
+    event_head = e.prev;
 
     return res;
 }
@@ -89,29 +92,13 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     if(base == NULL) return LV_RES_OK;
     if(base->event_cb == NULL) return LV_RES_OK;
 
-    /* Build a simple linked list from the objects used in the events
-     * It's important to know if an this object was deleted by a nested event
-     * called from this `event_cb`. */
-    lv_event_temp_data_t event_temp_data;
-    event_temp_data.obj     = e->target;
-    event_temp_data.deleted = false;
-    event_temp_data.prev    = NULL;
-
-    if(event_temp_data_head) {
-        event_temp_data.prev = event_temp_data_head;
-    }
-    event_temp_data_head = &event_temp_data;
-
     /*Call the actual event callback*/
     e->user_data = NULL;
     base->event_cb(base, e);
 
     lv_res_t res = LV_RES_OK;
     /*Stop if the object is deleted*/
-    if(event_temp_data.deleted) res = LV_RES_INV;
-
-    /*Remove this element from the list*/
-    event_temp_data_head = event_temp_data_head->prev;
+    if(e->deleted) res = LV_RES_INV;
 
     return res;
 }
@@ -120,6 +107,11 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 lv_obj_t * lv_event_get_target(lv_event_t * e)
 {
     return e->target;
+}
+
+lv_obj_t * lv_event_get_current_target(lv_event_t * e)
+{
+    return e->current_target;
 }
 
 lv_event_code_t lv_event_get_code(lv_event_t * e)
@@ -137,10 +129,6 @@ void * lv_event_get_user_data(lv_event_t * e)
     return e->user_data;
 }
 
-lv_obj_t * lv_event_get_original_target(void)
-{
-    return event_original_target;
-}
 
 uint32_t lv_event_register_id(void)
 {
@@ -151,11 +139,11 @@ uint32_t lv_event_register_id(void)
 
 void _lv_event_mark_deleted(lv_obj_t * obj)
 {
-    lv_event_temp_data_t * t = event_temp_data_head;
+    lv_event_t * e = event_head;
 
-    while(t) {
-        if(t->obj == obj) t->deleted = true;
-        t = t->prev;
+    while(e) {
+        if(e->current_target == obj || e->target == obj) e->deleted = 1;
+        e = e->prev;
     }
 }
 
@@ -239,74 +227,38 @@ static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id)
     return &obj->spec_attr->event_dsc[id];
 }
 
-static lv_res_t event_send_core(lv_obj_t * obj, lv_event_code_t event_code, void * param)
+static lv_res_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", event_code, obj, param);
-
-    /*Build a simple linked list from the objects used in the events
-     *It's important to know if an this object was deleted by a nested event
-     *called from this `event_cb`.*/
-    lv_event_temp_data_t event_temp_data;
-    event_temp_data.obj     = obj;
-    event_temp_data.deleted = false;
-    event_temp_data.prev    = NULL;
-
-    if(event_temp_data_head) {
-        event_temp_data.prev = event_temp_data_head;
-    }
-    event_temp_data_head = &event_temp_data;
-
-    /*There could be nested event sending with different param.
-     *It needs to be saved for the current event context because `lv_event_get_data` returns a global param.*/
-    void * event_act_param_save = event_act_param;
-    event_act_param = param;
+    EVENT_TRACE("Sending event %d to %p with %p param", e->code, e->current_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
-        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, event_code);
+        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, e->code);
     }
 
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, 0);
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(e->current_target, 0);
     lv_res_t res = LV_RES_OK;
-    lv_event_t e;
-    e.code = event_code;
-    e.target = obj;
-    e.original_target = obj;
-    e.param = param;
-    res = lv_obj_event_base(NULL, &e);
+    res = lv_obj_event_base(NULL, e);
 
     uint32_t i = 0;
     while(event_dsc && res == LV_RES_OK) {
-        if(event_dsc->cb && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == event_code)) {
-            void * event_act_user_data_cb_save = event_act_user_data_cb;
-            event_act_user_data_cb = event_dsc->user_data;
-
-            e.user_data = event_dsc->user_data;
-            event_dsc->cb(&e);
-
-            event_act_user_data_cb = event_act_user_data_cb_save;
+        if(event_dsc->cb && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == e->code)) {
+            e->user_data = event_dsc->user_data;
+            event_dsc->cb(e);
 
             /*Stop if the object is deleted*/
-            if(event_temp_data.deleted) {
-                res = LV_RES_INV;
-                break;
-            }
+            if(e->deleted) return LV_RES_INV;
         }
 
         i++;
-        event_dsc = lv_obj_get_event_dsc(obj, i);
+        event_dsc = lv_obj_get_event_dsc(e->current_target, i);
     }
 
-    /*Restore the event_code param*/
-    event_act_param = event_act_param_save;
-
-    /*Remove this element from the list*/
-    event_temp_data_head = event_temp_data_head->prev;
-
-    if(res == LV_RES_OK && event_is_bubbled(event_code)) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
-            res = event_send_core(obj->parent, event_code, param);
+    if(res == LV_RES_OK && event_is_bubbled(e->code)) {
+        if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) && e->current_target->parent) {
+            e->current_target = e->current_target->parent;
+            res = event_send_core(e);
             if(res != LV_RES_OK) return LV_RES_INV;
         }
     }
