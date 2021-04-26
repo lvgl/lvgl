@@ -101,7 +101,6 @@ static void style_init(void)
     lv_style_set_arc_width(&styles->light, LV_DPX(2));
     lv_style_set_arc_color(&styles->light, COLOR_MID);
 
-
     style_init_reset(&styles->dark);
     lv_style_set_bg_opa(&styles->dark, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->dark, COLOR_DARK);
