@@ -46,10 +46,10 @@ typedef struct {
 
 typedef struct {
     lv_obj_t obj;
-    int16_t cur_value;          /**< Current value of the bar*/
-    int16_t min_value;          /**< Minimum value of the bar*/
-    int16_t max_value;          /**< Maximum value of the bar*/
-    int16_t start_value;        /**< Start value of the bar*/
+    int32_t cur_value;          /**< Current value of the bar*/
+    int32_t min_value;          /**< Minimum value of the bar*/
+    int32_t max_value;          /**< Maximum value of the bar*/
+    int32_t start_value;        /**< Start value of the bar*/
     lv_area_t indic_area;       /**< Save the indicator area. Might be used by derived types*/
     lv_bar_anim_t cur_value_anim;
     lv_bar_anim_t start_value_anim;
@@ -79,7 +79,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent);
  * @param value     new value
  * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim);
+void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
 /**
  * Set a new start value on the bar
@@ -87,7 +87,7 @@ void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim);
  * @param value     new start value
  * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_bar_set_start_value(lv_obj_t * obj, int16_t start_value, lv_anim_enable_t anim);
+void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_t anim);
 
 /**
  * Set minimum and the maximum values of a bar
@@ -95,7 +95,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int16_t start_value, lv_anim_enable_
  * @param min       minimum value
  * @param max       maximum value
  */
-void lv_bar_set_range(lv_obj_t * obj, int16_t min, int16_t max);
+void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 
 /**
  * Set the type of bar.
@@ -113,28 +113,28 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode);
  * @param obj       pointer to a bar object
  * @return          the value of the bar
  */
-int16_t lv_bar_get_value(const lv_obj_t * obj);
+int32_t lv_bar_get_value(const lv_obj_t * obj);
 
 /**
  * Get the start value of a bar
  * @param obj       pointer to a bar object
  * @return          the start value of the bar
  */
-int16_t lv_bar_get_start_value(const lv_obj_t * obj);
+int32_t lv_bar_get_start_value(const lv_obj_t * obj);
 
 /**
  * Get the minimum value of a bar
  * @param obj       pointer to a bar object
  * @return          the minimum value of the bar
  */
-int16_t lv_bar_get_min_value(const lv_obj_t * obj);
+int32_t lv_bar_get_min_value(const lv_obj_t * obj);
 
 /**
  * Get the maximum value of a bar
  * @param obj       pointer to a bar object
  * @return          the maximum value of the bar
  */
-int16_t lv_bar_get_max_value(const lv_obj_t * obj);
+int32_t lv_bar_get_max_value(const lv_obj_t * obj);
 
 /**
  * Get the type of bar.
