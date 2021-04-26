@@ -643,7 +643,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
-            uint32_t state = 0;
             char c = *((char *)lv_event_get_param(e));
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
