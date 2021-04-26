@@ -122,11 +122,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     int32_t w;
 
     /*No need to waste processor time if string is empty*/
-    if (txt != NULL) {
-        if(txt[0] == '\0')  return;
-    } else {
+    if (txt == NULL || txt[0] == '\0')
         return;
-    }
 
     lv_area_t clipped_area;
     bool clip_ok = _lv_area_intersect(&clipped_area, coords, mask);
