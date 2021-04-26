@@ -13,6 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_MSGBOX_FLAG_AUTO_PARENT  LV_OBJ_FLAG_WIDGET_1        /*Mark that the parent was automatically created*/
 
 /**********************
  *      TYPEDEFS
@@ -36,23 +37,23 @@ const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class};
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a message box objects
- * @param par pointer to an object, it will be the parent of the new message box
- * @return pointer to the created message box
- */
-lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
+lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
 {
-    lv_obj_t * parent = lv_obj_create(lv_scr_act());
-    lv_obj_remove_style_all(parent);
-    lv_obj_set_style_bg_color(parent, lv_palette_main(LV_PALETTE_GREY), 0);
-    lv_obj_set_style_bg_opa(parent, LV_OPA_50, 0);
-    lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
+    bool auto_parent = false;
+    if(parent == NULL) {
+        auto_parent = true;
+        parent = lv_obj_create(lv_scr_act());
+        lv_obj_remove_style_all(parent);
+        lv_obj_set_style_bg_color(parent, lv_palette_main(LV_PALETTE_GREY), 0);
+        lv_obj_set_style_bg_opa(parent, LV_OPA_50, 0);
+        lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
+    }
 
     lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent);
     LV_ASSERT_MALLOC(mbox);
     if(mbox == NULL) return NULL;
 
+    if(auto_parent) lv_obj_add_flag(mbox, LV_MSGBOX_FLAG_AUTO_PARENT);
     lv_coord_t w = lv_obj_get_content_width(parent);
     if(w > 2 * LV_DPI_DEF) w = 2 * LV_DPI_DEF;
 
@@ -130,7 +131,8 @@ const char * lv_msgbox_get_active_btn_text(lv_obj_t * mbox)
 
 void lv_msgbox_close(lv_obj_t * mbox)
 {
-    lv_obj_del(lv_obj_get_parent(mbox));
+    if(lv_obj_has_flag(mbox, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_del(lv_obj_get_parent(mbox));
+    else lv_obj_del(mbox);
 }
 
 
