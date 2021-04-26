@@ -102,10 +102,11 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
         if(old_props[i] == prop) {
             lv_style_value_t * old_values = (lv_style_value_t *)style->v_p.values_and_props;
 
-            uint16_t * new_props = &style->prop1;
-            lv_style_value_t * new_values = &style->v_p.value1;
-
-            if(style->prop_cnt > 2) {
+            if(style->prop_cnt == 2) {
+                style->prop_cnt = 1;
+                style->prop1 = i == 0 ? old_props[1] : old_props[0];
+                style->v_p.value1 = i == 0 ? old_values[1] : old_values[0];
+            } else {
                 size_t size = (style->prop_cnt - 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
                 uint8_t * new_values_and_props = lv_mem_alloc(size);
                 if(new_values_and_props == NULL) return false;
@@ -113,19 +114,15 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 style->prop_cnt--;
 
                 tmp = new_values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
-                new_props = (uint16_t *)tmp;
-                new_values = (lv_style_value_t *)new_values_and_props;
-            } else {
-                style->prop_cnt = 1;
-                style->prop1 = i == 0 ? old_props[1] : old_props[0];
-                style->v_p.value1 = i == 0 ? old_values[1] : old_values[0];
-            }
+                uint16_t * new_props = (uint16_t *)tmp;
+                lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
 
-            uint32_t j;
-            for(i = j = 0; j <= style->prop_cnt; j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
-                if(old_props[j] != prop) {
-                    new_values[i] = old_values[j];
-                    new_props[i++] = old_props[j];
+                uint32_t j;
+                for(i = j = 0; j <= style->prop_cnt; j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
+                    if(old_props[j] != prop) {
+                        new_values[i] = old_values[j];
+                        new_props[i++] = old_props[j];
+                    }
                 }
             }
 
