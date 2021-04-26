@@ -633,6 +633,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
             else lv_obj_clear_state(obj, LV_STATE_CHECKED);
+
+            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return;
         }
     }
     else if(code == LV_EVENT_PRESS_LOST) {
@@ -644,13 +647,11 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             char c = *((char *)lv_event_get_param(e));
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
-                state = 1;
             }
             else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
                 lv_obj_clear_state(obj, LV_STATE_CHECKED);
-                state = 0;
             }
-            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &state);
+            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
     }
