@@ -24,7 +24,7 @@
 #define LIGHT_COLOR_CARD       lv_color_white()
 #define LIGHT_COLOR_TEXT       lv_palette_darken(LV_PALETTE_GREY, 4)
 #define LIGHT_COLOR_GREY       lv_palette_lighten(LV_PALETTE_GREY, 2)
-#define DARK_COLOR_SCR         lv_color_hex(0x22252a)
+#define DARK_COLOR_SCR         lv_color_hex(0x15171A)
 #define DARK_COLOR_CARD        lv_color_hex(0x282b30)
 #define DARK_COLOR_TEXT        lv_palette_lighten(LV_PALETTE_GREY, 5)
 #define DARK_COLOR_GREY        lv_color_hex(0x2f3237)
@@ -230,7 +230,7 @@ static void style_init(void)
     lv_style_set_transition(&styles->transition_normal, &trans_normal); /*Go back to default state with delay*/
 
     style_init_reset(&styles->scrollbar);
-    lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 3) : lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 2) : lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_right(&styles->scrollbar, LV_DPX(7));
     lv_style_set_pad_top(&styles->scrollbar,  LV_DPX(7));
