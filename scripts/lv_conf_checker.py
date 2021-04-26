@@ -59,6 +59,10 @@ fout.write(
 #  endif
 #endif
 
+
+/*----------------------------------
+ * Start parsing lv_conf_template.h
+ -----------------------------------*/
 '''
 )
 
@@ -106,13 +110,14 @@ for i in fin.read().splitlines():
 fout.write(
 '''
 
+/*----------------------------------
+ * End of parsing lv_conf_template.h
+ -----------------------------------*/
+
+LV_EXPORT_CONST_INT(LV_DPI_DEF);
+
 /*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
-
-
-# if LV_USE_USER_DATA
-  typedef void * lv_obj_user_data_t;
-# endif
 
 # if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
 #  define _CRT_SECURE_NO_WARNINGS
