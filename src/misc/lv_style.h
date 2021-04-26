@@ -266,10 +266,10 @@ typedef struct {
         const lv_style_const_prop_t * const_props;
     } v_p;
 
-    uint16_t prop1;
+    uint16_t prop1 :15;
+    uint16_t is_const :1;
     uint8_t has_group;
     uint8_t prop_cnt;
-    uint8_t is_const: 1;
 } lv_style_t;
 
 /**********************
