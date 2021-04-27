@@ -95,7 +95,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
 void lv_log(const char * buf)
 {
 #if LV_LOG_PRINTF
-    printf(buf);
+    printf("%s", buf);
 #endif
     if(custom_print_cb) custom_print_cb(buf);
 
