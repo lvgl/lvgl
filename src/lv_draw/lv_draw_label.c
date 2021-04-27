@@ -32,9 +32,6 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                                                 const lv_font_t * font_p,
-                                                 uint32_t letter, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
@@ -382,23 +379,20 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
 /**
  * Draw a letter in the Virtual Display Buffer
  * @param pos_p left-top coordinate of the latter
- * @param mask_p the letter will be drawn only on this area  (truncated to VDB area)
+ * @param clip_area the letter will be drawn only on this area  (truncated to VDB area)
  * @param font_p pointer to font
  * @param letter a letter to draw
  * @param color color of letter
  * @param opa opacity of letter (0..255)
+ * @param blend_mode blend mode
  */
-LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                                                 const lv_font_t * font_p,
-                                                 uint32_t letter,
-                                                 lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+                                          const lv_font_t * font_p,
+                                          uint32_t letter,
+                                          lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -446,6 +440,10 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
         draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,

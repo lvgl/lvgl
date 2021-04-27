@@ -1217,6 +1217,9 @@ menu "LVGL configuration"
            select LV_USE_IMG
            select LV_USE_PAGE
            default y if !LV_CONF_MINIMAL
+        config LV_USE_SPAN
+           bool "span and spangroup."
+           default y if !LV_CONF_MINIMAL
     endmenu
 
 endmenu

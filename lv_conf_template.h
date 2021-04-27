@@ -750,6 +750,9 @@ typedef void * lv_obj_user_data_t;
 /*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
 #define LV_USE_WIN      1
 
+/*span and spangroup*/
+#define LV_USE_SPAN     1
+
 /*==================
  * Non-user section
  *==================*/

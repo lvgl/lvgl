@@ -82,6 +82,20 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                                          const lv_draw_label_dsc_t * dsc,
                                          const char * txt, lv_draw_label_hint_t * hint);
 
+/**
+ * Draw a letter in the Virtual Display Buffer
+ * @param pos_p left-top coordinate of the latter
+ * @param clip_area the letter will be drawn only on this area  (truncated to VDB area)
+ * @param font_p pointer to font
+ * @param letter a letter to draw
+ * @param color color of letter
+ * @param opa opacity of letter (0..255)
+ * @param blend_mode blend mode
+ */
+LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+                                          const lv_font_t * font_p,
+                                          uint32_t letter,
+                                          lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 //! @endcond
 /***********************
  * GLOBAL VARIABLES

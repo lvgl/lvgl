@@ -31,6 +31,7 @@ CSRCS += lv_page.c
 CSRCS += lv_switch.c
 CSRCS += lv_win.c
 CSRCS += lv_objmask.c
+CSRCS += lv_span.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_widgets
 VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_widgets

@@ -1,5 +1,9 @@
 # Changelog
 
+### New features
+
+- add span widget for support rich text.
+
 ## v7.11.0 (Planned for 19.02.2021)
 
 ### New features
