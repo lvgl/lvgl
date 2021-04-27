@@ -89,7 +89,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     lv_btnmatrix_set_btn_ctrl_all(btns, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
 
     uint32_t btn_cnt = 0;
-    while(btn_txts[btn_cnt][0] != '\0') {
+    while(btn_txts[btn_cnt] && btn_txts[btn_cnt][0] != '\0') {
         btn_cnt++;
     }
 
