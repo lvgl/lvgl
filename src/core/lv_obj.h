@@ -263,6 +263,18 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
  */
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 
+/**
+ * Set the user_data field of the object
+ * @param obj   pointer to an object
+ * @param user_data   pointer to the new user_data.
+ */
+#if LV_USE_USER_DATA
+static inline void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
+{
+    obj->user_data = user_data;
+}
+#endif
+
 /*=======================
  * Getter functions
  *======================*/
@@ -312,6 +324,18 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
  * @return      the pointer to group of the object
  */
 void * lv_obj_get_group(const lv_obj_t * obj);
+
+/**
+ * Get the user_data field of the object
+ * @param obj   pointer to an object
+ * @return      the pointer to the user_data of the object
+ */
+#if LV_USE_USER_DATA
+static inline void * lv_obj_get_user_data(lv_obj_t * obj)
+{
+    return obj->user_data;
+}
+#endif
 
 /*=======================
  * Other functions
