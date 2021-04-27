@@ -94,6 +94,14 @@ static inline void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
     lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v);
 }
 
+static inline void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, v);
+}
+
 static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
 {
     lv_style_value_t v = {

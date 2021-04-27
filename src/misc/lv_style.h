@@ -125,7 +125,8 @@ typedef enum {
     LV_STYLE_COLOR_FILTER_DSC        = 10,
     LV_STYLE_COLOR_FILTER_OPA        = 11,
     LV_STYLE_ANIM_TIME               = 12,
-    LV_STYLE_TRANSITION              = 13,
+    LV_STYLE_ANIM_SPEED              = 12,
+    LV_STYLE_TRANSITION              = 14,
     LV_STYLE_BLEND_MODE              = 15,
 
     /*Group 1*/

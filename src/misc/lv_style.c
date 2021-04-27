@@ -49,6 +49,10 @@ void lv_style_init(lv_style_t * style)
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
+
+    static int cnt = 0;
+    cnt++;
+    printf("%d\n", cnt);
 }
 
 void lv_style_reset(lv_style_t * style)

@@ -478,7 +478,7 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
 
         ta->one_line = 1;
         lv_obj_set_content_height(obj, font_h);
-        lv_label_set_long_mode(ta->label, LV_LABEL_LONG_EXPAND);
+        lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
     else {
