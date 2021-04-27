@@ -572,7 +572,7 @@ bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 {
     lv_coord_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
-    if(w_set != LV_SIZE_CONTENT && h_set == LV_SIZE_CONTENT) return false;
+    if(w_set != LV_SIZE_CONTENT && h_set != LV_SIZE_CONTENT) return false;
 
     lv_obj_refr_size(obj);
     return true;
