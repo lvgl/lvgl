@@ -43,8 +43,8 @@ static void draw_main(lv_event_t * e);
 const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
     .event_cb = lv_switch_event,
-    .width_def =  (5 * LV_DPI_DEF) / 11,
-    .height_def = LV_DPI_DEF / 4,
+    .width_def =  (4 * LV_DPI_DEF) / 10,
+    .height_def = (4 * LV_DPI_DEF) / 17,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_switch_t),
     .base_class = &lv_obj_class
