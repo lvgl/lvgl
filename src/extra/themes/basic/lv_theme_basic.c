@@ -158,8 +158,6 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
     }
 
     theme.disp = disp;
-    theme.palette_primary = LV_PALETTE_NONE;
-    theme.palette_secondary = LV_PALETTE_NONE;
     theme.font_small = LV_FONT_DEFAULT;
     theme.font_normal = LV_FONT_DEFAULT;
     theme.font_large = LV_FONT_DEFAULT;

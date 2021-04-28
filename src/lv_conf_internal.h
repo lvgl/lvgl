@@ -1398,12 +1398,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #if LV_USE_THEME_DEFAULT
 
-/*1: Light mode; 0: Dark mode*/
-#ifndef LV_THEME_DEFAULT_PALETTE_LIGHT
-#  ifdef CONFIG_LV_THEME_DEFAULT_PALETTE_LIGHT
-#    define LV_THEME_DEFAULT_PALETTE_LIGHT CONFIG_LV_THEME_DEFAULT_PALETTE_LIGHT
+/*0: Light mode; 1: Dark mode*/
+#ifndef LV_THEME_DEFAULT_DARK
+#  ifdef CONFIG_LV_THEME_DEFAULT_DARK
+#    define LV_THEME_DEFAULT_DARK CONFIG_LV_THEME_DEFAULT_DARK
 #  else
-#    define  LV_THEME_DEFAULT_PALETTE_LIGHT     1
+#    define  LV_THEME_DEFAULT_DARK     0
 #  endif
 #endif
 
