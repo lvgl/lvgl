@@ -698,6 +698,8 @@ menu "LVGL configuration"
             bool "Tileview"
         config LV_USE_WIN
             bool "Win"
+        config LV_USE_SPAN
+            bool "span"
     endmenu
 
     menu "Layouts"
