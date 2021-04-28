@@ -40,3 +40,4 @@ jobs:
           FOLDER: out_html  # The folder the action should deploy.
           TARGET_FOLDER: ${{ steps.version.outputs.VERSION_NAME }}
           PRESERVE: true
+          SINGLE_COMMIT: true
