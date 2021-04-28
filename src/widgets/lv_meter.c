@@ -556,7 +556,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
     lv_obj_init_draw_img_dsc(obj, LV_PART_INDICATOR, &img_dsc);
-
+    img_dsc.antialias = 1;
     lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
 
     _LV_LL_READ_BACK(&meter->scale_ll, scale) {
@@ -675,10 +675,10 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
 
         lv_area_t a;
         _lv_img_buf_get_transformed_area(&a, info.w, info.h, angle, LV_IMG_ZOOM_NONE, &indic->type_data.needle_img.pivot);
-        a.x1 += scale_center.x;
-        a.y1 += scale_center.y;
-        a.x2 += scale_center.x;
-        a.y2 += scale_center.y;
+        a.x1 += scale_center.x - 2;
+        a.y1 += scale_center.y - 2;
+        a.x2 += scale_center.x + 2;
+        a.y2 += scale_center.y + 2;
 
         lv_obj_invalidate_area(obj, &a);
          }
