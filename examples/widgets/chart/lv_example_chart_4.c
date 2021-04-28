@@ -64,15 +64,15 @@ void lv_example_chart_4(void)
     lv_obj_set_size(chart, 200, 150);
     lv_obj_center(chart);
 
-    lv_obj_add_event_cb(chart, event_cb, NULL);
+    lv_obj_add_event_cb(chart, event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(chart);
 
     /*Zoom in a little in X*/
     lv_chart_set_zoom_x(chart, 800);
 
     /*Add two data series*/
-    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_color_green(), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
         lv_chart_set_next_value(chart, ser1, lv_rand(60,90));

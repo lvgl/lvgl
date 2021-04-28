@@ -66,15 +66,17 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     lv_obj_t * label = lv_obj_create_from_class(&lv_list_text_class, list);
     lv_label_set_text(label, txt);
     lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_width(label, LV_SIZE_PCT(100));
+    lv_obj_set_width(label, LV_PCT(100));
     return label;
 }
 
 lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt, lv_event_cb_t event_cb)
 {
     lv_obj_t * btn = lv_obj_create_from_class(&lv_list_btn_class, list);
-    lv_obj_set_size(btn, LV_SIZE_PCT(100), LV_SIZE_CONTENT);
-    lv_obj_add_event_cb(btn, event_cb, NULL);
+    lv_obj_set_size(btn, LV_PCT(100), LV_SIZE_CONTENT);
+    if(event_cb) {
+    	lv_obj_add_event_cb(btn, event_cb, LV_EVENT_ALL, NULL);
+    }
 
     if(icon) {
         lv_obj_t * img = lv_img_create(btn);

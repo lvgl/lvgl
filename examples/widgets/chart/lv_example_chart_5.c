@@ -48,21 +48,16 @@ static const lv_coord_t ecg_sample[] = {
 
 static void slider_x_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        int32_t v = lv_slider_get_value(obj);
-        lv_chart_set_zoom_x(chart, v);
-    }
+    int32_t v = lv_slider_get_value(obj);
+    lv_chart_set_zoom_x(chart, v);
 }
 
 static void slider_y_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        lv_chart_set_zoom_y(chart, lv_slider_get_value(obj));
-    }
+    int32_t v = lv_slider_get_value(obj);
+    lv_chart_set_zoom_y(chart, v);
 }
 
 /**
@@ -79,9 +74,9 @@ void lv_example_chart_5(void)
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, -1000, 1000);
 
     /*Do not display points on the data*/
-    lv_obj_set_style_size(chart, 0, LV_PART_ITEMS);
+    lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
 
-    lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
 
     uint32_t pcnt = sizeof(ecg_sample) / sizeof(ecg_sample[0]);
     lv_chart_set_point_count(chart, pcnt);
@@ -90,13 +85,13 @@ void lv_example_chart_5(void)
     lv_obj_t * slider;
     slider = lv_slider_create(lv_scr_act());
     lv_slider_set_range(slider, LV_IMG_ZOOM_NONE, LV_IMG_ZOOM_NONE * 10);
-    lv_obj_add_event_cb(slider, slider_x_event_cb, NULL);
+    lv_obj_add_event_cb(slider, slider_x_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(slider, lv_obj_get_width(chart), 10);
     lv_obj_align_to(slider, chart, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
 
     slider = lv_slider_create(lv_scr_act());
     lv_slider_set_range(slider, LV_IMG_ZOOM_NONE, LV_IMG_ZOOM_NONE * 10);
-    lv_obj_add_event_cb(slider, slider_y_event_cb, NULL);
+    lv_obj_add_event_cb(slider, slider_y_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(slider, 10, lv_obj_get_height(chart));
     lv_obj_align_to(slider, chart, LV_ALIGN_OUT_RIGHT_MID, 20, 0);
 }

@@ -4,12 +4,8 @@
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "lv_tlsf.h"
-
+#include "lv_mem.h"
 #include "lv_log.h"
 #define printf LV_LOG_ERROR
 
@@ -1265,7 +1261,7 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 			if (p)
 			{
 				const size_t minsize = tlsf_min(cursize, size);
-				memcpy(p, ptr, minsize);
+				lv_memcpy(p, ptr, minsize);
 				tlsf_free(tlsf, ptr);
 			}
 		}

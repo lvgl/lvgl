@@ -114,10 +114,10 @@ typedef enum {
     /*Group 0*/
     LV_STYLE_RADIUS                  = 1,
     LV_STYLE_CLIP_CORNER             = 2,
-    LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_X             = 5 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_Y             = 6 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_TRANSLATE_X             = 5 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSLATE_Y             = 6 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
     LV_STYLE_TRANSFORM_ZOOM          = 7 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_TRANSFORM_ANGLE         = 8 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_OPA                     = 9 | LV_STYLE_PROP_INHERIT,
@@ -125,8 +125,9 @@ typedef enum {
     LV_STYLE_COLOR_FILTER_DSC        = 10,
     LV_STYLE_COLOR_FILTER_OPA        = 11,
     LV_STYLE_ANIM_TIME               = 12,
-    LV_STYLE_TRANSITION              = 13,
-    LV_STYLE_BLEND_MODE              = 14,
+    LV_STYLE_ANIM_SPEED              = 12,
+    LV_STYLE_TRANSITION              = 14,
+    LV_STYLE_BLEND_MODE              = 15,
 
     /*Group 1*/
     LV_STYLE_PAD_TOP                 = 16 | LV_STYLE_PROP_LAYOUT_REFR,
@@ -219,7 +220,7 @@ typedef enum {
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
 
-    LV_STYLE_PROP_ALL                = 0xFFFF
+    LV_STYLE_PROP_ANY                = 0xFFFF
 }lv_style_prop_t;
 
 /**
@@ -230,7 +231,7 @@ typedef struct _lv_style_transiton_t {
 #if LV_USE_USER_DATA
     void * user_data;              /**< A custom user data that will be passed to the animation's user_data */
 #endif
-    lv_anim_path_cb_t path_cb;     /**< A path for the animation.*/
+    lv_anim_path_cb_t path_xcb;     /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
 }lv_style_transition_dsc_t;
@@ -287,7 +288,7 @@ void lv_style_reset(lv_style_t * style);
  * ...
  * MY_PROP = lv_style_register_prop();
  * ...
- * lv_style_set_my_prop(&style1, lv_color_red());
+ * lv_style_set_my_prop(&style1, lv_palette_main(LV_PALETTE_RED));
  */
 lv_style_prop_t lv_style_register_prop(void);
 
@@ -357,14 +358,13 @@ static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_pr
  * Initialize a transition descriptor.
  * @param tr        pointer to a transition descriptor to initialize
  * @param props     an array with the properties to transition. The last element must be zero.
- * @param path_cb   and animation path (ease) callback. If `NULL` liner path will be used.
+ * @param path_cb  and animation path (ease) callback. If `NULL` liner path will be used.
  * @param time      duration of the transition in [ms]
  * @param delay     delay before the transition in [ms]
  * @example
  * const static lv_style_prop_t trans_props[] = { LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, 0 };
  *  static lv_style_transition_dsc_t trans1;
  *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0);
- * @note For performance reasons there are no sanity check on `style`
  */
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
 

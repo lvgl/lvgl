@@ -29,7 +29,7 @@
  **********************/
 static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_meter_event(lv_event_t * e);
+static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
@@ -278,8 +278,10 @@ static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 }
 
-static void lv_meter_event(lv_event_t * e)
+static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
@@ -288,7 +290,7 @@ static void lv_meter_event(lv_event_t * e)
     if(code == LV_EVENT_DRAW_MAIN) {
         const lv_area_t * clip_area = lv_event_get_param(e);
         lv_area_t scale_area;
-        lv_obj_get_coords_fit(obj, &scale_area);
+        lv_obj_get_content_coords(obj, &scale_area);
 
         draw_arcs(obj, clip_area, &scale_area);
         draw_ticks_and_labels(obj, clip_area, &scale_area);
@@ -302,13 +304,13 @@ static void lv_meter_event(lv_event_t * e)
         lv_draw_rect_dsc_t mid_dsc;
         lv_draw_rect_dsc_init(&mid_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &mid_dsc);
-        lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
-        lv_coord_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
         lv_area_t nm_cord;
-        nm_cord.x1 = scale_center.x - point_w;
-        nm_cord.y1 = scale_center.y - point_w;
-        nm_cord.x2 = scale_center.x + point_h;
-        nm_cord.y2 = scale_center.y + point_h;
+        nm_cord.x1 = scale_center.x - w;
+        nm_cord.y1 = scale_center.y - h;
+        nm_cord.x2 = scale_center.x + w;
+        nm_cord.y2 = scale_center.y + h;
         lv_draw_rect(&nm_cord, clip_area, &mid_dsc);
     }
 }
@@ -617,7 +619,7 @@ static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_va
     bool rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_ITEMS);
 
     lv_area_t scale_area;
-    lv_obj_get_coords_fit(obj, &scale_area);
+    lv_obj_get_content_coords(obj, &scale_area);
 
     lv_coord_t r_out = lv_area_get_width(&scale_area) / 2;
     lv_point_t scale_center;
@@ -639,7 +641,7 @@ static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_va
 static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value)
 {
     lv_area_t scale_area;
-    lv_obj_get_coords_fit(obj, &scale_area);
+    lv_obj_get_content_coords(obj, &scale_area);
 
     lv_coord_t r_out = lv_area_get_width(&scale_area) / 2;
     lv_point_t scale_center;

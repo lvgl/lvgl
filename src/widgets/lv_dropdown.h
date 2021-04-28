@@ -1,5 +1,5 @@
 /**
- * @file lv_ddlist.h
+ * @file lv_dropdown.h
  *
  */
 
@@ -20,7 +20,7 @@ extern "C" {
 /*Testing of dependencies*/
 
 #if LV_USE_LABEL == 0
-#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
+#error "lv_dropdown: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../widgets/lv_label.h"
@@ -38,7 +38,7 @@ LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 typedef struct {
     lv_obj_t obj;
     lv_obj_t * list;                /**< The dropped down list*/
-    const char * text;              /**< Text to display on the ddlist's button*/
+    const char * text;              /**< Text to display on the dropdown's button*/
     const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
     char * options;                 /**< Options in a a '\n' separated list*/
     lv_coord_t max_height;          /**< Maximal height of the list when opened. (0: no max.  height)*/

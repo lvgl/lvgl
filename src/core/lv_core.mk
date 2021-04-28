@@ -9,6 +9,7 @@ CSRCS += lv_obj_pos.c
 CSRCS += lv_obj_scroll.c
 CSRCS += lv_obj_style.c
 CSRCS += lv_obj_tree.c
+CSRCS += lv_event.c
 CSRCS += lv_refr.c
 CSRCS += lv_theme.c
 

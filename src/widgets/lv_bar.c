@@ -13,7 +13,6 @@
 #include "../draw/lv_draw.h"
 #include "../misc/lv_anim.h"
 #include "../misc/lv_math.h"
-#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -47,9 +46,9 @@
  **********************/
 static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_bar_event(lv_event_t * e);
+static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_indic(lv_event_t * e);
-static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
+static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
@@ -86,7 +85,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
+void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -100,7 +99,7 @@ void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
 }
 
-void lv_bar_set_start_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
+void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -113,7 +112,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim
     lv_bar_set_value_with_anim(obj, value, &bar->start_value, &bar->start_value_anim, anim);
 }
 
-void lv_bar_set_range(lv_obj_t * obj, int16_t min, int16_t max)
+void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -155,7 +154,7 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode)
  * Getter functions
  *====================*/
 
-int16_t lv_bar_get_value(const lv_obj_t * obj)
+int32_t lv_bar_get_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -163,7 +162,7 @@ int16_t lv_bar_get_value(const lv_obj_t * obj)
     return LV_BAR_GET_ANIM_VALUE(bar->cur_value, bar->cur_value_anim);
 }
 
-int16_t lv_bar_get_start_value(const lv_obj_t * obj)
+int32_t lv_bar_get_start_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -173,14 +172,14 @@ int16_t lv_bar_get_start_value(const lv_obj_t * obj)
     return LV_BAR_GET_ANIM_VALUE(bar->start_value, bar->start_value_anim);
 }
 
-int16_t lv_bar_get_min_value(const lv_obj_t * obj)
+int32_t lv_bar_get_min_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
     return bar->min_value;
 }
 
-int16_t lv_bar_get_max_value(const lv_obj_t * obj)
+int32_t lv_bar_get_max_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -239,9 +238,14 @@ static void draw_indic(lv_event_t * e)
     const lv_area_t * clip_area = lv_event_get_param(e);
 
     lv_area_t bar_coords;
-    lv_area_zoom(lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN), &obj->coords, &bar_coords);
     lv_obj_get_coords(obj, &bar_coords);
 
+    lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    bar_coords.x1 -= transf_w;
+    bar_coords.x2 += transf_w;
+    bar_coords.y1 -= transf_h;
+    bar_coords.y2 += transf_h;
     lv_coord_t barw = lv_area_get_width(&bar_coords);
     lv_coord_t barh = lv_area_get_height(&bar_coords);
     int32_t range = bar->max_value - bar->min_value;
@@ -376,7 +380,7 @@ static void draw_indic(lv_event_t * e)
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
 
-    uint16_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+    lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
@@ -413,7 +417,7 @@ static void draw_indic(lv_event_t * e)
     bg_mask_area.y2 = obj->coords.y2 - bg_bottom;
 
     lv_draw_mask_radius_init(&mask_bg_param, &bg_mask_area, bg_radius, false);
-    int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
+    lv_coord_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 #endif
 
     /*Draw_only the background and background image*/
@@ -461,8 +465,10 @@ static void draw_indic(lv_event_t * e)
 #endif
 }
 
-static void lv_bar_event(lv_event_t * e)
+static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
@@ -519,7 +525,7 @@ static void lv_bar_anim_ready(lv_anim_t * a)
     lv_obj_invalidate(var->bar);
 }
 
-static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
+static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en)
 {
     if(en == LV_ANIM_OFF) {

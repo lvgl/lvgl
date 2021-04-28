@@ -28,7 +28,7 @@
  **********************/
 static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_checkbox_event(lv_event_t * e);
+static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_checkbox_draw(lv_event_t * e);
 
 /**********************
@@ -140,8 +140,10 @@ static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_checkbox_event(lv_event_t * e)
+static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);

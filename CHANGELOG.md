@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.11.0 (Planned for 19.02.2021)
+## v7.11.0
 
 ### New features
 - Add better screen orientation management with software rotation support

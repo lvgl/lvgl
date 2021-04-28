@@ -100,7 +100,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_color = lv_color_black();
-    dsc->sel_bg_color = lv_color_blue();
+    dsc->sel_bg_color = lv_palette_main(LV_PALETTE_BLUE);
     dsc->bidi_dir = LV_BIDI_DIR_LTR;
 }
 
@@ -124,7 +124,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     int32_t w;
 
     /*No need to waste processor time if string is empty*/
-    if(txt[0] == '\0')  return;
+    if (txt == NULL || txt[0] == '\0')
+        return;
 
     lv_area_t clipped_area;
     bool clip_ok = _lv_area_intersect(&clipped_area, coords, mask);

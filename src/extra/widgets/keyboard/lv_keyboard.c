@@ -32,8 +32,8 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_keyboard_class = {
     .constructor_cb = lv_keyboard_constructor,
-    .width_def = LV_SIZE_PCT(100),
-    .height_def = LV_SIZE_PCT(50),
+    .width_def = LV_PCT(100),
+    .height_def = LV_PCT(50),
     .instance_size = sizeof(lv_keyboard_t),
     .editable = 1,
     .base_class = &lv_btnmatrix_class
@@ -222,15 +222,11 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
  */
 void lv_keyboard_def_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    if(code != LV_EVENT_VALUE_CHANGED) return;
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     uint16_t btn_id   = lv_btnmatrix_get_selected_btn(obj);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
-    if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_HIDDEN | LV_BTNMATRIX_CTRL_DISABLED)) return;
-    if(lv_btnmatrix_has_btn_ctrl(obj, btn_id, LV_BTNMATRIX_CTRL_NO_REPEAT) && code == LV_EVENT_LONG_PRESSED_REPEAT) return;
 
     const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
     if(txt == NULL) return;
@@ -332,7 +328,7 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
 
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
-    lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, NULL);
+    lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_base_dir(obj, LV_BIDI_DIR_LTR);
 
     lv_btnmatrix_set_map(obj, kb_map[keyboard->mode]);

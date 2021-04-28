@@ -1,17 +1,12 @@
 /**
- * @file lv_ddlist.c
+ * @file lv_dropdown.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#ifdef ARDUINO
-   #include "../core/lv_obj.h"
-#else
-#include <lvgl/src/core/lv_obj.h>
-#endif
-
+#include "../core/lv_obj.h"
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 
@@ -44,12 +39,12 @@
 static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent);
 static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_dropdown_event(lv_event_t * e);
+static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t * list_obj);
-static void lv_dropdown_list_event(lv_event_t * e);
+static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_list(lv_event_t * e);
 
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
@@ -516,10 +511,10 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_set_x(label, 0);
         break;
     case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_set_x(label, lv_obj_get_width_fit(dropdown->list) - lv_obj_get_width(label));
+        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) - lv_obj_get_width(label));
         break;
     case LV_TEXT_ALIGN_CENTER:
-        lv_obj_set_x(label, lv_obj_get_width_fit(dropdown->list) / 2 - lv_obj_get_width(label) / 2);
+        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) / 2 - lv_obj_get_width(label) / 2);
         break;
 
     }
@@ -606,8 +601,10 @@ static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t 
     dropdown->list = NULL;
 }
 
-static void lv_dropdown_event(lv_event_t * e)
+static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
@@ -700,15 +697,18 @@ static void lv_dropdown_event(lv_event_t * e)
     }
 }
 
-static void lv_dropdown_list_event(lv_event_t * e)
+static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS_LIST, e);
-    if(res != LV_RES_OK) return;
-
     lv_event_code_t code = lv_event_get_code(e);
+    if(code != LV_EVENT_DRAW_POST) {
+        res = lv_obj_event_base(MY_CLASS_LIST, e);
+        if(res != LV_RES_OK) return;
+    }
     lv_obj_t * list = lv_event_get_target(e);
     lv_obj_t * dropdown_obj = ((lv_dropdown_list_t *)list)->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
@@ -727,6 +727,8 @@ static void lv_dropdown_list_event(lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_POST) {
         draw_list(e);
+        res = lv_obj_event_base(MY_CLASS_LIST, e);
+        if(res != LV_RES_OK) return;
     }
 }
 
@@ -1034,7 +1036,7 @@ static void position_to_selected(lv_obj_t * dropdown_obj)
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
 
-    if(lv_obj_get_height(label) <= lv_obj_get_height_fit(dropdown_obj)) return;
+    if(lv_obj_get_height(label) <= lv_obj_get_content_height(dropdown_obj)) return;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);

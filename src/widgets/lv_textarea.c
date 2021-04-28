@@ -44,7 +44,7 @@
  **********************/
 static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_textarea_event(lv_event_t * e);
+static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
 static void pwd_char_hider_anim_ready(lv_anim_t * a);
@@ -395,24 +395,29 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 
     ta->cursor.pos = pos;
 
-    /*Position the label to make the cursor show*/
-    lv_point_t cur_pos;
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_area_t label_cords;
-    lv_area_t ta_cords;
-    lv_label_get_letter_pos(ta->label, pos, &cur_pos);
-    lv_obj_get_coords(obj, &ta_cords);
-    lv_obj_get_coords(ta->label, &label_cords);
+    /*Position the label to make the cursor visible*/
+	lv_point_t cur_pos;
+	const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+	lv_area_t label_cords;
+	lv_area_t ta_cords;
+	lv_label_get_letter_pos(ta->label, pos, &cur_pos);
+	lv_obj_get_coords(obj, &ta_cords);
+	lv_obj_get_coords(ta->label, &label_cords);
 
-    /*Check the top*/
-    lv_coord_t font_h = lv_font_get_line_height(font);
-    if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
-        lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
-    }
-    /*Check the bottom*/
-    lv_coord_t h = lv_obj_get_height_fit(obj);
-    if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
-        lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE)) {
+        /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
+        lv_obj_update_layout(obj);
+
+        /*Check the top*/
+		lv_coord_t font_h = lv_font_get_line_height(font);
+		if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
+			lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
+		}
+		/*Check the bottom*/
+		lv_coord_t h = lv_obj_get_content_height(obj);
+		if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
+			lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+		}
     }
 
     ta->cursor.valid_x = cur_pos.x;
@@ -475,13 +480,14 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
         lv_coord_t font_h              = lv_font_get_line_height(font);
 
         ta->one_line = 1;
+        lv_obj_set_width(ta->label, LV_SIZE_CONTENT);
+
         lv_obj_set_content_height(obj, font_h);
-        lv_label_set_long_mode(ta->label, LV_LABEL_LONG_EXPAND);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
     else {
         ta->one_line = 0;
-        lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
+        lv_obj_set_width(ta->label, lv_pct(100));
 
         lv_obj_set_height(obj, LV_DPI_DEF);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
@@ -807,8 +813,9 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->placeholder_txt = NULL;
 
     ta->label = lv_label_create(obj);
-    lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(ta->label, lv_pct(100));
     lv_label_set_text(ta->label, "");
+    lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     start_cursor_blink(obj);
@@ -831,8 +838,10 @@ static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 }
 
-static void lv_textarea_event(lv_event_t * e)
+static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
@@ -855,7 +864,6 @@ static void lv_textarea_event(lv_event_t * e)
     else if(code == LV_EVENT_SIZE_CHANGED) {
         /*Set the label width according to the text area width*/
         if(ta->label) {
-            lv_obj_set_width(ta->label, lv_obj_get_width_fit(obj));
             lv_obj_set_pos(ta->label, 0, 0);
             lv_label_set_text(ta->label, NULL); /*Refresh the label*/
 
@@ -1165,7 +1173,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
     }
 
     if(ta->text_sel_en) {
-        if(!ta->text_sel_in_prog && !click_outside_label && e->code == LV_EVENT_PRESSED) {
+        if(!ta->text_sel_in_prog && !click_outside_label && code == LV_EVENT_PRESSED) {
             /*Input device just went down. Store the selection start position*/
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SEL_OFF;
@@ -1182,7 +1190,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         }
     }
 
-    if(ta->text_sel_in_prog || e->code == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
+    if(ta->text_sel_in_prog || code == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
 
     if(ta->text_sel_in_prog) {
         /*If the selected area has changed then update the real values and*/

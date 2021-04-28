@@ -14,10 +14,10 @@ static lv_obj_t * img1;
 void lv_example_img_2(void)
 {
     /*Create 4 sliders to adjust RGB color and re-color intensity*/
-    red_slider = create_slider(lv_color_red());
-    green_slider = create_slider(lv_color_green());
-    blue_slider = create_slider(lv_color_blue());
-    intense_slider = create_slider(lv_color_grey());
+    red_slider = create_slider(lv_palette_main(LV_PALETTE_RED));
+    green_slider = create_slider(lv_palette_main(LV_PALETTE_GREEN));
+    blue_slider = create_slider(lv_palette_main(LV_PALETTE_BLUE));
+    intense_slider = create_slider(lv_palette_main(LV_PALETTE_GREY));
 
     lv_slider_set_value(red_slider, LV_OPA_20, LV_ANIM_OFF);
     lv_slider_set_value(green_slider, LV_OPA_90, LV_ANIM_OFF);
@@ -40,15 +40,13 @@ void lv_example_img_2(void)
 
 static void slider_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
 
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        /*Recolor the image based on the sliders' values*/
-        lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider), lv_slider_get_value(blue_slider));
-        lv_opa_t intense = lv_slider_get_value(intense_slider);
-        lv_obj_set_style_img_recolor_opa(img1, intense, 0);
-        lv_obj_set_style_img_recolor(img1, color, 0);
-    }
+    /*Recolor the image based on the sliders' values*/
+    lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider), lv_slider_get_value(blue_slider));
+    lv_opa_t intense = lv_slider_get_value(intense_slider);
+    lv_obj_set_style_img_recolor_opa(img1, intense, 0);
+    lv_obj_set_style_img_recolor(img1, color, 0);
 }
 
 static lv_obj_t * create_slider(lv_color_t color)
@@ -58,7 +56,7 @@ static lv_obj_t * create_slider(lv_color_t color)
     lv_obj_set_size(slider, 10, 200);
     lv_obj_set_style_bg_color(slider, color, LV_PART_KNOB);
     lv_obj_set_style_bg_color(slider, lv_color_darken(color, LV_OPA_40), LV_PART_INDICATOR);
-    lv_obj_add_event_cb(slider, slider_event_cb, NULL);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     return slider;
 }
 

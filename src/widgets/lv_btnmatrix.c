@@ -34,7 +34,7 @@
  **********************/
 static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_btnmatrix_event(lv_event_t * e);
+static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -62,6 +62,7 @@ const lv_obj_class_t lv_btnmatrix_class = {
         .height_def = LV_DPI_DEF,
         .instance_size = sizeof(lv_btnmatrix_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
+        .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
         .base_class = &lv_obj_class
     };
 
@@ -102,13 +103,13 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     lv_coord_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-    lv_coord_t max_w            = lv_obj_get_width_fit(obj);
-    lv_coord_t max_h            = lv_obj_get_height_fit(obj);
+    lv_coord_t max_w            = lv_obj_get_content_width(obj);
+    lv_coord_t max_h            = lv_obj_get_content_height(obj);
 
     /*Count the lines to calculate button height*/
     uint8_t row_cnt = 1;
     uint32_t i;
-    for(i = 0; strlen(map[i]) != 0; i++) {
+    for(i = 0; map[i] && map[i][0] != '\0'; i++) {
         if(strcmp(map[i], "\n") == 0) row_cnt++;
     }
 
@@ -127,7 +128,7 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
         uint16_t unit_cnt = 0;           /*Number of units in a row*/
         uint16_t btn_cnt = 0;            /*Number of buttons in a row*/
         /*Count the buttons and units in this row*/
-        while(strcmp(map_row[btn_cnt], "\n") != 0 && strlen(map_row[btn_cnt]) != '\0') {
+        while(map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
             unit_cnt += get_button_width(btnm->ctrl_bits[btn_tot_i + btn_cnt]);
             btn_cnt++;
         }
@@ -386,8 +387,10 @@ static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_TRACE_OBJ_CREATE("finshed");
 }
 
-static void lv_btnmatrix_event(lv_event_t * e)
+static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
@@ -793,7 +796,7 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** 
     /*Count the buttons in the map*/
     uint16_t btn_cnt = 0;
     uint16_t i       = 0;
-    while(strlen(map[i]) != 0) {
+    while(map[i] && map[i][0] != '\0') {
         if(strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
             btn_cnt++;
         }

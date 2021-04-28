@@ -29,8 +29,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_roller_event(lv_event_t * e);
-static void lv_roller_label_event(lv_event_t * e);
+static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
@@ -51,6 +51,7 @@ const lv_obj_class_t lv_roller_class = {
         .height_def = LV_DPI_DEF,
         .instance_size = sizeof(lv_roller_t),
         .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
+        .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
         .base_class = &lv_obj_class
 };
 
@@ -302,8 +303,10 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_LOG_TRACE("finshed");
 }
 
-static void lv_roller_event(lv_event_t * e)
+static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
@@ -399,8 +402,10 @@ static void lv_roller_event(lv_event_t * e)
     }
 }
 
-static void lv_roller_label_event(lv_event_t * e)
+static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     lv_event_code_t code = lv_event_get_code(e);
@@ -484,8 +489,8 @@ static void draw_main(lv_event_t * e)
             lv_coord_t roller_h = lv_obj_get_height(obj);
             int32_t label_y_prop = label->coords.y1 - (roller_h / 2 +
                     obj->coords.y1); /*label offset from the middle line of the roller*/
-            label_y_prop = (label_y_prop << 14) / lv_obj_get_height(
-                               label); /*Proportional position from the middle line (upscaled)*/
+            label_y_prop = (label_y_prop * 16384) / lv_obj_get_height(
+                               label); /*Proportional position from the middle line (upscaled by << 14)*/
 
             /*Apply a correction with different line heights*/
             const lv_font_t * normal_label_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
@@ -566,10 +571,10 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
     switch(align) {
     case LV_TEXT_ALIGN_CENTER:
-        lv_obj_set_x(label, (lv_obj_get_width_fit(obj) - lv_obj_get_width(label)) / 2);
+        lv_obj_set_x(label, (lv_obj_get_content_width(obj) - lv_obj_get_width(label)) / 2);
         break;
     case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_set_x(label, lv_obj_get_width_fit(obj) - lv_obj_get_width(label));
+        lv_obj_set_x(label, lv_obj_get_content_width(obj) - lv_obj_get_width(label));
         break;
     case LV_TEXT_ALIGN_LEFT:
         lv_obj_set_x(label, 0);
@@ -581,7 +586,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_coord_t h                   = lv_obj_get_height_fit(obj);
+    lv_coord_t h                   = lv_obj_get_content_height(obj);
     uint16_t anim_time             = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
     /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
@@ -706,7 +711,7 @@ static void inf_normalize(lv_obj_t * obj)
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
         lv_coord_t font_h              = lv_font_get_line_height(font);
-        lv_coord_t h                   = lv_obj_get_height_fit(obj);
+        lv_coord_t h                   = lv_obj_get_content_height(obj);
 
         lv_obj_t * label = get_label(obj);
 

@@ -30,7 +30,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_led_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_led_event(lv_event_t * e);
+static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -156,8 +156,10 @@ static void lv_led_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     led->bright = LV_LED_BRIGHT_MAX;
 }
 
-static void lv_led_event(lv_event_t * e)
+static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /* Call the ancestor's event handler */

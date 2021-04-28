@@ -57,12 +57,12 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
     lv_coord_t w = lv_obj_get_width(calendar);
     lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_place(header, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_START);
+    lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
     lv_obj_t * mo_prev = lv_btn_create(header);
     lv_obj_set_style_bg_img_src(mo_prev, LV_SYMBOL_LEFT, 0);
     lv_obj_set_size(mo_prev, btn_size, btn_size);
-    lv_obj_add_event_cb(mo_prev, month_event_cb, calendar);
+    lv_obj_add_event_cb(mo_prev, month_event_cb, LV_EVENT_CLICKED, calendar);
     lv_obj_clear_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_t * label = lv_label_create(header);
@@ -74,7 +74,7 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
     lv_obj_t * mo_next = lv_btn_create(header);
     lv_obj_set_style_bg_img_src(mo_next, LV_SYMBOL_RIGHT, 0);
     lv_obj_set_size(mo_next, btn_size, btn_size);
-    lv_obj_add_event_cb(mo_next, month_event_cb, calendar);
+    lv_obj_add_event_cb(mo_next, month_event_cb, LV_EVENT_CLICKED, calendar);
     lv_obj_clear_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_align_to(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
@@ -88,11 +88,7 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
 
 static void month_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * btn = lv_event_get_target(e);
-
-    if(code != LV_EVENT_CLICKED) return;
-
 
     lv_obj_t * header = lv_obj_get_parent(btn);
     lv_obj_t * calendar = lv_event_get_user_data(e);

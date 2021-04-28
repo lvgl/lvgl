@@ -3,49 +3,49 @@
 
 #define ITEM_CNT 200
 
-static void event_cb(lv_event_t * e)
+static void draw_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
-        /*If the cells are drawn...*/
-        if(dsc->part == LV_PART_ITEMS) {
-            bool chk = lv_table_has_cell_ctrl(obj, dsc->id, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    /*If the cells are drawn...*/
+    if(dsc->part == LV_PART_ITEMS) {
+        bool chk = lv_table_has_cell_ctrl(obj, dsc->id, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
 
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_color_grey_lighten_2();
-            rect_dsc.radius = LV_RADIUS_CIRCLE;
+        lv_draw_rect_dsc_t rect_dsc;
+        lv_draw_rect_dsc_init(&rect_dsc);
+        rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_palette_lighten(LV_PALETTE_GREY, 2);
+        rect_dsc.radius = LV_RADIUS_CIRCLE;
 
-            lv_area_t sw_area;
-            sw_area.x1 = dsc->draw_area->x2 - 50;
-            sw_area.x2 = sw_area.x1 + 40;
-            sw_area.y1 =  dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
-            sw_area.y2 = sw_area.y1 + 20;
-            lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
+        lv_area_t sw_area;
+        sw_area.x1 = dsc->draw_area->x2 - 50;
+        sw_area.x2 = sw_area.x1 + 40;
+        sw_area.y1 =  dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
+        sw_area.y2 = sw_area.y1 + 20;
+        lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
 
-            rect_dsc.bg_color = lv_color_white();
-            if(chk) {
-                sw_area.x2 -= 2;
-                sw_area.x1 = sw_area.x2 - 16;
-            } else {
-                sw_area.x1 += 2;
-                sw_area.x2 = sw_area.x1 + 16;
-            }
-            sw_area.y1 += 2;
-            sw_area.y2 -= 2;
-            lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
+        rect_dsc.bg_color = lv_color_white();
+        if(chk) {
+            sw_area.x2 -= 2;
+            sw_area.x1 = sw_area.x2 - 16;
+        } else {
+            sw_area.x1 += 2;
+            sw_area.x2 = sw_area.x1 + 16;
         }
+        sw_area.y1 += 2;
+        sw_area.y2 -= 2;
+        lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
     }
-    else if(code == LV_EVENT_VALUE_CHANGED) {
-        uint16_t col;
-        uint16_t row;
-        lv_table_get_selected_cell(obj, &row, &col);
-        bool chk = lv_table_has_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
-        if(chk) lv_table_clear_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
-        else lv_table_add_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
-    }
+}
+
+static void change_event_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    uint16_t col;
+    uint16_t row;
+    lv_table_get_selected_cell(obj, &row, &col);
+    bool chk = lv_table_has_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+    if(chk) lv_table_clear_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+    else lv_table_add_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
 }
 
 
@@ -80,7 +80,8 @@ void lv_example_table_2(void)
     lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event_cb(table, event_cb, NULL);
+    lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_PART_END, NULL);
+    lv_obj_add_event_cb(table, change_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_mem_monitor_t mon2;
     lv_mem_monitor(&mon2);
@@ -90,9 +91,9 @@ void lv_example_table_2(void)
     uint32_t elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(label, "%d bytes are used by the table\n"
-                                  "and %d items were added in %d ms",
-                                  mem_used, ITEM_CNT, elaps);
+    lv_label_set_text_fmt(label, "%d items were created in %d ms\n"
+                                  "using %d bytes of memory",
+                                  ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
 

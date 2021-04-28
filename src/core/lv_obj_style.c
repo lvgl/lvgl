@@ -75,7 +75,7 @@ void _lv_obj_style_init(void)
 
 void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
 {
-    trans_del(obj, selector, LV_STYLE_PROP_ALL, NULL);
+    trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
     uint32_t i;
     /*Go after the transition and local styles*/
@@ -100,7 +100,7 @@ void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selec
     obj->styles[i].style = style;
     obj->styles[i].selector = selector;
 
-    lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ALL);
+    lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
 }
 
 void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
@@ -121,7 +121,7 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
         }
 
         if(obj->styles[i].is_trans) {
-            trans_del(obj, part, LV_STYLE_PROP_ALL, NULL);
+            trans_del(obj, part, LV_STYLE_PROP_ANY, NULL);
         }
 
         if(obj->styles[i].is_local || obj->styles[i].is_trans) {
@@ -144,7 +144,7 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
          *Therefore it doesn't needs to be incremented*/
     }
     if(deleted) {
-        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
     }
 }
 
@@ -172,10 +172,11 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
-        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout and sizes*/
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
+        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout*/
+        if(obj->parent) obj->parent->layout_inv = 1;
     }
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         if(parent) lv_obj_mark_layout_as_dirty(parent);
     }
@@ -184,7 +185,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     }
     lv_obj_invalidate(obj);
 
-    if(prop == LV_STYLE_PROP_ALL ||
+    if(prop == LV_STYLE_PROP_ANY ||
       ((prop & LV_STYLE_PROP_INHERIT) && ((prop & LV_STYLE_PROP_EXT_DRAW) || (prop & LV_STYLE_PROP_LAYOUT_REFR))))
     {
         if(part != LV_PART_SCROLLBAR) {
@@ -223,7 +224,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     }
 
     if(!found) {
-        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
+        if(prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT) {
             const lv_obj_class_t * cls = obj->class_p;
             while(cls) {
                 if(prop == LV_STYLE_WIDTH) {
@@ -390,6 +391,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ZOOM, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_OUTLINE_OPA, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_OUTLINE_PAD, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(lv_style_get_prop(style, LV_STYLE_OUTLINE_WIDTH, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_SHADOW_WIDTH, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_SHADOW_OPA, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_SHADOW_OFS_X, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
@@ -603,7 +605,7 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
         if(style == NULL || obj->styles[i].style == style) {
-            lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ALL);
+            lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
             break;
         }
     }
@@ -652,7 +654,7 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
         /*'tr' might be deleted, so get the next object while 'tr' is valid*/
         tr_prev = _lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
-        if(tr->obj == obj && (part == tr->selector || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ALL)) {
+        if(tr->obj == obj && (part == tr->selector || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ANY)) {
             /*Remove the transitioned property from trans. style
              *to allow changing it by normal styles*/
             uint32_t i;

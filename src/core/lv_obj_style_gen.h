@@ -22,15 +22,15 @@ static inline lv_coord_t lv_obj_get_style_transform_height(const struct _lv_obj_
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_transform_x(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_translate_x(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_X);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSLATE_X);
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_transform_y(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_translate_y(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_Y);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSLATE_Y);
     return (lv_coord_t)v.num;
 }
 
@@ -67,6 +67,12 @@ static inline lv_opa_t lv_obj_get_style_color_filter_opa(const struct _lv_obj_t 
 static inline uint32_t lv_obj_get_style_anim_time(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM_TIME);
+    return (uint32_t)v.num;
+}
+
+static inline uint32_t lv_obj_get_style_anim_speed(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM_SPEED);
     return (uint32_t)v.num;
 }
 
@@ -552,20 +558,20 @@ static inline void lv_obj_set_style_transform_height(struct _lv_obj_t * obj, lv_
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_HEIGHT, v, selector);
 }
 
-static inline void lv_obj_set_style_transform_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_translate_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_X, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_X, v, selector);
 }
 
-static inline void lv_obj_set_style_transform_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_translate_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_Y, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_Y, v, selector);
 }
 
 static inline void lv_obj_set_style_transform_zoom(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -614,6 +620,14 @@ static inline void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t v
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_TIME, v, selector);
+}
+
+static inline void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_SPEED, v, selector);
 }
 
 static inline void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)

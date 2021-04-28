@@ -32,7 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_slider_event(lv_event_t * e);
+static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
 static void draw_knob(lv_event_t * e);
 
@@ -90,8 +90,10 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_obj_set_height(obj, LV_DPX(10));
 }
 
-static void lv_slider_event(lv_event_t * e)
+static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
@@ -194,9 +196,9 @@ static void lv_slider_event(lv_event_t * e)
         lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
         int32_t range = slider->bar.max_value - slider->bar.min_value;
-        int16_t new_value = 0;
-        int16_t real_max_value = slider->bar.max_value;
-        int16_t real_min_value = slider->bar.min_value;
+        int32_t new_value = 0;
+        int32_t real_max_value = slider->bar.max_value;
+        int32_t real_min_value = slider->bar.min_value;
 
         if(w >= h) {
             lv_coord_t indic_w = w - bg_left - bg_right;
@@ -419,9 +421,6 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob
         knob_area->x1 = obj->coords.x1;
         knob_area->x2 = obj->coords.x2;
     }
-
-    lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_KNOB);
-    lv_area_zoom(zoom, knob_area, knob_area);
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);

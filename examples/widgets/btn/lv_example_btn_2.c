@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#include <stdio.h>
 #if LV_USE_BTN && LV_BUILD_EXAMPLES
 
 /**
@@ -14,7 +13,7 @@ void lv_example_btn_2(void)
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_outline_opa(&style, LV_OPA_COVER);
-    lv_style_set_outline_color(&style, lv_color_blue());
+    lv_style_set_outline_color(&style, lv_palette_main(LV_PALETTE_BLUE));
 
     static lv_style_t style_pr;
     lv_style_init(&style_pr);
@@ -27,16 +26,16 @@ void lv_example_btn_2(void)
 //    lv_style_set_radius(&style, 3);
 //
 //    lv_style_set_bg_opa(&style, LV_OPA_100);
-//    lv_style_set_bg_color(&style, lv_color_blue());
+//    lv_style_set_bg_color(&style, lv_palette_main(LV_PALETTE_BLUE));
 //    lv_style_set_bg_grad_color(&style, lv_color_blue_darken_2());
 //    lv_style_set_bg_grad_dir(&style, LV_GRAD_DIR_VER);
 //
 //    lv_style_set_border_opa(&style, LV_OPA_40);
 //    lv_style_set_border_width(&style, 2);
-//    lv_style_set_border_color(&style, lv_color_grey());
+//    lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_GREY));
 //
 //    lv_style_set_shadow_width(&style, 8);
-//    lv_style_set_shadow_color(&style, lv_color_grey());
+//    lv_style_set_shadow_color(&style, lv_palette_main(LV_PALETTE_GREY));
 //    lv_style_set_shadow_ofs_y(&style, 8);
 //
 //    lv_style_set_text_color(&style, lv_color_white());
@@ -46,8 +45,8 @@ void lv_example_btn_2(void)
 
     /*Init the pressed style*/
     lv_style_set_shadow_ofs_y(&style_pr, 3);
-    lv_style_set_bg_color(&style_pr, lv_color_blue_darken_2());
-    lv_style_set_bg_grad_color(&style_pr, lv_color_blue_darken_4());
+    lv_style_set_bg_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 2));
+    lv_style_set_bg_grad_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 4));
 
     lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
 //    lv_obj_remove_style(btn1, LV_PART_ANY, LV_STATE_ANY, NULL);

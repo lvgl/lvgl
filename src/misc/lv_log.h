@@ -45,9 +45,9 @@ typedef int8_t lv_log_level_t;
  **********************/
 
 /**
- * Log print function. Receives "Log Level", "File path", "Line number", "Function name" and "Description".
+ * Log print function. Receives a string buffer to print".
  */
-typedef void (*lv_log_print_g_cb_t)(lv_log_level_t level, const char *, uint32_t, const char *, const char *);
+typedef void (*lv_log_print_g_cb_t)(const char *buf);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -57,18 +57,25 @@ typedef void (*lv_log_print_g_cb_t)(lv_log_level_t level, const char *, uint32_t
  * Register custom print/write function to call when a log is added.
  * It can format its "File path", "Line number" and "Description" as required
  * and send the formatted log message to a console or serial port.
- * @param print_cb a function pointer to print a log
+ * @param           print_cb a function pointer to print a log
  */
 void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb);
 
 /**
+ * Print a log message via `printf` if enabled with `LV_LOG_PRINTF` in `lv_conf.h`
+ * and/or a print callback if registered with `lv_log_register_print_cb`
+ * @param buf       a string message to print
+ */
+void lv_log(const char * buf);
+
+/**
  * Add a log
- * @param level the level of log. (From `lv_log_level_t` enum)
- * @param file name of the file when the log added
- * @param line line number in the source code where the log added
- * @param func name of the function when the log added
- * @param format printf-like format string
- * @param ... parameters for `format`
+ * @param level     the level of log. (From `lv_log_level_t` enum)
+ * @param file      name of the file when the log added
+ * @param line      line number in the source code where the log added
+ * @param func      name of the function when the log added
+ * @param format    printf-like format string
+ * @param ...       parameters for `format`
  */
 void _lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...);
 

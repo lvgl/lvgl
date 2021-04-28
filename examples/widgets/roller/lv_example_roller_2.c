@@ -33,7 +33,7 @@ void lv_example_roller_2(void)
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
     lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_LEFT, 0);
     lv_obj_align(roller, LV_ALIGN_LEFT_MID, 10, 0);
-    lv_obj_add_event_cb(roller, event_handler, NULL);
+    lv_obj_add_event_cb(roller, event_handler, LV_EVENT_ALL, NULL);
     lv_roller_set_selected(roller, 2, LV_ANIM_OFF);
 
     /*A roller on the middle with center aligned text, and auto (default) width*/
@@ -42,7 +42,7 @@ void lv_example_roller_2(void)
     lv_roller_set_visible_row_count(roller, 3);
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
     lv_obj_align(roller, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event_cb(roller, event_handler, NULL);
+    lv_obj_add_event_cb(roller, event_handler, LV_EVENT_ALL, NULL);
     lv_roller_set_selected(roller, 5, LV_ANIM_OFF);
 
     /*A roller on the right with right aligned text, and custom width*/
@@ -53,7 +53,7 @@ void lv_example_roller_2(void)
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
     lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_align(roller, LV_ALIGN_RIGHT_MID, -10, 0);
-    lv_obj_add_event_cb(roller, event_handler, NULL);
+    lv_obj_add_event_cb(roller, event_handler, LV_EVENT_ALL, NULL);
     lv_roller_set_selected(roller, 8, LV_ANIM_OFF);
 }
 

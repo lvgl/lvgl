@@ -202,7 +202,7 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
 {
     lv_memset_00(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
-    tr->path_cb = path_cb == NULL ? lv_anim_path_linear : path_cb;
+    tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
     tr->time = time;
     tr->delay = delay;
 }

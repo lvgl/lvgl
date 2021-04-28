@@ -25,7 +25,7 @@
  **********************/
 static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void draw_main(lv_event_t * e);
-static void lv_imgbtn_event(lv_event_t * e);
+static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
@@ -160,8 +160,10 @@ static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 }
 
 
-static void lv_imgbtn_event(lv_event_t * e)
+static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
+
     lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, e);
     if(res != LV_RES_OK) return;
 

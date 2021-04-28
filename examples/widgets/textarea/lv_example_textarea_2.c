@@ -14,7 +14,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
     lv_obj_set_pos(pwd_ta, 5, 20);
-    lv_obj_add_event_cb(pwd_ta, ta_event_cb, NULL);
+    lv_obj_add_event_cb(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
 
     /*Create a label and position it above the text box*/
     lv_obj_t * pwd_label = lv_label_create(lv_scr_act());

@@ -128,7 +128,7 @@ typedef int _keep_pedantic_happy;
 //    _lv_style_set_int(&style, LV_STYLE_TEXT_LINE_SPACE, 5);
 //    _lv_style_set_opa(&style, LV_STYLE_BG_OPA, LV_OPA_50);
 //    _lv_style_set_ptr(&style, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL);
-//    _lv_style_set_color(&style, LV_STYLE_BG_COLOR, lv_color_red());
+//    _lv_style_set_color(&style, LV_STYLE_BG_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
 //    found = _lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get an existing 'int' property");
@@ -144,7 +144,7 @@ typedef int _keep_pedantic_happy;
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get an existing 'color' property");
-//    lv_test_assert_color_eq(lv_color_red(), color, "Get the value of a 'color' property");
+//    lv_test_assert_color_eq(lv_palette_main(LV_PALETTE_RED), color, "Get the value of a 'color' property");
 //
 //    lv_test_print("Reset the style");
 //    lv_style_reset(&style);
@@ -192,7 +192,7 @@ typedef int _keep_pedantic_happy;
 //    _lv_style_set_int(&style_first, LV_STYLE_TEXT_LINE_SPACE, 5);
 //    _lv_style_set_opa(&style_first, LV_STYLE_BG_OPA, LV_OPA_50);
 //    _lv_style_set_ptr(&style_first, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL);
-//    _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR, lv_color_red());
+//    _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
 //    found = _lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'int' property");
@@ -208,14 +208,14 @@ typedef int _keep_pedantic_happy;
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'color' property");
-//    lv_test_assert_color_eq(lv_color_red(), color, "Get the value of a 'color' property");
+//    lv_test_assert_color_eq(lv_palette_main(LV_PALETTE_RED), color, "Get the value of a 'color' property");
 //
 //    lv_test_print("Overwrite the properties from the second style");
 //
 //    _lv_style_set_int(&style_second, LV_STYLE_TEXT_LINE_SPACE, 10);
 //    _lv_style_set_opa(&style_second, LV_STYLE_BG_OPA, LV_OPA_60);
 //    _lv_style_set_ptr(&style_second, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL + 1);
-//    _lv_style_set_color(&style_second, LV_STYLE_BG_COLOR, lv_color_blue());
+//    _lv_style_set_color(&style_second, LV_STYLE_BG_COLOR, lv_palette_main(LV_PALETTE_BLUE));
 //
 //    found = _lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get an overwritten 'int' property");
@@ -231,7 +231,7 @@ typedef int _keep_pedantic_happy;
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get an overwritten 'color' property");
-//    lv_test_assert_color_eq(lv_color_blue(), color, "Get the value of an overwritten 'color' property");
+//    lv_test_assert_color_eq(lv_palette_main(LV_PALETTE_BLUE), color, "Get the value of an overwritten 'color' property");
 //
 //    lv_test_print("Overwrite the properties with the local style");
 //    _lv_style_list_set_local_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, 20);
@@ -375,9 +375,9 @@ typedef int _keep_pedantic_happy;
 //
 //    lv_test_print("Test state precedence in 2 styles");
 //    _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR, LV_COLOR_YELLOW);
-//    _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR | (LV_STATE_HOVERED) << LV_STYLE_STATE_POS, lv_color_red());
+//    _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR | (LV_STATE_HOVERED) << LV_STYLE_STATE_POS, lv_palette_main(LV_PALETTE_RED));
 //    _lv_style_set_color(&style_second, LV_STYLE_BG_COLOR | (LV_STATE_CHECKED) << LV_STYLE_STATE_POS, LV_COLOR_LIME);
-//    _lv_style_set_color(&style_second, LV_STYLE_BG_COLOR | (LV_STATE_HOVERED | LV_STATE_PRESSED) << LV_STYLE_STATE_POS, lv_color_blue());
+//    _lv_style_set_color(&style_second, LV_STYLE_BG_COLOR | (LV_STATE_HOVERED | LV_STATE_PRESSED) << LV_STYLE_STATE_POS, lv_palette_main(LV_PALETTE_BLUE));
 //
 //    lv_color_t color;
 //
@@ -387,7 +387,7 @@ typedef int _keep_pedantic_happy;
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR | (LV_STATE_HOVERED) << LV_STYLE_STATE_POS, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get a 'color' property in hovered state");
-//    lv_test_assert_color_eq(lv_color_red(), color, "Get the value of a 'color' in hovered state");
+//    lv_test_assert_color_eq(lv_palette_main(LV_PALETTE_RED), color, "Get the value of a 'color' in hovered state");
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR | (LV_STATE_CHECKED) << LV_STYLE_STATE_POS, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get a 'color' property in checked state");
@@ -395,7 +395,7 @@ typedef int _keep_pedantic_happy;
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR | (LV_STATE_HOVERED | LV_STATE_PRESSED) << LV_STYLE_STATE_POS, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get a 'color' property in hover pressed state");
-//    lv_test_assert_color_eq(lv_color_blue(), color, "Get the value of a 'color' in hover pressed state");
+//    lv_test_assert_color_eq(lv_palette_main(LV_PALETTE_BLUE), color, "Get the value of a 'color' in hover pressed state");
 //
 //    found = _lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR | (LV_STATE_EDITED) << LV_STYLE_STATE_POS, &color);
 //    lv_test_assert_int_eq(LV_RES_OK, found, "Get a 'color' property in edit (unspecified) state");
@@ -436,16 +436,16 @@ typedef int _keep_pedantic_happy;
 //    lv_test_print("Set style properties");
 //    lv_mem_monitor(&mon_start);
 //    for(i = 0; i < 100; i++) {
-//        _lv_style_set_color(&style2, LV_STYLE_LINE_COLOR, lv_color_red());
+//        _lv_style_set_color(&style2, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
-//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_color_red());
-//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED) << LV_STYLE_STATE_POS, lv_color_blue());
-//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_color_blue());
+//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
+//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED) << LV_STYLE_STATE_POS, lv_palette_main(LV_PALETTE_BLUE));
+//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_BLUE));
 //        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED | LV_STATE_FOCUSED) << LV_STYLE_STATE_POS, LV_COLOR_GREEN);
 //
-//        _lv_style_set_color(&style3, LV_STYLE_BG_COLOR, lv_color_red());
+//        _lv_style_set_color(&style3, LV_STYLE_BG_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
-//        _lv_style_set_color(&style3, LV_STYLE_IMAGE_RECOLOR, lv_color_red());
+//        _lv_style_set_color(&style3, LV_STYLE_IMAGE_RECOLOR, lv_palette_main(LV_PALETTE_RED));
 //
 //        lv_style_reset(&style1);
 //        lv_style_reset(&style2);
@@ -483,9 +483,9 @@ typedef int _keep_pedantic_happy;
 //    lv_test_print("Add styles");
 //    lv_mem_monitor(&mon_start);
 //    for(i = 0; i < 100; i++) {
-//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_color_red());
-//        _lv_style_set_color(&style2, LV_STYLE_LINE_COLOR, lv_color_red());
-//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_color_red());
+//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
+//        _lv_style_set_color(&style2, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
+//        _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
 //        _lv_style_list_add_style(&style_list, &style1);
 //        _lv_style_list_remove_style(&style_list, &style1);
@@ -509,11 +509,11 @@ typedef int _keep_pedantic_happy;
 //    lv_test_print("Add styles and use local style");
 //     lv_mem_monitor(&mon_start);
 //     for(i = 0; i < 100; i++) {
-//         _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_color_red());
-//         _lv_style_set_color(&style2, LV_STYLE_LINE_COLOR, lv_color_red());
-//         _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_color_red());
+//         _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
+//         _lv_style_set_color(&style2, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
+//         _lv_style_set_color(&style3, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
-//         if(i % 2 == 0) _lv_style_list_set_local_color(&style_list, LV_STYLE_LINE_COLOR, lv_color_red());
+//         if(i % 2 == 0) _lv_style_list_set_local_color(&style_list, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
 //         _lv_style_list_add_style(&style_list, &style1);
 //         _lv_style_list_remove_style(&style_list, &style1);
@@ -524,7 +524,7 @@ typedef int _keep_pedantic_happy;
 //         _lv_style_list_remove_style(&style_list, &style2);
 //         _lv_style_list_add_style(&style_list, &style1);
 //
-//         if(i % 2 != 0) _lv_style_list_set_local_color(&style_list, LV_STYLE_LINE_COLOR, lv_color_red());
+//         if(i % 2 != 0) _lv_style_list_set_local_color(&style_list, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
 //
 //         _lv_style_list_reset(&style_list);
 //         lv_style_reset(&style1);
@@ -545,9 +545,9 @@ typedef int _keep_pedantic_happy;
 //            _lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
 //        }
 //
-//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_color_red());
-//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED) << LV_STYLE_STATE_POS, lv_color_blue());
-//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_color_blue());
+//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_RED));
+//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED) << LV_STYLE_STATE_POS, lv_palette_main(LV_PALETTE_BLUE));
+//        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, lv_palette_main(LV_PALETTE_BLUE));
 //        _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR | (LV_STATE_EDITED | LV_STATE_FOCUSED) << LV_STYLE_STATE_POS, LV_COLOR_GREEN);
 //
 //        _lv_style_list_add_style(&style_list, &style1);

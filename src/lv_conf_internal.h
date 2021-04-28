@@ -42,6 +42,10 @@
 #  endif
 #endif
 
+
+/*----------------------------------
+ * Start parsing lv_conf_template.h
+ -----------------------------------*/
 /*clang-format off*/
 
 #include <stdint.h>
@@ -1468,13 +1472,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 
 
+/*----------------------------------
+ * End of parsing lv_conf_template.h
+ -----------------------------------*/
+
+LV_EXPORT_CONST_INT(LV_DPI_DEF);
+
 /*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
-
-
-# if LV_USE_USER_DATA
-  typedef void * lv_obj_user_data_t;
-# endif
 
 # if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
 #  define _CRT_SECURE_NO_WARNINGS

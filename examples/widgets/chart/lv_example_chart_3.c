@@ -1,15 +1,12 @@
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_BUILD_EXAMPLES
 
-static void event_cb(lv_event_t * e)
+static void draw_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
-        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_X) {
-            const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-            lv_snprintf(dsc->text, sizeof(dsc->text), "%s", month[dsc->value]);
-        }
+    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_X) {
+        const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+        lv_snprintf(dsc->text, sizeof(dsc->text), "%s", month[dsc->value]);
     }
 }
 
@@ -27,7 +24,7 @@ void lv_example_chart_3(void)
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
     lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, 0, 400);
     lv_chart_set_point_count(chart, 12);
-    lv_obj_add_event_cb(chart, event_cb, NULL);
+    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
 
     /*Add ticks and label to every axis*/
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_X, 10, 5, 12, 3, true, 40);
@@ -38,8 +35,8 @@ void lv_example_chart_3(void)
     lv_chart_set_zoom_x(chart, 800);
 
     /*Add two data series*/
-    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_color_green_lighten_2(), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_color_green_darken_2(), LV_CHART_AXIS_SECONDARY_Y);
+    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_lighten(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_darken(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_SECONDARY_Y);
 
     /*Set the next points on 'ser1'*/
     lv_chart_set_next_value(chart, ser1, 31);
