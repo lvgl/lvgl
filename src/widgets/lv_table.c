@@ -476,7 +476,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_STYLE_CHANGED) {
         refr_size(obj, 0);
     }
-    else if(code == LV_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_REFR_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         uint32_t i;
         lv_coord_t w = 0;
@@ -779,7 +779,7 @@ static void refr_size(lv_obj_t * obj, uint32_t strat_row)
         table->row_h[i] = LV_CLAMP(minh, table->row_h[i], maxh);
     }
 
-    lv_obj_handle_self_size_chg(obj) ;
+    lv_obj_refresh_self_size(obj) ;
 }
 
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,

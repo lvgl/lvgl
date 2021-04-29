@@ -7,11 +7,13 @@
 void lv_example_meter_4(void)
 {
     lv_obj_t * meter = lv_meter_create(lv_scr_act());
-    lv_obj_center(meter);
 
     /*Remove the background and the circle from the middle*/
     lv_obj_remove_style(meter, NULL, LV_PART_MAIN);
     lv_obj_remove_style(meter, NULL, LV_PART_INDICATOR);
+
+    lv_obj_set_size(meter, 200, 200);
+    lv_obj_center(meter);
 
     /*Add a scale first with no ticks.*/
     lv_meter_scale_t * scale = lv_meter_add_scale(meter);

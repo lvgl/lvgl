@@ -33,8 +33,8 @@
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           LV_DPX(3)
 
-#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(20))
-#define PAD_SMALL   (disp_size == DISP_LARGE ? LV_DPX(14) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(12))
+#define PAD_DEF     (disp_size == DISP_LARGE ? LV_DPX(24) : disp_size == DISP_MEDIUM ? LV_DPX(20) : LV_DPX(16))
+#define PAD_SMALL   (disp_size == DISP_LARGE ? LV_DPX(14) : disp_size == DISP_MEDIUM ? LV_DPX(12) : LV_DPX(10))
 #define PAD_TINY   (disp_size == DISP_LARGE ? LV_DPX(8) : disp_size == DISP_MEDIUM ? LV_DPX(6) : LV_DPX(2))
 
 /**********************
@@ -165,8 +165,6 @@ static my_theme_styles_t * styles;
 static lv_theme_t theme;
 static disp_size_t disp_size;
 static bool inited;
-static lv_color_t color_primary;
-static lv_color_t color_secondary;
 static lv_color_t color_scr;
 static lv_color_t color_text;
 static lv_color_t color_card;
@@ -206,16 +204,10 @@ static void style_init(void)
             0
     };
 
-    color_primary =   lv_palette_main(theme.palette_primary);
-    color_secondary = lv_palette_main(theme.palette_secondary);
-
     color_scr = theme.flags & MODE_DARK ? DARK_COLOR_SCR : LIGHT_COLOR_SCR;
     color_text = theme.flags & MODE_DARK ? DARK_COLOR_TEXT : LIGHT_COLOR_TEXT;
     color_card = theme.flags & MODE_DARK ? DARK_COLOR_CARD : LIGHT_COLOR_CARD;
     color_grey = theme.flags & MODE_DARK ? DARK_COLOR_GREY : LIGHT_COLOR_GREY;
-
-    theme.color_primary = color_primary;
-    theme.color_secondary = color_secondary;
 
     static lv_style_transition_dsc_t trans_delayed;
     lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70);
@@ -263,13 +255,13 @@ static void style_init(void)
     lv_style_set_line_width(&styles->card, LV_DPX(1));
 
     style_init_reset(&styles->outline_primary);
-    lv_style_set_outline_color(&styles->outline_primary, color_primary);
+    lv_style_set_outline_color(&styles->outline_primary, theme.color_primary);
     lv_style_set_outline_width(&styles->outline_primary, OUTLINE_WIDTH);
     lv_style_set_outline_pad(&styles->outline_primary, OUTLINE_WIDTH);
     lv_style_set_outline_opa(&styles->outline_primary, LV_OPA_50);
 
     style_init_reset(&styles->outline_secondary);
-    lv_style_set_outline_color(&styles->outline_secondary, color_secondary);
+    lv_style_set_outline_color(&styles->outline_secondary, theme.color_secondary);
     lv_style_set_outline_width(&styles->outline_secondary, OUTLINE_WIDTH);
     lv_style_set_outline_opa(&styles->outline_secondary, LV_OPA_50);
 
@@ -338,23 +330,23 @@ static void style_init(void)
     lv_style_set_pad_column(&styles->pad_tiny, PAD_TINY);
 
     style_init_reset(&styles->bg_color_primary);
-    lv_style_set_bg_color(&styles->bg_color_primary, color_primary);
+    lv_style_set_bg_color(&styles->bg_color_primary, theme.color_primary);
     lv_style_set_text_color(&styles->bg_color_primary, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_primary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_primary_muted);
-    lv_style_set_bg_color(&styles->bg_color_primary_muted, color_primary);
-    lv_style_set_text_color(&styles->bg_color_primary_muted, color_primary);
+    lv_style_set_bg_color(&styles->bg_color_primary_muted, theme.color_primary);
+    lv_style_set_text_color(&styles->bg_color_primary_muted, theme.color_primary);
     lv_style_set_bg_opa(&styles->bg_color_primary_muted, LV_OPA_20);
 
     style_init_reset(&styles->bg_color_secondary);
-    lv_style_set_bg_color(&styles->bg_color_secondary, color_secondary);
+    lv_style_set_bg_color(&styles->bg_color_secondary, theme.color_secondary);
     lv_style_set_text_color(&styles->bg_color_secondary, lv_color_white());
     lv_style_set_bg_opa(&styles->bg_color_secondary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_secondary_muted);
-    lv_style_set_bg_color(&styles->bg_color_secondary_muted, color_secondary);
-    lv_style_set_text_color(&styles->bg_color_secondary_muted, color_secondary);
+    lv_style_set_bg_color(&styles->bg_color_secondary_muted, theme.color_secondary);
+    lv_style_set_text_color(&styles->bg_color_secondary_muted, theme.color_secondary);
     lv_style_set_bg_opa(&styles->bg_color_secondary_muted, LV_OPA_20);
 
     style_init_reset(&styles->bg_color_grey);
@@ -380,7 +372,7 @@ static void style_init(void)
 #endif
 
     style_init_reset(&styles->knob);
-    lv_style_set_bg_color(&styles->knob, color_primary);
+    lv_style_set_bg_color(&styles->knob, theme.color_primary);
     lv_style_set_bg_opa(&styles->knob, LV_OPA_COVER);
     lv_style_set_pad_all(&styles->knob, LV_DPX(6));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
@@ -395,14 +387,14 @@ static void style_init(void)
     lv_style_set_arc_rounded(&styles->arc_indic, true);
 
     style_init_reset(&styles->arc_indic_primary);
-    lv_style_set_arc_color(&styles->arc_indic_primary, color_primary);
+    lv_style_set_arc_color(&styles->arc_indic_primary, theme.color_primary);
 #endif
 
 #if LV_USE_CHECKBOX
     style_init_reset(&styles->cb_marker);
     lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
     lv_style_set_border_width(&styles->cb_marker, BORDER_WIDTH);
-    lv_style_set_border_color(&styles->cb_marker, color_primary);
+    lv_style_set_border_color(&styles->cb_marker, theme.color_primary);
     lv_style_set_bg_color(&styles->cb_marker, color_card);
     lv_style_set_bg_opa(&styles->cb_marker, LV_OPA_COVER);
     lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
@@ -514,7 +506,7 @@ static void style_init(void)
 
 #if LV_USE_TABVIEW
     style_init_reset(&styles->tab_btn);
-    lv_style_set_border_color(&styles->tab_btn, color_primary);
+    lv_style_set_border_color(&styles->tab_btn, theme.color_primary);
     lv_style_set_border_width(&styles->tab_btn, BORDER_WIDTH * 2);
     lv_style_set_border_side(&styles->tab_btn, LV_BORDER_SIDE_BOTTOM);
 #endif
@@ -557,8 +549,7 @@ static void style_init(void)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_palette_t palette_primary, lv_palette_t palette_secondary, bool dark,
-                                   const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_large)
+lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark, const lv_font_t * font)
 {
 
     /*This trick is required only to avoid the garbage collection of
@@ -574,11 +565,11 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_palette_t palette_primar
     else disp_size = DISP_LARGE;
 
     theme.disp = disp;
-    theme.palette_primary = palette_primary;
-    theme.palette_secondary = palette_secondary;
-    theme.font_small = font_small;
-    theme.font_normal = font_normal;
-    theme.font_large = font_large;
+    theme.color_primary = color_primary;
+    theme.color_secondary = color_secondary;
+    theme.font_small = font;
+    theme.font_normal = font;
+    theme.font_large = font;
     theme.apply_cb = theme_apply;
     theme.flags = dark ? MODE_DARK : 0;
 
@@ -883,7 +874,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->keyboard_btn_bg, LV_PART_ITEMS);
         lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
         lv_obj_add_style(obj, &styles->bg_color_grey, LV_PART_ITEMS | LV_STATE_CHECKED);
-        lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUSED);
+        lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &styles->outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
     }
 #endif
 #if LV_USE_LIST
@@ -938,6 +930,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_TABVIEW
     if(lv_obj_check_type(obj, &lv_tabview_class)) {
         lv_obj_add_style(obj, &styles->scr, 0);
+        lv_obj_add_style(obj, &styles->pad_zero, 0);
         return;
     }
 #endif

@@ -285,7 +285,7 @@ static bool event_is_bubbled(lv_event_code_t e)
     case LV_EVENT_CHILD_CHANGED:
     case LV_EVENT_SIZE_CHANGED:
     case LV_EVENT_STYLE_CHANGED:
-    case LV_EVENT_GET_SELF_SIZE:
+    case LV_EVENT_REFR_SELF_SIZE:
         return false;
     default:
         return true;

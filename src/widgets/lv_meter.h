@@ -27,6 +27,27 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    lv_color_t tick_color;
+    uint16_t tick_cnt;
+    uint16_t tick_length;
+    uint16_t tick_width;
+
+    lv_color_t tick_major_color;
+    uint16_t tick_major_nth;
+    uint16_t tick_major_length;
+    uint16_t tick_major_width;
+
+    int16_t label_gap;
+    int16_t label_color;
+
+    int32_t min;
+    int32_t max;
+    int16_t r_mod;
+    uint16_t angle_range;
+    int16_t rotation;
+}lv_meter_scale_t;
+
 typedef enum {
     LV_METER_INDICATOR_TYPE_NEEDLE_IMG,
     LV_METER_INDICATOR_TYPE_NEEDLE_LINE,
@@ -35,6 +56,7 @@ typedef enum {
 }lv_meter_indicator_type_t;
 
 typedef struct {
+    lv_meter_scale_t * scale;
     lv_meter_indicator_type_t type;
     lv_opa_t opa;
     int32_t start_value;
@@ -64,33 +86,12 @@ typedef struct {
     } type_data;
 }lv_meter_indicator_t;
 
-typedef struct {
-    lv_ll_t indicator_ll;
-
-    lv_color_t tick_color;
-    uint16_t tick_cnt;
-    uint16_t tick_length;
-    uint16_t tick_width;
-
-    lv_color_t tick_major_color;
-    uint16_t tick_major_nth;
-    uint16_t tick_major_length;
-    uint16_t tick_major_width;
-
-    int16_t label_gap;
-    int16_t label_color;
-
-    int32_t min;
-    int32_t max;
-    int16_t r_mod;
-    uint16_t angle_range;
-    int16_t rotation;
-}lv_meter_scale_t;
 
 /*Data of line meter*/
 typedef struct {
     lv_obj_t obj;
     lv_ll_t scale_ll;
+    lv_ll_t indicator_ll;
 } lv_meter_t;
 
 extern const lv_obj_class_t lv_meter_class;

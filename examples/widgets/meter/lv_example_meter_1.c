@@ -15,6 +15,7 @@ void lv_example_meter_1(void)
 {
      meter = lv_meter_create(lv_scr_act());
     lv_obj_center(meter);
+    lv_obj_set_size(meter, 200, 200);
 
     /*Add a scale first*/
     lv_meter_scale_t * scale = lv_meter_add_scale(meter);

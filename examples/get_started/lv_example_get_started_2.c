@@ -37,10 +37,13 @@ void lv_example_get_started_2(void)
     lv_style_set_bg_grad_color(&style_btn_pressed, lv_palette_darken(LV_PALETTE_RED, 3));
 
     /*Create a button and use the new styles*/
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());     /*Add a button the current screen*/
+    lv_obj_t * btn = lv_btn_create(lv_scr_act());           /*Add a button the current screen*/
+    /* Remove the styles coming from the theme
+     * Note that size and position are also stored as style properties
+     * so lv_obj_remove_style_all will remove the set size and position too */
+    lv_obj_remove_style_all(btn);
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
-    lv_obj_remove_style_all(btn); /*Remove the styles coming from the theme*/
     lv_obj_add_style(btn, &style_btn, 0);
     lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
 
@@ -50,9 +53,9 @@ void lv_example_get_started_2(void)
 
     /*Create an other button and use the red style too*/
     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
+    lv_obj_remove_style_all(btn2);                             /*Remove the styles coming from the theme*/
     lv_obj_set_pos(btn2, 10, 80);
     lv_obj_set_size(btn2, 120, 50);                            /*Set its size*/
-    lv_obj_remove_style_all(btn2); /*Remove the styles coming from the theme*/
     lv_obj_add_style(btn2, &style_btn, 0);
     lv_obj_add_style(btn2, &style_btn_red, 0);
     lv_obj_add_style(btn2, &style_btn_pressed, LV_STATE_PRESSED);

@@ -16,6 +16,7 @@ void lv_example_meter_2(void)
 {
     meter = lv_meter_create(lv_scr_act());
     lv_obj_center(meter);
+    lv_obj_set_size(meter, 200, 200);
 
     /*Remove the circle from the middle*/
     lv_obj_remove_style(meter, NULL, LV_PART_INDICATOR);

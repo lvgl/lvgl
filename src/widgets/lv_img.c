@@ -149,7 +149,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     img->pivot.x = header.w / 2;
     img->pivot.y = header.h / 2;
 
-    lv_obj_handle_self_size_chg(obj);
+    lv_obj_refresh_self_size(obj);
 
     /*Provide enough room for the rotated corners*/
     if(img->angle || img->zoom != LV_IMG_ZOOM_NONE) lv_obj_refresh_ext_draw_size(obj);
@@ -471,7 +471,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
             info->result = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
-    else if(code == LV_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_REFR_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);;
         p->x = img->w;
         p->y = img->h;

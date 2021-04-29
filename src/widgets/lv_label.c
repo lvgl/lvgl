@@ -763,7 +763,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(code == LV_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_REFR_SELF_SIZE) {
         lv_point_t size;
         lv_label_t * label = (lv_label_t *)obj;
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
@@ -905,7 +905,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
     lv_txt_get_size(&size, label->text, font, letter_space, line_space, max_w, flag);
 
-    lv_obj_handle_self_size_chg(obj);
+    lv_obj_refresh_self_size(obj);
 
     /*In scroll mode start an offset animations*/
     if(label->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -1079,7 +1079,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
     }
     else if(label->long_mode == LV_LABEL_LONG_DOT) {
-        lv_obj_handle_self_size_chg(obj);
+        lv_obj_refresh_self_size(obj);
         if(size.y <= lv_area_get_height(&txt_coords)) { /*No dots are required, the text is short enough*/
             label->dot_end = LV_LABEL_DOT_END_INV;
         }

@@ -95,6 +95,7 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     }
 
 
+    lv_obj_mark_layout_as_dirty(obj);
     lv_theme_apply(obj);
     lv_obj_construct(obj);
     lv_group_t * def_group = lv_group_get_default();

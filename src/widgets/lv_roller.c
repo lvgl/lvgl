@@ -317,7 +317,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_roller_t * roller = (lv_roller_t*)obj;
 
-    if(code == LV_EVENT_GET_SELF_SIZE) {
+    if(code == LV_EVENT_REFR_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         p->x =  get_selected_label_width(obj);
     }
@@ -325,7 +325,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * label = get_label(obj);
         /*Be sure the label's style is updated before processing the roller*/
         if(label) lv_event_send(label, LV_EVENT_STYLE_CHANGED, NULL);
-        lv_obj_handle_self_size_chg(obj);
+        lv_obj_refresh_self_size(obj);
         refr_position(obj, false);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {

@@ -82,7 +82,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
     cb->static_txt = 0;
 
-    lv_obj_handle_self_size_chg(obj);
+    lv_obj_refresh_self_size(obj);
 }
 
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
@@ -94,7 +94,7 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
     cb->txt = (char*)txt;
     cb->static_txt = 1;
 
-    lv_obj_handle_self_size_chg(obj);
+    lv_obj_refresh_self_size(obj);
 }
 
 /*=====================
@@ -155,7 +155,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if (code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
        lv_obj_invalidate(obj);
     }
-    else if (code == LV_EVENT_GET_SELF_SIZE) {
+    else if (code == LV_EVENT_REFR_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 

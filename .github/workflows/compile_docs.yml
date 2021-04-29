@@ -5,6 +5,7 @@ on:
     - master
 jobs:
   build-and-deploy:
+    if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,6 +24,8 @@ jobs:
           pip install --upgrade --upgrade-strategy eager sphinx recommonmark commonmark breathe sphinx-rtd-theme sphinx-markdown-tables sphinx-sitemap
       - name: Build docs
         run: docs/build.py
+      - name: Remove .doctrees
+        run: rm -rf out_html/.doctrees
       - name: Retrieve version
         run: |
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
@@ -37,3 +40,4 @@ jobs:
           FOLDER: out_html  # The folder the action should deploy.
           TARGET_FOLDER: ${{ steps.version.outputs.VERSION_NAME }}
           PRESERVE: true
+          SINGLE_COMMIT: true
