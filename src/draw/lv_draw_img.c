@@ -61,7 +61,6 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_IMG_ZOOM_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
-
 }
 
 /**

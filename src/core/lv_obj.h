@@ -164,6 +164,7 @@ typedef struct _lv_obj_t {
     void * user_data;
 #endif
     lv_area_t coords;
+    lv_point_t self_size;
     lv_obj_flag_t flags;
     lv_state_t state;
     uint16_t layout_inv :1;

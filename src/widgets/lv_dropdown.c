@@ -658,10 +658,14 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_invalidate(obj);
         }
     }
+    else if(code == LV_EVENT_STYLE_CHANGED) {
+        lv_obj_refresh_self_size(obj);
+    }
     else if(code == LV_EVENT_SIZE_CHANGED) {
+        lv_obj_refresh_self_size(obj);
         if(dropdown->list) lv_dropdown_close(obj);
     }
-    else if(code == LV_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_REFR_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         p->y = lv_font_get_line_height(font);

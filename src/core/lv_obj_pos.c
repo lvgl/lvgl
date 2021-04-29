@@ -592,23 +592,20 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
-    lv_point_t p = {0, LV_COORD_MIN};
-    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
-    return p.x;
+    return obj->self_size.x;
 }
 
 lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
-    lv_point_t p = {LV_COORD_MIN, 0};
-    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
-    return p.y;
+    return obj->self_size.y;
 }
 
-bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
+bool lv_obj_refresh_self_size(struct _lv_obj_t * obj)
 {
-    lv_coord_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    lv_coord_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
-    if(w_set != LV_SIZE_CONTENT && h_set != LV_SIZE_CONTENT) return false;
+    lv_obj_update_layout(obj);
+    obj->self_size.x = 0;
+    obj->self_size.y = 0;
+    lv_event_send(obj, LV_EVENT_REFR_SELF_SIZE, &obj->self_size);
 
     lv_obj_refr_size(obj);
     return true;
