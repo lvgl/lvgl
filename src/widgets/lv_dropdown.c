@@ -747,6 +747,10 @@ static void draw_main(lv_event_t * e)
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
+    lv_draw_label_dsc_t symbol_dsc;
+    lv_draw_label_dsc_init(&symbol_dsc);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &symbol_dsc);
+
     /*If no text specified use the selected option*/
     const char * opt_txt;
     if(dropdown->text) opt_txt = dropdown->text;
@@ -766,7 +770,7 @@ static void draw_main(lv_event_t * e)
         lv_coord_t symbol_h;
         if(symbol_type == LV_IMG_SRC_SYMBOL) {
             lv_point_t size;
-            lv_txt_get_size(&size, dropdown->symbol, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+            lv_txt_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX, symbol_dsc.flag);
             symbol_w = size.x;
             symbol_h = size.y;
         } else {
@@ -793,16 +797,16 @@ static void draw_main(lv_event_t * e)
         if(symbol_type == LV_IMG_SRC_SYMBOL) {
             symbol_area.y1 = obj->coords.y1 + top;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
-            lv_draw_label(&symbol_area, clip_area, &label_dsc, dropdown->symbol, NULL);
+            lv_draw_label(&symbol_area, clip_area, &symbol_dsc, dropdown->symbol, NULL);
         } else {
             symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
-            lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
+            lv_obj_init_draw_img_dsc(obj, LV_PART_INDICATOR, &img_dsc);
             img_dsc.pivot.x = symbol_w / 2;
             img_dsc.pivot.y = symbol_h / 2;
-            img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
+            img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_INDICATOR);
             lv_draw_img(&symbol_area, clip_area, dropdown->symbol, &img_dsc);
         }
 
