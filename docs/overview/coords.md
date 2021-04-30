@@ -23,6 +23,8 @@ An object's "box" is built from the following parts:
 - padding: space between the sides of the object and its children. 
 - content: the content area which size if the bounding box reduced by the size of the paddings.
 
+![The box models of LVGL: The content area is smaller then the bounding box with the padding](/misc/boxmodel.png)
+
 The border is drawn inside the bounding box and doesn't take an extra space. (It's different from CSS in which increasing the border width makes the object larger.)
 
 The outline is drawn outside of the bounding box.
