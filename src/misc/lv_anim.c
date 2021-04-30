@@ -519,7 +519,7 @@ static void anim_mark_list_change(void)
 {
     anim_list_changed = true;
     if(_lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
-        lv_timer_pause(_lv_anim_tmr, true);
+        lv_timer_pause(_lv_anim_tmr);
     else
-        lv_timer_pause(_lv_anim_tmr, false);
+        lv_timer_resume(_lv_anim_tmr);
 }
