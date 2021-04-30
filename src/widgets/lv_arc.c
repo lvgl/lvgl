@@ -695,7 +695,7 @@ static void lv_arc_draw(lv_event_t * e)
         lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
 
         obj_draw_dsc.part = LV_PART_MAIN;
-        obj_draw_dsc.p1 = center;
+        obj_draw_dsc.p1 = &center;
         obj_draw_dsc.radius = arc_r;
         obj_draw_dsc.arc_dsc = &arc_dsc;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
@@ -719,7 +719,7 @@ static void lv_arc_draw(lv_event_t * e)
         lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
 
         obj_draw_dsc.part = LV_PART_INDICATOR;
-        obj_draw_dsc.p1 = center;
+        obj_draw_dsc.p1 = &center;
         obj_draw_dsc.radius = indic_r;
         obj_draw_dsc.arc_dsc = &arc_dsc;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
@@ -740,7 +740,7 @@ static void lv_arc_draw(lv_event_t * e)
 
     obj_draw_dsc.part = LV_PART_KNOB;
     obj_draw_dsc.draw_area = &knob_area;
-    obj_draw_dsc.arc_dsc = &knob_rect_dsc;
+    obj_draw_dsc.rect_dsc = &knob_rect_dsc;
     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
 
     lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
