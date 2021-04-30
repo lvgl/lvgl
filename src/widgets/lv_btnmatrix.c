@@ -42,8 +42,10 @@ static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_repeat_disabled(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_inactive(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_click_trig(lv_btnmatrix_ctrl_t ctrl_bits);
-static bool button_is_tgl_enabled(lv_btnmatrix_ctrl_t ctrl_bits);
+static bool button_is_checkable(lv_btnmatrix_ctrl_t ctrl_bits);
+static bool button_is_recolor(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_get_checked(lv_btnmatrix_ctrl_t ctrl_bits);
+static bool button_is_recolor(lv_btnmatrix_ctrl_t ctrl_bits);
 static uint16_t get_button_from_point(lv_obj_t * obj, lv_point_t * p);
 static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** map);
 static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx);
@@ -197,16 +199,6 @@ void lv_btnmatrix_set_selected_btn(lv_obj_t * obj, uint16_t btn_id)
     invalidate_button_area(obj, btn_id);
 }
 
-void lv_btnmatrix_set_recolor(const lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
-
-    btnm->recolor = en;
-    lv_obj_invalidate(obj);
-}
-
 void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -292,15 +284,6 @@ const char ** lv_btnmatrix_get_map(const lv_obj_t * obj)
     return btnm->map_p;
 }
 
-bool lv_btnmatrix_get_recolor(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
-
-    return btnm->recolor;
-}
-
 uint16_t lv_btnmatrix_get_selected_btn(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -367,7 +350,6 @@ static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     btnm->button_areas   = NULL;
     btnm->ctrl_bits      = NULL;
     btnm->map_p          = NULL;
-    btnm->recolor        = 0;
     btnm->one_check      = 0;
 
     lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
@@ -473,7 +455,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_RELEASED) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
             /*Toggle the button if enabled*/
-            if(button_is_tgl_enabled(btnm->ctrl_bits[btnm->btn_id_sel]) &&
+            if(button_is_checkable(btnm->ctrl_bits[btnm->btn_id_sel]) &&
                !button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel])) {
                 if(button_get_checked(btnm->ctrl_bits[btnm->btn_id_sel]) && !btnm->one_check) {
                     btnm->ctrl_bits[btnm->btn_id_sel] &= (~LV_BTNMATRIX_CTRL_CHECKED);
@@ -660,7 +642,6 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_rect_dsc_def;
     lv_draw_label_dsc_t draw_label_dsc_def;
 
-    lv_text_flag_t recolor_flag = btnm->recolor ? LV_TEXT_FLAG_RECOLOR : 0;
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
@@ -669,7 +650,6 @@ static void draw_main(lv_event_t * e)
     lv_draw_label_dsc_init(&draw_label_dsc_def);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_def);
     lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_def);
-    draw_label_dsc_act.flag |= recolor_flag;
     obj->skip_trans = 0;
     obj->state = state_ori;
 
@@ -729,10 +709,14 @@ static void draw_main(lv_event_t * e)
             lv_draw_label_dsc_init(&draw_label_dsc_act);
             lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
             lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
-            draw_label_dsc_act.flag = recolor_flag;
             obj->state = state_ori;
             obj->skip_trans = 0;
         }
+
+        bool recolor = button_is_hidden(btnm->ctrl_bits[btnm->ctrl_bits[btn_i]]);
+        if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
+        else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
+
 
         dsc.draw_area = &btn_area;
         dsc.id = btn_i;
@@ -764,10 +748,9 @@ static void draw_main(lv_event_t * e)
             txt = txt_ap;
         }
 #endif
-
         lv_point_t txt_size;
         lv_txt_get_size(&txt_size, txt, font, letter_space,
-                line_space, lv_area_get_width(&area_obj), recolor_flag);
+                line_space, lv_area_get_width(&area_obj), draw_label_dsc_act.flag);
 
         btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
         btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;
@@ -776,7 +759,6 @@ static void draw_main(lv_event_t * e)
 
         /*Draw the text*/
         lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
-
 
         lv_event_send(obj,LV_EVENT_DRAW_PART_END, &dsc);
     }
@@ -859,7 +841,7 @@ static bool button_is_click_trig(lv_btnmatrix_ctrl_t ctrl_bits)
     return (ctrl_bits & LV_BTNMATRIX_CTRL_CLICK_TRIG) ? true : false;
 }
 
-static bool button_is_tgl_enabled(lv_btnmatrix_ctrl_t ctrl_bits)
+static bool button_is_checkable(lv_btnmatrix_ctrl_t ctrl_bits)
 {
     return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKABLE) ? true : false;
 }
@@ -869,6 +851,10 @@ static bool button_get_checked(lv_btnmatrix_ctrl_t ctrl_bits)
     return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKED) ? true : false;
 }
 
+static bool button_is_recolor(lv_btnmatrix_ctrl_t ctrl_bits)
+{
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_RECOLOR) ? true : false;
+}
 /**
  * Gives the button id of a button under a given point
  * @param obj pointer to a button matrix object
