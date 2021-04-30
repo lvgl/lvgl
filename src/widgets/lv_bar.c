@@ -395,7 +395,7 @@ static void draw_indic(lv_event_t * e)
     lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
     obj_draw_dsc.part = LV_PART_INDICATOR;
     obj_draw_dsc.rect_dsc = &draw_rect_dsc;
-	obj_draw_dsc.draw_area = bar->indic_area;
+	obj_draw_dsc.draw_area = &bar->indic_area;
 
 	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
 
