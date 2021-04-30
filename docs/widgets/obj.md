@@ -147,13 +147,12 @@ Once, an object is added to *group* with `lv_group_add_obj(group, obj)` the obje
 By default, the objects can be clicked only on their coordinates, however, this area can be extended with `lv_obj_set_ext_click_area(obj, size)`.
 
 ## Events
-Besides the following special event(s) are sent by the base object:
 - `LV_EVENT_VALUE_CHANGED` when the `LV_OBJ_FLAG_CHECKABLE` flag is enabled and the obejct clicked (on transition to/from the checked state)
 
 Learn more about [Events](/overview/event).
 
 ## Keys
-If `LV_OBJ_FLAG_CHECKABLE` is enabled `LV_KEY_RIGHT` and `LV_KEY_UP` makes the object checked, and `LV_KEY_LEFT` and `LV_KEY_DOWN` makes i unchcked.
+If `LV_OBJ_FLAG_CHECKABLE` is enabled `LV_KEY_RIGHT` and `LV_KEY_UP` makes the object checked, and `LV_KEY_LEFT` and `LV_KEY_DOWN` makes it unchecked.
 
 
 Learn more about [Keys](/overview/indev).
