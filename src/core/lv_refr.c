@@ -188,7 +188,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     disp_refr = tmr->user_data;
 
-#if LV_USE_PERF_MONITOR == 0
+#if LV_USE_PERF_MONITOR == 0 && LV_USE_MEM_MONITOR == 0
     /**
      * Ensure the timer does not run again automatically.
      * This is done before refreshing in case refreshing invalidates something else.
