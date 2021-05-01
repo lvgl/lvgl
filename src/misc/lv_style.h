@@ -366,7 +366,7 @@ static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_pr
  *  static lv_style_transition_dsc_t trans1;
  *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0);
  */
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
 
 /**
  * Get the default value of a property
