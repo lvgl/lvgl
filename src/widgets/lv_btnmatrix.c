@@ -713,7 +713,7 @@ static void draw_main(lv_event_t * e)
             obj->skip_trans = 0;
         }
 
-        bool recolor = button_is_hidden(btnm->ctrl_bits[btnm->ctrl_bits[btn_i]]);
+        bool recolor = button_is_recolor(btnm->ctrl_bits[btnm->ctrl_bits[btn_i]]);
         if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
         else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
 
