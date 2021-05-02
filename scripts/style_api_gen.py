@@ -388,6 +388,17 @@ def local_style_set(p):
   print("}")
   print("")
 
+def style_const_set(p):
+    cast = style_set_cast(p['style_type'])
+    print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
+    print("    { \\")
+    print("        .prop = LV_STYLE_" + p['name'] + ", \\")
+    print("        .value = { \\")
+    print("            ." + p['style_type'] +" = " + cast + "val \\")
+    print("        } \\")
+    print("    }")
+    print("")
+
 
 
 def docs(p):
@@ -430,6 +441,7 @@ sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.h', 'w')
 
 for p in props:
   style_set(p)
+  style_const_set(p)
   
 sys.stdout = open(base_dir + '/style_props.md', 'w')
   
