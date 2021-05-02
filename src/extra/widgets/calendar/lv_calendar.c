@@ -180,7 +180,7 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
     return calendar->highlighted_dates_num;
 }
 
-bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date)
+lv_res_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date)
 {
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     uint16_t d = lv_btnmatrix_get_selected_btn(obj);
@@ -188,7 +188,7 @@ bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * dat
         date->year = 0;
         date->month = 0;
         date->day = 0;
-        return false;
+        return LV_RES_INV;
     }
 
     const char * txt = lv_btnmatrix_get_btn_text(obj, lv_btnmatrix_get_selected_btn(obj));
@@ -199,7 +199,7 @@ bool lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * dat
     date->year = calendar->showed_date.year;
     date->month = calendar->showed_date.month;
 
-    return true;
+    return LV_RES_OK;
 }
 
 
@@ -249,8 +249,6 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
 
     lv_obj_add_event_cb(obj, draw_part_begin_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
-
-
 }
 
 static void draw_part_begin_event_cb(lv_event_t * e)

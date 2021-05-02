@@ -85,15 +85,15 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
     lv_obj_refr_pos(obj);
 }
 
-void lv_obj_refr_size(lv_obj_t * obj)
+bool lv_obj_refr_size(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*If the width or height is set by a layout do not modify them*/
-    if(obj->w_layout && obj->h_layout) return;
+    if(obj->w_layout && obj->h_layout) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    if(parent == NULL) return;
+    if(parent == NULL) return false;
 
     lv_coord_t w;
     lv_coord_t sl_ori = lv_obj_get_scroll_left(obj);
@@ -153,7 +153,7 @@ void lv_obj_refr_size(lv_obj_t * obj)
 
     /*Do nothing if the size is not changed*/
     /*It is very important else recursive resizing can occur without size change*/
-    if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) return;
+    if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) return false;
 
     /*Invalidate the original area*/
     lv_obj_invalidate(obj);
@@ -190,10 +190,46 @@ void lv_obj_refr_size(lv_obj_t * obj)
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
 
+
+    /*Be sure the bottom side is not remains scrolled in*/
+    /*With snapping the content can't be scrolled in*/
+    if(lv_obj_get_scroll_snap_y(obj) == LV_SCROLL_SNAP_NONE) {
+        lv_coord_t st = lv_obj_get_scroll_top(obj);
+        lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
+        if(sb < 0 && st > 0) {
+            sb = LV_MIN(st, -sb);
+            lv_obj_scroll_by(obj, 0, sb, LV_ANIM_OFF);
+        }
+    }
+
+    if(lv_obj_get_scroll_snap_x(obj) == LV_SCROLL_SNAP_NONE) {
+        lv_coord_t sl = lv_obj_get_scroll_left(obj);
+        lv_coord_t sr = lv_obj_get_scroll_right(obj);
+        if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
+            /*Be sure the left side is not remains scrolled in*/
+            if(sr < 0 && sl > 0) {
+                sr = LV_MIN(sl, -sr);
+                lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
+            }
+        } else {
+            /*Be sure the right side is not remains scrolled in*/
+            if(sl < 0 && sr > 0) {
+                sr = LV_MIN(sr, -sl);
+                lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
+            }
+        }
+    }
+
     /*If the object was out of the parent invalidate the new scrollbar area too.
      *If it wasn't out of the parent but out now, also invalidate the srollbars*/
     bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
     if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
+
+
+
+
+
+    return true;
 }
 
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
@@ -281,7 +317,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
     /*Make the display refreshing*/
     lv_disp_t * disp = lv_obj_get_disp(scr);
-    lv_timer_pause(disp->refr_timer, false);
+    lv_timer_resume(disp->refr_timer);
 }
 
 void lv_obj_update_layout(const lv_obj_t * obj)
@@ -556,23 +592,20 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
-    lv_point_t p = {0, LV_COORD_MIN};
-    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
-    return p.x;
+    return obj->self_size.x;
 }
 
 lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
-    lv_point_t p = {LV_COORD_MIN, 0};
-    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
-    return p.y;
+    return obj->self_size.y;
 }
 
-bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
+bool lv_obj_refresh_self_size(struct _lv_obj_t * obj)
 {
-    lv_coord_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    lv_coord_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
-    if(w_set != LV_SIZE_CONTENT && h_set == LV_SIZE_CONTENT) return false;
+    lv_obj_update_layout(obj);
+    obj->self_size.x = 0;
+    obj->self_size.y = 0;
+    lv_event_send(obj, LV_EVENT_REFR_SELF_SIZE, &obj->self_size);
 
     lv_obj_refr_size(obj);
     return true;
@@ -915,36 +948,6 @@ static void layout_update_core(lv_obj_t * obj)
 
     lv_obj_refr_size(obj);
     lv_obj_refr_pos(obj);
-
-
-    /*Be sure the bottom side is not remains scrolled in*/
-    /*With snapping the content can't be scrolled in*/
-    if(lv_obj_get_scroll_snap_y(obj) == LV_SCROLL_SNAP_NONE) {
-        lv_coord_t st = lv_obj_get_scroll_top(obj);
-        lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
-        if(sb < 0 && st > 0) {
-            sb = LV_MIN(st, -sb);
-            lv_obj_scroll_by(obj, 0, sb, LV_ANIM_OFF);
-        }
-    }
-
-    if(lv_obj_get_scroll_snap_x(obj) == LV_SCROLL_SNAP_NONE) {
-        lv_coord_t sl = lv_obj_get_scroll_left(obj);
-        lv_coord_t sr = lv_obj_get_scroll_right(obj);
-        if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
-            /*Be sure the left side is not remains scrolled in*/
-            if(sr < 0 && sl > 0) {
-                sr = LV_MIN(sl, -sr);
-                lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
-            }
-        } else {
-            /*Be sure the right side is not remains scrolled in*/
-            if(sl < 0 && sr > 0) {
-                sr = LV_MIN(sr, -sl);
-                lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
-            }
-        }
-    }
 
     if(lv_obj_get_child_cnt(obj) > 0) {
         uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);

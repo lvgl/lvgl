@@ -141,6 +141,19 @@ To get the currently active screen use the `lv_scr_act()` function.
 
 To load a new screen, use `lv_scr_load(scr1)`.
 
+### Layers
+There are two automatically generated layers:
+- top layer
+- system layer
+
+They are independent of the screens and they will be shown on every screen. The *top layer* is above every object on the screen and the *system layer* is above the *top layer* too.
+You can add any pop-up windows to the *top layer* freely. But, the *system layer* is restricted to system-level things (e.g. mouse cursor will be placed here in `lv_indev_set_cursor()`).
+
+The `lv_layer_top()` and `lv_layer_sys()` functions gives a pointer to the top or system layer.
+
+Read the [Layer overview](/overview/layer) section to learn more about layers.
+
+
 #### Load screen with animation
 
 A new screen can be loaded with animation too using `lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The following transition types exist:

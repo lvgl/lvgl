@@ -23,9 +23,65 @@ An object's "box" is built from the following parts:
 - padding: space between the sides of the object and its children. 
 - content: the content area which size if the bounding box reduced by the size of the paddings.
 
+![The box models of LVGL: The content area is smaller then the bounding box with the padding](/misc/boxmodel.png)
+
 The border is drawn inside the bounding box and doesn't take an extra space. (It's different from CSS in which increasing the border width makes the object larger.)
 
 The outline is drawn outside of the bounding box.
+
+### Important notes
+This section describes special cases in which LVGL's behavior might look unexpected.
+
+#### Postponed coordinate calculation
+LVGL doesn't recalculate all the coordinate changes immediately to improve performance. 
+Instead, the object's are marked as "dirty" and before redrawing the screen LVGL checks if there are any "dirty" objects. If so it refreshes their position, size and layout.
+
+The following functions set size/position immediately:
+- `lv_obj_set_pos/x/y`
+- `lv_obj_set_size/width/height`
+- `lv_obj_set_content_width/height`
+- `lv_obj_align` 
+- `lv_obj_set_align` 
+- `lv_obj_align_to` 
+
+So if you don't use any complex feature (e.g. layouts) you don't have to worry about postponed layout recalculation. 
+
+However, if the coordinates are set by a style or layout the recalculation will be delayed.
+
+In some special cases even if the coordinates are set the by the above listed functions they can be incorrect. 
+For example if the width of an object is set in the percentage of parent width (e.g. `lv_pct(80)`) and the parent's size is set by a layout the child size might use non-updated size from the parent. 
+It will be recalculated automatically before the next screen redraw but if you need the final coordinates immediately after changing the coordinates and see incorrect values you need to use
+```c
+lv_obj_unpdate_layout(obj);
+``` 
+
+As the it can be seen form the above example the sizes and positions might depends on each other, therefore `lv_obj_unpdate_layout(obj)` recalculates the coordinates of all objects on the screen of `obj`.
+
+#### Removing styles
+As it's described in the [Using styles](#using-styles) section the coordinates can be set via style properties too. 
+To be more precise under the hood every style coordinate related property is stored as style a property. If you use `lv_obj_set_x(obj, 20)` LVGL saves `x=20` in the local style of the object.
+
+It's an internal mechanism and doesn't matter much as you use LVGL. However, there is one case in which you need to aware of that. If the style(s) of an object are removed by 
+```c
+lv_obj_remove_style_all(obj)
+˙``
+or
+```c
+lv_obj_remove_style(obj, NULL, LV_PART_MAIN);
+```
+The earlier set coordinates will be removed as well.
+
+For example:
+```c
+/*The size of obj1 will be set back to the default in the end*/
+lv_obj_set_size(obj1, 200, 100);  /*Now obj1 has 200;100 size*/
+lv_obj_remove_style_all(obj1);    /*It removes the set sizes*/
+
+
+/*obj2 will have 200;100 size in the end */
+lv_obj_remove_style_all(obj2);
+lv_obj_set_size(obj2, 200, 100);
+```
 
 ## Position
 

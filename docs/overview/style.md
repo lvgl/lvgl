@@ -225,6 +225,9 @@ In the documentation of the widgets you will see sentences like "The widget use 
 - Border
 - Outline
 - Shadow
+- Padding
+- Width and height transformation
+- X and Y translation
 
 
 ## Transitions

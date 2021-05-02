@@ -101,7 +101,6 @@ static void style_init(void)
     lv_style_set_arc_width(&styles->light, LV_DPX(2));
     lv_style_set_arc_color(&styles->light, COLOR_MID);
 
-
     style_init_reset(&styles->dark);
     lv_style_set_bg_opa(&styles->dark, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->dark, COLOR_DARK);
@@ -159,8 +158,6 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
     }
 
     theme.disp = disp;
-    theme.palette_primary = LV_PALETTE_NONE;
-    theme.palette_secondary = LV_PALETTE_NONE;
     theme.font_small = LV_FONT_DEFAULT;
     theme.font_normal = LV_FONT_DEFAULT;
     theme.font_large = LV_FONT_DEFAULT;

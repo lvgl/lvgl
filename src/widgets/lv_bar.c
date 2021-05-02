@@ -48,7 +48,7 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_indic(lv_event_t * e);
-static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
+static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
@@ -85,7 +85,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
+void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -99,7 +99,7 @@ void lv_bar_set_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
 }
 
-void lv_bar_set_start_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim)
+void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -112,7 +112,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int16_t value, lv_anim_enable_t anim
     lv_bar_set_value_with_anim(obj, value, &bar->start_value, &bar->start_value_anim, anim);
 }
 
-void lv_bar_set_range(lv_obj_t * obj, int16_t min, int16_t max)
+void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -154,7 +154,7 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode)
  * Getter functions
  *====================*/
 
-int16_t lv_bar_get_value(const lv_obj_t * obj)
+int32_t lv_bar_get_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -162,7 +162,7 @@ int16_t lv_bar_get_value(const lv_obj_t * obj)
     return LV_BAR_GET_ANIM_VALUE(bar->cur_value, bar->cur_value_anim);
 }
 
-int16_t lv_bar_get_start_value(const lv_obj_t * obj)
+int32_t lv_bar_get_start_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -172,14 +172,14 @@ int16_t lv_bar_get_start_value(const lv_obj_t * obj)
     return LV_BAR_GET_ANIM_VALUE(bar->start_value, bar->start_value_anim);
 }
 
-int16_t lv_bar_get_min_value(const lv_obj_t * obj)
+int32_t lv_bar_get_min_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
     return bar->min_value;
 }
 
-int16_t lv_bar_get_max_value(const lv_obj_t * obj)
+int32_t lv_bar_get_max_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
@@ -380,32 +380,42 @@ static void draw_indic(lv_event_t * e)
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
 
-    uint16_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+    lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
-    lv_draw_rect_dsc_t draw_indic_dsc;
-    lv_draw_rect_dsc_init(&draw_indic_dsc);
-    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-
     lv_area_t indic_area;
     lv_area_copy(&indic_area, &bar->indic_area);
+
+    lv_draw_rect_dsc_t draw_rect_dsc;
+    lv_draw_rect_dsc_init(&draw_rect_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
+
+    lv_obj_draw_dsc_t obj_draw_dsc;
+    lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
+    obj_draw_dsc.part = LV_PART_INDICATOR;
+    obj_draw_dsc.rect_dsc = &draw_rect_dsc;
+	obj_draw_dsc.draw_area = &bar->indic_area;
+
+	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
 
     /*Draw only the shadow if the indicator is long enough.
      *The radius of the bg and the indicator can make a strange shape where
      *it'd be very difficult to draw shadow.*/
     if((hor && lv_area_get_width(&bar->indic_area) > bg_radius * 2) ||
        (!hor && lv_area_get_height(&bar->indic_area) > bg_radius * 2)) {
-        lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
-        lv_opa_t bg_img_opa = draw_indic_dsc.bg_img_opa;
-        lv_opa_t border_opa = draw_indic_dsc.border_opa;
-        draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.bg_img_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.border_opa = LV_OPA_TRANSP;
-        lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
-        draw_indic_dsc.bg_opa = bg_opa;
-        draw_indic_dsc.bg_img_opa = bg_img_opa;
-        draw_indic_dsc.border_opa = border_opa;
+        lv_opa_t bg_opa = draw_rect_dsc.bg_opa;
+        lv_opa_t bg_img_opa = draw_rect_dsc.bg_img_opa;
+        lv_opa_t border_opa = draw_rect_dsc.border_opa;
+        draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
+        draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
+        draw_rect_dsc.border_opa = LV_OPA_TRANSP;
+
+        lv_draw_rect(&bar->indic_area, clip_area, &draw_rect_dsc);
+
+        draw_rect_dsc.bg_opa = bg_opa;
+        draw_rect_dsc.bg_img_opa = bg_img_opa;
+        draw_rect_dsc.border_opa = border_opa;
     }
 
 #if LV_DRAW_COMPLEX
@@ -417,14 +427,14 @@ static void draw_indic(lv_event_t * e)
     bg_mask_area.y2 = obj->coords.y2 - bg_bottom;
 
     lv_draw_mask_radius_init(&mask_bg_param, &bg_mask_area, bg_radius, false);
-    int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
+    lv_coord_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 #endif
 
     /*Draw_only the background and background image*/
-    lv_opa_t shadow_opa = draw_indic_dsc.shadow_opa;
-    lv_opa_t border_opa = draw_indic_dsc.border_opa;
-    draw_indic_dsc.border_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
+    lv_opa_t shadow_opa = draw_rect_dsc.shadow_opa;
+    lv_opa_t border_opa = draw_rect_dsc.border_opa;
+    draw_rect_dsc.border_opa = LV_OPA_TRANSP;
+    draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
@@ -445,24 +455,26 @@ static void draw_indic(lv_event_t * e)
 #if LV_DRAW_COMPLEX
     /*Create a mask to the current indicator area to see only this part from the whole gradient.*/
     lv_draw_mask_radius_param_t mask_indic_param;
-    lv_draw_mask_radius_init(&mask_indic_param, &bar->indic_area, draw_indic_dsc.radius, false);
+    lv_draw_mask_radius_init(&mask_indic_param, &bar->indic_area, draw_rect_dsc.radius, false);
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
 #endif
 
-    lv_draw_rect(&mask_indic_max_area, clip_area, &draw_indic_dsc);
-    draw_indic_dsc.border_opa = border_opa;
-    draw_indic_dsc.shadow_opa = shadow_opa;
+    lv_draw_rect(&mask_indic_max_area, clip_area, &draw_rect_dsc);
+    draw_rect_dsc.border_opa = border_opa;
+    draw_rect_dsc.shadow_opa = shadow_opa;
 
     /*Draw the border*/
-    draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.bg_img_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
-    lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
+    draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
+    draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
+    draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
+    lv_draw_rect(&bar->indic_area, clip_area, &draw_rect_dsc);
 
 #if LV_DRAW_COMPLEX
     lv_draw_mask_remove_id(mask_indic_id);
     lv_draw_mask_remove_id(mask_bg_id);
 #endif
+
+    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
 }
 
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -525,7 +537,7 @@ static void lv_bar_anim_ready(lv_anim_t * a)
     lv_obj_invalidate(var->bar);
 }
 
-static void lv_bar_set_value_with_anim(lv_obj_t * obj, int16_t new_value, int16_t * value_ptr,
+static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en)
 {
     if(en == LV_ANIM_OFF) {

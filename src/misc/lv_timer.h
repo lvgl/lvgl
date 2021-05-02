@@ -98,7 +98,9 @@ void lv_timer_del(lv_timer_t * timer);
  * @param timer pointer to an lv_timer
  * @param pause true: pause the timer; false: resume
  */
-void lv_timer_pause(lv_timer_t * timer, bool pause);
+void lv_timer_pause(lv_timer_t * timer);
+
+void lv_timer_resume(lv_timer_t * timer);
 
 /**
  * Set the callback the timer (the function to call periodically)

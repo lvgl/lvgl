@@ -68,7 +68,12 @@ void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
  */
 void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
-void lv_obj_refr_size(struct _lv_obj_t * obj);
+/**
+ * Recalculate the size of the object
+ * @param obj       pointer to an object
+ * @return          true: the size has been changed
+ */
+bool lv_obj_refr_size(struct _lv_obj_t * obj);
 
 /**
  * Set the width of an object
@@ -288,7 +293,7 @@ lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @return          false: nothing happened; true: refresh happened
  */
-bool lv_obj_handle_self_size_chg(struct _lv_obj_t * obj);
+bool lv_obj_refresh_self_size(struct _lv_obj_t * obj);
 
 void lv_obj_refr_pos(struct _lv_obj_t * obj);
 

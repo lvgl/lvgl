@@ -196,9 +196,9 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
         int32_t range = slider->bar.max_value - slider->bar.min_value;
-        int16_t new_value = 0;
-        int16_t real_max_value = slider->bar.max_value;
-        int16_t real_min_value = slider->bar.min_value;
+        int32_t new_value = 0;
+        int32_t real_max_value = slider->bar.max_value;
+        int32_t real_min_value = slider->bar.min_value;
 
         if(w >= h) {
             lv_coord_t indic_w = w - bg_left - bg_right;

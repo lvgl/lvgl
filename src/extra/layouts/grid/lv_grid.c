@@ -284,12 +284,21 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     lv_coord_t free_w = cont_w - grid_w;
     if(free_w < 0) free_w = 0;
 
+    int32_t last_fr_i = -1;
+    int32_t last_fr_x = 0;
     for(i = 0; i < c->col_num; i++) {
         lv_coord_t x = col_templ[i];
         if(IS_FR(x)) {
             lv_coord_t f = GET_FR(x);
             c->w[i] = (free_w * f) / col_fr_cnt;
+            last_fr_i = i;
+            last_fr_x = f;
         }
+    }
+
+    /*To avoid rounding errors set the last FR track to the remaining size */
+    if(last_fr_i >= 0) {
+    	c->w[last_fr_i] = free_w - ((free_w * (col_fr_cnt - last_fr_x)) / col_fr_cnt);
     }
 }
 
@@ -337,17 +346,25 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
         }
     }
 
+
     lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
     lv_coord_t cont_h = lv_obj_get_content_height(cont) - row_gap * (c->row_num - 1);
     lv_coord_t free_h = cont_h - grid_h;
     if(free_h < 0) free_h = 0;
 
+    int32_t last_fr_i = -1;
+    int32_t last_fr_x = 0;
     for(i = 0; i < c->row_num; i++) {
         lv_coord_t x = row_templ[i];
         if(IS_FR(x)) {
             lv_coord_t f = GET_FR(x);
             c->h[i] = (free_h * f) / row_fr_cnt;
         }
+    }
+
+    /*To avoid rounding errors set the last FR track to the remaining size */
+    if(last_fr_i >= 0) {
+    	c->h[last_fr_i] = free_h - ((free_h * (row_fr_cnt - last_fr_x)) / row_fr_cnt);
     }
 }
 

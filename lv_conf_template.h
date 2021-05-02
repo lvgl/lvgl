@@ -463,8 +463,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_USE_THEME_DEFAULT    1
 #if LV_USE_THEME_DEFAULT
 
-/*1: Light mode; 0: Dark mode*/
-# define LV_THEME_DEFAULT_PALETTE_LIGHT     1
+/*0: Light mode; 1: Dark mode*/
+# define LV_THEME_DEFAULT_DARK     0
 
 /*1: Enable grow on press*/
 # define LV_THEME_DEFAULT_GROW              1

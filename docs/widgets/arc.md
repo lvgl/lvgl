@@ -6,57 +6,72 @@
 
 ## Overview
 
-The Arc are consists of a background and a foreground arc. Both can have start and end angles and thickness.
+The Arc are consists of a background and a foreground arc. The foregrond (indicator) arc can be adjusted by finger.
 
 ## Parts and Styles
-The Arc's main part is called `LV_ARC_PART_MAIN`. It draws a background using the typical background style properties and an arc using the *line* style properties.
-The arc's size and position will respect the *padding* style properties.
-
-`LV_ARC_PART_INDIC` is virtual part and it draws an other arc using the *line* style properties. It's padding values are interpreted relative to the background arc. 
-The radius of the indicator arc will be modified according to the greatest padding value.
-
-`LV_ARC_PART_KNOB` is virtual part and it draws on the end of the arc indicator. It uses all background properties and padding values. With zero padding the knob size is the same as the indicator's width. 
+- `LV_PART_MAIN`  It draws a background using the typical background style properties and an arc using the arc style properties. The arc's size and position will respect the *padding* style properties.
+- `LV_PART_INDICATOR` It draws an other arc using the *arc* style properties. It's padding values are interpreted relative to the background arc. 
+- `LV_PART_KNOB`It draws a handle on the end of the indicator. It uses all background properties and padding values. With zero padding the knob size is the same as the indicator's width. 
 Larger padding makes it larger, smaller padding makes it smaller. 
 
 ## Usage
 
-### Angles
+### Value and range
 
-To set the angles of the background, use the `lv_arc_set_bg_angles(arc, start_angle, end_angle)` function or `lv_arc_set_bg_start/end_angle(arc, start_angle)`. 
-Zero degree is at the middle right (3 o'clock) of the object and the degrees are increasing in a clockwise direction.
+A new value can be set by `lv_arc_set_value(arc, new_value)`. 
+The value is interpreted in a range (minimum and maximum values) which can be modified with `lv_arc_set_range(arc, min, max)`.
+The default range is 1..100.
+
+The indicator arc is drawn on the main part's arc. That is if the vale is set to maximum the indicator arc will cover the entire "background" arc.
+To set the start and end angl of the background arc use  the `lv_arc_set_bg_angles(arc, start_angle, end_angle)` function or `lv_arc_set_bg_start/end_angle(arc, start_angle)`. 
+
+Zero degree is at the middle right (3 o'clock) of the object and the degrees are increasing in clockwise direction.
 The angles should be in [0;360] range.
-
-Similarly, `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)` sets the angles of the indicator arc. 
 
 ### Rotation
 
 An offset to the 0 degree position can added with `lv_arc_set_rotation(arc, deg)`.
 
+### Mode
 
-### Range and values
+The arc can be one of the following modes:
+- `LV_ARC_MODE_NORMAL` The indicator arc is drawn from the minimimum value to the current.
+- `LV_ARC_MODE_REVERSE` The indicator arc is drawn counter clockwise from the maximum value to the current.
+- `LV_ARC_MODE_SYMMETRICAL` The indicator arc is drawn from the middle point to the current value.
 
-Besides setting angles manually the arc can have a range and a value. To set the range use `lv_arc_set_range(arc, min, max)` and to set a value use `lv_arc_set_value(arc, value)`.
-Using range and value the angle of the indicator will be mapped between background angles.
+The mode can be set by `lv_arc_set_mode(arc, LV_ARC_MODE_...)` and used only if the the angle is set by `lv_arc_set_value()` or the arc is adjusted by finger.
 
-Note that, settings angles and values are independent. You should use either value and angle settings. Mixing the two might result unintended behavior. 
+### Change rate
+If the the arc is pressed the current value will set with a limited speed according to the set *change rate*. 
+The change rate is defined in degree/second unit and can be set with `lv_arc_set_change_rage(arc, rate)`
 
-### Type
 
-The arc can have the different "types". They are set with `lv_arc_set_type`.
-The following types exist:
-- `LV_ARC_TYPE_NORMAL` indicator arc drawn clockwise (min to current)
-- `LV_ARC_TYPE_REVERSE` indicator arc drawn counter clockwise (max to current)
-- `LV_ARC_TYPE_SYMMETRIC` indicator arc drawn from the middle point to the current value.  
+### Setting the indicator manually
+It also possible to set the angles o the indicator arc directly with `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)` sets the angles of the indicator arc. 
+In this case the set "value" and "mode" is ignored.
 
+In other words, settings angles and values are independent. You should use either value and angle settings. Mixing the two might result unintended behavior. 
+
+To make the arc non-adjutabe remove the style of the knob and make the object non-clickable:
+```c
+lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+```
 
 ## Events
-Besides the [Generic events](../overview/event.html#generic-events) the following [Special events](../overview/event.html#special-events) are sent by the arcs:
- - **LV_EVENT_VALUE_CHANGED** sent when the arc is pressed/dragged to set a new value.
+- `LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the background rectangle, the background arc, the foreground arc and the knob to allow hooking the drawing. 
+For more detail on the backround rectangle part see the [Base object](/widgets/obj#events)'s documentation. The fields of `lv_obj_draw_dsc_t` is set like the followings:
+  - For both arcs: `clip_area`, `p1` (center of the arc), `radius`, `arc_dsc`, `part`. 
+  - For the knob: `clip_area`, `draw_area`, `rect_dsc`, `part`.
+
 
 Learn more about [Events](/overview/event).
 
 ## Keys
-No *Keys* are processed by the object type.
+- `LV_KEY_RIGHT/UP` Increases the value by one.
+- `LV_KEY_LEFT/DOWN` Decreases the value by one.
+
 
 Learn more about [Keys](/overview/indev).
 

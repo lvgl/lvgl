@@ -70,6 +70,12 @@ static inline uint32_t lv_obj_get_style_anim_time(const struct _lv_obj_t * obj, 
     return (uint32_t)v.num;
 }
 
+static inline uint32_t lv_obj_get_style_anim_speed(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM_SPEED);
+    return (uint32_t)v.num;
+}
+
 static inline const lv_style_transition_dsc_t * lv_obj_get_style_transition(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION);
@@ -614,6 +620,14 @@ static inline void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t v
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_TIME, v, selector);
+}
+
+static inline void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_SPEED, v, selector);
 }
 
 static inline void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
