@@ -1123,7 +1123,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
 
         /*add text only to major tick*/
         if(major  && t->label_en)  {
-            int32_t tick_value = chart->ymax[axis] - lv_map(i, 0, total_tick_num, chart->ymin[axis], chart->ymax[axis]);
+            int32_t tick_value = lv_map(total_tick_num - i, 0, total_tick_num, chart->ymin[axis], chart->ymax[axis]);
             lv_snprintf(dsc.text, sizeof(dsc.text), "%d", tick_value);
             dsc.value = tick_value;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
