@@ -94,7 +94,6 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
         }
     }
 
-
     lv_obj_mark_layout_as_dirty(obj);
     lv_obj_enable_style_refresh(false);
 
@@ -103,6 +102,8 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
 
     lv_obj_enable_style_refresh(true);
     lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+
+    lv_obj_refresh_self_size(obj);
 
     lv_group_t * def_group = lv_group_get_default();
     if(def_group && lv_obj_is_group_def(obj)) {
