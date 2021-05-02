@@ -401,7 +401,9 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else {
                 if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
                     if((part_act == LV_PART_MAIN || part_act == LV_PART_SCROLLBAR)) {
-                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN;
+                    } else if(res != _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN) {
+                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW_PART;
                     }
                 }
             }
