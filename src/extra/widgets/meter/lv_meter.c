@@ -9,12 +9,6 @@
 #include "lv_meter.h"
 #if LV_USE_METER != 0
 
-#include "../misc/lv_assert.h"
-#include "../draw/lv_draw.h"
-#include "../core/lv_group.h"
-#include "../misc/lv_math.h"
-#include "../core/lv_disp.h"
-
 /*********************
  *      DEFINES
  *********************/

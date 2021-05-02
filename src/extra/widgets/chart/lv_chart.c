@@ -9,13 +9,6 @@
 #include "lv_chart.h"
 #if LV_USE_CHART != 0
 
-#include "../misc/lv_assert.h"
-#include "../core/lv_refr.h"
-#include "../draw/lv_draw.h"
-#include "../core/lv_disp.h"
-#include "../core/lv_indev.h"
-#include "../misc/lv_math.h"
-
 /*********************
  *      DEFINES
  *********************/

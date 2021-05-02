@@ -13,11 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_METER != 0
-
-#include "../core/lv_obj.h"
 
 /*********************
  *      DEFINES
