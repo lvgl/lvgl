@@ -9,7 +9,7 @@
 The Button Matrix objects can display multiple buttons in rows and columns.
 
 The Button matrix object is very light weighted because the buttons are not created just virtually drawn on the fly.
-This way, 1 button use only 8 extra bytes instead of the ~100-150 byte size of a normal [Button](/widgets/btn) object and other ~100 byte for the size of the [Label](/widgets/label) object.
+This way, 1 button use only 8 extra bytes instead of the ~100-150 byte size of a normal [Button](/widgets/core/btn) object and other ~100 byte for the size of the [Label](/widgets/core/label) object.
 
 The Button matrix is added to the deafult group (if it is set). Besides the Button matrix is an editable object to allow selecting and clicing the buttons with encoder navigation too.
 
@@ -82,7 +82,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_btnmatrix/index.rst
+.. include:: ../../../examples/widgets/btnmatrix/index.rst
 
 ```
 

@@ -80,7 +80,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_arc/index.rst
+.. include:: ../../../examples/widgets/arc/index.rst
 
 ```
 

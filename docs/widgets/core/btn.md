@@ -36,7 +36,7 @@ Learn more about [Keys](/overview/indev).
 ## Example
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_btn/index.rst
+.. include:: ../../../examples/widgets/btn/index.rst
 
 ```
 

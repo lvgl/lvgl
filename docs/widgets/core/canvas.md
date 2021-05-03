@@ -7,7 +7,7 @@
 
 ## Overview
 
-A Canvas inherites from [Image](/widgets/img) where the user can draw anything. 
+A Canvas inherites from [Image](/widgets/core/img) where the user can draw anything. 
 Rectangles, texts, images, lines, arcs can be drawn here using lvgl's drawing engine. 
 Besides some "effects" can be applied as well like rotation, zoom and blur.
 
@@ -53,7 +53,7 @@ To draw something to the canvas use
 
 `draw_dsc` is a `lv_draw_rect/label/img/line/arc_dsc_t` variable which should be first initialized with `lv_draw_rect/label/img/line/arc_dsc_init()` function and then it's filed should be modified with the desired colors and other values.
 
-The draw function can draw to any color format. For example, it's possible to draw a text to an `LV_IMG_VF_ALPHA_8BIT` canvas and use the result image as a mask in [lv_objmask](/widgets/objmask) later.
+The draw function can draw to any color format. For example, it's possible to draw a text to an `LV_IMG_VF_ALPHA_8BIT` canvas and use the result image as a [draw mask](/overview/drawing) later.
 
 ### Transformations
 `lv_canvas_transform()` can be used to rotate and/or scale the image of an image and store the result on the canvas. 
@@ -75,7 +75,7 @@ A given area of the canvas can be blurred horizontally with `lv_canvas_blur_hor(
 `r` is the radius of the blur (greater value means more intensive burring). `area` is the area where the blur should be applied (interpreted relative to the canvas)
 
 ## Events
-The same events are sent than for the [Images](/widgets/img).
+The same events are sent than for the [Images](/widgets/core/img).
 
 Learn more about [Events](/overview/event).
 
@@ -87,7 +87,7 @@ Learn more about [Keys](/overview/indev).
 ## Example
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_canvas/index.rst
+.. include:: ../../../examples/widgets/canvas/index.rst
 
 ```
 

@@ -21,7 +21,6 @@
    spinbox
    spinner
    tabview
-   textarea
    tileview
    win
 ```

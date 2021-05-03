@@ -3,11 +3,6 @@
 :github_url: |github_link_base|/index.md
 ```
 
-```eval_rst
-.. include:: /lang.rst
-
-```
-
 # Welcome to the documentation of LVGL!
 
 <img src="_static/img/home_banner.jpg" style="width:100%">
@@ -32,6 +27,7 @@
    porting/index
    overview/index
    widgets/index
+   layouts/index
    contributing/index
 
 ```

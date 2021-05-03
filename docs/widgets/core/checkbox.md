@@ -2,61 +2,54 @@
 .. include:: /header.rst 
 :github_url: |github_link_base|/widgets/checkbox.md
 ```
-# Checkbox (lv_cb)
+# Checkbox (lv_checkbox)
 
 
 ## Overview
 
-The Checkbox objects are built from a [Button](/widgets/btn) background which contains an also Button *bullet* and a [Label](/widgets/label) to realize a classical checkbox.
+The Checkbox object is created from a "tick box" and a label. 
+When the Chackbox is clicked the tick box is toggled.
 
 ## Parts and Styles
-The Check box's main part is called `LV_CHECKBOX_PART_BG`. It's a container for a "bullet" and a text next to it. The background uses all the typical background style properties.
+- `LV_PART_MAIN` The is the background of the Checkbox and it uses the text and all the typical backround style properties. 
+`pad_column` adjusts the spacing between the tickbox and the label
+- `LV_PART_INDICATOR` The "tick box" is a square the uses all the typical backround style properties. 
+By deafult its size is equal to the height of the main part's font. Padding properties makes the tick boy larger in the respectiev directions.
 
-The bullet is real [lv_obj](/widgets/obj) object and can be referred with `LV_CHECKBOX_PART_BULLET`. 
-The bullet automatically inherits the state of the background. So the background is pressed the bullet goes to pressed state as well.
-The bullet also uses all the typical background style properties.
-
-There is not dedicated part for the label. Its styles can be set in the background's styles because the *text* styles properties are always inherited.
-
+The Checkbox is added to the deafult group (if it is set). 
 
 ## Usage
 
 
 ### Text
-The text can be modified by the `lv_checkbox_set_text(cb, "New text")` function. It will dynamically allocate the text.
+The text can be modified by the `lv_checkbox_set_text(cb, "New text")` function. 
+It will dynamically allocate the text.
 
-To set a static text, use `lv_checkbox_set_static_text(cb, txt)`. This way, only a pointer of `txt` will be stored and it shouldn't be deallocated while the checkbox exists.
+To set a static text, 
+use `lv_checkbox_set_static_text(cb, txt)`. This way, only a pointer of `txt` will be stored and it shouldn't be deallocated while the checkbox exists.
 
-### Check/Uncheck
-You can manually check / un-check the Checkbox  via `lv_checkbox_set_checked(cb, true/false)`. Setting `true` will check the checkbox and `false` will un-check the checkbox.
-
-### Disabled
-To make the Checkbox disabled, use `lv_checkbox_set_disabled(cb, true)`.
-
-### Get/Set Checkbox State
-You can get the current state of the Checkbox with the `lv_checkbox_get_state(cb)` function which returns the current state.
-You can set the current state of the Checkbox with the `lv_checkbox_set_state(cb, state)`.
-The available states as defined by the enum `lv_btn_state_t` are:
-- **LV_BTN_STATE_RELEASED**
-- **LV_BTN_STATE_PRESSED**
-- **LV_BTN_STATE_DISABLED**
-- **LV_BTN_STATE_CHECKED_RELEASED**
-- **LV_BTN_STATE_CHECKED_PRESSED**
-- **LV_BTN_STATE_CHECKED_DISABLED**
+### Check, uncheck, disable
+You can manually check, un-check, and disable the Checkbox by using the common state state add/clear function:
+```c
+lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the chekbox checked*/
+lv_obj_clear_state(cb, LV_STATE_CHECKED); /*MAke the checkbox unchecked*/
+lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox checked and disabled*/
+```
 
 ## Events
-Besides the [Generic events](../overview/event.html#generic-events) the following [Special events](../overview/event.html#special-events) are sent by the Checkboxes:
- - **LV_EVENT_VALUE_CHANGED** - sent when the checkbox is toggled.
-
-Note that, the generic input device-related events (like `LV_EVENT_PRESSED`) are sent in the inactive state too. You need to check the state with `lv_cb_is_inactive(cb)` to ignore the events from inactive Checkboxes.
+- `LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for both main and indicator parts to allow hooking the drawing. 
+The for more detail on the main part see the [Base object](/widgets/obj#events)'s documentation.
+For the indicator the following fields are used: `clip_area`, `draw_area`, `rect_dsc`, `part`. 
 
 Learn more about [Events](/overview/event).
 
 
 ## Keys
 The following *Keys* are processed by the 'Buttons':
-- **LV_KEY_RIGHT/UP** - Go to toggled state if toggling is enabled
-- **LV_KEY_LEFT/DOWN** - Go to non-toggled state if toggling is  enabled
+- `LV_KEY_RIGHT/UP` Go to toggled state if toggling is enabled
+- `LV_KEY_LEFT/DOWN` Go to non-toggled state if toggling is  enabled
+- `LV_KEY_ENTER` Clicks the checkbox and toggles it
 
 Note that, as usual, the state of `LV_KEY_ENTER` is translated to `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
 
@@ -67,7 +60,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_checkbox/index.rst
+.. include:: ../../../examples/widgets/checkbox/index.rst
 
 ```
 

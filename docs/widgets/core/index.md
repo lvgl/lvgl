@@ -23,6 +23,7 @@
    slider
    switch
    table
+   textarea
    
 ```
 
