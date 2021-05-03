@@ -1,21 +1,34 @@
 # ESP-IDF component file for make based commands
 
-COMPONENT_SRCDIRS := .
-COMPONENT_SRCDIRS += src
-COMPONENT_SRCDIRS += src/core
-COMPONENT_SRCDIRS += src/draw
-COMPONENT_SRCDIRS += src/font
-COMPONENT_SRCDIRS += src/gpu
-COMPONENT_SRCDIRS += src/hal
-COMPONENT_SRCDIRS += src/misc
-COMPONENT_SRCDIRS += src/widgets
+COMPONENT_SRCDIRS := . \
+                  src \
+                  src/core \
+                  src/draw \
+                  src/extra \
+                  src/font \
+                  src/gpu \
+                  src/hal \
+                  src/misc \
+                  src/widgets \
+                  src/extra/layouts \
+                  src/extra/layouts/flex \
+                  src/extra/layouts/grid \
+                  src/extra/themes \
+                  src/extra/themes/basic \
+                  src/extra/themes/default \
+                  src/extra/widgets/calendar \
+                  src/extra/widgets/colorwheel \
+                  src/extra/widgets \
+                  src/extra/widgets/imgbtn \
+                  src/extra/widgets/keyboard \
+                  src/extra/widgets/led \
+                  src/extra/widgets/list \
+                  src/extra/widgets/msgbox \
+                  src/extra/widgets/spinbox \
+                  src/extra/widgets/spinner \
+                  src/extra/widgets/tabview \
+                  src/extra/widgets/tileview \
+                  src/extra/widgets/win
 
-COMPONENT_ADD_INCLUDEDIRS := .
-COMPONENT_ADD_INCLUDEDIRS += src
-COMPONENT_ADD_INCLUDEDIRS += src/core
-COMPONENT_ADD_INCLUDEDIRS += src/draw
-COMPONENT_ADD_INCLUDEDIRS += src/font
-COMPONENT_ADD_INCLUDEDIRS += src/gpu
-COMPONENT_ADD_INCLUDEDIRS += src/hal
-COMPONENT_ADD_INCLUDEDIRS += src/misc
-COMPONENT_ADD_INCLUDEDIRS += src/widgets
+
+COMPONENT_ADD_INCLUDEDIRS := $(COMPONENT_SRCDIRS) .
