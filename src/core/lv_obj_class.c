@@ -51,6 +51,8 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     obj->parent = parent;
 #if LV_USE_USER_DATA
     obj->user_data = user_data;
+#else
+    LV_UNUSED(user_data);
 #endif
 
     /*Create a screen*/
