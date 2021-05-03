@@ -167,7 +167,6 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_point_t txt_size;
         lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
-
         lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
         lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
         lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
@@ -181,7 +180,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         p->y = LV_MAX(marker_size.y, txt_size.y);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t *s = lv_event_get_param(e);;
+        lv_coord_t *s = lv_event_get_param(e);
         lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
         *s = LV_MAX(*s, m);
     }
@@ -217,9 +216,9 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_INDICATOR);
     lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_INDICATOR);
 
-    lv_draw_rect_dsc_t marker_dsc;
-    lv_draw_rect_dsc_init(&marker_dsc);
-    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &marker_dsc);
+    lv_draw_rect_dsc_t indic_dsc;
+    lv_draw_rect_dsc_init(&indic_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &indic_dsc);
     lv_area_t marker_area;
     marker_area.x1 = obj->coords.x1 + bg_leftp;
     marker_area.x2 = marker_area.x1 + font_h + marker_leftp + marker_rightp - 1;
@@ -233,7 +232,15 @@ static void lv_checkbox_draw(lv_event_t * e)
     marker_area_transf.y1 -= transf_h;
     marker_area_transf.y2 += transf_h;
 
-    lv_draw_rect(&marker_area_transf, clip_area, &marker_dsc);
+    lv_obj_draw_dsc_t obj_draw_dsc;
+    lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
+    obj_draw_dsc.rect_dsc = &indic_dsc;
+    obj_draw_dsc.draw_area = &marker_area_transf;
+    obj_draw_dsc.part = LV_PART_INDICATOR;
+
+    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
+    lv_draw_rect(&marker_area_transf, clip_area, &indic_dsc);
+    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
 
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
