@@ -663,7 +663,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
             lv_obj_add_style(obj, &styles->msgbox_btns_bg, 0);
             lv_obj_add_style(obj, &styles->pad_gap, 0);
-            lv_obj_add_style(obj, &styles->pad_tiny, 0);
             lv_obj_add_style(obj, &styles->btn, LV_PART_ITEMS);
             lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
             lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_ITEMS | LV_STATE_CHECKED);
