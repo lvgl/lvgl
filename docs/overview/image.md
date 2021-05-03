@@ -319,39 +319,12 @@ To do this, use `lv_img_cache_invalidate_src(&my_png)`. If `NULL` is passed as a
 
 ## API
 
-### Image decoder
-
-```eval_rst
-
-.. doxygenfile:: lv_img_decoder.h
-  :project: lvgl
-
-```
-
-
-### Image cache
-
-```eval_rst
-
-.. doxygenfile:: lv_img_cache.h
-  :project: lvgl
-
-```
 
 ### Image buffer
 
 ```eval_rst
 
 .. doxygenfile:: lv_img_buf.h
-  :project: lvgl
-
-```
-
-### Image draw
-
-```eval_rst
-
-.. doxygenfile:: lv_draw_img.h
   :project: lvgl
 
 ```

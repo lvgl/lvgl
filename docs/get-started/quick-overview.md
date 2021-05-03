@@ -117,7 +117,7 @@ lv_obj_set_event_cb(btn, btn_event_cb);                 /*Assign a callback to t
 
 void btn_event_cb(lv_obj_t * btn, lv_event_t event)
 {
-    if(event == LV_EVENT_CLICKED) {
+    if(code == LV_EVENT_CLICKED) {
         printf("Clicked\n");
     }
 }
@@ -172,36 +172,9 @@ You can select the theme to use in `lv_conf.h`.
 
 ## Examples
 
-### Button with label
-
 ```eval_rst
-.. image:: /lv_examples/src/lv_ex_get_started/lv_ex_get_started_1.*
-  :alt: Simple button with label with LVGL
 
-.. literalinclude:: /lv_examples/src/lv_ex_get_started/lv_ex_get_started_1.c
-  :language: c
-```
-
-
-### Styling buttons
-
-```eval_rst
-.. image:: /lv_examples/src/lv_ex_get_started/lv_ex_get_started_2.*
-  :alt: Styling buttons with LVGL
-
-.. literalinclude:: /lv_examples/src/lv_ex_get_started/lv_ex_get_started_2.c
-  :language: c
-```
-
-
-### Slider and alignment
-
-```eval_rst
-.. image:: /lv_examples/src/lv_ex_get_started/lv_ex_get_started_3.*
-  :alt: Create a slider with LVGL
-
-.. literalinclude:: /lv_examples/src/lv_ex_get_started/lv_ex_get_started_3.c
-  :language: c
+.. include:: ../../examples/get_started/index.rst
 ```
 
 ## Micropython

@@ -37,43 +37,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Convert a number to string
- * @param num a number
- * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
- * @return same as `buf` (just for convenience)
- */
-char * _lv_utils_num_to_str(int32_t num, char * buf)
-{
-    if(num == 0) {
-        buf[0] = '0';
-        buf[1] = '\0';
-        return buf;
-    }
-    int8_t digitCount = 0;
-    int8_t i          = 0;
-    if(num < 0) {
-        buf[digitCount++] = '-';
-        num               = LV_ABS(num);
-        ++i;
-    }
-    while(num) {
-        char digit        = num % 10;
-        buf[digitCount++] = digit + 48;
-        num /= 10;
-    }
-    buf[digitCount] = '\0';
-    digitCount--;
-    while(digitCount > i) {
-        char temp       = buf[i];
-        buf[i]          = buf[digitCount];
-        buf[digitCount] = temp;
-        digitCount--;
-        i++;
-    }
-    return buf;
-}
-
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
  * @note The function cmp must return negative if its first

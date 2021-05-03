@@ -1,5 +1,5 @@
 /**
- * @file lv_ddlist.h
+ * @file lv_dropdown.h
  *
  */
 
@@ -20,7 +20,7 @@ extern "C" {
 /*Testing of dependencies*/
 
 #if LV_USE_LABEL == 0
-#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
+#error "lv_dropdown: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
 #include "../widgets/lv_label.h"
@@ -38,10 +38,9 @@ LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 typedef struct {
     lv_obj_t obj;
     lv_obj_t * list;                /**< The dropped down list*/
-    const char * text;              /**< Text to display on the ddlist's button*/
+    const char * text;              /**< Text to display on the dropdown's button*/
     const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
     char * options;                 /**< Options in a a '\n' separated list*/
-    lv_coord_t max_height;          /**< Maximal height of the list when opened. (0: no max.  height)*/
     uint16_t option_cnt;            /**< Number of options*/
     uint16_t sel_opt_id;            /**< Index of the currently selected option*/
     uint16_t sel_opt_id_orig;       /**< Store the original index on focus*/
@@ -128,13 +127,6 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt);
 void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir);
 
 /**
- * Set the maximal height for the drop-down list
- * @param obj       pointer to a drop-down list
- * @param h         the maximal height
- */
-void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h);
-
-/**
  * Set an arrow or other symbol to display when on drop-down list's button.  Typically a down caret or arrow.
  * @param obj       pointer to drop-down list object
  * @param symbol    a text like `LV_SYMBOL_DOWN`, an image (pointer or path) or NULL to not draw symbol icon
@@ -196,13 +188,6 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj);
  * @param buf_size  size of `buf` in bytes. 0: to ignore it.
  */
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size);
-
-/**
- * Get the maximal height of the list.
- * @param obj       pointer to a drop-down list object
- * @return          the maximal height of the list
- */
-lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj);
 
 /**
  * Get the symbol on the drop-down list. Typically a down caret or arrow.

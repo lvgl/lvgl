@@ -130,7 +130,7 @@ static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
  * @param kb pointer to a  keyboard
  * @param event the triggering event
  */
-void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);
+void lv_keyboard_def_event_cb(lv_event_t * e);
 
 /**********************
  *      MACROS

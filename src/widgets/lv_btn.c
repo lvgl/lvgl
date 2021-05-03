@@ -30,7 +30,7 @@ static void lv_btn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_btn_class  = {
     .constructor_cb = lv_btn_constructor,
-    .width_def = LV_DPI_DEF,
+    .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_btn_t),
@@ -48,7 +48,7 @@ const lv_obj_class_t lv_btn_class  = {
 lv_obj_t * lv_btn_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-     return lv_obj_create_from_class(&lv_btn_class, parent);
+     return lv_obj_class_create_obj(&lv_btn_class, parent, NULL);
 }
 
 /**********************

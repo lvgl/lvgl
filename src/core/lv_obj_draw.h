@@ -43,7 +43,7 @@ typedef struct
     lv_draw_arc_dsc_t *  arc_dsc;
     const lv_point_t * p1;
     const lv_point_t * p2;
-    const lv_coord_t * radius;
+    lv_coord_t radius;
     char text[16];
     int32_t value;
     uint32_t id;

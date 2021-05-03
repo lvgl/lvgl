@@ -42,7 +42,6 @@ LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SEL_OFF);
 
 /** Long mode behaviors. Used in 'lv_label_ext_t'*/
 enum {
-    LV_LABEL_LONG_EXPAND,           /**< Expand the object size to the text size*/
     LV_LABEL_LONG_WRAP,             /**< Keep the object width, wrap the too long lines and expand the object height*/
     LV_LABEL_LONG_DOT,              /**< Keep the size and write dots at the end if the text is too long*/
     LV_LABEL_LONG_SCROLL,           /**< Keep the size and roll the text back and forth*/
@@ -159,20 +158,8 @@ char * lv_label_get_text(const lv_obj_t * obj);
 
 /**
  * Get the long mode of a label
-<<<<<<< HEAD
  * @param obj       pointer to a label object
  * @return          the current long mode
-=======
- * @param label pointer to a label object
- * @return the long mode
- */
-lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
-
-/**
- * Get the align attribute
- * @param label pointer to a label object
- * @return LV_LABEL_ALIGN_LEFT/RIGHT/CENTER
->>>>>>> master
  */
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
 

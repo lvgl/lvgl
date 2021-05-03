@@ -5,12 +5,13 @@ static lv_obj_t * chart1;
 static lv_chart_series_t * ser1;
 static lv_chart_series_t * ser2;
 
-static void event_cb(lv_obj_t * obj, lv_event_t e)
+static void draw_event_cb(lv_event_t * e)
 {
+    lv_obj_t * obj = lv_event_get_target(e);
+
     /*Add the faded area before the lines are drawn*/
-    if(e == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param();
-        if(dsc->part != LV_PART_ITEMS) return;
+    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    if(dsc->part == LV_PART_ITEMS) {
         if(!dsc->p1 || !dsc->p2) return;
 
         /*Add  a line mask that keeps the area below the line*/
@@ -41,6 +42,44 @@ static void event_cb(lv_obj_t * obj, lv_event_t e)
         lv_draw_mask_remove_id(line_mask_id);
         lv_draw_mask_remove_id(fade_mask_id);
     }
+    /*Hook the division lines too*/
+    else if(dsc->part == LV_PART_MAIN) {
+        if(dsc->line_dsc == NULL) return;
+
+        /*Vertical line*/
+        if(dsc->p1->x == dsc->p2->x) {
+            dsc->line_dsc->color  = lv_palette_lighten(LV_PALETTE_GREY, 1);
+            if(dsc->id == 3) {
+                dsc->line_dsc->width  = 2;
+                dsc->line_dsc->dash_gap  = 0;
+                dsc->line_dsc->dash_width  = 0;
+            }
+            else {
+                dsc->line_dsc->width = 1;
+                dsc->line_dsc->dash_gap  = 6;
+                dsc->line_dsc->dash_width  = 6;
+            }
+        }
+        /*Horizontal line*/
+        else {
+            if(dsc->id == 2) {
+                dsc->line_dsc->width  = 2;
+                dsc->line_dsc->dash_gap  = 0;
+                dsc->line_dsc->dash_width  = 0;
+            }
+            else {
+                dsc->line_dsc->width = 2;
+                dsc->line_dsc->dash_gap  = 6;
+                dsc->line_dsc->dash_width  = 6;
+            }
+
+            if(dsc->id == 1  || dsc->id == 3) {
+                dsc->line_dsc->color  = lv_palette_main(LV_PALETTE_GREEN);
+            } else {
+                dsc->line_dsc->color  = lv_palette_lighten(LV_PALETTE_GREY, 1);
+            }
+        }
+    }
 }
 
 static void add_data(lv_timer_t * timer)
@@ -55,7 +94,7 @@ static void add_data(lv_timer_t * timer)
 }
 
 /**
- * Add a faded area effect to the line chart
+ * Add a faded area effect to the line chart and make some division lines ticker
  */
 void lv_example_chart_2(void)
 {
@@ -65,12 +104,14 @@ void lv_example_chart_2(void)
     lv_obj_center(chart1);
     lv_chart_set_type(chart1, LV_CHART_TYPE_LINE);   /*Show lines and points too*/
 
-    lv_obj_add_event_cb(chart1, event_cb, NULL);
+    lv_chart_set_div_line_count(chart1, 5, 7);
+
+    lv_obj_add_event_cb(chart1, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
     lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
 
     /*Add two data series*/
-    ser1 = lv_chart_add_series(chart1, lv_color_red(), LV_CHART_AXIS_PRIMARY_Y);
-    ser2 = lv_chart_add_series(chart1, lv_color_blue(), LV_CHART_AXIS_SECONDARY_Y);
+    ser1 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+    ser2 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
 
     uint32_t i;
     for(i = 0; i < 10; i++) {

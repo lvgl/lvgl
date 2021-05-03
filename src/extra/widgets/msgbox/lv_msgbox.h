@@ -41,10 +41,14 @@ extern const lv_obj_class_t lv_msgbox_class;
 
 /**
  * Create a message box objects
- * @param par pointer to an object, it will be the parent of the new message box
- * @return pointer to the created message box
+ * @param parent        pointer to parent or NULL to create a full screen modal message box
+ * @param title         the title of the message box
+ * @param txt           the text of the message box
+ * @param btn_txts      the buttons as an array of texts terminated by an "" element. E.g. {"btn1", "btn2", ""}
+ * @param add_close_btn true: add a close button
+ * @return              pointer to the message box object
  */
-lv_obj_t * lv_msgbox_create(const char * title, const char * txt, const char * btn_txts[], bool add_close_btn);
+lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[], bool add_close_btn);
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * mbox);
 

@@ -1,9 +1,11 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_BTN
 
-static void btn_event_cb(lv_obj_t * btn, lv_event_t event)
+static void btn_event_cb(lv_event_t * e)
 {
-    if(event == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * btn = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED) {
         static uint8_t cnt = 0;
         cnt++;
 
@@ -21,7 +23,7 @@ void lv_example_get_started_1(void)
     lv_obj_t * btn = lv_btn_create(lv_scr_act());     /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
-    lv_obj_add_event_cb(btn, btn_event_cb, NULL);           /*Assign a callback to the button*/
+    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL);           /*Assign a callback to the button*/
 
     lv_obj_t * label = lv_label_create(btn);          /*Add a label to the button*/
     lv_label_set_text(label, "Button");                     /*Set the labels text*/

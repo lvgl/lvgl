@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdlib.h>
 #include "lv_canvas.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_math.h"
@@ -68,7 +67,7 @@ const lv_obj_class_t lv_canvas_class = {
 lv_obj_t * lv_canvas_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_canvas_class, parent);
+    return lv_obj_class_create_obj(&lv_canvas_class, parent, NULL);
 }
 
 /*=====================
@@ -579,7 +578,10 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     coords.y2 = y + h - 1;
 
     lv_disp_t disp;
+    /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
+    lv_disp_drv_t driver;
     lv_memset_00(&disp, sizeof(lv_disp_t));
+    disp.driver = &driver;
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -637,7 +639,10 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     coords.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
+    /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
+    lv_disp_drv_t driver;
     lv_memset_00(&disp, sizeof(lv_disp_t));
+    disp.driver = &driver;
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -695,7 +700,10 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     coords.y2 = y + header.h - 1;
 
     lv_disp_t disp;
+    /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
+    lv_disp_drv_t driver;
     lv_memset_00(&disp, sizeof(lv_disp_t));
+    disp.driver = &driver;
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -739,7 +747,10 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     mask.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
+    /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
+    lv_disp_drv_t driver;
     lv_memset_00(&disp, sizeof(lv_disp_t));
+    disp.driver = &driver;
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -794,7 +805,10 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     mask.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
+    /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
+    lv_disp_drv_t driver;
     lv_memset_00(&disp, sizeof(lv_disp_t));
+    disp.driver = &driver;
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -847,7 +861,10 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     mask.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
+    /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
+    lv_disp_drv_t driver;
     lv_memset_00(&disp, sizeof(lv_disp_t));
+    disp.driver = &driver;
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);

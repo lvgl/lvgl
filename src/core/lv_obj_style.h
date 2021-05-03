@@ -28,7 +28,8 @@ struct _lv_obj_t;
 
 typedef enum {
     _LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
-    _LV_STYLE_STATE_CMP_DIFF_REDRAW,    /*The differences can be shown with a simple redraw*/
+    _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN,    /*The differences can be shown with a simple redraw*/
+    _LV_STYLE_STATE_CMP_DIFF_REDRAW_PART,    /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
@@ -41,6 +42,17 @@ typedef struct {
     uint32_t is_local :1;
     uint32_t is_trans :1;
 }lv_obj_style_t;
+
+typedef struct {
+    uint16_t time;
+    uint16_t delay;
+    lv_style_selector_t selector;
+    lv_style_prop_t prop;
+    lv_anim_path_cb_t path_cb;
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
+}_lv_obj_style_transition_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -65,9 +77,8 @@ void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selec
 /**
  * Add a style to an object.
  * @param obj       pointer to an object
- * @param part      a part of the object from which the style should be removed E.g. `LV_PART_MAIN` or `LV_PART_KNOB`
- * @param state     a state or combination of states from which the style should be removed
- * @param style     pointer to a style to remove
+ * @param style     pointer to a style to remove. Can be NULL to check only the selector
+ * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
  * @example lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, &style); //Remove a specific style
  * @example lv_obj_remove_style(obj, LV_PART_MAIN, LV_STATE_ANY, &style); //Remove all styles from the main part
  * @example lv_obj_remove_style(obj, LV_PART_ANY, LV_STATE_ANY, NULL); //Remove all styles
@@ -94,7 +105,7 @@ void lv_obj_report_style_change(lv_style_t * style);
  * Notify an object and its children about its style is modified.
  * @param obj       pointer to an object
  * @param part      the part whose style was changed. E.g. `LV_PART_ANY`, `LV_PART_MAIN`
- * @param prop      `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property.
+ * @param prop      `LV_STYLE_PROP_ANY` or an `LV_STYLE_...` property.
  *                  It is used to optimize what needs to be refreshed.
  *                  `LV_STYLE_PROP_INV` to perform only a style cache update
  */
@@ -144,16 +155,12 @@ bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop
 /**
  * Used internally to create a style tarnsition
  * @param obj
- * @param prop
  * @param part
  * @param prev_state
  * @param new_state
- * @param time
- * @param delay
- * @param path
+ * @param tr
  */
-void _lv_obj_style_create_transition(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_part_t part, lv_state_t prev_state,
-                                       lv_state_t new_state, uint32_t time, uint32_t delay, const lv_anim_path_t * path);
+void _lv_obj_style_create_transition(struct _lv_obj_t * obj, lv_part_t part, lv_state_t prev_state, lv_state_t new_state, const _lv_obj_style_transition_dsc_t * tr);
 
 /**
  * Used internally to compare the appearance of an object in 2 states
@@ -206,6 +213,11 @@ static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t * obj, lv_coord_t v
 static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj,  lv_coord_t value, lv_style_selector_t selector) {
     lv_obj_set_style_pad_row(obj, value, selector);
     lv_obj_set_style_pad_column(obj, value, selector);
+}
+
+static inline void lv_obj_set_style_size(struct _lv_obj_t * obj,  lv_coord_t value, lv_style_selector_t selector) {
+    lv_obj_set_style_width(obj, value, selector);
+    lv_obj_set_style_height(obj, value, selector);
 }
 
 /**********************

@@ -12,16 +12,19 @@
    :maxdepth: 2
 
    object
+   coords
+   style
+   scroll
    layer
    event
-   style
    indev
    display
    font
    image
    file-system
    animation
-   task
+   timer
    drawing
+   new_widget
 ```
 

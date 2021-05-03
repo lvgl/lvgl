@@ -15,7 +15,7 @@ typedef int _keep_pedantic_happy;
 //    lv_style_set_bg_color(&style, LV_STATE_DEFAULT, lv_color_grey_lighten_3());
 //
 //    /*Set different background color in pressed state*/
-//    lv_style_set_bg_color(&style, LV_STATE_PRESSED, lv_color_grey());
+//    lv_style_set_bg_color(&style, LV_STATE_PRESSED, lv_palette_main(LV_PALETTE_GREY));
 //
 //    /*Set different transition time in default and pressed state
 //     *fast press, slower revert to default*/

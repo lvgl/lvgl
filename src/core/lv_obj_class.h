@@ -26,6 +26,8 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
+struct _lv_obj_class_t;
+struct _lv_event_t;
 
 typedef enum {
     LV_OBJ_CLASS_EDITABLE_INHERIT,      /**< Check the base class. Must have 0 value to let zero initialized class inherit*/
@@ -39,6 +41,8 @@ typedef enum {
     LV_OBJ_CLASS_GROUP_DEF_FALSE,
 }lv_obj_class_group_def_t;
 
+
+typedef void (*lv_obj_class_event_cb_t)(struct _lv_obj_class_t * class_p, struct _lv_event_t * e);
 /**
  * Describe the common methods of every object.
  * Similar to a C++ class.
@@ -50,11 +54,11 @@ typedef struct _lv_obj_class_t {
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
-    lv_event_cb_t event_cb;         /**< Object type specific event function*/
+    void (*event_cb)(const struct _lv_obj_class_t * class_p, struct _lv_event_t * e);  /**< Widget type specific event function*/
     lv_coord_t width_def;
     lv_coord_t height_def;
-    uint32_t editable : 2;          /**< Value from ::lv_obj_class_editable_t*/
-    uint32_t group_def : 2;          /**< Value from ::lv_obj_class_group_def_t*/
+    uint32_t editable : 2;             /**< Value from ::lv_obj_class_editable_t*/
+    uint32_t group_def : 2;            /**< Value from ::lv_obj_class_group_def_t*/
     uint32_t instance_size : 16;
 }lv_obj_class_t;
 
@@ -64,11 +68,13 @@ typedef struct _lv_obj_class_t {
 
 /**
  * Create an object form a class descriptor
- * @param class_p pointer to a class
- * @param parent pointer to an object where the new object should be created
- * @return pointer to the created object
+ * @param class_p   pointer to a class
+ * @param parent    pointer to an object where the new object should be created
+ * @param user_data a custom user_data to set in `obj->user_data` in creation time. Requires `LV_USE_USER_DATA 1`
+ *                  As some event fire during creation it's useful make user_data available for those events too.
+ * @return          pointer to the created object
  */
-struct _lv_obj_t * lv_obj_create_from_class(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent);
+struct _lv_obj_t * lv_obj_class_create_obj(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent, void * user_data);
 
 void _lv_obj_destructor(struct _lv_obj_t * obj);
 

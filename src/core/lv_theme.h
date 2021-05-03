@@ -33,13 +33,12 @@ typedef struct _lv_theme_t {
     struct _lv_theme_t * parent;    /**< Apply the current theme's style on top of this theme.*/
     void * user_data;
     struct _lv_disp_t * disp;
-    lv_color_palette_t palette_primary;
-    lv_color_palette_t palette_secondary;
     lv_color_t color_primary;
     lv_color_t color_secondary;
     const lv_font_t * font_small;
     const lv_font_t * font_normal;
     const lv_font_t * font_large;
+    uint32_t flags;                 /*Any custom flag used by the theme*/
 } lv_theme_t;
 
 /**********************
@@ -92,10 +91,6 @@ const lv_font_t * lv_theme_get_font_normal(lv_obj_t * obj);
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_large(lv_obj_t * obj);
-
-lv_color_palette_t lv_theme_get_palette_primary(lv_obj_t * obj);
-
-lv_color_palette_t lv_theme_get_palette_secondary(lv_obj_t * obj);
 
 /**
  * Get the primary color of the theme

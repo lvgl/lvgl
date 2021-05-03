@@ -95,28 +95,16 @@ const lv_font_t * lv_theme_get_font_large(lv_obj_t * obj)
     return th ? th->font_large : LV_FONT_DEFAULT;
 }
 
-lv_color_palette_t lv_theme_get_palette_primary(lv_obj_t * obj)
-{
-    lv_theme_t * th = lv_theme_get_from_obj(obj);
-    return th ? th->palette_primary : LV_COLOR_PALETTE_BLUE_GREY;
-}
-
-lv_color_palette_t lv_theme_get_palette_secondary(lv_obj_t * obj)
-{
-    lv_theme_t * th = lv_theme_get_from_obj(obj);
-    return th ? th->palette_secondary : LV_COLOR_PALETTE_BLUE;
-}
-
 lv_color_t lv_theme_get_color_primary(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);
-    return th ? th->color_primary : lv_color_blue_grey();
+    return th ? th->color_primary : lv_palette_main(LV_PALETTE_BLUE_GREY);
 }
 
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);
-    return th ? th->color_secondary : lv_color_blue();
+    return th ? th->color_secondary : lv_palette_main(LV_PALETTE_BLUE);
 }
 
 /**********************

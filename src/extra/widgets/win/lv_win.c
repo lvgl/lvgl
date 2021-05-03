@@ -28,8 +28,8 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
  **********************/
 const lv_obj_class_t lv_win_class = {
         .constructor_cb = lv_win_constructor,
-        .width_def = LV_SIZE_PCT(100),
-        .height_def = LV_SIZE_PCT(100),
+        .width_def = LV_PCT(100),
+        .height_def = LV_PCT(100),
         .base_class = &lv_obj_class,
         .instance_size = sizeof(lv_win_t)
 };
@@ -45,7 +45,7 @@ static lv_coord_t create_header_height;
 lv_obj_t * lv_win_create(lv_obj_t * parent, lv_coord_t header_height)
 {
     create_header_height = header_height;
-    return lv_obj_create_from_class(&lv_win_class, parent);
+    return lv_obj_class_create_obj(&lv_win_class, parent, NULL);
 }
 
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
@@ -62,8 +62,8 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * icon, lv_coord_t btn_w, l
 {
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * btn = lv_btn_create(header);
-    lv_obj_set_size(btn, btn_w, LV_SIZE_PCT(100));
-    lv_obj_add_event_cb(btn, event_cb, NULL);
+    lv_obj_set_size(btn, btn_w, LV_PCT(100));
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_ALL, NULL);
 
     lv_obj_t * img = lv_img_create(btn);
     lv_img_set_src(img, icon);
@@ -94,13 +94,13 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
     lv_obj_t * header = lv_obj_create(obj);
-    lv_obj_set_size(header, LV_SIZE_PCT(100), create_header_height);
+    lv_obj_set_size(header, LV_PCT(100), create_header_height);
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_place(header, LV_FLEX_PLACE_START, LV_FLEX_PLACE_CENTER, LV_FLEX_PLACE_CENTER);
+    lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * cont = lv_obj_create(obj);
     lv_obj_set_flex_grow(cont, 1);
-    lv_obj_set_width(cont, LV_SIZE_PCT(100));
+    lv_obj_set_width(cont, LV_PCT(100));
 }
 
 #endif

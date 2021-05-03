@@ -132,7 +132,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {
-        disp->theme = lv_theme_default_init(disp, LV_COLOR_PALETTE_BLUE, LV_COLOR_PALETTE_CYAN, LV_FONT_DEFAULT, LV_FONT_DEFAULT, LV_FONT_DEFAULT);
+        disp->theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), LV_THEME_DEFAULT_DARK, LV_FONT_DEFAULT);
     }
 #endif
 
@@ -358,28 +358,6 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
 lv_disp_draw_buf_t * lv_disp_get_draw_buf(lv_disp_t * disp)
 {
     return disp->driver->draw_buf;
-}
-
-/**
- * Get the number of areas in the buffer
- * @return number of invalid areas
- */
-uint16_t lv_disp_get_inv_buf_size(lv_disp_t * disp)
-{
-    return disp->inv_p;
-}
-
-/**
- * Pop (delete) the last 'num' invalidated areas from the buffer
- * @param num number of areas to delete
- */
-void _lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num)
-{
-
-    if(disp->inv_p < num)
-        disp->inv_p = 0;
-    else
-        disp->inv_p -= num;
 }
 
 /**
