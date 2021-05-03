@@ -75,7 +75,7 @@ static bool create_knob_recolor;
 lv_obj_t * lv_colorwheel_create(lv_obj_t * parent, bool knob_recolor)
 {
     create_knob_recolor = knob_recolor;
-    return lv_obj_create_from_class(&lv_colorwheel_class, parent);
+    return lv_obj_class_create_obj(&lv_colorwheel_class, parent);
 }
 
 /*=====================

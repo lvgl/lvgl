@@ -57,7 +57,7 @@ const lv_obj_class_t lv_img_class = {
 lv_obj_t * lv_img_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_img_class, parent);
+    return lv_obj_class_create_obj(&lv_img_class, parent);
 }
 
 /*=====================

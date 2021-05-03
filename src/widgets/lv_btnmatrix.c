@@ -79,7 +79,7 @@ const lv_obj_class_t lv_btnmatrix_class = {
 lv_obj_t * lv_btnmatrix_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_btnmatrix_class, parent);
+    return lv_obj_class_create_obj(&lv_btnmatrix_class, parent);
 }
 
 /*=====================

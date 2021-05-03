@@ -78,7 +78,7 @@ const lv_obj_class_t lv_bar_class = {
 lv_obj_t * lv_bar_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_bar_class, parent);
+    return lv_obj_class_create_obj(&lv_bar_class, parent);
 }
 
 /*=====================

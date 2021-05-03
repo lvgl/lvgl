@@ -50,7 +50,7 @@ static uint32_t create_row_id;
 
 lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 {
-   return lv_obj_create_from_class(&lv_tileview_class, parent);
+   return lv_obj_class_create_obj(&lv_tileview_class, parent);
 }
 
 /*======================
@@ -62,7 +62,7 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
     create_dir = dir;
     create_col_id = col_id;
     create_row_id = row_id;
-    return lv_obj_create_from_class(&lv_tileview_tile_class, tv);
+    return lv_obj_class_create_obj(&lv_tileview_tile_class, tv);
 }
 
 void lv_obj_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)

@@ -51,7 +51,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab
 {
     tabpos_create = tab_pos;
     tabsize_create = tab_size;
-    return lv_obj_create_from_class(&lv_tabview_class, parent);
+    return lv_obj_class_create_obj(&lv_tabview_class, parent);
 }
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
