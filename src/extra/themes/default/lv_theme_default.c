@@ -89,6 +89,10 @@ typedef struct {
     lv_style_t chart_series, chart_indic, chart_ticks, chart_bg;
 #endif
 
+#if LV_USE_DROPDOWN
+    lv_style_t dropdown_list;
+#endif
+
 #if LV_USE_CHECKBOX
     lv_style_t cb_marker, cb_marker_checked;
 #endif
@@ -390,6 +394,10 @@ static void style_init(void)
     lv_style_set_arc_color(&styles->arc_indic_primary, theme.color_primary);
 #endif
 
+#if LV_USE_DROPDOWN
+    style_init_reset(&styles->dropdown_list);
+    lv_style_set_max_height(&styles->dropdown_list, LV_DPI_DEF * 2);
+#endif
 #if LV_USE_CHECKBOX
     style_init_reset(&styles->cb_marker);
     lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
@@ -812,6 +820,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_dropdownlist_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->line_space_large, 0);
+        lv_obj_add_style(obj, &styles->dropdown_list, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
         lv_obj_add_style(obj, &styles->bg_color_white, LV_PART_SELECTED);
