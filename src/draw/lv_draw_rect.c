@@ -1398,7 +1398,7 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
     lv_draw_mask_remove_id(mask_rout_id);
     lv_mem_buf_release(mask_buf);
 }
-#endif /*LV_DRAW_COMPLEX*/
+#else /*LV_DRAW_COMPLEX*/
 
 static void draw_simple_border(const lv_area_t * clip, const lv_area_t * area_inner, const lv_area_t * area_outer,
         lv_color_t color, lv_opa_t opa, lv_border_side_t side)
@@ -1436,3 +1436,6 @@ static void draw_simple_border(const lv_area_t * clip, const lv_area_t * area_in
     }
 
 }
+
+#endif
+

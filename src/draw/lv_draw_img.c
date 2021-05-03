@@ -570,18 +570,18 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         c.full =  *((uint32_t *)map_px);
                         c.ch.alpha = 0xFF;
 #endif
-                    }
-#endif
-                    if(chroma_key) {
-                        if(c.full == chroma_keyed_color.full) {
-                            mask_buf[px_i] = LV_OPA_TRANSP;
+                        if(chroma_key) {
+                            if(c.full == chroma_keyed_color.full) {
+                                mask_buf[px_i] = LV_OPA_TRANSP;
 #if  LV_COLOR_DEPTH == 32
-                            map2[px_i].full = 0;
+                                map2[px_i].full = 0;
 #endif
-                            continue;
+                                continue;
+                            }
                         }
-                    }
 
+                    }
+#endif
                     if(draw_dsc->recolor_opa != 0) {
                         c = lv_color_mix_premult(recolor_premult, c, recolor_opa_inv);
                     }
