@@ -544,7 +544,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                     }
                     /*No transform*/
                     else
-#else
+#endif
                     {
                         if(alpha_byte) {
                             lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
@@ -581,7 +581,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         }
 
                     }
-#endif
                     if(draw_dsc->recolor_opa != 0) {
                         c = lv_color_mix_premult(recolor_premult, c, recolor_opa_inv);
                     }
