@@ -46,7 +46,7 @@ const lv_obj_class_t lv_spinbox_class = {
 
 lv_obj_t * lv_spinbox_create(lv_obj_t * parent)
 {
-   return lv_obj_class_create_obj(&lv_spinbox_class, parent);
+   return lv_obj_class_create_obj(&lv_spinbox_class, parent, NULL);
 }
 
 /*=====================

@@ -68,11 +68,13 @@ typedef struct _lv_obj_class_t {
 
 /**
  * Create an object form a class descriptor
- * @param class_p pointer to a class
- * @param parent pointer to an object where the new object should be created
- * @return pointer to the created object
+ * @param class_p   pointer to a class
+ * @param parent    pointer to an object where the new object should be created
+ * @param user_data a custom user_data to set in `obj->user_data` in creation time. Requires `LV_USE_USER_DATA 1`
+ *                  As some event fire during creation it's useful make user_data available for those events too.
+ * @return          pointer to the created object
  */
-struct _lv_obj_t * lv_obj_class_create_obj(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent);
+struct _lv_obj_t * lv_obj_class_create_obj(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * parent, void * user_data);
 
 void _lv_obj_destructor(struct _lv_obj_t * obj);
 

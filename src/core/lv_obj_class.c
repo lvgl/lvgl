@@ -40,7 +40,7 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent)
+lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent, void * user_data)
 {
     LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", class_p, parent);
     uint32_t s = get_instance_size(class_p);
@@ -49,6 +49,9 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     lv_memset_00(obj, s);
     obj->class_p = class_p;
     obj->parent = parent;
+#if LV_USE_USER_DATA
+    obj->user_data = user_data;
+#endif
 
     /*Create a screen*/
     if(parent == NULL) {

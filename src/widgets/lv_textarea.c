@@ -84,7 +84,7 @@ static const char * ta_insert_replace;
 lv_obj_t * lv_textarea_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-  return lv_obj_class_create_obj(&lv_textarea_class, parent);
+  return lv_obj_class_create_obj(&lv_textarea_class, parent, NULL);
 }
 
 /*======================

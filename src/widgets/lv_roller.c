@@ -77,7 +77,7 @@ const lv_obj_class_t lv_roller_label_class  = {
 lv_obj_t * lv_roller_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_class_create_obj(&lv_roller_class, parent);
+    return lv_obj_class_create_obj(&lv_roller_class, parent, NULL);
 }
 
 /*=====================
@@ -297,7 +297,7 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
 
-    lv_obj_class_create_obj(&lv_roller_label_class, obj);
+    lv_obj_class_create_obj(&lv_roller_label_class, obj, NULL);
     lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
 
     LV_LOG_TRACE("finshed");

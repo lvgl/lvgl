@@ -45,7 +45,7 @@ static lv_coord_t create_header_height;
 lv_obj_t * lv_win_create(lv_obj_t * parent, lv_coord_t header_height)
 {
     create_header_height = header_height;
-    return lv_obj_class_create_obj(&lv_win_class, parent);
+    return lv_obj_class_create_obj(&lv_win_class, parent, NULL);
 }
 
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)

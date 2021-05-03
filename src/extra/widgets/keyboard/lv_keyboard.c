@@ -121,7 +121,7 @@ static const lv_btnmatrix_ctrl_t * kb_ctrl[5] = {
  */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
 {
-    return lv_obj_class_create_obj(&lv_keyboard_class, parent);
+    return lv_obj_class_create_obj(&lv_keyboard_class, parent, NULL);
 }
 
 /*=====================

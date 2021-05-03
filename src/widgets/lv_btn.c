@@ -48,7 +48,7 @@ const lv_obj_class_t lv_btn_class  = {
 lv_obj_t * lv_btn_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-     return lv_obj_class_create_obj(&lv_btn_class, parent);
+     return lv_obj_class_create_obj(&lv_btn_class, parent, NULL);
 }
 
 /**********************
