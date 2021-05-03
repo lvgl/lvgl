@@ -28,6 +28,6 @@
    overview/index
    widgets/index
    layouts/index
-   contributing/index
+   CONTRIBUTING
 
 ```
