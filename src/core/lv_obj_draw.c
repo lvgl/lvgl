@@ -145,6 +145,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
             draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
             if(draw_dsc->border_opa > LV_OPA_MIN) {
                 draw_dsc->border_color = lv_obj_get_style_border_color_filtered(obj, part);
+                draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
             }
         }
     }
