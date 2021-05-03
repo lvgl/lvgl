@@ -75,9 +75,9 @@ enum {
     LV_PART_TICKS        = 0x060000,   /**< Ticks on scale e.g. for a chart or meter*/
     LV_PART_CURSOR       = 0x070000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
 
-    LV_PART_CUSTOM_FIRST = 0x800000,    /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
-    LV_PART_ANY          = 0xFF0000,    /**< Special value can be used in some functions to target all parts*/
+    LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
 };
 
 typedef uint32_t lv_part_t;

@@ -38,7 +38,7 @@ typedef uint32_t lv_style_selector_t;
 
 typedef struct {
     lv_style_t * style;
-    uint32_t selector;
+    uint32_t selector :24;
     uint32_t is_local :1;
     uint32_t is_trans :1;
 }lv_obj_style_t;
