@@ -6,7 +6,10 @@ table, th, td {
 td {
   text-align:center;
 }
-
+.descname
+{  
+  margin-left:12px;
+}
 .toggle .header {
     display: block;
     clear: both;
