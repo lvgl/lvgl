@@ -289,16 +289,6 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
     lv_obj_invalidate(obj);
 }
 
-void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(dropdown->max_height == h) return;
-
-    dropdown->max_height = h;
-}
-
 void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -390,13 +380,6 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     buf[c] = '\0';
 }
 
-lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    return dropdown->max_height;
-}
-
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -453,7 +436,6 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 
     lv_coord_t list_fit_h = label_h + top + bottom;
     lv_coord_t list_h = list_fit_h;
-    if(list_h > dropdown->max_height) list_h = dropdown->max_height;
 
     lv_dir_t dir = dropdown->dir;
     /*No space on the bottom? See if top is better.*/
@@ -484,8 +466,6 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     }
 
     if(list_h > list_fit_h) list_h = list_fit_h;
-    if(list_h > dropdown->max_height) list_h = dropdown->max_height;
-
     lv_obj_set_height(dropdown->list, list_h);
 
     position_to_selected(dropdown_obj);
@@ -557,7 +537,6 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
     dropdown->option_cnt      = 0;
     dropdown->dir = LV_DIR_BOTTOM;
-    dropdown->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
