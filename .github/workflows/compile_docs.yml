@@ -22,6 +22,8 @@ jobs:
       - name: Install requirements
         run: |
           pip install --upgrade --upgrade-strategy eager sphinx recommonmark commonmark breathe sphinx-rtd-theme sphinx-markdown-tables sphinx-sitemap
+      - name: Build examples
+        run: scripts/build_html_examples.sh
       - name: Build docs
         run: docs/build.py
       - name: Remove .doctrees

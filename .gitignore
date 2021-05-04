@@ -10,3 +10,4 @@ docs/doxygen_html
 docs/xml
 out_html
 __pycache__
+/emscripten_builder
