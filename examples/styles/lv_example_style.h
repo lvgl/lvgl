@@ -34,7 +34,7 @@ void lv_example_style_6(void);
 void lv_example_style_7(void);
 void lv_example_style_8(void);
 void lv_example_style_9(void);
-void lv_example_style_10(void);
+//void lv_example_style_10(void);
 void lv_example_style_11(void);
 
 /**********************
