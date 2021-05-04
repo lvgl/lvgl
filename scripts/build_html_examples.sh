@@ -10,6 +10,10 @@ cd lvgl
 git checkout $CURRENT_REF
 cd ..
 git submodule update --init -- lv_drivers
-make -j$(nproc) CHOSEN_DEMO=lv_example_noop || exit 1
-cd ..
-cp -a emscripten_builder/build docs/_static/built_lv_examples
+mkdir cmbuild
+cd cmbuild
+emcmake cmake .. -DLVGL_CHOSEN_DEMO=lv_example_noop
+make -j$(nproc)
+rm -rf CMakeFiles
+cd ../..
+cp -a emscripten_builder/cmbuild docs/_static/built_lv_examples
