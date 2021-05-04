@@ -6,10 +6,22 @@ table, th, td {
 td {
   text-align:center;
 }
-.descname
+span.pre
 {  
-  margin-left:12px;
+  padding-right:8px;
 }
+
+span.pre:first-child
+{  
+  padding-right:0px;
+}
+
+
+code.sig-name
+{
+  //margin-left:8px;
+}
+
 .toggle .header {
     display: block;
     clear: both;
