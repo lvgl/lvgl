@@ -106,7 +106,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
+lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
                              lv_text_flag_t flag);
 
 /**

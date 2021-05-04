@@ -197,14 +197,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
     /*Align to middle*/
     if(dsc->align == LV_TEXT_ALIGN_CENTER) {
-        line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
+        line_width = lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
     else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
-        line_width = _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
+        line_width = lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
 
@@ -364,7 +364,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         /*Align to middle*/
         if(dsc->align == LV_TEXT_ALIGN_CENTER) {
             line_width =
-                _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
+                lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
             pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
@@ -372,7 +372,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         /*Align to the right*/
         else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
             line_width =
-                _lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
+                lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
             pos.x += lv_area_get_width(coords) - line_width;
         }
 

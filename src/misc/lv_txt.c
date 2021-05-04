@@ -123,7 +123,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
         }
 
         /*Calculate the longest line*/
-        lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
+        lv_coord_t act_line_length = lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
                                                        flag);
 
         size_res->x = LV_MAX(act_line_length, size_res->x);
@@ -353,7 +353,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
+lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
                              lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;

@@ -110,6 +110,7 @@ void lv_anim_start(lv_anim_t * a)
     a->time_orig = a->time;
     a->run_round = anim_run_round;
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
+    if(a->var == a) new_anim->var = new_anim;
 
     /*Set the start value*/
     if(new_anim->early_apply) {

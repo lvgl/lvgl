@@ -278,7 +278,7 @@ static void refr_img(lv_obj_t * obj)
     if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         header.h = lv_font_get_line_height(font);
-        header.w = _lv_txt_get_width(src, (uint16_t)strlen(src), font, 0, LV_TEXT_FLAG_NONE);
+        header.w = lv_txt_get_width(src, (uint16_t)strlen(src), font, 0, LV_TEXT_FLAG_NONE);
         header.always_zero = 0;
         header.cf = LV_IMG_CF_ALPHA_1BIT;
     }

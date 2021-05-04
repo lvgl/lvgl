@@ -370,18 +370,18 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 #endif
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = _lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
+    lv_coord_t x = lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
     if(char_id != line_start) x += letter_space;
 
     if(align == LV_TEXT_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
 
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
 
         x += lv_area_get_width(&txt_coords) - line_w;
     }
@@ -455,12 +455,12 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     lv_coord_t x = 0;
     if(align == LV_TEXT_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
 
@@ -556,12 +556,12 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     lv_coord_t last_x = 0;
     if(align == LV_TEXT_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
 
