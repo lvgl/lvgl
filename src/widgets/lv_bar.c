@@ -78,7 +78,7 @@ const lv_obj_class_t lv_bar_class = {
 lv_obj_t * lv_bar_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_bar_class, parent);
+    return lv_obj_class_create_obj(&lv_bar_class, parent, NULL);
 }
 
 /*=====================
@@ -377,8 +377,18 @@ static void draw_indic(lv_event_t * e)
         }
     }
 
-    /*Do not draw a zero length indicator*/
-    if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
+    /*Do not draw a zero length indicator but at least call the draw part events*/
+    if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
+
+        lv_obj_draw_dsc_t obj_draw_dsc;
+        lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
+        obj_draw_dsc.part = LV_PART_INDICATOR;
+        obj_draw_dsc.draw_area = &bar->indic_area;
+
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
+        return;
+    }
 
     lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MIN(barw, barh);

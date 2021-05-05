@@ -369,6 +369,8 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_PAD_COLUMN, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_PAD_ROW, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_LAYOUT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSLATE_X, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSLATE_Y, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_HEIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_MIN_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
@@ -401,7 +403,9 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else {
                 if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
                     if((part_act == LV_PART_MAIN || part_act == LV_PART_SCROLLBAR)) {
-                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN;
+                    } else if(res != _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN) {
+                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW_PART;
                     }
                 }
             }

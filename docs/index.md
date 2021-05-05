@@ -4,8 +4,8 @@
 ```
 
 ```eval_rst
-.. include:: /lang.rst
 
+PDF version: :download:`LVGL.pdf <LVGL.pdf>`
 ```
 
 # Welcome to the documentation of LVGL!
@@ -32,6 +32,7 @@
    porting/index
    overview/index
    widgets/index
-   contributing/index
+   layouts/index
+   CONTRIBUTING
 
 ```

@@ -40,8 +40,8 @@ You can fully control the user interface without touchpad or mouse using a keypa
 
 The objects, you want to control with keypad or encoder, needs to be added to a *Group*.
 In every group, there is exactly one focused object which receives the pressed keys or the encoder actions.
-For example, if a [Text area](/widgets/textarea) is focused and you press some letter on a keyboard, the keys will be sent and inserted into the text area.
-Similarly, if a [Slider](/widgets/slider) is focused and you press the left or right arrows, the slider's value will be changed.
+For example, if a [Text area](/widgets/core/textarea) is focused and you press some letter on a keyboard, the keys will be sent and inserted into the text area.
+Similarly, if a [Slider](/widgets/core/slider) is focused and you press the left or right arrows, the slider's value will be changed.
 
 You need to associate an input device with a group. An input device can send the keys to only one group but, a group can receive data from more than one input device too.
 
@@ -58,11 +58,11 @@ There are some predefined keys which have special meaning:
 - **LV_KEY_DOWN** Decrease value or move downwards
 - **LV_KEY_RIGHT** Increase value or move the the right
 - **LV_KEY_LEFT** Decrease value or move the the left
-- **LV_KEY_ESC**  Close or exit (E.g. close a [Drop down list](/widgets/dropdown))
-- **LV_KEY_DEL**  Delete (E.g. a character on the right in a [Text area](/widgets/textarea))
-- **LV_KEY_BACKSPACE** Delete a character on the left (E.g. in a [Text area](/widgets/textarea))
-- **LV_KEY_HOME** Go to the beginning/top (E.g. in a [Text area](/widgets/textarea))
-- **LV_KEY_END** Go to the end (E.g. in a [Text area](/widgets/textarea)))
+- **LV_KEY_ESC**  Close or exit (E.g. close a [Drop down list](/widgets/core/dropdown))
+- **LV_KEY_DEL**  Delete (E.g. a character on the right in a [Text area](/widgets/core/textarea))
+- **LV_KEY_BACKSPACE** Delete a character on the left (E.g. in a [Text area](/widgets/core/textarea))
+- **LV_KEY_HOME** Go to the beginning/top (E.g. in a [Text area](/widgets/core/textarea))
+- **LV_KEY_END** Go to the end (E.g. in a [Text area](/widgets/core/textarea)))
 
 The most important special keys are `LV_KEY_NEXT/PREV`, `LV_KEY_ENTER` and `LV_KEY_UP/DOWN/LEFT/RIGHT`.
 In your `read_cb` function, you should translate some of your keys to these special keys to navigate in the group and interact with the selected object.
@@ -80,7 +80,7 @@ Pressing `LV_KEY_ENTER` will change to *Edit* mode.
 
 In *Edit* mode, `LV_KEY_NEXT/PREV` is usually used to edit the object.
 Depending on the object's type, a short or long press of `LV_KEY_ENTER` changes back to *Navigate* mode.
-Usually, an object which can not be pressed (like a [Slider](/widgets/slider)) leaves *Edit* mode on short click. But with objects where short click has meaning (e.g. [Button](/widgets/btn)), a long press is required.
+Usually, an object which can not be pressed (like a [Slider](/widgets/core/slider)) leaves *Edit* mode on short click. But with objects where short click has meaning (e.g. [Button](/widgets/core/btn)), a long press is required.
 
 ### Styling
 

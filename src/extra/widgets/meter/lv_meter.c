@@ -9,12 +9,6 @@
 #include "lv_meter.h"
 #if LV_USE_METER != 0
 
-#include "../misc/lv_assert.h"
-#include "../draw/lv_draw.h"
-#include "../core/lv_group.h"
-#include "../misc/lv_math.h"
-#include "../core/lv_disp.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -58,7 +52,7 @@ const lv_obj_class_t lv_meter_class = {
 lv_obj_t * lv_meter_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_meter_class, parent);
+    return lv_obj_class_create_obj(&lv_meter_class, parent, NULL);
 }
 
 /*=====================

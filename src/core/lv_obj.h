@@ -75,9 +75,9 @@ enum {
     LV_PART_TICKS        = 0x060000,   /**< Ticks on scale e.g. for a chart or meter*/
     LV_PART_CURSOR       = 0x070000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
 
-    LV_PART_CUSTOM_FIRST = 0x800000,    /**< Extension point for custom widgets*/
+    LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
-    LV_PART_ANY          = 0xFF0000,    /**< Special value can be used in some functions to target all parts*/
+    LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
 };
 
 typedef uint32_t lv_part_t;
@@ -144,7 +144,7 @@ typedef struct {
     struct _lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
     lv_point_t scroll;                      /**< The current X/Y scroll offset*/
 
-    uint8_t ext_click_pad;      /**< Extra click padding in all direction*/
+    lv_coord_t ext_click_pad;              /**< Extra click padding in all direction*/
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
     lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/

@@ -98,9 +98,7 @@ enum {
 };
 typedef uint8_t lv_img_cf_t;
 
-/**
- * LVGL image header
- */
+
 /**
  * The first 8 bit is very important to distinguish the different source types.
  * For more info see `lv_img_get_src_type()` in lv_img.c
@@ -135,9 +133,9 @@ typedef struct {
 /** Image header it is compatible with
  * the result from image converter utility*/
 typedef struct {
-    lv_img_header_t header;
-    uint32_t data_size;
-    const uint8_t * data;
+    lv_img_header_t header; /**< A header describing the basics of the image*/
+    uint32_t data_size;     /**< Size of the image in bytes*/
+    const uint8_t * data;   /**< Pointer to the data of the image*/
 } lv_img_dsc_t;
 
 typedef struct {

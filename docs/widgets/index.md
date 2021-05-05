@@ -10,39 +10,8 @@
    :maxdepth: 1
    
    obj
-   arc
-   bar
-   btn
-   btnmatrix
-   calendar
-   canvas
-   checkbox
-   chart
-   cont
-   cpicker
-   dropdown
-   gauge
-   img
-   imgbtn
-   keyboard
-   label
-   led
-   line
-   list
-   linemeter
-   msgbox
-   objmask
-   page
-   roller
-   slider
-   spinbox
-   spinner
-   switch
-   table
-   tabview
-   textarea
-   tileview
-   win
+   core/index
+   extra/index
 ```
 
 

@@ -235,7 +235,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
-    lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor);
+    lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
 
     if(cdsc == NULL) return LV_RES_INV;
 
@@ -361,7 +361,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
                       draw_dsc->blend_mode);
     }
-#if LV_DRAW_COMPLEX
 
 #if LV_USE_GPU_NXP_PXP
     /*Simple case without masking and transformations*/
@@ -382,6 +381,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 #endif
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
+//#if LV_DRAW_COMPLEX
         /*The pixel size in byte is different if an alpha byte is added too*/
         uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
 
@@ -476,6 +476,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
             lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
+#if LV_DRAW_COMPLEX
             lv_img_transform_dsc_t trans_dsc;
             lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
             if(transform) {
@@ -496,6 +497,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
                 _lv_img_buf_transform_init(&trans_dsc);
             }
+#endif
             uint16_t recolor_premult[3] = {0};
             lv_opa_t recolor_opa_inv = 255 - draw_dsc->recolor_opa;
             if(draw_dsc->recolor_opa != 0) {
@@ -513,13 +515,19 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
             int32_t x;
             int32_t y;
+#if LV_DRAW_COMPLEX
             int32_t rot_y = disp_area->y1 + draw_area.y1 - map_area->y1;
+#endif
             for(y = 0; y < draw_area_h; y++) {
                 map_px = map_buf_tmp;
+#if LV_DRAW_COMPLEX
                 uint32_t px_i_start = px_i;
-
                 int32_t rot_x = disp_area->x1 + draw_area.x1 - map_area->x1;
+#endif
+
                 for(x = 0; x < draw_area_w; x++, map_px += px_size_byte, px_i++) {
+
+#if LV_DRAW_COMPLEX
                     if(transform) {
 
                         /*Transform*/
@@ -535,7 +543,9 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         }
                     }
                     /*No transform*/
-                    else {
+                    else
+#endif
+                    {
                         if(alpha_byte) {
                             lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                             mask_buf[px_i] = px_opa;
@@ -569,15 +579,15 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                                 continue;
                             }
                         }
-                    }
 
+                    }
                     if(draw_dsc->recolor_opa != 0) {
                         c = lv_color_mix_premult(recolor_premult, c, recolor_opa_inv);
                     }
 
                     map2[px_i].full = c.full;
                 }
-
+#if LV_DRAW_COMPLEX
                 /*Apply the masks if any*/
                 if(other_mask_cnt) {
                     lv_draw_mask_res_t mask_res_sub;
@@ -591,6 +601,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         mask_res = LV_DRAW_MASK_RES_CHANGED;
                     }
                 }
+#endif
 
                 map_buf_tmp += map_w * px_size_byte;
                 if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
@@ -624,7 +635,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             lv_mem_buf_release(map2);
         }
     }
-#endif
 }
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg)

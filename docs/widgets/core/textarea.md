@@ -6,13 +6,13 @@
 
 ## Overview
 
-The Text Area is a [Page](/widgets/page) with a [Label](/widgets/label) and a cursor on it. 
+The Text Area is a Page with a [Label](/widgets/core/label) and a cursor on it. 
 Texts or characters can be added to it. 
 Long lines are wrapped and when the text becomes long enough the Text area can be scrolled.
 
 ## Parts and Styles
 
-The Text area has the same parts as [Page](/widgets/page). 
+The Text area has the same parts as Page. 
 Expect `LV_PAGE_PART_SCRL` because it can't be referenced and it's always transparent.
 Refer the Page's documentation of details.
 
@@ -100,17 +100,12 @@ Using `LV_LABEL_LONG_TXT_HINT` the scrolling and drawing will as fast as with "n
 A part of text can be selected if enabled with `lv_textarea_set_text_sel(textarea, true)`. 
 It works like when you select a text on your PC with your mouse. 
 
-### Scrollbars
-The scrollbars can shown according to different policies set by `lv_textarea_set_scrollbar_mode(textarea, LV_SCRLBAR_MODE_...)`. 
-Learn more at the [Page](/widgets/page) object.
-
 ### Scroll propagation
 When the Text area is scrolled on an other scrollable object (like a Page) and the scrolling has reached the edge of the Text area, the scrolling can be propagated to the parent. 
 In other words, when the Text area can be scrolled further, the parent will be scrolled instead.
 
 It can be enabled with `lv_ta_set_scroll_propagation(ta, true)`.
 
-Learn more at the [Page](/widgets/page) object.
 
 ### Edge flash
 When the Text area is scrolled to edge a circle like flash animation can be shown if it is enabled with `lv_ta_set_edge_flash(ta, true)`
@@ -133,7 +128,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_textarea/index.rst
+.. include:: ../../../examples/widgets/textarea/index.rst
 
 ```
 

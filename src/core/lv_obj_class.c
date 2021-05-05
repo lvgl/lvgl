@@ -40,7 +40,7 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * parent)
+lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent, void * user_data)
 {
     LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", class_p, parent);
     uint32_t s = get_instance_size(class_p);
@@ -49,6 +49,11 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
     lv_memset_00(obj, s);
     obj->class_p = class_p;
     obj->parent = parent;
+#if LV_USE_USER_DATA
+    obj->user_data = user_data;
+#else
+    LV_UNUSED(user_data);
+#endif
 
     /*Create a screen*/
     if(parent == NULL) {
@@ -94,10 +99,17 @@ lv_obj_t * lv_obj_create_from_class(const lv_obj_class_t * class_p, lv_obj_t * p
         }
     }
 
-
     lv_obj_mark_layout_as_dirty(obj);
+    lv_obj_enable_style_refresh(false);
+
     lv_theme_apply(obj);
     lv_obj_construct(obj);
+
+    lv_obj_enable_style_refresh(true);
+    lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+
+    lv_obj_refresh_self_size(obj);
+
     lv_group_t * def_group = lv_group_get_default();
     if(def_group && lv_obj_is_group_def(obj)) {
 

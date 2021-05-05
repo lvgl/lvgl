@@ -60,7 +60,7 @@
  * @param color color The color of the image with `LV_IMG_CF_ALPHA_...`
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
+lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id)
 {
     /*Is the image cached?*/
     lv_img_cache_entry_t * cached_src = NULL;
@@ -83,6 +83,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
 
     for(i = 0; i < entry_cnt; i++) {
         if(color.full == cache[i].dec_dsc.color.full &&
+           frame_id == cache[i].dec_dsc.frame_id &&
            lv_img_cache_match(src, cache[i].dec_dsc.src)) {
             /*If opened increment its life.
              *Image difficult to open should live longer to keep avoid frequent their recaching.
@@ -119,7 +120,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
 #endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
-    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color);
+    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color, frame_id);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));

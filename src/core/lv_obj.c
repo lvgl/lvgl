@@ -174,7 +174,7 @@ void lv_deinit(void)
 
 lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
-    return lv_obj_create_from_class(&lv_obj_class, parent);
+    return lv_obj_class_create_obj(&lv_obj_class, parent, NULL);
 }
 
 /*=====================
@@ -662,7 +662,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         bool editing = false;
         editing = lv_group_get_editing(lv_obj_get_group(obj));
         lv_state_t state = LV_STATE_FOCUSED;
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+
+        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) state |= LV_STATE_FOCUS_KEY;
         if(editing) {
             state |= LV_STATE_EDITED;
@@ -766,6 +768,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
         lv_obj_style_t * obj_style = &obj->styles[i];
         lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
         if(state_act & (~new_state)) continue; /*Skip unrelated styles*/
         if(obj_style->is_trans) continue;
 
@@ -773,13 +776,15 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         if(lv_style_get_prop_inlined(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
         const lv_style_transition_dsc_t * tr = v.ptr;
 
-        /*Add the props t the set is not added yet or added but with smaller weight*/
+        /*Add the props t the set if not added yet or added but with smaller weight*/
         uint32_t j;
         for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
             uint32_t t;
             for(t = 0; t < tsi; t++) {
-                lv_state_t state_tr = lv_obj_style_get_selector_state(ts[t].selector);
-                if(ts[t].prop == tr->props[j] && state_tr >= state_act) break;
+                lv_style_selector_t selector = lv_obj_style_get_selector_state(ts[t].selector);
+                lv_state_t state_ts = lv_obj_style_get_selector_state(selector);
+                lv_part_t part_ts = lv_obj_style_get_selector_part(selector);
+                if(ts[t].prop == tr->props[j] && part_ts == part_act && state_ts >= state_act) break;
             }
 
             /*If not found  add it*/
@@ -804,7 +809,9 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_mem_buf_release(ts);
 
-    lv_obj_invalidate(obj);
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN) {
+        lv_obj_invalidate(obj);
+    }
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);

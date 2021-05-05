@@ -3,6 +3,9 @@ on:
   push:
     branches:
     - master
+env:
+  EM_VERSION: 2.0.4
+  EM_CACHE_FOLDER: 'emsdk-cache'
 jobs:
   build-and-deploy:
     if: github.repository == 'lvgl/lvgl'
@@ -17,11 +20,36 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Install Doxygen
-        run: sudo apt-get install doxygen
+      - name: Cache Python packages
+        uses: actions/cache@v2
+        with:
+          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+          key: ${{ env.pythonLocation }}
+      - name: Install Doxygen and Latex dependencies
+        run: sudo apt-get install doxygen texlive-xetex
       - name: Install requirements
         run: |
           pip install --upgrade --upgrade-strategy eager sphinx recommonmark commonmark breathe sphinx-rtd-theme sphinx-markdown-tables sphinx-sitemap
+      - name: Setup Emscripten cache
+        id: cache-system-libraries
+        uses: actions/cache@v2
+        with:
+          path: ${{env.EM_CACHE_FOLDER}}
+          key: ${{env.EM_VERSION}}-${{ runner.os }}
+      - uses: mymindstorm/setup-emsdk@v9
+        with:
+          version: ${{env.EM_VERSION}}
+          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+      - name: Build examples
+        run: scripts/build_html_examples.sh
       - name: Build docs
         run: docs/build.py
       - name: Remove .doctrees

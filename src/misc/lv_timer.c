@@ -196,12 +196,17 @@ void lv_timer_del(lv_timer_t * timer)
 /**
  * Pause/resume a timer.
  * @param timer pointer to an lv_timer
- * @param pause true: pause the timer; false: resume
  */
-void lv_timer_pause(lv_timer_t * timer, bool pause)
+void lv_timer_pause(lv_timer_t * timer)
 {
-    timer->paused = pause;
+    timer->paused = true;
 }
+
+void lv_timer_resume(lv_timer_t * timer)
+{
+    timer->paused = false;
+}
+
 /**
  * Set new period for a lv_timer
  * @param timer pointer to a lv_timer

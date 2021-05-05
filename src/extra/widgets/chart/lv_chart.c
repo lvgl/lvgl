@@ -9,13 +9,6 @@
 #include "lv_chart.h"
 #if LV_USE_CHART != 0
 
-#include "../misc/lv_assert.h"
-#include "../core/lv_refr.h"
-#include "../draw/lv_draw.h"
-#include "../core/lv_disp.h"
-#include "../core/lv_indev.h"
-#include "../misc/lv_math.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -72,7 +65,7 @@ const lv_obj_class_t lv_chart_class = {
 lv_obj_t * lv_chart_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_chart_class, parent);
+    return lv_obj_class_create_obj(&lv_chart_class, parent, NULL);
 }
 
 void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
@@ -643,6 +636,8 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     } else if(code == LV_EVENT_RELEASED) {
         invalidate_point(obj, chart->pressed_point_id);
         chart->pressed_point_id = LV_CHART_POINT_NONE;
+    } else if(code == LV_EVENT_SIZE_CHANGED) {
+        lv_obj_refresh_self_size(obj);
     } else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
@@ -685,6 +680,11 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
+    lv_obj_draw_dsc_t obj_draw_dsc;
+    lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
+    obj_draw_dsc.line_dsc = &line_dsc;
+    obj_draw_dsc.part = LV_PART_MAIN;
+
     lv_opa_t border_opa = lv_obj_get_style_border_opa(obj, LV_PART_MAIN);
     lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_border_side_t border_side = lv_obj_get_style_border_side(obj, LV_PART_MAIN);
@@ -707,7 +707,14 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
             p1.y = (int32_t)((int32_t)(h - line_dsc.width) * i) / (chart->hdiv_cnt - 1);
             p1.y += y_ofs;
             p2.y = p1.y;
+
+            obj_draw_dsc.p1 = &p1;
+            obj_draw_dsc.p2 = &p2;
+            obj_draw_dsc.id = i;
+
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
             lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
         }
     }
 
@@ -726,7 +733,14 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
             p1.x = (int32_t)((int32_t)(w - line_dsc.width) * i) / (chart->vdiv_cnt - 1);
             p1.x += x_ofs;
             p2.x = p1.x;
+
+            obj_draw_dsc.p1 = &p1;
+            obj_draw_dsc.p2 = &p2;
+            obj_draw_dsc.id = i;
+
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
             lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
         }
     }
 }
@@ -1130,7 +1144,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
 
         /*add text only to major tick*/
         if(major  && t->label_en)  {
-            int32_t tick_value = chart->ymax[axis] - lv_map(i, 0, total_tick_num, chart->ymin[axis], chart->ymax[axis]);
+            int32_t tick_value = lv_map(total_tick_num - i, 0, total_tick_num, chart->ymin[axis], chart->ymax[axis]);
             lv_snprintf(dsc.text, sizeof(dsc.text), "%d", tick_value);
             dsc.value = tick_value;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);

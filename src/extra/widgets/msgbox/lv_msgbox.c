@@ -49,7 +49,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
     }
 
-    lv_obj_t * mbox = lv_obj_create_from_class(&lv_msgbox_class, parent);
+    lv_obj_t * mbox = lv_obj_class_create_obj(&lv_msgbox_class, parent, NULL);
     LV_ASSERT_MALLOC(mbox);
     if(mbox == NULL) return NULL;
 

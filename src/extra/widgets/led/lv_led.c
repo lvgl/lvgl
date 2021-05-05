@@ -59,7 +59,7 @@ const lv_obj_class_t lv_led_class  = {
  */
 lv_obj_t * lv_led_create(lv_obj_t * parent)
 {
-    return lv_obj_create_from_class(&lv_led_class, parent);
+    return lv_obj_class_create_obj(&lv_led_class, parent, NULL);
 }
 
 /*=====================

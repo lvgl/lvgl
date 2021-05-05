@@ -59,7 +59,7 @@ const lv_obj_class_t lv_slider_class = {
 lv_obj_t * lv_slider_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_create_from_class(&lv_slider_class, parent);
+    return lv_obj_class_create_obj(&lv_slider_class, parent, NULL);
 }
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
@@ -118,6 +118,9 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_PRESSED) {
+        lv_obj_invalidate_area(obj, &slider->right_knob_area);
+        if(slider->bar.mode == LV_SLIDER_MODE_SYMMETRICAL) lv_obj_invalidate_area(obj, &slider->left_knob_area);
+
         lv_point_t p;
         slider->dragging = true;
         if(type == LV_SLIDER_MODE_NORMAL || type == LV_SLIDER_MODE_SYMMETRICAL) {
@@ -240,6 +243,9 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
         slider->dragging = false;
         slider->value_to_set = NULL;
+
+        lv_obj_invalidate_area(obj, &slider->right_knob_area);
+        if(slider->bar.mode == LV_SLIDER_MODE_SYMMETRICAL) lv_obj_invalidate_area(obj, &slider->left_knob_area);
 
         /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g   = lv_obj_get_group(obj);

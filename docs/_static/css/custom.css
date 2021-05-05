@@ -6,6 +6,21 @@ table, th, td {
 td {
   text-align:center;
 }
+span.pre
+{  
+  padding-right:8px;
+}
+
+span.pre:first-child
+{  
+  padding-right:0px;
+}
+
+
+code.sig-name
+{
+  //margin-left:8px;
+}
 
 .toggle .header {
     display: block;

@@ -43,6 +43,12 @@ extern "C" {
 #define LV_IMG_ZOOM_NONE            256        /*Value for not zooming the image*/
 LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 
+#if LV_USE_ASSERT_STYLE
+#define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .sentinel = LV_STYLE_SENTINEL_VALUE, .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
+#else
+#define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -116,8 +122,8 @@ typedef enum {
     LV_STYLE_CLIP_CORNER             = 2,
     LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSLATE_X             = 5 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSLATE_Y             = 6 | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSLATE_X             = 5 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSLATE_Y             = 6 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
     LV_STYLE_TRANSFORM_ZOOM          = 7 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_TRANSFORM_ANGLE         = 8 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_OPA                     = 9 | LV_STYLE_PROP_INHERIT,
@@ -236,6 +242,14 @@ typedef struct _lv_style_transiton_t {
     uint32_t delay;                /**< Delay before the transition in [ms]*/
 }lv_style_transition_dsc_t;
 
+
+/**
+ * Descriptor of a constant style property.
+ */
+typedef struct {
+    lv_style_prop_t prop;
+    lv_style_value_t value;
+} lv_style_const_prop_t;
 /**
  * Descriptor of a style (a collection of properties and values).
  */
@@ -250,9 +264,11 @@ typedef struct {
     union {
         lv_style_value_t value1;
         uint8_t * values_and_props;
+        const lv_style_const_prop_t * const_props;
     } v_p;
 
-    uint16_t prop1;
+    uint16_t prop1 :15;
+    uint16_t is_const :1;
     uint8_t has_group;
     uint8_t prop_cnt;
 } lv_style_t;
@@ -334,6 +350,17 @@ lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_va
  */
 static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
+    if(style->is_const) {
+        const lv_style_const_prop_t *const_prop;
+        for(const_prop = style->v_p.const_props; const_prop->prop != LV_STYLE_PROP_INV; const_prop++) {
+            if(const_prop->prop == prop) {
+                *value = const_prop->value;
+                return LV_RES_OK;
+            }
+        }
+        return LV_RES_INV;
+    }
+
     if(style->prop_cnt == 0) return LV_RES_INV;
 
     if(style->prop_cnt > 1) {
@@ -366,7 +393,7 @@ static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_pr
  *  static lv_style_transition_dsc_t trans1;
  *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0);
  */
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t * props, lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
 
 /**
  * Get the default value of a property
