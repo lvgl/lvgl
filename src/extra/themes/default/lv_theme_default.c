@@ -643,7 +643,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
     }
-#if LV_USE_BTN
+    #if LV_USE_BTN
     else if(lv_obj_check_type(obj, &lv_btn_class)) {
         lv_obj_add_style(obj, &styles->btn, 0);
         lv_obj_add_style(obj, &styles->bg_color_primary, 0);

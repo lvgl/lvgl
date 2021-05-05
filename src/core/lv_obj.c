@@ -685,18 +685,16 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        uint32_t i;
-        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
-
-            lv_obj_refr_size(child);
-            lv_obj_refr_pos(child);
-        }
-
         lv_coord_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout || align) {
             lv_obj_mark_layout_as_dirty(obj);
+        }
+
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+            lv_obj_mark_layout_as_dirty(child);
         }
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
@@ -722,20 +720,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t * s = lv_event_get_param(e);
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         *s = LV_MAX(*s, d);
-    }
-    else if(code == LV_EVENT_STYLE_CHANGED) {
-        /*Padding might have changed so the layout should be recalculated*/
-        uint32_t i;
-        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
-
-            lv_obj_refr_size(child);
-            lv_obj_refr_pos(child);
-        }
-
-        lv_obj_mark_layout_as_dirty(obj);
-
-        lv_obj_refresh_ext_draw_size(obj);
     }
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
         lv_obj_draw(e);

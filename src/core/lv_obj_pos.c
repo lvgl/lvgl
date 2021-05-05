@@ -87,6 +87,7 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 
 bool lv_obj_refr_size(lv_obj_t * obj)
 {
+
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*If the width or height is set by a layout do not modify them*/
@@ -189,7 +190,6 @@ bool lv_obj_refr_size(lv_obj_t * obj)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
-
 
     /*Be sure the bottom side is not remains scrolled in*/
     /*With snapping the content can't be scrolled in*/
@@ -592,22 +592,25 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 
 lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
-    return obj->self_size.x;
+    lv_point_t p = {0, LV_COORD_MIN};
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_REFR_SELF_SIZE, &p);
+    return p.x;
 }
 
 lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
-    return obj->self_size.y;
+    lv_point_t p = {LV_COORD_MIN, 0};
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_REFR_SELF_SIZE, &p);
+    return p.y;
 }
 
 bool lv_obj_refresh_self_size(struct _lv_obj_t * obj)
 {
-    lv_obj_update_layout(obj);
-    obj->self_size.x = 0;
-    obj->self_size.y = 0;
-    lv_event_send(obj, LV_EVENT_REFR_SELF_SIZE, &obj->self_size);
+    lv_coord_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    lv_coord_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
+    if(w_set != LV_SIZE_CONTENT && h_set != LV_SIZE_CONTENT) return false;
 
-    lv_obj_refr_size(obj);
+    lv_obj_mark_layout_as_dirty(obj);
     return true;
 }
 
@@ -944,7 +947,7 @@ static void layout_update_core(lv_obj_t * obj)
 
     if(obj->layout_inv == 0) return;
 
-    if(lv_obj_get_screen(obj) != obj) obj->layout_inv = 0;
+    obj->layout_inv = 0;
 
     lv_obj_refr_size(obj);
     lv_obj_refr_pos(obj);

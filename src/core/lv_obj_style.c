@@ -173,14 +173,15 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
-        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL); /*To update layout*/
-        if(obj->parent) obj->parent->layout_inv = 1;
+        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL);
+        lv_obj_mark_layout_as_dirty(obj);
     }
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         if(parent) lv_obj_mark_layout_as_dirty(parent);
     }
-    else if(prop & LV_STYLE_PROP_EXT_DRAW) {
+
+    if(prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_EXT_DRAW)) {
         lv_obj_refresh_ext_draw_size(obj);
     }
     lv_obj_invalidate(obj);
@@ -791,7 +792,6 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 
                 if(lv_style_is_empty(obj->styles[i].style)) {
                     lv_obj_remove_style(obj, obj_style->style, obj_style->selector);
-                    //trans_del(obj, obj_style->part, prop, NULL);
 
                 }
                 break;
