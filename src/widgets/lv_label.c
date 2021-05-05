@@ -46,7 +46,6 @@ static void lv_label_revert_dots(lv_obj_t * label);
 static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint32_t len);
 static char * lv_label_get_dot_tmp(lv_obj_t * label);
 static void lv_label_dot_tmp_free(lv_obj_t * label);
-static void get_txt_coords(const lv_obj_t * label, lv_area_t * area);
 static void set_ofs_x_anim(void * obj, int32_t v);
 static void set_ofs_y_anim(void * obj, int32_t v);
 
@@ -307,7 +306,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     }
 
     lv_area_t txt_coords;
-    get_txt_coords(obj, &txt_coords);
+    lv_obj_get_content_coords(obj, &txt_coords);
 
     lv_label_t * label = (lv_label_t *)obj;
     uint32_t line_start      = 0;
@@ -404,7 +403,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     pos.y = pos_in->y - lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
 
     lv_area_t txt_coords;
-    get_txt_coords(obj, &txt_coords);
+    lv_obj_get_content_coords(obj, &txt_coords);
     const char * txt         = lv_label_get_text(obj);
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
@@ -523,7 +522,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     LV_ASSERT_NULL(pos);
 
     lv_area_t txt_coords;
-    get_txt_coords(obj, &txt_coords);
+    lv_obj_get_content_coords(obj, &txt_coords);
     const char * txt         = lv_label_get_text(obj);
     lv_label_t * label     = (lv_label_t*)obj;
     uint32_t line_start      = 0;
@@ -772,11 +771,10 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
         if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
         if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
-        lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        if(flag & LV_TEXT_FLAG_FIT) w = LV_COORD_MAX;
-        else w = lv_obj_get_width(obj);
+        lv_coord_t w = lv_obj_get_content_width(obj);
+        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
+        else w = lv_obj_get_content_width(obj);
 
         lv_txt_get_size(&size, label->text, font, letter_space, line_space, w, flag);
 
@@ -803,11 +801,7 @@ static void draw_main(lv_event_t * e)
     const lv_area_t * clip_area = lv_event_get_param(e);
 
     lv_area_t txt_coords;
-    get_txt_coords(obj, &txt_coords);
-
-    lv_area_t txt_clip;
-    bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
-    if(!is_common) return;
+    lv_obj_get_content_coords(obj, &txt_coords);
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
@@ -820,6 +814,7 @@ static void draw_main(lv_event_t * e)
 
     label_draw_dsc.ofs_x = label->offset.x;
     label_draw_dsc.ofs_y = label->offset.y;
+
     label_draw_dsc.flag = flag;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
 
@@ -850,6 +845,16 @@ static void draw_main(lv_event_t * e)
     /*Just for compatibility*/
     lv_draw_label_hint_t * hint = NULL;
 #endif
+
+    lv_area_t txt_clip;
+    bool is_common = _lv_area_intersect(&txt_clip, clip_area, clip_area);
+    if(!is_common) return;
+
+    if(label->long_mode == LV_LABEL_LONG_WRAP) {
+        lv_coord_t s = lv_obj_get_scroll_top(obj);
+        lv_area_move(&txt_coords, 0, -s);
+        txt_coords.y2 = obj->coords.y2;
+    }
 
     lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
 
@@ -890,7 +895,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 #endif
 
     lv_area_t txt_coords;
-    get_txt_coords(obj, &txt_coords);
+    lv_obj_get_content_coords(obj, &txt_coords);
     lv_coord_t max_w         = lv_area_get_width(&txt_coords);
     const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -1224,20 +1229,6 @@ static void lv_label_dot_tmp_free(lv_obj_t * obj)
     }
     label->dot_tmp_alloc = false;
     label->dot.tmp_ptr   = NULL;
-}
-
-static void get_txt_coords(const lv_obj_t * obj, lv_area_t * area)
-{
-    lv_obj_get_coords(obj, area);
-
-    lv_coord_t left   = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t right  = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    lv_coord_t top    = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    area->x1 += left;
-    area->x2 -= right;
-    area->y1 += top;
-    area->y2 -= bottom;
 }
 
 
