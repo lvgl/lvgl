@@ -8,6 +8,9 @@ scripts/cppcheck_res.txt
 scripts/built_in_font/lv_font_*
 docs/doxygen_html
 docs/xml
+docs/out_latex
+docs/_static/built_lv_examples
+docs/LVGL.pdf
 out_html
 __pycache__
 /emscripten_builder

@@ -43,7 +43,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx_markdown_tables',
     'breathe',
     'sphinx_sitemap',
-    #'lv_example'
+    'lv_example'
     ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -67,7 +67,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'LVGL'
 copyright = '2020, LVGL LLC'
-author = 'The community of LVGL'
+author = 'LVGL community'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -169,8 +169,6 @@ latex_elements = {
     'preamble': r'''
 \usepackage{fontspec}
 \setmonofont{DejaVu Sans Mono}
-\usepackage{xeCJK}
-\setCJKmainfont{SimSun}
 \usepackage{silence}
 \WarningsOff*
 ''',
@@ -181,7 +179,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'LVGL.tex', 'LVGL Documentation ' + version,
-     'Contributors of LVGL', 'manual'),
+     'LVGL community', 'manual'),
 ]
 
 
@@ -230,28 +228,3 @@ def setup(app):
     app.add_transform(AutoStructify)
     app.add_stylesheet('css/custom.css')
     app.add_stylesheet('css/fontawesome.min.css')
-
-# Attempt to checkout _static/built_lv_examples
-
-
-"""
-if not os.path.exists('_static/built_lv_examples'):
-    os.system('git clone https://github.com/lvgl/lv_examples.git _static/built_lv_examples')
-
-os.system('git -C _static/built_lv_examples fetch origin')
-
-out = subprocess.Popen(["git", "-C", "lv_examples", "rev-parse", "HEAD"], 
-       stdout=subprocess.PIPE, 
-       stderr=subprocess.STDOUT)
-stdout,stderr = out.communicate()
-example_commit_hash = stdout.decode("utf-8").strip()
-
-search_command = ["git", "-C", "_static/built_lv_examples", "--no-pager", "log", "--pretty=format:'%H'", "--all", "-n", "1", f"--grep='Deploying to gh-pages from  @ {example_commit_hash}'"]
-log_output = subprocess.check_output(' '.join(search_command), shell=True).strip().decode("utf-8")
-if len(log_output) == 0:
-    raise ValueError('lv_examples: cannot find corresponding deployed commit: ' + example_commit_hash)
-
-built_example_commit_hash = log_output
-os.system('git -C _static/built_lv_examples reset --hard')
-os.system('git -C _static/built_lv_examples checkout ' + log_output)
- """
