@@ -55,7 +55,6 @@ menu "LVGL configuration"
     
         config LV_COLOR_CHROMA_KEY_HEX
             hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
-            depends on LV_COLOR_SCREEN_TRANSP
             range 0x000000 0xFFFFFF
             default 0x00FF00
             help
