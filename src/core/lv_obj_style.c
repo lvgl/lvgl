@@ -107,6 +107,9 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
 {
     lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_part_t part = lv_obj_style_get_selector_part(selector);
+    lv_style_prop_t prop = LV_STYLE_PROP_ANY;
+    if(style && style->prop_cnt == 0) prop = LV_STYLE_PROP_INV;
+
     uint32_t i = 0;
     bool deleted = false;
     while(i <  obj->style_cnt) {
@@ -143,8 +146,8 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
         /*The style from the current `i` index is removed, so `i` points to the next style.
          *Therefore it doesn't needs to be incremented*/
     }
-    if(deleted) {
-        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+    if(deleted && prop != LV_STYLE_PROP_INV) {
+        lv_obj_refresh_style(obj, part, prop);
     }
 }
 
