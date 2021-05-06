@@ -430,6 +430,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_set_width(dropdown->list, lv_obj_get_width(dropdown_obj));
     }
 
+    lv_obj_update_layout(label);
     lv_coord_t label_h = lv_obj_get_height(label);
     lv_coord_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN);
     lv_coord_t bottom = lv_obj_get_style_pad_bottom(dropdown->list, LV_PART_MAIN);
