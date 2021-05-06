@@ -216,7 +216,7 @@ void lv_obj_move_background(lv_obj_t * obj)
     lv_obj_invalidate(parent);
 
     int32_t i;
-    for(i = lv_obj_get_child_id(obj) - 1; i > 0; i--) {
+    for(i = lv_obj_get_child_id(obj); i > 0; i--) {
         parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
     }
     parent->spec_attr->children[0] = obj;

@@ -207,11 +207,11 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 
     lv_coord_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
-    bool auto_w = w_set == LV_SIZE_CONTENT ? true : false;
+    bool auto_w = (w_set == LV_SIZE_CONTENT && !cont->w_layout) ? true : false;
     lv_coord_t cont_w = lv_obj_get_content_width(cont);
     calc_out->grid_w = grid_align(cont_w, auto_w, get_grid_col_align(cont), col_gap, calc_out->col_num, calc_out->w, calc_out->x, rev);
 
-    bool auto_h = h_set == LV_SIZE_CONTENT ? true : false;
+    bool auto_h = (h_set == LV_SIZE_CONTENT && !cont->h_layout) ? true : false;
     lv_coord_t cont_h = lv_obj_get_content_height(cont);
     calc_out->grid_h = grid_align(cont_h, auto_h, get_grid_row_align(cont), row_gap, calc_out->row_num, calc_out->h, calc_out->y, false);
 

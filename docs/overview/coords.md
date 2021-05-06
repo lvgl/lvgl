@@ -34,7 +34,7 @@ This section describes special cases in which LVGL's behavior might look unexpec
 
 #### Postponed coordinate calculation
 LVGL doesn't recalculate all the coordinate changes immediately to improve performance. 
-Instead, the object's are marked as "dirty" and before redrawing the screen LVGL checks if there are any "dirty" objects. If so it refreshes their position, size and layout.
+Instead, the objects are marked as "dirty" and before redrawing the screen LVGL checks if there are any "dirty" objects. If so it refreshes their position, size and layout.
 
 The following functions set size/position immediately:
 - `lv_obj_set_pos/x/y`
