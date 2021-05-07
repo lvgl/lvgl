@@ -34,7 +34,7 @@ jobs:
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
           key: ${{ env.pythonLocation }}
       - name: Install Doxygen and Latex dependencies
-        run: sudo apt-get install doxygen texlive-xetex
+        run: sudo apt-get install doxygen texlive-xetex makeindex texlive-lang-english
       - name: Install requirements
         run: |
           pip install --upgrade --upgrade-strategy eager sphinx recommonmark commonmark breathe sphinx-rtd-theme sphinx-markdown-tables sphinx-sitemap

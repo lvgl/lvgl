@@ -60,9 +60,7 @@ cmd("cd ../scripts && doxygen Doxyfile")
 cmd("sphinx-build -b latex . out_latex")
 
 # Generate PDF
-cmd("cd out_latex && makeindex LVGL.idx")
-cmd("cd out_latex && makeindex -s python.ist  -o LVGL.ind LVGL.idx")
-cmd("cd out_latex && xelatex -interaction=batchmode *.tex")
+cmd("cd out_latex && latexmk -pdf 'LVGL.tex'")
 # Copy the result PDF to the main directory to make it avaiable for the HTML build
 cmd("cd out_latex && cp -f LVGL.pdf ../LVGL.pdf")
 

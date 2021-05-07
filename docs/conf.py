@@ -146,6 +146,8 @@ html_last_updated_fmt = ''
 
 # -- Options for LaTeX output ---------------------------------------------
 
+latex_engine = 'xelatex'
+latex_use_xindy = False
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
@@ -166,6 +168,7 @@ latex_elements = {
     'inputenc': '',
     'utf8extra': '',
     'classoptions': ',openany,oneside',
+    'babel': '\\usepackage{babel}',
     'preamble': r'''
 \usepackage{fontspec}
 \setmonofont{DejaVu Sans Mono}
