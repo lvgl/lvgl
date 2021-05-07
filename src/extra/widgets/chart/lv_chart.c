@@ -699,8 +699,8 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
         i_start = 0;
         i_end = chart->hdiv_cnt;
         if(border_opa > LV_OPA_MIN && border_w > 0) {
-            if(border_side & LV_BORDER_SIDE_TOP) i_start++;
-            if(border_side & LV_BORDER_SIDE_BOTTOM) i_end--;
+            if((border_side & LV_BORDER_SIDE_TOP) && (lv_obj_get_style_pad_top(obj, LV_PART_MAIN) == 0)) i_start++;
+            if((border_side & LV_BORDER_SIDE_BOTTOM) && (lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
         for(i = i_start; i < i_end; i++) {
@@ -725,8 +725,8 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
         i_start = 0;
         i_end = chart->vdiv_cnt;
         if(border_opa > LV_OPA_MIN && border_w > 0) {
-            if(border_side & LV_BORDER_SIDE_LEFT) i_start++;
-            if(border_side & LV_BORDER_SIDE_RIGHT) i_end--;
+            if((border_side & LV_BORDER_SIDE_LEFT) && (lv_obj_get_style_pad_left(obj, LV_PART_MAIN) == 0)) i_start++;
+            if((border_side & LV_BORDER_SIDE_RIGHT) && (lv_obj_get_style_pad_right(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
         for(i = i_start; i < i_end; i++) {
