@@ -498,7 +498,7 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
    arc->min_value = 0;
    arc->max_value = 100;
    arc->dragging = false;
-   arc->chg_rate = 540;
+   arc->chg_rate = 720;
    arc->last_tick = lv_tick_get();
    arc->last_angle =arc->indic_angle_end;
 
@@ -578,8 +578,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*Do not allow big jumps.
          *It's mainly to avoid jumping to the opposite end if the "dead" range between min. an max. is crossed.
-         *Check which and was closer on the last valid press (arc->min_close) and prefer that end*/
-        if(LV_ABS(delta_angle) > 180) {
+         *Check which was closer on the last valid press (arc->min_close) and prefer that end*/
+        if(LV_ABS(delta_angle) > 280) {
             if(arc->min_close) angle = 0;
             else angle = deg_range;
         }
