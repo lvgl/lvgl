@@ -54,28 +54,9 @@ typedef uint8_t lv_animimg_part_t;
  */
 lv_obj_t * lv_animimg_create(lv_obj_t * parent);
 
-/**
- * Startup the  image animation.
- * @param img pointer to an animation image object
- */
-void lv_animimg_start(lv_obj_t * obj);
-
-
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set the  image animation duration time. unit:ms
- * @param img pointer to an animation image object
- */
-void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
-
-/**
- * Set the  image animation wait before repeat. unit:ms
- * @param img pointer to an animation image object
- */
-void lv_animimg_set_repeat_delay(lv_obj_t * img, uint32_t delay);
 
 /**
  * Set the  image animation images source.
@@ -84,6 +65,18 @@ void lv_animimg_set_repeat_delay(lv_obj_t * img, uint32_t delay);
  * @param num images' number
  */
 void lv_animimg_set_src(lv_obj_t * img,  lv_img_dsc_t ** dsc, uint8_t num);
+
+/**
+ * Startup the  image animation.
+ * @param img pointer to an animation image object
+ */
+void lv_animimg_start(lv_obj_t * obj);
+
+/**
+ * Set the  image animation duration time. unit:ms
+ * @param img pointer to an animation image object
+ */
+void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
 
 /**
  * Set the image animation reapeatly play times.
