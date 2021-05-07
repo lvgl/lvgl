@@ -169,6 +169,9 @@ latex_elements = {
     'utf8extra': '',
     'classoptions': ',openany,oneside',
     'babel': '\\usepackage{babel}',
+    'passoptionstopackages': r'''
+\PassOptionsToPackage{bookmarksdepth=5}{hyperref}% depth of pdf bookmarks
+''',
     'preamble': r'''
 \usepackage{fontspec}
 \setmonofont{DejaVu Sans Mono}
