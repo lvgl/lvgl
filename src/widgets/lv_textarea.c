@@ -404,21 +404,19 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 	lv_obj_get_coords(obj, &ta_cords);
 	lv_obj_get_coords(ta->label, &label_cords);
 
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE)) {
-        /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
-        lv_obj_update_layout(obj);
+	/*The text area needs to have it's final size to see if the cursor is out of the area or not*/
+	lv_obj_update_layout(obj);
 
-        /*Check the top*/
-		lv_coord_t font_h = lv_font_get_line_height(font);
-		if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
-			lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
-		}
-		/*Check the bottom*/
-		lv_coord_t h = lv_obj_get_content_height(obj);
-		if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
-			lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
-		}
-    }
+	/*Check the top*/
+	lv_coord_t font_h = lv_font_get_line_height(font);
+	if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
+		lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
+	}
+	/*Check the bottom*/
+	lv_coord_t h = lv_obj_get_content_height(obj);
+	if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
+		lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+	}
 
     ta->cursor.valid_x = cur_pos.x;
 
@@ -802,7 +800,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->accepted_chars    = NULL;
     ta->max_length        = 0;
     ta->cursor.show      = 1;
-    ta->cursor.pos        = 0;
+    ta->cursor.pos        = 1;	/*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); woldn't do anything as there is no difference)*/
     ta->cursor.click_pos  = 1;
     ta->cursor.valid_x    = 0;
     ta->one_line          = 0;
@@ -815,8 +813,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->label = lv_label_create(obj);
     lv_obj_set_width(ta->label, lv_pct(100));
     lv_label_set_text(ta->label, "");
-    lv_label_set_long_mode(ta->label, LV_LABEL_LONG_WRAP);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_textarea_set_cursor_pos(obj, 0);
 
     start_cursor_blink(obj);
 
