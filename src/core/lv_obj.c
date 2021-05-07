@@ -760,7 +760,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         if(lv_style_get_prop_inlined(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
         const lv_style_transition_dsc_t * tr = v.ptr;
 
-        /*Add the props t the set if not added yet or added but with smaller weight*/
+        /*Add the props to the set if not added yet or added but with smaller weight*/
         uint32_t j;
         for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
             uint32_t t;
