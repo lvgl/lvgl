@@ -8,7 +8,7 @@
 The Line object is capable of drawing straight lines between a set of points.
 
 ## Parts and Styles
-The Line has only a main part, called `LV_LABEL_PART_MAIN`. It uses all the *line* style properties.
+- `LV_PART_MAIN` It uses all the typical backgrund properties and the line style properties.
 
 ## Usage
 
@@ -16,7 +16,8 @@ The Line has only a main part, called `LV_LABEL_PART_MAIN`. It uses all the *lin
 The points has to be stored in an `lv_point_t` array and passed to the object by the `lv_line_set_points(lines, point_array, point_cnt)` function. 
 
 ### Auto-size
-It is possible to automatically set the size of the line object according to its points. 
+By default the Line's width and height is set to `LV_SIZE_CONTENT` to automatically set its size to involve all the points.
+If the size if set explicitly the point out of the object
 It can be enable with the `lv_line_set_auto_size(line, true)` function. 
 If enabled then when the points are set the object's width and height will be changed according to the maximal x and y coordinates among the points. The *auto size* is enabled by default.
 
@@ -38,7 +39,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_line/index.rst
+.. include:: ../../../examples/widgets/line/index.rst
 
 ```
 

@@ -60,7 +60,7 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Add custom drawer to the button matrix to c
+ * Add custom drawer to the button matrix to customize butons one by one
  */
 void lv_example_btnmatrix_2(void)
 {

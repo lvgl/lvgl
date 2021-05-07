@@ -4,7 +4,7 @@ C
 Simple Line 
 """"""""""""""""
 
-.. lv_example:: lv_ex_widgets/lv_ex_line/lv_ex_line_1
+.. lv_example:: widgets/line/lv_example_line_1
   :language: c
 
 MicroPython
