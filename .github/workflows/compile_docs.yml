@@ -34,7 +34,7 @@ jobs:
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
           key: ${{ env.pythonLocation }}
       - name: Install Doxygen and Latex dependencies
-        run: sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english
+        run: sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk
       - name: Install requirements
         run: |
           pip install --upgrade --upgrade-strategy eager sphinx recommonmark commonmark breathe sphinx-rtd-theme sphinx-markdown-tables sphinx-sitemap
@@ -48,7 +48,9 @@ jobs:
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
-      - name: Build examples
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+      - name: Build examples (with cache)
         run: scripts/build_html_examples.sh
       - name: Build docs
         run: docs/build.py
