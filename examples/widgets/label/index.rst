@@ -1,22 +1,16 @@
 C
 ^
+  
+Line wrap, recoloring and scrolling 
+"""""""""""""""""""""""""""""""""""
 
-Label recoloring and scrolling 
-"""""""""""""""""""""""""""""""
-
-.. lv_example:: lv_ex_widgets/lv_ex_label/lv_ex_label_1
+.. lv_example:: widgets/label/lv_example_label_1
   :language: c
 
 Text shadow 
 """"""""""""
 
-.. lv_example:: lv_ex_widgets/lv_ex_label/lv_ex_label_2
-  :language: c
-
-Align labels 
-""""""""""""
-
-.. lv_example:: lv_ex_widgets/lv_ex_label/lv_ex_label_3
+.. lv_example:: widgets/label/lv_example_label_2
   :language: c
 
 MicroPython
