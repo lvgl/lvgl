@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "animimg/lv_animimg.h"
 #include "calendar/lv_calendar.h"
 #include "calendar/lv_calendar_header_arrow.h"
 #include "calendar/lv_calendar_header_dropdown.h"

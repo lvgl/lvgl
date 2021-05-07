@@ -660,6 +660,10 @@ menu "LVGL configuration"
     endmenu
 
     menu "Extra components"
+	config LV_USE_ANIMIMG
+            bool "Anim image."
+            select LV_USE_IMG
+            default y if !LV_CONF_MINIMAL
         config LV_USE_CALENDAR
             bool "Calendar."
             default y if !LV_CONF_MINIMAL
