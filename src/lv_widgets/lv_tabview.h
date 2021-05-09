@@ -63,6 +63,7 @@ typedef struct {
     uint16_t anim_time;
 #endif
     lv_tabview_btns_pos_t btns_pos : 3;
+	uint16_t tabs_width_factor;
 } lv_tabview_ext_t;
 
 enum {
@@ -141,6 +142,19 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time);
  */
 void lv_tabview_set_btns_pos(lv_obj_t * tabview, lv_tabview_btns_pos_t btns_pos);
 
+/**
+ * Set the zoom factor of the tab's width (need it when btns'pos is right/left)
+ * @param tabview pointer to a tab view object
+ * @param zoom the zoom factor.
+ * - 100 no zoom
+ * - <100: scale down
+ * - >100 scale up
+ * - 50 half size
+ * - 200 double size
+ */
+void lv_tabview_set_tab_width_zoom(lv_obj_t* tabview, uint16_t zoom);
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -178,6 +192,13 @@ uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview);
  * @param tabview pointer to a ab view object
  */
 lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview);
+
+/**
+ * Get tab width zoom
+ * @param tabview pointer to Tab view object
+ * @return zoom factor (100: no zoom)
+ */
+uint16_t lv_tabview_get_tab_width_zoom(lv_obj_t* tabview);
 
 /**********************
  *      MACROS

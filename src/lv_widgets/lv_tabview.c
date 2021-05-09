@@ -96,6 +96,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->indic        = NULL;
     ext->btns         = NULL;
     ext->btns_pos     = LV_TABVIEW_TAB_POS_TOP;
+	ext->tabs_width_factor = 100;
 #if LV_USE_ANIMATION
     ext->anim_time = LV_TABVIEW_DEF_ANIM_TIME;
 #endif
@@ -504,6 +505,26 @@ void lv_tabview_set_btns_pos(lv_obj_t * tabview, lv_tabview_btns_pos_t btns_pos)
     tabview_realign(tabview);
 }
 
+/**
+ * Set the zoom factor of the tab's width (need it when btns'pos is right/left)
+ * @param tabview pointer to a tab view object
+ * @param zoom the zoom factor.
+ * - 100 no zoom
+ * - <100: scale down
+ * - >100 scale up
+ * - 50 half size
+ * - 200 double size
+ */
+void lv_tabview_set_tab_width_zoom(lv_obj_t *tabview, uint16_t zoom) {
+	LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
+
+	lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
+	if (zoom == 0)
+		ext->tabs_width_factor = 100;
+	else
+		ext->tabs_width_factor = zoom;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -587,6 +608,18 @@ lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview)
 
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     return ext->btns_pos;
+}
+
+/**
+ * Get tab width zoom
+ * @param tabview pointer to Tab view object
+ * @return zoom factor (100: no zoom)
+ */
+uint16_t lv_tabview_get_tab_width_zoom(lv_obj_t *tabview) {
+	LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
+
+	lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
+	return ext->tabs_width_factor;
 }
 
 /**********************
@@ -942,15 +975,16 @@ static void refr_btns_size(lv_obj_t * tabview)
             lv_obj_set_hidden(ext->btns, false);
             btns_h = lv_font_get_line_height(font) + tab_top + tab_bottom + tab_bg_top + tab_bg_bottom;
             btns_w = lv_obj_get_width(tabview);
-
-            break;
-        case LV_TABVIEW_TAB_POS_LEFT:
-        case LV_TABVIEW_TAB_POS_RIGHT:
-            lv_obj_set_hidden(ext->btns, false);
+			btns_w *= ext->tabs_width_factor/100.0;
+			break;
+		case LV_TABVIEW_TAB_POS_LEFT:
+		case LV_TABVIEW_TAB_POS_RIGHT:
+			lv_obj_set_hidden(ext->btns, false);
             btns_w = lv_font_get_glyph_width(font, 'A', '\0') +
                      tab_left + tab_right + tab_bg_left + tab_bg_right;
-            btns_h = lv_obj_get_height(tabview);
-            break;
+			btns_w *= ext->tabs_width_factor/100.0;
+			btns_h = lv_obj_get_height(tabview);
+			break;
     }
 
     lv_obj_set_size(ext->btns, btns_w, btns_h);
