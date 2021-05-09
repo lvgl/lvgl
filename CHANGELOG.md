@@ -16,6 +16,7 @@
 ### Bugfixes
 - fix(gauge) fix needle invalidation
 - fix(bar) correct symmetric handling for vertical sliders
+- Fix that when tabview btnpos is left or right, tab’s text cannot be displayed in one line
 
 ## v7.10.1 (Planned for 16.02.2021)
 
