@@ -10,6 +10,7 @@ jobs:
   build-and-deploy:
     if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-latest
+    concurrency: docs-build-and-deploy
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -62,7 +63,6 @@ jobs:
         id: version
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
-        concurrency: docs-push
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACCESS_TOKEN: ${{ secrets.LVGL_BOT_TOKEN }}
