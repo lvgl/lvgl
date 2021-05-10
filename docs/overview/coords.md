@@ -102,7 +102,7 @@ lv_obj_set_x(btn, lv_pct(10)); //x = 10 % of parant content area width
 ```
 
 ### Align
-In some cases it's convenient to change the origin of the positioning from the the default top left. If the the orogin is changed e.g. to bottom-right, the (0,0) position means: align to the bottom-right corner. 
+In some cases it's convenient to change the origin of the positioning from the the default top left. If the origin is changed e.g. to bottom-right, the (0,0) position means: align to the bottom-right corner. 
 To change the origin use:
 ```c
 lv_obj_set_align(obj, align);
@@ -171,13 +171,13 @@ lv_obj_set_height(obj, 100);
 lv_obj_set_size(obj, 200, 100); 	//Or in one function
 ```
 
-Percentage values aer calculated based on the parent's content area size. For example to set the object's height to the screen height:
+Percentage values are calculated based on the parent's content area size. For example to set the object's height to the screen height:
 ```c
 lv_obj_set_height(obj, lv_pct(100));
 ``` 
 
 Size setting supports a value: `LV_SIZE_CONTENT`. It means the object's size in the respective direction will be set to involve its the children. 
-Note that only children on the right and bottom will be considered and children o nthe top and left remains cropped. This limitation makes the behavior more predictable.
+Note that only children on the right and bottom will be considered and children on the top and left remains cropped. This limitation makes the behavior more predictable.
 
 Object with `LV_OBJ_FLAG_HIDDEN` or `LV_OBJ_FLAG_FLOATING` will be ignored by `LV_SIZE_CONTENT` calculation.
 
