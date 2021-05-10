@@ -429,13 +429,14 @@ static void anim_timer(lv_timer_t * param)
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;
-            if(a->act_time <= 0 && new_act_time >= 0) {
+            if(!a->start_cb_called && a->act_time <= 0 && new_act_time >= 0) {
                 if(a->early_apply == 0 && a->get_value_cb) {
                     int32_t v_ofs  = a->get_value_cb(a);
                     a->start_value += v_ofs;
                     a->end_value += v_ofs;
                 }
                 if(a->start_cb) a->start_cb(a);
+                a->start_cb_called = 1;
             }
             a->act_time += elaps;
             if(a->act_time >= 0) {
