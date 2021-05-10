@@ -79,7 +79,9 @@ typedef struct {
 enum {
     LV_TEXTAREA_PART_BG = LV_PAGE_PART_BG, /**< Text area background style */
     LV_TEXTAREA_PART_SCROLLBAR = LV_PAGE_PART_SCROLLBAR, /**< Scrollbar style */
+#if LV_USE_ANIMATION
     LV_TEXTAREA_PART_EDGE_FLASH = LV_PAGE_PART_EDGE_FLASH, /**< Edge flash style */
+#endif
     LV_TEXTAREA_PART_CURSOR = _LV_PAGE_PART_VIRTUAL_LAST, /**< Cursor style */
     LV_TEXTAREA_PART_PLACEHOLDER, /**< Placeholder style */
     _LV_TEXTAREA_PART_VIRTUAL_LAST,

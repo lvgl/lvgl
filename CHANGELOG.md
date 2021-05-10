@@ -1,5 +1,12 @@
 # Changelog
 
+## v7.11.1
+
+### New features
+
+### Bugfixes
+- fix(kconfig) remove dependency for LV_COLOR_CHROMA_KEY_HEX
+
 ## v7.11.0 (Planned for 19.02.2021)
 
 ### New features
