@@ -6,12 +6,12 @@
 
 ## Overview
 
-The Slider object looks like a [Bar](/widgets/bar) supplemented with a knob. The knob can be dragged to set a value. The Slider also can be vertical or horizontal.
+The Slider object looks like a [Bar](/widgets/core/bar) supplemented with a knob. The knob can be dragged to set a value. The Slider also can be vertical or horizontal.
 
 
-## Parts and Styles
-The Slider's main part is called `LV_SLIDER_PART_BG` and it uses the typical background style properties.
-
+## Parts and Styles 
+- `LV_PART_MAIN` The background of the Slider and it uses all the typical background style properties. `padding` makes the indicator smaller in the respective direction.
+- `LV_PART_INDICATOR` The indccator the show the current state os the slider. Also uses all the typical background style properties.
 `LV_SLIDER_PART_INDIC` is a virtual part which also uses all the typical background properties. 
 By default, the indicator maximal size is the same as the background's size but setting positive padding values in `LV_SLIDER_PART_BG` will make the indicator smaller. (negative values will make it larger)
 If the *value* style property is used on the indicator the alignment will be calculated based on the current size of the indicator. 

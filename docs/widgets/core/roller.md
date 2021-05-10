@@ -9,12 +9,9 @@
 Roller allows you to simply select one option from more with scrolling. 
 
 ## Parts and Styles
-The Roller's main part is called `LV_ROLLER_PART_BG`. It's a rectangle and uses all the typical background properties. 
-The style of the Roller's label is inherited from the *text* style properties of the background.
-To adjust the space between the options use the *text_line_space* style property.
-The *padding* style properties set the space on the sides.
-
-The selected option in the middle can be referenced with `LV_ROLLER_PART_SELECTED` virtual part. Besides the typical background properties it uses the *text* properties to change the appearance of the text in the selected area.
+- `LV_PART_MAIN` The background of the roller that uses all the typical background properties and the text style properties. `style_text_line_space` adjusts the space between the options. 
+When the Roller is scrolled and doesn't stop exactly on an option it will scroll to the nearest valid option automatically in `anim_time` milliseconds as it's specified in the style.
+- `LV_PART_SELECTED` The selected option in the middle. Besides the typical background properties it uses the text style properties to change the appearance of the text in the selected area.
 
 ## Usage
 
@@ -30,33 +27,24 @@ The get the currently selected option use `lv_roller_get_selected(roller)` it wi
 
 `lv_roller_get_selected_str(roller, buf, buf_size)` copy the name of the selected option to `buf`.
 
-### Align the options
-To align the label horizontally use `lv_roller_set_align(roller, LV_LABEL_ALIGN_LEFT/CENTER/RIGHT)`.
-
 ### Visible rows
 The number of visible rows can be adjusted with `lv_roller_set_visible_row_count(roller, num)`
 
-### Animation time
-When the Roller is scrolled and doesn't stop exactly on an option it will scroll to the nearest valid option automatically.
-The time of this scroll animation can be changed by `lv_roller_set_anim_time(roller, anim_time)`. Zero animation time means no animation.
-
 ## Events
-Besides, the [Generic events](../overview/event.html#generic-events) the following [Special events](../overview/event.html#special-events) are sent by the Drop down lists:
- - **LV_EVENT_VALUE_CHANGED** sent when a new option is selected
+- `LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.
 
 Learn more about [Events](/overview/event).
 
 ## Keys
-The following *Keys* are processed by the Buttons:
-- **LV_KEY_RIGHT/DOWN** Select the next option
-- **LV_KEY_LEFT/UP** Select the previous option
-- **LY_KEY_ENTER** Apply the selected option (Send `LV_EVENT_VALUE_CHANGED` event) 
+- `LV_KEY_RIGHT/DOWN` Select the next option
+- `LV_KEY_LEFT/UP` Select the previous option
+- `LY_KEY_ENTER` Apply the selected option (Send `LV_EVENT_VALUE_CHANGED` event) 
 
 ## Example
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_roller/index.rst
+.. include:: ../../../examples/widgets/roller/index.rst
 
 ```
 
