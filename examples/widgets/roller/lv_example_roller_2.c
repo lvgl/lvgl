@@ -8,7 +8,7 @@ static void event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         char buf[32];
         lv_roller_get_selected_str(obj, buf, sizeof(buf));
-        LV_LOG_USER("Selected value: %s\n", buf);
+        LV_LOG_USER("Selected value: %s", buf);
     }
 }
 

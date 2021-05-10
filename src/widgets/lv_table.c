@@ -689,7 +689,7 @@ static void draw_main(lv_event_t * e)
 
             lv_state_t cell_state = LV_STATE_DEFAULT;
             if(row == table->row_act && col == table->col_act) {
-                if(obj->state & LV_STATE_PRESSED) cell_state |= LV_STATE_PRESSED;
+                if(!(obj->state & LV_STATE_SCROLLED) && (obj->state & LV_STATE_PRESSED)) cell_state |= LV_STATE_PRESSED;
                 if(obj->state & LV_STATE_FOCUSED) cell_state |= LV_STATE_FOCUSED;
                 if(obj->state & LV_STATE_FOCUS_KEY) cell_state |= LV_STATE_FOCUS_KEY;
                 if(obj->state & LV_STATE_EDITED) cell_state |= LV_STATE_EDITED;

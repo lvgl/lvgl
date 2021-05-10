@@ -4,7 +4,13 @@ C
 Simple Roller 
 """"""""""""""""
 
-.. lv_example:: lv_ex_widgets/lv_ex_roller/lv_ex_roller_1
+.. lv_example:: widgets/roller/lv_example_roller_1
+  :language: c
+  
+Styling the roller
+""""""""""""""""""
+
+.. lv_example:: widgets/roller/lv_example_roller_2
   :language: c
 
 MicroPython
