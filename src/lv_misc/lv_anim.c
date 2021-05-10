@@ -105,7 +105,7 @@ void lv_anim_start(lv_anim_t * a)
     a->time_orig = a->time;
     a->run_round = anim_run_round;
     _lv_memcpy(new_anim, a, sizeof(lv_anim_t));
-
+    if(a->var == a) new_anim->var = new_anim;
     /*Set the start value*/
     if(new_anim->early_apply) {
         if(new_anim->exec_cb && new_anim->var) new_anim->exec_cb(new_anim->var, new_anim->start);
@@ -437,8 +437,9 @@ static void anim_task(lv_task_t * param)
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;
-            if(a->act_time <= 0 && new_act_time >= 0) {
+            if(!a->start_cb_called && a->act_time <= 0 && new_act_time >= 0) {
                 if(a->start_cb) a->start_cb(a);
+                a->start_cb_called = 1;
             }
             a->act_time += elaps;
             if(a->act_time >= 0) {
