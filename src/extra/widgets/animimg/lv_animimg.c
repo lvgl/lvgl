@@ -57,10 +57,12 @@ const lv_obj_class_t lv_animimg_class = {
 lv_obj_t * lv_animimg_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin")
-    return lv_obj_class_create_obj(&lv_animimg_class, parent, NULL);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_animimg_class, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
 }
 
-void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t ** dsc, uint8_t num)
+void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
 {
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;

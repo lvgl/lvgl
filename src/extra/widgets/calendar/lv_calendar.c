@@ -56,8 +56,9 @@ static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;
 
 lv_obj_t * lv_calendar_create(lv_obj_t * parent)
 {
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_class, parent, NULL);
-
+    LV_LOG_INFO("begin")
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_class, parent);
+    lv_obj_class_init_obj(obj);
     return obj;
 }
 

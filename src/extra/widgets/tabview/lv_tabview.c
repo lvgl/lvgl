@@ -49,9 +49,13 @@ static lv_coord_t tabsize_create;
 
 lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab_size)
 {
+    LV_LOG_INFO("begin")
     tabpos_create = tab_pos;
     tabsize_create = tab_size;
-    return lv_obj_class_create_obj(&lv_tabview_class, parent, NULL);
+
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_tabview_class, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
 }
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)

@@ -39,6 +39,7 @@ const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class};
 
 lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
 {
+    LV_LOG_INFO("begin")
     bool auto_parent = false;
     if(parent == NULL) {
         auto_parent = true;
@@ -49,7 +50,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
     }
 
-    lv_obj_t * mbox = lv_obj_class_create_obj(&lv_msgbox_class, parent, NULL);
+    lv_obj_t * mbox = lv_obj_class_create_obj(&lv_msgbox_class, parent);
+    lv_obj_class_init_obj(mbox);
     LV_ASSERT_MALLOC(mbox);
     if(mbox == NULL) return NULL;
 

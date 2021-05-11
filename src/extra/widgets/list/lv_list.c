@@ -55,42 +55,45 @@ const lv_obj_class_t lv_list_text_class = {
 
 lv_obj_t * lv_list_create(lv_obj_t * parent)
 {
-    lv_obj_t * list = lv_obj_class_create_obj(&lv_list_class, parent, NULL);
-    lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
-
-    return list;
+    LV_LOG_INFO("begin")
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_class, parent);
+    lv_obj_class_init_obj(obj);
+    lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
+    return obj;
 }
 
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
-    lv_obj_t * label = lv_obj_class_create_obj(&lv_list_text_class, list, NULL);
-    lv_label_set_text(label, txt);
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_width(label, LV_PCT(100));
-    return label;
+    LV_LOG_INFO("begin")
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_text_class, list);
+    lv_obj_class_init_obj(obj);
+    lv_label_set_text(obj, txt);
+    lv_label_set_long_mode(obj, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_width(obj, LV_PCT(100));
+    return obj;
 }
 
 lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt, lv_event_cb_t event_cb)
 {
-    lv_obj_t * btn = lv_obj_class_create_obj(&lv_list_btn_class, list, NULL);
-    lv_obj_set_size(btn, LV_PCT(100), LV_SIZE_CONTENT);
-    if(event_cb) {
-    	lv_obj_add_event_cb(btn, event_cb, LV_EVENT_ALL, NULL);
-    }
+    LV_LOG_INFO("begin")
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_btn_class, list);
+    lv_obj_class_init_obj(obj);
+    lv_obj_set_size(obj, LV_PCT(100), LV_SIZE_CONTENT);
+    if(event_cb) lv_obj_add_event_cb(obj, event_cb, LV_EVENT_ALL, NULL);
 
     if(icon) {
-        lv_obj_t * img = lv_img_create(btn);
+        lv_obj_t * img = lv_img_create(obj);
         lv_img_set_src(img, icon);
     }
 
     if(txt) {
-        lv_obj_t * label = lv_label_create(btn);
+        lv_obj_t * label = lv_label_create(obj);
         lv_label_set_text(label, txt);
         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
         lv_obj_set_flex_grow(label, 1);
     }
 
-    return btn;
+    return obj;
 }
 
 const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn)

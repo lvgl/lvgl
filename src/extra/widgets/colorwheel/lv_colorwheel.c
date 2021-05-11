@@ -74,8 +74,12 @@ static bool create_knob_recolor;
  */
 lv_obj_t * lv_colorwheel_create(lv_obj_t * parent, bool knob_recolor)
 {
+    LV_LOG_INFO("begin")
     create_knob_recolor = knob_recolor;
-    return lv_obj_class_create_obj(&lv_colorwheel_class, parent, NULL);
+
+    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
 }
 
 /*=====================

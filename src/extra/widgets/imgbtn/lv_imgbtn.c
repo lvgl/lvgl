@@ -55,7 +55,10 @@ const lv_obj_class_t lv_imgbtn_class = {
  */
 lv_obj_t * lv_imgbtn_create(lv_obj_t * parent)
 {
-   return lv_obj_class_create_obj(&lv_imgbtn_class, parent, NULL);
+    LV_LOG_INFO("begin")
+    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
 }
 
 /*=====================
