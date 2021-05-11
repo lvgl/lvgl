@@ -143,6 +143,17 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
  */
 char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap);
 
+/**
+ * Decode two encoded character from a string.
+ * @param txt pointer to '\0' terminated string
+ * @param letter the first decoded Unicode character or 0 on invalid data code
+ * @param letter_next the second decoded Unicode character or 0 on invalid data code
+ * @param ofs start index in 'txt' where to start.
+ *                After the call it will point to the next encoded char in 'txt'.
+ *                NULL to use txt[0] as index
+ */
+void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t *ofs);
+
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CHARACTER ENCODING INTERFACE
  ***************************************************************/

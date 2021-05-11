@@ -264,9 +264,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 #endif
             }
 
-            uint32_t letter      = _lv_txt_encoded_next(bidi_txt, &i);
-            uint32_t letter_next = _lv_txt_encoded_next(&bidi_txt[i], NULL);
-
+            uint32_t letter;
+            uint32_t letter_next;
+            _lv_txt_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
             /*Handle the re-color command*/
             if((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {

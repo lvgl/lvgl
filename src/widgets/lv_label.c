@@ -470,11 +470,11 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
-            /*Get the current letter.*/
-            uint32_t letter = _lv_txt_encoded_next(bidi_txt, &i);
-
-            /*Get the next letter too for kerning*/
-            uint32_t letter_next = _lv_txt_encoded_next(&bidi_txt[i], NULL);
+            /*Get the current letter and the next letter for kerning*/
+            /*Be careful 'i' already points to the next character*/
+            uint32_t letter;
+            uint32_t letter_next;
+            _lv_txt_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
 
             /*Handle the recolor command*/
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
@@ -573,12 +573,9 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
     if(new_line_start > 0) {
         while(i <= new_line_start - 1) {
-            /*Get the current letter
-             *Be careful 'i' already points to the next character*/
-            letter = _lv_txt_encoded_next(txt, &i);
-
-            /*Get the next letter for kerning*/
-            letter_next = _lv_txt_encoded_next(&txt[i], NULL);
+            /*Get the current letter and the next letter for kerning*/
+            /*Be careful 'i' already points to the next character*/
+            _lv_txt_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
             /*Handle the recolor command*/
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
