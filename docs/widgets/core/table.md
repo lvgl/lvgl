@@ -12,31 +12,11 @@ The Table object is very light weighted because only the texts are stored. No re
 
 
 ## Parts and Styles
-The main part of the Table is called `LV_TABLE_PART_BG`. It's a rectangle like background and uses all the typical background style properties.
+- `LV_PART_MAIN` The background of the table and uses all the typical background style properties.
+- `LV_PART_ITEMS` The cells of the table and they also use all the typical background style properties and the text properties.
 
-For the cells there are 4 virtual parts. Every cell has type (1, 2, ... 16) which tells which part's styles to apply on them. The cell parts can be referenced by `LV_TABLE_PART_CELL1 + x` where `x` is between `0..15`.
-
-The number of cell types can be adjusted in `lv_conf.h` by `LV_TABLE_CELL_STYLE_CNT`. By default it's 4. The default 4 cell types' part be referenced with dedicated names too:
-- `LV_TABLE_PART_CELL1`
-- `LV_TABLE_PART_CELL2`
-- `LV_TABLE_PART_CELL3`
-- `LV_TABLE_PART_CELL4`
-
-The cells also use all the typical background style properties. If there is a line break (`\n`) in a cell's content then a horizontal division line will drawn after the line break using the *line* style properties.
-
-The style of texts in the cells are inherited from the cell parts or the background part.
 
 ## Usage
-
-### Rows and Columns
-
-To set number of rows and columns use `lv_table_set_row_cnt(table, row_cnt)` and `lv_table_set_col_cnt(table, col_cnt)`
-
-### Width and Height
-
-The width of the columns can be set with `lv_table_set_col_width(table, col_id, width)`. The overall width of the Table object will be set to the sum of columns widths.
-
-The height is calculated automatically from the cell styles (font, padding etc) and the number of rows.
 
 ### Set cell value
 
@@ -46,36 +26,33 @@ The cells can store only texts so numbers needs to be converted to text before d
 
 Line break can be used in the text like `"Value\n60.3"`.
 
-### Align
+The new rows and column are automatically added is required 
 
-The text alignment in cells can be adjusted individually with `lv_table_set_cell_align(table, row, col, LV_LABEL_ALIGN_LEFT/CENTER/RIGHT)`.
+### Rows and Columns
 
-### Cell type
+To explicitly set number of rows and columns use `lv_table_set_row_cnt(table, row_cnt)` and `lv_table_set_col_cnt(table, col_cnt)`
 
-You can use 4 different cell types. Each has its own style.
+### Width and Height
 
-Cell types can be used to add different style for example to:
-- table header
-- first column
-- highlight a cell
-- etc
+The width of the columns can be set with `lv_table_set_col_width(table, col_id, width)`. The overall width of the Table object will be set to the sum of columns widths.
 
-The type can be selected with `lv_table_set_cell_type(table, row, col, type)` `type` can be 1, 2, 3 or 4.
+The height is calculated automatically from the cell styles (font, padding etc) and the number of rows.
 
 ### Merge cells
 
 Cells can be merged horizontally with `lv_table_set_cell_merge_right(table, col, row, true)`. To merge more adjacent cells apply this function for each cell.
 
-
-### Crop text
-By default, the texts are word-wrapped to fit into the width of the cell and the height of the cell is set automatically. 
-To disable this and keep the text as it is enable `lv_table_set_cell_crop(table, row, col, true)`.
-
 ### Scroll
-The make the Table scrollable place it on a [Page](/widgets/page)
+If the label's width or height is set to `LV_SIZE_CONTENT` that size will be se to show the whole table in the respective direction. 
+E.g. `lv_obj_set_size(table, LV_SIZE_CONTENT, LV_SIZE_CONTENT)` automatically sets the table size to show all the columns and rows.
+
+If the width or height is set to smaller number than the "intrinsic" size then the table becomes scrollable.
 
 ## Events
-Only the [Generic events](../overview/event.html#generic-events) are sent by the object type.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for both main and items parts to allow hooking the drawing. 
+The for more detail on the main part see the [Base object](/widgets/obj#events)'s documentation.
+For the items (sells) the following fields are used: `clip_area`, `draw_area`, `part`, `rect_dsc`, `label_dsc` `id` (current row &times; col count + current column). 
+
 
 Learn more about [Events](/overview/event).
 

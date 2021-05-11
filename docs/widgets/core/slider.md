@@ -10,45 +10,39 @@ The Slider object looks like a [Bar](/widgets/core/bar) supplemented with a knob
 
 
 ## Parts and Styles 
-- `LV_PART_MAIN` The background of the Slider and it uses all the typical background style properties. `padding` makes the indicator smaller in the respective direction.
-- `LV_PART_INDICATOR` The indccator the show the current state os the slider. Also uses all the typical background style properties.
-`LV_SLIDER_PART_INDIC` is a virtual part which also uses all the typical background properties. 
-By default, the indicator maximal size is the same as the background's size but setting positive padding values in `LV_SLIDER_PART_BG` will make the indicator smaller. (negative values will make it larger)
-If the *value* style property is used on the indicator the alignment will be calculated based on the current size of the indicator. 
-For example a center aligned value is always shown in the middle of the indicator regardless it's current size.
-
-`LV_SLIDER_PART_KNOB` is a virtual part using all the typical background properties to describe the knob(s). Similarly to the *indicator* the *value* text is also aligned to the current position and size of the knob.
-By default the knob is square (with a radius) with side length equal to the smaller side of the slider. The knob can be made larger with the *padding* values. Padding values can be asymmetric too. 
+- `LV_PART_MAIN` The background of the slider and it uses all the typical background style properties. `padding` makes the indicator smaller in the respective direction.
+- `LV_PART_INDICATOR` The indicator the show the current state of the slider. Also uses all the typical background style properties.
+- `LV_PART_KNOB` A rectangle (or circle) drawn at the current value. It also uses all the typical background properties to describe the knob(s). By default the knob is square (with a optional radius) with side length equal to the smaller side of the slider. The knob can be made larger with the `padding` values. Padding values can be asymmetric too. 
 
 ## Usage
 
 ### Value and range
-To set an initial value use `lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)`. 
-`lv_slider_set_anim_time(slider, anim_time)` sets the animation time in milliseconds.
+To set an initial value use `lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)`.  The animation time is set by the styles' `anim_time` property.
 
 To specify the range (min, max values) the `lv_slider_set_range(slider, min , max)` can be used.
 
-### Symmetrical and Range
-Besides the normal type the Slider can be configured in two additional types:
-- `LV_SLIDER_TYPE_NORMAL` normal type
-- `LV_SLIDER_TYPE_SYMMETRICAL` draw the indicator symmetrical to zero (drawn from zero, left to right)
-- `LV_SLIDER_TYPE_RANGE` allow the use of an additional knob for the left (start) value. (Can be used with `lv_slider_set/get_left_value()`)
+### Modes
+The slider can be one the following modes:
+- `LV_SLIDER_MODE_NORMAL` A normal slider as described above
+- `LV_SLIDER_SYMMETRICAL` Draw the indicator form the zero value to current value. Requires negaitve minimum range and positive maximum range.
+- `LV_SLIDER_RANGE` Allows setting the start value too by `lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start value has to be always smaller than the end value.
 
-The type can be changed with `lv_slider_set_type(slider, LV_SLIDER_TYPE_...)`
+The mode can be changed with `lv_slider_set_mode(slider, LV_SLIDER_MODE_...)`
 
 ### Knob-only mode
 Normally, the slider can be adjusted either by dragging the knob, or clicking on the slider bar. 
 In the latter case the knob moves to the point clicked and slider value changes accordingly. In some cases it is desirable to set the slider to react on dragging the knob only.
 
-This feature is enabled by calling `lv_obj_set_adv_hittest(slider, true);`.
+This feature is enabled by adding the `LV_OBJ_FLAG_ADV_HITTEST`: `lv_obj_add_flag(slider, LV_OBJ_FLAG_ADV_HITTEST)`.
 
 ## Events
-Besides the [Generic events](../overview/event.html#generic-events) the following [Special events](../overview/event.html#special-events) are sent by the Slider:
-- **LV_EVENT_VALUE_CHANGED** Sent while the slider is being dragged or changed with keys. The event is sent continuously while the slider is dragged and only when it is released. Use `lv_slider_is_dragged` to decide whether is slider is being dragged or just released.
+- `LV_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or changed with keys. 
+The event is sent continuously while the slider is dragged and only when it is released. Use `lv_slider_is_dragged` to decide whether is slider is being dragged or just released.
 
+Learn more about [Events](/overview/event).
 ## Keys
-- **LV_KEY_UP**, **LV_KEY_RIGHT** Increment the slider's value by 1
-- **LV_KEY_DOWN**, **LV_KEY_LEFT** Decrement the slider's value by 1
+- `LV_KEY_UP/RIGHT` Increment the slider's value by 1
+- `LV_KEY_DOWN/LEFT` Decrement the slider's value by 1
 
 Learn more about [Keys](/overview/indev).
 
@@ -56,10 +50,9 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_slider/index.rst
+.. include:: ../../../examples/widgets/lv_example_slider/index.rst
 
 ```
-
 
 ## API 
 
