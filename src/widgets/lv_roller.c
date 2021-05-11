@@ -581,7 +581,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         break;
     }
 
-
     lv_roller_t * roller = (lv_roller_t*)obj;
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -620,7 +619,6 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
 
 static lv_res_t release_handler(lv_obj_t * obj)
 {
-
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return LV_RES_OK;
 

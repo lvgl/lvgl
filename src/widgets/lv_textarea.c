@@ -1040,7 +1040,7 @@ static void start_cursor_blink(lv_obj_t * obj)
 
 static void refr_cursor_area(lv_obj_t * obj)
 {
-     lv_textarea_t * ta = (lv_textarea_t *)obj;
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -1271,12 +1271,10 @@ static void draw_placeholder(lv_event_t * e)
 
         lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
         lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         lv_area_t ph_coords;
         lv_area_copy(&ph_coords, &obj->coords);
-        ph_coords.x1 += left;
-        ph_coords.x2 += left;
-        ph_coords.y1 += top;
-        ph_coords.y2 += top;
+        lv_area_move(&ph_coords, left + border_width, top + border_width);
         lv_draw_label(&ph_coords, clip_area, &ph_dsc, ta->placeholder_txt, NULL);
     }
 }
@@ -1311,8 +1309,9 @@ static void draw_cursor(lv_event_t * e)
     if(cur_dsc.bg_opa == LV_OPA_COVER) {
         lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
         lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
-        cur_area.x1 += left;
-        cur_area.y1 += top;
+        lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        cur_area.x1 += left + border_width;
+        cur_area.y1 += top + border_width;
 
         lv_draw_label_dsc_t cur_label_dsc;
         lv_draw_label_dsc_init(&cur_label_dsc);

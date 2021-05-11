@@ -432,8 +432,9 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     }
 
     lv_coord_t label_h = lv_obj_get_height(label);
-    lv_coord_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN);
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(dropdown->list, LV_PART_MAIN);
+    lv_coord_t border_width = lv_obj_get_style_border_width(dropdown->list, LV_PART_MAIN);
+    lv_coord_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN) + border_width;
+    lv_coord_t bottom = lv_obj_get_style_pad_bottom(dropdown->list, LV_PART_MAIN) + border_width;
 
     lv_coord_t list_fit_h = label_h + top + bottom;
     lv_coord_t list_h = list_fit_h;
@@ -723,9 +724,10 @@ static void draw_main(lv_event_t * e)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     const lv_area_t * clip_area = lv_event_get_param(e);
 
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
+    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
 
     lv_draw_label_dsc_t symbol_dsc;
     lv_draw_label_dsc_init(&symbol_dsc);
