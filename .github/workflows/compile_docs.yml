@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - 'release/*'
 env:
   EM_VERSION: 2.0.4
   EM_CACHE_FOLDER: 'emsdk-cache'
