@@ -39,6 +39,7 @@ static void draw_main(lv_event_t * e);
 
 static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits);
+static bool button_is_checked(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_repeat_disabled(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_inactive(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_click_trig(lv_btnmatrix_ctrl_t ctrl_bits);
@@ -511,23 +512,18 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
             indev_type = lv_indev_get_type(indev);
         }
 
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            /*In navigation mode don't select any button but in edit mode select the fist*/
-            if(lv_group_get_editing(lv_obj_get_group(obj))) {
-                uint32_t b = 0;
-                while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b])) b++;
-                btnm->btn_id_sel = b;
-            }
-            else {
-                btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
-            }
-        }
-        else if(indev_type == LV_INDEV_TYPE_KEYPAD) {
+        bool editing = lv_group_get_editing(lv_obj_get_group(obj));
+        if(indev_type == LV_INDEV_TYPE_KEYPAD|| (indev_type == LV_INDEV_TYPE_ENCODER&& editing)) {
             uint32_t b = 0;
-            while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b])) {
-                b++;
+            if(btnm->one_check) {
+                while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b]) || button_is_checked(btnm->ctrl_bits[b]) == false) b++;
+            } else {
+                while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b])) b++;
             }
+
             btnm->btn_id_sel = b;
+        } else {
+            btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
         }
     }
     else if(code == LV_EVENT_DEFOCUSED || code == LV_EVENT_LEAVE) {
@@ -826,6 +822,11 @@ static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits)
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits)
 {
     return (ctrl_bits & LV_BTNMATRIX_CTRL_HIDDEN) ? true : false;
+}
+
+static bool button_is_checked(lv_btnmatrix_ctrl_t ctrl_bits)
+{
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKED) ? true : false;
 }
 
 static bool button_is_repeat_disabled(lv_btnmatrix_ctrl_t ctrl_bits)

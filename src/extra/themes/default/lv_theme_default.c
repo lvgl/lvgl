@@ -63,7 +63,6 @@ typedef struct {
     lv_style_t pad_gap;
     lv_style_t line_space_large;
     lv_style_t text_align_center;
-    lv_style_t text_underline;
     lv_style_t outline_primary;
     lv_style_t outline_secondary;
     lv_style_t circle;
@@ -138,7 +137,7 @@ typedef struct {
 #endif
 
 #if LV_USE_TABVIEW
-    lv_style_t tab_btn;
+    lv_style_t tab_bg_focus, tab_btn;
 #endif
 #if LV_USE_LED
     lv_style_t led;
@@ -319,9 +318,6 @@ static void style_init(void)
 
     style_init_reset(&styles->text_align_center);
     lv_style_set_text_align(&styles->text_align_center, LV_TEXT_ALIGN_CENTER);
-
-    style_init_reset(&styles->text_underline);
-    lv_style_set_text_decor(&styles->text_underline, LV_TEXT_DECOR_UNDERLINE);
 
     style_init_reset(&styles->pad_zero);
     lv_style_set_pad_all(&styles->pad_zero, 0);
@@ -517,6 +513,9 @@ static void style_init(void)
     lv_style_set_border_color(&styles->tab_btn, theme.color_primary);
     lv_style_set_border_width(&styles->tab_btn, BORDER_WIDTH * 2);
     lv_style_set_border_side(&styles->tab_btn, LV_BORDER_SIDE_BOTTOM);
+
+    style_init_reset(&styles->tab_bg_focus);
+    lv_style_set_outline_pad(&styles->tab_bg_focus, -BORDER_WIDTH);
 #endif
 
 #if LV_USE_LIST
@@ -682,12 +681,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_TABVIEW
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_tabview_class)) {
             lv_obj_add_style(obj, &styles->bg_color_white, 0);
-            lv_obj_add_style(obj, &styles->bg_color_white, LV_PART_ITEMS);
+            lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
+            lv_obj_add_style(obj, &styles->tab_bg_focus, LV_STATE_FOCUS_KEY);
             lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
             lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_PART_ITEMS | LV_STATE_CHECKED);
             lv_obj_add_style(obj, &styles->tab_btn, LV_PART_ITEMS | LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &styles->text_underline, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &styles->bg_color_secondary_muted, LV_PART_ITEMS | LV_STATE_EDITED | LV_STATE_CHECKED);
+            lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+            lv_obj_add_style(obj, &styles->outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
+            lv_obj_add_style(obj, &styles->tab_bg_focus, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
             return;
         }
 #endif
