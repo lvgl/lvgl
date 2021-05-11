@@ -5,12 +5,14 @@
 # Positions, sizes, and layouts
 
 ## Overview
-Similarly to many other parts of LVGL, the concept of setting the coordinates were inspired by CSS. It doesn't mean a perfect copy of the standard but parts that are reasonable were adopted in LVGL.
+Similarly to many other parts of LVGL, the concept of setting the coordinates were inspired by CSS. It doesn't mean a perfect copy of the standard but subsets of CSS were implemented (sometimes with minor adjustments).
 It shorts it means:
 - the set coordinates (size, position, layouts, etc) are stored in styles
 - support min-width, max-width, min-height, max-height
 - have pixel, percentage, and "content" units 
-- a subset of flexbox and grid layouts are supported by default 
+- x=0; y=0 coordinate means the to top-left corner of the parent plus the left/top padding plus border width
+- width/height means the full size, the "content area" is smaller with padding and border width 
+- a subset of flexbox and grid layouts are supported
  
 ###  Units
 - pixel: Simply a position in pixels. A simple integer always mean pixel. E.g. `lv_obj_set_x(btn, 10)`
@@ -18,14 +20,16 @@ It shorts it means:
 - `LV_SIZE_CONTENT`: Special value to set the width/height of an object to involve all the children. Its similar to `auto` in CSS. E.g. `lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
 
 ### Boxing model
+LVGL follows CSS's [border-box](https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing) model.
 An object's "box" is built from the following parts:
 - bounding box: the width/height of the elements.
+- border width: the width of the border. 
 - padding: space between the sides of the object and its children. 
-- content: the content area which size if the bounding box reduced by the size of the paddings.
+- content: the content area which size if the bounding box reduced by the border width and the size of the paddings.
 
-![The box models of LVGL: The content area is smaller then the bounding box with the padding](/misc/boxmodel.png)
+![The box models of LVGL: The content area is smaller then the bounding box with the padding and border width](/misc/boxmodel.png)
 
-The border is drawn inside the bounding box and doesn't take an extra space. (It's different from CSS in which increasing the border width makes the object larger.)
+The border is drawn inside the bounding box. Inside the border LVGL keeps "padding size" to place the children. 
 
 The outline is drawn outside of the bounding box.
 
@@ -36,26 +40,8 @@ This section describes special cases in which LVGL's behavior might look unexpec
 LVGL doesn't recalculate all the coordinate changes immediately to improve performance. 
 Instead, the objects are marked as "dirty" and before redrawing the screen LVGL checks if there are any "dirty" objects. If so it refreshes their position, size and layout.
 
-The following functions set size/position immediately:
-- `lv_obj_set_pos/x/y`
-- `lv_obj_set_size/width/height`
-- `lv_obj_set_content_width/height`
-- `lv_obj_align` 
-- `lv_obj_set_align` 
-- `lv_obj_align_to` 
-
-So if you don't use any complex feature (e.g. layouts) you don't have to worry about postponed layout recalculation. 
-
-However, if the coordinates are set by a style or layout the recalculation will be delayed.
-
-In some special cases even if the coordinates are set the by the above listed functions they can be incorrect. 
-For example if the width of an object is set in the percentage of parent width (e.g. `lv_pct(80)`) and the parent's size is set by a layout the child size might use non-updated size from the parent. 
-It will be recalculated automatically before the next screen redraw but if you need the final coordinates immediately after changing the coordinates and see incorrect values you need to use
-```c
-lv_obj_unpdate_layout(obj);
-``` 
-
-As the it can be seen form the above example the sizes and positions might depends on each other, therefore `lv_obj_unpdate_layout(obj)` recalculates the coordinates of all objects on the screen of `obj`.
+In other words, if you need to get the any coordinate of an object and it the coordinates were just changed LVGL's needs to be forced to recalculate to coordinates. 
+To do this call `lv_obj_update_layout(obj)`the size and position might depends on the parent or layout `lv_obj_update_layout` recalculates the coordinates of all objects on the screen of `obj`.
 
 #### Removing styles
 As it's described in the [Using styles](#using-styles) section the coordinates can be set via style properties too. 
