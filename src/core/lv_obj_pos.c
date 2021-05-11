@@ -62,8 +62,6 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
     if((res_x == LV_RES_OK && v_x.num != x) || res_x == LV_RES_INV) {
         lv_obj_set_style_x(obj, x, 0);
     }
-
-    lv_obj_refr_pos(obj);
 }
 
 void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
@@ -81,8 +79,6 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
     if((res_y == LV_RES_OK && v_y.num != y) || res_y == LV_RES_INV) {
         lv_obj_set_style_y(obj, y, 0);
     }
-
-    lv_obj_refr_pos(obj);
 }
 
 bool lv_obj_refr_size(lv_obj_t * obj)
@@ -251,8 +247,6 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
     if((res_w == LV_RES_OK && v_w.num != w) || res_w == LV_RES_INV) {
         lv_obj_set_style_width(obj, w, 0);
     }
-
-    lv_obj_refr_size(obj);
 }
 
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
@@ -266,8 +260,6 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
     if((res_h == LV_RES_OK && v_h.num != h) || res_h == LV_RES_INV) {
         lv_obj_set_style_height(obj, h, 0);
     }
-
-    lv_obj_refr_size(obj);
 }
 
 void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)

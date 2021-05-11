@@ -100,14 +100,14 @@ void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
 void lv_obj_set_height(struct _lv_obj_t * obj, lv_coord_t h);
 
 /**
- * Set the width reduced by the left and right padding.
+ * Set the width reduced by the left and right padding and the border width.
  * @param obj       pointer to an object
  * @param w         the width without paddings in pixels
  */
 void lv_obj_set_content_width(struct _lv_obj_t * obj, lv_coord_t w);
 
 /**
- * Set the height reduced by the top and bottom padding.
+ * Set the height reduced by the top and bottom padding and the border width.
  * @param obj       pointer to an object
  * @param h         the height without paddings in pixels
  */
@@ -250,21 +250,21 @@ lv_coord_t lv_obj_get_width(const struct _lv_obj_t * obj);
 lv_coord_t lv_obj_get_height(const struct _lv_obj_t * obj);
 
 /**
- * Get the width reduced by the left and right padding.
+ * Get the width reduced by the left and right padding and the border width.
  * @param obj       pointer to an object
  * @return          the width which still fits into its parent without causing overflow (making the parent scrollable)
  */
 lv_coord_t lv_obj_get_content_width(const struct _lv_obj_t * obj);
 
 /**
- * Get the height reduced by the top an bottom padding.
+ * Get the height reduced by the top an bottom padding and the border width.
  * @param obj       pointer to an object
  * @return          the height which still fits into the parent without causing overflow (making the parent scrollable)
  */
 lv_coord_t lv_obj_get_content_height(const struct _lv_obj_t * obj);
 
 /**
- * Get the area reduced by the paddings.
+ * Get the area reduced by the paddings and the border width.
  * @param obj       pointer to an object
  * @param area      the area which still fits into the parent without causing overflow (making the parent scrollable)
  */
