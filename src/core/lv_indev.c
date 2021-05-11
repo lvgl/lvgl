@@ -221,7 +221,7 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
     }
 }
 
-lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
+lv_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
 {
     return indev->proc.types.pointer.gesture_dir;
 }
@@ -234,7 +234,7 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev)
         return indev->proc.types.keypad.last_key;
 }
 
-lv_indev_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
+lv_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
 {
     if(indev == NULL) return false;
     if(indev->driver->type != LV_INDEV_TYPE_POINTER && indev->driver->type != LV_INDEV_TYPE_BUTTON) return false;
@@ -818,7 +818,8 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->long_pr_sent                 = 0;
             proc->types.pointer.scroll_sum.x     = 0;
             proc->types.pointer.scroll_sum.y     = 0;
-            proc->types.pointer.scroll_dir = LV_INDEV_SCROLL_DIR_NONE;
+            proc->types.pointer.scroll_dir = LV_DIR_NONE;
+            proc->types.pointer.gesture_dir = LV_DIR_NONE;
             proc->types.pointer.gesture_sent   = 0;
             proc->types.pointer.gesture_sum.x  = 0;
             proc->types.pointer.gesture_sum.y  = 0;
@@ -955,7 +956,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->proc.longpr_rep_timestamp            = 0;
         indev->proc.types.pointer.scroll_sum.x        = 0;
         indev->proc.types.pointer.scroll_sum.y        = 0;
-        indev->proc.types.pointer.scroll_dir = LV_INDEV_SCROLL_DIR_NONE;
+        indev->proc.types.pointer.scroll_dir = LV_DIR_NONE;
         indev->proc.types.pointer.scroll_throw_vect.x = 0;
         indev->proc.types.pointer.scroll_throw_vect.y = 0;
         indev->proc.types.pointer.gesture_sum.x     = 0;
@@ -1070,15 +1071,15 @@ void indev_gesture(lv_indev_proc_t * proc)
 
         if(LV_ABS(proc->types.pointer.gesture_sum.x) > LV_ABS(proc->types.pointer.gesture_sum.y)) {
             if(proc->types.pointer.gesture_sum.x > 0)
-                proc->types.pointer.gesture_dir = LV_GESTURE_DIR_RIGHT;
+                proc->types.pointer.gesture_dir = LV_DIR_RIGHT;
             else
-                proc->types.pointer.gesture_dir = LV_GESTURE_DIR_LEFT;
+                proc->types.pointer.gesture_dir = LV_DIR_LEFT;
         }
         else {
             if(proc->types.pointer.gesture_sum.y > 0)
-                proc->types.pointer.gesture_dir = LV_GESTURE_DIR_BOTTOM;
+                proc->types.pointer.gesture_dir = LV_DIR_BOTTOM;
             else
-                proc->types.pointer.gesture_dir = LV_GESTURE_DIR_TOP;
+                proc->types.pointer.gesture_dir = LV_DIR_TOP;
         }
 
         lv_event_send(gesture_obj, LV_EVENT_GESTURE, indev_act);

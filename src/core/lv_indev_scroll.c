@@ -65,7 +65,7 @@ void _lv_indev_scroll_handler(lv_indev_proc_t * proc)
         lv_coord_t diff_x = 0;
         lv_coord_t diff_y = 0;
 
-        if(proc->types.pointer.scroll_dir == LV_INDEV_SCROLL_DIR_HOR) {
+        if(proc->types.pointer.scroll_dir == LV_DIR_HOR) {
             lv_coord_t sr = lv_obj_get_scroll_right(scroll_obj);
             lv_coord_t sl = lv_obj_get_scroll_left(scroll_obj);
             diff_x = elastic_diff(scroll_obj, proc->types.pointer.vect.x, sl, sr, LV_DIR_HOR);
@@ -95,7 +95,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     if(scroll_obj == NULL) return;
-    if(proc->types.pointer.scroll_dir == LV_INDEV_SCROLL_DIR_NONE) return;
+    if(proc->types.pointer.scroll_dir == LV_DIR_NONE) return;
 
 
     lv_indev_t * indev_act = lv_indev_get_act();
@@ -109,7 +109,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
     lv_scroll_snap_t align_x = lv_obj_get_scroll_snap_x(scroll_obj);
     lv_scroll_snap_t align_y = lv_obj_get_scroll_snap_y(scroll_obj);
 
-    if(proc->types.pointer.scroll_dir == LV_INDEV_SCROLL_DIR_VER) {
+    if(proc->types.pointer.scroll_dir == LV_DIR_VER) {
         proc->types.pointer.scroll_throw_vect.x = 0;
         /*If no snapping "throw"*/
         if(align_y == LV_SCROLL_SNAP_NONE) {
@@ -132,7 +132,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
             lv_obj_scroll_by(scroll_obj, 0, diff_y + y, LV_ANIM_ON);
         }
     }
-    else if(proc->types.pointer.scroll_dir == LV_INDEV_SCROLL_DIR_HOR) {
+    else if(proc->types.pointer.scroll_dir == LV_DIR_HOR) {
         proc->types.pointer.scroll_throw_vect.y = 0;
         /*If no snapping "throw"*/
         if(align_x == LV_SCROLL_SNAP_NONE) {
@@ -190,7 +190,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
         lv_event_send(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(proc->reset_query) return;
 
-        proc->types.pointer.scroll_dir = LV_INDEV_SCROLL_DIR_NONE;
+        proc->types.pointer.scroll_dir = LV_DIR_NONE;
         proc->types.pointer.scroll_obj = NULL;
     }
 }
@@ -297,7 +297,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
                         (down_en  && proc->types.pointer.scroll_sum.y <= - scroll_limit)))
         {
             obj_candidate = obj_act;
-            dir_candidate = LV_INDEV_SCROLL_DIR_VER;
+            dir_candidate = LV_DIR_VER;
         }
 
         if((sl > 0 || sr > 0)  &&
@@ -305,7 +305,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
                         (right_en  && proc->types.pointer.scroll_sum.x <= - scroll_limit)))
         {
             obj_candidate = obj_act;
-            dir_candidate = LV_INDEV_SCROLL_DIR_HOR;
+            dir_candidate = LV_DIR_HOR;
         }
 
         if(st <= 0) up_en = false;
@@ -319,7 +319,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
                 (up_en    && proc->types.pointer.scroll_sum.y >=   scroll_limit) ||
                 (down_en  && proc->types.pointer.scroll_sum.y <= - scroll_limit))
         {
-            proc->types.pointer.scroll_dir = hor_en ? LV_INDEV_SCROLL_DIR_HOR : LV_INDEV_SCROLL_DIR_VER;
+            proc->types.pointer.scroll_dir = hor_en ? LV_DIR_HOR : LV_DIR_VER;
             break;
         }
 

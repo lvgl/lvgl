@@ -59,34 +59,19 @@ struct _lv_indev_t;
 struct _lv_indev_drv_t;
 
 /** Possible input device types*/
-enum {
+typedef enum {
     LV_INDEV_TYPE_NONE,    /**< Uninitialized state*/
     LV_INDEV_TYPE_POINTER, /**< Touch pad, mouse, external button*/
     LV_INDEV_TYPE_KEYPAD,  /**< Keypad or keyboard*/
     LV_INDEV_TYPE_BUTTON,  /**< External (hardware button) which is assigned to a specific point of the screen*/
     LV_INDEV_TYPE_ENCODER, /**< Encoder with only Left, Right turn and a Button*/
-};
-typedef uint8_t lv_indev_type_t;
+} lv_indev_type_t;
 
 /** States for input devices*/
-enum { LV_INDEV_STATE_RELEASED = 0, LV_INDEV_STATE_PRESSED };
-typedef uint8_t lv_indev_state_t;
-
-enum {
-    LV_INDEV_SCROLL_DIR_NONE,
-    LV_INDEV_SCROLL_DIR_HOR,
-    LV_INDEV_SCROLL_DIR_VER,
-};
-
-typedef uint8_t lv_indev_scroll_dir_t;
-
-enum {
-    LV_GESTURE_DIR_TOP,     /**< Gesture dir up.*/
-    LV_GESTURE_DIR_BOTTOM,  /**< Gesture dir down.*/
-    LV_GESTURE_DIR_LEFT,    /**< Gesture dir left.*/
-    LV_GESTURE_DIR_RIGHT,   /**< Gesture dir right.*/
-};
-typedef uint8_t lv_gesture_dir_t;
+typedef enum {
+    LV_INDEV_STATE_RELEASED = 0,
+    LV_INDEV_STATE_PRESSED
+} lv_indev_state_t;
 
 /** Data structure passed to an input driver to fill*/
 typedef struct {
@@ -171,8 +156,8 @@ typedef struct _lv_indev_proc_t {
 
             lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
             /*Flags*/
-            lv_indev_scroll_dir_t scroll_dir : 2;
-            lv_gesture_dir_t gesture_dir : 2;
+            lv_dir_t scroll_dir : 4;
+            lv_dir_t gesture_dir : 4;
             uint8_t gesture_sent : 1;
         } pointer;
         struct {
