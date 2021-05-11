@@ -54,6 +54,7 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
 
     const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
 
+    lv_obj_update_layout(calendar);
     lv_coord_t w = lv_obj_get_width(calendar);
     lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
