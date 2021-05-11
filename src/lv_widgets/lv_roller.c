@@ -481,7 +481,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
                                label); /*Proportional position from the middle line (upscaled)*/
 
             /*Apply a correction with different line heights*/
-            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
+            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_SELECTED);
             lv_coord_t corr = (label_dsc.font->line_height - normal_label_font->line_height) / 2;
 
             /*Apply the proportional position to the selected text*/
