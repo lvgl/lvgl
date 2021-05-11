@@ -28,7 +28,7 @@ extern "C" {
 void lv_example_arc_1(void);
 void lv_example_arc_2(void);
 
-void lv_example_animimg(void);
+void lv_example_animimg_1(void);
 
 void lv_example_bar_1(void);
 void lv_example_bar_2(void);
