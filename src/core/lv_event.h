@@ -206,6 +206,28 @@ bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
  */
 bool lv_obj_remove_event_dsc(struct _lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc);
 
+/**
+ * Get the input device passed as parameter to indev related events.
+ * @param e     pointer to an event
+ * @return      the indev that triggered the event or NULL if called on a not indev related event
+ */
+lv_indev_t * lv_event_get_indev(lv_event_t * e);
+
+/**
+ * Get the part draw descriptor passed as parameter to `LV_EVENT_DRAW_PART_BEGIN/END`.
+ * @param e     pointer to an event
+ * @return      the part draw descriptor to hook the drawing or NULL if called on an unrelated event
+ */
+lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e);
+
+/**
+ * Get the clip area passed as parameter to draw events events.
+ * Namely: `LV_EVENT_DRAW_MAIN/POST`, `LV_EVENT_DRAW_MAIN/POST_BEGIN`, `LV_EVENT_DRAW_MAIN/POST_END`
+ * @param e     pointer to an event
+ * @return      the clip area to use during drawing or NULL if called on an unrelated event
+ */
+const lv_area_t * lv_event_get_clip_area(lv_event_t * e);
+
 /**********************
  *      MACROS
  **********************/

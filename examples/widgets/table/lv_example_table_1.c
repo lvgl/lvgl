@@ -4,7 +4,7 @@
 static void draw_part_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
     /*If the cells are drawn...*/
     if(dsc->part == LV_PART_ITEMS) {
         uint32_t row = dsc->id /  lv_table_get_col_cnt(obj);

@@ -7,7 +7,7 @@ static void event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
 
         /*Change the draw descriptor the 2nd button*/
         if(dsc->id == 1) {
@@ -34,7 +34,7 @@ static void event_cb(lv_event_t * e)
         }
     }
     if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
 
         /*Add custom content to the 4th button when the button itself was drawn*/
         if(dsc->id == 3) {

@@ -33,7 +33,7 @@ static void slider_event_cb(lv_event_t * e)
         *size = LV_MAX(*size, 50);
     }
     else if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
         if(dsc->part == LV_PART_INDICATOR) {
             char buf[16];
             lv_snprintf(buf, sizeof(buf), "%d - %d", lv_slider_get_left_value(obj), lv_slider_get_value(obj));
