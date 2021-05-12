@@ -219,6 +219,8 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
     tr->delay = delay;
 #if LV_USE_USER_DATA
     tr->user_data = user_data;
+#else
+    LV_UNUSED(user_data);
 #endif
 }
 
