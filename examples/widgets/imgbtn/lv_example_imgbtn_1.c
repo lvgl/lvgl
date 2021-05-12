@@ -10,7 +10,7 @@ void lv_example_imgbtn_1(void)
     /*Create a transition animation on width transformation and recolor.*/
     static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA, 0};
     static lv_style_transition_dsc_t tr;
-    lv_style_transition_dsc_init(&tr, tr_prop, lv_anim_path_linear, 200, 0);
+    lv_style_transition_dsc_init(&tr, tr_prop, lv_anim_path_linear, 200, 0, NULL);
 
     static lv_style_t style_def;
     lv_style_init(&style_def);

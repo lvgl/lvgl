@@ -212,6 +212,61 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
     return false;
 }
 
+lv_indev_t * lv_event_get_indev(lv_event_t * e)
+{
+
+    if(e->code == LV_EVENT_PRESSED ||
+        e->code == LV_EVENT_PRESSING ||
+        e->code == LV_EVENT_PRESS_LOST ||
+        e->code == LV_EVENT_SHORT_CLICKED ||
+        e->code == LV_EVENT_LONG_PRESSED ||
+        e->code == LV_EVENT_LONG_PRESSED_REPEAT ||
+        e->code == LV_EVENT_CLICKED ||
+        e->code == LV_EVENT_RELEASED ||
+        e->code == LV_EVENT_SCROLL_BEGIN ||
+        e->code == LV_EVENT_SCROLL_END ||
+        e->code == LV_EVENT_SCROLL ||
+        e->code == LV_EVENT_GESTURE ||
+        e->code == LV_EVENT_KEY ||
+        e->code == LV_EVENT_FOCUSED ||
+        e->code == LV_EVENT_DEFOCUSED ||
+        e->code == LV_EVENT_LEAVE)
+    {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
+}
+
+lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_DRAW_PART_BEGIN||
+        e->code == LV_EVENT_DRAW_PART_END)
+    {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
+}
+
+const lv_area_t * lv_event_get_clip_area(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_DRAW_MAIN ||
+        e->code == LV_EVENT_DRAW_MAIN_BEGIN ||
+        e->code == LV_EVENT_DRAW_MAIN_END ||
+        e->code == LV_EVENT_DRAW_POST ||
+        e->code == LV_EVENT_DRAW_POST_BEGIN ||
+        e->code == LV_EVENT_DRAW_POST_END)
+    {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
+}
+
 
 /**********************
  *   STATIC FUNCTIONS

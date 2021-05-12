@@ -661,7 +661,7 @@ static void draw_main(lv_event_t * e)
     char * txt_ap = lv_mem_buf_get(txt_ap_size);
 #endif
 
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.part = LV_PART_ITEMS;
     dsc.rect_dsc = &draw_rect_dsc_act;

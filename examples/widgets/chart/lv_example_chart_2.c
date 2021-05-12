@@ -10,7 +10,7 @@ static void draw_event_cb(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     /*Add the faded area before the lines are drawn*/
-    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
     if(dsc->part == LV_PART_ITEMS) {
         if(!dsc->p1 || !dsc->p2) return;
 

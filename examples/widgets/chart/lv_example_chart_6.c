@@ -20,7 +20,7 @@ static void event_cb(lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+        lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
         if(dsc->part == LV_PART_CURSOR && dsc->p1 && dsc->p2 && dsc->p1->y == dsc->p2->y && last_id >= 0) {
             lv_coord_t * data_array = lv_chart_get_array(chart, ser);
             lv_coord_t v = data_array[last_id];

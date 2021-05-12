@@ -11,7 +11,7 @@ void lv_example_slider_2(void)
     /*Create a transition*/
     static const lv_style_prop_t props[] = {LV_STYLE_BG_COLOR, 0};
     static lv_style_transition_dsc_t transition_dsc;
-    lv_style_transition_dsc_init(&transition_dsc, props, lv_anim_path_linear, 300, 0);
+    lv_style_transition_dsc_init(&transition_dsc, props, lv_anim_path_linear, 300, 0, NULL);
 
     static lv_style_t style_main;
     static lv_style_t style_indicator;

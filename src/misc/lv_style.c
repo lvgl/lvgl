@@ -210,13 +210,18 @@ lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_va
    return lv_style_get_prop_inlined(style, prop, value);
 }
 
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay)
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
 {
     lv_memset_00(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
     tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
     tr->time = time;
     tr->delay = delay;
+#if LV_USE_USER_DATA
+    tr->user_data = user_data;
+#else
+    LV_UNUSED(user_data);
+#endif
 }
 
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)

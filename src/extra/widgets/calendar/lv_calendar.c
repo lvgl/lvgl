@@ -255,7 +255,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void draw_part_begin_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
     if(dsc->part == LV_PART_ITEMS) {
         /*Day name styles*/
         if(dsc->id < 7) {

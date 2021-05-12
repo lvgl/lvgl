@@ -372,7 +372,7 @@ static void draw_knob(lv_event_t * e)
     position_knob(obj, &knob_area, knob_size, hor);
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.part = LV_PART_KNOB;
     dsc.id = 0;

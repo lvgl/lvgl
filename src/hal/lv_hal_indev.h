@@ -81,6 +81,7 @@ typedef struct {
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
     lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
+    bool continue_reading;  /**< Call the read callback until it's set to true*/
 } lv_indev_data_t;
 
 /** Initialized by the user and registered by 'lv_indev_add()'*/
@@ -89,10 +90,8 @@ typedef struct _lv_indev_drv_t {
     /**< Input device type*/
     lv_indev_type_t type;
 
-    /**< Function pointer to read input device data.
-     * Return 'true' if there is more data to be read (buffered).
-     * Most drivers can safely return 'false'*/
-    bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+    /**< Function pointer to read input device data.*/
+    void (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 
     /** Called when an action happened on the input device.
      * The second parameter is the event from `lv_event_t`*/
@@ -220,9 +219,8 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
  * Read data from an input device.
  * @param indev pointer to an input device
  * @param data input device will write its data here
- * @return false: no more data; true: there more data to read (buffered)
  */
-bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
+void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  *      MACROS

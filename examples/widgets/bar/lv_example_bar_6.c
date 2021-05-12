@@ -8,7 +8,7 @@ static void set_value(void *bar, int32_t v)
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_draw_dsc_t * dsc = lv_event_get_param(e);
+    lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
     if(dsc->part != LV_PART_INDICATOR) return;
 
     lv_obj_t * obj= lv_event_get_target(e);

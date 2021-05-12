@@ -382,7 +382,7 @@ static void draw_indic(lv_event_t * e)
     /*Do not draw a zero length indicator but at least call the draw part events*/
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
 
-        lv_obj_draw_dsc_t obj_draw_dsc;
+        lv_obj_draw_part_dsc_t obj_draw_dsc;
         lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
         obj_draw_dsc.part = LV_PART_INDICATOR;
         obj_draw_dsc.draw_area = &bar->indic_area;
@@ -403,7 +403,7 @@ static void draw_indic(lv_event_t * e)
     lv_draw_rect_dsc_init(&draw_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
-    lv_obj_draw_dsc_t obj_draw_dsc;
+    lv_obj_draw_part_dsc_t obj_draw_dsc;
     lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
     obj_draw_dsc.part = LV_PART_INDICATOR;
     obj_draw_dsc.rect_dsc = &draw_rect_dsc;

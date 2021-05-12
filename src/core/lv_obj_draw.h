@@ -49,7 +49,7 @@ typedef struct
     uint32_t id;
     uint32_t part;
     const void * sub_part_ptr;
-}lv_obj_draw_dsc_t;
+}lv_obj_draw_part_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -118,7 +118,7 @@ lv_coord_t lv_obj_calculate_ext_draw_size(struct _lv_obj_t * obj, uint32_t part)
  * @param dsc pointer to a descriptor. Later it should be passed as parameter to an `LV_EEVNT_DRAW_PART_BEGIN/END` event.
  * @param clip_area the current clip area of the drawing
  */
-void lv_obj_draw_dsc_init(lv_obj_draw_dsc_t * dsc, const lv_area_t * clip_area);
+void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, const lv_area_t * clip_area);
 
 /**
  * Send a 'LV_EVENT_REFR_EXT_DRAW_SIZE' Call the ancestor's event handler to the object to refresh the value of the extended draw size.

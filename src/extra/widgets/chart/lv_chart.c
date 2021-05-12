@@ -682,7 +682,7 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
-    lv_obj_draw_dsc_t obj_draw_dsc;
+    lv_obj_draw_part_dsc_t obj_draw_dsc;
     lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
     obj_draw_dsc.line_dsc = &line_dsc;
     obj_draw_dsc.part = LV_PART_MAIN;
@@ -804,7 +804,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
         y_tmp  = y_tmp / (chart->ymax[ser->y_axis] - chart->ymin[ser->y_axis]);
         p2.y   = h - y_tmp + y_ofs;
 
-        lv_obj_draw_dsc_t dsc;
+        lv_obj_draw_part_dsc_t dsc;
         lv_obj_draw_dsc_init(&dsc, clip_area);
         dsc.part = LV_PART_ITEMS;
         dsc.line_dsc = &line_dsc_default;
@@ -941,7 +941,7 @@ static void draw_series_bar(lv_obj_t * obj, const lv_area_t * clip_area)
     bool mask_ret = _lv_area_intersect(&series_mask, &obj->coords, clip_area);
     if(mask_ret == false) return;
 
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, &series_mask);
     dsc.part = LV_PART_ITEMS;
 
@@ -1009,7 +1009,7 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_CURSOR) / 2;
     lv_coord_t point_h = lv_obj_get_style_width(obj, LV_PART_CURSOR) / 2;
 
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.line_dsc = &line_dsc_tmp;
     dsc.rect_dsc = &point_dsc_tmp;
@@ -1106,7 +1106,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
         minor_len *= -1;
     }
 
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.id = axis;
     dsc.part = LV_PART_TICKS;
@@ -1212,7 +1212,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area)
     line_dsc.dash_gap = 0;
     line_dsc.dash_width = 0;
 
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.id = LV_CHART_AXIS_X;
     dsc.part = LV_PART_TICKS;

@@ -76,10 +76,11 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     indev_proc_reset_query_handler(indev_act);
 
     if(indev_act->proc.disabled) return;
-    bool more_to_read;
+    bool continue_reading;
     do {
         /*Read the data*/
-        more_to_read = _lv_indev_read(indev_act, &data);
+        _lv_indev_read(indev_act, &data);
+        continue_reading = data.continue_reading;
 
         /*The active object might deleted even in the read function*/
         indev_proc_reset_query_handler(indev_act);
@@ -109,7 +110,7 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
         }
         /*Handle reset query if it happened in during processing*/
         indev_proc_reset_query_handler(indev_act);
-    } while(more_to_read);
+    } while(continue_reading);
 
     /*End of indev processing, so no act indev*/
     indev_act     = NULL;
