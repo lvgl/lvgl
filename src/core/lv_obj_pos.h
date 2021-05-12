@@ -277,7 +277,7 @@ void lv_obj_get_content_coords(const struct _lv_obj_t * obj, lv_area_t * area);
  * @note            This size independent from the real size of the widget.
  *                  It just tells how large the internal ("virtual") content is.
  */
-lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_self_width(const struct _lv_obj_t * obj);
 
 /**
  * Get the height occupied by the "parts" of the widget. E.g. the height of all rows of a table.
@@ -286,7 +286,7 @@ lv_coord_t lv_obj_get_self_width(struct _lv_obj_t * obj);
  * @note            This size independent from the real size of the widget.
  *                  It just tells how large the internal ("virtual") content is.
  */
-lv_coord_t lv_obj_get_self_height(struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_self_height(const struct _lv_obj_t * obj);
 
 /**
  * Handle if the size of the internal ("virtual") content of an object has changed.

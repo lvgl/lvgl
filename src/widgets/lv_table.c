@@ -619,7 +619,7 @@ static void draw_main(lv_event_t * e)
     bool rtl = lv_obj_get_base_dir(obj)  == LV_BIDI_DIR_RTL ? true : false;
 
     /*Handle custom drawer*/
-    lv_obj_draw_dsc_t dsc;
+    lv_obj_draw_part_dsc_t dsc;
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.part = LV_PART_ITEMS;
     dsc.rect_dsc = &rect_dsc_act;

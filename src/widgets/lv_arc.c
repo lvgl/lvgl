@@ -687,7 +687,7 @@ static void lv_arc_draw(lv_event_t * e)
     lv_coord_t arc_r;
     get_center(obj, &center, &arc_r);
 
-    lv_obj_draw_dsc_t obj_draw_dsc;
+    lv_obj_draw_part_dsc_t obj_draw_dsc;
     lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
 
     /*Draw the background arc*/

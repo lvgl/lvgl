@@ -324,9 +324,9 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
     return s;
 }
 
-void lv_obj_draw_dsc_init(lv_obj_draw_dsc_t * dsc, const lv_area_t * clip_area)
+void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, const lv_area_t * clip_area)
 {
-    lv_memset_00(dsc, sizeof(lv_obj_draw_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_obj_draw_part_dsc_t));
     dsc->clip_area = clip_area;
 }
 
