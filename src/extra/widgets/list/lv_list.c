@@ -73,13 +73,12 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt, lv_event_cb_t event_cb)
+lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt)
 {
     LV_LOG_INFO("begin")
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_btn_class, list);
     lv_obj_class_init_obj(obj);
     lv_obj_set_size(obj, LV_PCT(100), LV_SIZE_CONTENT);
-    if(event_cb) lv_obj_add_event_cb(obj, event_cb, LV_EVENT_ALL, NULL);
 
     if(icon) {
         lv_obj_t * img = lv_img_create(obj);

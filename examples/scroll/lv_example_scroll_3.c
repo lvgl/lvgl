@@ -12,7 +12,7 @@ static void float_btn_event_cb(lv_event_t * e)
         lv_obj_t * list = lv_event_get_user_data(e);
         char buf[32];
         lv_snprintf(buf, sizeof(buf), "Track %d", btn_cnt);
-        lv_obj_t * list_btn = lv_list_add_btn(list, LV_SYMBOL_AUDIO, buf, NULL);
+        lv_obj_t * list_btn = lv_list_add_btn(list, LV_SYMBOL_AUDIO, buf);
         btn_cnt++;
 
         lv_obj_move_foreground(float_btn);
@@ -33,7 +33,7 @@ void lv_example_scroll_3(void)
     for(btn_cnt = 1; btn_cnt <= 2; btn_cnt++) {
         char buf[32];
         lv_snprintf(buf, sizeof(buf), "Track %d", btn_cnt);
-        lv_list_add_btn(list, LV_SYMBOL_AUDIO, buf, NULL);
+        lv_list_add_btn(list, LV_SYMBOL_AUDIO, buf);
     }
 
     lv_obj_t * float_btn = lv_btn_create(list);
