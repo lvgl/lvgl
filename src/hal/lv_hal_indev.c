@@ -127,12 +127,9 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
  * Read data from an input device.
  * @param indev pointer to an input device
  * @param data input device will write its data here
- * @return false: no more data; true: there more data to read (buffered)
  */
-bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
+void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    bool cont = false;
-
     lv_memset_00(data, sizeof(lv_indev_data_t));
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
@@ -152,13 +149,11 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     if(indev->driver->read_cb) {
         INDEV_TRACE("calling indev_read_cb");
-        cont = indev->driver->read_cb(indev->driver, data);
+        indev->driver->read_cb(indev->driver, data);
     }
     else {
         LV_LOG_WARN("indev_read_cb is not registered");
     }
-
-    return cont;
 }
 
 /**********************
