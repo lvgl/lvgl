@@ -163,8 +163,9 @@ static void grid_update(lv_obj_t * cont, void * user_data)
 
     /*Calculate the grids absolute x and y coordinates.
      *It will be used as helper during item repositioning to avoid calculating this value for every children*/
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_PART_MAIN);
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_PART_MAIN);
+    lv_coord_t border_widt = lv_obj_get_style_border_width(cont, LV_PART_MAIN);
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_PART_MAIN) + border_widt;
+    lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_PART_MAIN) + border_widt;
     hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
     hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
 
