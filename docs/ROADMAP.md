@@ -9,7 +9,7 @@ Planned to May 2021
 - Create an `extra` folder for complex widgets
    - It makes the core LVGL leaner
    - In `extra` we can have a lot and specific widgets
-   - Good place for contribution
+   - Good place for contributions
 - New scrolling:
   - See [feat/new-scroll](https://github.com/lvgl/lvgl/tree/feat/new-scroll) branch and  [#1614](https://github.com/lvgl/lvgl/issues/1614)) issue.
   - Remove `lv_page` and support scrolling on `lv_obj`
