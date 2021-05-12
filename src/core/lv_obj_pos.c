@@ -370,8 +370,10 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
     lv_coord_t x = 0;
     lv_coord_t y = 0;
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
-    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
+
+    lv_coord_t border_width = lv_obj_get_style_border_width(parent, LV_PART_MAIN);
+    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN) + border_width;
+    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN) + border_width;
     switch(align) {
     case LV_ALIGN_CENTER:
         x = lv_obj_get_content_width(base) / 2 - lv_obj_get_width(obj) / 2;
