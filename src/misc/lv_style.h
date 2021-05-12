@@ -385,15 +385,16 @@ static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_pr
  * Initialize a transition descriptor.
  * @param tr        pointer to a transition descriptor to initialize
  * @param props     an array with the properties to transition. The last element must be zero.
- * @param path_cb  and animation path (ease) callback. If `NULL` liner path will be used.
+ * @param path_cb   an animation path (ease) callback. If `NULL` liner path will be used.
  * @param time      duration of the transition in [ms]
  * @param delay     delay before the transition in [ms]
+ * @param user_data any custom data that will be saved in the transition animation and will be available when `path_cb` is called
  * @example
  * const static lv_style_prop_t trans_props[] = { LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, 0 };
  *  static lv_style_transition_dsc_t trans1;
- *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0);
+ *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0, NULL);
  */
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay);
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data);
 
 /**
  * Get the default value of a property

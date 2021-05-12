@@ -14,12 +14,12 @@ void lv_example_btn_3(void)
     /*Transition descriptor when going back to the default state.
      *Add some delay to be sure the press transition is visible even if the press was very short*/
     static lv_style_transition_dsc_t transition_dsc_def;
-    lv_style_transition_dsc_init(&transition_dsc_def, props, lv_anim_path_overshoot, 250, 100);
+    lv_style_transition_dsc_init(&transition_dsc_def, props, lv_anim_path_overshoot, 250, 100, NULL);
 
     /*Transition descriptor when going to pressed state.
      *No delay, go to presses state immediately*/
     static lv_style_transition_dsc_t transition_dsc_pr;
-    lv_style_transition_dsc_init(&transition_dsc_pr, props, lv_anim_path_ease_in_out, 250, 0);
+    lv_style_transition_dsc_init(&transition_dsc_pr, props, lv_anim_path_ease_in_out, 250, 0, NULL);
 
     /*Add only the new transition to he default state*/
     static lv_style_t style_def;

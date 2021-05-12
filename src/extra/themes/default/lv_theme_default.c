@@ -213,10 +213,10 @@ static void style_init(void)
     color_grey = theme.flags & MODE_DARK ? DARK_COLOR_GREY : LIGHT_COLOR_GREY;
 
     static lv_style_transition_dsc_t trans_delayed;
-    lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70);
+    lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70, NULL);
 
     static lv_style_transition_dsc_t trans_normal;
-    lv_style_transition_dsc_init(&trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0);
+    lv_style_transition_dsc_init(&trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0, NULL);
 
     style_init_reset(&styles->transition_delayed);
     lv_style_set_transition(&styles->transition_delayed, &trans_delayed); /*Go back to default state with delay*/

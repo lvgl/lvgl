@@ -47,7 +47,7 @@ void lv_example_btn_2(void)
     /*Add a transition to the the outline*/
     static lv_style_transition_dsc_t trans;
     static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH, LV_STYLE_OUTLINE_OPA, 0};
-    lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear, 300, 0);
+    lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear, 300, 0, NULL);
 
     lv_style_set_transition(&style_pr, &trans);
 
