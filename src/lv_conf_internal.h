@@ -1393,6 +1393,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+#ifndef LV_USE_SPAN
+#  ifdef CONFIG_LV_USE_SPAN
+#    define LV_USE_SPAN CONFIG_LV_USE_SPAN
+#  else
+#    define  LV_USE_SPAN          1
+#  endif
+#endif
+
 /*-----------
  * Themes
  *----------*/
