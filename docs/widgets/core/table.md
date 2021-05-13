@@ -66,7 +66,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/widgets/core/table/index.rst
+.. include:: ../../../examples/widgets/table/index.rst
 
 ```
 

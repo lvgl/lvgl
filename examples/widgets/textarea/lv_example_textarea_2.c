@@ -12,7 +12,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_text(pwd_ta, "");
     lv_textarea_set_password_mode(pwd_ta, true);
     lv_textarea_set_one_line(pwd_ta, true);
-    lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
+    lv_obj_set_width(pwd_ta, lv_pct(40));
     lv_obj_set_pos(pwd_ta, 5, 20);
     lv_obj_add_event_cb(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
 
@@ -25,6 +25,7 @@ void lv_example_textarea_2(void)
     lv_obj_t * text_ta = lv_textarea_create(lv_scr_act());
     lv_textarea_set_one_line(text_ta, true);
     lv_textarea_set_password_mode(text_ta, false);
+    lv_obj_set_width(text_ta, lv_pct(40));
     lv_obj_add_event_cb(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_align(text_ta, LV_ALIGN_TOP_RIGHT, -5, 20);
 

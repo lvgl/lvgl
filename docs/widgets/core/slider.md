@@ -50,7 +50,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/core/slider/index.rst
+.. include:: ../../../examples/widgets/slider/index.rst
 
 ```
 
