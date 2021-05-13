@@ -89,7 +89,9 @@ const lv_obj_class_t lv_spangroup_class  = {
  */
 lv_obj_t * lv_spangroup_create(lv_obj_t * par)
 {
-    return lv_obj_class_create_obj(&lv_spangroup_class, par, NULL);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_spangroup_class, par);
+    lv_obj_class_init_obj(obj);
+    return obj;
 }
 
 /**
