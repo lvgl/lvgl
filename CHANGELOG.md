@@ -19,7 +19,7 @@
 - fix(list) scroll list when button is focused using LV_KEY_NEXT/PREV
 - fix(text) improve Arabic contextual analysis by adding hyphen processing and proper handling of lam-alef sequence
 - fix(delete) delete animation after the children are deleted
-- fix(gauge) consider paddigns for needle images
+- fix(gauge) consider paddings for needle images
 
 ## v7.10.0
 
