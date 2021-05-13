@@ -116,7 +116,7 @@ typedef struct {
  * `res` should be set like this:
  *   - If already set to ::LV_DRAW_RES_MASKED do nothing
  *   - If there is a draw mask on the object set to ::LV_DRAW_RES_MASKED
- *   - If there is no draw mask but the object simply not covers the area to ::LV_DRAW_RES_NOT_COVER
+ *   - If there is no draw mask but the object simply not covers the area set ::LV_DRAW_RES_NOT_COVER
  *   - If the area is fully covered by the object leave `res` unchanged.
  */
 typedef struct {
