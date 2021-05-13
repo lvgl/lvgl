@@ -56,10 +56,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     if(mbox == NULL) return NULL;
 
     if(auto_parent) lv_obj_add_flag(mbox, LV_MSGBOX_FLAG_AUTO_PARENT);
-    lv_coord_t w = lv_obj_get_content_width(parent);
-    if(w > 2 * LV_DPI_DEF) w = 2 * LV_DPI_DEF;
 
-    lv_obj_set_size(mbox, w, LV_SIZE_CONTENT);
+    lv_obj_set_size(mbox, LV_DPI_DEF * 2, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(mbox, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(mbox, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
@@ -76,7 +74,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         lv_obj_add_event_cb(close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
         label = lv_label_create(close_btn);
         lv_label_set_text(label, LV_SYMBOL_CLOSE);
-        lv_coord_t close_btn_size = LV_MAX(lv_obj_get_width(label), lv_obj_get_height(label)) + LV_DPX(10);
+        const lv_font_t * font = lv_obj_get_style_text_font(close_btn, LV_PART_MAIN);
+        lv_coord_t close_btn_size = lv_font_get_line_height(font) + LV_DPX(10);
         lv_obj_set_size(close_btn, close_btn_size, close_btn_size);
         lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
     }

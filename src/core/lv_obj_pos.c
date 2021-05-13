@@ -140,7 +140,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
 
         lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
         lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
-        h = lv_clamp_width(h, minh, maxh, parent_h);
+        h = lv_clamp_height(h, minh, maxh, parent_h);
     }
 
     /*calc_auto_size set the scroll x/y to 0 so revert the original value*/

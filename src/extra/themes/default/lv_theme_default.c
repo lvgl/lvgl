@@ -125,7 +125,7 @@ typedef struct {
 #endif
 
 #if LV_USE_MSGBOX
-    lv_style_t msgbox_btns_bg;
+    lv_style_t msgbox_bg, msgbox_btn_bg;
 #endif
 
 #if LV_USE_KEYBOARD
@@ -498,9 +498,12 @@ static void style_init(void)
 #endif
 
 #if LV_USE_MSGBOX
-    /*To add space for the buttons outline*/
-    style_init_reset(&styles->msgbox_btns_bg);
-    lv_style_set_pad_all(&styles->msgbox_btns_bg, OUTLINE_WIDTH);
+    /*To add space for for the button shadow*/
+    style_init_reset(&styles->msgbox_btn_bg);
+    lv_style_set_pad_all(&styles->msgbox_btn_bg, LV_DPX(4));
+
+    style_init_reset(&styles->msgbox_bg);
+    lv_style_set_max_width(&styles->msgbox_bg, lv_pct(100));
 #endif
 #if LV_USE_KEYBOARD
     style_init_reset(&styles->keyboard_btn_bg);
@@ -668,7 +671,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_btnmatrix_class)) {
 #if LV_USE_MSGBOX
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
-            lv_obj_add_style(obj, &styles->msgbox_btns_bg, 0);
+            lv_obj_add_style(obj, &styles->msgbox_btn_bg, 0);
             lv_obj_add_style(obj, &styles->pad_gap, 0);
             lv_obj_add_style(obj, &styles->btn, LV_PART_ITEMS);
             lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
@@ -914,6 +917,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_MSGBOX
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
+        lv_obj_add_style(obj, &styles->msgbox_bg, 0);
         return;
     }
 #endif
