@@ -25,8 +25,12 @@ extern "C" {
  * @return a special track size
  */
 #define LV_GRID_FR(x)          (LV_COORD_MAX - 100 + x)
+
 #define LV_GRID_CONTENT        (LV_COORD_MAX - 101)
+LV_EXPORT_CONST_INT(LV_GRID_CONTENT);
+
 #define LV_GRID_TEMPLATE_LAST  (LV_COORD_MAX)
+LV_EXPORT_CONST_INT(LV_GRID_TEMPLATE_LAST);
 
 /**********************
  *      TYPEDEFS

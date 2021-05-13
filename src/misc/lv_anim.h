@@ -34,6 +34,7 @@ typedef enum {
 }lv_anim_enable_t;
 
 #define LV_ANIM_REPEAT_INFINITE      0xFFFF
+LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
 
 struct _lv_anim_t;
 struct _lv_anim_path_t;

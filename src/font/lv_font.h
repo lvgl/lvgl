@@ -118,6 +118,15 @@ static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font_p)
     return font_p->line_height;
 }
 
+/**
+ * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function is some cases
+ * @return  pointer to LV_FONT_DEFAULT
+ */
+static inline const lv_font_t * lv_font_default(void)
+{
+    return LV_FONT_DEFAULT;
+}
+
 /**********************
  *      MACROS
  **********************/
