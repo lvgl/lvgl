@@ -157,7 +157,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if (code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
        lv_obj_invalidate(obj);
     }
-    else if (code == LV_EVENT_REFR_SELF_SIZE) {
+    else if (code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 

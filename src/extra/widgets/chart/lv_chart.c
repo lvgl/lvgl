@@ -644,7 +644,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_X].draw_size,
                      chart->tick[LV_CHART_AXIS_PRIMARY_Y].draw_size, chart->tick[LV_CHART_AXIS_SECONDARY_Y].draw_size);
-    } else if(code == LV_EVENT_REFR_SELF_SIZE) {
+    } else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         p->x = (lv_obj_get_content_width(obj) * chart->zoom_x) >> 8;
         p->y = (lv_obj_get_content_height(obj) * chart->zoom_y) >> 8;

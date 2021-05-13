@@ -595,14 +595,14 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 lv_coord_t lv_obj_get_self_width(const lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
-    lv_event_send((lv_obj_t * )obj, LV_EVENT_REFR_SELF_SIZE, &p);
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.x;
 }
 
 lv_coord_t lv_obj_get_self_height(const lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
-    lv_event_send((lv_obj_t * )obj, LV_EVENT_REFR_SELF_SIZE, &p);
+    lv_event_send((lv_obj_t * )obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.y;
 }
 
@@ -892,9 +892,9 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
-        hit_info.result = true;
+        hit_info.res = true;
         lv_event_send(obj, LV_EVENT_HIT_TEST, &hit_info);
-        return hit_info.result;
+        return hit_info.res;
     }
 
     return res;

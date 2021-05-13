@@ -321,7 +321,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_roller_t * roller = (lv_roller_t*)obj;
 
-    if(code == LV_EVENT_REFR_SELF_SIZE) {
+    if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         p->x =  get_selected_label_width(obj);
     }

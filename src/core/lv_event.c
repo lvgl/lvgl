@@ -267,6 +267,67 @@ const lv_area_t * lv_event_get_clip_area(lv_event_t * e)
     }
 }
 
+const lv_area_t * lv_event_get_old_size(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_SIZE_CHANGED) {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
+}
+
+uint32_t lv_event_get_key(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_KEY) {
+        uint32_t * k = lv_event_get_param(e);
+        if(k) return *k;
+        else return 0;
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
+lv_coord_t * lv_event_get_ext_draw_size_info(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
+lv_point_t * lv_event_get_self_size_info(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_GET_SELF_SIZE) {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
+lv_hit_test_info_t * lv_event_get_hit_test_info(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_HIT_TEST) {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
+lv_cover_check_info_t * lv_event_get_cover_check_info(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_COVER_CHECK) {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -340,7 +401,7 @@ static bool event_is_bubbled(lv_event_code_t e)
     case LV_EVENT_CHILD_CHANGED:
     case LV_EVENT_SIZE_CHANGED:
     case LV_EVENT_STYLE_CHANGED:
-    case LV_EVENT_REFR_SELF_SIZE:
+    case LV_EVENT_GET_SELF_SIZE:
         return false;
     default:
         return true;

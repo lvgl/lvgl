@@ -512,7 +512,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_hit_test_info_t * info = lv_event_get_param(e);;
 
         /*Valid clicks can be only in the circle*/
-        info->result = _lv_area_is_point_on(&obj->coords, info->point, LV_RADIUS_CIRCLE);
+        info->res = _lv_area_is_point_on(&obj->coords, info->point, LV_RADIUS_CIRCLE);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_disc_grad(e);

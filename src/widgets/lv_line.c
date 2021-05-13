@@ -140,7 +140,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t * s = lv_event_get_param(e);
         if(*s < line_width) *s = line_width;
     }
-    else if(code == LV_EVENT_REFR_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_line_t * line = (lv_line_t *)obj;
 
         lv_point_t * p = lv_event_get_param(e);

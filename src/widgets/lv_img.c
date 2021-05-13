@@ -465,15 +465,15 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
             coords.x2 += obj->coords.x1;
             coords.y2 += obj->coords.y1;
 
-            info->result = _lv_area_is_point_on(&coords, info->point, 0);
+            info->res = _lv_area_is_point_on(&coords, info->point, 0);
         }
         else {
             lv_area_t a;
             lv_obj_get_click_area(obj, &a);
-            info->result = _lv_area_is_point_on(&a, info->point, 0);
+            info->res = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
-    else if(code == LV_EVENT_REFR_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);;
         p->x = img->w;
         p->y = img->h;

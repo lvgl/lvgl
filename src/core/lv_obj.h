@@ -174,25 +174,6 @@ typedef struct _lv_obj_t {
     uint16_t w_layout   :1;
 }lv_obj_t;
 
-
-typedef struct {
-    const lv_point_t * point;
-    bool result;
-} lv_hit_test_info_t;
-
-/**
- * Used as the event parameter of ::LV_EVENT_COVER_CHECK to check if an area is covered by the object or not.
- * `res` should be set like this:
- *   - If there is a draw mask on the object set to ::LV_DRAW_RES_MASKED
- *   - If there is no draw mask but the object simply not covers the area and `res` is not set to ::LV_DRAW_RES_MASKED set to ::LV_DRAW_RES_NOT_COVER
- *     E.g. `if(cover == false && info->res != LV_DRAW_RES_MASKED) info->res = LV_DRAW_RES_NOT_COVER;`
- *   - If the area is fully covered by the object leave `res` unchanged.
- */
-typedef struct {
-    lv_draw_res_t res;              /**< Set to ::LV_DRAW_RES_NOT_COVER or ::LV_DRAW_RES_MASKED. */
-    const lv_area_t * area;         /**< The area to check */
-} lv_cover_check_info_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

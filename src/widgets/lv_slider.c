@@ -111,11 +111,11 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_hit_test_info_t * info = lv_event_get_param(e);
 
         /*Ordinary slider: was the knob area hit?*/
-        info->result = _lv_area_is_point_on(&slider->right_knob_area, info->point, 0);
+        info->res = _lv_area_is_point_on(&slider->right_knob_area, info->point, 0);
 
         /*There's still a change we have a hit, if we have another knob*/
-        if((info->result == false) && (type == LV_SLIDER_MODE_RANGE)) {
-            info->result = _lv_area_is_point_on(&slider->left_knob_area, info->point, 0);
+        if((info->res == false) && (type == LV_SLIDER_MODE_RANGE)) {
+            info->res = _lv_area_is_point_on(&slider->left_knob_area, info->point, 0);
         }
     }
     else if(code == LV_EVENT_PRESSED) {

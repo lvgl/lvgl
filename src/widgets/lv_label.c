@@ -764,7 +764,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(code == LV_EVENT_REFR_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t size;
         lv_label_t * label = (lv_label_t *)obj;
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);

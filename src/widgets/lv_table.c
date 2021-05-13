@@ -478,7 +478,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_STYLE_CHANGED) {
         refr_size(obj, 0);
     }
-    else if(code == LV_EVENT_REFR_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         uint32_t i;
         lv_coord_t w = 0;
