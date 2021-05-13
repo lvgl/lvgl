@@ -8,7 +8,9 @@
 A label is the basic object type that is used to display text. 
 
 ## Parts and Styles
-- `LV_PART_MAIN` ut uses all the typical background properties and the text properties.  The padding values can be used to add space between the text and the background.
+- `LV_PART_MAIN`  Uses all the typical background properties and the text properties.  The padding values can be used to add space between the text and the background.
+- `LV_PART_SCROLLBAR` The scrollbar that is shown when the text is larger than the widget's size.
+- `LV_PART_SELECTED` Tells the style of the [selected text](#text-selection). Only `text_color` and `bg_color` style properties can be used. 
 
 ## Usage
 
@@ -48,6 +50,11 @@ This is not the case with `lv_label_set_text_static`. The buffer you pass to `lv
 In the text, you can use commands to recolor parts of the text. For example: `"Write a #ff0000 red# word"`. 
 This feature can be enabled individually for each label by `lv_label_set_recolor()` function. 
 
+### Text selection
+If enabled by `LV_LABEL_TEXT_SELECTION` part of the text can be selected. It's similar when on PC a you use your mouse to select a text. 
+The whole mechanzim (click and select the text as you drag your finger/mouse) is implemeted in [Text area](/widgets/core/textarea) and the Label widget allows only to manually make parts of the text selected with
+`lv_label_get_text_selection_start(label, start_char_index)` and `lv_label_get_text_selection_start(label, end_char_index)`.
+ 
 ### Very long texts
 LVGL can efficiently handle very long (e.g. > 40k characters) by saving some extra data (~12 bytes) to speed up drawing. To enable this feature, set `LV_LABEL_LONG_TXT_HINT   1` in `lv_conf.h`.
 

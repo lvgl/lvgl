@@ -4,7 +4,7 @@
 static void slider_event_cb(lv_event_t * e);
 
 /**
- * Show the current value when the slider if pressed by extending the drawer
+ * Show the current value when the slider is pressed by extending the drawer
  *
  */
 void lv_example_slider_3(void)
