@@ -55,7 +55,7 @@ typedef struct {
         uint8_t show : 1;          /*Cursor is visible now or not (Handled by the library)*/
         uint8_t click_pos : 1;     /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     uint32_t sel_start;  /*Temporary values for text selection*/
     uint32_t sel_end;
     uint8_t text_sel_in_prog : 1; /*User is in process of selecting*/
@@ -189,7 +189,7 @@ void lv_textarea_set_insert_replace(lv_obj_t * obj, const char * txt);
  * @param obj       pointer to a text area object
  * @param en        true or false to enable/disable selection mode
  */
-void lv_textarea_set_text_sel(lv_obj_t * obj, bool en);
+void lv_textarea_set_text_selection(lv_obj_t * obj, bool en);
 
 /**
  * Set how long show the password before changing it to '*'
@@ -286,7 +286,7 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj);
  * @param obj       pointer to a text area object
  * @return          true: selection mode is enabled, false: disabled
  */
-bool lv_textarea_get_text_sel_en(lv_obj_t * obj);
+bool lv_textarea_get_text_selection(lv_obj_t * obj);
 
 /**
  * Set how long show the password before changing it to '*'

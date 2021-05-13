@@ -520,11 +520,11 @@ void lv_textarea_set_insert_replace(lv_obj_t * obj, const char * txt)
     ta_insert_replace = txt;
 }
 
-void lv_textarea_set_text_sel(lv_obj_t * obj, bool en)
+void lv_textarea_set_text_selection(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
      lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     ta->text_sel_en = en;
@@ -653,11 +653,11 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
      lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    if((lv_label_get_text_sel_start(ta->label) == LV_DRAW_LABEL_NO_TXT_SEL ||
-        lv_label_get_text_sel_end(ta->label) == LV_DRAW_LABEL_NO_TXT_SEL)) {
+    if((lv_label_get_text_selection_start(ta->label) == LV_DRAW_LABEL_NO_TXT_SEL ||
+        lv_label_get_text_selection_end(ta->label) == LV_DRAW_LABEL_NO_TXT_SEL)) {
         return true;
     }
     else {
@@ -669,11 +669,11 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj)
 #endif
 }
 
-bool lv_textarea_get_text_sel_en(lv_obj_t * obj)
+bool lv_textarea_get_text_selection(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
      lv_textarea_t * ta = (lv_textarea_t *)obj;
     return ta->text_sel_en;
 #else
@@ -699,11 +699,11 @@ void lv_textarea_clear_selection(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
      lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    if(lv_label_get_text_sel_start(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL ||
-       lv_label_get_text_sel_end(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL) {
+    if(lv_label_get_text_selection_start(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL ||
+       lv_label_get_text_selection_end(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL) {
         lv_label_set_text_sel_start(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
         lv_label_set_text_sel_end(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
     }
@@ -806,7 +806,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->cursor.click_pos  = 1;
     ta->cursor.valid_x    = 0;
     ta->one_line          = 0;
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     ta->text_sel_en = 0;
 #endif
     ta->label       = NULL;
@@ -1154,7 +1154,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
 
     uint16_t char_id_at_click;
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     lv_label_t * label_data = (lv_label_t *)ta->label;
     bool click_outside_label;
     /*Check if the click happened on the left side of the area outside the label*/
@@ -1176,7 +1176,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         if(!ta->text_sel_in_prog && !click_outside_label && code == LV_EVENT_PRESSED) {
             /*Input device just went down. Store the selection start position*/
             ta->sel_start    = char_id_at_click;
-            ta->sel_end      = LV_LABEL_TEXT_SEL_OFF;
+            ta->sel_end      = LV_LABEL_TEXT_SELECTION_OFF;
             ta->text_sel_in_prog = 1;
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         }

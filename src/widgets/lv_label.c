@@ -233,7 +233,7 @@ void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
     label->sel_start   = index;
     lv_obj_invalidate(obj);
@@ -247,7 +247,7 @@ void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
     label->sel_end     = index;
     lv_obj_invalidate(obj);
@@ -603,30 +603,30 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     return (pos->x >= (last_x - letter_space) && pos->x <= (last_x + max_diff));
 }
 
-uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj)
+uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
     return label->sel_start;
 
 #else
     (void)obj;    /*Unused*/
-    return LV_LABEL_TEXT_SEL_OFF;
+    return LV_LABEL_TEXT_SELECTION_OFF;
 #endif
 }
 
-uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj)
+uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
     return label->sel_end;
 #else
     (void)obj; /*Unused*/
-    return LV_LABEL_TEXT_SEL_OFF;
+    return LV_LABEL_TEXT_SELECTION_OFF;
 #endif
 }
 
@@ -717,7 +717,7 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->hint.y          = 0;
 #endif
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     label->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     label->sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
 #endif
@@ -820,8 +820,8 @@ static void draw_main(lv_event_t * e)
     label_draw_dsc.flag = flag;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
 
-    label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
-    label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
+    label_draw_dsc.sel_start = lv_label_get_text_selection_start(obj);
+    label_draw_dsc.sel_end = lv_label_get_text_selection_end(obj);
     if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
         label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_SELECTED);
         label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);

@@ -30,11 +30,11 @@ extern "C" {
 #define LV_LABEL_WAIT_CHAR_COUNT        3
 #define LV_LABEL_DOT_NUM 3
 #define LV_LABEL_POS_LAST 0xFFFF
-#define LV_LABEL_TEXT_SEL_OFF LV_DRAW_LABEL_NO_TXT_SEL
+#define LV_LABEL_TEXT_SELECTION_OFF LV_DRAW_LABEL_NO_TXT_SEL
 
 LV_EXPORT_CONST_INT(LV_LABEL_DOT_NUM);
 LV_EXPORT_CONST_INT(LV_LABEL_POS_LAST);
-LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SEL_OFF);
+LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SELECTION_OFF);
 
 /**********************
  *      TYPEDEFS
@@ -63,7 +63,7 @@ typedef struct {
     lv_draw_label_hint_t hint;
 #endif
 
-#if LV_LABEL_TEXT_SEL
+#if LV_LABEL_TEXT_SELECTION
     uint32_t sel_start; uint32_t sel_end;
 #endif
 
@@ -134,14 +134,14 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en);
 /**
  * Set where text selection should start
  * @param obj       pointer to a label object
- * @param index     character index from where selection should start. `LV_LABEL_TEXT_SEL_OFF` for no selection
+ * @param index     character index from where selection should start. `LV_LABEL_TEXT_SELECTION_OFF` for no selection
  */
 void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index);
 
 /**
  * Set where text selection should end
  * @param obj       pointer to a label object
- * @param index     character index where selection should end.  `LV_LABEL_TEXT_SEL_OFF` for no selection
+ * @param index     character index where selection should end.  `LV_LABEL_TEXT_SELECTION_OFF` for no selection
  */
 void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index);
 
@@ -199,16 +199,16 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos);
 /**
  * @brief Get the selection start index.
  * @param obj       pointer to a label object.
- * @return          selection start index. `LV_LABEL_TEXT_SEL_OFF` if nothing is selected.
+ * @return          selection start index. `LV_LABEL_TEXT_SELECTION_OFF` if nothing is selected.
  */
-uint32_t lv_label_get_text_sel_start(const lv_obj_t * obj);
+uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj);
 
 /**
  * @brief Get the selection end index.
  * @param obj       pointer to a label object.
  * @return          selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-uint32_t lv_label_get_text_sel_end(const lv_obj_t * obj);
+uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj);
 
 /*=====================
  * Other functions

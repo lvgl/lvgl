@@ -1152,11 +1152,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 #if LV_USE_LABEL
-#ifndef LV_LABEL_TEXT_SEL
-#  ifdef CONFIG_LV_LABEL_TEXT_SEL
-#    define LV_LABEL_TEXT_SEL CONFIG_LV_LABEL_TEXT_SEL
+#ifndef LV_LABEL_TEXT_SELECTION
+#  ifdef CONFIG_LV_LABEL_TEXT_SELECTION
+#    define LV_LABEL_TEXT_SELECTION CONFIG_LV_LABEL_TEXT_SELECTION
 #  else
-#    define  LV_LABEL_TEXT_SEL         1   /*Enable selecting text of the label*/
+#    define  LV_LABEL_TEXT_SELECTION         1   /*Enable selecting text of the label*/
 #  endif
 #endif
 #ifndef LV_LABEL_LONG_TXT_HINT
