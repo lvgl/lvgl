@@ -32,6 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -192,6 +193,8 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
     disp->inv_p = 0;
     if(disp->act_scr != NULL) lv_obj_invalidate(disp->act_scr);
+
+    lv_obj_tree_walk(NULL, invalidate_layout_cb, NULL);
 
     if(disp->driver->drv_update_cb) disp->driver->drv_update_cb(disp->driver);
 }
@@ -389,3 +392,9 @@ lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)
+{
+    lv_obj_mark_layout_as_dirty(obj);
+    return LV_OBJ_TREE_WALK_NEXT;
+}
