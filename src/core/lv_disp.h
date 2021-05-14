@@ -217,11 +217,48 @@ static inline void lv_scr_load(lv_obj_t * scr)
  * 1 dip is 2 px on a 320 DPI screen
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
-#define LV_DPX(n)   (n == 0 ? 0 :LV_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1)) /*+80 for rounding*/
+#define _LV_DPX_CALC(dpi, n)   ((n) == 0 ? 0 :LV_MAX((( (dpi) * (n) + 80) / 160), 1)) /*+80 for rounding*/
+#define LV_DPX(n)   _LV_DPX_CALC(lv_disp_get_dpi(NULL), n)
 
+/**
+ * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
+ * considering the DPI of the default display.
+ * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
+ * DPI of the display.
+ * @param n     the number of pixels to scale
+ * @return      `n x current_dpi/160`
+ */
 static inline lv_coord_t lv_dpx(lv_coord_t n)
 {
     return LV_DPX(n);
+}
+
+/**
+ * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
+ * considering the DPI of the given display.
+ * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
+ * DPI of the display.
+ * @param obj   an display whose dpi should be considered
+ * @param n     the number of pixels to scale
+ * @return      `n x current_dpi/160`
+ */
+static inline lv_coord_t lv_dpx_disp(const lv_disp_t * disp, lv_coord_t n)
+{
+    return _LV_DPX_CALC(lv_disp_get_dpi(disp), n);
+}
+
+/**
+ * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
+ * considering the DPI of the `obj`'s display.
+ * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
+ * DPI of the display.
+ * @param obj   an object whose display's dpi should be considered
+ * @param n     the number of pixels to scale
+ * @return      `n x current_dpi/160`
+ */
+static inline lv_coord_t lv_dpx_obj(const lv_obj_t * obj, lv_coord_t n)
+{
+    return _LV_DPX_CALC(lv_disp_get_dpi(lv_obj_get_disp(obj)), n);
 }
 
 #ifdef __cplusplus

@@ -264,7 +264,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp);
  * @param disp pointer to a display (NULL to use the default display)
  * @return dpi of the display
  */
-lv_coord_t lv_disp_get_dpi(lv_disp_t * disp);
+lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
 
 
 /**
