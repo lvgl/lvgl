@@ -25,12 +25,12 @@ extern "C" {
 
 struct _lv_obj_t;
 
-/** Design results*/
+/** Cover check results*/
 typedef enum {
-    LV_DRAW_RES_COVER,       /**< Returned on `LV_DRAW_COVER_CHK` if the areas is fully covered*/
-    LV_DRAW_RES_NOT_COVER,   /**< Returned on `LV_DRAW_COVER_CHK` if the areas is not covered*/
-    LV_DRAW_RES_MASKED,      /**< Returned on `LV_DRAW_COVER_CHK` if the areas is masked out*/
-}lv_draw_res_t;
+    LV_COVER_RES_COVER,
+    LV_COVER_RES_NOT_COVER,
+    LV_COVER_RES_MASKED,
+}lv_cover_res_t;
 
 typedef struct
 {

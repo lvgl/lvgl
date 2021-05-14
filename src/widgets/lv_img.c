@@ -490,21 +490,21 @@ static void draw_img(lv_event_t * e)
     lv_img_t * img = (lv_img_t *)obj;
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
-        if(info->res == LV_DRAW_RES_MASKED) return;
+        if(info->res == LV_COVER_RES_MASKED) return;
         if(img->src_type == LV_IMG_SRC_UNKNOWN || img->src_type == LV_IMG_SRC_SYMBOL) {
-            info->res = LV_DRAW_RES_NOT_COVER;
+            info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
 
         /*Non true color format might have "holes"*/
         if(img->cf != LV_IMG_CF_TRUE_COLOR && img->cf != LV_IMG_CF_RAW) {
-            info->res = LV_DRAW_RES_NOT_COVER;
+            info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
 
         /*With not LV_OPA_COVER images can't cover an area */
         if(lv_obj_get_style_img_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) {
-            info->res = LV_DRAW_RES_NOT_COVER;
+            info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
 
@@ -512,7 +512,7 @@ static void draw_img(lv_event_t * e)
         angle_final += img->angle;
 
         if(angle_final != 0) {
-            info->res = LV_DRAW_RES_NOT_COVER;
+            info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
 
@@ -523,7 +523,7 @@ static void draw_img(lv_event_t * e)
         const lv_area_t * clip_area = lv_event_get_param(e);
         if(zoom_final == LV_IMG_ZOOM_NONE) {
             if(_lv_area_is_in(clip_area, &obj->coords, 0) == false) {
-                info->res = LV_DRAW_RES_NOT_COVER;
+                info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
         }
@@ -536,7 +536,7 @@ static void draw_img(lv_event_t * e)
             a.y2 += obj->coords.y1;
 
             if(_lv_area_is_in(clip_area, &a, 0) == false) {
-                info->res = LV_DRAW_RES_NOT_COVER;
+                info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
         }

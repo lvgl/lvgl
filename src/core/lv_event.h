@@ -113,15 +113,12 @@ typedef struct {
 
 /**
  * Used as the event parameter of ::LV_EVENT_COVER_CHECK to check if an area is covered by the object or not.
- * `res` should be set like this:
- *   - If already set to ::LV_DRAW_RES_MASKED do nothing
- *   - If there is a draw mask on the object set to ::LV_DRAW_RES_MASKED
- *   - If there is no draw mask but the object simply not covers the area set ::LV_DRAW_RES_NOT_COVER
- *   - If the area is fully covered by the object leave `res` unchanged.
+ * In the event use `const lv_area_t * area = lv_event_get_cover_area(e)` to get the area to check
+ * and `lv_event_set_cover_res(e, res)` to set the result.
  */
 typedef struct {
-    lv_draw_res_t res;              /**< Set to ::LV_DRAW_RES_NOT_COVER or ::LV_DRAW_RES_MASKED. */
-    const lv_area_t * area;         /**< The area to check */
+    lv_cover_res_t res;
+    const lv_area_t * area;
 } lv_cover_check_info_t;
 
 /**********************
@@ -290,12 +287,19 @@ lv_point_t * lv_event_get_self_size_info(lv_event_t * e);
 lv_hit_test_info_t * lv_event_get_hit_test_info(lv_event_t * e);
 
 /**
- * Get a pointer to an `lv_cover_check_info_t` variable in which the area cover information should be saved.
- * Can be used in `LV_EVENT_COVER_CHECK`
+ * Get a pointer to an area which should be examined whether the object fully covers it or not.
+ * Can be used in `LV_EVENT_HIT_TEST`
  * @param e     pointer to an event
- * @return      pointer to `lv_cover_check_info_t` or NULL if called on an unrelated event
+ * @return      an area with absolute coordinates to check
  */
-lv_cover_check_info_t * lv_event_get_cover_check_info(lv_event_t * e);
+const lv_area_t * lv_event_get_cover_area(lv_event_t * e);
+
+/**
+ * Set the result of cover checking. Can be used in `LV_EVENT_COVER_CHECK`
+ * @param e     pointer to an event
+ * @param res   an element of ::lv_cover_check_info_t
+ */
+void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res);
 
 /**********************
  *      MACROS

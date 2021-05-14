@@ -177,37 +177,25 @@ Finish the drawing of a part. It's a good place to draw extra content on the par
 
 This event is used to check whether an object fully covers an area or not. 
 
-`lv_event_get_cover_check_info(event)` returns an pointer to an `lv_cover_check_info_t` variable. Its `res` field should be set to the following values considering the `area` field: 
-- `LV_DRAW_RES_COVER` the areas is fully covered by the object
-- `LV_DRAW_RES_NOT_COVER` the areas is not covered by the object
-- `LV_DRAW_RES_MASKED` there is a mask on the object so it can not covert the area
+`lv_event_get_cover_area(event)` returns an pointer to an area to check and `lv_event_set_cover_res(event, res)` can be used to set one of these results:
+- `LV_COVER_RES_COVER` the areas is fully covered by the object
+- `LV_COVER_RES_NOT_COVER` the areas is not covered by the object
+- `LV_COVER_RES_MASKED` there is a mask on the object so it can not covert the area
 
 Here are some cases why can't an object fully cover an area:
 - It's simply not fully on the that area
 - It has radius
 - It has not 100% background opacity
 - It's an ARGB or chroma keyed image
-- It's a text 
 - It has not normal blending mode. In this case LVGL needs to know the colors under the object to make the blending properly
+- It's a text, etc 
 
 In short if for any reason the the area below the object is visible than it doesn't cover that area.
 
-Some guideline how to set the `res` field in `lv_cover_check_info_t`:
-- Before sending this event LVGL checks if at least the widget's coordinates fully cover the area or not. If not the event is not called.
-- You need to check only the drawing you have added. The existing properties known by widget are handled in the widget's internal events. 
+Before sending this event LVGL checks if at least the widget's coordinates fully cover the area or not. If not the event is not called.
+
+You need to check only the drawing you have added. The existing properties known by widget are handled in the widget's internal events. 
 E.g. if a widget has &gt; 0 radius it might not cover an area but you need to handle `radius` only if you will modify it and widget can't know about it. 
-- If `res` is already set to `LV_DRAW_RES_MASKED` do nothing. In this case an other event already set it and it's the "strongest" state that shouldn't be overwritten.
-- If you added a draw mask on the object set `res` to `LV_DRAW_RES_MASKED`
-- If there is no draw masks but the object simply not covers the area for any reason set `LV_DRAW_RES_NOT_COVER`
-- If the area is fully covered by the object leave `res` unchanged.
-
-In the practice probably you need to set only `LV_DRAW_RES_MASKED`if you added masks in a MAIN or POST draw events because "normal" cover checks are handles by the widgets.
-
-However, if you really added masks in MAIN or POST draw events you need to handle `LV_EVENT_COVER_CHECK` event and tell LVGL there are masks on this object.
-
-If masks are added and removed in  `LV_EVENT_DRAW_PART_BEGIN/END`, `LV_EVENT_COVER_CHECK` doesn't need to know about it except the masks affects `LV_PART_MAIN`. 
-It's because LVGL checks the main part to decide whether an object covers an area or not. 
-So it doesn't matter e.g. if a tabel's cell is masked because the tables background already covered the area or not.
 
 #### LV_EVENT_REFR_EXT_DRAW_SIZE
 

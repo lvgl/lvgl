@@ -196,7 +196,7 @@ static lv_draw_res_t lv_templ_draw(lv_obj_t * templ, const lv_area_t * clip_area
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DRAW_COVER_CHK) {
-        return LV_DRAW_RES_NOT_COVER;
+        return LV_COVER_RES_NOT_COVER;
     }
     /*Draw the object*/
     else if(mode == LV_DRAW_DRAW_MAIN) {
@@ -206,7 +206,7 @@ static lv_draw_res_t lv_templ_draw(lv_obj_t * templ, const lv_area_t * clip_area
     else if(mode == LV_DRAW_DRAW_POST) {
     }
 
-    return LV_DRAW_RES_OK;
+    return LV_COVER_RES_OK;
 }
 
 /**
