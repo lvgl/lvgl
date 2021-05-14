@@ -34,5 +34,6 @@ PDF version: :download:`LVGL.pdf <LVGL.pdf>`
    widgets/index
    layouts/index
    CONTRIBUTING
-
+   CHANGELOG
+   ROADMAP
 ```
