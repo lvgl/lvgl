@@ -29,7 +29,7 @@ struct _lv_obj_t;
 typedef enum {
     LV_DRAW_RES_COVER,       /**< Returned on `LV_DRAW_COVER_CHK` if the areas is fully covered*/
     LV_DRAW_RES_NOT_COVER,   /**< Returned on `LV_DRAW_COVER_CHK` if the areas is not covered*/
-    LV_DRAW_RES_MASKED,      /**< Returned on `LV_DRAW_COVER_CHK` if the areas is masked out (children also not cover)*/
+    LV_DRAW_RES_MASKED,      /**< Returned on `LV_DRAW_COVER_CHK` if the areas is masked out*/
 }lv_draw_res_t;
 
 typedef struct
