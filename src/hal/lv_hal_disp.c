@@ -395,6 +395,7 @@ lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp)
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)
 {
+    LV_UNUSED(user_data);
     lv_obj_mark_layout_as_dirty(obj);
     return LV_OBJ_TREE_WALK_NEXT;
 }
