@@ -242,7 +242,7 @@ static inline lv_coord_t lv_dpx(lv_coord_t n)
  * @param n     the number of pixels to scale
  * @return      `n x current_dpi/160`
  */
-static inline lv_coord_t lv_dpx_disp(const lv_disp_t * disp, lv_coord_t n)
+static inline lv_coord_t lv_disp_dpx(const lv_disp_t * disp, lv_coord_t n)
 {
     return _LV_DPX_CALC(lv_disp_get_dpi(disp), n);
 }

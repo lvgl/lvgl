@@ -360,6 +360,20 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
  */
 bool lv_obj_is_valid(const lv_obj_t * obj);
 
+/**
+ * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
+ * considering the DPI of the `obj`'s display.
+ * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
+ * DPI of the display.
+ * @param obj   an object whose display's dpi should be considered
+ * @param n     the number of pixels to scale
+ * @return      `n x current_dpi/160`
+ */
+static inline lv_coord_t lv_dpx_obj(const lv_obj_t * obj, lv_coord_t n)
+{
+    return _LV_DPX_CALC(lv_disp_get_dpi(lv_obj_get_disp(obj)), n);
+}
+
 /**********************
  *      MACROS
  **********************/
