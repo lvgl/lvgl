@@ -214,10 +214,5 @@ So it doesn't matter e.g. if a tabel's cell is masked because the tables backgro
 If you need to draw outside of a widget LVGL needs to know about it to provide the extra space for drawing. 
 Let's say you create an event the writes the current value of a slider above its knob. In this case LVGL needs to know that the slider's draw area should be larger with the size required for the text.
 
-`lv_event_get_ext_draw_size_info(event)` return a pointer to an `lv_coord_t` variable in which the extra draw size can be set. 
-Note that, other events also might set the value of this variable so you should set only values larger than the current value. For example:
-```c
-lv_coord_t * s = lv_event_get_ext_draw_size_info(event);
-*s = LV_MAX(*s, 50);
-``` 
+You can simple set the required draw area with `lv_event_set_ext_draw_size(e, size)`. 
 

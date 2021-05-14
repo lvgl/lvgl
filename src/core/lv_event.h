@@ -268,11 +268,11 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e);
 uint32_t lv_event_get_key(lv_event_t * e);
 
 /**
- * Get a pointer to an `lv_coord_t` variable in which the new extra draw size should be saved. Can be used in `LV_EVENT_REFR_EXT_DRAW_SIZE`
+ * Set the new extra draw size. Can be used in `LV_EVENT_REFR_EXT_DRAW_SIZE`
  * @param e     pointer to an event
- * @return      pointer to `lv_coord_t` or NULL if called on an unrelated event
+ * @param size  The new extra draw size
  */
-lv_coord_t * lv_event_get_ext_draw_size_info(lv_event_t * e);
+void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size);
 
 /**
  * Get a pointer to an `lv_point_t` variable in which the self size should be saved (width in `point->x` and height `point->y`).

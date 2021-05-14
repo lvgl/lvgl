@@ -289,13 +289,13 @@ uint32_t lv_event_get_key(lv_event_t * e)
     }
 }
 
-lv_coord_t * lv_event_get_ext_draw_size_info(lv_event_t * e)
+void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size)
 {
     if(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        return lv_event_get_param(e);
+        lv_coord_t * cur_size = lv_event_get_param(e);
+        *cur_size = LV_MAX(*cur_size, size);
     } else {
         LV_LOG_WARN("Not interpreted with this event code");
-        return 0;
     }
 }
 
