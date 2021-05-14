@@ -15,15 +15,15 @@ Once rendering is ready the content of the draw buffer is send to display using 
 
 A draw draw buffer can be initialized via a `lv_disp_draw_buf_t` variable like this:
 ```c
-    /*A static or global variable to store the buffers*/
-    static lv_disp_draw_buf_t disp_buf;
+/*A static or global variable to store the buffers*/
+static lv_disp_draw_buf_t disp_buf;
 
-    /*Static or global buffer(s). The second buffer is optional*/
-    static lv_color_t buf_1[MY_DISP_HOR_RES * 10];
-    static lv_color_t buf_2[MY_DISP_HOR_RES * 10];
+/*Static or global buffer(s). The second buffer is optional*/
+static lv_color_t buf_1[MY_DISP_HOR_RES * 10];
+static lv_color_t buf_2[MY_DISP_HOR_RES * 10];
 
-    /*Initialize `disp_buf` with the buffer(s) */
-    lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, MY_DISP_HOR_RES*10);
+/*Initialize `disp_buf` with the buffer(s) */
+lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, MY_DISP_HOR_RES*10);
 ```
 
 Note that `lv_disp_draw_buf_t` needs to be static, global or dynamically allocated and not a local variable destroyed if goes out of the scope. 
@@ -90,15 +90,15 @@ To use a GPU the following callbacks can be used:
 ### Examples
 All together it looks like this:
 ```c
-    static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
-    lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
-    disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
-    disp_drv.flush_cb = my_flush_cb;        /*Set a flush callback to draw to the display*/
-    disp_drv.hor_res = 320;                 /*Set the horizontal resolution in pixels*/
-    disp_drv.ver_res = 240;                 /*Set the vertical resolution in pixels*/
-    
-    lv_disp_t * disp;
-    disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
+static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
+lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
+disp_drv.flush_cb = my_flush_cb;        /*Set a flush callback to draw to the display*/
+disp_drv.hor_res = 320;                 /*Set the horizontal resolution in pixels*/
+disp_drv.ver_res = 240;                 /*Set the vertical resolution in pixels*/
+
+lv_disp_t * disp;
+disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
 ```
 
 Here are some simple examples of the callbacks:

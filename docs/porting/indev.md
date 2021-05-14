@@ -48,9 +48,6 @@ void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
 }
 ```
 
-``` important::  Touchpad drivers must return the last X/Y coordinates even when the state is *LV_INDEV_STATE_REL*.
-```
-
 To set a mouse cursor use `lv_indev_set_cursor(my_indev, &img_cursor)`. (`my_indev` is the return value of `lv_indev_drv_register`)
 
 ### Keypad or keyboard

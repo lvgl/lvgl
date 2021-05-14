@@ -14,6 +14,7 @@
    object
    coords
    style
+   style-props
    scroll
    layer
    event

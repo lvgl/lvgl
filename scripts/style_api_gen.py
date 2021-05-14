@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import sys, os
+import sys, os, re
 
 props = [
+{'section': 'Miscellaneous', 'dsc':'TODO' },
 {'name': 'RADIUS',                    
  'style_type': 'num', 'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"}, 
@@ -21,15 +22,15 @@ props = [
 
 {'name': 'TRANSLATE_X',               
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Move the object with this value in X direction. Applied after layouts, aligns and other positionings. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
+ 'dsc': "Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
 
 {'name': 'TRANSLATE_Y',               
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positionings. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
+ 'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
 
 {'name': 'TRANSFORM_ZOOM',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) maens normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ANGLE',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -63,21 +64,22 @@ props = [
  'style_type': 'num',   'var_type': 'lv_blend_mode_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE`"},
 
+{'section': 'Padding', 'dsc':'TODO' },
 {'name': 'PAD_TOP',                   
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the top. It makes the content arae smaller in this direction."},
+ 'dsc': "Sets the padding on the top. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_BOTTOM',                
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the bottom. It makes the content arae smaller in this direction."},
+ 'dsc': "Sets the padding on the bottom. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_LEFT',                  
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the left. It makes the content arae smaller in this direction."},
+ 'dsc': "Sets the padding on the left. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_RIGHT',                 
   'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the right. It makes the content arae smaller in this direction."},
+ 'dsc': "Sets the padding on the right. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_ROW',                   
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -87,6 +89,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the padding between the columns. Used by the layouts."},
 
+{'section': 'Size and position', 'dsc':'TODO' },
 {'name': 'WIDTH',                     
  'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the width of object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
@@ -121,12 +124,13 @@ props = [
 
 {'name': 'ALIGN',                     
  'style_type': 'num',   'var_type': 'lv_align_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the alignment whcih tells from which point of teh aprent the X and Y coordinates should be interptreted. The possibel values are: `LV_ALIGN_TOP_LEFT/MID/RIGHT`, `LV_ALIGN_BOTTOM_LEFT/MID/RIGHT`, `LV_ALIGN_LEFT/RIGHT_MID`, `LV_ALIGN_CENTER`"},
+ 'dsc': "Set the alignment which tells from which point of the parent the X and Y coordinates should be interpreted. The possible values are: `LV_ALIGN_TOP_LEFT/MID/RIGHT`, `LV_ALIGN_BOTTOM_LEFT/MID/RIGHT`, `LV_ALIGN_LEFT/RIGHT_MID`, `LV_ALIGN_CENTER`"},
 
 {'name': 'LAYOUT',                    
  'style_type': 'num',   'var_type': 'uint16_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts."},
 
+{'section': 'Background', 'dsc':'TODO' },
 {'name': 'BG_COLOR',                  
  'style_type': 'color', 'var_type': 'lv_color_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the background color of the object."},
@@ -135,11 +139,11 @@ props = [
  'style_type': 'color', 'var_type': 'lv_color_t' },
 {'name': 'BG_OPA',                   
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the bacground. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set the opacity of the background. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BG_GRAD_COLOR',            
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the gradien color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`"},
+ 'dsc': "Set the gradient color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`"},
 
 {'name': 'BG_GRAD_COLOR_FILTERED',   
  'style_type': 'color', 'var_type': 'lv_color_t' },
@@ -150,11 +154,11 @@ props = [
 
 {'name': 'BG_MAIN_STOP',             
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the point from which the backround color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+ 'dsc': "Set the point from which the background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
 {'name': 'BG_GRAD_STOP',             
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the point from which the backround's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+ 'dsc': "Set the point from which the background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
 {'name': 'BG_IMG_SRC',               
  'style_type': 'ptr',   'var_type': 'const void *',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -173,12 +177,13 @@ props = [
 
 {'name': 'BG_IMG_RECOLOR_OPA',       
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 256, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportinally."},
+ 'dsc': "Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 256, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportionally."},
 
 {'name': 'BG_IMG_TILED',             
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "If enbaled the background image will be tiled. The possible values are `ture` or `false`."},
+ 'dsc': "If enbaled the background image will be tiled. The possible values are `true` or `false`."},
 
+{'section': 'Border', 'dsc':'TODO' },
 {'name': 'BORDER_COLOR',             
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the color of the border"},
@@ -202,6 +207,7 @@ props = [
 'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets wheter the the border should be drawn before or after the children ar drawn. `true`: after children, `false`: before children"},
 
+{'section': 'Text', 'dsc':'TODO' },
 {'name': 'TEXT_COLOR',                
 'style_type': 'color', 'var_type': 'lv_color_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the color of the text."},
@@ -211,7 +217,7 @@ props = [
 
 {'name': 'TEXT_OPA',                 
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opícity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'TEXT_FONT',                
  'style_type': 'ptr',   'var_type': 'const lv_font_t *',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -231,8 +237,9 @@ props = [
 
 {'name': 'TEXT_ALIGN',                
 'style_type': 'num',   'var_type': 'lv_text_align_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set how to align the lines of the text. Note that it doesn't align the object itself, only the lines inside the obejct. The possibel values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly"},
+ 'dsc': "Set how to align the lines of the text. Note that it doesn't align the object itself, only the lines inside the object. The possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly"},
 
+{'section': 'Image', 'dsc':'TODO' },
 {'name': 'IMG_OPA',                  
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
@@ -248,6 +255,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the intensity of the color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
+{'section': 'Outline', 'dsc':'TODO' },
 {'name': 'OUTLINE_WIDTH',            
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the width of the outline in pixels. "},
@@ -267,6 +275,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the padding of the outline, i.e. the gap between object and the outline."},
 
+{'section': 'Shadow', 'dsc':'TODO' },
 {'name': 'SHADOW_WIDTH',             
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the width of the shadow in pixels. The value should be >= 0."},
@@ -294,6 +303,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
+{'section': 'Line', 'dsc':'TODO' },
 {'name': 'LINE_WIDTH',               
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the width of the lines in pixel."},
@@ -308,7 +318,7 @@ props = [
 
 {'name': 'LINE_ROUNDED',             
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the end points of the lines rounded. `true`: rounded, `false`: perpadicular line ending "},
+ 'dsc': "Make the end points of the lines rounded. `true`: rounded, `false`: perpandicular line ending "},
 
 {'name': 'LINE_COLOR',               
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -321,13 +331,14 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the lines."},
 
+{'section': 'Arc', 'dsc':'TODO' },
 {'name': 'ARC_WIDTH',                
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the width (ticjkness) of the arcs in pixel."},
 
 {'name': 'ARC_ROUNDED',              
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the end points of the arcs rounded. `true`: rounded, `false`: perpadicular line ending "},
+ 'dsc': "Make the end points of the arcs rounded. `true`: rounded, `false`: perpandicular line ending "},
 
 {'name': 'ARC_COLOR',                
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -342,7 +353,7 @@ props = [
 
 {'name': 'ARC_IMG_SRC',              
  'style_type': 'ptr',   'var_type': 'const void *',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set an image from which the arc will be masked out. It's useful to display complex exxects on the arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file"},
+ 'dsc': "Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file"},
 ]
 
 def style_get_cast(style_type, var_type):
@@ -352,6 +363,8 @@ def style_get_cast(style_type, var_type):
   return cast
 
 def obj_style_get(p):
+  if 'section' in p: return
+  
   cast = style_get_cast(p['style_type'], p['var_type'])
   print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part)")
   print("{")
@@ -367,6 +380,8 @@ def style_set_cast(style_type):
   return cast
 
 def style_set(p):
+  if 'section' in p: return
+    
   cast = style_set_cast(p['style_type'])
   print("static inline void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
   print("{")
@@ -378,6 +393,8 @@ def style_set(p):
   print("")
 
 def local_style_set(p):
+  if 'section' in p: return
+  
   cast = style_set_cast(p['style_type'])
   print("static inline void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
   print("{")
@@ -389,20 +406,29 @@ def local_style_set(p):
   print("")
 
 def style_const_set(p):
-    cast = style_set_cast(p['style_type'])
-    print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
-    print("    { \\")
-    print("        .prop = LV_STYLE_" + p['name'] + ", \\")
-    print("        .value = { \\")
-    print("            ." + p['style_type'] +" = " + cast + "val \\")
-    print("        } \\")
-    print("    }")
-    print("")
+  if 'section' in p: return
+  
+  cast = style_set_cast(p['style_type'])
+  print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
+  print("    { \\")
+  print("        .prop = LV_STYLE_" + p['name'] + ", \\")
+  print("        .value = { \\")
+  print("            ." + p['style_type'] +" = " + cast + "val \\")
+  print("        } \\")
+  print("    }")
+  print("")
 
 
 
+docs_prop_cnt = 0
 def docs(p):
-  if "dsc" not in p: return  
+  if "section" in p:
+    print("") 
+    print("## " + p['section'])
+    print(p['dsc'])
+    return  
+  
+  if "default" not in p: return
   
   d = str(p["default"])
   
@@ -415,10 +441,22 @@ def docs(p):
   e = "No"
   if p["ext_draw"]: e = "Yes"
   
-  li_style = "style='display:inline; margin-right: 20px"
- 
-  print("<h3>" + p["name"].lower() + "</h3>")
-  print(p["dsc"])
+  li_style = "style='display:inline; margin-right: 20px; margin-left: 0px"
+  
+  global docs_prop_cnt 
+  div_style = "padding: 16px;"
+  if docs_prop_cnt % 2:
+    div_style += " background-color:#eee;"
+    
+  docs_prop_cnt+=1  
+    
+  dsc = p['dsc'];  
+    
+  print("")  
+  #print("<div style=\"" + div_style +"\">");
+  print("")  
+  print("### " + p["name"].lower())
+  print(dsc)
   
   print("<ul>")
   print("<li " + li_style + "'><strong>Default</strong> " + d + "</li>")
@@ -426,7 +464,8 @@ def docs(p):
   print("<li " + li_style + "'><strong>Layout</strong> " + l + "</li>")
   print("<li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
   print("</ul>")
-  print("")
+  #print("</div>")
+  print("")  
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
@@ -443,8 +482,9 @@ for p in props:
   style_set(p)
   style_const_set(p)
   
-sys.stdout = open(base_dir + '/style_props.md', 'w')
-  
+sys.stdout = open(base_dir + '/../docs/overview/style-props.md', 'w')
+
+print('# Style properties')  
 for p in props:
   docs(p)
   
