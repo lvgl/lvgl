@@ -232,5 +232,5 @@ def setup(app):
             'enable_auto_toc_tree': 'True',
             }, True)
     app.add_transform(AutoStructify)
-    app.add_stylesheet('css/custom.css')
-    app.add_stylesheet('css/fontawesome.min.css')
+    app.add_css_file('css/custom.css')
+    app.add_css_file('css/fontawesome.min.css')
