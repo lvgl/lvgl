@@ -51,6 +51,7 @@ code.sig-name
 }
 .wy-side-nav-search>div.version {
   color: #333;
+  display: none; /*replaced by dropdown*/
 }
 
 

@@ -37,9 +37,11 @@ os.system("sed -i \"s|html_baseurl = .*|" + base_html +"|\" conf.py")
 
 clean = 0
 trans = 0
+skip_latex = False
 args = sys.argv[1:]
 if len(args) >= 1:
   if "clean" in args: clean = 1
+  if "skip_latex" in args: skip_latex = True
   
 lang = "en"
 print("")
@@ -55,14 +57,17 @@ print("Running doxygen")
 cmd("cd ../scripts && doxygen Doxyfile")
 # BUILD PDF
 
-# Silly workarond to include the more or less correct PDF download link in the PDF
-#cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")
-cmd("sphinx-build -b latex . out_latex")
+if not skip_latex:
+  # Silly workarond to include the more or less correct PDF download link in the PDF
+  #cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")
+  cmd("sphinx-build -b latex . out_latex")
 
-# Generate PDF
-cmd("cd out_latex && latexmk -pdf 'LVGL.tex'")
-# Copy the result PDF to the main directory to make it avaiable for the HTML build
-cmd("cd out_latex && cp -f LVGL.pdf ../LVGL.pdf")
+  # Generate PDF
+  cmd("cd out_latex && latexmk -pdf 'LVGL.tex'")
+  # Copy the result PDF to the main directory to make it avaiable for the HTML build
+  cmd("cd out_latex && cp -f LVGL.pdf ../LVGL.pdf")
+else:
+  print("skipping latex build as requested")
 
 # BULD HTML
 cmd("sphinx-build -b html . ../out_html")

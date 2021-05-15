@@ -1,0 +1,45 @@
+{% extends "!page.html" %}
+
+{% block footer %}
+
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+<script type="text/javascript">
+function add_version_selector()
+{
+    return fetch("https://raw.githubusercontent.com/lvgl/docs_compiled/gh-pages/versionlist.txt")
+        .then(res => res.text())
+        .then(text => {
+            const versions = text.split("\n").filter(version => version.trim().length > 0);
+            p = document.getElementById("rtd-search-form").parentElement;
+            p.innerHTML = `
+            <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
+            ${versions.map(version => `<option value="${version}">${version}</option>`)}
+            </select>` + p.innerHTML;
+        });
+}
+
+function ver_sel()
+{
+  var x = document.getElementById("versions").value;
+  window.location.href = window.location.protocol + "//" + window.location.host + "/" + x + "/";
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    add_version_selector().then(() => {
+        var value = window.location.pathname.split('/')[1];
+        document.getElementById("versions").value = value;
+    });
+    
+})
+</script>
+{% endblock %}
