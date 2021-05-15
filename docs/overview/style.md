@@ -184,11 +184,11 @@ To remove specific styles use `lv_obj_remoev_style(obj, style, selector)`. This 
 
 
 ### Report style changes
-If a style - which is already assigned to object - changes (i.e. one of it's property is set to a new value) the objects using that style should be notified. There are 3 options to do this:
-1. If you know that the changed properties can be applied by a simple (e.g. color or opacity changes) redraw just call `lv_obj_invalidate(obj)`, `lv_obj_invalideate(lv_scr_act())`. 
-2. If something more complex change happened on a style and you know which object(s) are affected by that style call `lv_obj_refresh_style(obj, part, property)`. 
+If a style which is already assigned to object changes (i.e. a property is added or changed) the objects using that style should be notified. There are 3 options to do this:
+1. If you know that the changed properties can be applied by a simple redraw (e.g. color or opacity changes) just call `lv_obj_invalidate(obj)` or `lv_obj_invalideate(lv_scr_act())`. 
+2. If more complex style properties were changed or added, and you know which object(s) are affected by that style call `lv_obj_refresh_style(obj, part, property)`. 
 To refresh all parts and properties use `lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY)`.
-3. No make LVGL check all object whether thy use the style and refresh them use `lv_obj_report_style_change(&style)`. If `style` is `NULL` all object's will be notified.
+3. No make LVGL check all object whether they use the style and refresh them call `lv_obj_report_style_change(&style)`. If `style` is `NULL` all object's will be notified about the style change.
 
 ### Get a property's value on an object
 To get a final value of property - considering cascading, inheritance, local styles and transitions (see below) - get functions like this can be used: 
