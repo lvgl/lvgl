@@ -177,9 +177,9 @@ lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);  /*Overwrite only a some col
 ```
 
 ### Remove styles
-To remove all styles from an object use `lv_obj_reove_style_all(obj)`.
+To remove all styles from an object use `lv_obj_remove_style_all(obj)`.
 
-To remove specific styles use `lv_obj_remoev_style(obj, style, selector)`. This function will remove `style` only if the `selector` matches with the `selector` used in `lv_obj_add_style`. 
+To remove specific styles use `lv_obj_remove_style(obj, style, selector)`. This function will remove `style` only if the `selector` matches with the `selector` used in `lv_obj_add_style`. 
 `style` can be `NULL` to check only the `selector` and remove all matching styles. The `selector` can use the `LV_STATE_ANY` and `LV_PART_ANY` values to remove the style with any state or part.
 
 
