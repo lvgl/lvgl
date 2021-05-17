@@ -203,7 +203,7 @@ lv_color_t color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);
 Besides "normal" styles, the objects can store local styles too. This concept is similar to inline styles in CSS (e.g. `<div style="color:red">`) with some modification. 
 
 So local styles are like normal styles but they can't be shared among other objects. If used, local styles are allocated automatically, and freed when the object is deleted.
-They are usuful to add local customization to the object.
+They are useful to add local customization to the object.
 
 Unlike in CSS, in LVGL local styles can be assigned to states (*pseudo-classes*) and parts (pseudo-elements).
 

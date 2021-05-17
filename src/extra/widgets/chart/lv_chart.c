@@ -1046,6 +1046,7 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
             p1.y = cursor->dir & LV_DIR_TOP ? obj->coords.y1 : cy;
             p2.x = p1.x;
             p2.y = cursor->dir & LV_DIR_BOTTOM ? obj->coords.y2 : cy;
+
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
             lv_draw_line(&p1, &p2, clip_area, &line_dsc_tmp);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
@@ -1106,10 +1107,6 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
         minor_len *= -1;
     }
 
-    lv_obj_draw_part_dsc_t dsc;
-    lv_obj_draw_dsc_init(&dsc, clip_area);
-    dsc.id = axis;
-    dsc.part = LV_PART_TICKS;
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -1118,6 +1115,13 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_TICKS, &label_dsc);
+
+    lv_obj_draw_part_dsc_t dsc;
+    lv_obj_draw_dsc_init(&dsc, clip_area);
+    dsc.id = axis;
+    dsc.part = LV_PART_TICKS;
+    dsc.line_dsc = &line_dsc;
+    dsc.label_dsc = &label_dsc;
 
     uint32_t total_tick_num = (t->major_cnt - 1) * (t->minor_cnt);
     for(i = 0; i <= total_tick_num; i++) {
@@ -1174,6 +1178,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
             {
                 lv_draw_label(&a, clip_area, &label_dsc, dsc.text, NULL);
             }
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
         }
     }
 }
@@ -1216,6 +1221,8 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_obj_draw_dsc_init(&dsc, clip_area);
     dsc.id = LV_CHART_AXIS_X;
     dsc.part = LV_PART_TICKS;
+    dsc.label_dsc = &label_dsc;
+    dsc.line_dsc = &line_dsc;
 
     /*The columns ticks should be aligned to the center of blocks*/
     if(chart->type == LV_CHART_TYPE_BAR) {
@@ -1266,6 +1273,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area)
         {
             lv_draw_label(&a, clip_area, &label_dsc, dsc.text, NULL);
         }
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
     }
 }
 

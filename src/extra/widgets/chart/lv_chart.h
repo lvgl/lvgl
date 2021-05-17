@@ -35,7 +35,7 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 enum {
     LV_CHART_TYPE_NONE     = 0x00, /**< Don't draw the series*/
     LV_CHART_TYPE_LINE     = 0x01, /**< Connect the points with lines*/
-    LV_CHART_TYPE_BAR   = 0x02, /**< Draw columns*/
+    LV_CHART_TYPE_BAR      = 0x02, /**< Draw columns*/
 };
 typedef uint8_t lv_chart_type_t;
 
@@ -218,7 +218,7 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * obj);
 uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser);
 
 /**
- * Get the position of point of the an index relative to the chart.
+ * Get the position of a point to the chart.
  * @param chart     pointer to a chart object
  * @param ser       pointer to series
  * @param id        the index.

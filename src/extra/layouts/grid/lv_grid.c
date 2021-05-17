@@ -76,8 +76,8 @@ lv_style_prop_t LV_STYLE_GRID_COLUMN_DSC_ARRAY;
 lv_style_prop_t LV_STYLE_GRID_COLUMN_ALIGN;
 lv_style_prop_t LV_STYLE_GRID_ROW_DSC_ARRAY;
 lv_style_prop_t LV_STYLE_GRID_ROW_ALIGN;
-lv_style_prop_t LV_STYLE_GRID_CELL_COL_POS;
-lv_style_prop_t LV_STYLE_GRID_CELL_COL_SPAN;
+lv_style_prop_t LV_STYLE_GRID_CELL_COLUMN_POS;
+lv_style_prop_t LV_STYLE_GRID_CELL_COLUMN_SPAN;
 lv_style_prop_t LV_STYLE_GRID_CELL_X_ALIGN;
 lv_style_prop_t LV_STYLE_GRID_CELL_ROW_POS;
 lv_style_prop_t LV_STYLE_GRID_CELL_ROW_SPAN;
@@ -107,8 +107,8 @@ void lv_grid_init(void)
 
     LV_STYLE_GRID_CELL_ROW_SPAN = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
     LV_STYLE_GRID_CELL_ROW_POS = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
-    LV_STYLE_GRID_CELL_COL_SPAN = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
-    LV_STYLE_GRID_CELL_COL_POS = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
+    LV_STYLE_GRID_CELL_COLUMN_SPAN = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
+    LV_STYLE_GRID_CELL_COLUMN_POS = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
     LV_STYLE_GRID_CELL_X_ALIGN = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
     LV_STYLE_GRID_CELL_Y_ALIGN = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
 }
