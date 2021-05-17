@@ -52,10 +52,7 @@ static void ta_event_cb(lv_event_t * e)
     }
 
     else if(code == LV_EVENT_READY) {
-        const char * str = lv_event_get_param(e);
-        if(str[0] == '\n') {
-            LV_LOG_USER("Ready\n");
-        }
+        LV_LOG_USER("Ready, current text: %s", lv_textarea_get_text(ta));
     }
 }
 

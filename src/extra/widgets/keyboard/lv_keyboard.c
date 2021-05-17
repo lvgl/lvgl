@@ -260,7 +260,6 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
             res = lv_event_send(keyboard->ta, LV_EVENT_CANCEL, NULL);
             if(res != LV_RES_OK) return;
         }
-        lv_keyboard_set_textarea(obj, NULL); /*De-assign the text area  to hide it cursor if needed*/
         return;
     }
     else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
@@ -271,8 +270,6 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
             res = lv_event_send(keyboard->ta, LV_EVENT_READY, NULL);
             if(res != LV_RES_OK) return;
         }
-
-        lv_keyboard_set_textarea(obj, NULL); /*De-assign the text area  to hide it cursor if needed*/
         return;
     }
 
