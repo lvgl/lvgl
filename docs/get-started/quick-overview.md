@@ -72,7 +72,7 @@ bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
     if(touchpad_is_pressed()) {
       data->state = LV_INDEV_STATE_PRESSED;
-      touchpad_get_xy(&data->point.x, &data->point.y);     
+      touchpad_get_xy(&data->point.x, &data->point.y);
     } else {
       data->state = LV_INDEV_STATE_RELEASED;
     }
@@ -82,7 +82,7 @@ bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 - Call `lv_timer_handler()` periodically every few milliseconds in the main `while(1)` loop or in an Operation system task.
 It will redraw the screen if required, handle input devices, animation etc.
 
-For a more detailed guide go to the [Porting](/porting/index.html) section.
+For a more detailed guide go to the [Porting](/porting/index) section.
 
 ## Learn the basics
 

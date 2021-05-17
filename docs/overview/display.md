@@ -51,7 +51,7 @@ Be sure not to confuse displays and screens:
 Screens can be considered the highest level containers which have no parent.
 The screen's size is always equal to its display and size their position is (0;0). Therefore, the screens coordinates can't be changed, i.e. `lv_obj_set_pos()`, `lv_obj_set_size()` or similar functions can't be used on screens.
 
-A screen can be created from any object type but, the two most typical types are the [Base object](/widgets/obj) and the [Image](/widgets/img) (to create a wallpaper).
+A screen can be created from any object type but, the two most typical types are the [Base object](/widgets/obj) and the [Image](/widgets/core/img) (to create a wallpaper).
 
 To create a screen, use `lv_obj_t * scr = lv_<type>_create(NULL, copy)`. `copy` can be an other screen to copy it.
 

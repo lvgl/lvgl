@@ -54,7 +54,7 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Add ticks and labels to the axis and demonstrate scrolling
+ * Show the value of the pressed points
  */
 void lv_example_chart_4(void)
 {

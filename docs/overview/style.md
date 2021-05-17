@@ -104,7 +104,7 @@ The following predefined parts exist in LVGL:
 - `LV_PART_CUSTOM_FIRST` Custom parts can be added from here.
 
 
-For example a [Slider](/widgets/slider) has three parts:
+For example a [Slider](/widgets/core/slider) has three parts:
 - Background
 - Indiactor
 - Knob
@@ -327,19 +327,17 @@ void new_theme_apply_cb(lv_theme_t * th, lv_obj_t * obj)
 ## API
 ```eval_rst
 
-.. doxygenfile:: lv_obj_style.h
-  :project: lvgl
-  
-.. doxygenfile:: lv_obj_style_dec.h
-  :project: lvgl
-  
 .. doxygenfile:: lv_style.h
-  :project: lvgl
-  
-.. doxygenfile:: lv_style_dec.h
   :project: lvgl
 
 .. doxygenfile:: lv_theme.h
   :project: lvgl
+
+.. doxygenfile:: lv_obj_style_gen.h
+  :project: lvgl
+  
+.. doxygenfile:: lv_style_gen.h
+  :project: lvgl
+  
 
 ```

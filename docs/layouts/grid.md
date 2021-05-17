@@ -96,7 +96,7 @@ The columns will be placed from right to left.
 
 ```eval_rst
 
-.. include:: ../../../examples/layouts/grid/index.rst
+.. include:: ../../examples/layouts/grid/index.rst
 
 ```
 

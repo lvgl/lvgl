@@ -58,8 +58,8 @@ It's not mandatory but we highly appreciate it if you write a few words about yo
 
 Although you can get LVGL for free there is a huge work behind it. It's created by a group of volunteers who made it available for you in their free time.
 
-To make the LVGL project sustainable, please consider [Contributing](/contributing/index) to the project. 
-You can choose from [many ways of contributions](/contributing/index) such as simply writing a tweet about you are using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
+To make the LVGL project sustainable, please consider [Contributing](/CONTRIBUTING) to the project. 
+You can choose from [many ways of contributions](/CONTRIBUTING) such as simply writing a tweet about you are using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
 
 ## Repository layout
 All repositories of the LVGL project are hosted n GitHub: https://github.com/lvgl

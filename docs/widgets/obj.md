@@ -21,7 +21,7 @@ The Base object can be directly used as a simple widgets. It nothing else than a
 
 ### Coordinates
 
-Here only a small subset of cooridnate settings is described. To see all the features of LVGL (padding, cooridnates in styles, layouts, etc) visit the [Coordinates](overview/coord) page.
+Here only a small subset of cooridnate settings is described. To see all the features of LVGL (padding, cooridnates in styles, layouts, etc) visit the [Coordinates](/overview/coords) page.
 
 #### Size
 The object size can be modified on individual axes with `lv_obj_set_width(obj, new_width)` and `lv_obj_set_height(obj, new_height)`, or both axes can be modified at the same time with `lv_obj_set_size(obj, new_width, new_height)`.

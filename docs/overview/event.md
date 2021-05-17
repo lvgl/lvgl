@@ -146,7 +146,7 @@ lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 `lv_event_t` is the only parameter passed to event callback and it contains all the data about the event. The following values can be get from it:
 - `lv_event_get_code(e)` get the event code
 - `lv_event_get_target(e)` get the object to which the event is sent
-- `lv_event_get_original_target(e)` get the object to which the event is sent originally sent (different from `lv_event_get_target` if [event bubbling](event-bubbling) is enabled)
+- `lv_event_get_original_target(e)` get the object to which the event is sent originally sent (different from `lv_event_get_target` if [event bubbling](#event-bubbling) is enabled)
 - `lv_event_get_user_data(e)` get the pointer passed as the last parameter of `lv_obj_add_event_cb`.
 - `lv_event_get_param(e)` get the parameter passed as the last parameter of `lv_event_send` 
 

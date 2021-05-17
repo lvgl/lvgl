@@ -99,7 +99,7 @@ You can force Flex to put an item into a new line with `lv_obj_add_flag(child, L
 
 ```eval_rst
 
-.. include:: ../../../examples/layouts/flex/index.rst
+.. include:: ../../examples/layouts/flex/index.rst
 
 ```
 

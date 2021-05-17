@@ -96,7 +96,7 @@ lv_fs_dir_close(&dir);
 
 ## Use drivers for images
 
-[Image](/widgets/img) objects can be opened from files too (besides variables stored in the flash).
+[Image](/widgets/core/img) objects can be opened from files too (besides variables stored in the flash).
 
 To initialize the image, the following callbacks are required:
 - open

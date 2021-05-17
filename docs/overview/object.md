@@ -5,7 +5,7 @@
 # Objects
 
 In the LVGL the **basic building blocks** of a user interface are the objects, also called *Widgets*.
-For example a [Button](/widgets/core/btn), [Label](/widgets/core/label), [Image](/widgets/core/img), [List](/widgets/core/list), [Chart](/widgets/extra/chart) or [Text area](/widgets/core/textarea).
+For example a [Button](/widgets/core/btn), [Label](/widgets/core/label), [Image](/widgets/core/img), [List](/widgets/extra/list), [Chart](/widgets/extra/chart) or [Text area](/widgets/core/textarea).
 
 Check all the [Object types](/widgets/index) here.
 
