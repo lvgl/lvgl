@@ -18,6 +18,7 @@
    list
    meter
    msgbox
+   span
    spinbox
    spinner
    tabview
