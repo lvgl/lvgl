@@ -52,7 +52,7 @@ You can modify some parameters of the timers later:
 
 ## Repeat count
 
-You can make a timer repat only a given times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after being called the defined times. Set the ount to `-1` to repeat infinitly. 
+You can make a timer repat only a given times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after being called the defined times. Set the count to `-1` to repeat infinitly. 
 
 
 ## Measure idle time
