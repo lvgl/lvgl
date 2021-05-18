@@ -64,7 +64,7 @@ Besides managing "normal" scrolling there are many interesting and useful additi
 
 ### Scrollable
 
-It's possible to make an object non-scrollable with `lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLLABLE)`.
+It's possible to make an object non-scrollable with `lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE)`.
 
 Non-scrollable object can still propagate the scrolling (chain) to the parents.
 
@@ -154,7 +154,7 @@ if(event_code == LV_EVENT_GET_SELF_SIZE) {
     p->x = 200;	//Set or calculate the self width
   }
   
-  if(p->x >= 0) {
+  if(p->y >= 0) {
     p->y = 50;	//Set or calculate the self height
   }
 }
