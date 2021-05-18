@@ -1,5 +1,75 @@
 # Changelog
 
+## v8.0.0 (Planned in May 2021)
+
+### Directory structure
+- The `lv_` prefix is removed from the folder names
+- The `docs` is moved to the `lvgl` repository
+- The `examples` are moved to the `lvgl` repository
+- Create an `src/extra` folder for complex widgets:
+   - It makes the core LVGL leaner
+   - In `extra` we can have a lot and specific widgets
+   - Good place for contributions
+
+### Removed objects
+- `lv_cont` layout features are moved to `lv_obj`
+- `lv_page` scroll features are moved to `lv_obj`
+- `lv_objmask` the same can be achieved by events
+
+### New scrolling
+- Support "elastic" scrolling when scrolled in
+- Support scroll chaining among any objects types (not only `lv_pages`s)
+- Remove `lv_drag`. Similar effect can be achieved by setting the position in `LV_EVENT_PRESSING`
+- Add snapping
+- Add snap stop to scroll max 1 snap point
+
+### New layouts
+- [CSS Grid](https://css-tricks.com/snippets/css/a-guide-to-grid/)-like layout support
+- [CSS Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)-like layout support
+
+### Styles
+- Optimize and simplify styles
+- State is saved in the object instead of the style property
+- Object size and position can be set in styles too
+
+### Events
+- Allow adding multiple events to an object
+- A `user_data` can be attached to the added events
+
+### Driver changes
+- `lv_disp_drv_t`, `lv_indev_drv_t`, `lv_fs_drv_t` needs to be `static`
+- `...disp_buf...` is renamed to `draw_buf`. See an initialization example [here](https://github.com/lvgl/lv_sim_eclipse_sdl/blob/e164e3591c3e1e3bf3464d19e0dcdc67b2e6a791/main.c#L87-L97).
+- No partial update if two screen sized buffers are set
+- `disp_drv->full_refresh = 1` makes always the whole display redraw. 
+- `hor_res` and `ver_res` need to be set in `disp_drv`
+- `indev_read_cb` returns `void`. To indicate that there is more that to read set `data->continue_reading = 1` in the `read_cb`
+.
+### Other changes
+- Remove the copy parameter from create functions
+- Simplified File system interface API
+- Use a more generic inheritance
+- The built-in themes are reworked
+- `lv_obj_align` now saved the alignment and realigns the object automatically but can't be used to align to other than the parent
+- `lv_obj_align_to` can align to an object but doesn't save the alignment
+- `lv_pct(x)` can be used to set the size and position in percentage
+- There are many other changes in widgets that are not detailed here. Please refer to the documentation of the widgets.
+
+### New release policy
+- We will follow [Release branches with GitLab flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow)
+- Minor releases are expected in every 3-4 month
+- `master` will always contain the latest changes
+
+### Migrating from v7 to v8
+- First and foremost, create a new `lv_conf.h` based on `lv_conf_template.h`.
+- To try the new version it suggested using a simulator project and see the examples.
+- When migrating your project to v8
+  - Update the drivers are described above
+  - Update the styles
+  - Update the events
+  - Use the new layouts instead of `lv_cont` features
+  - Use `lv_obj` instead of `lv_page`
+  - The other parts are mainly minor renames and refactoring. See the functions' documentation for descriptions. 
+
 ## v7.11.0
 
 ### New features
