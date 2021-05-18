@@ -334,8 +334,7 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
 {
     if(e->code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * p = lv_event_get_param(e);
-        if(p->res == LV_COVER_RES_MASKED) return;   /*Do not overwrite masked result*/
-        if(res == LV_COVER_RES_NOT_COVER) p->res = res;
+        if(res > p->res) p->res = res;  /*Save only "stronger" results*/
     } else {
         LV_LOG_WARN("Not interpreted with this event code");
     }

@@ -25,11 +25,11 @@ extern "C" {
 
 struct _lv_obj_t;
 
-/** Cover check results*/
+/** Cover check results.*/
 typedef enum {
-    LV_COVER_RES_COVER,
-    LV_COVER_RES_NOT_COVER,
-    LV_COVER_RES_MASKED,
+    LV_COVER_RES_COVER      = 0,
+    LV_COVER_RES_NOT_COVER  = 1,
+    LV_COVER_RES_MASKED     = 2,
 }lv_cover_res_t;
 
 typedef struct
