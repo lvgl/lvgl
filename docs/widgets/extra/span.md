@@ -2,7 +2,7 @@
 .. include:: /header.rst 
 :github_url: |github_link_base|/widgets/span.md
 ```
-# span (lv_span)
+# Span (lv_span)
 
 ## Overview
 
@@ -47,7 +47,7 @@ use function `lv_span_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set obj
 use function `lv_span_set_indent(spangroup, 20)` to set text indent of first line.
 
 ## Events
-Only the [Generic events](../overview/event.html#generic-events) are sent by the object type.
+No special events are sent by this widget. 
 
 Learn more about [Events](/overview/event).
 

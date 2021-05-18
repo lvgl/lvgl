@@ -11,8 +11,11 @@ The LEDs are rectangle-like (or circle) object. It's brightness can be adjusted.
 ## Parts and Styles
 The LEDs have only one main part, called `LV_LED_PART_MAIN` and it uses all the typical background style properties.
 
-
 ## Usage
+
+### Color
+You can set the color of the LED with `lv_led_set_color(led, lv_color_hex(0xff0080))`.
+This will be used as background color, border color, and shadow color.
 
 ### Brightness
 You can set their brightness with `lv_led_set_bright(led, bright)`. The brightness should be between 0 (darkest) and 255 (lightest).
@@ -21,7 +24,7 @@ You can set their brightness with `lv_led_set_bright(led, bright)`. The brightne
 Use `lv_led_on(led)` and `lv_led_off(led)` to set the brightness to a predefined ON or OFF value. The `lv_led_toggle(led)` toggles between the ON and OFF state.
 
 ## Events
-Only the [Generic events](../overview/event.html#generic-events) are sent by the object type.
+No special event are sent by the LED object.
 
 Learn more about [Events](/overview/event).
 
@@ -34,7 +37,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_led/index.rst
+.. include:: ../../../examples/widgets/led/index.rst
 
 ```
 
