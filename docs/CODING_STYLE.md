@@ -8,7 +8,7 @@ Use [misc/lv_templ.c](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ
 * In variable and function names use only lower case letters (e.g. *height_tmp*)
 * In enums and defines use only upper case letters (e.g. *e.g. MAX_LINE_NUM*)
 * Global names (API):
-  * starts with *lv*
+  * start with *lv*
   * followed by module name: *btn*, *label*, *style* etc.
   * followed by the action (for functions): *set*, *get*, *refr* etc.
   * closed with the subject: *name*, *size*, *state* etc.
