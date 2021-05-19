@@ -36,15 +36,10 @@ class LvExample(Directive):
         node_list.append(toggle)
         return node_list
 
-def on_html_page_context(app, pagename, templatename, context, doctree):
-    if doctree:
-        print(doctree.attributes['source']) # Path to .rst file
-
 def setup(app):
     app.add_directive("lv_example", LvExample)
     app.add_config_value("example_commit_hash", "", "env")
     app.add_config_value("built_example_commit_hash", "", "env")
-    app.connect('html-page-context', on_html_page_context)    
 
     return {
         'version': '0.1',
