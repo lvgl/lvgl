@@ -258,6 +258,8 @@ static void btns_value_changed_event_cb(lv_event_t * e)
     lv_obj_t * tv = lv_obj_get_parent(btns);
     uint32_t id = lv_btnmatrix_get_selected_btn(btns);
     lv_tabview_set_act(tv, id, LV_ANIM_ON);
+
+    lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
 }
 static void cont_scroll_end_event_cb(lv_event_t * e)
 {
@@ -272,5 +274,6 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
     lv_coord_t t = (p.x + w/ 2) / w;
     if(t < 0) t = 0;
     lv_tabview_set_act(tv, t, LV_ANIM_ON);
+    lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
 }
 #endif /*LV_USE_TABVIEW*/

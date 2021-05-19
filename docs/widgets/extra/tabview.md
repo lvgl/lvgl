@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/tabview.md
+:github_url: |github_link_base|/widgets/extra/tabview.md
 ```
 
 # Tabview (lv_tabview)
@@ -8,81 +8,49 @@
 ## Overview
 
 The Tab view object can be used to organize content in tabs.
+The Tab view is built from other widgets like this:
+- Main container: [lv_obj](/widgets/obj))
+  - Tab buttons: [lv_btnmatrix](/widgets/core/btnmatrix)
+  - Container for the tabs: [lv_obj](/widgets/obj)
+     - Content of the tabs: [lv_obj](/widgets/obj)
+
+The tab buttons can be positioned on the topn, bottom, left and right side of teh Tab view. 
+
+A new tab can be selected either clicking on a tab button or sliding horizontally on the content.
 
 ## Parts and Styles
-
-The Tab view object has several parts. The main is `LV_TABVIEW_PART_BG`. It a rectangle-like container which holds the other parts of the Tab view.
-
-On the background 2 important real parts are created:
-
-- `LV_TABVIEW_PART_BG_SCRL`: it's the scrollable part of [Page](/widgets/page). It holds the content of the tabs next to each other. The background of the Page is always transparent and can't be accessed externally.
-- `LV_TABVIEW_PART_TAB_BG`: The tab buttons which is a [Button matrix](/widgets/btnmatrix).
-Clicking on a button will scroll `LV_TABVIEW_PART_BG_SCRL` to the related tab's content. The tab buttons can be accessed via `LV_TABVIEW_PART_TAB_BTN`. When tabs are selected, the buttons are in the checked state, and can be styled using `LV_STATE_CHECKED`.
-The height of the tab's button matrix is calculated from the font height plus padding of the background's and the button's style. 
-
-All the listed parts supports the typical background style properties and padding.
-
-`LV_TABVIEW_PART_TAB_BG` has an additional real part, an indicator, called `LV_TABVIEW_PART_INDIC`.
-It's a thin rectangle-like object under the currently selected tab. When the tab view is animated to an other tab the indicator will be animated too.
-It can be styles using the typical background style properties. The *size* style property will set the its thickness.
-
-When a new tab is added a [Page](/widgets/page) is create for them on `LV_TABVIEW_PART_BG_SCRL` and a new button is added to `LV_TABVIEW_PART_TAB_BG` Button matrix.
-The created Pages can be used as normal Pages and they have the usual Page parts.
+There are no special parts on the Tab view but the `lv_obj` and `lv_btnnmatrix` widgets are used to build up the Tab view.
 
 ## Usage
 
-### Adding tab
+### Create a Tab view
 
-New tabs can be added with `lv_tabview_add_tab(tabview, "Tab name")`. It will return with a pointer to a [Page](/widgets/page) object where the tab's content can be created.
+`lv_tabview_create(parent, tab_pos, tab_size);` creates a new empty Tab view.  `tab_pos` can be `LV_DIR_TOP/BOTTOM/LEFT/RIGHT` to position the tab buttons to a side. 
+`tab_size` is the height (in case of `LV_DIR_TOP/BOTTOM`) or width (in case of `LV_DIR_LEFT/RIGHT`) tab buttons.
+
+### Add tabs
+
+New tabs can be added with `lv_tabview_add_tab(tabview, "Tab name")`. It will return with a pointer to an [lv_obj](/widgets/obj) object where the tab's content can be created.
 
 ### Change tab
 
 To select a new tab you can:
+- Click on its tab button
+- Slide horizontally
+- Use `lv_tabview_set_act(tabview, id, LV_ANIM_ON/OFF)` function
 
-- Click on it on the Button matrix part
-- Slide
-- Use `lv_tabview_set_tab_act(tabview, id, LV_ANIM_ON/OFF)` function
+### Get the parts
 
-### Change tab's name
-
-To change the name (shown text of the underlying button matrix) of tab `id` during runtime the function `lv_tabview_set_tab_name(tabview, id, name)` can be used.
-
-### Tab button's position
-
-By default, the tab selector buttons are placed on the top of the Tab view. It can be changed with `lv_tabview_set_btns_pos(tabview, LV_TABVIEW_TAB_POS_TOP/BOTTOM/LEFT/RIGHT/NONE)`
-
-`LV_TABVIEW_TAB_POS_NONE` will hide the tabs.
-
-Note that, you can't change the tab position from top or bottom to left or right when tabs are already added.
-
-### Animation time
-
-The animation time is adjusted by `lv_tabview_set_anim_time(tabview, anim_time_ms)`. It is used when the new tab is loaded.
-
-### Scroll propagation
-
-As the tabs' content object is a Page it can receive scroll propagation from an other Page-like object.
-For example, if a text area is created on the tab's content and that Text area is scrolled but it reached the end the scroll can be propagated to the content Page.
-It can be enabled with `lv_page/textarea_set_scroll_propagation(obj, true)`.
-
-By default the tab's content Pages have enabled scroll propagation, therefore when they are scrolled horizontally the scroll is propagated to `LV_TABVIEW_PART_BG_SCRL` and this way the Pages will be scrolled.
-
-The manual sliding can be disabled with `lv_page_set_scroll_propagation(tab_page, false)`.
+`lv_tabview_get_content(tabview)` return the container for the tabs, `lv_tabview_get_tab_btns(tabview)` returns the Tab buttons which is a [Button matrix](/widgets/core/btnmatrix).
 
 ## Events
-
-Besides the [Generic events](../overview/event.html#generic-events) the following [Special events](../overview/event.html#special-events) are sent by the Slider:
-
-- **LV_EVENT_VALUE_CHANGED** Sent when a new tab is selected by sliding or clicking the tab button
+- `LV_EVENT_VALUE_CHANGED` Sent when a new tab is selected by sliding or clicking the tab button. `lv_tabview_get_tab_act(tabview)` returns the zero based index of the current tab.
 
 Learn more about [Events](/overview/event).
 
 ## Keys
 
-The following *Keys* are processed by the Tabview:
-
-- **LV_KEY_RIGHT/LEFT** Select a tab
-- **LV_KEY_ENTER** Change to the selected tab
+Keys have effect only on the tab buttons (Button matrix). You can add it manually to a group if required.
 
 Learn more about [Keys](/overview/indev).
 
@@ -90,7 +58,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_tabview/index.rst
+.. include:: ../../../examples/widgets/tabview/index.rst
 
 ```
 

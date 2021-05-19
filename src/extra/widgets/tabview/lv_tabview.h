@@ -41,7 +41,6 @@ extern const lv_obj_class_t lv_tabview_class;
  **********************/
 lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab_size);
 
-
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * tv, const char * name);
 
 lv_obj_t * lv_tabview_get_content(lv_obj_t * tv);

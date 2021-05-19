@@ -26,6 +26,7 @@ extern "C" {
  **********************/
 typedef struct {
     lv_obj_t obj;
+    lv_obj_t * tile_act;
 }lv_tileview_t;
 
 typedef struct {
@@ -52,6 +53,7 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t row_id, uint8_t col_id, l
 void lv_obj_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en);
 void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim_enable_t anim_en);
 
+lv_obj_t * lv_tileview_get_tile_act(lv_obj_t * obj);
 
 /*=====================
  * Other functions

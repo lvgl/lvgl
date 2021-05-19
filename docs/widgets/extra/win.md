@@ -7,58 +7,41 @@
 ## Overview
 
 The Window is container-like objects built from a header with title and button and a content area. 
-
  
 ## Parts and Styles
-The main part is `LV_WIN_PART_BG` which holds the two other real parts:
-1. `LV_WIN_PART_HEADER`: a header [Container](/widgets/cont) on the top with a title and control buttons
-2. `LV_WIN_PART_CONTENT_SCRL` the scrollable part of a [Page](/widgets/page) for the content below the header. 
+The Window is  built from other widgets so you can check these widget's documentation for details:
+- Background: [lv_obj](/widgets/obj)
+- Header on the background: [lv_obj](/widgets/obj)
+- Title on the header: [lv_label](/widgets/core/label)
+- Buttons on the header: [lv_btn](/widgets/core/btn)
+- Content area on the background: [lv_obj](/widgets/obj)
 
 
-Besides these, `LV_WIN_PART_CONTENT_SCRL` has a scrollbar part called `LV_WIN_PART_CONTENT_SCRL`.
-Read the documentation of [Page](/widgets/page) for more details on the scrollbars.
+## Usage
 
-All parts supports the typical background properties. The title uses the *Text* properties of the header part.
- 
-The height of the control buttons is: *header height - header padding_top -  header padding_bottom*.
- 
+### Create a Window
 
-### Title
-On the header, there is a title which can be modified by: `lv_win_set_title(win, "New title")`. 
+`lv_win_create(parent, header_height)` creates a Window with am empty header.
 
-### Control buttons
-Control buttons can be added to the right of the window header with: `lv_win_add_btn_right(win, LV_SYMBOL_CLOSE)`, to add a button to the left side of the window header use `lv_win_add_btn_left(win, LV_SYMBOL_CLOSE)` instead.
-The second parameter is an [Image](/widgets/img) source so it can be a symbol, a pointer to an `lv_img_dsc_t `variable or a path to file.
+### Title and buttons
 
-The width of the buttons can be set with `lv_win_set_btn_width(win, w)`. If `w == 0` the buttons will be square-shaped.
+Any number of text's (but typically only one) can be added to the header with `lv_win_add_title(win, "The title")`. 
 
-`lv_win_close_event_cb` can be used as an event callback to close the Window.
+Control buttons can be added to the window's header with `lv_win_add_btn_right(win, icon, btn_width)`. `icon` can be any image source, and `btn_width` is the width of the button.
 
-### Scrollbars
+The title and the buttons will be added in the order of the functions are called. So adding a button, a text and two other buttons will result in a button on the left, a title, ant 2 buttons on the right.
+The width of the title is set to take all the remaining space on the header. In other words it pushes the buttons to the right added after the title. 
 
-The scrollbar behavior can be set by `lv_win_set_scrlbar_mode(win, LV_SCRLBAR_MODE_...)`. 
-See [Page](/widgets/page) for details.
-
-### Manual scroll and focus
-To scroll the Window directly you can use `lv_win_scroll_hor(win, dist_px)` or `lv_win_scroll_ver(win, dist_px)`.
-
-To make the Window show an object on it use `lv_win_focus(win, child, LV_ANIM_ON/OFF)`.
-
-The time of scroll and focus animations can  be adjusted with `lv_win_set_anim_time(win, anim_time_ms)`
-
-### Layout
-To set a layout for the content use `lv_win_set_layout(win, LV_LAYOUT_...)`. 
-See [Container](/widgets/cont) for details.
+## Get the parts
+`lv_win_get_header(win)` return a pointer to the header,  `lv_win_get_content(win)` returns a pointer to the content container to which the content of the window can be added.
 
 ## Events
-Only the [Generic events](../overview/event.html#generic-events) are sent by the object type.
+No special events are sent by the windows, however events can be added manually to the return value of `lv_win_add_btn_right`.
 
 Learn more about [Events](/overview/event).
 
 ## Keys
-
-The following *Keys* are processed by the Page:
-- **LV_KEY_RIGHT/LEFT/UP/DOWN** Scroll the page
+No *Keys* are handled by the window. 
 
 Learn more about [Keys](/overview/indev).
 
@@ -67,7 +50,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_win/index.rst
+.. include:: ../../../examples/widgets/win/index.rst
 
 ```
 

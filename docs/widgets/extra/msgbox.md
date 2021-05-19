@@ -1,55 +1,54 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/msgbox.md
+:github_url: |github_link_base|/widgets/extra/msgbox.md
 ```
 # Message box (lv_msgbox)
 
 ## Overview
 The Message boxes act as pop-ups. 
-They are built from a background [Container](/widgets/cont), a [Label](/widgets/label) and a [Button matrix](/widgets/btnmatrix) for buttons. 
+They are built from a background container, a title, an optional close button, a text and optional buttons.
 
-The text will be broken into multiple lines automatically (has `LV_LABEL_LONG_MODE_BREAK`) and the height will be set automatically to involve the text and the buttons (`LV_FIT_TIGHT` fit vertically)-
+The text will be broken into multiple lines automatically and the height will be set automatically to involve the text and the buttons.
+
+The message box can be a modal (block clicks on the rest of the screen) or not modal.
 
 ## Parts and Styles
-The Message box's main part is called `LV_MSGBOX_PART_MAIN` and it uses all the typical background style properties. Using padding will add space on the sides. *pad_inner* will add space between the text and the buttons. 
-The *label* style properties affect the style of text.
-
-The buttons parts are the same as in case of [Button matrix](/widgets/btnmatrix):
-- `LV_MSGBOX_PART_BTN_BG` the background of the buttons
-- `LV_MSGBOX_PART_BTN` the buttons
-
+The mesasge box is built from other widgets so you can check these widget's documentation for details.
+- Background: [lv_obj](/widgets/obj)
+- Close button: [lv_btn](/widgets/core/btn)
+- Title and text: [lv_label](/widgets/core/label)
+- Buttons: [lv_btnmatrix](/widgets/core/btnmatrix)
 
 ## Usage
 
+### Create a messaeg box
 
-### Set text
-To set the text use the `lv_msgbox_set_text(msgbox, "My text")` function. Not only the pointer of the text will be saved, so the the text can be in a local variable too.
+`lv_msgbox_create(parent, title, txt, btn_txts[], add_close_btn)` creates a message box.
 
-### Add buttons
- To add buttons use the `lv_msgbox_add_btns(msgbox, btn_str)` function. The button's text needs to be specified like `const char * btn_str[] = {"Apply", "Close", ""}`. 
- For more information visit the [Button matrix](/widgets/btnmatrix) documentation.
+If `parent` is `NULL` the message box will be a modal. `title` and `txt` are strings for the title and the text. 
+`btn_txts[]` is an array with the buttons' text. E.g. `const char * btn_txts[] = {"Ok", "Cancel", NULL}`.
+`add_colse_btn` can be `true` or `false` to add/don't add a close button.
 
- The button matrix will be created only when `lv_msgbox_add_btns()` is called for the first time.
+### Get the parts
+The building block of the message box can be get with the following functions:
+```c 
+lv_obj_t * lv_msgbox_get_title(lv_obj_t * mbox);
+lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * mbox);
+lv_obj_t * lv_msgbox_get_text(lv_obj_t * mbox);
+lv_obj_t * lv_msgbox_get_btns(lv_obj_t * mbox);
+```
 
-### Auto-close
-With `lv_msgbox_start_auto_close(mbox, delay)` the message box can be closed automatically after `delay` milliseconds with an animation. The `lv_mbox_stop_auto_close(mbox)` function stops a started auto close.
-
-The duration of the close animation can be set by `lv_mbox_set_anim_time(mbox, anim_time)`.
+### Close the message box
+`lv_msgbox_close(msgbox)` closes (deletes) the message box.
 
 ## Events
-Besides the [Generic events](../overview/event.html#generic-events) the following [Special events](../overview/event.html#special-events) are sent by the Message boxes:
- - **LV_EVENT_VALUE_CHANGED** sent when the button is clicked. The event data is set to ID of the clicked button.
-
-The Message box has a default event callback which closes itself when a button is clicked.
+- `LV_EVENT_VALUE_CHANGED` is sent by the buttons if one of them is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the message box itself. 
+In the event `lv_event_get_target(e)` will give the button matrix, `lv_event_get_current_target(e)` will give the message box. `lv_msgbox_get_active_btn_text(msgbox)` can be used to get the text of the clicked button. 
 
 Learn more about [Events](/overview/event).
 
-##Keys
-
-The following *Keys* are processed by the Buttons:
-- **LV_KEY_RIGHT/DOWN** Select the next button
-- **LV_KEY_LEFT/TOP** Select the previous button
-- **LV_KEY_ENTER** Clicks the selected button 
+## Keys
+Keys have effect on the close button and button matrix. You can add them manually to a group if required.
 
 Learn more about [Keys](/overview/indev).
 
@@ -58,7 +57,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_msgbox/index.rst
+.. include:: ../../../examples/widgets/msgbox/index.rst
 
 ```
 

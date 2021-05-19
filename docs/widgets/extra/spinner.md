@@ -1,42 +1,25 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/spinner.md
+:github_url: |github_link_base|/widgets/extra/spinner.md
 ```
 # Spinner (lv_spinner)
 
 ## Overview
-The Spinner object is a spinning arc over a border. 
+The Spinner object is a spinning arc over a ring. 
 
 ## Parts and Styles
-
-The Spinner uses the the following parts:
-- `LV_SPINNER_PART_BG`: main part
-- `LV_SPINNER_PART_INDIC`: the spinning arc (virtual part)
-
-The parts and style works the same as in case of [Arc](/widgets/arc). Read its documentation for a details description.
+The parts are identical to the parts of [lv_arc](/widgets/core/arc).
 
 ## Usage
 
-### Arc length
-The length of the arc can be adjusted by `lv_spinner_set_arc_length(spinner, deg)`.
+### Create a spinner
 
-### Spinning speed
-The speed of the spinning can be adjusted by `lv_spinner_set_spin_time(preload, time_ms)`.
-
-### Spin types
-You can choose from more spin types:
-- **LV_SPINNER_TYPE_SPINNING_ARC** spin the arc, slow down on the top
-- **LV_SPINNER_TYPE_FILLSPIN_ARC** spin the arc, slow down on the top but also stretch the arc
-- **LV_SPINNER_TYPE_CONSTANT_ARC** spin the arc at a constant speed
-
-To apply one if them use `lv_spinner_set_type(preload, LV_SPINNER_TYPE_...)`
-
-### Spin direction
-The direction of spinning can be changed with `lv_spinner_set_dir(preload, LV_SPINNER_DIR_FORWARD/BACKWARD)`.
-
+To create spinner use `lv_spinner_create(parent, spin_time, arc_length)`. `spin time` set the spin time in milliseconds, `arc_length` sets the length of the spinning arc in degrees.
 
 ## Events
-Only the [Generic events](../overview/event.html#generic-events) are sent by the object type.
+No special events are sent the the Spinner.
+
+Learn more about [Events](/overview/events).
 
 ## Keys
 No *Keys* are processed by the object type.
@@ -49,7 +32,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_spinner/index.rst
+.. include:: ../../../examples/widgets/spinner/index.rst
 
 ```
 
