@@ -926,7 +926,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->pad_small, 0);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->outline_secondary, LV_STATE_EDITED);
-        lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_CURSOR | LV_STATE_FOCUSED);
+        lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_CURSOR);
     }
 #endif
 #if LV_USE_TILEVIEW
