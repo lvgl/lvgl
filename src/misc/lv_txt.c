@@ -366,8 +366,10 @@ lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t *
 
     if(length != 0) {
         while(i < length) {
-            uint32_t letter      = _lv_txt_encoded_next(txt, &i);
-            uint32_t letter_next = _lv_txt_encoded_next(&txt[i], NULL);
+            uint32_t letter;
+            uint32_t letter_next;
+            _lv_txt_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(_lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;
@@ -523,6 +525,12 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 #endif
 
     return text;
+}
+
+void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t *ofs)
+{
+    *letter = _lv_txt_encoded_next(txt, ofs);
+    *letter_next = *letter != '\0' ? _lv_txt_encoded_next(&txt[*ofs], NULL) : 0;
 }
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
