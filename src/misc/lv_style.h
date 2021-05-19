@@ -175,7 +175,7 @@ typedef enum {
     LV_STYLE_BORDER_COLOR            = 48,
     LV_STYLE_BORDER_COLOR_FILTERED   = 48 | LV_STYLE_PROP_FILTER,
     LV_STYLE_BORDER_OPA              = 49,
-    LV_STYLE_BORDER_WIDTH            = 50,
+    LV_STYLE_BORDER_WIDTH            = 50 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_BORDER_SIDE             = 51,
     LV_STYLE_BORDER_POST             = 52,
 

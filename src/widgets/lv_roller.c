@@ -190,7 +190,8 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt)
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    lv_obj_set_height(obj, (lv_font_get_line_height(font) + line_space) * row_cnt);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_obj_set_height(obj, (lv_font_get_line_height(font) + line_space) * row_cnt + 2 * border_width);
 }
 
 /*=====================
