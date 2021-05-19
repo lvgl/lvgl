@@ -21,6 +21,7 @@ extern "C" {
 #include "lv_txt.h"
 #include "lv_types.h"
 #include "lv_assert.h"
+#include "lv_bidi.h"
 
 /*********************
  *      DEFINES
@@ -118,22 +119,21 @@ typedef enum {
     LV_STYLE_PROP_INV                = 0,
 
     /*Group 0*/
-    LV_STYLE_RADIUS                  = 1,
-    LV_STYLE_CLIP_CORNER             = 2,
-    LV_STYLE_TRANSFORM_WIDTH         = 3 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_HEIGHT        = 4 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSLATE_X             = 5 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSLATE_Y             = 6 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_ZOOM          = 7 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_ANGLE         = 8 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OPA                     = 9 | LV_STYLE_PROP_INHERIT,
-
-    LV_STYLE_COLOR_FILTER_DSC        = 10,
-    LV_STYLE_COLOR_FILTER_OPA        = 11,
-    LV_STYLE_ANIM_TIME               = 12,
-    LV_STYLE_ANIM_SPEED              = 12,
-    LV_STYLE_TRANSITION              = 14,
-    LV_STYLE_BLEND_MODE              = 15,
+    LV_STYLE_WIDTH                   = 1 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MIN_WIDTH               = 2 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MAX_WIDTH               = 3 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_HEIGHT                  = 4 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MIN_HEIGHT              = 5 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_MAX_HEIGHT              = 6 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_X                       = 7 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_Y                       = 8 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_ALIGN                   = 9 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_WIDTH         = 10 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_TRANSFORM_HEIGHT        = 11 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_TRANSLATE_X             = 12 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSLATE_Y             = 13 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_TRANSFORM_ZOOM          = 14 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_TRANSFORM_ANGLE         = 15 | LV_STYLE_PROP_EXT_DRAW,
 
     /*Group 1*/
     LV_STYLE_PAD_TOP                 = 16 | LV_STYLE_PROP_LAYOUT_REFR,
@@ -142,17 +142,6 @@ typedef enum {
     LV_STYLE_PAD_RIGHT               = 19 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_ROW                 = 20 | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_PAD_COLUMN              = 21 | LV_STYLE_PROP_LAYOUT_REFR,
-
-    LV_STYLE_WIDTH                   = 22 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MIN_WIDTH               = 23 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MAX_WIDTH               = 24 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_HEIGHT                  = 25 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MIN_HEIGHT              = 26 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MAX_HEIGHT              = 27 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_X                       = 28 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_Y                       = 29 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_LAYOUT                  = 30 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_ALIGN                   = 31 | LV_STYLE_PROP_LAYOUT_REFR,
 
     /*Group 2*/
     LV_STYLE_BG_COLOR                = 32,
@@ -223,6 +212,19 @@ typedef enum {
     LV_STYLE_TEXT_LINE_SPACE         = 91 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
     LV_STYLE_TEXT_DECOR              = 92 | LV_STYLE_PROP_INHERIT,
     LV_STYLE_TEXT_ALIGN              = 93 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
+
+    /*Group 6*/
+    LV_STYLE_RADIUS                  = 96,
+    LV_STYLE_CLIP_CORNER             = 97,
+    LV_STYLE_OPA                     = 98 | LV_STYLE_PROP_INHERIT,
+    LV_STYLE_COLOR_FILTER_DSC        = 99,
+    LV_STYLE_COLOR_FILTER_OPA        = 100,
+    LV_STYLE_ANIM_TIME               = 101,
+    LV_STYLE_ANIM_SPEED              = 102,
+    LV_STYLE_TRANSITION              = 103,
+    LV_STYLE_BLEND_MODE              = 104,
+    LV_STYLE_LAYOUT                  = 105 | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_BASE_DIR                = 106 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
 

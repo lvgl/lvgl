@@ -1036,14 +1036,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #if LV_USE_BIDI
 /*Set the default direction. Supported values:
- *`LV_BIDI_DIR_LTR` Left-to-Right
- *`LV_BIDI_DIR_RTL` Right-to-Left
- *`LV_BIDI_DIR_AUTO` detect texts base direction*/
+ *`LV_BASE_DIR_LTR` Left-to-Right
+ *`LV_BASE_DIR_RTL` Right-to-Left
+ *`LV_BASE_DIR_AUTO` detect texts base direction*/
 #ifndef LV_BIDI_BASE_DIR_DEF
 #  ifdef CONFIG_LV_BIDI_BASE_DIR_DEF
 #    define LV_BIDI_BASE_DIR_DEF CONFIG_LV_BIDI_BASE_DIR_DEF
 #  else
-#    define  LV_BIDI_BASE_DIR_DEF  LV_BIDI_DIR_AUTO
+#    define  LV_BIDI_BASE_DIR_DEF  LV_BASE_DIR_AUTO
 #  endif
 #endif
 #endif

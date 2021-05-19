@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stdbool.h>
+#include "../misc/lv_bidi.h"
 
 /*********************
  *      DEFINES

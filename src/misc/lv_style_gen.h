@@ -1,339 +1,3 @@
-static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_RADIUS, v);
-}
-
-#define LV_STYLE_CONST_RADIUS(val) \
-    { \
-        .prop = LV_STYLE_RADIUS, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_clip_corner(lv_style_t * style, bool value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, v);
-}
-
-#define LV_STYLE_CONST_CLIP_CORNER(val) \
-    { \
-        .prop = LV_STYLE_CLIP_CORNER, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_transform_width(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_WIDTH, v);
-}
-
-#define LV_STYLE_CONST_TRANSFORM_WIDTH(val) \
-    { \
-        .prop = LV_STYLE_TRANSFORM_WIDTH, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_HEIGHT, v);
-}
-
-#define LV_STYLE_CONST_TRANSFORM_HEIGHT(val) \
-    { \
-        .prop = LV_STYLE_TRANSFORM_HEIGHT, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_X, v);
-}
-
-#define LV_STYLE_CONST_TRANSLATE_X(val) \
-    { \
-        .prop = LV_STYLE_TRANSLATE_X, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_Y, v);
-}
-
-#define LV_STYLE_CONST_TRANSLATE_Y(val) \
-    { \
-        .prop = LV_STYLE_TRANSLATE_Y, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ZOOM, v);
-}
-
-#define LV_STYLE_CONST_TRANSFORM_ZOOM(val) \
-    { \
-        .prop = LV_STYLE_TRANSFORM_ZOOM, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, v);
-}
-
-#define LV_STYLE_CONST_TRANSFORM_ANGLE(val) \
-    { \
-        .prop = LV_STYLE_TRANSFORM_ANGLE, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_OPA, v);
-}
-
-#define LV_STYLE_CONST_OPA(val) \
-    { \
-        .prop = LV_STYLE_OPA, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
-{
-    lv_style_value_t v = {
-        .ptr = value
-    };
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, v);
-}
-
-#define LV_STYLE_CONST_COLOR_FILTER_DSC(val) \
-    { \
-        .prop = LV_STYLE_COLOR_FILTER_DSC, \
-        .value = { \
-            .ptr = val \
-        } \
-    }
-
-static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v);
-}
-
-#define LV_STYLE_CONST_COLOR_FILTER_OPA(val) \
-    { \
-        .prop = LV_STYLE_COLOR_FILTER_OPA, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v);
-}
-
-#define LV_STYLE_CONST_ANIM_TIME(val) \
-    { \
-        .prop = LV_STYLE_ANIM_TIME, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, v);
-}
-
-#define LV_STYLE_CONST_ANIM_SPEED(val) \
-    { \
-        .prop = LV_STYLE_ANIM_SPEED, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
-{
-    lv_style_value_t v = {
-        .ptr = value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSITION, v);
-}
-
-#define LV_STYLE_CONST_TRANSITION(val) \
-    { \
-        .prop = LV_STYLE_TRANSITION, \
-        .value = { \
-            .ptr = val \
-        } \
-    }
-
-static inline void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_BLEND_MODE, v);
-}
-
-#define LV_STYLE_CONST_BLEND_MODE(val) \
-    { \
-        .prop = LV_STYLE_BLEND_MODE, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_PAD_TOP, v);
-}
-
-#define LV_STYLE_CONST_PAD_TOP(val) \
-    { \
-        .prop = LV_STYLE_PAD_TOP, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_PAD_BOTTOM, v);
-}
-
-#define LV_STYLE_CONST_PAD_BOTTOM(val) \
-    { \
-        .prop = LV_STYLE_PAD_BOTTOM, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_PAD_LEFT, v);
-}
-
-#define LV_STYLE_CONST_PAD_LEFT(val) \
-    { \
-        .prop = LV_STYLE_PAD_LEFT, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_PAD_RIGHT, v);
-}
-
-#define LV_STYLE_CONST_PAD_RIGHT(val) \
-    { \
-        .prop = LV_STYLE_PAD_RIGHT, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_PAD_ROW, v);
-}
-
-#define LV_STYLE_CONST_PAD_ROW(val) \
-    { \
-        .prop = LV_STYLE_PAD_ROW, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
-static inline void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, v);
-}
-
-#define LV_STYLE_CONST_PAD_COLUMN(val) \
-    { \
-        .prop = LV_STYLE_PAD_COLUMN, \
-        .value = { \
-            .num = (int32_t)val \
-        } \
-    }
-
 static inline void lv_style_set_width(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
@@ -478,6 +142,342 @@ static inline void lv_style_set_align(lv_style_t * style, lv_align_t value)
         } \
     }
 
+static inline void lv_style_set_transform_width(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_WIDTH, v);
+}
+
+#define LV_STYLE_CONST_TRANSFORM_WIDTH(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_WIDTH, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_HEIGHT, v);
+}
+
+#define LV_STYLE_CONST_TRANSFORM_HEIGHT(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_HEIGHT, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSLATE_X, v);
+}
+
+#define LV_STYLE_CONST_TRANSLATE_X(val) \
+    { \
+        .prop = LV_STYLE_TRANSLATE_X, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSLATE_Y, v);
+}
+
+#define LV_STYLE_CONST_TRANSLATE_Y(val) \
+    { \
+        .prop = LV_STYLE_TRANSLATE_Y, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ZOOM, v);
+}
+
+#define LV_STYLE_CONST_TRANSFORM_ZOOM(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_ZOOM, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, v);
+}
+
+#define LV_STYLE_CONST_TRANSFORM_ANGLE(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_ANGLE, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_TOP, v);
+}
+
+#define LV_STYLE_CONST_PAD_TOP(val) \
+    { \
+        .prop = LV_STYLE_PAD_TOP, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_BOTTOM, v);
+}
+
+#define LV_STYLE_CONST_PAD_BOTTOM(val) \
+    { \
+        .prop = LV_STYLE_PAD_BOTTOM, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_LEFT, v);
+}
+
+#define LV_STYLE_CONST_PAD_LEFT(val) \
+    { \
+        .prop = LV_STYLE_PAD_LEFT, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_RIGHT, v);
+}
+
+#define LV_STYLE_CONST_PAD_RIGHT(val) \
+    { \
+        .prop = LV_STYLE_PAD_RIGHT, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_ROW, v);
+}
+
+#define LV_STYLE_CONST_PAD_ROW(val) \
+    { \
+        .prop = LV_STYLE_PAD_ROW, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, v);
+}
+
+#define LV_STYLE_CONST_PAD_COLUMN(val) \
+    { \
+        .prop = LV_STYLE_PAD_COLUMN, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_RADIUS, v);
+}
+
+#define LV_STYLE_CONST_RADIUS(val) \
+    { \
+        .prop = LV_STYLE_RADIUS, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_clip_corner(lv_style_t * style, bool value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, v);
+}
+
+#define LV_STYLE_CONST_CLIP_CORNER(val) \
+    { \
+        .prop = LV_STYLE_CLIP_CORNER, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_OPA, v);
+}
+
+#define LV_STYLE_CONST_OPA(val) \
+    { \
+        .prop = LV_STYLE_OPA, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, v);
+}
+
+#define LV_STYLE_CONST_COLOR_FILTER_DSC(val) \
+    { \
+        .prop = LV_STYLE_COLOR_FILTER_DSC, \
+        .value = { \
+            .ptr = val \
+        } \
+    }
+
+static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v);
+}
+
+#define LV_STYLE_CONST_COLOR_FILTER_OPA(val) \
+    { \
+        .prop = LV_STYLE_COLOR_FILTER_OPA, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v);
+}
+
+#define LV_STYLE_CONST_ANIM_TIME(val) \
+    { \
+        .prop = LV_STYLE_ANIM_TIME, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, v);
+}
+
+#define LV_STYLE_CONST_ANIM_SPEED(val) \
+    { \
+        .prop = LV_STYLE_ANIM_SPEED, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSITION, v);
+}
+
+#define LV_STYLE_CONST_TRANSITION(val) \
+    { \
+        .prop = LV_STYLE_TRANSITION, \
+        .value = { \
+            .ptr = val \
+        } \
+    }
+
+static inline void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BLEND_MODE, v);
+}
+
+#define LV_STYLE_CONST_BLEND_MODE(val) \
+    { \
+        .prop = LV_STYLE_BLEND_MODE, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
 static inline void lv_style_set_layout(lv_style_t * style, uint16_t value)
 {
     lv_style_value_t v = {
@@ -489,6 +489,22 @@ static inline void lv_style_set_layout(lv_style_t * style, uint16_t value)
 #define LV_STYLE_CONST_LAYOUT(val) \
     { \
         .prop = LV_STYLE_LAYOUT, \
+        .value = { \
+            .num = (int32_t)val \
+        } \
+    }
+
+static inline void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BASE_DIR, v);
+}
+
+#define LV_STYLE_CONST_BASE_DIR(val) \
+    { \
+        .prop = LV_STYLE_BASE_DIR, \
         .value = { \
             .num = (int32_t)val \
         } \

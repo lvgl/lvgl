@@ -329,7 +329,7 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_set_base_dir(obj, LV_BIDI_DIR_LTR);
+    lv_obj_set_style_base_dir(obj, LV_BASE_DIR_LTR, 0);
 
     lv_btnmatrix_set_map(obj, kb_map[keyboard->mode]);
     lv_btnmatrix_set_ctrl_map(obj, kb_ctrl[keyboard->mode]);

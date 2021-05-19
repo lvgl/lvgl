@@ -3,92 +3,6 @@
 import sys, os, re
 
 props = [
-{'section': 'Miscellaneous', 'dsc':'TODO' },
-{'name': 'RADIUS',                    
- 'style_type': 'num', 'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"}, 
-
-{'name': 'CLIP_CORNER',               
- 'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`." },
-
-{'name': 'TRANSFORM_WIDTH',           
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
-
-{'name': 'TRANSFORM_HEIGHT',          
-  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
-
-{'name': 'TRANSLATE_X',               
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
-
-{'name': 'TRANSLATE_Y',               
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
-
-{'name': 'TRANSFORM_ZOOM',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
-
-{'name': 'TRANSFORM_ANGLE',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': " Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree unit. E.g. 45 deg. = 450 " },
-
-{'name': 'OPA', 
- 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency." },
-
-{'name': 'COLOR_FILTER_DSC',          
- 'style_type': 'ptr',   'var_type': 'const lv_color_filter_dsc_t *',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Mix a color to all colors of the object." },
-
-{'name': 'COLOR_FILTER_OPA', 
- 'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The intensity of mixing of color filter."},
-
-{'name': 'ANIM_TIME',                 
- 'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
-
-{'name': 'ANIM_SPEED',                 
- 'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more."},
-
-{'name': 'TRANSITION',
- 'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "An initialized `lv_style_transition_dsc_t` to describe a transition."},
-
-{'name': 'BLEND_MODE',
- 'style_type': 'num',   'var_type': 'lv_blend_mode_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE`"},
-
-{'section': 'Padding', 'dsc':'TODO' },
-{'name': 'PAD_TOP',                   
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the top. It makes the content area smaller in this direction."},
-
-{'name': 'PAD_BOTTOM',                
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the bottom. It makes the content area smaller in this direction."},
-
-{'name': 'PAD_LEFT',                  
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the left. It makes the content area smaller in this direction."},
-
-{'name': 'PAD_RIGHT',                 
-  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding on the right. It makes the content area smaller in this direction."},
-
-{'name': 'PAD_ROW',                   
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding between the rows. Used by the layouts."},
-
-{'name': 'PAD_COLUMN',                
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the padding between the columns. Used by the layouts."},
-
 {'section': 'Size and position', 'dsc':'TODO' },
 {'name': 'WIDTH',                     
  'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -126,9 +40,100 @@ props = [
  'style_type': 'num',   'var_type': 'lv_align_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the alignment which tells from which point of the parent the X and Y coordinates should be interpreted. The possible values are: `LV_ALIGN_TOP_LEFT/MID/RIGHT`, `LV_ALIGN_BOTTOM_LEFT/MID/RIGHT`, `LV_ALIGN_LEFT/RIGHT_MID`, `LV_ALIGN_CENTER`"},
 
+{'name': 'TRANSFORM_WIDTH',           
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
+
+{'name': 'TRANSFORM_HEIGHT',          
+  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
+
+{'name': 'TRANSLATE_X',               
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
+
+{'name': 'TRANSLATE_Y',               
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
+
+{'name': 'TRANSFORM_ZOOM',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+
+{'name': 'TRANSFORM_ANGLE',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': " Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree unit. E.g. 45 deg. = 450 " },
+
+{'section': 'Padding', 'dsc':'TODO' },
+{'name': 'PAD_TOP',                   
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the padding on the top. It makes the content area smaller in this direction."},
+
+{'name': 'PAD_BOTTOM',                
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the padding on the bottom. It makes the content area smaller in this direction."},
+
+{'name': 'PAD_LEFT',                  
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the padding on the left. It makes the content area smaller in this direction."},
+
+{'name': 'PAD_RIGHT',                 
+  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the padding on the right. It makes the content area smaller in this direction."},
+
+{'name': 'PAD_ROW',                   
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the padding between the rows. Used by the layouts."},
+
+{'name': 'PAD_COLUMN',                
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the padding between the columns. Used by the layouts."},
+
+{'section': 'Miscellaneous', 'dsc':'TODO' },
+{'name': 'RADIUS',                    
+ 'style_type': 'num', 'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"}, 
+
+{'name': 'CLIP_CORNER',               
+ 'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`." },
+
+{'name': 'OPA', 
+ 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency." },
+
+{'name': 'COLOR_FILTER_DSC',          
+ 'style_type': 'ptr',   'var_type': 'const lv_color_filter_dsc_t *',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Mix a color to all colors of the object." },
+
+{'name': 'COLOR_FILTER_OPA', 
+ 'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "The intensity of mixing of color filter."},
+
+{'name': 'ANIM_TIME',                 
+ 'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
+
+{'name': 'ANIM_SPEED',                 
+ 'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more."},
+
+{'name': 'TRANSITION',
+ 'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "An initialized `lv_style_transition_dsc_t` to describe a transition."},
+
+{'name': 'BLEND_MODE',
+ 'style_type': 'num',   'var_type': 'lv_blend_mode_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE`"},
+
 {'name': 'LAYOUT',                    
  'style_type': 'num',   'var_type': 'uint16_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts."},
+
+{'name': 'BASE_DIR',                    
+ 'style_type': 'num',   'var_type': 'lv_base_dir_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the base direction of the obejct. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
+
 
 {'section': 'Background', 'dsc':'TODO' },
 {'name': 'BG_COLOR',                  

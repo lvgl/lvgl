@@ -127,7 +127,7 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     const lv_area_t * clip_area = lv_event_get_param(e);
-    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     /*Calculate the indicator area*/
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -158,7 +158,7 @@ static void draw_main(lv_event_t * e)
     lv_area_t knob_area;
 
     /*Left*/
-    if((base_dir != LV_BIDI_DIR_RTL && !chk) || (base_dir == LV_BIDI_DIR_RTL && chk)) {
+    if((base_dir != LV_BASE_DIR_RTL && !chk) || (base_dir == LV_BASE_DIR_RTL && chk)) {
         knob_area.x1 = obj->coords.x1 + bg_left;
         knob_area.x2 = knob_area.x1 + knob_size;
     }

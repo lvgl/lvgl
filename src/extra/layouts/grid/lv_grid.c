@@ -204,7 +204,7 @@ static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     lv_coord_t col_gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
     lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
 
-    bool rev = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
+    bool rev = lv_obj_get_style_base_dir(cont, LV_PART_MAIN) == LV_BASE_DIR_RTL ? true : false;
 
     lv_coord_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
@@ -399,7 +399,7 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
 
 
     /*If the item has RTL base dir switch start and end*/
-    if(lv_obj_get_base_dir(item) == LV_BIDI_DIR_RTL) {
+    if(lv_obj_get_style_base_dir(item, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
         if(col_align == LV_GRID_ALIGN_START) col_align = LV_GRID_ALIGN_END;
         else if(col_align == LV_GRID_ALIGN_END) col_align = LV_GRID_ALIGN_START;
     }

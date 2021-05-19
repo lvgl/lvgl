@@ -330,8 +330,8 @@ static void draw_indic(lv_event_t * e)
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (bar->cur_value - bar->min_value)) / range;
     }
 
-    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
-    if(hor && base_dir == LV_BIDI_DIR_RTL) {
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    if(hor && base_dir == LV_BASE_DIR_RTL) {
         /*Swap axes*/
         lv_coord_t * tmp;
         tmp = axis1;

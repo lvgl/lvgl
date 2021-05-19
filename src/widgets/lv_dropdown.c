@@ -749,7 +749,7 @@ static void draw_main(lv_event_t * e)
 
     bool symbol_to_left = false;
     if(dropdown->dir == LV_DIR_LEFT) symbol_to_left = true;
-    if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) symbol_to_left = true;
+    if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) symbol_to_left = true;
 
     if(dropdown->symbol) {
         lv_img_src_t symbol_type = lv_img_src_get_type(dropdown->symbol);

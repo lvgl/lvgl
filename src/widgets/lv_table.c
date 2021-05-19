@@ -616,7 +616,7 @@ static void draw_main(lv_event_t * e)
 
     cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) ;
     lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
-    bool rtl = lv_obj_get_base_dir(obj)  == LV_BIDI_DIR_RTL ? true : false;
+    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL ? true : false;
 
     /*Handle custom drawer*/
     lv_obj_draw_part_dsc_t dsc;

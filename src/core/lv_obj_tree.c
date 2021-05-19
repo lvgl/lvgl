@@ -144,9 +144,9 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_point_t old_pos;
     old_pos.y = lv_obj_get_y(obj);
 
-    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
+    lv_base_dir_t new_base_dir = lv_obj_get_style_base_dir(parent, LV_PART_MAIN);
 
-    if(new_base_dir != LV_BIDI_DIR_RTL) old_pos.x = lv_obj_get_x(obj);
+    if(new_base_dir != LV_BASE_DIR_RTL) old_pos.x = lv_obj_get_x(obj);
     else  old_pos.x = old_parent->coords.x2 - obj->coords.x2;
 
     /*Remove the object from the old parent's child list*/
@@ -169,7 +169,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     obj->parent = parent;
 
-    if(new_base_dir != LV_BIDI_DIR_RTL) {
+    if(new_base_dir != LV_BASE_DIR_RTL) {
         lv_obj_set_pos(obj, old_pos.x, old_pos.y);
     }
     else {

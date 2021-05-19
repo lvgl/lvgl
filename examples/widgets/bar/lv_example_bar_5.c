@@ -19,7 +19,7 @@ void lv_example_bar_5(void)
     lv_obj_align_to(label, bar_ltr, LV_ALIGN_OUT_TOP_MID, 0, -5);
 
     lv_obj_t * bar_rtl = lv_bar_create(lv_scr_act());
-    lv_obj_set_base_dir(bar_rtl, LV_BIDI_DIR_RTL);
+    lv_obj_set_style_base_dir(bar_rtl, LV_BASE_DIR_RTL, 0);
     lv_obj_set_size(bar_rtl, 200, 20);
     lv_bar_set_value(bar_rtl, 70, LV_ANIM_OFF);
     lv_obj_align(bar_rtl, LV_ALIGN_CENTER, 0, 30);

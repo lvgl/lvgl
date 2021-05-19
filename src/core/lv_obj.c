@@ -54,7 +54,6 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
-static void base_dir_refr_children(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -247,25 +246,6 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
-{
-    if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
-       dir != LV_BIDI_DIR_AUTO && dir != LV_BIDI_DIR_INHERIT) {
-
-        LV_LOG_WARN("lv_obj_set_base_dir: invalid base direction: %d", dir);
-        return;
-    }
-
-    lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->base_dir = dir;
-    lv_event_send(obj, LV_EVENT_BASE_DIR_CHANGED, NULL);
-
-    /*Notify the children about the parent base dir has changed.
-     *(The children might have `LV_BIDI_DIR_INHERIT`)*/
-    base_dir_refr_children(obj);
-}
-
-
 /*=======================
  * Getter functions
  *======================*/
@@ -284,37 +264,12 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
     return (obj->flags & f) ? true : false;
 }
 
-lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-#if LV_USE_BIDI
-    if(obj->spec_attr == NULL) return LV_BIDI_DIR_LTR;
-    const lv_obj_t * parent = obj;
-
-    while(parent) {
-        /*If the base dir set use it. If not set assume INHERIT so got the next parent*/
-        if(parent->spec_attr) {
-            if(parent->spec_attr->base_dir != LV_BIDI_DIR_INHERIT) return parent->spec_attr->base_dir;
-        }
-
-        parent = lv_obj_get_parent(parent);
-    }
-
-    return LV_BIDI_BASE_DIR_DEF;
-#else
-    (void) obj;  /*Unused*/
-    return LV_BIDI_DIR_LTR;
-#endif
-}
-
 lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return obj->state;
 }
-
 
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
 {
@@ -349,9 +304,7 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
         lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
-        obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
         obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
-
     }
 }
 
@@ -709,11 +662,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
-    else if(code == LV_EVENT_BASE_DIR_CHANGED) {
-        /*The layout might depend on the base dir.
-         *E.g. the first is element is on the left or right*/
-        lv_obj_mark_layout_as_dirty(obj);
-    }
     else if(code == LV_EVENT_SCROLL_END) {
         if(lv_obj_get_scrollbar_mode(obj) == LV_SCROLLBAR_MODE_ACTIVE) {
             lv_obj_invalidate(obj);
@@ -805,19 +753,6 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     }
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
         lv_obj_refresh_ext_draw_size(obj);
-    }
-}
-
-
-static void base_dir_refr_children(lv_obj_t * obj)
-{
-    uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
-        if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
-            lv_event_send(child, LV_EVENT_BASE_DIR_CHANGED, NULL);
-            base_dir_refr_children(child);
-        }
     }
 }
 

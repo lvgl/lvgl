@@ -171,7 +171,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     /*Set the length and height
      *Be sure the content is not scrolled in an invalid position on the new size*/
     obj->coords.y2 = obj->coords.y1 + h - 1;
-    if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
+    if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
         obj->coords.x1 = obj->coords.x2 - w + 1;
     }
     else {
@@ -201,7 +201,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     if(lv_obj_get_scroll_snap_x(obj) == LV_SCROLL_SNAP_NONE) {
         lv_coord_t sl = lv_obj_get_scroll_left(obj);
         lv_coord_t sr = lv_obj_get_scroll_right(obj);
-        if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
+        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
             /*Be sure the left side is not remains scrolled in*/
             if(sr < 0 && sl > 0) {
                 sr = LV_MIN(sl, -sr);

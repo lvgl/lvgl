@@ -151,7 +151,6 @@ typedef struct {
     lv_scroll_snap_t scroll_snap_x : 2;      /**< Where to align the snapable children horizontally*/
     lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snapable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
-    lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object*/
     uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array*/
 }lv_obj_spec_attr_t;
 
@@ -238,13 +237,6 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
 /**
- * Set the base direction of the object
- * @param obj   pointer to an object
- * @param dir   the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
- */
-void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
-
-/**
  * Set the user_data field of the object
  * @param obj   pointer to an object
  * @param user_data   pointer to the new user_data.
@@ -275,14 +267,6 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * @return      true: at lest one flag flag is set; false: none of the flags are set
  */
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
-
-
-/**
- * Get the base direction of the object
- * @param obj   pointer to an object
- * @return      the base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
- */
-lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
 /**
  * Get the state of an object

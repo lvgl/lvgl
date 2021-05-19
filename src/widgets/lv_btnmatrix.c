@@ -100,7 +100,7 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     allocate_btn_areas_and_controls(obj, map);
     btnm->map_p = map;
 
-    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     /*Set size and positions of the buttons*/
     lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
@@ -160,7 +160,7 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
             lv_coord_t btn_x2 = pleft + (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * pcol - 1;
 
             /*If RTL start from the right*/
-            if(base_dir == LV_BIDI_DIR_RTL) {
+            if(base_dir == LV_BASE_DIR_RTL) {
                 lv_coord_t tmp = btn_x1;
                 btn_x1 = btn_x2;
                 btn_x2 = tmp;

@@ -130,15 +130,15 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(type == LV_SLIDER_MODE_RANGE) {
             lv_indev_get_point(lv_indev_get_act(), &p);
             bool hor = lv_obj_get_width(obj) >= lv_obj_get_height(obj);
-            lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+            lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
             lv_coord_t dist_left, dist_right;
             if(hor) {
-                if((base_dir != LV_BIDI_DIR_RTL && p.x > slider->right_knob_area.x2) || (base_dir == LV_BIDI_DIR_RTL &&
+                if((base_dir != LV_BASE_DIR_RTL && p.x > slider->right_knob_area.x2) || (base_dir == LV_BASE_DIR_RTL &&
                                                                                       p.x < slider->right_knob_area.x1)) {
                     slider->value_to_set = &slider->bar.cur_value;
                 }
-                else if((base_dir != LV_BIDI_DIR_RTL && p.x < slider->left_knob_area.x1) || (base_dir == LV_BIDI_DIR_RTL &&
+                else if((base_dir != LV_BASE_DIR_RTL && p.x < slider->left_knob_area.x1) || (base_dir == LV_BASE_DIR_RTL &&
                                                                                           p.x > slider->left_knob_area.x2)) {
                     slider->value_to_set = &slider->bar.start_value;
                 }
@@ -189,7 +189,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_point_t p;
         lv_indev_get_point(indev, &p);
-        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+        lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
         lv_coord_t w = lv_obj_get_width(obj);
         lv_coord_t h = lv_obj_get_height(obj);
@@ -206,7 +206,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         if(w >= h) {
             lv_coord_t indic_w = w - bg_left - bg_right;
-            if(base_dir == LV_BIDI_DIR_RTL) {
+            if(base_dir == LV_BASE_DIR_RTL) {
                 new_value = (obj->coords.x2 - bg_right) - p.x; /*Make the point relative to the indicator*/
             }
             else {
@@ -325,7 +325,7 @@ static void draw_knob(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     const lv_area_t * clip_area = lv_event_get_param(e);
-    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     lv_coord_t objw = lv_obj_get_width(obj);
     lv_coord_t objh = lv_obj_get_height(obj);
@@ -339,14 +339,14 @@ static void draw_knob(lv_event_t * e)
     /*Horizontal*/
     if(hor) {
         if(!sym) {
-            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BIDI_DIR_RTL, slider->bar.indic_area);
+            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BASE_DIR_RTL, slider->bar.indic_area);
         }
         else {
             if(slider->bar.cur_value >= 0) {
-                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BIDI_DIR_RTL, slider->bar.indic_area);
+                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BASE_DIR_RTL, slider->bar.indic_area);
             }
             else {
-                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
+                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BASE_DIR_RTL, slider->bar.indic_area);
             }
         }
     }
@@ -394,7 +394,7 @@ static void draw_knob(lv_event_t * e)
 
         /*Draw a second knob for the start_value side*/
         if(hor) {
-            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BIDI_DIR_RTL, slider->bar.indic_area);
+            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BASE_DIR_RTL, slider->bar.indic_area);
         }
         else {
             knob_area.y1 = slider->bar.indic_area.y2;

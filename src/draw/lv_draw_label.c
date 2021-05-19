@@ -98,7 +98,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_color = lv_color_black();
     dsc->sel_bg_color = lv_palette_main(LV_PALETTE_BLUE);
-    dsc->bidi_dir = LV_BIDI_DIR_LTR;
+    dsc->bidi_dir = LV_BASE_DIR_LTR;
 }
 
 /**

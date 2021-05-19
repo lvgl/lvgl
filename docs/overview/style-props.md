@@ -1,242 +1,5 @@
 # Style properties
 
-## Miscellaneous
-TODO
-
-
-### radius
-Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### clip_corner
-Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### transform_width
-Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### transform_height
-Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### translate_x
-Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### translate_y
-Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### transform_zoom
-Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### transform_angle
- Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree unit. E.g. 45 deg. = 450 
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### opa
-Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### color_filter_dsc
-Mix a color to all colors of the object.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### color_filter_opa
-The intensity of mixing of color filter.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### anim_time
-The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### anim_speed
-The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### transition
-An initialized `lv_style_transition_dsc_t` to describe a transition.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### blend_mode
-Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE`
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-## Padding
-TODO
-
-
-### pad_top
-Sets the padding on the top. It makes the content area smaller in this direction.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### pad_bottom
-Sets the padding on the bottom. It makes the content area smaller in this direction.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### pad_left
-Sets the padding on the left. It makes the content area smaller in this direction.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### pad_right
-Sets the padding on the right. It makes the content area smaller in this direction.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### pad_row
-Sets the padding between the rows. Used by the layouts.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
-
-### pad_column
-Sets the padding between the columns. Used by the layouts.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-
 ## Size and position
 TODO
 
@@ -340,8 +103,256 @@ Set the alignment which tells from which point of the parent the X and Y coordin
 
 
 
+### transform_width
+Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### transform_height
+Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### translate_x
+Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### translate_y
+Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### transform_zoom
+Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### transform_angle
+ Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree unit. E.g. 45 deg. = 450 
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+## Padding
+TODO
+
+
+### pad_top
+Sets the padding on the top. It makes the content area smaller in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### pad_bottom
+Sets the padding on the bottom. It makes the content area smaller in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### pad_left
+Sets the padding on the left. It makes the content area smaller in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### pad_right
+Sets the padding on the right. It makes the content area smaller in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### pad_row
+Sets the padding between the rows. Used by the layouts.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### pad_column
+Sets the padding between the columns. Used by the layouts.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+## Miscellaneous
+TODO
+
+
+### radius
+Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### clip_corner
+Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### opa
+Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### color_filter_dsc
+Mix a color to all colors of the object.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### color_filter_opa
+The intensity of mixing of color filter.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### anim_time
+The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### anim_speed
+The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### transition
+An initialized `lv_style_transition_dsc_t` to describe a transition.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### blend_mode
+Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE`
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
 ### layout
 Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+
+
+### base_dir
+Set the base direction of the obejct. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
