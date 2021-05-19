@@ -4,7 +4,13 @@ C
 Base objects with custom styles 
 """"""""""""""""""""""""""""""""
 
-.. lv_example:: lv_ex_widgets/lv_ex_obj/lv_ex_obj_1
+.. lv_example:: widgets/obj/lv_example_obj_1
+  :language: c
+  
+Make an object draggable 
+""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/obj/lv_example_obj_2
   :language: c
 
 MicroPython
