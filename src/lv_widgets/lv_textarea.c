@@ -1430,6 +1430,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         if(ext->label) {
             if(ext->one_line) {
                 lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
+                lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_BG);
                 lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
                 const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
 
@@ -1437,6 +1438,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
                 lv_coord_t font_h              = lv_font_get_line_height(font);
                 lv_obj_set_height(ext->label, font_h);
                 lv_obj_set_height(ta, font_h + top + bottom);
+                lv_obj_set_pos(lv_page_get_scrollable(ta), left, top);
             }
             else {
                 /*In not one line mode refresh the Label width because 'hpad' can modify it*/
