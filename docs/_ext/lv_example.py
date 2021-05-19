@@ -16,7 +16,7 @@ class LvExample(Directive):
         if self.arguments[2] == 'py':
             paragraph_node = nodes.raw(text=f"Click to try in the simulator!<br/><a target='_blank' href='https://sim.lvgl.io/v7/micropython/ports/javascript/bundle_out/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lv_examples/{env.config.example_commit_hash}/src/header.py&script=https://raw.githubusercontent.com/lvgl/lv_examples/{env.config.built_example_commit_hash}/{example_name}/{example_name}.py'><img alt='{example_name}' src='https://raw.githubusercontent.com/lvgl/lv_examples/{env.config.built_example_commit_hash}/{example_name}/{example_name}.png'/></a>", format='html')
         else:
-            paragraph_node = nodes.raw(text=f"<iframe class='lv-example' src='../../_static/built_lv_examples?example={example_name}&w=320&h=240'></iframe>", format='html')
+            paragraph_node = nodes.raw(text=f"<iframe class='lv-example' src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></iframe>", format='html')
         toggle = nodes.container('', literal_block=False, classes=['toggle'])
         header = nodes.container('', literal_block=False, classes=['header'])
         toggle.append(header)
@@ -36,10 +36,15 @@ class LvExample(Directive):
         node_list.append(toggle)
         return node_list
 
+def on_html_page_context(app, pagename, templatename, context, doctree):
+    if doctree:
+        print(doctree.attributes['source']) # Path to .rst file
+
 def setup(app):
     app.add_directive("lv_example", LvExample)
     app.add_config_value("example_commit_hash", "", "env")
     app.add_config_value("built_example_commit_hash", "", "env")
+    app.connect('html-page-context', on_html_page_context)    
 
     return {
         'version': '0.1',
