@@ -111,7 +111,7 @@ extern const lv_obj_class_t lv_chart_class;
 
 /**
  * Create a chart objects
- * @param parent    pointer to an object, it will be the parent of the new button
+ * @param parent    pointer to an object, it will be the parent of the new chart
  * @return          pointer to the created chart
  */
 lv_obj_t * lv_chart_create(lv_obj_t * parent);
@@ -124,7 +124,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * parent);
 void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type);
 /**
  * Set the number of points on a data line on a chart
- * @param obj       pointer r to chart object
+ * @param obj       pointer to a chart object
  * @param cnt       new number of points on the data lines
  */
 void lv_chart_set_point_count(lv_obj_t * obj, uint16_t cnt);
