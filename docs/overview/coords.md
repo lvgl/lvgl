@@ -41,7 +41,9 @@ LVGL doesn't recalculate all the coordinate changes immediately to improve perfo
 Instead, the objects are marked as "dirty" and before redrawing the screen LVGL checks if there are any "dirty" objects. If so it refreshes their position, size and layout.
 
 In other words, if you need to get the any coordinate of an object and it the coordinates were just changed LVGL's needs to be forced to recalculate to coordinates. 
-To do this call `lv_obj_update_layout(obj)`the size and position might depends on the parent or layout `lv_obj_update_layout` recalculates the coordinates of all objects on the screen of `obj`.
+To do this call `lv_obj_update_layout(obj)`.
+ 
+The size and position might depends on the parent or layout therefor `lv_obj_update_layout` recalculates the coordinates of all objects on the screen of `obj`.
 
 #### Removing styles
 As it's described in the [Using styles](#using-styles) section the coordinates can be set via style properties too. 
