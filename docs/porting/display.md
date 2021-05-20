@@ -4,7 +4,7 @@
 ```
 # Display interface
 
-To set up a display an `lv_disp_draw_buf_t` and an `lv_disp_drv_t` variables have to be initialized.
+To register a display for LVGL an `lv_disp_draw_buf_t` and an `lv_disp_drv_t` variables have to be initialized.
 - `lv_disp_draw_buf_t` contains internal graphic buffer(s), called draw buffer(s).
 - `lv_disp_drv_t` contains callback functions to interact with the display and manipulate drawing related things.
 
@@ -22,12 +22,11 @@ static lv_disp_draw_buf_t disp_buf;
 static lv_color_t buf_1[MY_DISP_HOR_RES * 10];
 static lv_color_t buf_2[MY_DISP_HOR_RES * 10];
 
-/*Initialize `disp_buf` with the buffer(s) */
+/*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
 lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, MY_DISP_HOR_RES*10);
 ```
 
 Note that `lv_disp_draw_buf_t` needs to be static, global or dynamically allocated and not a local variable destroyed if goes out of the scope. 
-
 
 As you can see the draw buffer can be smaller than the screen. In this case, the larger areas will be redrawn in smaller parts that fit into the draw buffer(s). 
 If only a small area changes (e.g. a button is  pressed) then only that area will be refreshed.
@@ -35,10 +34,11 @@ If only a small area changes (e.g. a button is  pressed) then only that area wil
 A larger buffer results in better performance but above 1/10 screen sized buffer(s) there is no significant performance improvement. 
 Therefore it's recommended to choose the size of the draw buffer(s) to at least 1/10 screen sized.
 
-If only **one buffer** is used LVGL draws the content of the screen into that draw buffer and sends it to the display.
+If only **one buffer** is used LVGL draws the content of the screen into that draw buffer and sends it to the display. 
+This way LVGL needs to wait until the content of the buffer is sent to the display before drawing something new in it.
 
 If **two buffers**  are used LVGL can draw into one buffer while the content of the other buffer is sent to display in the background. 
-DMA or other hardware should be used to transfer the data to the display to let the CPU draw meanwhile.
+DMA or other hardware should be used to transfer the data to the display to let the MCU draw meanwhile.
 This way, the rendering and refreshing of the display become parallel. 
 
 In the display driver (`lv_disp_drv_t`) the `full_refresh` bit can be enabled to force LVGL always redraw the whole screen. It works in both *one buffer* and *two buffers* modes.
@@ -47,43 +47,43 @@ If `full_refresh` is enabled and 2 screen sized draw buffers are provided, LVGL 
 It means in `flush_cb` only the address of the frame buffer needs to be changed to provided pointer (`color_p` parameter).
 This configuration should be used if the MCU has LCD controller periphery and not with an external display controller (e.g. ILI9341 or SSD1963). 
 
-You can measure the performance of different draw buffer configurations using the [benchmark example](https://github.com/lvgl/lv_examples/tree/master/src/lv_demo_benchmark).
+You can measure the performance of different draw buffer configurations using the [benchmark example](https://github.com/lvgl/lv_demos/tree/master/src/lv_demo_benchmark).
 
 ## Display driver
 
 Once the buffer initialization is ready a `lv_disp_drv_t` display drivers need to be
 1. initialized with `lv_disp_drv_init(&disp_drv)`
-2. its fields needs to be set and
+2. its fields needs to be set
 3. registered in LVGL with `lv_disp_drv_register(&disp_drv)`
 
-Note that `lv_disp_drv_t` needs to be static, global or dynamically allocated and not a local variable destroyed if goes out of the scope. 
+Note that `lv_disp_drv_t` also needs to be static, global or dynamically allocated and not a local variable destroyed if goes out of the scope. 
 
 ### Mandatory fields
 In the most simple case only the following fields of `lv_disp_drv_t` needs to be set:
 - `draw_buf` pointer to an initialized `lv_disp_draw_buf_t` variable.
+- `hor_res` horizontal resolution of the display in pixels. 
+- `ver_res` vertical resolution of the display in pixels.
 - `flush_cb` a callback function to copy a buffer's content to a specific area of the display. 
 `lv_disp_flush_ready(&disp_drv)` needs to be called when flushing is ready. 
 LVGL might render the screen in multiple chunks and therefore call `flush_cb` multiple times. To see which is the last chunk of rendering use `lv_disp_flush_is_last(&disp_drv)`.
-- `hor_res` horizontal resolution of the display in pixels. 
-- `ver_res` vertical resolution of the display in pixels.
 
 ### Optional fields 
 There are some optional data fields:
 - `color_chroma_key` A color which will be drawn as transparent on chrome keyed images. Set to `LV_COLOR_CHROMA_KEY` by default from `lv_conf.h`.
-- `user_data` A custom `void `user data for the driver..
 - `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
-- `rotated` and `sw_rotate` See the [rotation](#rotation) section below.
+- `rotated` and `sw_rotate` See the [Rotation](#rotation) section below.
 - `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_SCREEN_TRANSP` needs to enabled in `lv_conf.h` and requires `LV_COLOR_DEPTH 32`.
+- `user_data` A custom `void `user data for the driver..
 
 Some other optional callbacks to make easier and more optimal to work with monochrome, grayscale or other non-standard RGB displays:
 - `rounder_cb` Round the coordinates of areas to redraw. E.g. a 2x2 px can be converted to 2x8.
 It can be used if the display controller can refresh only areas with specific height or width (usually 8 px height with monochrome displays).
-- `set_px_cb` a custom function to write the draw buffer. It can be used to store the pixels more compactly i nthe draw buffer if the display has a special color format. (e.g. 1-bit monochrome, 2-bit grayscale etc.)
-This way the buffers used in `lv_disp_draw_buf_t` can be smaller to hold only the required number of bits for the given area size. Rendering with `set_px_cb` is slower than normal rendering.
-- `monitor_cb` A callback function that tells how many pixels were refreshed in how much time.
+- `set_px_cb` a custom function to write the draw buffer. It can be used to store the pixels more compactly in the draw buffer if the display has a special color format. (e.g. 1-bit monochrome, 2-bit grayscale etc.)
+This way the buffers used in `lv_disp_draw_buf_t` can be smaller to hold only the required number of bits for the given area size. Note that, rendering with `set_px_cb` is slower than normal rendering.
+- `monitor_cb` A callback function that tells how many pixels were refreshed in how much time. Called when the last chunk is rendered and sent to the display. 
 - `clean_dcache_cb` A callback for cleaning any caches related to the display.
 
-To use a GPU the following callbacks can be used:
+LVGL has built-in support to several GPUs (see `lv_conf.h`) but if something else is required these functions can be used to make LVGL use a GPU:
 - `gpu_fill_cb` fill an area in the memory with a color.
 - `gpu_wait_cb` if any GPU function return, while the GPU is still working, LVGL will use this function when required the be sure GPU rendering is ready.
 
@@ -105,7 +105,8 @@ Here are some simple examples of the callbacks:
 ```c
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
+    /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one
+     *`put_px` is just an example, it needs to implemented by you.*/
     int32_t x, y;
     for(y = area->y1; y <= area->y2; y++) {
         for(x = area->x1; x <= area->x2; x++) {
@@ -137,15 +138,15 @@ void my_gpu_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, const lv_ar
 void my_rounder_cb(lv_disp_drv_t * disp_drv, lv_area_t * area)
 {
   /* Update the areas as needed.
-   * For example make the area to start only on 8th rows and have Nx8 pixel height:*/
+   * For example it makes the area to start only on 8th rows and have Nx8 pixel height.*/
    area->y1 = area->y1 & 0x07;
    area->y2 = (area->y2 & 0x07) + 8;
 }
 
 void my_set_px_cb(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
 {
-    /* Write to the buffer as required for the display.
-     * Write only 1-bit for monochrome displays mapped vertically:*/
+   /* Write to the buffer as required for the display.
+    * For example it writes only 1-bit for monochrome displays mapped vertically.*/
    buf += buf_w * (y >> 3) + x;
    if(lv_color_brightness(color) > 128) (*buf) |= (1 << (y % 8));
    else (*buf) &= ~(1 << (y % 8));
@@ -181,9 +182,9 @@ Support for software rotation is a new feature, so there may be some glitches/bu
 
 ## Further reading
 
-See [lv_port_disp_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c) for a template for your own driver.
-
-Check out the [Drawing](/overview/drawing) section to learn more about how rendering works in LVGL.
+- [lv_port_disp_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c) for a template for your own driver.
+- [Drawing](/overview/drawing) to learn more about how rendering works in LVGL.
+- [Display features](/overview/display) to learn more about higher level display features.
 
 ## API
 

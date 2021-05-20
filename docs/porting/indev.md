@@ -6,7 +6,7 @@
 
 ## Types of input devices
 
-To set up an input device an `lv_indev_drv_t` variable has to be initialized:
+To register an input device an `lv_indev_drv_t` variable has to be initialized:
 
 ```c
 lv_indev_drv_t indev_drv;
@@ -188,11 +188,16 @@ Besides `read_cb` a `feedback_cb` callback can be also specified in `lv_indev_dr
 Every Input device is associated with a display. By default, a new input device is added to the lastly created or the explicitly selected (using `lv_disp_set_default()`) display.
 The associated display is stored and can be changed in `disp` field of the driver.
 
-### Event driven reading
+### Buffered reading
 By default LVGL calls `read_cb` periodically. This way there is a chance that some user gestures are missed. 
 
-To solve this you write an event driven driver for your input device that buffers measured data. In `read_cb` you can set the buffered data instead of reading the input device. 
-You can set the `data->continue_reding` flag to LVGL there is more data to read and call `read_cb` again.
+To solve this you can write an event driven driver for your input device that buffers measured data. In `read_cb` you can set the buffered data instead of reading the input device. 
+You can set the `data->continue_reding` flag to tell that LVGL there is more data to read and it should call the `read_cb` again.
+
+## Further reading
+
+- [lv_port_indev_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c) for a template for your own driver.
+- [INdev features](/overview/display) to learn more about higher level input device features.
 
 ## API
 

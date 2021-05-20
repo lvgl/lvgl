@@ -34,26 +34,28 @@ Labels are added automatically on major ticks with `label_gap` distance from the
 
 Indicators needs to be added to a Scale and their value is interpreted in the range of the Scale.
 
+All the indicator add functions returns `lv_meter_indicator_t *`.
+
 #### Needle line
 
-`lv_meter_indicator_t * indic = lv_meter_add_needle_line(meter, scale, line_width, line_color, r_mod)` adds a needle line to a Scale. By default the length of the line is the same as the scale's radius but `r_mod` changes the length.
+`indic = lv_meter_add_needle_line(meter, scale, line_width, line_color, r_mod)` adds a needle line to a Scale. By default the length of the line is the same as the scale's radius but `r_mod` changes the length.
 
-`lv_meter_set_indicator_value(meter, inidicator, value)` sets the value of the indicator.
+`lv_meter_set_indicator_value(meter, indic, value)` sets the value of the indicator.
 
 #### Needle image
 
-`lv_meter_indicator_t * indicator = lv_meter_add_needle_img(meter, scale, img_src, pivot_x, pivot_y)` sets an image that will be used as a needle. `img_src` should be a needle pointing to the right like this `-O--->`.
+`indic = lv_meter_add_needle_img(meter, scale, img_src, pivot_x, pivot_y)` sets an image that will be used as a needle. `img_src` should be a needle pointing to the right like this `-O--->`.
 `pivot_x` and `pivot_y` sets the pivot point of the rotation relative to the top left corner of the image. 
 
 `lv_meter_set_indicator_value(meter, inidicator, value)` sets the value of the indicator.
 
 #### Arc
-`lv_meter_indicator_t * indicator = lv_meter_add_arc(meter, scale, arc_width, arc_color, r_mod)` adds and arc indicator. . By default the radius of the arc is the same as the scale's radius but `r_mod` changes the radius.
+`indic = lv_meter_add_arc(meter, scale, arc_width, arc_color, r_mod)` adds and arc indicator. . By default the radius of the arc is the same as the scale's radius but `r_mod` changes the radius.
 
-`lv_meter_set_indicator_start_value(meter, inidicator, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator. 
+`lv_meter_set_indicator_start_value(meter, indic, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator. 
 
 #### Scale lines (ticks)
-`lv_meter_indicator_t * indicator = lv_meter_add_scale_lines(meter, scale, color_start, color_end, bool local, width_mod)` adds an indicator that modifies the ticks lines. 
+`indic = lv_meter_add_scale_lines(meter, scale, color_start, color_end, local, width_mod)` adds an indicator that modifies the ticks lines. 
 If `local` is `true` the ticks' color will be faded from `color_start` to `color_end` in the indicator's  start and end value range. 
 If `local` is `false` `color_start` and `color_end` is mapped to the start and end value of the scale and only a "slice" of that color gradient will be visible in the indicator's start and end value range.
 `width_mod` modifies the width of the tick lines.
@@ -67,7 +69,7 @@ If `local` is `false` `color_start` and `color_end` is mapped to the start and e
 Learn more about [Events](/overview/event).
 
 ## Keys
-Keys have effect on the close button and button matrix. You can add them manually to a group if required.
+No keys are handled by the Meter widget.
 
 Learn more about [Keys](/overview/indev).
 

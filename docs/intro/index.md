@@ -14,7 +14,7 @@ LVGL (Light and Versatile Graphics Library) is a free and open-source graphics l
 - Various input devices such as touchpad, mouse, keyboard, encoder etc.
 - Multi-language support with UTF-8 encoding
 - Multi-display support, i.e. use more TFT, monochrome displays simultaneously
-- Fully customizable graphic elements
+- Fully customizable graphic elements withh CSS-like styles
 - Hardware independent to use with any microcontroller or display
 - Scalable to operate with little memory (64 kB Flash, 16 kB RAM)
 - OS, External memory and GPU supported but not required
@@ -23,7 +23,7 @@ LVGL (Light and Versatile Graphics Library) is a free and open-source graphics l
 - Simulator to start embedded GUI design on a PC without embedded hardware
 - Binding to MicroPython
 - Tutorials, examples, themes for rapid GUI design
-- Documentation is available as online and offline
+- Documentation is available online and PDF
 - Free and open-source under MIT license
 
 ## Requirements
@@ -36,7 +36,7 @@ Basically, every modern controller  (which is able to drive a display) is suita
   <ul>
     <li> Static RAM usage: ~2 kB depending on the used features and objects types</li>
     <li> Stack: &gt; 2kB (&gt; 8 kB is recommended)</li>
-    <li> Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects).
+    <li> Dynamic data (heap): &gt; 4 KB (&gt; 32 kB is recommended if using several objects).
 	    Set by <em>LV_MEM_SIZE</em> in <em>lv_conf.h</em>. </li>
     <li> Display buffer:  &gt; <em>"Horizontal resolution"</em> pixels (&gt; 10 &times; <em>"Horizontal resolution"</em> is recommended) </li>
     <li> One frame buffer in the MCU or in external display controller</li>
@@ -46,7 +46,7 @@ Basically, every modern controller  (which is able to drive a display) is suita
 <li> Basic C (or C++) knowledge: 
           <a href="https://www.tutorialspoint.com/cprogramming/c_pointers.htm">pointers</a>, 
           <a href="https://www.tutorialspoint.com/cprogramming/c_structures.htm">structs</a>, 
-          <a href="https://www.geeksforgeeks.org/callbacks-in-c/">callbacks</a></li>
+          <a href="https://www.geeksforgeeks.org/callbacks-in-c/">callbacks</a>.</li>
 </ul>
 <em>Note that the memory usage might vary depending on the architecture, compiler and build options.</em>
 
@@ -64,19 +64,16 @@ You can choose from [many ways of contributions](/CONTRIBUTING) such as simply w
 ## Repository layout
 All repositories of the LVGL project are hosted n GitHub: https://github.com/lvgl
 
-You fill these repositories there:
-- [lvgl](https://github.com/lvgl/lvgl) The library itself
-- [lv_examples](https://github.com/lvgl/lv_examples) Examples and demos
+You find these repositories there:
+- [lvgl](https://github.com/lvgl/lvgl) The library itself with many [examples](https://github.com/lvgl/lvgl/blob/master/examples/).
+- [lv_demos](https://github.com/lvgl/lv_demos) Demos created with LVGL.
 - [lv_drivers](https://github.com/lvgl/lv_drivers) Display and input device drivers
-- [docs](https://github.com/lvgl/docs) Source of the documentation's site (https://docs.lvgl.io)
 - [blog](https://github.com/lvgl/blog) Source of the blog's site (https://blog.lvgl.io)
 - [sim](https://github.com/lvgl/sim) Source of the online simulator's site (https://sim.lvgl.io)
 - [lv_sim_...](https://github.com/lvgl?q=lv_sim&type=&language=) Simulator projects for various IDEs and platforms
 - [lv_port_...](https://github.com/lvgl?q=lv_port&type=&language=) LVGL ports to development boards
 - [lv_binding_..](https://github.com/lvgl?q=lv_binding&type=&language=l) Bindings to other languages
 - [lv_...](https://github.com/lvgl?q=lv_&type=&language=) Ports to other platforms
-
-The [lvgl](https://github.com/lvgl/lvgl),  [lv_examples](https://github.com/lvgl/lv_examples) and [lv_drivers](https://github.com/lvgl/lv_drivers) are the core repositories which gets the most attentions regarding maintenance. 
 
 ## Release policy
 
@@ -85,42 +82,35 @@ The core repositories follow the rules of [Semantic versioning](https://semver.o
 - Minor version for new but backward-compatible functionalities. E.g. v6.1.0, v6.2.0
 - Patch version for backward-compatible bug fixes. E.g. v6.1.1, v6.1.2
 
+Tags like `vX.Y.Z` are created for every release.
+
+### Release cycle
+- Bugfixes: Released on demand even weekly
+- Minor releases: In every 3-4 month
+- Major releases: Approximatelly yearly
+
 ### Branches
 The core repositories have at least the following branches:
 - `master` latest version, patches are merged directly here. 
-- `dev` merge new features here until they are merged into `master`.
-- `release/vX` stable versions of the major releases
+- `release/vX.Y` stable versions of the minor releases
+- `fix/some-description` temporal branches for bug fixes
+- `feat/some-description` temporal branches for features
 
-### Release cycle
-
-LVGL has 2 weeks release cycle. On every first and third Tuesday of a month:
-1. A major, minor or bug fix release is created (based on the new features) from the `master` branch
-2. `master` is merged into `release/vX`
-3. Immediately after the release `dev` is merged into `master` 
-4. In the upcoming 2 weeks the new features in `master` can be tested
-5. Bug fixes are merged directly into `master`
-6. After 2 weeks start again from the first point
-
-### Tags
-
-Tags like `vX.Y.Z` are created for every release.
 
 ### Changelog
 
-The changes are recorded in [CHANGELOG.md](https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md).
-
-### Side projects
-The [docs](https://github.com/lvgl/docs) is rebuilt on every release. By default, the `latest` documentation is displayed which is for the current `master` branch of lvgl. 
-The documentation of earlier versions is available from the menu on the left. 
-
-The simulator, porting, and other projects are updated with best effort. Pull requests are welcome if you updated one of them.
+The changes are recorded in [CHANGELOG.md](/CHANGELOG).
 
 ### Version support
-In the core repositories each major version has a branch (e.g. `release/v6`). All the minor and patch releases of that major version are merged there. 
+Before v8 every minor release of major releases are supproted for 1 year.
+From v8 every minor release is supported for 1 year.
 
-It makes possible to add fixed older versions without bothering the newer ones.
-
-All major versions are officially supported for 1 year.
+| Version | Release date | Support end | Active |
+|---------|--------------|-------------|--------|
+| v5.3    | Feb 1, 2019  |Feb 1, 2020  | No     |
+| v6.1    | Nov 26, 2019 |Nov 26, 2020 | No     |
+| v7.11   | Mar 16, 2021 |Mar 16, 2022 | Yes    |
+| v8.0    | In progress  |             |        |
 
 
 ## FAQ
@@ -155,7 +145,7 @@ Some examples of the supported display types:
 See the [Porting](/porting/display) section to learn more.
 
 ### Nothing happens, my display driver is not called. What have I missed?
-Be sure you are calling `lv_tick_inc(x)` in an interrupt and `lv_task_handler()` in your main `while(1)`.
+Be sure you are calling `lv_tick_inc(x)` in an interrupt and `lv_timer_handler()` in your main `while(1)`.
 
 Learn more in the [Tick](/porting/tick) and [Task handler](/porting/task-handler) section.
 
