@@ -499,7 +499,8 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 lv_draw_label_dsc_t label_dsc_tmp;
                 lv_memcpy(&label_dsc_tmp, &label_dsc, sizeof(label_dsc_tmp));
 
-                dsc.id = value_of_line;
+                dsc.id = i / scale->tick_major_nth;
+                dsc.value = value_of_line;
                 dsc.label_dsc = &label_dsc_tmp;
                 lv_snprintf(dsc.text, sizeof(dsc.text), "%d", value_of_line);
                 lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
@@ -515,6 +516,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 label_cord.y2 = label_cord.y1 + label_size.y;
 
                 lv_draw_label(&label_cord, clip_area, &label_dsc, dsc.text, NULL);
+                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
 
 #if LV_DRAW_COMPLEX
                 outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);

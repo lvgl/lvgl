@@ -12,7 +12,7 @@ static void event_cb(lv_event_t * e)
         /*Change the draw descriptor the 2nd button*/
         if(dsc->id == 1) {
             dsc->rect_dsc->radius = 0;
-            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_palette_darken(LV_PALETTE_GREY, 3);
+            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_palette_darken(LV_PALETTE_BLUE, 3);
             else dsc->rect_dsc->bg_color = lv_palette_main(LV_PALETTE_BLUE);
 
             dsc->rect_dsc->shadow_width = 6;
