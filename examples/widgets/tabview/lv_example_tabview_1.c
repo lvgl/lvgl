@@ -3,7 +3,6 @@
 
 void lv_example_tabview_1(void)
 {
-    lv_obj_set_style_base_dir(lv_scr_act(), LV_BASE_DIR_RTL, 0);
     /*Create a Tab view object*/
     lv_obj_t *tabview;
     tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 50);
@@ -37,7 +36,7 @@ void lv_example_tabview_1(void)
     label = lv_label_create(tab3);
     lv_label_set_text(label, "Third tab");
 
-//    lv_obj_scroll_to_view_recursive(label, LV_ANIM_ON);
+    lv_obj_scroll_to_view_recursive(label, LV_ANIM_ON);
 
 }
 #endif
