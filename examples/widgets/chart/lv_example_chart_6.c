@@ -14,7 +14,6 @@ static void event_cb(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         last_id = lv_chart_get_pressed_point(obj);
         if(last_id != LV_CHART_POINT_NONE) {
-            lv_point_t p;
             lv_chart_set_cursor_point(obj, cursor, NULL, last_id);
         }
     }

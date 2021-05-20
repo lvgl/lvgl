@@ -132,7 +132,8 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
         lv_obj_scroll_to_x(cont, id * (gap + w), anim_en);
     } else {
-        lv_obj_scroll_to_x(cont, (gap + w) * (-id - 1), anim_en);
+        int32_t id_rtl = (int32_t) -id - 1;
+        lv_obj_scroll_to_x(cont, (gap + w) * id_rtl, anim_en);
     }
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
