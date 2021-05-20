@@ -15,8 +15,7 @@ static void event_cb(lv_event_t * e)
         last_id = lv_chart_get_pressed_point(obj);
         if(last_id != LV_CHART_POINT_NONE) {
             lv_point_t p;
-            lv_chart_get_point_pos_by_id(obj, ser, last_id, &p);
-            lv_chart_set_cursor_point(obj, cursor, &p);
+            lv_chart_set_cursor_point(obj, cursor, NULL, last_id);
         }
     }
     else if(code == LV_EVENT_DRAW_PART_END) {

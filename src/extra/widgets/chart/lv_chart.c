@@ -436,10 +436,13 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
     LV_ASSERT_MALLOC(cursor);
     if(cursor == NULL) return NULL;
 
-    cursor->point.x = LV_CHART_POINT_NONE;
-    cursor->point.y = LV_CHART_POINT_NONE;
+    cursor->pos.x = LV_CHART_POINT_NONE;
+    cursor->pos.y = LV_CHART_POINT_NONE;
+    cursor->point_id = LV_CHART_POINT_NONE;
+    cursor->pos_set = 0;
     cursor->color = color;
     cursor->dir = dir;
+
 
     return cursor;
 }
@@ -449,19 +452,38 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
  * to the origin of series area of the chart.
  * @param chart pointer to a chart object.
  * @param cursor pointer to the cursor.
- * @param point the new coordinate of cursor relative to the series area
+ * @param pos the new coordinate of cursor relative to the series area
  */
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point)
+void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
-    cursor->point.x = point->x;
-    cursor->point.y = point->y;
+    cursor->pos.x = pos->x;
+    cursor->pos.y = pos->y;
+    cursor->pos_set = 1;
     lv_chart_refresh(chart);
 }
 
 
+/**
+ * Set the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object.
+ * @param cursor pointer to the cursor.
+ * @param pos the new coordinate of cursor relative to the series area
+ */
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint16_t point_id)
+{
+    LV_ASSERT_NULL(cursor);
+    LV_UNUSED(chart);
+
+    cursor->point_id = point_id;
+    cursor->pos_set = 0;
+    if(ser == NULL) ser = lv_chart_get_series_next(chart, NULL);
+    cursor->ser = ser;
+    lv_chart_refresh(chart);
+}
 /**
  * Get the coordinate of the cursor with respect
  * to the origin of series area of the chart.
@@ -474,7 +496,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
-    return cursor->point;
+    return cursor->pos;
 }
 
 /*=====================
@@ -1015,10 +1037,11 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
     dsc.rect_dsc = &point_dsc_tmp;
     dsc.part = LV_PART_CURSOR;
 
+    lv_area_t clip_area2;
+    _lv_area_intersect(&clip_area2, clip_area, &obj->coords);
+
     /*Go through all cursor lines*/
     _LV_LL_READ_BACK(&chart->cursor_ll, cursor) {
-        if(cursor->point.x == LV_CHART_POINT_NONE || cursor->point.y == LV_CHART_POINT_NONE) continue;
-
         lv_memcpy(&line_dsc_tmp, &line_dsc_ori, sizeof(lv_draw_line_dsc_t));
         lv_memcpy(&point_dsc_tmp, &point_dsc_ori, sizeof(lv_draw_rect_dsc_t));
         line_dsc_tmp.color = cursor->color;
@@ -1027,8 +1050,21 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
         dsc.p1 = &p1;
         dsc.p2 = &p2;
 
-        lv_coord_t cx = obj->coords.x1 + cursor->point.x;
-        lv_coord_t cy = obj->coords.y1 + cursor->point.y;
+        lv_coord_t cx;
+        lv_coord_t cy;
+        if(cursor->pos_set) {
+            cx = cursor->pos.x;
+            cy = cursor->pos.y;
+        } else {
+            if(cursor->point_id == LV_CHART_POINT_NONE) continue;
+            lv_point_t p;
+            lv_chart_get_point_pos_by_id(obj, lv_chart_get_series_next(obj, NULL), cursor->point_id, &p);
+            cx = p.x;
+            cy = p.y;
+        }
+
+        cx += obj->coords.x1;
+        cy += obj->coords.y1;
 
         if(cursor->dir & LV_DIR_HOR) {
             p1.x = cursor->dir & LV_DIR_LEFT ? obj->coords.x1 : cx;
@@ -1037,7 +1073,7 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
             p2.y = p1.y;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
-            lv_draw_line(&p1, &p2, clip_area, &line_dsc_tmp);
+            lv_draw_line(&p1, &p2, &clip_area2, &line_dsc_tmp);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
         }
 
@@ -1048,7 +1084,7 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
             p2.y = cursor->dir & LV_DIR_BOTTOM ? obj->coords.y2 : cy;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
-            lv_draw_line(&p1, &p2, clip_area, &line_dsc_tmp);
+            lv_draw_line(&p1, &p2, &clip_area2, &line_dsc_tmp);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
         }
 
@@ -1065,7 +1101,7 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
             dsc.p2 = NULL;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
-            lv_draw_rect(&point_area, clip_area, &point_dsc_tmp);
+            lv_draw_rect(&point_area, &clip_area2, &point_dsc_tmp);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
         }
 

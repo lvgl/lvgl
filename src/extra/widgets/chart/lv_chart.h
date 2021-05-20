@@ -72,9 +72,12 @@ typedef struct {
 } lv_chart_series_t;
 
 typedef struct {
-    lv_point_t point;
+    lv_point_t pos;
+    uint16_t point_id;
     lv_color_t color;
+    lv_chart_series_t * ser;
     lv_dir_t dir;
+    uint8_t pos_set:1;  /*1: pos is set; 0: point_id is set*/
 } lv_chart_cursor_t;
 
 typedef struct {
@@ -304,10 +307,18 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
  * Set the coordinate of the cursor with respect to the paddings
  * @param obj       pointer to a chart object
  * @param cursor    pointer to the cursor
- * @param point     the new coordinate of cursor relative to paddings of the background
+ * @param pos       the new coordinate of cursor relative the the chart
  */
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point);
+void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos);
 
+/**
+ * Stick the cursor to a point
+ * @param obj       pointer to a chart object
+ * @param cursor    pointer to the cursor
+ * @param ser       pointer to a series
+ * @param point_id  the point's index or  `LV_CHART_POINT_NONE` to not assign to any points.
+ */
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint16_t point_id);
 
 /**
  * Get the coordinate of the cursor with respect to the paddings
