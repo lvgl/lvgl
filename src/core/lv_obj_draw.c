@@ -201,14 +201,14 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
 
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
-#if LV_USE_BIDI == 0
+#if LV_USE_BIDI
     draw_dsc->bidi_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 #endif
 
     draw_dsc->align = lv_obj_get_style_text_align(obj, part);
     if(draw_dsc->align == LV_TEXT_ALIGN_AUTO) {
         if(draw_dsc->bidi_dir == LV_BASE_DIR_RTL) draw_dsc->align = LV_TEXT_ALIGN_RIGHT;
-        draw_dsc->align = LV_TEXT_ALIGN_LEFT;
+        else draw_dsc->align = LV_TEXT_ALIGN_LEFT;
     }
 }
 

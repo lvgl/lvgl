@@ -813,6 +813,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->placeholder_txt = NULL;
 
     ta->label = lv_label_create(obj);
+    lv_obj_set_style_bg_color(ta->label, lv_color_hex(0x226699), 0);
+    lv_obj_set_style_bg_opa(ta->label, 200, 0);
     lv_obj_set_width(ta->label, lv_pct(100));
     lv_label_set_text(ta->label, "");
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -1070,9 +1072,12 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_point_t letter_pos;
     lv_label_get_letter_pos(ta->label, cur_pos, &letter_pos);
 
+    lv_text_align_t align = lv_obj_get_style_text_align(ta->label, LV_PART_MAIN);
+    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+    else align = LV_TEXT_ALIGN_LEFT;
+
     /*If the cursor is out of the text (most right) draw it to the next line*/
-    if(letter_pos.x + ta->label->coords.x1 + letter_w > ta->label->coords.x2 && ta->one_line == 0 &&
-       lv_obj_get_style_text_align(ta->label, LV_PART_MAIN) != LV_TEXT_ALIGN_RIGHT) {
+    if(letter_pos.x + ta->label->coords.x1 + letter_w > ta->label->coords.x2 && ta->one_line == 0 && align != LV_TEXT_ALIGN_RIGHT) {
         letter_pos.x = 0;
         letter_pos.y += letter_h + line_space;
 

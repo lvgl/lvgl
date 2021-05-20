@@ -7,6 +7,7 @@ static lv_obj_t * kb;
 
 void lv_example_textarea_2(void)
 {
+    lv_obj_set_style_base_dir(lv_scr_act(), LV_BASE_DIR_RTL, 0);
     /*Create the password box*/
     lv_obj_t * pwd_ta = lv_textarea_create(lv_scr_act());
     lv_textarea_set_text(pwd_ta, "");

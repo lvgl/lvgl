@@ -19,6 +19,8 @@ static void sw_event_cb(lv_event_t * e)
  */
 void lv_example_scroll_2(void)
 {
+    lv_obj_set_style_base_dir(lv_scr_act(), LV_BASE_DIR_RTL, 0);
+
     lv_obj_t * panel = lv_obj_create(lv_scr_act());
     lv_obj_set_size(panel, 280, 150);
     lv_obj_set_scroll_snap_x(panel, LV_SCROLL_SNAP_CENTER);
@@ -40,6 +42,7 @@ void lv_example_scroll_2(void)
 
         lv_obj_center(label);
     }
+
     lv_obj_update_snap(panel, LV_ANIM_ON);
 
 #if LV_USE_SWITCH

@@ -11,7 +11,7 @@ void lv_example_flex_6(void)
     lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, 0);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_center(cont);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN_WRAP);
 
     uint32_t i;
     for(i = 0; i < 20; i++) {
@@ -23,4 +23,5 @@ void lv_example_flex_6(void)
         lv_obj_center(label);
     }
 }
+
 #endif

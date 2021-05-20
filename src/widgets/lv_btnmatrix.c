@@ -156,17 +156,21 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
         for(btn = 0; btn < btn_cnt; btn++, btn_tot_i++, txt_tot_i++) {
             uint32_t btn_u = get_button_width(btnm->ctrl_bits[btn_tot_i]);
 
-            lv_coord_t btn_x1 = pleft + (max_w_no_gap * row_unit_cnt) / unit_cnt + btn * pcol;
-            lv_coord_t btn_x2 = pleft + (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * pcol - 1;
+            lv_coord_t btn_x1 = (max_w_no_gap * row_unit_cnt) / unit_cnt + btn * pcol;
+            lv_coord_t btn_x2 = (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * pcol - 1;
 
             /*If RTL start from the right*/
             if(base_dir == LV_BASE_DIR_RTL) {
                 lv_coord_t tmp = btn_x1;
                 btn_x1 = btn_x2;
                 btn_x2 = tmp;
+
                 btn_x1 = max_w - btn_x1;
                 btn_x2 = max_w - btn_x2;
             }
+
+            btn_x1 += pleft;
+            btn_x2 += pleft;
 
             lv_area_set(&btnm->button_areas[btn_tot_i], btn_x1, row_y1, btn_x2, row_y2);
 

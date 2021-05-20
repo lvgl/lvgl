@@ -21,8 +21,10 @@ static void btnm_event_handler(lv_event_t * e)
 
 void lv_example_textarea_1(void)
 {
+//    lv_obj_set_style_base_dir(lv_scr_act(), LV_BASE_DIR_RTL, 0);
     lv_obj_t * ta = lv_textarea_create(lv_scr_act());
-    lv_textarea_set_one_line(ta, true);
+//    lv_textarea_set_one_line(ta, true);
+    lv_textarea_set_text(ta, "Hey");
     lv_obj_align(ta, LV_ALIGN_TOP_MID, 0, 10);
     lv_obj_add_event_cb(ta, textarea_event_handler, LV_EVENT_READY, ta);
     lv_obj_add_state(ta, LV_STATE_FOCUSED); /*To be sure the cursor is visible*/
