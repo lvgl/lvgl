@@ -21,7 +21,7 @@ void lv_example_meter_4(void)
     lv_meter_set_scale_range(meter, scale, 0, 100, 360, 0);
 
     /*Add a three arc indicator*/
-    lv_coord_t indic_w = lv_obj_get_width(meter) / 2;
+    lv_coord_t indic_w = 100;
     lv_meter_indicator_t * indic1 = lv_meter_add_arc(meter, scale, indic_w,lv_palette_main(LV_PALETTE_ORANGE), 0);
     lv_meter_set_indicator_start_value(meter, indic1, 0);
     lv_meter_set_indicator_end_value(meter, indic1, 40);

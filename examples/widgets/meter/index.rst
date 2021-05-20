@@ -9,7 +9,7 @@ Simple meter
 
 
 A meter with multiple arcs
-"""""""""""""""""""""""""
+"""""""""""""""""""""""""""
 
 .. lv_example:: widgets/meter/lv_example_meter_2
   :language: c
