@@ -74,14 +74,14 @@ lv_obj_t * lv_spangroup_create(lv_obj_t * par);
  * @param obj pointer to a spangroup object.
  * @return pointer to the created span.
  */
-lv_span_t * lv_span_create(lv_obj_t * obj);
+lv_span_t * lv_spangroup_new_span(lv_obj_t * obj);
 
 /**
  * Remove the span from the spangroup and free memory.
  * @param obj pointer to a spangroup object.
  * @param span pointer to a span.
  */
-void lv_span_del(lv_obj_t * obj, lv_span_t * span);
+void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span);
 
 /*=====================
  * Setter functions
@@ -107,28 +107,28 @@ void lv_span_set_text_static(lv_span_t * span, const char * text);
  * @param obj pointer to a spangroup object.
  * @param align see lv_text_align_t for details.
  */
-void lv_span_set_align(lv_obj_t * obj, lv_text_align_t align);
+void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align);
 
 /**
  * Set the overflow of the spangroup.
  * @param obj pointer to a spangroup object.
  * @param overflow see lv_span_overflow_t for details.
  */
-void lv_span_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow);
+void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow);
 
 /**
  * Set the indent of the spangroup.
  * @param obj pointer to a spangroup object.
  * @param indent The first line indentation
  */
-void lv_span_set_indent(lv_obj_t * obj, lv_coord_t indent);
+void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent);
 
 /**
  * Set the mode of the spangroup.
  * @param obj pointer to a spangroup object.
  * @param mode see lv_span_mode_t for details.
  */
-void lv_span_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
+void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
 
 /*=====================
  * Getter functions
@@ -139,45 +139,45 @@ void lv_span_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
  * @param obj pointer to a spangroup object.
  * @return the align value.
  */
-lv_text_align_t lv_span_get_align(lv_obj_t * obj);
+lv_text_align_t lv_spangroup_get_align(lv_obj_t * obj);
 
 /**
  * get the overflow of the spangroup.
  * @param obj pointer to a spangroup object.
  * @return the overflow value.
  */
-lv_span_overflow_t lv_span_get_overflow(lv_obj_t * obj);
+lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj);
 
 /**
  * get the indent of the spangroup.
  * @param obj pointer to a spangroup object.
  * @return the indent value.
  */
-lv_coord_t lv_span_get_indent(lv_obj_t * obj);
+lv_coord_t lv_spangroup_get_indent(lv_obj_t * obj);
 
 /**
  * get the mode of the spangroup.
  * @param obj pointer to a spangroup object.
  */
-lv_span_mode_t lv_span_get_mode(lv_obj_t * obj);
+lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj);
 
 /**
  * get max line height of all span in the spangroup.
  * @param obj pointer to a spangroup object.
  */
-lv_coord_t lv_span_get_max_line_h(lv_obj_t * obj);
+lv_coord_t lv_spangroup_get_max_line_h(lv_obj_t * obj);
 
 /**
  * get the width when all span of spangroup on a line. include spangroup pad.
  * @param obj pointer to a spangroup object.
  */
-lv_coord_t lv_span_get_expand_width(lv_obj_t * obj);
+lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj);
 
 /**
  * get the height with width fixed. the height include spangroup pad.
  * @param obj pointer to a spangroup object.
  */
-lv_coord_t lv_span_get_expand_height(lv_obj_t * obj, lv_coord_t width);
+lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width);
 
 
 /*=====================
@@ -188,7 +188,7 @@ lv_coord_t lv_span_get_expand_height(lv_obj_t * obj, lv_coord_t width);
  * update the mode of the spangroup.
  * @param obj pointer to a spangroup object.
  */
-void lv_span_refr_mode(lv_obj_t * obj);
+void lv_spangroup_refr_mode(lv_obj_t * obj);
 
 /**********************
  *      MACROS
