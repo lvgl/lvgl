@@ -132,7 +132,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
         lv_obj_scroll_to_x(cont, id * (gap + w), anim_en);
     } else {
-        int32_t id_rtl = (int32_t) -id - 1;
+        int32_t id_rtl = (int32_t) -id;
         lv_obj_scroll_to_x(cont, (gap + w) * id_rtl, anim_en);
     }
 
@@ -283,9 +283,11 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         lv_obj_get_scroll_end(cont, &p);
 
         lv_coord_t w = lv_obj_get_content_width(cont);
-        lv_coord_t t = (p.x + w/ 2) / w;
+        lv_coord_t t;
 
-        if(lv_obj_get_style_base_dir(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -t;
+        if(lv_obj_get_style_base_dir(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -(p.x - w/ 2) / w;
+        else t = (p.x + w/ 2) / w;
+
         if(t < 0) t = 0;
         lv_tabview_set_act(tv, t, LV_ANIM_ON);
         lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
