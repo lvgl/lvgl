@@ -193,7 +193,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_obj_add_event_cb(btnm, btns_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_SCROLL_END, NULL);
+    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
     switch(tabview->tab_pos) {
@@ -247,7 +247,7 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
 
-    if(code == LV_EVENT_SIZE_CHANGED || e == LV_EVENT_CHILD_CHANGED) {
+    if(code == LV_EVENT_SIZE_CHANGED) {
         lv_tabview_set_act(target, lv_tabview_get_tab_act(target), LV_ANIM_OFF);
     }
 }
@@ -263,19 +263,25 @@ static void btns_value_changed_event_cb(lv_event_t * e)
 
     lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
 }
+
 static void cont_scroll_end_event_cb(lv_event_t * e)
 {
     lv_obj_t * cont = lv_event_get_target(e);
+    lv_event_code_t code = lv_event_get_code(e);
 
     lv_obj_t * tv = lv_obj_get_parent(cont);
+    if(code == LV_EVENT_LAYOUT_CHANGED) {
+        lv_tabview_set_act(tv, lv_tabview_get_tab_act(tv), LV_ANIM_OFF);
+    }
+    else if(code == LV_EVENT_SCROLL_END) {
+        lv_point_t p;
+        lv_obj_get_scroll_end(cont, &p);
 
-    lv_point_t p;
-    lv_obj_get_scroll_end(cont, &p);
-
-    lv_coord_t w = lv_obj_get_content_width(cont);
-    lv_coord_t t = (p.x + w/ 2) / w;
-    if(t < 0) t = 0;
-    lv_tabview_set_act(tv, t, LV_ANIM_ON);
-    lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
+        lv_coord_t w = lv_obj_get_content_width(cont);
+        lv_coord_t t = (p.x + w/ 2) / w;
+        if(t < 0) t = 0;
+        lv_tabview_set_act(tv, t, LV_ANIM_ON);
+        lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
+    }
 }
 #endif /*LV_USE_TABVIEW*/

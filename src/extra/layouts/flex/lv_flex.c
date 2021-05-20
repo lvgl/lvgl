@@ -215,6 +215,8 @@ static void flex_update(lv_obj_t * cont, void * user_data)
         lv_obj_refr_size(cont);
     }
 
+    lv_event_send(cont, LV_EVENT_LAYOUT_CHANGED, NULL);
+
     LV_TRACE_LAYOUT("finished");
 }
 

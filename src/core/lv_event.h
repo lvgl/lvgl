@@ -73,8 +73,9 @@ typedef enum {
     /** Other events*/
     LV_EVENT_DELETE,              /**< Object is being deleted*/
     LV_EVENT_CHILD_CHANGED,       /**< Child was removed/added*/
-    LV_EVENT_SIZE_CHANGED,       /**< Object coordinates/size have changed*/
+    LV_EVENT_SIZE_CHANGED,        /**< Object coordinates/size have changed*/
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed*/
+    LV_EVENT_LAYOUT_CHANGED,      /**< The children position has changed due to a layout recalculation*/
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     _LV_EVENT_LAST                /** Number of default events*/
