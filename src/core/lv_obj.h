@@ -144,7 +144,7 @@ typedef struct {
     struct _lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
     lv_point_t scroll;                      /**< The current X/Y scroll offset*/
 
-    lv_coord_t ext_click_pad;              /**< Extra click padding in all direction*/
+    lv_area_t ext_click_pad;              /**< Extra click padding in all direction*/
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
     lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/

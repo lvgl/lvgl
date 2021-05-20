@@ -505,7 +505,8 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
    arc->last_angle =arc->indic_angle_end;
 
    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-   lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
+   lv_area_t delta_size = {LV_DPI_DEF / 10, LV_DPI_DEF / 10, LV_DPI_DEF / 10,LV_DPI_DEF / 10};
+   lv_obj_set_ext_click_area(obj, delta_size);
 
 
     LV_TRACE_OBJ_CREATE("finished");

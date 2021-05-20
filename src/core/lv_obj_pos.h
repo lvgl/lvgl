@@ -336,7 +336,7 @@ bool lv_obj_is_visible(const struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @param size      extended clickable area in all 4 directions [px]
  */
-void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, lv_coord_t size);
+void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, lv_area_t delta_size);
 
 /**
  * Get the an area where to object can be clicked.

@@ -863,22 +863,22 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
 
 }
 
-void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t size)
+void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_area_t delta_size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_allocate_spec_attr(obj);
-    obj->spec_attr->ext_click_pad = size;
+    obj->spec_attr->ext_click_pad = delta_size;
 }
 
 void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 {
     lv_area_copy(area, &obj->coords);
     if(obj->spec_attr) {
-        area->x1 -= obj->spec_attr->ext_click_pad;
-        area->x2 += obj->spec_attr->ext_click_pad;
-        area->y1 -= obj->spec_attr->ext_click_pad;
-        area->y2 += obj->spec_attr->ext_click_pad;
+        area->x1 -= obj->spec_attr->ext_click_pad.x1;
+        area->x2 += obj->spec_attr->ext_click_pad.x2;
+        area->y1 -= obj->spec_attr->ext_click_pad.y1;
+        area->y2 += obj->spec_attr->ext_click_pad.y2;
     }
 }
 

@@ -70,7 +70,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
 
     if(add_close_btn) {
         lv_obj_t * close_btn = lv_btn_create(mbox);
-        lv_obj_set_ext_click_area(close_btn, LV_DPX(10));
+        lv_area_t delta_size = {LV_DPX(10), LV_DPX(10), LV_DPX(10), LV_DPX(10)};
+        lv_obj_set_ext_click_area(close_btn, delta_size);
         lv_obj_add_event_cb(close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
         label = lv_label_create(close_btn);
         lv_label_set_text(label, LV_SYMBOL_CLOSE);

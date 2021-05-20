@@ -88,7 +88,8 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_ext_click_area(obj, LV_DPX(8));
+    lv_area_t delta_size = {LV_DPX(8), LV_DPX(8), LV_DPX(8), LV_DPX(8)};
+    lv_obj_set_ext_click_area(obj, delta_size);
 }
 
 static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
