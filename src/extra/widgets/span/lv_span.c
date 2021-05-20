@@ -65,7 +65,8 @@ static lv_snippet_t * lv_get_snippet(uint16_t index);
 /**********************
  *  STATIC VARIABLES
  **********************/
-struct _snippet_stack snippet_stack;
+static struct _snippet_stack snippet_stack;
+
 const lv_obj_class_t lv_spangroup_class  = {
     .base_class = &lv_obj_class,
     .constructor_cb = lv_spangroup_constructor,
@@ -99,7 +100,7 @@ lv_obj_t * lv_spangroup_create(lv_obj_t * par)
  * @param obj pointer to a spangroup object.
  * @return pointer to the created span.
  */
-lv_span_t * lv_span_create(lv_obj_t * obj)
+lv_span_t * lv_spangroup_new_span(lv_obj_t * obj)
 {
     if(obj == NULL) {
         return NULL;
@@ -122,7 +123,7 @@ lv_span_t * lv_span_create(lv_obj_t * obj)
  * @param obj pointer to a spangroup object.
  * @param span pointer to a span.
  */
-void lv_span_del(lv_obj_t * obj, lv_span_t * span)
+void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span)
 {
     if(obj == NULL) {
         return;
@@ -141,7 +142,7 @@ void lv_span_del(lv_obj_t * obj, lv_span_t * span)
         }
     }
 
-    lv_span_refr_mode(obj);
+    lv_spangroup_refr_mode(obj);
 }
 
 /*=====================
@@ -193,7 +194,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
  * @param obj pointer to a spangroup object.
  * @param align see lv_text_align_t for details.
  */
-void lv_span_set_align(lv_obj_t * obj, lv_text_align_t align)
+void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->align == align) return;
@@ -207,7 +208,7 @@ void lv_span_set_align(lv_obj_t * obj, lv_text_align_t align)
  * @param obj pointer to a spangroup object.
  * @param overflow see lv_span_overflow_t for details.
  */
-void lv_span_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
+void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->overflow == overflow) return;
@@ -221,7 +222,7 @@ void lv_span_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
  * @param obj pointer to a spangroup object.
  * @param indent The first line indentation
  */
-void lv_span_set_indent(lv_obj_t * obj, lv_coord_t indent)
+void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->indent == indent) return;
@@ -235,13 +236,13 @@ void lv_span_set_indent(lv_obj_t * obj, lv_coord_t indent)
  * @param obj pointer to a spangroup object.
  * @param mode see lv_span_mode_t for details.
  */
-void lv_span_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
+void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->mode == mode) return;
 
     spans->mode = mode;
-    lv_span_refr_mode(obj);
+    lv_spangroup_refr_mode(obj);
 }
 
 /*=====================
@@ -253,7 +254,7 @@ void lv_span_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
  * @param obj pointer to a spangroup object.
  * @return the align value.
  */
-lv_text_align_t lv_span_get_align(lv_obj_t * obj)
+lv_text_align_t lv_spangroup_get_align(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->align;
@@ -264,7 +265,7 @@ lv_text_align_t lv_span_get_align(lv_obj_t * obj)
  * @param obj pointer to a spangroup object.
  * @return the overflow value.
  */
-lv_span_overflow_t lv_span_get_overflow(lv_obj_t * obj)
+lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->overflow;
@@ -275,7 +276,7 @@ lv_span_overflow_t lv_span_get_overflow(lv_obj_t * obj)
  * @param obj pointer to a spangroup object.
  * @return the indent value.
  */
-lv_coord_t lv_span_get_indent(lv_obj_t * obj)
+lv_coord_t lv_spangroup_get_indent(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->indent;
@@ -286,7 +287,7 @@ lv_coord_t lv_span_get_indent(lv_obj_t * obj)
  * @param obj pointer to a spangroup object.
  * @return the mode value.
  */
-lv_span_mode_t lv_span_get_mode(lv_obj_t * obj)
+lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->mode;
@@ -296,7 +297,7 @@ lv_span_mode_t lv_span_get_mode(lv_obj_t * obj)
  * update the mode of the spangroup.
  * @param obj pointer to a spangroup object.
  */
-void lv_span_refr_mode(lv_obj_t * obj)
+void lv_spangroup_refr_mode(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
@@ -305,15 +306,15 @@ void lv_span_refr_mode(lv_obj_t * obj)
     }
 
     if(spans->mode == LV_SPAN_MODE_EXPAND) {
-        lv_coord_t width = lv_span_get_expand_width(obj);
-        lv_coord_t height = lv_span_get_max_line_h(obj);
+        lv_coord_t width = lv_spangroup_get_expand_width(obj);
+        lv_coord_t height = lv_spangroup_get_max_line_h(obj);
         lv_coord_t top_pad = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
         lv_coord_t bottom_pad = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
         lv_obj_set_width(obj, width + spans->indent);
         lv_obj_set_height(obj, height + top_pad + bottom_pad);
     }
     else if(spans->mode == LV_SPAN_MODE_BREAK) {
-        lv_coord_t height = lv_span_get_expand_height(obj, lv_obj_get_width(obj));
+        lv_coord_t height = lv_spangroup_get_expand_height(obj, lv_obj_get_width(obj));
         lv_obj_set_height(obj, height);
     }
 
@@ -324,7 +325,7 @@ void lv_span_refr_mode(lv_obj_t * obj)
  * get max line height of all span in the spangroup.
  * @param obj pointer to a spangroup object.
  */
-lv_coord_t lv_span_get_max_line_h(lv_obj_t * obj)
+lv_coord_t lv_spangroup_get_max_line_h(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
@@ -345,7 +346,7 @@ lv_coord_t lv_span_get_max_line_h(lv_obj_t * obj)
  * get the width when all span of spangroup on a line. include spangroup pad.
  * @param obj pointer to a spangroup object.
  */
-lv_coord_t lv_span_get_expand_width(lv_obj_t * obj)
+lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
@@ -380,7 +381,7 @@ lv_coord_t lv_span_get_expand_width(lv_obj_t * obj)
  * get the height with width fixed. the height include spangroup pad.
  * @param obj pointer to a spangroup object.
  */
-lv_coord_t lv_span_get_expand_height(lv_obj_t * obj, lv_coord_t width)
+lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(_lv_ll_get_head(&spans->child_ll) == NULL) {
@@ -519,10 +520,10 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
         draw_main(e);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
-        lv_span_refr_mode(obj);
+        lv_spangroup_refr_mode(obj);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_span_refr_mode(obj);
+        lv_spangroup_refr_mode(obj);
     }
 }
 
