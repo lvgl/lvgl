@@ -247,7 +247,7 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
 
-    if(code == LV_EVENT_SIZE_CHANGED || LV_EVENT_CHILD_CHANGED) {
+    if(code == LV_EVENT_SIZE_CHANGED || e == LV_EVENT_CHILD_CHANGED) {
         lv_tabview_set_act(target, lv_tabview_get_tab_act(target), LV_ANIM_OFF);
     }
 }
