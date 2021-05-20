@@ -86,7 +86,7 @@ The following event codes exist:
 - `LV_EVENT_FOCUSED`      The object is focused 
 - `LV_EVENT_DEFOCUSED`    The object is defocused
 - `LV_EVENT_LEAVE`        The object is defocused but still selected
-- `LV_EVENT_HIT_TEST`     Perform advanced hit-testing
+- `LV_EVENT_HIT_TEST`     Perform advanced hit-testing. Use `lv_hit_test_info_t * a = lv_event_get_hit_test_info(e)` and check if `a->point` can click the object or not. If not set `a->res = false` 
 
 
 ### Drawing events
