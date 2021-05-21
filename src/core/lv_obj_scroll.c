@@ -147,7 +147,9 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     lv_coord_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
 
-    child_res -= (obj->coords.y2 - pad_bottom - border_width);
+    if(child_res != LV_COORD_MIN) {
+        child_res -= (obj->coords.y2 - pad_bottom - border_width);
+    }
 
     lv_coord_t self_h = lv_obj_get_self_height(obj);
     self_h = self_h - (lv_obj_get_height(obj) - pad_top - pad_bottom - 2 * border_width);

@@ -813,8 +813,6 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->placeholder_txt = NULL;
 
     ta->label = lv_label_create(obj);
-    lv_obj_set_style_bg_color(ta->label, lv_color_hex(0x226699), 0);
-    lv_obj_set_style_bg_opa(ta->label, 200, 0);
     lv_obj_set_width(ta->label, lv_pct(100));
     lv_label_set_text(ta->label, "");
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
