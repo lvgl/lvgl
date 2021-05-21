@@ -859,8 +859,15 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
     lv_coord_t tmp;
     if(col) {
         lv_coord_t x = p.x + lv_obj_get_scroll_x(obj);
-        x -= obj->coords.x1;
-        x -= lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+
+        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
+            x = obj->coords.x2 - lv_obj_get_style_pad_right(obj, LV_PART_MAIN) - x;
+        }
+        else {
+            x -= obj->coords.x1;
+            x -= lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        }
+
         *col = 0;
         tmp = 0;
         for(*col = 0; *col < table->col_cnt; (*col)++) {
