@@ -489,8 +489,10 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     }
 
     lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(label, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-    else align = LV_TEXT_ALIGN_LEFT;
+    if(align == LV_TEXT_ALIGN_AUTO) {
+       if(lv_obj_get_style_base_dir(label, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+       else align = LV_TEXT_ALIGN_LEFT;
+    }
 
     switch(align) {
     default:

@@ -290,8 +290,10 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
     const char * txt         = lv_label_get_text(obj);
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-    else align = LV_TEXT_ALIGN_LEFT;
+    if(align == LV_TEXT_ALIGN_AUTO) {
+       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+       else align = LV_TEXT_ALIGN_LEFT;
+    }
 
     if(txt[0] == '\0') {
         pos->y = 0;
@@ -426,8 +428,10 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-    else align = LV_TEXT_ALIGN_LEFT;
+    if(align == LV_TEXT_ALIGN_AUTO) {
+       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+       else align = LV_TEXT_ALIGN_LEFT;
+    }
 
     /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
@@ -539,8 +543,10 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-    else align = LV_TEXT_ALIGN_LEFT;
+    if(align == LV_TEXT_ALIGN_AUTO) {
+       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+       else align = LV_TEXT_ALIGN_LEFT;
+    }
 
     lv_coord_t y             = 0;
     lv_text_flag_t flag       = LV_TEXT_FLAG_NONE;
@@ -804,9 +810,10 @@ static void draw_main(lv_event_t * e)
     lv_obj_get_content_coords(obj, &txt_coords);
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-    else align = LV_TEXT_ALIGN_LEFT;
-
+    if(align == LV_TEXT_ALIGN_AUTO) {
+       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+       else align = LV_TEXT_ALIGN_LEFT;
+    }
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
     if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;

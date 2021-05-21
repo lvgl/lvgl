@@ -574,8 +574,10 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     if(label == NULL) return;
 
     lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO && lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-    else align = LV_TEXT_ALIGN_LEFT;
+    if(align == LV_TEXT_ALIGN_AUTO) {
+        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
+        else align = LV_TEXT_ALIGN_LEFT;
+    }
 
     switch(align) {
     case LV_TEXT_ALIGN_CENTER:
