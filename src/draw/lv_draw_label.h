@@ -51,7 +51,7 @@ typedef struct {
  * all the previous characters needs to be checked to calculate the positions.
  * This structure stores an earlier (e.g. at -1000 px) coordinate and the index of that line.
  * Therefore the calculations can start from here.*/
-typedef struct {
+typedef struct _lv_draw_label_hint_t {
     /** Index of the line at `y` coordinate*/
     int32_t line_start;
 

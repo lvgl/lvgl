@@ -21,13 +21,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc);
-static void init_scroll_limits(lv_indev_proc_t * proc);
+static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc);
+static void init_scroll_limits(_lv_indev_proc_t * proc);
 static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs);
 static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs);
-static void scroll_limit_diff(lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_coord_t * diff_y);
-static lv_coord_t scroll_throw_predict_y(lv_indev_proc_t * proc);
-static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc);
+static void scroll_limit_diff(_lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_coord_t * diff_y);
+static lv_coord_t scroll_throw_predict_y(_lv_indev_proc_t * proc);
+static lv_coord_t scroll_throw_predict_x(_lv_indev_proc_t * proc);
 static lv_coord_t elastic_diff(lv_obj_t * scroll_obj, lv_coord_t diff, lv_coord_t scroll_start, lv_coord_t scroll_end, lv_dir_t dir);
 
 /**********************
@@ -42,7 +42,7 @@ static lv_coord_t elastic_diff(lv_obj_t * scroll_obj, lv_coord_t diff, lv_coord_
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_indev_scroll_handler(lv_indev_proc_t * proc)
+void _lv_indev_scroll_handler(_lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     /*If there is no scroll object yet try to find one*/
@@ -91,7 +91,7 @@ void _lv_indev_scroll_handler(lv_indev_proc_t * proc)
 }
 
 
-void _lv_indev_scroll_throw_handler(lv_indev_proc_t * proc)
+void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     if(scroll_obj == NULL) return;
@@ -236,7 +236,7 @@ void lv_indev_scroll_get_snap_dist(lv_obj_t * obj, lv_point_t * p)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
+static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
 {
     lv_obj_t * obj_candidate = NULL;
     lv_dir_t dir_candidate = LV_DIR_NONE;
@@ -341,7 +341,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
     return obj_candidate;
 }
 
-static void init_scroll_limits(lv_indev_proc_t * proc)
+static void init_scroll_limits(_lv_indev_proc_t * proc)
 {
     lv_obj_t * obj = proc->types.pointer.scroll_obj;
     /*If there no STOP allow scrolling anywhere*/
@@ -508,7 +508,7 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
     return dist == LV_COORD_MAX ? 0 : -dist;
 }
 
-static void scroll_limit_diff(lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_coord_t * diff_y)
+static void scroll_limit_diff(_lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_coord_t * diff_y)
 {
     if(diff_y) {
         if(proc->types.pointer.scroll_sum.y + *diff_y < proc->types.pointer.scroll_area.y1) {
@@ -533,7 +533,7 @@ static void scroll_limit_diff(lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_co
 
 
 
-static lv_coord_t scroll_throw_predict_y(lv_indev_proc_t * proc)
+static lv_coord_t scroll_throw_predict_y(_lv_indev_proc_t * proc)
 {
     lv_coord_t y =  proc->types.pointer.scroll_throw_vect.y;
     lv_coord_t move = 0;
@@ -549,7 +549,7 @@ static lv_coord_t scroll_throw_predict_y(lv_indev_proc_t * proc)
 }
 
 
-static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc)
+static lv_coord_t scroll_throw_predict_x(_lv_indev_proc_t * proc)
 {
     lv_coord_t x =  proc->types.pointer.scroll_throw_vect.x;
     lv_coord_t move = 0;

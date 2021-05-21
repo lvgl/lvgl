@@ -523,7 +523,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_arc_t * arc = (lv_arc_t *)e->target;
+    lv_arc_t * arc = (lv_arc_t *)lv_event_get_target(e);
     if(code == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return;

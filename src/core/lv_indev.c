@@ -35,12 +35,12 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
-static void indev_proc_press(lv_indev_proc_t * proc);
-static void indev_proc_release(lv_indev_proc_t * proc);
+static void indev_proc_press(_lv_indev_proc_t * proc);
+static void indev_proc_release(_lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
-static void indev_click_focus(lv_indev_proc_t * proc);
-static void indev_gesture(lv_indev_proc_t * proc);
-static bool indev_reset_check(lv_indev_proc_t * proc);
+static void indev_click_focus(_lv_indev_proc_t * proc);
+static void indev_gesture(_lv_indev_proc_t * proc);
+static bool indev_reset_check(_lv_indev_proc_t * proc);
 
 /**********************
  *  STATIC VARIABLES
@@ -595,7 +595,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 /*On enter long press toggle edit mode.*/
                 if(editable) {
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
-                    if(_lv_ll_get_len(&g->obj_ll) > 1) {
+                    if(lv_group_get_obj_count(g) > 1) {
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                         lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                     }
@@ -654,9 +654,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             }
             /*An object is being edited and the button is released.*/
-            else if(g->editing) {
+            else if(lv_group_get_editing(g)) {
                 /*Ignore long pressed enter release because it comes from mode switch*/
-                if(!i->proc.long_pr_sent || _lv_ll_get_len(&g->obj_ll) <= 1) {
+                if(!i->proc.long_pr_sent || lv_group_get_obj_count(g) <= 1) {
                     lv_event_send(indev_obj_act, LV_EVENT_RELEASED, indev_act);
                     if(indev_reset_check(&i->proc)) return;
 
@@ -674,7 +674,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
             /*If the focused object is editable and now in navigate mode then on enter switch edit
                mode*/
-            else if(editable && !g->editing && !i->proc.long_pr_sent) {
+            else if(editable && !lv_group_get_editing(g) && !i->proc.long_pr_sent) {
                 lv_group_set_editing(g, true); /*Set edit mode*/
             }
         }
@@ -765,7 +765,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  * @param indev pointer to an input device 'proc'
  * @return LV_RES_OK: no indev reset required; LV_RES_INV: indev reset is required
  */
-static void indev_proc_press(lv_indev_proc_t * proc)
+static void indev_proc_press(_lv_indev_proc_t * proc)
 {
     LV_LOG_INFO("pressed at x:%d y:%d", proc->types.pointer.act_point.x, proc->types.pointer.act_point.y);
     indev_obj_act = proc->types.pointer.act_obj;
@@ -901,7 +901,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
  * Process the released state of LV_INDEV_TYPE_POINTER input devices
  * @param proc pointer to an input device 'proc'
  */
-static void indev_proc_release(lv_indev_proc_t * proc)
+static void indev_proc_release(_lv_indev_proc_t * proc)
 {
     if(proc->wait_until_release != 0) {
         proc->types.pointer.act_obj  = NULL;
@@ -978,7 +978,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
  * Handle focus/defocus on click for POINTER input devices
  * @param proc pointer to the state of the indev
  */
-static void indev_click_focus(lv_indev_proc_t * proc)
+static void indev_click_focus(_lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
     lv_obj_t * obj_to_focus = indev_obj_act;
@@ -1047,7 +1047,7 @@ static void indev_click_focus(lv_indev_proc_t * proc)
 * Handle the gesture of indev_proc_p->types.pointer.act_obj
 * @param indev pointer to a input device state
 */
-void indev_gesture(lv_indev_proc_t * proc)
+void indev_gesture(_lv_indev_proc_t * proc)
 {
 
     if(proc->types.pointer.scroll_obj) return;
@@ -1100,7 +1100,7 @@ void indev_gesture(lv_indev_proc_t * proc)
  * @param proc pointer to an input device 'proc'
  * @return true if indev query should be immediately truncated.
  */
-static bool indev_reset_check(lv_indev_proc_t * proc)
+static bool indev_reset_check(_lv_indev_proc_t * proc)
 {
     if(proc->reset_query) {
         indev_obj_act = NULL;

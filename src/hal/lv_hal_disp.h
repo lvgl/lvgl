@@ -46,7 +46,7 @@ struct _lv_theme_t;
 /**
  * Structure for holding display buffer information.
  */
-typedef struct {
+typedef struct _lv_disp_draw_buf_t{
     void * buf1; /**< First display buffer.*/
     void * buf2; /**< Second display buffer.*/
 

@@ -46,33 +46,16 @@ typedef uint8_t lv_key_t;
  *      TYPEDEFS
  **********************/
 struct _lv_group_t;
+typedef struct _lv_group_t lv_group_t;
+
 struct _lv_obj_t;
 
 typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
 
-/**
- * Groups can be used to logically hold objects so that they can be individually focused.
- * They are NOT for laying out objects on a screen (try `lv_cont` for that).
- */
-typedef struct _lv_group_t {
-    lv_ll_t obj_ll;        /**< Linked list to store the objects in the group*/
-    struct _lv_obj_t ** obj_focus; /**< The object in focus*/
-
-    lv_group_focus_cb_t focus_cb;              /**< A function to call when a new object is focused (optional)*/
-#if LV_USE_USER_DATA
-    void * user_data;
-#endif
-
-    uint8_t frozen : 1;         /**< 1: can't focus to new object*/
-    uint8_t editing : 1;        /**< 1: Edit mode, 0: Navigate mode*/
-    uint8_t refocus_policy : 1; /**< 1: Focus prev if focused on deletion. 0: Focus next if focused on
-                                   deletion.*/
-    uint8_t wrap : 1;           /**< 1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end
-                                   of list.*/
-} lv_group_t;
-
-enum { LV_GROUP_REFOCUS_POLICY_NEXT = 0, LV_GROUP_REFOCUS_POLICY_PREV = 1 };
-typedef uint8_t lv_group_refocus_policy_t;
+typedef enum {
+    LV_GROUP_REFOCUS_POLICY_NEXT = 0,
+    LV_GROUP_REFOCUS_POLICY_PREV = 1
+}lv_group_refocus_policy_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -212,10 +195,17 @@ bool lv_group_get_editing(const lv_group_t * group);
 
 /**
  * Get whether focus next/prev will allow wrapping from first->last or last->first object.
- * @param group             pointer to group
+ * @param group         pointer to group
  * @param               en true: wrapping enabled; false: wrapping disabled
  */
 bool lv_group_get_wrap(lv_group_t * group);
+
+/**
+ * Get the number of object in the group
+ * @param group         pointer to a group
+ * @return              number of objects in the group
+ */
+uint32_t lv_group_get_obj_count(lv_group_t * group);
 
 /**********************
  *      MACROS
