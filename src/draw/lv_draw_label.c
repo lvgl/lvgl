@@ -413,7 +413,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
     if(g_ret == false)  {
         /*Add warning if the dsc is not found
          *but do not print warning for non printable ASCII chars (e.g. '\n')*/
-        if(letter >= 0x20) {
+        if(letter >= 0x20 && letter != 0xf8ff) { /*0xf8ff == LV_SYMBOL_DUMMY*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found");
         }
         return;
