@@ -47,6 +47,7 @@ typedef uint8_t lv_key_t;
  **********************/
 
 struct _lv_obj_t;
+struct _lv_group_t;
 
 typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
 
