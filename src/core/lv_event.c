@@ -17,17 +17,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct _lv_event_t {
-    struct _lv_obj_t * target;
-    struct _lv_obj_t * current_target;
-    lv_event_code_t code;
-    void * user_data;
-    void * param;
-    struct _lv_event_t * prev;
-    uint8_t deleted :1;
-}lv_event_t;
-
 typedef struct _lv_event_dsc_t{
     lv_event_cb_t cb;
     void * user_data;

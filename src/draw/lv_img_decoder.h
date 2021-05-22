@@ -42,9 +42,8 @@ typedef uint8_t lv_img_src_t;
 
 /*Decoder function definitions*/
 
-struct _lv_img_decoder;
-typedef struct _lv_img_decoder lv_img_decoder_t;
 struct _lv_img_decoder_dsc;
+struct _lv_img_decoder;
 
 /**
  * Get info from an image and store in the `header`
@@ -83,6 +82,19 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder * decode
  * @param dsc pointer to decoder descriptor
  */
 typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
+
+
+typedef struct _lv_img_decoder {
+    lv_img_decoder_info_f_t info_cb;
+    lv_img_decoder_open_f_t open_cb;
+    lv_img_decoder_read_line_f_t read_line_cb;
+    lv_img_decoder_close_f_t close_cb;
+
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
+} lv_img_decoder_t;
+
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_img_decoder_dsc {
