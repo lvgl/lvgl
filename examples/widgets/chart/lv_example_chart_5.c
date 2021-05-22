@@ -80,7 +80,7 @@ void lv_example_chart_5(void)
 
     uint32_t pcnt = sizeof(ecg_sample) / sizeof(ecg_sample[0]);
     lv_chart_set_point_count(chart, pcnt);
-    lv_chart_set_ext_array(chart, ser, (lv_coord_t *)ecg_sample);
+    lv_chart_set_ext_y_array(chart, ser, (lv_coord_t *)ecg_sample);
 
     lv_obj_t * slider;
     slider = lv_slider_create(lv_scr_act());

@@ -25,7 +25,7 @@ static void event_cb(lv_event_t * e)
             lv_point_t p;
             lv_chart_get_point_pos_by_id(chart, ser, id, &p);
 
-            lv_coord_t * y_array = lv_chart_get_array(chart, ser);
+            lv_coord_t * y_array = lv_chart_get_y_array(chart, ser);
             lv_coord_t value = y_array[id];
 
             char buf[16];

@@ -27,16 +27,16 @@ void lv_example_chart_1(void)
     lv_chart_set_next_value(chart, ser1, 90);
 
     /*Directly set points on 'ser2'*/
-    ser2->points[0] = 90;
-    ser2->points[1] = 70;
-    ser2->points[2] = 65;
-    ser2->points[3] = 65;
-    ser2->points[4] = 65;
-    ser2->points[5] = 65;
-    ser2->points[6] = 65;
-    ser2->points[7] = 65;
-    ser2->points[8] = 65;
-    ser2->points[9] = 65;
+    ser2->y_points[0] = 90;
+    ser2->y_points[1] = 70;
+    ser2->y_points[2] = 65;
+    ser2->y_points[3] = 65;
+    ser2->y_points[4] = 65;
+    ser2->y_points[5] = 65;
+    ser2->y_points[6] = 65;
+    ser2->y_points[7] = 65;
+    ser2->y_points[8] = 65;
+    ser2->y_points[9] = 65;
 
     lv_chart_refresh(chart); /*Required after direct set*/
 }
