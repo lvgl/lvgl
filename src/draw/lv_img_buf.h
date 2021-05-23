@@ -178,7 +178,7 @@ typedef struct {
         uint32_t pxi;
         uint8_t px_size;
     } tmp;
-} lv_img_transform_dsc_t;
+} _lv_img_transform_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -267,13 +267,13 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
  * Initialize a descriptor to rotate an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
  */
-void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc);
+void _lv_img_buf_transform_init(_lv_img_transform_dsc_t * dsc);
 
 /**
  * Continue transformation by taking the neighbors into account
  * @param dsc pointer to the transformation descriptor
  */
-bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc);
+bool _lv_img_buf_transform_anti_alias(_lv_img_transform_dsc_t * dsc);
 
 /**
  * Get which color and opa would come to a pixel if it were rotated
@@ -283,7 +283,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc);
  * @return true: there is valid pixel on these x/y coordinates; false: the rotated pixel was out of the image
  * @note the result is written back to `dsc->res_color` and `dsc->res_opa`
  */
-bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
+bool _lv_img_buf_transform(_lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
 
 #endif
 /**

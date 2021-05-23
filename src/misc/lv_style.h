@@ -244,7 +244,6 @@ typedef struct _lv_style_transiton_t {
     uint32_t delay;                /**< Delay before the transition in [ms]*/
 }lv_style_transition_dsc_t;
 
-
 /**
  * Descriptor of a constant style property.
  */
@@ -252,6 +251,7 @@ typedef struct {
     lv_style_prop_t prop;
     lv_style_value_t value;
 } lv_style_const_prop_t;
+
 /**
  * Descriptor of a style (a collection of properties and values).
  */

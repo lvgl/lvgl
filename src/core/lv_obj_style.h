@@ -42,7 +42,7 @@ typedef struct {
     uint32_t selector :24;
     uint32_t is_local :1;
     uint32_t is_trans :1;
-}lv_obj_style_t;
+}_lv_obj_style_t;
 
 typedef struct {
     uint16_t time;

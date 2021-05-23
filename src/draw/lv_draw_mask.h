@@ -92,11 +92,11 @@ typedef uint8_t lv_draw_mask_line_side_t;
 typedef struct {
     lv_draw_mask_xcb_t cb;
     lv_draw_mask_type_t type;
-} lv_draw_mask_common_dsc_t;
+} _lv_draw_mask_common_dsc_t;
 
 typedef struct {
     /*The first element must be the common descriptor*/
-    lv_draw_mask_common_dsc_t dsc;
+    _lv_draw_mask_common_dsc_t dsc;
 
     struct {
         /*First point*/
@@ -134,7 +134,7 @@ typedef struct {
 
 typedef struct {
     /*The first element must be the common descriptor*/
-    lv_draw_mask_common_dsc_t dsc;
+    _lv_draw_mask_common_dsc_t dsc;
 
     struct {
         lv_point_t vertex_p;
@@ -149,7 +149,7 @@ typedef struct {
 
 typedef struct {
     /*The first element must be the common descriptor*/
-    lv_draw_mask_common_dsc_t dsc;
+    _lv_draw_mask_common_dsc_t dsc;
 
     struct {
         lv_area_t rect;
@@ -164,7 +164,7 @@ typedef struct {
 
 typedef struct {
     /*The first element must be the common descriptor*/
-    lv_draw_mask_common_dsc_t dsc;
+    _lv_draw_mask_common_dsc_t dsc;
 
     struct {
         lv_area_t coords;
@@ -178,7 +178,7 @@ typedef struct {
 
 typedef struct _lv_draw_mask_map_param_t {
     /*The first element must be the common descriptor*/
-    lv_draw_mask_common_dsc_t dsc;
+    _lv_draw_mask_common_dsc_t dsc;
 
     struct {
         lv_area_t coords;

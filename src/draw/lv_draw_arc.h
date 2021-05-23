@@ -31,7 +31,6 @@ typedef struct {
     uint8_t rounded : 1;
 } lv_draw_arc_dsc_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

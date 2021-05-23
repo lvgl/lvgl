@@ -60,10 +60,10 @@
  * @param color color The color of the image with `LV_IMG_CF_ALPHA_...`
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id)
+_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id)
 {
     /*Is the image cached?*/
-    lv_img_cache_entry_t * cached_src = NULL;
+    _lv_img_cache_entry_t * cached_src = NULL;
 
 #if LV_IMG_CACHE_DEF_SIZE
     if(entry_cnt == 0) {
@@ -71,7 +71,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, in
         return NULL;
     }
 
-    lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+    _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
 
     /*Decrement all lifes. Make the entries older*/
     uint16_t i;
@@ -123,7 +123,7 @@ lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, in
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color, frame_id);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
-        lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
+        lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
         cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its us*/
         return NULL;
     }
@@ -159,7 +159,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     }
 
     /*Reallocate the cache*/
-    LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(lv_img_cache_entry_t) * new_entry_cnt);
+    LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(_lv_img_cache_entry_t) * new_entry_cnt);
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_img_cache_array));
     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
         entry_cnt = 0;
@@ -168,7 +168,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     entry_cnt = new_entry_cnt;
 
     /*Clean the cache*/
-    lv_memset_00(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(lv_img_cache_entry_t));
+    lv_memset_00(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(_lv_img_cache_entry_t));
 #endif
 }
 
@@ -181,7 +181,7 @@ void lv_img_cache_invalidate_src(const void * src)
 {
     LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
-    lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+    _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
 
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
@@ -190,7 +190,7 @@ void lv_img_cache_invalidate_src(const void * src)
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
 
-            lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
+            lv_memset_00(&cache[i], sizeof(_lv_img_cache_entry_t));
         }
     }
 #endif

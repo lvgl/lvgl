@@ -35,7 +35,7 @@ typedef struct {
      * Decrement all lifes by one every in every ::lv_img_cache_open.
      * If life == 0 the entry can be reused*/
     int32_t life;
-} lv_img_cache_entry_t;
+} _lv_img_cache_entry_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -50,7 +50,7 @@ typedef struct {
  * @param frame_id the index of the frame. Used only with animated images, set 0 for normal images
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id);
+_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id);
 
 /**
  * Set the number of images to be cached.

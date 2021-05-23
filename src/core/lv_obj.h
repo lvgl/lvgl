@@ -152,13 +152,13 @@ typedef struct {
     lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snapable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
     uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array*/
-}lv_obj_spec_attr_t;
+}_lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t {
     const lv_obj_class_t * class_p;
     struct _lv_obj_t * parent;
-    lv_obj_spec_attr_t * spec_attr;
-    lv_obj_style_t * styles;
+    _lv_obj_spec_attr_t * spec_attr;
+    _lv_obj_style_t * styles;
 #if LV_USE_USER_DATA
     void * user_data;
 #endif

@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 #define LV_NO_TIMER_READY 0xFFFFFFFF
+
 /**********************
  *      TYPEDEFS
  **********************/

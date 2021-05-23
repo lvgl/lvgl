@@ -104,7 +104,7 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf,
                                                             lv_coord_t len)
 {
     bool changed = false;
-    lv_draw_mask_common_dsc_t * dsc;
+    _lv_draw_mask_common_dsc_t * dsc;
 
     _lv_draw_mask_saved_t * m = LV_GC_ROOT(_lv_draw_mask_list);
 
