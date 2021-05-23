@@ -4,6 +4,7 @@ This is a summary for planned new features and a collection of ideas.
 This list indicates only the current intention and it can be changed.
 
 ## v8.X
+- `lv_snapshot`: buffer a widget and all of its children into an image. he source widget can be on a different screen too. The result image can be transformed.
 - Add radio button support
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
