@@ -695,8 +695,9 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     int16_t i_end;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
     lv_coord_t w     = (lv_obj_get_content_width(obj) * chart->zoom_x) >> 8;
     lv_coord_t h     = (lv_obj_get_content_height(obj) * chart->zoom_y) >> 8;
 
