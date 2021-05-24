@@ -54,7 +54,10 @@ typedef struct {
     void * p;
     uint16_t size;
     uint8_t used : 1;
-} lv_mem_buf_t;
+} _lv_mem_buf_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_mem_buf_t lv_mem_buf_t;
 
 typedef lv_mem_buf_t lv_mem_buf_arr_t[LV_MEM_BUF_MAX_NUM];
 

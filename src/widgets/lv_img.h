@@ -41,7 +41,10 @@ typedef struct {
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
-} lv_img_t;
+} _lv_img_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_img_t lv_img_t;
 
 extern const lv_obj_class_t lv_img_class;
 

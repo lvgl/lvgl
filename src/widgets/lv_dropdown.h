@@ -48,12 +48,18 @@ typedef struct {
     lv_dir_t dir              :4;   /**< Direction in which the list should open*/
     uint8_t static_txt        :1;   /**< 1: Only a pointer is saved in `options`*/
     uint8_t selected_highlight:1;   /**< 1: Make the selected option highlighted in the list*/
-}lv_dropdown_t;
+}_lv_dropdown_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_dropdown_t lv_dropdown_t;
 
 typedef struct {
   lv_obj_t obj;
   lv_obj_t * dropdown;
-}lv_dropdown_list_t;
+}_lv_dropdown_list_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_dropdown_list_t lv_dropdown_list_t;
 
 extern const  lv_obj_class_t lv_dropdown_class;
 extern const  lv_obj_class_t lv_dropdownlist_class;

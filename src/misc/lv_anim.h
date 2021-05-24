@@ -89,8 +89,11 @@ typedef struct _lv_anim_t {
     uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
     uint32_t time_orig;
-} lv_anim_t;
+} _lv_anim_t;
 
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_anim_t lv_anim_t;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

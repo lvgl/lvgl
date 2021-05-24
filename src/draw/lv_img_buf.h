@@ -180,6 +180,9 @@ typedef struct {
     } tmp;
 } _lv_img_transform_dsc_t;
 
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_img_transform_dsc_t lv_img_transform_dsc_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

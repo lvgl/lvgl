@@ -63,7 +63,10 @@ typedef struct {
 #endif
     uint8_t pwd_mode : 1; /*Replace characters with '*'*/
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
-} lv_textarea_t;
+} _lv_textarea_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_textarea_t lv_textarea_t;
 
 extern const lv_obj_class_t lv_textarea_class;
 

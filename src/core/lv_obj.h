@@ -171,8 +171,10 @@ typedef struct _lv_obj_t {
     uint16_t style_cnt  :6;
     uint16_t h_layout   :1;
     uint16_t w_layout   :1;
-}lv_obj_t;
+}_lv_obj_t;
 
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_obj_t lv_obj_t;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

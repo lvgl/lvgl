@@ -71,7 +71,10 @@ typedef struct _lv_group_t {
                                    deletion.*/
     uint8_t wrap : 1;           /**< 1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end
                                    of list.*/
-} lv_group_t;
+} _lv_group_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_group_t lv_group_t;
 
 typedef enum {
     LV_GROUP_REFOCUS_POLICY_NEXT = 0,

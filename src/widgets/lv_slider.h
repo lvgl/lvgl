@@ -47,7 +47,10 @@ typedef struct {
     int32_t * value_to_set; /*Which bar value to set*/
     uint8_t dragging : 1;       /*1: the slider is being dragged*/
     uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
-}lv_slider_t;
+}_lv_slider_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_slider_t lv_slider_t;
 
 extern const lv_obj_class_t lv_slider_class;
 

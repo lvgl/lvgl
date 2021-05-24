@@ -49,7 +49,10 @@ typedef struct {
     lv_btnmatrix_t btnm;
     lv_obj_t * ta;              /*Pointer to the assigned text area*/
     lv_keyboard_mode_t mode;    /*Key map type*/
-} lv_keyboard_t;
+} _lv_keyboard_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_keyboard_t lv_keyboard_t;
 
 extern const lv_obj_class_t lv_keyboard_class;
 

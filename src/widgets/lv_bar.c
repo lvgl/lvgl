@@ -49,8 +49,8 @@ static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_indic(lv_event_t * e);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
-                                       lv_bar_anim_t * anim_info, lv_anim_enable_t en);
-static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
+                                       _lv_bar_anim_t * anim_info, lv_anim_enable_t en);
+static void lv_bar_init_anim(lv_obj_t * bar, _lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
 static void lv_bar_anim_ready(lv_anim_t * a);
 
@@ -530,14 +530,14 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void lv_bar_anim(void * var, int32_t value)
 {
-    lv_bar_anim_t * bar_anim = var;
+    _lv_bar_anim_t * bar_anim = var;
     bar_anim->anim_state    = value;
     lv_obj_invalidate(bar_anim->bar);
 }
 
 static void lv_bar_anim_ready(lv_anim_t * a)
 {
-    lv_bar_anim_t * var = a->var;
+    _lv_bar_anim_t * var = a->var;
     lv_obj_t * obj = (lv_obj_t *)var->bar;
     lv_bar_t * bar = (lv_bar_t *)obj;
 
@@ -550,7 +550,7 @@ static void lv_bar_anim_ready(lv_anim_t * a)
 }
 
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
-                                       lv_bar_anim_t * anim_info, lv_anim_enable_t en)
+                                       _lv_bar_anim_t * anim_info, lv_anim_enable_t en)
 {
     if(en == LV_ANIM_OFF) {
         *value_ptr = new_value;
@@ -582,7 +582,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
     }
 }
 
-static void lv_bar_init_anim(lv_obj_t * obj, lv_bar_anim_t * bar_anim)
+static void lv_bar_init_anim(lv_obj_t * obj, _lv_bar_anim_t * bar_anim)
 {
     bar_anim->bar = obj;
     bar_anim->anim_start = 0;

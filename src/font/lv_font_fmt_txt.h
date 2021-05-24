@@ -43,7 +43,10 @@ typedef struct {
     int16_t ofs_x;                  /**< x offset of the bounding box*/
     int16_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
 #endif
-} lv_font_fmt_txt_glyph_dsc_t;
+} _lv_font_fmt_txt_glyph_dsc_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_font_fmt_txt_glyph_dsc_t lv_font_fmt_txt_glyph_dsc_t;
 
 /** Format of font character map.*/
 enum {
@@ -110,7 +113,10 @@ typedef struct {
 
     /** Type of this character map*/
     lv_font_fmt_txt_cmap_type_t type;
-} lv_font_fmt_txt_cmap_t;
+} _lv_font_fmt_txt_cmap_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_font_fmt_txt_cmap_t lv_font_fmt_txt_cmap_t;
 
 /** A simple mapping of kern values from pairs*/
 typedef struct {
@@ -125,7 +131,10 @@ typedef struct {
     const int8_t * values;
     uint32_t pair_cnt   : 30;
     uint32_t glyph_ids_size : 2;    /*0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t`*/
-} lv_font_fmt_txt_kern_pair_t;
+} _lv_font_fmt_txt_kern_pair_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_font_fmt_txt_kern_pair_t lv_font_fmt_txt_kern_pair_t;
 
 /** More complex but more optimal class based kern value storage*/
 typedef struct {
@@ -142,7 +151,10 @@ typedef struct {
     const uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     uint8_t left_class_cnt;
     uint8_t right_class_cnt;
-} lv_font_fmt_txt_kern_classes_t;
+} _lv_font_fmt_txt_kern_classes_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_font_fmt_txt_kern_classes_t lv_font_fmt_txt_kern_classes_t;
 
 /** Bitmap formats*/
 typedef enum {
@@ -154,7 +166,10 @@ typedef enum {
 typedef struct {
     uint32_t last_letter;
     uint32_t last_glyph_id;
-}lv_font_fmt_txt_glyph_cache_t;
+}_lv_font_fmt_txt_glyph_cache_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_font_fmt_txt_glyph_cache_t lv_font_fmt_txt_glyph_cache_t;
 
 /*Describe store additional data for fonts*/
 typedef struct {
@@ -195,7 +210,10 @@ typedef struct {
 
     /*Cache the last letter and is glyph id*/
     lv_font_fmt_txt_glyph_cache_t * cache;
-} lv_font_fmt_txt_dsc_t;
+} _lv_font_fmt_txt_dsc_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_font_fmt_txt_dsc_t lv_font_fmt_txt_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -43,7 +43,11 @@ typedef struct {
   uint16_t sel_opt_id_ori;      /**< Store the original index on focus*/
   lv_roller_mode_t mode : 1;
   uint32_t moved : 1;
-}lv_roller_t;
+}_lv_roller_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_roller_t lv_roller_t;
+
 
 extern const lv_obj_class_t lv_roller_class;
 

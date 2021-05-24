@@ -42,7 +42,10 @@ typedef struct {
     uint16_t digit_count : 4;
     uint16_t dec_point_pos : 4; /*if 0, there is no separator and the number is an integer*/
     uint16_t rollover : 1;   // Set to true for rollover functionality
-} lv_spinbox_t;
+} _lv_spinbox_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_spinbox_t lv_spinbox_t;
 
 extern const lv_obj_class_t lv_spinbox_class;
 

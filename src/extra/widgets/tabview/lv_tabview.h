@@ -32,7 +32,10 @@ typedef struct
     uint16_t tab_cnt;
     uint16_t tab_cur;
     lv_dir_t tab_pos;
-}lv_tabview_t;
+}_lv_tabview_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_tabview_t lv_tabview_t;
 
 extern const lv_obj_class_t lv_tabview_class;
 

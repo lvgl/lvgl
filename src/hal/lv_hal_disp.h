@@ -60,8 +60,10 @@ typedef struct _lv_disp_draw_buf_t{
     volatile int flushing_last;
     volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
-} lv_disp_draw_buf_t;
+} _lv_disp_draw_buf_t;
 
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_disp_draw_buf_t lv_disp_draw_buf_t;
 
 typedef enum {
     LV_DISP_ROT_NONE = 0,
@@ -174,7 +176,10 @@ typedef struct _lv_disp_t {
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
-} lv_disp_t;
+} _lv_disp_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_disp_t lv_disp_t;
 
 /**********************
  * GLOBAL PROTOTYPES

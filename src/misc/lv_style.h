@@ -242,7 +242,10 @@ typedef struct _lv_style_transiton_t {
     lv_anim_path_cb_t path_xcb;     /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
-}lv_style_transition_dsc_t;
+}_lv_style_transition_dsc_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_style_transition_dsc_t lv_style_transition_dsc_t;
 
 /**
  * Descriptor of a constant style property.
@@ -273,7 +276,10 @@ typedef struct {
     uint16_t is_const :1;
     uint8_t has_group;
     uint8_t prop_cnt;
-} lv_style_t;
+} _lv_style_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_style_t lv_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

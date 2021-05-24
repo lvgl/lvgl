@@ -33,7 +33,10 @@ typedef struct {
     /*picture sequence */
     lv_img_dsc_t **dsc;
     int8_t	pic_count;
-} lv_animimg_t;
+} _lv_animimg_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_animimg_t lv_animimg_t;
 
 
 /*Image parts*/

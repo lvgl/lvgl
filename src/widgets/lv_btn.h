@@ -28,7 +28,10 @@ extern "C" {
 
 typedef struct {
     lv_obj_t obj;
-}lv_btn_t;
+}_lv_btn_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_btn_t lv_btn_t;
 
 extern const lv_obj_class_t lv_btn_class;
 

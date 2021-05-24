@@ -89,7 +89,11 @@ typedef struct _lv_event_t {
     void * param;
     struct _lv_event_t * prev;
     uint8_t deleted :1;
-}lv_event_t;
+}_lv_event_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_event_t lv_event_t;
+
 
 /**
  * @brief Event callback.

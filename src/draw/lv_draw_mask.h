@@ -130,7 +130,10 @@ typedef struct {
     /*Invert the mask. The default is: Keep the left part.
      *It is used to select left/right/top/bottom*/
     uint8_t inv: 1;
-} lv_draw_mask_line_param_t;
+} _lv_draw_mask_line_param_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_draw_mask_line_param_t lv_draw_mask_line_param_t;
 
 typedef struct {
     /*The first element must be the common descriptor*/
@@ -145,7 +148,10 @@ typedef struct {
     lv_draw_mask_line_param_t start_line;
     lv_draw_mask_line_param_t end_line;
     uint16_t delta_deg;
-} lv_draw_mask_angle_param_t;
+} _lv_draw_mask_angle_param_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_draw_mask_angle_param_t lv_draw_mask_angle_param_t;
 
 typedef struct {
     /*The first element must be the common descriptor*/
@@ -160,7 +166,10 @@ typedef struct {
     int32_t y_prev;
     lv_sqrt_res_t y_prev_x;
 
-} lv_draw_mask_radius_param_t;
+} _lv_draw_mask_radius_param_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_draw_mask_radius_param_t lv_draw_mask_radius_param_t;
 
 typedef struct {
     /*The first element must be the common descriptor*/
@@ -174,7 +183,10 @@ typedef struct {
         lv_opa_t opa_bottom;
     } cfg;
 
-} lv_draw_mask_fade_param_t;
+} _lv_draw_mask_fade_param_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_draw_mask_fade_param_t lv_draw_mask_fade_param_t;
 
 typedef struct _lv_draw_mask_map_param_t {
     /*The first element must be the common descriptor*/
@@ -184,8 +196,10 @@ typedef struct _lv_draw_mask_map_param_t {
         lv_area_t coords;
         const lv_opa_t * map;
     } cfg;
-} lv_draw_mask_map_param_t;
+} _lv_draw_mask_map_param_t;
 
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_draw_mask_map_param_t lv_draw_mask_map_param_t;
 
 /**********************
  * GLOBAL PROTOTYPES

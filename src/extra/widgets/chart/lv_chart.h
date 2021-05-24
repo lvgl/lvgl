@@ -69,7 +69,10 @@ typedef struct {
     uint8_t hidden : 1;
     uint8_t ext_buf_assigned : 1;
     lv_chart_axis_t y_axis  : 2;
-} lv_chart_series_t;
+} _lv_chart_series_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_chart_series_t lv_chart_series_t;
 
 typedef struct {
     lv_point_t pos;
@@ -78,7 +81,10 @@ typedef struct {
     lv_chart_series_t * ser;
     lv_dir_t dir;
     uint8_t pos_set:1;  /*1: pos is set; 0: point_id is set*/
-} lv_chart_cursor_t;
+} _lv_chart_cursor_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_chart_cursor_t lv_chart_cursor_t;
 
 typedef struct {
     lv_coord_t major_len;
@@ -87,7 +93,10 @@ typedef struct {
     uint32_t minor_cnt :15;
     uint32_t major_cnt :15;
     uint32_t label_en  :1;
-}lv_chart_tick_dsc_t;
+}_lv_chart_tick_dsc_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_chart_tick_dsc_t lv_chart_tick_dsc_t;
 
 typedef struct {
     lv_obj_t obj;
@@ -104,7 +113,10 @@ typedef struct {
     uint16_t zoom_y;
     lv_chart_type_t type :2; /**< Line or column chart*/
     lv_chart_update_mode_t update_mode : 1;
-}lv_chart_t;
+}_lv_chart_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_chart_t lv_chart_t;
 
 extern const lv_obj_class_t lv_chart_class;
 

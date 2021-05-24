@@ -33,7 +33,10 @@ typedef struct {
     const lv_point_t * point_array;     /**< Pointer to an array with the points of the line*/
     uint16_t point_num;                 /**< Number of points in 'point_array'*/
     uint8_t y_inv : 1;                  /**< 1: y == 0 will be on the bottom*/
-} lv_line_t;
+} _lv_line_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_line_t lv_line_t;
 
 extern const lv_obj_class_t lv_line_class;
 

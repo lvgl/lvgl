@@ -24,7 +24,10 @@ extern "C" {
  **********************/
 typedef struct {
     lv_obj_t obj;
-}lv_win_t;
+}_lv_win_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef _lv_win_t lv_win_t;
 
 extern const lv_obj_class_t lv_win_class;
 
