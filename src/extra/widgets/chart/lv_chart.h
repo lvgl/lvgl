@@ -68,7 +68,7 @@ typedef struct {
     lv_coord_t * x_points;
     lv_coord_t * y_points;
     lv_color_t color;
-    uint16_t last_point;
+    uint16_t start_point;
     uint8_t hidden : 1;
     uint8_t x_ext_buf_assigned : 1;
     uint8_t y_ext_buf_assigned : 1;
@@ -360,7 +360,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
 void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value);
 
 /**
- * Set the next point according to the update mode policy.
+ * Set the next point's Y value according to the update mode policy.
  * @param obj       pointer to chart object
  * @param ser       pointer to a data series on 'chart'
  * @param value     the new value of the next data
@@ -368,13 +368,22 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t 
 void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value);
 
 /**
+ * Set the next point's X and Y value according to the update mode policy.
+ * @param obj       pointer to chart object
+ * @param ser       pointer to a data series on 'chart'
+ * @param x_value   the new X value of the next data
+ * @param y_value   the new Y value of the next data
+ */
+void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t x_value, lv_coord_t y_value);
+
+/**
  * Set an individual point's y value of a chart's series directly based on its index
  * @param obj     pointer to a chart object
  * @param ser     pointer to a data series on 'chart'
- * @param value   value to assign to array point
  * @param id      the index of the x point in the array
+ * @param value   value to assign to array point
  */
-void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value, uint16_t id);
+void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t value);
 
 /**
  * Set an individual point's x and y value of a chart's series directly based on its index

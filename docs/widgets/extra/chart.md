@@ -27,26 +27,37 @@ Charts also support:
 
 ## Usage
 
-### Data series
-You can add any number of series to the charts by `lv_chart_add_series(chart, color, LV_CHART_AXIS_PRIMARY/SECONDARY)`.
-It allocates data for a `lv_chart_series_t` structure which contains the chosen `color` and an array for the data points.
 
-`LV_CHART_AXIS_PRIMARY/SECONDARY` tells series should use the range of the `LV_CHART_AXIS_PRIMARY` (left) or `LV_CHART_AXIS_SECONDARY` (right) Y axis.
-
-With `lv_chart_set_ext_array(chart, ser, value_array)` makes the chart use an external array for the given series. 
-`value_array` should look like this: `lv_coord_t * value_array[num_points]`. The array size needs to be large enough to hold all the points of that series.
-The array's pointer will be saved in the chart so it needs to be global, static or dynamically allocated. 
-Note: you should call `lv_chart_refresh(chart)` after the external data source has been updated, to update the chart.
-
-The value array of a series can be get by `lv_chart_get_array(chart, ser)`. It can be use with `ext_array` or *normal array*s.
-
-### Series' type
+### Chart type
 The following data display types exist:
 - `LV_CHART_TYPE_NONE`  Do not display any data. It can be used to hide the series.
 - `LV_CHART_TYPE_LINE`  Draw lines between the data points and/or points (rectangles or circles) on the data points.
 - `LV_CHART_TYPE_BAR` - Draw bars.
+- `LV_CHART_TYPE_SCATTER` - X/Y chart drawing point's and lines between the points. .
 
-You can specify the display type with `lv_chart_set_type(chart, LV_CHART_TYPE_...)`. The types can be 'OR'ed (like `LV_CHART_TYPE_LINE`).
+You can specify the display type with `lv_chart_set_type(chart, LV_CHART_TYPE_...)`. 
+
+
+### Data series
+You can add any number of series to the charts by `lv_chart_add_series(chart, color, axis)`.
+It allocates data for a `lv_chart_series_t` structure which contains the chosen `color` and an array for the data points.
+`axis` can ha the following values:
+- `LV_CHART_AXIS_PRIMARY_Y` Left axis
+- `LV_CHART_AXIS_SECONDARY_Y` Right axis
+- `LV_CHART_AXIS_PRIMARY_X` Bottom axis
+- `LV_CHART_AXIS_SECONDARY_X` Top axis
+
+
+`axis` tells which axis's range should be used te scale the values.
+
+With `lv_chart_set_ext_y_array(chart, ser, value_array)` makes the chart use an external array for the given series. 
+`value_array` should look like this: `lv_coord_t * value_array[num_points]`. The array size needs to be large enough to hold all the points of that series.
+The array's pointer will be saved in the chart so it needs to be global, static or dynamically allocated. 
+Note: you should call `lv_chart_refresh(chart)` after the external data source has been updated, to update the chart.
+
+The value array of a series can be get by `lv_chart_get_y_array(chart, ser)`. It can be use with `ext_array` or *normal array*s.
+
+For `LV_CHART_TYPE_SCATTER` type  `lv_chart_set_ext_x_array(chart, ser, value_array)` and `lv_chart_get_x_array(chart, ser)` can be used as well.
 
 ### Modify the data
 You have several options to set the data of series:
@@ -56,6 +67,9 @@ You have several options to set the data of series:
 4. Initialize all points to a given value with: `lv_chart_set_all_value(chart, ser, value)`.
 
 Use `LV_CHART_POINT_DEF` as value to make the library skip drawing that point, column, or line segment.
+
+For `LV_CHART_TYPE_SCATTER` type  `lv_chart_set_value_by_id2(chart, ser, id, value)` and `lv_chart_set_next_value2(chart, ser, x_valuem y_value)` can be used as well.
+
 
 ### Update modes
 `lv_chart_set_next_value` can behave in two ways depending on *update mode*:
