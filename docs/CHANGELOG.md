@@ -11,10 +11,14 @@
    - In `extra` we can have a lot and specific widgets
    - Good place for contributions
 
-### Removed objects
-- `lv_cont` layout features are moved to `lv_obj`
-- `lv_page` scroll features are moved to `lv_obj`
+### Widget changes
+- `lv_cont` removed, layout features are moved to `lv_obj`
+- `lv_page` removed, scroll features are moved to `lv_obj`
 - `lv_objmask` the same can be achieved by events
+- `lv_meter` added as the unioin of `lv_linemeter` and `lv_gauge`
+- `lv_span` new widget mimicing HTML `<span>`
+- `lv_animing` new widget for simple slideshow animations
+- \+ many minor changes ad improvements
 
 ### New scrolling
 - Support "elastic" scrolling when scrolled in
@@ -43,7 +47,7 @@
 - `disp_drv->full_refresh = 1` makes always the whole display redraw. 
 - `hor_res` and `ver_res` need to be set in `disp_drv`
 - `indev_read_cb` returns `void`. To indicate that there is more that to read set `data->continue_reading = 1` in the `read_cb`
-.
+
 ### Other changes
 - Remove the copy parameter from create functions
 - Simplified File system interface API
@@ -61,7 +65,7 @@
 
 ### Migrating from v7 to v8
 - First and foremost, create a new `lv_conf.h` based on `lv_conf_template.h`.
-- To try the new version it suggested using a simulator project and see the examples.
+- To try the new version it's recommended to use a simulator project and see the examples.
 - When migrating your project to v8
   - Update the drivers are described above
   - Update the styles
