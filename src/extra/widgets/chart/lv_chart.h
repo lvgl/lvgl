@@ -107,7 +107,7 @@ typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
     lv_ll_t cursor_ll;     /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
-    lv_chart_tick_dsc_t tick[_LV_CHART_AXIS_LAST];
+    lv_chart_tick_dsc_t tick[4];
     lv_coord_t ymin[2];
     lv_coord_t ymax[2];
     lv_coord_t xmin[2];

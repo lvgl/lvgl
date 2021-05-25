@@ -38,6 +38,7 @@ static void draw_axes(lv_obj_t * obj, const lv_area_t * mask);
 static uint32_t get_index_from_x(lv_obj_t * obj, lv_coord_t x);
 static void invalidate_point(lv_obj_t * obj, uint16_t i);
 static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, lv_coord_t ** a);
+lv_chart_tick_dsc_t * get_tick_gsc(lv_obj_t * obj, lv_chart_axis_t axis);
 
 /**********************
  *  STATIC VARIABLES
@@ -222,13 +223,13 @@ void lv_chart_set_axis_tick(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t maj
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_chart_t * chart  = (lv_chart_t *)obj;
-    chart->tick[axis].major_len = major_len;
-    chart->tick[axis].minor_len = minor_len;
-    chart->tick[axis].minor_cnt = minor_cnt;
-    chart->tick[axis].major_cnt = major_cnt;
-    chart->tick[axis].label_en = label_en;
-    chart->tick[axis].draw_size = draw_size;
+    lv_chart_tick_dsc_t * t = get_tick_gsc(obj, axis);
+    t->major_len = major_len;
+    t->minor_len = minor_len;
+    t->minor_cnt = minor_cnt;
+    t->major_cnt = major_cnt;
+    t->label_en = label_en;
+    t->draw_size = draw_size;
 
     lv_obj_refresh_ext_draw_size(obj);
     lv_obj_invalidate(obj);
@@ -707,9 +708,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     } else if(code == LV_EVENT_SIZE_CHANGED) {
         lv_obj_refresh_self_size(obj);
     } else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param(e);
-        *s = LV_MAX4(*s, chart->tick[LV_CHART_AXIS_PRIMARY_X].draw_size,
-                     chart->tick[LV_CHART_AXIS_PRIMARY_Y].draw_size, chart->tick[LV_CHART_AXIS_SECONDARY_Y].draw_size);
+        lv_event_set_ext_draw_size(e, LV_MAX4(chart->tick[0].draw_size, chart->tick[1].draw_size, chart->tick[2].draw_size, chart->tick[3].draw_size));
     } else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         p->x = (lv_obj_get_content_width(obj) * chart->zoom_x) >> 8;
@@ -1296,7 +1295,8 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
-    lv_chart_tick_dsc_t * t = &chart->tick[axis];
+    lv_chart_tick_dsc_t * t = get_tick_gsc(obj, axis);
+
     if(t->major_cnt <= 1) return;
     if(!t->label_en && !t->major_len && !t->minor_len) return;
 
@@ -1409,8 +1409,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
-
-    lv_chart_tick_dsc_t * t = &chart->tick[axis];
+    lv_chart_tick_dsc_t * t = get_tick_gsc(obj, axis);
     if(t->major_cnt <= 1) return;
     if(!t->label_en && !t->major_len && !t->minor_len) return;
 
@@ -1650,5 +1649,18 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
         }
     }
 }
+
+lv_chart_tick_dsc_t * get_tick_gsc(lv_obj_t * obj, lv_chart_axis_t axis)
+{
+    lv_chart_t * chart = (lv_chart_t*) obj;
+    switch(axis) {
+        case LV_CHART_AXIS_PRIMARY_Y: return &chart->tick[0];
+        case LV_CHART_AXIS_PRIMARY_X: return &chart->tick[1];
+        case LV_CHART_AXIS_SECONDARY_Y: return &chart->tick[2];
+        case LV_CHART_AXIS_SECONDARY_X: return &chart->tick[3];
+        default: return NULL;
+    }
+}
+
 
 #endif
