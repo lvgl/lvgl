@@ -17,7 +17,10 @@ extern "C" {
 
 #if LV_USE_ANIMIMG != 0
 
-#include "../../../misc/lv_anim.h"
+/*Testing of dependencies*/
+#if LV_USE_IMG == 0
+#error "lv_animing: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG 1)"
+#endif
 
 /*********************
  *      DEFINES
