@@ -109,7 +109,9 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint16_t cnt)
     if(cnt < 1) cnt = 1;
 
     _LV_LL_READ_BACK(&chart->series_ll, ser) {
-        if(!ser->x_ext_buf_assigned) new_points_alloc(obj, ser, cnt, &ser->x_points);
+        if(chart->type == LV_CHART_TYPE_SCATTER) {
+            if(!ser->x_ext_buf_assigned) new_points_alloc(obj, ser, cnt, &ser->x_points);
+        }
         if(!ser->y_ext_buf_assigned) new_points_alloc(obj, ser, cnt, &ser->y_points);
         ser->start_point = 0;
     }
