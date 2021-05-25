@@ -18,7 +18,7 @@
 - `lv_meter` added as the unioin of `lv_linemeter` and `lv_gauge`
 - `lv_span` new widget mimicing HTML `<span>`
 - `lv_animing` new widget for simple slideshow animations
-- \+ many minor changes ad improvements
+- \+ many minor changes and improvements
 
 ### New scrolling
 - Support "elastic" scrolling when scrolled in
@@ -74,7 +74,7 @@
   - Use `lv_obj` instead of `lv_page`
   - The other parts are mainly minor renames and refactoring. See the functions' documentation for descriptions. 
 
-## v7.11.0
+## v7.11.0 (16.03.2021)
 
 ### New features
 - Add better screen orientation management with software rotation support
@@ -84,9 +84,9 @@
 - fix(gauge) fix needle invalidation
 - fix(bar) correct symmetric handling for vertical sliders
 
-## v7.10.1 (Planned for 16.02.2021)
+## v7.10.1 (16.02.2021)
 
-### Bugfixes
+### Bugfixes 
 - fix(draw) overlap outline with background to prevent aliasing artifacts
 - fix(indev) clear the indev's `act_obj` in `lv_indev_reset`
 - fix(text) fix out of bounds read in `_lv_txt_get_width`
@@ -95,7 +95,7 @@
 - fix(delete) delete animation after the children are deleted
 - fix(gauge) consider paddings for needle images
 
-## v7.10.0
+## v7.10.0 (02.02.2021)
 
 ### New features
 - feat(indev) allow input events to be passed to disabled objects
@@ -104,7 +104,7 @@
 ### Bugfixes
 - fix(btnmatrix) fix lv_btnmatrix_get_active_btn_text() when used in a group
 
-## v7.9.1
+## v7.9.1 (19.01.2021)
 
 ### Bugfixes
 - fix(cpicker) fix division by zero
@@ -115,7 +115,7 @@
 - fix(draw_rect) fix draw pattern stack-use-after-scope error
 
 
-## v7.9.0 
+## v7.9.0 (05.01.2021)
 
 ### New features
 - feat(chart) add lv_chart_remove_series and lv_chart_hide_series
@@ -135,7 +135,7 @@
 - fix(layout) stop layout after recursion threshold is reached
 - fix(gauge) fix redraw with image needle
 
-## v7.8.1
+## v7.8.1 (15.12.2020)
 
 ### Bugfixes
 - fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
