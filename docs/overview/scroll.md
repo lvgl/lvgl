@@ -164,6 +164,6 @@ if(event_code == LV_EVENT_GET_SELF_SIZE) {
 
 ```eval_rst
 
-.. include:: ../../../examples/scroll/index.rst
+.. include:: ../../examples/scroll/index.rst
 
 ```
