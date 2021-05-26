@@ -167,7 +167,7 @@ As you use LVGL you might find bugs. Before reporting them be sure to check the 
 
 If it really seems like a bug feel free to open an [issue on GitHub](https://github.com/lvgl/lvgl/issues). 
 
-When filing the issue be sure to fill the template. It helps find the root of the problem, avoid additional questions, or extended exchanges with other developers.
+When filing the issue be sure to fill out the template. It helps find the root of the problem while avoiding extensive questions and exchanges with other developers.
 
 ### Send fixes
 The beauty of open-source software is you can easily dig in to it to understand how it works. You can also fix or adjust it as you wish.
@@ -234,4 +234,3 @@ To make this concept sustainable there a few rules to follow:
   - Follow at least the major versions of LVGL 
   - Respond to the issues (in a reasonable time)
 - If there is no activity in a repo for 1 year it will be archived
-
