@@ -8,7 +8,7 @@ void lv_example_grid_6(void)
 {
 
     static lv_coord_t col_dsc[] = {60, 60, 60, LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {40, 40, 40, LV_GRID_TEMPLATE_LAST};
+    static lv_coord_t row_dsc[] = {45, 45, 45, LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_scr_act());
