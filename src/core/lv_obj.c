@@ -555,13 +555,25 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
     }
 
 #if LV_DRAW_COMPLEX
+    dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, LV_PART_SCROLLBAR);
+    if(dsc->shadow_opa > LV_OPA_MIN) {
+        dsc->shadow_width = lv_obj_get_style_shadow_width(obj, LV_PART_SCROLLBAR);
+        if(dsc->shadow_width > 0) {
+            dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, LV_PART_SCROLLBAR);
+            dsc->shadow_color = lv_obj_get_style_shadow_color(obj, LV_PART_SCROLLBAR);
+        } else {
+            dsc->shadow_opa = LV_OPA_TRANSP;
+        }
+    }
+
     lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
     if(opa < LV_OPA_MAX) {
         dsc->bg_opa = (dsc->bg_opa * opa) >> 8;
         dsc->border_opa = (dsc->bg_opa * opa) >> 8;
+        dsc->shadow_opa = (dsc->bg_opa * opa) >> 8;
     }
 
-    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) {
+    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP || dsc->shadow_opa != LV_OPA_TRANSP ) {
         dsc->radius = lv_obj_get_style_radius(obj, LV_PART_SCROLLBAR);
         return LV_RES_OK;
     } else {

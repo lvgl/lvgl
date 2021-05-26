@@ -17,6 +17,12 @@ Floating button
 .. lv_example:: scroll/lv_example_scroll_3
   :language: c
 
+Styling the scrollbars
+""""""""""""""""""""""""
+.. lv_example:: scroll/lv_example_scroll_4
+  :language: c
+  
+  
 MicroPython
 ^^^^^^^^^^^
 

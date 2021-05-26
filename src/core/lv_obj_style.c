@@ -228,7 +228,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     }
 
     if(!found) {
-        if(prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT) {
+        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
             const lv_obj_class_t * cls = obj->class_p;
             while(cls) {
                 if(prop == LV_STYLE_WIDTH) {
@@ -385,6 +385,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
 
             if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
                 if(part_act == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                else if(part_act == LV_PART_SCROLLBAR) return _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN;
                 else {
                     res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
                     continue;
