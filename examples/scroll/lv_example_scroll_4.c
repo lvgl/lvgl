@@ -1,25 +1,6 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_LIST
 
-static uint32_t btn_cnt = 1;
-
-static void float_btn_event_cb(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * float_btn = lv_event_get_target(e);
-
-    if(code == LV_EVENT_CLICKED) {
-        lv_obj_t * list = lv_event_get_user_data(e);
-        char buf[32];
-        lv_snprintf(buf, sizeof(buf), "Track %d", btn_cnt);
-        lv_obj_t * list_btn = lv_list_add_btn(list, LV_SYMBOL_AUDIO, buf);
-        btn_cnt++;
-
-        lv_obj_move_foreground(float_btn);
-
-        lv_obj_scroll_to_view(list_btn, LV_ANIM_ON);
-    }
-}
 
 /**
  * Styling the scrollbars

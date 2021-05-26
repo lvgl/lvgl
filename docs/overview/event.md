@@ -157,3 +157,12 @@ If `lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE)` is enabled all events will b
 
 The *target* parameter of the event is always the current target object, not the original object. To get the original target call `lv_event_get_original_target(e)` in the event handler.  
 
+
+
+## Examples
+
+```eval_rst
+
+.. include:: ../../examples/event/index.rst
+
+```
