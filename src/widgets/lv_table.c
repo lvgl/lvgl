@@ -539,7 +539,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else return;
 
         if(col >= table->col_cnt) {
-            if(row < table->row_cnt) {
+            if(row < table->row_cnt - 1) {
                 col = 0;
                 row++;
             } else {

@@ -534,8 +534,6 @@ static void style_init(void)
     lv_style_set_border_side(&styles->list_btn, LV_BORDER_SIDE_BOTTOM);
     lv_style_set_pad_all(&styles->list_btn, PAD_SMALL);
     lv_style_set_pad_column(&styles->list_btn, PAD_SMALL);
-    lv_style_set_flex_flow(&styles->list_btn, LV_FLEX_FLOW_ROW);
-    lv_style_set_layout(&styles->list_btn, LV_LAYOUT_FLEX);
 
     style_init_reset(&styles->list_item_grow);
     lv_style_set_transform_width(&styles->list_item_grow, PAD_DEF);

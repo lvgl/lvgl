@@ -381,6 +381,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_MAX_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_MIN_HEIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             else if(lv_style_get_prop(style, LV_STYLE_MAX_HEIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(lv_style_get_prop(style, LV_STYLE_BORDER_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
 
             if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
                 if(part_act == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;

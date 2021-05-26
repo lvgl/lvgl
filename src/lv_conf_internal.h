@@ -1076,7 +1076,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_ANIMIMG
 #    define LV_USE_ANIMIMG CONFIG_LV_USE_ANIMIMG
 #  else
-#    define  LV_USE_ANIMIMG      1
+#    define  LV_USE_ANIMIMG	    1
 #  endif
 #endif
 
@@ -1120,13 +1120,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-#ifndef LV_USE_CHART
-#  ifdef CONFIG_LV_USE_CHART
-#    define LV_USE_CHART CONFIG_LV_USE_CHART
-#  else
-#    define  LV_USE_CHART        1
-#  endif
-#endif
 
 #ifndef LV_USE_DROPDOWN
 #  ifdef CONFIG_LV_USE_DROPDOWN
@@ -1173,14 +1166,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_USE_LINE CONFIG_LV_USE_LINE
 #  else
 #    define  LV_USE_LINE         1
-#  endif
-#endif
-
-#ifndef LV_USE_METER
-#  ifdef CONFIG_LV_USE_METER
-#    define LV_USE_METER CONFIG_LV_USE_METER
-#  else
-#    define  LV_USE_METER        1
 #  endif
 #endif
 
@@ -1305,6 +1290,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif  /*LV_USE_CALENDAR*/
 
+#ifndef LV_USE_CHART
+#  ifdef CONFIG_LV_USE_CHART
+#    define LV_USE_CHART CONFIG_LV_USE_CHART
+#  else
+#    define  LV_USE_CHART        1
+#  endif
+#endif
+
 #ifndef LV_USE_COLORWHEEL
 #  ifdef CONFIG_LV_USE_COLORWHEEL
 #    define LV_USE_COLORWHEEL CONFIG_LV_USE_COLORWHEEL
@@ -1342,6 +1335,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_USE_LIST CONFIG_LV_USE_LIST
 #  else
 #    define  LV_USE_LIST         1
+#  endif
+#endif
+
+#ifndef LV_USE_METER
+#  ifdef CONFIG_LV_USE_METER
+#    define LV_USE_METER CONFIG_LV_USE_METER
+#  else
+#    define  LV_USE_METER        1
 #  endif
 #endif
 
@@ -1397,8 +1398,18 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_SPAN
 #    define LV_USE_SPAN CONFIG_LV_USE_SPAN
 #  else
-#    define  LV_USE_SPAN          1
+#    define  LV_USE_SPAN         1
 #  endif
+#endif
+#if LV_USE_SPAN
+/*A line text can contain maximum num of span descriptor */
+#ifndef LV_SPAN_SNIPPET_STACK_SIZE
+#  ifdef CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
+#    define LV_SPAN_SNIPPET_STACK_SIZE CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
+#  else
+#    define  LV_SPAN_SNIPPET_STACK_SIZE   64
+#  endif
+#endif
 #endif
 
 /*-----------
@@ -1448,6 +1459,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
 #  else
 #    define  LV_USE_THEME_BASIC    1
+#  endif
+#endif
+
+/*A theme designed for monochrome displays*/
+#ifndef LV_USE_THEME_MONO
+#  ifdef CONFIG_LV_USE_THEME_MONO
+#    define LV_USE_THEME_MONO CONFIG_LV_USE_THEME_MONO
+#  else
+#    define  LV_USE_THEME_MONO       1
 #  endif
 #endif
 
