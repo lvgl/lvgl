@@ -29,6 +29,7 @@ void lv_example_scroll_1(void);
 void lv_example_scroll_2(void);
 void lv_example_scroll_3(void);
 void lv_example_scroll_4(void);
+void lv_example_scroll_5(void);
 
 
 /**********************
