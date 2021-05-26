@@ -16,30 +16,25 @@ void lv_example_scroll_1(void)
 
     child = lv_obj_create(panel);
     lv_obj_set_pos(child, 0, 0);
+    lv_obj_set_size(child, 70, 70);
     label = lv_label_create(child);
     lv_label_set_text(label, "Zero");
     lv_obj_center(label);
 
     child = lv_obj_create(panel);
-    lv_obj_set_pos(child, -40, 100);
-    label = lv_label_create(child);
-    lv_label_set_text(label, "Left");
-    lv_obj_center(label);
+    lv_obj_set_pos(child, 160, 80);
+    lv_obj_set_size(child, 80, 80);
 
-    child = lv_obj_create(panel);
-    lv_obj_set_pos(child, 90, -30);
-    label = lv_label_create(child);
-    lv_label_set_text(label, "Top");
-    lv_obj_center(label);
+    lv_obj_t * child2 = lv_btn_create(child);
+    lv_obj_set_size(child2, 100, 50);
 
-    child = lv_obj_create(panel);
-    lv_obj_set_pos(child, 150, 80);
-    label = lv_label_create(child);
+    label = lv_label_create(child2);
     lv_label_set_text(label, "Right");
     lv_obj_center(label);
 
     child = lv_obj_create(panel);
-    lv_obj_set_pos(child, 60, 170);
+    lv_obj_set_pos(child, 40, 160);
+    lv_obj_set_size(child, 100, 70);
     label = lv_label_create(child);
     lv_label_set_text(label, "Bottom");
     lv_obj_center(label);
