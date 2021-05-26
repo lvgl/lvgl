@@ -1,0 +1,19 @@
+C
+^
+
+Start animation on an event 
+""""""""""""""""""""""""""""
+
+.. lv_example:: anim/lv_example_anim_1
+  :language: c
+
+Playback animation
+"""""""""""""""""""
+.. lv_example:: anim/lv_example_anim_2
+  :language: c
+
+  
+MicroPython
+^^^^^^^^^^^
+
+No examples yet.

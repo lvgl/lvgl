@@ -1,10 +1,10 @@
 /**
- * @file lv_examples.h
+ * @file lv_example_anim.h
  *
  */
 
-#ifndef LV_EXAMPLES_H
-#define LV_EXAMPLES_H
+#ifndef LV_EXAMPLE_ANIM_H
+#define LV_EXAMPLE_ANIM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,14 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
-
-#include "styles/lv_example_style.h"
-#include "get_started/lv_example_get_started.h"
-#include "widgets/lv_example_widgets.h"
-#include "layouts/lv_example_layout.h"
-#include "scroll/lv_example_scroll.h"
-#include "anim/lv_example_anim.h"
 
 /*********************
  *      DEFINES
@@ -33,6 +25,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_anim_1(void);
+void lv_example_anim_2(void);
 
 /**********************
  *      MACROS
@@ -42,4 +36,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLES_H*/
+#endif /*LV_EXAMPLE_ANIM_H*/
