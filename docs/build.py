@@ -23,7 +23,7 @@ def cmd(s):
 
 # Get the current branch name
 status, br = subprocess.getstatusoutput("git branch | grep '*'")
-gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
+_, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
 br = re.sub('\* ', '', br)
 urlpath = re.sub('release/', '', br)
  
