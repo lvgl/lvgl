@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EX_WIDGETS_H
-#define LV_EX_WIDGETS_H
+#ifndef LV_EXAMPLE_WIDGETS_H
+#define LV_EXAMPLE_WIDGETS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,6 +77,7 @@ void lv_example_keyboard_1(void);
 
 void lv_example_label_1(void);
 void lv_example_label_2(void);
+void lv_example_label_3(void);
 
 void lv_example_led_1(void);
 
