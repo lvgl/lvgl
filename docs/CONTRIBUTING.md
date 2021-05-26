@@ -100,7 +100,7 @@ As LVGL is MIT licensed, other MIT licensed code can be integrated without issue
 The MIT license requires a copyright notice be added to the derived work. Any derivative work based on MIT licensed code must copy the original work's license file or text.
 
 #### Use GPL licensed code
-The GPL license is not compatible with the MIT license, as such LVGL can not accept GPL licensed code. 
+The GPL license is not compatible with the MIT license. Therefore, LVGL can not accept GPL licensed code. 
  
 ## Ways to contribute
 
