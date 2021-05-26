@@ -374,6 +374,12 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
     lv_coord_t border_width = lv_obj_get_style_border_width(parent, LV_PART_MAIN);
     lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN) + border_width;
     lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN) + border_width;
+
+    if(align == LV_ALIGN_DEFAULT) {
+        if(lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_ALIGN_TOP_RIGHT;
+        else align = LV_ALIGN_TOP_LEFT;
+    }
+
     switch(align) {
     case LV_ALIGN_CENTER:
         x = lv_obj_get_content_width(base) / 2 - lv_obj_get_width(obj) / 2;
@@ -648,6 +654,12 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     y += tr_y;
 
     lv_align_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+
+    if(align == LV_ALIGN_DEFAULT) {
+        if(lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_ALIGN_TOP_RIGHT;
+        else align = LV_ALIGN_TOP_LEFT;
+    }
+
     if(align == LV_ALIGN_TOP_LEFT) {
         lv_obj_move_to(obj, x, y);
     }

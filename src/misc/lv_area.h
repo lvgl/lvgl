@@ -59,7 +59,8 @@ typedef struct {
 
 /** Alignments*/
 enum {
-    LV_ALIGN_TOP_LEFT = 0,
+    LV_ALIGN_DEFAULT = 0,
+    LV_ALIGN_TOP_LEFT,
     LV_ALIGN_TOP_MID,
     LV_ALIGN_TOP_RIGHT,
     LV_ALIGN_BOTTOM_LEFT,
@@ -225,9 +226,8 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coo
  * @param base an are where the other will be aligned
  * @param to_align the area to align
  * @param align `LV_ALIGN_...`
- * @param res x/y coordinates where `to_align` align area should be placed
  */
-void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align_t align, lv_point_t * res);
+void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, lv_coord_t ofs_x, lv_coord_t ofs_y);
 
 /**********************
  *      MACROS
