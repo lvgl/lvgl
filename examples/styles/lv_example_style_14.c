@@ -8,6 +8,8 @@ static lv_style_t style_btn;
   to add new styles*/
 static void new_theme_apply_cb(lv_theme_t * th, lv_obj_t * obj)
 {
+    LV_UNUSED(th);
+
     if(lv_obj_check_type(obj, &lv_btn_class)) {
         lv_obj_add_style(obj, &style_btn, 0);
     }
