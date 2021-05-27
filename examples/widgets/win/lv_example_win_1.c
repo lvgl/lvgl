@@ -10,7 +10,7 @@ static void event_handler(lv_event_t * e)
 
 void lv_example_win_1(void)
 {
-    lv_obj_t * win = lv_win_create(lv_scr_act(), 60);
+    lv_obj_t * win = lv_win_create(lv_scr_act(), 40);
     lv_obj_t * btn;
     btn = lv_win_add_btn(win, LV_SYMBOL_LEFT, 40);
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
