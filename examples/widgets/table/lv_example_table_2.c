@@ -63,7 +63,7 @@ void lv_example_table_2(void)
     lv_obj_t * table = lv_table_create(lv_scr_act());
 
     /*Set a smaller height to the table. It'll make it scrollable*/
-    lv_obj_set_size(table, 150, 200);
+    lv_obj_set_size(table, LV_SIZE_CONTENT, 200);
 
     lv_table_set_col_width(table, 0, 150);
     lv_table_set_row_cnt(table, ITEM_CNT); /*Not required but avoids a lot of memory reallocation lv_table_set_set_value*/
