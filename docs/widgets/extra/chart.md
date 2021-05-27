@@ -22,6 +22,7 @@ Charts also support:
 - `LV_PART_ITEMS` Refers to the line or bar series.
     - Line chart: The *line* properties are used by the lines. `width`, `height`, `bg_color` and `radius` is used to set the appearance of points.
     - Bar chart: The typical background properties are used to style the bars. 
+- `LV_PART_INDICATOR` Refers to the points on line and scatter chart (small circles or squares).
 - `LV_PART_CURSOR` *Line* properties are used to style the cursors.  `width`, `height`, `bg_color` and `radius` is used to set the appearance of points.
 - `LV_PART_TICKS` *Line* and *Text* style properties are used to style the ticks
 

@@ -22,6 +22,7 @@ extern "C" {
 #include "scroll/lv_example_scroll.h"
 #include "anim/lv_example_anim.h"
 #include "event/lv_example_event.h"
+#include "styles/lv_example_style.h"
 
 /*********************
  *      DEFINES

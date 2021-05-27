@@ -287,42 +287,17 @@ Built-in themes can be extended.
 If a custom theme is created a parent theme can be selected. The parent theme's styles will be added before the custom theme's styles. 
 Any number of themes can be chained this way. E.g. default theme -> custom theme -> dark theme.
 
-Here is an example about creating a custom theme based on the currently active theme.
-```c
-/*Declare the style used in the theme*/
-static lv_style_t style_btn;
-...
+`lv_theme_set_parent(new_theme, base_theme)` extends the `base_theme` with the `new_theme`.
 
-/*Initialize the styles*/
-lv_style_init(&style_btn);
-lv_style_set_bg_color(&style_btn, lv_color_green());
-
-/*Initialize the new theme from the current theme*/
-lv_theme_t * th_act = lv_disp_get_theme(NULL);
-static lv_theme_t th_new;
-th_new = *th_act;
-
-/*Set the parent theme ans the style applay callback for the new theme*/
-lv_theme_set_parent(&th_new, th_act);
-lv_theme_set_apply_cb(&th_new, new_theme_apply_cb);
-
-/*Assign the new theme the the current display*/
-lv_disp_set_theme(NULL, &th_new);
-
-...
-
-/*Will be called when the styles of the base theme are already added
-  to add new styles*/
-void new_theme_apply_cb(lv_theme_t * th, lv_obj_t * obj)
-{
-    if(lv_obj_check_type(obj, &lv_btn_class)) {
-        lv_obj_add_style(obj, &style_btn, 0);
-    }
-}
-```
+There is an example for it below.
 
 ## Examples
 
+```eval_rst
+
+.. include:: ../../examples/styles/index.rst
+
+```
 
 ## API
 ```eval_rst

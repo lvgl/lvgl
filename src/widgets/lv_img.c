@@ -419,6 +419,9 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Refresh the file name to refresh the symbol text size*/
         if(img->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(obj, img->src);
+        } else {
+            /*With transformation it might change*/
+            lv_obj_refresh_ext_draw_size(obj);
         }
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
@@ -519,7 +522,6 @@ static void draw_img(lv_event_t * e)
         int32_t zoom_final = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
         zoom_final = (zoom_final * img->zoom) >> 8;
 
-
         const lv_area_t * clip_area = lv_event_get_param(e);
         if(zoom_final == LV_IMG_ZOOM_NONE) {
             if(_lv_area_is_in(clip_area, &obj->coords, 0) == false) {
@@ -552,10 +554,11 @@ static void draw_img(lv_event_t * e)
         lv_coord_t obj_w = lv_obj_get_width(obj);
         lv_coord_t obj_h = lv_obj_get_height(obj);
 
-        lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+        lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
+        lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
+        lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
 
         lv_point_t bg_pivot;
         bg_pivot.x = img->pivot.x + pleft;

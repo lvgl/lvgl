@@ -119,8 +119,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_PRESSED) {
-        lv_obj_invalidate_area(obj, &slider->right_knob_area);
-        if(slider->bar.mode == LV_SLIDER_MODE_SYMMETRICAL) lv_obj_invalidate_area(obj, &slider->left_knob_area);
+        lv_obj_invalidate(obj);
 
         lv_point_t p;
         slider->dragging = true;
@@ -245,8 +244,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         slider->dragging = false;
         slider->value_to_set = NULL;
 
-        lv_obj_invalidate_area(obj, &slider->right_knob_area);
-        if(slider->bar.mode == LV_SLIDER_MODE_SYMMETRICAL) lv_obj_invalidate_area(obj, &slider->left_knob_area);
+        lv_obj_invalidate(obj);
 
         /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g   = lv_obj_get_group(obj);
