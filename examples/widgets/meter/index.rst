@@ -15,7 +15,7 @@ A meter with multiple arcs
   :language: c
 
 
- A clock from a meter
+A clock from a meter
 """""""""""""""""""""""
 
 .. lv_example:: widgets/meter/lv_example_meter_3
