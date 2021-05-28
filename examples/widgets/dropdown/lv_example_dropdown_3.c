@@ -20,7 +20,7 @@ void lv_example_dropdown_3(void)
     lv_dropdown_set_options(dropdown, "New project\n"
                                       "New file\n"
                                       "Save\n"
-                                      "Save as\n"
+                                      "Save as ...\n"
                                       "Open project\n"
                                       "Recent projects\n"
                                       "Preferences\n"

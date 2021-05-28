@@ -728,7 +728,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
             uint32_t t;
             for(t = 0; t < tsi; t++) {
-                lv_style_selector_t selector = lv_obj_style_get_selector_state(ts[t].selector);
+                lv_style_selector_t selector = ts[t].selector;
                 lv_state_t state_ts = lv_obj_style_get_selector_state(selector);
                 lv_part_t part_ts = lv_obj_style_get_selector_part(selector);
                 if(ts[t].prop == tr->props[j] && part_ts == part_act && state_ts >= state_act) break;
@@ -756,11 +756,10 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_mem_buf_release(ts);
 
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN) {
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) {
         lv_obj_invalidate(obj);
     }
-
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {

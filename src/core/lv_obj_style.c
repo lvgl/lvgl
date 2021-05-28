@@ -365,27 +365,28 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             lv_style_t * style = obj->styles[i].style;
             lv_style_value_t v;
             /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
-            _lv_style_state_cmp_t res_tmp = res;
-            if(lv_style_get_prop(style, LV_STYLE_PAD_TOP, &v)) res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_PAD_BOTTOM, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_PAD_LEFT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_PAD_RIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_PAD_COLUMN, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_PAD_ROW, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_LAYOUT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_TRANSLATE_X, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_TRANSLATE_Y, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_HEIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_MIN_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_MAX_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_MIN_HEIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_MAX_HEIGHT, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-            else if(lv_style_get_prop(style, LV_STYLE_BORDER_WIDTH, &v))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            bool layout_diff = false;
+            if(lv_style_get_prop(style, LV_STYLE_PAD_TOP, &v))layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_PAD_BOTTOM, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_PAD_LEFT, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_PAD_RIGHT, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_PAD_COLUMN, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_PAD_ROW, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_LAYOUT, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSLATE_X, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSLATE_Y, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_WIDTH, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_HEIGHT, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_MIN_WIDTH, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_MAX_WIDTH, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_MIN_HEIGHT, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_MAX_HEIGHT, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_BORDER_WIDTH, &v)) layout_diff = true;
 
-            if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
-                if(part_act == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                else if(part_act == LV_PART_SCROLLBAR) return _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN;
+            if(layout_diff) {
+                if(part_act == LV_PART_MAIN) {
+                    return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                }
                 else {
                     res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
                     continue;
@@ -406,15 +407,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_SHADOW_OFS_Y, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_SHADOW_SPREAD, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_LINE_WIDTH, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-            else {
-                if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
-                    if((part_act == LV_PART_MAIN || part_act == LV_PART_SCROLLBAR)) {
-                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN;
-                    } else if(res != _LV_STYLE_STATE_CMP_DIFF_REDRAW_MAIN) {
-                        res = _LV_STYLE_STATE_CMP_DIFF_REDRAW_PART;
-                    }
-                }
-            }
+            else if(res == _LV_STYLE_STATE_CMP_SAME) res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
         }
     }
 
