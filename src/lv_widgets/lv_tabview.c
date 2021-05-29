@@ -628,7 +628,16 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     if(sign == LV_SIGNAL_CLEANUP) {
         uint8_t i;
-        for(i = 0; ext->tab_name_ptr[i][0] != '\0' && ext->tab_name_ptr[i][0] != '\n'; i++) lv_mem_free(ext->tab_name_ptr[i]);
+        if(ext->btns_pos == LV_TABVIEW_TAB_POS_LEFT || ext->btns_pos == LV_TABVIEW_TAB_POS_RIGHT) {
+            for(i = 0; i < ext->tab_cnt; i++) {
+                lv_mem_free(ext->tab_name_ptr[i * 2]);
+            }
+        }
+        else {
+            for(i = 0; i < ext->tab_cnt; i++) {
+                lv_mem_free(ext->tab_name_ptr[i]);
+            }
+        }
 
         lv_mem_free(ext->tab_name_ptr);
         ext->tab_name_ptr = NULL;
