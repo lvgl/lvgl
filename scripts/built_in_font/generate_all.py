@@ -2,6 +2,12 @@
 
 import os
 
+print("\nGenerating 12 px subpx")
+os.system("./built_in_font_gen.py --size 12 -o lv_font_montserrat_12_subpx.c --bpp 4 --subpx")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_12_subpx.c')
+
+exit(1);
+
 print("Generating 8 px")
 os.system("./built_in_font_gen.py --size 8 -o lv_font_montserrat_8.c --bpp 4")
 os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_8.c')
