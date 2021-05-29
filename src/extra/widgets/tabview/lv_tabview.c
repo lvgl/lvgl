@@ -237,6 +237,12 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
             tabview->map[i] = NULL;
         }
     }
+    if(tabview->tab_pos & LV_DIR_HOR) {
+        for(i = 0; i < tabview->tab_cnt; i++) {
+            lv_mem_free(tabview->map[i * 2]);
+            tabview->map[i * 2] = NULL;
+        }
+    }
 
 
     lv_mem_free(tabview->map);
