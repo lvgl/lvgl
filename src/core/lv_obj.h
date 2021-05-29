@@ -33,6 +33,8 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef struct _lv_obj_t lv_obj_t;
 
 /**
  * Possible states of a widget.
@@ -137,7 +139,7 @@ extern const lv_obj_class_t lv_obj_class;
  * They are allocated automatically if any elements is set.
  */
 typedef struct {
-    struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
     uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
 
@@ -156,7 +158,7 @@ typedef struct {
 
 typedef struct _lv_obj_t {
     const lv_obj_class_t * class_p;
-    struct _lv_obj_t * parent;
+    lv_obj_t * parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
 #if LV_USE_USER_DATA
@@ -173,8 +175,7 @@ typedef struct _lv_obj_t {
     uint16_t w_layout   :1;
 }_lv_obj_t;
 
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_obj_t lv_obj_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

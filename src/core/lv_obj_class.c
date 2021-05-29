@@ -140,7 +140,7 @@ void _lv_obj_destructor(lv_obj_t * obj)
     }
 }
 
-bool lv_obj_is_editable(struct _lv_obj_t * obj)
+bool lv_obj_is_editable(lv_obj_t * obj)
 {
     const lv_obj_class_t * class_p = obj->class_p;
 
@@ -152,7 +152,7 @@ bool lv_obj_is_editable(struct _lv_obj_t * obj)
     return class_p->editable == LV_OBJ_CLASS_EDITABLE_TRUE ? true : false;
 }
 
-bool lv_obj_is_group_def(struct _lv_obj_t * obj)
+bool lv_obj_is_group_def(lv_obj_t * obj)
 {
     const lv_obj_class_t * class_p = obj->class_p;
 

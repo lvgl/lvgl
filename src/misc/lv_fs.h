@@ -68,20 +68,25 @@ enum {
 };
 typedef uint8_t lv_fs_whence_t;
 
+struct _lv_fs_drv_t;
+
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef struct _lv_fs_drv_t lv_fs_drv_t;
+
 typedef struct _lv_fs_drv_t {
     char letter;
-    bool (*ready_cb)(struct _lv_fs_drv_t * drv);
+    bool (*ready_cb)(lv_fs_drv_t * drv);
 
-    void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
-    lv_fs_res_t (*close_cb)(struct _lv_fs_drv_t * drv, void * file_p);
-    lv_fs_res_t (*read_cb)(struct _lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
-    lv_fs_res_t (*write_cb)(struct _lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-    lv_fs_res_t (*seek_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
-    lv_fs_res_t (*tell_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+    void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
+    lv_fs_res_t (*close_cb)(lv_fs_drv_t * drv, void * file_p);
+    lv_fs_res_t (*read_cb)(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
+    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
+    lv_fs_res_t (*seek_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
+    lv_fs_res_t (*tell_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
-    void * (*dir_open_cb)(struct _lv_fs_drv_t * drv, const char * path);
-    lv_fs_res_t (*dir_read_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
-    lv_fs_res_t (*dir_close_cb)(struct _lv_fs_drv_t * drv, void * rddir_p);
+    void * (*dir_open_cb)(lv_fs_drv_t * drv, const char * path);
+    lv_fs_res_t (*dir_read_cb)(lv_fs_drv_t * drv, void * rddir_p, char * fn);
+    lv_fs_res_t (*dir_close_cb)(lv_fs_drv_t * drv, void * rddir_p);
 
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom file user data*/

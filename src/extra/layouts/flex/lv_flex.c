@@ -110,7 +110,7 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
     lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, 0);
 }
 
-void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow)
+void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
 {
     lv_obj_set_style_flex_grow(obj, grow, 0);
 }

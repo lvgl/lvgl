@@ -33,11 +33,13 @@ extern "C" {
  **********************/
 
 struct _lv_timer_t;
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef struct _lv_timer_t lv_timer_t;
 
 /**
  * Timers execute this type of functions.
  */
-typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
+typedef void (*lv_timer_cb_t)(lv_timer_t *);
 
 /**
  * Descriptor of a lv_timer

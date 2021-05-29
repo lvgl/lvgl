@@ -49,7 +49,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void grid_update(lv_obj_t * cont, void * user_data);
-static void calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
+static void calc(lv_obj_t * obj, _lv_grid_calc_t * calc);
 static void calc_free(_lv_grid_calc_t * calc);
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c);
 static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c);
@@ -193,7 +193,7 @@ static void grid_update(lv_obj_t * cont, void * user_data)
  * @param calc store the calculated cells sizes here
  * @note `_lv_grid_calc_free(calc_out)` needs to be called when `calc_out` is not needed anymore
  */
-static void calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
+static void calc(lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 {
     if(lv_obj_get_child(cont, 0) == NULL) {
         lv_memset_00(calc_out, sizeof(_lv_grid_calc_t));

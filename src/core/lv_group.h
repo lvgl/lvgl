@@ -49,8 +49,11 @@ typedef uint8_t lv_key_t;
 struct _lv_obj_t;
 struct _lv_group_t;
 
-typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
+/*Trick to no expose the fields of the struct in the MicroPython binding*/
+typedef struct _lv_group_t lv_group_t;
+typedef struct _lv_obj_t lv_obj_t;
 
+typedef void (*lv_group_focus_cb_t)(lv_group_t *);
 
 /**
  * Groups can be used to logically hold objects so that they can be individually focused.
@@ -58,7 +61,7 @@ typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
  */
 typedef struct _lv_group_t {
     lv_ll_t obj_ll;        /**< Linked list to store the objects in the group*/
-    struct _lv_obj_t ** obj_focus; /**< The object in focus*/
+    lv_obj_t ** obj_focus; /**< The object in focus*/
 
     lv_group_focus_cb_t focus_cb;              /**< A function to call when a new object is focused (optional)*/
 #if LV_USE_USER_DATA
@@ -73,8 +76,6 @@ typedef struct _lv_group_t {
                                    of list.*/
 } _lv_group_t;
 
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_group_t lv_group_t;
 
 typedef enum {
     LV_GROUP_REFOCUS_POLICY_NEXT = 0,
@@ -120,13 +121,13 @@ lv_group_t * lv_group_get_default(void);
  * @param group     pointer to a group
  * @param obj       pointer to an object to add
  */
-void lv_group_add_obj(lv_group_t * group, struct _lv_obj_t * obj);
+void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj);
 
 /**
  * Remove an object from its group
  * @param obj       pointer to an object to remove
  */
-void lv_group_remove_obj(struct _lv_obj_t * obj);
+void lv_group_remove_obj(lv_obj_t * obj);
 
 /**
  * Remove all objects from a group
@@ -138,7 +139,7 @@ void lv_group_remove_all_objs(lv_group_t * group);
  * Focus on an object (defocus the current)
  * @param obj       pointer to an object to focus on
  */
-void lv_group_focus_obj(struct _lv_obj_t * obj);
+void lv_group_focus_obj(lv_obj_t * obj);
 
 /**
  * Focus the next object in a group (defocus the current)
@@ -201,7 +202,7 @@ void lv_group_set_wrap(lv_group_t * group, bool en);
  * @param group         pointer to a group
  * @return              pointer to the focused object
  */
-struct _lv_obj_t * lv_group_get_focused(const lv_group_t * group);
+lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
 /**
  * Get the focus callback function of a group

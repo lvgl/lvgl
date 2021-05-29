@@ -347,7 +347,7 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
-void lv_obj_set_align(struct _lv_obj_t * obj, lv_align_t align)
+void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
 {
     lv_obj_set_style_align(obj, align, 0);
 }

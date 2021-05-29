@@ -85,7 +85,7 @@ void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid
  * @param row_pos row ID
  * @param row_span number of rows to take (>= 1)
  */
-void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_grid_align_t column_align, uint8_t col_pos, uint8_t col_span,
+void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t column_align, uint8_t col_pos, uint8_t col_span,
                                           lv_grid_align_t row_align, uint8_t row_pos, uint8_t row_span);
 
 /**
@@ -259,61 +259,61 @@ static inline void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_coord_t
     lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_Y_ALIGN, v, selector);
 }
 
-static inline const lv_coord_t * lv_obj_get_style_grid_row_dsc_array(const struct _lv_obj_t * obj, uint32_t part)
+static inline const lv_coord_t * lv_obj_get_style_grid_row_dsc_array(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_ROW_DSC_ARRAY);
     return (const lv_coord_t *)v.ptr;
 }
 
-static inline const lv_coord_t * lv_obj_get_style_grid_column_dsc_array(const struct _lv_obj_t * obj, uint32_t part)
+static inline const lv_coord_t * lv_obj_get_style_grid_column_dsc_array(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_COLUMN_DSC_ARRAY);
     return (const lv_coord_t *)v.ptr;
 }
 
-static inline lv_grid_align_t lv_obj_get_style_grid_row_align(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_grid_align_t lv_obj_get_style_grid_row_align(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_ROW_ALIGN);
     return (lv_grid_align_t)v.num;
 }
 
-static inline lv_grid_align_t lv_obj_get_style_grid_column_align(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_grid_align_t lv_obj_get_style_grid_column_align(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_COLUMN_ALIGN);
     return (lv_grid_align_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_grid_cell_column_pos(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_grid_cell_column_pos(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_COLUMN_POS);
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_grid_cell_column_span(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_grid_cell_column_span(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_COLUMN_SPAN);
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_grid_cell_row_pos(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_grid_cell_row_pos(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_ROW_POS);
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_grid_cell_row_span(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_grid_cell_row_span(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_ROW_SPAN);
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_grid_cell_x_align(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_grid_cell_x_align(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_X_ALIGN);
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_grid_cell_y_align(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_grid_cell_y_align(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_Y_ALIGN);
     return (lv_coord_t)v.num;

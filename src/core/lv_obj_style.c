@@ -73,7 +73,7 @@ void _lv_obj_style_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));
 }
 
-void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
+void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
 {
     trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
