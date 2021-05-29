@@ -20,10 +20,11 @@ function add_version_selector()
         .then(res => res.text())
         .then(text => {
             const versions = text.split("\n").filter(version => version.trim().length > 0);
-            p = document.getElementById("rtd-search-form").parentElement;
+            let p = document.getElementById("rtd-search-form").parentElement;
+            const versionName = (version.indexOf(".") != -1) ? version : (version + " (latest minor)");
             p.innerHTML = `
             <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
-            ${versions.map(version => `<option value="${version}">${version}</option>`)}
+            ${versions.map(version => `<option value="${version}">${versionName}</option>`)}
             </select>` + p.innerHTML;
         });
 }
