@@ -47,16 +47,16 @@ typedef uint8_t lv_key_t;
  **********************/
 
 struct _lv_obj_t;
-struct lv_group_t_struct;
+struct _lv_group_t;
 
-typedef void (*lv_group_focus_cb_t)(struct lv_group_t_struct *);
+typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
 
 
 /**
  * Groups can be used to logically hold objects so that they can be individually focused.
  * They are NOT for laying out objects on a screen (try `lv_cont` for that).
  */
-typedef struct lv_group_t_struct{
+typedef struct _lv_group_t {
     lv_ll_t obj_ll;        /**< Linked list to store the objects in the group*/
     struct _lv_obj_t ** obj_focus; /**< The object in focus*/
 

@@ -265,11 +265,11 @@ typedef struct {
 typedef uint8_t lv_opa_t;
 //! @endcond
 
-struct lv_color_filter_dsc_t_struct;
+struct _lv_color_filter_dsc_t;
 
-typedef lv_color_t (*lv_color_filter_cb_t)(const struct lv_color_filter_dsc_t_struct *, lv_color_t, lv_opa_t);
+typedef lv_color_t (*lv_color_filter_cb_t)(const struct _lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
 
-typedef struct lv_color_filter_dsc_t_struct {
+typedef struct _lv_color_filter_dsc_t {
     lv_color_filter_cb_t filter_cb;
     void * user_data;
 }lv_color_filter_dsc_t;

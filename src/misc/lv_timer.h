@@ -32,17 +32,17 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_timer_t_struct;
+struct _lv_timer_t;
 
 /**
  * Timers execute this type of functions.
  */
-typedef void (*lv_timer_cb_t)(struct lv_timer_t_struct *);
+typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
 
 /**
  * Descriptor of a lv_timer
  */
-typedef struct lv_timer_t_struct {
+typedef struct _lv_timer_t {
     uint32_t period; /**< How often the timer should run*/
     uint32_t last_run; /**< Last time the timer ran*/
     lv_timer_cb_t timer_cb; /**< Timer function*/
