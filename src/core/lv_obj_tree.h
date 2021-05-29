@@ -26,7 +26,7 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
-struct _lv_obj_class_t;
+struct lv_obj_class_t_struct;
 
 typedef enum {
     LV_OBJ_TREE_WALK_NEXT,

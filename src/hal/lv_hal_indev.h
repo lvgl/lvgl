@@ -56,7 +56,7 @@ struct _lv_obj_t;
 struct _lv_disp_t;
 struct _lv_group_t;
 struct _lv_indev_t;
-struct _lv_indev_drv_t;
+struct lv_indev_drv_t_struct;
 
 /** Possible input device types*/
 typedef enum {
@@ -85,17 +85,17 @@ typedef struct {
 } lv_indev_data_t;
 
 /** Initialized by the user and registered by 'lv_indev_add()'*/
-typedef struct _lv_indev_drv_t {
+typedef struct lv_indev_drv_t_struct {
 
     /**< Input device type*/
     lv_indev_type_t type;
 
     /**< Function pointer to read input device data.*/
-    void (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+    void (*read_cb)(struct lv_indev_drv_t_struct * indev_drv, lv_indev_data_t * data);
 
     /** Called when an action happened on the input device.
      * The second parameter is the event from `lv_event_t`*/
-    void (*feedback_cb)(struct _lv_indev_drv_t *, uint8_t);
+    void (*feedback_cb)(struct lv_indev_drv_t_struct *, uint8_t);
 
 #if LV_USE_USER_DATA
     void * user_data;

@@ -54,12 +54,12 @@ enum {
 typedef uint8_t lv_font_subpx_t;
 
 /** Describe the properties of a font*/
-typedef struct _lv_font_struct {
+typedef struct lv_font_t_struct {
     /** Get a glyph's descriptor from a font*/
-    bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
+    bool (*get_glyph_dsc)(const struct lv_font_t_struct *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
+    const uint8_t * (*get_glyph_bitmap)(const struct lv_font_t_struct *, uint32_t);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     lv_coord_t line_height;         /**< The real line height where any text fits*/
