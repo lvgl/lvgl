@@ -29,7 +29,7 @@ int main(void)
     return 0;
 }
 
-static void * open_cb(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
+static void * open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     (void) drv;
     (void) mode;
@@ -39,7 +39,7 @@ static void * open_cb(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t
     return fp;
 }
 
-static lv_fs_res_t close_cb(struct _lv_fs_drv_t * drv, void * file_p)
+static lv_fs_res_t close_cb(lv_fs_drv_t * drv, void * file_p)
 {
     (void) drv;
 
@@ -47,7 +47,7 @@ static lv_fs_res_t close_cb(struct _lv_fs_drv_t * drv, void * file_p)
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t read_cb(struct _lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
+static lv_fs_res_t read_cb(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     (void) drv;
 
@@ -55,7 +55,7 @@ static lv_fs_res_t read_cb(struct _lv_fs_drv_t * drv, void * file_p, void * buf,
     return (*br <= 0) ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
-static lv_fs_res_t seek_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t w)
+static lv_fs_res_t seek_cb(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t w)
 {
     (void) drv;
 
@@ -79,7 +79,7 @@ static lv_fs_res_t seek_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t po
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t tell_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
+static lv_fs_res_t tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     (void) drv;
 
