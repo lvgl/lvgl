@@ -27,9 +27,9 @@ function add_version_selector()
             const versions = text.split("\n").filter(version => version.trim().length > 0);
             let p = document.getElementById("rtd-search-form").parentElement;
             p.innerHTML = `
-            v: <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
+            <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
             ${versions.map(version => {
-                const versionName = (version.indexOf(".") != -1) ? version : (version + " (latest minor)");
+                const versionName = "v" + ((version.indexOf(".") != -1) ? version : (version + " (latest minor)"));
                 return `<option value="${version}">${versionName}</option>`;
             })}
             </select>` + p.innerHTML;
