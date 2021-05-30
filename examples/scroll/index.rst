@@ -27,6 +27,11 @@ Right to left scrolling
 .. lv_example:: scroll/lv_example_scroll_5
   :language: c
   
+Translate on scroll
+""""""""""""""""""""""""
+.. lv_example:: scroll/lv_example_scroll_6
+  :language: c
+  
   
 MicroPython
 ^^^^^^^^^^^
