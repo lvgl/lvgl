@@ -2,6 +2,11 @@
 
 {% block footer %}
 
+<style>
+  .wy-side-nav-search > div[role="search"] {
+    color: black;
+  }
+</style>
  <script type="text/javascript">
     $(document).ready(function() {
         $(".toggle > *").hide();
@@ -22,7 +27,7 @@ function add_version_selector()
             const versions = text.split("\n").filter(version => version.trim().length > 0);
             let p = document.getElementById("rtd-search-form").parentElement;
             p.innerHTML = `
-            <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
+            v: <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
             ${versions.map(version => {
                 const versionName = (version.indexOf(".") != -1) ? version : (version + " (latest minor)");
                 return `<option value="${version}">${versionName}</option>`;
