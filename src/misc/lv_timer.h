@@ -33,13 +33,11 @@ extern "C" {
  **********************/
 
 struct _lv_timer_t;
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef struct _lv_timer_t lv_timer_t;
 
 /**
  * Timers execute this type of functions.
  */
-typedef void (*lv_timer_cb_t)(lv_timer_t *);
+typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
 
 /**
  * Descriptor of a lv_timer
@@ -51,10 +49,7 @@ typedef struct _lv_timer_t {
     void * user_data; /**< Custom user data*/
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
     uint32_t paused :1;
-} _lv_timer_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_timer_t lv_timer_t;
+} lv_timer_t;
 
 /**********************
  * GLOBAL PROTOTYPES

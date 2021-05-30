@@ -40,10 +40,7 @@ typedef struct {
     const void * img_src_left[_LV_IMGBTN_STATE_NUM];  /*Store left side images to each state*/
     const void * img_src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
     lv_img_cf_t act_cf; /*Color format of the currently active image*/
-} _lv_imgbtn_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_imgbtn_t lv_imgbtn_t;
+} lv_imgbtn_t;
 
 extern const lv_obj_class_t lv_imgbtn_class;
 

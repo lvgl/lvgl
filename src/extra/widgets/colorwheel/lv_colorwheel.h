@@ -46,10 +46,7 @@ typedef struct {
     lv_point_t last_press_point;
     lv_colorwheel_mode_t mode  : 2;
     uint8_t mode_fixed            : 1;
-} _lv_colorwheel_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_colorwheel_t lv_colorwheel_t;
+} lv_colorwheel_t;
 
 extern const lv_obj_class_t lv_colorwheel_class;
 

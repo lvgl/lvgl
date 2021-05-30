@@ -58,11 +58,7 @@ typedef struct {
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_sel;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE*/
     uint8_t one_check : 1;  /*Single button toggled at once*/
-} _lv_btnmatrix_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_btnmatrix_t lv_btnmatrix_t;
-
+} lv_btnmatrix_t;
 
 extern const lv_obj_class_t lv_btnmatrix_class;
 

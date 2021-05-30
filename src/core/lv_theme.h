@@ -26,10 +26,7 @@ extern "C" {
 struct _lv_theme_t;
 struct _lv_disp_t;
 
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef struct _lv_theme_t lv_theme_t;
-
-typedef void (*lv_theme_apply_cb_t)(lv_theme_t *, lv_obj_t *);
+typedef void (*lv_theme_apply_cb_t)(struct _lv_theme_t *, lv_obj_t *);
 
 typedef struct _lv_theme_t {
     lv_theme_apply_cb_t apply_cb;

@@ -30,10 +30,7 @@ typedef struct {
     lv_obj_t obj;
     char * txt;
     uint32_t static_txt :1;
-}_lv_checkbox_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_checkbox_t lv_checkbox_t;
+}lv_checkbox_t;
 
 extern const lv_obj_class_t lv_checkbox_class;
 

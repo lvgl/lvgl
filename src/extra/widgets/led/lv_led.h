@@ -31,10 +31,7 @@ typedef struct {
     lv_obj_t obj;
     lv_color_t color;
     uint8_t bright;     /**< Current brightness of the LED (0..255)*/
-} _lv_led_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_led_t lv_led_t;
+} lv_led_t;
 
 extern const lv_obj_class_t lv_led_class;
 

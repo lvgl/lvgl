@@ -50,10 +50,7 @@ typedef struct {
     uint16_t chg_rate; 			/*Drag angle rate of change of the arc (degrees/sec)*/
     uint32_t last_tick; 		/*Last dragging event timestamp of the arc*/
     int16_t last_angle; 		/*Last dragging angle of the arc*/
-}_lv_arc_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_arc_t lv_arc_t;
+}lv_arc_t;
 
 extern const lv_obj_class_t lv_arc_class;
 

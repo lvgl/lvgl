@@ -477,8 +477,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
 #if LV_DRAW_COMPLEX
-            _lv_img_transform_dsc_t trans_dsc;
-            lv_memset_00(&trans_dsc, sizeof(_lv_img_transform_dsc_t));
+            lv_img_transform_dsc_t trans_dsc;
+            lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
             if(transform) {
                 lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
                 if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;

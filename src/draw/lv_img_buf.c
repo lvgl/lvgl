@@ -415,7 +415,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
  * Initialize a descriptor to transform an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
  */
-void _lv_img_buf_transform_init(_lv_img_transform_dsc_t * dsc)
+void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
 {
     dsc->tmp.pivot_x_256 = dsc->cfg.pivot_x * 256;
     dsc->tmp.pivot_y_256 = dsc->cfg.pivot_y * 256;
@@ -566,7 +566,7 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
  * @return true: there is valid pixel on these x/y coordinates; false: the rotated pixel was out of the image
  * @note the result is written back to `dsc->res_color` and `dsc->res_opa`
  */
-bool _lv_img_buf_transform(_lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
+bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
     const uint8_t * src_u8 = (const uint8_t *)dsc->cfg.src;
 
@@ -651,7 +651,7 @@ bool _lv_img_buf_transform(_lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord
  * Continue transformation by taking the neighbors into account
  * @param dsc pointer to the transformation descriptor
  */
-bool _lv_img_buf_transform_anti_alias(_lv_img_transform_dsc_t * dsc)
+bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
 {
     const uint8_t * src_u8 = dsc->cfg.src;
 

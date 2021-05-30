@@ -44,10 +44,6 @@ typedef uint8_t lv_img_src_t;
 struct _lv_img_decoder_dsc_t;
 struct _lv_img_decoder_t;
 
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef struct _lv_img_decoder_dsc_t lv_img_decoder_dsc_t;
-typedef struct _lv_img_decoder_t lv_img_decoder_t;
-
 /**
  * Get info from an image and store in the `header`
  * @param src the image source. Can be a pointer to a C array or a file name (Use
@@ -55,7 +51,7 @@ typedef struct _lv_img_decoder_t lv_img_decoder_t;
  * @param header store the info here
  * @return LV_RES_OK: info written correctly; LV_RES_INV: failed
  */
-typedef lv_res_t (*lv_img_decoder_info_f_t)(lv_img_decoder_t * decoder, const void * src,
+typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder_t * decoder, const void * src,
                                             lv_img_header_t * header);
 
 /**
@@ -63,7 +59,7 @@ typedef lv_res_t (*lv_img_decoder_info_f_t)(lv_img_decoder_t * decoder, const vo
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
  */
-typedef lv_res_t (*lv_img_decoder_open_f_t)(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
+typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_decoder_t * decoder, struct _lv_img_decoder_dsc_t * dsc);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
@@ -76,7 +72,7 @@ typedef lv_res_t (*lv_img_decoder_open_f_t)(lv_img_decoder_t * decoder, lv_img_d
  * @param buf a buffer to store the decoded pixels
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
-typedef lv_res_t (*lv_img_decoder_read_line_f_t)(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder_t * decoder, struct _lv_img_decoder_dsc_t * dsc,
                                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
 /**
@@ -84,7 +80,7 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(lv_img_decoder_t * decoder, lv_
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
  */
-typedef void (*lv_img_decoder_close_f_t)(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
+typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder_t * decoder, struct _lv_img_decoder_dsc_t * dsc);
 
 
 typedef struct _lv_img_decoder_t {

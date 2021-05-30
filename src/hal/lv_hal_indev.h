@@ -58,12 +58,6 @@ struct _lv_group_t;
 struct _lv_indev_t;
 struct _lv_indev_drv_t;
 
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef struct _lv_indev_drv_t lv_indev_drv_t;
-typedef struct _lv_indev_t lv_indev_t;
-typedef struct _lv_group_t lv_group_t;
-typedef struct _lv_obj_t lv_obj_t;
-
 /** Possible input device types*/
 typedef enum {
     LV_INDEV_TYPE_NONE,    /**< Uninitialized state*/
@@ -97,11 +91,11 @@ typedef struct _lv_indev_drv_t {
     lv_indev_type_t type;
 
     /**< Function pointer to read input device data.*/
-    void (*read_cb)(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+    void (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 
     /** Called when an action happened on the input device.
      * The second parameter is the event from `lv_event_t`*/
-    void (*feedback_cb)(lv_indev_drv_t *, uint8_t);
+    void (*feedback_cb)(struct _lv_indev_drv_t *, uint8_t);
 
 #if LV_USE_USER_DATA
     void * user_data;
@@ -130,7 +124,7 @@ typedef struct _lv_indev_drv_t {
 
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
-} _lv_indev_drv_t;
+} lv_indev_drv_t;
 
 /** Run time data of input devices
  * Internally used by the library, you should not need to touch it.
@@ -153,10 +147,10 @@ typedef struct _lv_indev_proc_t {
             lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
             lv_point_t scroll_throw_vect;
             lv_point_t scroll_throw_vect_ori;
-            lv_obj_t * act_obj;      /*The object being pressed*/
-            lv_obj_t * last_obj;     /*The last object which was pressed*/
-            lv_obj_t * scroll_obj;   /*The object being scrolled*/
-            lv_obj_t * last_pressed; /*The lastly pressed object*/
+            struct _lv_obj_t * act_obj;      /*The object being pressed*/
+            struct _lv_obj_t * last_obj;     /*The last object which was pressed*/
+            struct _lv_obj_t * scroll_obj;   /*The object being scrolled*/
+            struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
             lv_area_t scroll_area;
 
             lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
@@ -179,16 +173,13 @@ typedef struct _lv_indev_proc_t {
 /** The main input device descriptor with driver, runtime data ('proc') and some additional
  * information*/
 typedef struct _lv_indev_t {
-    lv_indev_drv_t * driver;
+    struct _lv_indev_drv_t * driver;
     _lv_indev_proc_t proc;
-    lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
-    lv_group_t * group;    /**< Keypad destination group*/
+    struct _lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
+    struct _lv_group_t * group;    /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
-} _lv_indev_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_indev_t lv_indev_t;
+} lv_indev_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -200,21 +191,21 @@ typedef _lv_indev_t lv_indev_t;
  * After it you can set the fields.
  * @param driver pointer to driver variable to initialize
  */
-void lv_indev_drv_init(lv_indev_drv_t * driver);
+void lv_indev_drv_init(struct _lv_indev_drv_t * driver);
 
 /**
  * Register an initialized input device driver.
  * @param driver pointer to an initialized 'lv_indev_drv_t' variable (can be local variable)
  * @return pointer to the new input device or NULL on error
  */
-lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver);
+lv_indev_t * lv_indev_drv_register(struct _lv_indev_drv_t * driver);
 
 /**
  * Update the driver in run time.
  * @param indev pointer to a input device. (return value of `lv_indev_drv_register`)
  * @param new_drv pointer to the new driver
  */
-void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv);
+void lv_indev_drv_update(lv_indev_t * indev, struct _lv_indev_drv_t * new_drv);
 
 /**
  * Get the next input device.

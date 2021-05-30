@@ -178,7 +178,7 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * img, int16_t angle, uint
     int32_t y;
     bool ret;
 
-    _lv_img_transform_dsc_t dsc;
+    lv_img_transform_dsc_t dsc;
     dsc.cfg.angle = angle;
     dsc.cfg.zoom = zoom;
     dsc.cfg.src = img->data;

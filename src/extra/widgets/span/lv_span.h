@@ -44,10 +44,7 @@ typedef struct {
     char * txt;
     lv_style_t style;
     uint8_t static_flag : 1;
-} _lv_span_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_span_t lv_span_t;
+} lv_span_t;
 
 /** Data of label*/
 typedef struct {
@@ -57,10 +54,7 @@ typedef struct {
     uint8_t mode : 2;
     uint8_t align : 2;
     uint8_t overflow : 1;
-} _lv_spangroup_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_spangroup_t lv_spangroup_t;
+} lv_spangroup_t;
 
 extern const lv_obj_class_t lv_spangroup_class;
 

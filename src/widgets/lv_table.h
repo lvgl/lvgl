@@ -56,10 +56,7 @@ typedef struct {
     lv_coord_t * col_w;
     uint16_t col_act;
     uint16_t row_act;
-} _lv_table_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_table_t lv_table_t;
+} lv_table_t;
 
 extern const lv_obj_class_t lv_table_class;
 

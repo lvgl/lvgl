@@ -32,10 +32,7 @@ extern "C" {
 typedef struct {
     lv_img_t img;
     lv_img_dsc_t dsc;
-} _lv_canvas_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_canvas_t lv_canvas_t;
+} lv_canvas_t;
 
 /**********************
  * GLOBAL PROTOTYPES

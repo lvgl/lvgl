@@ -43,10 +43,6 @@ struct _lv_disp_t;
 struct _lv_disp_drv_t;
 struct _lv_theme_t;
 
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef struct _lv_disp_drv_t lv_disp_drv_t;
-typedef struct _lv_obj_t lv_obj_t;
-
 /**
  * Structure for holding display buffer information.
  */
@@ -64,10 +60,7 @@ typedef struct _lv_disp_draw_buf_t{
     volatile int flushing_last;
     volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
-} _lv_disp_draw_buf_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_disp_draw_buf_t lv_disp_draw_buf_t;
+} lv_disp_draw_buf_t;
 
 typedef enum {
     LV_DISP_ROT_NONE = 0,
@@ -101,38 +94,38 @@ typedef struct _lv_disp_drv_t {
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished*/
-    void (*flush_cb)(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
+    void (*flush_cb)(struct _lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
     /** OPTIONAL: Extend the invalidated areas to match with the display drivers requirements
      * E.g. round `y` to, 8, 16 ..) on a monochrome display*/
-    void (*rounder_cb)(lv_disp_drv_t * disp_drv, lv_area_t * area);
+    void (*rounder_cb)(struct _lv_disp_drv_t * disp_drv, lv_area_t * area);
 
     /** OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
      * Can be used for color format not supported in LittelvGL. E.g. 2 bit -> 4 gray scales
      * @note Much slower then drawing with supported color formats.*/
-    void (*set_px_cb)(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+    void (*set_px_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa);
 
     /** OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels*/
-    void (*monitor_cb)(lv_disp_drv_t * disp_drv, uint32_t time, uint32_t px);
+    void (*monitor_cb)(struct _lv_disp_drv_t * disp_drv, uint32_t time, uint32_t px);
 
     /** OPTIONAL: Called periodically while lvgl waits for operation to be completed.
      * For example flushing or GPU
      * User can execute very simple tasks here or yield the task*/
-    void (*wait_cb)(lv_disp_drv_t * disp_drv);
+    void (*wait_cb)(struct _lv_disp_drv_t * disp_drv);
 
     /** OPTIONAL: Called when lvgl needs any CPU cache that affects rendering to be cleaned*/
-    void (*clean_dcache_cb)(lv_disp_drv_t * disp_drv);
+    void (*clean_dcache_cb)(struct _lv_disp_drv_t * disp_drv);
 
     /** OPTIONAL: called to wait while the gpu is working*/
-    void (*gpu_wait_cb)(lv_disp_drv_t * disp_drv);
+    void (*gpu_wait_cb)(struct _lv_disp_drv_t * disp_drv);
 
     /** OPTIONAL: called when driver parameters are updated */
-    void (*drv_update_cb)(lv_disp_drv_t * disp_drv);
+    void (*drv_update_cb)(struct _lv_disp_drv_t * disp_drv);
 
     /** OPTIONAL: Fill a memory with a color (GPU only)*/
-    void (*gpu_fill_cb)(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
+    void (*gpu_fill_cb)(struct _lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                         const lv_area_t * fill_area, lv_color_t color);
 
     /** On CHROMA_KEYED images this color will be transparent.
@@ -151,7 +144,7 @@ typedef struct _lv_disp_drv_t {
  */
 typedef struct _lv_disp_t {
     /**< Driver to the display*/
-    lv_disp_drv_t * driver;
+    struct _lv_disp_drv_t * driver;
 
     /**< A timer which periodically checks the dirty areas and refreshes them*/
     lv_timer_t * refr_timer;
@@ -160,12 +153,12 @@ typedef struct _lv_disp_t {
     struct _lv_theme_t * theme;
 
     /** Screens of the display*/
-    lv_obj_t ** screens;    /**< Array of screen objects.*/
-    lv_obj_t * act_scr;     /**< Currently active screen on this display*/
-    lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
-    lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_scr_load_anim*/
-    lv_obj_t * top_layer;   /**< @see lv_disp_get_layer_top*/
-    lv_obj_t * sys_layer;   /**< @see lv_disp_get_layer_sys*/
+    struct _lv_obj_t ** screens;    /**< Array of screen objects.*/
+    struct _lv_obj_t * act_scr;     /**< Currently active screen on this display*/
+    struct _lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
+    struct _lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_scr_load_anim*/
+    struct _lv_obj_t * top_layer;   /**< @see lv_disp_get_layer_top*/
+    struct _lv_obj_t * sys_layer;   /**< @see lv_disp_get_layer_sys*/
     uint32_t screen_cnt;
     uint8_t del_prev  : 1;          /**< 1: Automatically delete the previous screen when the screen load animation is ready*/
 
@@ -180,10 +173,7 @@ typedef struct _lv_disp_t {
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
-} _lv_disp_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_disp_t lv_disp_t;
+} lv_disp_t;
 
 /**********************
  * GLOBAL PROTOTYPES

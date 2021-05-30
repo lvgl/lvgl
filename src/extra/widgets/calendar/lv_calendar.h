@@ -44,10 +44,7 @@ typedef struct {
     uint16_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     const char * map[8 * 7];
     char nums [7 * 6][4];
-} _lv_calendar_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_calendar_t lv_calendar_t;
+} lv_calendar_t;
 
 extern const lv_obj_class_t lv_calendar_class;
 

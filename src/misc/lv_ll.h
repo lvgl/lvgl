@@ -33,10 +33,7 @@ typedef struct {
     uint32_t n_size;
     lv_ll_node_t * head;
     lv_ll_node_t * tail;
-} _lv_ll_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_ll_t lv_ll_t;
+} lv_ll_t;
 
 /**********************
  * GLOBAL PROTOTYPES

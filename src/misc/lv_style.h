@@ -234,7 +234,7 @@ typedef enum {
 /**
  * Descriptor for style transitions
  */
-typedef struct _lv_style_transiton_t {
+typedef struct {
     const lv_style_prop_t * props; /**< An array with the properties to animate.*/
 #if LV_USE_USER_DATA
     void * user_data;              /**< A custom user data that will be passed to the animation's user_data */
@@ -242,10 +242,7 @@ typedef struct _lv_style_transiton_t {
     lv_anim_path_cb_t path_xcb;     /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
-}_lv_style_transition_dsc_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_style_transition_dsc_t lv_style_transition_dsc_t;
+}lv_style_transition_dsc_t;
 
 /**
  * Descriptor of a constant style property.
@@ -276,10 +273,7 @@ typedef struct {
     uint16_t is_const :1;
     uint8_t has_group;
     uint8_t prop_cnt;
-} _lv_style_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_style_t lv_style_t;
+} lv_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

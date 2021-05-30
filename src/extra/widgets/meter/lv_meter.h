@@ -44,10 +44,7 @@ typedef struct {
     int16_t r_mod;
     uint16_t angle_range;
     int16_t rotation;
-}_lv_meter_scale_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_meter_scale_t lv_meter_scale_t;
+}lv_meter_scale_t;
 
 typedef enum {
     LV_METER_INDICATOR_TYPE_NEEDLE_IMG,
@@ -85,22 +82,14 @@ typedef struct {
             uint8_t local_grad  :1;
         }scale_lines;
     } type_data;
-}_lv_meter_indicator_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_meter_indicator_t lv_meter_indicator_t;
-
+}lv_meter_indicator_t;
 
 /*Data of line meter*/
 typedef struct {
     lv_obj_t obj;
     lv_ll_t scale_ll;
     lv_ll_t indicator_ll;
-} _lv_meter_t;
-
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef _lv_meter_t lv_meter_t;
-
+} lv_meter_t;
 
 extern const lv_obj_class_t lv_meter_class;
 

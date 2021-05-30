@@ -37,11 +37,9 @@ typedef enum {
 LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
 
 struct _lv_anim_t;
-/*Trick to no expose the fields of the struct in the MicroPython binding*/
-typedef struct _lv_anim_t lv_anim_t;
 
 /** Get the current value during an animation*/
-typedef int32_t (*lv_anim_path_cb_t)(const lv_anim_t *);
+typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
 
 /** Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
@@ -53,16 +51,16 @@ typedef void (*lv_anim_exec_xcb_t)(void *, int32_t);
 
 /** Same as `lv_anim_exec_xcb_t` but receives `lv_anim_t *` as the first parameter.
  * It's more consistent but less convenient. Might be used by binding generator functions.*/
-typedef void (*lv_anim_custom_exec_cb_t)(lv_anim_t *, int32_t);
+typedef void (*lv_anim_custom_exec_cb_t)(struct _lv_anim_t *, int32_t);
 
 /** Callback to call when the animation is ready*/
-typedef void (*lv_anim_ready_cb_t)(lv_anim_t *);
+typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 
 /** Callback to call when the animation really stars (considering `delay`)*/
-typedef void (*lv_anim_start_cb_t)(lv_anim_t *);
+typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
 
 /** Callback used when the animation values are relative to get the current value*/
-typedef int32_t (*lv_anim_get_value_cb_t)(lv_anim_t *);
+typedef int32_t (*lv_anim_get_value_cb_t)(struct _lv_anim_t *);
 
 /** Describes an animation*/
 typedef struct _lv_anim_t {
@@ -91,7 +89,7 @@ typedef struct _lv_anim_t {
     uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
     uint32_t time_orig;
-} _lv_anim_t;
+} lv_anim_t;
 
 /**********************
  * GLOBAL PROTOTYPES
