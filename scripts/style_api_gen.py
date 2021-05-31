@@ -384,24 +384,29 @@ def style_set_cast(style_type):
     cast = "(int32_t)"
   return cast
 
-def style_set(p):
+def style_set_c(p):
   if 'section' in p: return
     
   cast = style_set_cast(p['style_type'])
-  print("static inline void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
+  print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
   print("{")
-  print("   lv_style_value_t v = {0};")
-  print("   " + p['var_type'] +" * v2 = ("+ p['var_type'] +" *) &v;")
-  print("   *v2 = value;")
-  print("   lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
+  print("    lv_style_value_t v = {")
+  print("        ." + p['style_type'] +" = " + cast + "value")
+  print("    };")
+  print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
   print("")
 
-def local_style_set(p):
+def style_set_h(p):
+  if 'section' in p: return
+  
+  print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
+  
+def local_style_set_c(p):
   if 'section' in p: return
   
   cast = style_set_cast(p['style_type'])
-  print("static inline void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
+  print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
   print("{")
   print("    lv_style_value_t v = {")
   print("        ." + p['style_type'] +" = " + cast + "value")
@@ -409,6 +414,12 @@ def local_style_set(p):
   print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] +", v, selector);")
   print("}")
   print("")
+
+ 
+def local_style_set_h(p):
+  if 'section' in p: return
+  print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
+ 
 
 def style_const_set(p):
   if 'section' in p: return
@@ -477,14 +488,29 @@ sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
 
 for p in props:
   obj_style_get(p)
-
+  
 for p in props:
-  local_style_set(p)
+  local_style_set_h(p)
 
+sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
+
+print("#include \"lv_obj.h\"")
+for p in props:
+  local_style_set_c(p)
+
+sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
+
+print("#include \"lv_style.h\"")
+print("#include <stdbool.h>")
+for p in props:
+  style_set_c(p)
+  
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.h', 'w')
 
 for p in props:
-  style_set(p)
+  style_set_h(p)
+  
+for p in props:
   style_const_set(p)
   
 sys.stdout = open(base_dir + '/../docs/overview/style-props.md', 'w')
