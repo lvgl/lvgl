@@ -52,12 +52,13 @@ To be more precise under the hood every style coordinate related property is sto
 It's an internal mechanism and doesn't matter much as you use LVGL. However, there is one case in which you need to aware of that. If the style(s) of an object are removed by 
 ```c
 lv_obj_remove_style_all(obj)
-˙``
+```
+
 or
 ```c
 lv_obj_remove_style(obj, NULL, LV_PART_MAIN);
 ```
-The earlier set coordinates will be removed as well.
+the earlier set coordinates will be removed as well.
 
 For example:
 ```c

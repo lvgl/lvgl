@@ -19,7 +19,7 @@ To create spinner use `lv_spinner_create(parent, spin_time, arc_length)`. `spin 
 ## Events
 No special events are sent the the Spinner.
 
-Learn more about [Events](/overview/events).
+Learn more about [Events](/overview/event).
 
 ## Keys
 No *Keys* are processed by the object type.

@@ -35,7 +35,7 @@ To assign the text area, use `lv_keyboard_set_textarea(kb, ta)`.
 
 ### New Keymap
 You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, map)` and `lv_keyboard_set_ctrl_map(kb, ctrl_map)`.
-Learn more about the [Button matrix](/widgets/btnmatrix) object.
+Learn more about the [Button matrix](/widgets/core/btnmatrix) object.
 Keep in mind that, using following keywords will have the same effect as with the original map:  
 - `LV_SYMBOL_OK` Apply.
 - `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Close.

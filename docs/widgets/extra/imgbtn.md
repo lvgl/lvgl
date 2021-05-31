@@ -20,7 +20,7 @@ You can set a left, right and center image, and the center image will be repeate
 ### Image sources
 To set the image in a state, use the `lv_imgbtn_set_src(imgbtn, LV_IMGBTN_STATE_..., src_left, src_center, src_right)`.
  
-The image sources works the same as described in the [Image object](/widgets/coreimg) except that, "Symbols" are not supported by the Image button.
+The image sources works the same as described in the [Image object](/widgets/core/img) except that, "Symbols" are not supported by the Image button.
 Any of the sources can `NULL`.
 
 The possible states are:
