@@ -1,6 +1,7 @@
 static inline void lv_style_set_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_WIDTH(val) \
@@ -13,7 +14,8 @@ static inline void lv_style_set_width(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_min_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_MIN_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_MIN_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_MIN_WIDTH(val) \
@@ -26,7 +28,8 @@ static inline void lv_style_set_min_width(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_max_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_MAX_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_MAX_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_MAX_WIDTH(val) \
@@ -39,7 +42,8 @@ static inline void lv_style_set_max_width(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_height(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_HEIGHT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_HEIGHT, *v);
 }
 
 #define LV_STYLE_CONST_HEIGHT(val) \
@@ -52,7 +56,8 @@ static inline void lv_style_set_height(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_min_height(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_MIN_HEIGHT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_MIN_HEIGHT, *v);
 }
 
 #define LV_STYLE_CONST_MIN_HEIGHT(val) \
@@ -65,7 +70,8 @@ static inline void lv_style_set_min_height(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_max_height(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_MAX_HEIGHT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_MAX_HEIGHT, *v);
 }
 
 #define LV_STYLE_CONST_MAX_HEIGHT(val) \
@@ -78,7 +84,8 @@ static inline void lv_style_set_max_height(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_x(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_X, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_X, *v);
 }
 
 #define LV_STYLE_CONST_X(val) \
@@ -91,7 +98,8 @@ static inline void lv_style_set_x(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_y(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_Y, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_Y, *v);
 }
 
 #define LV_STYLE_CONST_Y(val) \
@@ -104,7 +112,8 @@ static inline void lv_style_set_y(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_align(lv_style_t * style, lv_align_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ALIGN, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ALIGN, *v);
 }
 
 #define LV_STYLE_CONST_ALIGN(val) \
@@ -117,7 +126,8 @@ static inline void lv_style_set_align(lv_style_t * style, lv_align_t value)
 
 static inline void lv_style_set_transform_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_TRANSFORM_WIDTH(val) \
@@ -130,7 +140,8 @@ static inline void lv_style_set_transform_width(lv_style_t * style, lv_coord_t v
 
 static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_HEIGHT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_HEIGHT, *v);
 }
 
 #define LV_STYLE_CONST_TRANSFORM_HEIGHT(val) \
@@ -143,7 +154,8 @@ static inline void lv_style_set_transform_height(lv_style_t * style, lv_coord_t 
 
 static inline void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_X, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSLATE_X, *v);
 }
 
 #define LV_STYLE_CONST_TRANSLATE_X(val) \
@@ -156,7 +168,8 @@ static inline void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value
 
 static inline void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSLATE_Y, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSLATE_Y, *v);
 }
 
 #define LV_STYLE_CONST_TRANSLATE_Y(val) \
@@ -169,7 +182,8 @@ static inline void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value
 
 static inline void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ZOOM, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ZOOM, *v);
 }
 
 #define LV_STYLE_CONST_TRANSFORM_ZOOM(val) \
@@ -182,7 +196,8 @@ static inline void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t va
 
 static inline void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, *v);
 }
 
 #define LV_STYLE_CONST_TRANSFORM_ANGLE(val) \
@@ -195,7 +210,8 @@ static inline void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t v
 
 static inline void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_PAD_TOP, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_PAD_TOP, *v);
 }
 
 #define LV_STYLE_CONST_PAD_TOP(val) \
@@ -208,7 +224,8 @@ static inline void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_PAD_BOTTOM, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_PAD_BOTTOM, *v);
 }
 
 #define LV_STYLE_CONST_PAD_BOTTOM(val) \
@@ -221,7 +238,8 @@ static inline void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_PAD_LEFT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_PAD_LEFT, *v);
 }
 
 #define LV_STYLE_CONST_PAD_LEFT(val) \
@@ -234,7 +252,8 @@ static inline void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_PAD_RIGHT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_PAD_RIGHT, *v);
 }
 
 #define LV_STYLE_CONST_PAD_RIGHT(val) \
@@ -247,7 +266,8 @@ static inline void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_PAD_ROW, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_PAD_ROW, *v);
 }
 
 #define LV_STYLE_CONST_PAD_ROW(val) \
@@ -260,7 +280,8 @@ static inline void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, *v);
 }
 
 #define LV_STYLE_CONST_PAD_COLUMN(val) \
@@ -273,7 +294,8 @@ static inline void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_RADIUS, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_RADIUS, *v);
 }
 
 #define LV_STYLE_CONST_RADIUS(val) \
@@ -286,7 +308,8 @@ static inline void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_clip_corner(lv_style_t * style, bool value)
 {
-    lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, *v);
 }
 
 #define LV_STYLE_CONST_CLIP_CORNER(val) \
@@ -299,7 +322,8 @@ static inline void lv_style_set_clip_corner(lv_style_t * style, bool value)
 
 static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_OPA, *v);
 }
 
 #define LV_STYLE_CONST_OPA(val) \
@@ -312,7 +336,8 @@ static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
 {
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, *v);
 }
 
 #define LV_STYLE_CONST_COLOR_FILTER_DSC(val) \
@@ -325,7 +350,8 @@ static inline void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_co
 
 static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, *v);
 }
 
 #define LV_STYLE_CONST_COLOR_FILTER_OPA(val) \
@@ -338,7 +364,8 @@ static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t va
 
 static inline void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, *v);
 }
 
 #define LV_STYLE_CONST_ANIM_TIME(val) \
@@ -351,7 +378,8 @@ static inline void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
 
 static inline void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, *v);
 }
 
 #define LV_STYLE_CONST_ANIM_SPEED(val) \
@@ -364,7 +392,8 @@ static inline void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
 
 static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
 {
-    lv_style_set_prop(style, LV_STYLE_TRANSITION, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TRANSITION, *v);
 }
 
 #define LV_STYLE_CONST_TRANSITION(val) \
@@ -377,7 +406,8 @@ static inline void lv_style_set_transition(lv_style_t * style, const lv_style_tr
 
 static inline void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BLEND_MODE, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BLEND_MODE, *v);
 }
 
 #define LV_STYLE_CONST_BLEND_MODE(val) \
@@ -390,7 +420,8 @@ static inline void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t v
 
 static inline void lv_style_set_layout(lv_style_t * style, uint16_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LAYOUT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LAYOUT, *v);
 }
 
 #define LV_STYLE_CONST_LAYOUT(val) \
@@ -403,7 +434,8 @@ static inline void lv_style_set_layout(lv_style_t * style, uint16_t value)
 
 static inline void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BASE_DIR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BASE_DIR, *v);
 }
 
 #define LV_STYLE_CONST_BASE_DIR(val) \
@@ -416,7 +448,8 @@ static inline void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value
 
 static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_BG_COLOR(val) \
@@ -429,7 +462,8 @@ static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value)
 
 static inline void lv_style_set_bg_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_BG_COLOR_FILTERED(val) \
@@ -442,7 +476,8 @@ static inline void lv_style_set_bg_color_filtered(lv_style_t * style, lv_color_t
 
 static inline void lv_style_set_bg_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_OPA, *v);
 }
 
 #define LV_STYLE_CONST_BG_OPA(val) \
@@ -455,7 +490,8 @@ static inline void lv_style_set_bg_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_bg_grad_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_BG_GRAD_COLOR(val) \
@@ -468,7 +504,8 @@ static inline void lv_style_set_bg_grad_color(lv_style_t * style, lv_color_t val
 
 static inline void lv_style_set_bg_grad_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_BG_GRAD_COLOR_FILTERED(val) \
@@ -481,7 +518,8 @@ static inline void lv_style_set_bg_grad_color_filtered(lv_style_t * style, lv_co
 
 static inline void lv_style_set_bg_grad_dir(lv_style_t * style, lv_grad_dir_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_GRAD_DIR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_GRAD_DIR, *v);
 }
 
 #define LV_STYLE_CONST_BG_GRAD_DIR(val) \
@@ -494,7 +532,8 @@ static inline void lv_style_set_bg_grad_dir(lv_style_t * style, lv_grad_dir_t va
 
 static inline void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_MAIN_STOP, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_MAIN_STOP, *v);
 }
 
 #define LV_STYLE_CONST_BG_MAIN_STOP(val) \
@@ -507,7 +546,8 @@ static inline void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_GRAD_STOP, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_GRAD_STOP, *v);
 }
 
 #define LV_STYLE_CONST_BG_GRAD_STOP(val) \
@@ -520,7 +560,8 @@ static inline void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_bg_img_src(lv_style_t * style, const void * value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_SRC, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_IMG_SRC, *v);
 }
 
 #define LV_STYLE_CONST_BG_IMG_SRC(val) \
@@ -533,7 +574,8 @@ static inline void lv_style_set_bg_img_src(lv_style_t * style, const void * valu
 
 static inline void lv_style_set_bg_img_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_IMG_OPA, *v);
 }
 
 #define LV_STYLE_CONST_BG_IMG_OPA(val) \
@@ -546,7 +588,8 @@ static inline void lv_style_set_bg_img_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_bg_img_recolor(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR, *v);
 }
 
 #define LV_STYLE_CONST_BG_IMG_RECOLOR(val) \
@@ -559,7 +602,8 @@ static inline void lv_style_set_bg_img_recolor(lv_style_t * style, lv_color_t va
 
 static inline void lv_style_set_bg_img_recolor_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_BG_IMG_RECOLOR_FILTERED(val) \
@@ -572,7 +616,8 @@ static inline void lv_style_set_bg_img_recolor_filtered(lv_style_t * style, lv_c
 
 static inline void lv_style_set_bg_img_recolor_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_OPA, *v);
 }
 
 #define LV_STYLE_CONST_BG_IMG_RECOLOR_OPA(val) \
@@ -585,7 +630,8 @@ static inline void lv_style_set_bg_img_recolor_opa(lv_style_t * style, lv_opa_t 
 
 static inline void lv_style_set_bg_img_tiled(lv_style_t * style, bool value)
 {
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_TILED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BG_IMG_TILED, *v);
 }
 
 #define LV_STYLE_CONST_BG_IMG_TILED(val) \
@@ -598,7 +644,8 @@ static inline void lv_style_set_bg_img_tiled(lv_style_t * style, bool value)
 
 static inline void lv_style_set_border_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BORDER_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BORDER_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_BORDER_COLOR(val) \
@@ -611,7 +658,8 @@ static inline void lv_style_set_border_color(lv_style_t * style, lv_color_t valu
 
 static inline void lv_style_set_border_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BORDER_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BORDER_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_BORDER_COLOR_FILTERED(val) \
@@ -624,7 +672,8 @@ static inline void lv_style_set_border_color_filtered(lv_style_t * style, lv_col
 
 static inline void lv_style_set_border_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BORDER_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BORDER_OPA, *v);
 }
 
 #define LV_STYLE_CONST_BORDER_OPA(val) \
@@ -637,7 +686,8 @@ static inline void lv_style_set_border_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_border_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BORDER_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BORDER_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_BORDER_WIDTH(val) \
@@ -650,7 +700,8 @@ static inline void lv_style_set_border_width(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_border_side(lv_style_t * style, lv_border_side_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_BORDER_SIDE, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BORDER_SIDE, *v);
 }
 
 #define LV_STYLE_CONST_BORDER_SIDE(val) \
@@ -663,7 +714,8 @@ static inline void lv_style_set_border_side(lv_style_t * style, lv_border_side_t
 
 static inline void lv_style_set_border_post(lv_style_t * style, bool value)
 {
-    lv_style_set_prop(style, LV_STYLE_BORDER_POST, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_BORDER_POST, *v);
 }
 
 #define LV_STYLE_CONST_BORDER_POST(val) \
@@ -676,7 +728,8 @@ static inline void lv_style_set_border_post(lv_style_t * style, bool value)
 
 static inline void lv_style_set_text_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_COLOR(val) \
@@ -689,7 +742,8 @@ static inline void lv_style_set_text_color(lv_style_t * style, lv_color_t value)
 
 static inline void lv_style_set_text_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_COLOR_FILTERED(val) \
@@ -702,7 +756,8 @@ static inline void lv_style_set_text_color_filtered(lv_style_t * style, lv_color
 
 static inline void lv_style_set_text_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_OPA, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_OPA(val) \
@@ -715,7 +770,8 @@ static inline void lv_style_set_text_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_text_font(lv_style_t * style, const lv_font_t * value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_FONT, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_FONT, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_FONT(val) \
@@ -728,7 +784,8 @@ static inline void lv_style_set_text_font(lv_style_t * style, const lv_font_t * 
 
 static inline void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_LETTER_SPACE, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_LETTER_SPACE, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_LETTER_SPACE(val) \
@@ -741,7 +798,8 @@ static inline void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t
 
 static inline void lv_style_set_text_line_space(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_LINE_SPACE, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_LINE_SPACE, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_LINE_SPACE(val) \
@@ -754,7 +812,8 @@ static inline void lv_style_set_text_line_space(lv_style_t * style, lv_coord_t v
 
 static inline void lv_style_set_text_decor(lv_style_t * style, lv_text_decor_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_DECOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_DECOR, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_DECOR(val) \
@@ -767,7 +826,8 @@ static inline void lv_style_set_text_decor(lv_style_t * style, lv_text_decor_t v
 
 static inline void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_TEXT_ALIGN, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_TEXT_ALIGN, *v);
 }
 
 #define LV_STYLE_CONST_TEXT_ALIGN(val) \
@@ -780,7 +840,8 @@ static inline void lv_style_set_text_align(lv_style_t * style, lv_text_align_t v
 
 static inline void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_IMG_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_IMG_OPA, *v);
 }
 
 #define LV_STYLE_CONST_IMG_OPA(val) \
@@ -793,7 +854,8 @@ static inline void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, *v);
 }
 
 #define LV_STYLE_CONST_IMG_RECOLOR(val) \
@@ -806,7 +868,8 @@ static inline void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value
 
 static inline void lv_style_set_img_recolor_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_IMG_RECOLOR_FILTERED(val) \
@@ -819,7 +882,8 @@ static inline void lv_style_set_img_recolor_filtered(lv_style_t * style, lv_colo
 
 static inline void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_OPA, *v);
 }
 
 #define LV_STYLE_CONST_IMG_RECOLOR_OPA(val) \
@@ -832,7 +896,8 @@ static inline void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t val
 
 static inline void lv_style_set_outline_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_OUTLINE_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_OUTLINE_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_OUTLINE_WIDTH(val) \
@@ -845,7 +910,8 @@ static inline void lv_style_set_outline_width(lv_style_t * style, lv_coord_t val
 
 static inline void lv_style_set_outline_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_OUTLINE_COLOR(val) \
@@ -858,7 +924,8 @@ static inline void lv_style_set_outline_color(lv_style_t * style, lv_color_t val
 
 static inline void lv_style_set_outline_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_OUTLINE_COLOR_FILTERED(val) \
@@ -871,7 +938,8 @@ static inline void lv_style_set_outline_color_filtered(lv_style_t * style, lv_co
 
 static inline void lv_style_set_outline_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_OUTLINE_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_OUTLINE_OPA, *v);
 }
 
 #define LV_STYLE_CONST_OUTLINE_OPA(val) \
@@ -884,7 +952,8 @@ static inline void lv_style_set_outline_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_OUTLINE_PAD, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_OUTLINE_PAD, *v);
 }
 
 #define LV_STYLE_CONST_OUTLINE_PAD(val) \
@@ -897,7 +966,8 @@ static inline void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value
 
 static inline void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_WIDTH(val) \
@@ -910,7 +980,8 @@ static inline void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_shadow_ofs_x(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_OFS_X, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_OFS_X, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_OFS_X(val) \
@@ -923,7 +994,8 @@ static inline void lv_style_set_shadow_ofs_x(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_shadow_ofs_y(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_OFS_Y, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_OFS_Y, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_OFS_Y(val) \
@@ -936,7 +1008,8 @@ static inline void lv_style_set_shadow_ofs_y(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_SPREAD, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_SPREAD, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_SPREAD(val) \
@@ -949,7 +1022,8 @@ static inline void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t val
 
 static inline void lv_style_set_shadow_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_COLOR(val) \
@@ -962,7 +1036,8 @@ static inline void lv_style_set_shadow_color(lv_style_t * style, lv_color_t valu
 
 static inline void lv_style_set_shadow_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_COLOR_FILTERED(val) \
@@ -975,7 +1050,8 @@ static inline void lv_style_set_shadow_color_filtered(lv_style_t * style, lv_col
 
 static inline void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_SHADOW_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_SHADOW_OPA, *v);
 }
 
 #define LV_STYLE_CONST_SHADOW_OPA(val) \
@@ -988,7 +1064,8 @@ static inline void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_line_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_LINE_WIDTH(val) \
@@ -1001,7 +1078,8 @@ static inline void lv_style_set_line_width(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_line_dash_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_DASH_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_DASH_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_LINE_DASH_WIDTH(val) \
@@ -1014,7 +1092,8 @@ static inline void lv_style_set_line_dash_width(lv_style_t * style, lv_coord_t v
 
 static inline void lv_style_set_line_dash_gap(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_DASH_GAP, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_DASH_GAP, *v);
 }
 
 #define LV_STYLE_CONST_LINE_DASH_GAP(val) \
@@ -1027,7 +1106,8 @@ static inline void lv_style_set_line_dash_gap(lv_style_t * style, lv_coord_t val
 
 static inline void lv_style_set_line_rounded(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_ROUNDED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_ROUNDED, *v);
 }
 
 #define LV_STYLE_CONST_LINE_ROUNDED(val) \
@@ -1040,7 +1120,8 @@ static inline void lv_style_set_line_rounded(lv_style_t * style, lv_coord_t valu
 
 static inline void lv_style_set_line_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_LINE_COLOR(val) \
@@ -1053,7 +1134,8 @@ static inline void lv_style_set_line_color(lv_style_t * style, lv_color_t value)
 
 static inline void lv_style_set_line_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_LINE_COLOR_FILTERED(val) \
@@ -1066,7 +1148,8 @@ static inline void lv_style_set_line_color_filtered(lv_style_t * style, lv_color
 
 static inline void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_LINE_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_LINE_OPA, *v);
 }
 
 #define LV_STYLE_CONST_LINE_OPA(val) \
@@ -1079,7 +1162,8 @@ static inline void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_arc_width(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ARC_WIDTH, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ARC_WIDTH, *v);
 }
 
 #define LV_STYLE_CONST_ARC_WIDTH(val) \
@@ -1092,7 +1176,8 @@ static inline void lv_style_set_arc_width(lv_style_t * style, lv_coord_t value)
 
 static inline void lv_style_set_arc_rounded(lv_style_t * style, lv_coord_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ARC_ROUNDED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ARC_ROUNDED, *v);
 }
 
 #define LV_STYLE_CONST_ARC_ROUNDED(val) \
@@ -1105,7 +1190,8 @@ static inline void lv_style_set_arc_rounded(lv_style_t * style, lv_coord_t value
 
 static inline void lv_style_set_arc_color(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ARC_COLOR, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ARC_COLOR, *v);
 }
 
 #define LV_STYLE_CONST_ARC_COLOR(val) \
@@ -1118,7 +1204,8 @@ static inline void lv_style_set_arc_color(lv_style_t * style, lv_color_t value)
 
 static inline void lv_style_set_arc_color_filtered(lv_style_t * style, lv_color_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ARC_COLOR_FILTERED, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ARC_COLOR_FILTERED, *v);
 }
 
 #define LV_STYLE_CONST_ARC_COLOR_FILTERED(val) \
@@ -1131,7 +1218,8 @@ static inline void lv_style_set_arc_color_filtered(lv_style_t * style, lv_color_
 
 static inline void lv_style_set_arc_opa(lv_style_t * style, lv_opa_t value)
 {
-    lv_style_set_prop(style, LV_STYLE_ARC_OPA, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ARC_OPA, *v);
 }
 
 #define LV_STYLE_CONST_ARC_OPA(val) \
@@ -1144,7 +1232,8 @@ static inline void lv_style_set_arc_opa(lv_style_t * style, lv_opa_t value)
 
 static inline void lv_style_set_arc_img_src(lv_style_t * style, const void * value)
 {
-    lv_style_set_prop(style, LV_STYLE_ARC_IMG_SRC, *((lv_style_value_t*)&value));
+    lv_style_value_t * v = (lv_style_value_t*)&value;
+    lv_style_set_prop(style, LV_STYLE_ARC_IMG_SRC, *v);
 }
 
 #define LV_STYLE_CONST_ARC_IMG_SRC(val) \
