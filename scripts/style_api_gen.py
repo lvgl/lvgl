@@ -390,10 +390,7 @@ def style_set(p):
   cast = style_set_cast(p['style_type'])
   print("static inline void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
   print("{")
-  print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + cast + "value")
-  print("    };")
-  print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
+  print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", *((lv_style_value_t*)&value));")
   print("}")
   print("")
 
