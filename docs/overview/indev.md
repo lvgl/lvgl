@@ -82,6 +82,12 @@ In *Edit* mode, `LV_KEY_NEXT/PREV` is usually used to edit the object.
 Depending on the object's type, a short or long press of `LV_KEY_ENTER` changes back to *Navigate* mode.
 Usually, an object which can not be pressed (like a [Slider](/widgets/core/slider)) leaves *Edit* mode on short click. But with objects where short click has meaning (e.g. [Button](/widgets/core/btn)), a long press is required.
 
+#### Default group
+Interactive widgets - such as buttons, checkboxes, sliders, etc - can be automatically added to a default group.
+Just create a group with `lv_group_t * g = lv_group_create();` and set the default group with `lv_group_set_default(g);`
+
+Don't forget to assign the input device(s) to the default group with ` lv_indev_set_group(my_indev, g);`.
+
 ### Styling
 
 If an object is focused either by clicking it via touchpad, or focused via an encoder or keypad it goes to `LV_STATE_FOCUSED`. Hence focused styles will be applied on it. 
