@@ -97,87 +97,16 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
  */
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow);
 
-static inline void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_FLEX_FLOW, v);
-}
-
-static inline void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_FLEX_MAIN_PLACE, v);
-}
-
-static inline void lv_style_set_flex_cross_place(lv_style_t * style, lv_flex_align_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_FLEX_CROSS_PLACE, v);
-}
-
-static inline void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_FLEX_TRACK_PLACE, v);
-}
-
-static inline void lv_style_set_flex_grow(lv_style_t * style, uint8_t value)
-{
-    lv_style_value_t v = {
-            .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_FLEX_GROW, v);
-}
-
-
-
-static inline void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_FLOW, v, selector);
-}
-
-static inline void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MAIN_PLACE, v, selector);
-}
-
-static inline void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_CROSS_PLACE, v, selector);
-}
-
-static inline void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_TRACK_PLACE, v, selector);
-}
-
-static inline void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_GROW, v, selector);
-}
+void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value);
+void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value);
+void lv_style_set_flex_cross_place(lv_style_t * style, lv_flex_align_t value);
+void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value);
+void lv_style_set_flex_grow(lv_style_t * style, uint8_t value);
+void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector_t selector);
 
 static inline lv_flex_flow_t lv_obj_get_style_flex_flow(const lv_obj_t * obj, uint32_t part)
 {

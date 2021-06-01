@@ -115,6 +115,88 @@ void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
     lv_obj_set_style_flex_grow(obj, grow, 0);
 }
 
+
+void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_FLOW, v);
+}
+
+void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_MAIN_PLACE, v);
+}
+
+void lv_style_set_flex_cross_place(lv_style_t * style, lv_flex_align_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_CROSS_PLACE, v);
+}
+
+void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_TRACK_PLACE, v);
+}
+
+void lv_style_set_flex_grow(lv_style_t * style, uint8_t value)
+{
+    lv_style_value_t v = {
+            .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_GROW, v);
+}
+
+
+void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t) value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_FLOW, v, selector);
+}
+
+void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t) value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MAIN_PLACE, v, selector);
+}
+
+void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t) value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_CROSS_PLACE, v, selector);
+}
+
+void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t) value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_TRACK_PLACE, v, selector);
+}
+
+void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t) value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_GROW, v, selector);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
