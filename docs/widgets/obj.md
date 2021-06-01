@@ -162,7 +162,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: /lv_examples/src/lv_ex_widgets/lv_ex_obj/index.rst
+.. include:: ../../examples/widgets/obj/index.rst
 
 ```
 
