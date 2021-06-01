@@ -1,6 +1,10 @@
 # Changelog
 
-## v8.0.0 (Planned in May 2021)
+## v8.0.0 (01.06.2021)
+
+v8.0 brings many new features like simplified and more powerful scrolling, new layouts inspired by CSS Flexbox and Grid, simplified and improved widgets, more powerful events, hookable drawing, and more.
+
+v8 is a major change and therefore it's not backward compatible with v7. 
 
 ### Directory structure
 - The `lv_` prefix is removed from the folder names
