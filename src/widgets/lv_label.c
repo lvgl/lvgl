@@ -857,7 +857,7 @@ static void draw_main(lv_event_t * e)
 #endif
 
     lv_area_t txt_clip;
-    bool is_common = _lv_area_intersect(&txt_clip, clip_area, clip_area);
+    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, clip_area);
     if(!is_common) return;
 
     if(label->long_mode == LV_LABEL_LONG_WRAP) {
