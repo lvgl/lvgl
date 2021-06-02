@@ -517,17 +517,20 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         bool editing = lv_group_get_editing(lv_obj_get_group(obj));
-        if(indev_type == LV_INDEV_TYPE_KEYPAD|| (indev_type == LV_INDEV_TYPE_ENCODER&& editing)) {
-            uint32_t b = 0;
-            if(btnm->one_check) {
-                while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b]) || button_is_checked(btnm->ctrl_bits[b]) == false) b++;
-            } else {
-                while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b])) b++;
-            }
+        /*Focus the first button if there is not selected button*/
+        if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) {
+            if (indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && editing)) {
+                uint32_t b = 0;
+                if(btnm->one_check) {
+                    while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b]) || button_is_checked(btnm->ctrl_bits[b]) == false) b++;
+                } else {
+                    while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b])) b++;
+                }
 
-            btnm->btn_id_sel = b;
-        } else {
-            btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
+                btnm->btn_id_sel = b;
+            } else {
+                btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
+            }
         }
     }
     else if(code == LV_EVENT_DEFOCUSED || code == LV_EVENT_LEAVE) {
