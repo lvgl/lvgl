@@ -1,4 +1,6 @@
 #include "../lvgl.h"
+#if LV_BUILD_TEST
+
 #include "unity/unity.h"
 
 void test_obj_tree_1(void);
@@ -23,3 +25,5 @@ void test_obj_tree_2(void)
   lv_obj_clean(lv_scr_act());
   TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(lv_scr_act()), 0);
 }
+
+#endif
