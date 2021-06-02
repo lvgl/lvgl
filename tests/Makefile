@@ -16,25 +16,16 @@ WARNINGS += -Wpedantic -pedantic-errors
 #-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -O3 -g0
 
-CFLAGS ?= -I$(LVGL_DIR)/ $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
+CFLAGS ?= -I$(LVGL_DIR)/ -Iunity $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
 
 LDFLAGS ?=  -lpng
-BIN ?= demo
-
-#Collect the files to compile
-MAINSRC = ./lv_test_main.c
+BIN ?= test
 
 include ../lvgl.mk
 
-CSRCS += lv_test_assert.c
-CSRCS += lv_test_core/lv_test_core.c
-CSRCS += lv_test_core/lv_test_obj.c
-CSRCS += lv_test_core/lv_test_style.c
-CSRCS += lv_test_core/lv_test_font_loader.c
-CSRCS += lv_test_widgets/lv_test_label.c
-CSRCS += lv_test_fonts/font_1.c
-CSRCS += lv_test_fonts/font_2.c
-CSRCS += lv_test_fonts/font_3.c
+CSRCS += ${TEST_SRC}
+CSRCS += unity/unity.c
+CSRCS += lv_test_init.c
 
 OBJEXT ?= .o
 
