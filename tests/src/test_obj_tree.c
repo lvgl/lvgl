@@ -1,4 +1,4 @@
-#include "../../lvgl.h"
+#include "../lvgl.h"
 #if LV_BUILD_TEST
 
 #include "unity/unity.h"
