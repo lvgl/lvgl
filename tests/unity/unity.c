@@ -4,6 +4,7 @@
     [Released under MIT License. Please refer to license.txt for details]
 ============================================================================ */
 #if LV_BUILD_TEST
+#define UNITY_INCLUDE_PRINT_FORMATTED   1
 #include "unity.h"
 #include <stddef.h>
 
