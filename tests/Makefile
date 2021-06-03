@@ -25,6 +25,7 @@ include ../lvgl.mk
 
 CSRCS += ${TEST_SRC}
 CSRCS += unity/unity.c
+CSRCS += unity/unity_support.c
 CSRCS += lv_test_init.c
 
 OBJEXT ?= .o

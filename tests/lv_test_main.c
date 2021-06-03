@@ -1,8 +1,6 @@
 #include "../lvgl.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "lv_test_core/lv_test_core.h"
-#include "lv_test_widgets/lv_test_label.h"
 
 #if LV_BUILD_TEST && !defined(LV_BUILD_TEST_NO_MAIN)
 #include <sys/time.h>
