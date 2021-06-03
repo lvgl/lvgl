@@ -9,12 +9,12 @@ lvgldirname = '"' + lvgldirname + '"'
 base_defines = '"-DLV_CONF_PATH=' + lvgldirname +'/tests/lv_test_conf.h -DLV_BUILD_TEST"'
 optimization = '"-O3 -g0"'
 
-def build(name, defines, test_name):
+def build(defines, test_name):
   global base_defines, optimization
 
-  print("==========================================")
-  print(name)
-  print("==========================================")
+  print("~~~~~~~~~~~~~~~~~~~~~~~~")
+  print(test_name)
+  print("~~~~~~~~~~~~~~~~~~~~~~~~")
   
   d_all = base_defines[:-1] + " ";
   

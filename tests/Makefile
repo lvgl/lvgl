@@ -42,7 +42,7 @@ OBJS = $(AOBJS) $(COBJS)
 all: default
 
 %.o: %.c
-	$(CC)  $(CFLAGS) -c $< -o $@
+	@$(CC)  $(CFLAGS) -c $< -o $@
 	
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
