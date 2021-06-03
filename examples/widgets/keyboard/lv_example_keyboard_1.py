@@ -1,26 +1,28 @@
-# Create styles for the keyboard
-rel_style = lv.style_t()
-pr_style  = lv.style_t()
+def ta_event_cb(e,kb):
+    code = e.get_code()
+    ta = e.get_target()
+    if code == lv.EVENT.FOCUSED:
+        kb.set_textarea(ta)
+        kb.clear_flag(lv.obj.FLAG.HIDDEN)
 
-lv.style_copy(rel_style, lv.style_btn_rel)
-rel_style.body.radius = 0
-rel_style.body.border.width = 1
-
-lv.style_copy(pr_style, lv.style_btn_pr)
-pr_style.body.radius = 0
-pr_style.body.border.width = 1
-
-# Create a keyboard and apply the styles
-kb = lv.kb(lv.scr_act())
-kb.set_cursor_manage(True)
-kb.set_style(lv.kb.STYLE.BG, lv.style_transp_tight)
-kb.set_style(lv.kb.STYLE.BTN_REL, rel_style)
-kb.set_style(lv.kb.STYLE.BTN_PR, pr_style)
+    if code == lv.EVENT.DEFOCUSED:
+        kb.set_textarea(None)
+        kb.add_flag(lv.obj.FLAG.HIDDEN)
+        
+# Create a keyboard to use it with an of the text areas
+kb = lv.keyboard(lv.scr_act())
 
 # Create a text area. The keyboard will write here
-ta = lv.ta(lv.scr_act())
-ta.align(None, lv.ALIGN.IN_TOP_MID, 0, 10)
-ta.set_text("")
+ta = lv.textarea(lv.scr_act())
+ta.set_width(200)
+ta.align(lv.ALIGN.TOP_LEFT, 10, 10)
+ta.add_event_cb(lambda e: ta_event_cb(e,kb), lv.EVENT.ALL, None)
+ta.set_placeholder_text("Hello")
 
-# Assign the text area to the keyboard
-kb.set_ta(ta)
+ta = lv.textarea(lv.scr_act())
+ta.set_width(200)
+ta.align(lv.ALIGN.TOP_RIGHT, -10, 10)
+ta.add_event_cb(lambda e: ta_event_cb(e,kb), lv.EVENT.ALL, None)
+
+kb.set_textarea(ta)
+

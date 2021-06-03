@@ -1,12 +1,10 @@
-def event_handler(obj, event):
-    if event == lv.EVENT.VALUE_CHANGED:
-        print("Button: %s" % lv.mbox.get_active_btn_text(obj))
+def event_cb(e):
+    mbox = lv.msgbox.__cast__(e.get_current_target())
+    print("Button " + mbox.get_active_btn_text() + " clicked")
 
 btns = ["Apply", "Close", ""]
 
-mbox1 = lv.mbox(lv.scr_act())
-mbox1.set_text("A message box with two buttons.");
-mbox1.add_btns(btns)
-mbox1.set_width(200)
-mbox1.set_event_cb(event_handler)
-mbox1.align(None, lv.ALIGN.CENTER, 0, 0)  # Align to the corner
+mbox1 = lv.msgbox(lv.scr_act(), "Hello", "This is a message box with two buttons.", btns, True)
+mbox1.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
+mbox1.center()
+
