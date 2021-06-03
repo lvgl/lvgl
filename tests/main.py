@@ -7,9 +7,14 @@ import test
 
 files = test.prepare()
 
+print("============================================")
+print("Minimal config, 16 bit color depth")
+print("============================================")
+print("")
+
 for f in files:
   name = f[:-2] #test_foo.c -> test_foo 
-  build.build("Minimal config, 16 bit color depth", defines.minimal_16bit, name)
+  build.build(defines.minimal_16bit, name)
   
 
 #build("Minimal config monochrome", minimal_monochrome)
