@@ -18,6 +18,7 @@ extern "C" {
 #include "../misc/lv_style.h"
 #include "../misc/lv_txt.h"
 #include "lv_img_decoder.h"
+#include "lv_img_cache.h"
 
 #include "lv_draw_rect.h"
 #include "lv_draw_label.h"
