@@ -42,8 +42,8 @@ OBJS = $(AOBJS) $(COBJS)
 all: default
 
 %.o: %.c
-	@$(CC)  $(CFLAGS) -c $< -o $@
-	@echo "CC $<"
+	$(CC)  $(CFLAGS) -c $< -o $@
+	
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)

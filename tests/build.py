@@ -12,9 +12,9 @@ optimization = '"-O3 -g0"'
 def build(name, defines, test_name):
   global base_defines, optimization
 
-  print("=============================")
+  print("==========================================")
   print(name)
-  print("=============================")
+  print("==========================================")
   
   d_all = base_defines[:-1] + " ";
   
@@ -24,31 +24,31 @@ def build(name, defines, test_name):
   d_all += '"'
   test_file_name = test_name + ".c"
   test_file_runner_name = test_name + "_Runner.c"
-  cmd = "make -j8 BIN=test.bin MAINSRC=" + test_file_name + " TEST_SRC=" + test_file_runner_name + "  LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
+  cmd = "make -s -j BIN=test.bin MAINSRC=" + test_file_name + " TEST_SRC=" + test_file_runner_name + "  LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
 
-  print("---------------------------")
+  print("")
   print("Build")
-  print("---------------------------")
+  print("-----------------------")
   ret = os.system(cmd)
   if(ret != 0): 
     print("BUILD ERROR! (error code  " + str(ret) + ")")
     exit(1)
   
-  print("---------------------------")
+  print("")
   print("Run")
-  print("---------------------------")
+  print("-----------------------")
   ret = os.system("./test.bin")
   if(ret != 0): 
     print("RUN ERROR! (error code  " + str(ret) + ")")
     exit(1)
   
-  print("---------------------------")
+  print("")
   print("Finished")
-  print("---------------------------")
+  print("-----------------------")
 
 def clean():
-  print("---------------------------")
+  print("")
   print("Clean")
-  print("---------------------------")
+  print("-----------------------")
   os.system("make clean LVGL_DIR_NAME=" + lvgldirname)
   os.system("rm -f ./test.bin")
