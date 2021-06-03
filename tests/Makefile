@@ -27,6 +27,9 @@ CSRCS += ${TEST_SRC}
 CSRCS += unity/unity.c
 CSRCS += unity/unity_support.c
 CSRCS += lv_test_init.c
+CSRCS += src/test_fonts/font_1.c
+CSRCS += src/test_fonts/font_2.c
+CSRCS += src/test_fonts/font_3.c
 
 OBJEXT ?= .o
 
@@ -44,6 +47,8 @@ all: default
 
 %.o: %.c
 	@$(CC)  $(CFLAGS) -c $< -o $@
+#	@echo "CC $<"
+
 	
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)

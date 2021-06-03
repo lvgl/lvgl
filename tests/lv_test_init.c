@@ -113,7 +113,6 @@ static void hal_init(void)
 
     lv_fs_drv_register(&drv);                 /*Finally register the drive*/
 }
-#include <stdio.h>
 
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
