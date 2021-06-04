@@ -137,6 +137,7 @@ void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span)
             if(cur_span->txt && cur_span->static_flag == 0) {
                 lv_mem_free(cur_span->txt);
             }
+            lv_style_reset(&cur_span->style);
             lv_mem_free(cur_span);
             break;
         }
@@ -501,6 +502,7 @@ static void lv_spangroup_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         if(cur_span->txt && cur_span->static_flag == 0) {
             lv_mem_free(cur_span->txt);
         }
+        lv_style_reset(&cur_span->style);
         lv_mem_free(cur_span);
         cur_span = _lv_ll_get_head(&spans->child_ll);
     }
