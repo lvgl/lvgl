@@ -488,8 +488,12 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 {
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
-    while(draw_buf->flushing) {
-        if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
+    /* Below the `area_p` area will be redrawn into the draw buffer.
+     * In single buffered mode wait here until the buffer is freed.*/
+    if(draw_buf->buf1 && !draw_buf->buf2) {
+		while(draw_buf->flushing) {
+			if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
+		}
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -893,14 +897,22 @@ static void draw_buf_flush(void)
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
     lv_color_t * color_p = draw_buf->buf_act;
 
-    draw_buf->flushing = 1;
-
-    if(disp_refr->driver->draw_buf->last_area && disp_refr->driver->draw_buf->last_part) draw_buf->flushing_last = 1;
-    else draw_buf->flushing_last = 0;
-
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver->gpu_wait_cb) disp->driver->gpu_wait_cb(disp->driver);
+
+     /* In double buffered mode wait until the other buffer is freed
+	  * and driver is ready to receive the new buffer */
+	 if(draw_buf->buf1 && draw_buf->buf2) {
+		 while(draw_buf->flushing) {
+			 if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
+		 }
+	 }
+
+	 draw_buf->flushing = 1;
+
+	if(disp_refr->driver->draw_buf->last_area && disp_refr->driver->draw_buf->last_part) draw_buf->flushing_last = 1;
+	else draw_buf->flushing_last = 0;
 
     if(disp->driver->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
