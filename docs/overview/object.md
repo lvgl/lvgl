@@ -4,10 +4,10 @@
 ```
 # Objects
 
-In the LVGL the **basic building blocks** of a user interface are the objects, also called *Widgets*.
+In LVGL the **basic building blocks** of a user interface are the objects, also called *Widgets*.
 For example a [Button](/widgets/core/btn), [Label](/widgets/core/label), [Image](/widgets/core/img), [List](/widgets/extra/list), [Chart](/widgets/extra/chart) or [Text area](/widgets/core/textarea).
 
-Check all the [Object types](/widgets/index) here.
+You can see all the [Object types](/widgets/index) here.
 
 All objects are referenced using an `lv_obj_t` pointer as a handle. This pointer can later be used to set or get the attributes of the object.
 
@@ -39,7 +39,7 @@ The object types have special attributes too. For example, a slider has
 - Minimum and maximum values
 - Current value
 
-For these attributes, every object type have unique API functions. For example for a slider:
+For these special attributes, every object type may have unique API functions. For example for a slider:
 
 ```c
 /*Set slider specific attributes*/
@@ -95,9 +95,9 @@ lv_obj_set_x(obj1, -30);	/*Move the child a little bit off the parent*/
 
 In LVGL objects can be created and deleted dynamically in run time. It means only the currently created (existing) objects consume RAM.
 
-It allows to create a screen just when a button is clicked to open it. A delete the screen when a new screen is loaded.
+This allows for the creation of a screen just when a button is clicked to open it, and for deletion of screens when a new screen is loaded.
 
-Or the UI can be created based on the current environment of the device. For example create meter, charts, bars, slider etc according to the currently attached sensors.
+UIs can be created based on the current environment of the device. For example one can create meters, charts, bars and sliders based on the currently attached sensors.
  
 Every widget has its own **create** function with a prototype like this:
 ```c
@@ -116,8 +116,8 @@ void lv_obj_del(lv_obj_t * obj);
 ```
 
 `lv_obj_del` will delete the object immediately.
-If for any reason you can't delete the object immediately you can use `lv_obj_del_async(obj)` that will perefome the deletion on hte next call of `lv_timer_handler()`.
-It is useful e.g. if you want to delete the parent of an object in the child's `LV_EVENT_DELETE` signal.
+If for any reason you can't delete the object immediately you can use `lv_obj_del_async(obj)` that will perform the deletion on the next call of `lv_timer_handler()`.
+This is useful e.g. if you want to delete the parent of an object in the child's `LV_EVENT_DELETE` handler.
 
 You can remove all the children of an object (but not the object itself) using `lv_obj_clean(obj)`.
 
@@ -149,7 +149,7 @@ There are two automatically generated layers:
 They are independent of the screens and they will be shown on every screen. The *top layer* is above every object on the screen and the *system layer* is above the *top layer* too.
 You can add any pop-up windows to the *top layer* freely. But, the *system layer* is restricted to system-level things (e.g. mouse cursor will be placed here in `lv_indev_set_cursor()`).
 
-The `lv_layer_top()` and `lv_layer_sys()` functions gives a pointer to the top or system layer.
+The `lv_layer_top()` and `lv_layer_sys()` functions return pointers to the top and system layers respectively.
 
 Read the [Layer overview](/overview/layer) section to learn more about layers.
 
@@ -176,11 +176,11 @@ Visit [Multi-display support](/overview/display) to learn more.
 
 ## Parts
 
-The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scroll bar parts but a [Slider](/widgets/core/slider) uses the main, the indicator and the knob parts. 
+The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scrollbar parts but a [Slider](/widgets/core/slider) uses the main, the indicator and the knob parts. 
 Parts are similar to *pseudo elements* in CSS.
 
 The following predefined parts exist in LVGL:
-- `LV_PART_MAIN` A background like rectangle*/
+- `LV_PART_MAIN` A background like rectangle*/``
 - `LV_PART_SCROLLBAR`  The scrollbar(s)
 - `LV_PART_INDICATOR` Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
 - `LV_PART_KNOB` Like a handle to grab to adjust the value*/
@@ -194,7 +194,7 @@ The main purpose of parts to allow styling the "components" of the widgets.
 Therefore the parts are described in more detail in the [Style overview](/overview/style) section.
 
 ## States
-The object can be in a combinations of the following states:
+The object can be in a combination of the following states:
 - `LV_STATE_DEFAULT` Normal, released state
 - `LV_STATE_CHECKED` Toggled or checked state
 - `LV_STATE_FOCUSED` Focused via keypad or encoder or clicked via touchpad/mouse 

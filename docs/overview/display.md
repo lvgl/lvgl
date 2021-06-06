@@ -22,16 +22,16 @@ Why would you want multi-display support? Here are some examples:
 - Have two large TFT displays: one for a customer and one for the shop assistant.
 
 ### Using only one display
-Using more displays can be useful, but in most cases, it's not required. Therefore, the whole concept of multi-display is completely hidden if you register only one display.
-By default, the lastly created (the only one) display is used as default.
+Using more displays can be useful but in most cases it's not required. Therefore, the whole concept of multi-display is completely hidden if you register only one display.
+By default, the lastly created (and only) display is used.
 
-`lv_scr_act()`, `lv_scr_load(scr)`, `lv_layer_top()`, `lv_layer_sys()`, `LV_HOR_RES` and `LV_VER_RES` are always applied on the lastly created (default) screen.
+`lv_scr_act()`, `lv_scr_load(scr)`, `lv_layer_top()`, `lv_layer_sys()`, `LV_HOR_RES` and `LV_VER_RES` are always applied on the most recently created (default) screen.
 If you pass `NULL` as `disp` parameter to display related function, usually the default display will be used.
 E.g. `lv_disp_trig_activity(NULL)` will trigger a user activity on the default screen. (See below in [Inactivity](#Inactivity)).
 
 ### Mirror display
 
-To mirror the image of the display to another display, you don't need to use the multi-display support. Just transfer the buffer received in `drv.flush_cb` to another display too.
+To mirror the image of the display to another display, you don't need to use the multi-display support. Just transfer the buffer received in `drv.flush_cb` to the other display too.
 
 ### Split image
 You can create a larger display from smaller ones. You can create it as below:
@@ -51,7 +51,7 @@ Be sure not to confuse displays and screens:
 Screens can be considered the highest level containers which have no parent.
 The screen's size is always equal to its display and size their position is (0;0). Therefore, the screens coordinates can't be changed, i.e. `lv_obj_set_pos()`, `lv_obj_set_size()` or similar functions can't be used on screens.
 
-A screen can be created from any object type but, the two most typical types are the [Base object](/widgets/obj) and the [Image](/widgets/core/img) (to create a wallpaper).
+A screen can be created from any object type but the two most typical types are the [Base object](/widgets/obj) and the [Image](/widgets/core/img) (to create a wallpaper).
 
 To create a screen, use `lv_obj_t * scr = lv_<type>_create(NULL, copy)`. `copy` can be an other screen to copy it.
 
@@ -64,10 +64,10 @@ Screens can be deleted with `lv_obj_del(scr)`, but ensure that you do not delete
 Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If it's not the case (opacity &lt; 100%) the display's background color or image will be visible. 
 See the [Display background](#display-background) section for more details. If the display's background opacity is also not `LV_OPA_COVER` LVGL has no solid background to draw. 
 
-This configuration (transparent screen ans display) could be used to create for example OSD menus where a video is played to lower layer, and menu is created on an upper layer.
+This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlayed on an upper layer.
  
-To handle transparent displays special (slower) color mixing algorithms needs to be used by LVGL so this feature needs to enabled with `LV_COLOR_SCREEN_TRANSP` n `lv_conf.h`. 
-As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` is also required. The Alpha channel of 32-bit colors will be 0 where there are no objects and will be 255 where there are solid objects.
+To handle transparent displays special (slower) color mixing algorithms need to be used by LVGL so this feature needs to enabled with `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`. 
+As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` is also required. The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
 
 In summary, to enable transparent screen and displays to create OSD menu-like UIs:
 - Enable `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`
@@ -89,8 +89,8 @@ Every display has background color, a background image and background opacity pr
 
 Background color is a simple color to fill the display. It can be adjusted with `lv_disp_set_bg_color(disp, color)`;
 
-Background image is path to file or pointer to an `lv_img_dsc_t` variable (converted image) to be used as wallpaper. It can be set with `lv_disp_set_bg_color(disp, &my_img)`;
-If the background image is set (not `NULL`) the background won't filled with `bg_color`.
+Background image is a path to a file or a pointer to an `lv_img_dsc_t` variable (converted image) to be used as wallpaper. It can be set with `lv_disp_set_bg_color(disp, &my_img)`;
+If the background image is set (not `NULL`) the background won't be filled with `bg_color`.
 
 The opacity of the background color or image can be adjusted with `lv_disp_set_bg_opa(disp, opa)`. 
 
@@ -153,9 +153,9 @@ For example to create light red color: `my_color = COLOR_MAKE(0xFF,0x80,0x80)`.
 
 Colors can be created from HEX codes too: `my_color = lv_color_hex(0x288ACF)` or `my_color = lv_folro_hex3(0x28C)`.
 
-Mixing two colors is possible with `mixed_color = lv_color_mix(color1, color2, ratio)`. Ration can be 0..255. 0 results fully color2, 255 result fully color1.
+Mixing two colors is possible with `mixed_color = lv_color_mix(color1, color2, ratio)`. Ration can be 0..255. 0 is entirely color2, 255 is entirely color1.
 
-Colors can be created with from HSV space too using `lv_color_hsv_to_rgb(hue, saturation, value)` . `hue` should be in 0..360 range, `saturation` and `value` in 0..100 range.
+Colors can be created from HSV space too using `lv_color_hsv_to_rgb(hue, saturation, value)` . `hue` should be in 0..360 range, `saturation` and `value` in 0..100 range.
 
 ### Opacity
 To describe opacity the `lv_opa_t` type is created as a wrapper to `uint8_t`. Some defines are also introduced:

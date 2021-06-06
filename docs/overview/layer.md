@@ -7,7 +7,7 @@
 
 ## Order of creation
 
-By default, LVGL draws old objects on the background and new objects on the foreground.
+By default, LVGL draws new objects on top of old objects.
 
 For example, assume we added a button to a parent object named button1 and then another button named button2. Then button1 (with its child object(s)) will be in the background and can be covered by button2 and its children.
 
@@ -57,4 +57,4 @@ The `layer_top` can be used by the user to create some content visible everywher
 lv_obj_set_click(lv_layer_top(), true);
 ```
 
-The `layer_sys` is also used for a similar purpose on LVGL. For example, it places the mouse cursor above all layers to be sure it's always visible.
+The `layer_sys` is also used for similar purposes on LVGL. For example, it places the mouse cursor above all layers to be sure it's always visible.

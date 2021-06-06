@@ -5,13 +5,13 @@
 # Simulator on PC
 
 
-You can try out the LVGL **using only your PC** (i.e. without any development boards). The LVGL will run on a simulator environment on the PC where anyone can write and experiment the real LVGL applications.
+You can try out LVGL **using only your PC** (i.e. without any development boards). LVGL will run on a simulator environment on the PC where anyone can write and experiment the real LVGL applications.
 
-Simulator on the PC have the following advantages:
-- Hardware independent - Write a code, run it on the PC and see the result on the PC monitor.
-- Cross-platform - Any Windows, Linux or OSX PC can run the PC simulator.  
+Using the simulator on the PC has the following advantages:
+- Hardware independent - Write code, run it on the PC and see the result on the PC monitor.
+- Cross-platform - Any Windows, Linux or MacOS system can run the PC simulator.  
 - Portability - the written code is portable, which means you can simply copy it when using an embedded hardware.
-- Easy Validation - The simulator is also very useful to report bugs because it means common platform for every user. So it's a good idea to reproduce a bug in simulator and use the code snippet in the [Forum](https://forum.lvgl.io).
+- Easy Validation - The simulator is also very useful to report bugs because it means common platform for every user. So it's a good idea to reproduce a bug in the simulator and use the code snippet in the [Forum](https://forum.lvgl.io).
 
 ## Select an IDE
 
@@ -23,7 +23,7 @@ The simulator is ported to various IDEs (Integrated Development Environments). C
 - [VSCode with SDL driver](https://github.com/lvgl/lv_sim_vscode_sdl): Recommended on Linux and Mac
 - [PlatformIO with SDL driver](https://github.com/lvgl/lv_platformio): Recommended on Linux and Mac
 
-You can use any IDEs for the development but, for simplicity, the configuration for Eclipse CDT is focused in this tutorial.
+You can use any IDE for the development but, for simplicity, the configuration for Eclipse CDT is what we'll focus on in this tutorial.
 The following section describes the set-up guide of Eclipse CDT in more details.
 
 **Note: If you are on Windows, it's usually better to use the Visual Studio or CodeBlocks projects instead. They work out of the box without requiring extra steps.**
@@ -91,8 +91,8 @@ On **Windows** you have to do two additional things:
 
 ### Compile and Run
 
-Now you are ready to run the LVGL Graphics Library on your PC. Click on the Hammer Icon on the top menu bar to Build the project. If you have done everything right, then you will not get any errors. Note that on some systems additional steps might be required to "see" SDL 2 from Eclipse but, in most of cases the configurations in the downloaded project is enough.
+Now you are ready to run LVGL on your PC. Click on the Hammer Icon on the top menu bar to Build the project. If you have done everything right, then you will not get any errors. Note that on some systems additional steps might be required to "see" SDL 2 from Eclipse but, in most of cases the configurations in the downloaded project is enough.
 
 After a success build, click on the Play button on the top menu bar to run the project. Now a window should appear in the middle of your screen.
 
-Now everything is ready to use the LVGL in the practice or begin the development on your PC.
+Now you are ready to use LVGL and begin development on your PC.

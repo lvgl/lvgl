@@ -4,7 +4,7 @@
 ```
 # File system
 
-LVGL has a 'File system' abstraction module that enables you to attach any type of file systems.
+LVGL has a 'File system' abstraction module that enables you to attach any type of file system.
 The file system is identified by a drive letter.
 For example, if the SD card is associated with the letter `'S'`, a file can be reached like `"S:path/to/file.txt"`.
 
