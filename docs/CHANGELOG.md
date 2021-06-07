@@ -55,7 +55,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 
 ### Driver changes
 - `lv_disp_drv_t`, `lv_indev_drv_t`, `lv_fs_drv_t` needs to be `static`
-- `...disp_buf...` is renamed to `draw_buf`. See an initialization example [here](https://github.com/lvgl/lv_sim_eclipse_sdl/blob/e164e3591c3e1e3bf3464d19e0dcdc67b2e6a791/main.c#L87-L97).
+- `...disp_buf...` is renamed to `draw_buf`. See an initialization example [here](https://github.com/lvgl/lv_sim_eclipse_sdl/blob/release/v8.0/main.c#L128-L141).
 - No partial update if two screen sized buffers are set
 - `disp_drv->full_refresh = 1` makes always the whole display redraw. 
 - `hor_res` and `ver_res` need to be set in `disp_drv`
