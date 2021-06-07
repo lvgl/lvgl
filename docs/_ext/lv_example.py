@@ -33,7 +33,7 @@ class LvExample(Directive):
         literal_list = nodes.literal_block(contents, contents)
         literal_list['language'] = language
         toggle.append(literal_list)
-        header.append(nodes.raw(text=f"<p>code (<a class='fa fa-github' href='https://github.com/lvgl/lvgl/blob/{env.config.repo_commit_hash}/examples/{example_path}.{language}'>view on GitHub</a>)</p>", format='html'))
+        header.append(nodes.raw(text=f"<p>code &nbsp; <a class='fa fa-github' href='https://github.com/lvgl/lvgl/blob/{env.config.repo_commit_hash}/examples/{example_path}.{language}'>&nbsp; view on GitHub</a></p>", format='html'))
         if env.app.tags.has('html'):
             node_list.append(paragraph_node)
         node_list.append(toggle)
