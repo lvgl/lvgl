@@ -264,6 +264,13 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e);
 uint32_t lv_event_get_key(lv_event_t * e);
 
 /**
+ * Get the animation descriptor of a scrolling. Can be used in `LV_EVENT_SCROLL_BEGIN`
+ * @param e     pointer to an event
+ * @return      the animation that will scroll the object. (can be modified as required)
+ */
+lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e);
+
+/**
  * Set the new extra draw size. Can be used in `LV_EVENT_REFR_EXT_DRAW_SIZE`
  * @param e     pointer to an event
  * @param size  The new extra draw size

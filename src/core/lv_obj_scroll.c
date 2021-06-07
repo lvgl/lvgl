@@ -256,9 +256,6 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
 
         if(x) {
-            lv_res_t res;
-            res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
-            if(res != LV_RES_OK) return;
 
             uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 2) >> 2, 0, x);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
@@ -268,14 +265,14 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_anim_set_values(&a, -sx, -sx + x);
             lv_anim_set_exec_cb(&a, scroll_x_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+
+            lv_res_t res;
+            res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, &a);
+            if(res != LV_RES_OK) return;
             lv_anim_start(&a);
         }
 
         if(y) {
-            lv_res_t res;
-            res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
-            if(res != LV_RES_OK) return;
-
             uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 2) >> 2, 0, y);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
@@ -285,6 +282,11 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_anim_set_exec_cb(&a,  scroll_y_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
             lv_anim_start(&a);
+
+            lv_res_t res;
+            res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, &a);
+            if(res != LV_RES_OK) return;
+
         }
     } else {
         /*Remove pending animations*/
