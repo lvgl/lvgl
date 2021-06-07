@@ -13,10 +13,10 @@ In other words, if you have created a complex widget from other widgets, or modi
 - Add description in the [docs](https://github.com/lvgl/lvgl/tree/master/docs) 
 - Add [examples](https://github.com/lvgl/lvgl/tree/master/examples)
 - Update the [changelog](https://github.com/lvgl/lvgl/tree/master/docs/CHANGELOG.md)
-- Add yourself to the [Contributors](#contributors) section below.  :slight_smile:
+- Add yourself to the [Contributors](#contributors) section below.
 
 ## Ideas
-Here some ideas as inspiration feel free to contribute with ideas too :slight_smile:
+Here some ideas as inspiration feel free to contribute with ideas too. 
 - New [Calendar headers](https://github.com/lvgl/lvgl/tree/master/src/extra/widgets/calendar)
 - Color picker with RGB and or HSV bars
 - Ruler, horizontal or vertical with major and minor ticks and labels
