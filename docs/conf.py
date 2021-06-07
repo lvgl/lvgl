@@ -224,6 +224,9 @@ StandaloneHTMLBuilder.supported_image_types = [
 
 smartquotes = False
 
+_, repo_commit_hash = subprocess.getstatusoutput("git rev-parse HEAD")
+
+
 # Example configuration for intersphinx: refer to the Python standard library.
 
 def setup(app):
