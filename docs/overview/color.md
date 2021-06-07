@@ -40,6 +40,7 @@ lv_color_hsv_t c_hsv = lv_color_rgb_to_hsv(r, g, b);
 
 //From lv_color_t variable
 lv_color_hsv_t c_hsv = lv_color_to_hsv(color);
+```
 
 ### Palette
 LVGL includes [material design's palette](https://vuetifyjs.com/en/styles/colors/#material-colors). In this all color has a main, 4 darker and 5 lighter variants.
@@ -87,6 +88,9 @@ lv_color_t c = lv_color_change_lightness(lv_color_t c, lv_opa_t lvl);
 Mix 2 color with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
 lv_color_t c = lv_color_mix(c1, c2, ratio);
 ```
+
+### Built-in colors
+`lv_color_white()` and `lv_color_black` are return a color with `0xFFFFFF` and `0x000000`.
 
 ## Opacity
 To describe opacity the `lv_opa_t` type is created as a wrapper to `uint8_t`. Some defines are also introduced:
