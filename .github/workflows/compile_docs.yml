@@ -62,7 +62,7 @@ jobs:
         run: |
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
-      - name: Deploy
+      - name: Deploy to subfolder
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -71,5 +71,17 @@ jobs:
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: out_html  # The folder the action should deploy.
           TARGET_FOLDER: ${{ steps.version.outputs.VERSION_NAME }}
+          PRESERVE: true
+          SINGLE_COMMIT: true
+      - name: Deploy to master
+        if: github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACCESS_TOKEN: ${{ secrets.LVGL_BOT_TOKEN }}
+          REPOSITORY_NAME: lvgl/docs
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: out_html  # The folder the action should deploy.
+          TARGET_FOLDER: master
           PRESERVE: true
           SINGLE_COMMIT: true
