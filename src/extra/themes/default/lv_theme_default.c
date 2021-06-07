@@ -772,7 +772,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->circle, 0);
         lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->circle, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &styles->disabled, LV_PART_INDICATOR | LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->knob, LV_PART_KNOB);
