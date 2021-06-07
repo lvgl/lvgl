@@ -176,7 +176,7 @@ The objects can be in a combination of the following states:
 
 For example, if you press an object it will automatically goes to `LV_STATE_FOCUSED` and `LV_STATE_PRESSED` state and when you release it, the  `LV_STATE_PRESSED` state will be removed.
  
-To check if an object is in a geven state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object "has" the given state at that moment.
+To check if an object is in a given state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object "has" the given state at that moment.
 
 To manually add remove the states use
 ```c
