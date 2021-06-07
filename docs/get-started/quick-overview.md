@@ -170,7 +170,7 @@ The objects can be in a combination of the following states:
 - `LV_STATE_FOCUS_KEY`  Focused via keypad or encoder but not via touchpad/mouse 
 - `LV_STATE_EDITED` Edit by an encoder
 - `LV_STATE_HOVERED` Hovered by mouse (not supported now)
-- `LV_STATE_PRESSED` eing pressed
+- `LV_STATE_PRESSED` Being pressed
 - `LV_STATE_SCROLLED` Being scrolled
 - `LV_STATE_DISABLED` Disabled 
 
