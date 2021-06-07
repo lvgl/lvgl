@@ -1,5 +1,14 @@
 # Changelog
 
+## v8.0.1
+- fix(pxp) change LV_COLOR_TRANSP to LV_COLOR_CHROMA_KEY to v8 compatibility <a href="https://github.com/lvgl/lvgl/commit/81f3068d">81f3068d</a> 
+- fix(draw) with additive blending with 32 bit color depth <a href="https://github.com/lvgl/lvgl/commit/786db2af">786db2af</a> 
+- fix memory leak of spangroup (#2285) <a href="https://github.com/lvgl/lvgl/commit/33e0926a">33e0926a</a> 
+- fix make lv_img_cache.h public becasue cache invalidation is public <a href="https://github.com/lvgl/lvgl/commit/38ebcd81">38ebcd81</a> 
+- fix(btnmamatrix) fix focus event handling <a href="https://github.com/lvgl/lvgl/commit/3b58ef14">3b58ef14</a> 
+- fix(label) calculating the clip area <a href="https://github.com/lvgl/lvgl/commit/57e211cc">57e211cc</a> 
+- docs(group) add docs about the default group <a href="https://github.com/lvgl/lvgl/commit/29bfe604">29bfe604</a>
+
 ## v8.0.0 (01.06.2021)
 
 v8.0 brings many new features like simplified and more powerful scrolling, new layouts inspired by CSS Flexbox and Grid, simplified and improved widgets, more powerful events, hookable drawing, and more.
@@ -76,6 +85,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
   - Update the events
   - Use the new layouts instead of `lv_cont` features
   - Use `lv_obj` instead of `lv_page`
+  - See the changes in [Colors](https://docs.lvgl.io/8.0/overview/color.html)
   - The other parts are mainly minor renames and refactoring. See the functions' documentation for descriptions. 
 
 ## v7.11.0 (16.03.2021)
