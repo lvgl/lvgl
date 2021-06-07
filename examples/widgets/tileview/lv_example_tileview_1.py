@@ -1,62 +1,40 @@
-valid_pos = [{"x":0, "y": 0}, {"x": 0, "y": 1}, {"x": 1,"y": 1}]
-
-# resolution of the screen
-HOR_RES = lv.disp_get_hor_res(lv.disp_get_default())
-VER_RES = lv.disp_get_ver_res(lv.disp_get_default())
-
-tileview = lv.tileview(lv.scr_act())
-tileview.set_valid_positions(valid_pos, len(valid_pos))
-tileview.set_edge_flash(True)
-
-tile1 = lv.obj(tileview)
-tile1.set_size(HOR_RES, VER_RES)
-tile1.set_style(lv.style_pretty)
-tileview.add_element(tile1)
+#
+# Create a 2x2 tile view and allow scrolling only in an "L" shape.
+# Demonstrate scroll chaining with a long list that
+# scrolls the tile view when it cant't be scrolled further.
+#
+tv = lv.tileview(lv.scr_act())
 
 # Tile1: just a label
+tile1 = tv.add_tile(0, 0, lv.DIR.BOTTOM)
 label = lv.label(tile1)
-label.set_text("Tile 1")
-label.align(None, lv.ALIGN.CENTER, 0, 0)
+label.set_text("Scroll down")
+label.center()
 
-# Tile2: a list
-lst = lv.list(tileview)
-lst.set_size(HOR_RES, VER_RES)
-lst.set_pos(0, VER_RES)
-lst.set_scroll_propagation(True)
-lst.set_sb_mode(lv.SB_MODE.OFF)
-tileview.add_element(lst)
+# Tile2: a button
+tile2 = tv.add_tile(0, 1, lv.DIR.TOP | lv.DIR.RIGHT)
 
-list_btn = lst.add_btn(None, "One")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Two")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Three")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Four")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Five")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Six")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Seven")
-tileview.add_element(list_btn)
-
-list_btn = lst.add_btn(None, "Eight")
-tileview.add_element(list_btn)
-
-# Tile3: a button
-tile3 = lv.obj(tileview, tile1)
-tile3.set_pos(HOR_RES, VER_RES)
-tileview.add_element(tile3)
-
-btn = lv.btn(tile3)
-btn.align(None, lv.ALIGN.CENTER, 0, 0)
+btn = lv.btn(tile2)
 
 label = lv.label(btn)
-label.set_text("Button")
+label.set_text("Scroll up or right")
+
+btn.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
+btn.center()
+
+# Tile3: a list
+tile3 =  tv.add_tile(1, 1, lv.DIR.LEFT)
+list = lv.list(tile3)
+list.set_size(lv.pct(100), lv.pct(100))
+
+list.add_btn(None, "One")
+list.add_btn(None, "Two")
+list.add_btn(None, "Three")
+list.add_btn(None, "Four")
+list.add_btn(None, "Five")
+list.add_btn(None, "Six")
+list.add_btn(None, "Seven")
+list.add_btn(None, "Eight")
+list.add_btn(None, "Nine")
+list.add_btn(None, "Ten")
+

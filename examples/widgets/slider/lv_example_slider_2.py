@@ -1,23 +1,48 @@
-def slider_event_cb(slider, event):
-    if event == lv.EVENT.VALUE_CHANGED:
-        slider_label.set_text("%u" % slider.get_value())
+#
+# Show how to style a slider.
+#
+# Create a transition
+props = [lv.STYLE.BG_COLOR, 0]
+transition_dsc = lv.style_transition_dsc_t()
+transition_dsc.init(props, lv.anim_t.path_linear, 300, 0, None)
 
-# Create a slider in the center of the display
+style_main = lv.style_t()
+style_indicator =  lv.style_t()
+style_knob = lv.style_t()
+style_pressed_color = lv.style_t()
+style_main.init()
+style_main.set_bg_opa(lv.OPA.COVER)
+style_main.set_bg_color(lv.color_hex3(0xbbb))
+style_main.set_radius(lv.RADIUS.CIRCLE)
+style_main.set_pad_ver(-2)                 # Makes the indicator larger
+
+style_indicator.init()
+style_indicator.set_bg_opa(lv.OPA.COVER)
+style_indicator.set_bg_color(lv.palette_main(lv.PALETTE.CYAN))
+style_indicator.set_radius(lv.RADIUS.CIRCLE)
+style_indicator.set_transition(transition_dsc)
+
+style_knob.init()
+style_knob.set_bg_opa(lv.OPA.COVER)
+style_knob.set_bg_color(lv.palette_main(lv.PALETTE.CYAN))
+style_knob.set_border_color(lv.palette_darken(lv.PALETTE.CYAN, 3))
+style_knob.set_border_width(2)
+style_knob.set_radius(lv.RADIUS.CIRCLE)
+style_knob.set_pad_all(6)                   # Makes the knob larger
+style_knob.set_transition(transition_dsc)
+
+style_pressed_color.init()
+style_pressed_color.set_bg_color(lv.palette_darken(lv.PALETTE.CYAN, 2))
+
+# Create a slider and add the style
 slider = lv.slider(lv.scr_act())
-slider.set_width(200)
-slider.align(None, lv.ALIGN.CENTER, 0, 0)
-slider.set_event_cb(slider_event_cb)
-slider.set_range(0, 100)
+slider.remove_style_all()                   # Remove the styles coming from the theme
 
-# Create a label below the slider
-slider_label = lv.label(lv.scr_act())
-slider_label.set_text("0")
-slider_label.set_auto_realign(True)
-slider_label.align(slider, lv.ALIGN.OUT_BOTTOM_MID, 0, 10)
+slider.add_style(style_main, lv.PART.MAIN)
+slider.add_style(style_indicator, lv.PART.INDICATOR)
+slider.add_style(style_pressed_color, lv.PART.INDICATOR | lv.STATE.PRESSED)
+slider.add_style(style_knob, lv.PART.KNOB)
+slider.add_style(style_pressed_color, lv.PART.KNOB | lv.STATE.PRESSED)
 
-# Create an informative label
-info = lv.label(lv.scr_act())
-info.set_text("""Welcome to the slider+label demo!
-Move the slider and see that the label
-updates to match it.""")
-info.align(None, lv.ALIGN.IN_TOP_LEFT, 10, 10)
+slider.center()
+

@@ -1,23 +1,34 @@
-# Create a drop UP list by applying auto realign
+#
+# Create a drop down, up, left and right menus
+#
 
-# Create a drop down list
-ddlist = lv.ddlist(lv.scr_act())
-ddlist.set_options("\n".join([
-                    "Apple",
-                    "Banana",
-                    "Orange",
-                    "Melon",
-                    "Grape",
-                    "Raspberry"]))
+opts = "\n".join([
+    "Apple\n"
+    "Banana\n"
+    "Orange\n"
+    "Melon\n"
+    "Grape\n"
+    "Raspberry"])
+
+dd = lv.dropdown(lv.scr_act())
+dd.set_options_static(opts)
+dd.align(lv.ALIGN.TOP_MID, 0, 10)
+dd = lv.dropdown(lv.scr_act())
+dd.set_options_static(opts)
+dd.set_dir(lv.DIR.BOTTOM)
+dd.set_symbol(lv.SYMBOL.UP)
+dd.align(lv.ALIGN.BOTTOM_MID, 0, -10)
+
+dd = lv.dropdown(lv.scr_act())
+dd.set_options_static(opts)
+dd.set_dir(lv.DIR.RIGHT)
+dd.set_symbol(lv.SYMBOL.RIGHT)
+dd.align(lv.ALIGN.LEFT_MID, 10, 0)
+
+dd = lv.dropdown(lv.scr_act())
+dd.set_options_static(opts)
+dd.set_dir(lv.DIR.LEFT)
+dd.set_symbol(lv.SYMBOL.LEFT)
+dd.align(lv.ALIGN.RIGHT_MID, -10, 0)
 
 
-ddlist.set_fix_width(150)
-ddlist.set_fix_height(150)
-ddlist.set_draw_arrow(True)
-
-# Enable auto-realign when the size changes.
-# It will keep the bottom of the ddlist fixed
-ddlist.set_auto_realign(True)
-
-# It will be called automatically when the size changes
-ddlist.align(None, lv.ALIGN.IN_BOTTOM_MID, 0, -20)

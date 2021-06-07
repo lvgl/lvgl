@@ -1,21 +1,32 @@
-def event_handler(obj, event):
-    if event == lv.EVENT.CLICKED:
-        print("Clicked")
+def event_handler(evt):
+    code = evt.get_code()
 
+    if code == lv.EVENT.CLICKED:
+            print("Clicked event seen")
+    elif code == lv.EVENT.VALUE_CHANGED:
+        print("Value changed seen")
+        
+# create a simple button
 btn1 = lv.btn(lv.scr_act())
-btn1.set_event_cb(event_handler)
-btn1.align(None, lv.ALIGN.CENTER, 0, -40)
 
-label = lv.label(btn1)
+# attach the callback
+btn1.add_event_cb(event_handler,lv.EVENT.ALL, None)
+
+btn1.align(lv.ALIGN.CENTER,0,-40)
+label=lv.label(btn1)
 label.set_text("Button")
 
+# create a toggle button
 btn2 = lv.btn(lv.scr_act())
-# callback can be lambda:
-btn2.set_event_cb(lambda obj, event: print("Toggled") if event == lv.EVENT.VALUE_CHANGED else None)
-btn2.align(None, lv.ALIGN.CENTER, 0, 40)
-btn2.set_toggle(True)
-btn2.toggle()
-btn2.set_fit2(lv.FIT.NONE, lv.FIT.TIGHT)
 
-label = lv.label(btn2)
-label.set_text("Toggled")
+# attach the callback
+#btn2.add_event_cb(event_handler,lv.EVENT.VALUE_CHANGED,None)
+btn2.add_event_cb(event_handler,lv.EVENT.ALL, None)
+
+btn2.align(lv.ALIGN.CENTER,0,40)
+btn2.add_flag(lv.obj.FLAG.CHECKABLE)
+btn2.set_height(lv.SIZE.CONTENT)
+
+label=lv.label(btn2)
+label.set_text("Toggle")
+label.center()

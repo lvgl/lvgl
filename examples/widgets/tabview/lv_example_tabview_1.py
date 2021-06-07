@@ -1,5 +1,5 @@
 # Create a Tab view object
-tabview = lv.tabview(lv.scr_act())
+tabview = lv.tabview(lv.scr_act(), lv.DIR.TOP, 50)
 
 # Add 3 tabs (the tabs are page (lv_page) and can be scrolled
 tab1 = tabview.add_tab("Tab 1")
@@ -12,14 +12,24 @@ label.set_text("""This the first tab
 
 If the content
 of a tab
-become too long
-the it 
+becomes too
+longer
+than the
+container
+then it
 automatically
-become
-scrollable.""")
+becomes
+scrollable.
+
+
+
+Can you see it?""")
 
 label = lv.label(tab2)
 label.set_text("Second tab")
 
 label = lv.label(tab3)
-label.set_text("Third tab")
+label.set_text("Third tab");
+
+label.scroll_to_view_recursive(lv.ANIM.ON)
+

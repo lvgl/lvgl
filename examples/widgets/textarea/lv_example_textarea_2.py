@@ -1,51 +1,49 @@
-HOR_RES = lv.disp_get_hor_res(lv.disp_get_default())
-
-def kb_event_cb(event_kb, event):
-    # Just call the regular event handler
-    event_kb.def_event_cb(event)
-
-def ta_event_cb(ta, event):
-    if event == lv.EVENT.INSERT:
-        # get inserted value
-        ptr = lv.C_Pointer()
-        ptr.ptr_val = lv.event_get_data()
-        if ptr.str_val == "\n":
-            print("Ready")
-    elif event == lv.EVENT.CLICKED:
+def ta_event_cb(e):
+    code = e.get_code()
+    ta = lv.textarea.__cast__(e.get_target())
+    if code == lv.EVENT.CLICKED or code == lv.EVENT.FOCUSED:
         # Focus on the clicked text area
-        kb.set_ta(ta)
+        if kb != None:
+            kb.set_textarea(ta)
+
+    elif code == lv.EVENT.READY:
+        print("Ready, current text: " + ta.get_text())
+
 
 # Create the password box
-pwd_ta = lv.ta(lv.scr_act())
-pwd_ta.set_text("");
-pwd_ta.set_pwd_mode(True)
+LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
+LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
+
+pwd_ta = lv.textarea(lv.scr_act())
+pwd_ta.set_text("")
+pwd_ta.set_password_mode(True)
 pwd_ta.set_one_line(True)
-pwd_ta.set_width(HOR_RES // 2 - 20)
+pwd_ta.set_width(LV_HOR_RES // 2 - 20)
 pwd_ta.set_pos(5, 20)
-pwd_ta.set_event_cb(ta_event_cb)
+pwd_ta.add_event_cb(ta_event_cb, lv.EVENT.ALL, None)
 
 # Create a label and position it above the text box
 pwd_label = lv.label(lv.scr_act())
 pwd_label.set_text("Password:")
-pwd_label.align(pwd_ta, lv.ALIGN.OUT_TOP_LEFT, 0, 0)
+pwd_label.align_to(pwd_ta, lv.ALIGN.OUT_TOP_LEFT, 0, 0)
 
 # Create the one-line mode text area
-oneline_ta = lv.ta(lv.scr_act(), pwd_ta)
-oneline_ta.set_pwd_mode(False)
-oneline_ta.set_cursor_type(lv.CURSOR.LINE | lv.CURSOR.HIDDEN)
-oneline_ta.align(None, lv.ALIGN.IN_TOP_RIGHT, -5, 20)
-oneline_ta.set_event_cb(ta_event_cb)
+text_ta = lv.textarea(lv.scr_act())
+text_ta.set_width(LV_HOR_RES // 2 - 20)
+text_ta.set_one_line(True)
+text_ta.add_event_cb(ta_event_cb, lv.EVENT.ALL, None)
+text_ta.set_password_mode(False)
+
+text_ta.align(lv.ALIGN.TOP_RIGHT, -5, 20)
 
 # Create a label and position it above the text box
 oneline_label = lv.label(lv.scr_act())
 oneline_label.set_text("Text:")
-oneline_label.align(oneline_ta, lv.ALIGN.OUT_TOP_LEFT, 0, 0)
+oneline_label.align_to(text_ta, lv.ALIGN.OUT_TOP_LEFT, 0, 0)
 
-# Create a keyboard and make it fill the width of the above text areas
-kb = lv.kb(lv.scr_act())
-kb.set_pos(5, 90)
-kb.set_event_cb(kb_event_cb) # Setting a custom event handler stops the keyboard from closing automatically
-kb.set_size(HOR_RES - 10, 140)
+# Create a keyboard
+kb = lv.keyboard(lv.scr_act())
+kb.set_size(LV_HOR_RES, LV_VER_RES // 2)
 
-kb.set_ta(pwd_ta) # Focus it on one of the text areas to start
-kb.set_cursor_manage(True) # Automatically show/hide cursors on text areas
+kb.set_textarea(pwd_ta)  # Focus it on one of the text areas to start
+
