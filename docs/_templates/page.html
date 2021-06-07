@@ -29,7 +29,9 @@ function add_version_selector()
             p.innerHTML = `
             <select name="versions" id="versions" onchange="ver_sel()" style="border-radius:5px; margin-bottom:15px">
             ${versions.map(version => {
-                const versionName = "v" + ((version.indexOf(".") != -1) ? version : (version + " (latest minor)"));
+                const versionName = "";  
+                if(version == "master") versionName = "master (latest)";
+                else versionName = "v" + ((version.indexOf(".") != -1) ? version : (version + " (latest minor)"));
                 return `<option value="${version}">${versionName}</option>`;
             })}
             </select>` + p.innerHTML;
