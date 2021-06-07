@@ -97,94 +97,12 @@ The opacity of the background color or image can be adjusted with `lv_disp_set_b
 The `disp` parameter of these functions can be `NULL` to refer it to the default display.
 
 
-## Colors
-
-The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.
-
-The following variable types are defined by the color module:
-
-- **lv_color1_t** Store monochrome color. For compatibility, it also has R, G, B fields but they are always the same value (1 byte)
-- **lv_color8_t** A structure to store R (3 bit),G (3 bit),B (2 bit) components for 8-bit colors (1 byte)
-- **lv_color16_t** A structure to store R (5 bit),G (6 bit),B (5 bit) components for 16-bit colors (2 byte)
-- **lv_color32_t** A structure to store R (8 bit),G (8 bit), B (8 bit) components for 24-bit colors (4 byte)
-- **lv_color_t** Equal to `lv_color1/8/16/24_t` according to color depth settings
-- **lv_color_int_t** `uint8_t`, `uint16_t` or `uint32_t` according to color depth setting. Used to build color arrays from plain numbers.
-- **lv_opa_t** A simple `uint8_`t type to describe opacity.
-
-The `lv_color_t`, `lv_color1_t`, `lv_color8_t`, `lv_color16_t` and `lv_color32_t` types have got four fields:
-
-- **ch.red** red channel
-- **ch.green** green channel
-- **ch.blue** blue channel
-- **full** red + green + blue as one number
-
-You can set the current color depth in *lv_conf.h*, by setting the `LV_COLOR_DEPTH` define to 1 (monochrome), 8, 16 or 32.
-
-### Convert color
-You can convert a color from the current color depth to another. The converter functions return with a number, so you have to use the `full` field:
-
-```c
-lv_color_t c;
-c.red   = 0x38;
-c.green = 0x70;
-c.blue  = 0xCC;
-
-lv_color1_t c1;
-c1.full = lv_color_to1(c);	/*Return 1 for light colors, 0 for dark colors*/
-
-lv_color8_t c8;
-c8.full = lv_color_to8(c);	/*Give a 8 bit number with the converted color*/
-
-lv_color16_t c16;
-c16.full = lv_color_to16(c); /*Give a 16 bit number with the converted color*/
-
-lv_color32_t c24;
-c32.full = lv_color_to32(c);	/*Give a 32 bit number with the converted color*/
-```
-
-### Swap 16 colors
-You may set `LV_COLOR_16_SWAP` in *lv_conf.h* to swap the bytes of *RGB565* colors. It's useful if you send the 16-bit colors via a byte-oriented interface like SPI.
-
-As 16-bit numbers are stored in Little Endian format (lower byte on the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. A mismatch in the byte order will result in highly distorted colors.
-
-### Create and mix colors
-You can create colors with the current color depth using the LV_COLOR_MAKE macro. It takes 3 arguments (red, green, blue) as 8-bit numbers.
-For example to create light red color: `my_color = COLOR_MAKE(0xFF,0x80,0x80)`.
-
-Colors can be created from HEX codes too: `my_color = lv_color_hex(0x288ACF)` or `my_color = lv_folro_hex3(0x28C)`.
-
-Mixing two colors is possible with `mixed_color = lv_color_mix(color1, color2, ratio)`. Ration can be 0..255. 0 results fully color2, 255 result fully color1.
-
-Colors can be created with from HSV space too using `lv_color_hsv_to_rgb(hue, saturation, value)` . `hue` should be in 0..360 range, `saturation` and `value` in 0..100 range.
-
-### Opacity
-To describe opacity the `lv_opa_t` type is created as a wrapper to `uint8_t`. Some defines are also introduced:
-
-- **LV_OPA_TRANSP** Value: 0, means the opacity makes the color completely transparent
-- **LV_OPA_10** Value: 25, means the color covers only a little
-- **LV_OPA_20 ... OPA_80** come logically
-- **LV_OPA_90** Value: 229, means the color near completely covers
-- **LV_OPA_COVER** Value: 255, means the color completely covers
-
-You can also use the `LV_OPA_*` defines in `lv_color_mix()` as a *ratio*.
 
 ## API
-
-
-### Display
 
 ```eval_rst
 
 .. doxygenfile:: lv_disp.h
-  :project: lvgl
-
-```
-
-### Colors
-
-```eval_rst
-
-.. doxygenfile:: lv_color.h
   :project: lvgl
 
 ```
