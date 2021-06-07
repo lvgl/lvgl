@@ -86,7 +86,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     /*left or right dir*/
     else {
         new_map = lv_mem_alloc((tab_id * 2) * sizeof(const char *));
-        lv_memcpy_small(new_map, old_map, sizeof(const char *) * tab_id * 2);
+        lv_memcpy_small(new_map, old_map, sizeof(const char *) * (tab_id - 1) * 2);
         if(tabview->tab_cnt == 0) {
             new_map[0] = lv_mem_alloc(strlen(name) + 1);
             strcpy((char *)new_map[0], name);
@@ -128,7 +128,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
     lv_obj_t * cont = lv_tabview_get_content(obj);
     if(cont == NULL) return;
     lv_coord_t gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
-    lv_coord_t w = lv_obj_get_content_width(obj);
+    lv_coord_t w = lv_obj_get_content_width(cont);
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
         lv_obj_scroll_to_x(cont, id * (gap + w), anim_en);
     } else {
