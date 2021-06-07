@@ -90,7 +90,7 @@ lv_color_t c = lv_color_mix(c1, c2, ratio);
 ```
 
 ### Built-in colors
-`lv_color_white()` and `lv_color_black` are return a color with `0xFFFFFF` and `0x000000`.
+`lv_color_white()` and `lv_color_black()` are return a color with `0xFFFFFF` and `0x000000`.
 
 ## Opacity
 To describe opacity the `lv_opa_t` type is created as a wrapper to `uint8_t`. Some defines are also introduced:

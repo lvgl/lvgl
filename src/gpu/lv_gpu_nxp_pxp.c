@@ -119,7 +119,7 @@ lv_res_t lv_gpu_nxp_pxp_init(lv_nxp_pxp_cfg_t * cfg)
         return LV_RES_INV;
     }
 
-    colorKey = lv_color_to32(LV_COLOR_TRANSP);
+    colorKey = lv_color_to32(LV_COLOR_CHROMA_KEY);
 
     return LV_RES_OK;
 }
@@ -299,7 +299,7 @@ void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_colo
 /**
  * @brief Enable color keying for subsequent calls to lv_gpu_nxp_pxp_blit()
  *
- * Color key is defined by LV_COLOR_TRANSP symbol in lv_conf.h
+ * Color key is defined by  symbol in lv_conf.h
  */
 void lv_gpu_nxp_pxp_enable_color_key(void)
 {
