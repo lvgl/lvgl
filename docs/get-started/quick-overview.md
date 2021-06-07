@@ -170,13 +170,13 @@ The objects can be in a combination of the following states:
 - `LV_STATE_FOCUS_KEY`  Focused via keypad or encoder but not via touchpad/mouse 
 - `LV_STATE_EDITED` Edit by an encoder
 - `LV_STATE_HOVERED` Hovered by mouse (not supported now)
-- `LV_STATE_PRESSED` eing pressed
+- `LV_STATE_PRESSED` Being pressed
 - `LV_STATE_SCROLLED` Being scrolled
 - `LV_STATE_DISABLED` Disabled 
 
 For example, if you press an object it will automatically goes to `LV_STATE_FOCUSED` and `LV_STATE_PRESSED` state and when you release it, the  `LV_STATE_PRESSED` state will be removed.
  
-To check if an object is in a geven state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object "has" the given state at that moment.
+To check if an object is in a given state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object "has" the given state at that moment.
 
 To manually add remove the states use
 ```c
