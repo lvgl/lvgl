@@ -188,16 +188,19 @@ Just read the titles and if you are familiar with the topic don't hesitate to sh
 Participating in the discussions is one of the best ways to become part of the project and get to know like-minded people!
 
 ### Add features
-We collect the planned features in GitHub on the [Roadmap](/ROADMAP) page. If you are interested in any of them feel free to share your opinion and/or participate in the the implementation.
+If you have created a cool widget, or added useful feature to LVGL feel free to open a new PR for it. 
+We collect the optional features (a.k.a. plugins) in [lvgl/src/extra](https://github.com/lvgl/lvgl/tree/master/src/extra) folder so if you are interested in adding a new features please use this folder. 
+The [README](https://github.com/lvgl/lvgl/blob/master/src/extra/README.md) file describes the basics rules of contribution and and also lists some ideas.
+
+For further ideas take a look at the our [Roadmap](/ROADMAP) page. If you are interested in any of them feel free to share your opinion and/or participate in the the implementation.
 
 Other features which are (still) not on the road map are listed in the [Feature request](https://forum.lvgl.io/c/feature-request/9) category of the Forum. 
-If you have a feature idea for LVGL please use the Forum to share it! 
-Make sure to check that there isn't an existing post; if there is, you should comment on it to show that there is increased interest in an existing request.
 
 When adding a new features the followings also needs to be updated:
-- Add a line to [CHANGELOG.md](https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md).
-- Update the documentation. 
-- Add an example if applicable.  See this [guide](#write-examples).
+- Update [lv_conf_template.h](https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h)
+- Add description in the [docs](https://github.com/lvgl/lvgl/tree/master/docs) 
+- Add [examples](https://github.com/lvgl/lvgl/tree/master/examples)
+- Update the [changelog](https://github.com/lvgl/lvgl/tree/master/docs/CHANGELOG.md)
 
 ### Become a maintainer
 
