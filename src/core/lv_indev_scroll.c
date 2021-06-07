@@ -55,8 +55,7 @@ void _lv_indev_scroll_handler(_lv_indev_proc_t * proc)
 
         init_scroll_limits(proc);
 
-        lv_indev_t * indev_act = lv_indev_get_act();
-        lv_event_send(scroll_obj, LV_EVENT_SCROLL_BEGIN, indev_act);
+        lv_event_send(scroll_obj, LV_EVENT_SCROLL_BEGIN, NULL);
         if(proc->reset_query) return;
     }
 

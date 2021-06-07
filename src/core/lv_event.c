@@ -288,6 +288,16 @@ uint32_t lv_event_get_key(lv_event_t * e)
     }
 }
 
+lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_SCROLL_BEGIN) {
+        return lv_event_get_param(e);
+    } else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
 void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size)
 {
     if(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
