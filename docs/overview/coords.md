@@ -148,7 +148,7 @@ For example to align a label above a button and center the label is horizontally
 lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 ```
 
-Not that - unlike with `lv_obj_align()` - `lv_obj_align_to()` can not realign the object if its coordinates or the reference object's coordinates changes. 
+Note that - unlike with `lv_obj_align()` - `lv_obj_align_to()` can not realign the object if its coordinates or the reference object's coordinates changes. 
 
 ## Size
 
