@@ -1,14 +1,17 @@
-from docutils.parsers.rst import Directive
+import os
+
 from docutils import nodes
+from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives.images import Image
 from sphinx.directives.code import LiteralInclude
-import os
+
 
 class LvExample(Directive):
     required_arguments = 3
     def run(self):
         example_path = self.arguments[0]
         example_name = os.path.split(example_path)[1]
+        language = self.arguments[2]
         node_list = []
 
         env = self.state.document.settings.env
@@ -28,9 +31,9 @@ class LvExample(Directive):
         except FileNotFoundError:
             contents = 'Error encountered while trying to open ' + example_file
         literal_list = nodes.literal_block(contents, contents)
-        literal_list['language'] = self.arguments[2]
+        literal_list['language'] = language
         toggle.append(literal_list)
-        header.append(nodes.paragraph(text="code"))
+        header.append(nodes.raw(text=f"<p>code &nbsp; <a class='fa fa-github' href='https://github.com/lvgl/lvgl/blob/{env.config.repo_commit_hash}/examples/{example_path}.{language}'>&nbsp; view on GitHub</a></p>", format='html'))
         if env.app.tags.has('html'):
             node_list.append(paragraph_node)
         node_list.append(toggle)
@@ -38,8 +41,7 @@ class LvExample(Directive):
 
 def setup(app):
     app.add_directive("lv_example", LvExample)
-    app.add_config_value("example_commit_hash", "", "env")
-    app.add_config_value("built_example_commit_hash", "", "env")
+    app.add_config_value("repo_commit_hash", "", "env")
 
     return {
         'version': '0.1',
