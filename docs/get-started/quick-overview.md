@@ -26,10 +26,10 @@ If you rather want to try LVGL on your own project follow these steps:
 - Call `lv_tick_inc(x)` every `x` milliseconds in a Timer or Task (`x` should be between 1 and 10). It is required for the internal timing of LVGL. 
 Alternatively, configure `LV_TICK_CUSTOM` (see `lv_conf.h`) so that LVGL can retrieve the current time directly.
 - Call `lv_init()`
-- Create a draw buffer: LVGL will render the graphics here first, and seed the rendered image to the display. 
+- Create a draw buffer: LVGL will render the graphics here first, and send the rendered image to the display. 
 The buffer size can be set freely but 1/10 screen size is a good starting point. 
 ```c
-static lv_disp_darw_buf_t draw_buf;
+static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
 lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_SER / 10);  /*Initialize the display buffer.*/
 ```
@@ -79,7 +79,7 @@ bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
  
 }
 ```
-- Call `lv_timer_handler()` periodically every few milliseconds in the main `while(1)` loop or in an Operation system task.
+- Call `lv_timer_handler()` periodically every few milliseconds in the main `while(1)` loop or in an operating system task.
 It will redraw the screen if required, handle input devices, animation etc.
 
 For a more detailed guide go to the [Porting](/porting/index) section.
@@ -90,7 +90,7 @@ For a more detailed guide go to the [Porting](/porting/index) section.
 
 The graphical elements like Buttons, Labels, Sliders, Charts etc. are called objects or widgets. Go to [Widgets](/widgets/index) to see the full list of available widgets.
 
-Every object has a parent object where it is create. For example if a label is created on a button, the button is the parent of label. 
+Every object has a parent object where it is created. For example if a label is created on a button, the button is the parent of label. 
 
 The child object moves with the parent and if the parent is deleted the children will be deleted too. 
 
@@ -107,14 +107,14 @@ For example:
 lv_obj_t * slider1 = lv_slider_create(lv_scr_act());
 ```
 
-To set some basic attribute `lv_obj_set_<paramters_name>(obj, <value>)` function can be used. For example:
+To set some basic attributes `lv_obj_set_<parameter_name>(obj, <value>)` functions can be used. For example:
 ```c
 lv_obj_set_x(btn1, 30);
 lv_obj_set_y(btn1, 10);
 lv_obj_set_size(btn1, 200, 50);
 ```
 
-The widgets have type specific parameters too which can be set by `lv_<widget_type>_set_<paramters_name>(obj, <value>)` functions. For example:
+The widgets have type specific parameters too which can be set by `lv_<widget_type>_set_<parameter_name>(obj, <value>)` functions. For example:
 ```c
 lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 ```
