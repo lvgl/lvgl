@@ -83,6 +83,15 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     uint32_t handler_start = lv_tick_get();
 
+    if(handler_start == 0) {
+        static uint32_t run_cnt = 0;
+        run_cnt ++;
+        if(run_cnt > 100) {
+            run_cnt = 0;
+            LV_LOG_WARN("It seems lv_tick_inc() is not called.");
+        }
+    }
+
     /*Run all timer from the list*/
     lv_timer_t * next;
     do {
