@@ -206,15 +206,13 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
     if(g->frozen != 0) return;
 
-    if(g->obj_focus != NULL && obj == *g->obj_focus) return;
-
     /*On defocus edit mode must be leaved*/
     lv_group_set_editing(g, false);
 
     lv_obj_t ** i;
     _LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
-            if(g->obj_focus != NULL) {
+            if(g->obj_focus != NULL && obj != *g->obj_focus) {  /*Do not defocus if the same object needs to be focused again*/
                 lv_res_t res = lv_event_send(*g->obj_focus, LV_EVENT_DEFOCUSED, get_indev(g));
                 if(res != LV_RES_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
