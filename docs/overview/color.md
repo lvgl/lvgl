@@ -6,11 +6,9 @@
 
 The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.
 
-`lv_color_t` is used to store a color. Its fileds are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
+`lv_color_t` is used to store a color, its fileds are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
 
-You may set `LV_COLOR_16_SWAP` in `lv_conf.h` to swap the bytes of *RGB565* colors. It's useful if you send the 16-bit colors via a byte-oriented interface like SPI.
-As 16-bit numbers are stored in Little Endian format (lower byte on the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. 
-A mismatch in the byte order will result in highly distorted colors.
+You may set `LV_COLOR_16_SWAP` in `lv_conf.h` to swap the bytes of *RGB565* colors. You may need this to send the 16-bit colors via a byte-oriented interface like SPI. As 16-bit numbers are stored in Little Endian format (lower byte on the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. A mismatch in the byte order will result in highly distorted colors.
 
 ## Creating colors
 
@@ -43,9 +41,9 @@ lv_color_hsv_t c_hsv = lv_color_to_hsv(color);
 ```
 
 ### Palette
-LVGL includes [material design's palette](https://vuetifyjs.com/en/styles/colors/#material-colors). In this all color has a main, 4 darker and 5 lighter variants.
+LVGL includes [material design's palette](https://vuetifyjs.com/en/styles/colors/#material-colors). In this all color have a main as well as four darker and five lighter variants.
 
-The name of the palettes are the follwings:
+The names of the colors are as follows:
 - `LV_PALETTE_RED`
 - `LV_PALETTE_PINK`
 - `LV_PALETTE_PURPLE`
@@ -75,22 +73,22 @@ For the darker variants of a palette color use `lv_color_t c = lv_palette_darken
 ### Modify and mix colors
 The following functions can modify a color:
 ```c
-//Lighten a color. 0: no change, 255: white
+// Lighten a color. 0: no change, 255: white
 lv_color_t c = lv_color_lighten(c, lvl);
 
-//Darken a color. 0: no change, 255: black
+// Darken a color. 0: no change, 255: black
 lv_color_t c = lv_color_darken(lv_color_t c, lv_opa_t lvl);
 
-//Lighten or darken a color. 0: black, 128: no change 255: black
+// Lighten or darken a color. 0: black, 128: no change 255: black
 lv_color_t c = lv_color_change_lightness(lv_color_t c, lv_opa_t lvl);
 
 
-Mix 2 color with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
+// Mix 2 colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
 lv_color_t c = lv_color_mix(c1, c2, ratio);
 ```
 
 ### Built-in colors
-`lv_color_white()` and `lv_color_black()` are return a color with `0xFFFFFF` and `0x000000`.
+`lv_color_white()` and `lv_color_black()` return `0xFFFFFF` and `0x000000` respectively.
 
 ## Opacity
 To describe opacity the `lv_opa_t` type is created as a wrapper to `uint8_t`. Some defines are also introduced:
@@ -107,15 +105,15 @@ You can also use the `LV_OPA_*` defines in `lv_color_mix()` as a *ratio*.
 ## Color types
 The following variable types are defined by the color module:
 
-- `lv_color1_t` Store monochrome color. For compatibility, it also has R, G, B fields but they are always the same value (1 byte)
+- `lv_color1_t` Monochrome color. Also has R, G, B fields for compatibility but they are always the same value (1 byte)
 - `lv_color8_t` A structure to store R (3 bit),G (3 bit),B (2 bit) components for 8-bit colors (1 byte)
 - `lv_color16_t` A structure to store R (5 bit),G (6 bit),B (5 bit) components for 16-bit colors (2 byte)
 - `lv_color32_t` A structure to store R (8 bit),G (8 bit), B (8 bit) components for 24-bit colors (4 byte)
-- `lv_color_t` Equal to `lv_color1/8/16/24_t` according to color depth settings
-- `lv_color_int_t` `uint8_t`, `uint16_t` or `uint32_t` according to color depth setting. Used to build color arrays from plain numbers.
-- `lv_opa_t` A simple `uint8_`t type to describe opacity.
+- `lv_color_t` Equal to `lv_color1/8/16/24_t` depending on current color depth setting
+- `lv_color_int_t` `uint8_t`, `uint16_t` or `uint32_t` depending on color depth setting. Used to build color arrays from plain numbers.
+- `lv_opa_t` A simple `uint8_t` type to describe opacity.
 
-The `lv_color_t`, `lv_color1_t`, `lv_color8_t`, `lv_color16_t` and `lv_color32_t` types have got four fields:
+The `lv_color_t`, `lv_color1_t`, `lv_color8_t`, `lv_color16_t` and `lv_color32_t` types have four fields:
 
 - `ch.red` red channel
 - `ch.green` green channel
