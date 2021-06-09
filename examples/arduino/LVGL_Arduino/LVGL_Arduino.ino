@@ -41,7 +41,7 @@ void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *colo
 }
 
 /*Read the touchpad*/
-bool my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
+void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 {
    uint16_t touchX, touchY;
 
@@ -65,8 +65,6 @@ bool my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
       Serial.print( "Data y " );
       Serial.println( touchY );
    }
-
-   return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 
 void setup()
