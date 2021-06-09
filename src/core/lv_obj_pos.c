@@ -83,7 +83,6 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 
 bool lv_obj_refr_size(lv_obj_t * obj)
 {
-
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*If the width or height is set by a layout do not modify them*/
@@ -187,34 +186,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
 
-    /*Be sure the bottom side is not remains scrolled in*/
-    /*With snapping the content can't be scrolled in*/
-    if(lv_obj_get_scroll_snap_y(obj) == LV_SCROLL_SNAP_NONE) {
-        lv_coord_t st = lv_obj_get_scroll_top(obj);
-        lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
-        if(sb < 0 && st > 0) {
-            sb = LV_MIN(st, -sb);
-            lv_obj_scroll_by(obj, 0, sb, LV_ANIM_OFF);
-        }
-    }
-
-    if(lv_obj_get_scroll_snap_x(obj) == LV_SCROLL_SNAP_NONE) {
-        lv_coord_t sl = lv_obj_get_scroll_left(obj);
-        lv_coord_t sr = lv_obj_get_scroll_right(obj);
-        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
-            /*Be sure the left side is not remains scrolled in*/
-            if(sr < 0 && sl > 0) {
-                sr = LV_MIN(sl, -sr);
-                lv_obj_scroll_by(obj, sr, 0, LV_ANIM_OFF);
-            }
-        } else {
-            /*Be sure the right side is not remains scrolled in*/
-            if(sl < 0 && sr > 0) {
-                sr = LV_MIN(sr, -sl);
-                lv_obj_scroll_by(obj, sl, 0, LV_ANIM_OFF);
-            }
-        }
-    }
+    lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
 
     /*If the object was out of the parent invalidate the new scrollbar area too.
      *If it wasn't out of the parent but out now, also invalidate the srollbars*/
