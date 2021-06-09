@@ -94,7 +94,7 @@ enum {
     LV_OBJ_FLAG_SCROLLABLE      = (1 << 4),  /**< Make the object scrollable*/
     LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 5),  /**< Allow scrolling inside but with slower speed*/
     LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),  /**< Make the object scroll further when "thrown"*/
-    LV_OBJ_FLAG_SCROLL_ONE      = (1 << 7),   /**< Allow scrolling only one snapable children*/
+    LV_OBJ_FLAG_SCROLL_ONE      = (1 << 7),   /**< Allow scrolling only one snappable children*/
     LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8),  /**< Allow propagating the scroll to a parent*/
     LV_OBJ_FLAG_SCROLL_ON_FOCUS = (1 << 9),  /**< Automatically scroll object to make it visible when focused*/
     LV_OBJ_FLAG_SNAPPABLE        = (1 << 10), /**< If scroll snap is enabled on the parent it can snap to this object*/
@@ -148,8 +148,8 @@ typedef struct {
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
     lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/
-    lv_scroll_snap_t scroll_snap_x : 2;      /**< Where to align the snapable children horizontally*/
-    lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snapable children horizontally*/
+    lv_scroll_snap_t scroll_snap_x : 2;      /**< Where to align the snappable children horizontally*/
+    lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snappable children horizontally*/
     lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
     uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array*/
 }_lv_obj_spec_attr_t;
