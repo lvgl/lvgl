@@ -11,7 +11,7 @@ To enable logging, set `LV_USE_LOG  1` in `lv_conf.h` and set `LV_LOG_LEVEL` to 
 - `LV_LOG_LEVEL_TRACE` A lot of logs to give detailed information
 - `LV_LOG_LEVEL_INFO`  Log important events
 - `LV_LOG_LEVEL_WARN`  Log if something unwanted happened but didn't cause a problem
-- `LV_LOG_LEVEL_ERROR` Only critical issue, when the system may fail
+- `LV_LOG_LEVEL_ERROR` Only critical issues, where the system may fail
 - `LV_LOG_LEVEL_USER` Only user messages
 - `LV_LOG_LEVEL_NONE`  Do not log anything
 

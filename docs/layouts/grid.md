@@ -12,9 +12,9 @@ The Grid layout is a subset of [CSS Flexbox](https://css-tricks.com/snippets/css
 It can arrange items into 2D "table" that has rows or columns (tracks). The item can span through multiple columns or rows.
 The track's size can be set in pixel, to the largest item (`LV_GRID_CONTENT`) or in "Free unit" (FR) to distribute the free space proportionally.
 
-To make an object grid container call `lv_obj_set_layout(obj, LV_LAYOUT_GRID)`.
+To make an object a grid container call `lv_obj_set_layout(obj, LV_LAYOUT_GRID)`.
 
-Note that, the grid layout needs to enabled with `LV_USE_GRID` in `lv_conf.h`. 
+Note that the grid layout feature of LVGL needs to be globally enabled with `LV_USE_GRID` in `lv_conf.h`. 
 
 ## Terms
 - tracks: the rows or columns
@@ -23,7 +23,7 @@ Note that, the grid layout needs to enabled with `LV_USE_GRID` in `lv_conf.h`.
 
 ## Simple interface
 
-With the following functions you can simple set a Grid layout on any parent.
+With the following functions you can easily set a Grid layout on any parent.
 
 ### Grid descriptors
 
@@ -42,11 +42,11 @@ Besides simple settings the size in pixel you can use two special values:
 - `LV_GRID_FR(X)` tell what portion of the remaining space should be used by this track. Larger value means larger space.
 
 ### Grid items
-By default the children are not added to the grid but they needs to be added manually to a cell. 
+By default the children are not added to the grid. They need to be added manually to a cell. 
 
-To to this call `lv_obj_set_grid_cell(child, column_align, column_pos, column_span, row_align, row_pos, row_span)`.
+To do this call `lv_obj_set_grid_cell(child, column_align, column_pos, column_span, row_align, row_pos, row_span)`.
 
-`column_align` and `row_align` tells how to align the children in its cell. The possible values are:
+`column_align` and `row_align` determine how to align the children in its cell. The possible values are:
 - `LV_GRID_ALIGN_START` means left on a horizontally and top vertically. (default)
 - `LV_GRID_ALIGN_END` means right on a horizontally and bottom vertically
 - `LV_GRID_ALIGN_CENTER` simply center
@@ -87,7 +87,7 @@ All the Grid related values are style properties under the hood and you can use 
 ## Other features 
 
 ### RTL
-If the base direction of the container is set the `LV_BASE_DIR_RTL` the meaning of `LV_GRID_ALIGN_START` and `LV_GRID_ALIGN_END` is swapped. I.e. `START` will mean right.
+If the base direction of the container is set to `LV_BASE_DIR_RTL`, the meaning of `LV_GRID_ALIGN_START` and `LV_GRID_ALIGN_END` is swapped. I.e. `START` will mean right-most.
 
 The columns will be placed from right to left.
 

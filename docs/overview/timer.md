@@ -4,7 +4,7 @@
 ```
 # Timers
 
-LVGL has a built-in timer system. You can register a function to have it be called periodically. The timers are handled and called in `lv_timer_handler()`, which needs to be called periodically every few milliseconds.
+LVGL has a built-in timer system. You can register a function to have it be called periodically. The timers are handled and called in `lv_timer_handler()`, which needs to be called every few milliseconds.
 See [Porting](/porting/task-handler) for more information.
 
 The timers are non-preemptive, which means a timer cannot interrupt another timer. Therefore, you can call any LVGL related function in a timer.
@@ -12,7 +12,7 @@ The timers are non-preemptive, which means a timer cannot interrupt another time
 
 ## Create a timer
 To create a new timer, use `lv_timer_create(timer_cb, period_ms, user_data)`. It will create an `lv_timer_t *` variable, which can be used later to modify the parameters of the timer.
-`lv_timer_create_basic()` can also be used. It allows you to create a new timer without specifying any parameters.
+`lv_timer_create_basic()` can also be used. This allows you to create a new timer without specifying any parameters.
 
 A timer callback should have `void (*lv_timer_cb_t)(lv_timer_t *);` prototype.
 
@@ -52,13 +52,13 @@ You can modify some parameters of the timers later:
 
 ## Repeat count
 
-You can make a timer repat only a given times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after being called the defined times. Set the count to `-1` to repeat infinitly. 
+You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after being called the defined number of times. Set the count to `-1` to repeat indefinitely. 
 
 
 ## Measure idle time
 
 You can get the idle percentage time of `lv_timer_handler` with `lv_timer_get_idle()`. Note that, it doesn't measure the idle time of the overall system, only `lv_timer_handler`.
-It can be misleading if you use an operating system and call `lv_timer_handler` in an  timer, as it won't actually measure the time the OS spends in an idle thread.
+It can be misleading if you use an operating system and call `lv_timer_handler` in a timer, as it won't actually measure the time the OS spends in an idle thread.
 
 ## Asynchronous calls
 

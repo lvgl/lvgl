@@ -16,7 +16,7 @@ An input device usually means:
 
 ## Pointers
 
-Pointer input devices can have a cursor. (typically for mouses)
+Pointer input devices (like a mouse) can have a cursor.
 
 ```c
 ...
@@ -73,7 +73,7 @@ With an encoder, you should use only `LV_KEY_LEFT`, `LV_KEY_RIGHT`, and `LV_KEY_
 
 #### Edit and navigate mode
 
-Since a keypad has plenty of keys, it's easy to navigate between the objects and edit them using the keypad. But, the encoders have a limited number of "keys" hence, it is difficult to navigate using the default options. *Navigate* and *Edit* are created to avoid this problem with the encoders.
+Since a keypad has plenty of keys, it's easy to navigate between the objects and edit them using the keypad. But the encoders have a limited number of "keys" and hence it is difficult to navigate using the default options. *Navigate* and *Edit* are created to avoid this problem with the encoders.
 
 In *Navigate* mode, the encoders `LV_KEY_LEFT/RIGHT` is translated to `LV_KEY_NEXT/PREV`. Therefore the next or previous object will be selected by turning the encoder.
 Pressing `LV_KEY_ENTER` will change to *Edit* mode.

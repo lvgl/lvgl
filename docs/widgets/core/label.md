@@ -16,7 +16,7 @@ A label is the basic object type that is used to display text.
 
 ### Set text
 You can set the text on a label at runtime with `lv_label_set_text(label, "New text")`. 
-It will allocate a buffer dynamically, and the provided string will be copied into that buffer. 
+This will allocate a buffer dynamically, and the provided string will be copied into that buffer. 
 Therefore, you don't need to keep the text you pass to `lv_label_set_text` in scope after that function returns.
 
 With `lv_label_set_text_fmt(label, "Value: %d", 15)` printf formatting can be used to set the text.
@@ -26,15 +26,15 @@ In this case, the text is not stored in the dynamic memory and the given buffer 
 This means that the array can't be a local variable which goes out of scope when the function exits. 
 Constant strings are safe to use with `lv_label_set_text_static` (except when used with `LV_LABEL_LONG_DOT`, as it modifies the buffer in-place), as they are stored in ROM memory, which is always accessible.
 
-### New line
+### Newline
 
-New line characters are handled automatically by the label object. You can use `\n` to make a line break. For example: `"line1\nline2\n\nline4"`
+Newline characters are handled automatically by the label object. You can use `\n` to make a line break. For example: `"line1\nline2\n\nline4"`
 
 ### Long modes
-By default, the width and height of the label is set to `LV_SIZE_CONTENT`therefore the size of the label is automatically expands to the text size. 
-Otherwise, if the width or height is explicitly set (useing  e.g.`lv_obj_set_width` or a layout), the lines wider than the label's width can be manipulated according to several long mode policies. 
+By default, the width and height of the label is set to `LV_SIZE_CONTENT`. Therefore the size of the label is automatically expanded to the text size. 
+Otherwise, if the width or height are explicitly set (useing  e.g.`lv_obj_set_width` or a layout), the lines wider than the label's width can be manipulated according to several long mode policies. 
 Similary, the policies can be applied if the height of the text is greater than the height of the label.
-- `LV_LABEL_LONG_WRAP` Wrap too long lines. If the height is `LV_SIZE_CONTENT` the label's height will be expanded, elst the text will be clipped. (Default)
+- `LV_LABEL_LONG_WRAP` Wrap too long lines. If the height is `LV_SIZE_CONTENT` the label's height will be expanded, otherwise the text will be clipped. (Default)
 - `LV_LABEL_LONG_DOT` Replaces the last 3 characters from bottom right corner of the label with dots (`.`) 
 - `LV_LABEL_LONG_SCROLL` If the text is wider than the label scroll it horizontally back and forth. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
 - `LV_LABEL_LONG_SCROLL_CIRCULAR` If the text is wider than the label scroll it horizontally continously. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
@@ -52,17 +52,17 @@ This feature can be enabled individually for each label by `lv_label_set_recolor
 
 ### Text selection
 If enabled by `LV_LABEL_TEXT_SELECTION` part of the text can be selected. It's similar when on PC a you use your mouse to select a text. 
-The whole mechanzim (click and select the text as you drag your finger/mouse) is implemeted in [Text area](/widgets/core/textarea) and the Label widget allows only to manually make parts of the text selected with
+The whole mechanism (click and select the text as you drag your finger/mouse) is implemented in [Text area](/widgets/core/textarea) and the Label widget only allows manual text selection with
 `lv_label_get_text_selection_start(label, start_char_index)` and `lv_label_get_text_selection_start(label, end_char_index)`.
  
 ### Very long texts
-LVGL can efficiently handle very long (e.g. > 40k characters) by saving some extra data (~12 bytes) to speed up drawing. To enable this feature, set `LV_LABEL_LONG_TXT_HINT   1` in `lv_conf.h`.
+LVGL can efficiently handle very long (e.g. > 40k characters) labels by saving some extra data (~12 bytes) to speed up drawing. To enable this feature, set `LV_LABEL_LONG_TXT_HINT   1` in `lv_conf.h`.
 
 ### Symbols
 The labels can display symbols alongside letters (or on their own). Read the [Font](/overview/font) section to learn more about the symbols.
 
 ## Events
-No special event's are send by the Label.
+No special events are sent by the Label.
 
 Learn more about [Events](/overview/event).
 
