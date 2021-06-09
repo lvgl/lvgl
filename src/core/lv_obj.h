@@ -97,7 +97,7 @@ enum {
     LV_OBJ_FLAG_SCROLL_ONE      = (1 << 7),   /**< Allow scrolling only one snapable children*/
     LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8),  /**< Allow propagating the scroll to a parent*/
     LV_OBJ_FLAG_SCROLL_ON_FOCUS = (1 << 9),  /**< Automatically scroll object to make it visible when focused*/
-    LV_OBJ_FLAG_SNAPABLE        = (1 << 10), /**< If scroll snap is enabled on the parent it can snap to this object*/
+    LV_OBJ_FLAG_SNAPPABLE        = (1 << 10), /**< If scroll snap is enabled on the parent it can snap to this object*/
     LV_OBJ_FLAG_PRESS_LOCK      = (1 << 11), /**< Keep the object pressed even if the press slid from the object*/
     LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 12), /**< Propagate the events to the parent too*/
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 13), /**< Propagate the gestures to the parent*/
