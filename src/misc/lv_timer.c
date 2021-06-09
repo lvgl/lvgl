@@ -83,7 +83,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     uint32_t handler_start = lv_tick_get();
 
-    if(lv_tick_get() == 0) {
+    if(handler_start == 0) {
         static uint32_t run_cnt = 0;
         run_cnt ++;
         if(run_cnt > 100) {
