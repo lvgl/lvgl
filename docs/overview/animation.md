@@ -5,13 +5,13 @@
 # Animations
 
 You can automatically change the value of a variable between a start and an end value using animations.
-The animation will happen by the periodical call of an "animator" function with the corresponding value parameter.
+The animation will happen by periodically calling an "animator" function with the corresponding value parameter.
 
-The *animator* functions has the following prototype:
+The *animator* functions have the following prototype:
 ```c
 void func(void * var, lv_anim_var_t value);
 ```
-This prototype is compatible with the majority of the *set* function of LVGL. For example `lv_obj_set_x(obj, value)` or `lv_obj_set_width(obj, value)`
+This prototype is compatible with the majority of the *set* functions of LVGL. For example `lv_obj_set_x(obj, value)` or `lv_obj_set_width(obj, value)`
 
 
 ## Create an animation
@@ -82,27 +82,27 @@ Therefore `lv_anim_start()` will delete the already existing variable-function a
 
 ## Animation path
 
-You can determinate the path of animation. In the most simple case, it is linear, which means the current value between *start* and *end*  is changed linearly.
+You can determinate the path of animation. The most simple case is linear, meaning the current value between *start* and *end* is changed with fixed steps.
 A *path* is a function which calculates the next value to set based on the current state of the animation. Currently, there are the following built-in paths functions:
 
 - `lv_anim_path_linear` linear animation
 - `lv_anim_path_step` change in one step at the end
 - `lv_anim_path_ease_in` slow at the beginning
 - `lv_anim_path_ease_out` slow at the end
-- `lv_anim_path_ease_in_out` slow at the beginning and end too
+- `lv_anim_path_ease_in_out` slow at the beginning and at the end
 - `lv_anim_path_overshoot` overshoot the end value
 - `lv_anim_path_bounce` bounce back a little from the end value (like hitting a wall)
 
 
 ## Speed vs time
-By default, you can set the animation time. But, in some cases, the animation speed is more practical.
+By default, you set the animation time. But in some cases, setting the animation speed is more practical.
 
 The `lv_anim_speed_to_time(speed, start, end)` function calculates the required time in milliseconds to reach the end value from a start value with the given speed.
-The speed is interpreted in _unit/sec_ dimension. For example,  `lv_anim_speed_to_time(20,0,100)` will give 5000 milliseconds. For example, in case of `lv_obj_set_x` *unit* is pixels so *20* means *20 px/sec* speed.
+The speed is interpreted in _unit/sec_ dimension. For example,  `lv_anim_speed_to_time(20,0,100)` will yield 5000 milliseconds. For example, in case of `lv_obj_set_x` *unit* is pixels so *20* means *20 px/sec* speed.
 
 ## Delete animations
 
-You can delete an animation by `lv_anim_del(var, func)` by providing the animated variable and its animator function.
+You can delete an animation with `lv_anim_del(var, func)` if you provide the animated variable and its animator function.
 
 
 ## Examples

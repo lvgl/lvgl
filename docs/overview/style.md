@@ -4,10 +4,10 @@
 ```
 # Styles
 
-*Styles* are used to set the appearance of the objects. Styles in lvgl are heavily inspired by CSS. The concept in nutshell is the following:
-- A style is an `lv_style_t` variable which can hold properties, for example border width, text color and so on. It's similar to a `class` in CSS. 
+*Styles* are used to set the appearance of the objects. Styles in lvgl are heavily inspired by CSS. The concept in nutshell is as follows:
+- A style is an `lv_style_t` variable which can hold properties like border width, text color and so on. It's similar to a `class` in CSS. 
 - Styles can be assigned to objects to change their appearance. During the assignment the target part (*pseudo element* in CSS) and target state (*pseudo class*) can be specified.
-For example add `style_blue` to the knob of a slider when it's in pressed state.
+For example one can add `style_blue` to the knob of a slider when it's in pressed state.
 - The same style can be used by any number of objects.
 - Styles can be cascaded which means multiple styles can be assigned to an object and each style can have different properties. 
 Therefore not all properties have to be specified in style. LVLG will look for a property until a style defines it or use a default if it's not spefied by any of the styles.
@@ -35,16 +35,16 @@ The objects can be in the combination of the following states:
 - `LV_STATE_USER_3` (0x4000) Custom state
 - `LV_STATE_USER_4` (0x8000) Custom state
   
-The combination states the object can be focused and pressed at the same time. It represented as `LV_STATE_FOCUSED | LV_STATE_PRESSED`. 
+The combination states the object can be focused and pressed at the same time. This is represented as `LV_STATE_FOCUSED | LV_STATE_PRESSED`. 
 
 The style can be added to any state and state combination. 
 For example, setting a different background color for default and pressed state. 
-If a property is not defined in a state the best matching state's property will be used. Typically it means the property with `LV_STATE_DEFAULT` state.˛
+If a property is not defined in a state the best matching state's property will be used. Typically this means the property with `LV_STATE_DEFAULT` is used.˛
 If the property is not set even for the default state the default value will be used. (See later)
 
-But what does the "best matching state's property" really means? 
+But what does the "best matching state's property" really mean? 
 States have a precedence which is shown by their value (see in the above list). A higher value means higher precedence.
-To determine which state's property to use let's use an example. Let's see the background color is defined like this:
+To determine which state's property to use let's take an example. Imagine the background color is defined like this:
 - `LV_STATE_DEFAULT`: white
 - `LV_STATE_PRESSED`: gray
 - `LV_STATE_FOCUSED`: red
@@ -55,13 +55,13 @@ The pressed state has 0x0020 precedence which is higher than the default state's
 3. When the object is focused the same thing happens as in pressed state and red color will be used. (Focused state has higher precedence than default state).
 4. When the object is focused and pressed both gray and red would work, but the pressed state has higher precedence than focused so gray color will be used.
 5. It's possible to set e.g rose color for `LV_STATE_PRESSED | LV_STATE_FOCUSED`. 
-In this case, this combined state has 0x0020 + 0x0002 = 0x0022 precedence, which higher than the pressed states precedence so rose color would be used.
-6. When the object is in checked state there is no property to set the background color for this state. So in lack of a better option, the object remains white from the default state's property.
+In this case, this combined state has 0x0020 + 0x0002 = 0x0022 precedence, which is higher than the pressed state's precedence so rose color would be used.
+6. When the object is in checked state there is no property to set the background color for this state. So for lack of a better option, the object remains white from the default state's property.
 
 Some practical notes:
-- The precedence (value) of states is quite intuitive and it's something the user would expect naturally. E.g. if an object is focused, the user still want to see if it's pressed, therefore pressed state has a higher precedence. 
-If the focused state had higher precedence it would overwrite the pressed color.
-- If you want to set a property for all state (e.g. red background color) just set it for the default state. If the object can't find a property for its current state it will fall back to the default state's property.
+- The precedence (value) of states is quite intuitive and it's something the user would expect naturally. E.g. if an object is focused the user will still want to see if it's pressed, therefore pressed state has a higher precedence. 
+If the focused state had a higher precedence it would overwrite the pressed color.
+- If you want to set a property for all states (e.g. red background color) just set it for the default state. If the object can't find a property for its current state it will fall back to the default state's property.
 - Use ORed states to describe the properties for complex cases. (E.g. pressed + checked + focused)
 - It might be a good idea to use different style elements for different states. 
 For example, finding background colors for released, pressed, checked + pressed, focused, focused + pressed, focused + pressed + checked, etc states is quite difficult. 
@@ -71,21 +71,21 @@ Instead, for example, use the background color for pressed and checked states an
 It's not required to set all the properties in one style. It's possible to add more styles to an object and let the later added style to modify or extend appearance.
 For example, create a general gray button style and create a new for red buttons where only the new background color is set. 
 
-It's the same concept when in CSS all the used classes are listed like `<div class=".btn .btn-red">`.
+This is much like in CSS when used classes are listed like `<div class=".btn .btn-red">`.
 
-The later added styles have higher precedence over the earlier ones. So in the gray/red button example above, the normal button style should be added first and the red style second. 
+Styles added later have precedence over ones set earlier. So in the gray/red button example above, the normal button style should be added first and the red style second. 
 However, the precedence coming from states are still taken into account. 
 So let's examine the following case:
 - the basic button style defines dark-gray color for default state and light-gray color pressed state
 - the red button style defines the background color as red only in the default state
 
-In this case, when the button is released (it's in default state) it will be red because a perfect match is found in the lastly added style (red style). 
+In this case, when the button is released (it's in default state) it will be red because a perfect match is found in the most recently added style (red). 
 When the button is pressed the light-gray color is a better match because it describes the current state perfectly, so the button will be light-gray. 
 
 ## Inheritance 
 Some properties (typically that are related to texts) can be inherited from the parent object's styles. 
 Inheritance is applied only if the given property is not set in the object's styles (even in default state). 
-In this case, if the property is inheritable, the property's value will be searched in the parents too until an object can tell a value for the property. The parents will use their own state to tell the value. 
+In this case, if the property is inheritable, the property's value will be searched in the parents too until an object specifies a value for the property. The parents will use their own state to detemine the value. 
 So if a button is pressed, and the text color comes from here, the pressed text color will be used.
 
 
@@ -98,7 +98,7 @@ The following predefined parts exist in LVGL:
 - `LV_PART_INDICATOR` Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
 - `LV_PART_KNOB` Like a handle to grab to adjust the value*/
 - `LV_PART_SELECTED` Indicate the currently selected option or section
-- `LV_PART_ITEMS` Used if the widget has multiple similar elements (e.g. tabel cells)*/
+- `LV_PART_ITEMS` Used if the widget has multiple similar elements (e.g. table cells)*/
 - `LV_PART_TICKS` Ticks on scales e.g. for a chart or meter
 - `LV_PART_CURSOR` Mark a specific place e.g. text area's or chart's cursor
 - `LV_PART_CUSTOM_FIRST` Custom parts can be added from here.
@@ -139,7 +139,7 @@ To remove a property use:
 lv_style_remove_prop(&style, LV_STYLE_BG_COLOR);
 ```
 
-To get a properties value from style:
+To get a property's value from a style:
 ```c
 lv_style_value_t v;
 lv_res_t res = lv_style_rget_prop(&style, LV_STYLE_BG_COLOR, &v);
@@ -159,7 +159,7 @@ lv_style_reset(&style);
 ```
 
 ## Add and remove styles to a widget
-A style on its own not that useful. It should be assigned to an object to take its effect.
+A style on its own is not that useful, it needs to be assigned to an object to take effect.
 
 ### Add styles
 To add a style to an object use `lv_obj_add_style(obj, &style, <selector>)`. `<selector>` is an OR-ed value of parts and state to which the style should be added. Some examples:
@@ -188,7 +188,7 @@ If a style which is already assigned to object changes (i.e. a property is added
 1. If you know that the changed properties can be applied by a simple redraw (e.g. color or opacity changes) just call `lv_obj_invalidate(obj)` or `lv_obj_invalideate(lv_scr_act())`. 
 2. If more complex style properties were changed or added, and you know which object(s) are affected by that style call `lv_obj_refresh_style(obj, part, property)`. 
 To refresh all parts and properties use `lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY)`.
-3. No make LVGL check all object whether they use the style and refresh them call `lv_obj_report_style_change(&style)`. If `style` is `NULL` all object's will be notified about the style change.
+3. To make LVGL check all objects to see whether they use the style and refresh them when needed call `lv_obj_report_style_change(&style)`. If `style` is `NULL` all objects will be notified about the style change.
 
 ### Get a property's value on an object
 To get a final value of property - considering cascading, inheritance, local styles and transitions (see below) - get functions like this can be used: 
@@ -205,7 +205,7 @@ Besides "normal" styles, the objects can store local styles too. This concept is
 So local styles are like normal styles but they can't be shared among other objects. If used, local styles are allocated automatically, and freed when the object is deleted.
 They are useful to add local customization to the object.
 
-Unlike in CSS, in LVGL local styles can be assigned to states (*pseudo-classes*) and parts (pseudo-elements).
+Unlike in CSS, in LVGL local styles can be assigned to states (*pseudo-classes*) and parts (*pseudo-elements*).
 
 To set a local property use functions like `lv_obj_set_style_local_<property_name>(obj, <value>, <selector>);`  
 For example:
@@ -236,9 +236,9 @@ The parameters of the transitions are stored in the styles. It's possible to set
 - the animation path (also known as timing or easing function)
 - the properties to animate 
 
-The transition properties can be defined for each state. For example, setting 500 ms transition time in default state will mean that when the object goes to default state 500 ms transition time will be applied. 
-Setting 100 ms transition time in the pressed state will mean a 100 ms transition time when going to presses state.
-So this example configuration will result in fast going to presses state and slow going back to default. 
+The transition properties can be defined for each state. For example, setting 500 ms transition time in default state will mean that when the object goes to the default state a 500 ms transition time will be applied. 
+Setting 100 ms transition time in the pressed state will mean a 100 ms transition time when going to pressed state.
+So this example configuration will result in going to pressed state quickly and then going back to default slowly. 
 
 To describe a transition an `lv_transition_dsc_t` variable needs to initialized and added to a style:
 ```c
@@ -259,12 +259,12 @@ TODO
 
 
 ## Themes
-Themes are a collection of styles. If there is an active theme LVGL applies it on the every created widget.
-It gives a default appearance to UI which can be modified by adding further styles.
+Themes are a collection of styles. If there is an active theme LVGL applies it on every created widget.
+This will give a default appearance to the UI which can then be modified by adding further styles.
 
-Every display can have a different theme. For example a colorful theme on a TFT and monochrome theme on a secondary monochrome display.
+Every display can have a different theme. For example you could have a colorful theme on a TFT and monochrome theme on a secondary monochrome display.
 
-To set a theme for a display 2 steps are required:
+To set a theme for a display, 2 steps are required:
 1. Initialize a theme
 2. Assign the initialized theme to a display.
 

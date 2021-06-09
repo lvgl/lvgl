@@ -14,7 +14,7 @@ For example ESP32 is a good candidate to create your UI with LVGL.
 
 ## Get the LVGL Ardunio library
 
-LVGL can be installed via Arduino IDE Library Manager or as an .ZIP library.
+LVGL can be installed via the Arduino IDE Library Manager or as a .ZIP library.
 It will also install [lv_exmaples](https://github.com/lvgl/lv_examples) which contains a lot of examples and demos to try LVGL.
 
 ## Set up drivers
@@ -46,7 +46,7 @@ LVGL has its own configuration file called `lv_conf.h`. When LVGL is installed t
 ## Initialize LVGL and run an example
 
 Take a look at [LVGL_Arduino.ino](https://github.com/lvgl/lvgl/blob/master/examples/LVGL_Arduino.ino) to see how to initialize LVGL.
-It also uses TFT_eSPI as driver.
+TFT_eSPI is used as the display driver.
 
 In the INO file you can see how to register a display and a touch pad for LVGL and call an example.
 
@@ -55,9 +55,9 @@ For the full list of examples see the [README of lv_examples](https://github.com
 
 ## Debugging and logging
 
-In case of trouble there are debug information inside LVGL. 
+In case of trouble LVGL can display debug information. 
 In the `LVGL_Arduino.ino` example there is `my_print` method, which allow to send this debug information to the serial interface. 
-To enable this feature you have to edit `lv_conf.h` file and enable logging in section `log settings`:
+To enable this feature you have to edit `lv_conf.h` file and enable logging in the section `log settings`:
 
 ```c
 /*Log settings*/
@@ -73,5 +73,5 @@ To enable this feature you have to edit `lv_conf.h` file and enable logging in s
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 ```
 
-After enabling log module and setting LV_LOG_LEVEL accordingly the output log is sent to the `Serial` port @ 115200 Baud rate.
+After enabling the log module and setting LV_LOG_LEVEL accordingly the output log is sent to the `Serial` port @ 115200 bps.
 

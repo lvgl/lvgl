@@ -5,20 +5,20 @@
 
 # Introduction
 
-LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
+LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
 
 
 ## Key features
-- Powerful building blocks such as buttons, charts, lists, sliders, images etc.
+- Powerful building blocks such as buttons, charts, lists, sliders, images, etc.
 - Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
-- Various input devices such as touchpad, mouse, keyboard, encoder etc.
+- Various input devices such as touchpad, mouse, keyboard, encoder, etc.
 - Multi-language support with UTF-8 encoding
-- Multi-display support, i.e. use more TFT, monochrome displays simultaneously
-- Fully customizable graphic elements withh CSS-like styles
-- Hardware independent to use with any microcontroller or display
-- Scalable to operate with little memory (64 kB Flash, 16 kB RAM)
-- OS, External memory and GPU supported but not required
-- Single frame buffer operation even with advanced graphical effects
+- Multi-display support, i.e. use multiple TFT, monochrome displays simultaneously
+- Fully customizable graphic elements with CSS-like styles
+- Hardware independent: use with any microcontroller or display
+- Scalable: able to operate with little memory (64 kB Flash, 16 kB RAM)
+- OS, external memory and GPU supported but not required
+- Single frame buffer operation even with advanced graphic effects
 - Written in C for maximal compatibility (C++ compatible)
 - Simulator to start embedded GUI design on a PC without embedded hardware
 - Binding to MicroPython
@@ -48,23 +48,23 @@ Basically, every modern controller  (which is able to drive a display) is suita
           <a href="https://www.tutorialspoint.com/cprogramming/c_structures.htm">structs</a>, 
           <a href="https://www.geeksforgeeks.org/callbacks-in-c/">callbacks</a>.</li>
 </ul>
-<em>Note that the memory usage might vary depending on the architecture, compiler and build options.</em>
+<em>Note that memory usage may vary depending on architecture, compiler and build options.</em>
 
 ## License
 The LVGL project (including all repositories) is licensed under [MIT license](https://github.com/lvgl/lvgl/blob/master/LICENCE.txt). 
 It means you can use it even in commercial projects.
 
-It's not mandatory but we highly appreciate it if you write a few words about your project in the [My projects](https://forum.lvgl.io/c/my-projects/10) category of the Forum or a private message from [lvgl.io](https://lvgl.io/#contact).
+It's not mandatory but we highly appreciate it if you write a few words about your project in the [My projects](https://forum.lvgl.io/c/my-projects/10) category of the forum or a private message to [lvgl.io](https://lvgl.io/#contact).
 
-Although you can get LVGL for free there is a huge work behind it. It's created by a group of volunteers who made it available for you in their free time.
+Although you can get LVGL for free there is a massive amount of work behind it. It's created by a group of volunteers who made it available for you in their free time.
 
-To make the LVGL project sustainable, please consider [Contributing](/CONTRIBUTING) to the project. 
-You can choose from [many ways of contributions](/CONTRIBUTING) such as simply writing a tweet about you are using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
+To make the LVGL project sustainable, please consider [contributing](/CONTRIBUTING) to the project. 
+You can choose from [many different ways of contributing](/CONTRIBUTING) such as simply writing a tweet about you are using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
 
 ## Repository layout
-All repositories of the LVGL project are hosted n GitHub: https://github.com/lvgl
+All repositories of the LVGL project are hosted on GitHub: https://github.com/lvgl
 
-You find these repositories there:
+You will find these repositories there:
 - [lvgl](https://github.com/lvgl/lvgl) The library itself with many [examples](https://github.com/lvgl/lvgl/blob/master/examples/).
 - [lv_demos](https://github.com/lvgl/lv_demos) Demos created with LVGL.
 - [lv_drivers](https://github.com/lvgl/lv_drivers) Display and input device drivers
@@ -86,7 +86,7 @@ Tags like `vX.Y.Z` are created for every release.
 
 ### Release cycle
 - Bugfixes: Released on demand even weekly
-- Minor releases: In every 3-4 month
+- Minor releases: Every 3-4 months
 - Major releases: Approximatelly yearly
 
 ### Branches
@@ -102,7 +102,7 @@ The core repositories have at least the following branches:
 The changes are recorded in [CHANGELOG.md](/CHANGELOG).
 
 ### Version support
-Before v8 every minor release of major releases are supproted for 1 year.
+Before v8 every minor release of major releases is supported for 1 year.
 From v8 every minor release is supported for 1 year.
 
 | Version | Release date | Support end | Active |
@@ -116,7 +116,7 @@ From v8 every minor release is supported for 1 year.
 ## FAQ
 
 ### Where can I ask questions?
-You can ask questions in the Forum: [https://forum.lvgl.io/](https://forum.lvgl.io/).
+You can ask questions in the forum: [https://forum.lvgl.io/](https://forum.lvgl.io/).
 
 We use [GitHub issues](https://github.com/lvgl/lvgl/issues) for development related discussion. 
 So you should use them only if your question or issue is tightly related to the development of the library. 
@@ -124,10 +124,10 @@ So you should use them only if your question or issue is tightly related to the 
 ### Is my MCU/hardware supported?
 Every MCU which is capable of driving a display via Parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](#requirements) is supported by LLVGL.
 
-It includes:
+This includes:
 - "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32 etc. 
 - Bluetooth, GSM, WiFi modules like Nordic NRF and Espressif ESP32
-- Linux frame buffer like /dev/fb0 which includes Single-board computers too like Raspberry Pi
+- Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
 - And anything else with a strong enough MCU and a periphery to drive a display
 
 ### Is my display supported?
@@ -149,11 +149,11 @@ Be sure you are calling `lv_tick_inc(x)` in an interrupt and `lv_timer_handler()
 
 Learn more in the [Tick](/porting/tick) and [Task handler](/porting/task-handler) section.
 
-### Why the display driver is called only once? Only the upper part of the display is refreshed. 
+### Why is the display driver called only once? Only the upper part of the display is refreshed. 
 Be sure you are calling `lv_disp_flush_ready(drv)` at the end of your "*display flush callback*". 
 
-### Why I see only garbage on the screen?
-Probably there a bug in your display driver. Try the following code without using LVGL. You should see a square with red-blue gradient
+### Why do I see only garbage on the screen?
+Probably there a bug in your display driver. Try the following code without using LVGL. You should see a square with red-blue gradient.
 
 ```c
 #define BUF_W 20
@@ -178,7 +178,7 @@ a.y2 = a.y1 + BUF_H - 1;
 my_flush_cb(NULL, &a, buf);
 ```
 
-### Why I see non-sense colors on the screen? 
+### Why I see nonsense colors on the screen? 
 Probably LVGL's color format is not compatible with your displays color format. Check `LV_COLOR_DEPTH` in *lv_conf.h*.
 
 If you are using 16 bit colors with SPI (or other byte-oriented interface) probably you need to set `LV_COLOR_16_SWAP  1` in *lv_conf.h*. 

@@ -12,7 +12,7 @@ You can store images in two places
 - as a file
 
 ### Variables
-The images stored internally in a variable is composed mainly of an `lv_img_dsc_t` structure with the following fields:
+The images stored internally in a variable are composed mainly of an `lv_img_dsc_t` structure with the following fields:
 - **header**
   - *cf* Color format. See [below](#color-format)
   - *w* width in pixels (<= 2048)
@@ -27,7 +27,7 @@ These are usually stored within a project as C files. They are linked into the r
 ### Files
 To deal with files you need to add a *Drive* to LVGL. In short, a *Drive* is a collection of functions (*open*, *read*, *close*, etc.) registered in LVGL to make file operations.
 You can add an interface to a standard file system (FAT32 on SD card) or you create your simple file system to read data from an SPI Flash memory.
-In every case, a *Drive* is just an abstraction to read and/or write data to a memory.
+In every case, a *Drive* is just an abstraction to read and/or write data to memory.
 See the [File system](/overview/file-system) section to learn more.
 
 Images stored as files are not linked into the resulting executable, and must be read to RAM before being drawn. As a result, they are not as resource-friendly as variable images. However, they are easier to replace without needing to recompile the main program.
@@ -58,10 +58,10 @@ For 8-bit color depth:
 - Byte 2: Alpha byte (only with LV_IMG_CF_TRUE_COLOR_ALPHA)
 
 
-You can store images in a *Raw* format to indicate that, it's not a built-in color format and an external [Image decoder](#image-decoder) needs to be used to decode the image.
+You can store images in a *Raw* format to indicate that it's not encoded with one of the built-in color formats and an external [Image decoder](#image-decoder) needs to be used to decode the image.
 - **LV_IMG_CF_RAW** Indicates a basic raw image (e.g. a PNG or JPG image).
 - **LV_IMG_CF_RAW_ALPHA** Indicates that the image has alpha and an alpha byte is added for every pixel.
-- **LV_IMG_CF_RAW_CHROME_KEYED** Indicates that the image is chrome keyed as described in `LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED` above.
+- **LV_IMG_CF_RAW_CHROME_KEYED** Indicates that the image is chroma-keyed as described in `LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED` above.
 
 
 ## Add and use images
@@ -138,21 +138,21 @@ The image decoder consists of 4 callbacks:
 - **read** if *open* didn't fully open the image this function should give some decoded data (max 1 line) from a given position.
 - **close** close the opened image, free the allocated resources.
 
-You can add any number of image decoders. When an image needs to be drawn, the library will try all the registered image decoder until finding one which can open the image, i.e. knowing that format.
+You can add any number of image decoders. When an image needs to be drawn, the library will try all the registered image decoders until it finds one which can open the image, i.e. one which knows that format.
 
 The `LV_IMG_CF_TRUE_COLOR_...`, `LV_IMG_INDEXED_...` and `LV_IMG_ALPHA_...` formats (essentially, all non-`RAW` formats) are understood by the built-in decoder.
 
 ### Custom image formats
 
-The easiest way to create a custom image is to use the online image converter and set `Raw`, `Raw with alpha` or `Raw with chrome keyed` format. It will just take every byte of the binary file you uploaded and write it as the image "bitmap". You then need to attach an image decoder that will parse that bitmap and generate the real, renderable bitmap.
+The easiest way to create a custom image is to use the online image converter and set `Raw`, `Raw with alpha` or `Raw with chroma-keyed` format. It will just take every byte of the binary file you uploaded and write it as the image "bitmap". You then need to attach an image decoder that will parse that bitmap and generate the real, renderable bitmap.
 
 `header.cf` will be `LV_IMG_CF_RAW`, `LV_IMG_CF_RAW_ALPHA` or `LV_IMG_CF_RAW_CHROME_KEYED` accordingly. You should choose the correct format according to your needs: fully opaque image, use alpha channel or use chroma keying.
 
 After decoding, the *raw* formats are considered *True color* by the library. In other words, the image decoder must decode the *Raw* images to *True color* according to the format described in [#color-formats](Color formats) section.
 
 If you want to create a custom image, you should use `LV_IMG_CF_USER_ENCODED_0..7` color formats. However, the library can draw the images only in *True color* format (or *Raw* but finally it's supposed to be in *True color* format).
-So the `LV_IMG_CF_USER_ENCODED_...` formats are not known by the library, therefore, they should be decoded to one of the known formats from [#color-formats](Color formats) section.
-It's possible to decode the image to a non-true color format first, for example, `LV_IMG_INDEXED_4BITS`, and then call the built-in decoder functions to convert it to *True color*.
+The `LV_IMG_CF_USER_ENCODED_...` formats are not known by the library and therefore they should be decoded to one of the known formats from [#color-formats](Color formats) section.
+It's possible to decode the image to a non-true color format first (for example: `LV_IMG_INDEXED_4BITS`) and then call the built-in decoder functions to convert it to *True color*.
 
 With *User encoded* formats, the color format in the open function (`dsc->header.cf`) should be changed according to the new format.
 
@@ -256,11 +256,11 @@ So in summary:
 - In `decoder_open`, you should try to open the image source pointed by `dsc->src`. Its type is already in `dsc->src_type == LV_IMG_SRC_FILE/VARIABLE`.
 If this format/type is not supported by the decoder, return `LV_RES_INV`.
 However, if you can open the image, a pointer to the decoded *True color* image should be set in `dsc->img_data`.
-If the format is known but, you don't want to decode while image (e.g. no memory for it) set `dsc->img_data = NULL` to call `read_line` to get the pixels.
+If the format is known but you don't want to decode the entire image (e.g. no memory for it) set `dsc->img_data = NULL` to call `read_line` to get the pixels.
 - In `decoder_close` you should free all the allocated resources.
 - `decoder_read` is optional. Decoding the whole image requires extra memory and some computational overhead.
 However, if can decode one line of the image without decoding the whole image, you can save memory and time.
-To indicate that, the *line read* function should be used, set `dsc->img_data = NULL` in the open function.
+To indicate that the *line read* function should be used, set `dsc->img_data = NULL` in the open function.
 
 
 ### Manually use an image decoder
@@ -301,15 +301,15 @@ To decide which image to close, LVGL uses a measurement it previously made of ho
 
 If you want or need to override LVGL's measurement, you can manually set the *time to open* value in the decoder open function in `dsc->time_to_open = time_ms` to give a higher or lower value. (Leave it unchanged to let LVGL set it.)
 
-Every cache entry has a *"life"* value. Every time an image opening happens through the cache, the *life* of all entries are decreased to make them older.
-When a cached image is used, its *life* is increased by the *time to open* value to make it more alive.
+Every cache entry has a *"life"* value. Every time an image opening happens through the cache, the *life* value of all entries is decreased to make them older.
+When a cached image is used, its *life* value is increased by the *time to open* value to make it more alive.
 
-If there is no more space in the cache, always the entry with the smallest life will be closed.
+If there is no more space in the cache, the entry with the smallest life value will be closed.
 
 ### Memory usage
-Note that, the cached image might continuously consume memory. For example, if 3 PNG images are cached, they will consume memory while they are opened.
+Note that the cached image might continuously consume memory. For example, if 3 PNG images are cached, they will consume memory while they are open.
 
-Therefore, it's the user's responsibility to be sure there is enough RAM to cache, even the largest images at the same time.
+Therefore, it's the user's responsibility to be sure there is enough RAM to cache even the largest images at the same time.
 
 ### Clean the cache
 Let's say you have loaded a PNG image into a `lv_img_dsc_t my_png` variable and use it in an `lv_img` object. If the image is already cached and you then change the underlying PNG file, you need to notify LVGL to cache the image again. Otherwise, there is no easy way of detecting that the underlying file changed and LVGL will still draw the old image.

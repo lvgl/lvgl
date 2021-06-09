@@ -6,7 +6,7 @@
 
 ## Overview
 
-The LEDs are rectangle-like (or circle) object. It's brightness can be adjusted. With lower brightness the the colors of the LED become darker.
+The LEDs are rectangle-like (or circle) object whose brightness can be adjusted. With lower brightness the colors of the LED become darker.
 
 ## Parts and Styles
 The LEDs have only one main part, called `LV_LED_PART_MAIN` and it uses all the typical background style properties.
