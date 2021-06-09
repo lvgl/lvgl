@@ -28,7 +28,7 @@ for i in range(10):
     label = lv.label(btn)
     if i == 3:
         label.set_text("Panel {:d}\nno snap".format(i))
-        btn.clear_flag(lv.obj.FLAG.SNAPABLE)
+        btn.clear_flag(lv.obj.FLAG.SNAPPABLE)
     else:
         label.set_text("Panel {:d}".format(i))
     label.center()

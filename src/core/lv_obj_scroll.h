@@ -37,7 +37,7 @@ enum {
 typedef uint8_t lv_scrollbar_mode_t;
 
 
-/** Scroll span align options. Tells where to align the snapable children when scroll stops.*/
+/** Scroll span align options. Tells where to align the snappable children when scroll stops.*/
 enum {
     LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is*/
     LV_SCROLL_SNAP_START,   /**< Align to to the left/top*/

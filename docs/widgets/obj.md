@@ -104,10 +104,10 @@ There are some attributes which can be enabled/disabled by `lv_obj_add/clear_fla
 - `LV_OBJ_FLAG_SCROLLABLE`  Make the object scrollable
 - `LV_OBJ_FLAG_SCROLL_ELASTIC`  Allow scrolling inside but with slower speed
 - `LV_OBJ_FLAG_SCROLL_MOMENTUM`  Make the object scroll further when "thrown"
-- `LV_OBJ_FLAG_SCROLL_ONE` Allow scrolling only one snapable children
+- `LV_OBJ_FLAG_SCROLL_ONE` Allow scrolling only one snappable children
 - `LV_OBJ_FLAG_SCROLL_CHAIN`  Allow propagating the scroll to a parent
 - `LV_OBJ_FLAG_SCROLL_ON_FOCUS`  Automatically scroll object to make it visible when focused
-- `LV_OBJ_FLAG_SNAPABLE` If scroll snap is enabled on the parent it can snap to this object
+- `LV_OBJ_FLAG_SNAPPABLE` If scroll snap is enabled on the parent it can snap to this object
 - `LV_OBJ_FLAG_PRESS_LOCK` Keep the object pressed even if the press slid from the object
 - `LV_OBJ_FLAG_EVENT_BUBBLE` Propagate the events to the parent too
 - `LV_OBJ_FLAG_GESTURE_BUBBLE` Propagate the gestures to the parent

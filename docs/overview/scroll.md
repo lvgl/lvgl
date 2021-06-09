@@ -100,7 +100,8 @@ However, with `LV_OBJ_FLAG_SCROLL_ELASTIC` a fancy effect can be added when the 
 When the object is released the content scrolled in it will be animated back to the valid position. 
 
 ### Snapping
-The children of an object can be snapped according to specific rules when scrolling ends. Children can be made snappable individually with the `LV_OBJ_FLAG_SNAPABLE` flag. (Note misspelling of the flag name: your code needs to spell it with one P.)
+The children of an object can be snapped according to specific rules when scrolling ends. Children can be made snappable individually with the `LV_OBJ_FLAG_SNAPPABLE` flag.
+
 The object can align the snapped children in 4 ways: 
 - `LV_SCROLL_SNAP_NONE` Snapping is disabled. (default)
 - `LV_SCROLL_SNAP_START` Align the children to the left/top side of the scrolled object
@@ -117,7 +118,7 @@ Under the hood the following happens:
  
 ### Scroll one
 The "scroll one" feature tells LVGL to allow scrolling only one snappable child at a time. 
-So this requires to make the children snappable (LV_OBJ_FLAG_SNAPABLE spelled with one P in code) and and set a scroll snap alignment different from `LV_SCROLL_SNAP_NONE`.
+So this requires to make the children snappable and set a scroll snap alignment different from `LV_SCROLL_SNAP_NONE`.
 
 This feature can be enabled by the `LV_OBJ_FLAG_SCROLL_ONE` flag.
 
