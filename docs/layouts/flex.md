@@ -9,11 +9,11 @@
 
 The Flexbox (or Flex for short) is a subset of [CSS Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/).
 
-It can arrange items into rows or columns (tracks), handle wrapping, adjust the spacing between the items and tracks, handle *grow* to make the item(s) will the remaining space with respect to min/max width and height.
+It can arrange items into rows or columns (tracks), handle wrapping, adjust the spacing between the items and tracks, handle *grow* to make the item(s) fill the remaining space with respect to min/max width and height.
 
 To make an object flex container call `lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`.
 
-Note that, the flex layout needs to enabled with `LV_USE_FLEX` in `lv_conf.h`. 
+Note that the flex layout feature of LVGL needs to be globally enabled with `LV_USE_FLEX` in `lv_conf.h`. 
 
 ## Terms
 - tracks: the rows or columns
@@ -26,13 +26,13 @@ The available space will be distributed among items respective to the their grow
 
 ## Simple interface
 
-With follwoing functions you can simple set a Flex layout on any parent.
+With the following functions you can set a Flex layout on any parent.
 
 ### Flex flow
 
-`lv_obj_set_flex_flow(obj, felx_flow)`
+`lv_obj_set_flex_flow(obj, flex_flow)`
 
-The possible values for `felx_flow` are:
+The possible values for `flex_flow` are:
 - `LV_FLEX_FLOW_ROW` Place the children in a row without wrapping
 - `LV_FLEX_FLOW_COLUMN` Place the children in a column without wrapping
 - `LV_FLEX_FLOW_ROW_WRAP` Place the children in a row with wrapping
@@ -45,15 +45,15 @@ The possible values for `felx_flow` are:
 ### Flex align
 To manage the placement of the children use `lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`
 
-- `main_place` tells how to distribute the items in their track on the main axis. E.g. flush the items to the right on `LV_FLEX_FLOW_ROW_WRAP`.  (It's called `justify-content` in CSS)
-- `cross_place` tells how to distribute the items in their track on the cross axis. E.g. if the items have differetn height place them to the bottom of the track.  (It's called `align-items` in CSS)
-- `track_cross_place` tells how to distribute the tracks (It's called `align-content` in CSS)
+- `main_place` determines how to distribute the items in their track on the main axis. E.g. flush the items to the right on `LV_FLEX_FLOW_ROW_WRAP`.  (It's called `justify-content` in CSS)
+- `cross_place` determines how to distribute the items in their track on the cross axis. E.g. if the items have different height place them to the bottom of the track.  (It's called `align-items` in CSS)
+- `track_cross_place` determines how to distribute the tracks (It's called `align-content` in CSS)
 
 The possible values are:
 - `LV_FLEX_ALIGN_START` means left on a horizontally and top vertically. (default)
 - `LV_FLEX_ALIGN_END` means right on a horizontally and bottom vertically
 - `LV_FLEX_ALIGN_CENTER` simply center
-- `LV_FLEX_ALIGN_SPACE_EVENLY` items are distributed so that the spacing between any two items (and the space to the edges) is equal. Not applies to `track_cross_place`.
+- `LV_FLEX_ALIGN_SPACE_EVENLY` items are distributed so that the spacing between any two items (and the space to the edges) is equal. Does not apply to `track_cross_place`.
 - `LV_FLEX_ALIGN_SPACE_AROUND` items are evenly distributed in the track with equal space around them. 
 Note that visually the spaces aren’t equal, since all the items have equal space on both sides. 
 The first item will have one unit of space against the container edge, but two units of space between the next item because that next item has its own spacing that applies. Not applies to `track_cross_place`.
@@ -66,7 +66,7 @@ Flex grow can be used to make one or more children fill the available space on t
 For example let's there is 400 px remaining space and 4 object with grow:
 - `A` with grow = 1
 - `B` with grow = 1
-- `c` with grow = 2
+- `C` with grow = 2
 
 `A` and `B` will have 100 px size, and `C` will have 200 px size.
 
@@ -75,7 +75,7 @@ Flex grow can be set on a child with `lv_obj_set_flex_flow(child, value)`. `valu
 
 ## Style interface
 
-All the Flex related values are style properties under the hood and you can use them similarly to any other style property. The following flex related style properties exist:
+All the Flex-related values are style properties under the hood and you can use them similarly to any other style property. The following flex related style properties exist:
 
 - `FLEX_FLOW`
 - `FLEX_MAIN_PLACE`

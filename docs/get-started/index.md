@@ -4,7 +4,7 @@
 ```
 # Get started
 
-There are several ways to get your feet wet with LVGL. This list shows the recommended way of learning the library:
+There are several ways to get your feet wet with LVGL. Here is one recommended order of documents to read and things to play with when you are learning to use LVGL:
 1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
 2. Read the [Introduction](https://docs.lvgl.io/latest/en/html/intro/index.html) page of the documentation (5 minutes)
 3. Read the [Quick overview](https://docs.lvgl.io/latest/en/html/get-started/quick-overview.html) page of the documentation (15 minutes)

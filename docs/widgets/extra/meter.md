@@ -8,23 +8,23 @@
 The Meter widget can visualize data in very flexible ways. In can show arcs, needles, ticks lines and labels.
 
 ## Parts and Styles
-- `LV_PART_MAIN` The background of the Meter and it uses the typical background properties. 
+- `LV_PART_MAIN` The background of the Meter. Uses the typical background properties. 
 - `LV_PART_TICK` The tick lines a labels using the *line* and *text* style properties.
-- `LV_PART_INDICATOR` The needle line or image using the *line* and *img* style properties, plus the background properties to draw a square (or circle) on the pivot of the needles. Padding makes the square larger.
+- `LV_PART_INDICATOR` The needle line or image using the *line* and *img* style properties, as well as the background properties to draw a square (or circle) on the pivot of the needles. Padding makes the square larger.
 - `LV_PART_ITEMS` The arcs using the *arc* properties.
 
 ## Usage
 
 ### Add a scale
 
-For first a *Scale* needs to be added to the Meter with `lv_meter_scale_t * scale = lv_meter_add_scale(meter)`. 
-The Scale has minor and major ticks and labels on the major tick. Later indicators (needles, arcs, tick modifiers) can be added to the meter
+First a *Scale* needs to be added to the Meter with `lv_meter_scale_t * scale = lv_meter_add_scale(meter)`. 
+The Scale has minor and major ticks and labels on the major ticks. Later indicators (needles, arcs, tick modifiers) can be added to the meter
 
-Any number of scaled can be added to Meter.
+Any number of scales can be added to Meter.
 
 The minor tick lines can be configured with: `lv_meter_set_scale_ticks(meter, scale, tick_count, line_width, tick_length, ctick_olor)`.
 
-To add major tick lines use `lv_meter_set_scale_major_ticks(meter, scale, nth_major, tick_width, tick_length, tick_color, label_gap)`. `nth_major` tells how many minor ticks to skip to draw a major tick.
+To add major tick lines use `lv_meter_set_scale_major_ticks(meter, scale, nth_major, tick_width, tick_length, tick_color, label_gap)`. `nth_major` to specify how many minor ticks to skip to draw a major tick.
 
 Labels are added automatically on major ticks with `label_gap` distance from the ticks with text proportionally to the values of the tick line.
 
@@ -34,7 +34,7 @@ Labels are added automatically on major ticks with `label_gap` distance from the
 
 Indicators needs to be added to a Scale and their value is interpreted in the range of the Scale.
 
-All the indicator add functions returns `lv_meter_indicator_t *`.
+All the indicator add functions return `lv_meter_indicator_t *`.
 
 #### Needle line
 
@@ -57,7 +57,7 @@ All the indicator add functions returns `lv_meter_indicator_t *`.
 #### Scale lines (ticks)
 `indic = lv_meter_add_scale_lines(meter, scale, color_start, color_end, local, width_mod)` adds an indicator that modifies the ticks lines. 
 If `local` is `true` the ticks' color will be faded from `color_start` to `color_end` in the indicator's  start and end value range. 
-If `local` is `false` `color_start` and `color_end` is mapped to the start and end value of the scale and only a "slice" of that color gradient will be visible in the indicator's start and end value range.
+If `local` is `false` `color_start` and `color_end` will be mapped to the start and end value of the scale and only a "slice" of that color gradient will be visible in the indicator's start and end value range.
 `width_mod` modifies the width of the tick lines.
 
 `lv_meter_set_indicator_start_value(meter, inidicator, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator. 

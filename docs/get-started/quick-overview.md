@@ -6,20 +6,20 @@
 # Quick overview
 
 Here you can learn the most important things about LVGL.
-You should read it first to get a general impression and read the detailed [Porting](/porting/index) and [Overview](/overview/index) sections after that.
+You should read this first to get a general impression and read the detailed [Porting](/porting/index) and [Overview](/overview/index) sections after that.
 
 ## Get started in a simulator
 
-Instead of porting LVGL to an embedded hardware, it's highly recommended to get started in a simulator first. 
+Instead of porting LVGL to embedded hardware straight away, it's highly recommended to get started in a simulator first. 
 
 LVGL is ported to many IDEs to be sure you will find your favorite one. 
 Go to the [Simulators](/get-started/pc-simulator) section to get ready-to-use projects that can be run on your PC. 
-This way you can save the time of  porting for now and make some experience with LVGL immediately. 
+This way you can save the time of porting for now and get some experience with LVGL immediately. 
 
 ## Add LVGL into your project
-If you rather want to try LVGL on your own project follow these steps:
+If you would rather try LVGL on your own project follow these steps:
 
-- [Download](https://github.com/lvgl/lvgl/archive/master.zip) or Clone the library from GitHub with `git clone https://github.com/lvgl/lvgl.git`.
+- [Download](https://github.com/lvgl/lvgl/archive/master.zip) or clone the library from GitHub with `git clone https://github.com/lvgl/lvgl.git`.
 - Copy the `lvgl` folder into your project.
 - Copy `lvgl/lv_conf_template.h` as `lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable the file's content and set the `LV_COLOR_DEPTH` defines.
 - Include `lvgl/lvgl.h` in files where you need to use LVGL related functions.
@@ -94,7 +94,7 @@ Every object has a parent object where it is created. For example if a label is 
 
 The child object moves with the parent and if the parent is deleted the children will be deleted too. 
 
-Children can be visible only on their parent. It other words, the parts of the children out of the parent are clipped.
+Children can be visible only on their parent. It other words, the parts of the children outside of the parent are clipped.
 
 A Screen is the "root" parent. You can have any number of screens. 
 
@@ -124,10 +124,10 @@ To see the full API visit the documentation of the widgets or the related header
 
 
 ### Events
-Events are used to inform the user if something has happened with an object. 
+Events are used to inform the user that something has happened with an object. 
 You can assign one or more callbacks to an object which will be called if the object is clicked, released, dragged, being deleted etc. 
 
-It should look like this:
+A callback is assigned like this:
 
 ```c
 lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
@@ -174,11 +174,11 @@ The objects can be in a combination of the following states:
 - `LV_STATE_SCROLLED` Being scrolled
 - `LV_STATE_DISABLED` Disabled 
 
-For example, if you press an object it will automatically goes to `LV_STATE_FOCUSED` and `LV_STATE_PRESSED` state and when you release it, the  `LV_STATE_PRESSED` state will be removed.
+For example, if you press an object it will automatically go to `LV_STATE_FOCUSED` and `LV_STATE_PRESSED` state and when you release it, the  `LV_STATE_PRESSED` state will be removed.
  
-To check if an object is in a given state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object "has" the given state at that moment.
+To check if an object is in a given state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object is in that state at that time.
 
-To manually add remove the states use
+To manually add or remove states use
 ```c
 lv_obj_add_state(obj, LV_STATE_...);
 lv_obj_clear_state(obj, LV_STATE_...);
@@ -195,7 +195,7 @@ lv_style_init(&style1);
 lv_style_set_bg_color(&style1, lv_color_hex(0xa03080))
 lv_style_set_border_width(&style1, 2))
 ```
-See the full list of properties go [here](/overview/style.html#properties).
+See the full list of properties [here](/overview/style.html#properties).
 
 
 The styles are assigned to an object's part and state. For example to *"Use this style on the slider's indicator when the slider is pressed"*:
@@ -230,15 +230,15 @@ lv_obj_add_style(btn1, &style1_btn_red, 0);
 If a property is not set on for the current state the style with `LV_STATE_DEFAULT` will be used. If the property is not defined even in the default state a default value is used.
 
 Some properties (typically the text-related ones) can be inherited. It means if a property is not set in an object it will be searched in its parents too. 
-For example, you can set the font once in the screen's style and every text will inherit it by default. 
+For example, you can set the font once in the screen's style and all text on that screen will inherit it by default. 
 
 
-Local style properties also can be added to the objects. It creates a style is inside the object that is used only by the object:
+Local style properties also can be added to the objects. It creates a style which resides inside the object and which is used only by the object:
 ```c
 lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 ``` 
 
-To learn all the features of styles see the [Style overview](/overview/style) section
+To learn all the features of styles see the [Style overview](/overview/style) section.
 
 
 ### Themes

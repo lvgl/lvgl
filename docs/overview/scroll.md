@@ -9,7 +9,7 @@ In LVGL scrolling works very intuitively: if an object is out of its parent cont
 
 Any object can be scrollable including `lv_obj_t`, `lv_img`, `lv_btn`, `lv_meter`, etc
 
-The obejct can be scrolled either horizontally or vertically at a time, that is diagonal scrolling is not possible.
+The object can either be scrolled either horizontally or vertically in one stroke; diagonal scrolling is not possible.
 
 ### Scrollbar
  
@@ -24,7 +24,7 @@ The scrollbars are displayed according to the set `mode`. The following `mode`s 
 
 
 #### Styling
-The scrollbars have its own dedicated part, called `LV_PART_SCROLLBAR`. For example a scrollbar can turned to red like this:
+The scrollbars have their own dedicated part, called `LV_PART_SCROLLBAR`. For example a scrollbar can turned to red like this:
 ```c
 static lv_style_t style_red;
 lv_style_init(&style_red);
@@ -83,13 +83,13 @@ OR-ed values are also possible. E.g. `LV_DIR_TOP | LV_DIR_LEFT`.
 
 ### Scroll chain
 If an object can't be scrolled further (e.g. it's content has reached the bottom most position) the scrolling is propagated to it's parent. If the parent an be scrolled in that direction than it will be scrolled instead.
-It goes to the grad parent and grand grandparents too.
+It propagets to the grandparent and grand-grandparents too.
 
-The propagation on scrolling in called "scroll chaining" and it can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_CHAIN` flag. 
+The propagation on scrolling is called "scroll chaining" and it can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_CHAIN` flag. 
 If chaining is disabled the propagation stops on the object and the parent(s) won't be scrolled.
 
 ### Scroll momentum
-When the user scrolls an object and releases it LVGL can emulate a momentum for the scrolling. It's like to object were thrown and the scrolling slows down smoothly. 
+When the user scrolls an object and releases it, LVGL can emulate a momentum for the scrolling. It's like the object was thrown and scrolling slows down smoothly. 
 
 The scroll momentum can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_MOMENTUM` flag. 
 
@@ -97,10 +97,10 @@ The scroll momentum can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_MOMENTU
 Normally the content can't be scrolled inside the object. That is the top side of the content can't be below the top side of the object. 
 
 However, with `LV_OBJ_FLAG_SCROLL_ELASTIC` a fancy effect can be added when the user "over-scrolls" the content. The scrolling slows down, and the content can be scrolled inside the object. 
-When the object is releases the content is scrolled in it will be animated back to the valid position. 
+When the object is released the content scrolled in it will be animated back to the valid position. 
 
-### Snaping
-The children of an object can be snapped according to specific rules when scrolling ends. Children can be made snapable individually with the `LV_OBJ_FLAG_SNAPABLE` flag.
+### Snapping
+The children of an object can be snapped according to specific rules when scrolling ends. Children can be made snappable individually with the `LV_OBJ_FLAG_SNAPABLE` flag. (Note misspelling of the flag name: your code needs to spell it with one P.)
 The object can align the snapped children in 4 ways: 
 - `LV_SCROLL_SNAP_NONE` Snapping is disabled. (default)
 - `LV_SCROLL_SNAP_START` Align the children to the left/top side of the scrolled object
@@ -109,15 +109,15 @@ The object can align the snapped children in 4 ways:
   
 The alignment can be set with `lv_obj_set_scroll_snap_x/y(obj, LV_SCROLL_SNAP_...)`:
  
-Under the hood the followings happen
+Under the hood the following happens:
 1. User scrolls an object and releases the screen
-2. LVGL calculates where would the scroll end considering scroll momentum
+2. LVGL calculates where the scroll would end considering scroll momentum
 3. LVGL finds the nearest scroll point
-4. LVGL scrolls the snap point with an animation
+4. LVGL scrolls to the snap point with an animation
  
 ### Scroll one
-The "scroll one" feature tells LVGL to allow scrolling only one snapable children at a time. 
-So it requires to make the children snapable and and set a scroll snap alignment different from `LV_SCROLL_SNAP_NONE`.
+The "scroll one" feature tells LVGL to allow scrolling only one snappable child at a time. 
+So this requires to make the children snappable (LV_OBJ_FLAG_SNAPABLE spelled with one P in code) and and set a scroll snap alignment different from `LV_SCROLL_SNAP_NONE`.
 
 This feature can be enabled by the `LV_OBJ_FLAG_SCROLL_ONE` flag.
 

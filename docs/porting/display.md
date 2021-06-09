@@ -4,14 +4,14 @@
 ```
 # Display interface
 
-To register a display for LVGL an `lv_disp_draw_buf_t` and an `lv_disp_drv_t` variables have to be initialized.
-- `lv_disp_draw_buf_t` contains internal graphic buffer(s), called draw buffer(s).
+To register a display for LVGL a `lv_disp_draw_buf_t` and a `lv_disp_drv_t` variable have to be initialized.
+- `lv_disp_draw_buf_t` contains internal graphic buffer(s) called draw buffer(s).
 - `lv_disp_drv_t` contains callback functions to interact with the display and manipulate drawing related things.
 
 ## Draw buffer
 
 Draw buffer(s) are simple array(s) that LVGL uses to render the content of the screen. 
-Once rendering is ready the content of the draw buffer is send to display using the `flush_cb` set in the display driver (see below).
+Once rendering is ready the content of the draw buffer is sent to the display using the `flush_cb` function set in the display driver (see below).
 
 A draw draw buffer can be initialized via a `lv_disp_draw_buf_t` variable like this:
 ```c
@@ -28,8 +28,8 @@ lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, MY_DISP_HOR_RES*10);
 
 Note that `lv_disp_draw_buf_t` needs to be static, global or dynamically allocated and not a local variable destroyed if goes out of the scope. 
 
-As you can see the draw buffer can be smaller than the screen. In this case, the larger areas will be redrawn in smaller parts that fit into the draw buffer(s). 
-If only a small area changes (e.g. a button is  pressed) then only that area will be refreshed.
+As you can see the draw buffer can be smaller than the screen. In this case, the larger areas will be redrawn in smaller parts that fit into the draw buffer(s).
+If only a small area changes (e.g. a button is pressed) then only that area will be refreshed.
 
 A larger buffer results in better performance but above 1/10 screen sized buffer(s) there is no significant performance improvement. 
 Therefore it's recommended to choose the size of the draw buffer(s) to at least 1/10 screen sized.
@@ -41,31 +41,31 @@ If **two buffers**  are used LVGL can draw into one buffer while the content of 
 DMA or other hardware should be used to transfer the data to the display to let the MCU draw meanwhile.
 This way, the rendering and refreshing of the display become parallel. 
 
-In the display driver (`lv_disp_drv_t`) the `full_refresh` bit can be enabled to force LVGL always redraw the whole screen. It works in both *one buffer* and *two buffers* modes.
+In the display driver (`lv_disp_drv_t`) the `full_refresh` bit can be enabled to force LVGL to always redraw the whole screen. This works in both *one buffer* and *two buffers* modes.
 
-If `full_refresh` is enabled and 2 screen sized draw buffers are provided, LVGL work as "traditional" double buffering. 
-It means in `flush_cb` only the address of the frame buffer needs to be changed to provided pointer (`color_p` parameter).
+If `full_refresh` is enabled and 2 screen sized draw buffers are provided, LVGL's display handling works like "traditional" double buffering. 
+This means in `flush_cb` only the address of the frame buffer needs to be changed to the provided pointer (`color_p` parameter).
 This configuration should be used if the MCU has LCD controller periphery and not with an external display controller (e.g. ILI9341 or SSD1963). 
 
 You can measure the performance of different draw buffer configurations using the [benchmark example](https://github.com/lvgl/lv_demos/tree/master/src/lv_demo_benchmark).
 
 ## Display driver
 
-Once the buffer initialization is ready a `lv_disp_drv_t` display drivers need to be
+Once the buffer initialization is ready a `lv_disp_drv_t` display driver needs to be
 1. initialized with `lv_disp_drv_init(&disp_drv)`
-2. its fields needs to be set
-3. registered in LVGL with `lv_disp_drv_register(&disp_drv)`
+2. its fields need to be set
+3. it needs to be registered in LVGL with `lv_disp_drv_register(&disp_drv)`
 
 Note that `lv_disp_drv_t` also needs to be static, global or dynamically allocated and not a local variable destroyed if goes out of the scope. 
 
 ### Mandatory fields
-In the most simple case only the following fields of `lv_disp_drv_t` needs to be set:
+In the most simple case only the following fields of `lv_disp_drv_t` need to be set:
 - `draw_buf` pointer to an initialized `lv_disp_draw_buf_t` variable.
 - `hor_res` horizontal resolution of the display in pixels. 
 - `ver_res` vertical resolution of the display in pixels.
 - `flush_cb` a callback function to copy a buffer's content to a specific area of the display. 
 `lv_disp_flush_ready(&disp_drv)` needs to be called when flushing is ready. 
-LVGL might render the screen in multiple chunks and therefore call `flush_cb` multiple times. To see which is the last chunk of rendering use `lv_disp_flush_is_last(&disp_drv)`.
+LVGL might render the screen in multiple chunks and therefore call `flush_cb` multiple times. To see if the current one is the last chunk of rendering use `lv_disp_flush_is_last(&disp_drv)`.
 
 ### Optional fields 
 There are some optional data fields:
@@ -85,7 +85,7 @@ This way the buffers used in `lv_disp_draw_buf_t` can be smaller to hold only th
 
 LVGL has built-in support to several GPUs (see `lv_conf.h`) but if something else is required these functions can be used to make LVGL use a GPU:
 - `gpu_fill_cb` fill an area in the memory with a color.
-- `gpu_wait_cb` if any GPU function return, while the GPU is still working, LVGL will use this function when required the be sure GPU rendering is ready.
+- `gpu_wait_cb` if any GPU function returns while the GPU is still working, LVGL will use this function when required to make sure GPU rendering is ready.
 
 ### Examples
 All together it looks like this:

@@ -7,9 +7,9 @@
 
 ## Overview
 
-A Canvas inherites from [Image](/widgets/core/img) where the user can draw anything. 
+A Canvas inherits from [Image](/widgets/core/img) where the user can draw anything. 
 Rectangles, texts, images, lines, arcs can be drawn here using lvgl's drawing engine. 
-Besides some "effects" can be applied as well like rotation, zoom and blur.
+Additionally "effects" can be applied, such as rotation, zoom and blur.
 
 
 ## Parts and Styles
@@ -18,7 +18,7 @@ Besides some "effects" can be applied as well like rotation, zoom and blur.
 ## Usage
 
 ### Buffer
-The Canvas needs a buffer which stores the drawn image.
+The Canvas needs a buffer in which stores the drawn image.
 To assign a buffer to a Canvas, use `lv_canvas_set_buffer(canvas, buffer, width, height, LV_IMG_CF_...)`. 
 Where  `buffer` is a static buffer (not just a local variable) to hold the image of the canvas.
 For example,
@@ -37,7 +37,7 @@ To set a pixel on the canvas, use `lv_canvas_set_px(canvas, x, y, LV_COLOR_RED)`
 With `LV_IMG_CF_INDEXED_...` or `LV_IMG_CF_ALPHA_...`, the index of the color or the alpha value needs to be passed as color. 
 E.g. `lv_color_t c; c.full = 3;`
 
-`lv_canvas_fill_bg(canvas, LV_COLOR_BLUE, LV_OPA_50)` fills the whole canvas to blue with 50% opacity. Note that, if the current color format doesn't support colors (e.g. `LV_IMG_CF_ALPHA_2BIT`) the color will be ignored. 
+`lv_canvas_fill_bg(canvas, LV_COLOR_BLUE, LV_OPA_50)` fills the whole canvas to blue with 50% opacity. Note that if the current color format doesn't support colors (e.g. `LV_IMG_CF_ALPHA_2BIT`) the color will be ignored. 
 Similarly, if opacity is not supported (e.g. `LV_IMG_CF_TRUE_COLOR`) it will be ignored.
 
 An array of pixels can be copied to the canvas with `lv_canvas_copy_buf(canvas, buffer_to_copy, x, y, width, height)`. 
@@ -51,7 +51,7 @@ To draw something to the canvas use
 - `lv_canvas_draw_polygon(canvas, points_array, point_cnt, &draw_dsc)`
 - `lv_canvas_draw_arc(canvas, x, y, radius, start_angle, end_angle, &draw_dsc)`
 
-`draw_dsc` is a `lv_draw_rect/label/img/line/arc_dsc_t` variable which should be first initialized with `lv_draw_rect/label/img/line/arc_dsc_init()` function and then it's filed should be modified with the desired colors and other values.
+`draw_dsc` is a `lv_draw_rect/label/img/line/arc_dsc_t` variable which should be first initialized with one of `lv_draw_rect/label/img/line/arc_dsc_init()` and then modified with the desired colors and other values.
 
 The draw function can draw to any color format. For example, it's possible to draw a text to an `LV_IMG_VF_ALPHA_8BIT` canvas and use the result image as a [draw mask](/overview/drawing) later.
 
@@ -61,7 +61,7 @@ The function needs the following parameters:
 - `canvas` pointer to a canvas object to store the result of the transformation.
 - `img pointer` to an image descriptor to transform. Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
 - `angle` the angle of rotation (0..3600), 0.1 deg resolution
-- `zoom` zoom factor (256 no zoom, 512 double size, 128 half size);
+- `zoom` zoom factor (256: no zoom, 512: double size, 128: half size);
 - `offset_x` offset X to tell where to put the result data on destination canvas
 - `offset_y` offset X to tell where to put the result data on destination canvas
 - `pivot_x` pivot X of rotation. Relative to the source canvas. Set to `source width / 2` to rotate around the center
@@ -72,10 +72,10 @@ Note that a canvas can't be rotated on itself.  You need a source and destinatio
 
 ### Blur
 A given area of the canvas can be blurred horizontally with `lv_canvas_blur_hor(canvas, &area, r)` or vertically with `lv_canvas_blur_ver(canvas, &area, r)`. 
-`r` is the radius of the blur (greater value means more intensive burring). `area` is the area where the blur should be applied (interpreted relative to the canvas)
+`r` is the radius of the blur (greater value means more intensive burring). `area` is the area where the blur should be applied (interpreted relative to the canvas).
 
 ## Events
-The same events are sent than for the [Images](/widgets/core/img).
+The same events are sent as for the [Images](/widgets/core/img).
 
 Learn more about [Events](/overview/event).
 

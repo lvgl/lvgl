@@ -13,13 +13,13 @@ Long lines are wrapped and when the text becomes long enough the Text area can b
 One line mode and password modes are supported.
 
 ## Parts and Styles
-- `LV_PART_MAIN` The background of the text area and it uses all the typical backgrond style properties and the text related style properties including `text_align` to align the text to the left, right or center.
+- `LV_PART_MAIN` The background of the text area. Uses all the typical backgrond style properties and the text related style properties including `text_align` to align the text to the left, right or center.
 - `LV_PART_SCROLLBAR` The scrollbar that is shown when the text is too long.
-- `LV_PART_SELECTED` Tells the style of the [selected text](#text-selection). Only `text_color` and `bg_color` style properties can be used. 
+- `LV_PART_SELECTED` Detemines the style of the [selected text](#text-selection). Only `text_color` and `bg_color` style properties can be used.
 - `LV_PART_CURSOR` Marks the position where the characters are inserted. The cursor's area is always the bounding box of the current character. 
-A block cursor can be created by adding a background color and background opacity to `LV_PART_CURSOR`'s style. The create line cursor let the cursor transparent and set a left border. 
-The `anim_time` style property sets the cursors blink time. 
-- `LV_PART_TEXTAREA_PLACEHOLDER` It's a part related only to the text area and allows styling the placeholder text.
+A block cursor can be created by adding a background color and background opacity to `LV_PART_CURSOR`'s style. The create line cursor leave the cursor transparent and set a left border. 
+The `anim_time` style property sets the cursor's blink time. 
+- `LV_PART_TEXTAREA_PLACEHOLDER` Unique to Text Area, allows styling the placeholder text.
 
 ## Usage
 
@@ -58,11 +58,11 @@ You can step the cursor with
 If `lv_textarea_set_cursor_click_pos(textarea, true)` is applied the cursor will jump to the position where the Text area was clicked.
 
 ### Hide the cursor
-The cursor is always visible, hiwever it can be good idea to style to be visible only in `LV_STATE_FOCUSED` state. 
+The cursor is always visible, however it can be a good idea to style it to be visible only in `LV_STATE_FOCUSED` state. 
 
 ### One line mode
-The Text area can be configures to be one lined with `lv_textarea_set_one_line(textarea, true)`. 
-In this mode the height is set automatically to show only one line, line break character are ignored, and word wrap is disabled. 
+The Text area can be configured to be on a single line with `lv_textarea_set_one_line(textarea, true)`. 
+In this mode the height is set automatically to show only one line, line break characters are ignored, and word wrap is disabled. 
 
 ### Password mode
 The text area supports password mode which can be enabled with `lv_textarea_set_password_mode(textarea, true)`. 
@@ -70,7 +70,7 @@ The text area supports password mode which can be enabled with `lv_textarea_set_
 If the `•` ([Bullet, U+2022](http://www.fileformat.info/info/unicode/char/2022/index.htm)) character exists in the font, the entered characters are converted to it after some time or when a new character is entered. 
 If `•` not exists, `*` will be used.
 
-In password mode `lv_textarea_get_text(textarea)` gives the real text, not the bullet characters.
+In password mode `lv_textarea_get_text(textarea)` returns the actual text entered, not the bullet characters.
 
 The visibility time can be adjusted with `LV_TEXTAREA_DEF_PWD_SHOW_TIME)` in `lv_conf.h`.
 
@@ -82,19 +82,19 @@ Other characters will be ignored.
 The maximum number of characters can be limited with `lv_textarea_set_max_length(textarea, max_char_num)`
 
 ### Very long texts
-If there is a  very long text in the Text area  (e. g. > 20k characters) its scrolling and drawing might be slow. 
+If there is a very long text in the Text area (e. g. > 20k characters), scrolling and drawing might be slow. 
 However, by enabling `LV_LABEL_LONG_TXT_HINT   1` in `lv_conf.h` the performance can be hugely improved. 
-It will save some information about the label to speed up its drawing. 
+This will save some additional information about the label to speed up its drawing. 
 Using `LV_LABEL_LONG_TXT_HINT` the scrolling and drawing will as fast as with "normal" short texts.
 
 ### Select text
-A part of text can be selected if enabled with `lv_textarea_set_text_selection(textarea, true)`. 
-It works like when you select a text on your PC with your mouse. 
+Any part of the text can be selected if enabled with `lv_textarea_set_text_selection(textarea, true)`. 
+This works much like when you select text on your PC with your mouse. 
 
 ## Events
-- `LV_EVENT_INSERT` Sent when before a character or text is inserted. 
-The event paramter is the text planned to be inserted. `lv_textarea_set_insert_replace(textarea, "New text")` replaces the text to insert. 
-The new text can not be in a local variable which is destroyed when the event callback exists. `""` means do not insert anything.
+- `LV_EVENT_INSERT` Sent right before a character or text is inserted. 
+The event paramter is the text about to be inserted. `lv_textarea_set_insert_replace(textarea, "New text")` replaces the text to insert. 
+The new text cannot be in a local variable which is destroyed when the event callback exists. `""` means do not insert anything.
 - `LV_EVENT_VALUE_CHANGED` Sent when the content of the text area has been changed. 
 - `LV_EVENT_APPLY` Sent when `LV_KEY_ENTER` is pressed (or(sent) to a one line text area.
 

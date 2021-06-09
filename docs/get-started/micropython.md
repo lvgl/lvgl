@@ -33,8 +33,8 @@ In Micropython it's just **`Change code` > `Run`** ! You can even run commands i
 ### Micropython + LVGL could be used for:
 
 - Fast prototyping GUI.  
-- Shorten the cycle of changing and fine-tuning the GUI.
-- Model the GUI in a more abstract way by defining reusable composite objects, taking advantage of Python's language features such as Inheritance, Closures, List Comprehension, Generators, Exception Handling, Arbitrary Precision Integers and others.
+- Shortening the cycle of changing and fine-tuning the GUI.
+- Modelling the GUI in a more abstract way by defining reusable composite objects, taking advantage of Python's language features such as Inheritance, Closures, List Comprehension, Generators, Exception Handling, Arbitrary Precision Integers and others.
 - Make LVGL accessible to a larger audience. No need to know C in order to create a nice GUI on an embedded system.  
 This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython). CircuitPython was designed with education in mind, to make it easier for new or unexperienced users to get started with embedded development.
 - Creating tools to work with LVGL at a higher level (e.g. drag-and-drop designer).
@@ -82,15 +82,15 @@ Micropython is ported to many platforms. One notable port is "unix", which allow
 
 ### Embedded platform
 
-At the end, the goal is to run it all on an embedded platform.  
+In the end, the goal is to run it all on an embedded platform.  
 Both Micropython and LVGL can be used on many embedded architectures, such as stm32, ESP32 etc.  
-You would also need display and input drivers. We have some sample drivers (ESP32+ILI9341, as well as some other examples), but most chances are you would want to create your own input/display drivers for your specific purposes.  
-Drivers can be implemented either in C as Micropython module, or in pure Micropython!
+You would also need display and input drivers. We have some sample drivers (ESP32+ILI9341, as well as some other examples), but chances are you would want to create your own input/display drivers for your specific hardware.
+Drivers can be implemented either in C as a Micropython module, or in pure Micropython!
 
 ## Where can I find more information?
 
-- On the [Blog Post](https://blog.lvgl.io/2019-02-20/micropython-bindings)
-- On `lv_micropython` [README](https://github.com/lvgl/lv_micropython)
-- On `lv_binding_micropython` [README](https://github.com/lvgl/lv_binding_micropython)
-- On LVGL forum (Feel free to ask anything!)
-- On Micropython [docs](http://docs.micropython.org/en/latest/) and [forum](https://forum.micropython.org/)
+- In this [Blog Post](https://blog.lvgl.io/2019-02-20/micropython-bindings)
+- `lv_micropython` [README](https://github.com/lvgl/lv_micropython)
+- `lv_binding_micropython` [README](https://github.com/lvgl/lv_binding_micropython)
+- The [LVGL micropython forum](https://forum.lvgl.io/c/micropython) (Feel free to ask anything!)
+- At Micropython: [docs](http://docs.micropython.org/en/latest/) and [forum](https://forum.micropython.org/)

@@ -9,7 +9,7 @@ The Spinbox contains a number as text which can be increased or decreased by *Ke
 Under the hood the Spinbox is a modified [Text area](/widgets/core/textarea).
 
 ## Parts and Styles
-The parts of the Spinbox are identiacl to the [Text area](/widgets/core/textarea).
+The parts of the Spinbox are identical to the [Text area](/widgets/core/textarea).
 
 ### Value, range and step
 `lv_spinbox_set_value(spinbox, 1234)` sets a new value on the Spinbox.
@@ -18,16 +18,15 @@ The parts of the Spinbox are identiacl to the [Text area](/widgets/core/textarea
 
 `lv_spinbox_set_range(spinbox, -1000, 2500)` sets a range. If the value is changed by `lv_spinbox_set_value`, by *Keys*,`lv_spinbox_increment/decrement` this range will be respected.
 
-`lv_spinbox_set_step(spinbox, 100)` sets which digits to change on increment/decrement. Only 10^n values values can be set, and not for example 3. 
+`lv_spinbox_set_step(spinbox, 100)` sets which digits to change on increment/decrement. Only multiples of ten can be set, and not for example 3. 
 
 ### Format
 
-`lv_spinbox_set_digit_format(spinbox, digit_count, separator_position)` sets the number format. `digit_count` is the number of digit excluding the decimal separator and the sign.
-`separator_position` is the number of digit before the decimal point. If 0, decimal point is not
+`lv_spinbox_set_digit_format(spinbox, digit_count, separator_position)` sets the number format. `digit_count` is the number of digits excluding the decimal separator and the sign.
+`separator_position` is the number of digits before the decimal point. If 0, no decimal point is displayed.
 
 ### Rollover
-`lv_spinbox_set_rollover(spinbox, true/false)` enables/disabled rolloiver mode. If the minimum or maximum values is reached with rollover the value will change to the other limit. 
-If not enabled the value will be reamain at the minimum or maximum value. 
+`lv_spinbox_set_rollover(spinbox, true/false)` enables/disabled rollover mode. If either the minimum or maximum value is reached with rollover enabled, the value will change to the other limit. If rollover is disabled the value will be remain at the minimum or maximum value. 
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the value has changed.

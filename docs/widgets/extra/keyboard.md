@@ -12,8 +12,8 @@ The Keyboard object is a special [Button matrix](/widgets/core/btnmatrix) with p
 
 ## Parts and Styles
 Similarly to Button matrices Keyboards consist of 2 part: 
-- `LV_PART_MAIN` The main part and uses all the typical background properties
-- `LV_PART_ITEMS` The buttons and it also uses all typical background properties and the *text* properties.
+- `LV_PART_MAIN` The main part. Uses all the typical background properties
+- `LV_PART_ITEMS` The buttons. Also uses all typical background properties as well as the *text* properties.
 
 ## Usage
 
@@ -36,7 +36,7 @@ To assign the text area, use `lv_keyboard_set_textarea(kb, ta)`.
 ### New Keymap
 You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, map)` and `lv_keyboard_set_ctrl_map(kb, ctrl_map)`.
 Learn more about the [Button matrix](/widgets/core/btnmatrix) object.
-Keep in mind that, using following keywords will have the same effect as with the original map:  
+Keep in mind that using following keywords will have the same effect as with the original map:  
 - `LV_SYMBOL_OK` Apply.
 - `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Close.
 - `LV_SYMBOL_BACKSPACE` Delete on the left.
@@ -52,9 +52,7 @@ Keep in mind that, using following keywords will have the same effect as with th
 - `LV_EVENT_READY` - The *Ok* button is clicked.
 - `LV_EVENT_CANCEL` - The *Close* button is clicked.
 
-The keyboard has a **default event handler** callback called `lv_keyboard_def_event_cb`.
-It handles the button pressing, map changing, the assigned text area, etc.
-You can remove it and replace it with a custom event handler if you wish.
+The keyboard has a **default event handler** callback called `lv_keyboard_def_event_cb`, which handles the button pressing, map changing, the assigned text area, etc. You can remove it and replace it with a custom event handler if you wish.
 
 Learn more about [Events](/overview/event).
 

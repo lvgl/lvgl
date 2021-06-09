@@ -8,18 +8,18 @@
 ## Overview
 
 The Tab view object can be used to organize content in tabs.
-The Tab view is built from other widgets like this:
+The Tab view is built from other widgets:
 - Main container: [lv_obj](/widgets/obj))
   - Tab buttons: [lv_btnmatrix](/widgets/core/btnmatrix)
   - Container for the tabs: [lv_obj](/widgets/obj)
      - Content of the tabs: [lv_obj](/widgets/obj)
 
-The tab buttons can be positioned on the topn, bottom, left and right side of teh Tab view. 
+The tab buttons can be positioned on the top, bottom, left and right side of the Tab view. 
 
-A new tab can be selected either clicking on a tab button or sliding horizontally on the content.
+A new tab can be selected either by clicking on a tab button or by sliding horizontally on the content.
 
 ## Parts and Styles
-There are no special parts on the Tab view but the `lv_obj` and `lv_btnnmatrix` widgets are used to build up the Tab view.
+There are no special parts on the Tab view but the `lv_obj` and `lv_btnnmatrix` widgets are used to create the Tab view.
 
 ## Usage
 
@@ -30,7 +30,7 @@ There are no special parts on the Tab view but the `lv_obj` and `lv_btnnmatrix` 
 
 ### Add tabs
 
-New tabs can be added with `lv_tabview_add_tab(tabview, "Tab name")`. It will return with a pointer to an [lv_obj](/widgets/obj) object where the tab's content can be created.
+New tabs can be added with `lv_tabview_add_tab(tabview, "Tab name")`. This will return a pointer to an [lv_obj](/widgets/obj) object where the tab's content can be created.
 
 ### Change tab
 
@@ -41,7 +41,7 @@ To select a new tab you can:
 
 ### Get the parts
 
-`lv_tabview_get_content(tabview)` return the container for the tabs, `lv_tabview_get_tab_btns(tabview)` returns the Tab buttons which is a [Button matrix](/widgets/core/btnmatrix).
+`lv_tabview_get_content(tabview)` returns the container for the tabs, `lv_tabview_get_tab_btns(tabview)` returns the Tab buttons object which is a [Button matrix](/widgets/core/btnmatrix).
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a new tab is selected by sliding or clicking the tab button. `lv_tabview_get_tab_act(tabview)` returns the zero based index of the current tab.
@@ -50,7 +50,7 @@ Learn more about [Events](/overview/event).
 
 ## Keys
 
-Keys have effect only on the tab buttons (Button matrix). You can add it manually to a group if required.
+Keys have effect only on the tab buttons (Button matrix). Add manually to a group if required.
 
 Learn more about [Keys](/overview/indev).
 
