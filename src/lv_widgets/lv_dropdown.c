@@ -1259,7 +1259,9 @@ static lv_res_t page_release_handler(lv_obj_t * page)
     /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
         lv_point_t p;
-        lv_indev_get_point(indev, &p);
+        /* when press released, current point is '-1, -1', we must use last point */
+        p.x = indev->proc.types.pointer.last_point.x;
+        p.y = indev->proc.types.pointer.last_point.y;
         ext->sel_opt_id     = get_id_on_point(ddlist, p.y);
         ext->sel_opt_id_orig = ext->sel_opt_id;
     }
