@@ -861,7 +861,7 @@ static void integrity_walker(void* ptr, size_t size, int used, void* user)
 	integ->status += status;
 }
 
-int tlsf_check(tlsf_t tlsf)
+int lv_tlsf_check(lv_tlsf_t tlsf)
 {
 	int i, j;
 
@@ -921,9 +921,9 @@ static void default_walker(void* ptr, size_t size, int used, void* user)
 	printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, (void*)block_from_ptr(ptr));
 }
 
-void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
+void lv_tlsf_walk_pool(lv_pool_t pool, lv_tlsf_walker walker, void* user)
 {
-	tlsf_walker pool_walker = walker ? walker : default_walker;
+	lv_tlsf_walker pool_walker = walker ? walker : default_walker;
 	block_header_t* block =
 		offset_to_block(pool, -(int)block_header_overhead);
 
@@ -938,7 +938,7 @@ void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
 	}
 }
 
-size_t tlsf_block_size(void* ptr)
+size_t lv_tlsf_block_size(void* ptr)
 {
 	size_t size = 0;
 	if (ptr)
@@ -949,65 +949,65 @@ size_t tlsf_block_size(void* ptr)
 	return size;
 }
 
-int tlsf_check_pool(pool_t pool)
+int lv_tlsf_check_pool(lv_pool_t pool)
 {
 	/* Check that the blocks are physically correct. */
 	integrity_t integ = { 0, 0 };
-	tlsf_walk_pool(pool, integrity_walker, &integ);
+	lv_tlsf_walk_pool(pool, integrity_walker, &integ);
 
 	return integ.status;
 }
 
 /*
 ** Size of the TLSF structures in a given memory block passed to
-** tlsf_create, equal to the size of a control_t
+** lv_tlsf_create, equal to the size of a control_t
 */
-size_t tlsf_size(void)
+size_t lv_tlsf_size(void)
 {
 	return sizeof(control_t);
 }
 
-size_t tlsf_align_size(void)
+size_t lv_tlsf_align_size(void)
 {
 	return ALIGN_SIZE;
 }
 
-size_t tlsf_block_size_min(void)
+size_t lv_tlsf_block_size_min(void)
 {
 	return block_size_min;
 }
 
-size_t tlsf_block_size_max(void)
+size_t lv_tlsf_block_size_max(void)
 {
 	return block_size_max;
 }
 
 /*
 ** Overhead of the TLSF structures in a given memory block passed to
-** tlsf_add_pool, equal to the overhead of a free block and the
+** lv_tlsf_add_pool, equal to the overhead of a free block and the
 ** sentinel block.
 */
-size_t tlsf_pool_overhead(void)
+size_t lv_tlsf_pool_overhead(void)
 {
 	return 2 * block_header_overhead;
 }
 
-size_t tlsf_alloc_overhead(void)
+size_t lv_tlsf_alloc_overhead(void)
 {
 	return block_header_overhead;
 }
 
-pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
+lv_pool_t lv_tlsf_add_pool(lv_tlsf_t tlsf, void* mem, size_t bytes)
 {
 	block_header_t* block;
 	block_header_t* next;
 
-	const size_t pool_overhead = tlsf_pool_overhead();
+	const size_t pool_overhead = lv_tlsf_pool_overhead();
 	const size_t pool_bytes = align_down(bytes - pool_overhead, ALIGN_SIZE);
 
 	if (((ptrdiff_t)mem % ALIGN_SIZE) != 0)
 	{
-		printf("tlsf_add_pool: Memory must be aligned by %u bytes.\n",
+		printf("lv_tlsf_add_pool: Memory must be aligned by %u bytes.\n",
 			(unsigned int)ALIGN_SIZE);
 		return 0;
 	}
@@ -1015,11 +1015,11 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 	if (pool_bytes < block_size_min || pool_bytes > block_size_max)
 	{
 #if defined (TLSF_64BIT)
-		printf("tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n", 
+		printf("lv_tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n", 
 			(unsigned int)(pool_overhead + block_size_min),
 			(unsigned int)((pool_overhead + block_size_max) / 256));
 #else
-		printf("tlsf_add_pool: Memory size must be between %u and %u bytes.\n", 
+		printf("lv_tlsf_add_pool: Memory size must be between %u and %u bytes.\n", 
 			(unsigned int)(pool_overhead + block_size_min),
 			(unsigned int)(pool_overhead + block_size_max));
 #endif
@@ -1046,7 +1046,7 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 	return mem;
 }
 
-void tlsf_remove_pool(tlsf_t tlsf, pool_t pool)
+void lv_tlsf_remove_pool(lv_tlsf_t tlsf, lv_pool_t pool)
 {
 	control_t* control = tlsf_cast(control_t*, tlsf);
 	block_header_t* block = offset_to_block(pool, -(int)block_header_overhead);
@@ -1093,7 +1093,7 @@ int test_ffs_fls()
 }
 #endif
 
-tlsf_t tlsf_create(void* mem)
+lv_tlsf_t lv_tlsf_create(void* mem)
 {
 #if _DEBUG
 	if (test_ffs_fls())
@@ -1104,35 +1104,35 @@ tlsf_t tlsf_create(void* mem)
 
 	if (((tlsfptr_t)mem % ALIGN_SIZE) != 0)
 	{
-		printf("tlsf_create: Memory must be aligned to %u bytes.\n",
+		printf("lv_tlsf_create: Memory must be aligned to %u bytes.\n",
 			(unsigned int)ALIGN_SIZE);
 		return 0;
 	}
 
 	control_constructor(tlsf_cast(control_t*, mem));
 
-	return tlsf_cast(tlsf_t, mem);
+	return tlsf_cast(lv_tlsf_t, mem);
 }
 
-tlsf_t tlsf_create_with_pool(void* mem, size_t bytes)
+lv_tlsf_t lv_tlsf_create_with_pool(void* mem, size_t bytes)
 {
-	tlsf_t tlsf = tlsf_create(mem);
-	tlsf_add_pool(tlsf, (char*)mem + tlsf_size(), bytes - tlsf_size());
+	lv_tlsf_t tlsf = lv_tlsf_create(mem);
+	lv_tlsf_add_pool(tlsf, (char*)mem + lv_tlsf_size(), bytes - lv_tlsf_size());
 	return tlsf;
 }
 
-void tlsf_destroy(tlsf_t tlsf)
+void lv_tlsf_destroy(lv_tlsf_t tlsf)
 {
 	/* Nothing to do. */
 	(void)tlsf;
 }
 
-pool_t tlsf_get_pool(tlsf_t tlsf)
+lv_pool_t lv_tlsf_get_pool(lv_tlsf_t tlsf)
 {
-	return tlsf_cast(pool_t, (char*)tlsf + tlsf_size());
+	return tlsf_cast(lv_pool_t, (char*)tlsf + lv_tlsf_size());
 }
 
-void* tlsf_malloc(tlsf_t tlsf, size_t size)
+void* lv_tlsf_malloc(lv_tlsf_t tlsf, size_t size)
 {
 	control_t* control = tlsf_cast(control_t*, tlsf);
 	const size_t adjust = adjust_request_size(size, ALIGN_SIZE);
@@ -1140,7 +1140,7 @@ void* tlsf_malloc(tlsf_t tlsf, size_t size)
 	return block_prepare_used(control, block, adjust);
 }
 
-void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
+void* lv_tlsf_memalign(lv_tlsf_t tlsf, size_t align, size_t size)
 {
 	control_t* control = tlsf_cast(control_t*, tlsf);
 	const size_t adjust = adjust_request_size(size, ALIGN_SIZE);
@@ -1158,7 +1158,7 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 
 	/*
 	** If alignment is less than or equals base alignment, we're done.
-	** If we requested 0 bytes, return null, as tlsf_malloc(0) does.
+	** If we requested 0 bytes, return null, as lv_tlsf_malloc(0) does.
 	*/
 	const size_t aligned_size = (adjust && align > ALIGN_SIZE) ? size_with_gap : adjust;
 
@@ -1197,7 +1197,7 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 	return block_prepare_used(control, block, adjust);
 }
 
-void tlsf_free(tlsf_t tlsf, void* ptr)
+void lv_tlsf_free(lv_tlsf_t tlsf, void* ptr)
 {
 	/* Don't attempt to free a NULL pointer. */
 	if (ptr)
@@ -1225,7 +1225,7 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
 ** - an extended buffer size will leave the newly-allocated area with
 **   contents undefined
 */
-void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
+void* lv_tlsf_realloc(lv_tlsf_t tlsf, void* ptr, size_t size)
 {
 	control_t* control = tlsf_cast(control_t*, tlsf);
 	void* p = 0;
@@ -1233,12 +1233,12 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 	/* Zero-size requests are treated as free. */
 	if (ptr && size == 0)
 	{
-		tlsf_free(tlsf, ptr);
+		lv_tlsf_free(tlsf, ptr);
 	}
 	/* Requests with NULL pointers are treated as malloc. */
 	else if (!ptr)
 	{
-		p = tlsf_malloc(tlsf, size);
+		p = lv_tlsf_malloc(tlsf, size);
 	}
 	else
 	{
@@ -1257,12 +1257,12 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 		*/
 		if (adjust > cursize && (!block_is_free(next) || adjust > combined))
 		{
-			p = tlsf_malloc(tlsf, size);
+			p = lv_tlsf_malloc(tlsf, size);
 			if (p)
 			{
 				const size_t minsize = tlsf_min(cursize, size);
 				lv_memcpy(p, ptr, minsize);
-				tlsf_free(tlsf, ptr);
+				lv_tlsf_free(tlsf, ptr);
 			}
 		}
 		else

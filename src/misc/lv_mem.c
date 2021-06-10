@@ -51,7 +51,7 @@
  *  STATIC VARIABLES
  **********************/
 #if LV_MEM_CUSTOM == 0
-    static tlsf_t tlsf;
+    static lv_tlsf_t tlsf;
 #endif
 
 static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
@@ -85,9 +85,9 @@ void lv_mem_init(void)
 #if LV_MEM_ADR == 0
     /*Allocate a large array to store the dynamically allocated data*/
     static LV_ATTRIBUTE_LARGE_RAM_ARRAY MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
-    tlsf = tlsf_create_with_pool((void *)work_mem_int, LV_MEM_SIZE);
+    tlsf = lv_tlsf_create_with_pool((void *)work_mem_int, LV_MEM_SIZE);
 #else
-    tlsf = tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
+    tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
 #endif
 
@@ -103,7 +103,7 @@ void lv_mem_init(void)
 void lv_mem_deinit(void)
 {
 #if LV_MEM_CUSTOM == 0
-    tlsf_destroy(tlsf);
+    lv_tlsf_destroy(tlsf);
     lv_mem_init();
 #endif
 }
@@ -122,7 +122,7 @@ void * lv_mem_alloc(size_t size)
     }
 
 #if LV_MEM_CUSTOM == 0
-    void * alloc = tlsf_malloc(tlsf, size);
+    void * alloc = lv_tlsf_malloc(tlsf, size);
 #else
     void * alloc = LV_MEM_CUSTOM_ALLOC(size);
 #endif
@@ -156,9 +156,9 @@ void lv_mem_free(void * data)
 
 #if LV_MEM_CUSTOM == 0
 #  if LV_MEM_ADD_JUNK
-    lv_memset(data, 0xbb, tlsf_block_size(data));
+    lv_memset(data, 0xbb, lv_tlsf_block_size(data));
 #  endif
-    tlsf_free(tlsf, data);
+    lv_tlsf_free(tlsf, data);
 #else
     LV_MEM_CUSTOM_FREE(data);
 #endif
@@ -183,7 +183,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     if(data_p == &zero_mem) return lv_mem_alloc(new_size);
 
 #if LV_MEM_CUSTOM == 0
-    void * new_p = tlsf_realloc(tlsf, data_p, new_size);
+    void * new_p = lv_tlsf_realloc(tlsf, data_p, new_size);
 #else
     void * new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
 #endif
@@ -204,12 +204,12 @@ lv_res_t lv_mem_test(void)
     }
 
 #if LV_MEM_CUSTOM == 0
-    if(tlsf_check(tlsf)) {
+    if(lv_tlsf_check(tlsf)) {
         LV_LOG_WARN("failed");
         return LV_RES_INV;
     }
 
-    if (tlsf_check_pool(tlsf_get_pool(tlsf))) {
+    if (lv_tlsf_check_pool(lv_tlsf_get_pool(tlsf))) {
         LV_LOG_WARN("pool failed");
         return LV_RES_INV;
     }
@@ -230,7 +230,7 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 #if LV_MEM_CUSTOM == 0
     MEM_TRACE("begin");
 
-    tlsf_walk_pool(tlsf_get_pool(tlsf), lv_mem_walker, mon_p);
+    lv_tlsf_walk_pool(lv_tlsf_get_pool(tlsf), lv_mem_walker, mon_p);
 
     mon_p->total_size = LV_MEM_SIZE;
     mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
