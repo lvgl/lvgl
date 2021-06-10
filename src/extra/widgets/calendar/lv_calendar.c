@@ -359,7 +359,7 @@ static void highlight_update(lv_obj_t * obj)
     }
 
     if(calendar->showed_date.year == calendar->today.year && calendar->showed_date.month == calendar->today.month) {
-        uint8_t day_first = get_day_of_week(calendar->today.year, calendar->today.month, calendar->today.day - 1);
+        uint8_t day_first = get_day_of_week(calendar->today.year, calendar->today.month, 0);
         lv_btnmatrix_set_btn_ctrl(obj, calendar->today.day + day_first + 7, LV_CALENDAR_CTRL_TODAY);
     }
 }
