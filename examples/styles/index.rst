@@ -1,5 +1,3 @@
-C
-^
 
 Size styles
 """""""""""""""""""
@@ -91,7 +89,3 @@ Extending the current theme
   :language: c
   
   
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.

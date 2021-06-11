@@ -1,5 +1,3 @@
-C
-^
 
 Image from variable and symbol 
 """""""""""""""""""""""""""""""
@@ -28,7 +26,3 @@ Image offset and styling
   :language: c
 
 
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.

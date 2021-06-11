@@ -1,5 +1,3 @@
-C
-^
 
 Drawing on the Canvas and rotate 
 """"""""""""""""""""""""""""""""""
@@ -13,7 +11,3 @@ Transparent Canvas with chroma keying
 .. lv_example:: widgets/canvas/lv_example_canvas_2
   :language: c
 
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.

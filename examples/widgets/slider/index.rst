@@ -1,5 +1,3 @@
-C
-^
 
 Simple Slider
 """""""""""""""""""""""""
@@ -20,7 +18,3 @@ Slider with extended drawer
   :language: c
   
 
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.

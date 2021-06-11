@@ -1,5 +1,3 @@
-C
-^
 
 Button click event
 """""""""""""""""""
@@ -19,7 +17,3 @@ Event bubbling
   :language: c
 
   
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.

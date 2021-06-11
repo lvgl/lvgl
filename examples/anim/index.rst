@@ -1,5 +1,3 @@
-C
-^
 
 Start animation on an event 
 """"""""""""""""""""""""""""
@@ -13,7 +11,3 @@ Playback animation
   :language: c
 
   
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.

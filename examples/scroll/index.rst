@@ -1,5 +1,3 @@
-C
-^
 
 Nested scrolling 
 """"""""""""""""
@@ -33,7 +31,3 @@ Translate on scroll
   :language: c
   
   
-MicroPython
-^^^^^^^^^^^
-
-No examples yet.
