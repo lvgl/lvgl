@@ -57,6 +57,13 @@ void lv_obj_del(struct _lv_obj_t * obj);
 void lv_obj_clean(struct _lv_obj_t * obj);
 
 /**
+ * Delete an object after some delay
+ * @param obj       pointer to an object
+ * @param delay_ms  time to wait before delete in milliseconds
+ */
+void lv_obj_del_delayed(struct _lv_obj_t * obj, uint32_t delay_ms);
+
+/**
  * A function to be easily used in animation ready callback to delete an object when the animation is ready
  * @param a         pointer to the animation
  */

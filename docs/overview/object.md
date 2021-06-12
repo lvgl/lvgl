@@ -121,6 +121,8 @@ This is useful e.g. if you want to delete the parent of an object in the child's
 
 You can remove all the children of an object (but not the object itself) using `lv_obj_clean(obj)`.
 
+You can use `lv_obj_del_delayed(obj, 1000)` to delete an object after some time. The delay is expressed in millliseconds. 
+
 
 ## Screens
 
