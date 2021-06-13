@@ -27,7 +27,7 @@ With the following functions you can easily set a Grid layout on any parent.
 
 ### Grid descriptors
 
-First you need to describe the size of rows and columns. It can be done by declaring 2 arrays and the the track sizes in them. The last element must be `LV_GRID_TEMPLATE_LAST`.
+First you need to describe the size of rows and columns. It can be done by declaring 2 arrays and the track sizes in them. The last element must be `LV_GRID_TEMPLATE_LAST`.
 
 For example:
 ```
