@@ -69,6 +69,9 @@ class LvExample(Directive):
         if not 'py' in excluded_languages:
             node_list.append(py_code)
 
+        trailing_node = nodes.raw(text=f"<hr/>", format='html')
+        node_list.append(trailing_node)
+
         return node_list
 
 def setup(app):
