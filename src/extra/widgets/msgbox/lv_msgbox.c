@@ -43,8 +43,9 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     bool auto_parent = false;
     if(parent == NULL) {
         auto_parent = true;
-        parent = lv_obj_create(lv_scr_act());
+        parent = lv_obj_create(lv_layer_top());
         lv_obj_remove_style_all(parent);
+        lv_obj_clear_flag(parent, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_obj_set_style_bg_color(parent, lv_palette_main(LV_PALETTE_GREY), 0);
         lv_obj_set_style_bg_opa(parent, LV_OPA_50, 0);
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
