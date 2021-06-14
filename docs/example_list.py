@@ -51,7 +51,8 @@ widgets = {
 "obj":"Base object",
 "arc":"Arc",
 "bar":"Bar",
-"btn":"Button","btnmatrix"
+"btn":"Button",
+"btnmatrix":"Button matrix",
 "calendar":"Calendar",
 "canvas":"Canvas",
 "chart":"Chart",
