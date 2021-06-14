@@ -61,12 +61,11 @@ typedef uint8_t lv_fs_mode_t;
 /**
  * Seek modes.
  */
-enum {
-    LV_FS_SEEK_SET = 0x00,
-    LV_FS_SEEK_CUR = 0x01,
-    LV_FS_SEEK_END = 0x02,
-};
-typedef uint8_t lv_fs_whence_t;
+typedef enum {
+    LV_FS_SEEK_SET = 0x00,      /**< Set the position from absolutely (from the start of file)*/
+    LV_FS_SEEK_CUR = 0x01,      /**< Set the position from the current position*/
+    LV_FS_SEEK_END = 0x02,      /**< Set the position from the end of the file*/
+}lv_fs_whence_t;
 
 typedef struct _lv_fs_drv_t {
     char letter;
