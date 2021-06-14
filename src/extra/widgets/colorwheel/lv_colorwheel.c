@@ -226,6 +226,7 @@ static void lv_colorwheel_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     colorwheel->knob.recolor = create_knob_recolor;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
     refr_knob_pos(obj);
 }
 
