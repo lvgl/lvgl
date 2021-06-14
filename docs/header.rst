@@ -1,1 +1,1 @@
-.. |github_link_base| replace:: https://github.com/lvgl/docs/blob/master
+.. |github_link_base| replace:: https://github.com/lvgl/lvgl/blob/8691611de2206669cd22e3e97c844fdf2bf494b0/docs
