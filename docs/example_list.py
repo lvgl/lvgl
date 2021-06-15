@@ -1,6 +1,4 @@
 import os
-
-path ="../examples/"
     
 def process_index_rst(path):
 #  print(path)
@@ -71,9 +69,8 @@ layouts = {
 "grid":"Grid",
 }
 
-fout = open("examples.md", "w")
 
-def print_item(path, lvl, d):
+def print_item(path, lvl, d, fout):
   for k in d:
     v = d[k]
     b = os.path.basename(k)
@@ -83,8 +80,10 @@ def print_item(path, lvl, d):
      fout.write("\n")
 
 def exec():
-
+  path ="../examples/"
+  fout = open("examples.md", "w")
   filelist = []
+
   for root, dirs, files in os.walk(path):
 	  for f in files:
       #append the file name to the list
@@ -111,13 +110,13 @@ def exec():
     if h == "widgets":
       for w in widgets:
         fout.write("### " + widgets[w] + "\n")
-        print_item(h + "/" + w, 4, d_all)
+        print_item(h + "/" + w, 4, d_all, fout)
     elif h == "layouts":
       for l in layouts:
         fout.write("### " + layouts[l] + "\n")
-        print_item(h + "/" + l, 4, d_all)
+        print_item(h + "/" + l, 4, d_all, fout)
     else:
-      print_item(h, 3, d_all)   
+      print_item(h, 3, d_all, fout)   
       
     fout.write("")
   
