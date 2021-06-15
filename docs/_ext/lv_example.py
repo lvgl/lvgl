@@ -50,7 +50,7 @@ class LvExample(Directive):
 
         env = self.state.document.settings.env
 
-        iframe_node = nodes.raw(text=f"<iframe class='lv-example' src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></iframe>", format='html')
+        iframe_node = nodes.raw(text=f"<iframe loading='lazy' class='lv-example' src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></iframe>", format='html')
         micropython_node = nodes.raw(text=f"<a style='display: inline-block; margin-bottom: 1rem;' target='_blank' href='https://sim.lvgl.io/v{env.config.version}/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/{example_path}.py'>Click to try in the MicroPython simulator!</a>", format='html')
 
         c_path = self.get_example_code_path(example_path, 'c')
