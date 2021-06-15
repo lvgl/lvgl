@@ -173,7 +173,20 @@
 #### Gummy button
 <iframe class="lv-example" src="_static/built_lv_examples?example=lv_example_btn_3&amp;w=320&amp;h=240"></iframe>
 
+### Button matrix
+#### Simple Button matrix
+<iframe class="lv-example" src="_static/built_lv_examples?example=lv_example_btnmatrix_1&amp;w=320&amp;h=240"></iframe>
+
+#### Custom buttons
+<iframe class="lv-example" src="_static/built_lv_examples?example=lv_example_btnmatrix_2&amp;w=320&amp;h=240"></iframe>
+
+#### Pagination
+<iframe class="lv-example" src="_static/built_lv_examples?example=lv_example_btnmatrix_3&amp;w=320&amp;h=240"></iframe>
+
 ### Calendar
+#### Calendar with header
+<iframe class="lv-example" src="_static/built_lv_examples?example=lv_example_calendar_1&amp;w=320&amp;h=240"></iframe>
+
 ### Canvas
 #### Drawing on the Canvas and rotate
 <iframe class="lv-example" src="_static/built_lv_examples?example=lv_example_canvas_1&amp;w=320&amp;h=240"></iframe>
