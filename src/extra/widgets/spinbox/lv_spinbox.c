@@ -156,7 +156,7 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     int32_t step_limit;
     step_limit       = LV_MAX(spinbox->range_max, (spinbox->range_min < 0 ? (-spinbox->range_min) : spinbox->range_min));
-    int32_t new_step = spinbox->step * exp10(pos);
+    int32_t new_step = spinbox->step * lv_pow(10, pos);
     if(pos <= 0) spinbox->step = 1;
 	else if(new_step <= step_limit) spinbox->step = new_step; 
 	
