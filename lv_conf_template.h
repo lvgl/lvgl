@@ -465,8 +465,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  define LV_SPAN_SNIPPET_STACK_SIZE   64
 #endif
 
-#define LV_USE_ANIM_TIMELINE    1
-
 /*-----------
  * Themes
  *----------*/

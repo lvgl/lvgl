@@ -8,15 +8,28 @@ static lv_obj_t * obj3 = NULL;
 static lv_obj_t * btn = NULL;
 static lv_obj_t * slider = NULL;
 
+static lv_coord_t obj_width = 0;
+static lv_coord_t obj_height = 0;
+
+static void set_width(void * var, int32_t v)
+{
+    lv_obj_set_width((lv_obj_t *)var, v);
+}
+
+static void set_height(void * var, int32_t v)
+{
+    lv_obj_set_height((lv_obj_t *)var, v);
+}
+
 static void event_handler(lv_event_t * e)
 {
     lv_anim_timeline_t anim_timeline[] = {
-        {0,   obj1, (lv_anim_exec_xcb_t)lv_obj_set_width,  0, 200, 300, lv_anim_path_overshoot, false},
-        {0,   obj1, (lv_anim_exec_xcb_t)lv_obj_set_height, 0, 200, 300, lv_anim_path_ease_out,  false},
-        {200, obj2, (lv_anim_exec_xcb_t)lv_obj_set_width,  0, 200, 300, lv_anim_path_overshoot, false},
-        {200, obj2, (lv_anim_exec_xcb_t)lv_obj_set_height, 0, 200, 300, lv_anim_path_ease_out,  false},
-        {400, obj3, (lv_anim_exec_xcb_t)lv_obj_set_width,  0, 200, 300, lv_anim_path_overshoot, false},
-        {400, obj3, (lv_anim_exec_xcb_t)lv_obj_set_height, 0, 200, 300, lv_anim_path_ease_out,  false},
+        {0,   obj1, (lv_anim_exec_xcb_t)set_width,  0, obj_width,  300, lv_anim_path_overshoot, false},
+        {0,   obj1, (lv_anim_exec_xcb_t)set_height, 0, obj_height, 300, lv_anim_path_ease_out,  false},
+        {200, obj2, (lv_anim_exec_xcb_t)set_width,  0, obj_width,  300, lv_anim_path_overshoot, false},
+        {200, obj2, (lv_anim_exec_xcb_t)set_height, 0, obj_height, 300, lv_anim_path_ease_out,  false},
+        {400, obj3, (lv_anim_exec_xcb_t)set_width,  0, obj_width,  300, lv_anim_path_overshoot, false},
+        {400, obj3, (lv_anim_exec_xcb_t)set_height, 0, obj_height, 300, lv_anim_path_ease_out,  false},
         LV_ANIM_TIMELINE_END
     };
 
@@ -27,11 +40,14 @@ static void event_handler(lv_event_t * e)
         lv_anim_timeline_start(anim_timeline, playback);
     }
     else if (obj == slider) {
-        int32_t progress = lv_slider_get_value(lv_event_get_target(e));
+        int32_t progress = lv_slider_get_value(slider);
         lv_anim_timeline_set_progress(anim_timeline, progress);
     } 
 }
 
+/**
+ * Create an animation timeline
+ */
 void lv_example_anim_timeline_1(void)
 {
     lv_obj_t * par = lv_scr_act();
@@ -53,6 +69,9 @@ void lv_example_anim_timeline_1(void)
     obj1 = lv_obj_create(par);
     obj2 = lv_obj_create(par);
     obj3 = lv_obj_create(par);
+
+    obj_width = lv_obj_get_style_width(obj1, 0);
+    obj_height = lv_obj_get_style_height(obj1, 0);
 }
 
 #endif

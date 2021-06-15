@@ -19,7 +19,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool playback, uint32_t playtime);
+static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool reverse, uint32_t playtime);
 
 /**********************
  *  STATIC VARIABLES
@@ -33,12 +33,12 @@ static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool 
  *   GLOBAL FUNCTIONS
  **********************/
 
-uint32_t lv_anim_timeline_start(const lv_anim_timeline_t * anim_timeline, bool playback)
+uint32_t lv_anim_timeline_start(const lv_anim_timeline_t * anim_timeline, bool reverse)
 {
     const uint32_t playtime = lv_anim_timeline_get_playtime(anim_timeline);
     uint32_t i = 0;
     while(anim_timeline[i].start_time >= 0) {
-        lv_anim_timeline_add(&(anim_timeline[i]), playback, playtime);
+        lv_anim_timeline_add(&(anim_timeline[i]), reverse, playtime);
         i++;
     }
     return playtime;
@@ -103,7 +103,7 @@ void lv_anim_timeline_del(const lv_anim_timeline_t * anim_timeline)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool playback, uint32_t playtime)
+static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool reverse, uint32_t playtime)
 {
     void * var = anim_timeline->var;
     int32_t delay = anim_timeline->start_time;
@@ -114,7 +114,7 @@ static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool 
     int32_t start = anim_timeline->start_value;
     int32_t end = anim_timeline->end_value;
 
-    if(playback) {
+    if(reverse) {
         int32_t temp = start;
         start = end;
         end = temp;

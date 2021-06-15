@@ -19,6 +19,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_ANIM_TIMELINE_END { -1, NULL, NULL, 0, 0, 0, NULL, false }
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -44,37 +46,35 @@ typedef struct {
 
 /**
  * Start animation according to the timeline
- * @param anim_timeline  timeline array address
- * @param playback       whether to play in reverse
- * @return timeline total time spent
+ * @param anim_timeline  pointer to timeline array
+ * @param reverse        whether to play in reverse
+ * @return total time spent in timeline
  */
-uint32_t lv_anim_timeline_start(const lv_anim_timeline_t * anim_timeline, bool playback);
+uint32_t lv_anim_timeline_start(const lv_anim_timeline_t * anim_timeline, bool reverse);
 
 /**
  * Set the progress of the timeline
- * @param anim_timeline  timeline array address
+ * @param anim_timeline  pointer to timeline array
  * @param progress       set value 0~65535 to map 0~100% animation progress
  */
 void lv_anim_timeline_set_progress(const lv_anim_timeline_t * anim_timeline, uint16_t progress);
 
 /**
  * Get the time used to play the timeline
- * @param anim_timeline  timeline array address
- * @return timeline playback takes time
+ * @param anim_timeline  pointer to timeline array
+ * @return total time spent in timeline
  */
 uint32_t lv_anim_timeline_get_playtime(const lv_anim_timeline_t * anim_timeline);
 
 /**
  * Delete timeline
- * @param anim_timeline  timeline array address
+ * @param anim_timeline  pointer to timeline array
  */
 void lv_anim_timeline_del(const lv_anim_timeline_t * anim_timeline);
 
 /**********************
  *      MACROS
  **********************/
-
-#define LV_ANIM_TIMELINE_END { -1 }
 
 #ifdef __cplusplus
 } /*extern "C"*/
