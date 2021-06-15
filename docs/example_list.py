@@ -22,21 +22,6 @@ def process_index_rst(path):
 
     return(d)
       
-
-filelist = []
-for root, dirs, files in os.walk(path):
-	for f in files:
-    #append the file name to the list
-		filelist.append(os.path.join(root,f))
-
-filelist = [ fi for fi in filelist if fi.endswith("index.rst") ]
-
-d_all = {}
-#print all the file names
-for fn in filelist:
-   d_act = process_index_rst(fn)
-   d_all.update(d_act)
-
 h1= {
   "get_started":"Get started", 
   "styles":"Styles", 
@@ -88,16 +73,31 @@ layouts = {
 
 fout = open("examples.md", "w")
 
-def print_item(path, lvl):
-  for k in d_all:
-    v = d_all[k]
+def print_item(path, lvl, d):
+  for k in d:
+    v = d[k]
     b = os.path.basename(k)
     if k.startswith(path + "/lv_example_"):
      fout.write("#"*lvl + " " + v + "\n")
-     fout.write('<iframe class="lv-example" src="_static/built_lv_examples?example=' + b +'&amp;w=320&amp;h=240"></iframe>\n')
+     fout.write('<iframe loading="lazy" class="lv-example" src="_static/built_lv_examples?example=' + b +'&amp;w=320&amp;h=240"></iframe>\n')
      fout.write("\n")
 
 def exec():
+
+  filelist = []
+  for root, dirs, files in os.walk(path):
+	  for f in files:
+      #append the file name to the list
+		  filelist.append(os.path.join(root,f))
+
+  filelist = [ fi for fi in filelist if fi.endswith("index.rst") ]
+
+  d_all = {}
+  #print all the file names
+  for fn in filelist:
+     d_act = process_index_rst(fn)
+     d_all.update(d_act)
+
   fout.write("```eval_rst\n")
   fout.write(".. include:: /header.rst\n") 
   fout.write(":github_url: |github_link_base|/examples.md\n")
@@ -111,13 +111,13 @@ def exec():
     if h == "widgets":
       for w in widgets:
         fout.write("### " + widgets[w] + "\n")
-        print_item(h + "/" + w, 4)
+        print_item(h + "/" + w, 4, d_all)
     elif h == "layouts":
       for l in layouts:
         fout.write("### " + layouts[l] + "\n")
-        print_item(h + "/" + l, 4)
+        print_item(h + "/" + l, 4, d_all)
     else:
-      print_item(h, 3)   
+      print_item(h, 3, d_all)   
       
     fout.write("")
   
