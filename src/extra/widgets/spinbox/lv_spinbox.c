@@ -145,6 +145,23 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max)
     lv_spinbox_updatevalue(obj);
 }
 
+/**
+ * Set cursor position to a specific digit for edition
+ * @param spinbox pointer to spinbox
+ * @param pos selected position in spinbox
+ */
+void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
+{
+
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    int32_t step_limit;
+    step_limit       = LV_MAX(spinbox->range_max, (spinbox->range_min < 0 ? (-spinbox->range_min) : spinbox->range_min));
+    int32_t new_step = spinbox->step * exp10(pos);
+    if(pos <= 0) spinbox->step = 1;
+	else if(new_step <= step_limit) spinbox->step = new_step; 
+	
+    lv_spinbox_updatevalue(obj);
+}
 /*=====================
  * Getter functions
  *====================*/
