@@ -933,7 +933,13 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
-                disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa);
+#if LV_COLOR_DEPTH == 32
+                if(map_buf_tmp[x].full != 0xff000000) {
+#else
+                if(map_buf_tmp[x].full != 0) {
+#endif
+                    disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa);
+                }
             }
             disp_buf_tmp += disp_w;
             map_buf_tmp += map_w;
@@ -951,7 +957,14 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x] == 0) continue;
                 lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : ((opa * mask_tmp[x]) >> 8);
-                disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa_tmp);
+#if LV_COLOR_DEPTH == 32
+                if(map_buf_tmp[x].full != 0xff000000) {
+#else
+                if(map_buf_tmp[x].full != 0) {
+#endif
+                    disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa_tmp);
+                }
+
             }
             disp_buf_tmp += disp_w;
             mask_tmp += draw_area_w;
@@ -962,9 +975,6 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
 {
-
-    if(opa <= LV_OPA_MIN) return bg;
-
     uint32_t tmp;
 #if LV_COLOR_DEPTH == 1
     tmp = bg.full + fg.full;
