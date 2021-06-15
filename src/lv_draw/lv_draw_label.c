@@ -655,6 +655,14 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     int32_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
+    lv_area_t map_area;
+    map_area.x1 = col_start / 3 + pos_x;
+    map_area.x2 = col_end / 3  + pos_x - 1;
+    map_area.y1 = row_start + pos_y;
+    map_area.y2 = map_area.y1;
+
+    if(map_area.x2 <= map_area.x1) return;
+
     int32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : g->box_w * g->box_h;
     lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
