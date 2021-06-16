@@ -15,7 +15,7 @@ For example ESP32 is a good candidate to create your UI with LVGL.
 ## Get the LVGL Ardunio library
 
 LVGL can be installed via the Arduino IDE Library Manager or as a .ZIP library.
-It will also install [lv_exmaples](https://github.com/lvgl/lv_examples) which contains a lot of examples and demos to try LVGL.
+It will also install [lv_examples](https://github.com/lvgl/lv_examples) which contains a lot of examples and demos to try LVGL.
 
 ## Set up drivers
 
@@ -45,8 +45,11 @@ LVGL has its own configuration file called `lv_conf.h`. When LVGL is installed t
 
 ## Initialize LVGL and run an example
 
-Take a look at [LVGL_Arduino.ino](https://github.com/lvgl/lvgl/blob/master/examples/LVGL_Arduino.ino) to see how to initialize LVGL.
+Take a look at [LVGL_Arduino.ino](https://github.com/lvgl/lv_arduino) to see how to initialize LVGL.
+Note, that this repository is obsolete and can be used only as an example of initializing the library with a given display driver.
 TFT_eSPI is used as the display driver.
+
+The corresponding issue for more details about the Aruino library is here: [Github Issue](https://github.com/arduino/Arduino/issues/10592)
 
 In the INO file you can see how to register a display and a touch pad for LVGL and call an example.
 
