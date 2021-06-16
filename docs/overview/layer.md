@@ -40,12 +40,9 @@ lv_obj_del(label2);
 
 ## Bring to the foreground
 
-There are several ways to bring an object to the foreground:
-- Use `lv_obj_set_top(obj, true)`. If `obj` or any of its children is clicked, then LVGL will automatically bring the object to the foreground.
-It works similarly to a typical GUI on a PC. When a window in the background is clicked, it will come to the foreground automatically.
+There are 2 explicit way to bring an object to the foreground:
 - Use `lv_obj_move_foreground(obj)` to explicitly tell the library to bring an object to the foreground. Similarly, use `lv_obj_move_background(obj)` to move to the background.
 - When `lv_obj_set_parent(obj, new_parent)` is used, `obj` will be on the foreground on the `new_parent`.
-
 
 ## Top and sys layers
 
