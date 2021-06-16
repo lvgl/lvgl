@@ -107,6 +107,8 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
 
     table->cell_data[cell][0] = ctrl;
     refr_size(obj, row);
+
+    lv_obj_invalidate(obj);
 }
 
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...)
@@ -196,6 +198,8 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
 
     table->row_h[row] = LV_CLAMP(minh, h, maxh);
+
+    lv_obj_invalidate(obj);
 }
 
 void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
