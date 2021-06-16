@@ -1094,7 +1094,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
     }
     else if(label->long_mode == LV_LABEL_LONG_DOT) {
-        lv_obj_refresh_self_size(obj);
         if(size.y <= lv_area_get_height(&txt_coords)) { /*No dots are required, the text is short enough*/
             label->dot_end = LV_LABEL_DOT_END_INV;
         }
