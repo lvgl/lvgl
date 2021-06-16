@@ -681,12 +681,6 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     /*If the letter is partially out of mask the move there on VDB*/
     vdb_buf_tmp += (row_start * vdb_width) + col_start / 3;
 
-    lv_area_t map_area;
-    map_area.x1 = col_start / 3 + pos_x;
-    map_area.x2 = col_end / 3  + pos_x - 1;
-    map_area.y1 = row_start + pos_y;
-    map_area.y2 = map_area.y1;
-
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     uint8_t font_rgb[3];
