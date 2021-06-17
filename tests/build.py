@@ -24,6 +24,7 @@ def build(defines, test_name):
   d_all += '"'
   test_file_name = test_name + ".c"
   test_file_runner_name = test_name + "_Runner.c"
+  test_file_runner_name = test_file_runner_name.replace("/test_cases/", "/test_runners/")
   # -s makes it silence
   cmd = "make -s -j BIN=test.bin MAINSRC=" + test_file_name + " TEST_SRC=" + test_file_runner_name + "  LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
 
