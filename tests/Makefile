@@ -4,6 +4,7 @@
 CC ?= gcc
 LVGL_DIR ?= ${shell pwd}/../..
 LVGL_DIR_NAME ?= lvgl
+OBJDIR = objs
 
 WARNINGS = -Werror -Wall -Wextra \
            -Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wpointer-arith -Wuninitialized \
@@ -45,14 +46,13 @@ OBJS = $(AOBJS) $(COBJS)
 
 all: default
 
-%.o: %.c
-	@$(CC)  $(CFLAGS) -c $< -o $@
-#	@echo "CC $<"
-
-	
+$(OBJDIR)/%.o: %.c
+	@$(CC)  $(CFLAGS) -c -o $@ $<
+	@echo "CC $<"	
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)
 
 clean:
-	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ)
+	find . -type f -name '*.o' -exec rm -f {} +
+	rm -f $(BIN) 
