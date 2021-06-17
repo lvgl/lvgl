@@ -80,6 +80,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*Initialize the allocated 'ext' */
+    ext->lmeter.lvl_ofs = -1;
     ext->needle_count  = 0;
     ext->values        = NULL;
     ext->needle_colors = NULL;

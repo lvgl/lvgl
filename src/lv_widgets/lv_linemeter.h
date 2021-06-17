@@ -33,6 +33,7 @@ typedef struct {
     uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
     uint16_t angle_ofs;
     uint16_t line_cnt;     /*Count of lines */
+    int16_t lvl_ofs;
     int32_t cur_value;
     int32_t min_value;
     int32_t max_value;
