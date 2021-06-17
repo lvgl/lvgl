@@ -222,7 +222,9 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
 
-    child_res -= (obj->coords.x2 - pad_right - border_width);
+    if(child_res != LV_COORD_MIN) {
+        child_res -= (obj->coords.x2 - pad_right - border_width);
+    }
 
     lv_coord_t self_w;
     self_w = lv_obj_get_self_width(obj);
