@@ -99,6 +99,12 @@ void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step);
  */
 void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max);
 
+/**
+ * Set cursor position to a specific digit for edition
+ * @param spinbox pointer to spinbox
+ * @param pos selected position in spinbox
+ */
+void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos);
 /*=====================
  * Getter functions
  *====================*/
