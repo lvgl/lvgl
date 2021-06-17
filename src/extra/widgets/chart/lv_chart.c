@@ -718,9 +718,11 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
         draw_div_lines(obj, clip_area);
         draw_axes(obj, clip_area);
 
-        if(chart->type == LV_CHART_TYPE_LINE) draw_series_line(obj, clip_area);
-        else if(chart->type == LV_CHART_TYPE_BAR) draw_series_bar(obj, clip_area);
-        else if(chart->type == LV_CHART_TYPE_SCATTER) draw_series_scatter(obj, clip_area);
+        if(_lv_ll_is_empty(&chart->series_ll) == false) {
+            if(chart->type == LV_CHART_TYPE_LINE) draw_series_line(obj, clip_area);
+            else if(chart->type == LV_CHART_TYPE_BAR) draw_series_bar(obj, clip_area);
+            else if(chart->type == LV_CHART_TYPE_SCATTER) draw_series_scatter(obj, clip_area);
+        }
 
         draw_cursors(obj, clip_area);
     }
