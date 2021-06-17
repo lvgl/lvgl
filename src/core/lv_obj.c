@@ -770,7 +770,6 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {
-
     /*Check all children of `parent`*/
     uint32_t child_cnt = 0;
     if(parent->spec_attr) child_cnt = parent->spec_attr->child_cnt;

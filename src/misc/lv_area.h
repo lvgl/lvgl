@@ -233,7 +233,12 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
  *      MACROS
  **********************/
 
+#if LV_USE_LARGE_COORD
+#define _LV_COORD_TYPE_SHIFT    (29)
+#else
 #define _LV_COORD_TYPE_SHIFT    (13)
+#endif
+
 #define _LV_COORD_TYPE_MASK     (3 << _LV_COORD_TYPE_SHIFT)
 #define _LV_COORD_PLAIN(x)      ((x) & (~_LV_COORD_TYPE_MASK))  /*Remove type specifiers*/
 
