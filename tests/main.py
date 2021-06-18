@@ -3,21 +3,47 @@
 import defines
 import build
 import test
+import sys
+import os
+
+def build_conf(title, defs):
+  print("")
+  print("")
+  print("============================================")
+  print(title)
+  print("============================================")
+  print("")
+
+  build.clean()
+  build.build(defs)
+
+
+test_only = False;
+test_report = False;
+test_noclean = False;
+if "test" in sys.argv: test_only = True;
+if "report" in sys.argv: test_report = True;
+if "noclean" in sys.argv: test_noclean = True;
+
+if not test_only:
+  build_conf("Minimal config monochrome", defines.minimal_monochrome)
+  build_conf("Minimal config, 16 bit color depth", defines.minimal_16bit)
+  build_conf("Normal config, 16 bit color depth swapped", defines.normal_16bit_swap)
+  build_conf("Full config, 32 bit color depth", defines.full_32bit)
 
 
 files = test.prepare()
-
-print("============================================")
-print("Full config, 32 bit color depth")
-print("============================================")
-print("")
+if test_noclean == False:
+  build.clean()
 
 for f in files:
   name = f[:-2] #test_foo.c -> test_foo 
-  build.build(defines.full_32bit, name)
+  build.build_test(defines.test, name)
   
+if test_report:
+  print("")
+  print("Generating report")
+  print("-----------------------")
+  os.system("gcovr -r ../ --html-details -o report/index.html  --exclude-directories '\.\./examples' --exclude-directories 'src/.*' --exclude-directories 'unity' --exclude 'lv_test_.*\.c'") 
+  print("Done: See report/index.html")
 
-#build("Minimal config monochrome", minimal_monochrome)
-#build.build("Minimal config, 16 bit color depth", defines.minimal_16bit, "test_obj_tree")
-#build("Minimal config, 16 bit color depth swapped", minimal_16bit_swap)
-#build("Full config, 32 bit color depth", full_32bit)

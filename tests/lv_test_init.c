@@ -17,14 +17,12 @@ static lv_color_t disp_buf1[HOR_RES * VER_RES];
 
 void lv_test_init(void)
 {
-    printf("Call lv_init...\n");
     lv_init();
     hal_init();
 }
 
 void lv_test_deinit(void)
 {
-    printf("Call lv_deinit...\n");
     lv_mem_deinit();
 }
 

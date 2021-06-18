@@ -4,7 +4,6 @@
 CC ?= gcc
 LVGL_DIR ?= ${shell pwd}/../..
 LVGL_DIR_NAME ?= lvgl
-OBJDIR = objs
 
 WARNINGS = -Werror -Wall -Wextra \
            -Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wpointer-arith -Wuninitialized \
@@ -15,22 +14,18 @@ WARNINGS = -Werror -Wall -Wextra \
 WARNINGS += -Wpedantic -pedantic-errors
 
 #-Wno-unused-value -Wno-unused-parameter
-OPTIMIZATION ?= -O3 -g0
+OPTIMIZATION ?= -g0
 
-CFLAGS ?= -I$(LVGL_DIR)/ -Iunity $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
+CFLAGS ?= -I$(LVGL_DIR)/ --coverage -Iunity $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
 
-LDFLAGS ?=  -lpng
+LDFLAGS ?=  -lpng --coverage 
 BIN ?= test
 
 include ../lvgl.mk
 
 CSRCS += ${TEST_SRC}
-CSRCS += unity/unity.c
-CSRCS += unity/unity_support.c
 CSRCS += lv_test_init.c
-CSRCS += src/test_fonts/font_1.c
-CSRCS += src/test_fonts/font_2.c
-CSRCS += src/test_fonts/font_3.c
+CSRCS := $(CSRCS) $(EXTRA_CSRCS)
 
 OBJEXT ?= .o
 
@@ -46,13 +41,13 @@ OBJS = $(AOBJS) $(COBJS)
 
 all: default
 
-$(OBJDIR)/%.o: %.c
+%.o: %.c
 	@$(CC)  $(CFLAGS) -c -o $@ $<
-	@echo "CC $<"	
+#	@echo "CC $<"	
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)
 
 clean:
-	find . -type f -name '*.o' -exec rm -f {} +
+	find ../ -type f -name '*.o' -exec rm -f {} +
 	rm -f $(BIN) 

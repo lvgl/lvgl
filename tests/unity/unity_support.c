@@ -63,7 +63,6 @@ static void png_release(png_img_t * p);
 
 bool lv_test_assert_img_eq(const char * fn_ref)
 {
-
   char fn_ref_full[512];
   sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
@@ -86,15 +85,21 @@ bool lv_test_assert_img_eq(const char * fn_ref)
   int x, y, i_buf = 0;
   for (y = 0; y < p.height; y++) {
     png_byte* row = p.row_pointers[y];
+    //printf("\n");
+      
     for (x = 0; x < p.width; x++) {
       ptr_ref = &(row[x*3]);
       ptr_act = &(screen_buf[i_buf*4]);
       
-      uint8_t tmp = ptr_act[0];
-      ptr_act[0] = ptr_act[2];
-      ptr_act[2] = tmp;
+      uint32_t ref_px = 0;
+      uint32_t act_px = 0;
+      memcpy(&ref_px, ptr_ref, 3);
+      memcpy(&act_px, ptr_act, 3);
+      //printf("0xFF%06x, ", act_px);
+      
+      uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
 
-      if(memcmp(ptr_act, ptr_ref, 3) != 0) {
+      if(memcmp(act_swap, ptr_ref, 3) != 0) {
         err = true;
         break;
       }
@@ -111,6 +116,39 @@ bool lv_test_assert_img_eq(const char * fn_ref)
       memcpy(&ref_px, ptr_ref, 3);
       memcpy(&act_px, ptr_act, 3);
       TEST_PRINTF("Diff in %s at (%d;%d), %x instead of %x)", fn_ref, x, y, act_px, ref_px);
+      
+      FILE * f = fopen("../image_err.h", "w");
+      
+      fprintf(f, "static const uint32_t img_data[] = {\n");
+      
+      i_buf = 0;
+      for (y = 0; y < 480; y++) {
+        fprintf(f, "\n");
+        for (x = 0; x < 800; x++) {
+          ptr_act = &(screen_buf[i_buf * 4]);
+          act_px = 0;
+          memcpy(&act_px, ptr_act, 3);
+          fprintf(f, "0xFF%06X, ", act_px);
+          i_buf++;
+        }
+      }
+      fprintf(f, "};\n\n");
+      
+      fprintf(f, "static lv_img_dsc_t dsc = { \n"
+      "  .header.w = 800,\n"
+      "  .header.h = 480,\n"
+      "  .header.always_zero = 0,\n"
+      "  .header.cf = LV_IMG_CF_TRUE_COLOR,\n"
+      "  .data_size = 800 * 480 * 4,\n"
+      "  .data = img_data};\n\n"
+      "static inline void show_test_img_error(void)\n"
+      "{\n"
+      "  lv_obj_t * img = lv_img_create(lv_scr_act());\n"
+      "  lv_img_set_src(img, &dsc);\n"
+      "}\n");
+      
+      fclose(f);
+      
       return false;
   }
   
