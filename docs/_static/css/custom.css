@@ -85,6 +85,7 @@ code.sig-name
 }
 .lv-example-description {
     flex: 1 1 auto;
+    margin-left: 1rem;
 }
 
 .lv-example-link-button {
