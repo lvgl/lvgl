@@ -16,7 +16,8 @@ class LvExample(Directive):
     required_arguments = 1
     option_spec = {
         'excluded_languages': excluded_list,
-        'language': directives.unchanged
+        'language': directives.unchanged,
+        'description': directives.unchanged
     }
     def get_example_code_path(self, example_path, language):
         return os.path.abspath("../examples/" + example_path + "." + language)
@@ -27,8 +28,10 @@ class LvExample(Directive):
             return 'C'
         else:
             return language
-    def embed_code(self, example_file, example_path, language):
+    def github_path(self, example_path, language):
         env = self.state.document.settings.env
+        return f"https://github.com/lvgl/lvgl/blob/{env.config.repo_commit_hash}/examples/{example_path}.{language}"
+    def embed_code(self, example_file, example_path, language, buttons={}):
         toggle = nodes.container('', literal_block=False, classes=['toggle'])
         header = nodes.container('', literal_block=False, classes=['header'])
         toggle.append(header)
@@ -40,7 +43,10 @@ class LvExample(Directive):
         literal_list = nodes.literal_block(contents, contents)
         literal_list['language'] = language
         toggle.append(literal_list)
-        header.append(nodes.raw(text=f"<p>{self.human_language_name(language)} code &nbsp; <a onclick=\"event.stopPropagation();\" class='fa fa-github' href='https://github.com/lvgl/lvgl/blob/{env.config.repo_commit_hash}/examples/{example_path}.{language}'>&nbsp; view on GitHub</a></p>", format='html'))
+        paragraph_node = nodes.raw(text=f"<p>{self.human_language_name(language)} code &nbsp;</p>", format='html')
+        for text, url in buttons.items():
+            paragraph_node.append(nodes.raw(text=f"<a class='lv-example-link-button' onclick=\"event.stopPropagation();\" href='{url}'>{text}</a>", format='html'))
+        header.append(paragraph_node)
         return toggle
     def run(self):
         example_path = self.arguments[0]
@@ -50,20 +56,27 @@ class LvExample(Directive):
 
         env = self.state.document.settings.env
 
-        iframe_node = nodes.raw(text=f"<iframe loading='lazy' class='lv-example' src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></iframe>", format='html')
-        micropython_node = nodes.raw(text=f"<a style='display: inline-block; margin-bottom: 1rem;' target='_blank' href='https://sim.lvgl.io/v{env.config.version}/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/{example_path}.py'>Click to try in the MicroPython simulator!</a>", format='html')
-
+        iframe_html = ""
+        
         c_path = self.get_example_code_path(example_path, 'c')
         py_path = self.get_example_code_path(example_path, 'py')
 
-        c_code = self.embed_code(c_path, example_path, 'c')
-        py_code = self.embed_code(py_path, example_path, 'py')
+        c_code = self.embed_code(c_path, example_path, 'c', buttons={
+            '<i class="fa fa-github"></i>&nbsp;GitHub': self.github_path(example_path, 'c')
+        })
+        py_code = self.embed_code(py_path, example_path, 'py', buttons={
+            '<i class="fa fa-github"></i>&nbsp;GitHub': self.github_path(example_path, 'py'),
+            '<i class="fa fa-play"></i>&nbsp;Simulator': f"https://sim.lvgl.io/v{env.config.version}/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/{example_path}.py"
+        })
 
         if not 'c' in excluded_languages:   
             if env.app.tags.has('html'):
-                node_list.append(iframe_node)
-        if not 'py' in excluded_languages:
-            node_list.append(micropython_node)
+                iframe_html = f"<div class='lv-example' data-real-src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></div>"
+
+        description_html = f"<div class='lv-example-description'>{self.options.get('description', '')}</div>"
+        layout_node = nodes.raw(text=f"<div class='lv-example-container'>{iframe_html}{description_html}</div>", format='html')
+
+        node_list.append(layout_node)
         if not 'c' in excluded_languages:
             node_list.append(c_code)
         if not 'py' in excluded_languages:

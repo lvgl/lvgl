@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import os
-    
+
+
 def process_index_rst(path):
 #  print(path)
   with open(path) as fp:
@@ -73,10 +75,11 @@ layouts = {
 def print_item(path, lvl, d, fout):
   for k in d:
     v = d[k]
-    b = os.path.basename(k)
     if k.startswith(path + "/lv_example_"):
      fout.write("#"*lvl + " " + v + "\n")
-     fout.write('<iframe loading="lazy" class="lv-example" src="_static/built_lv_examples?example=' + b +'&amp;w=320&amp;h=240"></iframe>\n')
+     fout.write('```eval_rst\n')
+     fout.write(f".. lv_example:: {k}\n")
+     fout.write('```\n')
      fout.write("\n")
 
 def exec():
