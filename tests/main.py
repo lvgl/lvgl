@@ -44,6 +44,8 @@ if test_report:
   print("")
   print("Generating report")
   print("-----------------------")
+  os.system("rm -r report")
+  os.system("mkdir report")
   os.system("gcovr -r ../ --html-details -o report/index.html  --exclude-directories '\.\./examples' --exclude-directories 'src/.*' --exclude-directories 'unity' --exclude 'lv_test_.*\.c'") 
   print("Done: See report/index.html")
 
