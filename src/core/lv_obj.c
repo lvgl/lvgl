@@ -472,7 +472,17 @@ static void lv_obj_draw(lv_event_t * e)
         coords.y1 -= h;
         coords.y2 += h;
 
+
+        lv_obj_draw_part_dsc_t part_dsc;
+        lv_obj_draw_dsc_init(&part_dsc, clip_area);
+        part_dsc.rect_dsc = &draw_dsc;
+        part_dsc.draw_area = &coords;
+        part_dsc.part = LV_PART_MAIN;
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+
         lv_draw_rect(&coords, clip_area, &draw_dsc);
+
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
 
 #if LV_DRAW_COMPLEX
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
@@ -530,8 +540,23 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_res_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
     if(sb_res != LV_RES_OK) return;
 
-    if(lv_area_get_size(&hor_area) > 0) lv_draw_rect(&hor_area, clip_area, &draw_dsc);
-    if(lv_area_get_size(&ver_area) > 0) lv_draw_rect(&ver_area, clip_area, &draw_dsc);
+    lv_obj_draw_part_dsc_t part_dsc;
+    lv_obj_draw_dsc_init(&part_dsc, clip_area);
+    part_dsc.rect_dsc = &draw_dsc;
+    part_dsc.part = LV_PART_SCROLLBAR;
+
+    if(lv_area_get_size(&hor_area) > 0) {
+        part_dsc.draw_area = &hor_area;
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        lv_draw_rect(&hor_area, clip_area, &draw_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+    }
+    if(lv_area_get_size(&ver_area) > 0) {
+        part_dsc.draw_area = &ver_area;
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        lv_draw_rect(&ver_area, clip_area, &draw_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+    }
 }
 
 /**
