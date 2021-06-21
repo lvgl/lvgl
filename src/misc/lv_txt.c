@@ -26,7 +26,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static inline bool is_break_char(uint32_t letter);
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
     static uint8_t lv_txt_utf8_size(const char * str);
@@ -224,7 +223,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         }
 
         /*Check for new line chars and breakchars*/
-        if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
+        if(letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter)) {
             /*Update the output width on the first character if it fits.
              *Must do this here in case first letter is a break character.*/
             if(i == 0 && break_index == NO_BREAK_FOUND && word_w_ptr != NULL) *word_w_ptr = cur_w;
@@ -895,28 +894,3 @@ static uint32_t lv_txt_iso8859_1_get_length(const char * txt)
 #error "Invalid character encoding. See `LV_TXT_ENC` in `lv_conf.h`"
 
 #endif
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-/**
- * Test if char is break char or not (a text can broken here or not)
- * @param letter a letter
- * @return false: 'letter' is not break char
- */
-static inline bool is_break_char(uint32_t letter)
-{
-    uint8_t i;
-    bool ret = false;
-
-    /*Compare the letter to TXT_BREAK_CHARS*/
-    for(i = 0; LV_TXT_BREAK_CHARS[i] != '\0'; i++) {
-        if(letter == (uint32_t)LV_TXT_BREAK_CHARS[i]) {
-            ret = true; /*If match then it is break char*/
-            break;
-        }
-    }
-
-    return ret;
-}

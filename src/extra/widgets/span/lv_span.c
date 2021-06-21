@@ -50,7 +50,6 @@ static lv_opa_t lv_span_get_style_text_blend_mode(lv_obj_t * par, lv_span_t * sp
 static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span);
 
 static inline void span_text_check(const char ** text);
-static inline bool is_break_char(uint32_t letter);
 static void get_txt_coords(const lv_obj_t * span, lv_area_t * area);
 static void lv_draw_span(lv_obj_t * spans, const lv_area_t * coords, const lv_area_t * mask);
 static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font, lv_coord_t letter_space,
@@ -442,9 +441,9 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
             /* break word deal width */
             if(isfill && next_ofs > 0 && snippet_cnt > 0) {
                 uint32_t letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs - 1];
-                if(!(letter == '\0' || letter == '\n' || letter == '\r' || is_break_char(letter))) {
+                if(!(letter == '\0' || letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter))) {
                     letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs];
-                    if(!(letter == '\0' || letter == '\n'  || letter == '\r' || is_break_char(letter))) {
+                    if(!(letter == '\0' || letter == '\n'  || letter == '\r' || _lv_txt_is_break_char(letter))) {
                         break;
                     }
                 }
@@ -694,22 +693,6 @@ static inline void span_text_check(const char ** text)
     }
 }
 
-static inline bool is_break_char(uint32_t letter)
-{
-    uint8_t i;
-    bool ret = false;
-
-    /*Compare the letter to TXT_BREAK_CHARS*/
-    for(i = 0; LV_TXT_BREAK_CHARS[i] != '\0'; i++) {
-        if(letter == (uint32_t)LV_TXT_BREAK_CHARS[i]) {
-            ret = true; /*If match then it is break char*/
-            break;
-        }
-    }
-
-    return ret;
-}
-
 /**
  * draw span group
  * @param spans obj handle
@@ -788,9 +771,9 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             /* break word deal width */
             if(isfill && next_ofs > 0 && lv_get_snippet_cnt() > 0) {
                 uint32_t letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs - 1];
-                if(!(letter == '\0' || letter == '\n' || letter == '\r' || is_break_char(letter))) {
+                if(!(letter == '\0' || letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter))) {
                     letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs];
-                    if(!(letter == '\0' || letter == '\n'  || letter == '\r' || is_break_char(letter))) {
+                    if(!(letter == '\0' || letter == '\n'  || letter == '\r' || _lv_txt_is_break_char(letter))) {
                         break;
                     }
                 }
