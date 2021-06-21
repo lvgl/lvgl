@@ -115,14 +115,14 @@ LVGL is also avaiable as:
 This list shows the recommended way of learning the library:
 1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
 2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes)
-3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/html/get-started/quick-overview.html) page (15 minutes)
-4. Set up a [Simulator](https://docs.lvgl.io/latest/master/get-started/pc-simulator.html) (10 minutes)
+3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/get-started/quick-overview.html page (15 minutes)
+4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/pc-simulator.html) (10 minutes)
 5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples)
-6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_&type=&language=)
+6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_)
 7. Read the [Overview](https://docs.lvgl.io/master/overview/index.html) page to get a better understanding of the library (2-3 hours)
-8. Check the documentation of the [Widgets](https://docs.lvgl.io/master/html/widgets/index.html) to see their features and usage
+8. Check the documentation of the [Widgets](https://docs.lvgl.io/master/widgets/index.html) to see their features and usage
 9. If you have questions go to the [Forum](http://forum.lvgl.io/)
-10. Read the [Contributing](https://docs.lvgl.io/master/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes)
+10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
 
 ## Examples
 
@@ -177,5 +177,5 @@ Feel free to contact us if you have any questions.
 ## Contributing
 LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosing your own project under the LVGL organization.
 
-For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.htmll) section of the documentation.
+For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
  
