@@ -39,5 +39,5 @@ img.header.cf = lv.img.CF.TRUE_COLOR
 img.header.w = _CANVAS_WIDTH
 img.header.h = _CANVAS_HEIGHT
 
-canvas.fill_bg(lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER)
+canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
 canvas.transform(img, 30, LV_IMG_ZOOM_NONE, 0, 0, _CANVAS_WIDTH // 2, _CANVAS_HEIGHT // 2, True);
