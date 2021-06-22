@@ -30,6 +30,11 @@
     #include "../gpu/lv_gpu_stm32_dma2d.h"
 #endif
 
+#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
+    #include "../gpu/lv_gpu_nxp_pxp.h"
+    #include "../gpu/lv_gpu_nxp_pxp_osa.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -103,6 +108,13 @@ void lv_init(void)
 #if LV_USE_GPU_STM32_DMA2D
     /*Initialize DMA2D GPU*/
     lv_gpu_stm32_dma2d_init();
+#endif
+
+#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
+    if(lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
+        LV_LOG_ERROR("PXP init error. STOP.\n");
+        for(; ;) ;
+    }
 #endif
 
     _lv_obj_style_init();

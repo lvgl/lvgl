@@ -61,6 +61,11 @@ extern "C" {
 #define LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT 16
 #endif
 
+#ifndef LV_GPU_NXP_PXP_BUFF_SYNC_BLIT_SIZE_LIMIT
+/** Minimum invalidated area (in pixels) to be synchronized by PXP during buffer sync */
+#define LV_GPU_NXP_PXP_BUFF_SYNC_BLIT_SIZE_LIMIT 32
+#endif
+
 #ifndef LV_GPU_NXP_PXP_FILL_SIZE_LIMIT
 /** Minimum area (in pixels) to be filled by PXP with 100% opacity*/
 #define LV_GPU_NXP_PXP_FILL_SIZE_LIMIT 64

@@ -43,8 +43,11 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/** Stride in px required by VG-Lite HW. Don't change this.*/
-#define LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX 16
+/** Use this symbol as limit to disable feature (value has to be larger than supported resolution) */
+#define LV_GPU_NXP_VG_LITE_FEATURE_DISABLED (1920*1080+1)
+
+/** Stride in px required by VG-Lite HW. Don't change this. */
+#define LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX 16U
 
 #ifndef LV_GPU_NXP_VG_LITE_FILL_SIZE_LIMIT
 /** Minimum area (in pixels) to be filled by VG-Lite with 100% opacity*/
@@ -59,6 +62,11 @@ extern "C" {
 #ifndef LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT
 /** Minimum area (in pixels) for image copy with 100% opacity to be handled by VG-Lite*/
 #define LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT 32
+#endif
+
+#ifndef LV_GPU_NXP_VG_LITE_BUFF_SYNC_BLIT_SIZE_LIMIT
+/** Minimum invalidated area (in pixels) to be synchronized by VG-Lite during buffer sync */
+#define LV_GPU_NXP_VG_LITE_BUFF_SYNC_BLIT_SIZE_LIMIT 32
 #endif
 
 #ifndef LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT
