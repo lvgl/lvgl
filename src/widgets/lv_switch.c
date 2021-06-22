@@ -112,10 +112,6 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
     }
     else if(code == LV_EVENT_CLICKED) {
-        uint32_t v = lv_obj_get_state(obj) & LV_STATE_CHECKED ? 1 : 0;
-        res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &v);
-        if(res != LV_RES_OK) return;
-
         lv_obj_invalidate(obj);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
