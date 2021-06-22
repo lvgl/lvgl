@@ -342,8 +342,10 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                     LV_ASSERT_MALLOC(new_dsc);
                     if(new_dsc == NULL) return item_id;
 
-                    lv_memcpy(new_dsc, t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt - 1));
-                    lv_mem_buf_release(t->grow_dsc);
+                    if(t->grow_dsc) {
+                        lv_memcpy(new_dsc, t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt - 1));
+                        lv_mem_buf_release(t->grow_dsc);
+                    }
                     new_dsc[t->grow_item_cnt - 1].item = item;
                     new_dsc[t->grow_item_cnt - 1].min_size = f->row ? lv_obj_get_style_min_width(item, LV_PART_MAIN) : lv_obj_get_style_min_height(item, LV_PART_MAIN);
                     new_dsc[t->grow_item_cnt - 1].max_size = f->row ? lv_obj_get_style_max_width(item, LV_PART_MAIN) : lv_obj_get_style_max_height(item, LV_PART_MAIN);
