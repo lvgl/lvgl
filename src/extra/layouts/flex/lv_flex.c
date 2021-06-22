@@ -113,6 +113,7 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
 {
     lv_obj_set_style_flex_grow(obj, grow, 0);
+    lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
 }
 
 
@@ -455,16 +456,16 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                     break;
                 }
             }
-            lv_area_t old_coords;
-            lv_area_copy(&old_coords, &item->coords);
-
-            area_set_main_size(&item->coords, s);
 
             if(f->row) item->w_layout = 1;
             else item->h_layout = 1;
 
-            if(area_get_main_size(&old_coords) != area_get_main_size(&item->coords)) {
+            if(s != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
+
+                lv_area_t old_coords;
+                lv_area_copy(&old_coords, &item->coords);
+                area_set_main_size(&item->coords, s);
                 lv_event_send(item, LV_EVENT_SIZE_CHANGED, &old_coords);
                 lv_event_send(lv_obj_get_parent(item), LV_EVENT_CHILD_CHANGED, item);
                 lv_obj_invalidate(item);
