@@ -154,6 +154,32 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap);
  */
 void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t *ofs);
 
+/**
+ * Test if char is break char or not (a text can broken here or not)
+ * @param letter a letter
+ * @return false: 'letter' is not break char
+ */
+static inline bool _lv_txt_is_break_char(uint32_t letter)
+{
+    uint8_t i;
+    bool ret = false;
+
+    /* each chinese character can be break */
+    if (letter >= 0x4E00 && letter <= 0x9FA5) {
+        return true;
+    }
+
+    /*Compare the letter to TXT_BREAK_CHARS*/
+    for(i = 0; LV_TXT_BREAK_CHARS[i] != '\0'; i++) {
+        if(letter == (uint32_t)LV_TXT_BREAK_CHARS[i]) {
+            ret = true; /*If match then it is break char*/
+            break;
+        }
+    }
+
+    return ret;
+}
+
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CHARACTER ENCODING INTERFACE
  ***************************************************************/
