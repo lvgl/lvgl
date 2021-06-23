@@ -2,11 +2,13 @@
 #if LV_BUILD_TEST
 
 #include "unity/unity.h"
+#include "lv_test_indev.h"
 
 void test_dropdown_create_delete(void);
 void test_dropdown_set_text_and_symbol(void);
 void test_dropdown_set_options(void);
 void test_dropdown_select(void);
+void test_dropdown_click(void);
 void test_dropdown_render(void);
 
 void test_dropdown_create_delete(void)
@@ -133,6 +135,24 @@ void test_dropdown_select(void)
   lv_dropdown_set_selected(dd1, 3);
   TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
 }
+
+void test_dropdown_click(void)
+{
+  lv_obj_clean(lv_scr_act());
+  lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+  lv_obj_update_layout(dd1);
+  
+  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  lv_test_mouse_click_at(dd1->coords.x1 + 5, dd1->coords.y1 + 5); 
+  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
+    
+  lv_obj_t * list = lv_dropdown_get_list(dd1);
+  TEST_ASSERT_EQUAL(0, lv_dropdown_get_selected(dd1));
+  lv_test_mouse_click_at(list->coords.x1 + 5, list->coords.y2 - 25);
+  TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
+  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+}
+
 
 void test_dropdown_render(void)
 {

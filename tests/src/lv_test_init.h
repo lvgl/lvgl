@@ -7,9 +7,12 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+#include <../lvgl.h>
 
 void lv_test_init(void);
 void lv_test_deinit(void);
+
+extern lv_indev_t * lv_test_mouse_indev;
 
 #ifdef __cplusplus
 } /*extern "C"*/

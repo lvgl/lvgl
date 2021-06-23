@@ -1,7 +1,7 @@
-#include "../lvgl.h"
 
 #if LV_BUILD_TEST
 #include "lv_test_init.h"
+#include "lv_test_indev.h"
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +12,7 @@
 static void hal_init(void);
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
+lv_indev_t * lv_test_mouse_indev;
 lv_color_t test_fb[HOR_RES * VER_RES];
 static lv_color_t disp_buf1[HOR_RES * VER_RES];
 
@@ -98,6 +99,13 @@ static void hal_init(void)
     disp_drv.hor_res = HOR_RES;
     disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
+    
+    static lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = lv_test_mouse_read_cb;
+    lv_test_mouse_indev = lv_indev_drv_register(&indev_drv);
+
 
     static lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
