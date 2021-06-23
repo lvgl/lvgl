@@ -615,10 +615,14 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*Open the list if editing*/
-            if(editing) lv_dropdown_open(obj);
+            if(editing) {
+                lv_dropdown_open(obj);
+            }
             /*Close the list if navigating*/
-            else
+            else {
+                dropdown->sel_opt_id = dropdown->sel_opt_id_orig;
                 lv_dropdown_close(obj);
+            }
         }
     }
     else if(code == LV_EVENT_DEFOCUSED || code == LV_EVENT_LEAVE) {
