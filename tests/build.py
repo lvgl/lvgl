@@ -23,7 +23,7 @@ def build(defines):
 
   print("")
   print("Build")
-  print("-----------------------")
+  print("-----------------------", flush=True)
 #  print(cmd)
   ret = os.system(cmd)
   if(ret != 0): 
@@ -32,10 +32,10 @@ def build(defines):
 
   print("")
   print("Run")
-  print("-----------------------")
+  print("-----------------------", flush=True)
   ret = os.system("./test.bin")
   if(ret != 0): 
-    print("RUN ERROR! (error code  " + str(ret) + ")")
+    print("RUN ERROR! (error code  " + str(ret) + ")", flush=True)
     exit(1)
 
 
@@ -47,7 +47,7 @@ def build_test(defines, test_name):
   print("")
   print("~~~~~~~~~~~~~~~~~~~~~~~~")
   print(re.search("/[a-z_]*$", test_name).group(0)[1:])
-  print("~~~~~~~~~~~~~~~~~~~~~~~~")
+  print("~~~~~~~~~~~~~~~~~~~~~~~~", flush=True)
   
   d_all = base_defines[:-1] + " ";
   
@@ -60,15 +60,15 @@ def build_test(defines, test_name):
   test_file_runner_name = test_file_runner_name.replace("/test_cases/", "/test_runners/")
   csrcs = " EXTRA_CSRCS=\"unity/unity.c unity/unity_support.c src/test_fonts/font_1.c src/test_fonts/font_2.c src/test_fonts/font_3.c \" "
   # -s makes it silence
-  cmd = "make -s -j BIN=test.bin MAINSRC=" + test_file_name + " TEST_SRC=" + test_file_runner_name + csrcs + "  LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
+  cmd = "make -s -j BIN=test.bin MAINSRC=" + test_file_name + " TEST_SRC=" + test_file_runner_name + csrcs + "  LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization 
 
   print("")
   print("Build")
-  print("-----------------------")
+  print("-----------------------", flush=True)
 #  print(cmd)
   ret = os.system(cmd)
   if(ret != 0): 
-    print("BUILD ERROR! (error code  " + str(ret) + ")")
+    print("BUILD ERROR! (error code  " + str(ret) + ")", flush=True)
     exit(1)
   
   print("")
@@ -76,12 +76,12 @@ def build_test(defines, test_name):
   print("-----------------------")
   ret = os.system("./test.bin")
   if(ret != 0): 
-    print("RUN ERROR! (error code  " + str(ret) + ")")
+    print("RUN ERROR! (error code  " + str(ret) + ")", flush=True)
     exit(1)
 
 def clean():
   print("")
   print("Clean")
-  print("-----------------------")
+  print("-----------------------", flush=True)
   os.system("make clean LVGL_DIR_NAME=" + lvgldirname)
   os.system("rm -f ./test.bin")

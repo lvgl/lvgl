@@ -12,7 +12,7 @@ def build_conf(title, defs):
   print("============================================")
   print(title)
   print("============================================")
-  print("")
+  print("", flush=True)
 
   build.clean()
   build.build(defs)
@@ -43,9 +43,9 @@ for f in files:
 if test_report:
   print("")
   print("Generating report")
-  print("-----------------------")
+  print("-----------------------", flush=True)
   os.system("rm -r report")
   os.system("mkdir report")
   os.system("gcovr -r ../ --html-details -o report/index.html  --exclude-directories '\.\./examples' --exclude-directories 'src/.*' --exclude-directories 'unity' --exclude 'lv_test_.*\.c'") 
-  print("Done: See report/index.html")
+  print("Done: See report/index.html", flush=True)
 
