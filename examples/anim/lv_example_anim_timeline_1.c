@@ -24,12 +24,60 @@ static void set_height(void * var, int32_t v)
 static void event_handler(lv_event_t * e)
 {
     lv_anim_timeline_t anim_timeline[] = {
-        {0,   obj1, (lv_anim_exec_xcb_t)set_width,  0, obj_width,  300, lv_anim_path_overshoot, false},
-        {0,   obj1, (lv_anim_exec_xcb_t)set_height, 0, obj_height, 300, lv_anim_path_ease_out,  false},
-        {200, obj2, (lv_anim_exec_xcb_t)set_width,  0, obj_width,  300, lv_anim_path_overshoot, false},
-        {200, obj2, (lv_anim_exec_xcb_t)set_height, 0, obj_height, 300, lv_anim_path_ease_out,  false},
-        {400, obj3, (lv_anim_exec_xcb_t)set_width,  0, obj_width,  300, lv_anim_path_overshoot, false},
-        {400, obj3, (lv_anim_exec_xcb_t)set_height, 0, obj_height, 300, lv_anim_path_ease_out,  false},
+        {
+            .start_time = 0,
+            .var = obj1,
+            .exec_cb = (lv_anim_exec_xcb_t)set_width,
+            .start_value = 0,
+            .end_value = obj_width,
+            .duration = 300,
+            .path_cb = lv_anim_path_overshoot
+        },
+        {
+            .start_time = 0,
+            .var = obj1,
+            .exec_cb = (lv_anim_exec_xcb_t)set_height,
+            .start_value = 0,
+            .end_value = obj_height,
+            .duration = 300,
+            .path_cb = lv_anim_path_ease_out,
+        },
+        {
+            .start_time = 200,
+            .var = obj2,
+            .exec_cb = (lv_anim_exec_xcb_t)set_width,
+            .start_value = 0,
+            .end_value = obj_width,
+            .duration = 300,
+            .path_cb = lv_anim_path_overshoot
+        },
+        {
+            .start_time = 200,
+            .var = obj2,
+            .exec_cb = (lv_anim_exec_xcb_t)set_height,
+            .start_value = 0,
+            .end_value = obj_height,
+            .duration = 300,
+            .path_cb = lv_anim_path_ease_out,
+        },
+        {
+            .start_time = 400,
+            .var = obj3,
+            .exec_cb = (lv_anim_exec_xcb_t)set_width,
+            .start_value = 0,
+            .end_value = obj_width,
+            .duration = 300,
+            .path_cb = lv_anim_path_overshoot
+        },
+        {
+            .start_time = 400,
+            .var = obj3,
+            .exec_cb = (lv_anim_exec_xcb_t)set_height,
+            .start_value = 0,
+            .end_value = obj_height,
+            .duration = 300,
+            .path_cb = lv_anim_path_ease_out,
+        },
         LV_ANIM_TIMELINE_END
     };
 
@@ -42,7 +90,7 @@ static void event_handler(lv_event_t * e)
     else if (obj == slider) {
         int32_t progress = lv_slider_get_value(slider);
         lv_anim_timeline_set_progress(anim_timeline, progress);
-    } 
+    }
 }
 
 /**
