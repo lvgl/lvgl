@@ -7,7 +7,7 @@ lvgldirname = os.path.abspath('..')
 lvgldirname = os.path.basename(lvgldirname)
 lvgldirname = '"' + lvgldirname + '"'
 
-base_defines = '"-DLV_CONF_PATH=' + lvgldirname +'/tests/lv_test_conf.h -DLV_BUILD_TEST"'
+base_defines = '"-DLV_CONF_PATH=' + lvgldirname +'/tests/src/lv_test_conf.h -DLV_BUILD_TEST"'
 
 def build(defines):
   global base_defines
@@ -19,7 +19,7 @@ def build(defines):
   
   d_all += '"'
   # -s makes it silence
-  cmd = "make -s -j BIN=test.bin " + "MAINSRC=lv_test_main.c LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
+  cmd = "make -s -j BIN=test.bin " + "MAINSRC=src/lv_test_main.c LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
 
   print("")
   print("Build")

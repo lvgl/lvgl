@@ -147,14 +147,28 @@ void test_dropdown_render(void)
   lv_obj_set_width(dd2, 200);
   lv_dropdown_set_selected(dd2, 2);
   lv_dropdown_open(dd2);
+  TEST_ASSERT_TRUE(lv_dropdown_get_selected_highlight(dd2));
+  lv_dropdown_set_selected_highlight(dd2, false);
+  TEST_ASSERT_FALSE(lv_dropdown_get_selected_highlight(dd2)); 
 
   lv_obj_t * dd3 = lv_dropdown_create(lv_scr_act());
   lv_obj_set_style_pad_hor(dd3, 5, 0);
   lv_obj_set_style_pad_ver(dd3, 20, 0);
   lv_obj_set_pos(dd3, 500, 150);
+  TEST_ASSERT_EQUAL_PTR(NULL, lv_dropdown_get_text(dd3));
+  lv_dropdown_set_text(dd3, "A text");
+  TEST_ASSERT_EQUAL_STRING("A text", lv_dropdown_get_text(dd3));
+  
   lv_dropdown_set_selected(dd3, 2);
+  
+  TEST_ASSERT_EQUAL(LV_DIR_BOTTOM, lv_dropdown_get_dir(dd3));
   lv_dropdown_set_dir(dd3, LV_DIR_LEFT);
+  TEST_ASSERT_EQUAL(LV_DIR_LEFT, lv_dropdown_get_dir(dd3));
+  
+  TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, lv_dropdown_get_symbol(dd3));
   lv_dropdown_set_symbol(dd3, LV_SYMBOL_LEFT);
+  TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_LEFT, lv_dropdown_get_symbol(dd3));
+
   lv_dropdown_set_options(dd3, "a0\na1\na2\na3\na4\na5\na6\na7\na8\na9\na10\na11\na12\na13\na14\na15\na16");
   lv_dropdown_open(dd3);
   lv_dropdown_set_selected(dd3, 3);

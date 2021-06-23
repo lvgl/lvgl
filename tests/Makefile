@@ -16,7 +16,7 @@ WARNINGS += -Wpedantic -pedantic-errors
 #-Wno-unused-value -Wno-unused-parameter
 OPTIMIZATION ?= -g0
 
-CFLAGS ?= -I$(LVGL_DIR)/ --coverage -Iunity $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
+CFLAGS ?= -I$(LVGL_DIR)/ --coverage -Isrc -Iunity $(DEFINES) $(WARNINGS) $(OPTIMIZATION) -I$(LVGL_DIR) -I.
 
 LDFLAGS ?=  -lpng --coverage 
 BIN ?= test
@@ -24,7 +24,7 @@ BIN ?= test
 include ../lvgl.mk
 
 CSRCS += ${TEST_SRC}
-CSRCS += lv_test_init.c
+CSRCS += src/lv_test_init.c
 CSRCS := $(CSRCS) $(EXTRA_CSRCS)
 
 OBJEXT ?= .o

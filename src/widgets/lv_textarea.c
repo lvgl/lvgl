@@ -656,8 +656,8 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj)
 #if LV_LABEL_TEXT_SELECTION
      lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    if((lv_label_get_text_selection_start(ta->label) == LV_DRAW_LABEL_NO_TXT_SEL ||
-        lv_label_get_text_selection_end(ta->label) == LV_DRAW_LABEL_NO_TXT_SEL)) {
+    if((lv_label_get_text_selection_start(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL ||
+        lv_label_get_text_selection_end(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL)) {
         return true;
     }
     else {
