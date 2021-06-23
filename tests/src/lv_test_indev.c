@@ -9,14 +9,18 @@
 
 static lv_coord_t x_act;
 static lv_coord_t y_act;
-static bool pressed;
+static uint32_t key_act;
+static int32_t diff_act;
+static bool mouse_pressed;
+static bool key_pressed;
+static bool enc_pressed;
 
 void lv_test_mouse_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data) 
 {
   LV_UNUSED(drv);
   data->point.x = x_act;
   data->point.y = y_act;
-  data->state = pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+  data->state = mouse_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
 void lv_test_mouse_move_to(lv_coord_t x, lv_coord_t y)
@@ -33,26 +37,97 @@ void lv_test_mouse_move_by(lv_coord_t x, lv_coord_t y)
 
 void lv_test_mouse_press(void)
 {
-  pressed = true;
+  mouse_pressed = true;
 }
 
 void lv_test_mouse_release(void)
 {
-  pressed = false;
+  mouse_pressed = false;
 }
 
 void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
 { 
   lv_test_mouse_release();
-  lv_test_mouse_wait(50);
+  lv_test_indev_wait(50);
   lv_test_mouse_move_to(x, y);
   lv_test_mouse_press();
-  lv_test_mouse_wait(50);
+  lv_test_indev_wait(50);
   lv_test_mouse_release();
-  lv_test_mouse_wait(50);
+  lv_test_indev_wait(50);
 }
 
-void lv_test_mouse_wait(uint32_t ms)
+
+void lv_test_keypad_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data) 
+{
+  LV_UNUSED(drv);
+  data->key = key_act;
+  data->state = key_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+}
+
+void lv_test_key_press(uint32_t k)
+{
+  key_act = k;
+  key_pressed = true;
+}
+
+void lv_test_key_release(void)
+{
+  key_pressed = false;
+}
+
+void lv_test_key_hit(uint32_t k)
+{
+  lv_test_key_release();
+  lv_test_indev_wait(50);
+  lv_test_key_press(k);
+  lv_test_mouse_press();
+  lv_test_indev_wait(50);
+  lv_test_key_release();
+  lv_test_indev_wait(50);
+}
+
+void lv_test_encoder_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data) 
+{
+  LV_UNUSED(drv);
+  data->enc_diff = diff_act;
+  data->state = enc_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+  diff_act = 0;
+}
+
+void lv_test_encoder_add_diff(int32_t d)
+{
+  diff_act += d;
+}
+
+void lv_test_encoder_turn(int32_t d)
+{
+  diff_act += d;
+  lv_test_indev_wait(50);
+}
+
+
+void lv_test_encoder_press(void)
+{
+  enc_pressed = true;
+}
+
+void lv_test_encoder_release(void)
+{
+  enc_pressed = false;
+}
+
+void lv_test_encoder_click(void)
+{
+  lv_test_encoder_release();
+  lv_test_indev_wait(50);
+  lv_test_encoder_press();
+  lv_test_indev_wait(50);
+  lv_test_encoder_release();
+  lv_test_indev_wait(50);
+}
+
+
+void lv_test_indev_wait(uint32_t ms)
 {
   uint32_t t = lv_tick_get();
   while(lv_tick_elaps(t) < ms) {
