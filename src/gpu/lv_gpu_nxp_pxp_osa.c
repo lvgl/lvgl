@@ -32,13 +32,14 @@
  *********************/
 
 #include "../lv_conf_internal.h"
+#include "../misc/lv_log.h"
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 
 #include "lv_gpu_nxp_pxp.h"
 #include "fsl_pxp.h"
 
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
     #include "FreeRTOS.h"
     #include "semphr.h"
 #endif
@@ -62,7 +63,7 @@ static void _lv_gpu_nxp_pxp_run(void);
  *  STATIC VARIABLES
  **********************/
 
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
     static SemaphoreHandle_t s_pxpIdle;
 #else
     static volatile bool s_pxpIdle;
@@ -81,13 +82,13 @@ static void _lv_gpu_nxp_pxp_run(void);
  */
 void PXP_IRQHandler(void)
 {
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
     BaseType_t taskAwake = pdFALSE;
 #endif
 
     if(kPXP_CompleteFlag & PXP_GetStatusFlags(LV_GPU_NXP_PXP_ID)) {
         PXP_ClearStatusFlags(LV_GPU_NXP_PXP_ID, kPXP_CompleteFlag);
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
         xSemaphoreGiveFromISR(s_pxpIdle, &taskAwake);
         portYIELD_FROM_ISR(taskAwake);
 #else
@@ -106,7 +107,7 @@ void PXP_IRQHandler(void)
  */
 static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
 {
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
     s_pxpIdle = xSemaphoreCreateBinary();
     if(s_pxpIdle == NULL) {
         return LV_RES_INV;
@@ -128,7 +129,7 @@ static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
 static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
 {
     NVIC_DisableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
     vSemaphoreDelete(s_pxpIdle);
 #endif
 }
@@ -138,14 +139,14 @@ static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
  */
 static void _lv_gpu_nxp_pxp_run(void)
 {
-#if !defined(FSL_RTOS_FREE_RTOS)
+#if !defined(SDK_OS_FREE_RTOS)
     s_pxpIdle = false;
 #endif
 
     PXP_EnableInterrupts(LV_GPU_NXP_PXP_ID, kPXP_CompleteInterruptEnable);
     PXP_Start(LV_GPU_NXP_PXP_ID);
 
-#if defined(FSL_RTOS_FREE_RTOS)
+#if defined(SDK_OS_FREE_RTOS)
     if(xSemaphoreTake(s_pxpIdle, portMAX_DELAY) != pdTRUE) {
         LV_LOG_ERROR("xSemaphoreTake error. Task halted.");
         for(; ;) ;

@@ -113,6 +113,7 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
 {
     lv_obj_set_style_flex_grow(obj, grow, 0);
+    lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
 }
 
 
@@ -342,8 +343,10 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                     LV_ASSERT_MALLOC(new_dsc);
                     if(new_dsc == NULL) return item_id;
 
-                    lv_memcpy(new_dsc, t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt - 1));
-                    lv_mem_buf_release(t->grow_dsc);
+                    if(t->grow_dsc) {
+                        lv_memcpy(new_dsc, t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt - 1));
+                        lv_mem_buf_release(t->grow_dsc);
+                    }
                     new_dsc[t->grow_item_cnt - 1].item = item;
                     new_dsc[t->grow_item_cnt - 1].min_size = f->row ? lv_obj_get_style_min_width(item, LV_PART_MAIN) : lv_obj_get_style_min_height(item, LV_PART_MAIN);
                     new_dsc[t->grow_item_cnt - 1].max_size = f->row ? lv_obj_get_style_max_width(item, LV_PART_MAIN) : lv_obj_get_style_max_height(item, LV_PART_MAIN);
@@ -453,16 +456,16 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                     break;
                 }
             }
-            lv_area_t old_coords;
-            lv_area_copy(&old_coords, &item->coords);
-
-            area_set_main_size(&item->coords, s);
 
             if(f->row) item->w_layout = 1;
             else item->h_layout = 1;
 
-            if(area_get_main_size(&old_coords) != area_get_main_size(&item->coords)) {
+            if(s != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
+
+                lv_area_t old_coords;
+                lv_area_copy(&old_coords, &item->coords);
+                area_set_main_size(&item->coords, s);
                 lv_event_send(item, LV_EVENT_SIZE_CHANGED, &old_coords);
                 lv_event_send(lv_obj_get_parent(item), LV_EVENT_CHILD_CHANGED, item);
                 lv_obj_invalidate(item);
