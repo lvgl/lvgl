@@ -58,7 +58,7 @@ def build_test(defines, test_name):
   test_file_name = test_name + ".c"
   test_file_runner_name = test_name + "_Runner.c"
   test_file_runner_name = test_file_runner_name.replace("/test_cases/", "/test_runners/")
-  csrcs = " EXTRA_CSRCS=\"unity/unity.c unity/unity_support.c src/lv_test_indev.c src/test_fonts/font_1.c src/test_fonts/font_2.c src/test_fonts/font_3.c \" "
+  csrcs = " EXTRA_CSRCS=\"unity/unity.c unity/unity_support.c src/test_fonts/font_1.c src/test_fonts/font_2.c src/test_fonts/font_3.c \" "
   # -s makes it silence
   cmd = "make -s -j BIN=test.bin MAINSRC=" + test_file_name + " TEST_SRC=" + test_file_runner_name + csrcs + "  LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
 

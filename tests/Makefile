@@ -25,6 +25,7 @@ include ../lvgl.mk
 
 CSRCS += ${TEST_SRC}
 CSRCS += src/lv_test_init.c
+CSRCS += src/lv_test_indev.c
 CSRCS := $(CSRCS) $(EXTRA_CSRCS)
 
 OBJEXT ?= .o
