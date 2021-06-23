@@ -19,8 +19,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_ANIM_TIMELINE_END { -1, NULL, NULL, 0, 0, 0, NULL, false }
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -39,6 +37,8 @@ typedef struct {
     void * user_data;           /**< Custom user data*/
 #endif
 } lv_anim_timeline_t;
+
+extern const lv_anim_timeline_t LV_ANIM_TIMELINE_END;
 
 /**********************
 * GLOBAL PROTOTYPES

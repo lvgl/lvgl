@@ -24,6 +24,7 @@ static void lv_anim_timeline_add(const lv_anim_timeline_t * anim_timeline, bool 
 /**********************
  *  STATIC VARIABLES
  **********************/
+const lv_anim_timeline_t LV_ANIM_TIMELINE_END = { -1, NULL, NULL, 0, 0, 0, NULL, false };
 
 /**********************
  *      MACROS
@@ -47,7 +48,7 @@ uint32_t lv_anim_timeline_start(const lv_anim_timeline_t * anim_timeline, bool r
 void lv_anim_timeline_set_progress(const lv_anim_timeline_t * anim_timeline, uint16_t progress)
 {
     const uint32_t playtime = lv_anim_timeline_get_playtime(anim_timeline);
-    const uint32_t act_time = progress * playtime / 0xFFFF;
+    const int32_t act_time = progress * playtime / 0xFFFF;
 
     uint32_t i = 0;
     while(anim_timeline[i].start_time >= 0) {
@@ -63,6 +64,10 @@ void lv_anim_timeline_set_progress(const lv_anim_timeline_t * anim_timeline, uin
             lv_anim_set_time(&a, at->duration);
 
             a.act_time = act_time - at->start_time;
+
+#if LV_USE_USER_DATA
+            a.user_data = at->user_data;
+#endif
 
             value = at->path_cb(&a);
         }
