@@ -105,7 +105,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
  * @param fmt           `printf`-like format
  * @example lv_label_set_text_fmt(label1, "%d user", user_num);
  */
-void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...);
+void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable
