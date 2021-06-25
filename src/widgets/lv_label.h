@@ -37,6 +37,15 @@ LV_EXPORT_CONST_INT(LV_LABEL_POS_LAST);
 LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SELECTION_OFF);
 
 /**********************
+*      MACROS
+**********************/
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__ ((format(printf, fmtstr, vararg)))
+#else
+#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
+#endif
+
+/**********************
  *      TYPEDEFS
  **********************/
 
@@ -105,7 +114,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
  * @param fmt           `printf`-like format
  * @example lv_label_set_text_fmt(label1, "%d user", user_num);
  */
-void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable
