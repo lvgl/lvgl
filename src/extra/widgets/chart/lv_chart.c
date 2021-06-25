@@ -755,6 +755,10 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
     obj_draw_dsc.line_dsc = &line_dsc;
     obj_draw_dsc.part = LV_PART_MAIN;
+    obj_draw_dsc.id = 0xFFFFFFFF;
+    obj_draw_dsc.p1 = NULL;
+    obj_draw_dsc.p2 = NULL;
+    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
 
     lv_opa_t border_opa = lv_obj_get_style_border_opa(obj, LV_PART_MAIN);
     lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
@@ -775,7 +779,7 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
         }
 
         for(i = i_start; i < i_end; i++) {
-            p1.y = (int32_t)((int32_t)(h - line_dsc.width) * i) / (chart->hdiv_cnt - 1);
+            p1.y = (int32_t)((int32_t)h * i) / (chart->hdiv_cnt - 1);
             p1.y += y_ofs;
             p2.y = p1.y;
 
@@ -801,7 +805,7 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
         }
 
         for(i = i_start; i < i_end; i++) {
-            p1.x = (int32_t)((int32_t)(w - line_dsc.width) * i) / (chart->vdiv_cnt - 1);
+            p1.x = (int32_t)((int32_t)w * i) / (chart->vdiv_cnt - 1);
             p1.x += x_ofs;
             p2.x = p1.x;
 
@@ -814,6 +818,12 @@ static void draw_div_lines(lv_obj_t * obj, const lv_area_t * clip_area)
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
         }
     }
+
+    obj_draw_dsc.id = 0xFFFFFFFF;
+    obj_draw_dsc.p1 = NULL;
+    obj_draw_dsc.p2 = NULL;
+    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
+
 }
 
 static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)

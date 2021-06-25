@@ -140,7 +140,7 @@ The possible values of `dir`  `LV_DIR_NONE/RIGHT/UP/LEFT/DOWN/HOR/VER/ALL` or th
       - vertical line `clip_area`, `p1`, `p2` (points of the line), `line_dsc`, `part`
       - horizontal line `clip_area`, `p1`, `p2` (points of the line), `line_dsc`, `part`
       - point `clip_area`, `draw_area` (points of the line), `rect_dsc`, `part`
-  - `LV_PART_MAIN` (the division lines)  `clip_area`, `id` (index of the line), `p1`, `p2` (points of the line), `line_dsc`, `part`
+  - `LV_PART_MAIN` (the division lines)  `clip_area`, `id` (index of the line), `p1`, `p2` (points of the line), `line_dsc`, `part`. Besides events for every line, an event is sent before the first line and after the last line with `id=0xFFFFFFFF`, `p1 = NULL` and `p2 = NULL`. It can be used to add/remove masks, or draw special division lines. 
   
 Learn more about [Events](/overview/event).
 
