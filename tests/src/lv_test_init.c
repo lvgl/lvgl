@@ -1,11 +1,10 @@
-#include "../lvgl.h"
+
+#if LV_BUILD_TEST
+#include "lv_test_init.h"
+#include "lv_test_indev.h"
+#include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lv_test_core/lv_test_core.h"
-#include "lv_test_widgets/lv_test_label.h"
-
-#if LV_BUILD_TEST && !defined(LV_BUILD_TEST_NO_MAIN)
-#include <sys/time.h>
 
 #define HOR_RES 800
 #define VER_RES 480
@@ -13,20 +12,22 @@
 static void hal_init(void);
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
+lv_indev_t * lv_test_mouse_indev;
+lv_indev_t * lv_test_keypad_indev;
+lv_indev_t * lv_test_encoder_indev;
+
 lv_color_t test_fb[HOR_RES * VER_RES];
+static lv_color_t disp_buf1[HOR_RES * VER_RES];
 
-int main(void)
+void lv_test_init(void)
 {
-    printf("Call lv_init...\n");
     lv_init();
-
     hal_init();
+}
 
-    lv_test_core();
-//    lv_test_label();
-
-    printf("Exit with success!\n");
-    return 0;
+void lv_test_deinit(void)
+{
+    lv_mem_deinit();
 }
 
 static void * open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -88,13 +89,11 @@ static lv_fs_res_t tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     return LV_FS_RES_OK;
 }
 
-
 static void hal_init(void)
 {
     static lv_disp_draw_buf_t draw_buf;
-    lv_color_t * disp_buf1 = (lv_color_t *)malloc(LV_HOR_RES * LV_VER_RES * sizeof(lv_color_t));
 
-    lv_disp_draw_buf_init(&draw_buf, disp_buf1, NULL, LV_HOR_RES * LV_VER_RES);
+    lv_disp_draw_buf_init(&draw_buf, disp_buf1, NULL, HOR_RES * VER_RES);
 
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
@@ -103,6 +102,25 @@ static void hal_init(void)
     disp_drv.hor_res = HOR_RES;
     disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
+    
+    static lv_indev_drv_t indev_mouse_drv;
+    lv_indev_drv_init(&indev_mouse_drv);
+    indev_mouse_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_mouse_drv.read_cb = lv_test_mouse_read_cb;
+    lv_test_mouse_indev = lv_indev_drv_register(&indev_mouse_drv);
+    
+    static lv_indev_drv_t indev_keypad_drv;
+    lv_indev_drv_init(&indev_keypad_drv);
+    indev_keypad_drv.type = LV_INDEV_TYPE_KEYPAD;
+    indev_keypad_drv.read_cb = lv_test_keypad_read_cb;
+    lv_test_keypad_indev = lv_indev_drv_register(&indev_keypad_drv);
+
+    static lv_indev_drv_t indev_encoder_drv;
+    lv_indev_drv_init(&indev_encoder_drv);
+    indev_encoder_drv.type = LV_INDEV_TYPE_ENCODER;
+    indev_encoder_drv.read_cb = lv_test_encoder_read_cb;
+    lv_test_encoder_indev = lv_indev_drv_register(&indev_encoder_drv);
+
 
     static lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
@@ -116,7 +134,6 @@ static void hal_init(void)
 
     lv_fs_drv_register(&drv);                 /*Finally register the drive*/
 }
-#include <stdio.h>
 
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {

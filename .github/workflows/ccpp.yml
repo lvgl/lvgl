@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ feat/test-unity ]
   pull_request:
-    branches: [master, dev ]
+    branches: [ feat/test-unity ]
 
 jobs:
   build:
@@ -15,4 +15,4 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Run tests
-      run: sudo apt-get install libpng-dev; cd tests; python ./build.py
+      run: sudo apt-get install libpng-dev ruby-full; cd tests; python ./main.py

@@ -1,0 +1,37 @@
+/*=======Test Runner Used To Run Each Test=====*/
+static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE line_num)
+{
+    Unity.CurrentTestName = name;
+    Unity.CurrentTestLineNumber = line_num;
+#ifdef UNITY_USE_COMMAND_LINE_ARGS
+    if (!UnityTestMatches())
+        return;
+#endif
+    Unity.NumberOfTests++;
+    UNITY_CLR_DETAILS();
+    UNITY_EXEC_TIME_START();
+    CMock_Init();
+    if (TEST_PROTECT())
+    {
+<% if @options[:plugins].include?(:cexception) %>
+        CEXCEPTION_T e;
+        Try {
+            <%= @options[:setup_name] %>();
+            func();
+        } Catch(e) {
+            TEST_ASSERT_EQUAL_HEX32_MESSAGE(CEXCEPTION_NONE, e, "Unhandled Exception!");
+        }
+<% else %>
+        <%= @options[:setup_name] %>();
+        func();
+<% end %>
+    }
+    if (TEST_PROTECT())
+    {
+        <%= @options[:teardown_name] %>();
+        CMock_Verify();
+    }
+    CMock_Destroy();
+    UNITY_EXEC_TIME_STOP();
+    UnityConcludeTest();
+}

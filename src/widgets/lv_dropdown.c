@@ -335,7 +335,7 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    return dropdown->options;
+    return dropdown->options == NULL ? "" : dropdown->options;
 }
 
 uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
