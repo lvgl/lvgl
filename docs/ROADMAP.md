@@ -31,6 +31,7 @@ This list indicates only the current intention and it can be changed.
 ## v8.2
 - [ ] Optimize line and circle drawing and masking
 - [ ] Handle stride. See [#1858](https://github.com/lvgl/lvgl/issues/1858)
+- [ ] Support LV_STATE_HOVERED
 
 ## Ideas
 - Reconsider color format management for run time color format setting, and custom color format usage. (Also [RGB888](https://github.com/lvgl/lvgl/issues/1722))
