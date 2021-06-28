@@ -3,16 +3,34 @@
 This is a summary for planned new features and a collection of ideas.
 This list indicates only the current intention and it can be changed.
 
-## v8.X
-- `lv_snapshot`: buffer a widget and all of its children into an image. he source widget can be on a different screen too. The result image can be transformed.
-- Add radio button support
-- Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
-- Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
-- chart: pre-delete `X` pint after the lastly set
-- chart: autoscroll to the right
-- 9-patch support for `lv_imgbtn`.
-- Handle stride. See [#1858](https://github.com/lvgl/lvgl/issues/1858)
-- Optimize line and circle drawing and masking 
+## v8.1
+### Features
+- [x] Unit testing (gtest?). See #1658
+- [ ] Benchmarking (gem5 or qemu?). See #1660  
+- [ ] lv_snapshot: buffer a widget and all of its children into an image. The source widget can be on a different screen too. The resulting image can be transformed.
+- [ ] High level GPU support. See #2058
+
+#### New features
+- [x] merge MicroPython examples
+- [x] add a "Try out yourself" button to the Micropython examples
+  
+### Discuss
+- [ ] CPP binding  
+- [ ] Plugins. In v8 core and extra widgets are separated. With the new flexible events, the behavior of the widgets can be modified in a modular way. E.g. a plugin to add faded area to a line chart (as in the widgets demo)
+
+### Docs
+- [x] Display the Micropytohn examples too.
+- [x] Add a link to the example C and py files
+- [x] List of all examples on a page. All in iframes grouped by category (e.g. flex, style, button)
+
+### Others
+- [ ] Add automatic rebuild to get binary directly. Similarly to [STM32F746 project](https://github.com/lvgl/lv_port_stm32f746_disco#try-it-with-just-a-few-clicks).
+- [ ] Implement release scripts. I've added a basic specification [here](https://github.com/lvgl/lvgl/tree/master/scripts/release), but we should discuss it.
+- [ ] Unit test for the core widgets
+
+## v8.2
+- [ ] Optimize line and circle drawing and masking
+- [ ] Handle stride. See [#1858](https://github.com/lvgl/lvgl/issues/1858)
 
 ## Ideas
 - Reconsider color format management for run time color format setting, and custom color format usage. (Also [RGB888](https://github.com/lvgl/lvgl/issues/1722))
