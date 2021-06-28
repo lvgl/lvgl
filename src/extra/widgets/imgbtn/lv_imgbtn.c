@@ -175,6 +175,19 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res != LV_COVER_RES_MASKED) info->res = LV_COVER_RES_NOT_COVER;
     }
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_self_size_info(e);
+        lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
+        lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
+        if(imgbtn->img_src_left[state] == NULL &&
+           imgbtn->img_src_mid[state] != NULL &&
+           imgbtn->img_src_right[state] == NULL)
+        {
+            lv_img_header_t header;
+            lv_img_decoder_get_info(imgbtn->img_src_mid, &header);
+            p->x = LV_MAX(p->x, header.w);
+        }
+    }
 }
 
 static void draw_main(lv_event_t * e)
@@ -271,6 +284,7 @@ static void refr_img(lv_obj_t * obj)
 
     if(info_res == LV_RES_OK) {
         imgbtn->act_cf = header.cf;
+        lv_obj_refresh_self_size(obj);
         lv_obj_set_height(obj, header.h); /*Keep the user defined width*/
     }
     else {
