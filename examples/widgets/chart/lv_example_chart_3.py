@@ -1,6 +1,6 @@
 def draw_event_cb(e):
 
-    dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+    dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     if dsc.part == lv.PART.TICKS and dsc.id == lv.chart.AXIS.PRIMARY_X: 
         month = ["Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
         # dsc.text is defined char text[16], I must therefore convert the Python string to a byte_array

@@ -5,7 +5,7 @@ def set_value(bar, v):
     bar.set_value(v, lv.ANIM.OFF)
 
 def event_cb(e):
-    dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+    dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     if dsc.part != lv.PART.INDICATOR:
         return
 

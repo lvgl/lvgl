@@ -35,7 +35,7 @@ def event_cb(e):
             a.y1 = coords.y1 + p.y - 30
             a.y2 = coords.y1 + p.y - 10
             
-            clip_area = lv.area_t.cast(e.get_param())
+            clip_area = lv.area_t.__cast__(e.get_param())
             lv.draw_rect(a, clip_area, draw_rect_dsc)
             
     elif code == lv.EVENT.RELEASED:
