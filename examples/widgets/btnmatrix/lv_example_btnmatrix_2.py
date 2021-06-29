@@ -22,7 +22,7 @@ def event_cb(e):
     code = e.get_code()
     obj = e.get_target()
     if code == lv.EVENT.DRAW_PART_BEGIN:
-        dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+        dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
         # Change the draw descriptor the 2nd button
         if dsc.id == 1:
             dsc.rect_dsc.radius = 0;
@@ -50,7 +50,7 @@ def event_cb(e):
             dsc.label_dsc.opa = lv.OPA.TRANSP  # Hide the text if any
 
     if code == lv.EVENT.DRAW_PART_END:
-        dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+        dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
 
         # Add custom content to the 4th button when the button itself was drawn
         if dsc.id == 3:

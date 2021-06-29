@@ -49,7 +49,7 @@ class ExampleChart_6():
                 
         elif code == lv.EVENT.DRAW_PART_END:
             # print("EVENT.DRAW_PART_END")
-            dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+            dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
             # if dsc.p1 and dsc.p2:
                 # print("p1, p2", dsc.p1,dsc.p2)
                 # print("p1.y, p2.y", dsc.p1.y, dsc.p2.y)

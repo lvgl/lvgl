@@ -5,7 +5,7 @@ ITEM_CNT = 200
 
 def draw_event_cb(e):
     obj = lv.table.__cast__(e.get_target())
-    dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+    dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     # If the cells are drawn...
     if dsc.part == lv.PART.ITEMS:
         chk = obj.has_cell_ctrl(dsc.id, 0, lv.table.CELL_CTRL.CUSTOM_1)

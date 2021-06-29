@@ -3,7 +3,7 @@ def draw_event_cb(e):
     obj = lv.obj.__cast__(e.get_target())
 
     # Add the faded area before the lines are drawn
-    dsc = lv.obj_draw_part_dsc_t.cast(e.get_param())
+    dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     if dsc.part != lv.PART.ITEMS:
         return
     if not dsc.p1 or not dsc.p2:
