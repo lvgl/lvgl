@@ -23,60 +23,75 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#if LV_ANIM_TIMELINE_CUSTOM_EXEC
-typedef lv_anim_custom_exec_cb_t lv_anim_timeline_exec_cb_t;
-#else
-typedef lv_anim_exec_xcb_t lv_anim_timeline_exec_cb_t;
-#endif
+struct _lv_anim_timeline_t;
 
-/*Data of anim_timeline*/
-typedef struct {
-    int32_t start_time;                   /**< Start time on the timeline*/
-    void * var;                           /**< Variable to animate*/
-    lv_anim_timeline_exec_cb_t exec_cb;   /**< Function to execute to animate*/
-    int32_t start_value;                  /**< Start value*/
-    int32_t end_value;                    /**< End value*/
-    uint32_t duration;                    /**< Animation time in ms*/
-    lv_anim_path_cb_t path_cb;            /**< Describe the path (curve) of animations*/
-    bool early_apply;                     /**< Apply start value immediately even is there is `delay`*/
-#if LV_USE_USER_DATA
-    void * user_data;                     /**< Custom user data*/
-#endif
-} lv_anim_timeline_t;
-
-extern const lv_anim_timeline_t LV_ANIM_TIMELINE_END;
+typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
 
 /**********************
 * GLOBAL PROTOTYPES
 **********************/
 
 /**
- * Start animation according to the timeline
- * @param anim_timeline  timeline array
- * @param reverse        whether to play in reverse
- * @return total time spent in timeline
+ * Create a animation timeline.
+ * @return pointer to the animation timeline.
  */
-uint32_t lv_anim_timeline_start(const lv_anim_timeline_t anim_timeline[], bool reverse);
+lv_anim_timeline_t * lv_anim_timeline_create(void);
 
 /**
- * Set the progress of the timeline
- * @param anim_timeline  timeline array
- * @param progress       set value 0~65535 to map 0~100% animation progress
+ * Delete animation timeline.
+ * @param at    pointer to the animation timeline.
  */
-void lv_anim_timeline_set_progress(const lv_anim_timeline_t anim_timeline[], uint16_t progress);
+void lv_anim_timeline_del(lv_anim_timeline_t * at);
 
 /**
- * Get the time used to play the timeline
- * @param anim_timeline  timeline array
- * @return total time spent in timeline
+ * Add animation to the animation timeline.
+ * @param at            pointer to the animation timeline.
+ * @param start_time    the time the animation started on the timeline, note that start_time will override the value of delay.
+ * @param a             pointer to an animation.
  */
-uint32_t lv_anim_timeline_get_playtime(const lv_anim_timeline_t anim_timeline[]);
+void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, lv_anim_t * a);
 
 /**
- * Delete timeline
- * @param anim_timeline  timeline array
+ * Start the animation timeline.
+ * @param at    pointer to the animation timeline.
+ * @return total time spent in animation timeline.
  */
-void lv_anim_timeline_del(const lv_anim_timeline_t anim_timeline[]);
+uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at);
+
+/**
+ * Set the playback direction of the animation timeline.
+ * @param at        pointer to the animation timeline.
+ * @param reverse   whether to play in reverse.
+ */
+void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
+
+/**
+ * Set the progress of the animation timeline.
+ * @param at        pointer to the animation timeline.
+ * @param progress  set value 0~65535 to map 0~100% animation progress.
+ */
+void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress);
+
+/**
+ * Get the time used to play the animation timeline.
+ * @param at    pointer to the animation timeline.
+ * @return total time spent in animation timeline.
+ */
+uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at);
+
+/**
+ * Get whether the animation timeline is played in reverse.
+ * @param at    pointer to the animation timeline.
+ * @return return true if it is reverse playback.
+ */
+bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at);
+
+/**
+ * Get the playback progress of the animation timeline.
+ * @param at    pointer to the animation timeline.
+ * @return return value 0~65535 to map 0~100% animation progress.
+ */
+uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at);
 
 /**********************
  *      MACROS
