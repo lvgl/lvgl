@@ -1,12 +1,12 @@
 #include "../lv_conf_internal.h"
 #if LV_MEM_CUSTOM == 0
 
-#include <assert.h>
 #include <limits.h>
 #include <stddef.h>
 #include "lv_tlsf.h"
 #include "lv_mem.h"
 #include "lv_log.h"
+#include "lv_assert.h"
 #define printf LV_LOG_ERROR
 
 #define TLSF_MAX_POOL_SIZE LV_MEM_SIZE
@@ -281,6 +281,8 @@ enum tlsf_private
 /*
 ** Set assert macro, if it has not been provided by the user.
 */
+#define tlsf_assert LV_ASSERT
+
 #if !defined (tlsf_assert)
 #define tlsf_assert assert
 #endif
