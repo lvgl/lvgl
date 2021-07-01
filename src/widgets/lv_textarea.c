@@ -420,6 +420,16 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 		lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
 	}
 
+    /*Check the left*/
+    if(cur_pos.x < lv_obj_get_scroll_left(obj)) {
+        lv_obj_scroll_to_x(obj, cur_pos.x, LV_ANIM_ON);
+    }
+    /*Check the right*/
+    lv_coord_t w = lv_obj_get_content_width(obj);
+    if(cur_pos.x + font_h - lv_obj_get_scroll_left(obj) > w) {
+        lv_obj_scroll_to_x(obj, cur_pos.x - w + font_h, LV_ANIM_ON);
+    }
+
     ta->cursor.valid_x = cur_pos.x;
 
     start_cursor_blink(obj);
@@ -476,20 +486,16 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
     if(ta->one_line == en) return;
 
     if(en) {
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t font_h              = lv_font_get_line_height(font);
-
         ta->one_line = 1;
         lv_obj_set_width(ta->label, LV_SIZE_CONTENT);
 
-        lv_obj_set_content_height(obj, font_h);
+        lv_obj_set_height(obj, LV_SIZE_CONTENT);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
     else {
         ta->one_line = 0;
         lv_obj_set_width(ta->label, lv_pct(100));
-
-        lv_obj_set_height(obj, LV_DPI_DEF);
+        lv_obj_remove_local_style_prop(obj, LV_STYLE_HEIGHT, LV_PART_MAIN);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
 }
