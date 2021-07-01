@@ -58,6 +58,33 @@ It will "copy" the `lvgl` repository to your GitHub account (`https://github.com
 8. Describe what is in the update. An example code is welcome if applicable.
 9. If you need to make more changes, just update your forked `lvgl` repo with new commits. They will automatically appear in the PR.
 
+### Commit message format
+In commit messages please follow the [Angular Commit Format](https://gist.github.com/brianclements/841ea7bffdb01346392c).
+
+Some examples:
+```
+fix(img) update size if a new source is set
+```
+
+```
+fix(bar) fix memory leak
+
+The animations weren't deleted in the destructor.
+
+Fixes: #1234
+```
+
+```
+feat add span widget
+
+The span widget allows mixing different font sizes, colors and styles.
+It's similar to HTML <span>
+```
+
+```
+docs(porting) fix typo
+```
+
 ## Developer Certification of Origin (DCO)
 
 ### Overview
