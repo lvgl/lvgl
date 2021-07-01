@@ -752,7 +752,8 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff, bool ignore_floating)
 {
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING)) continue;
         child->coords.x1 += x_diff;
@@ -934,7 +935,8 @@ static void calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_ou
 static void layout_update_core(lv_obj_t * obj)
 {
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         layout_update_core(child);
     }

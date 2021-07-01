@@ -419,7 +419,8 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
     lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPPABLE)) {
@@ -473,7 +474,8 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
     lv_coord_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPPABLE)) {

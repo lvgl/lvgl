@@ -705,7 +705,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         uint32_t i;
-        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        for(i = 0; i < child_cnt; i++) {
             lv_obj_t * child = lv_obj_get_child(obj, i);
             lv_obj_mark_layout_as_dirty(child);
         }
