@@ -942,6 +942,11 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     lv_coord_t row_gap = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
+    /*Be sure to have a minimal extra space if row/col_gap is small*/
+    lv_coord_t dpi = lv_disp_get_dpi(lv_obj_get_disp(obj));
+    row_gap = LV_MAX(row_gap, dpi / 10);
+    col_gap = LV_MAX(col_gap, dpi / 10);
+
     /*Convert relative coordinates to absolute*/
     btn_area.x1 += obj_area.x1 - row_gap;
     btn_area.y1 += obj_area.y1 - col_gap;
