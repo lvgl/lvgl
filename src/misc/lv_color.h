@@ -459,7 +459,15 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
-#if LV_COLOR_DEPTH != 1
+
+#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0
+    /*Source: https://stackoverflow.com/a/50012418/1999969*/
+    mix = ( mix + 4 ) >> 3;
+    uint32_t bg = (c2.full | (c2.full << 16)) & 0x7E0F81F; /*0b00000111111000001111100000011111*/
+    uint32_t fg = (c1.full | (c1.full << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * mix) >> 5) + bg) & 0x7E0F81F;
+    ret.full = (uint16_t)((result >> 16) | result);
+#elif LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
     LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
                                         (255 - mix) + LV_COLOR_MIX_ROUND_OFS));

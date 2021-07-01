@@ -147,6 +147,18 @@ typedef struct {
     uint16_t delta_deg;
 } lv_draw_mask_angle_param_t;
 
+typedef struct  {
+    uint8_t * buf;
+    lv_opa_t * cir_opa;         /*Opacity of values on the circumference of an 1/4 circle*/
+    uint16_t * x_start_on_y;        /*The x coordinate of the circle for each y value*/
+    uint16_t * opa_start_on_y;      /*The index of `cir_opa` for each y value*/
+    int32_t life;               /*How many times the entry way used*/
+    uint32_t used_cnt;          /*Like a semaphore to count the referencing masks*/
+    lv_coord_t radius;          /*The radius of the entry*/
+} _lv_draw_mask_radius_circle_dsc_t;
+
+typedef _lv_draw_mask_radius_circle_dsc_t _lv_draw_mask_radius_circle_dsc_arr_t[LV_CIRCLE_CACHE_SIZE];
+
 typedef struct {
     /*The first element must be the common descriptor*/
     _lv_draw_mask_common_dsc_t dsc;
@@ -157,9 +169,8 @@ typedef struct {
         /*Invert the mask. 0: Keep the pixels inside.*/
         uint8_t outer: 1;
     } cfg;
-    int32_t y_prev;
-    lv_sqrt_res_t y_prev_x;
 
+    _lv_draw_mask_radius_circle_dsc_t * circle;
 } lv_draw_mask_radius_param_t;
 
 
@@ -234,6 +245,21 @@ void * lv_draw_mask_remove_id(int16_t id);
  * If more masks have `custom_id` ID then the last mask's parameter will be returned
  */
 void * lv_draw_mask_remove_custom(void * custom_id);
+
+/**
+ * Free the data from the parameter.
+ * It's called inside  `lv_draw_mask_remove_id` and `lv_draw_mask_remove_custom`
+ * Needs to be called only in special cases when the mask is not added by `lv_draw_mask_add`
+ * and not removed by `lv_draw_mask_remove_id` or `lv_draw_mask_remove_custom`
+ * @param p pointer to a mask parameter
+ */
+void lv_draw_mask_free_param(void * p);
+
+/**
+ * Called by LVGL the rendering of a screen is ready to clean up
+ * the temporal (cache) data of the masks
+ */
+void _lv_draw_mask_cleanup(void);
 
 //! @cond Doxygen_Suppress
 

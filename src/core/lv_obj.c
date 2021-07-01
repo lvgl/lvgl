@@ -528,6 +528,7 @@ static void lv_obj_draw(lv_event_t * e)
 #if LV_DRAW_COMPLEX
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
+            lv_draw_mask_free_param(param);
             lv_mem_buf_release(param);
         }
 #endif
@@ -748,7 +749,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
+            lv_obj_t * child = obj->spec_attr->children[i];
             lv_obj_mark_layout_as_dirty(child);
         }
     }

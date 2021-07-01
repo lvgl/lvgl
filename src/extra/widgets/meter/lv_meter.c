@@ -414,7 +414,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
         lv_draw_mask_radius_init(&outer_mask, &area_outer, LV_RADIUS_CIRCLE, false);
         int16_t outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
 
-        int16_t inner_act_mask_id = -1; /*Will be added later*/
+        int16_t inner_act_mask_id = LV_MASK_ID_INV; /*Will be added later*/
 
         uint32_t minor_cnt = scale->tick_major_nth ? scale->tick_major_nth - 1 : 0xFFFF;
         for(i = 0; i < scale->tick_cnt; i++) {
@@ -532,6 +532,9 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
 
         }
+        lv_draw_mask_free_param(&inner_minor_mask);
+        lv_draw_mask_free_param(&inner_major_mask);
+        lv_draw_mask_free_param(&outer_mask);
         lv_draw_mask_remove_id(outer_mask_id);
     }
 }

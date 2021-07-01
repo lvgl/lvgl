@@ -39,6 +39,8 @@ static void draw_event_cb(lv_event_t * e)
         lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
 
         /*Remove the masks*/
+        lv_draw_mask_free_param(&line_mask_param);
+        lv_draw_mask_free_param(&fade_mask_param);
         lv_draw_mask_remove_id(line_mask_id);
         lv_draw_mask_remove_id(fade_mask_id);
     }

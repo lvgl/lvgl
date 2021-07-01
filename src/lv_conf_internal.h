@@ -74,7 +74,7 @@
 #endif
 
 /*Enable more complex drawing routines to manage screens transparency.
- *Can be used if the UI is above an other layer, e.g. an OSD menu or video player.
+ *Can be used if the UI is above another layer, e.g. an OSD menu or video player.
  *Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to non LV_OPA_COVER value*/
 #ifndef LV_COLOR_SCREEN_TRANSP
 #  ifdef CONFIG_LV_COLOR_SCREEN_TRANSP
@@ -250,6 +250,19 @@
 #    define  LV_SHADOW_CACHE_SIZE    0
 #  endif
 #endif
+
+/* Set number of maximally cached circle data.
+ * The circumference of 1/4 circle are saved for anti-aliasing
+ * radius * 4 bytes are used per circle (the most often used radiuses are saved)
+ * 0: to disable caching */
+#ifndef LV_CIRCLE_CACHE_SIZE
+#  ifdef CONFIG_LV_CIRCLE_CACHE_SIZE
+#    define LV_CIRCLE_CACHE_SIZE CONFIG_LV_CIRCLE_CACHE_SIZE
+#  else
+#    define  LV_CIRCLE_CACHE_SIZE    4
+#  endif
+#endif
+
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.

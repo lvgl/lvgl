@@ -228,7 +228,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
                y < coords_bg.y2 - rout - 1) {
                 mask_res = LV_DRAW_MASK_RES_FULL_COVER;
                 if(simple_mode == false) {
-                    lv_memset(mask_buf, opa, draw_area_w);
+                    lv_memset(mask_buf, 0xff, draw_area_w);
                     mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
                 }
             }
@@ -240,7 +240,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 
             /*If mask will taken into account its base opacity was already set by memset above*/
             if(mask_res == LV_DRAW_MASK_RES_CHANGED) {
-                opa2 = LV_OPA_COVER;
+//                opa2 = LV_OPA_COVER;
             }
 
             /*Get the current line color*/
@@ -329,6 +329,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         if(grad_map) lv_mem_buf_release(grad_map);
         if(mask_buf) lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_rout_id);
+        if(mask_rout_id != LV_MASK_ID_INV) lv_draw_mask_free_param(&mask_rout_param);
     }
 
 #endif
@@ -509,8 +510,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
             fill_area.y2++;
 
         }
+        lv_draw_mask_free_param(&mask_rin_param);
+        lv_draw_mask_free_param(&mask_rout_param);
         lv_draw_mask_remove_id(mask_rin_id);
-        lv_draw_mask_remove_id(mask_rout_id);
+        if(mask_rout_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_rout_id);
         lv_mem_buf_release(mask_buf);
     }
 #else /*LV_DRAW_COMPLEX*/
@@ -1007,6 +1010,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         }
     }
 
+    lv_draw_mask_free_param(&mask_rout_param);
     lv_draw_mask_remove_id(mask_rout_id);
     lv_mem_buf_release(mask_buf);
     lv_mem_buf_release(sh_buf);
@@ -1063,6 +1067,8 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
         sh_ups_tmp_buf += size;
     }
     lv_mem_buf_release(mask_line);
+
+    lv_draw_mask_free_param(&mask_param);
 
     if(sw == 1) {
         int32_t i;
@@ -1394,6 +1400,8 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
 
         }
     }
+    lv_draw_mask_free_param(&mask_rin_param);
+    lv_draw_mask_free_param(&mask_rout_param);
     lv_draw_mask_remove_id(mask_rin_id);
     lv_draw_mask_remove_id(mask_rout_id);
     lv_mem_buf_release(mask_buf);
