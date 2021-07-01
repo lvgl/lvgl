@@ -3,7 +3,7 @@
 #
 def get_icon(filename,xres,yres):
     try:
-        sdl_filename = "../../assets/" + filename + "_" + str(xres) + "x" + str(yres) + "_argb8888.bin"
+        sdl_filename = "../../assets/" + filename + "_" + str(xres) + "x" + str(yres) + "_argb8888.fnt"
         print("file name: ", sdl_filename)
         with open(sdl_filename,'rb') as f:
             icon_data = f.read()

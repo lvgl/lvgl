@@ -55,7 +55,7 @@ a2.set_custom_exec_cb(lambda a,val: set_zoom(img,val))
 a2.set_values(128, 256)
 a2.set_time(5000)
 a2.set_playback_time(3000)
-a2.set_repeat_count(LV_ANIM_REPEAT_INFINITE)
+a2.set_repeat_count(lv.ANIM_REPEAT.INFINITE)
 lv.anim_t.start(a2)
 
 

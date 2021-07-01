@@ -13,7 +13,7 @@ fs_driver.fs_register(fs_drv, 'S')
 try:
     ltr_label.set_style_text_font(ltr_label, lv.font_montserrat_16, 0)
 except:
-    font_montserrat_16 = lv.font_load("S:../../assets/font/montserrat-16.bin")
+    font_montserrat_16 = lv.font_load("S:../../assets/font/montserrat-16.fnt")
     ltr_label.set_style_text_font(font_montserrat_16, 0)
     
 ltr_label.set_width(310)
@@ -26,7 +26,7 @@ rtl_label.set_style_text_font(lv.font_dejavu_16_persian_hebrew, 0)
 rtl_label.set_width(310)
 rtl_label.align(lv.ALIGN.LEFT_MID, 5, 0)
 
-font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.bin")
+font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt")
 
 cz_label = lv.label(lv.scr_act())
 cz_label.set_style_text_font(font_simsun_16_cjk, 0)

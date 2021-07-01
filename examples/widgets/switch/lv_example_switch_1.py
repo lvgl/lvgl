@@ -23,6 +23,6 @@ sw.add_state(lv.STATE.DISABLED)
 sw.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
 sw = lv.switch(lv.scr_act())
-sw.add_state(STATE.CHECKED | lv.STATE.DISABLED)
+sw.add_state(lv.STATE.CHECKED | lv.STATE.DISABLED)
 sw.add_event_cb(event_handler, lv.EVENT.ALL, None)
 

@@ -27,6 +27,6 @@ meter.set_indicator_start_value(indic2, 40)  # Start from the previous
 meter.set_indicator_end_value(indic2, 80)
 
 indic3 = meter.add_arc(scale, indic_w, lv.palette_main(lv.PALETTE.DEEP_ORANGE), 0)
-meter_set_indicator_start_value(indic3, 80)  # Start from the previous
-meter_set_indicator_end_value(indic3, 100)
+meter.set_indicator_start_value(indic3, 80)  # Start from the previous
+meter.set_indicator_end_value(indic3, 100)
 
