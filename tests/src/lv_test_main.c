@@ -1,8 +1,8 @@
+#if LV_BUILD_TEST && !defined(LV_BUILD_TEST_NO_MAIN)
 #include "../lvgl.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#if LV_BUILD_TEST && !defined(LV_BUILD_TEST_NO_MAIN)
 #include <sys/time.h>
 #include "lv_test_init.h"
 

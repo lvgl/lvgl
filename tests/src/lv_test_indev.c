@@ -1,8 +1,8 @@
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#if LV_BUILD_TEST
 #include <sys/time.h>
 #include "lv_test_indev.h"
 #include "lv_test_init.h"
