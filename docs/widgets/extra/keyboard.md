@@ -22,7 +22,7 @@ The Keyboards have the following modes:
 - `LV_KEYBOARD_MODE_TEXT_LOWER`  Display lower case letters
 - `LV_KEYBOARD_MODE_TEXT_UPPER`  Display upper case letters
 - `LV_KEYBOARD_MODE_TEXT_SPECIAL` Display special characters
-- `LV_KEYBOARD_MODE_NUM` Display numbers, +/- sign, and decimal dot.
+- `LV_KEYBOARD_MODE_NUMBER` Display numbers, +/- sign, and decimal dot.
 
 The `TEXT` modes' layout contains buttons to change mode.
 
