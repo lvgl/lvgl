@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES & LV_USE_USER_DATA
 
 static lv_anim_timeline_t * anim_timeline = NULL; 
 
