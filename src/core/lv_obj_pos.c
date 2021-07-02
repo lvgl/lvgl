@@ -553,8 +553,8 @@ lv_coord_t lv_obj_get_content_height(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t top = lv_obj_get_style_pad_top((lv_obj_t *)obj, LV_PART_MAIN);
-    lv_coord_t bottom =  lv_obj_get_style_pad_bottom((lv_obj_t *)obj, LV_PART_MAIN);
+    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t bottom =  lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom - 2 * border_width;
