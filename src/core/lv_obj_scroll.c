@@ -282,12 +282,11 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_anim_set_values(&a, -sy, -sy + y);
             lv_anim_set_exec_cb(&a,  scroll_y_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
-            lv_anim_start(&a);
-
+            
             lv_res_t res;
             res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, &a);
             if(res != LV_RES_OK) return;
-
+            lv_anim_start(&a);
         }
     } else {
         /*Remove pending animations*/
