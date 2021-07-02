@@ -24,6 +24,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+#define lv_calendar_header_dropdown_class lv_obj_class
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

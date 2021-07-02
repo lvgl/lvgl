@@ -30,6 +30,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+#define lv_spinner_class lv_arc_class
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
