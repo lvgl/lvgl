@@ -2,7 +2,7 @@ def scroll_begin_event(e):
 
     #Disable the scroll animations. Triggered when a tab button is clicked */
     if e.get_code() == lv.EVENT.SCROLL_BEGIN:
-        a = lv.anim_t.cast(e.get_param())
+        a = lv.anim_t.__cast__(e.get_param())
         if a:
             a.time = 0
 
