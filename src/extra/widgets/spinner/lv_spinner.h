@@ -30,7 +30,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#define lv_spinner_class lv_arc_class
+extern const lv_obj_class_t lv_spinner_class;
 
 /**********************
  * GLOBAL PROTOTYPES

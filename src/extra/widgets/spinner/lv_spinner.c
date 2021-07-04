@@ -26,6 +26,9 @@ static void arc_anim_end_angle(void * obj, int32_t v);
 /**********************
  *  STATIC VARIABLES
  **********************/
+const lv_obj_class_t lv_spinner_class = {
+    .base_class = &lv_obj_class
+};
 
 /**********************
  *      MACROS

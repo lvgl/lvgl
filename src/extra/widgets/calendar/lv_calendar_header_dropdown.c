@@ -30,6 +30,10 @@ static void month_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+const lv_obj_class_t lv_calendar_header_dropdown_class = {
+    .base_class = &lv_obj_class
+};
+
 static const char * month_list = "01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12";
 static const char * year_list = {
         "2023\n2022\n2021\n"

@@ -32,6 +32,10 @@ static void month_event_cb(lv_event_t * e);
  **********************/
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
 
+const lv_obj_class_t lv_calendar_header_arrow_class = {
+    .base_class = &lv_obj_class
+};
+
 /**********************
  *      MACROS
  **********************/
