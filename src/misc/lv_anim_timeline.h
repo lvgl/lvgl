@@ -86,13 +86,6 @@ uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at);
  */
 bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at);
 
-/**
- * Get the playback progress of the animation timeline.
- * @param at    pointer to the animation timeline.
- * @return return value 0~65535 to map 0~100% animation progress.
- */
-uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at);
-
 /**********************
  *      MACROS
  **********************/

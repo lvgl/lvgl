@@ -105,26 +105,27 @@ The speed is interpreted in _unit/sec_ dimension. For example,  `lv_anim_speed_t
 You can delete an animation with `lv_anim_del(var, func)` if you provide the animated variable and its animator function.
 
 ## Timeline
-Timeline is a collection of multiple Animations, which makes it easy to create complex composite animations. 
+Timeline is a collection of multiple Animations, which makes it easy to create complex composite animations.
 
-It supports forward and reverse playback of the entire animation group, using`lv_anim_timeline_start(anim_timeline, reverse)`.
+Firstly, create the animation element, but don’t call `lv_anim_start()`.
 
-Use the `lv_anim_timeline_set_progress(anim_timeline, progress)` function to set the state of the object corresponding to the progress of the timeline.
+Secondly, create an animation timeline object, by calling `lv_anim_timeline_create()`.
+
+Thirdly, add animation elements to the animation timeline, by calling `lv_anim_timeline_add(at, start_time, &a)`. `start_time` is the start time of the animation on the timeline. Note that `start_time` will override the value of `delay`.
+
+Finally, call `lv_anim_timeline_start(at)` to start the animation timeline.
+
+It supports forward and backward playback of the entire animation group, using `lv_anim_timeline_set_reverse(at, reverse)`.
+
+Call the `lv_anim_timeline_set_progress(at, progress)` function to set the state of the object corresponding to the progress of the timeline.
+
+Call the `lv_anim_timeline_get_playtime(at)` function to get the total duration of the entire animation timeline.
+
+Call the `lv_anim_timeline_get_reverse(at)` function to get whether to reverse the animation timeline.
+
+Call the `lv_anim_timeline_del(at)` function to delete the animation timeline.
 
 ![](/misc/anim-timeline.png "timeline diagram")
-
-**Note**
-* All the timeline member parameters must be set. It includs:
-  1) Start time (must >= 0)
-  2) Variable to animate
-  3) Function to execute to animate
-  4) Start value
-  5) End value
-  6) Animation duration
-  7) Animation path
-  8) Early apply (When the timeline appears at different time points on an object and the same execution function is set, the **early_apply** parameter needs to be set to **false** to prevent the previous animation from being overwritten.)
-
-* The last data of the timeline array must be set **LV_ANIM_TIMELINE_END**, which is used to mark the end of the array.
 
 ## Examples
 

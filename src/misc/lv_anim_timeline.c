@@ -30,7 +30,6 @@ struct _lv_anim_timeline_t{
     lv_anim_timeline_dsc_t * anim_dsc;  /**< Dynamically allocated anim dsc array*/
     uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
     bool reverse;                       /**< Reverse playback*/
-    uint16_t progress;                  /**< Animation progress, value 0~65535 to map 0~100%*/
 };
 
 /**********************
@@ -67,7 +66,7 @@ void lv_anim_timeline_del(lv_anim_timeline_t * at)
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
 #if LV_ANIM_TIMELINE_CUSTOM_EXEC
-        lv_anim_custom_del(at->anim_dsc[i].new_anim, a->exec_cb);
+        lv_anim_custom_del(at->anim_dsc[i].new_anim, (lv_anim_custom_exec_cb_t)a->exec_cb);
 #else
         lv_anim_del(a->var, a->exec_cb);
 #endif
@@ -127,7 +126,6 @@ void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 {
     LV_ASSERT_NULL(at);
-    at->progress = progress;
 
     const uint32_t playtime = lv_anim_timeline_get_playtime(at);
     const uint32_t act_time = progress * playtime / 0xFFFF;
@@ -171,10 +169,4 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
     return at->reverse;
-}
-
-uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
-{
-    LV_ASSERT_NULL(at);
-    return at->progress;
 }
