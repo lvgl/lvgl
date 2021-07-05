@@ -141,17 +141,17 @@ typedef struct {
     uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
 
-    struct _lv_event_dsc_t * event_dsc;             /**< Dynamically allocated event callback and user data array*/
-    lv_point_t scroll;                      /**< The current X/Y scroll offset*/
+    struct _lv_event_dsc_t * event_dsc; /**< Dynamically allocated event callback and user data array*/
+    lv_point_t scroll;                  /**< The current X/Y scroll offset*/
 
-    lv_coord_t ext_click_pad;              /**< Extra click padding in all direction*/
+    lv_coord_t ext_click_pad;           /**< Extra click padding in all direction*/
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
-    lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/
-    lv_scroll_snap_t scroll_snap_x : 2;      /**< Where to align the snappable children horizontally*/
-    lv_scroll_snap_t scroll_snap_y : 2;      /**< Where to align the snappable children horizontally*/
-    lv_dir_t scroll_dir :4;                /**< The allowed scroll direction(s)*/
-    uint8_t event_dsc_cnt;           /**< Number of event callabcks stored in `event_cb` array*/
+    lv_scrollbar_mode_t scrollbar_mode :2;  /**< How to display scrollbars*/
+    lv_scroll_snap_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally*/
+    lv_scroll_snap_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
+    lv_dir_t scroll_dir :4;                 /**< The allowed scroll direction(s)*/
+    uint8_t event_dsc_cnt;                  /**< Number of event callabcks stored in `event_dsc` array*/
 }_lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t {
@@ -197,7 +197,7 @@ void lv_deinit(void);
 /**
  * Create a base object (a rectangle)
  * @param parent    pointer to a parent object. If NULL then a screen will be created.
- * @return pointer to the new object
+ * @return          pointer to the new object
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent);
 
@@ -314,10 +314,10 @@ static inline void * lv_obj_get_user_data(lv_obj_t * obj)
 void lv_obj_allocate_spec_attr(lv_obj_t * obj);
 
 /**
- * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
- * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
- * @param obj   pointer to an object which type should be get
- * @param buf   pointer to an `lv_obj_type_t` buffer to store the types
+ * Check the type of obj.
+ * @param obj       pointer to an object
+ * @param class_p   a class to check (e.g. `lv_slider_class`)
+ * @return          true: `class_p` is the `obj` class.
  */
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 
@@ -332,15 +332,14 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 
 /**
  * Get the class (type) of the object
- * @param obj       pointer to an object
- * @return the class (type) of the object
+ * @param obj   pointer to an object
+ * @return      the class (type) of the object
  */
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 
 /**
- * Check if any object is still "alive", and part of the hierarchy
+ * Check if any object is still "alive".
  * @param obj       pointer to an object
- * @param obj_type  type of the object. (e.g. "lv_btn")
  * @return          true: valid
  */
 bool lv_obj_is_valid(const lv_obj_t * obj);
