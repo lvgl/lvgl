@@ -33,6 +33,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
+static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
 static lv_res_t release_handler(lv_obj_t * obj);
 static void inf_normalize(lv_obj_t * obj_scrl);
@@ -446,22 +447,12 @@ static void draw_main(lv_event_t * e)
     if(code == LV_EVENT_DRAW_MAIN) {
         /*Draw the selected rectangle*/
         const lv_area_t * clip_area = lv_event_get_param(e);
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        lv_coord_t font_h        = lv_font_get_line_height(font);
-        lv_area_t rect_area;
-        rect_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - font_h - line_space) / 2;
-        rect_area.y2 = rect_area.y1 + font_h + line_space - 1;
-        lv_area_t roller_coords;
-        lv_obj_get_coords(obj, &roller_coords);
-
-        rect_area.x1 = roller_coords.x1;
-        rect_area.x2 = roller_coords.x2;
-
+        lv_area_t sel_area;
+        get_sel_area(obj, &sel_area);
         lv_draw_rect_dsc_t sel_dsc;
         lv_draw_rect_dsc_init(&sel_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_SELECTED, &sel_dsc);
-        lv_draw_rect(&rect_area, clip_area, &sel_dsc);
+        lv_draw_rect(&sel_area, clip_area, &sel_dsc);
     }
     /*Post draw when the children are drawn*/
     else if(code == LV_EVENT_DRAW_POST) {
@@ -471,17 +462,12 @@ static void draw_main(lv_event_t * e)
         lv_draw_label_dsc_init(&label_dsc);
         lv_obj_init_draw_label_dsc(obj, LV_PART_SELECTED, &label_dsc);
 
-        lv_coord_t bg_font_h = lv_font_get_line_height(lv_obj_get_style_text_font(obj, LV_PART_MAIN));
-
         /*Redraw the text on the selected area*/
-        lv_area_t rect_area;
-        rect_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - bg_font_h - label_dsc.line_space) / 2;
-        rect_area.y2 = rect_area.y1 + bg_font_h + label_dsc.line_space - 1;
-        rect_area.x1 = obj->coords.x1;
-        rect_area.x2 = obj->coords.x2;
+        lv_area_t sel_area;
+        get_sel_area(obj, &sel_area);
         lv_area_t mask_sel;
         bool area_ok;
-        area_ok = _lv_area_intersect(&mask_sel, clip_area, &rect_area);
+        area_ok = _lv_area_intersect(&mask_sel, clip_area, &sel_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
 
@@ -529,32 +515,22 @@ static void draw_label(lv_event_t * e)
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
     lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
-    const lv_font_t * font = label_draw_dsc.font;
-    lv_coord_t line_space = label_draw_dsc.line_space;
-    lv_coord_t font_h        = lv_font_get_line_height(font);
     const lv_area_t * clip_area = lv_event_get_param(e);
 
-    lv_area_t rect_area;
-    rect_area.y1 = roller->coords.y1 + (lv_obj_get_height(roller) - font_h - line_space) / 2;
-    if((font_h & 0x1) && (line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
-    rect_area.y2 = rect_area.y1 + font_h + line_space - 1;
-    lv_area_t roller_coords;
-    lv_obj_get_coords(roller, &roller_coords);
-
-    rect_area.x1 = roller_coords.x1;
-    rect_area.x2 = roller_coords.x2;
+    lv_area_t sel_area;
+    get_sel_area(roller, &sel_area);
 
     lv_area_t clip2;
     clip2.x1 = label_obj->coords.x1;
     clip2.y1 = label_obj->coords.y1;
     clip2.x2 = label_obj->coords.x2;
-    clip2.y2 = rect_area.y1;
+    clip2.y2 = sel_area.y1;
     if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
         lv_draw_label(&label_obj->coords, &clip2, &label_draw_dsc, lv_label_get_text(label_obj), NULL);
     }
 
     clip2.x1 = label_obj->coords.x1;
-    clip2.y1 = rect_area.y2;
+    clip2.y1 = sel_area.y2;
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = label_obj->coords.y2;
     if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
@@ -562,6 +538,24 @@ static void draw_label(lv_event_t * e)
     }
 }
 
+static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
+{
+
+    const lv_font_t * font_main = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    const lv_font_t * font_sel = lv_obj_get_style_text_font(obj, LV_PART_SELECTED);
+    lv_coord_t font_main_h        = lv_font_get_line_height(font_main);
+    lv_coord_t font_sel_h        = lv_font_get_line_height(font_sel);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    lv_coord_t d = (font_sel_h + font_main_h) / 2 + line_space;
+    sel_area->y1 = obj->coords.y1 + lv_obj_get_height(obj) / 2 - d / 2;
+    sel_area->y2 = sel_area->y1 + d;
+    lv_area_t roller_coords;
+    lv_obj_get_coords(obj, &roller_coords);
+
+    sel_area->x1 = roller_coords.x1;
+    sel_area->x2 = roller_coords.x2;
+
+}
 
 /**
  * Refresh the position of the roller. It uses the id stored in: roller->ddlist.selected_option_id
