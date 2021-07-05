@@ -403,6 +403,10 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
+    else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        lv_obj_t * label = get_label(obj);
+        lv_obj_refresh_ext_draw_size(label);
+    }
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST) {
         draw_main(e);
     }
@@ -493,11 +497,15 @@ static void draw_main(lv_event_t * e)
             label_sel_y += (label_y_prop * res_p.y) >> 14;
             label_sel_y -= corr;
 
+            lv_coord_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+            lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+            lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+
             /*Draw the selected text*/
             lv_area_t label_sel_area;
-            label_sel_area.x1 = label->coords.x1;
+            label_sel_area.x1 = obj->coords.x1 + pleft + bwidth;
             label_sel_area.y1 = label_sel_y;
-            label_sel_area.x2 = label->coords.x2;
+            label_sel_area.x2 = obj->coords.x2 - pright - bwidth;
             label_sel_area.y2 = label_sel_area.y1 + res_p.y;
 
             label_dsc.flag |= LV_TEXT_FLAG_EXPAND;
