@@ -112,7 +112,6 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
 
     lv_group_t * def_group = lv_group_get_default();
     if(def_group && lv_obj_is_group_def(obj)) {
-
         lv_group_add_obj(def_group, obj);
     }
 
@@ -127,7 +126,7 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     }
 }
 
-void _lv_obj_destructor(lv_obj_t * obj)
+void _lv_obj_destruct(lv_obj_t * obj)
 {
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
@@ -136,7 +135,7 @@ void _lv_obj_destructor(lv_obj_t * obj)
         obj->class_p = obj->class_p->base_class;
 
         /*Call the base class's destructor too*/
-        _lv_obj_destructor(obj);
+        _lv_obj_destruct(obj);
     }
 }
 
@@ -163,6 +162,7 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
 
     return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE ? true : false;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

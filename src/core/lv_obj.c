@@ -401,6 +401,20 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
 
+    _lv_event_mark_deleted(obj);
+
+    /*Remove all style*/
+    lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
+    lv_obj_remove_style_all(obj);
+    lv_obj_enable_style_refresh(true);
+
+    /*Remove the animations from this object*/
+    lv_anim_del(obj, NULL);
+
+    /*Delete from the group*/
+    lv_group_t * group = lv_obj_get_group(obj);
+    if(group) lv_group_remove_obj(obj);
+
     if(obj->spec_attr) {
         if(obj->spec_attr->children) {
             lv_mem_free(obj->spec_attr->children);
@@ -414,7 +428,6 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         lv_mem_free(obj->spec_attr);
         obj->spec_attr = NULL;
     }
-
 }
 
 static void lv_obj_draw(lv_event_t * e)

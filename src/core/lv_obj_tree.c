@@ -343,13 +343,6 @@ static void obj_del_core(lv_obj_t * obj)
     lv_res_t res = lv_event_send(obj, LV_EVENT_DELETE, NULL);
     if(res == LV_RES_INV) return;
 
-    /*Delete from the group*/
-    lv_group_t * group = lv_obj_get_group(obj);
-    if(group) lv_group_remove_obj(obj);
-
-    /*Remove the animations from this object*/
-    lv_anim_del(obj, NULL);
-
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);
     while(child) {
@@ -357,12 +350,7 @@ static void obj_del_core(lv_obj_t * obj)
         child = lv_obj_get_child(obj, 0);
     }
 
-    _lv_event_mark_deleted(obj);
-
-    /*Remove all style*/
-    lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
-    lv_obj_remove_style_all(obj);
-    lv_obj_enable_style_refresh(true);
+    lv_group_t * group = lv_obj_get_group(obj);
 
     /*Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
@@ -381,7 +369,7 @@ static void obj_del_core(lv_obj_t * obj)
     }
 
     /*All children deleted. Now clean up the object specific data*/
-    _lv_obj_destructor(obj);
+    _lv_obj_destruct(obj);
 
     /*Remove the screen for the screen list*/
     if(obj->parent == NULL) {
