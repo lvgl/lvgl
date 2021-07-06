@@ -25,7 +25,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_constructor(lv_obj_class_t * class_p, lv_obj_t * obj);
+static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void month_event_cb(lv_event_t * e);
 
 /**********************
@@ -61,7 +61,7 @@ lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calenda
  *  STATIC FUNCTIONS
  **********************/
 
-static void my_constructor(lv_obj_class_t * class_p, lv_obj_t * obj)
+static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
