@@ -103,14 +103,22 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     area_in.x2 -= dsc->width;
     area_in.y2 -= dsc->width;
 
+    /*Create inner the mask*/
+    lv_draw_mask_radius_param_t mask_in_param;
+    lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+    int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
+
+    lv_draw_mask_radius_param_t mask_out_param;
+    lv_draw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
+    int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, NULL);
+
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle || start_angle == end_angle + 360) {
-        cir_dsc.border_width = dsc->width;
-        cir_dsc.border_color = dsc->color;
-        cir_dsc.border_opa = dsc->opa;
-        cir_dsc.bg_opa = LV_OPA_TRANSP;
         cir_dsc.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&area_out, clip_area, &cir_dsc);
+
+        lv_draw_mask_remove_id(mask_out_id);
+        lv_draw_mask_remove_id(mask_in_id);
         return;
     }
 
@@ -120,15 +128,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     lv_draw_mask_angle_param_t mask_angle_param;
     lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
     int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
-
-    /*Create inner the mask*/
-    lv_draw_mask_radius_param_t mask_in_param;
-    lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
-    int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
-
-    lv_draw_mask_radius_param_t mask_out_param;
-    lv_draw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
-    int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, NULL);
 
     int32_t angle_gap;
     if(end_angle > start_angle) {
