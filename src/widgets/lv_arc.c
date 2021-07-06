@@ -505,6 +505,7 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
    arc->last_angle =arc->indic_angle_end;
 
    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+   lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
    lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
 
 
