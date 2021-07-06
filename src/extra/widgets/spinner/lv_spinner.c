@@ -20,7 +20,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_spinner_constructor(lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void arc_anim_start_angle(void * obj, int32_t v);
 static void arc_anim_end_angle(void * obj, int32_t v);
 
@@ -63,7 +63,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_leng
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_spinner_constructor(lv_obj_class_t * class_p, lv_obj_t * obj)
+static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
