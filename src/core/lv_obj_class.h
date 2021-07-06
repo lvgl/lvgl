@@ -75,7 +75,7 @@ struct _lv_obj_t * lv_obj_class_create_obj(const struct _lv_obj_class_t * class_
 
 void lv_obj_class_init_obj(struct _lv_obj_t * obj);
 
-void _lv_obj_destructor(struct _lv_obj_t * obj);
+void _lv_obj_destruct(struct _lv_obj_t * obj);
 
 bool lv_obj_is_editable(struct _lv_obj_t * obj);
 
