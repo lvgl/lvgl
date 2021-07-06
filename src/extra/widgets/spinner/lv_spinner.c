@@ -20,12 +20,20 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_spinner_constructor(lv_obj_class_t * class_p, lv_obj_t * obj);
 static void arc_anim_start_angle(void * obj, int32_t v);
 static void arc_anim_end_angle(void * obj, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+const lv_obj_class_t lv_spinner_class = {
+        .base_class = &lv_arc_class,
+        .constructor_cb = lv_spinner_constructor
+};
+
+static uint32_t time_param;
+static uint32_t arc_length_param;
 
 /**********************
  *      MACROS
@@ -42,20 +50,32 @@ static void arc_anim_end_angle(void * obj, int32_t v);
  */
 lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_length)
 {
-    /*Create the ancestor of spinner*/
-    lv_obj_t * spinner = lv_arc_create(parent);
-    LV_ASSERT_MALLOC(spinner);
-    if(spinner == NULL) return NULL;
+    time_param = time;
+    arc_length_param = arc_length;
 
-    lv_obj_remove_style(spinner, NULL, LV_PART_KNOB | LV_STATE_ANY);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_spinner_class, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
+}
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_spinner_constructor(lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_TRACE_OBJ_CREATE("begin");
+
+    LV_UNUSED(class_p);
 
     lv_anim_t a;
     lv_anim_init(&a);
-    lv_anim_set_var(&a, spinner);
+    lv_anim_set_var(&a, obj);
     lv_anim_set_exec_cb(&a, arc_anim_end_angle);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_set_time(&a, time);
-    lv_anim_set_values(&a, arc_length, 360 + arc_length);
+    lv_anim_set_time(&a, time_param);
+    lv_anim_set_values(&a, arc_length_param, 360 + arc_length_param);
     lv_anim_start(&a);
 
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
@@ -63,16 +83,10 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent, uint32_t time, uint32_t arc_leng
     lv_anim_set_exec_cb(&a, arc_anim_start_angle);
     lv_anim_start(&a);
 
-    lv_arc_set_bg_angles(spinner, 0, 360);
-    lv_arc_set_rotation(spinner, 270);
-
-    return spinner;
+    lv_arc_set_bg_angles(obj, 0, 360);
+    lv_arc_set_rotation(obj, 270);
 }
 
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 static void arc_anim_start_angle(void * obj, int32_t v)
 {

@@ -843,6 +843,15 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
+
+#if LV_USE_SPINNER
+    else if(lv_obj_check_type(obj, &lv_spinner_class)) {
+        lv_obj_add_style(obj, &styles->arc_indic, 0);
+        lv_obj_add_style(obj, &styles->arc_indic, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->arc_indic_primary, LV_PART_INDICATOR);
+    }
+#endif
+
 #if LV_USE_METER
     else if(lv_obj_check_type(obj, &lv_meter_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
@@ -875,6 +884,18 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
+    }
+#endif
+
+#if LV_USE_CALENDAR_HEADER_ARROW
+    else if(lv_obj_check_type(obj, &lv_calendar_header_arrow_class)) {
+        lv_obj_add_style(obj, &styles->card, 0);
+    }
+#endif
+
+#if LV_USE_CALENDAR_HEADER_DROPDOWN
+    else if(lv_obj_check_type(obj, &lv_calendar_header_dropdown_class)) {
+        lv_obj_add_style(obj, &styles->card, 0);
     }
 #endif
 

@@ -25,12 +25,20 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void my_constructor(lv_obj_class_t * class_p, lv_obj_t * obj);
 static void month_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+const lv_obj_class_t lv_calendar_header_arrow_class = {
+     .base_class = &lv_obj_class,
+     .constructor_cb = my_constructor
+};
+
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
+static lv_obj_t * calendar_param;
+static lv_coord_t btn_size_param;
 
 /**********************
  *      MACROS
@@ -42,50 +50,59 @@ static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
 
 lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent, lv_obj_t * calendar, lv_coord_t btn_size)
 {
-    lv_obj_t * header = lv_obj_create(parent);
-
-    /*Use the same paddings as the calendar*/
-    lv_obj_set_style_pad_left(header, lv_obj_get_style_pad_left(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_right(header, lv_obj_get_style_pad_right(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_top(header, lv_obj_get_style_pad_top(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_bottom(header, lv_obj_get_style_pad_bottom(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_column(header, lv_obj_get_style_pad_column(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_radius(header, lv_obj_get_style_radius(calendar, LV_PART_MAIN), 0);
-
-    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
-
-    lv_obj_update_layout(calendar);
-    lv_coord_t w = lv_obj_get_width(calendar);
-    lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-
-    lv_obj_t * mo_prev = lv_btn_create(header);
-    lv_obj_set_style_bg_img_src(mo_prev, LV_SYMBOL_LEFT, 0);
-    lv_obj_set_size(mo_prev, btn_size, btn_size);
-    lv_obj_add_event_cb(mo_prev, month_event_cb, LV_EVENT_CLICKED, calendar);
-    lv_obj_clear_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
-
-    lv_obj_t * label = lv_label_create(header);
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_flex_grow(label, 1);
-    lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);
-
-    lv_obj_t * mo_next = lv_btn_create(header);
-    lv_obj_set_style_bg_img_src(mo_next, LV_SYMBOL_RIGHT, 0);
-    lv_obj_set_size(mo_next, btn_size, btn_size);
-    lv_obj_add_event_cb(mo_next, month_event_cb, LV_EVENT_CLICKED, calendar);
-    lv_obj_clear_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);
-
-    lv_obj_align_to(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
-
-    return header;
+    calendar_param = calendar;
+    btn_size_param = btn_size;
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_arrow_class, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
 }
 
 /**********************
  *  STATIC FUNCTIONS
  **********************/
+
+static void my_constructor(lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_TRACE_OBJ_CREATE("begin");
+
+    LV_UNUSED(class_p);
+
+    /*Use the same paddings as the calendar_param*/
+    lv_obj_set_style_pad_left(obj, lv_obj_get_style_pad_left(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_right(obj, lv_obj_get_style_pad_right(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_top(obj, lv_obj_get_style_pad_top(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_bottom(obj, lv_obj_get_style_pad_bottom(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_column(obj, lv_obj_get_style_pad_column(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_radius(obj, lv_obj_get_style_radius(calendar_param, LV_PART_MAIN), 0);
+
+    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar_param);
+
+    lv_obj_update_layout(calendar_param);
+    lv_coord_t w = lv_obj_get_width(calendar_param);
+    lv_obj_set_size(obj,  w, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+
+    lv_obj_t * mo_prev = lv_btn_create(obj);
+    lv_obj_set_style_bg_img_src(mo_prev, LV_SYMBOL_LEFT, 0);
+    lv_obj_set_size(mo_prev, btn_size_param, btn_size_param);
+    lv_obj_add_event_cb(mo_prev, month_event_cb, LV_EVENT_CLICKED, calendar_param);
+    lv_obj_clear_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+
+    lv_obj_t * label = lv_label_create(obj);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_flex_grow(label, 1);
+    lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);
+
+    lv_obj_t * mo_next = lv_btn_create(obj);
+    lv_obj_set_style_bg_img_src(mo_next, LV_SYMBOL_RIGHT, 0);
+    lv_obj_set_size(mo_next, btn_size_param, btn_size_param);
+    lv_obj_add_event_cb(mo_next, month_event_cb, LV_EVENT_CLICKED, calendar_param);
+    lv_obj_clear_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+
+    lv_obj_align_to(obj, calendar_param, LV_ALIGN_OUT_TOP_MID, 0, 0);
+}
 
 static void month_event_cb(lv_event_t * e)
 {
