@@ -23,6 +23,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+extern const lv_obj_class_t lv_calendar_header_dropdown_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -34,6 +35,7 @@ extern "C" {
  * @return pointer to the created calendar
  */
 lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * calendar);
+
 /**********************
  *      MACROS
  **********************/

@@ -28,6 +28,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+extern const lv_obj_class_t lv_canvas_class;
+
 /*Data of canvas*/
 typedef struct {
     lv_img_t img;

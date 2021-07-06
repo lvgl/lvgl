@@ -1,5 +1,5 @@
 /**
- * @file lv_calendar_header_dropdown.c
+ * @file lv_calendar_obj_dropdown.c
  *
  */
 
@@ -24,12 +24,18 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void my_constructor(lv_obj_class_t * class_p, lv_obj_t * obj);
 static void year_event_cb(lv_event_t * e);
 static void month_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+const lv_obj_class_t lv_calendar_header_dropdown_class = {
+     .base_class = &lv_obj_class,
+     .constructor_cb = my_constructor
+ };
+
 static const char * month_list = "01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12";
 static const char * year_list = {
         "2023\n2022\n2021\n"
@@ -41,6 +47,8 @@ static const char * year_list = {
         "1920\n1919\n1918\n1917\n1916\n1915\n1914\n1913\n1912\n1911\n1910\n1909\n1908\n1907\n1906\n1905\n1904\n1903\n1902\n1901"
 };
 
+static lv_obj_t * calendar_param;
+
 /**********************
  *      MACROS
  **********************/
@@ -51,44 +59,54 @@ static const char * year_list = {
 
 lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent, lv_obj_t * calendar)
 {
-    lv_obj_t * header = lv_obj_create(parent);
+    calendar_param = calendar;
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_dropdown_class, parent);
+    lv_obj_class_init_obj(obj);
 
-    /*Use the same paddings as the calendar*/
-    lv_obj_set_style_pad_left(header,lv_obj_get_style_pad_left(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_right(header,lv_obj_get_style_pad_right(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_top(header,lv_obj_get_style_pad_top(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_bottom(header,lv_obj_get_style_pad_bottom(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_pad_column(header,lv_obj_get_style_pad_column(calendar, LV_PART_MAIN), 0);
-    lv_obj_set_style_radius(header,lv_obj_get_style_radius(calendar, LV_PART_MAIN), 0);
-
-    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
-
-    lv_obj_update_layout(calendar);
-    lv_coord_t w = lv_obj_get_width(calendar);
-    lv_obj_set_size(header,  w, LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-
-    lv_obj_t * year_dd = lv_dropdown_create(header);
-    lv_dropdown_set_options(year_dd, year_list);
-    lv_dropdown_set_selected(year_dd, 2023 - cur_date->year);
-    lv_obj_add_event_cb(year_dd, year_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
-    lv_obj_set_flex_grow(year_dd, 1);
-
-    lv_obj_t * month_dd = lv_dropdown_create(header);
-    lv_dropdown_set_options(month_dd, month_list);
-    lv_dropdown_set_selected(month_dd, cur_date->month - 1);
-    lv_obj_add_event_cb(month_dd, month_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
-    lv_obj_set_flex_grow(month_dd, 1);
-
-    lv_obj_align_to(header, calendar, LV_ALIGN_OUT_TOP_MID, 0, 0);
-
-    return header;
+    return obj;
 }
 
 /**********************
  *  STATIC FUNCTIONS
  **********************/
+
+static void my_constructor(lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_TRACE_OBJ_CREATE("begin");
+
+    LV_UNUSED(class_p);
+
+    /*Use the same paddings as the calendar_param*/
+    lv_obj_set_style_pad_left(obj,lv_obj_get_style_pad_left(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_right(obj,lv_obj_get_style_pad_right(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_top(obj,lv_obj_get_style_pad_top(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_bottom(obj,lv_obj_get_style_pad_bottom(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_column(obj,lv_obj_get_style_pad_column(calendar_param, LV_PART_MAIN), 0);
+    lv_obj_set_style_radius(obj,lv_obj_get_style_radius(calendar_param, LV_PART_MAIN), 0);
+
+    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar_param);
+
+    lv_obj_update_layout(calendar_param);
+    lv_coord_t w = lv_obj_get_width(calendar_param);
+    lv_obj_set_size(obj,  w, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+
+    lv_obj_t * year_dd = lv_dropdown_create(obj);
+    lv_dropdown_set_options(year_dd, year_list);
+    lv_dropdown_set_selected(year_dd, 2023 - cur_date->year);
+    lv_obj_add_event_cb(year_dd, year_event_cb, LV_EVENT_VALUE_CHANGED, calendar_param);
+    lv_obj_set_flex_grow(year_dd, 1);
+
+    lv_obj_t * month_dd = lv_dropdown_create(obj);
+    lv_dropdown_set_options(month_dd, month_list);
+    lv_dropdown_set_selected(month_dd, cur_date->month - 1);
+    lv_obj_add_event_cb(month_dd, month_event_cb, LV_EVENT_VALUE_CHANGED, calendar_param);
+    lv_obj_set_flex_grow(month_dd, 1);
+
+    lv_obj_align_to(obj, calendar_param, LV_ALIGN_OUT_TOP_MID, 0, 0);
+
+}
 
 static void month_event_cb(lv_event_t * e)
 {
