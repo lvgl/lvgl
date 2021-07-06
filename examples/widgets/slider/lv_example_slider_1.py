@@ -3,7 +3,7 @@
 #
 def slider_event_cb(e):
 
-    slider = lv.slider.__cast__(e.get_target())
+    slider = e.get_target()
     slider_label.set_text("{:d}%".format(slider.get_value()))
     slider_label.align_to(slider, lv.ALIGN.OUT_BOTTOM_MID, 0, 10)
 

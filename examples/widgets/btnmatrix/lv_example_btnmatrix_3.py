@@ -1,5 +1,5 @@
 def event_cb(e):
-    obj = lv.btnmatrix.__cast__(e.get_target())
+    obj = e.get_target()
     id = obj.get_selected_btn()
     if id == 0:
         prev = True

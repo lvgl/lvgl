@@ -17,7 +17,7 @@ class Event_1():
     def event_cb(self,e):
         print("Clicked");
             
-        btn = lv.btn.__cast__(e.get_target())
+        btn = e.get_target()
         label = btn.get_child(0)
         label.set_text(str(self.cnt))
         self.cnt += 1

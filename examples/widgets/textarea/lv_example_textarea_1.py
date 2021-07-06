@@ -3,13 +3,13 @@ def textarea_event_handler(e,ta):
     
 def btnm_event_handler(e,ta):
 
-    obj = lv.btnmatrix.__cast__(e.get_target())
+    obj = e.get_target()
     txt = obj.get_btn_text(obj.get_selected_btn())
     if txt == lv.SYMBOL.BACKSPACE:
         ta.del_char()
     elif txt == lv.SYMBOL.NEW_LINE:
         lv.event_send(ta,lv.EVENT.READY,None)
-    else:
+    elif txt:
         ta.add_text(txt)
 
 ta = lv.textarea(lv.scr_act())

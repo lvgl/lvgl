@@ -1,6 +1,6 @@
 def event_handler(e):
     code = e.get_code()
-    obj = lv.dropdown.__cast__(e.get_target())
+    obj = e.get_target()
     if code == lv.EVENT.VALUE_CHANGED: 
         option = " "*10 # should be large enough to store the option
         obj.get_selected_str(option, len(option))

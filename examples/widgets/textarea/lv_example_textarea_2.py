@@ -1,6 +1,6 @@
 def ta_event_cb(e):
     code = e.get_code()
-    ta = lv.textarea.__cast__(e.get_target())
+    ta = e.get_target()
     if code == lv.EVENT.CLICKED or code == lv.EVENT.FOCUSED:
         # Focus on the clicked text area
         if kb != None:

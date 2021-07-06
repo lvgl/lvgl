@@ -1,6 +1,6 @@
 def draw_event_cb(e):
 
-    obj = lv.obj.__cast__(e.get_target())
+    obj = e.get_target()
 
     # Add the faded area before the lines are drawn
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
