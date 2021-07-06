@@ -27,7 +27,7 @@ The Window is built from other widgets so you can check their documentation for 
 
 Any number of texts (but typically only one) can be added to the header with `lv_win_add_title(win, "The title")`. 
 
-Control buttons can be added to the window's header with `lv_win_add_btn_right(win, icon, btn_width)`. `icon` can be any image source, and `btn_width` is the width of the button.
+Control buttons can be added to the window's header with `lv_win_add_btn(win, icon, btn_width)`. `icon` can be any image source, and `btn_width` is the width of the button.
 
 The title and the buttons will be added in the order the functions are called. So adding a button, a text and two other buttons will result in a button on the left, a title, and 2 buttons on the right.
 The width of the title is set to take all the remaining space on the header. In other words: it pushes to the right all the buttons that are added after the title. 
@@ -36,7 +36,7 @@ The width of the title is set to take all the remaining space on the header. In 
 `lv_win_get_header(win)` returns a pointer to the header, `lv_win_get_content(win)` returns a pointer to the content container to which the content of the window can be added.
 
 ## Events
-No special events are sent by the windows, however events can be added manually to the return value of `lv_win_add_btn_right`.
+No special events are sent by the windows, however events can be added manually to the return value of `lv_win_add_btn`.
 
 Learn more about [Events](/overview/event).
 
