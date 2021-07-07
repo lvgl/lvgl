@@ -20,7 +20,7 @@ jobs:
     - name: Clone lv_micropython
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
-        git checkout dev-8.0
+        git checkout master
     - name: Update submodules
       run: git submodule update --init --recursive
     - name: Checkout LVGL submodule
