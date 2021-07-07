@@ -49,10 +49,15 @@ E.g. `lv_obj_set_size(table, LV_SIZE_CONTENT, LV_SIZE_CONTENT)` automatically se
 If the width or height is set to a smaller number than the "intrinsic" size then the table becomes scrollable.
 
 ## Events
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for both main and items parts to allow hooking the drawing. 
-For more detail on the main part see the [Base object](/widgets/obj#events)'s documentation.
-For the items (cells) the following fields are used: `clip_area`, `draw_area`, `part`, `rect_dsc`, `label_dsc` `id` (current row &times; col count + current column). 
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
+    - `LV_TABLE_DRAW_PART_CELL` The individual cells of the table
+        - `part`: `LV_PART_ITEMS` 
+        - `draw_area`: area of the indicator
+        - `rect_dsc`
+        - `label_dsc`
+        - `id`: current row &times; col count + current column 
 
+See the events of the [Base object](/widgets/obj) too.
 
 Learn more about [Events](/overview/event).
 

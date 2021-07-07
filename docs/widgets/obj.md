@@ -149,6 +149,19 @@ By default, the objects can be clicked only on their coordinates, however, this 
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` when the `LV_OBJ_FLAG_CHECKABLE` flag is enabled and the object clicked (on transition to/from the checked state)
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` is sent for the following types:
+    - `LV_OBJ_DRAW_PART_RECTANGLE` The main rectangle
+       - `part`: `LV_PART_MAIN`
+       - `rect_dsc`
+       - `draw_area`: the area of the rectangle
+    - `LV_OBJ_DRAW_PART_BORDER_POST`  The border if the `border_post` style property is `true`
+       - `part`: `LV_PART_MAIN`
+       - `rect_dsc`
+       - `draw_area`: the area of the rectangle
+    - `LV_OBJ_DRAW_PART_SCROLLBAR` the scrollbars
+       - `part`: `LV_PART_SCROLLBAR`
+       - `rect_dsc`
+       - `draw_area`: the area of the rectangle
 
 Learn more about [Events](/overview/event).
 

@@ -382,13 +382,15 @@ static void draw_indic(lv_event_t * e)
     /*Do not draw a zero length indicator but at least call the draw part events*/
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
 
-        lv_obj_draw_part_dsc_t obj_draw_dsc;
-        lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
-        obj_draw_dsc.part = LV_PART_INDICATOR;
-        obj_draw_dsc.draw_area = &bar->indic_area;
+        lv_obj_draw_part_dsc_t part_draw_dsc;
+        lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+        part_draw_dsc.part = LV_PART_INDICATOR;
+        part_draw_dsc.class_p = MY_CLASS;
+        part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
+        part_draw_dsc.draw_area = &bar->indic_area;
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         return;
     }
 
@@ -403,13 +405,15 @@ static void draw_indic(lv_event_t * e)
     lv_draw_rect_dsc_init(&draw_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
-    lv_obj_draw_part_dsc_t obj_draw_dsc;
-    lv_obj_draw_dsc_init(&obj_draw_dsc, clip_area);
-    obj_draw_dsc.part = LV_PART_INDICATOR;
-    obj_draw_dsc.rect_dsc = &draw_rect_dsc;
-	obj_draw_dsc.draw_area = &bar->indic_area;
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.part = LV_PART_INDICATOR;
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
+    part_draw_dsc.rect_dsc = &draw_rect_dsc;
+	part_draw_dsc.draw_area = &bar->indic_area;
 
-	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &obj_draw_dsc);
+	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
     /*Draw only the shadow if the indicator is long enough.
      *The radius of the bg and the indicator can make a strange shape where
@@ -486,7 +490,7 @@ static void draw_indic(lv_event_t * e)
     lv_draw_mask_remove_id(mask_bg_id);
 #endif
 
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &obj_draw_dsc);
+    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 }
 
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)

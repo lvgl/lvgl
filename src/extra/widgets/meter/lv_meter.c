@@ -322,6 +322,14 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
 
     lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
     lv_meter_indicator_t * indic;
+
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.arc_dsc = &arc_dsc;
+    part_draw_dsc.part = LV_PART_INDICATOR;
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.type = LV_METER_DRAW_PART_ARC;
+
     _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
         if(indic->type != LV_METER_INDICATOR_TYPE_ARC) continue;
 
@@ -333,7 +341,14 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
 
         int32_t start_angle = lv_map(indic->start_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
         int32_t end_angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
-        lv_draw_arc(scale_center.x, scale_center.y, r_out + indic->type_data.arc.r_mod, start_angle, end_angle, clip_area, &arc_dsc);
+
+        part_draw_dsc.radius = r_out + indic->type_data.arc.r_mod;
+        part_draw_dsc.sub_part_ptr = indic;
+        part_draw_dsc.p1 = &scale_center;
+
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_draw_arc(scale_center.x, scale_center.y, part_draw_dsc.radius, start_angle, end_angle, clip_area, &arc_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 
@@ -359,22 +374,24 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 
     lv_meter_scale_t * scale;
 
-    lv_obj_draw_part_dsc_t dsc;
-    lv_obj_draw_dsc_init(&dsc, clip_area);
-
-#if LV_DRAW_COMPLEX
     lv_draw_mask_radius_param_t inner_minor_mask;
     lv_draw_mask_radius_param_t inner_major_mask;
     lv_draw_mask_radius_param_t outer_mask;
-#endif
+
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.part = LV_PART_TICKS;
+    part_draw_dsc.type = LV_METER_DRAW_PART_TICK;
+    part_draw_dsc.line_dsc = &line_dsc;
 
     _LV_LL_READ_BACK(&meter->scale_ll, scale) {
+        part_draw_dsc.sub_part_ptr = scale;
 
         lv_coord_t r_out = r_edge + scale->r_mod;
         lv_coord_t r_in_minor = r_out - scale->tick_length;
         lv_coord_t r_in_major = r_out - scale->tick_major_length;
 
-#if LV_DRAW_COMPLEX
         lv_area_t area_inner_minor;
         area_inner_minor.x1 = p_center.x - r_in_minor;
         area_inner_minor.y1 = p_center.y - r_in_minor;
@@ -398,7 +415,6 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
         int16_t outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
 
         int16_t inner_act_mask_id = -1; /*Will be added later*/
-#endif
 
         uint32_t minor_cnt = scale->tick_major_nth ? scale->tick_major_nth - 1 : 0xFFFF;
         for(i = 0; i < scale->tick_cnt; i++) {
@@ -409,11 +425,10 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 major = true;
             }
 
-#if LV_DRAW_COMPLEX
             inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
-#endif
 
             int32_t value_of_line = lv_map(i, 0, scale->tick_cnt - 1, scale->min, scale->max);
+            part_draw_dsc.value = value_of_line;
 
             lv_color_t line_color = major ? scale->tick_major_color : scale->tick_color;
             lv_color_t line_color_ori = line_color;
@@ -457,40 +472,27 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             int32_t cos_high = lv_trigo_cos(angle_high + scale->rotation);
             int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
-
             line_dsc.color = line_color;
             line_dsc.width = line_width;
-#if LV_DRAW_COMPLEX
             /*Use the interpolated angle to get the outer x and y coordinates.
              *Draw a little bit longer lines to be sure the mask will clip them correctly*/
             lv_point_t p_outer;
             p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
             p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
-            lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
-#else
-            /*Use the interpolated angle to get the outer and inner x and y coordinates.*/
-            lv_point_t p_outer;
-            p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
-            p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
-            lv_point_t p_inner;
-            lv_coord_t r_in = major ? r_in_major : r_in_minor;
-            p_inner.x = (int32_t)(((int32_t)cos_mid * (r_in) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
-            p_inner.y = (int32_t)(((int32_t)sin_mid * (r_in) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
-            lv_draw_line(&p_outer, &p_inner, clip_area, &line_dsc);
-#endif
+
+            part_draw_dsc.p1 = &p_outer;
+            part_draw_dsc.p1 = &p_center;
+            part_draw_dsc.id = i;
+            part_draw_dsc.label_dsc = &label_dsc;
 
             line_dsc.color = line_color_ori;
             line_dsc.width = line_width_ori;
 
-#if LV_DRAW_COMPLEX
             lv_draw_mask_remove_id(inner_act_mask_id);
-#endif
 
             /*Draw the text*/
             if(major) {
-#if LV_DRAW_COMPLEX
                 lv_draw_mask_remove_id(outer_mask_id);
-#endif
                 uint32_t r_text = r_in_major - scale->label_gap;
                 lv_point_t p;
                 p.x = (int32_t)((int32_t)((int32_t)cos_mid * r_text + 127) >> LV_TRIGO_SHIFT) + p_center.x;
@@ -499,14 +501,16 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 lv_draw_label_dsc_t label_dsc_tmp;
                 lv_memcpy(&label_dsc_tmp, &label_dsc, sizeof(label_dsc_tmp));
 
-                dsc.id = i / scale->tick_major_nth;
-                dsc.value = value_of_line;
-                dsc.label_dsc = &label_dsc_tmp;
-                lv_snprintf(dsc.text, sizeof(dsc.text), "%d", value_of_line);
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+                part_draw_dsc.label_dsc = &label_dsc_tmp;
+                char buf[16];
+
+                lv_snprintf(buf, sizeof(buf), "%d", value_of_line);
+                part_draw_dsc.text = buf;
+
+                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
                 lv_point_t label_size;
-                lv_txt_get_size(&label_size, dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                lv_txt_get_size(&label_size, part_draw_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                         LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
                 lv_area_t label_cord;
@@ -515,18 +519,20 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 label_cord.x2 = label_cord.x1 + label_size.x;
                 label_cord.y2 = label_cord.y1 + label_size.y;
 
-                lv_draw_label(&label_cord, clip_area, &label_dsc, dsc.text, NULL);
-                lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
+                lv_draw_label(&label_cord, clip_area, &label_dsc, part_draw_dsc.text, NULL);
 
-#if LV_DRAW_COMPLEX
                 outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
-#endif
+            } else {
+                part_draw_dsc.label_dsc = NULL;
+                part_draw_dsc.text = NULL;
+                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             }
 
+            lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
+
         }
-#if LV_DRAW_COMPLEX
         lv_draw_mask_remove_id(outer_mask_id);
-#endif
     }
 }
 
@@ -542,17 +548,23 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
 
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
-    lv_obj_init_draw_img_dsc(obj, LV_PART_INDICATOR, &img_dsc);
-    img_dsc.antialias = 1;
+    lv_obj_init_draw_img_dsc(obj, LV_PART_ITEMS, &img_dsc);
     lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.p1 = &scale_center;
 
     lv_meter_indicator_t * indic;
     _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
         lv_meter_scale_t * scale = indic->scale;
+        part_draw_dsc.sub_part_ptr = indic;
+
         if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_LINE) {
             int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
             lv_coord_t r_out = r_edge + scale->r_mod + indic->type_data.needle_line.r_mod;
@@ -562,7 +574,14 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
             line_dsc.color = indic->type_data.needle_line.color;
             line_dsc.width = indic->type_data.needle_line.width;
             line_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
+
+            part_draw_dsc.id = LV_METER_DRAW_PART_NEEDLE_LINE;
+            part_draw_dsc.line_dsc = &line_dsc;
+            part_draw_dsc.p2 = &p_end;
+
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(&scale_center, &p_end, clip_area, &line_dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
         else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
             if(indic->type_data.needle_img.src == NULL) continue;
@@ -582,7 +601,12 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
             angle = angle * 10;
             if(angle > 3600) angle -= 3600;
             img_dsc.angle = angle;
+
+            part_draw_dsc.img_dsc = &img_dsc;
+
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_img(&a, clip_area, indic->type_data.needle_img.src, &img_dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }
 }

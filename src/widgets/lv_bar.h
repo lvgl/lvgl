@@ -58,6 +58,14 @@ typedef struct {
 
 extern const lv_obj_class_t lv_bar_class;
 
+/**
+ * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_bar_class`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
+ */
+typedef enum {
+    LV_BAR_DRAW_PART_INDICATOR,    /**< The indicator*/
+}lv_bar_draw_part_type_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

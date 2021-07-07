@@ -60,12 +60,24 @@ lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the background rectangle, the background arc, the foreground arc and the knob to allow hooking the drawing. 
-For more detail on the backround rectangle part see the [Base object](/widgets/obj#events)'s documentation. The fields of `lv_obj_draw_dsc_t` are set as follows:
-  - For both arcs: `clip_area`, `p1` (center of the arc), `radius`, `arc_dsc`, `part`. 
-  - For the knob: `clip_area`, `draw_area`, `rect_dsc`, `part`.
-
-
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent with the following types:
+    - `LV_ARC_DRAW_PART_BACKGROUND` The background arc. 
+        - `part`: `LV_PART_MAIN`
+        - `p1`: center of the arc
+        - `radius`: radius of the arc
+        - `arc_dsc`
+    - `LV_ARC_DRAW_PART_FOREGROUND` The foreground arc.  
+        - `part`: `LV_PART_INDICATOR`
+        - `p1`: center of the arc
+        - `radius`: radius of the arc
+        - `arc_dsc`
+    - LV_ARC_DRAW_PART_KNOB The knob
+        - `part`: `LV_PART_KNOB`
+        - `draw_area`: the arae of the knob
+        - `rect_dsc`:
+    
+See the events of the [Base object](/widgets/obj) too.
+    
 Learn more about [Events](/overview/event).
 
 ## Keys

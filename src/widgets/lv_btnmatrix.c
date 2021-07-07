@@ -670,11 +670,13 @@ static void draw_main(lv_event_t * e)
     char * txt_ap = lv_mem_buf_get(txt_ap_size);
 #endif
 
-    lv_obj_draw_part_dsc_t dsc;
-    lv_obj_draw_dsc_init(&dsc, clip_area);
-    dsc.part = LV_PART_ITEMS;
-    dsc.rect_dsc = &draw_rect_dsc_act;
-    dsc.label_dsc = &draw_label_dsc_act;
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.part = LV_PART_ITEMS;
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.type = LV_BTNMATRIX_DRAW_PART_BTN;
+    part_draw_dsc.rect_dsc = &draw_rect_dsc_act;
+    part_draw_dsc.label_dsc = &draw_label_dsc_act;
 
     for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
         /*Search the next valid text in the map*/
@@ -725,9 +727,9 @@ static void draw_main(lv_event_t * e)
         else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
 
 
-        dsc.draw_area = &btn_area;
-        dsc.id = btn_i;
-        lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &dsc);
+        part_draw_dsc.draw_area = &btn_area;
+        part_draw_dsc.id = btn_i;
+        lv_event_send(obj,LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
@@ -767,7 +769,7 @@ static void draw_main(lv_event_t * e)
         /*Draw the text*/
         lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
 
-        lv_event_send(obj,LV_EVENT_DRAW_PART_END, &dsc);
+        lv_event_send(obj,LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 
     obj->skip_trans = 0;

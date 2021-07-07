@@ -62,6 +62,14 @@ typedef struct {
 
 extern const lv_obj_class_t lv_btnmatrix_class;
 
+/**
+ * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_btnmatrix_class`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
+ */
+typedef enum {
+    LV_BTNMATRIX_DRAW_PART_BTN,    /**< The rectangle and label of buttons*/
+}lv_btnmatrix_draw_part_type_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

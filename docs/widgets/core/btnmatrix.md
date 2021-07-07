@@ -59,9 +59,14 @@ The "One check" feature can be enabled with `lv_btnmatrix_set_one_check(btnm, tr
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a button is pressed/released or repeated after long press. The event parameter is set to the ID of the pressed/released button.
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for both the main and the items (buttons) parts to allow hooking the drawing. 
-For more detail on the main part see the [Base object](/widgets/obj#events)'s documentation.
-For the buttons the following fields are used: `clip_area`, `draw_area`, `rect_dsc`, `rect_dsc`, `part`, `id` (index of the button being drawn). 
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
+    - `LV_BTNMATRIX_DRAW_PART_BTN` The individual buttons.
+        - `part`: `LV_PART_ITEMS`
+        - `id`:index of the button being drawn 
+        - `draw_area`: the area of teh button
+        - `rect_dsc`
+
+See the events of the [Base object](/widgets/obj) too.
 
 `lv_btnmatrix_get_selected_btn(btnm)` returns the index of the most recently released or focused button or `LV_BTNMATRIX_BTN_NONE` if no such button.
 

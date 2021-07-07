@@ -203,15 +203,17 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         const lv_area_t * clip_area = lv_event_get_param(e);
 
-        lv_obj_draw_part_dsc_t  part_dsc;
-        lv_obj_draw_dsc_init(&part_dsc, clip_area);
-        part_dsc.draw_area = &obj->coords;
-        part_dsc.rect_dsc = &rect_dsc;
-        part_dsc.part = LV_PART_MAIN;
+        lv_obj_draw_part_dsc_t  part_draw_dsc;
+        lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+        part_draw_dsc.draw_area = &obj->coords;
+        part_draw_dsc.class_p = MY_CLASS;
+        part_draw_dsc.type = LV_LED_DRAW_PART_RECTANGLE;
+        part_draw_dsc.rect_dsc = &rect_dsc;
+        part_draw_dsc.part = LV_PART_MAIN;
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(&obj->coords, clip_area, &rect_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 

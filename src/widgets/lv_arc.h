@@ -54,6 +54,16 @@ typedef struct {
 
 extern const lv_obj_class_t lv_arc_class;
 
+/**
+ * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_arc_class`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
+ */
+typedef enum {
+    LV_ARC_DRAW_PART_BACKGROUND,    /**< The background arc*/
+    LV_ARC_DRAW_PART_FOREGROUND,    /**< The foreground arc*/
+    LV_ARC_DRAW_PART_KNOB,          /**< The knob*/
+}lv_arc_draw_part_type_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

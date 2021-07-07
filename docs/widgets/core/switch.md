@@ -25,6 +25,8 @@ To manually turn the switch on/off call `lvobj_add/clear_state(switch, LV_STATE_
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the switch changes state.
 
+See the events of the [Base object](/widgets/obj) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

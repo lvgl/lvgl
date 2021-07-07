@@ -75,7 +75,10 @@ A given area of the canvas can be blurred horizontally with `lv_canvas_blur_hor(
 `r` is the radius of the blur (greater value means more intensive burring). `area` is the area where the blur should be applied (interpreted relative to the canvas).
 
 ## Events
-The same events are sent as for the [Images](/widgets/core/img).
+No special events are sent by canvas objects.
+The same events are sent as for the 
+
+See the events of the [Images](/widgets/core/img) too.
 
 Learn more about [Events](/overview/event).
 

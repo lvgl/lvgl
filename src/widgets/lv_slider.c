@@ -370,25 +370,27 @@ static void draw_knob(lv_event_t * e)
     position_knob(obj, &knob_area, knob_size, hor);
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
-    lv_obj_draw_part_dsc_t dsc;
-    lv_obj_draw_dsc_init(&dsc, clip_area);
-    dsc.part = LV_PART_KNOB;
-    dsc.id = 0;
-    dsc.draw_area = &slider->right_knob_area;
-    dsc.rect_dsc = &knob_rect_dsc;
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.part = LV_PART_KNOB;
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.type = LV_SLIDER_DRAW_PART_KNOB;
+    part_draw_dsc.id = 0;
+    part_draw_dsc.draw_area = &slider->right_knob_area;
+    part_draw_dsc.rect_dsc = &knob_rect_dsc;
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     } else {
-        /*Save the draw dsc. because it can be modified in the event*/
+        /*Save the draw part_draw_dsc. because it can be modified in the event*/
         lv_draw_rect_dsc_t knob_rect_dsc_tmp;
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Draw a second knob for the start_value side*/
         if(hor) {
@@ -401,13 +403,14 @@ static void draw_knob(lv_event_t * e)
         lv_area_copy(&slider->left_knob_area, &knob_area);
 
         lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
-        dsc.draw_area = &slider->left_knob_area;
-        dsc.rect_dsc = &knob_rect_dsc;
-        dsc.id = 1;
+        part_draw_dsc.type = LV_SLIDER_DRAW_PART_KNOB_LEFT;
+        part_draw_dsc.draw_area = &slider->left_knob_area;
+        part_draw_dsc.rect_dsc = &knob_rect_dsc;
+        part_draw_dsc.id = 1;
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 

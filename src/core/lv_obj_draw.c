@@ -330,6 +330,12 @@ void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, const lv_area_t * clip_a
     dsc->clip_area = clip_area;
 }
 
+bool lv_obj_draw_part_check_type(lv_obj_draw_part_dsc_t * dsc, const lv_obj_class_t * class_p, uint32_t type)
+{
+    if(dsc->class_p == class_p && dsc->type == type) return true;
+    else return false;
+}
+
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

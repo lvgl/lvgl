@@ -95,6 +95,8 @@ Note that the real coordinates of image objects won't change during transformati
 ## Events
 No special events are sent by image objects.
 
+See the events of the [Base object](/widgets/obj) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

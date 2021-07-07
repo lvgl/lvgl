@@ -131,16 +131,46 @@ The possible values of `dir`  `LV_DIR_NONE/RIGHT/UP/LEFT/DOWN/HOR/VER/ALL` or th
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a new point is clicked pressed.  `lv_chart_get_pressed_point(chart)` returns the zero-based index of the pressed point.
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for multiple parts. The fields of `lv_obj_draw_part_dsc_t` are set as follows:
-   - `LV_PART_ITEMS` (the series)
-       - *Line chart* `clip_area`, `id` (index of the point), `value` (value of `id`th point), `p1`, `p2` (points of the line), `draw_area` (area of the point), `line_dsc`, `rect_dsc`, `sub_part_ptr` (pointer to the series), `part`
-       - *Bar chart* `clip_area`, `id` (index of the point), `value` (value of `id`th point), `draw_area` (area of the point), `rect_dsc`, `sub_part_ptr` (pointer to the series), `part`
-   - `LV_PART_TICKS` (major tick lines and label)  `clip_area`, `id` (axis), `value` (scaled value of the tick), `text` (`value` converted to decimal), `line_dsc`, `label_dsc`, `part`
-   - `LV_PART_CURSOR` These events are sent at three times:
-      - vertical line `clip_area`, `p1`, `p2` (points of the line), `line_dsc`, `part`
-      - horizontal line `clip_area`, `p1`, `p2` (points of the line), `line_dsc`, `part`
-      - point `clip_area`, `draw_area` (points of the line), `rect_dsc`, `part`
-  - `LV_PART_MAIN` (the division lines)  `clip_area`, `id` (index of the line), `p1`, `p2` (points of the line), `line_dsc`, `part`. Besides events for every line, an event is sent before the first line and after the last line with `id=0xFFFFFFFF`, `p1 = NULL` and `p2 = NULL`. It can be used to add/remove masks, or draw special division lines. 
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent with the following types:
+   - `LV_CHART_DRAW_PART_DIV_LINE_INIT`  Used before/after drawn the div lines to add masks to any extra drawings. The following fields are set:
+       -  `part`: `LV_PART_MAIN`
+       - `line_dsc`
+   - `LV_CHART_DRAW_PART_DIV_LINE_HOR`, `LV_CHART_DRAW_PART_DIV_LINE_VER` Used for each horizontal and vertical division lines.  
+       - `part`: `LV_PART_MAIN` 
+       - `id`: index of the line
+       - `p1`, `p2`: (points of the line
+       - `line_dsc`
+   - `LV_CHART_DRAW_PART_LINE_AND_POINT` Used on line and scatter charts for lines and points. 
+       - `part`: `LV_PART_ITEMS`
+       - `id`: index of the point
+       - `value`: value of `id`th point
+       - `p1`, `p2`: points of the line
+       - `draw_area`: area of the point
+       - `line_dsc`
+       - `rect_dsc`
+       - `sub_part_ptr`: pointer to the series
+   - `LV_CHART_DRAW_PART_BAR` Used on bar charts for the rectangles. 
+        - `part`: `LV_PART_ITEMS`
+        - `id`: index of the point
+        - `value`: value of `id`th point 
+        - `draw_area`: area of the point
+        - `rect_dsc`:
+        - `sub_part_ptr`: pointer to the series
+   - `LV_CHART_DRAW_PART_CURSOR`  Used on cursor lines and points.
+         - `part`: `LV_PART_CURSOR` 
+         - `p1`, `p2`: points of the line
+         - `line_dsc`
+         - `rect_dsc`
+         - `draw_area`: area of the points
+   - `LV_CHART_DRAW_PART_TICK_LABEL`  Used on tick lines and labels.
+         - `part`: `LV_PART_TICKS`  
+         - `id`: axis
+         - `value`: value of the tick
+         - `text`: `value` converted to decimal or `NULL` for minor ticks
+         - `line_dsc`,
+         - `label_dsc`,
+  
+See the events of the [Base object](/widgets/obj) too.
   
 Learn more about [Events](/overview/event).
 

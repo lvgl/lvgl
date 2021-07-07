@@ -623,11 +623,13 @@ static void draw_main(lv_event_t * e)
     bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL ? true : false;
 
     /*Handle custom drawer*/
-    lv_obj_draw_part_dsc_t dsc;
-    lv_obj_draw_dsc_init(&dsc, clip_area);
-    dsc.part = LV_PART_ITEMS;
-    dsc.rect_dsc = &rect_dsc_act;
-    dsc.label_dsc = &label_dsc_act;
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    part_draw_dsc.part = LV_PART_ITEMS;
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.type = LV_TABLE_DRAW_PART_CELL;
+    part_draw_dsc.rect_dsc = &rect_dsc_act;
+    part_draw_dsc.label_dsc = &label_dsc_act;
 
     for(row = 0; row < table->row_cnt; row++) {
         lv_coord_t h_row = table->row_h[row];
@@ -718,9 +720,9 @@ static void draw_main(lv_event_t * e)
                 obj->skip_trans = 0;
             }
 
-            dsc.draw_area = &cell_area_border;
-            dsc.id = row * table->col_cnt + col;
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &dsc);
+            part_draw_dsc.draw_area = &cell_area_border;
+            part_draw_dsc.id = row * table->col_cnt + col;
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
             lv_draw_rect(&cell_area_border, clip_area, &rect_dsc_act);
 
@@ -753,7 +755,7 @@ static void draw_main(lv_event_t * e)
                 }
             }
 
-            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
             cell += col_merge + 1;
             col += col_merge;

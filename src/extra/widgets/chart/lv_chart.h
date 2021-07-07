@@ -116,6 +116,20 @@ typedef struct {
 
 extern const lv_obj_class_t lv_chart_class;
 
+/**
+ * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_chart_class`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
+ */
+typedef enum {
+    LV_CHART_DRAW_PART_DIV_LINE_INIT,    /**< Used before/after drawn the div lines*/
+    LV_CHART_DRAW_PART_DIV_LINE_HOR,     /**< Used for each horizontal division lines*/
+    LV_CHART_DRAW_PART_DIV_LINE_VER,     /**< Used for each vertical division lines*/
+    LV_CHART_DRAW_PART_LINE_AND_POINT,   /**< Used on line and scatter charts for lines and points*/
+    LV_CHART_DRAW_PART_BAR,              /**< Used on bar charts for the rectangles*/
+    LV_CHART_DRAW_PART_CURSOR,           /**< Used on cursor lines and points*/
+    LV_CHART_DRAW_PART_TICK_LABEL,       /**< Used on tick lines and labels*/
+}lv_chart_draw_part_type_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

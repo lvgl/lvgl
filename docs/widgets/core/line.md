@@ -25,6 +25,8 @@ By default, the *y == 0* point is in the top of the object. It might be conter-i
 ## Events
 Only the [Generic events](../overview/event.html#generic-events) are sent by the object type.
 
+See the events of the [Base object](/widgets/obj) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

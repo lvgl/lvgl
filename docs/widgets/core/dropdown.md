@@ -77,6 +77,8 @@ To manually open or close the drop-down list the `lv_dropdown_open/close(dropdow
 Apart from the [Generic events](../overview/event.html#generic-events), the following [Special events](../overview/event.html#special-events) are sent by the drop-down list:
 - `LV_EVENT_VALUE_CHANGED` Sent when the new option is selected or the list is opened/closed.
 
+See the events of the [Base object](/widgets/obj) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

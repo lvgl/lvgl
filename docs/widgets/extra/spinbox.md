@@ -33,6 +33,8 @@ The parts of the Spinbox are identical to the [Text area](/widgets/core/textarea
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
+See the events of the [Text area](/widgets/core/textarea) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

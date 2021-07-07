@@ -5,6 +5,7 @@ minimal_monochrome = {
   
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
+  "LV_USE_METER":0,
   
   "LV_USE_LOG":1,
 
@@ -34,6 +35,7 @@ minimal_16bit = {
   
   "LV_DPI_DEF":40,
   "LV_DRAW_COMPLEX":0,
+  "LV_USE_METER":0,
   
   "LV_USE_LOG":1,
 

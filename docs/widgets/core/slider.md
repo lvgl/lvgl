@@ -36,8 +36,22 @@ In the latter case the knob moves to the point clicked and slider value changes 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or changed with keys. 
 The event is sent continuously while the slider is dragged and once when released. Use `lv_slider_is_dragged` to detemine whether the Slider is still being dragged or has just been released.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following parts. 
+    - `LV_SLIDER_DRAW_PART_KNOB` The main (right) knob of the slider
+        - `part`: `LV_PART_KNOB` 
+        - `draw_area`: area of the indicator
+        - `rect_dsc`
+        - `id`: 0
+    - `LV_SLIDER_DRAW_PART_KNOB`  The left knob of the slider
+        - `part`: `LV_PART_KNOB` 
+        - `draw_area`: area of the indicator
+        - `rect_dsc`
+        - `id`: 1
+
+See the events of the [Bar](/widgets/core/bar) too.
 
 Learn more about [Events](/overview/event).
+
 ## Keys
 - `LV_KEY_UP/RIGHT` Increment the slider's value by 1
 - `LV_KEY_DOWN/LEFT` Decrement the slider's value by 1

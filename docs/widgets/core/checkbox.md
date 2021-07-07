@@ -36,9 +36,13 @@ lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox 
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for both main and indicator parts to allow hooking the drawing. 
-For more detail on the main part see the [Base object](/widgets/obj#events)'s documentation.
-For the indicator the following fields are used: `clip_area`, `draw_area`, `rect_dsc`, `part`. 
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
+    - `LV_CHECKBOX_DRAW_PART_BOX` The tickbox of the checkbox
+        - `part`: `LV_PART_INDICATOR` 
+        - `draw_area`: the area of the tickbox
+        - `rect_dsc`
+
+See the events of the [Base object](/widgets/obj) too.
 
 Learn more about [Events](/overview/event).
 

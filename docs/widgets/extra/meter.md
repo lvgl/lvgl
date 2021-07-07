@@ -63,9 +63,34 @@ If `local` is `false` `color_start` and `color_end` will be mapped to the start 
 `lv_meter_set_indicator_start_value(meter, inidicator, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator. 
 
 ## Events
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` is sent for the tick labels to allow overwriting the texts. The following fields of `lv_obj_draw_part_dsc_t` is set:
-`clip_area`, `part` (to `LV_PART_TICK`), `id` (the index of the major tick line), `value` (the value of the tick line), `label_dsc`, `text` (value converted to decimal)
-
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` is sent for the following types:
+    - `LV_METER_DRAW_PART_ARC` The arc indicator
+       - `part`: `LV_PART_ITEMS`
+       - `sub_part_ptr`: pointer to the indicator
+       - `arc_dsc`
+       - `radius`: radius of the arc
+       - `p1` center of the arc
+    - `LV_METER_DRAW_PART_NEEDLE_LINE` The needle lines
+       - `part`: `LV_PART_ITEMS`
+       - `p1`, `p2` points of the line
+       - `line_dsc`
+       - `sub_part_ptr`: pointer to the indicator
+    - `LV_METER_DRAW_PART_NEEDLE_IMG`  The needle images
+       - `part`: `LV_PART_ITEMS`
+       - `p1`, `p2` points of the line
+       - `img_dsc`
+       - `sub_part_ptr`: pointer to the indicator
+    - `LV_METER_DRAW_PART_TICK` The tick lines and labels
+       - `part`: `LV_PART_TICKS`
+       - `value`: the value of the line
+       - `text`: `value` converted to decimal or `NULL` on minor lines
+       - `label_dsc`: label draw descriptor or `NULL` on minor lines
+       - `line_dsc`: 
+       - `id`: the index of the line      
+    
+    
+See the events of the [Base object](/widgets/obj) too.
+    
 Learn more about [Events](/overview/event).
 
 ## Keys

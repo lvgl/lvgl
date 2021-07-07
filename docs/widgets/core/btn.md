@@ -27,9 +27,9 @@ There are no new features compared to [Base object](/widgets/obj).
 Learn more about [Events](/overview/event).
 
 ## Keys
-If `LV_OBJ_FLAG_CHECKABLE` is enabled `LV_KEY_RIGHT` and `LV_KEY_UP` make the object checked, and `LV_KEY_LEFT` and `LV_KEY_DOWN` make it unchecked.
-
 Note that the state of `LV_KEY_ENTER` is translated to `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
+
+See the events of the [Base object](/widgets/obj) too.
 
 Learn more about [Keys](/overview/indev).
 

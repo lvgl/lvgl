@@ -33,8 +33,13 @@ The bar can be one the following modes:
 - `LV_BAR_RANGE` Allows setting the start value too by `lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start value always has to be smaller than the end value.
 
 ## Events
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for both main and indicator parts to allow hooking the drawing. For more detail on the main part see the [Base object](/widgets/obj#events)'s documentation.
-For the indicator the following fields are used: `clip_area`, `draw_area`, `rect_dsc`, `part`. 
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following parts:
+    - `LV_BAR_DRAW_PART_INDICATOR` The indicator of the bar
+        - `part`: `LV_PART_INDICATOR` 
+        - `draw_area`: area of the indicator
+        - `rect_dsc`
+        
+See the events of the [Base object](/widgets/obj) too.
 
 Learn more about [Events](/overview/event).
 

@@ -500,6 +500,8 @@ static void lv_obj_draw(lv_event_t * e)
 
         lv_obj_draw_part_dsc_t part_dsc;
         lv_obj_draw_dsc_init(&part_dsc, clip_area);
+        part_dsc.class_p = MY_CLASS;
+        part_dsc.type = LV_OBJ_DRAW_PART_RECTANGLE;
         part_dsc.rect_dsc = &draw_dsc;
         part_dsc.draw_area = &coords;
         part_dsc.part = LV_PART_MAIN;
@@ -547,7 +549,19 @@ static void lv_obj_draw(lv_event_t * e)
             coords.x2 += w;
             coords.y1 -= h;
             coords.y2 += h;
+
+
+            lv_obj_draw_part_dsc_t part_dsc;
+            lv_obj_draw_dsc_init(&part_dsc, clip_area);
+            part_dsc.class_p = MY_CLASS;
+            part_dsc.type = LV_OBJ_DRAW_PART_BORDER_POST;
+            part_dsc.rect_dsc = &draw_dsc;
+            part_dsc.draw_area = &coords;
+            part_dsc.part = LV_PART_MAIN;
+            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+
             lv_draw_rect(&coords, clip_area, &draw_dsc);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
         }
     }
 }
@@ -567,6 +581,8 @@ static void draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_obj_draw_part_dsc_t part_dsc;
     lv_obj_draw_dsc_init(&part_dsc, clip_area);
+    part_dsc.class_p = MY_CLASS;
+    part_dsc.type = LV_OBJ_DRAW_PART_SCROLLBAR;
     part_dsc.rect_dsc = &draw_dsc;
     part_dsc.part = LV_PART_SCROLLBAR;
 

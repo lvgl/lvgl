@@ -35,6 +35,8 @@ This function calculates the height with the current style. If the font, line sp
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.
 
+See the events of the [Base object](/widgets/obj) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

@@ -98,6 +98,8 @@ The new text cannot be in a local variable which is destroyed when the event cal
 - `LV_EVENT_VALUE_CHANGED` Sent when the content of the text area has been changed. 
 - `LV_EVENT_APPLY` Sent when `LV_KEY_ENTER` is pressed (or(sent) to a one line text area.
 
+See the events of the [Base object](/widgets/obj) too.
+
 Learn more about [Events](/overview/event).
 
 ## Keys

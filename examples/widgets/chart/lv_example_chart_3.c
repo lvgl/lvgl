@@ -3,10 +3,12 @@
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-    if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
+    lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
+    if(!lv_obj_draw_part_check_type(dsc, &lv_chart_class, LV_CHART_DRAW_PART_TICK_LABEL)) return;
+
+    if(dsc->id == LV_CHART_AXIS_PRIMARY_X && dsc->text) {
         const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-        lv_snprintf(dsc->text, sizeof(dsc->text), "%s", month[dsc->value]);
+        dsc->text = month[dsc->value];
     }
 }
 
