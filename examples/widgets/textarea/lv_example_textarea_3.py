@@ -1,5 +1,5 @@
 def ta_event_cb(e):
-    ta = lv.textarea.__cast__(e.get_target())
+    ta = e.get_target()
     txt = ta.get_text()
     # print(txt)
     pos = ta.get_cursor_pos()

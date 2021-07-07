@@ -2,7 +2,7 @@ import fs_driver
 
 def event_handler(e):
     code = e.get_code()
-    obj = lv.roller.__cast__(e.get_target())
+    obj = e.get_target()
     if code == lv.EVENT.VALUE_CHANGED: 
         option = " "*10
         obj.get_selected_str(option, len(option))

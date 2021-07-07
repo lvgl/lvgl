@@ -1,6 +1,6 @@
 def event_cb(e):
-    mbox = lv.msgbox.__cast__(e.get_current_target())
-    print("Button " + mbox.get_active_btn_text() + " clicked")
+    mbox = e.get_current_target()
+    print("Button %s clicked" % mbox.get_active_btn_text())
 
 btns = ["Apply", "Close", ""]
 

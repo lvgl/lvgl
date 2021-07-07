@@ -1,6 +1,6 @@
 def event_handler(e):
     code = e.get_code()
-    obj = lv.obj.__cast__(e.get_target())
+    obj = e.get_target()
     if code == lv.EVENT.CLICKED:
         print("Button {:d} clicked".format(obj.get_child_id()))
 

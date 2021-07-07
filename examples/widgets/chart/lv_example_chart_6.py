@@ -37,7 +37,7 @@ class ExampleChart_6():
     def event_cb(self,e):
 
         code = e.get_code()
-        chart = lv.chart.__cast__(e.get_target())
+        chart = e.get_target()
 
         if code == lv.EVENT.VALUE_CHANGED:
             # print("last_id: ",self.last_id)

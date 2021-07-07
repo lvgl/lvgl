@@ -2,7 +2,7 @@ def event_handler(evt):
     code = evt.get_code()
 
     if code == lv.EVENT.VALUE_CHANGED:
-        source = lv.calendar.__cast__(evt.get_target())
+        source = evt.get_target()
         date = lv.calendar_date_t()
         lv.calendar.get_pressed_date(source,date)
         if date:

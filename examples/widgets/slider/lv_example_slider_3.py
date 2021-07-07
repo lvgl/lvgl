@@ -1,6 +1,6 @@
 def slider_event_cb(e):
     code = e.get_code()
-    obj = lv.slider.__cast__(e.get_target())
+    obj = e.get_target()
 
     # Provide some extra space for the value
     if code == lv.EVENT.REFR_EXT_DRAW_SIZE:

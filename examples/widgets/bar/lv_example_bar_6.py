@@ -6,7 +6,7 @@ def event_cb(e):
     if dsc.part != lv.PART.INDICATOR:
         return
 
-    obj= lv.bar.__cast__(e.get_target())
+    obj= e.get_target()
 
     label_dsc = lv.draw_label_dsc_t()
     label_dsc.init()

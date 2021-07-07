@@ -21,7 +21,7 @@ class CounterBtn():
             self.cnt += 1
 
         # Get the first child of the button which is the label and change its text
-        label = lv.label.__cast__(btn.get_child(0))
+        label = btn.get_child(0)
         label.set_text("Button: " + str(self.cnt))
 
 
