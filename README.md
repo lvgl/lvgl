@@ -13,7 +13,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 <a href="https://docs.lvgl.io/">Docs</a> &middot;
 <a href="https://forum.lvgl.io">Forum</a>  &middot;
 <a href="https://lvgl.io/services">Services</a>  &middot;
-<a href="https://docs.lvgl.io/master/examples.html">Interactive exmamples</a>
+<a href="https://docs.lvgl.io/master/examples.html">Interactive examples</a>
 </h4>
 
 ---
