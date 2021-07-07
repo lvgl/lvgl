@@ -41,7 +41,7 @@ extern const lv_obj_class_t lv_led_class;
  */
 typedef enum {
     LV_LED_DRAW_PART_RECTANGLE,    /**< The main rectangle*/
-}lv_ledc_draw_part_type_t;
+}lv_led_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES

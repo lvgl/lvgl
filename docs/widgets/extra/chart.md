@@ -138,7 +138,7 @@ The possible values of `dir`  `LV_DIR_NONE/RIGHT/UP/LEFT/DOWN/HOR/VER/ALL` or th
    - `LV_CHART_DRAW_PART_DIV_LINE_HOR`, `LV_CHART_DRAW_PART_DIV_LINE_VER` Used for each horizontal and vertical division lines.  
        - `part`: `LV_PART_MAIN` 
        - `id`: index of the line
-       - `p1`, `p2`: (points of the line
+       - `p1`, `p2`: points of the line
        - `line_dsc`
    - `LV_CHART_DRAW_PART_LINE_AND_POINT` Used on line and scatter charts for lines and points. 
        - `part`: `LV_PART_ITEMS`
@@ -157,18 +157,18 @@ The possible values of `dir`  `LV_DIR_NONE/RIGHT/UP/LEFT/DOWN/HOR/VER/ALL` or th
         - `rect_dsc`:
         - `sub_part_ptr`: pointer to the series
    - `LV_CHART_DRAW_PART_CURSOR`  Used on cursor lines and points.
-         - `part`: `LV_PART_CURSOR` 
-         - `p1`, `p2`: points of the line
-         - `line_dsc`
-         - `rect_dsc`
-         - `draw_area`: area of the points
+        - `part`: `LV_PART_CURSOR` 
+        - `p1`, `p2`: points of the line
+        - `line_dsc`
+        - `rect_dsc`
+        - `draw_area`: area of the points
    - `LV_CHART_DRAW_PART_TICK_LABEL`  Used on tick lines and labels.
-         - `part`: `LV_PART_TICKS`  
-         - `id`: axis
-         - `value`: value of the tick
-         - `text`: `value` converted to decimal or `NULL` for minor ticks
-         - `line_dsc`,
-         - `label_dsc`,
+        - `part`: `LV_PART_TICKS`  
+        - `id`: axis
+        - `value`: value of the tick
+        - `text`: `value` converted to decimal or `NULL` for minor ticks
+        - `line_dsc`,
+        - `label_dsc`,
   
 See the events of the [Base object](/widgets/obj) too.
   
