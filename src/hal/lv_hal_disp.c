@@ -220,6 +220,20 @@ void lv_disp_remove(lv_disp_t * disp)
 
     _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
     lv_timer_del(disp->refr_timer);
+
+    /** delete screen and other obj */
+    if (disp->sys_layer) {
+        lv_obj_del(disp->sys_layer);
+        disp->sys_layer = NULL;
+    }
+    if (disp->top_layer) {
+        lv_obj_del(disp->top_layer);
+        disp->top_layer = NULL;
+    }
+    while (disp->screen_cnt != 0) {
+        /*Delete the screenst*/
+        lv_obj_del(disp->screens[0]);
+    }
     lv_mem_free(disp);
 
     if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
