@@ -18,6 +18,7 @@ jobs:
       run: sudo apt-get install libpng-dev ruby-full; cd tests; python ./main.py report
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
+      if: github.event_name == 'push'
       with:
         fail_ci_if_error: true
         verbose: true
