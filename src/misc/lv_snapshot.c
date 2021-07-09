@@ -59,20 +59,14 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     }
 
     /*Backup obj original info.*/
-    lv_disp_t * disp_old = lv_disp_get_default();
+    lv_disp_t * disp_old = lv_obj_get_disp(obj);
     lv_obj_t * parent_old = lv_obj_get_parent(obj);
-    lv_coord_t w, h, x, y;
 
     lv_obj_update_layout(obj);
 
     /*Width and height determine snapshot image size.*/
-    w = lv_obj_get_width(obj);
-    h = lv_obj_get_height(obj);
-
-    /*Position will be set back to obj once done. */
-    x = lv_obj_get_style_x(obj, LV_PART_MAIN);
-    y = lv_obj_get_style_y(obj, LV_PART_MAIN);
-    lv_align_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+    lv_coord_t w = lv_obj_get_width(obj);
+    lv_coord_t h = lv_obj_get_height(obj);
 
     uint8_t px_size = lv_img_cf_get_px_size(cf);
     uint32_t buff_size = w * h * ((px_size + 7) >> 3);
@@ -96,15 +90,11 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     lv_disp_draw_buf_t draw_buf;
 
     lv_disp_draw_buf_init(&draw_buf, buff, NULL, w * h);
-    draw_buf.area.x1 = 0;
-    draw_buf.area.x2 = w - 1;
-    draw_buf.area.y1 = 0;
-    draw_buf.area.y2 = h - 1;
 
     lv_disp_drv_init(&driver);
     driver.draw_buf = &draw_buf;
-    driver.hor_res = w;
-    driver.ver_res = h;
+    driver.hor_res = lv_disp_get_hor_res(disp_old);
+    driver.ver_res = lv_disp_get_ver_res(disp_old);
     set_set_px_cb(&driver, cf);
 
     disp = lv_disp_drv_register(&driver);
@@ -118,9 +108,8 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     lv_disp_set_bg_opa(disp, LV_OPA_TRANSP);
 
     /*Move obj to newly created disp and refresh it. */
-    lv_disp_set_default(disp);
-
-    lv_obj_t * screen = lv_scr_act();
+    lv_obj_t * screen = lv_disp_get_scr_act(disp);
+    lv_obj_remove_style_all(screen);
     lv_obj_allocate_spec_attr(screen);
     screen->spec_attr->child_cnt = 1;
     screen->spec_attr->children = &obj;
@@ -128,25 +117,18 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     obj->parent = screen;
 
     /*Display buffer targets to position 0, 0 */
-    lv_obj_align(obj, LV_ALIGN_DEFAULT, 0, 0);
+    disp->inv_p = 0;
     lv_obj_invalidate(obj);
 
     /*Don't call lv_refr_now to avoid animation disruption */
     _lv_disp_refr_timer(disp->refr_timer);
 
-    /*Restore obj original parameters. */
-    lv_disp_set_default(disp_old);
-
+    /*Restore obj original parameters and clean up*/
     obj->parent = parent_old;
     screen->spec_attr->child_cnt = 0;
     screen->spec_attr->children = NULL;
 
-    /*Unregister temp display driver. */
     lv_disp_remove(disp);
-
-    lv_obj_align(obj, align, x, y);
-
-    lv_obj_invalidate(obj);
 
     dsc->data = buff;
     dsc->header.w = w;
