@@ -10,6 +10,7 @@
  *      INCLUDES
  *********************/
 #include "lv_port_fs_template.h"
+#include "../../lvgl.h"
 
 /*********************
  *      DEFINES
