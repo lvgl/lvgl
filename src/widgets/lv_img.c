@@ -637,6 +637,10 @@ static void draw_img(lv_event_t * e)
                 img_max_area.y1 -= ((img->h - img_size_final.y) + 1) / 2;
                 img_max_area.y2 -= ((img->h - img_size_final.y) + 1) / 2;
             }
+            else {
+                img_max_area.x2 = img_max_area.x1 + lv_area_get_width(&bg_coords) - 1;
+                img_max_area.y2 = img_max_area.y1 + lv_area_get_height(&bg_coords) - 1;
+            }
 
             img_max_area.x1 += pleft;
             img_max_area.y1 += ptop;
