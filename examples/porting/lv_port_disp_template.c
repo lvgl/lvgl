@@ -10,6 +10,7 @@
  *      INCLUDES
  *********************/
 #include "lv_port_disp_template.h"
+#include "../../lvgl.h"
 
 /*********************
  *      DEFINES
