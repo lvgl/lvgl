@@ -1,8 +1,8 @@
 #!/opt/bin/lv_micropython -i
-import time
+import utime as time
 import lvgl as lv
 import display_driver
-import sys
+import usys as sys
 
 class Lv_Roller_3():
 

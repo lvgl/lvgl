@@ -1,10 +1,7 @@
 #!/opt/bin/lv_micropython -i
 
 import lvgl as lv
-try:
-    import sys
-except ImportError:
-    import usys as sys
+import usys as sys
 
 # JS requires a special import
 if sys.platform == 'javascript':
