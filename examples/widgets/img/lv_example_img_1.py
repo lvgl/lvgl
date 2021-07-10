@@ -1,5 +1,5 @@
 #!/opt/bin/lv_micropython -i
-import sys
+import usys as sys
 import lvgl as lv
 import display_driver
 from imagetools import get_png_info, open_png
