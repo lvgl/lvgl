@@ -37,4 +37,6 @@ jobs:
     - name: Build the unix port
       run: make -j $(nproc) -C ports/unix VARIANT=dev DEBUG=1
     - name: Run tests      
-      run: lib/lv_bindings/tests/run.sh
+      run: |
+        export XDG_RUNTIME_DIR=/tmp
+        lib/lv_bindings/tests/run.sh
