@@ -20,6 +20,7 @@ extern "C" {
 #include "lv_area.h"
 #include "../font/lv_font.h"
 #include "lv_printf.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -30,15 +31,6 @@ extern "C" {
 
 #define LV_TXT_ENC_UTF8 1
 #define LV_TXT_ENC_ASCII 2
-
-/**********************
-*      MACROS
-**********************/
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__ ((format(printf, fmtstr, vararg)))
-#else
-#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
-#endif
 
 /**********************
  *      TYPEDEFS

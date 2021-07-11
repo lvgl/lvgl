@@ -37,15 +37,6 @@ LV_EXPORT_CONST_INT(LV_LABEL_POS_LAST);
 LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SELECTION_OFF);
 
 /**********************
-*      MACROS
-**********************/
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__ ((format(printf, fmtstr, vararg)))
-#else
-#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
-#endif
-
-/**********************
  *      TYPEDEFS
  **********************/
 
