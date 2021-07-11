@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-LVGL provides everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
+LVGL provides everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
 </p>
 
 <h4 align="center">
