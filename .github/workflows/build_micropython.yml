@@ -24,7 +24,7 @@ jobs:
     - name: Initialize lv_bindings submodule
       run: git submodule update --init --recursive lib/lv_bindings
     - name: Update Unix port submodules
-      run: make -C ports/unix submodules
+      run: make -C ports/unix VARIANT=dev DEBUG=1 submodules
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
       run: |
