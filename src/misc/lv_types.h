@@ -80,7 +80,7 @@ typedef uint32_t lv_uintptr_t;
 #define _LV_CONCAT3(x, y, z) x ## y ## z
 #define LV_CONCAT3(x, y, z) _LV_CONCAT3(x, y, z)
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#if (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)) && !defined(PYCPARSER)
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__ ((format(printf, fmtstr, vararg)))
 #else
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
