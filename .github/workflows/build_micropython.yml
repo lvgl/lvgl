@@ -21,8 +21,10 @@ jobs:
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
         git checkout master
-    - name: Update submodules
-      run: git submodule update --init --recursive
+    - name: Initialize lv_bindings submodule
+      run: git submodule update --init --recursive lib/lv_bindings
+    - name: Update Unix port submodules
+      run: make -C ports/unix submodules
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
       run: |
