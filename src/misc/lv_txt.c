@@ -483,7 +483,7 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
  * @param fmt `printf`-like format
  * @return pointer to the allocated text string.
  */
-char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
+LV_FORMAT_ATTRIBUTE(1, 0) char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 {
     /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12*/
     va_list ap_copy;
