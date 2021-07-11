@@ -39,7 +39,7 @@ static void keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static uint32_t keypad_get_key(void);
 
 static void encoder_init(void);
-static bool encoder_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+static void encoder_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static void encoder_handler(void);
 
 static void button_init(void);
@@ -110,7 +110,7 @@ void lv_port_indev_init(void)
     indev_mouse = lv_indev_drv_register(&indev_drv);
 
     /*Set cursor. For simplicity set a HOME symbol now.*/
-    lv_obj_t * mouse_cursor = lv_img_create(lv_disp_get_scr_act(NULL), NULL);
+    lv_obj_t * mouse_cursor = lv_img_create(lv_scr_act());
     lv_img_set_src(mouse_cursor, LV_SYMBOL_HOME);
     lv_indev_set_cursor(indev_mouse, mouse_cursor);
 
