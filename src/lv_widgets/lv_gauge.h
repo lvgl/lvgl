@@ -112,6 +112,12 @@ static inline void lv_gauge_set_range(lv_obj_t * gauge, int32_t min, int32_t max
  */
 static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int32_t value)
 {
+    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(gauge);
+    if(value > lv_linemeter_get_max_value(gauge)) {
+        ext->lvl_ofs = 1;
+    } else {
+        ext->lvl_ofs = -1;
+    }
     lv_linemeter_set_value(gauge, value);
 }
 
