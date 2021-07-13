@@ -705,7 +705,12 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         editing = lv_group_get_editing(lv_obj_get_group(obj));
         lv_state_t state = LV_STATE_FOCUSED;
 
-        lv_indev_t * indev = lv_event_get_indev(e);
+        /* Use the indev for then indev handler.
+         * But if the obj was focused manually it returns NULL so try to
+         * use the indev from the event*/
+        lv_indev_t * indev = lv_indev_get_act();
+        if(indev == NULL) indev = lv_event_get_indev(e);
+
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) state |= LV_STATE_FOCUS_KEY;
         if(editing) {
