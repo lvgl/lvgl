@@ -28,7 +28,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of image*/
+
+/**
+ * Data of image
+ */
 typedef struct {
     lv_obj_t obj;
     const void * src; /*Image source: Pointer to an array or a file or a symbol*/
@@ -46,12 +49,22 @@ typedef struct {
 
 extern const lv_obj_class_t lv_img_class;
 
-/*Image size mode, when image size and object size is different*/
+/**
+ * Image size mode, when image size and object size is different
+ */
 enum {
-    LV_IMG_OBJ_SIZE_MODE_ORIGINAL = 0, /*Content size equals original image size*/
-    LV_IMG_OBJ_SIZE_MODE_ZOOMED, /*If object size is set to SIZE_CONTENT, then object size equals zoomed image size, otherwise, object size stays as setting value. */
+    /** Zoom doesn't affect the coordinates of the object,
+     *  however if zoomed in the image is drawn out of the its coordinates.
+     *  The layout's won't change on zoom */
+    LV_IMG_SIZE_MODE_VIRTUAL = 0,
+
+    /** If the object size is set to SIZE_CONTENT, then object size equals zoomed image size.
+     *  It causes layout recalculation.
+     *  If the object size is set explicitly the the image will be cropped if zoomed in.*/
+    LV_IMG_SIZE_MODE_REAL,
 };
-typedef uint8_t lv_img_content_size_mode_t;
+
+typedef uint8_t lv_img_size_mode_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -137,7 +150,7 @@ void lv_img_set_antialias(lv_obj_t * obj, bool antialias);
  * @param obj       pointer to an image object
  * @param mode      the new size mode.
  */
-void lv_img_set_content_size_mode(lv_obj_t * obj, lv_img_content_size_mode_t mode);
+void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
 /*=====================
  * Getter functions
  *====================*/
@@ -190,6 +203,13 @@ uint16_t lv_img_get_zoom(lv_obj_t * obj);
  * @return          true: anti-aliased; false: not anti-aliased
  */
 bool lv_img_get_antialias(lv_obj_t * obj);
+
+/**
+ * Get the size mode of the image
+ * @param obj       pointer to an image object
+ * @return          element of @ref lv_img_size_mode_t
+ */
+lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj);
 
 /**********************
  *      MACROS

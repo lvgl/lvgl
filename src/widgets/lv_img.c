@@ -291,8 +291,9 @@ void lv_img_set_antialias(lv_obj_t * obj, bool antialias)
     lv_obj_invalidate(obj);
 }
 
-void lv_img_set_content_size_mode(lv_obj_t * obj, lv_img_content_size_mode_t mode)
+void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
     if(mode == img->obj_size_mode) return;
 
@@ -367,6 +368,13 @@ bool lv_img_get_antialias(lv_obj_t * obj)
     return img->antialias ? true : false;
 }
 
+lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t *)obj;
+    return img->obj_size_mode;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -390,7 +398,7 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->offset.y  = 0;
     img->pivot.x = 0;
     img->pivot.y = 0;
-    img->obj_size_mode = LV_IMG_OBJ_SIZE_MODE_ORIGINAL;
+    img->obj_size_mode = LV_IMG_SIZE_MODE_VIRTUAL;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
@@ -504,7 +512,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
-        if (img->obj_size_mode == LV_IMG_OBJ_SIZE_MODE_ZOOMED){
+        if (img->obj_size_mode == LV_IMG_SIZE_MODE_REAL){
             *p = lv_img_get_tranformed_size(obj);
         }
         else {
@@ -596,7 +604,7 @@ static void draw_img(lv_event_t * e)
         bg_pivot.y = img->pivot.y + ptop;
         lv_area_t bg_coords;
 
-        if (img->obj_size_mode == LV_IMG_OBJ_SIZE_MODE_ZOOMED) {
+        if (img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
             /*Object size equals to transformed image size*/
             lv_obj_get_coords(obj, &bg_coords);
         }
@@ -631,7 +639,7 @@ static void draw_img(lv_event_t * e)
 
             lv_point_t img_size_final = lv_img_get_tranformed_size(obj);
 
-            if(img->obj_size_mode == LV_IMG_OBJ_SIZE_MODE_ZOOMED){
+            if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL){
                 img_max_area.x1 -= ((img->w - img_size_final.x) + 1) / 2;
                 img_max_area.x2 -= ((img->w - img_size_final.x) + 1) / 2;
                 img_max_area.y1 -= ((img->h - img_size_final.y) + 1) / 2;
