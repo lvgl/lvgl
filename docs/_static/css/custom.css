@@ -73,7 +73,6 @@ code.sig-name
   height: 240px;
   flex: none;
   position: relative;
-  padding-bottom: 16px;
 }
 
 .lv-example > iframe {
@@ -84,6 +83,7 @@ code.sig-name
 
 .lv-example-container {
     display: flex;
+    padding-bottom: 16px;
 }
 .lv-example-description {
     flex: 1 1 auto;
