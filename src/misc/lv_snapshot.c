@@ -35,16 +35,14 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/** Take snapshot for object with its children.
- *
- * @note The function will change the order obj in its parent.
+/** Get the buffer needed for object snapshot image.
  *
  * @param obj    The object to generate snapshot.
  * @param cf     color format for generated image.
  *
- * @return a pointer to a image descriptor, or NULL if failed.
+ * @return the buffer size needed in bytes
  */
-lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
+uint32_t lv_snapshot_buff_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
 {
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
@@ -54,12 +52,8 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
         case LV_IMG_CF_ALPHA_8BIT:
             break;
         default:
-            return NULL;
+            return 0;
     }
-
-    /*Backup obj original info.*/
-    lv_disp_t * disp_old = lv_obj_get_disp(obj);
-    lv_obj_t * parent_old = lv_obj_get_parent(obj);
 
     lv_obj_update_layout(obj);
 
@@ -68,17 +62,46 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     lv_coord_t h = lv_obj_get_height(obj);
 
     uint8_t px_size = lv_img_cf_get_px_size(cf);
-    uint32_t buff_size = w * h * ((px_size + 7) >> 3);
-    void * buff = lv_mem_alloc(buff_size);
-    if(buff == NULL) {
-        return NULL;
+    return w * h * ((px_size + 7) >> 3);
+}
+
+/** Take snapshot for object with its children, save image info to provided buffer.
+ *
+ * @param obj    The object to generate snapshot.
+ * @param cf     color format for generated image.
+ * @param dsc    image descriptor to store the image result.
+ * @param buff   the buffer to store image data.
+ * @param buff_size provided buffer size in bytes.
+ *
+ * @return LV_RES_OK on success, LV_RES_INV on error.
+ */
+lv_res_t lv_snapshot_take_to_buff(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buff, uint32_t buff_size)
+{
+    LV_ASSERT(dsc);
+    LV_ASSERT(buff);
+
+    switch(cf) {
+        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+        case LV_IMG_CF_ALPHA_1BIT:
+        case LV_IMG_CF_ALPHA_2BIT:
+        case LV_IMG_CF_ALPHA_4BIT:
+        case LV_IMG_CF_ALPHA_8BIT:
+            break;
+        default:
+            return LV_RES_INV;
     }
 
-    lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
-    if(dsc == NULL) {
-        lv_mem_free(buff);
-        return NULL;
-    }
+    if(lv_snapshot_buff_size_needed(obj, cf) > buff_size)
+        return LV_RES_INV;
+
+    /*Width and height determine snapshot image size.*/
+    lv_coord_t w = lv_obj_get_width(obj);
+    lv_coord_t h = lv_obj_get_height(obj);
+
+    /*Backup obj original info.*/
+    lv_disp_t * disp_old = lv_obj_get_disp(obj);
+    lv_obj_t * parent_old = lv_obj_get_parent(obj);
+
     lv_memset(buff, 0x00, buff_size);
     lv_memset_00(dsc, sizeof(lv_img_dsc_t));
 
@@ -98,9 +121,7 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
 
     disp = lv_disp_drv_register(&driver);
     if(disp == NULL) {
-        lv_mem_free(buff);
-        lv_mem_free(dsc);
-        return NULL;
+        return LV_RES_INV;
     }
 
     /*Make background transparent */
@@ -115,7 +136,6 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
 
     obj->parent = screen;
 
-    /*Display buffer targets to position 0, 0 */
     disp->inv_p = 0;
     lv_obj_invalidate(obj);
 
@@ -133,6 +153,37 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     dsc->header.w = w;
     dsc->header.h = h;
     dsc->header.cf = cf;
+    return LV_RES_OK;
+}
+
+/** Take snapshot for object with its children, alloc the memory needed.
+ *
+ * @param obj    The object to generate snapshot.
+ * @param cf     color format for generated image.
+ *
+ * @return a pointer to a image descriptor, or NULL if failed.
+ */
+lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
+{
+    uint32_t buff_size = lv_snapshot_buff_size_needed(obj, cf);
+
+    void * buff = lv_mem_alloc(buff_size);
+    if(buff == NULL) {
+        return NULL;
+    }
+
+    lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
+    if(dsc == NULL) {
+        lv_mem_free(buff);
+        return NULL;
+    }
+
+    if(lv_snapshot_take_to_buff(obj, cf, dsc, buff, buff_size) == LV_RES_INV) {
+        lv_mem_free(buff);
+        lv_mem_free(dsc);
+        return NULL;
+    }
+
     return dsc;
 }
 
