@@ -28,6 +28,35 @@ minimal_monochrome = {
 
 }
 
+normal_8bit = {
+  "LV_COLOR_DEPTH":8,
+  
+  "LV_MEM_SIZE":64 * 1024,
+  
+  "LV_DPI_DEF":40,
+  "LV_DRAW_COMPLEX":1,
+  
+  "LV_USE_LOG":1,
+
+  "LV_USE_ASSERT_NULL":0,
+  "LV_USE_ASSERT_MALLOC":0,
+  "LV_USE_ASSERT_MEM_INTEGRITY":0,
+  "LV_USE_ASSERT_OBJ":0,
+  "LV_USE_ASSERT_STYLE":0,
+  
+  "LV_USE_USER_DATA": 0,
+  
+  "LV_FONT_UNSCII_8":1,
+  
+  "LV_USE_FONT_SUBPX": 1,
+  "LV_USE_BIDI": 0,
+  "LV_USE_ARABIC_PERSIAN_CHARS":0,
+  
+  "LV_BUILD_EXAMPLES":1,
+
+  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
+}
+
 
 minimal_16bit = {
   "LV_COLOR_DEPTH":16,
@@ -87,7 +116,6 @@ normal_16bit_swap = {
 
   "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
 }
-
 
 full_32bit = {
   "LV_COLOR_DEPTH":32,

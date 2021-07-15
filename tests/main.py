@@ -27,6 +27,7 @@ if "noclean" in sys.argv: test_noclean = True;
 
 if not test_only:
   build_conf("Minimal config monochrome", defines.minimal_monochrome)
+  build_conf("Normal config, 8 bit color depth", defines.normal_8bit)
   build_conf("Minimal config, 16 bit color depth", defines.minimal_16bit)
   build_conf("Normal config, 16 bit color depth swapped", defines.normal_16bit_swap)
   build_conf("Full config, 32 bit color depth", defines.full_32bit)
