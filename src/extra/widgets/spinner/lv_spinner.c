@@ -69,6 +69,8 @@ static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     LV_UNUSED(class_p);
 
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
