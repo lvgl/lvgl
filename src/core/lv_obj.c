@@ -679,6 +679,13 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESS_LOST) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
     }
+    else if(code == LV_EVENT_STYLE_CHANGED) {
+        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        for(uint32_t i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            lv_obj_mark_layout_as_dirty(child);
+        }
+    }
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             char c = *((char *)lv_event_get_param(e));
