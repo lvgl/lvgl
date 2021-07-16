@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ master, release/v8.* ]
   pull_request:
-    branches: [master, dev ]
+    branches: [ master, release/v8.* ]
 
 jobs:
   build:
@@ -15,4 +15,11 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Run tests
-      run: sudo apt-get install libpng-dev; cd tests; python ./build.py
+      run: sudo apt-get install libpng-dev ruby-full; cd tests; python ./main.py report
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      if: github.event_name == 'push'
+      with:
+        fail_ci_if_error: true
+        verbose: true
+
