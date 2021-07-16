@@ -11,7 +11,7 @@
 
 import os, subprocess, com, re
 
-# tag = True
+push = False
 
 def clone(repo):
   com.cmd("git clone  --recurse-submodules https://github.com/lvgl/" + repo)
@@ -38,15 +38,21 @@ branches = branches.replace("\\n", "")
 branches = branches.split(" ")
 branches = list(filter(len, branches))
 
-
 commits = []
-with open('commits.txt') as f:
+with open('../commits.txt') as f:
     for line in f:
-        commits.append(line)
+        commits.insert(0, line)
 
 print(commits)
 
 for br in branches:
+  com.cmd("git checkout " + br)
+
+  print("Applying commits")
+  for c in commits:
+    h = c.split(" ")
+    com.cmd("git cherry-pick " + h[0])
+      
   ver = com.get_lvgl_version(br)
   ver_new = ver.copy()
   ver_new[2] = str(int(ver_new[2]) + 1)
@@ -62,8 +68,7 @@ ver = com.get_lvgl_version("master")
 ver = com.get_lvgl_version(br)
 ver_new[2] = str(int(ver_new[2]) + 1)
 t = com.ver_format(ver_new) + "-dev"
-com.cmd("git tag -a " + t + "-m \"Start " + t + "\"")
-
+com.cmd("git tag -a " + t + " -m \"Start " + t + "\"")
 
 if push:
   com.cmd("git push origin master --tags")

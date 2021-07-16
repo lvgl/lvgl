@@ -41,12 +41,10 @@ def ver_format(ver):
     if(ver[3] != ""): s = s + "-" + ver[3]
     return s
 
-def get_lvgl_version(br):
-    print("Get LVGL's version")
+def get_lvgl_version():
+    print("Get lvgl's version ")
 
     ver = [0, 0, 0, ""]
-
-    com.cmd("git checkout " + br)
 
     f = open("./lvgl.h", "r")
 
@@ -68,39 +66,43 @@ def get_lvgl_version(br):
             if m: ver[2] = m.group(1)
 
     f.close()
+    
+    print("Version found: " + ver_format(ver))
 
-    com.cmd("git checkout master")
     return ver
 
 def push(c):
     cmd("git push " + c)
 
 def update_version(ver):
-    ver_str = ver_format(ver)
-    ver_num = ver[0] + "." + ver[1] + "." + ver[2]
+  ver_str = ver_format(ver)
+  ver_num = ver[0] + "." + ver[1] + "." + ver[2]
 
-    templ = fnmatch.filter(os.listdir('.'), '*_templ*.h')
+  templ = fnmatch.filter(os.listdir('.'), '*_templ*.h')
 
-    if len(templ) > 0 and templ[0]:
-        print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ "v" + ver_num + "/' " + templ[0])
+  if len(templ) > 0 and templ[0]:
+      print("Updating version in " + templ[0])
+      cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ "v" + ver_num + "/' " + templ[0])
 
-    if os.path.exists("library.json"):
-        print("Updating version in library.json")
-        cmd("sed -i -r 's/[0-9]+\.[0-9]+\.[0-9]+/"+ ver_num +"/' library.json")
+  if os.path.exists("library.json"):
+      print("Updating version in library.json")
+      cmd("sed -i -r 's/[0-9]+\.[0-9]+\.[0-9]+/"+ ver_num +"/' library.json")
 
-    if path.exists("library.properties"):
-        print("Updating version in library.properties")
-        cmd("sed -i -r 's/version=[0-9]+\.[0-9]+\.[0-9]+/"+ "version=" + ver_num + "/' library.properties")
+  if path.exists("library.properties"):
+      print("Updating version in library.properties")
+      cmd("sed -i -r 's/version=[0-9]+\.[0-9]+\.[0-9]+/"+ "version=" + ver_num + "/' library.properties")
 
-    if path.exists("conf.py"):
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/" + ver_str + "/' conf.py")
+  if path.exists("conf.py"):
+      cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/" + ver_str + "/' conf.py")
 
-    if path.exists("Kconfig"):
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/" + ver_str + "/' Kconfig")
+  if path.exists("Kconfig"):
+      cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/" + ver_str + "/' Kconfig")
 
-    if path.exists("lvgl.h"):
-        define_set("./lvgl.h", "LVGL_VERSION_MAJOR", str(ver[0]))
-        define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver[1]))
-        define_set("./lvgl.h", "LVGL_VERSION_PATCH", str(ver[2]))
-        define_set("./lvgl.h", "LVGL_VERSION_INFO", "\"" + ver[3] + "\"")
+  if path.exists("lvgl.h"):
+      define_set("./lvgl.h", "LVGL_VERSION_MAJOR", str(ver[0]))
+      define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver[1]))
+      define_set("./lvgl.h", "LVGL_VERSION_PATCH", str(ver[2]))
+      define_set("./lvgl.h", "LVGL_VERSION_INFO", "\"" + ver[3] + "\"")
+        
+  cmd("git commit -am 'Update versions to " + ver_str + "'")
+  
