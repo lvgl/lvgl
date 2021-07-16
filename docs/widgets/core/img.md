@@ -90,7 +90,17 @@ The quality of the transformation can be adjusted with `lv_img_set_antialias(img
 The transformations require the whole image to be available. Therefore indexed images (`LV_IMG_CF_INDEXED_...`), alpha only images (`LV_IMG_CF_ALPHA_...`) or images from files can not be transformed. 
 In other words transformations work only on true color images stored as C array, or if a custom [Image decoder](/overview/images#image-edecoder) returns the whole image.
 
-Note that the real coordinates of image objects won't change during transformation. That is `lv_obj_get_width/height/x/y()` will return the original, non-zoomed coordinates. 
+Note that the real coordinates of image objects won't change during transformation. That is `lv_obj_get_width/height/x/y()` will return the original, non-zoomed coordinates.
+
+### Size mode
+
+By default if the image is zoom or rotated the real coordinates of the image object are not changed. 
+The larger content simply overflows the object's boundaries. 
+It also means the layouts are not affected the by the transformations. 
+
+If you need the object size to be updated to the transformed size set `lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_REAL)`. (The previous mode is the default and called `LV_IMG_SIZE_MODE_VIRTUAL`).
+In this case if the width/height of the object is set to `LV_SIZE_CONTENT` the object's size will be set to the zoomed and rotated size.
+If an explicit size is set then the overflowing content will be cropped. 
 
 ## Events
 No special events are sent by image objects.
