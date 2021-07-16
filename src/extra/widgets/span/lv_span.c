@@ -954,7 +954,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
                     lv_point_t p1;
                     lv_point_t p2;
                     p1.x = txt_pos.x;
-                    p1.y = pos.y + pinfo->line_h + line_dsc.width / 2;
+                    p1.y = pos.y + pinfo->line_h - pinfo->font->base_line - pinfo->font->underline_position;
                     p2.x = pos.x;
                     p2.y = p1.y;
                     lv_draw_line(&p1, &p2, &clipped_area, &line_dsc);
