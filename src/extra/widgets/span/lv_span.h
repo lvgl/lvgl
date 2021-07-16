@@ -138,6 +138,27 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
  *====================*/
 
 /**
+ * Get a spangroup child by its index.
+ *
+ * @param obj   The spangroup object
+ * @param id    the index of the child.
+ *              0: the oldest (firstly created) child
+ *              1: the second oldest
+ *              child count-1: the youngest
+ *              -1: the youngest
+ *              -2: the second youngest
+ * @return      The child span at index `id`, or NULL if the ID does not exist
+ */
+lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id);
+
+/**
+ *
+ * @param obj   The spangroup object to get the child count of.
+ * @return      The span count of the spangroup.
+ */
+uint32_t lv_spangroup_get_child_cnt(const lv_obj_t * obj);
+
+/**
  * get the align of the spangroup.
  * @param obj pointer to a spangroup object.
  * @return the align value.

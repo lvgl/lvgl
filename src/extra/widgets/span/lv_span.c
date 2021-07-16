@@ -255,6 +255,71 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
  *====================*/
 
 /**
+ * Get a spangroup child by its index.
+ *
+ * @param obj   The spangroup object
+ * @param id    the index of the child.
+ *              0: the oldest (firstly created) child
+ *              1: the second oldest
+ *              child count-1: the youngest
+ *              -1: the youngest
+ *              -2: the second youngest
+ * @return      The child span at index `id`, or NULL if the ID does not exist
+ */
+lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
+{
+    if(obj == NULL) {
+        return NULL;
+    }
+
+    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
+    lv_ll_t * linked_list = &spans->child_ll;
+
+    bool traverse_forwards = (id >= 0);
+    int32_t cur_idx = 0;
+    lv_ll_node_t * cur_node = linked_list->head;
+
+    /*If using a negative index, start from the tail and use cur -1 to indicate the end*/
+    if(!traverse_forwards) {
+        cur_idx = -1;
+        cur_node = linked_list->tail;
+    }
+
+    while(cur_node != NULL) {
+        if(cur_idx == id) {
+            return (lv_span_t *) cur_node;
+        }
+        if(traverse_forwards) {
+            cur_node = (lv_ll_node_t *) _lv_ll_get_next(linked_list, cur_node);
+            cur_idx++;
+        }
+        else {
+            cur_node = (lv_ll_node_t *) _lv_ll_get_prev(linked_list, cur_node);
+            cur_idx--;
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ *
+ * @param obj   The spangroup object to get the child count of.
+ * @return      The span count of the spangroup.
+ */
+uint32_t lv_spangroup_get_child_cnt(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(obj == NULL) {
+        return 0;
+    }
+
+    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
+    return _lv_ll_get_len(&(spans->child_ll));
+}
+
+/**
  * get the align of the spangroup.
  * @param obj pointer to a spangroup object.
  * @return the align value.
