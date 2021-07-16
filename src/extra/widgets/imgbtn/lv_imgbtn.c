@@ -184,7 +184,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
            imgbtn->img_src_right[state] == NULL)
         {
             lv_img_header_t header;
-            lv_img_decoder_get_info(imgbtn->img_src_mid, &header);
+            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header);
             p->x = LV_MAX(p->x, header.w);
         }
     }
