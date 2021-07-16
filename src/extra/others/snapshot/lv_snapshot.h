@@ -16,13 +16,14 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include "../lv_conf_internal.h"
-#include "../core/lv_obj.h"
+#include "../../../lv_conf_internal.h"
+#include "../../../core/lv_obj.h"
 
 /*********************
  *      DEFINES
  *********************/
 
+#if LV_USE_SNAPSHOT
 /**********************
  *      TYPEDEFS
  **********************/
@@ -56,7 +57,7 @@ void lv_snapshot_free(lv_img_dsc_t * dsc);
  *
  * @return the buffer size needed in bytes
  */
-uint32_t lv_snapshot_buff_size_needed(lv_obj_t * obj, lv_img_cf_t cf);
+uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf);
 
 /** Take snapshot for object with its children, save image info to provided buffer.
  *
@@ -68,12 +69,13 @@ uint32_t lv_snapshot_buff_size_needed(lv_obj_t * obj, lv_img_cf_t cf);
  *
  * @return LV_RES_OK on success, LV_RES_INV on error.
  */
-lv_res_t lv_snapshot_take_to_buff(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buff, uint32_t buff_size);
+lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buff_size);
 
 
 /**********************
  *      MACROS
  **********************/
+#endif /*LV_USE_SNAPSHOT*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-
 #include "lv_snapshot.h"
-#include "../core/lv_disp.h"
-#include "../core/lv_refr.h"
+#if LV_USE_SNAPSHOT
+
+#include <stdbool.h>
+#include "../../../core/lv_disp.h"
+#include "../../../core/lv_refr.h"
 /*********************
  *      DEFINES
  *********************/
@@ -70,15 +71,15 @@ uint32_t lv_snapshot_buff_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
  * @param obj    The object to generate snapshot.
  * @param cf     color format for generated image.
  * @param dsc    image descriptor to store the image result.
- * @param buff   the buffer to store image data.
+ * @param buf    the buffer to store image data.
  * @param buff_size provided buffer size in bytes.
  *
  * @return LV_RES_OK on success, LV_RES_INV on error.
  */
-lv_res_t lv_snapshot_take_to_buff(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buff, uint32_t buff_size)
+lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buff_size)
 {
     LV_ASSERT(dsc);
-    LV_ASSERT(buff);
+    LV_ASSERT(buf);
 
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
@@ -102,7 +103,7 @@ lv_res_t lv_snapshot_take_to_buff(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t *
     lv_disp_t * disp_old = lv_obj_get_disp(obj);
     lv_obj_t * parent_old = lv_obj_get_parent(obj);
 
-    lv_memset(buff, 0x00, buff_size);
+    lv_memset(buf, 0x00, buff_size);
     lv_memset_00(dsc, sizeof(lv_img_dsc_t));
 
     /*We are safe to use stack for below variables since disp will be
@@ -111,7 +112,7 @@ lv_res_t lv_snapshot_take_to_buff(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t *
     lv_disp_drv_t driver;
     lv_disp_draw_buf_t draw_buf;
 
-    lv_disp_draw_buf_init(&draw_buf, buff, NULL, w * h);
+    lv_disp_draw_buf_init(&draw_buf, buf, NULL, w * h);
 
     lv_disp_drv_init(&driver);
     driver.draw_buf = &draw_buf;
@@ -149,7 +150,7 @@ lv_res_t lv_snapshot_take_to_buff(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t *
 
     lv_disp_remove(disp);
 
-    dsc->data = buff;
+    dsc->data = buf;
     dsc->header.w = w;
     dsc->header.h = h;
     dsc->header.cf = cf;
@@ -167,19 +168,19 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
 {
     uint32_t buff_size = lv_snapshot_buff_size_needed(obj, cf);
 
-    void * buff = lv_mem_alloc(buff_size);
-    if(buff == NULL) {
+    void * buf = lv_mem_alloc(buff_size);
+    if(buf == NULL) {
         return NULL;
     }
 
     lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
     if(dsc == NULL) {
-        lv_mem_free(buff);
+        lv_mem_free(buf);
         return NULL;
     }
 
-    if(lv_snapshot_take_to_buff(obj, cf, dsc, buff, buff_size) == LV_RES_INV) {
-        lv_mem_free(buff);
+    if(lv_snapshot_take_to_buf(obj, cf, dsc, buf, buff_size) == LV_RES_INV) {
+        lv_mem_free(buf);
         lv_mem_free(dsc);
         return NULL;
     }
@@ -208,3 +209,5 @@ void lv_snapshot_free(lv_img_dsc_t * dsc)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_USE_SNAPSHOT*/
