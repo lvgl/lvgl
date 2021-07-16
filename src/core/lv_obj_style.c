@@ -175,9 +175,15 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_LAYOUT_REFR))) {
-        lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL);
-        lv_obj_mark_layout_as_dirty(obj);
+    if(prop & LV_STYLE_PROP_LAYOUT_REFR) {
+        if(part == LV_PART_ANY ||
+           part == LV_PART_MAIN ||
+           lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT ||
+           lv_obj_get_style_width(obj, 0) == LV_SIZE_CONTENT)
+        {
+            lv_event_send(obj, LV_EVENT_STYLE_CHANGED, NULL);
+            lv_obj_mark_layout_as_dirty(obj);
+        }
     }
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
