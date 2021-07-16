@@ -34,6 +34,24 @@
  **********************/
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
+                                    lv_coord_t y,
+                                    lv_color_t color, lv_opa_t opa);
+
+static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa);
+
+static void set_px_cb_alpha2(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa);
+
+static void set_px_cb_alpha4(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa);
+
+static void set_px_cb_alpha8(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa);
+
+static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -389,6 +407,29 @@ lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp)
     return disp->driver->rotated;
 }
 
+void lv_disp_drv_use_generic_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)
+{
+    switch(cf) {
+        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+            disp_drv->set_px_cb = set_px_true_color_alpha;
+            break;
+        case LV_IMG_CF_ALPHA_1BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha1;
+            break;
+        case LV_IMG_CF_ALPHA_2BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha2;
+            break;
+        case LV_IMG_CF_ALPHA_4BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha4;
+            break;
+        case LV_IMG_CF_ALPHA_8BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha8;
+            break;
+        default:
+            disp_drv->set_px_cb = NULL;
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -398,4 +439,100 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
     LV_UNUSED(user_data);
     lv_obj_mark_layout_as_dirty(obj);
     return LV_OBJ_TREE_WALK_NEXT;
+}
+
+static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa)
+{
+    (void) disp_drv; /*Unused*/
+
+    if(opa <= LV_OPA_MIN) return;
+    lv_img_dsc_t d;
+    d.data = buf;
+    d.header.w = buf_w;
+    d.header.cf = LV_IMG_CF_ALPHA_1BIT;
+
+    set_px_alpha_generic(&d, x, y, color, opa);
+}
+
+static void set_px_cb_alpha2(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa)
+{
+    (void) disp_drv; /*Unused*/
+
+    if(opa <= LV_OPA_MIN) return;
+    lv_img_dsc_t d;
+    d.data = buf;
+    d.header.w = buf_w;
+    d.header.cf = LV_IMG_CF_ALPHA_2BIT;
+
+    set_px_alpha_generic(&d, x, y, color, opa);
+}
+
+static void set_px_cb_alpha4(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa)
+{
+    (void) disp_drv; /*Unused*/
+
+    if(opa <= LV_OPA_MIN) return;
+    lv_img_dsc_t d;
+    d.data = buf;
+    d.header.w = buf_w;
+    d.header.cf = LV_IMG_CF_ALPHA_4BIT;
+
+    set_px_alpha_generic(&d, x, y, color, opa);
+}
+
+static void set_px_cb_alpha8(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                             lv_color_t color, lv_opa_t opa)
+{
+    (void) disp_drv; /*Unused*/
+
+    if(opa <= LV_OPA_MIN) return;
+    lv_img_dsc_t d;
+    d.data = buf;
+    d.header.w = buf_w;
+    d.header.cf = LV_IMG_CF_ALPHA_8BIT;
+
+    set_px_alpha_generic(&d, x, y, color, opa);
+}
+
+static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
+{
+    d->header.always_zero = 0;
+    d->header.h = 1;    /*Doesn't matter*/
+
+    uint8_t br = lv_color_brightness(color);
+    if(opa < LV_OPA_MAX) {
+        uint8_t bg = lv_img_buf_get_px_alpha(d, x, y);
+        br = (uint16_t)((uint16_t)br * opa + (bg * (255 - opa))) >> 8;
+    }
+
+    lv_img_buf_set_px_alpha(d, x, y, br);
+}
+
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
+                                    lv_coord_t y,
+                                    lv_color_t color, lv_opa_t opa)
+{
+    (void) disp_drv; /*Unused*/
+
+    if(opa <= LV_OPA_MIN) return;
+    lv_img_dsc_t d;
+    d.data = buf;
+    d.header.always_zero = 0;
+    d.header.h = 1;    /*Doesn't matter*/;
+    d.header.w = buf_w;
+    d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+
+    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, lv_color_black());
+    lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
+
+    lv_opa_t res_opa;
+    lv_color_t res_color;
+
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &res_opa);
+
+    lv_img_buf_set_px_alpha(&d, x, y, res_opa);
+    lv_img_buf_set_px_color(&d, x, y, res_color);
 }
