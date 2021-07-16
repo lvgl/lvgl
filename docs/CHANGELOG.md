@@ -1,5 +1,53 @@
 # Changelog
 
+## v8.0.2 (16.07.2021)
+- fix(theme) improve button focus of keyboard
+- fix(tabview) send LV_EVENT_VALUE_CHANGED only once
+- fix(imgbtn) use the correct src in LV_EVENT_GET_SELF_SIZE
+- fix(color) remove extraneous cast for 8-bit color
+- fix(obj style) fix children reposition if the parent's padding changes.
+- fix(color) remove extraneous _LV_COLOR_MAKE_TYPE_HELPER (#2372) 
+- fix(spinner) should not be clickable (#2373) 
+- fix(obj) improve how the focusing indev is determined  
+- fix(template) update indev template for v8 
+- fix(printf) skip defining attribute if pycparser is used  
+- refactor(printf) add printf-like function attribute to _lv_txt_set_text_vfmt and lv_label_set_text_fmt (#2332) 
+- fix(template) include lvgl.h in lv_port_*_template.c files 
+- fix(obj) detecting which indev sent LV_EVENT_FOCUS  
+- fix (span) fill LV_EVENT_GET_SELF_SIZE (#2360) 
+- fix(arc) disable LV_OBJ_FLAG_SCROLL_CHAIN by default 
+- fix (draw) fix arc bg image drawing with full arcs 
+- fix(disp) fix memory leak in lv_disp_remove (#2355) 
+- fix warnigs introduced by 3fb8baf5 
+- fix(widgets) use lv_obj_class for all the widgets  
+- fix(obj) move clean ups from lv_obj_del to lv_obj_destructor
+- fix(roller) fix partial redraw of the selected area 
+- fix(roller) adjust the size of the selected area correctly  
+- fix(obj) delete useless type conversion (#2343)  
+- fix(lv_obj_scroll.h) typos (#2345)
+- fix(scroll) fire LV_EVENT_SCROLL_BEGIN in the same spot for both axes
+- fix(btnmatrix) fix button invalidation on focus change 
+- fix(textarea) style update in oneline mode + improve sroll to cursor  
+- fix(tlsf) do not use <assert.h>  
+- fix(imgbtn) consider width==LV_SIZE_CONTENT if only mid. img is set 
+- fix(refr) reduce the nesting level in lv_refr_area 
+- fix(txt) enhance the function of break_chars (#2327) 
+- fix(pxp): update RTOS macro for SDK 2.10  
+- fix(vglite): update for v8  
+- fix(pxp): update for v8  
+- fix(flex) fix layout update and invalidation issues 
+- fix(flex) fix NULL pointer dereference 
+- fix(obj, switch) do not send LV_EVENT_VALUE_CHANGED twice  
+- fix(color) overflow with 16 bit color depth  
+- fix(coords) fix using large coordinates  
+- fix(chart) fix crash if no series are added 
+- fix(chart) invalidation with LV_CHART_UPDATE_MODE_SHIFT 
+- fix(align) fix lv_obj_align_to  G
+- fix(table) invalidate the table on cell value change  
+- fix(label) remove dupliacted lv_obj_refresh_self_size 
+- fix(draw) underflow in subpixel font drawing 
+- fix (scroll) do not send unnecessary scroll end events  
+
 ## v8.0.1 (14.06.2021)
 - docs(filesystem) update to v8 <a href="https://github.com/lvgl/lvgl/commit/7971ade4">7971ade4</a> 
 - fix(msgbox) create modals on top layer instead of act screen <a href="https://github.com/lvgl/lvgl/commit/5cf6303e">5cf6303e</a> 
