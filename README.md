@@ -10,7 +10,7 @@
 LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint. 
 </p>
 
-<h4><a href="https://github.com/lvgl/docs/raw/release/v6/en/docs_v5_3.zip">Documentation</a></h4>
+<h4><a href="https://github.com/lvgl/docs_old/raw/release/v6/en/docs_v5_3.zip">Documentation</a></h4>
 
 <!--
 <p align="center">
