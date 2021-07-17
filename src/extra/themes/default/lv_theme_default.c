@@ -74,6 +74,7 @@ typedef struct {
     lv_style_t transition_delayed;
     lv_style_t transition_normal;
     lv_style_t anim;
+    lv_style_t anim_fast;
 
     /*Parts*/
     lv_style_t knob;
@@ -379,6 +380,9 @@ static void style_init(void)
 
     style_init_reset(&styles->anim);
     lv_style_set_anim_time(&styles->anim, 200);
+
+    style_init_reset(&styles->anim_fast);
+    lv_style_set_anim_time(&styles->anim_fast, 120);
 
 #if LV_USE_ARC
     style_init_reset(&styles->arc_indic);
@@ -772,6 +776,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_switch_class)) {
         lv_obj_add_style(obj, &styles->bg_color_grey, 0);
         lv_obj_add_style(obj, &styles->circle, 0);
+        lv_obj_add_style(obj, &styles->anim_fast, 0);
         lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_INDICATOR | LV_STATE_CHECKED);
@@ -781,6 +786,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->bg_color_white, LV_PART_KNOB);
         lv_obj_add_style(obj, &styles->switch_knob, LV_PART_KNOB);
         lv_obj_add_style(obj, &styles->disabled, LV_PART_KNOB | LV_STATE_DISABLED);
+
+        lv_obj_add_style(obj, &styles->transition_normal, LV_PART_INDICATOR | LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->transition_normal, LV_PART_INDICATOR);
     }
 #endif
 
