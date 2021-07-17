@@ -17,11 +17,6 @@ extern "C" {
 
 #if LV_USE_SWITCH != 0
 
-/*Testing of dependencies*/
-#if LV_USE_SLIDER == 0
-#error "lv_switch: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1)"
-#endif
-
 #include "../core/lv_obj.h"
 
 /*********************
@@ -33,7 +28,14 @@ extern "C" {
  **********************/
 
 typedef struct {
+    lv_obj_t * sw;
+    int32_t anim_state;
+} _lv_switch_anim_t;
+
+
+typedef struct {
     lv_obj_t obj;
+    _lv_switch_anim_t value_anim;
 }lv_switch_t;
 
 extern const lv_obj_class_t lv_switch_class;
