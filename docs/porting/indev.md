@@ -132,8 +132,6 @@ bool encoder_with_keys_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
       /* Optionally you can also use enc_diff, if you have encoder*/
       data->enc_diff = enc_get_new_moves();
   }
-
-  return false; /*No buffering now so no more data read*/
 }
 ```
 
