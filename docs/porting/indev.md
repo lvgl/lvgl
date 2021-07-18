@@ -123,7 +123,7 @@ indev_drv.read_cb = encoder_with_keys_read;
 
 ...
 
-bool encoder_with_keys_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
+void encoder_with_keys_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
   data->key = last_key();            /*Get the last pressed or released key*/
                                      /* use LV_KEY_ENTER for encoder press */
   if(key_pressed()) data->state = LV_INDEV_STATE_PRESSED;
