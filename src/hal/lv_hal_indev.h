@@ -81,7 +81,7 @@ typedef struct {
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
     lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
-    bool continue_reading;  /**< Call the read callback until it's set to true*/
+    bool continue_reading;  /**< If set to true, the read callback is invoked again*/
 } lv_indev_data_t;
 
 /** Initialized by the user and registered by 'lv_indev_add()'*/
