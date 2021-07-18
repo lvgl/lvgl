@@ -43,7 +43,7 @@
  *
  * @return the buffer size needed in bytes
  */
-uint32_t lv_snapshot_buff_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
+uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
 {
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
@@ -92,7 +92,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
             return LV_RES_INV;
     }
 
-    if(lv_snapshot_buff_size_needed(obj, cf) > buff_size)
+    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size)
         return LV_RES_INV;
 
     /*Width and height determine snapshot image size.*/
@@ -166,7 +166,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
  */
 lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
 {
-    uint32_t buff_size = lv_snapshot_buff_size_needed(obj, cf);
+    uint32_t buff_size = lv_snapshot_buf_size_needed(obj, cf);
 
     void * buf = lv_mem_alloc(buff_size);
     if(buf == NULL) {
