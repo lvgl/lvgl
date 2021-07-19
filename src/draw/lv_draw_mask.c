@@ -193,7 +193,7 @@ void _lv_draw_mask_cleanup(void)
         if(LV_GC_ROOT(_lv_circle_cache[i]).buf) {
             lv_mem_free(LV_GC_ROOT(_lv_circle_cache[i]).buf);
         }
-        lv_memset_00(&_lv_circle_cache[i], sizeof(_lv_circle_cache[i]));
+        lv_memset_00(&LV_GC_ROOT(_lv_circle_cache[i]), sizeof(LV_GC_ROOT(_lv_circle_cache[i])));
     }
 }
 
@@ -429,10 +429,10 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 
     /*Try to reuse a circle cache entry*/
     for(i = 0; i < LV_CIRCLE_CACHE_SIZE; i++) {
-        if(_lv_circle_cache[i].radius == radius) {
-            _lv_circle_cache[i].used_cnt++;
-            CIRCLE_CACHE_AGING(_lv_circle_cache[i].life, radius);
-            param->circle = &_lv_circle_cache[i];
+        if(LV_GC_ROOT(_lv_circle_cache[i]).radius == radius) {
+            LV_GC_ROOT(_lv_circle_cache[i]).used_cnt++;
+            CIRCLE_CACHE_AGING(LV_GC_ROOT(_lv_circle_cache[i]).life, radius);
+            param->circle = &LV_GC_ROOT(_lv_circle_cache[i]);
             return;
         }
     }
@@ -440,9 +440,9 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
     /*If not found find a free entry with lowest life*/
     _lv_draw_mask_radius_circle_dsc_t * entry = NULL;
     for(i = 0; i < LV_CIRCLE_CACHE_SIZE; i++) {
-        if(_lv_circle_cache[i].used_cnt == 0) {
-            if(!entry) entry = &_lv_circle_cache[i];
-            else if(_lv_circle_cache[i].life < entry->life) entry = &_lv_circle_cache[i];
+        if(LV_GC_ROOT(_lv_circle_cache[i]).used_cnt == 0) {
+            if(!entry) entry = &LV_GC_ROOT(_lv_circle_cache[i]);
+            else if(LV_GC_ROOT(_lv_circle_cache[i]).life < entry->life) entry = &LV_GC_ROOT(_lv_circle_cache[i]);
         }
     }
 
