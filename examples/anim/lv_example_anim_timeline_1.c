@@ -104,6 +104,7 @@ static void btn_run_event_handler(lv_event_t * e)
 
 static void btn_del_event_handler(lv_event_t * e)
 {
+    LV_UNUSED(e);
     if (anim_timeline) {
         lv_anim_timeline_del(anim_timeline);
         anim_timeline = NULL;
