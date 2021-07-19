@@ -585,15 +585,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif /*LV_ENABLE_GC*/
 
-/*1: Enable custom execution callback of the animation timeline, might be used by binding generator functions*/
-#ifndef LV_ANIM_TIMELINE_CUSTOM_EXEC
-#  ifdef CONFIG_LV_ANIM_TIMELINE_CUSTOM_EXEC
-#    define LV_ANIM_TIMELINE_CUSTOM_EXEC CONFIG_LV_ANIM_TIMELINE_CUSTOM_EXEC
-#  else
-#    define  LV_ANIM_TIMELINE_CUSTOM_EXEC    0
-#  endif
-#endif
-
 /*=====================
  *  COMPILER SETTINGS
  *====================*/

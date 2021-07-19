@@ -65,11 +65,7 @@ void lv_anim_timeline_del(lv_anim_timeline_t * at)
 
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
-#if LV_ANIM_TIMELINE_CUSTOM_EXEC
         lv_anim_custom_del(at->anim_dsc[i].new_anim, (lv_anim_custom_exec_cb_t)a->exec_cb);
-#else
-        lv_anim_del(a->var, a->exec_cb);
-#endif
     }
 
     lv_mem_free(at->anim_dsc);
