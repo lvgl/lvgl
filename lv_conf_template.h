@@ -214,6 +214,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
 #endif /*LV_ENABLE_GC*/
 
+/*1: Enable API to take snapshot for object*/
+#define LV_USE_SNAPSHOT         1
+
 /*=====================
  *  COMPILER SETTINGS
  *====================*/

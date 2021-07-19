@@ -19,6 +19,18 @@ The spangroup object uses span to describe text and text style. so, first we nee
 
 If spangroup object `mode != LV_SPAN_MODE_FIXED` you must call `lv_spangroup_refr_mode()` after you have modified `span` style(eg:set text, changed the font size, del span).
 
+### Retreiving a span child
+Spangroups store their children differently from normal objects, so normal functions for getting children won't work.
+
+`lv_spangroup_get_child(spangroup, id)` will return a pointer to the child span at index `id`. In addition, `id` can be negative to index from the end of the spangroup where `-1` is the youngest child, `-2` is second youngest, etc.
+
+e.g. `lv_span_t* span = lv_spangroup_get_child(spangroup, 0)` will return the first child of the spangroup. `lv_span_t* span = lv_spangroup_get_child(spangroup, -1)` will return the last (or most recent) child.
+
+### Child Count
+Use the function `lv_spangroup_get_child_cnt(spangroup)` to get back the number of spans the group is maintaining.
+
+e.g. `uint32_t size = lv_spangroup_get_child_cnt(spangroup)`
+
 ### Text align
 like label object, the spangroup can be set to one the following modes:
 - `LV_TEXT_ALIGN_LEFT` Align text to left.

@@ -74,7 +74,7 @@
 #endif
 
 /*Enable more complex drawing routines to manage screens transparency.
- *Can be used if the UI is above an other layer, e.g. an OSD menu or video player.
+ *Can be used if the UI is above another layer, e.g. an OSD menu or video player.
  *Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to non LV_OPA_COVER value*/
 #ifndef LV_COLOR_SCREEN_TRANSP
 #  ifdef CONFIG_LV_COLOR_SCREEN_TRANSP
@@ -584,6 +584,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 #endif /*LV_ENABLE_GC*/
+
+/*1: Enable API to take snapshot for object*/
+#ifndef LV_USE_SNAPSHOT
+#  ifdef CONFIG_LV_USE_SNAPSHOT
+#    define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
+#  else
+#    define  LV_USE_SNAPSHOT         1
+#  endif
+#endif
 
 /*=====================
  *  COMPILER SETTINGS

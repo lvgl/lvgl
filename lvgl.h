@@ -26,6 +26,7 @@ extern "C" {
 #include "src/misc/lv_timer.h"
 #include "src/misc/lv_math.h"
 #include "src/misc/lv_async.h"
+#include "src/misc/lv_anim_timeline.h"
 
 #include "src/hal/lv_hal.h"
 
@@ -69,6 +70,7 @@ extern "C" {
 #include "src/extra/widgets/lv_widgets.h"
 #include "src/extra/layouts/lv_layouts.h"
 #include "src/extra/themes/lv_themes.h"
+#include "src/extra/others/lv_others.h"
 
 /*********************
  *      DEFINES
