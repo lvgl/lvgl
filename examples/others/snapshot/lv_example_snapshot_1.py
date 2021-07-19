@@ -1,4 +1,11 @@
+import sys
+sys.path.append('') # See: https://github.com/micropython/micropython/issues/6419
+
+script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
+
 import lvgl as lv
+import display_driver
+import gc
 from imagetools import get_png_info, open_png
 
 # Register PNG image decoder
@@ -16,12 +23,13 @@ label.align(lv.ALIGN.BOTTOM_MID, 0, -10)
 label.set_text(" memory free:" + str(mem_free/1024) + " kB")
 
 # Create an image from the png file
+image_filename = '%s/../../assets/img_star.png' % script_path
 try:
-    with open('../../assets/img_star.png','rb') as f:
+    with open(image_filename, 'rb') as f:
         png_data = f.read()
 except:
-    print("Could not find img_star.png")
-    sys.exit()
+        print("Could not find %s" % image_filename)
+        raise
 
 img_star = lv.img_dsc_t({
   'data_size': len(png_data),
