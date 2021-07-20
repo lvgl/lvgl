@@ -1,3 +1,4 @@
+import gc
 import lvgl as lv
 from imagetools import get_png_info, open_png
 
