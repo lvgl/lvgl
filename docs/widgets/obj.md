@@ -166,7 +166,9 @@ By default, the objects can be clicked only on their coordinates, however, this 
 Learn more about [Events](/overview/event).
 
 ## Keys
-If `LV_OBJ_FLAG_CHECKABLE` is enabled `LV_KEY_RIGHT` and `LV_KEY_UP` make the object checked, and `LV_KEY_LEFT` and `LV_KEY_DOWN` make it unchecked.
+If `LV_OBJ_FLAG_CHECKABLE` is enabled, `LV_KEY_RIGHT` and `LV_KEY_UP` make the object checked, and `LV_KEY_LEFT` and `LV_KEY_DOWN` make it unchecked.
+
+If `LV_OBJ_FLAG_SCROLLABLE` is enabled, but the object is not editable (as declared by the widget class), the arrow keys (`LV_KEY_UP`, `LV_KEY_DOWN`, `LV_KEY_LEFT`, `LV_KEY_RIGHT`) scroll the object. If the object can only scroll vertically, `LV_KEY_LEFT` and `LV_KEY_RIGHT` will scroll up/down instead, making it compatible with an encoder input device. See [Input devices overview](/overview/indev) for more on encoder behaviors and the edit mode.
 
 
 Learn more about [Keys](/overview/indev).
