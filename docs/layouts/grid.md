@@ -84,6 +84,18 @@ All the Grid related values are style properties under the hood and you can use 
 - `GRID_CELL_ROW_POS`
 - `GRID_CELL_ROW_SPAN`
 
+### Internal padding
+
+To modify the minimum space Grid inserts between objects, the following properties can be set on the Grid container style:
+
+- `pad_row`
+
+  Sets the padding between the rows. 
+
+- `pad_column`
+
+  Sets the padding between the columns.
+
 ## Other features 
 
 ### RTL
