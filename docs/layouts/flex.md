@@ -83,6 +83,16 @@ All the Flex-related values are style properties under the hood and you can use 
 - `FLEX_TRACK_PLACE`
 - `FLEX_GROW`
 
+### Internal padding
+
+To modify the minimum space flexbox inserts between objects, the following properties can be set on the flex container style:
+
+- `pad_row` Sets the padding between the rows. 
+
+- `pad_column` Sets the padding between the columns.
+
+These can for example be used if you don't want any padding between your objects: `lv_style_set_pad_column(&row_container_style,0)`
+
 ## Other features 
 
 ### RTL
