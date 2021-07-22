@@ -18,6 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_hal.h"
+#include "../draw/lv_img_buf.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_ll.h"
@@ -311,6 +312,8 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
  * @return pointer to the internal buffers
  */
 lv_disp_draw_buf_t * lv_disp_get_draw_buf(lv_disp_t * disp);
+
+void lv_disp_drv_use_generic_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
 /**********************
  *      MACROS

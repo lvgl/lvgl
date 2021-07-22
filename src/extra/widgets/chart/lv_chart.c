@@ -1297,6 +1297,8 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(&p1, &p2, &clip_area2, &line_dsc_tmp);
+            lv_draw_rect(&point_area, &clip_area2, &point_dsc_tmp);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
 
         if(cursor->dir & LV_DIR_VER) {
@@ -1307,10 +1309,10 @@ static void draw_cursors(lv_obj_t * obj, const lv_area_t * clip_area)
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(&p1, &p2, &clip_area2, &line_dsc_tmp);
+            lv_draw_rect(&point_area, &clip_area2, &point_dsc_tmp);
+            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
 
-        lv_draw_rect(&point_area, &clip_area2, &point_dsc_tmp);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 

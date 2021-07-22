@@ -218,3 +218,5 @@ In both cases ORed state values can be used as well. E.g. `lv_obj_add_state(obj,
 
 To learn more about the states read the related section of the [Style overview](/overview/style).
 
+## Snapshot
+A snapshot image could be generated for object together with its children. Check details in [Snapshot](/others/snapshot).
