@@ -40,7 +40,7 @@ The height is calculated automatically from the cell styles (font, padding etc) 
 
 ### Merge cells
 
-Cells can be merged horizontally with `lv_table_set_cell_merge_right(table, col, row, true)`. To merge more adjacent cells call this function for each cell.
+Cells can be merged horizontally with `lv_table_add_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)`. To merge more adjacent cells call this function for each cell.
 
 ### Scroll
 If the label's width or height is set to `LV_SIZE_CONTENT` that size will be used to show the whole table in the respective direction. 
