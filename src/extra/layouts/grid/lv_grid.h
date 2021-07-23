@@ -78,10 +78,10 @@ void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid
 /**
  * Set the cell of an object. The object's parent needs to have grid layout, else nothing will happen
  * @param obj pointer to an object
- * @param hor_place the vertical alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
+ * @param column_align the vertical alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
  * @param col_pos column ID
  * @param col_span number of columns to take (>= 1)
- * @param ver_place the horizontal alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
+ * @param row_align the horizontal alignment in the cell. `LV_GRID_START/END/CENTER/STRETCH`
  * @param row_pos row ID
  * @param row_span number of rows to take (>= 1)
  */

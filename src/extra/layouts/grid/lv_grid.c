@@ -734,7 +734,7 @@ static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, uint8_t alig
 static uint32_t count_tracks(const lv_coord_t * templ)
 {
     uint32_t i;
-    for(i = 0; templ[i] != LV_COORD_MAX; i++);
+    for(i = 0; templ[i] != LV_GRID_TEMPLATE_LAST; i++);
 
     return i;
 }
