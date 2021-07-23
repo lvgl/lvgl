@@ -65,10 +65,12 @@ typedef enum {
     LV_FS_SEEK_SET = 0x00,      /**< Set the position from absolutely (from the start of file)*/
     LV_FS_SEEK_CUR = 0x01,      /**< Set the position from the current position*/
     LV_FS_SEEK_END = 0x02,      /**< Set the position from the end of the file*/
-}lv_fs_whence_t;
+} lv_fs_whence_t;
 
 typedef struct _lv_fs_drv_t {
     char letter;
+    bool enable_cache;
+    uint16_t cache_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
     void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
@@ -88,8 +90,16 @@ typedef struct _lv_fs_drv_t {
 } lv_fs_drv_t;
 
 typedef struct {
+    uint32_t start;
+    uint32_t end;
+    uint32_t file_position;
+    void * buffer;
+} lv_fs_file_cache_t;
+
+typedef struct {
     void * file_d;
     lv_fs_drv_t * drv;
+    lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
 
 typedef struct {

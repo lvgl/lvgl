@@ -566,6 +566,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+#ifndef LV_FS_CACHE_DEFAULT_SIZE
+#  ifdef CONFIG_LV_FS_CACHE_DEFAULT_SIZE
+#    define LV_FS_CACHE_DEFAULT_SIZE CONFIG_LV_FS_CACHE_DEFAULT_SIZE
+#  else
+#    define  LV_FS_CACHE_DEFAULT_SIZE      512
+#  endif
+#endif
+
 /*Garbage Collector settings
  *Used if lvgl is binded to higher level language and the memory is managed by that language*/
 #ifndef LV_ENABLE_GC
