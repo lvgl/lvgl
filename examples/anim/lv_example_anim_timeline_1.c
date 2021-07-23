@@ -7,8 +7,8 @@ static lv_obj_t * obj1 = NULL;
 static lv_obj_t * obj2 = NULL;
 static lv_obj_t * obj3 = NULL;
 
-static const lv_coord_t obj_width = 150;
-static const lv_coord_t obj_height = 200;
+static const lv_coord_t obj_width = 90;
+static const lv_coord_t obj_height = 70;
 
 static void set_width(void * var, int32_t v)
 {
