@@ -308,7 +308,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
     temp_y = temp_y / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
     p_out->y = h - temp_y;
     p_out->y += lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
-
+    p_out->y -= lv_obj_get_scroll_top(obj);
 }
 
 void lv_chart_refresh(lv_obj_t * obj)
