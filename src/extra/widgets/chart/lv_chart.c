@@ -303,9 +303,10 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     p_out->x -= lv_obj_get_scroll_left(obj);
 
-    p_out->y = (int32_t)((int32_t)ser->y_points[id] - chart->ymin[ser->y_axis_sec]) * h;
-    p_out->y = p_out->y / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
-    p_out->y = h - p_out->y;
+    int32_t temp_y = 0;
+    temp_y = (int32_t)((int32_t)ser->y_points[id] - chart->ymin[ser->y_axis_sec]) * h;
+    temp_y = temp_y / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
+    p_out->y = h - temp_y;
     p_out->y += lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
 
 }
