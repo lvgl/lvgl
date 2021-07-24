@@ -84,6 +84,11 @@ const lv_obj_class_t lv_obj_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
+bool lv_is_initialized(void)
+{
+    return lv_initialized;
+}
+
 void lv_init(void)
 {
     /*Do nothing if already initialized*/

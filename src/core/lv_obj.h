@@ -205,6 +205,11 @@ void lv_deinit(void);
 #endif
 
 /**
+ * Returns whether the 'lv' library is currently initialized
+ */
+bool lv_is_initialized(void);
+
+/**
  * Create a base object (a rectangle)
  * @param parent    pointer to a parent object. If NULL then a screen will be created.
  * @return          pointer to the new object
