@@ -36,7 +36,7 @@ static void draw_main(lv_event_t * e);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
-static void refr_size(lv_obj_t * obj, uint32_t strat_row);
+static void refr_size(lv_obj_t * obj, uint32_t start_row);
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 
 /**********************
@@ -745,7 +745,7 @@ static void draw_main(lv_event_t * e)
     }
 }
 
-static void refr_size(lv_obj_t * obj, uint32_t strat_row)
+static void refr_size(lv_obj_t * obj, uint32_t start_row)
 {
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -763,7 +763,7 @@ static void refr_size(lv_obj_t * obj, uint32_t strat_row)
     lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
     lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
 
-    for(i = strat_row; i < table->row_cnt; i++) {
+    for(i = start_row; i < table->row_cnt; i++) {
         table->row_h[i] = get_row_height(obj, i, font, letter_space, line_space,
                                        cell_left, cell_right, cell_top, cell_bottom);
         table->row_h[i] = LV_CLAMP(minh, table->row_h[i], maxh);
