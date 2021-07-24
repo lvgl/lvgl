@@ -179,25 +179,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     va_end(ap2);
 
     table->cell_data[cell][0] = ctrl;
-
-    /*Refresh the row height*/
-    lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
-
-    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
-
-    lv_coord_t h = get_row_height(obj, row, font, letter_space, line_space,
-                                       cell_left, cell_right, cell_top, cell_bottom);
-
-
-    lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
-    lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
-
-    table->row_h[row] = LV_CLAMP(minh, h, maxh);
+    refr_size(obj, row);
 
     lv_obj_invalidate(obj);
 }
