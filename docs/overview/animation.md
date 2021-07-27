@@ -117,6 +117,8 @@ Finally, call `lv_anim_timeline_start(at)` to start the animation timeline.
 
 It supports forward and backward playback of the entire animation group, using `lv_anim_timeline_set_reverse(at, reverse)`.
 
+Call the `lv_anim_timeline_stop(at)` to stop the animation timeline.
+
 Call the `lv_anim_timeline_set_progress(at, progress)` function to set the state of the object corresponding to the progress of the timeline.
 
 Call the `lv_anim_timeline_get_playtime(at)` function to get the total duration of the entire animation timeline.

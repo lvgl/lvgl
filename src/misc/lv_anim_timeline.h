@@ -59,6 +59,12 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, lv_anim_
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at);
 
 /**
+ * Stop the animation timeline.
+ * @param at    pointer to the animation timeline.
+ */
+void lv_anim_timeline_stop(lv_anim_timeline_t * at);
+
+/**
  * Set the playback direction of the animation timeline.
  * @param at        pointer to the animation timeline.
  * @param reverse   whether to play in reverse.
