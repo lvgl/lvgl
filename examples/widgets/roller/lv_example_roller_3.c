@@ -43,6 +43,8 @@ static void mask_event_cb(lv_event_t * e)
         lv_draw_mask_fade_param_t * fade_mask_bottom = lv_draw_mask_remove_id(mask_bottom_id);
         lv_mem_buf_release(fade_mask_top);
         lv_mem_buf_release(fade_mask_bottom);
+        lv_draw_mask_free_param(&fade_mask_top);
+        lv_draw_mask_free_param(&fade_mask_bottom);
         mask_top_id = -1;
         mask_bottom_id = -1;
     }

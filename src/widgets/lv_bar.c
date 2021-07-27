@@ -486,6 +486,8 @@ static void draw_indic(lv_event_t * e)
     lv_draw_rect(&bar->indic_area, clip_area, &draw_rect_dsc);
 
 #if LV_DRAW_COMPLEX
+    lv_draw_mask_free_param(&mask_indic_param);
+    lv_draw_mask_free_param(&mask_bg_param);
     lv_draw_mask_remove_id(mask_indic_id);
     lv_draw_mask_remove_id(mask_bg_id);
 #endif

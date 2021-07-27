@@ -290,8 +290,9 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     /*If the point is on this object check its children too*/
     if(lv_obj_hit_test(obj, point)) {
         int32_t i;
-        for(i = lv_obj_get_child_cnt(obj) - 1; i >= 0; i--) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
+        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        for(i = child_cnt - 1; i >= 0; i--) {
+            lv_obj_t * child = obj->spec_attr->children[i];
             found_p = lv_indev_search_obj(child, point);
 
             /*If a child was found then break*/

@@ -287,6 +287,8 @@ static void draw_disc_grad(lv_event_t * e)
     }
 
 #if LV_DRAW_COMPLEX
+    lv_draw_mask_free_param(&mask_out_param);
+    lv_draw_mask_free_param(&mask_in_param);
     lv_draw_mask_remove_id(mask_out_id);
     lv_draw_mask_remove_id(mask_in_id);
 #endif

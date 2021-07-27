@@ -53,6 +53,7 @@ extern "C" {
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t, _lv_img_cache_single, LV_IMG_CACHE_DEF, 0)    \
     LV_DISPATCH(f, lv_timer_t*, _lv_timer_act)                                              \
     LV_DISPATCH(f, lv_mem_buf_arr_t , lv_mem_buf)                                           \
+    LV_DISPATCH_COND(f, _lv_draw_mask_radius_circle_dsc_arr_t , _lv_circle_cache, LV_DRAW_COMPLEX, 1)  \
     LV_DISPATCH_COND(f, _lv_draw_mask_saved_arr_t , _lv_draw_mask_list, LV_DRAW_COMPLEX, 1) \
     LV_DISPATCH(f, void * , _lv_theme_default_styles)                                       \
     LV_DISPATCH_COND(f, uint8_t *, _lv_font_decompr_buf, LV_USE_FONT_COMPRESSED, 1)
