@@ -89,7 +89,7 @@ static void anim_timeline_create(void)
     lv_anim_timeline_add(anim_timeline, 400, &a6);
 }
 
-static void btn_run_event_handler(lv_event_t * e)
+static void btn_start_event_handler(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target(e);
 
@@ -108,6 +108,14 @@ static void btn_del_event_handler(lv_event_t * e)
     if (anim_timeline) {
         lv_anim_timeline_del(anim_timeline);
         anim_timeline = NULL;
+    }
+}
+
+static void btn_stop_event_handler(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    if (anim_timeline) {
+        lv_anim_timeline_stop(anim_timeline);
     }
 }
 
@@ -132,31 +140,45 @@ void lv_example_anim_timeline_1(void)
     lv_obj_set_flex_flow(par, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(par, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    lv_obj_t * btn_run = lv_btn_create(par);
-    lv_obj_add_event_cb(btn_run, btn_run_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_add_flag(btn_run, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_obj_add_flag(btn_run, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_align(btn_run, LV_ALIGN_TOP_MID, -50, 20);
+    /* create btn_start */
+    lv_obj_t * btn_start = lv_btn_create(par);
+    lv_obj_add_event_cb(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_flag(btn_start, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_add_flag(btn_start, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_align(btn_start, LV_ALIGN_TOP_MID, -100, 20);
 
-    lv_obj_t * label_run = lv_label_create(btn_run);
-    lv_label_set_text(label_run, "Run");
-    lv_obj_center(label_run);
+    lv_obj_t * label_start = lv_label_create(btn_start);
+    lv_label_set_text(label_start, "Start");
+    lv_obj_center(label_start);
 
+    /* create btn_del */
     lv_obj_t * btn_del = lv_btn_create(par);
     lv_obj_add_event_cb(btn_del, btn_del_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_del, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_obj_align(btn_del, LV_ALIGN_TOP_MID, 50, 20);
+    lv_obj_align(btn_del, LV_ALIGN_TOP_MID, 0, 20);
 
     lv_obj_t * label_del = lv_label_create(btn_del);
-    lv_label_set_text(label_del, "Stop");
+    lv_label_set_text(label_del, "Delete");
     lv_obj_center(label_del);
 
+    /* create btn_stop */
+    lv_obj_t * btn_stop = lv_btn_create(par);
+    lv_obj_add_event_cb(btn_stop, btn_stop_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_flag(btn_stop, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_align(btn_stop, LV_ALIGN_TOP_MID, 100, 20);
+
+    lv_obj_t * label_stop = lv_label_create(btn_stop);
+    lv_label_set_text(label_stop, "Stop");
+    lv_obj_center(label_stop);
+
+    /* create slider_prg */
     lv_obj_t * slider_prg = lv_slider_create(par);
     lv_obj_add_event_cb(slider_prg, slider_prg_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(slider_prg, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(slider_prg, LV_ALIGN_BOTTOM_MID, 0, -20);
     lv_slider_set_range(slider_prg, 0, 65535);
 
+    /* create 3 objects */
     obj1 = lv_obj_create(par);
     lv_obj_set_size(obj1, obj_width, obj_height);
 
