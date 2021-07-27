@@ -425,8 +425,6 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 major = true;
             }
 
-            inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
-
             int32_t value_of_line = lv_map(i, 0, scale->tick_cnt - 1, scale->min, scale->max);
             part_draw_dsc.value = value_of_line;
 
@@ -485,11 +483,6 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             part_draw_dsc.id = i;
             part_draw_dsc.label_dsc = &label_dsc;
 
-            line_dsc.color = line_color_ori;
-            line_dsc.width = line_width_ori;
-
-            lv_draw_mask_remove_id(inner_act_mask_id);
-
             /*Draw the text*/
             if(major) {
                 lv_draw_mask_remove_id(outer_mask_id);
@@ -528,8 +521,13 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             }
 
+            inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
             lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
+            lv_draw_mask_remove_id(inner_act_mask_id);
             lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
+
+            line_dsc.color = line_color_ori;
+            line_dsc.width = line_width_ori;
 
         }
         lv_draw_mask_remove_id(outer_mask_id);

@@ -554,9 +554,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.pr_timestamp = lv_tick_get();
 
         if(data->key == LV_KEY_ENTER) {
-            bool editable = lv_obj_is_editable(indev_obj_act);
-
-            if(lv_group_get_editing(g) == true || editable == false) {
+            bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
+                                          lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
+            if(lv_group_get_editing(g) == true || editable_or_scrollable == false) {
                 lv_event_send(indev_obj_act, LV_EVENT_PRESSED, indev_act);
                 if(indev_reset_check(&i->proc)) return;
             }
@@ -590,12 +590,14 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
             if(data->key == LV_KEY_ENTER) {
-                bool editable = lv_obj_is_editable(indev_obj_act);
+                bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
+                                              lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
 
                 /*On enter long press toggle edit mode.*/
-                if(editable) {
+                if(editable_or_scrollable) {
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
                     if(lv_group_get_obj_count(g) > 1) {
+                        LV_LOG_INFO("toggling edit mode");
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                         lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                     }
@@ -639,10 +641,11 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("released");
 
         if(data->key == LV_KEY_ENTER) {
-            bool editable = lv_obj_is_editable(indev_obj_act);
+            bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
+                                          lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
 
             /*The button was released on a non-editable object. Just send enter*/
-            if(editable == false) {
+            if(editable_or_scrollable == false) {
                 lv_event_send(indev_obj_act, LV_EVENT_RELEASED, indev_act);
                 if(indev_reset_check(&i->proc)) return;
 
@@ -674,7 +677,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
             /*If the focused object is editable and now in navigate mode then on enter switch edit
                mode*/
-            else if(editable && !lv_group_get_editing(g) && !i->proc.long_pr_sent) {
+            else if(!i->proc.long_pr_sent) {
+                LV_LOG_INFO("entering edit mode");
                 lv_group_set_editing(g, true); /*Set edit mode*/
             }
         }
@@ -686,9 +690,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*if encoder steps or simulated steps via left/right keys*/
     if(data->enc_diff != 0) {
-        LV_LOG_INFO("rotated by %d", data->enc_diff);
         /*In edit mode send LEFT/RIGHT keys*/
         if(lv_group_get_editing(g)) {
+            LV_LOG_INFO("rotated by %+d (edit)", data->enc_diff);
             int32_t s;
             if(data->enc_diff < 0) {
                 for(s = 0; s < -data->enc_diff; s++) lv_group_send_data(g, LV_KEY_LEFT);
@@ -699,6 +703,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
         /*In navigate mode focus on the next/prev objects*/
         else {
+            LV_LOG_INFO("rotated by %+d (nav)", data->enc_diff);
             int32_t s;
             if(data->enc_diff < 0) {
                 for(s = 0; s < -data->enc_diff; s++) lv_group_focus_prev(g);
