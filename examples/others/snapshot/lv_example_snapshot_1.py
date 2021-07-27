@@ -18,10 +18,10 @@ label.set_text(" memory free:" + str(mem_free/1024) + " kB")
 
 # Create an image from the png file
 try:
-    with open('../../assets/img_star.png','rb') as f:
+    with open('../../assets/star.png','rb') as f:
         png_data = f.read()
 except:
-    print("Could not find img_star.png")
+    print("Could not find star.png")
     sys.exit()
 
 img_star = lv.img_dsc_t({
