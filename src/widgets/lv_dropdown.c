@@ -422,6 +422,9 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_update_layout(dropdown->list);
     }
 
+    /*To allow styling the list*/
+    lv_event_send(dropdown_obj, LV_EVENT_VALUE_CHANGED, NULL);
+
     lv_obj_t * label = get_label(dropdown_obj);
     lv_label_set_text_static(label, dropdown->options);
     lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
@@ -517,6 +520,8 @@ void lv_dropdown_close(lv_obj_t * obj)
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
     if(dropdown->list) lv_obj_del(dropdown->list);
+
+    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 /**********************
