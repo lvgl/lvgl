@@ -234,6 +234,16 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_BG_COLOR:
             value.color = lv_color_white();
             break;
+        case LV_STYLE_BG_GRAD_COLOR:
+        case LV_STYLE_BORDER_COLOR:
+        case LV_STYLE_SHADOW_COLOR:
+        case LV_STYLE_OUTLINE_COLOR:
+        case LV_STYLE_ARC_COLOR:
+        case LV_STYLE_LINE_COLOR:
+        case LV_STYLE_TEXT_COLOR:
+        case LV_STYLE_IMG_RECOLOR:
+            value.color = lv_color_black();
+            break;
         case LV_STYLE_OPA:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
