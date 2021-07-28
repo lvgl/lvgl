@@ -27,7 +27,7 @@ class Lv_Roller_3():
         #    lv_obj_set_style_text_font(roller1, &lv_font_montserrat_22, LV_PART_SELECTED);
         #endif
         try:
-            roller1.set_style_text_font(lv.font_montserrat_22)
+            roller1.set_style_text_font(lv.font_montserrat_22,lv.PART.SELECTED)
         except:
             fs_drv = lv.fs_drv_t()
             fs_driver.fs_register(fs_drv, 'S')
