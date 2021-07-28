@@ -73,22 +73,21 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 /**********************
  *      MACROS
  **********************/
+#if LV_COLOR_SCREEN_TRANSP == 0
+#define FILL_NORMAL_MASK_PX(color)                                                          \
+    if(*mask == LV_OPA_COVER) *disp_buf_first = color;                                 \
+    else *disp_buf_first = lv_color_mix(color, *disp_buf_first, *mask);            \
+    mask++;                                                         \
+    disp_buf_first++;
 
-#define FILL_NORMAL_MASK_PX(out_x,  color)                                                          \
-    if(*mask_tmp_x) {          \
-        if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[out_x] = color;                                 \
-        else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
-    }                                                                                               \
-    mask_tmp_x++;
-
-#define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
-    if(*mask_tmp_x) {          \
-        if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[out_x] = color;                                 \
-        else if(disp->driver->screen_transp) lv_color_mix_with_alpha(disp_buf_first[out_x], disp_buf_first[out_x].ch.alpha,              \
-                                                                        color, *mask_tmp_x, &disp_buf_first[out_x], &disp_buf_first[out_x].ch.alpha);           \
-        else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
-    }                                                                                                      \
-    mask_tmp_x++;
+#else
+#define FILL_NORMAL_MASK_PX(color)                                               \
+    if(*mask == LV_OPA_COVER) *disp_buf_first = color;                                 \
+    else if(disp->driver->screen_transp) lv_color_mix_with_alpha(*disp_buf_first, disp_buf_first->ch.alpha, color, *mask, disp_buf_first, &disp_buf_first->ch.alpha);           \
+    else *disp_buf_first = lv_color_mix(color, *disp_buf_first, *mask);            \
+    mask++;                                                         \
+    disp_buf_first++;
+#endif
 
 #define MAP_NORMAL_MASK_PX(x)                                                          \
     if(*mask_tmp_x) {          \
@@ -326,7 +325,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 if(lv_gpu_nxp_vglite_fill(disp_buf, disp_w, lv_area_get_height(disp_area), draw_area, color, opa) == LV_RES_OK) {
                     return;
                 }
-                /*Fall down to SW render in case of error*/
             }
 #elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
@@ -401,65 +399,55 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 
         int32_t x_end4 = draw_area_w - 4;
 
+#if LV_COLOR_DEPTH == 16
+        uint32_t c32 = color.full + ((uint32_t)color.full << 16);
+#endif
+
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
             for(y = 0; y < draw_area_h; y++) {
-                const lv_opa_t * mask_tmp_x = mask;
-#if 0
-                for(x = 0; x < draw_area_w; x++) {
-#if LV_COLOR_SCREEN_TRANSP
-                    FILL_NORMAL_MASK_PX_SCR_TRANSP(x, color)
-#else
-                    FILL_NORMAL_MASK_PX(x, color)
-#endif
-                }
-#else
-                for(x = 0; x < draw_area_w && ((lv_uintptr_t)mask_tmp_x & 0x3); x++) {
-#if LV_COLOR_SCREEN_TRANSP
-                    FILL_NORMAL_MASK_PX_SCR_TRANSP(x, color)
-#else
-                    FILL_NORMAL_MASK_PX(x, color)
-#endif
+                for(x = 0; x < draw_area_w && ((lv_uintptr_t)(mask) & 0x3); x++) {
+                    FILL_NORMAL_MASK_PX(color)
                 }
 
-                uint32_t * mask32 = (uint32_t *)mask_tmp_x;
                 for(; x <= x_end4; x += 4) {
-                    if(*mask32) {
-                        if((*mask32) == 0xFFFFFFFF) {
-                            disp_buf_first[x] = color;
-                            disp_buf_first[x + 1] = color;
-                            disp_buf_first[x + 2] = color;
-                            disp_buf_first[x + 3] = color;
+                    uint32_t mask32 = *((uint32_t *)mask);
+                    if(mask32 == 0xFFFFFFFF) {
+#if LV_COLOR_DEPTH == 16
+                        if((lv_uintptr_t)disp_buf_first & 0x3) {
+                            *(disp_buf_first + 0) = color;
+                            uint32_t * d = (uint32_t * )(disp_buf_first + 1);
+                            *d = c32;
+                            *(disp_buf_first + 3) = color;
+                        } else {
+                            uint32_t * d = (uint32_t * )disp_buf_first;
+                            *d = c32;
+                            *(d + 1) = c32;
                         }
-                        else {
-                            mask_tmp_x = (const lv_opa_t *)mask32;
-#if LV_COLOR_SCREEN_TRANSP
-                            FILL_NORMAL_MASK_PX_SCR_TRANSP(x, color)
-                            FILL_NORMAL_MASK_PX_SCR_TRANSP(x + 1, color)
-                            FILL_NORMAL_MASK_PX_SCR_TRANSP(x + 2, color)
-                            FILL_NORMAL_MASK_PX_SCR_TRANSP(x + 3, color)
 #else
-                            FILL_NORMAL_MASK_PX(x, color)
-                            FILL_NORMAL_MASK_PX(x + 1, color)
-                            FILL_NORMAL_MASK_PX(x + 2, color)
-                            FILL_NORMAL_MASK_PX(x + 3, color)
+                        disp_buf_first[0] = color;
+                        disp_buf_first[1] = color;
+                        disp_buf_first[2] = color;
+                        disp_buf_first[3] = color;
 #endif
-                        }
+                        disp_buf_first+= 4;
+                        mask += 4;
                     }
-                    mask32++;
+                    else if(mask32) {
+                        FILL_NORMAL_MASK_PX(color)
+                        FILL_NORMAL_MASK_PX(color)
+                        FILL_NORMAL_MASK_PX(color)
+                        FILL_NORMAL_MASK_PX(color)
+                    } else {
+                        mask += 4;
+                        disp_buf_first += 4;
+                    }
                 }
 
-                mask_tmp_x = (const lv_opa_t *)mask32;
                 for(; x < draw_area_w ; x++) {
-#if LV_COLOR_SCREEN_TRANSP
-                    FILL_NORMAL_MASK_PX_SCR_TRANSP(x, color)
-#else
-                    FILL_NORMAL_MASK_PX(x, color)
-#endif
+                    FILL_NORMAL_MASK_PX(color)
                 }
-#endif
-                disp_buf_first += disp_w;
-                mask += draw_area_w;
+                disp_buf_first += (disp_w-draw_area_w);
             }
         }
         /*Handle opa and mask values too*/
@@ -701,8 +689,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.src_stride = lv_area_get_width(map_area) * sizeof(lv_color_t);
                 blit.src_area.x1 = (draw_area->x1 - (map_area->x1 - disp_area->x1));
                 blit.src_area.y1 = (draw_area->y1 - (map_area->y1 - disp_area->y1));
-                blit.src_area.x2 = blit.src_area.x1 + draw_area_w - 1;
-                blit.src_area.y2 = blit.src_area.y1 + draw_area_h - 1;
+                blit.src_area.x2 = blit.src_area.x1 + draw_area_w;
+                blit.src_area.y2 = blit.src_area.y1 + draw_area_h;
 
                 blit.dst = disp_buf;
                 blit.dst_width = lv_area_get_width(disp_area);
@@ -710,8 +698,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.dst_stride = lv_area_get_width(disp_area) * sizeof(lv_color_t);
                 blit.dst_area.x1 = draw_area->x1;
                 blit.dst_area.y1 = draw_area->y1;
-                blit.dst_area.x2 = blit.dst_area.x1 + draw_area_w - 1;
-                blit.dst_area.y2 = blit.dst_area.y1 + draw_area_h - 1;
+                blit.dst_area.x2 = blit.dst_area.x1 + draw_area_w;
+                blit.dst_area.y2 = blit.dst_area.y1 + draw_area_h;
 
                 blit.opa = opa;
 
@@ -751,8 +739,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.src_stride = lv_area_get_width(map_area) * sizeof(lv_color_t);
                 blit.src_area.x1 = (draw_area->x1 - (map_area->x1 - disp_area->x1));
                 blit.src_area.y1 = (draw_area->y1 - (map_area->y1 - disp_area->y1));
-                blit.src_area.x2 = blit.src_area.x1 + draw_area_w - 1;
-                blit.src_area.y2 = blit.src_area.y1 + draw_area_h - 1;
+                blit.src_area.x2 = blit.src_area.x1 + draw_area_w;
+                blit.src_area.y2 = blit.src_area.y1 + draw_area_h;
 
                 blit.dst = disp_buf;
                 blit.dst_width = lv_area_get_width(disp_area);
@@ -760,8 +748,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                 blit.dst_stride = lv_area_get_width(disp_area) * sizeof(lv_color_t);
                 blit.dst_area.x1 = draw_area->x1;
                 blit.dst_area.y1 = draw_area->y1;
-                blit.dst_area.x2 = blit.dst_area.x1 + draw_area_w - 1;
-                blit.dst_area.y2 = blit.dst_area.y1 + draw_area_h - 1;
+                blit.dst_area.x2 = blit.dst_area.x1 + draw_area_w;
+                blit.dst_area.y2 = blit.dst_area.y1 + draw_area_h;
 
                 blit.opa = opa;
 
@@ -933,13 +921,7 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
-#if LV_COLOR_DEPTH == 32
-                if(map_buf_tmp[x].full != 0xff000000) {
-#else
-                if(map_buf_tmp[x].full != 0) {
-#endif
-                    disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa);
-                }
+                disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa);
             }
             disp_buf_tmp += disp_w;
             map_buf_tmp += map_w;
@@ -957,14 +939,7 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x] == 0) continue;
                 lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : ((opa * mask_tmp[x]) >> 8);
-#if LV_COLOR_DEPTH == 32
-                if(map_buf_tmp[x].full != 0xff000000) {
-#else
-                if(map_buf_tmp[x].full != 0) {
-#endif
-                    disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa_tmp);
-                }
-
+                disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa_tmp);
             }
             disp_buf_tmp += disp_w;
             mask_tmp += draw_area_w;
@@ -975,6 +950,9 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
 {
+
+    if(opa <= LV_OPA_MIN) return bg;
+
     uint32_t tmp;
 #if LV_COLOR_DEPTH == 1
     tmp = bg.full + fg.full;
@@ -990,7 +968,6 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 #endif
 
 #if LV_COLOR_DEPTH == 8
-    tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 7);
 #elif LV_COLOR_DEPTH == 16
 #if LV_COLOR_16_SWAP == 0
@@ -1004,7 +981,6 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 #endif
 
 #elif LV_COLOR_DEPTH == 32
-    tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 255);
 #endif
 

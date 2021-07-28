@@ -236,6 +236,10 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_mem_buf_free_all();
     _lv_font_clean_up_fmt_txt();
 
+#if LV_DRAW_COMPLEX
+    _lv_draw_mask_cleanup();
+#endif
+
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     static lv_obj_t * perf_label = NULL;
     if(perf_label == NULL) {
@@ -586,7 +590,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
+            lv_obj_t * child = obj->spec_attr->children[i];
             found_p = lv_refr_get_top_obj(area_p, child);
 
             /*If a children is ok then break*/
@@ -634,7 +638,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(par);
         for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = lv_obj_get_child(par, i);
+            lv_obj_t * child = par->spec_attr->children[i];
             if(!go) {
                 if(child == border_p) go = true;
             } else {
@@ -707,7 +711,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             uint32_t i;
             uint32_t child_cnt = lv_obj_get_child_cnt(obj);
             for(i = 0; i < child_cnt; i++) {
-                lv_obj_t * child = lv_obj_get_child(obj, i);
+                lv_obj_t * child = obj->spec_attr->children[i];
                 lv_obj_get_coords(child, &child_area);
                 ext_size = _lv_obj_get_ext_draw_size(child);
                 child_area.x1 -= ext_size;

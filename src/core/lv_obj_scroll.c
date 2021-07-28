@@ -139,7 +139,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
+        lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         child_res = LV_MAX(child_res, child->coords.y2);
     }
@@ -180,8 +180,8 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
     lv_coord_t x1 = LV_COORD_MAX;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-       lv_obj_t * child = lv_obj_get_child(obj, i);
-       if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+        lv_obj_t * child = obj->spec_attr->children[i];
+        if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         x1 = LV_MIN(x1, child->coords.x1);
 
     }
@@ -216,7 +216,7 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
+        lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
         child_res = LV_MAX(child_res, child->coords.x2);
     }

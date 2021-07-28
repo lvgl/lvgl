@@ -95,6 +95,13 @@
  *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
  *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
 #define LV_SHADOW_CACHE_SIZE    0
+
+/* Set number of maximally cached circle data.
+ * The circumference of 1/4 circle are saved for anti-aliasing
+ * radius * 4 bytes are used per circle (the most often used radiuses are saved)
+ * 0: to disable caching */
+#define LV_CIRCLE_CACHE_SIZE    4
+
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.

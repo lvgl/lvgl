@@ -623,7 +623,7 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
 
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        report_style_change_core(style, lv_obj_get_child(obj, i));
+        report_style_change_core(style, obj->spec_attr->children[i]);
     }
 }
 
@@ -637,7 +637,7 @@ static void refresh_children_style(lv_obj_t * obj)
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
+        lv_obj_t * child = obj->spec_attr->children[i];
         lv_obj_invalidate(child);
         lv_event_send(child, LV_EVENT_STYLE_CHANGED, NULL);
         lv_obj_invalidate(child);

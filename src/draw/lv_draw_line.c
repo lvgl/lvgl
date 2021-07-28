@@ -474,6 +474,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     lv_mem_buf_release(mask_buf);
 
+    lv_draw_mask_free_param(&mask_left_param);
+    lv_draw_mask_free_param(&mask_right_param);
+    if(mask_top_id != LV_MASK_ID_INV) lv_draw_mask_free_param(&mask_top_param);
+    if(mask_bottom_id != LV_MASK_ID_INV) lv_draw_mask_free_param(&mask_bottom_param);
     lv_draw_mask_remove_id(mask_left_id);
     lv_draw_mask_remove_id(mask_right_id);
     lv_draw_mask_remove_id(mask_top_id);

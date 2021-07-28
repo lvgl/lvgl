@@ -54,13 +54,13 @@ The difference between buffering modes regarding the drawing mechanism is the fo
 To use LVGL it's not required to know about the mechanisms described here, but you might find interesting to know how drawing works under hood. 
 Knowing about masking comes in handy if you want to customize drawing.
 
-To learn masking let's learn the steps of drawing first. 
+To learn masking let's see the steps of drawing first. 
 LVGL performs the following steps to render any shape, image or text. It can be considered as a drawing pipeline.
 
 1. **Prepare the draw descriptors** Create a draw descriptor from an object's styles (e.g. `lv_draw_rect_dsc_t`).  This gives us the parameters for drawing, for example the colors, widths, opacity, fonts, radius, etc. 
-2. **Call the draw function** Call the draw function with the draw descriptor and some other parameters (e.g. `lv_draw_rect()`).  It renders the primitive shape to the current draw buffer. 
-3. **Create masks** If the shape is very simple and doesn't require masks go to #5.  Else create the required masks (e.g. a rounded rectangle mask)
-4. **Calculate all the added mask**. It creates 0..255 values into a *mask buffer* with the "shape" of the created masks. 
+2. **Call the draw function** Call the draw function with the draw descriptor and some other parameters (e.g. `lv_draw_rect()`).  It will render the primitive shape to the current draw buffer. 
+3. **Create masks** If the shape is very simple and doesn't require masks go to #5.  Else create the required masks in the draw function. (e.g. a rounded rectangle mask)
+4. **Calculate all the added mask** It creates 0..255 values into a *mask buffer* with the "shape" of the created masks. 
 E.g. in case of a "line mask" according to the parameters of the mask, keep one side of the buffer as it is (255 by default) and set the rest to 0 to indicate that this side should be removed.
 5. **Blend a color or image** During blending masks (make some pixels transparent or opaque), blending modes (additive, subtractive, etc) and opacity are handled.
 
@@ -80,6 +80,25 @@ Masks are used the create almost every basic primitives:
 - **rectangle border** Same as a rounded rectangle, but inner part is masked out too.
 - **arc drawing** A circle border is drawn, but an arc mask is applied too.
 - **ARGB images** The alpha channel is separated into a mask and the image is drawn as a normal RGB image.
+
+### Using masks
+
+Every mask type has a related paramter to describe the mask's data. The following paramater types exist:
+- `lv_draw_mask_line_param_t`
+- `lv_draw_mask_radius_param_t`
+- `lv_draw_mask_angle_param_t`
+- `lv_draw_mask_fade_param_t`
+- `lv_draw_mask_map_param_t`
+
+1. Initialize a mask parameter with `lv_draw_mask_<type>_init`. See `lv_draw_mask.h` for the whole API.
+2. Add the mask parameter to the draw engine with `int16_t mask_id = lv_draw_mask_add(&param, ptr)`. `ptr` can be any pointer to identify the mask, (`NULL` if unused). 
+3. Call the draw functions
+4. Remove the mask from the draw engine with `lv_draw_mask_remove_id(mask_id)` of `lv_draw_mask_remove_custom(ptr)`.
+5. Free the parameter with `lv_draw_mask_free_param(&param)`.
+
+A parameter can be added and removed any number of times but it needs to be freed when not required anymore. 
+
+`lv_draw_mask_add` saves only the pointer of the mask so the parameter needs to be valid while in use. 
 
 ## Hook drawing
 Although widgets can be very well customized by styles there might be cases when something really custom is required. 

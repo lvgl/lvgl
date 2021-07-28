@@ -754,7 +754,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
+        lv_obj_t * child = obj->spec_attr->children[i];
         if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING)) continue;
         child->coords.x1 += x_diff;
         child->coords.y1 += y_diff;
@@ -937,7 +937,7 @@ static void layout_update_core(lv_obj_t * obj)
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = lv_obj_get_child(obj, i);
+        lv_obj_t * child = obj->spec_attr->children[i];
         layout_update_core(child);
     }
 
@@ -948,7 +948,7 @@ static void layout_update_core(lv_obj_t * obj)
     lv_obj_refr_size(obj);
     lv_obj_refr_pos(obj);
 
-    if(lv_obj_get_child_cnt(obj) > 0) {
+    if(child_cnt > 0) {
         uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout_id > 0 && layout_id <= layout_cnt) {
             void  * user_data = LV_GC_ROOT(_lv_layout_list)[layout_id -1].user_data;
