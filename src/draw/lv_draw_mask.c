@@ -1291,20 +1291,20 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
     int32_t mid = radius * 723;
     int32_t mid_int = mid >> 10;
     if(cir_x[cir_size-1] != mid_int || cir_y[cir_size-1] != mid_int) {
-        tmp = mid - (mid_int << 10);
-        if(tmp <= 512) {
-            tmp = tmp * tmp * 2;
-            tmp = tmp >> (10 + 6);
+        int32_t tmp_val = mid - (mid_int << 10);
+        if(tmp_val <= 512) {
+            tmp_val = tmp_val * tmp_val * 2;
+            tmp_val = tmp_val >> (10 + 6);
         } else {
-            tmp = 1024 - tmp;
-            tmp = (int32_t)tmp * tmp * 2;
-            tmp = (int32_t)tmp >> (10 + 6);
-            tmp = 15 - tmp;
+            tmp_val = 1024 - tmp_val;
+            tmp_val = tmp_val * tmp_val * 2;
+            tmp_val = tmp_val >> (10 + 6);
+            tmp_val = 15 - tmp_val;
         }
 
         cir_x[cir_size] = mid_int;
         cir_y[cir_size] = mid_int;
-        c->cir_opa[cir_size] = tmp;
+        c->cir_opa[cir_size] = tmp_val;
         c->cir_opa[cir_size] *= 16;
         cir_size++;
     }
