@@ -422,6 +422,7 @@ void test_dropdown_render_2(void)
   lv_dropdown_set_options(dd7, "1aaa\n2\n3");
   lv_dropdown_set_dir(dd7, LV_DIR_LEFT);
   lv_dropdown_set_symbol(dd7, LV_SYMBOL_LEFT);
+  lv_obj_align(dd7, LV_ALIGN_BOTTOM_RIGHT, -20, -20);
   lv_dropdown_open(dd7);
   
   TEST_ASSERT_EQUAL_SCREENSHOT("dropdown_2.png");

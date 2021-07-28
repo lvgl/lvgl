@@ -221,6 +221,16 @@ bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
  */
 bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius);
 
+
+/**
+ * Check if an area is fully out of an other
+ * @param aout_p pointer to an area which could be in 'aholder_p'
+ * @param aholder_p pointer to an area which could involve 'ain_p'
+ * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
+ * @return true: `aout_p` is fully outside `aholder_p`
+ */
+bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_coord_t radius);
+
 /**
  * Align an area to an other
  * @param base an are where the other will be aligned

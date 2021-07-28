@@ -731,6 +731,7 @@ static void lv_arc_draw(lv_event_t * e)
         part_draw_dsc.arc_dsc = &arc_dsc;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
+        if(arc_dsc.width > part_draw_dsc.radius) arc_dsc.width = part_draw_dsc.radius;
         lv_draw_arc(center.x, center.y, part_draw_dsc.radius, arc->indic_angle_start +arc->rotation,
                    arc->indic_angle_end + arc->rotation, clip_area,
                     &arc_dsc);

@@ -211,6 +211,11 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void)
     return cnt;
 }
 
+bool lv_draw_mask_is_any(void)
+{
+    return LV_GC_ROOT(_lv_draw_mask_list[0]).param ? true : false;
+}
+
 /**
  *Initialize a line mask from two points.
  * @param param pointer to a `lv_draw_mask_param_t` to initialize
@@ -1203,9 +1208,19 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
     if(c->buf) lv_mem_free(c->buf);
 
     c->buf = lv_mem_alloc(radius * 6 + 6);  /*Use uint16_t for opa_start_on_y and x_start_on_y*/
+    LV_ASSERT_MALLOC(c->buf);
     c->cir_opa = c->buf;
     c->opa_start_on_y = (uint16_t *) (c->buf + 2 * radius + 2);
     c->x_start_on_y = (uint16_t *) (c->buf + 4 * radius + 4);
+
+    /*Special case, handle manually*/
+    if(radius == 1) {
+        c->cir_opa[0] =  180;
+        c->opa_start_on_y[0] =  0;
+        c->opa_start_on_y[1] =  1;
+        c->x_start_on_y[0] =  0;
+        return;
+    }
 
     lv_coord_t * cir_x = lv_mem_buf_get((radius + 1) * 2 * 2 * sizeof(lv_coord_t));
     lv_coord_t * cir_y = &cir_x[(radius + 1) * 2];
