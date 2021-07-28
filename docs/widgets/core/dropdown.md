@@ -30,10 +30,11 @@ The button goes to `LV_STATE_CHECKED` when its opened.
 - `LV_PART_SELECTED` Refers to the currently pressed, checked or pressed+checked option. Also uses the typical background properties. 
 
 As list does not exist when the drop-down list is closed it's not possible to simply add styles to it.
-Instead the following should be done:
-1. Ad an event handler to the button for `LV_EVENT_VALUE_CHANGED` (triggered when the list is opened/closed)
-2. Use `lv_obj_t * list = lv_dropdown_get_list(dropdown)`
-3. `if(list != NULL) {/*Add the styles to the list*/}`
+Insteada add an event handler to the button for `LV_EVENT_READY` (triggered when the list is opened) and add styles to the list in it like this:
+```c
+lv_obj_t * list = lv_dropdown_get_list(dropdown) /*Get the list*/
+lv_obj_add_style(list, &my_style, ...)           /*Add the styles to the list*/}`
+```
 
 Alternatively the theme can be extended with the new styles. 
  
@@ -76,6 +77,8 @@ To manually open or close the drop-down list the `lv_dropdown_open/close(dropdow
 ## Events
 Apart from the [Generic events](../overview/event.html#generic-events), the following [Special events](../overview/event.html#special-events) are sent by the drop-down list:
 - `LV_EVENT_VALUE_CHANGED` Sent when the new option is selected or the list is opened/closed.
+- `LV_EVENT_APPLY` Sent when the list is opened
+- `LV_EVENT_CANCEL`  Sent when the list is closed
 
 See the events of the [Base object](/widgets/obj) too.
 
