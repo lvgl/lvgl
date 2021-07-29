@@ -273,6 +273,18 @@ static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
 }
 
 /**
+ * Set the custom user data field of the animation.
+ * @param a           pointer to an initialized `lv_anim_t` variable
+ * @param user_data   pointer to the new user_data.
+ */
+#if LV_USE_USER_DATA
+static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
+{
+    a->user_data = user_data;
+}
+#endif
+
+/**
  * Create an animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
  * @return          pointer to the created animation (different from the `a` parameter)
@@ -288,6 +300,18 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 {
     return -a->act_time;
 }
+
+/**
+ * Get the user_data field of the animation
+ * @param   a pointer to an initialized `lv_anim_t` variable
+ * @return  the pointer to the costom user_data of the animation
+ */
+#if LV_USE_USER_DATA
+static inline void * lv_anim_get_user_data(lv_anim_t * a)
+{
+    return a->user_data;
+}
+#endif
 
 /**
  * Delete an animation of a variable with a given animator function
