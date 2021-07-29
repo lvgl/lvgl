@@ -278,7 +278,7 @@ static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
  * @param user_data   pointer to the new user_data.
  */
 #if LV_USE_USER_DATA
-static inline void lv_anim_set_user_data(lv_obj_t * a, void * user_data)
+static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
 {
     a->user_data = user_data;
 }
