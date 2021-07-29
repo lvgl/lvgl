@@ -302,6 +302,18 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 }
 
 /**
+ * Get the user_data field of the animation
+ * @param   a pointer to an initialized `lv_anim_t` variable
+ * @return  the pointer to the costom user_data of the animation
+ */
+#if LV_USE_USER_DATA
+static inline void * lv_anim_get_user_data(lv_anim_t * a)
+{
+    return a->user_data;
+}
+#endif
+
+/**
  * Delete an animation of a variable with a given animator function
  * @param var       pointer to variable
  * @param exec_cb   a function pointer which is animating 'var',
