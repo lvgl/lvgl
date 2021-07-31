@@ -7,8 +7,6 @@ from micropython import const
 #
 
 CHART_POINTS_NUM = const(256)
-def LV_GRID_FR(x):
-    return lv.COORD.MAX -100 +x
 
 class LvExampleAnim_3():
     #
@@ -16,8 +14,8 @@ class LvExampleAnim_3():
     #
     def __init__(self):
         # Create a container with grid
-        col_dsc = [LV_GRID_FR(1), 200, LV_GRID_FR(1), lv.GRID_TEMPLATE.LAST]
-        row_dsc = [30, 10, 10, LV_GRID_FR(1),lv.GRID_TEMPLATE.LAST]
+        col_dsc = [lv.grid_fr(1), 200, lv.grid_fr(1), lv.GRID_TEMPLATE.LAST]
+        row_dsc = [30, 10, 10, lv.grid_fr(1),lv.GRID_TEMPLATE.LAST]
 
         self.p1 = 0
         self.p2 = 0

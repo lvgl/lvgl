@@ -1,5 +1,3 @@
-def LV_GRID_FR(x):
-    return lv.COORD.MAX - 100 + x
 #
 # Demonstrate grid's "free unit"
 #
@@ -8,13 +6,13 @@ def LV_GRID_FR(x):
 # Column 2: 1 unit from the remaining free space
 # Column 3: 2 unit from the remaining free space
 
-col_dsc = [60, LV_GRID_FR(1), LV_GRID_FR(2), lv.COORD.MAX]
+col_dsc = [60, lv.grid_fr(1), lv.grid_fr(2), lv.GRID_TEMPLATE.LAST]
 
 # Row 1: fix width 60 px
 # Row 2: 1 unit from the remaining free space
 # Row 3: fix width 60 px
 
-row_dsc = [40, LV_GRID_FR(1), 40, lv.COORD.MAX]
+row_dsc = [40, lv.grid_fr(1), 40, lv.GRID_TEMPLATE.LAST]
 
 # Create a container with grid
 cont = lv.obj(lv.scr_act())

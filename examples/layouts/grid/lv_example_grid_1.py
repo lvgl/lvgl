@@ -2,8 +2,8 @@
 # A simple grid
 #
 
-col_dsc = [70, 70, 70, lv.COORD.MAX]
-row_dsc = [50, 50, 50, lv.COORD.MAX]
+col_dsc = [70, 70, 70, lv.GRID_TEMPLATE.LAST]
+row_dsc = [50, 50, 50, lv.GRID_TEMPLATE.LAST]
 
 # Create a container with grid
 cont = lv.obj(lv.scr_act())
