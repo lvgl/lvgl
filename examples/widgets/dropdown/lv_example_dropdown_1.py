@@ -10,16 +10,16 @@ def event_handler(e):
 # Create a normal drop down list
 dd = lv.dropdown(lv.scr_act())
 dd.set_options("\n".join([
-    "Apple\n"
-    "Banana\n"
-    "Orange\n"
-    "Cherry\n"
-    "Grape\n"
-    "Raspberry\n"
-    "Melon\n"
-    "Orange\n"
-    "Lemon\n"
-    "Nuts\n"]))
+    "Apple",
+    "Banana",
+    "Orange",
+    "Cherry",
+    "Grape",
+    "Raspberry",
+    "Melon",
+    "Orange",
+    "Lemon",
+    "Nuts"]))
 
 dd.align(lv.ALIGN.TOP_MID, 0, 20)
 dd.add_event_cb(event_handler, lv.EVENT.ALL, None)

@@ -30,12 +30,12 @@ def event_cb(e):
 # Create a drop down list
 dropdown = lv.dropdown(lv.scr_act())
 dropdown.align(lv.ALIGN.TOP_LEFT, 10, 10)
-dropdown.set_options("".join([
-    "New project\n",
-    "New file\n",
-    "Open project\n",
-    "Recent projects\n",
-    "Preferences\n",
+dropdown.set_options("\n".join([
+    "New project",
+    "New file",
+    "Open project",
+    "Recent projects",
+    "Preferences",
     "Exit"]))
 
 # Set a fixed text to display on the button of the drop-down list
