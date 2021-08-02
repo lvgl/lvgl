@@ -501,13 +501,13 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     switch(align) {
     default:
     case LV_TEXT_ALIGN_LEFT:
-        lv_obj_set_x(label, 0);
+        lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);
         break;
     case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) - lv_obj_get_width(label));
+        lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
         break;
     case LV_TEXT_ALIGN_CENTER:
-        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) / 2 - lv_obj_get_width(label) / 2);
+        lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
         break;
 
     }
