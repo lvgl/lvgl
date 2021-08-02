@@ -498,7 +498,7 @@ menu "LVGL configuration"
         config LV_USE_THEME_DEFAULT
             bool "A simple, impressive and very complete theme"
             default y
-        config LV_THEME_DEFAULT_PALETTE_LIGHT
+        config LV_THEME_DEFAULT_DARK
             bool "Yes to set light mode, No to set dark mode"
             default y
             depends on LV_USE_THEME_DEFAULT
