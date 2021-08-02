@@ -65,7 +65,7 @@ You have several options to set the data of series:
 3. Use the `lv_chart_set_next_value(chart, ser, value)`.
 4. Initialize all points to a given value with: `lv_chart_set_all_value(chart, ser, value)`.
 
-Use `LV_CHART_POINT_DEF` as value to make the library skip drawing that point, column, or line segment.
+Use `LV_CHART_POINT_NONE` as value to make the library skip drawing that point, column, or line segment.
 
 For `LV_CHART_TYPE_SCATTER` type  `lv_chart_set_value_by_id2(chart, ser, id, value)` and `lv_chart_set_next_value2(chart, ser, x_valuem y_value)` can be used as well.
 
