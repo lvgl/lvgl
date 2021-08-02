@@ -1,6 +1,12 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- feat(anim) add interface for handling lv_anim user data. (#2415)
+- feat(obj) add lv_is_initialized (#2402)
+- feat(obj) Backport keypad and encoder scrolling from v7 `lv_page` to v8 `lv_obj` (#2390)
+- feat(snapshot) add API to take snapshot for object (#2353) 
+- feat(anim) add anim timeline (#2309) 
+- feat(span) Add missing spangroup functions
 - feat(img) add img_size property (#2284)  <a href="https://github.com/lvgl/lvgl/commit/fe461caf">fe461caf</a>  
 - feat(calendar) improve MicroPython example (#2366)  Amir Gonnen <a href="https://github.com/lvgl/lvgl/commit/5f6e07e5">5f6e07e5</a> 
 - feat(obj) add lv_obj_del_delayed() <a href="https://github.com/lvgl/lvgl/commit/c6a2e15e">c6a2e15e</a> 
@@ -11,6 +17,9 @@
 - feat(timer) check if lv_tick_inc is called <a href="https://github.com/lvgl/lvgl/commit/aa6641a6">aa6641a6</a> 
 - feat(docs) add view on GitHub link <a href="https://github.com/lvgl/lvgl/commit/a716ac6e">a716ac6e</a> 
 - feat(event) pass the scroll aniamtion to LV_EVENT_SCROLL_BEGIN <a href="https://github.com/lvgl/lvgl/commit/ca54ecfe">ca54ecfe</a> 
+
+- perf(draw) reimplement rectangle drawing algorithms 
+- perf(draw) reimplement circle drawing algorithms (#2374) (Also [change masking](https://docs.lvgl.io/master/overview/drawing.html#masking))
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
