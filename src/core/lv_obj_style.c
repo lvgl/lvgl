@@ -458,7 +458,7 @@ lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector)
 }
 
 
-lv_text_align_t lv_obj_calculate_style_text_align(struct _lv_obj_t * obj, lv_part_t part, const char * txt)
+lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt)
 {
     lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, part);
