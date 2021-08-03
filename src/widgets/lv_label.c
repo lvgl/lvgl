@@ -288,12 +288,9 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(pos);
 
+    lv_label_t * label = (lv_label_t *)obj;
     const char * txt         = lv_label_get_text(obj);
-    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO) {
-       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-       else align = LV_TEXT_ALIGN_LEFT;
-    }
+    lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, txt);
 
     if(txt[0] == '\0') {
         pos->y = 0;
@@ -314,7 +311,6 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
 
-    lv_label_t * label = (lv_label_t *)obj;
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_area_get_width(&txt_coords);
@@ -427,11 +423,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
-    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO) {
-       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-       else align = LV_TEXT_ALIGN_LEFT;
-    }
+    lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
 
     /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
@@ -542,11 +534,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
-    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO) {
-       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-       else align = LV_TEXT_ALIGN_LEFT;
-    }
+    lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
 
     lv_coord_t y             = 0;
     lv_text_flag_t flag       = LV_TEXT_FLAG_NONE;
@@ -701,7 +689,6 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
     lv_label_refr_text(obj);
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -809,11 +796,6 @@ static void draw_main(lv_event_t * e)
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
 
-    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO) {
-       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-       else align = LV_TEXT_ALIGN_LEFT;
-    }
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
     if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
@@ -827,6 +809,7 @@ static void draw_main(lv_event_t * e)
 
     label_draw_dsc.flag = flag;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
+    lv_bidi_calculate_align(&label_draw_dsc.align, &label_draw_dsc.bidi_dir, label->text);
 
     label_draw_dsc.sel_start = lv_label_get_text_selection_start(obj);
     label_draw_dsc.sel_end = lv_label_get_text_selection_end(obj);
@@ -838,7 +821,7 @@ static void draw_main(lv_event_t * e)
     /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
      * (In addition they will result misalignment is this case)*/
     if((label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) &&
-       (align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT)) {
+       (label_draw_dsc.align == LV_TEXT_ALIGN_CENTER || label_draw_dsc.align == LV_TEXT_ALIGN_RIGHT)) {
         lv_point_t size;
         lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                          LV_COORD_MAX, flag);

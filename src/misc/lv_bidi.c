@@ -305,6 +305,16 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
     }
 }
 
+void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt)
+{
+    if(*base_dir == LV_BASE_DIR_AUTO) *base_dir = _lv_bidi_detect_base_dir(txt);
+
+    if(*align == LV_TEXT_ALIGN_AUTO) {
+        if(*base_dir == LV_BASE_DIR_RTL) *align = LV_TEXT_ALIGN_RIGHT;
+        else *align = LV_TEXT_ALIGN_LEFT;
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

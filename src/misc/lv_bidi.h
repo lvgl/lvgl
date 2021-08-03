@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "lv_txt.h"
 
 /*********************
  *      DEFINES
@@ -104,10 +105,33 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
 void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_base_dir_t base_dir,
                                 uint16_t * pos_conv_out, uint16_t pos_conv_len);
 
+/**
+ * Get the real text alignment from the a text alignment, base direction and a text.
+ * @param align     LV_TEXT_ALIGN_..., write back the calculated align here (LV_TEXT_ALIGN_LEFT/RIGHT/CENTER)
+ * @param base_dir  LV_BASE_DIR_..., write the calculated base dir here (LV_BASE_DIR_LTR/RTL)
+ * @param txt       a text, used with LV_BASE_DIR_AUTO to determine the base direction
+ */
+void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt);
+
+
 /**********************
  *      MACROS
  **********************/
 
+#else /*LV_USE_BIDI*/
+/**
+ * For compatibility if LV_USE_BIDI = 0
+ * Get the real text alignment from the a text alignment, base direction and a text.
+ * @param align     For LV_TEXT_ALIGN_AUTO give LV_TEXT_ALIGN_LEFT else leave unchanged, write back the calculated align here
+ * @param base_dir  Unused
+ * @param txt       Unused
+ */
+static inline void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt)
+{
+    LV_UNUSED(txt);
+    LV_UNUSED(base_dir);
+    if(*align == LV_TEXT_ALIGN_AUTO) * align = LV_TEXT_ALIGN_LEFT;
+}
 #endif /*LV_USE_BIDI*/
 
 #ifdef __cplusplus
