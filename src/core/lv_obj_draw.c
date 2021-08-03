@@ -206,10 +206,6 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
 #endif
 
     draw_dsc->align = lv_obj_get_style_text_align(obj, part);
-    if(draw_dsc->align == LV_TEXT_ALIGN_AUTO) {
-        if(draw_dsc->bidi_dir == LV_BASE_DIR_RTL) draw_dsc->align = LV_TEXT_ALIGN_RIGHT;
-        else draw_dsc->align = LV_TEXT_ALIGN_LEFT;
-    }
 }
 
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc)

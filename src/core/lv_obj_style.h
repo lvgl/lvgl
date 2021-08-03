@@ -220,6 +220,8 @@ static inline void lv_obj_set_style_size(struct _lv_obj_t * obj,  lv_coord_t val
     lv_obj_set_style_height(obj, value, selector);
 }
 
+lv_text_align_t lv_obj_calculate_style_text_align(struct _lv_obj_t * obj, lv_part_t part, const char * txt);
+
 /**********************
  *      MACROS
  **********************/

@@ -247,6 +247,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
 
     /*Delete a character*/
     _lv_txt_cut(label_txt, ta->cursor.pos - 1, 1);
+
     /*Refresh the label*/
     lv_label_set_text(ta->label, label_txt);
     lv_textarea_clear_selection(obj);
@@ -1076,11 +1077,7 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_point_t letter_pos;
     lv_label_get_letter_pos(ta->label, cur_pos, &letter_pos);
 
-    lv_text_align_t align = lv_obj_get_style_text_align(ta->label, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO) {
-       if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-       else align = LV_TEXT_ALIGN_LEFT;
-    }
+    lv_text_align_t align = lv_obj_calculate_style_text_align(ta->label, LV_PART_MAIN, lv_label_get_text(ta->label));
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
     if(letter_pos.x + ta->label->coords.x1 + letter_w > ta->label->coords.x2 && ta->one_line == 0 && align != LV_TEXT_ALIGN_RIGHT) {
