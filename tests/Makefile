@@ -53,5 +53,4 @@ clean:
 	find ../ -type f -name '*.o' -exec rm -f {} +
 	find ../ -type f -name '*.gcda' -exec rm -f {} +
 	find ../ -type f -name '*.gcno' -exec rm -f {} +
-	rm -rf src/test_runners
 	rm -f $(BIN) 
