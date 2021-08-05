@@ -46,7 +46,7 @@ static void draw_event_cb(lv_event_t * e)
     }
     /*Hook the division lines too*/
     else if(dsc->part == LV_PART_MAIN) {
-        if(dsc->line_dsc == NULL) return;
+        if(dsc->line_dsc == NULL || dsc->p1 == NULL || dsc->p2 == NULL) return;
 
         /*Vertical line*/
         if(dsc->p1->x == dsc->p2->x) {
