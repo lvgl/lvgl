@@ -18,4 +18,4 @@ docs/env
 out_html
 __pycache__
 /emscripten_builder
-image_err.h
+test_screenshot_error.h
