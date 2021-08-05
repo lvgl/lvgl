@@ -136,7 +136,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     lv_grad_dir_t grad_dir = dsc->bg_grad_dir;
     if(dsc->bg_color.full == dsc->bg_grad_color.full) grad_dir = LV_GRAD_DIR_NONE;
 
-    bool mask_any = lv_draw_mask_is_any();
+    bool mask_any = lv_draw_mask_is_any(&coords_bg);
 
     /*Most simple case: just a plain rectangle*/
     if(!mask_any && dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
@@ -497,7 +497,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 
 
     /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
-    bool mask_any = lv_draw_mask_is_any();
+    bool mask_any = lv_draw_mask_is_any(&shadow_area);
     bool simple = true;
     if(mask_any || dsc->bg_opa < LV_OPA_COVER) simple = false;
 
@@ -1083,7 +1083,7 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
     if(!_lv_area_intersect(&draw_area, outer_area, clip_area)) return;
     int32_t draw_area_w = lv_area_get_width(&draw_area);
 
-    bool mask_any = lv_draw_mask_is_any();
+    bool mask_any = lv_draw_mask_is_any(outer_area);
 
     /*Create a mask if there is a radius*/
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);

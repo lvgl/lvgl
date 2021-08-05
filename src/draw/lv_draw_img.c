@@ -353,10 +353,10 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
+    bool mask_any = lv_draw_mask_is_any(map_area);
 
     /*The simplest case just copy the pixels into the draw_buf*/
-    if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
+    if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
                       draw_dsc->blend_mode);
@@ -364,14 +364,14 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
 #if LV_USE_GPU_NXP_PXP
     /*Simple case without masking and transformations*/
-    else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
+    else if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
             chroma_key == true && draw_dsc->recolor_opa == LV_OPA_TRANSP) { /*copy with color keying (+ alpha)*/
         lv_gpu_nxp_pxp_enable_color_key();
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
                       draw_dsc->blend_mode);
         lv_gpu_nxp_pxp_disable_color_key();
     }
-    else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
+    else if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
             chroma_key == false && draw_dsc->recolor_opa != LV_OPA_TRANSP) { /*copy with recolor (+ alpha)*/
         lv_gpu_nxp_pxp_enable_recolor(draw_dsc->recolor, draw_dsc->recolor_opa);
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
@@ -408,7 +408,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
         bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
         /*Simple ARGB image. Handle it as special case because it's very common*/
-        if(other_mask_cnt == 0 && !transform && !chroma_key && draw_dsc->recolor_opa == LV_OPA_TRANSP && alpha_byte) {
+        if(!mask_any && !transform && !chroma_key && draw_dsc->recolor_opa == LV_OPA_TRANSP && alpha_byte) {
 #if LV_USE_GPU_STM32_DMA2D && LV_COLOR_DEPTH == 32
             /*Blend ARGB images directly*/
             if(lv_area_get_size(&draw_area) > 240) {
@@ -509,7 +509,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                         draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
             /*Prepare the `mask_buf`if there are other masks*/
-            if(other_mask_cnt) {
+            if(mask_any) {
                 lv_memset_ff(mask_buf, mask_buf_size);
             }
 
@@ -589,7 +589,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 }
 #if LV_DRAW_COMPLEX
                 /*Apply the masks if any*/
-                if(other_mask_cnt) {
+                if(mask_any) {
                     lv_draw_mask_res_t mask_res_sub;
                     mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + draw_buf->area.x1, y + draw_area.y1 + draw_buf->area.y1,
                                                       lv_area_get_width(&draw_area));
@@ -619,7 +619,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                                 draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
                     /*Prepare the `mask_buf`if there are other masks*/
-                    if(other_mask_cnt) {
+                    if(mask_any) {
                         lv_memset_ff(mask_buf, mask_buf_size);
                     }
                 }

@@ -539,7 +539,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
 #if LV_DRAW_COMPLEX
-    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
+    bool mask_any = lv_draw_mask_is_any(&fill_area);
 #endif
 
     uint32_t col_bit_max = 8 - bpp;
@@ -577,7 +577,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
 #if LV_DRAW_COMPLEX
         /*Apply masks if any*/
-        if(other_mask_cnt) {
+        if(mask_any) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
                                                              lv_area_get_width(&fill_area));
             if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
@@ -695,8 +695,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     /*If the letter is partially out of mask the move there on draw_buf*/
     disp_buf_buf_tmp += (row_start * disp_buf_width) + col_start / 3;
 
-    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
-
+    bool mask_any = lv_draw_mask_is_any(&map_area);
     uint8_t font_rgb[3];
 
 #if LV_COLOR_16_SWAP == 0
@@ -784,7 +783,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
         }
 
         /*Apply masks if any*/
-        if(other_mask_cnt) {
+        if(mask_any) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
                                                              lv_area_get_width(&map_area));
             if(mask_res == LV_DRAW_MASK_RES_TRANSP) {

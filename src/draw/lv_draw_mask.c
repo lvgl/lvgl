@@ -211,9 +211,29 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void)
     return cnt;
 }
 
-bool lv_draw_mask_is_any(void)
+bool lv_draw_mask_is_any(const lv_area_t * a)
 {
-    return LV_GC_ROOT(_lv_draw_mask_list[0]).param ? true : false;
+    if(a == NULL) return LV_GC_ROOT(_lv_draw_mask_list[0]).param ? true : false;
+
+    uint8_t i;
+    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        _lv_draw_mask_common_dsc_t * comm_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        if(comm_param == NULL) continue;
+        if(comm_param->type == LV_DRAW_MASK_TYPE_RADIUS) {
+            lv_draw_mask_radius_param_t * radius_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+            if(radius_param->cfg.outer) {
+                if(!_lv_area_is_out(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
+            }
+            else {
+                if(!_lv_area_is_in(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    return false;
+
 }
 
 /**

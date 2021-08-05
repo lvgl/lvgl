@@ -518,11 +518,14 @@ static void lv_obj_draw(lv_event_t * e)
 
 #if LV_DRAW_COMPLEX
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+            /*If the radius is 0 the parent's coordinates will clip anyway*/
             lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-            lv_draw_mask_radius_init(mp, &obj->coords, r, false);
-            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
-            lv_draw_mask_add(mp, obj + 8);
+            if(r != 0) {
+                lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+                lv_draw_mask_radius_init(mp, &obj->coords, r, false);
+                /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
+                lv_draw_mask_add(mp, obj + 8);
+            }
         }
 #endif
     }
@@ -533,8 +536,10 @@ static void lv_obj_draw(lv_event_t * e)
 #if LV_DRAW_COMPLEX
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
-            lv_draw_mask_free_param(param);
-            lv_mem_buf_release(param);
+            if(param) {
+                lv_draw_mask_free_param(param);
+                lv_mem_buf_release(param);
+            }
         }
 #endif
 
@@ -555,7 +560,6 @@ static void lv_obj_draw(lv_event_t * e)
             coords.x2 += w;
             coords.y1 -= h;
             coords.y2 += h;
-
 
             lv_obj_draw_part_dsc_t part_dsc;
             lv_obj_draw_dsc_init(&part_dsc, clip_area);

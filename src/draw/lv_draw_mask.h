@@ -55,11 +55,14 @@ typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
 
 
 #if LV_DRAW_COMPLEX == 0
-static inline  uint8_t lv_draw_mask_get_cnt(void) {
+static inline  uint8_t lv_draw_mask_get_cnt(void)
+{
     return 0;
 }
 
-static inline bool lv_draw_mask_is_any(void) {
+static inline bool lv_draw_mask_is_any(const lv_area_t * a)
+{
+    LV_UNUSED(a);
     return false;
 }
 
@@ -277,9 +280,10 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void);
 
 /**
  * Check is there is any added draw mask
+ * @param a     an area to test for affecting masks.
  * @return true: there is t least 1 draw mask; false: there are no draw masks
  */
-bool lv_draw_mask_is_any(void);
+bool lv_draw_mask_is_any(const lv_area_t * a);
 
 //! @endcond
 
