@@ -120,7 +120,9 @@ lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * mbox)
 
 lv_obj_t * lv_msgbox_get_text(lv_obj_t * mbox)
 {
-    return lv_obj_get_child(mbox, lv_obj_get_child_cnt(mbox) - 2);
+    lv_obj_t * guess = lv_obj_get_child(mbox, 1); /*Can be the close button*/
+    if(lv_obj_get_class(guess) == &lv_btn_class) guess = lv_obj_get_child(mbox, 2);
+    return guess;
 }
 
 lv_obj_t * lv_msgbox_get_btns(lv_obj_t * mbox)
