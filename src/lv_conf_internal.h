@@ -6,7 +6,7 @@
 
 #ifndef LV_CONF_INTERNAL_H
 #define LV_CONF_INTERNAL_H
-/*clang-format off*/
+/* clang-format off */
 
 #include <stdint.h>
 
@@ -46,7 +46,7 @@
 /*----------------------------------
  * Start parsing lv_conf_template.h
  -----------------------------------*/
-/*clang-format off*/
+/* clang-format off */
 
 #include <stdint.h>
 
