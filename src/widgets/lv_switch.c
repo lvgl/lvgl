@@ -46,7 +46,8 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 static void lv_switch_init_anim(lv_obj_t * sw, _lv_switch_anim_t * switch_anim);
-static void lv_switch_anim(void * sw, int32_t value);
+static void lv_switch_anim_exec_cb(void * sw, int32_t value);
+static void lv_switch_trigger_anim(lv_obj_t * obj);
 static void lv_switch_anim_ready(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
@@ -76,49 +77,6 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent)
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
-}
-
-/*=====================
- * Setter functions
- *====================*/
-
-void lv_switch_set_anim(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_switch_t * sw = (lv_switch_t *)obj;
-    _lv_switch_anim_t * anim_info = &sw->value_anim;
-
-    uint32_t anim_dur_full = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
-
-    if(anim_dur_full>0) {
-        bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
-        int32_t anim_start;
-        int32_t anim_end;
-        /*No animation in progress -> simply set the values*/
-        if(anim_info->anim_state == LV_SWITCH_ANIM_STATE_INV) {
-            anim_start = chk ? LV_SWITCH_ANIM_STATE_START : LV_SWITCH_ANIM_STATE_END;
-            anim_end   = chk ? LV_SWITCH_ANIM_STATE_END : LV_SWITCH_ANIM_STATE_START;
-        }
-        /*Animation in progress. Start from the animation end value*/
-        else {
-            anim_start = anim_info->anim_state;
-            anim_end   = chk ? LV_SWITCH_ANIM_STATE_END : LV_SWITCH_ANIM_STATE_START;
-        }
-        /*Calculate actual animation duration*/
-        uint32_t anim_dur = (anim_dur_full * LV_ABS(anim_start - anim_end))/LV_SWITCH_ANIM_STATE_END;
-
-        /*Stop the previous animation if it exists*/
-        lv_anim_del(anim_info, NULL);
-
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, anim_info);
-        lv_anim_set_exec_cb(&a, lv_switch_anim);
-        lv_anim_set_values(&a, anim_start, anim_end);
-        lv_anim_set_ready_cb(&a, lv_switch_anim_ready);
-        lv_anim_set_time(&a, anim_dur);
-        lv_anim_start(&a);
-    }
 }
 
 /**********************
@@ -178,7 +136,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
-        lv_switch_set_anim(obj);
+        lv_switch_trigger_anim(obj);
         lv_obj_invalidate(obj);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
@@ -226,9 +184,11 @@ static void draw_main(lv_event_t * e)
     bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
 
     if(LV_SWITCH_IS_ANIMATING(sw->value_anim)) {
+        /* Use the animation's coordinate */
         anim_value_x = (anim_length * sw->value_anim.anim_state) / LV_SWITCH_ANIM_STATE_END;
     }
     else {
+        /* Use LV_STATE_CHECKED to decide the coordinate */
         anim_value_x = chk ? anim_length : 0;
     }
 
@@ -260,13 +220,16 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
 }
 
-static void lv_switch_anim(void * var, int32_t value)
+static void lv_switch_anim_exec_cb(void * var, int32_t value)
 {
     _lv_switch_anim_t * switch_anim = var;
     switch_anim->anim_state = value;
     lv_obj_invalidate(switch_anim->sw);
 }
 
+/**
+ * Resets the switch's animation state to "no animation in progress".
+ */
 static void lv_switch_anim_ready(lv_anim_t * a)
 {
     _lv_switch_anim_t * var = a->var;
@@ -274,10 +237,57 @@ static void lv_switch_anim_ready(lv_anim_t * a)
     lv_obj_invalidate(var->sw);
 }
 
+/**
+ * Helper function to initialize a switch's animation structure.
+ */
 static void lv_switch_init_anim(lv_obj_t * obj, _lv_switch_anim_t * switch_anim)
 {
     switch_anim->sw = obj;
     switch_anim->anim_state = LV_SWITCH_ANIM_STATE_INV;
 }
+
+/**
+ * Starts an animation for the switch knob. if the anim_time style property is greater than 0
+ * @param obj the switch to animate
+ */
+static void lv_switch_trigger_anim(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_switch_t * sw = (lv_switch_t *)obj;
+    _lv_switch_anim_t * anim_info = &sw->value_anim;
+
+    uint32_t anim_dur_full = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+
+    if(anim_dur_full>0) {
+        bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
+        int32_t anim_start;
+        int32_t anim_end;
+        /*No animation in progress -> simply set the values*/
+        if(anim_info->anim_state == LV_SWITCH_ANIM_STATE_INV) {
+            anim_start = chk ? LV_SWITCH_ANIM_STATE_START : LV_SWITCH_ANIM_STATE_END;
+            anim_end   = chk ? LV_SWITCH_ANIM_STATE_END : LV_SWITCH_ANIM_STATE_START;
+        }
+        /*Animation in progress. Start from the animation end value*/
+        else {
+            anim_start = anim_info->anim_state;
+            anim_end   = chk ? LV_SWITCH_ANIM_STATE_END : LV_SWITCH_ANIM_STATE_START;
+        }
+        /*Calculate actual animation duration*/
+        uint32_t anim_dur = (anim_dur_full * LV_ABS(anim_start - anim_end))/LV_SWITCH_ANIM_STATE_END;
+
+        /*Stop the previous animation if it exists*/
+        lv_anim_del(anim_info, NULL);
+
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, anim_info);
+        lv_anim_set_exec_cb(&a, lv_switch_anim_exec_cb);
+        lv_anim_set_values(&a, anim_start, anim_end);
+        lv_anim_set_ready_cb(&a, lv_switch_anim_ready);
+        lv_anim_set_time(&a, anim_dur);
+        lv_anim_start(&a);
+    }
+}
+
 
 #endif
