@@ -71,6 +71,8 @@ jobs:
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: out_html  # The folder the action should deploy.
           TARGET_FOLDER: ${{ steps.version.outputs.VERSION_NAME }}
+          GIT_CONFIG_NAME: lvgl-bot
+          GIT_CONFIG_EMAIL: lvgl-bot@users.noreply.github.com
           PRESERVE: true
           SINGLE_COMMIT: true
       - name: Deploy to master
@@ -83,5 +85,7 @@ jobs:
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: out_html  # The folder the action should deploy.
           TARGET_FOLDER: master
+          GIT_CONFIG_NAME: lvgl-bot
+          GIT_CONFIG_EMAIL: lvgl-bot@users.noreply.github.com
           PRESERVE: true
           SINGLE_COMMIT: true
