@@ -218,10 +218,13 @@ void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t
 {
     lv_coord_t rout = radius;
     lv_coord_t rin = radius - w;
-    lv_coord_t extra_area = rounded ? w : 0;
+    lv_coord_t extra_area = rounded ? w / 2 + 1 : 0;
     uint8_t start_quarter = start_angle / 90;
     uint8_t end_quarter = end_angle / 90;
 
+    /*360 deg still counts as quarter 3 (360 / 90 would be 4)*/
+    if(start_quarter == 4) start_quarter = 3;
+    if(end_quarter == 4) end_quarter = 3;
 
     if(start_quarter == end_quarter && start_angle <= end_angle) {
         if(start_quarter == 0) {

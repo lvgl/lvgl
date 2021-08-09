@@ -92,28 +92,10 @@ void lv_arc_set_start_angle(lv_obj_t * obj, uint16_t start)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    if(start > 360) start -= 360;
-
-    /*Too large move, the whole arc need to be invalidated anyway*/
-    if(LV_ABS(start -arc->indic_angle_start) >= 180) {
-        lv_obj_invalidate(obj);
-    }
-    /*Only a smaller incremental move*/
-    else if(arc->indic_angle_start >arc->indic_angle_end && start >arc->indic_angle_end) {
-        inv_arc_area(obj, LV_MIN(arc->indic_angle_start, start), LV_MAX(arc->indic_angle_start, start),
-                     LV_PART_INDICATOR);
-    }
-    /*Only a smaller incremental move*/
-    else  if(arc->indic_angle_start <arc->indic_angle_end && start <arc->indic_angle_end) {
-        inv_arc_area(obj, LV_MIN(arc->indic_angle_start, start), LV_MAX(arc->indic_angle_start, start),
-                     LV_PART_INDICATOR);
-    }
-    /*Crossing the start angle makes the whole arc change*/
-    else {
-        lv_obj_invalidate(obj);
-    }
-
-   arc->indic_angle_start = start;
+    inv_arc_area(obj, LV_MIN(arc->indic_angle_start >= 360 ? arc->indic_angle_start - 360 : arc->indic_angle_start, start),
+            LV_MAX(arc->indic_angle_start, start),
+            LV_PART_INDICATOR);
+    arc->indic_angle_start = start > 360 ? start - 360 : start;
 }
 
 /**
@@ -126,26 +108,10 @@ void lv_arc_set_end_angle(lv_obj_t * obj, uint16_t end)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    if(end > (arc->indic_angle_start + 360)) end =arc->indic_angle_start + 360;
-
-    /*Too large move, the whole arc need to be invalidated anyway*/
-    if(LV_ABS(end -arc->indic_angle_end) >= 180) {
-        lv_obj_invalidate(obj);
-    }
-    /*Only a smaller incremental move*/
-    else if(arc->indic_angle_end >arc->indic_angle_start && end >arc->indic_angle_start) {
-        inv_arc_area(obj, LV_MIN(arc->indic_angle_end, end), LV_MAX(arc->indic_angle_end, end), LV_PART_INDICATOR);
-    }
-    /*Only a smaller incremental move*/
-    else  if(arc->indic_angle_end <arc->indic_angle_start && end <arc->indic_angle_start) {
-        inv_arc_area(obj, LV_MIN(arc->indic_angle_end, end), LV_MAX(arc->indic_angle_end, end), LV_PART_INDICATOR);
-    }
-    /*Crossing the end angle makes the whole arc change*/
-    else {
-        lv_obj_invalidate(obj);
-    }
-
-   arc->indic_angle_end = end;
+    inv_arc_area(obj, LV_MIN(arc->indic_angle_end, end),
+            LV_MAX(arc->indic_angle_end, end),
+            LV_PART_INDICATOR);
+    arc->indic_angle_end = end > 360 ? end - 360 : end;
 }
 
 /**
@@ -159,11 +125,10 @@ void lv_arc_set_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
+    inv_arc_area(obj,arc->indic_angle_start, arc->indic_angle_end, LV_PART_INDICATOR);
+
     if(start > 360) start -= 360;
-    if(end > (start + 360)) end = start + 360;
-
-    inv_arc_area(obj,arc->indic_angle_start,arc->indic_angle_end, LV_PART_INDICATOR);
-
+    if(end > 360) end -= 360;
     arc->indic_angle_start = start;
     arc->indic_angle_end = end;
 
@@ -180,26 +145,10 @@ void lv_arc_set_bg_start_angle(lv_obj_t * obj, uint16_t start)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    if(start > 360) start -= 360;
-
-    /*Too large move, the whole arc need to be invalidated anyway*/
-    if(LV_ABS(start -arc->bg_angle_start) >= 180) {
-        lv_obj_invalidate(obj);
-    }
-    /*Only a smaller incremental move*/
-    else if(arc->bg_angle_start >arc->bg_angle_end && start >arc->bg_angle_end) {
-        inv_arc_area(obj, LV_MIN(arc->bg_angle_start, start), LV_MAX(arc->bg_angle_start, start), LV_PART_MAIN);
-    }
-    /*Only a smaller incremental move*/
-    else  if(arc->bg_angle_start <arc->bg_angle_end && start <arc->bg_angle_end) {
-        inv_arc_area(obj, LV_MIN(arc->bg_angle_start, start), LV_MAX(arc->bg_angle_start, start), LV_PART_MAIN);
-    }
-    /*Crossing the start angle makes the whole arc change*/
-    else {
-        lv_obj_invalidate(obj);
-    }
-
-   arc->bg_angle_start = start;
+    inv_arc_area(obj, LV_MIN(arc->bg_angle_start >= 360 ? arc->bg_angle_start - 360 : arc->bg_angle_start, start),
+            LV_MAX(arc->bg_angle_start, start),
+            LV_PART_INDICATOR);
+    arc->bg_angle_start = start > 360 ? start - 360 : start;
 
     value_update(obj);
 }
@@ -214,29 +163,11 @@ void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint16_t end)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-
-    if(end > (arc->bg_angle_start + 360)) end =arc->bg_angle_start + 360;
-
-    /*Too large move, the whole arc need to be invalidated anyway*/
-    if(LV_ABS(end -arc->bg_angle_end) >= 180) {
-        lv_obj_invalidate(obj);
-    }
-    /*Only a smaller incremental move*/
-    else if(arc->bg_angle_end >arc->bg_angle_start && end >arc->bg_angle_start) {
-        inv_arc_area(obj, LV_MIN(arc->bg_angle_end, end), LV_MAX(arc->bg_angle_end, end), LV_PART_MAIN);
-    }
-    /*Only a smaller incremental move*/
-    else  if(arc->bg_angle_end <arc->bg_angle_start && end <arc->bg_angle_start) {
-        inv_arc_area(obj, LV_MIN(arc->bg_angle_end, end), LV_MAX(arc->bg_angle_end, end), LV_PART_MAIN);
-    }
-    /*Crossing the end angle makes the whole arc change*/
-    else {
-        lv_obj_invalidate(obj);
-    }
-
+    inv_arc_area(obj, LV_MIN(arc->bg_angle_end >= 360 ? arc->bg_angle_end - 360 : arc->bg_angle_end, end),
+            LV_MAX(arc->bg_angle_end, end),
+            LV_PART_INDICATOR);
+    arc->bg_angle_end = end > 360 ? end - 360 : end;
     value_update(obj);
-
-   arc->bg_angle_end = end;
 }
 
 /**
@@ -247,17 +178,15 @@ void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint16_t end)
  */
 void lv_arc_set_bg_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
 {
-
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    if(start > 360) start -= 360;
-    if(end > (start + 360)) end = start + 360;
-
     inv_arc_area(obj,arc->bg_angle_start,arc->bg_angle_end, LV_PART_MAIN);
 
-   arc->bg_angle_start = start;
-   arc->bg_angle_end = end;
+    if(start > 360) start -= 360;
+    if(end > 360) end -= 360;
+    arc->bg_angle_start = start;
+    arc->bg_angle_end = end;
 
     inv_arc_area(obj,arc->bg_angle_start,arc->bg_angle_end, LV_PART_MAIN);
 
@@ -271,11 +200,10 @@ void lv_arc_set_bg_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
  */
 void lv_arc_set_rotation(lv_obj_t * obj, uint16_t rotation)
 {
-
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-   arc->rotation = rotation;
+    arc->rotation = rotation;
 
     lv_obj_invalidate(obj);
 }
@@ -292,8 +220,8 @@ void lv_arc_set_mode(lv_obj_t * obj, lv_arc_mode_t type)
 
     int16_t val =arc->value;
 
-   arc->type = type;
-   arc->value = -1; /** Force set_value handling*/
+    arc->type = type;
+    arc->value = -1; /** Force set_value handling*/
 
     int16_t bg_midpoint, bg_end =arc->bg_angle_end;
     if(arc->bg_angle_end <arc->bg_angle_start) bg_end =arc->bg_angle_end + 360;
@@ -763,17 +691,16 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
+    if(start_angle == end_angle) return;
+
     /*Skip this complicated invalidation if the arc is not visible*/
     if(lv_obj_is_visible(obj) == false) return;
 
-    start_angle +=arc->rotation;
-    end_angle +=arc->rotation;
+    start_angle += arc->rotation;
+    end_angle += arc->rotation;
 
     if(start_angle >= 360) start_angle -= 360;
     if(end_angle >= 360) end_angle -= 360;
-
-    uint8_t start_quarter = start_angle / 90;
-    uint8_t end_quarter = end_angle / 90;
 
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
@@ -784,10 +711,6 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     lv_coord_t y       = obj->coords.y1 + rout + top;
     lv_coord_t w = lv_obj_get_style_arc_width(obj, part);
     lv_coord_t rounded = lv_obj_get_style_arc_rounded(obj, part);
-    lv_coord_t rin       = rout - w;
-    lv_coord_t extra_area = 0;
-
-    extra_area = rounded ? w / 2 + 2 : 0;
 
     if(part == LV_PART_INDICATOR) {
         lv_coord_t knob_extra_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
@@ -799,86 +722,13 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
 
         knob_extra_size += LV_MAX4(knob_left, knob_right, knob_top, knob_bottom);
 
-        extra_area = LV_MAX(extra_area, w / 2 + 2 + knob_extra_size);
+        w += knob_extra_size * 2 + 2;
+        rout += knob_extra_size + 2;
     }
 
     lv_area_t inv_area;
-
-    if(start_quarter == end_quarter && start_angle <= end_angle) {
-        if(start_quarter == 0) {
-            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) - extra_area;
-            inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-
-            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-            inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rin) >> LV_TRIGO_SHIFT) - extra_area;
-
-            lv_obj_invalidate_area(obj, &inv_area);
-        }
-        else if(start_quarter == 1) {
-            inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-            inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rin) >> LV_TRIGO_SHIFT) + extra_area;
-
-            inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rin) >> LV_TRIGO_SHIFT) - extra_area;
-            inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-
-            lv_obj_invalidate_area(obj, &inv_area);
-        }
-        else if(start_quarter == 2) {
-            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-            inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
-
-            inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rin) >> LV_TRIGO_SHIFT) + extra_area;
-
-            lv_obj_invalidate_area(obj, &inv_area);
-        }
-        else if(start_quarter == 3) {
-            /*Small arc here*/
-            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rin) >> LV_TRIGO_SHIFT) - extra_area;
-            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-
-            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
-
-            lv_obj_invalidate_area(obj, &inv_area);
-        }
-    }
-    else if(start_quarter == 0 && end_quarter == 1) {
-        inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-        inv_area.y1 = y + ((LV_MIN(lv_trigo_sin(end_angle),
-                                        lv_trigo_sin(start_angle))  * rin) >> LV_TRIGO_SHIFT) - extra_area;
-        inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-        inv_area.y2 = y + rout + extra_area;
-        lv_obj_invalidate_area(obj, &inv_area);
-    }
-    else if(start_quarter == 1 && end_quarter == 2) {
-        inv_area.x1 = x - rout - extra_area;
-        inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-        inv_area.x2 = x + ((LV_MAX(lv_trigo_sin(start_angle + 90),
-                                        lv_trigo_sin(end_angle + 90)) * rin) >> LV_TRIGO_SHIFT) + extra_area;
-        inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-        lv_obj_invalidate_area(obj, &inv_area);
-    }
-    else if(start_quarter == 2 && end_quarter == 3) {
-        inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-        inv_area.y1 = y - rout - extra_area;
-        inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-        inv_area.y2 = y + (LV_MAX(lv_trigo_sin(end_angle) * rin,
-                                       lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
-        lv_obj_invalidate_area(obj, &inv_area);
-    }
-    else if(start_quarter == 3 && end_quarter == 0) {
-        inv_area.x1 = x + ((LV_MIN(lv_trigo_sin(end_angle + 90),
-                                        lv_trigo_sin(start_angle + 90)) * rin) >> LV_TRIGO_SHIFT) - extra_area;
-        inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
-        inv_area.x2 = x + rout + extra_area;
-        inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
-
-        lv_obj_invalidate_area(obj, &inv_area);
-    }
-    else {
-        lv_obj_invalidate(obj);
-    }
+    lv_draw_arc_get_area(x, y, rout, start_angle, end_angle, w, rounded, &inv_area);
+    lv_obj_invalidate_area(obj, &inv_area);
 }
 
 static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
