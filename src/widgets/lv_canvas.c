@@ -27,12 +27,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_canvas_class = {
     .constructor_cb = lv_canvas_constructor,
+    .destructor_cb = lv_canvas_destructor,
     .instance_size = sizeof(lv_canvas_t),
     .base_class = &lv_img_class
 };
@@ -909,6 +911,15 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_img_set_src(obj, &canvas->dsc);
 
     LV_TRACE_OBJ_CREATE("finished");
+}
+
+static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+    LV_TRACE_OBJ_CREATE("begin");
+
+    lv_canvas_t * canvas = (lv_canvas_t *)obj;
+    lv_img_cache_invalidate_src(&canvas->dsc);
 }
 
 #endif
