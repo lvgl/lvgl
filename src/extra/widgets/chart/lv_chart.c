@@ -839,7 +839,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
     if(_lv_area_intersect(&com_area, &obj->coords, clip_area) == false) return;
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
-    if(chart->point_cnt < 1) return;
+    if(chart->point_cnt < 2) return;
 
     uint16_t i;
     lv_point_t p1;
