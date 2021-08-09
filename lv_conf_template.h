@@ -4,24 +4,27 @@
  */
 
 /*
- * COPY THIS FILE AS `lv_conf.h` NEXT TO the `lvgl` FOLDER
+ * Copy this file as `lv_conf.h`
+ * 1. simply next to the `lvgl` folder
+ * 2. or any other places and
+ *    - define `LV_CONF_INCLUDE_SIMPLE`
+ *    - add the path as include path
  */
 
+/* clang-format off */
 #if 0 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
-/* clang-format off */
 
 #include <stdint.h>
-
 
 /*====================
    COLOR SETTINGS
  *====================*/
 
 /*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
-#define LV_COLOR_DEPTH     32
+#define LV_COLOR_DEPTH     16
 
 /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
 #define LV_COLOR_16_SWAP   0
@@ -113,6 +116,7 @@
 
 /*Maximum buffer size to allocate for rotation. Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF         (10*1024)
+
 /*-------------
  * GPU
  *-----------*/
@@ -393,7 +397,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 #define LV_USE_CHECKBOX     1
 
-
 #define LV_USE_DROPDOWN     1   /*Requires: lv_label*/
 
 #define LV_USE_IMG          1   /*Requires: lv_label*/
@@ -478,6 +481,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*-----------
  * Themes
  *----------*/
+
 /*A simple, impressive and very complete theme*/
 #define LV_USE_THEME_DEFAULT    1
 #if LV_USE_THEME_DEFAULT
