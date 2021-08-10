@@ -70,7 +70,7 @@ For example let's there is 400 px remaining space and 4 object with grow:
 
 `A` and `B` will have 100 px size, and `C` will have 200 px size.
 
-Flex grow can be set on a child with `lv_obj_set_flex_flow(child, value)`. `value` needs to be &gt; 1 or 0 to disable grow on the child.
+Flex grow can be set on a child with `lv_obj_set_flex_grow(child, value)`. `value` needs to be &gt; 1 or 0 to disable grow on the child.
 
 
 ## Style interface
