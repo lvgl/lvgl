@@ -135,6 +135,12 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     }
 
     highlight_update(obj);
+
+    /*Reset the focused button if the days changes*/
+    if(lv_btnmatrix_get_selected_btn(obj) != LV_BTNMATRIX_BTN_NONE) {
+        lv_btnmatrix_set_selected_btn(obj, day_first + 7);
+    }
+
     lv_obj_invalidate(obj);
 }
 
@@ -339,7 +345,7 @@ static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
 #endif
 
-    return day_of_week;
+    return day_of_week  ;
 }
 
 static void highlight_update(lv_obj_t * obj)
@@ -360,7 +366,9 @@ static void highlight_update(lv_obj_t * obj)
 
     if(calendar->showed_date.year == calendar->today.year && calendar->showed_date.month == calendar->today.month) {
         uint8_t day_first = get_day_of_week(calendar->today.year, calendar->today.month, 0);
-        lv_btnmatrix_set_btn_ctrl(obj, calendar->today.day + day_first + 7, LV_CALENDAR_CTRL_TODAY);
+        uint8_t tmp = calendar->today.day + day_first;
+        if(tmp >= 7) tmp -= 7;  /*Do not leave an empty line*/
+        lv_btnmatrix_set_btn_ctrl(obj, tmp + 7, LV_CALENDAR_CTRL_TODAY);
     }
 }
 
