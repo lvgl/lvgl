@@ -82,7 +82,15 @@ void _lv_img_decoder_init(void)
  */
 lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 {
-   lv_memset_00(header, sizeof(lv_img_header_t));
+    lv_memset_00(header, sizeof(lv_img_header_t));
+
+    if(src == NULL) return LV_RES_INV;
+
+    lv_img_src_t src_type = lv_img_src_get_type(src);
+    if(src_type == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * dsc = src;
+        if(dsc->data == NULL) return LV_RES_INV;
+    }
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
@@ -100,8 +108,15 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 {
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
+    if(src == NULL) return LV_RES_INV;
+    lv_img_src_t src_type = lv_img_src_get_type(src);
+    if(src_type == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * dsc = src;
+        if(dsc->data == NULL) return LV_RES_INV;
+    }
+
     dsc->color    = color;
-    dsc->src_type = lv_img_src_get_type(src);
+    dsc->src_type = src_type;
     dsc->frame_id = frame_id;
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
