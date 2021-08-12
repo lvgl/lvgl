@@ -111,8 +111,8 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     if(src == NULL) return LV_RES_INV;
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * dsc = src;
-        if(dsc->data == NULL) return LV_RES_INV;
+        const lv_img_dsc_t * img_dsc = src;
+        if(img_dsc->data == NULL) return LV_RES_INV;
     }
 
     dsc->color    = color;
