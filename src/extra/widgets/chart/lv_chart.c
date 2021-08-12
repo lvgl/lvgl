@@ -188,6 +188,8 @@ void lv_chart_set_zoom_x(lv_obj_t * obj, uint16_t zoom_x)
 
     chart->zoom_x = zoom_x;
     lv_obj_refresh_self_size(obj);
+    /*Be the chart doesn't remain scrolled out*/
+    lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     lv_obj_invalidate(obj);
 }
 
@@ -200,6 +202,8 @@ void lv_chart_set_zoom_y(lv_obj_t * obj, uint16_t zoom_y)
 
     chart->zoom_y = zoom_y;
     lv_obj_refresh_self_size(obj);
+    /*Be the chart doesn't remain scrolled out*/
+    lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     lv_obj_invalidate(obj);
 }
 
