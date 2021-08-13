@@ -35,7 +35,7 @@ lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_SER /
 ```
 - Implement and register a function which can copy the rendered image to an area of your display:
 ```c
-lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
+static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
 lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
 disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
 disp_drv.buffer = &draw_buf;          /*Assign the buffer to the display*/
@@ -61,7 +61,7 @@ void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * co
 ```
 - Implement and register a function which can read an input device. E.g. for a touch pad:
 ```c
-lv_indev_drv_t indev_drv;                  /*Descriptor of a input device driver*/
+static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
 lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
 indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
