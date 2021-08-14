@@ -28,14 +28,8 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_obj_t * sw;
-    int32_t anim_state;
-} _lv_switch_anim_t;
-
-
-typedef struct {
     lv_obj_t obj;
-    _lv_switch_anim_t value_anim;
+    int32_t anim_state;
 }lv_switch_t;
 
 extern const lv_obj_class_t lv_switch_class;
