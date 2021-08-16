@@ -187,7 +187,7 @@ The following predefined parts exist in LVGL:
 - `LV_PART_INDICATOR` Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
 - `LV_PART_KNOB` Like a handle to grab to adjust the value*/
 - `LV_PART_SELECTED` Indicate the currently selected option or section
-- `LV_PART_ITEMS` Used if the widget has multiple similar elements (e.g. tabel cells)*/
+- `LV_PART_ITEMS` Used if the widget has multiple similar elements (e.g. table cells)*/
 - `LV_PART_TICKS` Ticks on scales e.g. for a chart or meter
 - `LV_PART_CURSOR` Mark a specific place e.g. text area's or chart's cursor
 - `LV_PART_CUSTOM_FIRST` Custom parts can be added from here.
