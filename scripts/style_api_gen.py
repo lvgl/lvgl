@@ -9,7 +9,7 @@ props = [
  'dsc': "Sets the width of object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MIN_WIDTH',                 
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':'idget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a minimal width. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MAX_WIDTH',                 
