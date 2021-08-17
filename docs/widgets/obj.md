@@ -69,6 +69,8 @@ for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
 
 You can bring an object to the foreground or send it to the background with `lv_obj_move_foreground(obj)` and `lv_obj_move_background(obj)`.
 
+You can swap the order (between foreground and background) of two objects with `lv_obj_swap(obj1, obj2)`.
+
 ### Screens
 When you have created a screen like `lv_obj_t * screen = lv_obj_create(NULL)`, you can load it with `lv_scr_load(screen)`. The `lv_scr_act()` function gives you a pointer to the current screen.
 
