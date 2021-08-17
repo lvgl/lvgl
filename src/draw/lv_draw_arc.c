@@ -104,9 +104,12 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     area_in.y2 -= dsc->width;
 
     /*Create inner the mask*/
+    int16_t mask_in_id = LV_MASK_ID_INV;
     lv_draw_mask_radius_param_t mask_in_param;
-    lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
-    int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
+    if(lv_area_get_width(&area_in) > 0 && lv_area_get_height(&area_in) > 0) {
+        lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
+    }
 
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
@@ -118,7 +121,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         lv_draw_rect(&area_out, clip_area, &cir_dsc);
 
         lv_draw_mask_remove_id(mask_out_id);
-        lv_draw_mask_remove_id(mask_in_id);
+        if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
         return;
     }
 
@@ -166,7 +169,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     lv_draw_mask_remove_id(mask_angle_id);
     lv_draw_mask_remove_id(mask_out_id);
-    lv_draw_mask_remove_id(mask_in_id);
+    if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
 
     if(dsc->rounded) {
 
