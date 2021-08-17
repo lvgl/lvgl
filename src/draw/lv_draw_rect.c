@@ -187,7 +187,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     blend_area.x1 = draw_area.x1;
     blend_area.x2 = draw_area.x2;
 
-
     /*There is an other mask too. Draw line by line. */
     if(mask_any) {
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
@@ -198,6 +197,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
              * It saves calculating the final opa in _lv_blend_fill*/
             lv_memset(mask_buf, opa, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, draw_area.x1, h, draw_area_w);
+            if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             if(grad_dir == LV_GRAD_DIR_NONE) {
                 _lv_blend_fill(clip_area, &blend_area, dsc->bg_color, mask_buf, mask_res, LV_OPA_COVER, dsc->blend_mode);
