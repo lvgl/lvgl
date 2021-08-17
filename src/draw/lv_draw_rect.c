@@ -177,7 +177,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
         int32_t i;
         for(i = 0; i < coords_w; i++) {
-            grad_map[i] = grad_get(dsc, coords_w, i);
+            grad_map[i] = grad_get(dsc, coords_w, i - coords_bg.x1);
         }
     }
 
