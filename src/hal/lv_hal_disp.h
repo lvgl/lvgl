@@ -84,6 +84,7 @@ typedef struct _lv_disp_drv_t {
      * LVGL will use this buffer(s) to draw the screens contents*/
     lv_disp_draw_buf_t * draw_buf;
 
+    uint32_t direct_mode : 1;        /**< 1: Use screen-sized buffers and draw to absolute coordinates*/
     uint32_t full_refresh : 1;       /**< 1: Always make the whole screen redrawn*/
     uint32_t sw_rotate : 1;          /**< 1: use software rotation (slower)*/
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
