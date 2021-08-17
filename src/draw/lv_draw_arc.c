@@ -216,6 +216,9 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
 void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle, lv_coord_t w, bool rounded, lv_area_t * area)
 {
+    if(start_angle > 360) start_angle -= 360;
+    if(end_angle > 360) end_angle -= 360;
+
     lv_coord_t rout = radius;
     lv_coord_t rin = radius - w;
     lv_coord_t extra_area = rounded ? w / 2 + 1 : 0;
