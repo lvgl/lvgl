@@ -87,7 +87,7 @@ void lv_example_list_2(void)
     for (int i = 0; i < 10; i++)
     {
         char szBuf[100];
-        sprintf(szBuf, " Item %d ", i);
+        lv_snprintf(szBuf, sizeof(szBuf), " Item %d ", i);
         btn = lv_btn_create(list2);
         lv_obj_t* lab = lv_label_create(btn);
         lv_label_set_text(lab, szBuf);

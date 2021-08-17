@@ -237,23 +237,26 @@ void lv_obj_move_background(lv_obj_t * obj)
 
 void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
 {
-    LV_ASSERT_OBJ(obj1, MY_CLASS)
-    LV_ASSERT_OBJ(obj2, MY_CLASS)
+    LV_ASSERT_OBJ(obj1, MY_CLASS);
+    LV_ASSERT_OBJ(obj2, MY_CLASS);
 
     lv_obj_t* parent = lv_obj_get_parent(obj1);
     lv_obj_t* parent2 = lv_obj_get_parent(obj2);
-    LV_ASSERT(parent == parent2);
 
     uint_fast32_t index1 = lv_obj_get_child_id(obj1);
     uint_fast32_t index2 = lv_obj_get_child_id(obj2);
 
     parent->spec_attr->children[index1] = obj2;
-    parent->spec_attr->children[index2] = obj1;
+    parent2->spec_attr->children[index2] = obj1;
 
     lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj2);
-    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj1);
+    lv_event_send(parent2, LV_EVENT_CHILD_CHANGED, obj1);
 
     lv_obj_invalidate(parent);
+    if( parent != parent2)
+    {
+        lv_obj_invalidate(parent2);
+    }
 }
 
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)

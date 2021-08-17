@@ -1,6 +1,7 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- lv_obj_swap(obj1, obj2) added. (#2461)
 - feat(anim) add interface for handling lv_anim user data. (#2415)
 - feat(obj) add lv_is_initialized (#2402)
 - feat(obj) Backport keypad and encoder scrolling from v7 `lv_page` to v8 `lv_obj` (#2390)
