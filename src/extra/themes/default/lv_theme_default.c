@@ -300,6 +300,7 @@ static void style_init(void)
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, true);
+    lv_style_set_border_post(&styles->clip_corner, true);
 
     style_init_reset(&styles->pad_normal);
     lv_style_set_pad_all(&styles->pad_normal, PAD_DEF);
@@ -974,10 +975,15 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 
 #if LV_USE_TABVIEW
-    if(lv_obj_check_type(obj, &lv_tabview_class)) {
+    else if(lv_obj_check_type(obj, &lv_tabview_class)) {
         lv_obj_add_style(obj, &styles->scr, 0);
         lv_obj_add_style(obj, &styles->pad_zero, 0);
-        return;
+    }
+#endif
+
+#if LV_USE_WIN
+    else if(lv_obj_check_type(obj, &lv_win_class)) {
+        lv_obj_add_style(obj, &styles->clip_corner, 0);
     }
 #endif
 
