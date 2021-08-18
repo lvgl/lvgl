@@ -102,7 +102,7 @@ void lv_obj_move_foreground(struct _lv_obj_t * obj);
 void lv_obj_move_background(struct _lv_obj_t * obj);
 
 /**
- * Swap two objects within the same parent.
+ * Swap the positions of two objects.
  * When used in listboxes, it can be used to sort the listbox items. 
  * @param obj1  pointer to the first object  
  * @param obj2  pointer to the second object  
