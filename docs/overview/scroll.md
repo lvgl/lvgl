@@ -47,6 +47,10 @@ lv_style_set_bg_color(&style_red, lv_color_blue());
 lv_obj_add_style(obj, &style_blue, LV_STATE_SCROLLED | LV_PART_SCROLLBAR);
 ```
 
+If the base direction of the `LV_PART_SCROLLBAR` is RTL (`LV_BASE_DIR_RTL`) the vertical scrollbar will be placed on the left. 
+Note that, the `base_dir` style property is inhertied. Therefore it can be set directly on the `LV_PART_SCROLLBAR` part of an object
+or on the obejct's or any parent's main part to make scrollbar inherit the base direction. 
+
 ### Events
 The following events are related to scrolling:
 - `LV_EVENT_SCROLL_BEGIN` Scrolling begins
