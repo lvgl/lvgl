@@ -110,6 +110,20 @@ void lv_obj_move_background(struct _lv_obj_t * obj);
 void lv_obj_swap(struct _lv_obj_t* obj1, struct _lv_obj_t* obj2);
 
 /**
+ * moves the object one position up in the hierarchy.
+ * When used in listboxes, it can be used to sort the listbox items.
+ * @param obj  pointer to the object to be moved upwards.
+ */
+void lv_obj_move_up(struct _lv_obj_t* obj);
+
+/**
+ * moves the object one position down in the hierarchy.
+ * When used in listboxes, it can be used to sort the listbox items.
+ * @param obj  pointer to the object to be moved downwards.
+ */
+void lv_obj_move_down(struct _lv_obj_t* obj);
+
+/**
  * Get the screen of an object
  * @param obj       pointer to an object
  * @return          pointer to the obejct's screen

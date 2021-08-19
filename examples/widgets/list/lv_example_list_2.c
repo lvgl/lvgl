@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "../../lv_examples.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
 
@@ -48,7 +50,7 @@ static void event_handler_mu(lv_event_t* e)
         lv_obj_t* parent = lv_obj_get_parent(currentButton);
         uint_fast32_t i = lv_obj_get_child_id(currentButton);
         if (i > 0) {
-            lv_obj_swap(parent->spec_attr->children[i], parent->spec_attr->children[i - 1]);
+            lv_obj_move_up(currentButton);
             lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
         }
     }
@@ -60,11 +62,34 @@ static void event_handler_dn(lv_event_t* e)
     if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
     {
         if (currentButton == NULL) return;
-        lv_obj_t* parent = lv_obj_get_parent(currentButton);
-        uint_fast32_t i = lv_obj_get_child_id(currentButton);
-        if (i < lv_obj_get_child_cnt(parent) - 1) {
-            lv_obj_swap(parent->spec_attr->children[i], parent->spec_attr->children[i + 1]);
-            lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
+        lv_obj_move_down(currentButton);
+        lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
+    }
+}
+
+static void event_handler_swap(lv_event_t* e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    // lv_obj_t* obj = lv_event_get_target(e);
+    if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
+    {
+        uint32_t first = 0;
+        uint32_t last = lv_obj_get_child_cnt(list1);
+        if (last > 1)
+        {
+            last--;
+            while (first < last)
+            {
+                lv_obj_t* obj1 = lv_obj_get_child(list1, first);
+                lv_obj_t* obj2 = lv_obj_get_child(list1, last);
+                lv_obj_swap(obj1, obj2);
+                first++;
+                last--;
+            }
+            if (currentButton != NULL)
+            {
+                lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
+            }
         }
     }
 }
@@ -104,6 +129,10 @@ void lv_example_list_2(void)
 
     btn = lv_list_add_btn(list2, LV_SYMBOL_DOWN, "Down");
     lv_obj_add_event_cb(btn, event_handler_dn, LV_EVENT_ALL, NULL);
+    lv_group_remove_obj(btn);
+
+    btn = lv_list_add_btn(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
+    lv_obj_add_event_cb(btn, event_handler_swap, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 }
 
