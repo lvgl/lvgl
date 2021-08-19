@@ -152,6 +152,10 @@ void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
         if((*obj_i) == obj1) (*obj_i) =  obj2;
         else if((*obj_i) == obj2) (*obj_i) =  obj1;
     }
+
+    if(*g1->obj_focus == obj1) lv_group_focus_obj(obj2);
+    else if(*g1->obj_focus == obj2) lv_group_focus_obj(obj1);
+
 }
 
 void lv_group_remove_obj(lv_obj_t * obj)

@@ -73,7 +73,7 @@ void lv_example_list_2(void)
 {
     /*Create a list*/
     list1 = lv_list_create(lv_scr_act());
-    lv_obj_set_size(list1, lv_pct(70), lv_pct(100));
+    lv_obj_set_size(list1, lv_pct(60), lv_pct(100));
     lv_obj_set_style_pad_row(list1, 5, 0);
 
     /*Add buttons to the list*/
@@ -94,15 +94,17 @@ void lv_example_list_2(void)
 
     /*Create a second list with up and down buttons*/
     list2 = lv_list_create(lv_scr_act());
-    lv_obj_set_size(list2, lv_pct(30), lv_pct(100));
+    lv_obj_set_size(list2, lv_pct(40), lv_pct(100));
     lv_obj_align(list2, LV_ALIGN_TOP_RIGHT, 0, 0);
     lv_obj_set_flex_flow(list2, LV_FLEX_FLOW_COLUMN);
 
     btn = lv_list_add_btn(list2, LV_SYMBOL_UP, "Up");
     lv_obj_add_event_cb(btn, event_handler_mu, LV_EVENT_ALL, NULL);
+    lv_group_remove_obj(btn);
 
     btn = lv_list_add_btn(list2, LV_SYMBOL_DOWN, "Down");
     lv_obj_add_event_cb(btn, event_handler_dn, LV_EVENT_ALL, NULL);
+    lv_group_remove_obj(btn);
 }
 
 #endif
