@@ -253,10 +253,11 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     lv_event_send(parent2, LV_EVENT_CHILD_CHANGED, obj1);
 
     lv_obj_invalidate(parent);
-    if( parent != parent2)
-    {
+    if( parent != parent2) {
         lv_obj_invalidate(parent2);
     }
+
+    lv_group_swap_obj(obj1, obj2);
 }
 
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
