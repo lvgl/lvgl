@@ -47,7 +47,6 @@ static void event_handler_mu(lv_event_t* e)
     if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
     {
         if (currentButton == NULL) return;
-        lv_obj_t* parent = lv_obj_get_parent(currentButton);
         uint_fast32_t i = lv_obj_get_child_id(currentButton);
         if (i > 0) {
             lv_obj_move_up(currentButton);
