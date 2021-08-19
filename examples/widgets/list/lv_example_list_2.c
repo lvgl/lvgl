@@ -41,17 +41,25 @@ static void event_handler(lv_event_t* e)
     }
 }
 
-static void event_handler_mu(lv_event_t* e)
+static void event_handler_top(lv_event_t* e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if (code == LV_EVENT_CLICKED)
+    {
+        if (currentButton == NULL) return;
+        lv_obj_move_background(currentButton);
+        lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
+    }
+}
+
+static void event_handler_up(lv_event_t* e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
     {
         if (currentButton == NULL) return;
-        uint_fast32_t i = lv_obj_get_child_id(currentButton);
-        if (i > 0) {
-            lv_obj_move_up(currentButton);
-            lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
-        }
+        lv_obj_move_up(currentButton);
+        lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
     }
 }
 
@@ -62,6 +70,17 @@ static void event_handler_dn(lv_event_t* e)
     {
         if (currentButton == NULL) return;
         lv_obj_move_down(currentButton);
+        lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
+    }
+}
+
+static void event_handler_bottom(lv_event_t* e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if (code == LV_EVENT_CLICKED)
+    {
+        if (currentButton == NULL) return;
+        lv_obj_move_foreground(currentButton);
         lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
     }
 }
@@ -122,12 +141,20 @@ void lv_example_list_2(void)
     lv_obj_align(list2, LV_ALIGN_TOP_RIGHT, 0, 0);
     lv_obj_set_flex_flow(list2, LV_FLEX_FLOW_COLUMN);
 
+    btn = lv_list_add_btn(list2, NULL, "Top");
+    lv_obj_add_event_cb(btn, event_handler_top, LV_EVENT_ALL, NULL);
+    lv_group_remove_obj(btn);
+
     btn = lv_list_add_btn(list2, LV_SYMBOL_UP, "Up");
-    lv_obj_add_event_cb(btn, event_handler_mu, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_up, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_btn(list2, LV_SYMBOL_DOWN, "Down");
     lv_obj_add_event_cb(btn, event_handler_dn, LV_EVENT_ALL, NULL);
+    lv_group_remove_obj(btn);
+
+    btn = lv_list_add_btn(list2, NULL, "Bottom");
+    lv_obj_add_event_cb(btn, event_handler_bottom, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_btn(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
