@@ -274,9 +274,10 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->btn, color_grey);
     if(!(theme.flags & MODE_DARK)) {
-        lv_style_set_shadow_color(&styles->btn, lv_palette_lighten(LV_PALETTE_GREY, 3));
-        lv_style_set_shadow_width(&styles->btn, 1);
-        lv_style_set_shadow_ofs_y(&styles->btn, lv_disp_dpx(theme.disp, 4));
+        lv_style_set_shadow_color(&styles->btn, lv_palette_main(LV_PALETTE_GREY));
+        lv_style_set_shadow_width(&styles->btn, LV_DPX(3));
+        lv_style_set_shadow_opa(&styles->btn, LV_OPA_50);
+        lv_style_set_shadow_ofs_y(&styles->btn, lv_disp_dpx(theme.disp, LV_DPX(4)));
     }
     lv_style_set_text_color(&styles->btn, color_text);
     lv_style_set_pad_hor(&styles->btn, PAD_DEF);
