@@ -13,6 +13,9 @@
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_assert.h"
 
+#if LV_USE_GPU_SDL_RENDER
+    #include "../gpu/lv_gpu_sdl2_render.h"
+#endif
 /*********************
  *      DEFINES
  *********************/
@@ -32,9 +35,13 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+#if LV_USE_GPU_SDL_RENDER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+#endif
+
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
@@ -439,7 +446,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
        pos_y > clip_area->y2)  {
         return;
     }
-
+#if LV_USE_GPU_SDL_RENDER
+    lv_gpu_sdl_render_draw_letter(pos_x, pos_y, &g, clip_area, font_p, letter, color, opa, blend_mode);
+#else
     const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
     if(map_p == NULL) {
         LV_LOG_WARN("lv_draw_letter: character's bitmap not found");
@@ -455,8 +464,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
     } else {
         draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
+#endif
 }
 
+#if LV_USE_GPU_SDL_RENDER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
@@ -615,6 +626,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
     lv_mem_buf_release(mask_buf);
 }
+#endif
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,

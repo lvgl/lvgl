@@ -342,6 +342,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+/*Use SDL render API*/
+#ifndef LV_USE_GPU_SDL_RENDER
+#  ifdef CONFIG_LV_USE_GPU_SDL_RENDER
+#    define LV_USE_GPU_SDL_RENDER CONFIG_LV_USE_GPU_SDL_RENDER
+#  else
+#    define  LV_USE_GPU_SDL_RENDER   0
+#  endif
+#endif
+
 /*-------------
  * Logging
  *-----------*/

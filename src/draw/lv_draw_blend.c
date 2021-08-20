@@ -18,6 +18,8 @@
     #include "../gpu/lv_gpu_nxp_vglite.h"
 #elif LV_USE_GPU_STM32_DMA2D
     #include "../gpu/lv_gpu_stm32_dma2d.h"
+#elif LV_USE_GPU_SDL_RENDER
+    #include "../gpu/lv_gpu_sdl2_render.h"
 #endif
 
 /*********************
@@ -37,6 +39,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                         lv_color_t color, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
+#if LV_USE_GPU_SDL_RENDER == 0
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,
                                               const lv_area_t * draw_area,
                                               lv_color_t color, lv_opa_t opa,
@@ -47,6 +50,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
                          lv_color_t color, lv_opa_t opa,
                          const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
 #endif
+#endif //LV_USE_GPU_SDL_RENDER
 
 static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
@@ -156,6 +160,11 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     if(disp->driver->set_px_cb) {
         fill_set_px(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res);
     }
+#if LV_USE_GPU_SDL_RENDER
+    else {
+        lv_gpu_sdl_render_fill_color(disp->driver, disp_area, &draw_area, color, opa, mask, mask_res, mode);
+    }
+#else
     else if(mode == LV_BLEND_MODE_NORMAL) {
         fill_normal(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res);
     }
@@ -163,7 +172,8 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     else {
         fill_blended(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res, mode);
     }
-#endif
+#endif // LV_DRAW_COMPLEX
+#endif // LV_USE_GPU_SDL_RENDER
 }
 
 /**
@@ -274,6 +284,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     }
 }
 
+#if LV_USE_GPU_SDL_RENDER == 0
 /**
  * Fill an area with a color
  * @param disp_area the current display area (destination area)
@@ -571,6 +582,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
     }
 }
 #endif
+#endif // LV_USE_GPU_SDL_RENDER
 
 static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
