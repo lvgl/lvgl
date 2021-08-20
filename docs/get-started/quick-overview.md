@@ -40,7 +40,7 @@ lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
 disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
 disp_drv.buffer = &draw_buf;          /*Assign the buffer to the display*/
 disp_drv.hor_res = MY_DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
-disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the verizontal resolution of the display*/
+disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the vertical resolution of the display*/
 lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
 
 void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p)
@@ -67,7 +67,7 @@ indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
     if(touchpad_is_pressed()) {

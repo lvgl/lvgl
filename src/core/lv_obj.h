@@ -71,7 +71,7 @@ enum {
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
     LV_PART_KNOB         = 0x030000,   /**< Like handle to grab to adjust the value*/
     LV_PART_SELECTED     = 0x040000,   /**< Indicate the currently selected option or section*/
-    LV_PART_ITEMS        = 0x050000,   /**< Used if the widget has multiple similar elements (e.g. tabel cells)*/
+    LV_PART_ITEMS        = 0x050000,   /**< Used if the widget has multiple similar elements (e.g. table cells)*/
     LV_PART_TICKS        = 0x060000,   /**< Ticks on scale e.g. for a chart or meter*/
     LV_PART_CURSOR       = 0x070000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
 
