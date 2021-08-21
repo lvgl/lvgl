@@ -46,7 +46,10 @@ if test_report:
     print("")
     print("Generating report")
     print("-----------------------", flush=True)
-    shutil.rmtree('report')
+    try:
+        shutil.rmtree('report')
+    except FileNotFoundError:
+        pass
     os.mkdir('report')
     subprocess.check_call(['gcovr', '-r', '../', '--html-details', '-o', 'report/index.html',
                            '--exclude-directories', '\.\./examples', '--exclude-directories',
