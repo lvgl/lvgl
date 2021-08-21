@@ -68,7 +68,10 @@ endif() # CONFIG_LVGL
 
 else()
 
-file(GLOB_RECURSE SOURCES src/*.c)
+file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c)
 add_library(lvgl STATIC ${SOURCES})
+
+file(GLOB_RECURSE EXAMPLE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/examples/*.c)
+add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
 
 endif()

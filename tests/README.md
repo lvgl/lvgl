@@ -5,9 +5,10 @@ The tests in the folder can be run locally and automatically by GitHub CI.
 ## Running locally
 
 ### Requirements (Linux)
-1. Be sure GCC and Python3 is installed.
-2. Install [gcovr](https://gcovr.com/en/stable/index.html) with `pip install gcovr`
-3. Install Ruby with `sudo apt-get install ruby-full`
+1. Be sure GCC Python3 is installed.
+2. Install [cmake](https://cmake.org/) with `sudo apt install cmake`.
+3. Install [gcovr](https://gcovr.com/en/stable/index.html) with `sudo apt install gcovr`
+4. Install Ruby with `sudo apt install ruby-full`
 
 ### Run test
 1. Enter `lvgl/tests/`
@@ -18,11 +19,10 @@ The tests in the folder can be run locally and automatically by GitHub CI.
 
 For example: 
 - `./main.py` Run all the test as they run in the CI.
-- `./main.py report test noclean` Run only the test, should be sued when writing tests.
+- `./main.py report test noclean` Run only the test, should be used when writing tests.
 
 
 ## Running automatically
-TODO
 
 GitHub's CI automatically runs these tests on pushes and pull requests to `master` and `releasev8.*` branches. 
 
