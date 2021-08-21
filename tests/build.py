@@ -2,7 +2,6 @@
 
 import os
 import re
-import shutil
 import subprocess
 
 test_dir = os.path.dirname(os.path.realpath(__file__))
