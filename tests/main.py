@@ -4,7 +4,6 @@ import defines
 import build
 import shutil
 import test
-import subprocess
 import sys
 import os
 
@@ -51,12 +50,6 @@ if test_report:
     except FileNotFoundError:
         pass
     os.mkdir('report')
-    subprocess.check_call(['gcovr', '-r', '../', '--html-details', '-o', 'report/index.html',
-                           '--exclude-directories', '\.\./examples', '--exclude-directories',
-                           'src/.*', '--exclude-directories', 'unity', '--exclude',
-                           'lv_test_.*\.c'], shell=True)
-    subprocess.check_call(['gcovr', '-r', '../', '-x', 'report/coverage.xml',
-                           '--exclude-directories', '\.\./examples', '--exclude-directories',
-                           'src/.*', '--exclude-directories', 'unity', '--exclude',
-                           'lv_test_.*\.c'], shell=True)
-    print("Done: See report/index.html")
+    os.system("gcovr -r ../ --html-details -o report/index.html  --exclude-directories '\.\./examples' --exclude-directories 'src/.*' --exclude-directories 'unity' --exclude 'lv_test_.*\.c'")
+    os.system("gcovr -r ../ -x report/coverage.xml  --exclude-directories '\.\./examples' --exclude-directories 'src/.*' --exclude-directories 'unity' --exclude 'lv_test_.*\.c'")
+    print("Done: See report/index.html", flush=True)
