@@ -38,7 +38,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     lv_area_to_sdl_rect(&area_out, &area_out_rect);
     lv_area_to_sdl_rect(clip_area, &clip_rect);
 
-    lv_draw_arc_key_t key = {.radius = radius, .angle = ((end_angle - start_angle) % 360 + 360) % 360, .width = dsc->width,
+    lv_draw_arc_key_t key = {.radius = radius, .angle = ((end_angle - start_angle) % 360 + 360) %
+                                                        360, .width = dsc->width,
             .rounded = dsc->rounded};
     SDL_Texture *texture = NULL;
     lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
@@ -84,11 +85,11 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             SDL_FRect cap_dst;
             cap_dst.w = lv_area_get_width(&cap_area);
             cap_dst.h = lv_area_get_height(&cap_area);
-            cap_dst.x = mid_point + cosf(0) * mid_point;
-            cap_dst.y = mid_point + sinf(0) * mid_point;
+            cap_dst.x = mid_point + SDL_round(SDL_cos(0) * mid_point);
+            cap_dst.y = mid_point + SDL_round(SDL_sin(0) * mid_point);
             SDL_RenderCopyF(mask_renderer, round_texture, NULL, &cap_dst);
-            cap_dst.x = mid_point + roundf(cosf(key.angle * M_PI / 180.0f) * mid_point);
-            cap_dst.y = mid_point + roundf(sinf(key.angle * M_PI / 180.0f) * mid_point);
+            cap_dst.x = mid_point + SDL_round(SDL_cos(key.angle * M_PI / 180.0f) * mid_point);
+            cap_dst.y = mid_point + SDL_round(SDL_sin(key.angle * M_PI / 180.0f) * mid_point);
             SDL_RenderCopyF(mask_renderer, round_texture, NULL, &cap_dst);
             SDL_DestroyTexture(round_texture);
             SDL_DestroyRenderer(mask_renderer);
