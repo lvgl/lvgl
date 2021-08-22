@@ -2,15 +2,18 @@
 // Created by Mariotaku on 2021/08/22.
 //
 #include "core/lv_refr.h"
-#include "gpu/lv_gpu_sdl2_render.h"
+#include "gpu/lv_gpu_sdl.h"
 #include "lv_gpu_sdl2_utils.h"
 #include "lv_gpu_sdl2_lru.h"
 #include "lv_gpu_draw_cache.h"
 
+typedef struct {
+    const void *src;
+    int32_t frame_id;
+} lv_draw_img_key_t;
+
 void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src, const lv_draw_img_dsc_t *draw_dsc) {
 
-    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    lv_disp_drv_t *driver = disp->driver;
 
     if (draw_dsc->opa <= LV_OPA_MIN) return;
 
@@ -18,14 +21,16 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
 
     if (cdsc == NULL) return;
 
-    SDL_Renderer *renderer = (SDL_Renderer *) driver->draw_buf->buf_act;
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer *renderer = (SDL_Renderer *) lv_disp_get_draw_buf(disp)->buf_act;
 
     SDL_Rect mask_rect, coords_rect;
     lv_area_to_sdl_rect(mask, &mask_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
     SDL_Texture *texture = NULL;
-    lv_lru_get(lv_sdl2_texture_cache, &src, sizeof(void *), (void *) &texture);
+    lv_draw_img_key_t key = {.src = src, .frame_id = draw_dsc->frame_id};
+    lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void *) &texture);
     if (!texture) {
         int w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;
         SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h, 32,
@@ -33,7 +38,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
                                                                   SDL_PIXELFORMAT_ARGB8888);
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
-        lv_lru_set(lv_sdl2_texture_cache, &src, sizeof(void *), texture, w * h);
+        lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, w * h);
     }
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
     SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);

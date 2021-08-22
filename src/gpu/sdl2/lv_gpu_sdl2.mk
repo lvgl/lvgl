@@ -1,5 +1,7 @@
 CSRCS += lv_draw_arc_gpu_sdl2.c
 CSRCS += lv_draw_rect_gpu_sdl2.c
+CSRCS += lv_draw_img_gpu_sdl2.c
+CSRCS += lv_draw_label_gpu_sdl2.c
 CSRCS += lv_gpu_draw_cache.c
 CSRCS += lv_gpu_sdl2_utils.c
 CSRCS += lv_gpu_sdl2_lru.c
