@@ -332,6 +332,7 @@ void draw_bg_compat(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_R
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(texture, dsc->bg_opa);
     SDL_SetTextureColorMod(texture, bg_color.r, bg_color.g, bg_color.b);
     SDL_RenderSetClipRect(renderer, mask_rect);
     SDL_RenderCopy(renderer, texture, NULL, coords_rect);

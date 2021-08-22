@@ -38,7 +38,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     lv_area_to_sdl_rect(&area_out, &area_out_rect);
     lv_area_to_sdl_rect(clip_area, &clip_rect);
 
-    lv_draw_arc_key_t key = {.radius = radius, .angle = abs(end_angle - start_angle), .width = dsc->width,
+    lv_draw_arc_key_t key = {.radius = radius, .angle = ((end_angle - start_angle) % 360 + 360) % 360, .width = dsc->width,
             .rounded = dsc->rounded};
     SDL_Texture *texture = NULL;
     lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
