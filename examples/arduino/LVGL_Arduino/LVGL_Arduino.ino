@@ -70,7 +70,11 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 void setup()
 {
     Serial.begin( 115200 ); /* prepare for possible serial debug */
-    Serial.printf( "Hello Arduino! (V%d.%d.%d)", lv_version_major(), lv_version_minor(), lv_version_patch() );
+
+    String LVGL_Arduino = "Hello Arduino! ";
+    LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
+
+    Serial.println( LVGL_Arduino );
     Serial.println( "I am LVGL_Arduino" );
 
     lv_init();
@@ -110,7 +114,7 @@ void setup()
 #if 0
     /* Create simple label */
     lv_obj_t *label = lv_label_create( lv_scr_act() );
-    lv_label_set_text( label, "Hello Arduino! (V8.0.X)" );
+    lv_label_set_text( label, LVGL_Arduino.c_str() );
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 #else
     /* Try an example from the lv_examples Arduino library
