@@ -36,24 +36,25 @@ SDL_Surface *lv_sdl2_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_
     return converted;
 }
 
-SDL_Surface *lv_sdl2_apply_mask_surface(const lv_area_t *coords, const SDL_Rect *coords_rect) {
-    lv_opa_t *mask_buf = lv_mem_buf_get(coords_rect->w * coords_rect->h);
-    for (lv_coord_t y = 0; y < coords_rect->h; y++) {
-        lv_memset_ff(&mask_buf[y * coords_rect->w], coords_rect->w);
-        lv_draw_mask_res_t res = lv_draw_mask_apply(&mask_buf[y * coords_rect->w], coords->x1,
+SDL_Surface *lv_sdl2_apply_mask_surface(const lv_area_t *coords) {
+    lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
+    lv_opa_t *mask_buf = lv_mem_buf_get(w * h);
+    for (lv_coord_t y = 0; y < h; y++) {
+        lv_memset_ff(&mask_buf[y * w], w);
+        lv_draw_mask_res_t res = lv_draw_mask_apply(&mask_buf[y * w], (lv_coord_t) coords->x1,
                                                     (lv_coord_t) (y + coords->y1),
-                                                    (lv_coord_t) coords_rect->w);
+                                                    (lv_coord_t) w);
         if (res == LV_DRAW_MASK_RES_TRANSP) {
-            lv_memset_00(&mask_buf[y * coords_rect->w], coords_rect->w);
+            lv_memset_00(&mask_buf[y * w], w);
         }
     }
 
     lv_mem_buf_release(mask_buf);
-    return lv_sdl2_create_mask_surface(mask_buf, coords_rect->w, coords_rect->h);
+    return lv_sdl2_create_mask_surface(mask_buf, w, h);
 }
 
-SDL_Texture *lv_sdl2_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *coords_rect) {
-    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords, coords_rect);
+SDL_Texture *lv_sdl2_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords) {
+    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
     SDL_FreeSurface(indexed);
     return texture;

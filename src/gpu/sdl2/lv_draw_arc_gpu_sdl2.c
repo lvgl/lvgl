@@ -59,10 +59,10 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             lv_draw_mask_angle_param_t mask_angle_param;
             lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, 0, key.angle);
             int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
-            arg_mask = lv_sdl2_apply_mask_surface(&area_out, &area_out_rect);
+            arg_mask = lv_sdl2_apply_mask_surface(&area_out);
             lv_draw_mask_remove_id(mask_angle_id);
         } else {
-            arg_mask = lv_sdl2_apply_mask_surface(&area_out, &area_out_rect);
+            arg_mask = lv_sdl2_apply_mask_surface(&area_out);
         }
         lv_draw_mask_remove_id(mask_out_id);
         lv_draw_mask_remove_id(mask_in_id);
@@ -72,20 +72,18 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             lv_area_t cap_area = {.x1 = 0, .y1 = 0};
             lv_area_set_width(&cap_area, dsc->width);
             lv_area_set_height(&cap_area, dsc->width);
-            SDL_Rect cap_rect;
-            lv_area_to_sdl_rect(&cap_area, &cap_rect);
 
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, &cap_area, LV_RADIUS_CIRCLE, false);
             int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-            SDL_Texture *round_texture = lv_sdl2_gen_mask_texture(mask_renderer, &cap_area, &cap_rect);
+            SDL_Texture *round_texture = lv_sdl2_gen_mask_texture(mask_renderer, &cap_area);
             lv_draw_mask_remove_id(mask_rout_id);
 
             SDL_SetTextureBlendMode(round_texture, SDL_BLENDMODE_BLEND);
             float mid_point = radius - key.width / 2.0f;
             SDL_FRect cap_dst;
-            cap_dst.w = cap_rect.w;
-            cap_dst.h = cap_rect.h;
+            cap_dst.w = lv_area_get_width(&cap_area);
+            cap_dst.h = lv_area_get_height(&cap_area);
             cap_dst.x = mid_point + cosf(0) * mid_point;
             cap_dst.y = mid_point + sinf(0) * mid_point;
             SDL_RenderCopyF(mask_renderer, round_texture, NULL, &cap_dst);

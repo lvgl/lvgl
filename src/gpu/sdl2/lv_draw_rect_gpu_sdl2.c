@@ -75,7 +75,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, coords, dsc->radius, false);
             int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-            texture = lv_sdl2_gen_mask_texture(renderer, coords, coords_rect);
+            texture = lv_sdl2_gen_mask_texture(renderer, coords);
             lv_draw_mask_remove_id(mask_rout_id);
             SDL_assert(texture);
             lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, coords_rect->w * coords_rect->h);
@@ -190,18 +190,27 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
 
     SDL_Color shadow_color;
     lv_color_to_sdl_color(&dsc->shadow_color, &shadow_color);
+    lv_area_t coords_scaled;
+    lv_area_copy(&coords_scaled, coords);
+    uint16_t shadow_radius = dsc->radius;
+    if (sw > 1) {
+        lv_coord_t diff_w = lv_area_get_width(coords) - lv_area_get_width(coords) / sw;
+        lv_coord_t diff_h = lv_area_get_height(coords) - lv_area_get_height(coords) / sw;
+        lv_area_increase(&coords_scaled, -diff_w / 2, -diff_h / 2);
+        shadow_radius /= sw;
+    }
     lv_draw_rect_bg_key_t key = {
-            .width = lv_area_get_width(coords),
-            .height = lv_area_get_height(coords),
-            .radius = dsc->radius,
+            .width = lv_area_get_width(&coords_scaled),
+            .height = lv_area_get_height(&coords_scaled),
+            .radius = shadow_radius,
     };
     SDL_Texture *texture = NULL;
     lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
     if (texture == NULL) {
         lv_draw_mask_radius_param_t mask_rout_param;
-        lv_draw_mask_radius_init(&mask_rout_param, coords, dsc->radius, false);
+        lv_draw_mask_radius_init(&mask_rout_param, &coords_scaled, shadow_radius, false);
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        texture = lv_sdl2_gen_mask_texture(renderer, coords, &sh_area_rect);
+        texture = lv_sdl2_gen_mask_texture(renderer, &coords_scaled);
         lv_draw_mask_remove_id(mask_rout_id);
         SDL_assert(texture);
         lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, key.width * key.height);
@@ -284,7 +293,7 @@ void draw_border(SDL_Renderer *renderer, const lv_area_t *coords,
             lv_draw_mask_radius_init(&mask_rin_param, &area_inner, rout - dsc->border_width, true);
             int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
 
-            texture = lv_sdl2_gen_mask_texture(renderer, coords, coords_rect);
+            texture = lv_sdl2_gen_mask_texture(renderer, coords);
 
             lv_draw_mask_remove_id(mask_rin_id);
             lv_draw_mask_remove_id(mask_rout_id);
@@ -319,7 +328,7 @@ void draw_bg_compat(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_R
     SDL_Color bg_color;
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
 
-    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords, coords_rect);
+    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
