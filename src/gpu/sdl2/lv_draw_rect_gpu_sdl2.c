@@ -246,6 +246,12 @@ void draw_border(SDL_Renderer *renderer, const lv_area_t *coords,
             if (dsc->border_side & LV_BORDER_SIDE_BOTTOM) {
                 SDL_RenderDrawLine(renderer, coords->x1, coords->y2 - w, coords->x2, coords->y2 - w);
             }
+            if (dsc->border_side & LV_BORDER_SIDE_LEFT) {
+                SDL_RenderDrawLine(renderer, coords->x1 + w, coords->y1, coords->x1 + w, coords->y2);
+            }
+            if (dsc->border_side & LV_BORDER_SIDE_RIGHT) {
+                SDL_RenderDrawLine(renderer, coords->x2 - w, coords->y1, coords->x2 - w, coords->y2);
+            }
         }
     } else if (dsc->radius > 0) {
         lv_draw_rect_border_key_t key = {

@@ -26,6 +26,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
 
     SDL_Rect mask_rect, coords_rect;
     lv_area_to_sdl_rect(mask, &mask_rect);
+    lv_area_to_sdl_rect(coords, &coords_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
     SDL_Texture *texture = NULL;
@@ -33,17 +34,34 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void *) &texture);
     if (!texture) {
         int w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;
-        SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h, 32,
+        SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h, LV_COLOR_DEPTH,
                                                                   cdsc->dec_dsc.header.w * sizeof(lv_color_t),
                                                                   SDL_PIXELFORMAT_ARGB8888);
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
         lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, w * h);
     }
+    SDL_Point pivot = {.x = coords_rect.w / 2, .y = coords_rect.h / 2};
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
     SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_Point pivot = {.x = coords_rect.w / 2, .y = coords_rect.h / 2};
     SDL_RenderSetClipRect(renderer, &mask_rect);
-    SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+
+    SDL_Color recolor;
+    lv_color_to_sdl_color(&draw_dsc->recolor, &recolor);
+    // Draw original image if not fully recolored
+    // TODO: what if the image is translucent as well?
+    if (draw_dsc->recolor_opa < LV_OPA_MAX) {
+        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+    }
+
+    SDL_SetTextureColorMod(texture, recolor.r, recolor.g, recolor.b);
+    if (draw_dsc->recolor_opa >= LV_OPA_MAX) {
+        // Draw fully colored image
+        SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
+        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+    } else if (draw_dsc->recolor_opa >= LV_OPA_MIN) {
+        SDL_SetTextureAlphaMod(texture, draw_dsc->recolor_opa);
+        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+    }
 }
