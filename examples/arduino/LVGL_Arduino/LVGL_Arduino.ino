@@ -70,7 +70,7 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 void setup()
 {
     Serial.begin( 115200 ); /* prepare for possible serial debug */
-    Serial.println( "Hello Arduino! (V8.0.X)" );
+    Serial.printf( "Hello Arduino! (V%d.%d.%d)", lv_version_major(), lv_version_minor(), lv_version_patch() );
     Serial.println( "I am LVGL_Arduino" );
 
     lv_init();
