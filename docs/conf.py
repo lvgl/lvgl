@@ -66,7 +66,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'LVGL'
-copyright = '2020, LVGL LLC'
+copyright = '2021, LVGL Kft'
 author = 'LVGL community'
 
 # The version info for the project you're documenting, acts as replacement for
