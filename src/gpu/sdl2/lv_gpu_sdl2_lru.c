@@ -8,7 +8,7 @@
 // ------------------------------------------
 // MurmurHash2, by Austin Appleby
 // http://sites.google.com/site/murmurhash/
-uint32_t lruc_hash(lv_lru_t *cache, const void *key, uint32_t key_length) {
+static uint32_t lv_lru_hash(lv_lru_t *cache, const void *key, uint32_t key_length) {
     uint32_t m = 0x5bd1e995;
     uint32_t r = 24;
     uint32_t h = cache->seed ^ key_length;
@@ -42,7 +42,7 @@ uint32_t lruc_hash(lv_lru_t *cache, const void *key, uint32_t key_length) {
 }
 
 // compare a key against an existing item's key
-int lruc_cmp_keys(lruc_item *item, const void *key, uint32_t key_length) {
+static int lv_lru_cmp_keys(lruc_item *item, const void *key, uint32_t key_length) {
     if (key_length != item->key_length)
         return 1;
     else
@@ -50,7 +50,7 @@ int lruc_cmp_keys(lruc_item *item, const void *key, uint32_t key_length) {
 }
 
 // remove an item and push it to the free items queue
-void lruc_remove_item(lv_lru_t *cache, lruc_item *prev, lruc_item *item, uint32_t hash_index) {
+static void lv_lru_remove_item(lv_lru_t *cache, lruc_item *prev, lruc_item *item, uint32_t hash_index) {
     if (prev)
         prev->next = item->next;
     else
@@ -69,7 +69,7 @@ void lruc_remove_item(lv_lru_t *cache, lruc_item *prev, lruc_item *item, uint32_
 
 // remove the least recently used item
 // TODO: we can optimise this by finding the n lru items, where n = required_space / average_length
-void lruc_remove_lru_item(lv_lru_t *cache) {
+static void lv_lru_remove_lru_item(lv_lru_t *cache) {
     lruc_item *min_item = NULL, *min_prev = NULL;
     lruc_item *item = NULL, *prev = NULL;
     uint32_t i = 0, min_index = -1;
@@ -92,11 +92,11 @@ void lruc_remove_lru_item(lv_lru_t *cache) {
     }
 
     if (min_item)
-        lruc_remove_item(cache, min_prev, min_item, min_index);
+        lv_lru_remove_item(cache, min_prev, min_item, min_index);
 }
 
 // pop an existing item off the free queue, or create a new one
-lruc_item *lruc_pop_or_create_item(lv_lru_t *cache) {
+lruc_item *lv_lru_pop_or_create_item(lv_lru_t *cache) {
     lruc_item *item = NULL;
 
     if (cache->free_items) {
@@ -214,12 +214,12 @@ lruc_error lv_lru_set(lv_lru_t *cache, const void *key, size_t key_length, void 
     lock_cache();
 
     // see if the key already exists
-    uint32_t hash_index = lruc_hash(cache, key, key_length);
+    uint32_t hash_index = lv_lru_hash(cache, key, key_length);
     size_t required = 0;
     lruc_item *item = NULL, *prev = NULL;
     item = cache->items[hash_index];
 
-    while (item && lruc_cmp_keys(item, key, key_length)) {
+    while (item && lv_lru_cmp_keys(item, key, key_length)) {
         prev = item;
         item = (lruc_item *) item->next;
     }
@@ -233,7 +233,7 @@ lruc_error lv_lru_set(lv_lru_t *cache, const void *key, size_t key_length, void 
 
     } else {
         // insert a new item
-        item = lruc_pop_or_create_item(cache);
+        item = lv_lru_pop_or_create_item(cache);
         item->value = value;
         item->key = malloc(key_length);
         memcpy(item->key, key, key_length);
@@ -251,7 +251,7 @@ lruc_error lv_lru_set(lv_lru_t *cache, const void *key, size_t key_length, void 
     // remove as many items as necessary to free enough space
     if (required > 0 && required > cache->free_memory) {
         while (cache->free_memory < required)
-            lruc_remove_lru_item(cache);
+            lv_lru_remove_lru_item(cache);
     }
     cache->free_memory -= required;
     unlock_cache();
@@ -265,10 +265,10 @@ lruc_error lv_lru_get(lv_lru_t *cache, const void *key, size_t key_size, void **
     lock_cache();
 
     // loop until we find the item, or hit the end of a chain
-    uint32_t hash_index = lruc_hash(cache, key, key_size);
+    uint32_t hash_index = lv_lru_hash(cache, key, key_size);
     lruc_item *item = cache->items[hash_index];
 
-    while (item && lruc_cmp_keys(item, key, key_size))
+    while (item && lv_lru_cmp_keys(item, key, key_size))
         item = (lruc_item *) item->next;
 
     if (item) {
@@ -282,7 +282,6 @@ lruc_error lv_lru_get(lv_lru_t *cache, const void *key, size_t key_size, void **
     return LV_LRU_NO_ERROR;
 }
 
-
 lruc_error lv_lru_delete(lv_lru_t *cache, const void *key, size_t key_size) {
     test_for_missing_cache();
     test_for_missing_key();
@@ -290,16 +289,16 @@ lruc_error lv_lru_delete(lv_lru_t *cache, const void *key, size_t key_size) {
 
     // loop until we find the item, or hit the end of a chain
     lruc_item *item = NULL, *prev = NULL;
-    uint32_t hash_index = lruc_hash(cache, key, key_size);
+    uint32_t hash_index = lv_lru_hash(cache, key, key_size);
     item = cache->items[hash_index];
 
-    while (item && lruc_cmp_keys(item, key, key_size)) {
+    while (item && lv_lru_cmp_keys(item, key, key_size)) {
         prev = item;
         item = (lruc_item *) item->next;
     }
 
     if (item) {
-        lruc_remove_item(cache, prev, item, hash_index);
+        lv_lru_remove_item(cache, prev, item, hash_index);
     }
 
     unlock_cache();
