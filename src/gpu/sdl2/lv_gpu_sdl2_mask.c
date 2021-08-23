@@ -26,6 +26,8 @@ SDL_Texture *lv_sdl2_create_mask_texture(SDL_Renderer *renderer, lv_opa_t *pixel
 }
 
 lv_opa_t *lv_draw_mask_dump(const lv_area_t *coords) {
+    SDL_assert(coords->x2 >= coords->x1);
+    SDL_assert(coords->y2 >= coords->y1);
     lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
     lv_opa_t *mask_buf = lv_mem_buf_get(w * h);
     for (lv_coord_t y = 0; y < h; y++) {
