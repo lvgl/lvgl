@@ -35,8 +35,13 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     area_in.x2 -= dsc->width;
     area_in.y2 -= dsc->width;
 
+    // Increase 1 px each side to texture, to have better rotation result
+    lv_area_t texture_area_out;
+    lv_area_copy(&texture_area_out, &area_out);
+    lv_area_increase(&texture_area_out, 1, 1);
+
     SDL_Rect area_out_rect, clip_rect;
-    lv_area_to_sdl_rect(&area_out, &area_out_rect);
+    lv_area_to_sdl_rect(&texture_area_out, &area_out_rect);
     lv_area_to_sdl_rect(clip_area, &clip_rect);
 
     lv_draw_arc_key_t key = {.radius = radius, .angle = ((end_angle - start_angle) % 360 + 360) %
@@ -53,23 +58,23 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
         lv_draw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
         int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, NULL);
 
-        SDL_Surface *arg_mask;
+        SDL_Surface *ark_mask;
         if (key.angle < 360) {
             while (start_angle >= 360) start_angle -= 360;
             while (end_angle >= 360) end_angle -= 360;
             lv_draw_mask_angle_param_t mask_angle_param;
             lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, 0, key.angle);
             int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
-            arg_mask = lv_sdl2_apply_mask_surface(&area_out);
+            ark_mask = lv_sdl2_apply_mask_surface(&texture_area_out);
             lv_draw_mask_remove_id(mask_angle_id);
         } else {
-            arg_mask = lv_sdl2_apply_mask_surface(&area_out);
+            ark_mask = lv_sdl2_apply_mask_surface(&texture_area_out);
         }
         lv_draw_mask_remove_id(mask_out_id);
         lv_draw_mask_remove_id(mask_in_id);
 
         if (dsc->rounded) {
-            SDL_Renderer *mask_renderer = SDL_CreateSoftwareRenderer(arg_mask);
+            SDL_Renderer *mask_renderer = SDL_CreateSoftwareRenderer(ark_mask);
             lv_area_t cap_area = {.x1 = 0, .y1 = 0};
             lv_area_set_width(&cap_area, dsc->width);
             lv_area_set_height(&cap_area, dsc->width);
@@ -94,8 +99,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             SDL_DestroyTexture(round_texture);
             SDL_DestroyRenderer(mask_renderer);
         }
-        texture = SDL_CreateTextureFromSurface(renderer, arg_mask);
-        SDL_FreeSurface(arg_mask);
+        texture = SDL_CreateTextureFromSurface(renderer, ark_mask);
+        SDL_FreeSurface(ark_mask);
 
         SDL_assert(texture);
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);
