@@ -90,11 +90,11 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             SDL_FRect cap_dst;
             cap_dst.w = lv_area_get_width(&cap_area);
             cap_dst.h = lv_area_get_height(&cap_area);
-            cap_dst.x = mid_point + SDL_round(SDL_cos(0) * mid_point);
-            cap_dst.y = mid_point + SDL_round(SDL_sin(0) * mid_point);
+            cap_dst.x = mid_point + lv_sdl_round(SDL_cos(0) * mid_point);
+            cap_dst.y = mid_point + lv_sdl_round(SDL_sin(0) * mid_point);
             SDL_RenderCopyF(mask_renderer, round_texture, NULL, &cap_dst);
-            cap_dst.x = mid_point + SDL_round(SDL_cos(key.angle * M_PI / 180.0f) * mid_point);
-            cap_dst.y = mid_point + SDL_round(SDL_sin(key.angle * M_PI / 180.0f) * mid_point);
+            cap_dst.x = mid_point + lv_sdl_round(SDL_cos(key.angle * M_PI / 180.0f) * mid_point);
+            cap_dst.y = mid_point + lv_sdl_round(SDL_sin(key.angle * M_PI / 180.0f) * mid_point);
             SDL_RenderCopyF(mask_renderer, round_texture, NULL, &cap_dst);
             SDL_DestroyTexture(round_texture);
             SDL_DestroyRenderer(mask_renderer);
