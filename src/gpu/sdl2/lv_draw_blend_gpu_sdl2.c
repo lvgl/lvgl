@@ -17,8 +17,7 @@ void _lv_blend_fill(const lv_area_t *clip_area, const lv_area_t *fill_area, lv_c
     if (mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t *draw_buf = lv_disp_get_draw_buf(disp);
-    SDL_Renderer *renderer = (SDL_Renderer *) draw_buf->buf_act;
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
     /*Get clipped fill area which is the real draw area.
      *It is always the same or inside `fill_area`*/

@@ -61,7 +61,7 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
 
     if (letter > 255) return;
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer *renderer = (SDL_Renderer *) lv_disp_get_draw_buf(disp)->buf_act;
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
     lv_sdl_font_userdata_t *userdata = NULL;
     for (lv_sdl_font_userdata_t *cur = font_sprites; cur != NULL; cur = cur->next) {
         if (cur->key == font_p) {

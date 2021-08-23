@@ -20,7 +20,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
                  const lv_area_t *clip_area, const lv_draw_arc_dsc_t *dsc) {
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     lv_disp_drv_t *driver = disp->driver;
-    SDL_Renderer *renderer = (SDL_Renderer *) driver->draw_buf->buf_act;
+    SDL_Renderer *renderer = (SDL_Renderer *) driver->user_data;
 
     lv_area_t area_out;
     area_out.x1 = center_x - radius;

@@ -22,7 +22,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     if (cdsc == NULL) return;
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer *renderer = (SDL_Renderer *) lv_disp_get_draw_buf(disp)->buf_act;
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
     SDL_Rect mask_rect, coords_rect;
     lv_area_to_sdl_rect(mask, &mask_rect);

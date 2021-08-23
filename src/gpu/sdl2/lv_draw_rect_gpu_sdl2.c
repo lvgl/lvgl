@@ -47,7 +47,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg_compat(SDL_Renderer *renderer, const l
 
 void lv_draw_rect(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer *renderer = (SDL_Renderer *) lv_disp_get_draw_buf(disp)->buf_act;
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
     SDL_Rect coords_rect, mask_rect, render_rect;
     lv_area_to_sdl_rect(coords, &coords_rect);

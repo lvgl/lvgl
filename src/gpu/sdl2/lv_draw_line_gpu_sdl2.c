@@ -33,7 +33,7 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
     if (!is_common) return;
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer *renderer = (SDL_Renderer *) lv_disp_get_draw_buf(disp)->buf_act;
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
     SDL_Color line_color;
     lv_color_to_sdl_color(&dsc->color, &line_color);
