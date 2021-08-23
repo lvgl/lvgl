@@ -7,12 +7,20 @@
 #include "lv_gpu_sdl2_utils.h"
 #include "lv_gpu_sdl2_lru.h"
 #include "lv_gpu_draw_cache.h"
+#include "lv_gpu_sdl2_mask.h"
 
 typedef struct {
     lv_coord_t width;
     lv_coord_t height;
     lv_coord_t radius;
 } lv_draw_rect_bg_key_t;
+
+typedef struct {
+    lv_point_t size;
+    lv_coord_t radius;
+    lv_coord_t blur;
+    lv_point_t offset;
+} lv_draw_rect_shadow_key_t;
 
 typedef struct {
     lv_draw_rect_bg_key_t bg;
@@ -68,8 +76,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
                 .height =(lv_coord_t) coords_rect->h,
                 .radius = dsc->radius,
         };
-        SDL_Texture *texture = NULL;
-        lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
+        SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
         if (texture == NULL) {
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, coords, dsc->radius, false);
@@ -77,7 +84,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
             texture = lv_sdl2_gen_mask_texture(renderer, coords);
             lv_draw_mask_remove_id(mask_rout_id);
             SDL_assert(texture);
-            lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, coords_rect->w * coords_rect->h);
+            lv_gpu_draw_cache_put(&key, sizeof(key), texture);
         }
 
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
@@ -189,30 +196,26 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
 
     SDL_Color shadow_color;
     lv_color_to_sdl_color(&dsc->shadow_color, &shadow_color);
-    lv_area_t coords_scaled;
-    lv_area_copy(&coords_scaled, coords);
     uint16_t shadow_radius = dsc->radius;
-    if (sw > 1) {
-        lv_coord_t diff_w = lv_area_get_width(coords) - lv_area_get_width(coords) / sw;
-        lv_coord_t diff_h = lv_area_get_height(coords) - lv_area_get_height(coords) / sw;
-        lv_area_increase(&coords_scaled, -diff_w / 2, -diff_h / 2);
-        shadow_radius /= sw;
-    }
-    lv_draw_rect_bg_key_t key = {
-            .width = lv_area_get_width(&coords_scaled),
-            .height = lv_area_get_height(&coords_scaled),
+    lv_draw_rect_shadow_key_t key = {
+            .size= {lv_area_get_width(&sh_area), lv_area_get_height(&sh_area)},
             .radius = shadow_radius,
+            .blur = dsc->shadow_width,
+            .offset = {dsc->shadow_ofs_x, dsc->shadow_ofs_y}
     };
-    SDL_Texture *texture = NULL;
-    lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (texture == NULL) {
         lv_draw_mask_radius_param_t mask_rout_param;
-        lv_draw_mask_radius_init(&mask_rout_param, &coords_scaled, shadow_radius, false);
+        lv_draw_mask_radius_init(&mask_rout_param, &sh_rect_area, shadow_radius, false);
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        texture = lv_sdl2_gen_mask_texture(renderer, &coords_scaled);
+        lv_opa_t *mask_buf = lv_draw_mask_dump(&sh_area);
+        lv_draw_mask_blur(mask_buf, lv_area_get_width(&sh_area), lv_area_get_height(&sh_area), sw / 2 + 1);
+        texture = lv_sdl2_create_mask_texture(renderer, mask_buf, lv_area_get_width(&sh_area),
+                                              lv_area_get_height(&sh_area));
+        lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_rout_id);
         SDL_assert(texture);
-        lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, key.width * key.height);
+        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
     }
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
@@ -263,8 +266,7 @@ void draw_border(SDL_Renderer *renderer, const lv_area_t *coords,
                 .side = dsc->border_side,
                 .thickness = dsc->border_width
         };
-        SDL_Texture *texture = NULL;
-        lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
+        SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
         if (texture == NULL) {
             /*Get the real radius*/
             int32_t rout = dsc->radius;
@@ -303,7 +305,7 @@ void draw_border(SDL_Renderer *renderer, const lv_area_t *coords,
             lv_draw_mask_remove_id(mask_rin_id);
             lv_draw_mask_remove_id(mask_rout_id);
             SDL_assert(texture);
-            lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, key.bg.width * key.bg.height);
+            lv_gpu_draw_cache_put(&key, sizeof(key), texture);
         }
 
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);

@@ -29,9 +29,8 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_area_to_sdl_rect(coords, &coords_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
-    SDL_Texture *texture = NULL;
     lv_draw_img_key_t key = {.src = src, .frame_id = draw_dsc->frame_id};
-    lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void *) &texture);
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (!texture) {
         int w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;
         SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h, LV_COLOR_DEPTH,
@@ -39,7 +38,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
                                                                   SDL_PIXELFORMAT_ARGB8888);
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
-        lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, w * h);
+        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
     }
     SDL_Point pivot = {.x = coords_rect.w / 2, .y = coords_rect.h / 2};
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);

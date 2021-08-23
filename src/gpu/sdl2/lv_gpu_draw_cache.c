@@ -2,14 +2,12 @@
 // Created by Mariotaku on 2021/08/21.
 //
 
-#include "draw/lv_draw_mask.h"
-#include "misc/lv_color.h"
-#include "misc/lv_mem.h"
-#include "lv_gpu_draw_cache.h"
 #include <SDL.h>
 
-lv_lru_t *lv_sdl2_texture_cache;
-static SDL_Palette *lv_sdl2_palette_grayscale8;
+#include "lv_gpu_draw_cache.h"
+#include "lv_gpu_sdl2_mask.h"
+
+static lv_lru_t *lv_sdl2_texture_cache;
 
 void lv_gpu_draw_cache_init() {
     lv_sdl2_texture_cache = lv_lru_new(1024 * 1024 * 128, 65536, (lv_lru_free_t *) SDL_DestroyTexture, free);
@@ -27,35 +25,18 @@ void lv_gpu_draw_cache_deinit() {
     lv_lru_free(lv_sdl2_texture_cache);
 }
 
-SDL_Surface *lv_sdl2_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height) {
-    SDL_Surface *indexed = SDL_CreateRGBSurfaceWithFormatFrom(pixels, width, height, 8,
-                                                              width, SDL_PIXELFORMAT_INDEX8);
-    SDL_SetSurfacePalette(indexed, lv_sdl2_palette_grayscale8);
-    SDL_Surface *converted = SDL_ConvertSurfaceFormat(indexed, SDL_PIXELFORMAT_ARGB8888, 0);
-    SDL_FreeSurface(indexed);
-    return converted;
-}
-
-SDL_Surface *lv_sdl2_apply_mask_surface(const lv_area_t *coords) {
-    lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
-    lv_opa_t *mask_buf = lv_mem_buf_get(w * h);
-    for (lv_coord_t y = 0; y < h; y++) {
-        lv_memset_ff(&mask_buf[y * w], w);
-        lv_draw_mask_res_t res = lv_draw_mask_apply(&mask_buf[y * w], (lv_coord_t) coords->x1,
-                                                    (lv_coord_t) (y + coords->y1),
-                                                    (lv_coord_t) w);
-        if (res == LV_DRAW_MASK_RES_TRANSP) {
-            lv_memset_00(&mask_buf[y * w], w);
-        }
-    }
-
-    lv_mem_buf_release(mask_buf);
-    return lv_sdl2_create_mask_surface(mask_buf, w, h);
-}
-
-SDL_Texture *lv_sdl2_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords) {
-    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
-    SDL_FreeSurface(indexed);
+SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length) {
+    SDL_Texture *texture = NULL;
+    lv_lru_get(lv_sdl2_texture_cache, key, key_length, (void **) &texture);
     return texture;
+}
+
+void lv_gpu_draw_cache_put(const void *key, size_t key_length, SDL_Texture *texture) {
+    SDL_assert(texture);
+    Uint32 format;
+    int access, width, height;
+    if (SDL_QueryTexture(texture, &format, &access, &width, &height) != 0) {
+        return;
+    }
+    lv_lru_set(lv_sdl2_texture_cache, key, key_length, texture, width * height * SDL_BITSPERPIXEL(format) / 8);
 }

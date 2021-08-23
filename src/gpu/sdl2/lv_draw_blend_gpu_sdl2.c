@@ -8,6 +8,7 @@
 #include "SDL.h"
 #include "lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl2_utils.h"
+#include "lv_gpu_sdl2_mask.h"
 
 void _lv_blend_fill(const lv_area_t *clip_area, const lv_area_t *fill_area, lv_color_t color,
                     lv_opa_t *mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode) {

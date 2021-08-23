@@ -7,6 +7,7 @@
 #include "lv_gpu_sdl2_utils.h"
 #include "lv_gpu_sdl2_lru.h"
 #include "lv_gpu_draw_cache.h"
+#include "lv_gpu_sdl2_mask.h"
 
 typedef struct {
     uint16_t radius;
@@ -41,8 +42,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     lv_draw_arc_key_t key = {.radius = radius, .angle = ((end_angle - start_angle) % 360 + 360) %
                                                         360, .width = dsc->width,
             .rounded = dsc->rounded};
-    SDL_Texture *texture = NULL;
-    lv_lru_get(lv_sdl2_texture_cache, &key, sizeof(key), (void **) &texture);
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (texture == NULL) {
         /*Create inner the mask*/
         lv_draw_mask_radius_param_t mask_in_param;
@@ -98,7 +98,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
         SDL_FreeSurface(arg_mask);
 
         SDL_assert(texture);
-        lv_lru_set(lv_sdl2_texture_cache, &key, sizeof(key), texture, radius * radius * 4);
+        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
     }
 
     SDL_Color arc_color;

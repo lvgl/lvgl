@@ -9,16 +9,12 @@
 #include "misc/lv_area.h"
 #include "lv_gpu_sdl2_lru.h"
 
-extern lv_lru_t *lv_sdl2_texture_cache;
-
 void lv_gpu_draw_cache_init();
 
 void lv_gpu_draw_cache_deinit();
 
-SDL_Surface *lv_sdl2_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height);
+SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length);
 
-SDL_Surface *lv_sdl2_apply_mask_surface(const lv_area_t *coords);
-
-SDL_Texture *lv_sdl2_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords);
+void lv_gpu_draw_cache_put(const void *key, size_t key_length, SDL_Texture *texture);
 
 #endif //LVGL_SDL_EXAMPLE_LV_GPU_DRAW_CACHE_H

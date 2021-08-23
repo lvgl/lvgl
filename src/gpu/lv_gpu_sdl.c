@@ -54,7 +54,7 @@ static void lv_sdl_drv_fb_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, 
         return;
     }
 
-    if (disp_drv->draw_buf->flushing_last) {
+    if (lv_disp_flush_is_last(disp_drv)) {
         SDL_Renderer *renderer = (SDL_Renderer *) disp_drv->draw_buf->buf_act;
         SDL_RenderPresent(renderer);
     }
