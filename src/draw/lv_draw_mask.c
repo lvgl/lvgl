@@ -473,7 +473,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 
     if(!entry) {
         entry = lv_mem_alloc(sizeof(_lv_draw_mask_radius_circle_dsc_t));
-        LV_ASSERT_MALLOC(param->circle);
+        LV_ASSERT_MALLOC(entry);
         lv_memset_00(entry, sizeof(_lv_draw_mask_radius_circle_dsc_t));
         entry->life = -1;
     } else {
