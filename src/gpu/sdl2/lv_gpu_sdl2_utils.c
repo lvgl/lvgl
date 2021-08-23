@@ -40,3 +40,7 @@ void lv_area_zoom_to_sdl_rect(const lv_area_t *in, SDL_Rect *out, uint16_t zoom,
     out->w = sw;
     out->h = sh;
 }
+
+double lv_sdl_round(double d) {
+    return (d - (long) d) < 0.5 ? SDL_floor(d) : SDL_ceil(d);
+}
