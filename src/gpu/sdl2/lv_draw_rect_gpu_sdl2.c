@@ -25,7 +25,7 @@ typedef struct {
 
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
-    lv_coord_t radius;
+    lv_coord_t rout, rin;
     lv_coord_t width, height;
     lv_coord_t thickness;
     lv_border_side_t side;
@@ -43,6 +43,15 @@ static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords,
 
 static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *mask_rect,
                         const lv_draw_rect_dsc_t *dsc);
+
+static void draw_outline(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc);
+
+static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *outer_area, const lv_area_t *inner_area,
+                                lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa,
+                                lv_blend_mode_t blend_mode);
+
+static void draw_border_simple(const lv_area_t *clip, const lv_area_t *outer_area, const lv_area_t *inner_area,
+                               lv_color_t color, lv_opa_t opa);
 
 LV_ATTRIBUTE_FAST_MEM static void draw_bg_compat(SDL_Renderer *renderer, const lv_area_t *coords,
                                                  const SDL_Rect *coords_rect, const SDL_Rect *mask_rect,
@@ -66,6 +75,9 @@ void lv_draw_rect(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_
         draw_bg_color(renderer, coords, &mask_rect, dsc);
         draw_bg_img(coords, mask, dsc);
         draw_border(renderer, coords, &coords_rect, &mask_rect, dsc);
+
+        // Outline
+        draw_outline(coords, mask, dsc);
     }
 }
 
@@ -317,76 +329,166 @@ void draw_border(SDL_Renderer *renderer, const lv_area_t *coords,
                 SDL_RenderDrawLine(renderer, coords->x2 - w, coords->y1, coords->x2 - w, coords->y2);
             }
         }
-    } else if (dsc->radius > 0) {
-        lv_draw_rect_border_key_t key = {
-                .magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER,
-                .radius = dsc->radius,
-                .width = coords_rect->w,
-                .height = coords_rect->h,
-                .side = dsc->border_side,
-                .thickness = dsc->border_width
-        };
-        SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
-        if (texture == NULL) {
-            /*Get the real radius*/
-            int32_t rout = dsc->radius;
-            int32_t short_side = LV_MIN(coords_rect->w, coords_rect->h);
-            if (rout > short_side >> 1) rout = short_side >> 1;
-
-            /*Create mask for the outer area*/
-            int16_t mask_rout_id = LV_MASK_ID_INV;
-            lv_draw_mask_radius_param_t mask_rout_param;
-            if (rout > 0) {
-                lv_draw_mask_radius_init(&mask_rout_param, coords, rout, false);
-                mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-            }
-
-            /*Get the inner area*/
-            lv_area_t area_inner;
-            lv_area_copy(&area_inner, coords);
-            area_inner.x1 += ((dsc->border_side & LV_BORDER_SIDE_LEFT) ? dsc->border_width : -(dsc->border_width +
-                                                                                               rout));
-            area_inner.x2 -= ((dsc->border_side & LV_BORDER_SIDE_RIGHT) ? dsc->border_width : -(dsc->border_width +
-                                                                                                rout));
-            area_inner.y1 += ((dsc->border_side & LV_BORDER_SIDE_TOP) ? dsc->border_width : -(dsc->border_width +
-                                                                                              rout));
-            area_inner.y2 -= ((dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? dsc->border_width : -(dsc->border_width +
-                                                                                                 rout));
-
-            /*Create mask for the inner mask*/
-            int32_t rin = rout - dsc->border_width;
-            if (rin < 0) rin = 0;
-            lv_draw_mask_radius_param_t mask_rin_param;
-            lv_draw_mask_radius_init(&mask_rin_param, &area_inner, rout - dsc->border_width, true);
-            int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
-
-            texture = lv_sdl2_gen_mask_texture(renderer, coords);
-
-            lv_draw_mask_remove_id(mask_rin_id);
-            lv_draw_mask_remove_id(mask_rout_id);
-            SDL_assert(texture);
-            lv_gpu_draw_cache_put(&key, sizeof(key), texture);
-        }
-
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(texture, dsc->border_opa);
-        SDL_SetTextureColorMod(texture, border_color.r, border_color.g, border_color.b);
-        SDL_RenderSetClipRect(renderer, mask_rect);
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_RenderCopy(renderer, texture, NULL, coords_rect);
     } else {
-        SDL_SetRenderDrawColor(renderer, border_color.r, border_color.g, border_color.b, dsc->border_opa);
-        SDL_RenderSetClipRect(renderer, mask_rect);
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_Rect simple_rect;
-        for (int w = 0; w <= dsc->border_width; w++) {
-            simple_rect.x = coords_rect->x + w;
-            simple_rect.y = coords_rect->y + w;
-            simple_rect.w = coords_rect->w - w * 2;
-            simple_rect.h = coords_rect->h - w * 2;
-            SDL_RenderDrawRect(renderer, &simple_rect);
-        }
+        int32_t coords_w = lv_area_get_width(coords);
+        int32_t coords_h = lv_area_get_height(coords);
+        int32_t rout = dsc->radius;
+        int32_t short_side = LV_MIN(coords_w, coords_h);
+        if (rout > short_side >> 1) rout = short_side >> 1;
+
+        /*Get the inner area*/
+        lv_area_t area_inner;
+        lv_area_copy(&area_inner, coords);
+        area_inner.x1 += ((dsc->border_side & LV_BORDER_SIDE_LEFT) ? dsc->border_width : -(dsc->border_width + rout));
+        area_inner.x2 -= ((dsc->border_side & LV_BORDER_SIDE_RIGHT) ? dsc->border_width : -(dsc->border_width + rout));
+        area_inner.y1 += ((dsc->border_side & LV_BORDER_SIDE_TOP) ? dsc->border_width : -(dsc->border_width + rout));
+        area_inner.y2 -= ((dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? dsc->border_width : -(dsc->border_width + rout));
+
+        lv_coord_t rin = rout - dsc->border_width;
+        if (rin < 0) rin = 0;
+        draw_border_generic(mask_rect, coords, &area_inner, rout, rin, dsc->border_color, dsc->border_opa,
+                            dsc->blend_mode);
     }
+}
+
+static void draw_outline(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
+    if (dsc->outline_opa <= LV_OPA_MIN) return;
+    if (dsc->outline_width == 0) return;
+
+    lv_opa_t opa = dsc->outline_opa;
+
+    if (opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+
+    /*Get the inner radius*/
+    lv_area_t area_inner;
+    lv_area_copy(&area_inner, coords);
+
+    /*Extend the outline into the background area if it's overlapping the edge*/
+    lv_coord_t pad = (dsc->outline_pad == 0 ? (dsc->outline_pad - 1) : dsc->outline_pad);
+    area_inner.x1 -= pad;
+    area_inner.y1 -= pad;
+    area_inner.x2 += pad;
+    area_inner.y2 += pad;
+
+    lv_area_t area_outer;
+    lv_area_copy(&area_outer, &area_inner);
+
+    area_outer.x1 -= dsc->outline_width;
+    area_outer.x2 += dsc->outline_width;
+    area_outer.y1 -= dsc->outline_width;
+    area_outer.y2 += dsc->outline_width;
+
+
+    int32_t inner_w = lv_area_get_width(&area_inner);
+    int32_t inner_h = lv_area_get_height(&area_inner);
+    int32_t rin = dsc->radius;
+    int32_t short_side = LV_MIN(inner_w, inner_h);
+    if (rin > short_side >> 1) rin = short_side >> 1;
+
+    lv_coord_t rout = rin + dsc->outline_width;
+
+    draw_border_generic(clip, &area_outer, &area_inner, rout, rin, dsc->outline_color, dsc->outline_opa,
+                        dsc->blend_mode);
+}
+
+void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *outer_area, const lv_area_t *inner_area,
+                         lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode) {
+    opa = opa >= LV_OPA_COVER ? LV_OPA_COVER : opa;
+
+    if (rout == 0 || rin == 0) {
+        draw_border_simple(clip_area, outer_area, inner_area, color, opa);
+        return;
+    }
+
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    lv_draw_rect_border_key_t key = {
+            .magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER,
+            .rout = rout,
+            .rin = rin,
+            .width = lv_area_get_width(outer_area),
+            .height = lv_area_get_width(inner_area),
+            .side = LV_BORDER_SIDE_FULL,
+            .thickness = inner_area->x1 - outer_area->x1 + 1
+    };
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+    if (texture == NULL) {
+        /*Get the real radius*/
+
+        /*Create mask for the outer area*/
+        int16_t mask_rout_id = LV_MASK_ID_INV;
+        lv_draw_mask_radius_param_t mask_rout_param;
+        if (rout > 0) {
+            lv_draw_mask_radius_init(&mask_rout_param, outer_area, rout, false);
+            mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
+        }
+
+        /*Create mask for the inner mask*/
+        if (rin < 0) rin = 0;
+        lv_draw_mask_radius_param_t mask_rin_param;
+        lv_draw_mask_radius_init(&mask_rin_param, inner_area, rin, true);
+        int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
+
+        texture = lv_sdl2_gen_mask_texture(renderer, outer_area);
+
+        lv_draw_mask_remove_id(mask_rin_id);
+        lv_draw_mask_remove_id(mask_rout_id);
+        SDL_assert(texture);
+        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
+    }
+
+    SDL_Rect clip_rect, outer_rect;
+    lv_area_to_sdl_rect(clip_area, &clip_rect);
+    lv_area_to_sdl_rect(outer_area, &outer_rect);
+    SDL_Color color_sdl;
+    lv_color_to_sdl_color(&color, &color_sdl);
+
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(texture, opa);
+    SDL_SetTextureColorMod(texture, color_sdl.r, color_sdl.g, color_sdl.b);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderCopy(renderer, texture, NULL, &outer_rect);
+}
+
+static void draw_border_simple(const lv_area_t *clip, const lv_area_t *outer_area, const lv_area_t *inner_area,
+                               lv_color_t color, lv_opa_t opa) {
+
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    SDL_Color color_sdl;
+    lv_color_to_sdl_color(&color, &color_sdl);
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(clip, &clip_rect);
+
+    SDL_SetRenderDrawColor(renderer, color_sdl.r, color_sdl.g, color_sdl.b, opa);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_Rect simple_rect;
+    simple_rect.w = inner_area->x2 - outer_area->x1 + 1;
+    simple_rect.h = inner_area->y2 - outer_area->y1 + 1;
+    // Top border
+    simple_rect.x = outer_area->x1;
+    simple_rect.y = outer_area->y1;
+    SDL_RenderFillRect(renderer, &simple_rect);
+    // Bottom border
+    simple_rect.x = inner_area->x1;
+    simple_rect.y = inner_area->y1;
+    SDL_RenderFillRect(renderer, &simple_rect);
+
+    simple_rect.w = inner_area->x1 - outer_area->x1 + 1;
+    simple_rect.h = inner_area->y2 - outer_area->y1 + 1;
+    // Left border
+    simple_rect.x = outer_area->x1;
+    simple_rect.y = outer_area->y1;
+    SDL_RenderFillRect(renderer, &simple_rect);
+    // Right border
+    simple_rect.x = inner_area->x2;
+    simple_rect.y = outer_area->y2;
+    SDL_RenderFillRect(renderer, &simple_rect);
+
 }
 
 // Slow draw function

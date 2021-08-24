@@ -56,7 +56,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             .width = dsc->width,
             .rounded = dsc->rounded,
     };
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+//    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+    SDL_Texture *texture = NULL;
     if (texture == NULL) {
         /*Create inner the mask*/
         lv_draw_mask_radius_param_t mask_in_param;
@@ -112,7 +113,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
         SDL_FreeSurface(ark_mask);
 
         SDL_assert(texture);
-        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
+//        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
     }
 
     SDL_Color arc_color;
@@ -122,4 +123,5 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     SDL_SetTextureColorMod(texture, arc_color.r, arc_color.g, arc_color.b);
     SDL_RenderSetClipRect(renderer, &clip_rect);
     SDL_RenderCopyEx(renderer, texture, NULL, &area_out_rect, start_angle, NULL, SDL_FLIP_NONE);
+    SDL_DestroyTexture(texture);
 }
