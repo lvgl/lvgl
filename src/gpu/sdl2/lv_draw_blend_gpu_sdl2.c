@@ -28,7 +28,8 @@ void _lv_blend_fill(const lv_area_t *clip_area, const lv_area_t *fill_area, lv_c
     lv_area_to_sdl_rect(&draw_area, &draw_area_rect);
     if (mask) {
         SDL_Surface *mask_surface = lv_sdl2_create_mask_surface(mask, lv_area_get_width(&draw_area),
-                                                                lv_area_get_height(&draw_area));
+                                                                lv_area_get_height(&draw_area),
+                                                                lv_area_get_width(&draw_area));
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, mask_surface);
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(texture, opa);

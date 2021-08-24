@@ -14,10 +14,10 @@ extern SDL_Palette *lv_sdl2_palette_grayscale8;
 
 lv_opa_t *lv_draw_mask_dump(const lv_area_t *coords);
 
-SDL_Surface *lv_sdl2_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height);
+SDL_Surface *lv_sdl2_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride);
 
-SDL_Texture *lv_sdl2_create_mask_texture(SDL_Renderer *renderer, lv_opa_t *pixels,
-                                         lv_coord_t width, lv_coord_t height);
+SDL_Texture *lv_sdl2_create_mask_texture(SDL_Renderer *renderer, lv_opa_t *pixels, lv_coord_t width,
+                                         lv_coord_t height, lv_coord_t stride);
 
 SDL_Surface *lv_sdl2_apply_mask_surface(const lv_area_t *coords);
 

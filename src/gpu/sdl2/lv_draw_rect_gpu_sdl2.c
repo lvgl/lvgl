@@ -17,10 +17,9 @@ typedef struct {
 
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
-    lv_point_t size;
     lv_coord_t radius;
+    lv_coord_t size;
     lv_coord_t blur;
-    lv_point_t offset;
 } lv_draw_rect_shadow_key_t;
 
 typedef struct {
@@ -97,7 +96,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
         /* If size isn't times of 2, increase 1 px */
         lv_coord_t min_half = bg_min % 2 == 0 ? bg_min / 2 : bg_min / 2 + 1;
         lv_coord_t frag_size = radius == LV_RADIUS_CIRCLE ? min_half : LV_MIN(radius + 1, min_half);
-        lv_draw_rect_bg_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG, .radius = radius, .size = bg_min};
+        lv_draw_rect_bg_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG, .radius = radius, .size = min_half};
         lv_area_t coords_frag;
         lv_area_copy(&coords_frag, coords);
         lv_area_set_width(&coords_frag, frag_size);
@@ -120,7 +119,6 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
         render_corners(renderer, texture, frag_size, coords);
         render_borders(renderer, texture, frag_size, coords);
         render_center(renderer, texture, frag_size, coords);
-
     } else {
         SDL_Rect coords_rect;
         lv_area_to_sdl_rect(coords, &coords_rect);
@@ -205,7 +203,7 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
         return;
     }
 
-    int32_t sw = dsc->shadow_width;
+    lv_coord_t sw = dsc->shadow_width;
 
     lv_area_t sh_rect_area;
     sh_rect_area.x1 = coords->x1 + dsc->shadow_ofs_x - dsc->shadow_spread;
@@ -226,36 +224,48 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
     SDL_Rect sh_area_rect;
     lv_area_to_sdl_rect(&sh_area, &sh_area_rect);
 
-    SDL_Color shadow_color;
-    lv_color_to_sdl_color(&dsc->shadow_color, &shadow_color);
-    uint16_t shadow_radius = dsc->radius;
-    lv_draw_rect_shadow_key_t key = {
-            .magic = LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW,
-            .size= {lv_area_get_width(&sh_area), lv_area_get_height(&sh_area)},
-            .radius = shadow_radius,
-            .blur = dsc->shadow_width,
-            .offset = {dsc->shadow_ofs_x, dsc->shadow_ofs_y}
-    };
+    lv_coord_t radius = dsc->radius;
+    lv_coord_t sh_width = lv_area_get_width(&sh_rect_area), sh_height = lv_area_get_height(&sh_rect_area),
+            sh_min = LV_MIN(sh_width, sh_height);
+    /* If size isn't times of 2, increase 1 px */
+    lv_coord_t min_half = sh_min % 2 == 0 ? sh_min / 2 : sh_min / 2 + 1;
+    /* No matter how big the shadow is, what we need is just a corner */
+    lv_coord_t frag_size = radius == LV_RADIUS_CIRCLE ? min_half : LV_MIN(radius + 1, min_half);
+    /* This is how big the corner is after blurring */
+    lv_coord_t blur_frag_size = frag_size + sw + 2;
+
+    lv_draw_rect_shadow_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW, .radius = radius, .size = min_half,
+            .blur = sw};
+
+    lv_area_t blur_frag;
+    lv_area_copy(&blur_frag, &sh_area);
+    lv_area_set_width(&blur_frag, blur_frag_size * 2);
+    lv_area_set_height(&blur_frag, blur_frag_size * 2);
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (texture == NULL) {
         lv_draw_mask_radius_param_t mask_rout_param;
-        lv_draw_mask_radius_init(&mask_rout_param, &sh_rect_area, shadow_radius, false);
+        lv_draw_mask_radius_init(&mask_rout_param, &sh_rect_area, radius, false);
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        lv_opa_t *mask_buf = lv_draw_mask_dump(&sh_area);
-        lv_draw_mask_blur(mask_buf, lv_area_get_width(&sh_area), lv_area_get_height(&sh_area), sw / 2 + 1);
-        texture = lv_sdl2_create_mask_texture(renderer, mask_buf, lv_area_get_width(&sh_area),
-                                              lv_area_get_height(&sh_area));
+        lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag);
+        lv_draw_mask_blur(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
+        texture = lv_sdl2_create_mask_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
+                                              lv_area_get_width(&blur_frag));
         lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_rout_id);
         SDL_assert(texture);
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);
     }
 
+    SDL_Color shadow_color;
+    lv_color_to_sdl_color(&dsc->shadow_color, &shadow_color);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, opa);
     SDL_SetTextureColorMod(texture, shadow_color.r, shadow_color.g, shadow_color.b);
     SDL_RenderSetClipRect(renderer, mask_rect);
-    SDL_RenderCopy(renderer, texture, NULL, &sh_area_rect);
+
+    render_corners(renderer, texture, blur_frag_size, &sh_area);
+    render_borders(renderer, texture, blur_frag_size, &sh_area);
+    render_center(renderer, texture, blur_frag_size, &sh_area);
 }
 
 
@@ -471,7 +481,7 @@ void draw_bg_compat(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_R
 }
 
 
-void render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords) {
+static void render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords) {
     lv_coord_t bg_w = lv_area_get_width(coords), bg_h = lv_area_get_height(coords);
     SDL_Rect srcrect = {0, 0, frag_size, frag_size},
             dstrect = {.x=coords->x1, .y=coords->y1, .w = frag_size, .h=frag_size};
@@ -491,7 +501,7 @@ void render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_s
     SDL_RenderCopyEx(renderer, frag, &srcrect, &dstrect, 0, NULL, SDL_FLIP_VERTICAL);
 }
 
-void render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords) {
+static void render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords) {
     lv_coord_t bg_w = lv_area_get_width(coords), bg_h = lv_area_get_height(coords);
     SDL_Rect srcrect, dstrect;
     /* For top/bottom edges, stretch pixels on the right */
@@ -541,7 +551,7 @@ void render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_s
     }
 }
 
-void render_center(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords) {
+static void render_center(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords) {
     lv_coord_t bg_w = lv_area_get_width(coords), bg_h = lv_area_get_height(coords);
     SDL_Rect dstrect = {coords->x1 + frag_size, coords->y1 + frag_size, bg_w - frag_size * 2, bg_h - frag_size * 2};
     if (dstrect.w > 0 && dstrect.h > 0) {
