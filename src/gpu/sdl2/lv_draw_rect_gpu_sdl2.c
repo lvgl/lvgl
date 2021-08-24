@@ -25,8 +25,8 @@ typedef struct {
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     lv_coord_t rout, rin;
-    lv_coord_t width, height;
     lv_coord_t thickness;
+    lv_coord_t size;
     lv_border_side_t side;
 } lv_draw_rect_border_key_t;
 
@@ -375,14 +375,16 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
+    lv_coord_t border_width = lv_area_get_width(outer_area), border_height = lv_area_get_height(outer_area),
+            border_min = LV_MIN(border_width, border_height);
+    lv_coord_t min_half = border_min % 2 == 0 ? border_min / 2 : border_min / 2 + 1;
+    lv_coord_t frag_size = rout == LV_RADIUS_CIRCLE ? min_half : LV_MIN(rout + 1, min_half);
     lv_draw_rect_border_key_t key = {
             .magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER,
-            .rout = rout,
-            .rin = rin,
-            .width = lv_area_get_width(outer_area),
-            .height = lv_area_get_width(inner_area),
+            .rout = rout, .rin = rin,
+            .thickness = inner_area->x1 - outer_area->x1 + 1,
+            .size = min_half,
             .side = LV_BORDER_SIDE_FULL,
-            .thickness = inner_area->x1 - outer_area->x1 + 1
     };
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (texture == NULL) {
@@ -400,7 +402,12 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
         lv_draw_mask_radius_init(&mask_rin_param, inner_area, rin, true);
         int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
 
-        texture = lv_sdl2_gen_mask_texture(renderer, outer_area);
+        lv_area_t frag_area;
+        lv_area_copy(&frag_area, outer_area);
+        lv_area_set_width(&frag_area, frag_size);
+        lv_area_set_height(&frag_area, frag_size);
+
+        texture = lv_sdl2_gen_mask_texture(renderer, &frag_area);
 
         lv_draw_mask_remove_id(mask_rin_id);
         lv_draw_mask_remove_id(mask_rout_id);
@@ -418,8 +425,9 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
     SDL_SetTextureAlphaMod(texture, opa);
     SDL_SetTextureColorMod(texture, color_sdl.r, color_sdl.g, color_sdl.b);
     SDL_RenderSetClipRect(renderer, &clip_rect);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_RenderCopy(renderer, texture, NULL, &outer_rect);
+
+    render_corners(renderer, texture, frag_size, outer_area);
+    render_borders(renderer, texture, frag_size, outer_area);
 }
 
 static void draw_border_simple(const lv_area_t *clip, const lv_area_t *outer_area, const lv_area_t *inner_area,
