@@ -438,25 +438,25 @@ static void draw_border_simple(const lv_area_t *clip, const lv_area_t *outer_are
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_Rect simple_rect;
     simple_rect.w = inner_area->x2 - outer_area->x1 + 1;
-    simple_rect.h = inner_area->y2 - outer_area->y1 + 1;
+    simple_rect.h = inner_area->y1 - outer_area->y1 + 1;
     // Top border
     simple_rect.x = outer_area->x1;
     simple_rect.y = outer_area->y1;
     SDL_RenderFillRect(renderer, &simple_rect);
     // Bottom border
     simple_rect.x = inner_area->x1;
-    simple_rect.y = inner_area->y1;
+    simple_rect.y = inner_area->y2;
     SDL_RenderFillRect(renderer, &simple_rect);
 
     simple_rect.w = inner_area->x1 - outer_area->x1 + 1;
     simple_rect.h = inner_area->y2 - outer_area->y1 + 1;
-    // Left border
+    /* Left border */
     simple_rect.x = outer_area->x1;
-    simple_rect.y = outer_area->y1;
+    simple_rect.y = inner_area->y1;
     SDL_RenderFillRect(renderer, &simple_rect);
     // Right border
     simple_rect.x = inner_area->x2;
-    simple_rect.y = outer_area->y2;
+    simple_rect.y = outer_area->y1;
     SDL_RenderFillRect(renderer, &simple_rect);
 
 }
