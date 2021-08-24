@@ -10,6 +10,7 @@
 #include "lv_gpu_sdl2_mask.h"
 
 typedef struct {
+    lv_gpu_cache_key_magic_t magic;
     lv_coord_t length;
     lv_coord_t thickness;
 } lv_draw_line_key_t;
@@ -39,7 +40,7 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
     lv_color_to_sdl_color(&dsc->color, &line_color);
 
     int length = lv_sdl_round(SDL_sqrt(SDL_pow(point2->y - point1->y + 1, 2) + SDL_pow(point2->x - point1->x + 1, 2)));
-    lv_draw_line_key_t key = {.length=length, .thickness = dsc->width};
+    lv_draw_line_key_t key = {.magic=LV_GPU_CACHE_KEY_MAGIC_LINE, .length=length, .thickness = dsc->width};
     lv_area_t coords = {1, 1, length, dsc->width};
     lv_area_t tex_coords;
     lv_area_copy(&tex_coords, &coords);

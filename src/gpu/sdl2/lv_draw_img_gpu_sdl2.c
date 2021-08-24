@@ -8,6 +8,7 @@
 #include "lv_gpu_draw_cache.h"
 
 typedef struct {
+    lv_gpu_cache_key_magic_t magic;
     const void *src;
     int32_t frame_id;
 } lv_draw_img_key_t;
@@ -29,7 +30,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_area_to_sdl_rect(coords, &coords_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
-    lv_draw_img_key_t key = {.src = src, .frame_id = draw_dsc->frame_id};
+    lv_draw_img_key_t key = {.magic=LV_GPU_CACHE_KEY_MAGIC_IMG, .src = src, .frame_id = draw_dsc->frame_id};
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (!texture) {
         int w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;

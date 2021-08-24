@@ -14,6 +14,7 @@
 #endif
 
 typedef struct {
+    lv_gpu_cache_key_magic_t magic;
     uint16_t radius;
     uint16_t angle;
     lv_coord_t width;
@@ -48,9 +49,13 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     lv_area_to_sdl_rect(&texture_area_out, &area_out_rect);
     lv_area_to_sdl_rect(clip_area, &clip_rect);
 
-    lv_draw_arc_key_t key = {.radius = radius, .angle = ((end_angle - start_angle) % 360 + 360) %
-                                                        360, .width = dsc->width,
-            .rounded = dsc->rounded};
+    lv_draw_arc_key_t key = {
+            .magic = LV_GPU_CACHE_KEY_MAGIC_ARC,
+            .radius = radius,
+            .angle = ((end_angle - start_angle) % 360 + 360) % 360,
+            .width = dsc->width,
+            .rounded = dsc->rounded,
+    };
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (texture == NULL) {
         /*Create inner the mask*/

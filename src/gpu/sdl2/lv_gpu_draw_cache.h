@@ -9,6 +9,17 @@
 #include "misc/lv_area.h"
 #include "lv_gpu_sdl2_lru.h"
 
+typedef uint8_t lv_gpu_cache_key_magic_t;
+
+#define LV_GPU_CACHE_KEY_MAGIC_ARC 0x01
+#define LV_GPU_CACHE_KEY_MAGIC_IMG 0x11
+#define LV_GPU_CACHE_KEY_MAGIC_LINE 0x21
+#define LV_GPU_CACHE_KEY_MAGIC_RECT_BG 0x31
+#define LV_GPU_CACHE_KEY_MAGIC_CIRCLE_BG 0x32
+#define LV_GPU_CACHE_KEY_MAGIC_CIRCLE_FRAG_BG 0x33
+#define LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW 0x3A
+#define LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER 0x3B
+
 void lv_gpu_draw_cache_init();
 
 void lv_gpu_draw_cache_deinit();
