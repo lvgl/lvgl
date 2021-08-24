@@ -12,13 +12,6 @@ void lv_area_to_sdl_rect(const lv_area_t *in, SDL_Rect *out) {
     out->h = in->y2 - in->y1 + 1;
 }
 
-void lv_area_to_sdl_frect(const lv_area_t *in, SDL_FRect *out) {
-    out->x = in->x1;
-    out->y = in->y1;
-    out->w = in->x2 - in->x1 + 1;
-    out->h = in->y2 - in->y1 + 1;
-}
-
 void lv_color_to_sdl_color(const lv_color_t *in, SDL_Color *out) {
     uint32_t color32 = lv_color_to32(*in);
     lv_color32_t *color32_t = (lv_color32_t *) &color32;
