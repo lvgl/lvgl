@@ -73,7 +73,7 @@ lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
         - `arc_dsc`
     - LV_ARC_DRAW_PART_KNOB The knob
         - `part`: `LV_PART_KNOB`
-        - `draw_area`: the arae of the knob
+        - `draw_area`: the area of the knob
         - `rect_dsc`:
     
 See the events of the [Base object](/widgets/obj) too.
