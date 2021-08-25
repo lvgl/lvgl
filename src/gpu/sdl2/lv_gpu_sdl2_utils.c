@@ -4,6 +4,7 @@
 
 #include "misc/lv_style.h"
 #include "lv_gpu_sdl2_utils.h"
+#include "SDL.h"
 
 void lv_area_to_sdl_rect(const lv_area_t *in, SDL_Rect *out) {
     out->x = in->x1;
@@ -36,4 +37,64 @@ void lv_area_zoom_to_sdl_rect(const lv_area_t *in, SDL_Rect *out, uint16_t zoom,
 
 double lv_sdl_round(double d) {
     return (d - (long) d) < 0.5 ? SDL_floor(d) : SDL_ceil(d);
+}
+
+SDL_Palette *lv_sdl_alloc_palette_for_bpp(const uint8_t *mapping, uint8_t bpp) {
+    SDL_assert(bpp >= 1 && bpp <= 8);
+    SDL_Palette *result = SDL_AllocPalette(1 << bpp);
+    SDL_Color palette[256];
+    for (int i = 0; i < 256; i++) {
+        palette[i].r = palette[i].g = palette[i].b = 0xFF;
+        palette[i].a = mapping ? mapping[i] : i;
+    }
+    SDL_SetPaletteColors(result, palette, 0, 256);
+    return result;
+}
+
+SDL_Palette *lv_sdl_get_grayscale_palette(uint8_t bpp) {
+    switch (bpp) {
+        case 1:
+            return lv_sdl2_palette_grayscale1;
+        case 2:
+            return lv_sdl2_palette_grayscale2;
+        case 4:
+            return lv_sdl2_palette_grayscale4;
+        case 8:
+            return lv_sdl2_palette_grayscale8;
+    }
+    return NULL;
+}
+
+void lv_sdl_to8bpp(uint8_t *dest, const uint8_t *src, int width, int height, int stride, uint8_t bpp) {
+    int src_len = width * height;
+    int cur = 0, src_idx = 0;
+    int curbit;
+    uint8_t opa_mask;
+    switch (bpp) {
+        case 1:
+            opa_mask = 0x1;
+            break;
+        case 2:
+            opa_mask = 0x4;
+            break;
+        case 4:
+            opa_mask = 0xF;
+            break;
+        case 8:
+            opa_mask = 0xFF;
+            break;
+        default:
+            return;
+    }
+    /* Does this work well on big endian systems? */
+    while (cur < src_len) {
+        curbit = 8 - bpp;
+        uint8_t src_byte = src[cur * bpp / 8];
+        while (curbit >= 0) {
+            uint8_t src_bits = opa_mask & (src_byte >> curbit);
+            dest[(cur / width * stride) + (cur % width)] = src_bits;
+            curbit -= bpp;
+            cur++;
+        }
+    }
 }

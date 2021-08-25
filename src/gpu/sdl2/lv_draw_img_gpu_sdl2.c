@@ -37,6 +37,13 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
             chroma_keyed = SDL_TRUE;
             break;
         }
+        case LV_IMG_CF_INDEXED_1BIT:
+        case LV_IMG_CF_INDEXED_2BIT:
+        case LV_IMG_CF_INDEXED_4BIT:
+        case LV_IMG_CF_INDEXED_8BIT: {
+            pixel_format = SDL_PIXELFORMAT_INDEX8;
+            return;
+        }
         default: {
 //            SDL_assert(cdsc->dec_dsc.header.cf != 0);
             // Unsupported color format
@@ -59,7 +66,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
 
         SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h,
                                                                   SDL_BITSPERPIXEL(pixel_format),
-                                                                  w * sizeof(lv_color_t), pixel_format);
+                                                                  w * SDL_BYTESPERPIXEL(pixel_format), pixel_format);
         SDL_SetColorKey(surface, chroma_keyed, lv_color_to32(LV_COLOR_CHROMA_KEY));
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);

@@ -21,6 +21,8 @@ static lv_sdl_font_atlas_t *font_sprites = NULL;
 
 static lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *renderer);
 
+SDL_Palette *lv_sdl2_palette_grayscale1 = NULL;
+SDL_Palette *lv_sdl2_palette_grayscale2 = NULL;
 SDL_Palette *lv_sdl2_palette_grayscale4 = NULL;
 
 void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
@@ -98,45 +100,6 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
     SDL_RenderCopy(renderer, userdata->texture, &userdata->pos[letter - userdata->start], &dstrect);
 }
 
-static void letter_copy(lv_opa_t *dest, const uint8_t *src, const SDL_Rect *area, int stride, uint8_t bpp) {
-    int src_len = area->w * area->h;
-    int cur = 0, src_idx = 0;
-    int curbit;
-    const uint8_t *opa_table;
-    uint8_t opa_mask;
-    switch (bpp) {
-        case 1:
-            opa_table = _lv_bpp1_opa_table;
-            opa_mask = 0x1;
-            break;
-        case 2:
-            opa_table = _lv_bpp2_opa_table;
-            opa_mask = 0x4;
-            break;
-        case 4:
-            opa_table = _lv_bpp4_opa_table;
-            opa_mask = 0xF;
-            break;
-        case 8:
-            opa_table = _lv_bpp8_opa_table;
-            opa_mask = 0xFF;
-            break;
-        default:
-            return;
-    }
-    /* Does this work well on big endian systems? */
-    while (cur < src_len) {
-        curbit = 8 - bpp;
-        uint8_t src_byte = src[cur * bpp / 8];
-        while (curbit >= 0) {
-            uint8_t src_bits = opa_mask & (src_byte >> curbit);
-            dest[(cur / area->w * stride) + (cur % area->w)] = opa_table[src_bits];
-            curbit -= bpp;
-            cur++;
-        }
-    }
-}
-
 lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *renderer) {
     const lv_font_fmt_txt_dsc_t *dsc = (lv_font_fmt_txt_dsc_t *) font_p->dsc;
     lv_sdl_font_atlas_t *atlas = malloc(sizeof(lv_sdl_font_atlas_t));
@@ -169,13 +132,16 @@ lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *rend
                 if (gd->box_w <= 0 || gd->box_h <= 0) {
                     continue;
                 }
-                letter_copy(&s1[rect->y * sprite_w + rect->x], &dsc->glyph_bitmap[gd->bitmap_index], rect, sprite_w,
-                            dsc->bpp);
+                lv_sdl_to8bpp(&s1[rect->y * sprite_w + rect->x], &dsc->glyph_bitmap[gd->bitmap_index], rect->w, rect->h,
+                              sprite_w, dsc->bpp);
                 sprite_x += gd->box_w;
             }
-
-            atlas->texture = lv_sdl2_create_mask_texture(renderer, s1, sprite_w, sprite_h, sprite_w);
+            SDL_Surface *indexed = SDL_CreateRGBSurfaceWithFormatFrom(s1, sprite_w, sprite_h, 8, sprite_w,
+                                                                      SDL_PIXELFORMAT_INDEX8);
+            SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(dsc->bpp));
+            atlas->texture = SDL_CreateTextureFromSurface(renderer, indexed);
             SDL_assert(atlas->texture);
+            SDL_FreeSurface(indexed);
             lv_mem_buf_release(s1);
             break;
         }

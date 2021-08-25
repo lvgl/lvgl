@@ -9,12 +9,23 @@
 #include "misc/lv_area.h"
 #include "SDL_rect.h"
 
+extern SDL_Palette *lv_sdl2_palette_grayscale8;
+extern SDL_Palette *lv_sdl2_palette_grayscale4;
+extern SDL_Palette *lv_sdl2_palette_grayscale2;
+extern SDL_Palette *lv_sdl2_palette_grayscale1;
+
 void lv_area_to_sdl_rect(const lv_area_t *in, SDL_Rect *out);
 
 void lv_color_to_sdl_color(const lv_color_t *in, SDL_Color *out);
 
-void lv_area_zoom_to_sdl_rect(const lv_area_t *in, SDL_Rect *out,uint16_t zoom, const lv_point_t *pivot);
+void lv_area_zoom_to_sdl_rect(const lv_area_t *in, SDL_Rect *out, uint16_t zoom, const lv_point_t *pivot);
 
 double lv_sdl_round(double d);
+
+SDL_Palette *lv_sdl_alloc_palette_for_bpp(const uint8_t *mapping, uint8_t bpp);
+
+SDL_Palette *lv_sdl_get_grayscale_palette(uint8_t bpp);
+
+void lv_sdl_to8bpp(uint8_t *dest, const uint8_t *src, int width, int height, int stride, uint8_t bpp);
 
 #endif //LV_GPU_SDL2_UTILS_H

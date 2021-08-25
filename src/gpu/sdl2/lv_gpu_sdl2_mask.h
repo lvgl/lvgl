@@ -10,8 +10,6 @@
 #include "misc/lv_area.h"
 #include "misc/lv_color.h"
 
-extern SDL_Palette *lv_sdl2_palette_grayscale8;
-extern SDL_Palette *lv_sdl2_palette_grayscale4;
 
 lv_opa_t *lv_draw_mask_dump(const lv_area_t *coords);
 

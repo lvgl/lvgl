@@ -7,29 +7,23 @@
 
 #include "lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl2_mask.h"
+#include "lv_gpu_sdl2_utils.h"
 
 static lv_lru_t *lv_sdl2_texture_cache;
 
 void lv_gpu_draw_cache_init() {
     lv_sdl2_texture_cache = lv_lru_new(1024 * 1024 * 128, 65536, (lv_lru_free_t *) SDL_DestroyTexture, free);
-    lv_sdl2_palette_grayscale8 = SDL_AllocPalette(256);
-    SDL_Color palette[256];
-    for (int i = 0; i < 256; i++) {
-        palette[i].r = palette[i].g = palette[i].b = 0xFF;
-        palette[i].a = i;
-    }
-    SDL_SetPaletteColors(lv_sdl2_palette_grayscale8, palette, 0, 256);
-    lv_sdl2_palette_grayscale4 = SDL_AllocPalette(16);
-    for (int i = 0; i < 16; i++) {
-        palette[i].r = palette[i].g = palette[i].b = 0xFF;
-        palette[i].a = _lv_bpp4_opa_table[i];
-    }
-    SDL_SetPaletteColors(lv_sdl2_palette_grayscale4, palette, 0, 16);
+    lv_sdl2_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
+    lv_sdl2_palette_grayscale4 = lv_sdl_alloc_palette_for_bpp(_lv_bpp4_opa_table, 4);
+    lv_sdl2_palette_grayscale2 = lv_sdl_alloc_palette_for_bpp(_lv_bpp2_opa_table, 2);
+    lv_sdl2_palette_grayscale1 = lv_sdl_alloc_palette_for_bpp(_lv_bpp1_opa_table, 1);
 }
 
 void lv_gpu_draw_cache_deinit() {
-    SDL_FreePalette(lv_sdl2_palette_grayscale8);
+    SDL_FreePalette(lv_sdl2_palette_grayscale1);
+    SDL_FreePalette(lv_sdl2_palette_grayscale2);
     SDL_FreePalette(lv_sdl2_palette_grayscale4);
+    SDL_FreePalette(lv_sdl2_palette_grayscale8);
     lv_lru_free(lv_sdl2_texture_cache);
 }
 
