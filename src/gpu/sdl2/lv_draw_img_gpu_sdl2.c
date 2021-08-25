@@ -21,6 +21,28 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
 
     if (cdsc == NULL) return;
+    SDL_PixelFormatEnum pixel_format;
+    int chroma_keyed = SDL_FALSE;
+    switch (cdsc->dec_dsc.header.cf) {
+        case LV_IMG_CF_TRUE_COLOR_ALPHA: {
+            pixel_format = SDL_PIXELFORMAT_ARGB8888;
+            break;
+        }
+        case LV_IMG_CF_TRUE_COLOR: {
+            pixel_format = SDL_PIXELFORMAT_XRGB8888;
+            break;
+        }
+        case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED: {
+            pixel_format = SDL_PIXELFORMAT_XRGB8888;
+            chroma_keyed = SDL_TRUE;
+            break;
+        }
+        default: {
+//            SDL_assert(cdsc->dec_dsc.header.cf != 0);
+            // Unsupported color format
+            return;
+        }
+    }
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
@@ -33,10 +55,12 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_draw_img_key_t key = {.magic=LV_GPU_CACHE_KEY_MAGIC_IMG, .src = src, .frame_id = draw_dsc->frame_id};
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
     if (!texture) {
-        int w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;
-        SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h, LV_COLOR_DEPTH,
-                                                                  cdsc->dec_dsc.header.w * sizeof(lv_color_t),
-                                                                  SDL_PIXELFORMAT_ARGB8888);
+        uint32_t w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;
+
+        SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h,
+                                                                  SDL_BITSPERPIXEL(pixel_format),
+                                                                  w * sizeof(lv_color_t), pixel_format);
+        SDL_SetColorKey(surface, chroma_keyed, lv_color_to32(LV_COLOR_CHROMA_KEY));
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);

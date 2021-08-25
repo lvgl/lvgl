@@ -3,6 +3,7 @@
 //
 
 #include <SDL.h>
+#include "draw/lv_draw_label.h"
 
 #include "lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl2_mask.h"
@@ -18,10 +19,17 @@ void lv_gpu_draw_cache_init() {
         palette[i].a = i;
     }
     SDL_SetPaletteColors(lv_sdl2_palette_grayscale8, palette, 0, 256);
+    lv_sdl2_palette_grayscale4 = SDL_AllocPalette(16);
+    for (int i = 0; i < 16; i++) {
+        palette[i].r = palette[i].g = palette[i].b = 0xFF;
+        palette[i].a = _lv_bpp4_opa_table[i];
+    }
+    SDL_SetPaletteColors(lv_sdl2_palette_grayscale4, palette, 0, 16);
 }
 
 void lv_gpu_draw_cache_deinit() {
     SDL_FreePalette(lv_sdl2_palette_grayscale8);
+    SDL_FreePalette(lv_sdl2_palette_grayscale4);
     lv_lru_free(lv_sdl2_texture_cache);
 }
 
