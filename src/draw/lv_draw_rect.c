@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_GPU_SDL_RENDER == 0
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
                                           const lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv_area_t * clip,
@@ -91,7 +91,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->border_side = LV_BORDER_SIDE_FULL;
 }
 
-#if LV_USE_GPU_SDL_RENDER == 0
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Draw a rectangle
  * @param coords the coordinates of the rectangle

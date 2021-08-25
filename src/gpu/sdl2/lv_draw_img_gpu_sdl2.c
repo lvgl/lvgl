@@ -1,8 +1,8 @@
-//
-// Created by Mariotaku on 2021/08/22.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include "core/lv_refr.h"
-#include "gpu/lv_gpu_sdl.h"
 #include "lv_gpu_sdl2_utils.h"
 #include "lv_gpu_sdl2_lru.h"
 #include "lv_gpu_draw_cache.h"
@@ -97,3 +97,5 @@ static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_d
     lv_mem_buf_release(data);
     return texture;
 }
+
+#endif /*LV_USE_GPU_SDL*/

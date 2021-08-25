@@ -1,3 +1,7 @@
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include "lv_gpu_sdl2_lru.h"
 #include <stdlib.h>
 #include <string.h>
@@ -304,3 +308,5 @@ lruc_error lv_lru_delete(lv_lru_t *cache, const void *key, size_t key_size) {
     unlock_cache();
     return LV_LRU_NO_ERROR;
 }
+
+#endif /*LV_USE_GPU_SDL*/

@@ -30,7 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_GPU_SDL_RENDER == 0
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        const lv_draw_img_dsc_t * draw_dsc);
@@ -65,7 +65,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
-#if LV_USE_GPU_SDL_RENDER == 0
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -233,7 +233,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_GPU_SDL_RENDER == 0
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        const lv_draw_img_dsc_t * draw_dsc)

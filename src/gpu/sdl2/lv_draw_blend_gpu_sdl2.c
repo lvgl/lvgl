@@ -1,6 +1,6 @@
-//
-// Created by Mariotaku on 2021/08/23.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
 
 #include "hal/lv_hal.h"
 #include "core/lv_refr.h"
@@ -51,3 +51,5 @@ void _lv_blend_map(const lv_area_t *clip_area, const lv_area_t *map_area,
                    lv_blend_mode_t mode) {
 
 }
+
+#endif /*LV_USE_GPU_SDL*/

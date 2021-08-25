@@ -1,6 +1,6 @@
-//
-// Created by Mariotaku on 2021/08/23.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
 
 #include "lv_gpu_sdl2_mask.h"
 #include "draw/lv_draw_mask.h"
@@ -264,3 +264,5 @@ void lv_draw_mask_blur(lv_opa_t *pix, uint16_t w, uint16_t h, uint16_t radius) {
     stack_blur_job(pix, w, h, radius, 1, 0, 1);
     stack_blur_job(pix, w, h, radius, 1, 0, 2);
 }
+
+#endif /*LV_USE_GPU_SDL*/

@@ -67,7 +67,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-#if LV_USE_GPU_SDL_RENDER == 0
+#if LV_USE_EXTERNAL_RENDERER == 0
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
                  const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {

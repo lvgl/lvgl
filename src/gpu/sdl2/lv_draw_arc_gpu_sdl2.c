@@ -1,6 +1,7 @@
-//
-// Created by Mariotaku on 2021/08/21.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include <hal/lv_hal_disp.h>
 #include <core/lv_refr.h>
 #include "draw/lv_draw_arc.h"
@@ -125,3 +126,5 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
     SDL_RenderCopyEx(renderer, texture, NULL, &area_out_rect, start_angle, NULL, SDL_FLIP_NONE);
     SDL_DestroyTexture(texture);
 }
+
+#endif /*LV_USE_GPU_SDL*/

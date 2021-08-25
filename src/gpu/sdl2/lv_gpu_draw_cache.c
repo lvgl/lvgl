@@ -1,6 +1,6 @@
-//
-// Created by Mariotaku on 2021/08/21.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
 
 #include <SDL.h>
 #include "draw/lv_draw_label.h"
@@ -69,3 +69,5 @@ static void draw_cache_free_value(draw_cache_value_t *value) {
     }
     free(value);
 }
+
+#endif /*LV_USE_GPU_SDL*/

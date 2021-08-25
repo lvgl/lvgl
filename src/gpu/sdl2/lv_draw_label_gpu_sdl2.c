@@ -1,6 +1,7 @@
-//
-// Created by Mariotaku on 2021/08/23.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include <font/lv_font_fmt_txt.h>
 #include "SDL.h"
 #include "core/lv_refr.h"
@@ -132,8 +133,8 @@ lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *rend
                 if (gd->box_w <= 0 || gd->box_h <= 0) {
                     continue;
                 }
-                lv_sdl_to8bpp(&s1[rect->y * sprite_w + rect->x], &dsc->glyph_bitmap[gd->bitmap_index], rect->w, rect->h,
-                              sprite_w, dsc->bpp);
+                lv_sdl_to_8bpp(&s1[rect->y * sprite_w + rect->x], &dsc->glyph_bitmap[gd->bitmap_index], rect->w,
+                               rect->h, sprite_w, dsc->bpp);
                 sprite_x += gd->box_w;
             }
             SDL_Surface *indexed = SDL_CreateRGBSurfaceWithFormatFrom(s1, sprite_w, sprite_h, 8, sprite_w,
@@ -148,3 +149,5 @@ lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *rend
     }
     return atlas;
 }
+
+#endif /*LV_USE_GPU_SDL*/

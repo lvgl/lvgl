@@ -1,6 +1,7 @@
-//
-// Created by Mariotaku on 2021/08/23.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include <core/lv_refr.h>
 #include "SDL.h"
 #include "lv_draw_gpu_sdl2.h"
@@ -102,3 +103,5 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
         }
     }
 }
+
+#endif /*LV_USE_GPU_SDL*/

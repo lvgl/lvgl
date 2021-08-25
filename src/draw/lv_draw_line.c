@@ -12,7 +12,7 @@
 #include "../core/lv_refr.h"
 #include "../misc/lv_math.h"
 
-#if LV_USE_GPU_SDL_RENDER
+#if LV_USE_GPU_SDL
 #include "../gpu/sdl2/lv_draw_gpu_sdl2.h"
 #endif
 
@@ -83,7 +83,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
     bool is_common;
     is_common = _lv_area_intersect(&clip_line, &clip_line, clip);
     if(!is_common) return;
-#if LV_USE_GPU_SDL_RENDER
+#if LV_USE_GPU_SDL
     if (lv_draw_mask_get_cnt() == 0) {
         lv_draw_line_gpu_sdl(point1, point2, clip, dsc);
         return;

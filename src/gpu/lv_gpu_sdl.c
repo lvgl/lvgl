@@ -1,6 +1,6 @@
-//
-// Created by Mariotaku on 2021/08/20.
-//
+#include "../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
 
 #include "font/lv_font_fmt_txt.h"
 #include "core/lv_refr.h"
@@ -72,3 +72,5 @@ static void lv_sdl_drv_fb_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, 
     }
     lv_disp_flush_ready(disp_drv);
 }
+
+#endif /*LV_USE_GPU_SDL*/

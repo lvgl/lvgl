@@ -1,6 +1,6 @@
-//
-// Created by Mariotaku on 2021/08/21.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
 
 #include "misc/lv_style.h"
 #include "lv_gpu_sdl2_utils.h"
@@ -65,7 +65,7 @@ SDL_Palette *lv_sdl_get_grayscale_palette(uint8_t bpp) {
     return NULL;
 }
 
-void lv_sdl_to8bpp(uint8_t *dest, const uint8_t *src, int width, int height, int stride, uint8_t bpp) {
+void lv_sdl_to_8bpp(uint8_t *dest, const uint8_t *src, int width, int height, int stride, uint8_t bpp) {
     int src_len = width * height;
     int cur = 0, src_idx = 0;
     int curbit;
@@ -98,3 +98,5 @@ void lv_sdl_to8bpp(uint8_t *dest, const uint8_t *src, int width, int height, int
         }
     }
 }
+
+#endif /*LV_USE_GPU_SDL*/

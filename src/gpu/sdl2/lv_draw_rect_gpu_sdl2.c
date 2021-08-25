@@ -1,6 +1,7 @@
-//
-// Created by Mariotaku on 2021/08/21.
-//
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include "draw/lv_draw_rect.h"
 #include "hal/lv_hal_disp.h"
 #include "core/lv_refr.h"
@@ -567,3 +568,5 @@ static void render_center(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t 
         SDL_RenderCopy(renderer, frag, &srcrect, &dstrect);
     }
 }
+
+#endif /*LV_USE_GPU_SDL*/
