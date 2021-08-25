@@ -2,7 +2,7 @@
 
 #if LV_USE_GPU_SDL
 
-#include "lv_gpu_sdl2_lru.h"
+#include "lv_gpu_sdl_lru.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

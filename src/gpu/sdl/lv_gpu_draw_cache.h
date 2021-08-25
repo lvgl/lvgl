@@ -7,7 +7,7 @@
 
 #include "SDL.h"
 #include "misc/lv_area.h"
-#include "lv_gpu_sdl2_lru.h"
+#include "lv_gpu_sdl_lru.h"
 
 typedef uint8_t lv_gpu_cache_key_magic_t;
 
@@ -18,9 +18,9 @@ typedef uint8_t lv_gpu_cache_key_magic_t;
 #define LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW 0x3A
 #define LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER 0x3B
 
-void lv_gpu_draw_cache_init();
+void _lv_gpu_sdl_texture_cache_init();
 
-void lv_gpu_draw_cache_deinit();
+void _lv_gpu_sdl_texture_cache_deinit();
 
 SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length, bool *found);
 

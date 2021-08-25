@@ -4,11 +4,11 @@
 
 #include <core/lv_refr.h>
 #include "SDL.h"
-#include "lv_draw_gpu_sdl2.h"
-#include "lv_gpu_sdl2_utils.h"
-#include "lv_gpu_sdl2_lru.h"
+#include "lv_draw_gpu_sdl.h"
+#include "lv_gpu_sdl_utils.h"
+#include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_draw_cache.h"
-#include "lv_gpu_sdl2_mask.h"
+#include "lv_gpu_sdl_mask.h"
 
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
@@ -53,7 +53,7 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
         lv_draw_mask_radius_param_t mask_rout_param;
         lv_draw_mask_radius_init(&mask_rout_param, &coords, 0, false);
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        texture = lv_sdl2_gen_mask_texture(renderer, &tex_coords);
+        texture = lv_sdl_gen_mask_texture(renderer, &tex_coords);
         lv_draw_mask_remove_id(mask_rout_id);
         SDL_assert(texture);
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);

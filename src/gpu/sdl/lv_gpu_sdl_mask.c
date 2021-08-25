@@ -2,24 +2,24 @@
 
 #if LV_USE_GPU_SDL
 
-#include "lv_gpu_sdl2_mask.h"
 #include "draw/lv_draw_mask.h"
 #include "misc/lv_mem.h"
+#include "lv_gpu_sdl_mask.h"
+#include "lv_gpu_sdl_utils.h"
 
-SDL_Palette *lv_sdl2_palette_grayscale8 = NULL;
 
-SDL_Surface *lv_sdl2_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride) {
+SDL_Surface *lv_sdl_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride) {
     SDL_Surface *indexed = SDL_CreateRGBSurfaceWithFormatFrom(pixels, width, height, 8,
                                                               stride, SDL_PIXELFORMAT_INDEX8);
-    SDL_SetSurfacePalette(indexed, lv_sdl2_palette_grayscale8);
+    SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(8));
     SDL_Surface *converted = SDL_ConvertSurfaceFormat(indexed, SDL_PIXELFORMAT_ARGB8888, 0);
     SDL_FreeSurface(indexed);
     return converted;
 }
 
-SDL_Texture *lv_sdl2_create_mask_texture(SDL_Renderer *renderer, lv_opa_t *pixels, lv_coord_t width,
+SDL_Texture *lv_sdl_create_mask_texture(SDL_Renderer *renderer, lv_opa_t *pixels, lv_coord_t width,
                                          lv_coord_t height, lv_coord_t stride) {
-    SDL_Surface *indexed = lv_sdl2_create_mask_surface(pixels, width, height, stride);
+    SDL_Surface *indexed = lv_sdl_create_mask_surface(pixels, width, height, stride);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
     SDL_FreeSurface(indexed);
     return texture;
@@ -42,16 +42,16 @@ lv_opa_t *lv_draw_mask_dump(const lv_area_t *coords) {
     return mask_buf;
 }
 
-SDL_Surface *lv_sdl2_apply_mask_surface(const lv_area_t *coords) {
+SDL_Surface *lv_sdl_apply_mask_surface(const lv_area_t *coords) {
     lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
 
     lv_opa_t *mask_buf = lv_draw_mask_dump(coords);
     lv_mem_buf_release(mask_buf);
-    return lv_sdl2_create_mask_surface(mask_buf, w, h, w);
+    return lv_sdl_create_mask_surface(mask_buf, w, h, w);
 }
 
-SDL_Texture *lv_sdl2_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords) {
-    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords);
+SDL_Texture *lv_sdl_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords) {
+    SDL_Surface *indexed = lv_sdl_apply_mask_surface(coords);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
     SDL_FreeSurface(indexed);
     return texture;

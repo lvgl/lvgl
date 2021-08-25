@@ -6,25 +6,21 @@
 #include "SDL.h"
 #include "core/lv_refr.h"
 #include "draw/lv_draw_label.h"
-#include "lv_gpu_sdl2_utils.h"
-#include "lv_gpu_sdl2_mask.h"
+#include "lv_gpu_sdl_utils.h"
+#include "lv_gpu_sdl_mask.h"
 
-typedef struct _lv_sdl_font_userdata_t {
+typedef struct lv_sdl_font_atlas_t {
     const lv_font_t *key;
     uint8_t supported;
     SDL_Texture *texture;
     SDL_Rect *pos;
     uint32_t start;
-    struct _lv_sdl_font_userdata_t *next;
+    struct lv_sdl_font_atlas_t *next;
 } lv_sdl_font_atlas_t;
 
 static lv_sdl_font_atlas_t *font_sprites = NULL;
 
 static lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *renderer);
-
-SDL_Palette *lv_sdl2_palette_grayscale1 = NULL;
-SDL_Palette *lv_sdl2_palette_grayscale2 = NULL;
-SDL_Palette *lv_sdl2_palette_grayscale4 = NULL;
 
 void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
                     const lv_font_t *font_p,

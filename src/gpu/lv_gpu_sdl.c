@@ -4,8 +4,8 @@
 
 #include "font/lv_font_fmt_txt.h"
 #include "core/lv_refr.h"
-#include "sdl2/lv_gpu_sdl2_utils.h"
-#include "sdl2/lv_gpu_draw_cache.h"
+#include "sdl/lv_gpu_sdl_utils.h"
+#include "sdl/lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl.h"
 
 static void lv_sdl_drv_wait_cb(lv_disp_drv_t *disp_drv);
@@ -33,13 +33,15 @@ lv_disp_t *lv_sdl_display_init(SDL_Window *window) {
     SDL_assert(renderer_info.flags & SDL_RENDERER_TARGETTEXTURE);
     SDL_SetRenderTarget(renderer, texture);
 
-    lv_gpu_draw_cache_init();
+    _lv_gpu_sdl_utils_init();
+    _lv_gpu_sdl_texture_cache_init();
 
     return lv_disp_drv_register(driver);
 }
 
 void lv_sdl_display_deinit(lv_disp_t *disp) {
-    lv_gpu_draw_cache_deinit();
+    _lv_gpu_sdl_texture_cache_deinit();
+    _lv_gpu_sdl_utils_deinit();
     SDL_DestroyTexture((SDL_Texture *) disp->driver->draw_buf->buf1);
     SDL_DestroyRenderer((SDL_Renderer *) disp->driver->user_data);
     free(disp->driver->draw_buf);

@@ -9,10 +9,9 @@
 #include "misc/lv_area.h"
 #include "SDL_rect.h"
 
-extern SDL_Palette *lv_sdl2_palette_grayscale8;
-extern SDL_Palette *lv_sdl2_palette_grayscale4;
-extern SDL_Palette *lv_sdl2_palette_grayscale2;
-extern SDL_Palette *lv_sdl2_palette_grayscale1;
+void _lv_gpu_sdl_utils_init();
+
+void _lv_gpu_sdl_utils_deinit();
 
 void lv_area_to_sdl_rect(const lv_area_t *in, SDL_Rect *out);
 

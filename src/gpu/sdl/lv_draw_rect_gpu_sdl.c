@@ -5,10 +5,10 @@
 #include "draw/lv_draw_rect.h"
 #include "hal/lv_hal_disp.h"
 #include "core/lv_refr.h"
-#include "lv_gpu_sdl2_utils.h"
-#include "lv_gpu_sdl2_lru.h"
+#include "lv_gpu_sdl_utils.h"
+#include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_draw_cache.h"
-#include "lv_gpu_sdl2_mask.h"
+#include "lv_gpu_sdl_mask.h"
 
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
@@ -107,7 +107,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, coords, radius, false);
             int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-            texture = lv_sdl2_gen_mask_texture(renderer, &coords_frag);
+            texture = lv_sdl_gen_mask_texture(renderer, &coords_frag);
             lv_draw_mask_remove_id(mask_rout_id);
             SDL_assert(texture);
             lv_gpu_draw_cache_put(&key, sizeof(key), texture);
@@ -249,7 +249,7 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
         lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag);
         lv_draw_mask_blur(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
-        texture = lv_sdl2_create_mask_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
+        texture = lv_sdl_create_mask_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
                                               lv_area_get_width(&blur_frag));
         lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_rout_id);
@@ -408,7 +408,7 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
         lv_area_set_width(&frag_area, frag_size);
         lv_area_set_height(&frag_area, frag_size);
 
-        texture = lv_sdl2_gen_mask_texture(renderer, &frag_area);
+        texture = lv_sdl_gen_mask_texture(renderer, &frag_area);
 
         lv_draw_mask_remove_id(mask_rin_id);
         lv_draw_mask_remove_id(mask_rout_id);
@@ -476,7 +476,7 @@ void draw_bg_compat(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_R
     SDL_Color bg_color;
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
 
-    SDL_Surface *indexed = lv_sdl2_apply_mask_surface(coords);
+    SDL_Surface *indexed = lv_sdl_apply_mask_surface(coords);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);

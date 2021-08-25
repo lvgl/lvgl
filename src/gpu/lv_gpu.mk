@@ -9,4 +9,4 @@ VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/gpu
 
 CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/gpu"
 
-include sdl2/lv_gpu_sdl2.mk
+include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/gpu/sdl/lv_gpu_sdl.mk

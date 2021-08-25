@@ -5,10 +5,10 @@
 #include <hal/lv_hal_disp.h>
 #include <core/lv_refr.h>
 #include "draw/lv_draw_arc.h"
-#include "lv_gpu_sdl2_utils.h"
-#include "lv_gpu_sdl2_lru.h"
+#include "lv_gpu_sdl_utils.h"
+#include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_draw_cache.h"
-#include "lv_gpu_sdl2_mask.h"
+#include "lv_gpu_sdl_mask.h"
 
 #ifndef M_PI
 #include <math.h>
@@ -76,10 +76,10 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             lv_draw_mask_angle_param_t mask_angle_param;
             lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, 0, key.angle);
             int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
-            ark_mask = lv_sdl2_apply_mask_surface(&texture_area_out);
+            ark_mask = lv_sdl_apply_mask_surface(&texture_area_out);
             lv_draw_mask_remove_id(mask_angle_id);
         } else {
-            ark_mask = lv_sdl2_apply_mask_surface(&texture_area_out);
+            ark_mask = lv_sdl_apply_mask_surface(&texture_area_out);
         }
         lv_draw_mask_remove_id(mask_out_id);
         lv_draw_mask_remove_id(mask_in_id);
@@ -93,7 +93,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, &cap_area, LV_RADIUS_CIRCLE, false);
             int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-            SDL_Texture *round_texture = lv_sdl2_gen_mask_texture(mask_renderer, &cap_area);
+            SDL_Texture *round_texture = lv_sdl_gen_mask_texture(mask_renderer, &cap_area);
             lv_draw_mask_remove_id(mask_rout_id);
 
             SDL_SetTextureBlendMode(round_texture, SDL_BLENDMODE_BLEND);

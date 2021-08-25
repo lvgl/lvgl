@@ -2,9 +2,29 @@
 
 #if LV_USE_GPU_SDL
 
-#include "misc/lv_style.h"
-#include "lv_gpu_sdl2_utils.h"
+#include "draw/lv_draw_label.h"
+#include "lv_gpu_sdl_utils.h"
 #include "SDL.h"
+
+SDL_Palette *lv_sdl_palette_grayscale1 = NULL;
+SDL_Palette *lv_sdl_palette_grayscale2 = NULL;
+SDL_Palette *lv_sdl_palette_grayscale4 = NULL;
+SDL_Palette *lv_sdl_palette_grayscale8 = NULL;
+
+void _lv_gpu_sdl_utils_init() {
+    lv_sdl_palette_grayscale1 = lv_sdl_alloc_palette_for_bpp(_lv_bpp1_opa_table, 1);
+    lv_sdl_palette_grayscale2 = lv_sdl_alloc_palette_for_bpp(_lv_bpp2_opa_table, 2);
+    lv_sdl_palette_grayscale4 = lv_sdl_alloc_palette_for_bpp(_lv_bpp4_opa_table, 4);
+    lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
+
+}
+
+void _lv_gpu_sdl_utils_deinit() {
+    SDL_FreePalette(lv_sdl_palette_grayscale1);
+    SDL_FreePalette(lv_sdl_palette_grayscale2);
+    SDL_FreePalette(lv_sdl_palette_grayscale4);
+    SDL_FreePalette(lv_sdl_palette_grayscale8);
+}
 
 void lv_area_to_sdl_rect(const lv_area_t *in, SDL_Rect *out) {
     out->x = in->x1;
@@ -54,13 +74,13 @@ SDL_Palette *lv_sdl_alloc_palette_for_bpp(const uint8_t *mapping, uint8_t bpp) {
 SDL_Palette *lv_sdl_get_grayscale_palette(uint8_t bpp) {
     switch (bpp) {
         case 1:
-            return lv_sdl2_palette_grayscale1;
+            return lv_sdl_palette_grayscale1;
         case 2:
-            return lv_sdl2_palette_grayscale2;
+            return lv_sdl_palette_grayscale2;
         case 4:
-            return lv_sdl2_palette_grayscale4;
+            return lv_sdl_palette_grayscale4;
         case 8:
-            return lv_sdl2_palette_grayscale8;
+            return lv_sdl_palette_grayscale8;
     }
     return NULL;
 }

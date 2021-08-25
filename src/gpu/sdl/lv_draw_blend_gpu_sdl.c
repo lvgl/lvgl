@@ -7,8 +7,8 @@
 #include "draw/lv_draw_blend.h"
 #include "SDL.h"
 #include "lv_gpu_draw_cache.h"
-#include "lv_gpu_sdl2_utils.h"
-#include "lv_gpu_sdl2_mask.h"
+#include "lv_gpu_sdl_utils.h"
+#include "lv_gpu_sdl_mask.h"
 
 void _lv_blend_fill(const lv_area_t *clip_area, const lv_area_t *fill_area, lv_color_t color,
                     lv_opa_t *mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode) {
@@ -27,7 +27,7 @@ void _lv_blend_fill(const lv_area_t *clip_area, const lv_area_t *fill_area, lv_c
     SDL_Rect draw_area_rect;
     lv_area_to_sdl_rect(&draw_area, &draw_area_rect);
     if (mask) {
-        SDL_Surface *mask_surface = lv_sdl2_create_mask_surface(mask, lv_area_get_width(&draw_area),
+        SDL_Surface *mask_surface = lv_sdl_create_mask_surface(mask, lv_area_get_width(&draw_area),
                                                                 lv_area_get_height(&draw_area),
                                                                 lv_area_get_width(&draw_area));
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, mask_surface);
