@@ -24,7 +24,7 @@ minimal_monochrome = {
   
   "LV_BUILD_EXAMPLES":1,
   
-  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
+  "LV_FONT_DEFAULT":"&lv_font_montserrat_14",
 
 }
 
@@ -54,7 +54,7 @@ normal_8bit = {
   
   "LV_BUILD_EXAMPLES":1,
 
-  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
+  "LV_FONT_DEFAULT":"&lv_font_montserrat_14",
 }
 
 
@@ -83,7 +83,7 @@ minimal_16bit = {
   
   "LV_BUILD_EXAMPLES":1,
   
-  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
+  "LV_FONT_DEFAULT":"&lv_font_montserrat_14",
 
 }
 
@@ -114,7 +114,7 @@ normal_16bit_swap = {
   
   "LV_BUILD_EXAMPLES":1,
 
-  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
+  "LV_FONT_DEFAULT":"&lv_font_montserrat_14",
 }
 
 full_32bit = {
@@ -182,7 +182,7 @@ full_32bit = {
 
   "LV_BUILD_EXAMPLES":1,
   
-  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_24\\\"",
+  "LV_FONT_DEFAULT":"&lv_font_montserrat_24",
 }
 
 test = {
@@ -227,5 +227,5 @@ test = {
 
   "LV_BUILD_EXAMPLES":1,
   
-  "LV_FONT_DEFAULT":"\\\"&lv_font_montserrat_14\\\"",
+  "LV_FONT_DEFAULT":"&lv_font_montserrat_14",
 }
