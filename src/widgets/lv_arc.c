@@ -696,12 +696,6 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     /*Skip this complicated invalidation if the arc is not visible*/
     if(lv_obj_is_visible(obj) == false) return;
 
-    start_angle += arc->rotation;
-    end_angle += arc->rotation;
-
-    if(start_angle >= 360) start_angle -= 360;
-    if(end_angle >= 360) end_angle -= 360;
-
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
     lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -725,6 +719,9 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
         w += knob_extra_size * 2 + 2;
         rout += knob_extra_size + 2;
     }
+
+    start_angle += arc->rotation;
+    end_angle += arc->rotation;
 
     lv_area_t inv_area;
     lv_draw_arc_get_area(x, y, rout, start_angle, end_angle, w, rounded, &inv_area);
