@@ -59,7 +59,7 @@ There is no limitation for the type of the parent but, there are typical parent 
 ### Moving together
 
 If the position of the parent changes the children will move with the parent.
-Therefore all positions are relative to the parent.
+Therefore, all positions are relative to the parent.
 
 ![](/misc/par_child1.png "Objects are moving together 1")
 
@@ -104,7 +104,7 @@ Every widget has its own **create** function with a prototype like this:
 lv_obj_t * lv_<widget>_create(lv_obj_t * parent, <other paramaters if any>);
 ```
 
-In most of the cases the create functions have only a *parent* parameter that tells on which object create the new widget.
+Typically, the create functions only have a *parent* parameter telling them on which object to create the new widget.
 
 The return value is a pointer to the created object with `lv_obj_t *` type.
 
@@ -121,7 +121,7 @@ This is useful e.g. if you want to delete the parent of an object in the child's
 
 You can remove all the children of an object (but not the object itself) using `lv_obj_clean(obj)`.
 
-You can use `lv_obj_del_delayed(obj, 1000)` to delete an object after some time. The delay is expressed in millliseconds. 
+You can use `lv_obj_del_delayed(obj, 1000)` to delete an object after some time. The delay is expressed in milliseconds. 
 
 
 ## Screens
@@ -166,7 +166,7 @@ A new screen can be loaded with animation too using `lv_scr_load_anim(scr, trans
 
 Setting `auto_del` to `true` will automatically delete the old screen when the animation is finished.
 
-The new screen will become active (returned by `lv_scr_act()`) when the animations starts after `delay` time.
+The new screen will become active (returned by `lv_scr_act()`) when the animation starts after `delay` time.
 
 ### Handling multiple displays
 Screens are created on the currently selected *default display*.
@@ -179,7 +179,7 @@ Visit [Multi-display support](/overview/display) to learn more.
 ## Parts
 
 The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scrollbar parts but a [Slider](/widgets/core/slider) uses the main, the indicator and the knob parts. 
-Parts are similar to *pseudo elements* in CSS.
+Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL:
 - `LV_PART_MAIN` A background like rectangle*/``
@@ -193,7 +193,7 @@ The following predefined parts exist in LVGL:
 - `LV_PART_CUSTOM_FIRST` Custom parts can be added from here.
 
 The main purpose of parts to allow styling the "components" of the widgets. 
-Therefore the parts are described in more detail in the [Style overview](/overview/style) section.
+Therefore, the parts are described in more detail in the [Style overview](/overview/style) section.
 
 ## States
 The object can be in a combination of the following states:
@@ -211,12 +211,12 @@ The object can be in a combination of the following states:
 - `LV_STATE_USER_3` Custom state
 - `LV_STATE_USER_4` Custom state
 
-The states are usually automatically changed by the library as the user presses, releases, focuses etc an object. 
+The states are usually automatically changed by the library as the user presses, releases, focuses, etc. an object. 
 However, the states can be changed manually too. 
 To set or clear given state (but leave the other states untouched) use `lv_obj_add/clear_state(obj, LV_STATE_...)`
-In both cases ORed state values can be used as well. E.g. `lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
+In both cases OR-ed state values can be used as well. E.g. `lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states read the related section of the [Style overview](/overview/style).
 
 ## Snapshot
-A snapshot image could be generated for object together with its children. Check details in [Snapshot](/others/snapshot).
+A snapshot image could be generated for an object together with its children. Check details in [Snapshot](/others/snapshot).

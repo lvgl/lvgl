@@ -9,7 +9,7 @@ You can try out LVGL **using only your PC** (i.e. without any development boards
 
 Using the simulator on the PC has the following advantages:
 - Hardware independent - Write code, run it on the PC and see the result on the PC monitor.
-- Cross-platform - Any Windows, Linux or MacOS system can run the PC simulator.  
+- Cross-platform - Any Windows, Linux or macOS system can run the PC simulator.  
 - Portability - the written code is portable, which means you can simply copy it when using an embedded hardware.
 - Easy Validation - The simulator is also very useful to report bugs because it means common platform for every user. So it's a good idea to reproduce a bug in the simulator and use the code snippet in the [Forum](https://forum.lvgl.io).
 
@@ -45,7 +45,7 @@ You can download Eclipse's CDT from: [https://www.eclipse.org/cdt/downloads.php]
 
 ### Install SDL 2
 
-The PC simulator uses the [SDL 2](https://www.libsdl.org/download-2.0.php) cross platform library to simulate a TFT display and a touch pad. 
+The PC simulator uses the [SDL 2](https://www.libsdl.org/download-2.0.php) cross-platform library to simulate a TFT display and a touchpad. 
 
 #### Linux
 On **Linux** you can easily install SDL2 using a terminal:
@@ -82,16 +82,16 @@ You can find the latest one on [GitHub](https://github.com/lvgl/lv_sim_eclipse_s
 
 Run Eclipse CDT. It will show a dialogue about the **workspace path**. Before accepting the path, check that path and copy (and unzip) the downloaded pre-configured project there. After that, you can accept the workspace path. Of course you can modify this path but, in that case copy the project to the corresponding location.
 
-Close the start up window and go to **File-&gt;Import** and choose **General-&gt;Existing project into Workspace**. **Browse the root directory** of the project and click **Finish**
+Close the start-up window and go to **File-&gt;Import** and choose **General-&gt;Existing project into Workspace**. **Browse the root directory** of the project and click **Finish**
 
 On **Windows** you have to do two additional things:
 
 - Copy the **SDL2.dll** into the project's Debug folder 
-- Right click on the project -&gt; Project properties -&gt; C/C++ Build -&gt; Settings -&gt; Libraries -&gt; Add ... and add _mingw32_ above SDLmain and SDL. (The order is important: mingw32, SDLmain, SDL)
+- Right-click on the project -&gt; Project properties -&gt; C/C++ Build -&gt; Settings -&gt; Libraries -&gt; Add ... and add _mingw32_ above SDLmain and SDL. (The order is important: mingw32, SDLmain, SDL)
 
 ### Compile and Run
 
-Now you are ready to run LVGL on your PC. Click on the Hammer Icon on the top menu bar to Build the project. If you have done everything right, then you will not get any errors. Note that on some systems additional steps might be required to "see" SDL 2 from Eclipse but, in most of cases the configurations in the downloaded project is enough.
+Now you are ready to run LVGL on your PC. Click on the Hammer Icon on the top menu bar to Build the project. If you have done everything right, then you will not get any errors. Note that on some systems additional steps might be required to "see" SDL 2 from Eclipse but, in most cases the configuration in the downloaded project is enough.
 
 After a success build, click on the Play button on the top menu bar to run the project. Now a window should appear in the middle of your screen.
 

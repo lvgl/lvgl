@@ -6,7 +6,7 @@
 
 The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.
 
-`lv_color_t` is used to store a color, its fileds are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
+`lv_color_t` is used to store a color, its fields are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
 
 You may set `LV_COLOR_16_SWAP` in `lv_conf.h` to swap the bytes of *RGB565* colors. You may need this to send the 16-bit colors via a byte-oriented interface like SPI. As 16-bit numbers are stored in Little Endian format (lower byte on the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. A mismatch in the byte order will result in highly distorted colors.
 

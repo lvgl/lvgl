@@ -42,7 +42,7 @@ Besides simple settings the size in pixel you can use two special values:
 - `LV_GRID_FR(X)` tell what portion of the remaining space should be used by this track. Larger value means larger space.
 
 ### Grid items
-By default the children are not added to the grid. They need to be added manually to a cell. 
+By default, the children are not added to the grid. They need to be added manually to a cell. 
 
 To do this call `lv_obj_set_grid_cell(child, column_align, column_pos, column_span, row_align, row_pos, row_span)`.
 
