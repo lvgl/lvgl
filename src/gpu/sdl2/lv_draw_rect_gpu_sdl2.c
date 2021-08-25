@@ -101,7 +101,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
         lv_area_copy(&coords_frag, coords);
         lv_area_set_width(&coords_frag, frag_size);
         lv_area_set_height(&coords_frag, frag_size);
-        SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+        SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
         if (texture == NULL) {
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, coords, radius, false);
@@ -241,7 +241,7 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
     lv_area_copy(&blur_frag, &sh_area);
     lv_area_set_width(&blur_frag, blur_frag_size * 2);
     lv_area_set_height(&blur_frag, blur_frag_size * 2);
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
     if (texture == NULL) {
         lv_draw_mask_radius_param_t mask_rout_param;
         lv_draw_mask_radius_init(&mask_rout_param, &sh_rect_area, radius, false);
@@ -386,7 +386,7 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
             .size = min_half,
             .side = LV_BORDER_SIDE_FULL,
     };
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
     if (texture == NULL) {
         /*Create mask for the outer area*/
         int16_t mask_rout_id = LV_MASK_ID_INV;

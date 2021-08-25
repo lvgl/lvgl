@@ -13,43 +13,16 @@ typedef struct {
     int32_t frame_id;
 } lv_draw_img_key_t;
 
+static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc);
+
+static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc);
+
 void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src, const lv_draw_img_dsc_t *draw_dsc) {
-
-
     if (draw_dsc->opa <= LV_OPA_MIN) return;
 
     _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
 
     if (cdsc == NULL) return;
-    SDL_PixelFormatEnum pixel_format;
-    int chroma_keyed = SDL_FALSE;
-    switch (cdsc->dec_dsc.header.cf) {
-        case LV_IMG_CF_TRUE_COLOR_ALPHA: {
-            pixel_format = SDL_PIXELFORMAT_ARGB8888;
-            break;
-        }
-        case LV_IMG_CF_TRUE_COLOR: {
-            pixel_format = SDL_PIXELFORMAT_XRGB8888;
-            break;
-        }
-        case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED: {
-            pixel_format = SDL_PIXELFORMAT_XRGB8888;
-            chroma_keyed = SDL_TRUE;
-            break;
-        }
-        case LV_IMG_CF_INDEXED_1BIT:
-        case LV_IMG_CF_INDEXED_2BIT:
-        case LV_IMG_CF_INDEXED_4BIT:
-        case LV_IMG_CF_INDEXED_8BIT: {
-            pixel_format = SDL_PIXELFORMAT_INDEX8;
-            return;
-        }
-        default: {
-//            SDL_assert(cdsc->dec_dsc.header.cf != 0);
-            // Unsupported color format
-            return;
-        }
-    }
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
@@ -60,17 +33,14 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
     lv_draw_img_key_t key = {.magic=LV_GPU_CACHE_KEY_MAGIC_IMG, .src = src, .frame_id = draw_dsc->frame_id};
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
-    if (!texture) {
-        uint32_t w = cdsc->dec_dsc.header.w, h = cdsc->dec_dsc.header.h;
-
-        SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void *) cdsc->dec_dsc.img_data, w, h,
-                                                                  SDL_BITSPERPIXEL(pixel_format),
-                                                                  w * SDL_BYTESPERPIXEL(pixel_format), pixel_format);
-        SDL_SetColorKey(surface, chroma_keyed, lv_color_to32(LV_COLOR_CHROMA_KEY));
-        texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
+    bool texture_found = false;
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), &texture_found);
+    if (!texture_found) {
+        texture = upload_img_texture(renderer, &cdsc->dec_dsc);
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);
+    }
+    if (!texture) {
+        return;
     }
     SDL_Point pivot = {.x = coords_rect.w / 2, .y = coords_rect.h / 2};
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
@@ -95,4 +65,35 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
         SDL_SetTextureAlphaMod(texture, draw_dsc->recolor_opa);
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
+}
+
+static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc) {
+    if (!dsc->img_data) {
+        return upload_img_texture_fallback(renderer, dsc);
+    }
+    int chroma_keyed = dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    SDL_PixelFormatEnum format = chroma_keyed ? SDL_PIXELFORMAT_XRGB8888 : SDL_PIXELFORMAT_ARGB8888;
+    int w = dsc->header.w, h = dsc->header.h;
+    void *data = (void *) dsc->img_data;
+    SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
+                                                              format);
+    SDL_SetColorKey(surface, chroma_keyed, lv_color_to32(LV_COLOR_CHROMA_KEY));
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}
+
+static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc) {
+    lv_coord_t w = dsc->header.w, h = dsc->header.h;
+    uint8_t *data = lv_mem_buf_get(w * h * sizeof(lv_color_t));
+    for (lv_coord_t y = 0; y < h; y++) {
+        lv_img_decoder_read_line(dsc, 0, y, w, &data[y * w * sizeof(lv_color_t)]);
+    }
+    SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
+                                                              SDL_PIXELFORMAT_XRGB8888);
+    SDL_SetColorKey(surface, SDL_TRUE, lv_color_to32(LV_COLOR_CHROMA_KEY));
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    lv_mem_buf_release(data);
+    return texture;
 }

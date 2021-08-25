@@ -22,7 +22,7 @@ void lv_gpu_draw_cache_init();
 
 void lv_gpu_draw_cache_deinit();
 
-SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length);
+SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length, bool *found);
 
 void lv_gpu_draw_cache_put(const void *key, size_t key_length, SDL_Texture *texture);
 

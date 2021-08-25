@@ -46,7 +46,7 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
     lv_area_copy(&tex_coords, &coords);
     lv_area_increase(&tex_coords, 1, 1);
 
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key));
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
 
     if (texture == NULL) {
         lv_draw_mask_radius_param_t mask_rout_param;
