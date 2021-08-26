@@ -9,6 +9,7 @@ The tests in the folder can be run locally and automatically by GitHub CI.
 2. Install [cmake](https://cmake.org/) with `sudo apt install cmake`.
 3. Install [gcovr](https://gcovr.com/en/stable/index.html) with `sudo apt install gcovr`
 4. Install Ruby with `sudo apt install ruby-full`
+5. Install libpng development package with `sudo apt install libpng-dev`
 
 ### Run test
 1. Enter `lvgl/tests/`
