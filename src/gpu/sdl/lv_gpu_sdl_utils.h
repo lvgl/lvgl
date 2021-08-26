@@ -5,9 +5,9 @@
 #ifndef LV_GPU_SDL2_UTILS_H
 #define LV_GPU_SDL2_UTILS_H
 
-#include "misc/lv_color.h"
-#include "misc/lv_area.h"
-#include "SDL_rect.h"
+#include "../../misc/lv_color.h"
+#include "../../misc/lv_area.h"
+#include <SDL2/SDL_rect.h>
 
 void _lv_gpu_sdl_utils_init();
 

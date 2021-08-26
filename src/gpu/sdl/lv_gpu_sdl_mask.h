@@ -5,10 +5,10 @@
 #ifndef LVGL_SDL_EXAMPLE_LV_GPU_SDL_MASK_H
 #define LVGL_SDL_EXAMPLE_LV_GPU_SDL_MASK_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
-#include "misc/lv_area.h"
-#include "misc/lv_color.h"
+#include "../../misc/lv_area.h"
+#include "../../misc/lv_color.h"
 
 
 lv_opa_t *lv_draw_mask_dump(const lv_area_t *coords);
