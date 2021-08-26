@@ -46,10 +46,8 @@
 /*----------------------------------
  * Start parsing lv_conf_template.h
  -----------------------------------*/
-/* clang-format off */
 
 #include <stdint.h>
-
 
 /*====================
    COLOR SETTINGS
@@ -60,7 +58,7 @@
 #  ifdef CONFIG_LV_COLOR_DEPTH
 #    define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
 #  else
-#    define  LV_COLOR_DEPTH     32
+#    define  LV_COLOR_DEPTH     16
 #  endif
 #endif
 
@@ -123,6 +121,12 @@
 #    define  LV_MEM_ADR          0     /*0: unused*/
 #  endif
 #endif
+/*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
+#if LV_MEM_ADR == 0
+//#define LV_MEM_POOL_INCLUDE   your_alloc_library  /* Uncomment if using an external allocator*/
+//#define LV_MEM_POOL_ALLOC     your_alloc          /* Uncomment if using an external allocator*/
+#endif
+
 #else       /*LV_MEM_CUSTOM*/
 #ifndef LV_MEM_CUSTOM_INCLUDE
 #  ifdef CONFIG_LV_MEM_CUSTOM_INCLUDE
@@ -286,6 +290,7 @@
 #    define  LV_DISP_ROT_MAX_BUF         (10*1024)
 #  endif
 #endif
+
 /*-------------
  * GPU
  *-----------*/
@@ -345,13 +350,25 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Use SDL renderer API*/
 #ifndef LV_USE_GPU_SDL
 #  ifdef CONFIG_LV_USE_GPU_SDL
+#ifndef LV_USE_GPU_SDL
+#  ifdef CONFIG_LV_USE_GPU_SDL
 #    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  else
+#    define  LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  endif
+#endif
 #  else
 #    define  LV_USE_GPU_SDL   0
 #  endif
 #endif
 #if LV_USE_GPU_SDL
-#define LV_USE_EXTERNAL_RENDERER 1
+#ifndef LV_USE_EXTERNAL_RENDERER
+#  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
+#    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
+#  else
+#    define  LV_USE_EXTERNAL_RENDERER 1
+#  endif
+#endif
 #endif
 
 /*-------------
@@ -1154,7 +1171,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-
 #ifndef LV_USE_DROPDOWN
 #  ifdef CONFIG_LV_USE_DROPDOWN
 #    define LV_USE_DROPDOWN CONFIG_LV_USE_DROPDOWN
@@ -1449,6 +1465,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*-----------
  * Themes
  *----------*/
+
 /*A simple, impressive and very complete theme*/
 #ifndef LV_USE_THEME_DEFAULT
 #  ifdef CONFIG_LV_USE_THEME_DEFAULT

@@ -149,6 +149,18 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE   0
 
+/*Use SDL renderer API*/
+#ifndef LV_USE_GPU_SDL
+#  ifdef CONFIG_LV_USE_GPU_SDL
+#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  else
+#    define  LV_USE_GPU_SDL   0
+#  endif
+#endif
+#if LV_USE_GPU_SDL
+#define LV_USE_EXTERNAL_RENDERER 1
+#endif
+
 /*-------------
  * Logging
  *-----------*/
