@@ -29,7 +29,7 @@ static void scroll_event_cb(lv_event_t * e)
             x = r;
         } else {
             /*Use Pythagoras theorem to get x from radius and y*/
-            lv_coord_t x_sqr = r * r - diff_y * diff_y;
+            uint32_t x_sqr = r * r - diff_y * diff_y;
             lv_sqrt_res_t res;
             lv_sqrt(x_sqr, &res, 0x8000);   /*Use lvgl's built in sqrt root function*/
             x = r - res.i;
