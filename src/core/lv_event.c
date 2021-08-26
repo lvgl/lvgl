@@ -173,9 +173,7 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
         if(obj->spec_attr->event_dsc[i].cb == event_cb) {
             /*Shift the remaining event handlers forward*/
             for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
-                obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
-                obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
-                obj->spec_attr->event_dsc[i].filter = obj->spec_attr->event_dsc[i+1].filter;
+                obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i+1];
             }
             obj->spec_attr->event_dsc_cnt--;
             obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
@@ -198,9 +196,7 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
         if(&obj->spec_attr->event_dsc[i] == event_dsc) {
             /*Shift the remaining event handlers forward*/
             for(; i < (obj->spec_attr->event_dsc_cnt-1); i++) {
-                obj->spec_attr->event_dsc[i].cb = obj->spec_attr->event_dsc[i+1].cb;
-                obj->spec_attr->event_dsc[i].user_data = obj->spec_attr->event_dsc[i+1].user_data;
-                obj->spec_attr->event_dsc[i].filter = obj->spec_attr->event_dsc[i+1].filter;
+                obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i+1];
             }
             obj->spec_attr->event_dsc_cnt--;
             obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc, obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
