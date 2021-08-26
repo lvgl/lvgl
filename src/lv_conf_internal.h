@@ -371,6 +371,16 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif
 
+#ifndef LV_USE_EXTERNAL_RENDERER
+#ifndef LV_USE_EXTERNAL_RENDERER
+#  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
+#    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
+#  else
+#    define  LV_USE_EXTERNAL_RENDERER 0
+#  endif
+#endif
+#endif
+
 /*-------------
  * Logging
  *-----------*/

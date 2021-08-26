@@ -158,7 +158,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 #if LV_USE_GPU_SDL
-#define LV_USE_EXTERNAL_RENDERER 1
+#  define LV_USE_EXTERNAL_RENDERER 1
+#endif
+
+#ifndef LV_USE_EXTERNAL_RENDERER
+#  define LV_USE_EXTERNAL_RENDERER 0
 #endif
 
 /*-------------
