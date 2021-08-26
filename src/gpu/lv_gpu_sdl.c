@@ -2,8 +2,8 @@
 
 #if LV_USE_GPU_SDL
 
-#include "font/lv_font_fmt_txt.h"
-#include "core/lv_refr.h"
+#include "../font/lv_font_fmt_txt.h"
+#include "../core/lv_refr.h"
 #include "sdl/lv_gpu_sdl_utils.h"
 #include "sdl/lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl.h"

@@ -2,15 +2,15 @@
 // Created by Mariotaku on 2021/08/20.
 //
 
-#ifndef LV_GPU_H
-#define LV_GPU_H
+#ifndef LV_GPU_SDL_H
+#define LV_GPU_SDL_H
 
-#include "hal/lv_hal_disp.h"
-#include "misc/lv_color.h"
-#include "misc/lv_area.h"
-#include "misc/lv_style.h"
-#include "font/lv_font.h"
-#include "draw/lv_draw_mask.h"
+#include "../hal/lv_hal_disp.h"
+#include "../misc/lv_color.h"
+#include "../misc/lv_area.h"
+#include "../misc/lv_style.h"
+#include "../font/lv_font.h"
+#include "../draw/lv_draw_mask.h"
 
 #include <SDL.h>
 

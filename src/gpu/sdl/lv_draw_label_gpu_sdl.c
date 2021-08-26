@@ -2,10 +2,10 @@
 
 #if LV_USE_GPU_SDL
 
-#include <font/lv_font_fmt_txt.h>
 #include "SDL.h"
-#include "core/lv_refr.h"
-#include "draw/lv_draw_label.h"
+#include "../../font/lv_font_fmt_txt.h"
+#include "../../core/lv_refr.h"
+#include "../../draw/lv_draw_label.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_mask.h"
 #include "lv_gpu_draw_cache.h"

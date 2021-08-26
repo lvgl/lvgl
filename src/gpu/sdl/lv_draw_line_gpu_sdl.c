@@ -2,8 +2,8 @@
 
 #if LV_USE_GPU_SDL
 
-#include <core/lv_refr.h>
 #include "SDL.h"
+#include "../../core/lv_refr.h"
 #include "lv_draw_gpu_sdl.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"

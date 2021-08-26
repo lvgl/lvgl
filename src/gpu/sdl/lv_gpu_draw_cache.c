@@ -3,7 +3,7 @@
 #if LV_USE_GPU_SDL
 
 #include <SDL.h>
-#include "draw/lv_draw_label.h"
+#include "../../draw/lv_draw_label.h"
 
 #include "lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl_mask.h"
