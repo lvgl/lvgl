@@ -33,6 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                         lv_color_t color, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
@@ -65,6 +66,7 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 #endif
+#endif //LV_USE_GPU_SDL_RENDER
 
 /**********************
  *  STATIC VARIABLES
@@ -109,6 +111,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Fill and area in the display buffer.
  * @param clip_area clip the fill to this area  (absolute coordinates)
@@ -274,6 +277,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     }
 }
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Fill an area with a color
  * @param disp_area the current display area (destination area)
@@ -571,6 +575,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
     }
 }
 #endif
+#endif // LV_USE_GPU_SDL_RENDER
 
 static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
@@ -1021,3 +1026,5 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
     return lv_color_mix(fg, bg, opa);
 }
 #endif
+
+#endif // LV_USE_GPU_SDL_RENDER

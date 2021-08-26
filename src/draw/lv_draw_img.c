@@ -30,6 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        const lv_draw_img_dsc_t * draw_dsc);
@@ -41,6 +42,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg);
 static void draw_cleanup(_lv_img_cache_entry_t * cache);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -63,6 +65,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -89,6 +92,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
         return;
     }
 }
+#endif //LV_USE_GPU_SDL_RENDER
 
 /**
  * Get the pixel size of a color format in bits
@@ -229,6 +233,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        const lv_draw_img_dsc_t * draw_dsc)
@@ -658,3 +663,5 @@ static void draw_cleanup(_lv_img_cache_entry_t * cache)
     LV_UNUSED(cache);
 #endif
 }
+
+#endif //LV_USE_GPU_SDL_RENDER
