@@ -8,19 +8,21 @@
 #include "draw/lv_draw_label.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_mask.h"
+#include "lv_gpu_draw_cache.h"
 
 typedef struct lv_sdl_font_atlas_t {
-    const lv_font_t *key;
-    uint8_t supported;
-    SDL_Texture *texture;
     SDL_Rect *pos;
     uint32_t start;
-    struct lv_sdl_font_atlas_t *next;
 } lv_sdl_font_atlas_t;
 
-static lv_sdl_font_atlas_t *font_sprites = NULL;
+typedef struct {
+    lv_gpu_cache_key_magic_t magic;
+    const lv_font_t *font_p;
+} lv_font_key_t;
 
-static lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *renderer);
+static void font_atlas_free(lv_sdl_font_atlas_t *atlas);
+
+static SDL_Texture *font_atlas_bake(const lv_font_t *font_p, lv_sdl_font_atlas_t *atlas, SDL_Renderer *renderer);
 
 void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
                     const lv_font_t *font_p,
@@ -60,60 +62,46 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
         pos_y > clip_area->y2) {
         return;
     }
+    lv_font_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_FONT, .font_p = font_p};
+    lv_sdl_font_atlas_t *atlas = NULL;
+    bool found = false;
+    SDL_Texture *texture = lv_gpu_draw_cache_get_with_userdata(&key, sizeof(key), &found, (void **) &atlas);
 
-    if (letter > 255) return;
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
-    lv_sdl_font_atlas_t *userdata = NULL;
-    for (lv_sdl_font_atlas_t *cur = font_sprites; cur != NULL; cur = cur->next) {
-        if (cur->key == font_p) {
-            userdata = cur;
-            break;
-        }
+
+    if (!found) {
+        atlas = SDL_malloc(sizeof(lv_sdl_font_atlas_t));
+        texture = font_atlas_bake(font_p, atlas, renderer);
+        lv_gpu_draw_cache_put_with_userdata(&key, sizeof(key), texture, atlas, (lv_lru_free_t *) font_atlas_free);
     }
-    if (!userdata) {
-        userdata = font_atlas_bake(font_p, renderer);
-        if (font_sprites) {
-            lv_sdl_font_atlas_t *cur = font_sprites;
-            while (cur->next != NULL) {
-                cur = cur->next;
-            }
-            cur->next = userdata;
-        } else {
-            font_sprites = userdata;
-        }
-    }
-    if (!userdata->supported) {
-        return;
-    }
+    if (letter > 255 || texture == NULL) return;
     SDL_Rect dstrect = {.x = pos_x, .y = pos_y, .w = g.box_w, .h = g.box_h};
 
     SDL_Rect clip_area_rect;
     lv_area_to_sdl_rect(clip_area, &clip_area_rect);
 
-    SDL_SetTextureBlendMode(userdata->texture, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureColorMod(userdata->texture, color.ch.red, color.ch.green, color.ch.blue);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(texture, opa);
+    SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
     SDL_RenderSetClipRect(renderer, &clip_area_rect);
-    SDL_RenderCopy(renderer, userdata->texture, &userdata->pos[letter - userdata->start], &dstrect);
+    SDL_RenderCopy(renderer, texture, &atlas->pos[letter - atlas->start], &dstrect);
 }
 
-lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *renderer) {
+SDL_Texture *font_atlas_bake(const lv_font_t *font_p, lv_sdl_font_atlas_t *atlas, SDL_Renderer *renderer) {
+    SDL_memset(atlas, 0, sizeof(lv_sdl_font_atlas_t));
     const lv_font_fmt_txt_dsc_t *dsc = (lv_font_fmt_txt_dsc_t *) font_p->dsc;
-    lv_sdl_font_atlas_t *atlas = malloc(sizeof(lv_sdl_font_atlas_t));
-    atlas->key = font_p;
-    atlas->supported = 0;
-    atlas->next = NULL;
+    SDL_Texture *result = NULL;
     for (int cmap_idx = 0; cmap_idx < dsc->cmap_num; cmap_idx++) {
         const lv_font_fmt_txt_cmap_t *cmap = &dsc->cmaps[cmap_idx];
         if (cmap->type == LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY) {
             if (cmap->range_length > 256) break;
-            atlas->supported = 1;
             atlas->start = cmap->range_start;
             int sprite_w = font_p->line_height * 16;
             int sprite_h = font_p->line_height * ((cmap->range_length / 16) + 1);
             lv_opa_t *s1 = lv_mem_buf_get(
                     sprite_w * font_p->line_height * ((cmap->range_length / 16) + 1) * sizeof(lv_opa_t));
-            atlas->pos = malloc(sizeof(SDL_Rect) * cmap->range_length);
+            atlas->pos = SDL_malloc(sizeof(SDL_Rect) * cmap->range_length);
             int sprite_x = 0, sprite_y = 0;
             for (int i = 0; i < cmap->range_length; i++) {
                 const lv_font_fmt_txt_glyph_dsc_t *gd = &dsc->glyph_dsc[cmap->glyph_id_start + i];
@@ -141,14 +129,26 @@ lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *rend
                                                             0xFF);
 #endif
             SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(dsc->bpp));
-            atlas->texture = SDL_CreateTextureFromSurface(renderer, indexed);
-            SDL_assert(atlas->texture);
+            result = SDL_CreateTextureFromSurface(renderer, indexed);
             SDL_FreeSurface(indexed);
             lv_mem_buf_release(s1);
             break;
         }
     }
-    return atlas;
+    if (!result) {
+        if (atlas->pos) {
+            SDL_free(atlas->pos);
+        }
+        SDL_memset(atlas, 0, sizeof(lv_sdl_font_atlas_t));
+    }
+    return result;
+}
+
+static void font_atlas_free(lv_sdl_font_atlas_t *atlas) {
+    if (atlas->pos) {
+        SDL_free(atlas->pos);
+    }
+    SDL_free(atlas);
 }
 
 #endif /*LV_USE_GPU_SDL*/

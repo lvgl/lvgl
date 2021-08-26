@@ -13,12 +13,15 @@ static lv_lru_t *lv_sdl_texture_cache;
 
 typedef struct {
     SDL_Texture *texture;
+    void *userdata;
+    lv_lru_free_t *userdata_free;
 } draw_cache_value_t;
 
 static void draw_cache_free_value(draw_cache_value_t *);
 
 void _lv_gpu_sdl_texture_cache_init() {
-    lv_sdl_texture_cache = lv_lru_new(1024 * 1024 * 128, 65536, (lv_lru_free_t *) draw_cache_free_value, free);
+    lv_sdl_texture_cache = lv_lru_new(1024 * 1024 * 128, 65536, (lv_lru_free_t *) draw_cache_free_value,
+                                      SDL_free);
 }
 
 void _lv_gpu_sdl_texture_cache_deinit() {
@@ -26,6 +29,10 @@ void _lv_gpu_sdl_texture_cache_deinit() {
 }
 
 SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length, bool *found) {
+    return lv_gpu_draw_cache_get_with_userdata(key, key_length, found, NULL);
+}
+
+SDL_Texture *lv_gpu_draw_cache_get_with_userdata(const void *key, size_t key_length, bool *found, void **userdata) {
     draw_cache_value_t *value = NULL;
     lv_lru_get(lv_sdl_texture_cache, key, key_length, (void **) &value);
     if (!value) {
@@ -33,6 +40,10 @@ SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length, bool *fou
             *found = false;
         }
         return NULL;
+    } else {
+        if (userdata) {
+            *userdata = value->userdata;
+        }
     }
     if (found) {
         *found = true;
@@ -41,8 +52,15 @@ SDL_Texture *lv_gpu_draw_cache_get(const void *key, size_t key_length, bool *fou
 }
 
 void lv_gpu_draw_cache_put(const void *key, size_t key_length, SDL_Texture *texture) {
-    draw_cache_value_t *value = malloc(sizeof(draw_cache_value_t));
+    lv_gpu_draw_cache_put_with_userdata(key, key_length, texture, NULL, NULL);
+}
+
+void lv_gpu_draw_cache_put_with_userdata(const void *key, size_t key_length, SDL_Texture *texture, void *userdata,
+                                         lv_lru_free_t userdata_free) {
+    draw_cache_value_t *value = SDL_malloc(sizeof(draw_cache_value_t));
     value->texture = texture;
+    value->userdata = userdata;
+    value->userdata_free = userdata_free;
     if (!texture) {
         lv_lru_set(lv_sdl_texture_cache, key, key_length, value, 1);
         return;
@@ -59,7 +77,10 @@ static void draw_cache_free_value(draw_cache_value_t *value) {
     if (value->texture) {
         SDL_DestroyTexture(value->texture);
     }
-    free(value);
+    if (value->userdata_free) {
+        value->userdata_free(value->userdata);
+    }
+    SDL_free(value);
 }
 
 #endif /*LV_USE_GPU_SDL*/
