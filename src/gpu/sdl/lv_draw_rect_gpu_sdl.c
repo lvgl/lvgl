@@ -97,7 +97,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
         /* If size isn't times of 2, increase 1 px */
         lv_coord_t min_half = bg_min % 2 == 0 ? bg_min / 2 : bg_min / 2 + 1;
         lv_coord_t frag_size = radius == LV_RADIUS_CIRCLE ? min_half : LV_MIN(radius + 1, min_half);
-        lv_draw_rect_bg_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG, .radius = radius, .size = min_half};
+        lv_draw_rect_bg_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG, .radius = radius, .size = frag_size};
         lv_area_t coords_frag;
         lv_area_copy(&coords_frag, coords);
         lv_area_set_width(&coords_frag, frag_size);
@@ -235,8 +235,8 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
     /* This is how big the corner is after blurring */
     lv_coord_t blur_frag_size = frag_size + sw + 2;
 
-    lv_draw_rect_shadow_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW, .radius = radius, .size = min_half,
-            .blur = sw};
+    lv_draw_rect_shadow_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW, .radius = radius,
+            .size = frag_size, .blur = sw};
 
     lv_area_t blur_frag;
     lv_area_copy(&blur_frag, &sh_area);
@@ -250,7 +250,7 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
         lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag);
         lv_draw_mask_blur(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
         texture = lv_sdl_create_mask_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
-                                              lv_area_get_width(&blur_frag));
+                                             lv_area_get_width(&blur_frag));
         lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_rout_id);
         SDL_assert(texture);
@@ -384,7 +384,7 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
             .magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER,
             .rout = rout, .rin = rin,
             .thickness = inner_area->x1 - outer_area->x1 + 1,
-            .size = min_half,
+            .size = frag_size,
             .side = LV_BORDER_SIDE_FULL,
     };
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);

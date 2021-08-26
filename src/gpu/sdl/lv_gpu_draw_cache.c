@@ -2,12 +2,10 @@
 
 #if LV_USE_GPU_SDL
 
-#include <SDL.h>
-#include "draw/lv_draw_label.h"
-
 #include "lv_gpu_draw_cache.h"
-#include "lv_gpu_sdl_mask.h"
-#include "lv_gpu_sdl_utils.h"
+
+#include "misc/lv_log.h"
+#include "draw/lv_draw_label.h"
 
 static lv_lru_t *lv_sdl_texture_cache;
 
@@ -70,11 +68,13 @@ void lv_gpu_draw_cache_put_with_userdata(const void *key, size_t key_length, SDL
     if (SDL_QueryTexture(texture, &format, &access, &width, &height) != 0) {
         return;
     }
+    LV_LOG_INFO("cache texture %p, %d*%d@%dbpp", texture, width, height, SDL_BITSPERPIXEL(format));
     lv_lru_set(lv_sdl_texture_cache, key, key_length, value, width * height * SDL_BITSPERPIXEL(format) / 8);
 }
 
 static void draw_cache_free_value(draw_cache_value_t *value) {
     if (value->texture) {
+        LV_LOG_INFO("destroy texture %p", value->texture);
         SDL_DestroyTexture(value->texture);
     }
     if (value->userdata_free) {
