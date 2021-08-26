@@ -9,8 +9,13 @@
 
 
 SDL_Surface *lv_sdl_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride) {
+#if SDL_VERSION_ATLEAST(2, 0, 5)
     SDL_Surface *indexed = SDL_CreateRGBSurfaceWithFormatFrom(pixels, width, height, 8,
                                                               stride, SDL_PIXELFORMAT_INDEX8);
+#else
+    SDL_Surface *indexed = SDL_CreateRGBSurfaceFrom(pixels, width, height, 8, width, 0, 0, 0,
+                                                    0xFF);
+#endif
     SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(8));
     SDL_Surface *converted = SDL_ConvertSurfaceFormat(indexed, SDL_PIXELFORMAT_ARGB8888, 0);
     SDL_FreeSurface(indexed);
@@ -18,7 +23,7 @@ SDL_Surface *lv_sdl_create_mask_surface(lv_opa_t *pixels, lv_coord_t width, lv_c
 }
 
 SDL_Texture *lv_sdl_create_mask_texture(SDL_Renderer *renderer, lv_opa_t *pixels, lv_coord_t width,
-                                         lv_coord_t height, lv_coord_t stride) {
+                                        lv_coord_t height, lv_coord_t stride) {
     SDL_Surface *indexed = lv_sdl_create_mask_surface(pixels, width, height, stride);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
     SDL_FreeSurface(indexed);

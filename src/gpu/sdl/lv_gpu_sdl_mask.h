@@ -5,7 +5,7 @@
 #ifndef LVGL_SDL_EXAMPLE_LV_GPU_SDL_MASK_H
 #define LVGL_SDL_EXAMPLE_LV_GPU_SDL_MASK_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"

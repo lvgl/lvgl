@@ -133,8 +133,13 @@ lv_sdl_font_atlas_t *font_atlas_bake(const lv_font_t *font_p, SDL_Renderer *rend
                                rect->h, sprite_w, dsc->bpp);
                 sprite_x += gd->box_w;
             }
+#if SDL_VERSION_ATLEAST(2, 0, 5)
             SDL_Surface *indexed = SDL_CreateRGBSurfaceWithFormatFrom(s1, sprite_w, sprite_h, 8, sprite_w,
                                                                       SDL_PIXELFORMAT_INDEX8);
+#else
+            SDL_Surface *indexed = SDL_CreateRGBSurfaceFrom(s1, sprite_w, sprite_h, 8, sprite_w, 0, 0, 0,
+                                                            0xFF);
+#endif
             SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(dsc->bpp));
             atlas->texture = SDL_CreateTextureFromSurface(renderer, indexed);
             SDL_assert(atlas->texture);

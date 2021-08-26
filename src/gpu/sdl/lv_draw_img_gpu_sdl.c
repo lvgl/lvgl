@@ -72,11 +72,19 @@ static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_ds
         return upload_img_texture_fallback(renderer, dsc);
     }
     int chroma_keyed = dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    SDL_PixelFormatEnum format = chroma_keyed ? SDL_PIXELFORMAT_XRGB8888 : SDL_PIXELFORMAT_ARGB8888;
     int w = dsc->header.w, h = dsc->header.h;
     void *data = (void *) dsc->img_data;
+#if SDL_VERSION_ATLEAST(2, 0, 5)
     SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
-                                                              format);
+                                                              SDL_PIXELFORMAT_ARGB8888);
+#else
+    Uint32 rmask = 0x00FF0000, gmask = 0x0000FF00, bmask = 0x000000FF, amask = 0xFF000000;
+    if (chroma_keyed) {
+        amask = 0x00;
+    }
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
+                                                    rmask, gmask, bmask, amask);
+#endif
     SDL_SetColorKey(surface, chroma_keyed, lv_color_to32(LV_COLOR_CHROMA_KEY));
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
@@ -89,8 +97,14 @@ static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_d
     for (lv_coord_t y = 0; y < h; y++) {
         lv_img_decoder_read_line(dsc, 0, y, w, &data[y * w * sizeof(lv_color_t)]);
     }
+#if SDL_VERSION_ATLEAST(2, 0, 5)
     SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
-                                                              SDL_PIXELFORMAT_XRGB8888);
+                                                              SDL_PIXELFORMAT_ARGB8888);
+#else
+    Uint32 rmask = 0x00FF0000, gmask = 0x0000FF00, bmask = 0x000000FF, amask = 0xFF000000;
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
+                                                    rmask, gmask, bmask, amask);
+#endif
     SDL_SetColorKey(surface, SDL_TRUE, lv_color_to32(LV_COLOR_CHROMA_KEY));
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);

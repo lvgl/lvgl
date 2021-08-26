@@ -1,4 +1,4 @@
-#include <SDL2/SDL_mutex.h>
+#include <SDL_mutex.h>
 #include <stdint.h>
 #include <time.h>
 
