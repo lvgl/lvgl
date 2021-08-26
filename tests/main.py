@@ -85,7 +85,7 @@ def build_tests(options_name, build_type):
     print('=' * len(label))
     print(label)
     print('=' * len(label))
-    print("", flush=True)
+    print(flush=True)
 
     if not test_noclean:
         delete_build_dir(options_name)
@@ -117,7 +117,7 @@ def run_tests(options_name, test_names):
             options_abbrev(options_name), test_name)
         print('=' * len(label))
         print(label)
-        print('=' * len(label))
+        print('=' * len(label), flush=True)
 
         try:
             os.chdir(lvgl_test_dir)
@@ -136,7 +136,7 @@ def generate_code_coverage_report():
     print('=' * len(label))
     print(label)
     print('=' * len(label))
-    print("", flush=True)
+    print(flush=True)
 
     os.chdir(lvgl_test_dir)
     delete_dir_ignore_missing('report')
