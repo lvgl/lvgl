@@ -218,9 +218,9 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
 
 /**
  * Default keyboard event to add characters to the Text area and change the map.
- * If a custom `event_cb` is added to the keyboard this function be called from it to handle the
+ * If a custom `event_cb` is added to the keyboard this function can be called from it to handle the
  * button clicks
- * @param kb pointer to a  keyboard
+ * @param kb pointer to a keyboard
  * @param event the triggering event
  */
 void lv_keyboard_def_event_cb(lv_event_t * e)

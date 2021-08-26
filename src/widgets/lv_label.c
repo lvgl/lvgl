@@ -481,7 +481,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
             /*Handle the recolor command*/
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(_lv_txt_is_cmd(&cmd_state, bidi_txt[i]) != false) {
-                    continue; /*Skip the letter is it is part of a command*/
+                    continue; /*Skip the letter if it is part of a command*/
                 }
             }
 
@@ -583,7 +583,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
             /*Handle the recolor command*/
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(_lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                    continue; /*Skip the letter is it is part of a command*/
+                    continue; /*Skip the letter if it is part of a command*/
                 }
             }
             last_x = x;
@@ -856,7 +856,7 @@ static void draw_main(lv_event_t * e)
         lv_txt_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                          LV_COORD_MAX, flag);
 
-        /*Draw the text again on label to the original to make an circular effect */
+        /*Draw the text again on label to the original to make a circular effect */
         if(size.x > lv_area_get_width(&txt_coords)) {
             label_draw_dsc.ofs_x = label->offset.x + size.x +
                                    lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
@@ -865,7 +865,7 @@ static void draw_main(lv_event_t * e)
             lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
         }
 
-        /*Draw the text again below the original to make an circular effect */
+        /*Draw the text again below the original to make a circular effect */
         if(size.y > lv_area_get_height(&txt_coords)) {
             label_draw_dsc.ofs_x = label->offset.x;
             label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
@@ -876,7 +876,7 @@ static void draw_main(lv_event_t * e)
 }
 
 /**
- * Refresh the label with its text stored in its labelended data
+ * Refresh the label with its text stored in its extended data
  * @param label pointer to a label object
  */
 static void lv_label_refr_text(lv_obj_t * obj)

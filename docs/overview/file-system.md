@@ -10,7 +10,7 @@ For example, if the SD card is associated with the letter `'S'`, a file can be r
 
 ## Ready to use drivers
 The [lv_fs_if](https://github.com/lvgl/lv_fs_if) repository contains ready to use drivers using POSIX, standard C and [FATFS](http://elm-chan.org/fsw/ff/00index_e.html) API.
-See it's [README](https://github.com/lvgl/lv_fs_if#readme) for the details.
+See its [README](https://github.com/lvgl/lv_fs_if#readme) for the details.
 
 ## Add a driver
 

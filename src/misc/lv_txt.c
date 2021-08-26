@@ -204,7 +204,7 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
                 i = i_next;
                 i_next = i_next_next;
                 letter = letter_next;
-                continue;   /*Skip the letter is it is part of a command*/
+                continue;   /*Skip the letter if it is part of a command*/
             }
         }
 

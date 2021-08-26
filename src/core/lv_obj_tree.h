@@ -41,7 +41,7 @@ typedef lv_obj_tree_walk_res_t (*lv_obj_tree_walk_cb_t)(struct _lv_obj_t *, void
  **********************/
 
 /**
- * Delete an object and all of it's children.
+ * Delete an object and all of its children.
  * Also remove the objects from their group and remove all animations (if any).
  * Send `LV_EVENT_DELETED` to deleted objects.
  * @param obj       pointer to an object
@@ -103,9 +103,9 @@ void lv_obj_move_background(struct _lv_obj_t * obj);
 
 /**
  * Swap the positions of two objects.
- * When used in listboxes, it can be used to sort the listbox items. 
- * @param obj1  pointer to the first object  
- * @param obj2  pointer to the second object  
+ * When used in listboxes, it can be used to sort the listbox items.
+ * @param obj1  pointer to the first object
+ * @param obj2  pointer to the second object
  */
 void lv_obj_swap(struct _lv_obj_t* obj1, struct _lv_obj_t* obj2);
 
@@ -126,14 +126,14 @@ void lv_obj_move_down(struct _lv_obj_t* obj);
 /**
  * Get the screen of an object
  * @param obj       pointer to an object
- * @return          pointer to the obejct's screen
+ * @return          pointer to the object's screen
  */
 struct _lv_obj_t * lv_obj_get_screen(const struct _lv_obj_t * obj);
 
 /**
  * Get the display of the object
  * @param obj       pointer to an object
- * @return          pointer to the obejct's display
+ * @return          pointer to the object's display
  */
 lv_disp_t * lv_obj_get_disp(const struct _lv_obj_t * obj);
 

@@ -296,7 +296,7 @@ props = [
 
 {'name': 'SHADOW_SPREAD',            
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel t make the area larger/smaller"},
+ 'dsc': "Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
 
 {'name': 'SHADOW_COLOR',            
   'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,

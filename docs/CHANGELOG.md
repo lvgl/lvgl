@@ -266,7 +266,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 ## v7.8.1 (15.12.2020)
 
 ### Bugfixes
-- fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
+- fix(lv_scr_load_anim) fix when multiple screens are loaded at the same time with delay
 - fix(page) fix LV_SCROLLBAR_MODE_DRAG
 
 ## v7.8.0 (01.12.2020)
@@ -300,7 +300,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 - fix(arc) fix and improve arc dragging
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
 - fix(theme_material): remove the bottom border from tabview header
-- fix(imgbtn) guess a the closest available state with valid src
+- fix(imgbtn) guess the closest available state with valid src
 - fix(spinbox) update cursor position in lv_spinbox_set_step 
 
 ## v7.7.1 (03.11.2020)

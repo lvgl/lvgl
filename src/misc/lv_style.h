@@ -283,8 +283,8 @@ typedef struct {
 /**
  * Initialize a style
  * @param style pointer to a style to initialize
- * @note Do not call `lv_style_init` on styles that are already have some properties
- *       because this function won't free the used memory just set a default state for the style.
+ * @note Do not call `lv_style_init` on styles that already have some properties
+ *       because this function won't free the used memory, just sets a default state for the style.
  *       In other words be sure to initialize styles only once!
  */
 void lv_style_init(lv_style_t * style);
@@ -323,8 +323,8 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop);
  * This function shouldn't be used directly by the user.
  * Instead use `lv_style_set_<prop_name>()`. E.g. `lv_style_set_bg_color()`
  * @param style pointer to style
- * @param prop the ID of a property (e.g. `LV_STLYE_BG_COLOR`)
- * @param value `lv_style_value_t` variable in which a filed is set according to the type of `prop`
+ * @param prop the ID of a property (e.g. `LV_STYLE_BG_COLOR`)
+ * @param value `lv_style_value_t` variable in which a field is set according to the type of `prop`
  */
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
 
@@ -333,7 +333,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
  * @param style pointer to a style
  * @param prop  the ID of a property
  * @param value pointer to a `lv_style_value_t` variable to store the value
- * @return LV_RES_INV: the property wsn't found in the style (`value` is unchanged)
+ * @return LV_RES_INV: the property wasn't found in the style (`value` is unchanged)
  *         LV_RES_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  */
@@ -345,7 +345,7 @@ lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_va
  * @param style pointer to a style
  * @param prop  the ID of a property
  * @param value pointer to a `lv_style_value_t` variable to store the value
- * @return LV_RES_INV: the property wsn't found in the style (`value` is unchanged)
+ * @return LV_RES_INV: the property wasn't found in the style (`value` is unchanged)
  *         LV_RES_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
