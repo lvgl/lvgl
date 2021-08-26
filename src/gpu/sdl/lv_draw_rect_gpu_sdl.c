@@ -2,9 +2,9 @@
 
 #if LV_USE_GPU_SDL
 
-#include "draw/lv_draw_rect.h"
-#include "hal/lv_hal_disp.h"
-#include "core/lv_refr.h"
+#include "../../draw/lv_draw_rect.h"
+#include "../../hal/lv_hal_disp.h"
+#include "../../core/lv_refr.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_draw_cache.h"

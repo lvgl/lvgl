@@ -2,8 +2,8 @@
 
 #if LV_USE_GPU_SDL
 
-#include "draw/lv_draw_mask.h"
-#include "misc/lv_mem.h"
+#include "../../draw/lv_draw_mask.h"
+#include "../../misc/lv_mem.h"
 #include "lv_gpu_sdl_mask.h"
 #include "lv_gpu_sdl_utils.h"
 

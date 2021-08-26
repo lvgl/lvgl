@@ -2,7 +2,7 @@
 
 #if LV_USE_GPU_SDL
 
-#include "draw/lv_draw_label.h"
+#include "../../draw/lv_draw_label.h"
 #include "lv_gpu_sdl_utils.h"
 #include "SDL.h"
 
