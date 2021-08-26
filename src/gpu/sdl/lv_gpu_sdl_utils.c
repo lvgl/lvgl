@@ -61,13 +61,14 @@ double lv_sdl_round(double d) {
 
 SDL_Palette *lv_sdl_alloc_palette_for_bpp(const uint8_t *mapping, uint8_t bpp) {
     SDL_assert(bpp >= 1 && bpp <= 8);
-    SDL_Palette *result = SDL_AllocPalette(1 << bpp);
+    int color_cnt = 1 << bpp;
+    SDL_Palette *result = SDL_AllocPalette(color_cnt);
     SDL_Color palette[256];
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < color_cnt; i++) {
         palette[i].r = palette[i].g = palette[i].b = 0xFF;
         palette[i].a = mapping ? mapping[i] : i;
     }
-    SDL_SetPaletteColors(result, palette, 0, 256);
+    SDL_SetPaletteColors(result, palette, 0, color_cnt);
     return result;
 }
 
