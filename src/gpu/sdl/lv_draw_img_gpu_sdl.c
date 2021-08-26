@@ -42,7 +42,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     if (!texture) {
         return;
     }
-    SDL_Point pivot = {.x = coords_rect.w / 2, .y = coords_rect.h / 2};
+    SDL_Point pivot = {.x = draw_dsc->pivot.x, .y = draw_dsc->pivot.y};
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
     SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
