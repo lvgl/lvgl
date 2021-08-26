@@ -62,9 +62,9 @@ It can be misleading if you use an operating system and call `lv_timer_handler` 
 
 ## Asynchronous calls
 
-In some cases, you can't do an action immediately. For example, you can't delete an object because something else is still using it or you don't want to block the execution now.
+In some cases, you can't do an action immediately. For example, you can't delete an object because something else is still using it, or you don't want to block the execution now.
 For these cases, `lv_async_call(my_function, data_p)` can be used to make `my_function` be called on the next call of `lv_timer_handler`. `data_p` will be passed to function when it's called.
-Note that, only the pointer of the data is saved so you need to ensure that the variable will be "alive" while the function is called. It can be *static*, global or dynamically allocated data.
+Note that only the data pointer is saved, so you need to ensure that the variable will be "alive" while the function is called. It can be *static*, global or dynamically allocated data.
 
 For example:
 ```c

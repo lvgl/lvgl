@@ -63,7 +63,7 @@ The event codes can be grouped into these categories:
 
 All objects (such as Buttons/Labels/Sliders etc.) regardless their type receive the *Input device*, *Drawing* and *Other* events. 
 
-However the *Special events* are specific to a particular widget type. See the [widgets' documentation](/widgets/index) to learn when they are sent, 
+However, the *Special events* are specific to a particular widget type. See the [widgets' documentation](/widgets/index) to learn when they are sent, 
 
 *Custom events* are added by the user and therefore these are never sent by LVGL.
 
@@ -78,14 +78,14 @@ The following event codes exist:
 - `LV_EVENT_LONG_PRESSED_REPEAT`  Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
 - `LV_EVENT_CLICKED`      Called on release if the object did not scroll (regardless of long press)
 - `LV_EVENT_RELEASED`     Called in every case when the object has been released
-- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event paramter is `NULL` or an `lv_anim_t *` with the scroll animation descriptor to modify if required. 
+- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with the scroll animation descriptor to modify if required. 
 - `LV_EVENT_SCROLL_END`   Scrolling ends.
 - `LV_EVENT_SCROLL`       The object was scrolled
 - `LV_EVENT_GESTURE`      A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());`
 - `LV_EVENT_KEY`          A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_get_act());`
 - `LV_EVENT_FOCUSED`      The object is focused 
-- `LV_EVENT_DEFOCUSED`    The object is defocused
-- `LV_EVENT_LEAVE`        The object is defocused but still selected
+- `LV_EVENT_DEFOCUSED`    The object is unfocused
+- `LV_EVENT_LEAVE`        The object is unfocused but still selected
 - `LV_EVENT_HIT_TEST`     Perform advanced hit-testing. Use `lv_hit_test_info_t * a = lv_event_get_hit_test_info(e)` and check if `a->point` can click the object or not. If not set `a->res = false` 
 
 

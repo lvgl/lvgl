@@ -59,7 +59,7 @@ The draw function can draw to any color format. For example, it's possible to dr
 `lv_canvas_transform()` can be used to rotate and/or scale the image of an image and store the result on the canvas. 
 The function needs the following parameters:
 - `canvas` pointer to a canvas object to store the result of the transformation.
-- `img pointer` to an image descriptor to transform. Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
+- `img pointer` to an image descriptor to transform. Can be the image descriptor of another canvas too (`lv_canvas_get_img()`).
 - `angle` the angle of rotation (0..3600), 0.1 deg resolution
 - `zoom` zoom factor (256: no zoom, 512: double size, 128: half size);
 - `offset_x` offset X to tell where to put the result data on destination canvas

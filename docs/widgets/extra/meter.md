@@ -32,13 +32,13 @@ Labels are added automatically on major ticks with `label_gap` distance from the
 
 ### Add indicators
 
-Indicators needs to be added to a Scale and their value is interpreted in the range of the Scale.
+Indicators need to be added to a Scale and their value is interpreted in the range of the Scale.
 
 All the indicator add functions return `lv_meter_indicator_t *`.
 
 #### Needle line
 
-`indic = lv_meter_add_needle_line(meter, scale, line_width, line_color, r_mod)` adds a needle line to a Scale. By default the length of the line is the same as the scale's radius but `r_mod` changes the length.
+`indic = lv_meter_add_needle_line(meter, scale, line_width, line_color, r_mod)` adds a needle line to a Scale. By default, the length of the line is the same as the scale's radius but `r_mod` changes the length.
 
 `lv_meter_set_indicator_value(meter, indic, value)` sets the value of the indicator.
 
@@ -50,7 +50,7 @@ All the indicator add functions return `lv_meter_indicator_t *`.
 `lv_meter_set_indicator_value(meter, inidicator, value)` sets the value of the indicator.
 
 #### Arc
-`indic = lv_meter_add_arc(meter, scale, arc_width, arc_color, r_mod)` adds and arc indicator. . By default the radius of the arc is the same as the scale's radius but `r_mod` changes the radius.
+`indic = lv_meter_add_arc(meter, scale, arc_width, arc_color, r_mod)` adds and arc indicator. . By default, the radius of the arc is the same as the scale's radius but `r_mod` changes the radius.
 
 `lv_meter_set_indicator_start_value(meter, indic, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator. 
 

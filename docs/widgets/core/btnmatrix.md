@@ -42,7 +42,7 @@ In addition to the width, each button can be customized with the following param
 - `LV_BTNMATRIX_CTRL_CUSTOM_1` Custom free to use flag
 - `LV_BTNMATRIX_CTRL_CUSTOM_2` Custom free to use flag
 
-By default all flags are disabled.
+By default, all flags are disabled.
 
 To set or clear a button's control attribute, use `lv_btnmatrix_set_btn_ctrl(btnm, btn_id, LV_BTNM_CTRL_...)` and 
 `lv_btnmatrix_clear_btn_ctrl(btnm, btn_id, LV_BTNMATRIX_CTRL_...)` respectively. More `LV_BTNM_CTRL_...` values can be OR-ed
