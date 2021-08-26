@@ -1289,8 +1289,6 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
 static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_area, const lv_area_t * inner_area,
         lv_color_t color, lv_opa_t opa)
 {
-
-
     bool top_side = outer_area->y1 <= inner_area->y1 ? true : false;
     bool bottom_side = outer_area->y2 >= inner_area->y2 ? true : false;
     bool left_side = outer_area->x1 <= inner_area->x1 ? true : false;
@@ -1301,13 +1299,13 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
     a.x1 = outer_area->x1;
     a.x2 = outer_area->x2;
     a.y1 = outer_area->y1;
-    a.y2 = inner_area->y1;
+    a.y2 = inner_area->y1 - 1;
     if(top_side) {
         _lv_blend_fill(clip, &a, color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, LV_BLEND_MODE_NORMAL);
     }
 
     /*Bottom*/
-    a.y1 = inner_area->y2;
+    a.y1 = inner_area->y2 + 1;
     a.y2 = outer_area->y2;
     if(bottom_side) {
         _lv_blend_fill(clip, &a, color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, LV_BLEND_MODE_NORMAL);
@@ -1315,7 +1313,7 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
 
     /*Left*/
     a.x1 = outer_area->x1;
-    a.x2 = inner_area->x1;
+    a.x2 = inner_area->x1 - 1;
     a.y1 = (top_side) ? inner_area->y1 : outer_area->y1;
     a.y2 = (bottom_side) ? inner_area->y2 : outer_area->y2;
     if(left_side) {
@@ -1323,7 +1321,7 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
     }
 
     /*Right*/
-    a.x1 = inner_area->x2;
+    a.x1 = inner_area->x2 + 1;
     a.x2 = outer_area->x2;
     if(right_side) {
         _lv_blend_fill(clip, &a, color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, LV_BLEND_MODE_NORMAL);

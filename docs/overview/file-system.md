@@ -15,7 +15,7 @@ See it's [README](https://github.com/lvgl/lv_fs_if#readme) for the details.
 ## Add a driver
 
 ### Registering a driver
-To add a driver, `lv_fs_drv_t` needs to be initialized like below. `lv_fs_drv_t` needs to be static, global or dynamically allocated and not a local varaible.
+To add a driver, `lv_fs_drv_t` needs to be initialized like below. `lv_fs_drv_t` needs to be static, global or dynamically allocated and not a local variable.
 ```c
 static lv_fs_drv_t drv;                   /*Needs to be static or global*/
 lv_fs_drv_init(&drv);                     /*Basic initialization*/
@@ -53,7 +53,7 @@ void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 `path` is path after the driver letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt"). `mode` can be `LV_FS_MODE_WR` or `LV_FS_MODE_RD` to open for write or read.
 
 The return value is a pointer the *file object* the describes the opened file or `NULL` if there were any issues (e.g. the file wasn't found). 
-The returned file object will be passed to to other file system related callbacks. (see below)
+The returned file object will be passed to other file system related callbacks. (see below)
 
 ### Other callbacks
 The other callbacks are quite similar. For example `write_cb` looks like this:

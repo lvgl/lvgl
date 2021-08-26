@@ -13,7 +13,7 @@ The text will be broken into multiple lines automatically and the height will be
 The message box can be modal (blocking clicks on the rest of the screen) or not modal.
 
 ## Parts and Styles
-The mesasge box is built from other widgets so you can check these widget's documentation for details.
+The message box is built from other widgets, so you can check these widgets' documentation for details.
 - Background: [lv_obj](/widgets/obj)
 - Close button: [lv_btn](/widgets/core/btn)
 - Title and text: [lv_label](/widgets/core/label)

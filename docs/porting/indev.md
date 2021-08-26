@@ -169,7 +169,7 @@ void button_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
 
 ### Parameters
 
-The default value of the following parameters can changed in `lv_indev_drv_t`:
+The default value of the following parameters can be changed in `lv_indev_drv_t`:
 - `scroll_limit` Number of pixels to slide before actually scrolling the object.
 - `scroll_throw`  Scroll throw (momentum) slow-down in [%]. Greater value means faster slow-down.
 - `long_press_time` Press time to send `LV_EVENT_LONG_PRESSED` (in milliseconds)
@@ -179,7 +179,7 @@ The default value of the following parameters can changed in `lv_indev_drv_t`:
 ### Feedback
 
 Besides `read_cb` a `feedback_cb` callback can be also specified in `lv_indev_drv_t`.
-`feedback_cb` is called when any type of event is sent by the input devices (independently from its type). This allows generating feedback for the user, e.g. to play a sound on `LV_EVENT_CLICKED`.
+`feedback_cb` is called when any type of event is sent by the input devices (independently of its type). This allows generating feedback for the user, e.g. to play a sound on `LV_EVENT_CLICKED`.
 
 
 ### Associating with a display
@@ -187,7 +187,7 @@ Every input device is associated with a display. By default, a new input device 
 The associated display is stored and can be changed in `disp` field of the driver.
 
 ### Buffered reading
-By default LVGL calls `read_cb` periodically. This way there is a chance that some user gestures are missed. 
+By default, LVGL calls `read_cb` periodically. This way there is a chance that some user gestures are missed. 
 
 To solve this you can write an event driven driver for your input device that buffers measured data. In `read_cb` you can set the buffered data instead of reading the input device. 
 You can set the `data->continue_reading` flag to tell that LVGL there is more data to read and it should call the `read_cb` again.

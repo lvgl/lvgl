@@ -9,7 +9,7 @@
 
 ## Multiple display support
 
-In LVGL, you can have multiple displays, each with their own driver and objects. The only limitation is that every display needs to be have same color depth (as defined in `LV_COLOR_DEPTH`). 
+In LVGL, you can have multiple displays, each with their own driver and objects. The only limitation is that every display needs to have the same color depth (as defined in `LV_COLOR_DEPTH`). 
 If the displays are different in this regard the rendered image can be converted to the correct format in the drivers `flush_cb`.
 
 Creating more displays is easy: just initialize more display buffers and register another driver for every display.
@@ -53,9 +53,9 @@ The screen's size is always equal to its display and size their position is (0;0
 
 A screen can be created from any object type but the two most typical types are the [Base object](/widgets/obj) and the [Image](/widgets/core/img) (to create a wallpaper).
 
-To create a screen, use `lv_obj_t * scr = lv_<type>_create(NULL, copy)`. `copy` can be an other screen to copy it.
+To create a screen, use `lv_obj_t * scr = lv_<type>_create(NULL, copy)`. `copy` can be another screen to copy it.
 
-To load a screen, use `lv_scr_load(scr)`. To get the active screen, use `lv_scr_act()`. These functions works on the default display. If you want to to specify which display to work on, use `lv_disp_get_scr_act(disp)` and `lv_disp_load_scr(disp, scr)`. Screen can be loaded with animations too. Read more [here](object.html#load-screens).
+To load a screen, use `lv_scr_load(scr)`. To get the active screen, use `lv_scr_act()`. These functions work on the default display. If you want to specify which display to work on, use `lv_disp_get_scr_act(disp)` and `lv_disp_load_scr(disp, scr)`. Screen can be loaded with animations too. Read more [here](object.html#load-screens).
 
 Screens can be deleted with `lv_obj_del(scr)`, but ensure that you do not delete the currently loaded screen.
 
@@ -72,7 +72,7 @@ As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` i
 In summary, to enable transparent screen and displays to create OSD menu-like UIs:
 - Enable `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`
 - Be sure to use `LV_COLOR_DEPTH 32`
-- Set the screens opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
+- Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
 - Set the display opacity to `LV_OPA_TRANSP` with `lv_disp_set_bg_opa(NULL, LV_OPA_TRANSP);`
 
 ## Features of displays

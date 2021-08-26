@@ -26,7 +26,7 @@ Currently, Micropython [does not have a good high-level GUI library](https://for
 
 ### Here are some advantages of using LVGL in Micropython:
 
-- Develop GUI in Python, a very popular high level language. Use paradigms such as Object Oriented Programming.
+- Develop GUI in Python, a very popular high level language. Use paradigms such as Object-Oriented Programming.
 - Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of **`Change code` > `Build` > `Flash` > `Run`**.  
 In Micropython it's just **`Change code` > `Run`** ! You can even run commands interactively using the [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) (the interactive prompt)
 
@@ -44,7 +44,7 @@ This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to
 ## So what does it look like?
 
 > TL;DR:
-> It's very much like the C API, but Object Oriented for LVGL components.
+> It's very much like the C API, but Object-Oriented for LVGL components.
 
 Let's dive right into an example!  
 

@@ -5,8 +5,8 @@
 #ifndef LVGL_SDL_EXAMPLE_LV_GPU_DRAW_CACHE_H
 #define LVGL_SDL_EXAMPLE_LV_GPU_DRAW_CACHE_H
 
-#include "SDL.h"
-#include "misc/lv_area.h"
+#include <SDL2/SDL.h>
+#include "../../misc/lv_area.h"
 #include "lv_gpu_sdl_lru.h"
 
 typedef uint8_t lv_gpu_cache_key_magic_t;

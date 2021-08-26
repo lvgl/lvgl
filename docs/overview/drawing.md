@@ -4,7 +4,7 @@
 ```
 # Drawing
 
-With LVGL, you don't need to draw anything manually. Just create objects (like buttons, labels, arc, etc), move and change them, and LVGL will refresh and redraw what is required.
+With LVGL, you don't need to draw anything manually. Just create objects (like buttons, labels, arc, etc.), move and change them, and LVGL will refresh and redraw what is required.
 
 However, it might be useful to have a basic understanding of how drawing happens in LVGL to add customization, make it easier to find bugs or just out of curiosity.
 
@@ -62,7 +62,7 @@ LVGL performs the following steps to render any shape, image or text. It can be 
 3. **Create masks** If the shape is very simple and doesn't require masks go to #5.  Else create the required masks in the draw function. (e.g. a rounded rectangle mask)
 4. **Calculate all the added mask** It creates 0..255 values into a *mask buffer* with the "shape" of the created masks. 
 E.g. in case of a "line mask" according to the parameters of the mask, keep one side of the buffer as it is (255 by default) and set the rest to 0 to indicate that this side should be removed.
-5. **Blend a color or image** During blending masks (make some pixels transparent or opaque), blending modes (additive, subtractive, etc) and opacity are handled.
+5. **Blend a color or image** During blending masks (make some pixels transparent or opaque), blending modes (additive, subtractive, etc.) and opacity are handled.
 
 LVGL has the following built-in mask types which can be calculated and applied real-time:
 - `LV_DRAW_MASK_TYPE_LINE` Removes a side from a line (top, bottom, left or right). `lv_draw_line` uses 4 of it. 
@@ -72,7 +72,7 @@ Essentially, every (skew) line is bounded with 4 line masks by forming a rectang
 - `LV_DRAW_MASK_TYPE_FADE` Create a vertical fade (change opacity) 
 - `LV_DRAW_MASK_TYPE_MAP` The mask is stored in an array and the necessary parts are applied 
 
-Masks are used the create almost every basic primitives:
+Masks are used to create almost every basic primitive:
 - **letters** Create a mask from the letter and draw a rectangle with the letter's color considering the mask.
 - **line** Created from 4 "line masks", to mask out the left, right, top and bottom part of the line to get perfectly perpendicular line ending.
 - **rounded rectangle** A mask is created real-time to add radius to the corners.
@@ -83,7 +83,7 @@ Masks are used the create almost every basic primitives:
 
 ### Using masks
 
-Every mask type has a related paramter to describe the mask's data. The following paramater types exist:
+Every mask type has a related parameter to describe the mask's data. The following parameter types exist:
 - `lv_draw_mask_line_param_t`
 - `lv_draw_mask_radius_param_t`
 - `lv_draw_mask_angle_param_t`
@@ -96,23 +96,23 @@ Every mask type has a related paramter to describe the mask's data. The followin
 4. Remove the mask from the draw engine with `lv_draw_mask_remove_id(mask_id)` of `lv_draw_mask_remove_custom(ptr)`.
 5. Free the parameter with `lv_draw_mask_free_param(&param)`.
 
-A parameter can be added and removed any number of times but it needs to be freed when not required anymore. 
+A parameter can be added and removed any number of times, but it needs to be freed when not required anymore. 
 
 `lv_draw_mask_add` saves only the pointer of the mask so the parameter needs to be valid while in use. 
 
 ## Hook drawing
 Although widgets can be very well customized by styles there might be cases when something really custom is required. 
-To ensure a great level of flexibility LVGL sends a lot events during drawing with parameters that tell what LVGL is about to draw. 
+To ensure a great level of flexibility LVGL sends a lot of events during drawing with parameters that tell what LVGL is about to draw. 
 Some fields of these parameters can be modified to draw something else or any custom drawing can be added manually.
 
-A good use case for it is the [Button matrix](/widgets/core/btnmatrix) widget. By default its buttons can be styled in different states but you can't style the buttons one by one. 
-However, an event is sent for every button and you can for example tell LVGL to use different colors on a specific button or to manually draw an image on some buttons.
+A good use case for it is the [Button matrix](/widgets/core/btnmatrix) widget. By default, its buttons can be styled in different states, but you can't style the buttons one by one. 
+However, an event is sent for every button, and you can for example tell LVGL to use different colors on a specific button or to manually draw an image on some buttons.
 
 Below each of these events are described in detail.
 
 ### Main drawing
 
-These events are related to the actual drawing of the object. E.g. drawing of buttons, texts, etc happens here.
+These events are related to the actual drawing of the object. E.g. drawing of buttons, texts, etc. happens here.
 
 `lv_event_get_clip_area(event)` can be used to get the current clip area. The clip area is required in draw functions to make them draw only on a limited area. 
 
@@ -196,10 +196,10 @@ Finish the drawing of a part. This is a good place to draw extra content on the 
 
 This event is used to check whether an object fully covers an area or not. 
 
-`lv_event_get_cover_area(event)` returns an pointer to an area to check and `lv_event_set_cover_res(event, res)` can be used to set one of these results:
+`lv_event_get_cover_area(event)` returns a pointer to an area to check and `lv_event_set_cover_res(event, res)` can be used to set one of these results:
 - `LV_COVER_RES_COVER` the areas is fully covered by the object
 - `LV_COVER_RES_NOT_COVER` the areas is not covered by the object
-- `LV_COVER_RES_MASKED` there is a mask on the object so it can not cover the area
+- `LV_COVER_RES_MASKED` there is a mask on the object, so it can not cover the area
 
 Here are some reasons why an object would be unable to fully cover an area:
 - It's simply not fully in area
@@ -214,12 +214,12 @@ In short if for any reason the area below the object is visible than it doesn't 
 Before sending this event LVGL checks if at least the widget's coordinates fully cover the area or not. If not the event is not called.
 
 You need to check only the drawing you have added. The existing properties known by widget are handled in the widget's internal events. 
-E.g. if a widget has &gt; 0 radius it might not cover an area but you need to handle `radius` only if you will modify it and the widget can't know about it. 
+E.g. if a widget has &gt; 0 radius it might not cover an area, but you need to handle `radius` only if you will modify it and the widget can't know about it. 
 
 #### LV_EVENT_REFR_EXT_DRAW_SIZE
 
-If you need to draw outside of a widget LVGL needs to know about it to provide the extra space for drawing. 
-Let's say you create an event the writes the current value of a slider above its knob. In this case LVGL needs to know that the slider's draw area should be larger with the size required for the text.
+If you need to draw outside a widget, LVGL needs to know about it to provide the extra space for drawing. 
+Let's say you create an event which writes the current value of a slider above its knob. In this case LVGL needs to know that the slider's draw area should be larger with the size required for the text.
 
-You can simple set the required draw area with `lv_event_set_ext_draw_size(e, size)`. 
+You can simply set the required draw area with `lv_event_set_ext_draw_size(e, size)`. 
 

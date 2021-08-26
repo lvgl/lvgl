@@ -94,7 +94,7 @@ Note that the real coordinates of image objects won't change during transformati
 
 ### Size mode
 
-By default if the image is zoom or rotated the real coordinates of the image object are not changed. 
+By default, when the image is zoomed or rotated the real coordinates of the image object are not changed. 
 The larger content simply overflows the object's boundaries. 
 It also means the layouts are not affected the by the transformations. 
 

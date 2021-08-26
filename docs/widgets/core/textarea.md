@@ -80,7 +80,7 @@ To align the text in the Text area ` lv_textarea_set_align(textarea, LV_TEXT_ALI
 
 
 ### Accepted characters
-You can set a list of accepted characters with `lv_textarae_set_accepted_chars(textarea, "0123456789.+-")`. 
+You can set a list of accepted characters with `lv_textarea_set_accepted_chars(textarea, "0123456789.+-")`. 
 Other characters will be ignored. 
 
 ### Max text length
