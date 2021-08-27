@@ -592,6 +592,7 @@ static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, con
     SDL_SetTextureBlendMode(content, SDL_BLENDMODE_BLEND);
 
     SDL_SetRenderTarget(renderer, content);
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x00);
     SDL_RenderClear(renderer);
     SDL_RenderSetClipRect(renderer, NULL);
     lv_area_t content_coords;

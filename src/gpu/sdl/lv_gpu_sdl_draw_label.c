@@ -159,23 +159,26 @@ static void draw_letter_masked(SDL_Renderer *renderer, SDL_Texture *atlas, SDL_R
     SDL_SetRenderTarget(renderer, content);
     SDL_RenderSetClipRect(renderer, NULL);
 
+    /* Replace texture with clip mask */
+    SDL_Rect mask_rect = {.w = dst->w, .h = dst->h, .x = 0, .y = 0};
     SDL_Texture *mask = lv_sdl_gen_mask_texture(renderer, &mask_area, NULL, 0);
     SDL_SetTextureBlendMode(mask, SDL_BLENDMODE_NONE);
-
-    SDL_SetTextureAlphaMod(atlas, 0xFF);
-    SDL_SetTextureColorMod(atlas, 0xFF, 0xFF, 0xFF);
-    SDL_SetTextureBlendMode(atlas, SDL_BLENDMODE_BLEND);
-    SDL_Rect mask_rect = {.w = dst->w, .h = dst->h, .x = 0, .y = 0};
     SDL_RenderCopy(renderer, mask, NULL, &mask_rect);
 
+    /* Multiply with font atlas */
+    SDL_SetTextureAlphaMod(atlas, 0xFF);
+    SDL_SetTextureColorMod(atlas, 0xFF, 0xFF, 0xFF);
 #if SDL_VERSION_ATLEAST(2, 0, 6)
     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ZERO,
                                                     SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
                                                     SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
     SDL_SetTextureBlendMode(atlas, mode);
-    SDL_RenderCopy(renderer, atlas, src, &mask_rect);
+#else
+    SDL_SetTextureBlendMode(atlas, SDL_BLENDMODE_BLEND);
 #endif
+    SDL_RenderCopy(renderer, atlas, src, &mask_rect);
 
+    /* Draw composited part on screen */
     SDL_SetTextureBlendMode(content, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(content, opa);
     SDL_SetTextureColorMod(content, color.ch.red, color.ch.green, color.ch.blue);
