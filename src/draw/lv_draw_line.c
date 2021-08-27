@@ -12,10 +12,6 @@
 #include "../core/lv_refr.h"
 #include "../misc/lv_math.h"
 
-#if LV_USE_GPU_SDL
-#include "../gpu/sdl/lv_gpu_sdl_draw.h"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -59,6 +55,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
+#if CONFIG_LV_USE_EXTERNAL_RENDERER
 /**
  * Draw a line
  * @param point1 first point of the line
@@ -83,12 +80,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
     bool is_common;
     is_common = _lv_area_intersect(&clip_line, &clip_line, clip);
     if(!is_common) return;
-#if LV_USE_GPU_SDL
-    if (lv_draw_mask_get_cnt() == 0) {
-        lv_draw_line_gpu_sdl(point1, point2, clip, dsc);
-        return;
-    }
-#endif
 
     if(point1->y == point2->y) draw_line_hor(point1, point2, &clip_line, dsc);
     else if(point1->x == point2->x) draw_line_ver(point1, point2, &clip_line, dsc);
@@ -122,6 +113,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
         }
     }
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

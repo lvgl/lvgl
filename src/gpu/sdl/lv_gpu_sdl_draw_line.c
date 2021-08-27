@@ -13,7 +13,6 @@
 
 #include "SDL.h"
 #include "../../core/lv_refr.h"
-#include "lv_gpu_sdl_draw.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_sdl_texture_cache.h"
@@ -37,6 +36,12 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
+static void draw_horizontal(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
+                            const lv_draw_line_dsc_t *dsc);
+
+static void draw_vertical(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
+                          const lv_draw_line_dsc_t *dsc);
+
 static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thickness);
 
 /**********************
@@ -51,11 +56,10 @@ static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thicknes
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
-                          const lv_draw_line_dsc_t *dsc) {
+void lv_draw_line(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
+                  const lv_draw_line_dsc_t *dsc) {
     if (dsc->width == 0) return;
     if (dsc->opa <= LV_OPA_MIN) return;
-    if (lv_draw_mask_get_cnt() > 0) return;
 
     if (point1->x == point2->x && point1->y == point2->y) return;
 
@@ -65,9 +69,15 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
     clip_line.y1 = LV_MIN(point1->y, point2->y) - dsc->width / 2;
     clip_line.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
-    bool is_common;
-    is_common = _lv_area_intersect(&clip_line, &clip_line, clip);
-    if (!is_common) return;
+    if (!_lv_area_intersect(&clip_line, &clip_line, clip)) return;
+
+    if (point1->x == point2->x) {
+        draw_vertical(point1, point2, clip, dsc);
+        return;
+    } else if (point1->y == point2->y) {
+        draw_horizontal(point1, point2, clip, dsc);
+        return;
+    }
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
@@ -89,7 +99,7 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
         lv_draw_mask_radius_param_t mask_rout_param;
         lv_draw_mask_radius_init(&mask_rout_param, &coords, 0, false);
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        texture = lv_sdl_gen_mask_texture(renderer, &tex_coords, NULL, 0);
+        texture = lv_sdl_gen_mask_texture(renderer, &tex_coords, &mask_rout_id, 1);
         lv_draw_mask_remove_id(mask_rout_id);
         SDL_assert(texture);
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);
@@ -110,39 +120,41 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
     coords_rect.y = point1->y - coords_rect.h / 2;
     SDL_Point center = {coords_rect.h / 2, coords_rect.h / 2};
     SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, angle, &center, SDL_FLIP_NONE);
-
-    if (dsc->round_end || dsc->round_start) {
-        lv_draw_rect_dsc_t cir_dsc;
-        lv_draw_rect_dsc_init(&cir_dsc);
-        cir_dsc.bg_color = dsc->color;
-        cir_dsc.radius = LV_RADIUS_CIRCLE;
-        cir_dsc.bg_opa = dsc->opa;
-
-        int32_t r = (dsc->width >> 1);
-        int32_t r_corr = (dsc->width & 1) ? 0 : 1;
-        lv_area_t cir_area;
-
-        if (dsc->round_start) {
-            cir_area.x1 = point1->x - r;
-            cir_area.y1 = point1->y - r;
-            cir_area.x2 = point1->x + r - r_corr;
-            cir_area.y2 = point1->y + r - r_corr;
-            lv_draw_rect(&cir_area, clip, &cir_dsc);
-        }
-
-        if (dsc->round_end) {
-            cir_area.x1 = point2->x - r;
-            cir_area.y1 = point2->y - r;
-            cir_area.x2 = point2->x + r - r_corr;
-            cir_area.y2 = point2->y + r - r_corr;
-            lv_draw_rect(&cir_area, clip, &cir_dsc);
-        }
-    }
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void draw_horizontal(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
+                            const lv_draw_line_dsc_t *dsc) {
+
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(clip, &clip_rect);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_Color color;
+    lv_color_to_sdl_color(&dsc->color, &color);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, dsc->opa);
+    SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x, point2->y);
+}
+
+static void draw_vertical(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
+                          const lv_draw_line_dsc_t *dsc) {
+
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(clip, &clip_rect);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_Color color;
+    lv_color_to_sdl_color(&dsc->color, &color);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, dsc->opa);
+    SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x, point2->y);
+}
 
 static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thickness) {
     lv_draw_line_key_t key;
