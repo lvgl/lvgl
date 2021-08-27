@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define SPLIT_RADIUS_LIMIT 10  /*With radius greater then this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
+#define SPLIT_RADIUS_LIMIT 10  /*With radius greater than this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
 #define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.*/
 
 /**********************

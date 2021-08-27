@@ -83,7 +83,7 @@ extern const lv_obj_class_t lv_label_class;
 
 /**
  * Create a label objects
- * @param parent    pointer to an object, it will be the parent of the new labely.
+ * @param parent    pointer to an object, it will be the parent of the new label.
  * @return          pointer to the created button
  */
 lv_obj_t * lv_label_create(lv_obj_t * parent);
@@ -109,7 +109,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
 
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable
- * has to be 'alive' while the label exist.
+ * has to be 'alive' while the label exists.
  * @param label         pointer to a label object
  * @param text          pointer to a text. NULL to refresh with the current text.
  */

@@ -242,10 +242,10 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
     lv_indev_t * indev_act = lv_indev_get_act();
     lv_coord_t scroll_limit =  indev_act->driver->scroll_limit;
 
-    /*Go until find an scrollable object in the current direction
+    /*Go until find a scrollable object in the current direction
      *More precisely:
      * 1. Check the pressed object and all of its ancestors and try to find an object which is scrollable
-     * 2. Scrollable means it has some content out of it's area
+     * 2. Scrollable means it has some content out of its area
      * 3. If an object can be scrolled into the current direction then use it ("real match"")
      * 4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
      * 5. Use the last candidate. Always the "deepest" parent or the object from point 3*/
@@ -402,8 +402,8 @@ static void init_scroll_limits(_lv_indev_proc_t * proc)
 /**
  * Search for snap point in the `min` - `max` range.
  * @param obj the object on which snap point should be found
- * @param min ignore snap points smaller then this. (Absolute coordinate)
- * @param max ignore snap points greater then this. (Absolute coordinate)
+ * @param min ignore snap points smaller than this. (Absolute coordinate)
+ * @param max ignore snap points greater than this. (Absolute coordinate)
  * @param ofs offset to snap points. Useful the get a snap point in an imagined case
  *            what if children are already moved by this value
  * @return the distance of the snap point.
@@ -457,9 +457,9 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
 /**
  * Search for snap point in the `min` - `max` range.
  * @param obj the object on which snap point should be found
- * @param min ignore snap points smaller then this. (Absolute coordinate)
- * @param max ignore snap points greater then this. (Absolute coordinate)
- * @param ofs offset to snap points. Useful the get a snap point in an imagined case
+ * @param min ignore snap points smaller than this. (Absolute coordinate)
+ * @param max ignore snap points greater than this. (Absolute coordinate)
+ * @param ofs offset to snap points. Useful to get a snap point in an imagined case
  *            what if children are already moved by this value
  * @return the distance of the snap point.
  */

@@ -279,7 +279,7 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void);
 
 
 /**
- * Check is there is any added draw mask
+ * Check if there is any added draw mask
  * @param a     an area to test for affecting masks.
  * @return true: there is t least 1 draw mask; false: there are no draw masks
  */

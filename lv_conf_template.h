@@ -26,7 +26,7 @@
 /*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
 #define LV_COLOR_DEPTH     16
 
-/*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
+/*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
 #define LV_COLOR_16_SWAP   0
 
 /*Enable more complex drawing routines to manage screens transparency.
@@ -34,7 +34,7 @@
  *Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to non LV_OPA_COVER value*/
 #define LV_COLOR_SCREEN_TRANSP    0
 
-/*Images pixels with this color will not be drawn if they are  chroma keyed)*/
+/*Images pixels with this color will not be drawn if they are chroma keyed)*/
 #define LV_COLOR_CHROMA_KEY    lv_color_hex(0x00ff00)         /*pure green*/
 
 /*=========================
@@ -69,7 +69,7 @@
    HAL SETTINGS
  *====================*/
 
-/*Default display refresh period. LVG will redraw changed ares with this period time*/
+/*Default display refresh period. LVG will redraw changed areas with this period time*/
 #define LV_DISP_DEF_REFR_PERIOD     30      /*[ms]*/
 
 /*Input device read period in milliseconds*/
@@ -205,7 +205,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*1: Show CPU usage and FPS count in the right bottom corner*/
 #define LV_USE_PERF_MONITOR     0
 
-/*1: Show the used memory and the memory fragmentation  in the left bottom corner
+/*1: Show the used memory and the memory fragmentation in the left bottom corner
  * Requires LV_MEM_CUSTOM = 0*/
 #define LV_USE_MEM_MONITOR      0
 
@@ -368,7 +368,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_TXT_COLOR_CMD "#"
 
 /*Support bidirectional texts. Allows mixing Left-to-Right and Right-to-Left texts.
- *The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ *The direction will be processed according to the Unicode Bidirectional Algorithm:
  *https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #define LV_USE_BIDI         0
 #if LV_USE_BIDI
@@ -502,7 +502,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80
 #endif /*LV_USE_THEME_DEFAULT*/
 
-/*An very simple them that is a good starting point for a custom theme*/
+/*A very simple theme that is a good starting point for a custom theme*/
  #define LV_USE_THEME_BASIC    1
 
 /*A theme designed for monochrome displays*/
