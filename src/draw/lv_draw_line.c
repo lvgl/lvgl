@@ -24,6 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
+#if LV_USE_EXTERNAL_RENDERER
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
                                                  const lv_area_t * clip,
                                                  const lv_draw_line_dsc_t * dsc);
@@ -34,7 +35,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
                                                 const lv_draw_line_dsc_t * dsc);
-
+#endif /*LV_USE_EXTERNAL_RENDERER*/
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -55,7 +56,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-#if CONFIG_LV_USE_EXTERNAL_RENDERER
+#if LV_USE_EXTERNAL_RENDERER
 /**
  * Draw a line
  * @param point1 first point of the line
@@ -113,11 +114,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
         }
     }
 }
-#endif
+#endif /*LV_USE_EXTERNAL_RENDERER*/
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#if LV_USE_EXTERNAL_RENDERER
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
@@ -492,3 +495,5 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     LV_LOG_WARN("Can't draw skewed line with LV_DRAW_COMPLEX == 0");
 #endif /*LV_DRAW_COMPLEX*/
 }
+
+#endif /*LV_USE_EXTERNAL_RENDERER*/
