@@ -3,9 +3,12 @@
 #if LV_USE_GPU_SDL
 
 #include "lv_gpu_sdl_lru.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#include <SDL_assert.h>
 
 // ------------------------------------------
 // private functions
@@ -230,7 +233,7 @@ lruc_error lv_lru_set(lv_lru_t *cache, const void *key, size_t key_length, void 
 
     if (item) {
         // update the value and value_lengths
-        required = value_length - item->value_length;
+        required = (int) (value_length - item->value_length);
         cache->value_free(item->value);
         item->value = value;
         item->value_length = value_length;
