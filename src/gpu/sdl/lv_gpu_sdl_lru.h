@@ -1,9 +1,11 @@
+#ifndef LV_LRU_H_
+#define LV_LRU_H_
+
+#include "../src/lv_conf_internal.h"
+
 #include <SDL_mutex.h>
 #include <stdint.h>
 #include <time.h>
-
-#ifndef LV_LRU_H_
-#define LV_LRU_H_
 
 // ------------------------------------------
 // errors
@@ -60,4 +62,4 @@ lruc_error lv_lru_get(lv_lru_t *cache, const void *key, size_t key_size, void **
 
 lruc_error lv_lru_delete(lv_lru_t *cache, const void *key, size_t key_size);
 
-#endif
+#endif /*LV_LRU_H_*/
