@@ -8,12 +8,14 @@
 
 SDL_Palette *lv_sdl_palette_grayscale1 = NULL;
 SDL_Palette *lv_sdl_palette_grayscale2 = NULL;
+SDL_Palette *lv_sdl_palette_grayscale3 = NULL;
 SDL_Palette *lv_sdl_palette_grayscale4 = NULL;
 SDL_Palette *lv_sdl_palette_grayscale8 = NULL;
 
 void _lv_gpu_sdl_utils_init() {
     lv_sdl_palette_grayscale1 = lv_sdl_alloc_palette_for_bpp(_lv_bpp1_opa_table, 1);
     lv_sdl_palette_grayscale2 = lv_sdl_alloc_palette_for_bpp(_lv_bpp2_opa_table, 2);
+    lv_sdl_palette_grayscale3 = lv_sdl_alloc_palette_for_bpp(_lv_bpp3_opa_table, 3);
     lv_sdl_palette_grayscale4 = lv_sdl_alloc_palette_for_bpp(_lv_bpp4_opa_table, 4);
     lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
 
@@ -22,6 +24,7 @@ void _lv_gpu_sdl_utils_init() {
 void _lv_gpu_sdl_utils_deinit() {
     SDL_FreePalette(lv_sdl_palette_grayscale1);
     SDL_FreePalette(lv_sdl_palette_grayscale2);
+    SDL_FreePalette(lv_sdl_palette_grayscale3);
     SDL_FreePalette(lv_sdl_palette_grayscale4);
     SDL_FreePalette(lv_sdl_palette_grayscale8);
 }
@@ -78,6 +81,8 @@ SDL_Palette *lv_sdl_get_grayscale_palette(uint8_t bpp) {
             return lv_sdl_palette_grayscale1;
         case 2:
             return lv_sdl_palette_grayscale2;
+        case 3:
+            return lv_sdl_palette_grayscale3;
         case 4:
             return lv_sdl_palette_grayscale4;
         case 8:
