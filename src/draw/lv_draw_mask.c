@@ -145,7 +145,9 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_
     _lv_draw_mask_common_dsc_t * dsc;
 
     for (int i = 0; i < ids_count; i++) {
-        _lv_draw_mask_saved_t * m = LV_GC_ROOT(&_lv_draw_mask_list[i]);
+        int16_t id = ids[i];
+        if (id == LV_MASK_ID_INV) continue;
+        _lv_draw_mask_saved_t * m = LV_GC_ROOT(&_lv_draw_mask_list[id]);
         if (!m->param) continue;
         dsc = m->param;
         lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;

@@ -23,7 +23,7 @@ typedef struct {
 } lv_draw_arc_key_t;
 
 void lv_draw_arc2(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint16_t start_angle, uint16_t end_angle,
-                 const lv_area_t *clip_area, const lv_draw_arc_dsc_t *dsc) {
+                  const lv_area_t *clip_area, const lv_draw_arc_dsc_t *dsc) {
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     lv_disp_drv_t *driver = disp->driver;
     SDL_Renderer *renderer = (SDL_Renderer *) driver->user_data;
@@ -76,10 +76,10 @@ void lv_draw_arc2(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uin
             lv_draw_mask_angle_param_t mask_angle_param;
             lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, 0, key.angle);
             int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
-            ark_mask = lv_sdl_apply_mask_surface(&texture_area_out);
+            ark_mask = lv_sdl_apply_mask_surface(&texture_area_out, NULL, 0);
             lv_draw_mask_remove_id(mask_angle_id);
         } else {
-            ark_mask = lv_sdl_apply_mask_surface(&texture_area_out);
+            ark_mask = lv_sdl_apply_mask_surface(&texture_area_out, NULL, 0);
         }
         lv_draw_mask_remove_id(mask_out_id);
         lv_draw_mask_remove_id(mask_in_id);
@@ -93,7 +93,7 @@ void lv_draw_arc2(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uin
             lv_draw_mask_radius_param_t mask_rout_param;
             lv_draw_mask_radius_init(&mask_rout_param, &cap_area, LV_RADIUS_CIRCLE, false);
             int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-            SDL_Texture *round_texture = lv_sdl_gen_mask_texture(mask_renderer, &cap_area);
+            SDL_Texture *round_texture = lv_sdl_gen_mask_texture(mask_renderer, &cap_area, &mask_rout_id, 1);
             lv_draw_mask_remove_id(mask_rout_id);
 
             SDL_SetTextureBlendMode(round_texture, SDL_BLENDMODE_BLEND);

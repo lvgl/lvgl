@@ -52,16 +52,16 @@ lv_opa_t *lv_draw_mask_dump(const lv_area_t *coords, const int16_t *ids, int16_t
     return mask_buf;
 }
 
-SDL_Surface *lv_sdl_apply_mask_surface(const lv_area_t *coords) {
+SDL_Surface *lv_sdl_apply_mask_surface(const lv_area_t *coords, const int16_t *ids, int16_t ids_count) {
     lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
 
-    lv_opa_t *mask_buf = lv_draw_mask_dump(coords, NULL, 0);
+    lv_opa_t *mask_buf = lv_draw_mask_dump(coords, ids, ids_count);
     lv_mem_buf_release(mask_buf);
     return lv_sdl_create_mask_surface(mask_buf, w, h, w);
 }
 
-SDL_Texture *lv_sdl_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords) {
-    SDL_Surface *indexed = lv_sdl_apply_mask_surface(coords);
+SDL_Texture *lv_sdl_gen_mask_texture(SDL_Renderer *renderer, const lv_area_t *coords, const int16_t *ids, int16_t ids_count) {
+    SDL_Surface *indexed = lv_sdl_apply_mask_surface(coords, ids, ids_count);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
     SDL_FreeSurface(indexed);
     return texture;
