@@ -417,7 +417,7 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     }
 }
 
-static lv_point_t lv_img_get_tranformed_size(lv_obj_t* obj)
+static lv_point_t lv_img_get_transformed_size(lv_obj_t* obj)
 {
     lv_img_t * img = (lv_img_t *)obj;
 
@@ -513,7 +513,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         if (img->obj_size_mode == LV_IMG_SIZE_MODE_REAL){
-            *p = lv_img_get_tranformed_size(obj);
+            *p = lv_img_get_transformed_size(obj);
         }
         else {
             p->x = img->w;
@@ -637,7 +637,7 @@ static void draw_img(lv_event_t * e)
             lv_area_t img_max_area;
             lv_area_copy(&img_max_area, &obj->coords);
 
-            lv_point_t img_size_final = lv_img_get_tranformed_size(obj);
+            lv_point_t img_size_final = lv_img_get_transformed_size(obj);
 
             if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL){
                 img_max_area.x1 -= ((img->w - img_size_final.x) + 1) / 2;
