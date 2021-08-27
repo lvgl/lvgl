@@ -41,7 +41,7 @@ You can create a larger display from smaller ones. You can create it as below:
 
 ## Screens
 
-Every display has each set of [Screens](overview/object#screen-the-most-basic-parent) and the object on the screens.
+Every display has its own set of [screens](overview/object#screen-the-most-basic-parent) and the object on the screens.
 
 Be sure not to confuse displays and screens:
 
