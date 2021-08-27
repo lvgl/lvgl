@@ -5,7 +5,7 @@
 #include "../font/lv_font_fmt_txt.h"
 #include "../core/lv_refr.h"
 #include "sdl/lv_gpu_sdl_utils.h"
-#include "sdl/lv_gpu_draw_cache.h"
+#include "sdl/lv_gpu_sdl_draw_cache.h"
 #include "lv_gpu_sdl.h"
 
 static void lv_sdl_drv_wait_cb(lv_disp_drv_t *disp_drv);

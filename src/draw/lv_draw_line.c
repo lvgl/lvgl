@@ -13,7 +13,7 @@
 #include "../misc/lv_math.h"
 
 #if LV_USE_GPU_SDL
-#include "../gpu/sdl/lv_draw_gpu_sdl.h"
+#include "../gpu/sdl/lv_gpu_sdl_draw.h"
 #endif
 
 /*********************

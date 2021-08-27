@@ -5,7 +5,7 @@
 #include "../../hal/lv_hal.h"
 #include "../../core/lv_refr.h"
 #include "../../draw/lv_draw_blend.h"
-#include "lv_gpu_draw_cache.h"
+#include "lv_gpu_sdl_draw_cache.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_mask.h"
 

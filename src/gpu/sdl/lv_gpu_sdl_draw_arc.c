@@ -7,7 +7,7 @@
 #include "../../draw/lv_draw_arc.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
-#include "lv_gpu_draw_cache.h"
+#include "lv_gpu_sdl_draw_cache.h"
 #include "lv_gpu_sdl_mask.h"
 
 #ifndef M_PI
@@ -22,7 +22,7 @@ typedef struct {
     uint8_t rounded;
 } lv_draw_arc_key_t;
 
-void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint16_t start_angle, uint16_t end_angle,
+void lv_draw_arc2(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uint16_t start_angle, uint16_t end_angle,
                  const lv_area_t *clip_area, const lv_draw_arc_dsc_t *dsc) {
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     lv_disp_drv_t *driver = disp->driver;
