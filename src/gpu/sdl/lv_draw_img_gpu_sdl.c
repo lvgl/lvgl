@@ -75,8 +75,12 @@ static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_ds
     int w = dsc->header.w, h = dsc->header.h;
     void *data = (void *) dsc->img_data;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
+    int format = SDL_PIXELFORMAT_ARGB8888;
+    if (chroma_keyed) {
+        format = SDL_PIXELFORMAT_RGB888;
+    }
     SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(data, w, h, LV_COLOR_DEPTH, w * LV_COLOR_DEPTH / 8,
-                                                              SDL_PIXELFORMAT_ARGB8888);
+                                                              format);
 #else
     Uint32 rmask = 0x00FF0000, gmask = 0x0000FF00, bmask = 0x000000FF, amask = 0xFF000000;
     if (chroma_keyed) {
