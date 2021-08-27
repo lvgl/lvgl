@@ -147,17 +147,16 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_
     for (int i = 0; i < ids_count; i++) {
         int16_t id = ids[i];
         if (id == LV_MASK_ID_INV) continue;
-        _lv_draw_mask_saved_t * m = LV_GC_ROOT(&_lv_draw_mask_list[id]);
-        if (!m->param) continue;
-        dsc = m->param;
+        dsc = LV_GC_ROOT(_lv_draw_mask_list[id]).param;
+        if (!dsc) continue;
         lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
-        res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)m->param);
+        res = dsc->cb(mask_buf, abs_x, abs_y, len, dsc);
         if(res == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
         else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
     }
 
     return changed ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-                                                            }
+}
 
 /**
  * Remove a mask with a given ID
