@@ -49,11 +49,6 @@ typedef struct {
     lv_border_side_t side;
 } lv_draw_rect_border_key_t;
 
-typedef struct {
-    lv_gpu_cache_key_magic_t magic;
-    lv_coord_t width, height;
-} lv_draw_rect_masked_key_t;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -94,8 +89,6 @@ static lv_draw_rect_shadow_key_t rect_shadow_key_create(lv_coord_t radius, lv_co
 
 static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coord_t rin, lv_coord_t thickness,
                                                         lv_coord_t size, lv_border_side_t side);
-
-static lv_draw_rect_masked_key_t rect_masked_key_create(lv_coord_t width, lv_coord_t height);
 
 /**********************
  *  STATIC VARIABLES
@@ -592,14 +585,10 @@ static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, con
 
     lv_coord_t draw_w = lv_area_get_width(&sh_area), draw_h = lv_area_get_height(&sh_area);
     /* Render drawing area to an offscreen texture */
-    lv_draw_rect_masked_key_t key = rect_masked_key_create(draw_w, draw_h);
-    SDL_Texture *content = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
-    if (content == NULL) {
-        content = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, draw_w,
-                                    draw_h);
-        SDL_assert(content);
-        lv_gpu_draw_cache_put(&key, sizeof(key), content);
-    }
+    SDL_Texture *content = lv_gpu_temp_texture_obtain(renderer, draw_w, draw_h);
+    SDL_assert(content);
+    SDL_SetTextureColorMod(content, 0xFF, 0xFF, 0xFF);
+    SDL_SetTextureAlphaMod(content, 0xFF);
     SDL_SetTextureBlendMode(content, SDL_BLENDMODE_BLEND);
 
     SDL_SetRenderTarget(renderer, content);
@@ -616,12 +605,13 @@ static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, con
     draw_outline(&content_coords, dsc);
 
     SDL_Texture *clip = lv_sdl_gen_mask_texture(renderer, &sh_area, NULL, 0);
+    SDL_Rect src_rect = {.w = draw_w, .h = draw_h, .x = 0, .y = 0};
 #if SDL_VERSION_ATLEAST(2, 0, 6)
     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
                                                     SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
                                                     SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
     SDL_SetTextureBlendMode(clip, mode);
-    SDL_RenderCopy(renderer, clip, NULL, NULL);
+    SDL_RenderCopy(renderer, clip, NULL, &src_rect);
 #endif
 
     SDL_Rect draw_rect, mask_rect;
@@ -630,7 +620,7 @@ static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, con
 
     SDL_SetRenderTarget(renderer, screen);
     SDL_RenderSetClipRect(renderer, &mask_rect);
-    SDL_RenderCopy(renderer, content, NULL, &draw_rect);
+    SDL_RenderCopy(renderer, content, &src_rect, &draw_rect);
     SDL_DestroyTexture(clip);
 }
 
@@ -689,16 +679,6 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
     key.thickness = thickness;
     key.size = size;
     key.side = side;
-    return key;
-}
-
-static lv_draw_rect_masked_key_t rect_masked_key_create(lv_coord_t width, lv_coord_t height) {
-    lv_draw_rect_masked_key_t key;
-    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
-    SDL_memset(&key, 0, sizeof(key));
-    key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_MASKED;
-    key.width = width;
-    key.height = height;
     return key;
 }
 

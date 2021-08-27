@@ -219,7 +219,7 @@ lruc_error lv_lru_set(lv_lru_t *cache, const void *key, size_t key_length, void 
 
     // see if the key already exists
     uint32_t hash_index = lv_lru_hash(cache, key, key_length);
-    size_t required = 0;
+    int64_t required = 0;
     lruc_item *item = NULL, *prev = NULL;
     item = cache->items[hash_index];
 

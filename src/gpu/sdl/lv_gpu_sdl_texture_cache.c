@@ -15,6 +15,14 @@ typedef struct {
     lv_lru_free_t *userdata_free;
 } draw_cache_value_t;
 
+typedef struct {
+    lv_gpu_cache_key_magic_t magic;
+} temp_texture_key_t;
+
+typedef struct {
+    lv_coord_t width, height;
+} temp_texture_userdata_t;
+
 static void draw_cache_free_value(draw_cache_value_t *);
 
 void _lv_gpu_sdl_texture_cache_init() {
@@ -70,6 +78,23 @@ void lv_gpu_draw_cache_put_with_userdata(const void *key, size_t key_length, SDL
     }
     LV_LOG_INFO("cache texture %p, %d*%d@%dbpp", texture, width, height, SDL_BITSPERPIXEL(format));
     lv_lru_set(lv_sdl_texture_cache, key, key_length, value, width * height * SDL_BITSPERPIXEL(format) / 8);
+}
+
+SDL_Texture *lv_gpu_temp_texture_obtain(SDL_Renderer *renderer, lv_coord_t width, lv_coord_t height) {
+    temp_texture_key_t key;
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_TEMP;
+    temp_texture_userdata_t *userdata = NULL;
+    SDL_Texture *texture = lv_gpu_draw_cache_get_with_userdata(&key, sizeof(key), NULL, (void **) &userdata);
+    if (texture && userdata->width >= width && userdata->height >= height) {
+        return texture;
+    }
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, width, height);
+    userdata = SDL_malloc(sizeof(temp_texture_userdata_t));
+    userdata->width = width;
+    userdata->height = height;
+    lv_gpu_draw_cache_put_with_userdata(&key, sizeof(key), texture, userdata, SDL_free);
+    return texture;
 }
 
 static void draw_cache_free_value(draw_cache_value_t *value) {

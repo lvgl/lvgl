@@ -20,6 +20,7 @@
 
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_texture_cache.h"
+#include "lv_gpu_sdl_mask.h"
 
 /*********************
  *      DEFINES
@@ -42,6 +43,9 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void draw_letter_masked(SDL_Renderer *renderer, SDL_Texture *atlas, SDL_Rect *src, SDL_Rect *dst, SDL_Rect *clip,
+                               lv_color_t color, lv_opa_t opa);
 
 static void font_atlas_free(lv_sdl_font_atlas_t *atlas);
 
@@ -68,9 +72,8 @@ static lv_font_key_t font_key_create(const lv_font_t *font_p, uint32_t cmap_inde
  **********************/
 
 void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
-                    const lv_font_t *font_p,
-                    uint32_t letter,
-                    lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode) {
+                    const lv_font_t *font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
+                    lv_blend_mode_t blend_mode) {
     if (opa < LV_OPA_MIN) return;
     if (opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -106,10 +109,6 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
         return;
     }
     lv_area_t dst = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
-    if (lv_draw_mask_is_any(&dst)) {
-        // TODO draw with mask
-        return;
-    }
     uint32_t cmap_index, atlas_index;
     if (!font_cmap_find_index(font_p->dsc, letter, &cmap_index, &atlas_index)) {
         return;
@@ -133,6 +132,11 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
     SDL_Rect clip_area_rect;
     lv_area_to_sdl_rect(clip_area, &clip_area_rect);
 
+    if (lv_draw_mask_is_any(&dst)) {
+        draw_letter_masked(renderer, texture, &atlas->pos[atlas_index], &dstrect, &clip_area_rect, color, opa);
+        return;
+    }
+
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, opa);
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
@@ -144,6 +148,43 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void draw_letter_masked(SDL_Renderer *renderer, SDL_Texture *atlas, SDL_Rect *src, SDL_Rect *dst, SDL_Rect *clip,
+                               lv_color_t color, lv_opa_t opa) {
+    SDL_Texture *screen = SDL_GetRenderTarget(renderer);
+
+    lv_area_t mask_area = {.x1 = dst->x, .x2 = dst->x + dst->w - 1, .y1 = dst->y, .y2 = dst->y + dst->h - 1};
+    SDL_Texture *content = lv_gpu_temp_texture_obtain(renderer, dst->w, dst->h);
+    SDL_SetTextureBlendMode(content, SDL_BLENDMODE_NONE);
+    SDL_SetRenderTarget(renderer, content);
+    SDL_RenderSetClipRect(renderer, NULL);
+
+    SDL_Texture *mask = lv_sdl_gen_mask_texture(renderer, &mask_area, NULL, 0);
+    SDL_SetTextureBlendMode(mask, SDL_BLENDMODE_NONE);
+
+    SDL_SetTextureAlphaMod(atlas, 0xFF);
+    SDL_SetTextureColorMod(atlas, 0xFF, 0xFF, 0xFF);
+    SDL_SetTextureBlendMode(atlas, SDL_BLENDMODE_BLEND);
+    SDL_Rect mask_rect = {.w = dst->w, .h = dst->h, .x = 0, .y = 0};
+    SDL_RenderCopy(renderer, mask, NULL, &mask_rect);
+
+#if SDL_VERSION_ATLEAST(2, 0, 6)
+    SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ZERO,
+                                                    SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+                                                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+    SDL_SetTextureBlendMode(atlas, mode);
+    SDL_RenderCopy(renderer, atlas, src, &mask_rect);
+#endif
+
+    SDL_SetTextureBlendMode(content, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(content, opa);
+    SDL_SetTextureColorMod(content, color.ch.red, color.ch.green, color.ch.blue);
+
+    SDL_SetRenderTarget(renderer, screen);
+    SDL_RenderSetClipRect(renderer, clip);
+    SDL_RenderCopy(renderer, content, &mask_rect, dst);
+    SDL_DestroyTexture(mask);
+}
 
 SDL_Texture *font_atlas_bake(SDL_Renderer *renderer, const lv_font_t *font_p, uint32_t cmap_idx,
                              lv_sdl_font_atlas_t *atlas) {
