@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include <misc/lv_color.h>
+#include "../../misc/lv_color.h"
 
 /*********************
  *      DEFINES
