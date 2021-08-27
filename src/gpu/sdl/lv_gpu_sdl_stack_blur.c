@@ -88,7 +88,7 @@ void lv_stack_blur_grayscale(lv_opa_t *buf, uint16_t w, uint16_t h, uint16_t r) 
 
 static void stack_blur_job(lv_opa_t *src, unsigned int w, unsigned int h, unsigned int radius, int cores, int core,
                            int step) {
-    if(radius < 2 || radius > 254) {
+    if (radius < 2 || radius > 254) {
         /* Silently ignore bad radius */
         return;
     }
@@ -114,8 +114,8 @@ static void stack_blur_job(lv_opa_t *src, unsigned int w, unsigned int h, unsign
     unsigned char stack[254 * 2 + 1];
 
     if (step == 1) {
-        int minY = core * h / cores;
-        int maxY = (core + 1) * h / cores;
+        unsigned int minY = core * h / cores;
+        unsigned int maxY = (core + 1) * h / cores;
 
         for (y = minY; y < maxY; y++) {
             sum_r =
@@ -181,8 +181,8 @@ static void stack_blur_job(lv_opa_t *src, unsigned int w, unsigned int h, unsign
 
     // step 2
     if (step == 2) {
-        int minX = core * w / cores;
-        int maxX = (core + 1) * w / cores;
+        unsigned int minX = core * w / cores;
+        unsigned int maxX = (core + 1) * w / cores;
 
         for (x = minX; x < maxX; x++) {
             sum_r =
