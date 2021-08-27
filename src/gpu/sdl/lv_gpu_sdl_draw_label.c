@@ -150,6 +150,10 @@ SDL_Texture *font_atlas_bake(SDL_Renderer *renderer, const lv_font_t *font_p, ui
     /* Clear atlas struct */
     SDL_memset(atlas, 0, sizeof(lv_sdl_font_atlas_t));
     const lv_font_fmt_txt_dsc_t *dsc = (lv_font_fmt_txt_dsc_t *) font_p->dsc;
+    if (dsc->bitmap_format != LV_FONT_FMT_TXT_PLAIN) {
+        /* we don't support compressed font at this moment */
+        return NULL;
+    }
     const lv_font_fmt_txt_cmap_t *cmap = &dsc->cmaps[cmap_idx];
     int glyph_count = cmap->type == LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY ? cmap->range_length : cmap->list_length;
     int atlas_size = 0;

@@ -86,6 +86,8 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
 
 static void lv_draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc);
 
+static void lv_draw_rect_masked_simple(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -93,7 +95,10 @@ static void lv_draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, 
 /**********************
  *      MACROS
  **********************/
-
+#define SKIP_BORDER(dsc) ((dsc)->border_opa <= LV_OPA_MIN || (dsc)->border_width == 0 || (dsc)->border_side == LV_BORDER_SIDE_NONE || (dsc)->border_post)
+#define SKIP_SHADOW(dsc) ((dsc)->shadow_width == 0 || (dsc)->shadow_opa <= LV_OPA_MIN || ((dsc)->shadow_width == 1 && (dsc)->shadow_spread <= 0 && (dsc)->shadow_ofs_x == 0 && (dsc)->shadow_ofs_y == 0))
+#define SKIP_IMAGE(dsc) ((dsc)->bg_img_src == NULL || (dsc)->bg_img_opa <= LV_OPA_MIN)
+#define SKIP_OUTLINE(dsc) ((dsc)->outline_opa <= LV_OPA_MIN || (dsc)->outline_width == 0)
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -170,8 +175,7 @@ static void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const
 }
 
 static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
-    if (dsc->bg_img_src == NULL) return;
-    if (dsc->bg_img_opa <= LV_OPA_MIN) return;
+    if (SKIP_IMAGE(dsc)) return;
 
     lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
     if (src_type == LV_IMG_SRC_SYMBOL) {
@@ -232,13 +236,7 @@ static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip, const lv
 
 static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc) {
     /*Check whether the shadow is visible*/
-    if (dsc->shadow_width == 0) return;
-    if (dsc->shadow_opa <= LV_OPA_MIN) return;
-
-    if (dsc->shadow_width == 1 && dsc->shadow_ofs_x == 0 &&
-        dsc->shadow_ofs_y == 0 && dsc->shadow_spread <= 0) {
-        return;
-    }
+    if (SKIP_SHADOW(dsc)) return;
 
     lv_coord_t sw = dsc->shadow_width;
 
@@ -305,10 +303,7 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
 
 
 static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc) {
-    if (dsc->border_opa <= LV_OPA_MIN) return;
-    if (dsc->border_width == 0) return;
-    if (dsc->border_side == LV_BORDER_SIDE_NONE) return;
-    if (dsc->border_post) return;
+    if (SKIP_BORDER(dsc)) return;
 
     SDL_Color border_color;
     lv_color_to_sdl_color(&dsc->border_color, &border_color);
@@ -354,8 +349,7 @@ static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const l
 }
 
 static void draw_outline(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc) {
-    if (dsc->outline_opa <= LV_OPA_MIN) return;
-    if (dsc->outline_width == 0) return;
+    if (SKIP_OUTLINE(dsc)) return;
 
     lv_opa_t opa = dsc->outline_opa;
 
@@ -602,6 +596,10 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
 }
 
 static void lv_draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
+    if (dsc->radius <= 0 && SKIP_BORDER(dsc) && SKIP_SHADOW(dsc) && SKIP_IMAGE(dsc) && SKIP_OUTLINE(dsc)) {
+        lv_draw_rect_masked_simple(coords, mask, dsc);
+        return;
+    }
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
@@ -648,6 +646,31 @@ static void lv_draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, 
     SDL_RenderCopy(renderer, content, NULL, &draw_rect);
     SDL_DestroyTexture(clip);
     SDL_DestroyTexture(content);
+}
+
+static void lv_draw_rect_masked_simple(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
+    SDL_Color bg_color;
+    lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
+
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    SDL_Surface *indexed = lv_sdl_apply_mask_surface(coords, NULL, 0);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, indexed);
+
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(texture, dsc->bg_opa);
+    SDL_SetTextureColorMod(texture, bg_color.r, bg_color.g, bg_color.b);
+
+    SDL_Rect coords_rect, mask_rect;
+    lv_area_to_sdl_rect(coords, &coords_rect);
+    lv_area_to_sdl_rect(mask, &mask_rect);
+
+    SDL_RenderSetClipRect(renderer, &mask_rect);
+    SDL_RenderCopy(renderer, texture, NULL, &coords_rect);
+
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(indexed);
 }
 
 #endif /*LV_USE_GPU_SDL*/
