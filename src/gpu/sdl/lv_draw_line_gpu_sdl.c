@@ -1,3 +1,12 @@
+/**
+ * @file lv_gpu_sdl_draw_line.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -10,11 +19,37 @@
 #include "lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl_mask.h"
 
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     lv_coord_t length;
     lv_coord_t thickness;
 } lv_draw_line_key_t;
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thickness);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 
 void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
                           const lv_draw_line_dsc_t *dsc) {
@@ -41,7 +76,8 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
     lv_color_to_sdl_color(&dsc->color, &line_color);
 
     int length = lv_sdl_round(SDL_sqrt(SDL_pow(point2->y - point1->y + 1, 2) + SDL_pow(point2->x - point1->x + 1, 2)));
-    lv_draw_line_key_t key = {.magic=LV_GPU_CACHE_KEY_MAGIC_LINE, .length=length, .thickness = dsc->width};
+    lv_coord_t thickness = dsc->width;
+    lv_draw_line_key_t key = line_key_create(length, thickness);
     lv_area_t coords = {1, 1, length, dsc->width};
     lv_area_t tex_coords;
     lv_area_copy(&tex_coords, &coords);
@@ -103,5 +139,20 @@ void lv_draw_line_gpu_sdl(const lv_point_t *point1, const lv_point_t *point2, co
         }
     }
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thickness) {
+    lv_draw_line_key_t key;
+    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_LINE;
+    key.length = length;
+    key.thickness = thickness;
+    return key;
+}
+
 
 #endif /*LV_USE_GPU_SDL*/

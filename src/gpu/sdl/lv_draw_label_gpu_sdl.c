@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.c
+ * @file lv_gpu_sdl_draw_label.c
  *
  */
 
@@ -263,7 +263,7 @@ static int32_t unicode_list_compare(const void *ref, const void *element) {
 
 static lv_font_key_t font_key_create(const lv_font_t *font_p, uint32_t cmap_index) {
     lv_font_key_t key;
-    /* VERY IMPORTANT! Padding between members may contain uninitialized data */
+    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
     SDL_memset(&key, 0, sizeof(key));
     key.magic = LV_GPU_CACHE_KEY_MAGIC_FONT;
     key.font_p = font_p;

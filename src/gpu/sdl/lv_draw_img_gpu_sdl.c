@@ -1,3 +1,12 @@
+/**
+ * @file lv_gpu_sdl_draw_img.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -7,15 +16,41 @@
 #include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_draw_cache.h"
 
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     const void *src;
     int32_t frame_id;
 } lv_draw_img_key_t;
 
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
 static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc);
 
 static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc);
+
+static lv_draw_img_key_t img_key_create(const void *src, int32_t frame_id);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 
 void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src, const lv_draw_img_dsc_t *draw_dsc) {
     if (draw_dsc->opa <= LV_OPA_MIN) return;
@@ -32,7 +67,7 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_area_to_sdl_rect(coords, &coords_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
-    lv_draw_img_key_t key = {.magic=LV_GPU_CACHE_KEY_MAGIC_IMG, .src = src, .frame_id = draw_dsc->frame_id};
+    lv_draw_img_key_t key = img_key_create(src, draw_dsc->frame_id);
     bool texture_found = false;
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), &texture_found);
     if (!texture_found) {
@@ -66,6 +101,10 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc) {
     if (!dsc->img_data) {
@@ -114,6 +153,16 @@ static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_d
     SDL_FreeSurface(surface);
     lv_mem_buf_release(data);
     return texture;
+}
+
+static lv_draw_img_key_t img_key_create(const void *src, int32_t frame_id) {
+    lv_draw_img_key_t key;
+    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_IMG;
+    key.src = src;
+    key.frame_id = frame_id;
+    return key;
 }
 
 #endif /*LV_USE_GPU_SDL*/

@@ -1,3 +1,12 @@
+/**
+ * @file lv_gpu_sdl_draw_rect.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -9,6 +18,14 @@
 #include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_draw_cache.h"
 #include "lv_gpu_sdl_mask.h"
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
 
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
@@ -30,6 +47,10 @@ typedef struct {
     lv_coord_t size;
     lv_border_side_t side;
 } lv_draw_rect_border_key_t;
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
 
 static void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *mask_rect,
                           const lv_draw_rect_dsc_t *dsc);
@@ -62,6 +83,26 @@ static void render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t
 
 static void render_center(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size, const lv_area_t *coords);
 
+static lv_draw_rect_bg_key_t rect_bg_key_create(lv_coord_t radius, lv_coord_t size);
+
+static lv_draw_rect_shadow_key_t rect_shadow_key_create(lv_coord_t radius, lv_coord_t size, lv_coord_t blur);
+
+static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coord_t rin, lv_coord_t thickness,
+                                                        lv_coord_t size, lv_border_side_t side);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
 void lv_draw_rect(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
@@ -86,8 +127,12 @@ void lv_draw_rect(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_
     }
 }
 
-void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *mask_rect,
-                   const lv_draw_rect_dsc_t *dsc) {
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *mask_rect,
+                          const lv_draw_rect_dsc_t *dsc) {
     SDL_Color bg_color;
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
     lv_coord_t radius = dsc->radius;
@@ -97,7 +142,7 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
         /* If size isn't times of 2, increase 1 px */
         lv_coord_t min_half = bg_min % 2 == 0 ? bg_min / 2 : bg_min / 2 + 1;
         lv_coord_t frag_size = radius == LV_RADIUS_CIRCLE ? min_half : LV_MIN(radius + 1, min_half);
-        lv_draw_rect_bg_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG, .radius = radius, .size = frag_size};
+        lv_draw_rect_bg_key_t key = rect_bg_key_create(radius, frag_size);
         lv_area_t coords_frag;
         lv_area_copy(&coords_frag, coords);
         lv_area_set_width(&coords_frag, frag_size);
@@ -131,8 +176,8 @@ void draw_bg_color(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Re
 }
 
 
-void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip,
-                 const lv_draw_rect_dsc_t *dsc) {
+static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip,
+                        const lv_draw_rect_dsc_t *dsc) {
     if (dsc->bg_img_src == NULL) return;
     if (dsc->bg_img_opa <= LV_OPA_MIN) return;
 
@@ -193,8 +238,8 @@ void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip,
     }
 }
 
-void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *mask_rect,
-                 const lv_draw_rect_dsc_t *dsc) {
+static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect *mask_rect,
+                        const lv_draw_rect_dsc_t *dsc) {
     /*Check whether the shadow is visible*/
     if (dsc->shadow_width == 0) return;
     if (dsc->shadow_opa <= LV_OPA_MIN) return;
@@ -235,8 +280,7 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
     /* This is how big the corner is after blurring */
     lv_coord_t blur_frag_size = frag_size + sw + 2;
 
-    lv_draw_rect_shadow_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW, .radius = radius,
-            .size = frag_size, .blur = sw};
+    lv_draw_rect_shadow_key_t key = rect_shadow_key_create(radius, frag_size, sw);
 
     lv_area_t blur_frag;
     lv_area_copy(&blur_frag, &sh_area);
@@ -270,8 +314,8 @@ void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const SDL_Rect
 }
 
 
-void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const lv_area_t *mask,
-                 const lv_draw_rect_dsc_t *dsc) {
+static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const lv_area_t *mask,
+                        const lv_draw_rect_dsc_t *dsc) {
     if (dsc->border_opa <= LV_OPA_MIN) return;
     if (dsc->border_width == 0) return;
     if (dsc->border_side == LV_BORDER_SIDE_NONE) return;
@@ -380,13 +424,8 @@ static void draw_border_generic(const lv_area_t *clip_area, const lv_area_t *out
             border_min = LV_MIN(border_width, border_height);
     lv_coord_t min_half = border_min % 2 == 0 ? border_min / 2 : border_min / 2 + 1;
     lv_coord_t frag_size = rout == LV_RADIUS_CIRCLE ? min_half : LV_MIN(rout + 1, min_half);
-    lv_draw_rect_border_key_t key = {
-            .magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER,
-            .rout = rout, .rin = rin,
-            .thickness = inner_area->x1 - outer_area->x1 + 1,
-            .size = frag_size,
-            .side = LV_BORDER_SIDE_FULL,
-    };
+    lv_draw_rect_border_key_t key = rect_border_key_create(rout, rin, inner_area->x1 - outer_area->x1 + 1,
+                                                           frag_size, LV_BORDER_SIDE_FULL);
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
     if (texture == NULL) {
         /*Create mask for the outer area*/
@@ -567,6 +606,39 @@ static void render_center(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t 
         SDL_Rect srcrect = {frag_size - 1, frag_size - 1, 1, 1};
         SDL_RenderCopy(renderer, frag, &srcrect, &dstrect);
     }
+}
+
+static lv_draw_rect_bg_key_t rect_bg_key_create(lv_coord_t radius, lv_coord_t size) {
+    lv_draw_rect_bg_key_t key;
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG;
+    key.radius = radius;
+    key.size = size;
+    return key;
+}
+
+static lv_draw_rect_shadow_key_t rect_shadow_key_create(lv_coord_t radius, lv_coord_t size, lv_coord_t blur) {
+    lv_draw_rect_shadow_key_t key;
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW;
+    key.radius = radius;
+    key.size = size;
+    key.blur = blur;
+    return key;
+}
+
+static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coord_t rin, lv_coord_t thickness,
+                                                        lv_coord_t size, lv_border_side_t side) {
+    lv_draw_rect_border_key_t key;
+    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER;
+    key.rout = rout;
+    key.rin = rin;
+    key.thickness = thickness;
+    key.size = size;
+    key.side = side;
+    return key;
 }
 
 #endif /*LV_USE_GPU_SDL*/
