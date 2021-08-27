@@ -16,8 +16,9 @@
 #include "../../core/lv_refr.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
-#include "lv_gpu_sdl_draw_cache.h"
+#include "lv_gpu_sdl_texture_cache.h"
 #include "lv_gpu_sdl_mask.h"
+#include "lv_gpu_sdl_stack_blur.h"
 
 /*********************
  *      DEFINES
@@ -291,8 +292,8 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const S
         lv_draw_mask_radius_param_t mask_rout_param;
         lv_draw_mask_radius_init(&mask_rout_param, &sh_rect_area, radius, false);
         int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag);
-        lv_draw_mask_blur(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
+        lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag, &mask_rout_id, 1);
+        lv_stack_blur_grayscale(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
         texture = lv_sdl_create_mask_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
                                              lv_area_get_width(&blur_frag));
         lv_mem_buf_release(mask_buf);

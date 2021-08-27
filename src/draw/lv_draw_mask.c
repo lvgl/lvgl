@@ -126,6 +126,38 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf,
 }
 
 /**
+ * Apply the specified buffers on a line. Used internally by the library's drawing routines.
+ * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
+ * @param abs_x absolute X coordinate where the line to calculate start
+ * @param abs_y absolute Y coordinate where the line to calculate start
+ * @param len length of the line to calculate (in pixel count)
+ * @param ids ID array of added buffers
+ * @param ids_count number of ID array
+ * @return One of these values:
+ * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
+ * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
+ * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
+ */
+LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                                lv_coord_t len, const int16_t *ids, int16_t ids_count)
+{
+    bool changed = false;
+    _lv_draw_mask_common_dsc_t * dsc;
+
+    for (int i = 0; i < ids_count; i++) {
+        _lv_draw_mask_saved_t * m = LV_GC_ROOT(&_lv_draw_mask_list[i]);
+        if (!m->param) continue;
+        dsc = m->param;
+        lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
+        res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)m->param);
+        if(res == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
+        else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
+    }
+
+    return changed ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                                                            }
+
+/**
  * Remove a mask with a given ID
  * @param id the ID of the mask.  Returned by `lv_draw_mask_add`
  * @return the parameter of the removed mask.

@@ -14,7 +14,7 @@
 #include "../../core/lv_refr.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
-#include "lv_gpu_sdl_draw_cache.h"
+#include "lv_gpu_sdl_texture_cache.h"
 
 /*********************
  *      DEFINES

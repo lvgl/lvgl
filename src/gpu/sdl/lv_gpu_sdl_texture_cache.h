@@ -2,8 +2,8 @@
 // Created by Mariotaku on 2021/08/21.
 //
 
-#ifndef LVGL_SDL_EXAMPLE_LV_GPU_SDL_DRAW_CACHE_H
-#define LVGL_SDL_EXAMPLE_LV_GPU_SDL_DRAW_CACHE_H
+#ifndef LVGL_SDL_EXAMPLE_LV_GPU_SDL_TEXTURE_CACHE_H
+#define LVGL_SDL_EXAMPLE_LV_GPU_SDL_TEXTURE_CACHE_H
 
 #include <SDL.h>
 #include "../../misc/lv_area.h"
@@ -32,4 +32,4 @@ void lv_gpu_draw_cache_put(const void *key, size_t key_length, SDL_Texture *text
 void lv_gpu_draw_cache_put_with_userdata(const void *key, size_t key_length, SDL_Texture *texture, void *userdata,
                                          lv_lru_free_t userdata_free);
 
-#endif //LVGL_SDL_EXAMPLE_LV_GPU_SDL_DRAW_CACHE_H
+#endif //LVGL_SDL_EXAMPLE_LV_GPU_SDL_TEXTURE_CACHE_H

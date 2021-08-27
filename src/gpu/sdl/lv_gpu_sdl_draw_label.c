@@ -19,7 +19,7 @@
 #include <SDL.h>
 
 #include "lv_gpu_sdl_utils.h"
-#include "lv_gpu_sdl_draw_cache.h"
+#include "lv_gpu_sdl_texture_cache.h"
 
 /*********************
  *      DEFINES
@@ -103,6 +103,11 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
         pos_x > clip_area->x2 ||
         pos_y + g.box_h < clip_area->y1 ||
         pos_y > clip_area->y2) {
+        return;
+    }
+    lv_area_t dst = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
+    if (lv_draw_mask_is_any(&dst)) {
+        // TODO draw with mask
         return;
     }
     uint32_t cmap_index, atlas_index;

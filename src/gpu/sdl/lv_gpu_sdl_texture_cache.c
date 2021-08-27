@@ -5,7 +5,7 @@
 #include "../../misc/lv_log.h"
 #include "../../draw/lv_draw_label.h"
 
-#include "lv_gpu_sdl_draw_cache.h"
+#include "lv_gpu_sdl_texture_cache.h"
 
 static lv_lru_t *lv_sdl_texture_cache;
 
