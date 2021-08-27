@@ -9,15 +9,16 @@
 #include "../../misc/lv_area.h"
 #include "lv_gpu_sdl_lru.h"
 
-typedef uint8_t lv_gpu_cache_key_magic_t;
-
-#define LV_GPU_CACHE_KEY_MAGIC_ARC 0x01
-#define LV_GPU_CACHE_KEY_MAGIC_IMG 0x11
-#define LV_GPU_CACHE_KEY_MAGIC_LINE 0x21
-#define LV_GPU_CACHE_KEY_MAGIC_RECT_BG 0x31
-#define LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW 0x3A
-#define LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER 0x3B
-#define LV_GPU_CACHE_KEY_MAGIC_FONT 0x41
+typedef enum {
+    LV_GPU_CACHE_KEY_MAGIC_ARC = 0x01,
+    LV_GPU_CACHE_KEY_MAGIC_IMG = 0x11,
+    LV_GPU_CACHE_KEY_MAGIC_LINE = 0x21,
+    LV_GPU_CACHE_KEY_MAGIC_RECT_BG = 0x31,
+    LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW = 0x32,
+    LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER = 0x33,
+    LV_GPU_CACHE_KEY_MAGIC_RECT_MASKED = 0x3F,
+    LV_GPU_CACHE_KEY_MAGIC_FONT = 0x41,
+} lv_gpu_cache_key_magic_t;
 
 void _lv_gpu_sdl_texture_cache_init();
 
