@@ -13,7 +13,7 @@ static void set_value(void * indic, int32_t v)
  */
 void lv_example_meter_1(void)
 {
-     meter = lv_meter_create(lv_scr_act());
+    meter = lv_meter_create(lv_scr_act());
     lv_obj_center(meter);
     lv_obj_set_size(meter, 200, 200);
 

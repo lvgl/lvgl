@@ -19,7 +19,7 @@
  *********************/
 #define MY_CLASS &lv_bar_class
 
-/** hor. pad and ver. pad cannot make the indicator smaller then this [px]*/
+/** hor. pad and ver. pad cannot make the indicator smaller than this [px]*/
 #define LV_BAR_SIZE_MIN  4
 
 #define LV_BAR_IS_ANIMATING(anim_struct) (((anim_struct).anim_state) != LV_BAR_ANIM_STATE_INV)
@@ -95,7 +95,7 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
     if(bar->cur_value == value) return;
 
     value = LV_CLAMP(bar->min_value, value, bar->max_value);
-    value = value < bar->start_value ? bar->start_value : value; /*Can't be smaller then the left value*/
+    value = value < bar->start_value ? bar->start_value : value; /*Can't be smaller than the left value*/
 
     if(bar->cur_value == value) return;
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
@@ -108,7 +108,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     value = LV_CLAMP(bar->min_value, value, bar->max_value);
-    value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater then the right value*/
+    value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater than the right value*/
 
     if(bar->start_value == value) return;
     lv_bar_set_value_with_anim(obj, value, &bar->start_value, &bar->start_value_anim, anim);

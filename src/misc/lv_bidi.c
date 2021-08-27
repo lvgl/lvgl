@@ -599,7 +599,7 @@ static lv_base_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
     /*Is the letter an opening bracket?*/
     for(i = 0; bracket_left[i] != '\0'; i++) {
         if(bracket_left[i] == letter) {
-            /*If so find it's matching closing bracket.
+            /*If so find its matching closing bracket.
              *If a char with base dir. direction is found then the brackets will have `base_dir` direction*/
             uint32_t txt_i = next_pos;
             while(txt_i < len) {

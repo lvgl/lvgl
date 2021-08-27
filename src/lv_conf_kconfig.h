@@ -1,4 +1,4 @@
-/** * @file lv_conf_kconfig.h * Configs that needs special handling when LVGL is used with Kconfig */
+/** * @file lv_conf_kconfig.h * Configs that need special handling when LVGL is used with Kconfig */
 
 #ifndef LV_CONF_KCONFIG_H
 #define LV_CONF_KCONFIG_H

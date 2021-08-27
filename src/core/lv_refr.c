@@ -849,7 +849,7 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
             area->y1 = area->x1;
             area->y2 = area->y1 + area_w - 1;
         }
-        draw_buf->flushing = 0;
+
         /*Rotate the screen in chunks, flushing after each one*/
         lv_coord_t row = 0;
         while(row < area_h) {
@@ -882,6 +882,15 @@ static void draw_buf_rotate(lv_area_t *area, lv_color_t *color_p) {
                     area->x1 = area->x2 - height + 1;
                 }
             }
+
+            /* The original part (chunk of the current area) were split into more parts here.
+             * Set the original last_part flag on the last part of rotation. */
+            if(row + height >= area_h && draw_buf->last_area && draw_buf->last_part) {
+                draw_buf->flushing_last = 1;
+            } else {
+                draw_buf->flushing_last = 0;
+            }
+
             /*Flush the completed area to the display*/
             call_flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
             /*FIXME: Rotation forces legacy behavior where rendering and flushing are done serially*/

@@ -190,7 +190,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     blend_area.x1 = draw_area.x1;
     blend_area.x2 = draw_area.x2;
 
-    /*There is an other mask too. Draw line by line. */
+    /*There is another mask too. Draw line by line. */
     if(mask_any) {
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             blend_area.y1 = h;
@@ -337,7 +337,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv
         lv_img_header_t header;
         lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
         if(res != LV_RES_OK) {
-            LV_LOG_WARN("Coudn't read the background image");
+            LV_LOG_WARN("Couldn't read the background image");
             return;
         }
 
@@ -863,7 +863,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 /**
  * Calculate a blurred corner
  * @param coords Coordinates of the shadow
- * @param sh_buf a buffer to store the result. It's size should be `(sw + r)^2 * 2`
+ * @param sh_buf a buffer to store the result. Its size should be `(sw + r)^2 * 2`
  * @param sw shadow width
  * @param r radius
  */

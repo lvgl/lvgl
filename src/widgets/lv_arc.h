@@ -69,7 +69,7 @@ typedef enum {
  **********************/
 
 /**
- * Create a arc objects
+ * Create an arc object
  * @param par pointer to an object, it will be the parent of the new arc
  * @return pointer to the created arc
  */
@@ -143,13 +143,13 @@ void lv_arc_set_mode(lv_obj_t * arc, lv_arc_mode_t type);
 
 /**
  * Set a new value on the arc
- * @param arc 	pointer to a arc object
+ * @param arc 	pointer to an arc object
  * @param value new value
  */
 void lv_arc_set_value(lv_obj_t * arc, int16_t value);
 
 /**
- * Set minimum and the maximum values of a arc
+ * Set minimum and the maximum values of an arc
  * @param arc 	pointer to the arc object
  * @param min 	minimum value
  * @param max 	maximum value
@@ -157,8 +157,8 @@ void lv_arc_set_value(lv_obj_t * arc, int16_t value);
 void lv_arc_set_range(lv_obj_t * arc, int16_t min, int16_t max);
 
 /**
- * Set a change rate to limit the speed how fast the arc should reache the pressed point.
- * @param arc 		pointer to a arc object
+ * Set a change rate to limit the speed how fast the arc should reach the pressed point.
+ * @param arc 		pointer to an arc object
  * @param rate 		the change rate
  */
 void lv_arc_set_change_rate(lv_obj_t * arc, uint16_t rate);
@@ -196,29 +196,29 @@ uint16_t lv_arc_get_bg_angle_start(lv_obj_t * obj);
 uint16_t lv_arc_get_bg_angle_end(lv_obj_t * obj);
 
 /**
- * Get the value of a arc
- * @param arc 		pointer to a arc object
+ * Get the value of an arc
+ * @param arc 		pointer to an arc object
  * @return the 		value of the arc
  */
 int16_t lv_arc_get_value(const lv_obj_t * obj);
 
 /**
- * Get the minimum value of a arc
- * @param arc 	pointer to a arc object
+ * Get the minimum value of an arc
+ * @param arc 	pointer to an arc object
  * @return 		the minimum value of the arc
  */
 int16_t lv_arc_get_min_value(const lv_obj_t * obj);
 
 /**
- * Get the maximum value of a arc
- * @param arc 	pointer to a arc object
+ * Get the maximum value of an arc
+ * @param arc 	pointer to an arc object
  * @return 		the maximum value of the arc
  */
 int16_t lv_arc_get_max_value(const lv_obj_t * obj);
 
 /**
  * Get whether the arc is type or not.
- * @param arc 		pointer to a arc object
+ * @param arc 		pointer to an arc object
  * @return 			arc's mode
  */
 lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj);

@@ -489,7 +489,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
         angle += img->angle;
 
         /*If the object is exactly image sized (not cropped, not mosaic) and transformed
-         *perform hit test on it's transformed area*/
+         *perform hit test on its transformed area*/
         if(img->w == lv_obj_get_width(obj) && img->h == lv_obj_get_height(obj) &&
                 (zoom != LV_IMG_ZOOM_NONE || angle != 0 || img->pivot.x != img->w / 2 || img->pivot.y != img->h / 2)) {
 

@@ -30,8 +30,8 @@ extern "C" {
 
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
- * @note The function cmp must return negative if its first
- *  argument (the search key) is less that its second (a table entry),
+ * @note The function cmp must return negative if it's first
+ *  argument (the search key) is less that it's second (a table entry),
  *  zero if equal, and positive if greater.
  *
  *  @note Items in the array must be in ascending order.

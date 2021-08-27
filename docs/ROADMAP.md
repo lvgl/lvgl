@@ -76,7 +76,7 @@ This list indicates only the current intention and it can be changed.
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
 - Remove the copy parameter from create functions
-- Optimize and simplifie styles [#1832](https://github.com/lvgl/lvgl/issues/1832)
-- Use a more generic inheritenace [#1919](https://github.com/lvgl/lvgl/issues/1919)
-- Allow adding multiple events to an obejct
+- Optimize and simplify styles [#1832](https://github.com/lvgl/lvgl/issues/1832)
+- Use a more generic inheritance [#1919](https://github.com/lvgl/lvgl/issues/1919)
+- Allow adding multiple events to an object
 

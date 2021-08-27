@@ -5,7 +5,7 @@
 
 /**
  * TODO Remove these instructions
- * Search an replace: templ -> object short name with lower case(e.g. btn, label etc)
+ * Search and replace: templ -> object short name with lower case(e.g. btn, label etc)
  *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
  *
  */

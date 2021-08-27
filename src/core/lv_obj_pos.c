@@ -277,7 +277,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
     obj->layout_inv = 1;
 
-    /*Mark the screen as dirty too to mark that there is an something to do on this screen*/
+    /*Mark the screen as dirty too to mark that there is something to do on this screen*/
     lv_obj_t * scr = lv_obj_get_screen(obj);
     scr->scr_layout_inv = 1;
 

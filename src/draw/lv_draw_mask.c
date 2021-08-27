@@ -649,7 +649,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
         }
     }
 
-    /*At the end of the mask if the limit line is smaller then the mask's y.
+    /*At the end of the mask if the limit line is smaller than the mask's y.
      *Then the mask is in the "good" area*/
     y_at_x = (int32_t)((int32_t)p->yx_steep * (abs_x + len)) >> 10;
     if(p->yx_steep > 0) {
@@ -742,7 +742,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
 {
     int32_t k;
     int32_t x_at_y;
-    /*At the beginning of the mask if the limit line is greater then the mask's y.
+    /*At the beginning of the mask if the limit line is greater than the mask's y.
      *Then the mask is in the "wrong" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * abs_y) >> 10;
     if(p->xy_steep > 0) x_at_y++;
@@ -755,7 +755,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
         }
     }
 
-    /*At the end of the mask if the limit line is smaller then the mask's y.
+    /*At the end of the mask if the limit line is smaller than the mask's y.
      *Then the mask is in the "good" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * (abs_y)) >> 10;
     if(x_at_y > abs_x + len) {

@@ -53,7 +53,7 @@ Both are visible and common on all screens of a display. **They are not, however
 
 The `layer_top` can be used by the user to create some content visible everywhere. For example, a menu bar, a pop-up, etc. If the `click` attribute is enabled, then `layer_top` will absorb all user click and acts as a modal.
 ```c
-lv_obj_set_click(lv_layer_top(), true);
+lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
 ```
 
 The `layer_sys` is also used for similar purposes on LVGL. For example, it places the mouse cursor above all layers to be sure it's always visible.

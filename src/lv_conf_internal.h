@@ -62,7 +62,7 @@
 #  endif
 #endif
 
-/*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
+/*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
 #ifndef LV_COLOR_16_SWAP
 #  ifdef CONFIG_LV_COLOR_16_SWAP
 #    define LV_COLOR_16_SWAP CONFIG_LV_COLOR_16_SWAP
@@ -82,7 +82,7 @@
 #  endif
 #endif
 
-/*Images pixels with this color will not be drawn if they are  chroma keyed)*/
+/*Images pixels with this color will not be drawn if they are chroma keyed)*/
 #ifndef LV_COLOR_CHROMA_KEY
 #  ifdef CONFIG_LV_COLOR_CHROMA_KEY
 #    define LV_COLOR_CHROMA_KEY CONFIG_LV_COLOR_CHROMA_KEY
@@ -171,7 +171,7 @@
    HAL SETTINGS
  *====================*/
 
-/*Default display refresh period. LVG will redraw changed ares with this period time*/
+/*Default display refresh period. LVG will redraw changed areas with this period time*/
 #ifndef LV_DISP_DEF_REFR_PERIOD
 #  ifdef CONFIG_LV_DISP_DEF_REFR_PERIOD
 #    define LV_DISP_DEF_REFR_PERIOD CONFIG_LV_DISP_DEF_REFR_PERIOD
@@ -551,7 +551,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*1: Show the used memory and the memory fragmentation  in the left bottom corner
+/*1: Show the used memory and the memory fragmentation in the left bottom corner
  * Requires LV_MEM_CUSTOM = 0*/
 #ifndef LV_USE_MEM_MONITOR
 #  ifdef CONFIG_LV_USE_MEM_MONITOR
@@ -619,7 +619,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Garbage Collector settings
- *Used if lvgl is binded to higher level language and the memory is managed by that language*/
+ *Used if lvgl is bound to higher level language and the memory is managed by that language*/
 #ifndef LV_ENABLE_GC
 #  ifdef CONFIG_LV_ENABLE_GC
 #    define LV_ENABLE_GC CONFIG_LV_ENABLE_GC
@@ -714,7 +714,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*Complier prefix for a big array declaration in RAM*/
+/*Compiler prefix for a big array declaration in RAM*/
 #ifndef LV_ATTRIBUTE_LARGE_RAM_ARRAY
 #  ifdef CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
 #    define LV_ATTRIBUTE_LARGE_RAM_ARRAY CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
@@ -933,7 +933,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 #    define LV_FONT_DEJAVU_16_PERSIAN_HEBREW CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 #  else
-#    define  LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
+#    define  LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
 #  endif
 #endif
 #ifndef LV_FONT_SIMSUN_16_CJK
@@ -1086,7 +1086,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Support bidirectional texts. Allows mixing Left-to-Right and Right-to-Left texts.
- *The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ *The direction will be processed according to the Unicode Bidirectional Algorithm:
  *https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #  ifdef CONFIG_LV_USE_BIDI
@@ -1514,7 +1514,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif /*LV_USE_THEME_DEFAULT*/
 
-/*An very simple them that is a good starting point for a custom theme*/
+/*A very simple theme that is a good starting point for a custom theme*/
 #ifndef LV_USE_THEME_BASIC
 #  ifdef CONFIG_LV_USE_THEME_BASIC
 #    define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
@@ -1575,7 +1575,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
-/*If running without lv_conf.h add typdesf with default value*/
+/*If running without lv_conf.h add typedefs with default value*/
 #if defined(LV_CONF_SKIP)
 
 # if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/

@@ -193,8 +193,8 @@ uint32_t lv_event_register_id(void);
 
 /**
  * Nested events can be called and one of them might belong to an object that is being deleted.
- * Mark this object's `event_temp_data` deleted to know that it's `lv_event_send` should return `LV_RES_INV`
- * @param obj pointer to an obejct to mark as deleted
+ * Mark this object's `event_temp_data` deleted to know that its `lv_event_send` should return `LV_RES_INV`
+ * @param obj pointer to an object to mark as deleted
  */
 void _lv_event_mark_deleted(struct _lv_obj_t * obj);
 
