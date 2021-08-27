@@ -1,3 +1,12 @@
+/**
+ * @file lv_templ.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -12,6 +21,14 @@
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_draw_cache.h"
 
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 typedef struct lv_sdl_font_atlas_t {
     SDL_Rect *pos;
 } lv_sdl_font_atlas_t;
@@ -22,6 +39,10 @@ typedef struct {
     uint32_t cmap_index;
 } lv_font_key_t;
 
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
 static void font_atlas_free(lv_sdl_font_atlas_t *atlas);
 
 static SDL_Texture *font_atlas_bake(SDL_Renderer *renderer, const lv_font_t *font_p, uint32_t cmap_idx,
@@ -31,6 +52,20 @@ static int32_t unicode_list_compare(const void *ref, const void *element);
 
 static bool font_cmap_find_index(const lv_font_fmt_txt_dsc_t *dsc, uint32_t letter, uint32_t *cmap_index,
                                  uint32_t *char_index);
+
+static lv_font_key_t font_key_create(const lv_font_t *font_p, uint32_t cmap_index);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 
 void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
                     const lv_font_t *font_p,
@@ -74,7 +109,7 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
     if (!font_cmap_find_index(font_p->dsc, letter, &cmap_index, &atlas_index)) {
         return;
     }
-    lv_font_key_t key = {.magic = LV_GPU_CACHE_KEY_MAGIC_FONT, .font_p = font_p, .cmap_index = cmap_index};
+    lv_font_key_t key = font_key_create(font_p, cmap_index);
     lv_sdl_font_atlas_t *atlas = NULL;
     bool found = false;
     SDL_Texture *texture = lv_gpu_draw_cache_get_with_userdata(&key, sizeof(key), &found, (void **) &atlas);
@@ -100,6 +135,10 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
     SDL_RenderCopy(renderer, texture, &atlas->pos[atlas_index], &dstrect);
 }
 
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 SDL_Texture *font_atlas_bake(SDL_Renderer *renderer, const lv_font_t *font_p, uint32_t cmap_idx,
                              lv_sdl_font_atlas_t *atlas) {
@@ -220,6 +259,16 @@ static bool font_cmap_find_index(const lv_font_fmt_txt_dsc_t *dsc, uint32_t lett
 
 static int32_t unicode_list_compare(const void *ref, const void *element) {
     return ((int32_t) (*(uint16_t *) ref)) - ((int32_t) (*(uint16_t *) element));
+}
+
+static lv_font_key_t font_key_create(const lv_font_t *font_p, uint32_t cmap_index) {
+    lv_font_key_t key;
+    /* VERY IMPORTANT! Padding between members may contain uninitialized data */
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_FONT;
+    key.font_p = font_p;
+    key.cmap_index = cmap_index;
+    return key;
 }
 
 #endif /*LV_USE_GPU_SDL*/
