@@ -9,7 +9,7 @@
 
 The Grid layout is a subset of [CSS Flexbox](https://css-tricks.com/snippets/css/complete-guide-grid/).
 
-It can arrange items into 2D "table" that has rows or columns (tracks). The item can span through multiple columns or rows.
+It can arrange items into a 2D "table" that has rows or columns (tracks). The item can span through multiple columns or rows.
 The track's size can be set in pixel, to the largest item (`LV_GRID_CONTENT`) or in "Free unit" (FR) to distribute the free space proportionally.
 
 To make an object a grid container call `lv_obj_set_layout(obj, LV_LAYOUT_GRID)`.
