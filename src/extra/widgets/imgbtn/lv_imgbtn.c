@@ -255,13 +255,12 @@ static void draw_main(lv_event_t * e)
             lv_coord_t i;
             lv_img_decoder_get_info(src, &header);
 
-            coords_part.x1 = clip_center_area.x1;
-            coords_part.y1 = clip_center_area.y1;
+            coords_part.x1 = coords.x1 + left_w;
+            coords_part.y1 = coords.y1;
             coords_part.x2 = coords_part.x1 + header.w - 1;
             coords_part.y2 = coords_part.y1 + header.h - 1;
 
-            for(i = 0; i < clip_center_area.x2 + header.w - 1; i += header.w) {
-
+            for(i = coords_part.x1; i < clip_center_area.x2 + header.w - 1; i += header.w) {
                 lv_draw_img(&coords_part, &clip_center_area, src, &img_dsc);
                 coords_part.x1 = coords_part.x2 + 1;
                 coords_part.x2 += header.w;
