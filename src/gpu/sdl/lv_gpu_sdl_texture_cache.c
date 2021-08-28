@@ -26,8 +26,8 @@ typedef struct {
 static void draw_cache_free_value(draw_cache_value_t *);
 
 void _lv_gpu_sdl_texture_cache_init() {
-    lv_sdl_texture_cache = lv_lru_new(1024 * 1024 * 128, 65536, (lv_lru_free_t *) draw_cache_free_value,
-                                      SDL_free);
+    lv_sdl_texture_cache = lv_lru_new(1024 * 1024 * 4, 65536, (lv_lru_free_t *) draw_cache_free_value,
+                                      NULL);
 }
 
 void _lv_gpu_sdl_texture_cache_deinit() {
