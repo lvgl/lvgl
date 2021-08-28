@@ -1,6 +1,7 @@
 #include "../../lv_examples.h"
-#include <math.h>
 #if LV_USE_CHART && LV_DRAW_COMPLEX && LV_BUILD_EXAMPLES
+
+#define FIXED_POINT_SHIFT 5
 
 /*  A struct is used to keep track of the series list because later we need to draw to the series in the reverse order to which they were initialised. */
 typedef struct
@@ -38,7 +39,7 @@ static void draw_event_cb(lv_event_t *e)
 
         lv_area_t a;
         a.x1 = dsc->p1->x;
-        a.x2 = dsc->p2->x - 1;
+        a.x2 = dsc->p2->x;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
         a.y2 = obj->coords.y2 - 13; /* -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesnt look like 0 */
         lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
@@ -47,6 +48,27 @@ static void draw_event_cb(lv_event_t *e)
         lv_draw_mask_free_param(&line_mask_param);
         lv_draw_mask_remove_id(line_mask_id);
     }
+}
+
+/**
+ * Helper function to round a fixed point number
+ **/
+static int32_t round_fixed_point(int32_t n)
+{
+    /* Create a bitmask to isolates the decimal part of the fixed point number */
+    int32_t mask = 1;
+    for (int32_t bit_pos = 0; bit_pos < FIXED_POINT_SHIFT; bit_pos++)
+    {
+        mask = (mask << 1) + 1;
+    }
+
+    int32_t decimal_part = n & mask;
+
+    /* Get 0.5 as fixed point */
+    int32_t rounding_boundary = 1 << (FIXED_POINT_SHIFT - 1);
+
+    /* Return either the integer part of n or the integer part + 1 */
+    return (decimal_part < rounding_boundary) ? (n & ~mask) : ((n >> FIXED_POINT_SHIFT) + 1) << FIXED_POINT_SHIFT;
 }
 
 /**
@@ -74,38 +96,32 @@ void lv_example_chart_8(void)
     stacked_area_chart.series_list[1] = lv_chart_add_series(stacked_area_chart.obj, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
     stacked_area_chart.series_list[2] = lv_chart_add_series(stacked_area_chart.obj, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
 
-    for (int i = 0; i < 10; i++)
+    for (int point = 0; point < 10; point++)
     {
         /* Make some random data */
-        int32_t vals[3] = {lv_rand(10, 20), lv_rand(20, 30), lv_rand(20, 30) - i};
+        uint32_t vals[3] = {lv_rand(10, 20), lv_rand(20, 30), lv_rand(20, 30) - point};
 
-        int32_t total = vals[0] + vals[1] + vals[2];
-        float heights[3];
-        int32_t draw_heights[3];
-        int32_t int_sum = 0;
-        float float_sum = 0;
+        uint32_t total = vals[0] + vals[1] + vals[2];
+        uint32_t draw_heights[3];
+        uint32_t int_sum = 0;
+        uint32_t decimal_sum = 0;
 
-        /* Cascade rounding ensures percentages add to 100 */
-        for (int32_t i = 0; i < 3; i++)
+        /* Fixed point cascade rounding ensures percentages add to 100 */
+        for (int32_t series_index = 0; series_index < 3; series_index++)
         {
-            heights[i] = ((double)vals[i] / total) * 100;
-            float_sum += heights[i];
-            int_sum += (int32_t)heights[i];
-            int32_t modifier = (int32_t)float_sum - int_sum;
+            decimal_sum += (((vals[series_index] * 100) << FIXED_POINT_SHIFT) / total);
+            int_sum += (vals[series_index] * 100) / total;
+
+            int32_t modifier = (round_fixed_point(decimal_sum) >> FIXED_POINT_SHIFT) - int_sum;
 
             /*  The draw heights are equal to the percentage of the total each value is + the cumulative sum of the previous percentages.
                 The accumulation is how the values get "stacked" */
-            draw_heights[i] = int_sum + modifier;
-        }
+            draw_heights[series_index] = int_sum + modifier;
 
-        /* Now finally draw the points*/
-        for (int i = 0; i < 3; i++)
-        {
-            int val = draw_heights[i];
             /*  Draw to the series in the reverse order to which they were initialised.
                 Without this the higher values will draw on top of the lower ones.
                 This is because the Z-height of a series matches the order it was initialsied */
-            lv_chart_set_next_value(stacked_area_chart.obj, stacked_area_chart.series_list[3 - i - 1], val);
+            lv_chart_set_next_value(stacked_area_chart.obj, stacked_area_chart.series_list[3 - series_index - 1], draw_heights[series_index]);
         }
     }
 
