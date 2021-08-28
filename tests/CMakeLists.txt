@@ -224,7 +224,7 @@ set(COMPILE_OPTIONS
     -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
-    -Wno-discarded-qualifiers
+    -Wdiscarded-qualifiers
     -Wpedantic
     -Wreturn-type
     -Wshadow
