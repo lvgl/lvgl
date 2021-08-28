@@ -1,22 +1,29 @@
 #include "../../lv_examples.h"
-#include <stdio.h>
 #include <math.h>
 #if LV_USE_CHART && LV_DRAW_COMPLEX && LV_BUILD_EXAMPLES
 
 /*  A struct is used to keep track of the series list because later we need to draw to the series in the reverse order to which they were initialised. */
-static struct {
-    lv_obj_t * obj;
-    lv_chart_series_t * series_list[3];
-} stacked_area_chart;
-
-static void draw_event_cb(lv_event_t * e)
+typedef struct
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t *obj;
+    lv_chart_series_t *series_list[3];
+} stacked_area_chart_t;
+
+static stacked_area_chart_t stacked_area_chart;
+
+/**
+ * Callback which draws the blocks of colour under the lines
+ **/
+static void draw_event_cb(lv_event_t *e)
+{
+    lv_obj_t *obj = lv_event_get_target(e);
 
     /*Add the faded area before the lines are drawn*/
-    lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
-    if(dsc->part == LV_PART_ITEMS) {
-        if(!dsc->p1 || !dsc->p2) return;
+    lv_obj_draw_part_dsc_t *dsc = lv_event_get_draw_part_dsc(e);
+    if (dsc->part == LV_PART_ITEMS)
+    {
+        if (!dsc->p1 || !dsc->p2)
+            return;
 
         /*Add a line mask that keeps the area below the line*/
         lv_draw_mask_line_param_t line_mask_param;
@@ -33,7 +40,7 @@ static void draw_event_cb(lv_event_t * e)
         a.x1 = dsc->p1->x;
         a.x2 = dsc->p2->x - 1;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
-        a.y2 = obj->coords.y2 - 13; //-13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesnt look like 0
+        a.y2 = obj->coords.y2 - 13; /* -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesnt look like 0 */
         lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
 
         /*Remove the mask*/
@@ -63,24 +70,24 @@ void lv_example_chart_8(void)
     stacked_area_chart.series_list[1] = lv_chart_add_series(stacked_area_chart.obj, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
     stacked_area_chart.series_list[2] = lv_chart_add_series(stacked_area_chart.obj, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
 
-    for(int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         /* Make some random data */
-        int vals[3] = {lv_rand(10,20), lv_rand(20,30), lv_rand(20,30) - i};
+        int32_t vals[3] = {lv_rand(10, 20), lv_rand(20, 30), lv_rand(20, 30) - i};
 
-        /*The percentages to display on the chart*/
-        int total = vals[0] + vals[1] + vals[2];
+        int32_t total = vals[0] + vals[1] + vals[2];
         float heights[3];
-        int draw_heights[3];
-        int int_sum = 0;
+        int32_t draw_heights[3];
+        int32_t int_sum = 0;
         float float_sum = 0;
 
         /* Cascade rounding ensures percentages add to 100 */
-        for (int i = 0; i < 3; i++)
+        for (int32_t i = 0; i < 3; i++)
         {
             heights[i] = ((double)vals[i] / total) * 100;
             float_sum += heights[i];
-            int_sum += (int)heights[i];
-            int modifier = (int)float_sum - int_sum;
+            int_sum += (int32_t)heights[i];
+            int32_t modifier = (int32_t)float_sum - int_sum;
 
             /*  The draw heights are equal to the percentage of the total each value is + the cumulative sum of the previous percentages.
                 The accumulation is how the values get "stacked" */
