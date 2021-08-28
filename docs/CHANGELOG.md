@@ -1,6 +1,7 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- feat(example) stacked area chart lv_chart_example_8 added.
 - lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
 - lv_obj_swap(obj1, obj2) added. (#2461)
 - feat(anim) add interface for handling lv_anim user data. (#2415)
