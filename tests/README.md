@@ -5,11 +5,12 @@ The tests in the folder can be run locally and automatically by GitHub CI.
 ## Running locally
 
 ### Requirements (Linux)
-1. Be sure GCC and Python3 are installed.
-2. Install [cmake](https://cmake.org/) with `sudo apt install cmake`.
-3. Install [gcovr](https://gcovr.com/en/stable/index.html) with `sudo apt install gcovr`
-4. Install Ruby with `sudo apt install ruby-full`
-5. Install libpng development package with `sudo apt install libpng-dev`
+
+Install requirements by:
+
+```sh
+scripts/install-prerequisites.sh
+```
 
 ### Run test
 1. Enter `lvgl/tests/`
