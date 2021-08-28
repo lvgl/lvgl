@@ -1,8 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_DRAW_COMPLEX && LV_BUILD_EXAMPLES
 
-#define FIXED_POINT_SHIFT 5
-
 /*  A struct is used to keep track of the series list because later we need to draw to the series in the reverse order to which they were initialised. */
 typedef struct
 {
@@ -53,11 +51,11 @@ static void draw_event_cb(lv_event_t *e)
 /**
  * Helper function to round a fixed point number
  **/
-static int32_t round_fixed_point(int32_t n)
+static int32_t round_fixed_point(int32_t n, int8_t shift)
 {
     /* Create a bitmask to isolates the decimal part of the fixed point number */
     int32_t mask = 1;
-    for (int32_t bit_pos = 0; bit_pos < FIXED_POINT_SHIFT; bit_pos++)
+    for (int32_t bit_pos = 0; bit_pos < shift; bit_pos++)
     {
         mask = (mask << 1) + 1;
     }
@@ -65,10 +63,10 @@ static int32_t round_fixed_point(int32_t n)
     int32_t decimal_part = n & mask;
 
     /* Get 0.5 as fixed point */
-    int32_t rounding_boundary = 1 << (FIXED_POINT_SHIFT - 1);
+    int32_t rounding_boundary = 1 << (shift - 1);
 
     /* Return either the integer part of n or the integer part + 1 */
-    return (decimal_part < rounding_boundary) ? (n & ~mask) : ((n >> FIXED_POINT_SHIFT) + 1) << FIXED_POINT_SHIFT;
+    return (decimal_part < rounding_boundary) ? (n & ~mask) : ((n >> shift) + 1) << shift;
 }
 
 /**
@@ -99,8 +97,9 @@ void lv_example_chart_8(void)
     for (int point = 0; point < 10; point++)
     {
         /* Make some random data */
-        uint32_t vals[3] = {lv_rand(10, 20), lv_rand(20, 30), lv_rand(20, 30) - point};
+        uint32_t vals[3] = {lv_rand(10, 20), lv_rand(20, 30), lv_rand(20, 30)};
 
+        int8_t fixed_point_shift = 5;
         uint32_t total = vals[0] + vals[1] + vals[2];
         uint32_t draw_heights[3];
         uint32_t int_sum = 0;
@@ -109,10 +108,10 @@ void lv_example_chart_8(void)
         /* Fixed point cascade rounding ensures percentages add to 100 */
         for (int32_t series_index = 0; series_index < 3; series_index++)
         {
-            decimal_sum += (((vals[series_index] * 100) << FIXED_POINT_SHIFT) / total);
+            decimal_sum += (((vals[series_index] * 100) << fixed_point_shift) / total);
             int_sum += (vals[series_index] * 100) / total;
 
-            int32_t modifier = (round_fixed_point(decimal_sum) >> FIXED_POINT_SHIFT) - int_sum;
+            int32_t modifier = (round_fixed_point(decimal_sum, fixed_point_shift) >> fixed_point_shift) - int_sum;
 
             /*  The draw heights are equal to the percentage of the total each value is + the cumulative sum of the previous percentages.
                 The accumulation is how the values get "stacked" */
