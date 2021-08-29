@@ -8,8 +8,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <SDL_assert.h>
-
 // ------------------------------------------
 // private functions
 // ------------------------------------------
@@ -187,6 +185,7 @@ lruc_error lv_lru_free(lv_lru_t *cache) {
                 next = (lruc_item *) item->next;
                 cache->value_free(item->value);
                 cache->key_free(item->key);
+                cache->free_memory += item->value_length;
                 free(item);
                 item = next;
             }
