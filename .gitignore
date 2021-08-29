@@ -19,3 +19,6 @@ out_html
 __pycache__
 /emscripten_builder
 test_screenshot_error.h
+build/
+tests/build_*/
+tests/report/

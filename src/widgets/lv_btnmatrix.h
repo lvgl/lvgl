@@ -159,10 +159,10 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * obj, uint16_t btn_id, uint8_t width);
 
 /**
  * Make the button matrix like a selector widget (only one button may be checked at a time).
- * `LV_BTNMATRIX_CTRL_CHECKABLE` must be enabled on the buttons to be selected useing
+ * `LV_BTNMATRIX_CTRL_CHECKABLE` must be enabled on the buttons to be selected using
  *  `lv_btnmatrix_set_ctrl()` or `lv_btnmatrix_set_btn_ctrl_all()`.
  * @param obj       pointer to a button matrix object
- * @param           en:  whether "one check" mode is enabled
+ * @param en        whether "one check" mode is enabled
  */
 void lv_btnmatrix_set_one_checked(lv_obj_t * obj, bool en);
 

@@ -86,7 +86,7 @@ OR-ed values are also possible. E.g. `LV_DIR_TOP | LV_DIR_LEFT`.
 
 
 ### Scroll chain
-If an object can't be scrolled further (e.g. it's content has reached the bottom most position) the scrolling is propagated to its parent. If the parent can be scrolled in that direction than it will be scrolled instead.
+If an object can't be scrolled further (e.g. its content has reached the bottom most position) the scrolling is propagated to its parent. If the parent can be scrolled in that direction than it will be scrolled instead.
 It propagates to the grandparent and grand-grandparents too.
 
 The propagation on scrolling is called "scroll chaining" and it can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_CHAIN` flag. 

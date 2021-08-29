@@ -29,7 +29,7 @@ lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image 
 
 ```
 
-Note that the cursor object should have `lv_obj_set_click(cursor_obj, false)`.
+Note that the cursor object should have `lv_obj_clear_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`.
 For images, *clicking* is disabled by default.
 
 ## Keypad and encoder

@@ -1,5 +1,5 @@
 /**
- * @file lv_theme_defau.c
+ * @file lv_theme_default.c
  *
  */
 
