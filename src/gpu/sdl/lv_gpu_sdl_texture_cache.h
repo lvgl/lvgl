@@ -1,7 +1,7 @@
 #ifndef LV_GPU_SDL_TEXTURE_CACHE_H
 #define LV_GPU_SDL_TEXTURE_CACHE_H
 
-#include "../src/lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
 #include <SDL.h>
 #include "../../misc/lv_area.h"

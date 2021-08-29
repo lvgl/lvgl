@@ -1,7 +1,7 @@
 #ifndef LV_LRU_H_
 #define LV_LRU_H_
 
-#include "../src/lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
 #include <SDL_mutex.h>
 #include <stdint.h>

@@ -1,7 +1,7 @@
 #ifndef LV_GPU_SDL_MASK_H
 #define LV_GPU_SDL_MASK_H
 
-#include "../src/lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
 #include <SDL.h>
 

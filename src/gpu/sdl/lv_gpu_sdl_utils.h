@@ -2,7 +2,7 @@
 #ifndef LV_GPU_SDL2_UTILS_H
 #define LV_GPU_SDL2_UTILS_H
 
-#include "../src/lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
