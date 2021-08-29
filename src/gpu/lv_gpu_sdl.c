@@ -68,6 +68,9 @@ static void lv_sdl_drv_fb_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, 
         SDL_Renderer *renderer = (SDL_Renderer *) disp_drv->user_data;
         SDL_Texture *texture = disp_drv->draw_buf->buf_act;
         SDL_SetRenderTarget(renderer, NULL);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_SetRenderTarget(renderer, texture);

@@ -516,7 +516,9 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 
     /*Draw a display background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
-        if(disp_refr->bg_img) {
+        if(disp_refr->bg_fn) {
+            disp_refr->bg_fn(&start_mask);
+        } else if(disp_refr->bg_img) {
             lv_draw_img_dsc_t dsc;
             lv_draw_img_dsc_init(&dsc);
             dsc.opa = disp_refr->bg_opa;

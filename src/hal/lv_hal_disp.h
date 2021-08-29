@@ -166,6 +166,7 @@ typedef struct _lv_disp_t {
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
     const void * bg_img;            /**< An image source to display as wallpaper*/
+    const void (*bg_fn)(lv_area_t*);/**< A function to handle drawing*/
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
