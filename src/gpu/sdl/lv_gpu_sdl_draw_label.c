@@ -246,9 +246,12 @@ SDL_Texture *font_atlas_bake(SDL_Renderer *renderer, const lv_font_t *font_p, ui
     }
     SDL_Surface *indexed = SDL_CreateRGBSurfaceFrom(s1, atlas_w, atlas_h, 8, atlas_w, 0, 0, 0, 0);
     SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(dsc->bpp));
-    SDL_Texture *result = SDL_CreateTextureFromSurface(renderer, indexed);
+    SDL_Surface *full_color = SDL_ConvertSurfaceFormat(indexed, SDL_PIXELFORMAT_ARGB8888, 0);
     SDL_FreeSurface(indexed);
     lv_mem_buf_release(s1);
+
+    SDL_Texture *result = SDL_CreateTextureFromSurface(renderer, full_color);
+    SDL_FreeSurface(full_color);
 
     if (!result) {
         if (atlas->pos) {
@@ -305,7 +308,7 @@ static bool font_cmap_find_index(const lv_font_fmt_txt_dsc_t *dsc, uint32_t lett
 }
 
 static int32_t unicode_list_compare(const void *ref, const void *element) {
-    return ((int32_t) (*(uint16_t *) ref)) - ((int32_t) (*(uint16_t *) element));
+    return ((int32_t)(*(uint16_t *) ref)) - ((int32_t)(*(uint16_t *) element));
 }
 
 static lv_font_key_t font_key_create(const lv_font_t *font_p, uint32_t cmap_index) {
