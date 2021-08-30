@@ -9,6 +9,8 @@ else()
 cmake_minimum_required(VERSION 3.13)
 project(lvgl_tests LANGUAGES C)
 
+include(CTest)
+
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
@@ -289,6 +291,11 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     target_link_libraries(${test_name} test_common lvgl_examples lvgl png ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${COMPILE_OPTIONS})
+
+    add_test(
+        NAME ${test_name} 
+        WORKING_DIRECTORY ${LVGL_TEST_DIR}
+        COMMAND ${test_name})
 endforeach( test_case_fname ${TEST_CASE_FILES} )
 
 endif()
