@@ -24,7 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_USE_EXTERNAL_RENDERER
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
                                                  const lv_area_t * clip,
                                                  const lv_draw_line_dsc_t * dsc);
@@ -56,7 +56,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-#if LV_USE_EXTERNAL_RENDERER
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Draw a line
  * @param point1 first point of the line
@@ -120,7 +120,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_EXTERNAL_RENDERER
+#if LV_USE_EXTERNAL_RENDERER == 0
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
