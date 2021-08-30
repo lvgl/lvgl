@@ -42,7 +42,7 @@ lv_obj_align(obj, LV_ALIGN_CENTER, 10, 20);
 
 To align one object to another use `lv_obj_align_to(obj_to_align, obj_referece, LV_ALIGN_..., x, y)`
 
-For example, to align a text below an image: `lv_obj_align(text, image, LV_ALIGN_OUT_BOTTOM_MID, 0, 10)`.
+For example, to align a text below an image: `lv_obj_align_to(text, image, LV_ALIGN_OUT_BOTTOM_MID, 0, 10)`.
 
 The following align types exist:
 ![](/misc/align.png "Alignment types in LVGL")
