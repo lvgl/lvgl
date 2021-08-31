@@ -48,6 +48,23 @@ void lv_sdl_display_deinit(lv_disp_t *disp) {
     free(disp->driver);
 }
 
+void lv_sdl_display_resize(lv_disp_t *disp, int width, int height) {
+    lv_disp_drv_t *driver = disp->driver;
+    SDL_Renderer *renderer = driver->user_data;
+    if (driver->draw_buf->buf1) {
+        SDL_DestroyTexture(driver->draw_buf->buf1);
+    }
+    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, width,
+                                             height);
+    lv_disp_draw_buf_init(driver->draw_buf, texture, NULL, width * height);
+    driver->hor_res = (lv_coord_t) width;
+    driver->ver_res = (lv_coord_t) height;
+    SDL_RendererInfo renderer_info;
+    SDL_GetRendererInfo(renderer, &renderer_info);
+    SDL_assert(renderer_info.flags & SDL_RENDERER_TARGETTEXTURE);
+    SDL_SetRenderTarget(renderer, texture);
+    lv_disp_drv_update(disp, driver);
+}
 
 static void lv_sdl_drv_wait_cb(lv_disp_drv_t *disp_drv) {
     (void) disp_drv;

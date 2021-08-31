@@ -44,6 +44,8 @@ lv_disp_t *lv_sdl_display_init(SDL_Window *window);
 
 void lv_sdl_display_deinit(lv_disp_t *disp);
 
+void lv_sdl_display_resize(lv_disp_t *disp, int width, int height);
+
 
 /*======================
  * Add/remove functions
