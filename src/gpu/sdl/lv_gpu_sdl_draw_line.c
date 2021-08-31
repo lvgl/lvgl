@@ -32,16 +32,6 @@ typedef struct {
     lv_coord_t thickness;
 } lv_draw_line_key_t;
 
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-static void draw_horizontal(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
-                            const lv_draw_line_dsc_t *dsc);
-
-static void draw_vertical(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
-                          const lv_draw_line_dsc_t *dsc);
-
 static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thickness);
 
 /**********************
@@ -56,7 +46,7 @@ static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thicknes
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_line(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
+void lv_draw_line2(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
                   const lv_draw_line_dsc_t *dsc) {
     if (dsc->width == 0) return;
     if (dsc->opa <= LV_OPA_MIN) return;
@@ -70,14 +60,6 @@ void lv_draw_line(const lv_point_t *point1, const lv_point_t *point2, const lv_a
     clip_line.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
     if (!_lv_area_intersect(&clip_line, &clip_line, clip)) return;
-
-    if (point1->x == point2->x) {
-        draw_vertical(point1, point2, clip, dsc);
-        return;
-    } else if (point1->y == point2->y) {
-        draw_horizontal(point1, point2, clip, dsc);
-        return;
-    }
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
@@ -107,53 +89,51 @@ void lv_draw_line(const lv_point_t *point1, const lv_point_t *point2, const lv_a
     double angle = SDL_atan2(point2->y - point1->y, point2->x - point1->x) * 180 / M_PI;
 
     SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(clip, &clip_rect);
+    lv_area_to_sdl_rect(&clip_line, &clip_rect);
 
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureAlphaMod(texture, dsc->opa);
-    SDL_SetTextureColorMod(texture, line_color.r, line_color.g, line_color.b);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
+
+    SDL_Texture *screen = SDL_GetRenderTarget(renderer);
+
+    SDL_Texture *content = lv_gpu_temp_texture_obtain(renderer, clip_rect.w, clip_rect.h);
+    SDL_SetTextureBlendMode(content, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderTarget(renderer, content);
+    SDL_RenderSetClipRect(renderer, NULL);
+
+//    /* Replace texture with clip mask */
+    SDL_Rect mask_rect = {.w = clip_rect.w, .h = clip_rect.h, .x = 0, .y = 0};
+//    SDL_Texture *mask = lv_sdl_gen_mask_texture(renderer, &clip_line, NULL, 0);
+//    SDL_SetTextureBlendMode(mask, SDL_BLENDMODE_NONE);
+////    SDL_RenderCopy(renderer, mask, NULL, &mask_rect);
+//
+//    SDL_SetTextureAlphaMod(texture, 0xFF);
+//    SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
+//#if SDL_VERSION_ATLEAST(2, 0, 6)
+//    SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ZERO,
+//                                                    SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+//                                                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+//    SDL_SetTextureBlendMode(texture, mode);
+//    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+//#else
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+//#endif
 
     SDL_Rect coords_rect;
     lv_area_to_sdl_rect(&tex_coords, &coords_rect);
-    coords_rect.x = point1->x - coords_rect.h / 2;
-    coords_rect.y = point1->y - coords_rect.h / 2;
+    coords_rect.x = 0 - coords_rect.h / 2;
+    coords_rect.y = 0 - coords_rect.h / 2;
     SDL_Point center = {coords_rect.h / 2, coords_rect.h / 2};
     SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, angle, &center, SDL_FLIP_NONE);
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void draw_horizontal(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
-                            const lv_draw_line_dsc_t *dsc) {
-
-    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
-
-    SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(clip, &clip_rect);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
-    SDL_Color color;
-    lv_color_to_sdl_color(&dsc->color, &color);
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, dsc->opa);
-    SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x, point2->y);
-}
-
-static void draw_vertical(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
-                          const lv_draw_line_dsc_t *dsc) {
-
-    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
-
-    SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(clip, &clip_rect);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
-    SDL_Color color;
-    lv_color_to_sdl_color(&dsc->color, &color);
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, dsc->opa);
-    SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x, point2->y);
+//
+//    /* Draw composited part on screen */
+    SDL_SetTextureBlendMode(content, SDL_BLENDMODE_NONE);
+    SDL_SetTextureAlphaMod(content, dsc->opa);
+    SDL_SetTextureColorMod(content, line_color.r, line_color.g, line_color.b);
+//
+    SDL_SetRenderTarget(renderer, screen);
+//    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_RenderSetClipRect(renderer, NULL);
+    SDL_RenderCopy(renderer, content, &mask_rect, &clip_rect);
+//    SDL_DestroyTexture(mask);
 }
 
 static lv_draw_line_key_t line_key_create(lv_coord_t length, lv_coord_t thickness) {
