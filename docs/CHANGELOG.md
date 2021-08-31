@@ -1,6 +1,8 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- renamed lv_obj_get_child_id(obj) to lv_obj_get_index(obj).
+- added lv_obj_move_to_index(obj, index).
 - lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
 - lv_obj_swap(obj1, obj2) added. (#2461)
 - feat(anim) add interface for handling lv_anim user data. (#2415)

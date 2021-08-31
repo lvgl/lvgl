@@ -124,6 +124,14 @@ void lv_obj_move_up(struct _lv_obj_t* obj);
 void lv_obj_move_down(struct _lv_obj_t* obj);
 
 /**
+ * moves the object to the given index in its parent.
+ * When used in listboxes, it can be used to sort the listbox items.
+ * @param obj  pointer to the object to be moved.
+ * @param index  new index in parent.
+ */
+void lv_obj_move_to_index(struct _lv_obj_t* obj, int32_t index);
+
+/**
  * Get the screen of an object
  * @param obj       pointer to an object
  * @return          pointer to the object's screen
@@ -166,11 +174,11 @@ uint32_t lv_obj_get_child_cnt(const struct _lv_obj_t * obj);
 
 /**
  * Get the index of a child.
- * @param obj       pointer to an obejct
+ * @param obj       pointer to an object
  * @return          the child index of the object.
  *                  E.g. 0: the oldest (firstly created child)
  */
-uint32_t lv_obj_get_child_id(const struct _lv_obj_t * obj);
+uint32_t lv_obj_get_index(const struct _lv_obj_t* obj);
 
 /**
  * Iterate through all children of any object.

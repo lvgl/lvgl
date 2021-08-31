@@ -40,9 +40,10 @@ lv_obj_del(label2);
 
 ## Bring to the foreground
 
-There are 4 explicit way to bring an object to the foreground:
+There are 5 explicit way to bring an object to the foreground:
 - Use `lv_obj_move_foreground(obj)` to explicitly tell the library to bring an object to the foreground. Similarly, use `lv_obj_move_background(obj)` to move to the background.
-- Use `lv_obj_move_up(obj)` moves the object one position up in the hierarchy, Similarly, use `lv_obj_move_down(obj)` moves the object one position down in the hierarchy. 
+- Use `lv_obj_move_to_index(obj, index)` to set the index of the object in its parent. 
+- Use `lv_obj_move_up(obj)` to move the object one position up in the hierarchy, Similarly, use `lv_obj_move_down(obj)` moves the object one position down in the hierarchy. 
 - Use `lv_obj_swap(obj1, obj2)` to swap the relative position of two objects.
 - When `lv_obj_set_parent(obj, new_parent)` is used, `obj` will be on the foreground on the `new_parent`.
 
