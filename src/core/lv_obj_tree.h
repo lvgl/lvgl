@@ -187,11 +187,7 @@ uint32_t lv_obj_get_index(const struct _lv_obj_t* obj);
  * @return          the child index of the object.
  *                  E.g. 0: the oldest (firstly created child)
  */
-inline uint32_t lv_obj_get_child_id(const struct _lv_obj_t* obj)
-{
-    LV_LOG_USER("lv_obj_get_child_id(obj) is deprecated, please use lv_obj_get_index(obj).");
-    return lv_obj_get_index(obj);
-}
+uint32_t lv_obj_get_child_id(const struct _lv_obj_t* obj);
 
 /**
  * Iterate through all children of any object.
