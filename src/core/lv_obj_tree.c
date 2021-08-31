@@ -242,7 +242,7 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
     lv_obj_t * parent = lv_obj_get_parent(obj);
 
     if(index < 0) return;
-    if(index >= lv_obj_get_child_cnt(parent)) return;
+    if(index >= (int32_t) lv_obj_get_child_cnt(parent)) return;
     if(index == old_index) return;
 
     int32_t i = old_index;
