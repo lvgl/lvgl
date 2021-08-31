@@ -181,6 +181,15 @@ uint32_t lv_obj_get_child_cnt(const struct _lv_obj_t * obj);
 uint32_t lv_obj_get_index(const struct _lv_obj_t* obj);
 
 /**
+ * DEPRECATED FUNCTION, please use uint32_t lv_obj_get_index(obj);
+ * Get the index of a child.
+ * @param obj       pointer to an object
+ * @return          the child index of the object.
+ *                  E.g. 0: the oldest (firstly created child)
+ */
+uint32_t lv_obj_get_child_id(const struct _lv_obj_t* obj);
+
+/**
  * Iterate through all children of any object.
  * @param start_obj     start integrating from this object
  * @param cb            call this callback on the objects
