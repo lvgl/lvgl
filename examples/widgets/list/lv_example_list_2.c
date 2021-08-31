@@ -78,7 +78,6 @@ static void event_handler_center(lv_event_t* e)
     if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
     {
         if (currentButton == NULL) return;
-        uint32_t index = lv_obj_get_index(currentButton);
 
         lv_obj_t* parent = lv_obj_get_parent(currentButton);
         const uint32_t pos = lv_obj_get_child_cnt(parent) / 2;
