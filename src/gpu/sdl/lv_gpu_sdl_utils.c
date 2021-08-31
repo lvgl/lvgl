@@ -6,8 +6,6 @@
 
 #include "../../draw/lv_draw_label.h"
 
-#include <SDL.h>
-
 SDL_Palette *lv_sdl_palette_grayscale1 = NULL;
 SDL_Palette *lv_sdl_palette_grayscale2 = NULL;
 SDL_Palette *lv_sdl_palette_grayscale3 = NULL;

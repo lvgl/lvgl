@@ -3,7 +3,8 @@
 
 #include "../../lv_conf_internal.h"
 
-#include <SDL_mutex.h>
+#include LV_GPU_SDL_INCLUDE_PATH
+
 #include <stdint.h>
 #include <time.h>
 

@@ -6,7 +6,8 @@
 
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
-#include <SDL_rect.h>
+
+#include LV_GPU_SDL_INCLUDE_PATH
 
 void _lv_gpu_sdl_utils_init();
 

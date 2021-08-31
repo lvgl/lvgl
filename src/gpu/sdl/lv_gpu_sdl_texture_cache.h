@@ -3,7 +3,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#include <SDL.h>
+#include LV_GPU_SDL_INCLUDE_PATH
 #include "../../misc/lv_area.h"
 #include "lv_gpu_sdl_lru.h"
 

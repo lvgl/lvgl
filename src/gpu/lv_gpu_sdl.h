@@ -16,6 +16,8 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
+#if LV_USE_GPU_SDL
+
 #include "../hal/lv_hal_disp.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
@@ -23,7 +25,7 @@ extern "C" {
 #include "../font/lv_font.h"
 #include "../draw/lv_draw_mask.h"
 
-#include <SDL.h>
+#include LV_GPU_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -63,6 +65,7 @@ void lv_sdl_display_deinit(lv_disp_t *disp);
  *      MACROS
  **********************/
 
+#endif /*LV_USE_GPU_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

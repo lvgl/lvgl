@@ -16,7 +16,7 @@
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_utils.h"
 
-#include <SDL.h>
+#include LV_GPU_SDL_INCLUDE_PATH
 
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_texture_cache.h"

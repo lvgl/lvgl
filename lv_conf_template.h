@@ -159,6 +159,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #if LV_USE_GPU_SDL
 #  define LV_USE_EXTERNAL_RENDERER 1
+#  ifndef LV_GPU_SDL_INCLUDE
+#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+#  endif
 #endif
 
 #ifndef LV_USE_EXTERNAL_RENDERER

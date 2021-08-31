@@ -369,6 +369,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define  LV_USE_EXTERNAL_RENDERER 1
 #  endif
 #endif
+#  ifndef LV_GPU_SDL_INCLUDE
+#ifndef LV_GPU_SDL_INCLUDE_PATH
+#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#  else
+#    define  LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+#  endif
+#endif
+#  endif
 #endif
 
 #ifndef LV_USE_EXTERNAL_RENDERER
@@ -619,7 +628,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
+ *Used if lvgl is binded to higher level language and the memory is managed by that language*/
 #ifndef LV_ENABLE_GC
 #  ifdef CONFIG_LV_ENABLE_GC
 #    define LV_ENABLE_GC CONFIG_LV_ENABLE_GC
@@ -714,7 +723,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*Compiler prefix for a big array declaration in RAM*/
+/*Complier prefix for a big array declaration in RAM*/
 #ifndef LV_ATTRIBUTE_LARGE_RAM_ARRAY
 #  ifdef CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
 #    define LV_ATTRIBUTE_LARGE_RAM_ARRAY CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
@@ -933,7 +942,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 #    define LV_FONT_DEJAVU_16_PERSIAN_HEBREW CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 #  else
-#    define  LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
+#    define  LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
 #  endif
 #endif
 #ifndef LV_FONT_SIMSUN_16_CJK
@@ -1575,7 +1584,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
-/*If running without lv_conf.h add typedefs with default value*/
+/*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
 
 # if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/

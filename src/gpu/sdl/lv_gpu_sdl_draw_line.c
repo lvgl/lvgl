@@ -11,7 +11,7 @@
 
 #if LV_USE_GPU_SDL
 
-#include "SDL.h"
+#include LV_GPU_SDL_INCLUDE_PATH
 #include "../../core/lv_refr.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
