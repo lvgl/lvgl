@@ -425,13 +425,6 @@ uint32_t lv_obj_get_index(const lv_obj_t * obj)
     return 0xFFFFFFFF; /*Shouldn't happen*/
 }
 
-uint32_t lv_obj_get_child_id(const struct _lv_obj_t* obj)
-{
-    LV_LOG_USER("lv_obj_get_child_id(obj) is deprecated, please use lv_obj_get_index(obj).");
-    return lv_obj_get_index(obj);
-}
-
-
 void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void* user_data)
 {
     walk_core(start_obj, cb, user_data);
