@@ -47,7 +47,7 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_task_handler(void)
 
 static inline uint32_t lv_obj_get_child_id(const struct _lv_obj_t* obj)
 {
-    LV_LOG_USER("lv_obj_get_child_id(obj) is deprecated, please use lv_obj_get_index(obj).");
+    LV_LOG_WARN("lv_obj_get_child_id(obj) is deprecated, please use lv_obj_get_index(obj).");
     return lv_obj_get_index(obj);
 }
 
