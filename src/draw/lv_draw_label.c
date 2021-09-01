@@ -128,6 +128,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     bool clip_ok = _lv_area_intersect(&clipped_area, coords, mask);
     if(!clip_ok) return;
 
+    lv_text_align_t align = dsc->align;
+    lv_base_dir_t base_dir = dsc->bidi_dir;
+
+    lv_bidi_calculate_align(&align, &base_dir, txt);
+
     if((dsc->flag & LV_TEXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);
@@ -193,14 +198,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     }
 
     /*Align to middle*/
-    if(dsc->align == LV_TEXT_ALIGN_CENTER) {
+    if(align == LV_TEXT_ALIGN_CENTER) {
         line_width = lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
-    else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
+    else if(align == LV_TEXT_ALIGN_RIGHT) {
         line_width = lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
@@ -244,7 +249,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         i         = 0;
 #if LV_USE_BIDI
         char * bidi_txt = lv_mem_buf_get(line_end - line_start + 1);
-        _lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, dsc->bidi_dir, NULL, 0);
+        _lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, base_dir, NULL, 0);
 #else
         const char * bidi_txt = txt + line_start;
 #endif
@@ -255,7 +260,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 #if LV_USE_BIDI
                 logical_char_pos = _lv_txt_encoded_get_char_id(txt, line_start);
                 uint32_t t = _lv_txt_encoded_get_char_id(bidi_txt, i);
-                logical_char_pos += _lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, dsc->bidi_dir, t, NULL);
+                logical_char_pos += _lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
 #else
                 logical_char_pos = _lv_txt_encoded_get_char_id(txt, line_start + i);
 #endif
@@ -359,7 +364,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         pos.x = coords->x1;
         /*Align to middle*/
-        if(dsc->align == LV_TEXT_ALIGN_CENTER) {
+        if(align == LV_TEXT_ALIGN_CENTER) {
             line_width =
                 lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
 
@@ -367,7 +372,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
         }
         /*Align to the right*/
-        else if(dsc->align == LV_TEXT_ALIGN_RIGHT) {
+        else if(align == LV_TEXT_ALIGN_RIGHT) {
             line_width =
                 lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
             pos.x += lv_area_get_width(coords) - line_width;
@@ -534,7 +539,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
 #if LV_DRAW_COMPLEX
-    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
+    bool mask_any = lv_draw_mask_is_any(&fill_area);
 #endif
 
     uint32_t col_bit_max = 8 - bpp;
@@ -572,7 +577,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
 #if LV_DRAW_COMPLEX
         /*Apply masks if any*/
-        if(other_mask_cnt) {
+        if(mask_any) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
                                                              lv_area_get_width(&fill_area));
             if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
@@ -690,8 +695,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     /*If the letter is partially out of mask the move there on draw_buf*/
     disp_buf_buf_tmp += (row_start * disp_buf_width) + col_start / 3;
 
-    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
-
+    bool mask_any = lv_draw_mask_is_any(&map_area);
     uint8_t font_rgb[3];
 
 #if LV_COLOR_16_SWAP == 0
@@ -779,7 +783,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
         }
 
         /*Apply masks if any*/
-        if(other_mask_cnt) {
+        if(mask_any) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
                                                              lv_area_get_width(&map_area));
             if(mask_res == LV_DRAW_MASK_RES_TRANSP) {

@@ -14,7 +14,7 @@ static void draw_event_cb(lv_event_t * e)
     if(dsc->part == LV_PART_ITEMS) {
         if(!dsc->p1 || !dsc->p2) return;
 
-        /*Add  a line mask that keeps the area below the line*/
+        /*Add a line mask that keeps the area below the line*/
         lv_draw_mask_line_param_t line_mask_param;
         lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
         int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
@@ -46,7 +46,7 @@ static void draw_event_cb(lv_event_t * e)
     }
     /*Hook the division lines too*/
     else if(dsc->part == LV_PART_MAIN) {
-        if(dsc->line_dsc == NULL) return;
+        if(dsc->line_dsc == NULL || dsc->p1 == NULL || dsc->p2 == NULL) return;
 
         /*Vertical line*/
         if(dsc->p1->x == dsc->p2->x) {

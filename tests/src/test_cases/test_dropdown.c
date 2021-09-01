@@ -5,7 +5,6 @@
 #include "lv_test_indev.h"
 
 void test_dropdown_create_delete(void);
-void test_dropdown_set_text_and_symbol(void);
 void test_dropdown_set_options(void);
 void test_dropdown_select(void);
 void test_dropdown_click(void);
@@ -45,11 +44,6 @@ void test_dropdown_create_delete(void)
   lv_obj_clean(lv_scr_act());
   TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(lv_scr_act()));
 
-}
-
-void test_dropdown_set_text_and_symbol(void)
-{
-  TEST_ASSERT_EQUAL(0, 0);
 }
 
 void test_dropdown_set_options(void)
@@ -422,6 +416,7 @@ void test_dropdown_render_2(void)
   lv_dropdown_set_options(dd7, "1aaa\n2\n3");
   lv_dropdown_set_dir(dd7, LV_DIR_LEFT);
   lv_dropdown_set_symbol(dd7, LV_SYMBOL_LEFT);
+  lv_obj_align(dd7, LV_ALIGN_BOTTOM_RIGHT, -20, -20);
   lv_dropdown_open(dd7);
   
   TEST_ASSERT_EQUAL_SCREENSHOT("dropdown_2.png");

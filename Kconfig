@@ -42,7 +42,7 @@ menu "LVGL configuration"
             default 32 if LV_COLOR_DEPTH_32
 
         config LV_COLOR_16_SWAP
-            bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
+            bool "Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)."
             depends on LV_COLOR_DEPTH_16
 
         config LV_COLOR_SCREEN_TRANSP
@@ -498,7 +498,7 @@ menu "LVGL configuration"
         config LV_USE_THEME_DEFAULT
             bool "A simple, impressive and very complete theme"
             default y
-        config LV_THEME_DEFAULT_PALETTE_LIGHT
+        config LV_THEME_DEFAULT_DARK
             bool "Yes to set light mode, No to set dark mode"
             default y
             depends on LV_USE_THEME_DEFAULT

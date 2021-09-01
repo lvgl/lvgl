@@ -30,12 +30,12 @@ def event_cb(e):
 # Create a drop down list
 dropdown = lv.dropdown(lv.scr_act())
 dropdown.align(lv.ALIGN.TOP_LEFT, 10, 10)
-dropdown.set_options("".join([
-    "New project\n",
-    "New file\n",
-    "Open project\n",
-    "Recent projects\n",
-    "Preferences\n",
+dropdown.set_options("\n".join([
+    "New project",
+    "New file",
+    "Open project",
+    "Recent projects",
+    "Preferences",
     "Exit"]))
 
 # Set a fixed text to display on the button of the drop-down list
@@ -44,7 +44,7 @@ dropdown.set_text("Menu")
 # Use a custom image as down icon and flip it when the list is opened
 # LV_IMG_DECLARE(img_caret_down)
 dropdown.set_symbol(img_caret_down_argb)
-dropdown.set_style_transform_angle(1800, lv.STATE.CHECKED)
+dropdown.set_style_transform_angle(1800, lv.PART.INDICATOR | lv.STATE.CHECKED)
 
 # In a menu we don't need to show the last clicked item
 dropdown.set_selected_highlight(False)

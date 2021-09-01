@@ -630,6 +630,7 @@ static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_va
 
     int32_t start_angle = lv_map(old_value, scale->min, scale->max, scale->rotation, scale->angle_range + scale->rotation);
     int32_t end_angle = lv_map(new_value, scale->min, scale->max, scale->rotation, scale->angle_range + scale->rotation);
+
     lv_area_t a;
     lv_draw_arc_get_area(scale_center.x, scale_center.y, r_out, LV_MIN(start_angle, end_angle), LV_MAX(start_angle, end_angle), indic->type_data.arc.width, rounded, &a);
     lv_obj_invalidate_area(obj, &a);

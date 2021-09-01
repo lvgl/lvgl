@@ -127,17 +127,18 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
     int32_t w_half0 = w >> 1;
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
-    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
 
-    bool simple_mode = true;
-    if(lv_draw_mask_get_cnt()) simple_mode = false;
-    else if(dashed) simple_mode = false;
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MIN(point1->x, point2->x);
     draw_area.x2 = LV_MAX(point1->x, point2->x)  - 1;
     draw_area.y1 = point1->y - w_half1;
     draw_area.y2 = point1->y + w_half0;
+
+    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
+    bool simple_mode = true;
+    if(lv_draw_mask_is_any(&draw_area)) simple_mode = false;
+    else if(dashed) simple_mode = false;
 
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {
@@ -227,17 +228,16 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
     int32_t w_half0 = w >> 1;
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
-    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
-
-    bool simple_mode = true;
-    if(lv_draw_mask_get_cnt()) simple_mode = false;
-    else if(dashed) simple_mode = false;
-
     lv_area_t draw_area;
     draw_area.x1 = point1->x - w_half1;
     draw_area.x2 = point1->x + w_half0;
     draw_area.y1 = LV_MIN(point1->y, point2->y);
     draw_area.y2 = LV_MAX(point1->y, point2->y) - 1;
+
+    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
+    bool simple_mode = true;
+    if(lv_draw_mask_is_any(&draw_area)) simple_mode = false;
+    else if(dashed) simple_mode = false;
 
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {

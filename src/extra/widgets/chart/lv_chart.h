@@ -306,7 +306,7 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint16_
  * Get the next series.
  * @param chart     pointer to a chart
  * @param ser      the previous series or NULL to get the first
- * @return          the next series or NULL if thre is no more.
+ * @return          the next series or NULL if there is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser);
 
@@ -358,7 +358,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
  * Initialize all data points of a series with a value
  * @param obj       pointer to chart object
  * @param ser       pointer to a data series on 'chart'
- * @param value     the new value for all points. `LV_CHART_POINT_DEF` can be used to hide the points.
+ * @param value     the new value for all points. `LV_CHART_POINT_NONE` can be used to hide the points.
  */
 void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value);
 

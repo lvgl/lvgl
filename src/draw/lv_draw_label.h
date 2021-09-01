@@ -40,8 +40,8 @@ typedef struct {
     lv_coord_t ofs_y;
     lv_opa_t opa;
     lv_base_dir_t bidi_dir;
+    lv_text_align_t align;
     lv_text_flag_t flag;
-    lv_text_align_t align :2;
     lv_text_decor_t decor : 3;
     lv_blend_mode_t blend_mode: 3;
 } lv_draw_label_dsc_t;

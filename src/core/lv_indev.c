@@ -845,6 +845,11 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
             if(indev_reset_check(proc)) return;
 
             if(indev_act->proc.wait_until_release) return;
+
+            /*Handle focus*/
+            indev_click_focus(&indev_act->proc);
+            if(indev_reset_check(proc)) return;
+
         }
     }
 
@@ -924,11 +929,6 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
 
         /*Send CLICK if no scrolling*/
         if(scroll_obj == NULL) {
-
-            /*Handle focus*/
-            indev_click_focus(&indev_act->proc);
-            if(indev_reset_check(proc)) return;
-
             if(proc->long_pr_sent == 0) {
                 lv_event_send(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(proc)) return;

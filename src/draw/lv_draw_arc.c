@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define SPLIT_RADIUS_LIMIT 10  /*With radius greater then this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
+#define SPLIT_RADIUS_LIMIT 10  /*With radius greater than this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
 #define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.*/
 
 /**********************
@@ -104,9 +104,12 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     area_in.y2 -= dsc->width;
 
     /*Create inner the mask*/
+    int16_t mask_in_id = LV_MASK_ID_INV;
     lv_draw_mask_radius_param_t mask_in_param;
-    lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
-    int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
+    if(lv_area_get_width(&area_in) > 0 && lv_area_get_height(&area_in) > 0) {
+        lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
+    }
 
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
@@ -118,7 +121,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         lv_draw_rect(&area_out, clip_area, &cir_dsc);
 
         lv_draw_mask_remove_id(mask_out_id);
-        lv_draw_mask_remove_id(mask_in_id);
+        if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
         return;
     }
 
@@ -166,7 +169,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     lv_draw_mask_remove_id(mask_angle_id);
     lv_draw_mask_remove_id(mask_out_id);
-    lv_draw_mask_remove_id(mask_in_id);
+    if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
 
     if(dsc->rounded) {
 
@@ -217,11 +220,27 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle, lv_coord_t w, bool rounded, lv_area_t * area)
 {
     lv_coord_t rout = radius;
+
+    /*Special case: full arc invalidation */
+    if(end_angle == start_angle + 360) {
+        area->x1 = x - rout;
+        area->y1 = y - rout;
+        area->x2 = x + rout;
+        area->y2 = y + rout;
+        return;
+    }
+
+    if(start_angle > 360) start_angle -= 360;
+    if(end_angle > 360) end_angle -= 360;
+
     lv_coord_t rin = radius - w;
-    lv_coord_t extra_area = rounded ? w : 0;
+    lv_coord_t extra_area = rounded ? w / 2 + 1 : 0;
     uint8_t start_quarter = start_angle / 90;
     uint8_t end_quarter = end_angle / 90;
 
+    /*360 deg still counts as quarter 3 (360 / 90 would be 4)*/
+    if(start_quarter == 4) start_quarter = 3;
+    if(end_quarter == 4) end_quarter = 3;
 
     if(start_quarter == end_quarter && start_angle <= end_angle) {
         if(start_quarter == 0) {

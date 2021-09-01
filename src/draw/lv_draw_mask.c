@@ -211,6 +211,31 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void)
     return cnt;
 }
 
+bool lv_draw_mask_is_any(const lv_area_t * a)
+{
+    if(a == NULL) return LV_GC_ROOT(_lv_draw_mask_list[0]).param ? true : false;
+
+    uint8_t i;
+    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        _lv_draw_mask_common_dsc_t * comm_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        if(comm_param == NULL) continue;
+        if(comm_param->type == LV_DRAW_MASK_TYPE_RADIUS) {
+            lv_draw_mask_radius_param_t * radius_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+            if(radius_param->cfg.outer) {
+                if(!_lv_area_is_out(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
+            }
+            else {
+                if(!_lv_area_is_in(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
 /**
  *Initialize a line mask from two points.
  * @param param pointer to a `lv_draw_mask_param_t` to initialize
@@ -448,7 +473,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 
     if(!entry) {
         entry = lv_mem_alloc(sizeof(_lv_draw_mask_radius_circle_dsc_t));
-        LV_ASSERT_MALLOC(param->circle);
+        LV_ASSERT_MALLOC(entry);
         lv_memset_00(entry, sizeof(_lv_draw_mask_radius_circle_dsc_t));
         entry->life = -1;
     } else {
@@ -591,7 +616,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
         }
     }
 
-    /*At the end of the mask if the limit line is smaller then the mask's y.
+    /*At the end of the mask if the limit line is smaller than the mask's y.
      *Then the mask is in the "good" area*/
     y_at_x = (int32_t)((int32_t)p->yx_steep * (abs_x + len)) >> 10;
     if(p->yx_steep > 0) {
@@ -684,7 +709,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
 {
     int32_t k;
     int32_t x_at_y;
-    /*At the beginning of the mask if the limit line is greater then the mask's y.
+    /*At the beginning of the mask if the limit line is greater than the mask's y.
      *Then the mask is in the "wrong" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * abs_y) >> 10;
     if(p->xy_steep > 0) x_at_y++;
@@ -697,7 +722,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
         }
     }
 
-    /*At the end of the mask if the limit line is smaller then the mask's y.
+    /*At the end of the mask if the limit line is smaller than the mask's y.
      *Then the mask is in the "good" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * (abs_y)) >> 10;
     if(x_at_y > abs_x + len) {
@@ -1203,9 +1228,19 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
     if(c->buf) lv_mem_free(c->buf);
 
     c->buf = lv_mem_alloc(radius * 6 + 6);  /*Use uint16_t for opa_start_on_y and x_start_on_y*/
+    LV_ASSERT_MALLOC(c->buf);
     c->cir_opa = c->buf;
     c->opa_start_on_y = (uint16_t *) (c->buf + 2 * radius + 2);
     c->x_start_on_y = (uint16_t *) (c->buf + 4 * radius + 4);
+
+    /*Special case, handle manually*/
+    if(radius == 1) {
+        c->cir_opa[0] =  180;
+        c->opa_start_on_y[0] =  0;
+        c->opa_start_on_y[1] =  1;
+        c->x_start_on_y[0] =  0;
+        return;
+    }
 
     lv_coord_t * cir_x = lv_mem_buf_get((radius + 1) * 2 * 2 * sizeof(lv_coord_t));
     lv_coord_t * cir_y = &cir_x[(radius + 1) * 2];

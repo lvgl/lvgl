@@ -45,7 +45,7 @@ typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
  * First parameter is the variable to animate.
  * Second parameter is the value to set.
  * Compatible with `lv_xxx_set_yyy(obj, value)` functions
- * The `x` in `_xcb_t` means its not a fully generic prototype because
+ * The `x` in `_xcb_t` means it's not a fully generic prototype because
  * it doesn't receive `lv_anim_t *` as its first argument*/
 typedef void (*lv_anim_exec_xcb_t)(void *, int32_t);
 
@@ -169,7 +169,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
 /**
  * Similar to `lv_anim_set_exec_cb` but `lv_anim_custom_exec_cb_t` receives
  * `lv_anim_t * ` as its first parameter instead of `void *`.
- * This function might be used when LVGL is binded to other languages because
+ * This function might be used when LVGL is bound to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
  * The variable to animate can be stored in the animation's `user_sata`
  * @param a         pointer to an initialized `lv_anim_t` variable
@@ -184,7 +184,7 @@ static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec
 /**
  * Set the path (curve) of the animation.
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param path_cb a function the get the current value of the animation.
+ * @param path_cb a function to set the current value of the animation.
  */
 static inline void lv_anim_set_path_cb(lv_anim_t * a, lv_anim_path_cb_t path_cb)
 {
@@ -273,6 +273,18 @@ static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
 }
 
 /**
+ * Set the custom user data field of the animation.
+ * @param a           pointer to an initialized `lv_anim_t` variable
+ * @param user_data   pointer to the new user_data.
+ */
+#if LV_USE_USER_DATA
+static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
+{
+    a->user_data = user_data;
+}
+#endif
+
+/**
  * Create an animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
  * @return          pointer to the created animation (different from the `a` parameter)
@@ -290,6 +302,18 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 }
 
 /**
+ * Get the user_data field of the animation
+ * @param   a pointer to an initialized `lv_anim_t` variable
+ * @return  the pointer to the custom user_data of the animation
+ */
+#if LV_USE_USER_DATA
+static inline void * lv_anim_get_user_data(lv_anim_t * a)
+{
+    return a->user_data;
+}
+#endif
+
+/**
  * Delete an animation of a variable with a given animator function
  * @param var       pointer to variable
  * @param exec_cb   a function pointer which is animating 'var',
@@ -299,7 +323,7 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb);
 
 /**
- * Delete all the animations animation
+ * Delete all the animations
  */
 void lv_anim_del_all(void);
 
@@ -320,7 +344,7 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb);
  * @param a         pointer to an animation.
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
- * @return           true: at least 1 animation is deleted, false: no animation is deleted
+ * @return          true: at least 1 animation is deleted, false: no animation is deleted
  */
 static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {

@@ -69,7 +69,7 @@ extern lv_style_prop_t LV_STYLE_FLEX_GROW;
  **********************/
 
 /**
- * Initialize a felx layout the default values
+ * Initialize a flex layout the default values
  * @param flex pointer to a flex layout descriptor
  */
 void lv_flex_init(void);
@@ -82,7 +82,7 @@ void lv_flex_init(void);
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow);
 
 /**
- * Set how to place (where to align) the items an tracks
+ * Set how to place (where to align) the items and tracks
  * @param flex pointer: to a flex layout descriptor
  * @param main_place where to place the items on main axis (in their track). Any value of `lv_flex_align_t`.
  * @param cross_place where to place the item in their track on the cross axis. `LV_FLEX_ALIGN_START/END/CENTER`

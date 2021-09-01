@@ -23,7 +23,7 @@ fout.write(
 
 #ifndef LV_CONF_INTERNAL_H
 #define LV_CONF_INTERNAL_H
-/*clang-format off*/
+/* clang-format off */
 
 #include <stdint.h>
 

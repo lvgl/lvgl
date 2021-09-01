@@ -36,7 +36,7 @@ Learn more about [Events](/overview/event).
 
 ## Keys
 - `LV_KEY_UP`, `LV_KEY_RIGHT` Increment the current parameter's value by 1
-- `LV_KEY_DOWN`, `LV_KEY_LEFT` Decrement the current parameter's by 1
+- `LV_KEY_DOWN`, `LV_KEY_LEFT` Decrement the current parameter's value by 1
 - `LV_KEY_ENTER` A long press will show the next mode. Double click to reset the current parameter.
 
 Learn more about [Keys](/overview/indev).

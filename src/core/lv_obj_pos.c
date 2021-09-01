@@ -277,7 +277,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
     obj->layout_inv = 1;
 
-    /*Mark the screen as dirty too to mark that there is an something to do on this screen*/
+    /*Mark the screen as dirty too to mark that there is something to do on this screen*/
     lv_obj_t * scr = lv_obj_get_screen(obj);
     scr->scr_layout_inv = 1;
 
@@ -460,7 +460,11 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
         break;
     }
 
-    x += x_ofs + base->coords.x1 - parent->coords.x1 + lv_obj_get_scroll_left(parent) - pleft;
+    if(lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
+        x += x_ofs + base->coords.x1 - parent->coords.x1 + lv_obj_get_scroll_right(parent) - pleft;
+    } else {
+        x += x_ofs + base->coords.x1 - parent->coords.x1 + lv_obj_get_scroll_left(parent) - pleft;
+    }
     y += y_ofs + base->coords.y1 - parent->coords.y1 + lv_obj_get_scroll_top(parent) - ptop;
     lv_obj_set_style_align(obj, LV_ALIGN_TOP_LEFT, 0);
     lv_obj_set_pos(obj, x, y);

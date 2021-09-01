@@ -140,16 +140,11 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     /*Get clipped fill area which is the real draw area.
      *It is always the same or inside `fill_area`*/
     lv_area_t draw_area;
-    bool is_common;
-    is_common = _lv_area_intersect(&draw_area, clip_area, fill_area);
-    if(!is_common) return;
+    if(!_lv_area_intersect(&draw_area, clip_area, fill_area)) return;
 
     /*Now `draw_area` has absolute coordinates.
-     *Make it relative to `disp_area` to simplify draw to `disp_buf`*/
-    draw_area.x1 -= disp_area->x1;
-    draw_area.y1 -= disp_area->y1;
-    draw_area.x2 -= disp_area->x1;
-    draw_area.y2 -= disp_area->y1;
+     *Make it relative to `disp_area` to simplify the drawing to `disp_buf`*/
+    lv_area_move(&draw_area, -disp_area->x1, -disp_area->y1);
 
     /*Round the values in the mask if anti-aliasing is disabled*/
     if(mask && disp->driver->antialiasing == 0 && mask) {
@@ -390,13 +385,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
     }
     /*Masked*/
     else {
-        /*Buffer the result color to avoid recalculating the same color*/
-        lv_color_t last_dest_color;
-        lv_color_t last_res_color;
-        lv_opa_t last_mask = LV_OPA_TRANSP;
-        last_dest_color.full = disp_buf_first[0].full;
-        last_res_color.full = disp_buf_first[0].full;
-
         int32_t x_end4 = draw_area_w - 4;
 
 #if LV_COLOR_DEPTH == 16
@@ -452,7 +440,14 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
         }
         /*Handle opa and mask values too*/
         else {
+            /*Buffer the result color to avoid recalculating the same color*/
+            lv_color_t last_dest_color;
+            lv_color_t last_res_color;
+            lv_opa_t last_mask = LV_OPA_TRANSP;
+            last_dest_color.full = disp_buf_first[0].full;
+            last_res_color.full = disp_buf_first[0].full;
             lv_opa_t opa_tmp = LV_OPA_TRANSP;
+
             for(y = draw_area->y1; y <= draw_area->y2; y++) {
                 const lv_opa_t * mask_tmp_x = mask;
                 for(x = 0; x < draw_area_w; x++) {

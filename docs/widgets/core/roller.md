@@ -30,7 +30,7 @@ The get the *index* of the currently selected option use `lv_roller_get_selected
 ### Visible rows
 The number of visible rows can be adjusted with `lv_roller_set_visible_row_count(roller, num)`.
 
-This function calculates the height with the current style. If the font, line space, border width, etc of the roller changes this function needs to be called again. 
+This function calculates the height with the current style. If the font, line space, border width, etc. of the roller changes this function needs to be called again. 
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.

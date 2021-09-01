@@ -14,8 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
     - name: Run tests
-      run: sudo apt-get install libpng-dev ruby-full; cd tests; python ./main.py report
+      run: python tests/main.py report
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       if: github.event_name == 'push'

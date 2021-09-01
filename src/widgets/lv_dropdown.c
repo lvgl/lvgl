@@ -49,8 +49,9 @@ static void draw_list(lv_event_t * e);
 
 static void draw_box(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
+static lv_res_t btn_release_handler(lv_obj_t * obj);
 static lv_res_t list_release_handler(lv_obj_t * list_obj);
-static void page_press_handler(lv_obj_t * page);
+static void list_press_handler(lv_obj_t * page);
 static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y);
 static void position_to_selected(lv_obj_t * obj);
 static lv_obj_t * get_label(const lv_obj_t * obj);
@@ -422,6 +423,9 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_update_layout(dropdown->list);
     }
 
+    /*To allow styling the list*/
+    lv_event_send(dropdown_obj, LV_EVENT_READY, NULL);
+
     lv_obj_t * label = get_label(dropdown_obj);
     lv_label_set_text_static(label, dropdown->options);
     lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
@@ -489,22 +493,18 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         }
     }
 
-    lv_text_align_t align = lv_obj_get_style_text_align(label, LV_PART_MAIN);
-    if(align == LV_TEXT_ALIGN_AUTO) {
-       if(lv_obj_get_style_base_dir(label, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_TEXT_ALIGN_RIGHT;
-       else align = LV_TEXT_ALIGN_LEFT;
-    }
+    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, dropdown->options);
 
     switch(align) {
     default:
     case LV_TEXT_ALIGN_LEFT:
-        lv_obj_set_x(label, 0);
+        lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);
         break;
     case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) - lv_obj_get_width(label));
+        lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
         break;
     case LV_TEXT_ALIGN_CENTER:
-        lv_obj_set_x(label, lv_obj_get_content_width(dropdown->list) / 2 - lv_obj_get_width(label) / 2);
+        lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
         break;
 
     }
@@ -517,6 +517,8 @@ void lv_dropdown_close(lv_obj_t * obj)
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
     if(dropdown->list) lv_obj_del(dropdown->list);
+
+    lv_event_send(obj, LV_EVENT_CANCEL, NULL);
 }
 
 /**********************
@@ -629,30 +631,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_dropdown_close(obj);
     }
     else if(code == LV_EVENT_RELEASED) {
-        lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_scroll_obj(indev) == NULL) {
-            if(dropdown->list) {
-                lv_dropdown_close(obj);
-                if(dropdown->sel_opt_id_orig != dropdown->sel_opt_id) {
-                    dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
-                    uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
-                    res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &id);
-                    if(res != LV_RES_OK) return;
-                    lv_obj_invalidate(obj);
-                }
-                lv_indev_type_t indev_type = lv_indev_get_type(indev);
-                if(indev_type == LV_INDEV_TYPE_ENCODER) {
-                    lv_group_set_editing(lv_obj_get_group(obj), false);
-                }
-            }
-            else {
-                lv_dropdown_open(obj);
-            }
-        }
-        else {
-            dropdown->sel_opt_id = dropdown->sel_opt_id_orig;
-            lv_obj_invalidate(obj);
-        }
+        res = btn_release_handler(obj);
+        if(res != LV_RES_OK) return;
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
         lv_obj_refresh_self_size(obj);
@@ -690,6 +670,15 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             dropdown->sel_opt_id = dropdown->sel_opt_id_orig;
             lv_dropdown_close(obj);
         }
+        else if(c == LV_KEY_ENTER) {
+            /* Handle the ENTER key only if it was send by an other object.
+             * Do no process it if ENTER is sent by the dropdown becasue it's handled in LV_EVENT_RELEASED */
+            lv_obj_t * indev_obj = lv_indev_get_obj_act();
+            if(indev_obj != obj) {
+                res = btn_release_handler(obj);
+                if(res != LV_RES_OK) return;
+            }
+        }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
@@ -718,7 +707,7 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
         }
     }
     else if(code == LV_EVENT_PRESSED) {
-        page_press_handler(list);
+        list_press_handler(list);
     }
     else if(code == LV_EVENT_SCROLL_BEGIN) {
         dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
@@ -953,6 +942,38 @@ static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area,
     list_obj->skip_trans = 0;
 }
 
+
+static lv_res_t btn_release_handler(lv_obj_t * obj)
+{
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    lv_indev_t * indev = lv_indev_get_act();
+    if(lv_indev_get_scroll_obj(indev) == NULL) {
+        if(dropdown->list) {
+            lv_dropdown_close(obj);
+            if(dropdown->sel_opt_id_orig != dropdown->sel_opt_id) {
+                dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
+                lv_res_t res;
+                uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
+                res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &id);
+                if(res != LV_RES_OK) return res;
+                lv_obj_invalidate(obj);
+            }
+            lv_indev_type_t indev_type = lv_indev_get_type(indev);
+            if(indev_type == LV_INDEV_TYPE_ENCODER) {
+                lv_group_set_editing(lv_obj_get_group(obj), false);
+            }
+        }
+        else {
+            lv_dropdown_open(obj);
+        }
+    }
+    else {
+        dropdown->sel_opt_id = dropdown->sel_opt_id_orig;
+        lv_obj_invalidate(obj);
+    }
+    return LV_RES_OK;
+}
+
 /**
  * Called when a drop down list is released to open it or set new option
  * @param list pointer to the drop down list's list
@@ -994,7 +1015,7 @@ static lv_res_t list_release_handler(lv_obj_t * list_obj)
     return LV_RES_OK;
 }
 
-static void page_press_handler(lv_obj_t * list_obj)
+static void list_press_handler(lv_obj_t * list_obj)
 {
     lv_dropdown_list_t * list = (lv_dropdown_list_t*) list_obj;
     lv_obj_t * dropdown_obj = list->dropdown;

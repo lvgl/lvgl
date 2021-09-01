@@ -154,7 +154,7 @@ lv_timer_t * lv_timer_create_basic(void)
 /**
  * Create a new lv_timer
  * @param timer_xcb a callback which is the timer itself. It will be called periodically.
- *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param user_data custom parameter
@@ -289,7 +289,7 @@ lv_timer_t * lv_timer_get_next(lv_timer_t * timer)
  **********************/
 
 /**
- * Execute timer if its the priority is appropriate
+ * Execute timer if its priority is appropriate
  * @param timer pointer to lv_timer
  * @return true: execute, false: not executed
  */

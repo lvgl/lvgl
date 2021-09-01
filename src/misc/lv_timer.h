@@ -80,7 +80,7 @@ lv_timer_t * lv_timer_create_basic(void);
 /**
  * Create a new lv_timer
  * @param timer_xcb a callback to call periodically.
- *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param user_data custom parameter

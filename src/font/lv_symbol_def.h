@@ -1,6 +1,5 @@
 #ifndef LV_SYMBOL_DEF_H
 #define LV_SYMBOL_DEF_H
-/*clang-format off*/
 
 #ifdef __cplusplus
 extern "C" {

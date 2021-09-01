@@ -135,6 +135,12 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     }
 
     highlight_update(obj);
+
+    /*Reset the focused button if the days changes*/
+    if(lv_btnmatrix_get_selected_btn(obj) != LV_BTNMATRIX_BTN_NONE) {
+        lv_btnmatrix_set_selected_btn(obj, day_first + 7);
+    }
+
     lv_obj_invalidate(obj);
 }
 
@@ -339,7 +345,7 @@ static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
 #endif
 
-    return day_of_week;
+    return day_of_week  ;
 }
 
 static void highlight_update(lv_obj_t * obj)
@@ -350,17 +356,17 @@ static void highlight_update(lv_obj_t * obj)
     /*Clear all kind of selection*/
     lv_btnmatrix_clear_btn_ctrl_all(obj, LV_CALENDAR_CTRL_TODAY | LV_CALENDAR_CTRL_HIGHLIGHT);
 
+    uint8_t day_first = get_day_of_week(calendar->showed_date.year, calendar->showed_date.month, 1);
     if(calendar->highlighted_dates) {
         for(i = 0; i < calendar->highlighted_dates_num; i++) {
-            if(calendar->highlighted_dates[i].year == calendar->today.year && calendar->highlighted_dates[i].month == calendar->showed_date.month) {
-                lv_btnmatrix_set_btn_ctrl(obj, calendar->highlighted_dates[i].day + 7, LV_CALENDAR_CTRL_HIGHLIGHT);
+            if(calendar->highlighted_dates[i].year == calendar->showed_date.year && calendar->highlighted_dates[i].month == calendar->showed_date.month) {
+                lv_btnmatrix_set_btn_ctrl(obj, calendar->highlighted_dates[i].day - 1 + day_first + 7, LV_CALENDAR_CTRL_HIGHLIGHT);
             }
         }
     }
 
     if(calendar->showed_date.year == calendar->today.year && calendar->showed_date.month == calendar->today.month) {
-        uint8_t day_first = get_day_of_week(calendar->today.year, calendar->today.month, 0);
-        lv_btnmatrix_set_btn_ctrl(obj, calendar->today.day + day_first + 7, LV_CALENDAR_CTRL_TODAY);
+        lv_btnmatrix_set_btn_ctrl(obj, calendar->today.day - 1 + day_first + 7, LV_CALENDAR_CTRL_TODAY);
     }
 }
 

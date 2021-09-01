@@ -2,9 +2,16 @@ if(ESP_PLATFORM)
 
 file(GLOB_RECURSE SOURCES src/*.c)
 
-idf_component_register(SRCS ${SOURCES}
-                       INCLUDE_DIRS . src ../
-                       REQUIRES main)
+idf_build_get_property(LV_MICROPYTHON LV_MICROPYTHON)
+
+if (LV_MICROPYTHON)
+    idf_component_register(SRCS ${SOURCES}
+                           INCLUDE_DIRS . src ../
+                           REQUIRES main)
+else()
+    idf_component_register(SRCS ${SOURCES}
+                           INCLUDE_DIRS . src ../)
+endif()
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
@@ -61,7 +68,10 @@ endif() # CONFIG_LVGL
 
 else()
 
-file(GLOB_RECURSE SOURCES src/*.c)
+file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c)
 add_library(lvgl STATIC ${SOURCES})
+
+file(GLOB_RECURSE EXAMPLE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/examples/*.c)
+add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
 
 endif()

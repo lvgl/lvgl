@@ -153,7 +153,7 @@ lv_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t pro
 bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector);
 
 /**
- * Used internally to create a style tarnsition
+ * Used internally to create a style transition
  * @param obj
  * @param part
  * @param prev_state
@@ -218,6 +218,18 @@ static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj,  lv_coord_t 
 static inline void lv_obj_set_style_size(struct _lv_obj_t * obj,  lv_coord_t value, lv_style_selector_t selector) {
     lv_obj_set_style_width(obj, value, selector);
     lv_obj_set_style_height(obj, value, selector);
+}
+
+lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
+
+static inline lv_coord_t lv_obj_get_x_aligned(const struct _lv_obj_t * obj)
+{
+    return lv_obj_get_style_x(obj, LV_PART_MAIN);
+}
+
+static inline lv_coord_t lv_obj_get_y_aligned(const struct _lv_obj_t * obj)
+{
+    return lv_obj_get_style_y(obj, LV_PART_MAIN);
 }
 
 /**********************

@@ -188,6 +188,8 @@ void lv_chart_set_zoom_x(lv_obj_t * obj, uint16_t zoom_x)
 
     chart->zoom_x = zoom_x;
     lv_obj_refresh_self_size(obj);
+    /*Be the chart doesn't remain scrolled out*/
+    lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     lv_obj_invalidate(obj);
 }
 
@@ -200,6 +202,8 @@ void lv_chart_set_zoom_y(lv_obj_t * obj, uint16_t zoom_y)
 
     chart->zoom_y = zoom_y;
     lv_obj_refresh_self_size(obj);
+    /*Be the chart doesn't remain scrolled out*/
+    lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     lv_obj_invalidate(obj);
 }
 
@@ -839,6 +843,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
     if(_lv_area_intersect(&com_area, &obj->coords, clip_area) == false) return;
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->point_cnt < 2) return;
 
     uint16_t i;
     lv_point_t p1;
@@ -925,7 +930,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
             if(i != 0) {
                 if(crowded_mode) {
                     if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                        /*Draw only one vertical line between the min an max y values on the same x value*/
+                        /*Draw only one vertical line between the min and max y-values on the same x-value*/
                         y_max = LV_MAX(y_max, p2.y);
                         y_min = LV_MIN(y_min, p2.y);
                         if(p1.x != p2.x) {
