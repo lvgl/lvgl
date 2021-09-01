@@ -88,7 +88,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
         char buf[512];
         uint32_t t = lv_tick_get();
         static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error", "User"};
-        lv_snprintf(buf, sizeof(buf), "[%s]\t(%ld.%03ld, +%ld)\t %s: %s \t(in %s line #%d)\n", lvl_prefix[level], t / 1000, t % 1000, t - last_log_time, func, msg, &file[p], line);
+        lv_snprintf(buf, sizeof(buf), "[%s]\t(%" PRId32 ".%03" PRId32 ", +%" PRId32 ")\t %s: %s \t(in %s line #%d)\n", lvl_prefix[level], t / 1000, t % 1000, t - last_log_time, func, msg, &file[p], line);
         last_log_time = t;
         lv_log(buf);
     }

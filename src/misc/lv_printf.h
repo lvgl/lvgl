@@ -34,6 +34,9 @@
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 
+/* provides c99 portable printf strings such as PRId32 */
+#include <inttypes.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
