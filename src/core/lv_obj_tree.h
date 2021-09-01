@@ -110,24 +110,12 @@ void lv_obj_move_background(struct _lv_obj_t * obj);
 void lv_obj_swap(struct _lv_obj_t* obj1, struct _lv_obj_t* obj2);
 
 /**
- * moves the object one position up in the hierarchy.
- * When used in listboxes, it can be used to sort the listbox items.
- * @param obj  pointer to the object to be moved upwards.
- */
-void lv_obj_move_up(struct _lv_obj_t* obj);
-
-/**
- * moves the object one position down in the hierarchy.
- * When used in listboxes, it can be used to sort the listbox items.
- * @param obj  pointer to the object to be moved downwards.
- */
-void lv_obj_move_down(struct _lv_obj_t* obj);
-
-/**
  * moves the object to the given index in its parent.
  * When used in listboxes, it can be used to sort the listbox items.
  * @param obj  pointer to the object to be moved.
  * @param index  new index in parent.
+ * @note to move to the foreground: lv_obj_move_to_index(obj, 0)
+ * @note to move forward (up): lv_obj_move_to_index(obj, lv_obj_get_index(obj) - 1) 
  */
 void lv_obj_move_to_index(struct _lv_obj_t* obj, int32_t index);
 

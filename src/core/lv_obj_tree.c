@@ -295,51 +295,6 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     lv_group_swap_obj(obj1, obj2);
 }
 
-void lv_obj_move_up(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    uint_fast32_t index = lv_obj_get_index(obj);
-    if (index > 0)
-    {
-        lv_obj_t * obj2 = parent->spec_attr->children[index - 1];
-        parent->spec_attr->children[index - 1] = obj;
-        parent->spec_attr->children[index] = obj2;
-
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj2);
-
-        lv_obj_invalidate(parent);
-
-        lv_group_swap_obj(obj, obj2);
-    }
-}
-
-
-void lv_obj_move_down(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    uint_fast32_t index = lv_obj_get_index(obj);
-    if (index < lv_obj_get_child_cnt(parent) - 1)
-    {
-        lv_obj_t * obj2 = parent->spec_attr->children[index + 1];
-        parent->spec_attr->children[index + 1] = obj;
-        parent->spec_attr->children[index] = obj2;
-
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj2);
-
-        lv_obj_invalidate(parent);
-
-        lv_group_swap_obj(obj, obj2);
-    }
-}
-
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

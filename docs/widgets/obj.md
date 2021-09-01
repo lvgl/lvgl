@@ -71,8 +71,6 @@ You can bring an object to the foreground or send it to the background with `lv_
 
 You can change the index of an object in its parent using  `lv_obj_move_to_index(obj, index)`. 
 
-You can move an object one position up or down in the hierargy with `lv_obj_move_up(obj)` and `lv_obj_move_down(obj)`. 
-
 You can swap the position of two objects with `lv_obj_swap(obj1, obj2)`.
 
 ### Screens

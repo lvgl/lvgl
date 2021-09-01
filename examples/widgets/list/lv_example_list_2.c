@@ -4,8 +4,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
 
-#define USE_MOVE_TO_INDEX
-
 static lv_obj_t* list1;
 static lv_obj_t* list2;
 
@@ -61,13 +59,9 @@ static void event_handler_up(lv_event_t* e)
     if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
     {
         if (currentButton == NULL) return;
-#ifndef USE_MOVE_TO_INDEX
-        lv_obj_move_up(currentButton);
-#else
         uint32_t index = lv_obj_get_index(currentButton);
         if (index <= 0) return;
         lv_obj_move_to_index(currentButton, index - 1);
-#endif
         lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
     }
 }
@@ -94,13 +88,9 @@ static void event_handler_dn(lv_event_t* e)
     if ((code == LV_EVENT_CLICKED) || (code == LV_EVENT_LONG_PRESSED_REPEAT))
     {
         if (currentButton == NULL) return;
-#ifndef USE_MOVE_TO_INDEX
-        lv_obj_move_down(currentButton);
-#else
         const uint32_t index = lv_obj_get_index(currentButton);
 
         lv_obj_move_to_index(currentButton, index + 1);
-#endif
         lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
     }
 }
