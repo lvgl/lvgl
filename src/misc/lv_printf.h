@@ -34,8 +34,16 @@
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 
-/* provides c99 portable printf strings such as PRId32 */
-#include <inttypes.h>
+/* not all compilers provide inttypes.h which would define these */
+#include<limits.h>
+
+#if INT_MAX==32767
+   #define LV_PRId32 "d"
+#elif INT_MAX==2147483647
+   #define LV_PRId32 "ld"
+#else
+   #error Unrecognized width of int type (neither 16-bit nor 32-bit).
+#endif
 
 #ifdef __cplusplus
 extern "C" {

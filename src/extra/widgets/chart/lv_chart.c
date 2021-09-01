@@ -1406,7 +1406,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
         /*add text only to major tick*/
         if(major && t->label_en)  {
             char buf[16];
-            lv_snprintf(buf, sizeof(buf), "%" PRId32, tick_value);
+            lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, tick_value);
             part_draw_dsc.label_dsc = &label_dsc;
             part_draw_dsc.text = buf;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
@@ -1537,7 +1537,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
 
         if(major && t->label_en) {
             char buf[16];
-            lv_snprintf(buf, sizeof(buf), "%" PRId32, tick_value);
+            lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, tick_value);
             part_draw_dsc.label_dsc = &label_dsc;
             part_draw_dsc.text = buf;
 
