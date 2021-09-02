@@ -69,8 +69,9 @@ if(ESP_PLATFORM)
 else(ESP_PLATFORM)
 
     file(GLOB_RECURSE SOURCES src/*.c)
+    file(GLOB_RECURSE EXAMPLE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/examples/*.c)
 
-    if (MICROPY_DIR)
+    if(MICROPY_DIR)
         ## LVGL wrapper must be added to to Micropython's uniQueSTRing but it *must* be done in Micropython port's CMakeLists.txt, not here
         ## perhaps later someone figures this out better: list(APPEND MICROPY_SOURCE_QSTR ${LV_SRC})
 
@@ -85,6 +86,11 @@ else(ESP_PLATFORM)
             #       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             -Wno-unused-function
         )
+        # no examples to be built for this  case
+    else(MICROPY_DIR)
+        # without micropython, build lvgl and examples libs
+        add_library(lvgl STATIC ${SOURCES})
+        add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
     endif(MICROPY_DIR)
 
 
