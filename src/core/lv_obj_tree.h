@@ -86,22 +86,6 @@ void lv_obj_del_async(struct _lv_obj_t * obj);
 void lv_obj_set_parent(struct _lv_obj_t * obj, struct _lv_obj_t * parent);
 
 /**
- * Move the object to the foreground.
- * It will look like if it was created as the last child of its parent.
- * It also means it can cover any of the siblings.
- * @param obj       pointer to an object
- */
-void lv_obj_move_foreground(struct _lv_obj_t * obj);
-
-/**
- * Move the object to the background.
- * It will look like if it was created as the first child of its parent.
- * It also means any of the siblings can cover the object.
- * @param obj       pointer to an object
- */
-void lv_obj_move_background(struct _lv_obj_t * obj);
-
-/**
  * Swap the positions of two objects.
  * When used in listboxes, it can be used to sort the listbox items.
  * @param obj1  pointer to the first object

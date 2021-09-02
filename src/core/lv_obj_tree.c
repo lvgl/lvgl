@@ -197,42 +197,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_invalidate(obj);
 }
 
-void lv_obj_move_foreground(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    uint32_t i;
-    for(i = lv_obj_get_index(obj); i < lv_obj_get_child_cnt(parent) - 1; i++) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
-    }
-    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
-
-    /*Notify the new parent about the child*/
-    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-
-    lv_obj_invalidate(parent);
-}
-
-void lv_obj_move_background(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    int32_t i;
-    for(i = lv_obj_get_index(obj); i > 0; i--) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
-    }
-    parent->spec_attr->children[0] = obj;
-
-    /*Notify the new parent about the child*/
-    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-
-    lv_obj_invalidate(parent);
-}
-
 void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
