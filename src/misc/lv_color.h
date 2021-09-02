@@ -512,12 +512,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0
-    /*For compatibility with lv_color_mix on 16 bit color depth*/
-    LV_COLOR_SET_R(ret, (premult_c1[0] + LV_COLOR_GET_R(c2) * mix) >> 8);
-    LV_COLOR_SET_G(ret, (premult_c1[1] + LV_COLOR_GET_G(c2) * mix) >> 8);
-    LV_COLOR_SET_B(ret, (premult_c1[2] + LV_COLOR_GET_B(c2) * mix) >> 8);
-#elif LV_COLOR_DEPTH != 1
+#if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8 or 32*/
     LV_COLOR_SET_R(ret, LV_UDIV255(premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_G(ret, LV_UDIV255(premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
