@@ -39,9 +39,9 @@ LVGL has its own configuration file called `lv_conf.h`. When LVGL is installed t
 Take a look at [LVGL_Arduino.ino](https://github.com/lvgl/lvgl/blob/master/examples/arduino/LVGL_Arduino/LVGL_Arduino.ino) to see how to initialize LVGL.
 TFT_eSPI is used as the display driver.
 
-In the INO file you can see how to register a display and a touch pad for LVGL and call an example.
+In the INO file you can see how to register a display and a touchpad for LVGL and call an example.
 
-Note that, there is no dedicated INO file for every example but you can call functions like `lv_example_btn_1()` or `lv_example_slider_1()` to run an example.
+Note that, there is no dedicated INO file for every example, but you can call functions like `lv_example_btn_1()` or `lv_example_slider_1()` to run an example.
 Most of the examples are available in the [`lvgl/examples`](https://github.com/lvgl/lvgl/tree/master/examples) folder. Some are also available in [`lv_demos`](https://github.com/lvgl/lv_demos), which needs to be installed and configured separately.
 
 ## Debugging and logging

@@ -17,7 +17,7 @@ In object-oriented thinking, it is the base class from which all other objects i
 
 The functions and functionalities of the Base object can be used with other widgets too. For example `lv_obj_set_width(slider, 100)`
 
-The Base object can be directly used as a simple widget: it nothing else than a rectangle. In HTML terms, think of it as a `<div>`.
+The Base object can be directly used as a simple widget: it's nothing else than a rectangle. In HTML terms, think of it as a `<div>`.
 
 ### Coordinates
 
@@ -31,7 +31,7 @@ You can set the position relative to the parent with `lv_obj_set_x(obj, new_x)` 
 
 #### Alignment
 You can align the object on its parent with `lv_obj_set_align(obj, LV_ALIGN_...)`. After this every x and y setting will be ralitive to the set alignment mode. 
-For example a this will shift the object by 10;20 px from the center of its parent.
+For example, this will shift the object by 10;20 px from the center of its parent.
 ```c
 lv_obj_set_align(obj, LV_ALIGN_CENTER);
 lv_obj_set_pos(obj, 10, 20);
@@ -42,7 +42,7 @@ lv_obj_align(obj, LV_ALIGN_CENTER, 10, 20);
 
 To align one object to another use `lv_obj_align_to(obj_to_align, obj_referece, LV_ALIGN_..., x, y)`
 
-For example, to align a text below an image: `lv_obj_align(text, image, LV_ALIGN_OUT_BOTTOM_MID, 0, 10)`.
+For example, to align a text below an image: `lv_obj_align_to(text, image, LV_ALIGN_OUT_BOTTOM_MID, 0, 10)`.
 
 The following align types exist:
 ![](/misc/align.png "Alignment types in LVGL")
@@ -68,6 +68,10 @@ for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
 `lv_obj_get_child_id(obj)` returns the index of the object. That is how many younger children its parent has.
 
 You can bring an object to the foreground or send it to the background with `lv_obj_move_foreground(obj)` and `lv_obj_move_background(obj)`.
+
+You can move an object one position up or down in the hierargy with `lv_obj_move_up(obj)` and `lv_obj_move_down(obj)`. 
+
+You can swap the position of two objects with `lv_obj_swap(obj1, obj2)`.
 
 ### Screens
 When you have created a screen like `lv_obj_t * screen = lv_obj_create(NULL)`, you can load it with `lv_scr_load(screen)`. The `lv_scr_act()` function gives you a pointer to the current screen.

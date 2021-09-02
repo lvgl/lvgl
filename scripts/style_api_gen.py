@@ -9,7 +9,7 @@ props = [
  'dsc': "Sets the width of object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MIN_WIDTH',                 
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':'idget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a minimal width. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MAX_WIDTH',                 
@@ -296,7 +296,7 @@ props = [
 
 {'name': 'SHADOW_SPREAD',            
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel t make the area larger/smaller"},
+ 'dsc': "Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
 
 {'name': 'SHADOW_COLOR',            
   'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,

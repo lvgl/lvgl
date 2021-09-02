@@ -42,13 +42,13 @@ In addition to the width, each button can be customized with the following param
 - `LV_BTNMATRIX_CTRL_CUSTOM_1` Custom free to use flag
 - `LV_BTNMATRIX_CTRL_CUSTOM_2` Custom free to use flag
 
-By default all flags are disabled.
+By default, all flags are disabled.
 
 To set or clear a button's control attribute, use `lv_btnmatrix_set_btn_ctrl(btnm, btn_id, LV_BTNM_CTRL_...)` and 
 `lv_btnmatrix_clear_btn_ctrl(btnm, btn_id, LV_BTNMATRIX_CTRL_...)` respectively. More `LV_BTNM_CTRL_...` values can be OR-ed
 
-To set/clear the same control attribute for all buttons of a button matrix, use `lv_btnmatrix_set_btn_ctrl_all(btnm, btn_id, LV_BTNM_CTRL_...)` and 
-`lv_btnmatrix_clear_btn_ctrl_all(btnm, btn_id, LV_BTNMATRIX_CTRL_...)`.
+To set/clear the same control attribute for all buttons of a button matrix, use `lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNM_CTRL_...)` and 
+`lv_btnmatrix_clear_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_...)`.
 
 The set a control map for a button matrix (similarly to the map for the text), use `lv_btnmatrix_set_ctrl_map(btnm, ctrl_map)`.
 An element of `ctrl_map` should look like `ctrl_map[0] = width | LV_BTNM_CTRL_NO_REPEAT |  LV_BTNM_CTRL_CHECHKABLE`. 

@@ -58,7 +58,7 @@ const lv_obj_class_t lv_arc_class  = {
  **********************/
 
 /**
- * Create a arc object
+ * Create an arc object
  * @param par pointer to an object, it will be the parent of the new arc
  * @return pointer to the created arc
  */
@@ -244,7 +244,7 @@ void lv_arc_set_mode(lv_obj_t * obj, lv_arc_mode_t type)
 
 /**
  * Set a new value on the arc
- * @param arc pointer to a arc object
+ * @param arc pointer to an arc object
  * @param value new value
  */
 void lv_arc_set_value(lv_obj_t * obj, int16_t value)
@@ -265,7 +265,7 @@ void lv_arc_set_value(lv_obj_t * obj, int16_t value)
 }
 
 /**
- * Set minimum and the maximum values of a arc
+ * Set minimum and the maximum values of an arc
  * @param arc pointer to the arc object
  * @param min minimum value
  * @param max maximum value
@@ -293,7 +293,7 @@ void lv_arc_set_range(lv_obj_t * obj, int16_t min, int16_t max)
 /**
  * Set the threshold of arc knob increments
  * position.
- * @param arc pointer to a arc object
+ * @param arc pointer to an arc object
  * @param threshold increment threshold
  */
 void lv_arc_set_change_rate(lv_obj_t * obj, uint16_t rate)
@@ -354,8 +354,8 @@ uint16_t lv_arc_get_bg_angle_end(lv_obj_t * obj)
 
 
 /**
- * Get the value of a arc
- * @param arc pointer to a arc object
+ * Get the value of an arc
+ * @param arc pointer to an arc object
  * @return the value of the arc
  */
 int16_t lv_arc_get_value(const lv_obj_t * obj)
@@ -365,8 +365,8 @@ int16_t lv_arc_get_value(const lv_obj_t * obj)
 }
 
 /**
- * Get the minimum value of a arc
- * @param arc pointer to a arc object
+ * Get the minimum value of an arc
+ * @param arc pointer to an arc object
  * @return the minimum value of the arc
  */
 int16_t lv_arc_get_min_value(const lv_obj_t * obj)
@@ -376,8 +376,8 @@ int16_t lv_arc_get_min_value(const lv_obj_t * obj)
 }
 
 /**
- * Get the maximum value of a arc
- * @param arc pointer to a arc object
+ * Get the maximum value of an arc
+ * @param arc pointer to an arc object
  * @return the maximum value of the arc
  */
 int16_t lv_arc_get_max_value(const lv_obj_t * obj)
@@ -388,7 +388,7 @@ int16_t lv_arc_get_max_value(const lv_obj_t * obj)
 
 /**
  * Get whether the arc is type or not.
- * @param arc pointer to a arc object
+ * @param arc pointer to an arc object
  * @return arc type
  */
 lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj)
@@ -508,8 +508,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         int16_t delta_angle = angle - last_angle_rel;
 
         /*Do not allow big jumps.
-         *It's mainly to avoid jumping to the opposite end if the "dead" range between min. an max. is crossed.
-         *Check which was closer on the last valid press (arc->min_close) and prefer that end*/
+         *It's mainly to avoid jumping to the opposite end if the "dead" range between min. and max. is crossed.
+         *Check which end was closer on the last valid press (arc->min_close) and prefer that end*/
         if(LV_ABS(delta_angle) > 280) {
             if(arc->min_close) angle = 0;
             else angle = deg_range;
@@ -552,7 +552,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
 
-        /*Don1't let the elapsed time to big while sitting on an end point*/
+        /*Don't let the elapsed time become too big while sitting on an end point*/
         if(new_value ==arc->min_value || new_value ==arc->max_value) {
            arc->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
         }
@@ -696,12 +696,6 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
     /*Skip this complicated invalidation if the arc is not visible*/
     if(lv_obj_is_visible(obj) == false) return;
 
-    start_angle += arc->rotation;
-    end_angle += arc->rotation;
-
-    if(start_angle >= 360) start_angle -= 360;
-    if(end_angle >= 360) end_angle -= 360;
-
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
     lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
@@ -725,6 +719,9 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
         w += knob_extra_size * 2 + 2;
         rout += knob_extra_size + 2;
     }
+
+    start_angle += arc->rotation;
+    end_angle += arc->rotation;
 
     lv_area_t inv_area;
     lv_draw_arc_get_area(x, y, rout, start_angle, end_angle, w, rounded, &inv_area);
@@ -786,7 +783,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t 
 
 /**
  * Used internally to update arc angles after a value change
- * @param arc pointer to a arc object
+ * @param arc pointer to an arc object
  */
 static void value_update(lv_obj_t * obj)
 {

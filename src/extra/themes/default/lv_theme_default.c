@@ -1,5 +1,5 @@
 /**
- * @file lv_theme_defau.c
+ * @file lv_theme_default.c
  *
  */
 
@@ -74,6 +74,7 @@ typedef struct {
     lv_style_t transition_delayed;
     lv_style_t transition_normal;
     lv_style_t anim;
+    lv_style_t anim_fast;
 
     /*Parts*/
     lv_style_t knob;
@@ -273,9 +274,10 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->btn, color_grey);
     if(!(theme.flags & MODE_DARK)) {
-        lv_style_set_shadow_color(&styles->btn, lv_palette_lighten(LV_PALETTE_GREY, 3));
-        lv_style_set_shadow_width(&styles->btn, 1);
-        lv_style_set_shadow_ofs_y(&styles->btn, lv_disp_dpx(theme.disp, 4));
+        lv_style_set_shadow_color(&styles->btn, lv_palette_main(LV_PALETTE_GREY));
+        lv_style_set_shadow_width(&styles->btn, LV_DPX(3));
+        lv_style_set_shadow_opa(&styles->btn, LV_OPA_50);
+        lv_style_set_shadow_ofs_y(&styles->btn, lv_disp_dpx(theme.disp, LV_DPX(4)));
     }
     lv_style_set_text_color(&styles->btn, color_text);
     lv_style_set_pad_hor(&styles->btn, PAD_DEF);
@@ -299,6 +301,7 @@ static void style_init(void)
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, true);
+    lv_style_set_border_post(&styles->clip_corner, true);
 
     style_init_reset(&styles->pad_normal);
     lv_style_set_pad_all(&styles->pad_normal, PAD_DEF);
@@ -379,6 +382,9 @@ static void style_init(void)
 
     style_init_reset(&styles->anim);
     lv_style_set_anim_time(&styles->anim, 200);
+
+    style_init_reset(&styles->anim_fast);
+    lv_style_set_anim_time(&styles->anim_fast, 120);
 
 #if LV_USE_ARC
     style_init_reset(&styles->arc_indic);
@@ -772,6 +778,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_switch_class)) {
         lv_obj_add_style(obj, &styles->bg_color_grey, 0);
         lv_obj_add_style(obj, &styles->circle, 0);
+        lv_obj_add_style(obj, &styles->anim_fast, 0);
         lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_INDICATOR | LV_STATE_CHECKED);
@@ -781,6 +788,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->bg_color_white, LV_PART_KNOB);
         lv_obj_add_style(obj, &styles->switch_knob, LV_PART_KNOB);
         lv_obj_add_style(obj, &styles->disabled, LV_PART_KNOB | LV_STATE_DISABLED);
+
+        lv_obj_add_style(obj, &styles->transition_normal, LV_PART_INDICATOR | LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->transition_normal, LV_PART_INDICATOR);
     }
 #endif
 
@@ -966,10 +976,15 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 
 #if LV_USE_TABVIEW
-    if(lv_obj_check_type(obj, &lv_tabview_class)) {
+    else if(lv_obj_check_type(obj, &lv_tabview_class)) {
         lv_obj_add_style(obj, &styles->scr, 0);
         lv_obj_add_style(obj, &styles->pad_zero, 0);
-        return;
+    }
+#endif
+
+#if LV_USE_WIN
+    else if(lv_obj_check_type(obj, &lv_win_class)) {
+        lv_obj_add_style(obj, &styles->clip_corner, 0);
     }
 #endif
 

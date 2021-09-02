@@ -15,7 +15,7 @@ Not only the end, but also the start value of the bar can be set, which changes 
 
 ## Parts and Styles
 - `LV_PART_MAIN` The background of the bar and it uses the typical background style properties. Adding padding makes the indicator smaller or larger. The `anim_time` style property sets the animation time if the values set with `LV_ANIM_ON`.
-- `LV_PART_INDICATOR` The indicator itself; also also uses all the typical background properties.
+- `LV_PART_INDICATOR` The indicator itself; also uses all the typical background properties.
  
 ## Usage
 
@@ -27,7 +27,7 @@ The default range is 1..100.
 The new value in `lv_bar_set_value` can be set with or without an animation depending on the last parameter (`LV_ANIM_ON/OFF`).
 
 ### Modes
-The bar can be one the following modes:
+The bar can be one of the following modes:
 - `LV_BAR_MODE_NORMAL` A normal bar as described above
 - `LV_BAR_SYMMETRICAL` Draw the indicator from the zero value to current value. Requires a negative minimum range and positive maximum range.
 - `LV_BAR_RANGE` Allows setting the start value too by `lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start value always has to be smaller than the end value.

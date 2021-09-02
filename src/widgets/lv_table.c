@@ -491,8 +491,8 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t h = 0;
         for(i = 0; i < table->row_cnt; i++) h += table->row_h[i];
 
-        p->x = w;
-        p->y = h;
+        p->x = w - 1;
+        p->y = h - 1;
     }
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING) {
         uint16_t col;

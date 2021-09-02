@@ -502,7 +502,6 @@ static void lv_obj_draw(lv_event_t * e)
         coords.y1 -= h;
         coords.y2 += h;
 
-
         lv_obj_draw_part_dsc_t part_dsc;
         lv_obj_draw_dsc_init(&part_dsc, clip_area);
         part_dsc.class_p = MY_CLASS;

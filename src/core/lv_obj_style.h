@@ -153,7 +153,7 @@ lv_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t pro
 bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector);
 
 /**
- * Used internally to create a style tarnsition
+ * Used internally to create a style transition
  * @param obj
  * @param part
  * @param prev_state

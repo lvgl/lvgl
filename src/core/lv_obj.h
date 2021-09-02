@@ -71,7 +71,7 @@ enum {
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
     LV_PART_KNOB         = 0x030000,   /**< Like handle to grab to adjust the value*/
     LV_PART_SELECTED     = 0x040000,   /**< Indicate the currently selected option or section*/
-    LV_PART_ITEMS        = 0x050000,   /**< Used if the widget has multiple similar elements (e.g. tabel cells)*/
+    LV_PART_ITEMS        = 0x050000,   /**< Used if the widget has multiple similar elements (e.g. table cells)*/
     LV_PART_TICKS        = 0x060000,   /**< Ticks on scale e.g. for a chart or meter*/
     LV_PART_CURSOR       = 0x070000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
 
@@ -161,7 +161,7 @@ typedef struct {
     lv_scroll_snap_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally*/
     lv_scroll_snap_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
     lv_dir_t scroll_dir :4;                 /**< The allowed scroll direction(s)*/
-    uint8_t event_dsc_cnt;                  /**< Number of event callabcks stored in `event_dsc` array*/
+    uint8_t event_dsc_cnt;                  /**< Number of event callbacks stored in `event_dsc` array*/
 }_lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t {

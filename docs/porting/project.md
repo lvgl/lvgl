@@ -3,7 +3,7 @@
 :github_url: |github_link_base|/porting/project.md
 ```
 
-# Set-up a project
+# Set up a project
 
 ## Get the library
 
@@ -19,7 +19,7 @@ There is a configuration header file for LVGL called **lv_conf.h**. In this you 
 
 Copy **lvgl/lv_conf_template.h** next to the *lvgl* directory and rename it to *lv_conf.h*. Open the file and change the `#if 0` at the beginning to `#if 1` to enable its content.
 
-*lv_conf.h* can be copied to another place as well but then you should add `LV_CONF_INCLUDE_SIMPLE` define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for gcc compiler) and set the include path manually. 
+*lv_conf.h* can be copied to another place as well, but then you should add the `LV_CONF_INCLUDE_SIMPLE` define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for gcc compiler) and set the include path manually. 
 In this case LVGL will attempt to include `lv_conf.h` simply with `#include "lv_conf.h"`.
 
 In the config file comments explain the meaning of the options. Be sure to set at least `LV_COLOR_DEPTH` according to your display's color depth.

@@ -38,9 +38,9 @@ lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_SER /
 static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
 lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
 disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-disp_drv.buffer = &draw_buf;          /*Assign the buffer to the display*/
+disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
 disp_drv.hor_res = MY_DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
-disp_drv.hor_res = MY_DISP_VER_RES;   /*Set the verizontal resolution of the display*/
+disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the vertical resolution of the display*/
 lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
 
 void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p)
@@ -59,7 +59,7 @@ void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * co
 }
 
 ```
-- Implement and register a function which can read an input device. E.g. for a touch pad:
+- Implement and register a function which can read an input device. E.g. for a touchpad:
 ```c
 static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
 lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
@@ -67,7 +67,7 @@ indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
     if(touchpad_is_pressed()) {
@@ -94,7 +94,7 @@ Every object has a parent object where it is created. For example if a label is 
 
 The child object moves with the parent and if the parent is deleted the children will be deleted too. 
 
-Children can be visible only on their parent. It other words, the parts of the children outside of the parent are clipped.
+Children can be visible only on their parent. In other words, the parts of the children outside the parent are clipped.
 
 A Screen is the "root" parent. You can have any number of screens. 
 
@@ -142,7 +142,7 @@ void btn_event_cb(lv_event_t * e)
 
 Instead of `LV_EVENT_CLICKED` `LV_EVENT_ALL` can be used too to call the callback for any event. 
 
-From `lv_event_t * e` the current event code can be get with
+From `lv_event_t * e` the current event code can be retrieved with
 ```c
 lv_event_code_t code = lv_event_get_code(e);
 ```
@@ -185,9 +185,9 @@ lv_obj_clear_state(obj, LV_STATE_...);
 ```
 
 ### Styles
-Styles contains properties such as background color, border width, font, etc to describe the appearance of the objects.
+Styles contains properties such as background color, border width, font, etc. to describe the appearance of the objects.
 
-The styles are `lv_style_t` variables. Only their pointer is saved in the objects so they need to be static or global.
+The styles are `lv_style_t` variables. Only their pointer is saved in the objects, so they need to be static or global.
 Before using a style it needs to be initialized with `lv_style_init(&style1)`. After that properties can be added. For example:
 ```
 static lv_style_t style1;

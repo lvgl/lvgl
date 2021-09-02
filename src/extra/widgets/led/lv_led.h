@@ -21,6 +21,15 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/** Brightness when the LED if OFF */
+#ifndef LV_LED_BRIGHT_MIN
+# define LV_LED_BRIGHT_MIN 80
+#endif
+
+/** Brightness when the LED if ON */
+#ifndef LV_LED_BRIGHT_MAX
+# define LV_LED_BRIGHT_MAX 255
+#endif
 
 /**********************
  *      TYPEDEFS

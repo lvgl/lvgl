@@ -930,7 +930,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
             if(i != 0) {
                 if(crowded_mode) {
                     if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                        /*Draw only one vertical line between the min an max y values on the same x value*/
+                        /*Draw only one vertical line between the min and max y-values on the same x-value*/
                         y_max = LV_MAX(y_max, p2.y);
                         y_min = LV_MIN(y_min, p2.y);
                         if(p1.x != p2.x) {

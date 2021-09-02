@@ -18,7 +18,7 @@ The *bpp* also affects the required memory size to store the font. For example, 
 ## Unicode support
 
 LVGL supports **UTF-8** encoded Unicode characters.
-Your editor needs to be configureed to save your code/text as UTF-8 (usually this the default) and be sure that, `LV_TXT_ENC` is set to `LV_TXT_ENC_UTF8` in *lv_conf.h*. (This is the default value)
+Your editor needs to be configured to save your code/text as UTF-8 (usually this the default) and be sure that, `LV_TXT_ENC` is set to `LV_TXT_ENC_UTF8` in *lv_conf.h*. (This is the default value)
 
 To test it try
 ```c
@@ -62,7 +62,7 @@ Containing all the ASCII characters, the degree symbol (U+00B0), the bullet symb
 - `LV_FONT_UNSCII_16` 16 px pixel perfect font with only ASCII characters
 
 
-The built-in fonts are **global variables** with names like `lv_font_montserrat_16` for a 16 px hight font. To use them in a style, just add a pointer to a font variable like shown above.
+The built-in fonts are **global variables** with names like `lv_font_montserrat_16` for a 16 px height font. To use them in a style, just add a pointer to a font variable like shown above.
 
 The built-in fonts with *bpp = 4* contain the ASCII characters and use the [Montserrat](https://fonts.google.com/specimen/Montserrat) font.
 
@@ -138,7 +138,7 @@ For subpixel rendering the fonts need to be generated with special settings:
 - In the command line tool use `--lcd` flag. Note that the generated font needs about 3 times more memory.
 
 Subpixel rendering works only if the color channels of the pixels have a horizontal layout. That is the R, G, B channels are next each other and not above each other. 
-The order of color channels also needs to match with the library settings. By default LVGL assumes `RGB` order, however this can be swapped by setting `LV_SUBPX_BGR  1` in *lv_conf.h*.
+The order of color channels also needs to match with the library settings. By default, LVGL assumes `RGB` order, however this can be swapped by setting `LV_SUBPX_BGR  1` in *lv_conf.h*.
 
 ### Compress fonts
 The bitmaps of the fonts can be compressed by 
@@ -149,7 +149,7 @@ The compression is more effective with larger fonts and higher bpp. However, it'
 Therefore it's recommended to compress only the largest fonts of user interface, because
 - they need the most memory 
 - they can be compressed better
-- and probably they are used less frequently then the medium sized fonts, so the performance cost is smaller.
+- and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
 
 ## Add new font
 
@@ -167,7 +167,7 @@ To make the fonts globally available (like the builtin fonts), add them to `LV_F
 The built-in symbols are created from the [FontAwesome](https://fontawesome.com/) font. 
 
 1. Search symbol on [https://fontawesome.com](https://fontawesome.com). For example the [USB symbol](https://fontawesome.com/icons/usb?style=brands). Copy it's Unicode ID which is `0xf287` in this case.
-2. Open the [Online font converter](https://lvgl.io/tools/fontconverter). Add Add [FontAwesome.woff](https://lvgl.io/assets/others/FontAwesome5-Solid+Brands+Regular.woff). . 
+2. Open the [Online font converter](https://lvgl.io/tools/fontconverter). Add [FontAwesome.woff](https://lvgl.io/assets/others/FontAwesome5-Solid+Brands+Regular.woff). . 
 3. Set the parameters such as Name, Size, BPP. You'll use this name to declare and use the font in your code.
 4. Add the Unicode ID of the symbol to the range field. E.g.` 0xf287` for the USB symbol. More symbols can be enumerated with `,`.
 5. Convert the font and copy it to your project. Make sure to compile the .c file of your font.

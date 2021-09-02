@@ -7,17 +7,17 @@
 ## Overview
 Similarly to many other parts of LVGL, the concept of setting the coordinates was inspired by CSS. By no means a complete implementation of the standard but subsets of CSS were implemented (sometimes with minor adjustments).
 In shorts this means:
-- the set coordinates (size, position, layouts, etc) are stored in styles
+- the set coordinates (size, position, layouts, etc.) are stored in styles
 - support min-width, max-width, min-height, max-height
 - have pixel, percentage, and "content" units 
-- x=0; y=0 coordinate means the to top-left corner of the parent plus the left/top padding plus border width
+- x=0; y=0 coordinate means the top-left corner of the parent plus the left/top padding plus border width
 - width/height means the full size, the "content area" is smaller with padding and border width 
 - a subset of flexbox and grid layouts are supported
  
 ###  Units
 - pixel: Simply a position in pixels. A simple integer always means pixel. E.g. `lv_obj_set_x(btn, 10)`
 - percentage: The percentage of the size of the object or its parent (depending on the property). The `lv_pct(value)` converts a value to percentage. E.g. `lv_obj_set_width(btn, lv_pct(50))`
-- `LV_SIZE_CONTENT`: Special value to set the width/height of an object to involve all the children. Its similar to `auto` in CSS. E.g. `lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+- `LV_SIZE_CONTENT`: Special value to set the width/height of an object to involve all the children. It's similar to `auto` in CSS. E.g. `lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
 
 ### Boxing model
 LVGL follows CSS's [border-box](https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing) model.
@@ -27,11 +27,11 @@ An object's "box" is built from the following parts:
 - padding: space between the sides of the object and its children. 
 - content: the content area which size if the bounding box reduced by the border width and the size of the paddings.
 
-![The box models of LVGL: The content area is smaller then the bounding box with the padding and border width](/misc/boxmodel.png)
+![The box models of LVGL: The content area is smaller than the bounding box with the padding and border width](/misc/boxmodel.png)
 
 The border is drawn inside the bounding box. Inside the border LVGL keeps "padding size" to place the children. 
 
-The outline is drawn outside of the bounding box.
+The outline is drawn outside the bounding box.
 
 ### Important notes
 This section describes special cases in which LVGL's behavior might be unexpected.
@@ -40,7 +40,7 @@ This section describes special cases in which LVGL's behavior might be unexpecte
 LVGL doesn't recalculate all the coordinate changes immediately. This is done to improve performance. 
 Instead, the objects are marked as "dirty" and before redrawing the screen LVGL checks if there are any "dirty" objects. If so it refreshes their position, size and layout.
 
-In other words, if you need to get the any coordinate of an object and it the coordinates were just changed LVGL's needs to be forced to recalculate the coordinates. 
+In other words, if you need to get the coordinate of an object and the coordinates were just changed LVGL needs to be forced to recalculate the coordinates. 
 To do this call `lv_obj_update_layout(obj)`.
  
 The size and position might depend on the parent or layout. Therefore `lv_obj_update_layout` recalculates the coordinates of all objects on the screen of `obj`.
@@ -49,7 +49,7 @@ The size and position might depend on the parent or layout. Therefore `lv_obj_up
 As it's described in the [Using styles](#using-styles) section the coordinates can be set via style properties too. 
 To be more precise under the hood every style coordinate related property is stored as style a property. If you use `lv_obj_set_x(obj, 20)` LVGL saves `x=20` in the local style of the object.
 
-It's an internal mechanism and doesn't matter much as you use LVGL. However, there is one case in which you need to aware of that. If the style(s) of an object are removed by 
+It's an internal mechanism and doesn't matter much as you use LVGL. However, there is one case in which you need to be aware of that. If the style(s) of an object are removed by 
 ```c
 lv_obj_remove_style_all(obj)
 ```
@@ -82,7 +82,7 @@ lv_obj_set_y(obj, 20);
 lv_obj_set_pos(obj, 10, 20); 	//Or in one function
 ```
 
-By default the the x and y coordinates are measured from the top left corner of the parent's content area. 
+By default, the x and y coordinates are measured from the top left corner of the parent's content area. 
 For example if the parent has 5 pixels padding on every side, the above code will place `obj` at (15, 25) because the content area starts after the padding.
 
 If percentage values are calculated from the parents content area size. 
@@ -91,7 +91,7 @@ lv_obj_set_x(btn, lv_pct(10)); //x = 10 % of parant content area width
 ```
 
 ### Align
-In some cases it's convenient to change the origin of the positioning from the the default top left. If the origin is changed e.g. to bottom-right, the (0,0) position means: align to the bottom-right corner. 
+In some cases it's convenient to change the origin of the positioning from the default top left. If the origin is changed e.g. to bottom-right, the (0,0) position means: align to the bottom-right corner. 
 To change the origin use:
 ```c
 lv_obj_set_align(obj, align);
@@ -113,7 +113,7 @@ The following alignment options can be used:
 - `LV_ALIGN_RIGHT_MID`
 - `LV_ALIGN_CENTER`
 
-It quite common to align a children to the center of its parent, there fore is a dedicated function for it:
+It's quite common to align a child to the center of its parent, therefore a dedicated function exists:
 ```c
 lv_obj_center(obj);
 
@@ -123,12 +123,12 @@ lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 
 If the parent's size changes the set alignment and position of the children is applied again automatically.
 
-The functions introduced above aligns the object to its parent. However it's also possible to align an object to an arbitrary object.
+The functions introduced above align the object to its parent. However, it's also possible to align an object to an arbitrary object.
 ```c
 lv_obj_align_to(obj_to_align, reference_obj, align, x, y);
 ```
 
-Besides the alignments options above the following can be used to align the object outside of the reference object:
+Besides the alignments options above, the following can be used to align the object outside the reference object:
 
 - `LV_ALIGN_OUT_TOP_LEFT`
 - `LV_ALIGN_OUT_TOP_MID`
@@ -176,7 +176,7 @@ lv_obj_set_content_width(obj, 50); //The actual width: padding left + 50 + paddi
 lv_obj_set_content_height(obj, 30); //The actual width: padding top + 30 + padding bottom
 ```
 
-The size of the bounding box and the content area can be get with the following functions:
+The size of the bounding box and the content area can be retrieved with the following functions:
 ```c
 lv_coord_t w = lv_obj_get_width(obj);
 lv_coord_t h = lv_obj_get_height(obj);
@@ -186,10 +186,10 @@ lv_coord_t content_h = lv_obj_get_content_height(obj);
 
 ## Using styles
 Under the hood the position, size and alignment properties are style properties. 
-The above described "simple functions" hide the style related code for the sake of simplicity and set the position, size, and alignment properties in the local styles of the obejct.
+The above described "simple functions" hide the style related code for the sake of simplicity and set the position, size, and alignment properties in the local styles of the object.
 
 However, using styles as to set the coordinates has some great advantages:
-- It makes it easy to set the width/height/etc for several objects together. E.g. make all the sliders 100x10 pixels sized. 
+- It makes it easy to set the width/height/etc. for several objects together. E.g. make all the sliders 100x10 pixels sized. 
 - It also makes possible to modify the values in one place.
 - The values can be overwritten by other styles. For example `style_btn` makes the object `100x50` by default but adding `style_full_width` overwrites only the width of the object.
 - The object can have different position or size in different state. E.g. 100 px wide in `LV_STATE_DEFAULT` but 120 px in `LV_STATE_PRESSED`.
@@ -234,7 +234,7 @@ lv_obj_add_style(btn3, &style_normal, LV_STATE_DEFAULT);
 lv_obj_add_style(btn3, &style_pressed, LV_STATE_PRESSED);
 ```
 
-It works but it's not really flexible because the pressed coordinate is hard-coded. If the buttons are not at y=100 `style_pressed` won't work as expected. To solve this translations can be used:
+It works, but it's not really flexible because the pressed coordinate is hard-coded. If the buttons are not at y=100 `style_pressed` won't work as expected. To solve this, translations can be used:
 ```c
 static lv_style_t style_normal;
 lv_style_init(&style_normal);
@@ -268,9 +268,9 @@ Similarly to the position the size can be changed relative to the current size a
 The transformed width and height are added on both sides of the object. This means 10 px transformed width makes the object 2x10 pixel wider.
 
 Unlike position translation, the size transformation doesn't make the object "really" larger. In other words scrollbars, layouts, `LV_SIZE_CONTENT` will not consider the transformed size. 
-Hence size transformation if "only" a visual effect. 
+Hence, size transformation if "only" a visual effect. 
 
-This code makes the a button larger when it's pressed:
+This code enlarges a button when it's pressed:
 ```c
 static lv_style_t style_pressed;
 lv_style_init(&style_pressed);
@@ -281,7 +281,7 @@ lv_obj_add_style(btn, &style_pressed, LV_STATE_PRESSED);
 ```
 
 ### Min and Max size
-Similarly to CSS, LVGL also support `min-width`, `max-width`, `min-height` and `max-height`. These are limits preventing an object's size to be smaller/larger then these values. 
+Similarly to CSS, LVGL also support `min-width`, `max-width`, `min-height` and `max-height`. These are limits preventing an object's size to be smaller/larger than these values. 
 They are especially useful if the size is set by percentage or `LV_SIZE_CONTENT`.
 ```c
 static lv_style_t style_max_height;
@@ -329,7 +329,7 @@ These flags can be added/removed with `lv_obj_add/clear_flag(obj, FLAG);`
 
 ### Adding new layouts
 
-LVGL can be freely extended by a custom layouts like this:
+LVGL can be freely extended by a custom layout like this:
 ```c
 uint32_t MY_LAYOUT;
 
@@ -345,7 +345,7 @@ void my_layout_update(lv_obj_t * obj, void * user_data)
 }
 ```
 
-Custom style properties can be added too that can be get and used in the update callback. For example:
+Custom style properties can be added which can be retrieved and used in the update callback. For example:
 ```c
 uint32_t MY_PROP;
 ...
@@ -364,5 +364,3 @@ static inline void lv_style_set_my_prop(lv_style_t * style, uint32_t value)
 ```
 
 ## Examples
-
-

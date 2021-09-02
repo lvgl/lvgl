@@ -22,7 +22,7 @@ The Dropdown widget is built from the elements: "button" and "list" (both not re
 - `LV_PART_MAIN` The background of the button. Uses the typical background properties and text properties for the text on it.
 - `LV_PART_INDICATOR` Typically an arrow symbol that can be an image or a text (`LV_SYMBOL`).
 
-The button goes to `LV_STATE_CHECKED` when its opened.
+The button goes to `LV_STATE_CHECKED` when it's opened.
 
 ### List
 - `LV_PART_MAIN` The list itself. Uses the typical background properties. `max_height` can be used to limit the height of the list. 
@@ -63,7 +63,7 @@ The list can be created on any side. The default `LV_DIR_BOTTOM` can be modified
 If the list would be vertically out of the screen, it will be aligned to the edge.
 
 ### Symbol
-A symbol (typically an arrow) can be added to the drop down list with `lv_dropdown_set_symbol(dropdown, LV_SYMBOL_...)`
+A symbol (typically an arrow) can be added to the dropdown list with `lv_dropdown_set_symbol(dropdown, LV_SYMBOL_...)`
 
 If the direction of the drop-down list is  `LV_DIR_LEFT` the symbol will be shown on the left, otherwise on the right.
 
