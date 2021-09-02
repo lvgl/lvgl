@@ -126,7 +126,7 @@ Every MCU which is capable of driving a display via Parallel port, SPI, RGB inte
 
 This includes:
 - "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32 etc. 
-- Bluetooth, GSM, WiFi modules like Nordic NRF and Espressif ESP32
+- Bluetooth, GSM, Wi-Fi modules like Nordic NRF and Espressif ESP32
 - Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
 - And anything else with a strong enough MCU and a periphery to drive a display
 
@@ -181,7 +181,7 @@ my_flush_cb(NULL, &a, buf);
 ### Why I see nonsense colors on the screen? 
 Probably LVGL's color format is not compatible with your displays color format. Check `LV_COLOR_DEPTH` in *lv_conf.h*.
 
-If you are using 16 bit colors with SPI (or other byte-oriented interface) probably you need to set `LV_COLOR_16_SWAP  1` in *lv_conf.h*. 
+If you are using 16-bit colors with SPI (or other byte-oriented interface) probably you need to set `LV_COLOR_16_SWAP  1` in *lv_conf.h*. 
 It swaps the upper and lower bytes of the pixels.
 
 ### How to speed up my UI?

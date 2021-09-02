@@ -7,13 +7,13 @@
 
 ## Overview
 
-The Checkbox object is created from a "tick box" and a label. When the Chackbox is clicked the tick box is toggled.
+The Checkbox object is created from a "tick box" and a label. When the Checkbox is clicked the tick box is toggled.
 
 ## Parts and Styles
-- `LV_PART_MAIN` The is the background of the Checkbox and it uses the text and all the typical backround style properties. 
+- `LV_PART_MAIN` The is the background of the Checkbox and it uses the text and all the typical background style properties. 
 `pad_column` adjusts the spacing between the tickbox and the label
-- `LV_PART_INDICATOR` The "tick box" is a square that uses all the typical backround style properties. 
-By default its size is equal to the height of the main part's font. Padding properties make the tick box larger in the respective directions.
+- `LV_PART_INDICATOR` The "tick box" is a square that uses all the typical background style properties. 
+By default, its size is equal to the height of the main part's font. Padding properties make the tick box larger in the respective directions.
 
 The Checkbox is added to the default group (if it is set). 
 

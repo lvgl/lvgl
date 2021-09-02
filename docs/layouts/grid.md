@@ -9,7 +9,7 @@
 
 The Grid layout is a subset of [CSS Flexbox](https://css-tricks.com/snippets/css/complete-guide-grid/).
 
-It can arrange items into 2D "table" that has rows or columns (tracks). The item can span through multiple columns or rows.
+It can arrange items into a 2D "table" that has rows or columns (tracks). The item can span through multiple columns or rows.
 The track's size can be set in pixel, to the largest item (`LV_GRID_CONTENT`) or in "Free unit" (FR) to distribute the free space proportionally.
 
 To make an object a grid container call `lv_obj_set_layout(obj, LV_LAYOUT_GRID)`.
@@ -42,7 +42,7 @@ Besides simple settings the size in pixel you can use two special values:
 - `LV_GRID_FR(X)` tell what portion of the remaining space should be used by this track. Larger value means larger space.
 
 ### Grid items
-By default the children are not added to the grid. They need to be added manually to a cell. 
+By default, the children are not added to the grid. They need to be added manually to a cell. 
 
 To do this call `lv_obj_set_grid_cell(child, column_align, column_pos, column_span, row_align, row_pos, row_span)`.
 

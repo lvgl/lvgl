@@ -272,7 +272,7 @@ lv_coord_t lv_obj_get_height(const struct _lv_obj_t * obj);
 lv_coord_t lv_obj_get_content_width(const struct _lv_obj_t * obj);
 
 /**
- * Get the height reduced by the top an bottom padding and the border width.
+ * Get the height reduced by the top and bottom padding and the border width.
  * @param obj       pointer to an object
  * @note            The position of the object is recalculated only on the next redraw. To force coordinate recalculation
  *                  call `lv_obj_update_layout(obj)`.
@@ -379,7 +379,7 @@ bool lv_obj_hit_test(struct _lv_obj_t * obj, const lv_point_t * point);
  * @param min_width     the minimal width
  * @param max_width     the maximal width
  * @param ref_width     the reference width used when min/max width is in percentage
- * @return              the clampled width
+ * @return              the clamped width
  */
 lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max_width, lv_coord_t ref_width);
 
@@ -389,7 +389,7 @@ lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max
  * @param min_height     the minimal height
  * @param max_height     the maximal height
  * @param ref_height     the reference height used when min/max height is in percentage
- * @return              the clampled height
+ * @return              the clamped height
  */
 lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t max_height, lv_coord_t ref_height);
 

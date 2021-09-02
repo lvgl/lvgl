@@ -177,7 +177,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
         int32_t i;
         for(i = 0; i < coords_w; i++) {
-            grad_map[i] = grad_get(dsc, coords_w, i);
+            grad_map[i] = grad_get(dsc, coords_w, i - coords_bg.x1);
         }
     }
 
@@ -187,8 +187,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     blend_area.x1 = draw_area.x1;
     blend_area.x2 = draw_area.x2;
 
-
-    /*There is an other mask too. Draw line by line. */
+    /*There is another mask too. Draw line by line. */
     if(mask_any) {
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             blend_area.y1 = h;
@@ -198,6 +197,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
              * It saves calculating the final opa in _lv_blend_fill*/
             lv_memset(mask_buf, opa, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, draw_area.x1, h, draw_area_w);
+            if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             if(grad_dir == LV_GRAD_DIR_NONE) {
                 _lv_blend_fill(clip_area, &blend_area, dsc->bg_color, mask_buf, mask_res, LV_OPA_COVER, dsc->blend_mode);
@@ -334,7 +334,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv
         lv_img_header_t header;
         lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
         if(res != LV_RES_OK) {
-            LV_LOG_WARN("Coudn't read the background image");
+            LV_LOG_WARN("Couldn't read the background image");
             return;
         }
 
@@ -860,7 +860,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 /**
  * Calculate a blurred corner
  * @param coords Coordinates of the shadow
- * @param sh_buf a buffer to store the result. It's size should be `(sw + r)^2 * 2`
+ * @param sh_buf a buffer to store the result. Its size should be `(sw + r)^2 * 2`
  * @param sw shadow width
  * @param r radius
  */
@@ -1286,8 +1286,6 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
 static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_area, const lv_area_t * inner_area,
         lv_color_t color, lv_opa_t opa)
 {
-
-
     bool top_side = outer_area->y1 <= inner_area->y1 ? true : false;
     bool bottom_side = outer_area->y2 >= inner_area->y2 ? true : false;
     bool left_side = outer_area->x1 <= inner_area->x1 ? true : false;
@@ -1298,13 +1296,13 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
     a.x1 = outer_area->x1;
     a.x2 = outer_area->x2;
     a.y1 = outer_area->y1;
-    a.y2 = inner_area->y1;
+    a.y2 = inner_area->y1 - 1;
     if(top_side) {
         _lv_blend_fill(clip, &a, color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, LV_BLEND_MODE_NORMAL);
     }
 
     /*Bottom*/
-    a.y1 = inner_area->y2;
+    a.y1 = inner_area->y2 + 1;
     a.y2 = outer_area->y2;
     if(bottom_side) {
         _lv_blend_fill(clip, &a, color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, LV_BLEND_MODE_NORMAL);
@@ -1312,7 +1310,7 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
 
     /*Left*/
     a.x1 = outer_area->x1;
-    a.x2 = inner_area->x1;
+    a.x2 = inner_area->x1 - 1;
     a.y1 = (top_side) ? inner_area->y1 : outer_area->y1;
     a.y2 = (bottom_side) ? inner_area->y2 : outer_area->y2;
     if(left_side) {
@@ -1320,7 +1318,7 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
     }
 
     /*Right*/
-    a.x1 = inner_area->x2;
+    a.x1 = inner_area->x2 + 1;
     a.x2 = outer_area->x2;
     if(right_side) {
         _lv_blend_fill(clip, &a, color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, LV_BLEND_MODE_NORMAL);

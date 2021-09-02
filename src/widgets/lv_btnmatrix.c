@@ -361,7 +361,7 @@ static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
 
-    LV_TRACE_OBJ_CREATE("finshed");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
@@ -373,7 +373,7 @@ static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_mem_free(btnm->ctrl_bits);
     btnm->button_areas = NULL;
     btnm->ctrl_bits = NULL;
-    LV_TRACE_OBJ_CREATE("finshed");
+    LV_TRACE_OBJ_CREATE("finished");
 }
 
 static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -940,7 +940,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     lv_obj_get_coords(obj, &obj_area);
 
     /*The buttons might have outline and shadow so make the invalidation larger with the gaps between the buttons.
-     *It assumes that the outline or shadow is smaller then the gaps*/
+     *It assumes that the outline or shadow is smaller than the gaps*/
     lv_coord_t row_gap = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 

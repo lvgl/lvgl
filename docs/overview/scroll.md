@@ -24,7 +24,7 @@ The scrollbars are displayed according to the set `mode`. The following `mode`s 
 
 
 #### Styling
-The scrollbars have their own dedicated part, called `LV_PART_SCROLLBAR`. For example a scrollbar can turned to red like this:
+The scrollbars have their own dedicated part, called `LV_PART_SCROLLBAR`. For example a scrollbar can turn to red like this:
 ```c
 static lv_style_t style_red;
 lv_style_init(&style_red);
@@ -47,6 +47,10 @@ lv_style_set_bg_color(&style_red, lv_color_blue());
 lv_obj_add_style(obj, &style_blue, LV_STATE_SCROLLED | LV_PART_SCROLLBAR);
 ```
 
+If the base direction of the `LV_PART_SCROLLBAR` is RTL (`LV_BASE_DIR_RTL`) the vertical scrollbar will be placed on the left. 
+Note that, the `base_dir` style property is inherited. Therefore, it can be set directly on the `LV_PART_SCROLLBAR` part of an object
+or on the obejct's or any parent's main part to make scrollbar inherit the base direction. 
+
 ### Events
 The following events are related to scrolling:
 - `LV_EVENT_SCROLL_BEGIN` Scrolling begins
@@ -59,7 +63,7 @@ TODO
 
 ## Features of scrolling
 
-Besides managing "normal" scrolling there are many interesting and useful additional features too.
+Besides, managing "normal" scrolling there are many interesting and useful additional features too.
 
 
 ### Scrollable
@@ -82,8 +86,8 @@ OR-ed values are also possible. E.g. `LV_DIR_TOP | LV_DIR_LEFT`.
 
 
 ### Scroll chain
-If an object can't be scrolled further (e.g. it's content has reached the bottom most position) the scrolling is propagated to it's parent. If the parent an be scrolled in that direction than it will be scrolled instead.
-It propagets to the grandparent and grand-grandparents too.
+If an object can't be scrolled further (e.g. its content has reached the bottom most position) the scrolling is propagated to its parent. If the parent can be scrolled in that direction than it will be scrolled instead.
+It propagates to the grandparent and grand-grandparents too.
 
 The propagation on scrolling is called "scroll chaining" and it can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_CHAIN` flag. 
 If chaining is disabled the propagation stops on the object and the parent(s) won't be scrolled.
@@ -123,7 +127,7 @@ So this requires to make the children snappable and set a scroll snap alignment 
 This feature can be enabled by the `LV_OBJ_FLAG_SCROLL_ONE` flag.
 
 ### Scroll on focus
-Imagine that there a lot of objects in a group that are on scrollable object. Pressing the "Tab" button focuses the next object but it might be out of the visible area of the scrollable object. 
+Imagine that there a lot of objects in a group that are on scrollable object. Pressing the "Tab" button focuses the next object, but it might be out of the visible area of the scrollable object. 
 If the "scroll on focus" features is enabled LVGL will automatically scroll to the objects to bring the children into the view. 
 The scrolling happens recursively therefore even nested scrollable object are handled properly. 
 The object will be scrolled to the view even if it's on a different page of a tabview. 

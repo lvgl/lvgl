@@ -21,7 +21,7 @@ btn=lv.btn(lv.scr_act())
 # Create a buffer for the canvas
 cbuf= bytearray(LV_CANVAS_BUF_SIZE_INDEXED_1BIT(CANVAS_WIDTH, CANVAS_HEIGHT))
 
-# Create a canvas and initialize its the palette
+# Create a canvas and initialize its palette
 canvas = lv.canvas(lv.scr_act())
 canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.img.CF.INDEXED_1BIT)
 canvas.set_palette(0, LV_COLOR_CHROMA_KEY)

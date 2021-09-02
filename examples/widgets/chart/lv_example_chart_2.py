@@ -9,7 +9,7 @@ def draw_event_cb(e):
     if not dsc.p1 or not dsc.p2:
         return
 
-    # Add  a line mask that keeps the area below the line
+    # Add a line mask that keeps the area below the line
     line_mask_param = lv.draw_mask_line_param_t()
     line_mask_param.points_init(dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y, lv.DRAW_MASK_LINE_SIDE.BOTTOM)
     # line_mask_id = line_mask_param.draw_mask_add(None)

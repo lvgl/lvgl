@@ -161,7 +161,7 @@ With *User encoded* formats, the color format in the open function (`dsc->header
 
 Here's an example of getting LVGL to work with PNG images.
 
-First, you need to create a new image decoder and set some functions to open/close the PNG files. It should looks like this:
+First, you need to create a new image decoder and set some functions to open/close the PNG files. It should look like this:
 
 ```c
 /*Create a new decoder and register functions */
@@ -256,10 +256,10 @@ So in summary:
 - In `decoder_open`, you should try to open the image source pointed by `dsc->src`. Its type is already in `dsc->src_type == LV_IMG_SRC_FILE/VARIABLE`.
 If this format/type is not supported by the decoder, return `LV_RES_INV`.
 However, if you can open the image, a pointer to the decoded *True color* image should be set in `dsc->img_data`.
-If the format is known but you don't want to decode the entire image (e.g. no memory for it) set `dsc->img_data = NULL` to call `read_line` to get the pixels.
+If the format is known, but you don't want to decode the entire image (e.g. no memory for it), set `dsc->img_data = NULL` to call `read_line` to get the pixels.
 - In `decoder_close` you should free all the allocated resources.
 - `decoder_read` is optional. Decoding the whole image requires extra memory and some computational overhead.
-However, if can decode one line of the image without decoding the whole image, you can save memory and time.
+However, it can decode one line of the image without decoding the whole image, you can save memory and time.
 To indicate that the *line read* function should be used, set `dsc->img_data = NULL` in the open function.
 
 
@@ -295,7 +295,7 @@ The number of cache entries can be defined in `LV_IMG_CACHE_DEF_SIZE` in *lv_con
 The size of the cache can be changed at run-time with `lv_img_cache_set_size(entry_num)`.
 
 ### Value of images
-When you use more images than cache entries, LVGL can't cache all of the images. Instead, the library will close one of the cached images (to free space).
+When you use more images than cache entries, LVGL can't cache all the images. Instead, the library will close one of the cached images (to free space).
 
 To decide which image to close, LVGL uses a measurement it previously made of how long it took to open the image. Cache entries that hold slower-to-open images are considered more valuable and are kept in the cache as long as possible.
 

@@ -206,8 +206,9 @@ static void lv_checkbox_draw(lv_event_t * e)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t font_h = lv_font_get_line_height(font);
 
-    lv_coord_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bg_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t bg_border = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + bg_border;
+    lv_coord_t bg_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + bg_border;
     lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);

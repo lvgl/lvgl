@@ -93,5 +93,4 @@ else(ESP_PLATFORM)
         add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
     endif(MICROPY_DIR)
 
-
 endif(ESP_PLATFORM)

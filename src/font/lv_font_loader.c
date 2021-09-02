@@ -457,6 +457,10 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
             if(res != LV_FS_RES_OK) {
                 return -1;
             }
+
+            /*The last fragment should be on the MSB but read_bits() will place it to the LSB*/
+            glyph_bmp[cur_bmp_size + bmp_size - 1] = glyph_bmp[cur_bmp_size + bmp_size - 1] << (nbits % 8);
+
         }
 
         cur_bmp_size += bmp_size;

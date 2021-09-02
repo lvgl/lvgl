@@ -112,7 +112,7 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
  * @param buf a buffer which should be filled using a mask
  * @param buf_w width of the buffer in pixels
  * @param color fill color
- * @param mask 0..255 values describing the opacity of the corresponding pixel. It's width is `fill_w`
+ * @param mask 0..255 values describing the opacity of the corresponding pixel. Its width is `fill_w`
  * @param opa overall opacity. 255 in `mask` should mean this opacity.
  * @param fill_w width to fill in pixels (<= buf_w)
  * @param fill_h height to fill in pixels

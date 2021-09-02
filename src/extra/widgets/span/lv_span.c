@@ -244,8 +244,6 @@ void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent)
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
-    if(spans->mode == mode) return;
-
     spans->mode = mode;
     lv_spangroup_refr_mode(obj);
 }
@@ -432,15 +430,16 @@ lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj)
         return 0;
     }
 
-    lv_coord_t width = 0;
+    lv_coord_t width = spans->indent;
     lv_span_t * cur_span;
+    lv_coord_t letter_space = 0;
     _LV_LL_READ(&spans->child_ll, cur_span) {
         const lv_font_t * font = lv_span_get_style_text_font(obj, cur_span);
-        lv_coord_t letter_space = lv_span_get_style_text_letter_space(obj, cur_span);
+        letter_space = lv_span_get_style_text_letter_space(obj, cur_span);
         uint32_t j = 0;
         const char * cur_txt = cur_span->txt;
         span_text_check(&cur_txt);
-        while(cur_txt[j] != 0) {
+        while(cur_txt[j] != '\0') {
             uint32_t letter      = _lv_txt_encoded_next(cur_txt, &j);
             uint32_t letter_next = _lv_txt_encoded_next(&cur_txt[j], NULL);
             int32_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
@@ -448,7 +447,7 @@ lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj)
         }
     }
 
-    return width;
+    return width - letter_space;
 }
 
 /**
@@ -540,6 +539,7 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
         txt_pos.y += max_line_h;
         max_w = max_width;
     }
+    txt_pos.y -= line_space;
 
     return txt_pos.y;
 }
@@ -759,13 +759,11 @@ static lv_blend_mode_t lv_span_get_style_text_blend_mode(lv_obj_t * par, lv_span
 
 static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span)
 {
-    LV_UNUSED(par);
-
     int32_t decor;
     lv_style_value_t value;
     lv_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_DECOR, &value);
     if(res != LV_RES_OK) {
-        decor = LV_TEXT_DECOR_NONE;
+        decor = (lv_text_decor_t)lv_obj_get_style_text_decor(par, LV_PART_MAIN);;
     }
     else {
         decor = (int32_t)value.num;
@@ -819,8 +817,11 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
     lv_snippet_t snippet;   /* use to save cur_span info and push it to stack */
     memset(&snippet, 0, sizeof(snippet));
 
+    bool is_first_line = true;
     /* the loop control how many lines need to draw */
     while(cur_span) {
+        bool is_end_line = false;
+        bool ellipsis_valid = false;
         lv_coord_t max_line_h = 0;  /* the max height of span-font when a line have a lot of span */
         lv_snippet_clear();
 
@@ -844,8 +845,10 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             }
 
             if(spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS) {
-                /* span txt overflow, don't push */
+                /* curretn line span txt overflow, don't push */
                 if(txt_pos.y + snippet.line_h - line_space > coords->y2 + 1) {
+                    ellipsis_valid = true;
+                    is_end_line = true;
                     break;
                 }
             }
@@ -856,13 +859,32 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             bool isfill = lv_txt_get_snippet(&cur_txt[cur_txt_ofs], snippet.font, snippet.letter_space,
                                              max_w, txt_flag, &use_width, &next_ofs);
 
-            /* break word deal width */
-            if(isfill && next_ofs > 0 && lv_get_snippet_cnt() > 0) {
-                uint32_t letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs - 1];
-                if(!(letter == '\0' || letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter))) {
-                    letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs];
-                    if(!(letter == '\0' || letter == '\n'  || letter == '\r' || _lv_txt_is_break_char(letter))) {
-                        break;
+            if(isfill) {
+                lv_coord_t next_line_h = snippet.line_h;
+                if(cur_txt[cur_txt_ofs + next_ofs] == '\0') {
+                    next_line_h = 0;
+                    lv_span_t * next_span = _lv_ll_get_next(&spans->child_ll, cur_span);
+                    if(next_span) { /* have the next line */
+                        next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                    }
+                }
+                lv_coord_t cur_line_h = max_line_h < snippet.line_h ? snippet.line_h : max_line_h;
+                if(txt_pos.y + cur_line_h + next_line_h - line_space > coords->y2 + 1) { /* for overflow if is end line. */
+                    if(cur_txt[cur_txt_ofs + next_ofs] != '\0') {
+                        next_ofs = strlen(&cur_txt[cur_txt_ofs]);
+                        use_width = lv_txt_get_width(&cur_txt[cur_txt_ofs], next_ofs, snippet.font, snippet.letter_space, txt_flag);
+                        ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS ? true : false;
+                        is_end_line = true;
+                    }
+                }
+                else if(next_ofs > 0 && lv_get_snippet_cnt() > 0) {
+                    /* break word deal width */
+                    uint32_t letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs - 1];
+                    if(!(letter == '\0' || letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter))) {
+                        letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs];
+                        if(!(letter == '\0' || letter == '\n'  || letter == '\r' || _lv_txt_is_break_char(letter))) {
+                            break;
+                        }
                     }
                 }
             }
@@ -876,10 +898,10 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             }
 
             lv_snippet_push(&snippet);
-            if(isfill) {
+            max_w = max_w - use_width - snippet.letter_space;
+            if(isfill || max_w <= 0) {
                 break;
             }
-            max_w -= use_width;
         }
 
         /* start current line deal width */
@@ -894,38 +916,19 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             goto Next_line_init;
         }
 
-        /* overflow deal width */
-        bool ellipsis_valid = false;
-        if(spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS) {
-            lv_coord_t next_line_h = snippet.line_h;
-            if(cur_txt[cur_txt_ofs] == '\0') {  /* current span deal with ok, need get next line first line height */
-                next_line_h = 0;
-                if(cur_span) {
-                    lv_span_t * next_span = _lv_ll_get_next(&spans->child_ll, cur_span);
-                    if(next_span) { /* have the next line */
-                        next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
-                    }
-                }
-            }
-            if(txt_pos.y + max_line_h + next_line_h > coords->y2  + 1) {
-                ellipsis_valid = true;
-            }
-        }
-
         /* align deal with */
         lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
         if(align != LV_TEXT_ALIGN_LEFT) {
             lv_coord_t align_ofs = 0;
-            lv_coord_t txts_w = 0;
+            lv_coord_t txts_w = is_first_line ? spans->indent : 0;
             for(int i = 0; i < item_cnt; i++) {
                 lv_snippet_t * pinfo = lv_get_snippet(i);
-                txts_w += pinfo->txt_w;
+                txts_w = txts_w + pinfo->txt_w + pinfo->letter_space;
             }
+            txts_w -= lv_get_snippet(item_cnt - 1)->letter_space;
+            align_ofs = max_width > txts_w ? max_width - txts_w : 0;
             if(align == LV_TEXT_ALIGN_CENTER) {
-                align_ofs = (max_width - txts_w) / 2;
-            }
-            else if(align == LV_TEXT_ALIGN_RIGHT) {
-                align_ofs = max_width - txts_w;
+                align_ofs = align_ofs >> 1;
             }
             txt_pos.x += align_ofs;
         }
@@ -949,7 +952,6 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             uint16_t dot_letter_w = 0;
             uint16_t dot_width = 0;
             if(ellipsis_valid) {
-                txt_bytes = strlen(bidi_txt);
                 dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;
             }
@@ -977,6 +979,9 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
                     for(int ell = 0; ell < 3; ell++) {
                         lv_draw_letter(&pos, &clipped_area, pinfo->font, '.', letter_color, letter_opa, blend_mode);
                         pos.x = pos.x + dot_letter_w + pinfo->letter_space;
+                    }
+                    if(pos.x <= ellipsis_width) {
+                        pos.x = ellipsis_width + 1;
                     }
                     break;
                 }
@@ -1009,7 +1014,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
                     lv_point_t p1;
                     lv_point_t p2;
                     p1.x = txt_pos.x;
-                    p1.y = pos.y + (pinfo->line_h / 2)  + line_dsc.width / 2;
+                    p1.y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
                     p2.x = pos.x;
                     p2.y = p1.y;
                     lv_draw_line(&p1, &p2, mask, &line_dsc);
@@ -1019,7 +1024,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
                     lv_point_t p1;
                     lv_point_t p2;
                     p1.x = txt_pos.x;
-                    p1.y = pos.y + pinfo->line_h - pinfo->font->base_line - pinfo->font->underline_position;
+                    p1.y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
                     p2.x = pos.x;
                     p2.y = p1.y;
                     lv_draw_line(&p1, &p2, &clipped_area, &line_dsc);
@@ -1030,9 +1035,10 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
 
 Next_line_init:
         /* next line init */
+        is_first_line = false;
         txt_pos.x = coords->x1;
         txt_pos.y += max_line_h;
-        if(txt_pos.y > clipped_area.y2 + 1) {
+        if(is_end_line || txt_pos.y > clipped_area.y2 + 1) {
             return;
         }
         max_w = max_width;

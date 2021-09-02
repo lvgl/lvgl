@@ -226,7 +226,7 @@ extern uint32_t (*_lv_txt_encoded_next)(const char *, uint32_t *);
 extern uint32_t (*_lv_txt_encoded_prev)(const char *, uint32_t *);
 
 /**
- * Convert a letter index (in an the encoded text) to byte index.
+ * Convert a letter index (in the encoded text) to byte index.
  * E.g. in UTF-8 "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
  * @param txt a '\0' terminated UTF-8 string
  * @param enc_id letter index

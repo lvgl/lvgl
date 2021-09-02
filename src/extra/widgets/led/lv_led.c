@@ -14,14 +14,6 @@
  *********************/
 #define MY_CLASS &lv_led_class
 
-#ifndef LV_LED_BRIGHT_MIN
-# define LV_LED_BRIGHT_MIN 80
-#endif
-
-#ifndef LV_LED_BRIGHT_MAX
-# define LV_LED_BRIGHT_MAX 255
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -91,10 +83,7 @@ void lv_led_set_brightness(lv_obj_t * obj, uint8_t bright)
     lv_led_t * led = (lv_led_t *)obj;
     if(led->bright == bright) return;
 
-    if(bright <= LV_LED_BRIGHT_MIN) bright = LV_LED_BRIGHT_MIN;
-    if(bright >= LV_LED_BRIGHT_MAX) bright = LV_LED_BRIGHT_MAX;
-
-    led->bright = bright;
+    led->bright = LV_CLAMP(LV_LED_BRIGHT_MIN, bright, LV_LED_BRIGHT_MAX);
 
     /*Invalidate the object there fore it will be redrawn*/
     lv_obj_invalidate(obj);
