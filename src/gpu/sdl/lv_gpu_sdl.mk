@@ -4,7 +4,6 @@ CSRCS += lv_gpu_sdl_draw_img.c
 CSRCS += lv_gpu_sdl_draw_label.c
 CSRCS += lv_gpu_sdl_draw_line.c
 CSRCS += lv_gpu_sdl_draw_rect.c
-CSRCS += lv_gpu_sdl_texture_cache.c
 CSRCS += lv_gpu_sdl_lru.c
 CSRCS += lv_gpu_sdl_mask.c
 CSRCS += lv_gpu_sdl_stack_blur.c
