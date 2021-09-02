@@ -37,12 +37,10 @@
 /* not all compilers provide inttypes.h which would define these */
 #include<limits.h>
 
-#if INT_MAX==32767
-   #define LV_PRId32 "d"
-#elif INT_MAX==2147483647
+#if LONG_MAX==2147483647
    #define LV_PRId32 "ld"
 #else
-   #error Unrecognized width of int type (neither 16-bit nor 32-bit).
+   #define LV_PRId32 "d"
 #endif
 
 #ifdef __cplusplus
