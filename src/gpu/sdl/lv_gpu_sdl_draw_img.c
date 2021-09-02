@@ -55,28 +55,26 @@ static lv_draw_img_key_t img_key_create(const void *src, int32_t frame_id);
 void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src, const lv_draw_img_dsc_t *draw_dsc) {
     if (draw_dsc->opa <= LV_OPA_MIN) return;
 
-    _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
-
-    if (cdsc == NULL) return;
-
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    lv_draw_img_key_t key = img_key_create(src, draw_dsc->frame_id);
+    bool texture_found = false;
+    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), &texture_found);
+    if (!texture_found) {
+        _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
+        texture = cdsc ? upload_img_texture(renderer, &cdsc->dec_dsc) : NULL;
+        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
+    }
+    if (!texture) {
+        return;
+    }
 
     SDL_Rect mask_rect, coords_rect;
     lv_area_to_sdl_rect(mask, &mask_rect);
     lv_area_to_sdl_rect(coords, &coords_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
-    lv_draw_img_key_t key = img_key_create(src, draw_dsc->frame_id);
-    bool texture_found = false;
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), &texture_found);
-    if (!texture_found) {
-        texture = upload_img_texture(renderer, &cdsc->dec_dsc);
-        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
-    }
-    if (!texture) {
-        return;
-    }
     SDL_Point pivot = {.x = draw_dsc->pivot.x, .y = draw_dsc->pivot.y};
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
     SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
