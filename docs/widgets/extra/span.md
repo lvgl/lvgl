@@ -6,7 +6,7 @@
 
 ## Overview
 
-A spangroup is the object that is used to display rich text. Different from the label object, `spangroup` can automatically organize text of different fonts, colors, and sizes into the spangroup obj.
+A spangroup is the object that is used to display rich text. Different from the label object, `spangroup` can render text styled with different fonts, colors, and sizes into the spangroup object.
 
 ## Parts and Styles
 - `LV_PART_MAIN` The spangroup has only one part.
@@ -15,7 +15,7 @@ A spangroup is the object that is used to display rich text. Different from the 
 
 ### Set text and style
 
-The spangroup object uses span to describe text and text style. so, first we need to create `span` descriptor using `lv_span_t * span = lv_spangroup_new_span(spangroup)`. Then use `lv_span_set_text(span, "text")` to set text.The style of the modified text is the same as the normal style used, eg:`lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED))`.
+The spangroup object uses span to describe text and text style. so, first we need to create `span` descriptor using `lv_span_t * span = lv_spangroup_new_span(spangroup)`. Then use `lv_span_set_text(span, "text")` to set text. The style of the span is configured as with a normal style object by using its `style` member, eg:`lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED))`.
 
 If spangroup object `mode != LV_SPAN_MODE_FIXED` you must call `lv_spangroup_refr_mode()` after you have modified `span` style(eg:set text, changed the font size, del span).
 

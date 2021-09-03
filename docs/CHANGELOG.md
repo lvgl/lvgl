@@ -25,6 +25,7 @@
 - fix(draw) false assertion error in lv_draw_mask caused by wrong pointer
 - fix(color) Bad cast in lv_color_mix() caused UB with 16bpp or less
 - fix(examples) don't compile assets unless needed
+- docs(all) Proofread, fix typos and add clarifications in confusing areas
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
