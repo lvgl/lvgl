@@ -63,7 +63,12 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), &texture_found);
     if (!texture_found) {
         _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
-        texture = cdsc ? upload_img_texture(renderer, &cdsc->dec_dsc) : NULL;
+        if (cdsc) {
+            texture = upload_img_texture(renderer, &cdsc->dec_dsc);
+#if LV_IMG_CACHE_DEF_SIZE == 0
+            lv_img_decoder_close(&cdsc->dec_dsc);
+#endif
+        }
         lv_gpu_draw_cache_put(&key, sizeof(key), texture);
     }
     if (!texture) {
