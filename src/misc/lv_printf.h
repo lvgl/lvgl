@@ -34,6 +34,15 @@
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 
+/* not all compilers provide inttypes.h which would define these */
+#include<limits.h>
+
+#if LONG_MAX==2147483647
+   #define LV_PRId32 "ld"
+#else
+   #define LV_PRId32 "d"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
