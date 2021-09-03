@@ -4,6 +4,7 @@
 #include "lvgl/lvgl.h"
 #endif
 
+#if LV_BUILD_EXAMPLES
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
@@ -232,3 +233,5 @@ const lv_img_dsc_t imgbtn_mid = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .data = imgbtn_mid_map,
 };
+
+#endif /* LV_BUILD_EXAMPLES */
