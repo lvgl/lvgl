@@ -24,11 +24,6 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_gpu_cache_key_magic_t magic;
-    const void *src;
-    int32_t frame_id;
-} lv_draw_img_key_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -37,8 +32,6 @@ typedef struct {
 static SDL_Texture *upload_img_texture(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc);
 
 static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_decoder_dsc_t *dsc);
-
-static lv_draw_img_key_t img_key_create(const void *src, int32_t frame_id);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,19 +51,34 @@ void lv_draw_img(const lv_area_t *coords, const lv_area_t *mask, const void *src
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
-    lv_draw_img_key_t key = img_key_create(src, draw_dsc->frame_id);
+    size_t key_size;
+    lv_gpu_sdl_cache_key_head_img_t *key = lv_gpu_sdl_img_cache_key_create(src, draw_dsc->frame_id, &key_size);
     bool texture_found = false;
-    SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), &texture_found);
+    SDL_Texture *texture = lv_gpu_draw_cache_get(key, key_size, &texture_found);
     if (!texture_found) {
         _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
+        lv_gpu_sdl_cache_flag_t tex_flags = 0;
         if (cdsc) {
-            texture = upload_img_texture(renderer, &cdsc->dec_dsc);
+            lv_img_decoder_dsc_t *dsc = &cdsc->dec_dsc;
+            if (dsc->user_data && SDL_memcmp(dsc->user_data, LV_GPU_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
+                texture = ((lv_gpu_sdl_dec_dsc_userdata_t *) dsc->user_data)->texture;
+                tex_flags |= LV_GPU_SDL_CACHE_FLAG_MANAGED;
+            } else {
+                texture = upload_img_texture(renderer, dsc);
+            }
 #if LV_IMG_CACHE_DEF_SIZE == 0
-            lv_img_decoder_close(&cdsc->dec_dsc);
+            lv_img_decoder_close(dsc);
 #endif
         }
-        lv_gpu_draw_cache_put(&key, sizeof(key), texture);
+        if (texture) {
+            lv_img_header_t *header = SDL_malloc(sizeof(lv_img_header_t));
+            SDL_memcpy(header, &cdsc->dec_dsc.header, sizeof(lv_img_header_t));
+            lv_gpu_draw_cache_put_advanced(key, key_size, texture, header, SDL_free, tex_flags);
+        } else {
+            lv_gpu_draw_cache_put(key, key_size, NULL);
+        }
     }
+    SDL_free(key);
     if (!texture) {
         return;
     }
@@ -144,14 +152,5 @@ static SDL_Texture *upload_img_texture_fallback(SDL_Renderer *renderer, lv_img_d
     return texture;
 }
 
-static lv_draw_img_key_t img_key_create(const void *src, int32_t frame_id) {
-    lv_draw_img_key_t key;
-    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
-    SDL_memset(&key, 0, sizeof(key));
-    key.magic = LV_GPU_CACHE_KEY_MAGIC_IMG;
-    key.src = src;
-    key.frame_id = frame_id;
-    return key;
-}
 
 #endif /*LV_USE_GPU_SDL*/

@@ -124,7 +124,7 @@ void lv_draw_letter(const lv_point_t *pos_p, const lv_area_t *clip_area,
     if (!found) {
         atlas = SDL_malloc(sizeof(lv_sdl_font_atlas_t));
         texture = font_atlas_bake(renderer, font_p, cmap_index, atlas);
-        lv_gpu_draw_cache_put_with_userdata(&key, sizeof(key), texture, atlas, (lv_lru_free_t *) font_atlas_free);
+        lv_gpu_draw_cache_put_advanced(&key, sizeof(key), texture, atlas, (lv_lru_free_t *) font_atlas_free, 0);
     }
     if (texture == NULL) return;
     SDL_Rect dstrect = {.x = pos_x, .y = pos_y, .w = g.box_w, .h = g.box_h};

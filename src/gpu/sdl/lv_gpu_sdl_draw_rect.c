@@ -197,9 +197,17 @@ static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip, const lv
         lv_draw_label(&a, clip, &label_draw_dsc, dsc->bg_img_src, NULL);
     } else {
         lv_img_header_t header;
-        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
-        if (res != LV_RES_OK) {
-            LV_LOG_WARN("Coudn't read the background image");
+        size_t key_size;
+        lv_gpu_sdl_cache_key_head_img_t *key = lv_gpu_sdl_img_cache_key_create(dsc->bg_img_src, 0, &key_size);
+        bool key_found;
+        lv_img_header_t *cache_header = NULL;
+        SDL_Texture *texture = lv_gpu_draw_cache_get_with_userdata(key, key_size, &key_found, (void **) &cache_header);
+        SDL_free(key);
+        if (texture) {
+            header = *cache_header;
+        } else if (key_found || lv_img_decoder_get_info(dsc->bg_img_src, &header) != LV_RES_OK) {
+            /* When cache hit but with negative result, use default decoder. If still fail, return.*/
+            LV_LOG_WARN("Couldn't read the background image");
             return;
         }
 
