@@ -46,6 +46,7 @@ There are four explicit ways to bring an object to the foreground:
 - Use `lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When `lv_obj_set_parent(obj, new_parent)` is used, `obj` will be on the foreground of the `new_parent`.
 
+
 ## Top and sys layers
 
 LVGL uses two special layers named `layer_top` and `layer_sys`.

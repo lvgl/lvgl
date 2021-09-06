@@ -13,14 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include <stdint.h>
 
 /*********************
  *      DEFINES
  *********************/
-
-#if defined(__cplusplus) || __STDC_VERSION__ >= 199901L  // If c99 or newer, use stdint.h to determine arch size
-#include <stdint.h>
-#endif
 
 // If __UINTPTR_MAX__ or UINTPTR_MAX are available, use them to determine arch size
 #if defined(__UINTPTR_MAX__) && __UINTPTR_MAX__ > 0xFFFFFFFF

@@ -65,11 +65,11 @@ for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
 }
 ```
 
-`lv_obj_get_child_id(obj)` returns the index of the object in its parent. It is equivalent to the number of younger children in the parent.
+`lv_obj_get_index(obj)` returns the index of the object in its parent. It is equivalent to the number of younger children in the parent.
 
 You can bring an object to the foreground or send it to the background with `lv_obj_move_foreground(obj)` and `lv_obj_move_background(obj)`.
 
-You can move an object one position up or down in the hierarchy with `lv_obj_move_up(obj)` and `lv_obj_move_down(obj)`. 
+You can change the index of an object in its parent using  `lv_obj_move_to_index(obj, index)`. 
 
 You can swap the position of two objects with `lv_obj_swap(obj1, obj2)`.
 
