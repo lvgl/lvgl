@@ -34,13 +34,13 @@
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 
-/* not all compilers provide inttypes.h which would define these */
-#include<limits.h>
-
-#if LONG_MAX==2147483647
-   #define LV_PRId32 "ld"
-#else
+/* ports without C99's inttypes.h */
+#ifdef __XC16__
    #define LV_PRId32 "d"
+#else
+   /* if you get an error here, handle your port above */
+   #include<inttypes.h>
+   #define LV_PRId32 PRId32
 #endif
 
 #ifdef __cplusplus
