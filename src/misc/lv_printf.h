@@ -34,13 +34,13 @@
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 
-/* ports without C99's inttypes.h */
-#ifdef __XC16__
-   #define LV_PRId32 "d"
-#else
-   /* if you get an error here, handle your port above */
+#if __has_include(<inttypes.h>)
    #include<inttypes.h>
+   /* platform-specific printf format for int32_t, usually "d" or "ld" */
    #define LV_PRId32 PRId32
+#else
+   /* hope this is correct for ports without inttypes.h */
+   #define LV_PRId32 "d"
 #endif
 
 #ifdef __cplusplus
