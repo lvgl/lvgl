@@ -10,6 +10,7 @@
 #include "lv_font.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
+#include "../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -47,6 +48,7 @@
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter)
 {
+    LV_ASSERT_NULL(font_p);
     return font_p->get_glyph_bitmap(font_p, letter);
 }
 
@@ -61,6 +63,7 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next)
 {
+    LV_ASSERT_NULL(font_p);
     return font_p->get_glyph_dsc(font_p, dsc_out, letter, letter_next);
 }
 
@@ -73,6 +76,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
  */
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
 {
+    LV_ASSERT_NULL(font);
     lv_font_glyph_dsc_t g;
     bool ret;
     ret = lv_font_get_glyph_dsc(font, &g, letter, letter_next);
