@@ -91,7 +91,7 @@ for i in fin.read().splitlines():
   if r:
     line = re.sub('\(.*?\)', '', r[1], 1)    #remove parentheses from macros
     dr = re.sub('.*# *define', '', i, 1)
-    d = "#    define " + dr
+    d = "#    define" + dr
 		
     fout.write(
       f'#ifndef {line}\n'
