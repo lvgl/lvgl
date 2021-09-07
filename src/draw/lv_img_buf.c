@@ -483,10 +483,10 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
         return;
     }
 
-    res->x1 = (((-pivot->x) * zoom) >> 8) - 1;
-    res->y1 = (((-pivot->y) * zoom) >> 8) - 1;
-    res->x2 = (((w - pivot->x) * zoom) >> 8) + 2;
-    res->y2 = (((h - pivot->y) * zoom) >> 8) + 2;
+    res->x1 = (((int32_t)(-pivot->x) * zoom) >> 8) - 1;
+    res->y1 = (((int32_t)(-pivot->y) * zoom) >> 8) - 1;
+    res->x2 = (((int32_t)(w - pivot->x) * zoom) >> 8) + 2;
+    res->y2 = (((int32_t)(h - pivot->y) * zoom) >> 8) + 2;
 
     if(angle == 0) {
         res->x1 += pivot->x;

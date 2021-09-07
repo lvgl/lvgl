@@ -191,7 +191,7 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
     if(angle == img->angle) return;
 
     lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
-    transf_zoom = (transf_zoom * img->zoom) >> 8;
+    transf_zoom = ((int32_t)transf_zoom * img->zoom) >> 8;
 
     lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
 
@@ -222,7 +222,7 @@ void lv_img_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     if(img->pivot.x == x && img->pivot.y == y) return;
 
     lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
-    transf_zoom = (transf_zoom * img->zoom) >> 8;
+    transf_zoom = ((int32_t)transf_zoom * img->zoom) >> 8;
 
     lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
     transf_angle += img->angle;
@@ -264,7 +264,7 @@ void lv_img_set_zoom(lv_obj_t * obj, uint16_t zoom)
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_area_t a;
-    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, (transf_zoom * img->zoom) >> 8, &img->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, ((int32_t)transf_zoom * img->zoom) >> 8, &img->pivot);
     a.x1 += obj->coords.x1 - 1;
     a.y1 += obj->coords.y1 - 1;
     a.x2 += obj->coords.x1 + 1;
@@ -274,7 +274,7 @@ void lv_img_set_zoom(lv_obj_t * obj, uint16_t zoom)
     img->zoom = zoom;
     lv_obj_refresh_ext_draw_size(obj);
 
-    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, (transf_zoom * img->zoom) >> 8, &img->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, ((int32_t)transf_zoom * img->zoom) >> 8, &img->pivot);
     a.x1 += obj->coords.x1 - 1;
     a.y1 += obj->coords.y1 - 1;
     a.x2 += obj->coords.x1 + 1;
@@ -462,7 +462,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_coord_t * s = lv_event_get_param(e);
         lv_coord_t transf_zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_MAIN);
-        transf_zoom = (transf_zoom * img->zoom) >> 8;
+        transf_zoom = ((int32_t)transf_zoom * img->zoom) >> 8;
 
         lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
         transf_angle += img->angle;
