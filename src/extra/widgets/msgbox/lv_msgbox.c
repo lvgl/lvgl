@@ -63,11 +63,16 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
-    mbox->title = lv_label_create(obj);
-    lv_label_set_text(mbox->title, title);
-    lv_label_set_long_mode(mbox->title, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    if(add_close_btn) lv_obj_set_flex_grow(mbox->title, 1);
-    else lv_obj_set_width(mbox->title, LV_PCT(100));
+    bool has_title = title && strlen(title) > 0;
+
+    /*When a close button is required, we need the empty label as spacer to push the button to the right*/
+    if (add_close_btn || has_title) {
+        mbox->title = lv_label_create(obj);
+        lv_label_set_text(mbox->title, has_title ? title : "");
+        lv_label_set_long_mode(mbox->title, LV_LABEL_LONG_SCROLL_CIRCULAR);
+        if(add_close_btn) lv_obj_set_flex_grow(mbox->title, 1);
+        else lv_obj_set_width(mbox->title, LV_PCT(100));
+    }
 
     if(add_close_btn) {
         mbox->close_btn = lv_btn_create(obj);

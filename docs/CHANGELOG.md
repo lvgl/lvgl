@@ -29,6 +29,7 @@
 - fix(examples) don't compile assets unless needed
 - docs(all) Proofread, fix typos and add clarifications in confusing areas
 - fix(zoom) multiplication overflow with zoom calculations on 16-bit platforms
+- feat(msgbox): omit title label unless needed
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
