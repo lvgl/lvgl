@@ -130,6 +130,12 @@ lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj)
     return mbox->btns;
 }
 
+uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox)
+{
+    lv_obj_t * btnm = lv_msgbox_get_btns(mbox);
+    return lv_btnmatrix_get_selected_btn(btnm);
+}
+
 const char * lv_msgbox_get_active_btn_text(lv_obj_t * mbox)
 {
     lv_obj_t * btnm = lv_msgbox_get_btns(mbox);

@@ -67,6 +67,13 @@ lv_obj_t * lv_msgbox_get_text(lv_obj_t * obj);
 
 lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj);
 
+/**
+ * Get the index of the selected button
+ * @param mbox message box object
+ * @return     index of the button (LV_BTNMATRIX_BTN_NONE: if unset)
+ */
+uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox);
+
 const char * lv_msgbox_get_active_btn_text(lv_obj_t * mbox);
 
 void lv_msgbox_close(lv_obj_t * mbox);
