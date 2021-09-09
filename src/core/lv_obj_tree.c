@@ -210,26 +210,21 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
     if(index == old_index) return;
 
     int32_t i = old_index;
-    if(index < old_index)
-    {
-        while (i > index)
-        {
+    if(index < old_index) {
+        while (i > index)  {
             parent->spec_attr->children[i] = parent->spec_attr->children[i - 1];
-            lv_event_send(parent, LV_EVENT_CHILD_CHANGED, parent->spec_attr->children[i]);
             i--;
         }
     }
-    else
-    {
-        while (i < index)
-        {
+    else {
+        while (i < index) {
             parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
-            lv_event_send(parent, LV_EVENT_CHILD_CHANGED, parent->spec_attr->children[i]);
             i++;
         }
     }
+
     parent->spec_attr->children[index] = obj;
-    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, NULL);
     lv_obj_invalidate(parent);
 }
 
