@@ -219,16 +219,19 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa)
  */
 void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool auto_del)
 {
+
     lv_disp_t * d = lv_obj_get_disp(new_scr);
     lv_obj_t * act_scr = lv_scr_act();
 
-    if(d->del_prev && act_scr != d->scr_to_load && d->scr_to_load) {
-        lv_obj_del(act_scr);
+    if(d->scr_to_load && act_scr != d->scr_to_load) {
         lv_disp_load_scr(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
         lv_obj_remove_local_style_prop(d->scr_to_load, LV_STYLE_OPA, 0);
 
+        if(d->del_prev) {
+            lv_obj_del(act_scr);
+        }
         act_scr = d->scr_to_load;
     }
 
