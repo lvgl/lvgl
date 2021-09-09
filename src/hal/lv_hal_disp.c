@@ -139,7 +139,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     if(driver->full_refresh && driver->draw_buf->size < (uint32_t)driver->hor_res * driver->ver_res) {
         driver->full_refresh = 0;
-        LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)")
+        LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)");
     }
 
     disp->bg_color = lv_color_white();
@@ -187,7 +187,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
 
     if(disp->driver->full_refresh && disp->driver->draw_buf->size < (uint32_t)disp->driver->hor_res * disp->driver->ver_res) {
         disp->driver->full_refresh = 0;
-        LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)")
+        LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)");
     }
 
     lv_coord_t w = lv_disp_get_hor_res(disp);

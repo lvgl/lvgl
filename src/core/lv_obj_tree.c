@@ -48,7 +48,7 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
 void lv_obj_del(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", obj)
+    LV_LOG_TRACE("begin (delete %p)", obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
@@ -76,17 +76,17 @@ void lv_obj_del(lv_obj_t * obj)
 
     /*Handle if the active screen was deleted*/
     if(act_scr_del) {
-        LV_LOG_WARN("the active screen was deleted")
+        LV_LOG_WARN("the active screen was deleted");
         disp->act_scr = NULL;
     }
 
     LV_ASSERT_MEM_INTEGRITY();
-    LV_LOG_TRACE("finished (delete %p)", obj)
+    LV_LOG_TRACE("finished (delete %p)", obj);
 }
 
 void lv_obj_clean(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", obj)
+    LV_LOG_TRACE("begin (delete %p)", obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
@@ -105,7 +105,7 @@ void lv_obj_clean(lv_obj_t * obj)
 
     LV_ASSERT_MEM_INTEGRITY();
 
-    LV_LOG_TRACE("finished (delete %p)", obj)
+    LV_LOG_TRACE("finished (delete %p)", obj);
 }
 
 void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
@@ -286,7 +286,7 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
         }
     }
 
-    LV_LOG_WARN("No screen found")
+    LV_LOG_WARN("No screen found");
     return NULL;
 }
 
