@@ -13,7 +13,6 @@ def event_handler(evt):
         else:
             currentButton = obj
         parent = obj.get_parent()
-        
         for i in range( parent.get_child_cnt()):
             child = parent.get_child(i)
             if child == currentButton:
@@ -51,10 +50,8 @@ def event_handler_center(evt):
     if code == lv.EVENT.CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
         if currentButton == None:
             return
-
         parent = currentButton.get_parent()
         pos = parent.get_child_cnt() // 2
-
         currentButton.move_to_index(pos)
         currentButton.scroll_to_view(lv.ANIM.ON)
 
