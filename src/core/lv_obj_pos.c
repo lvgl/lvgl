@@ -290,7 +290,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 {
     static bool mutex = false;
     if(mutex) {
-        LV_LOG_TRACE("Already running, returning")
+        LV_LOG_TRACE("Already running, returning");
         return;
     }
     mutex = true;
@@ -299,10 +299,10 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 
     /*Repeat until there where layout invalidations*/
     while(scr->scr_layout_inv) {
-        LV_LOG_INFO("Layout update begin")
+        LV_LOG_INFO("Layout update begin");
         scr->scr_layout_inv = 0;
         layout_update_core(scr);
-        LV_LOG_TRACE("Layout update end")
+        LV_LOG_TRACE("Layout update end");
     }
 
     mutex = false;

@@ -138,7 +138,7 @@ void lv_init(void)
 
     uint8_t * txt_u8 = (uint8_t *)txt;
     if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
-        LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.")
+        LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.");
     }
 
     uint32_t endianess_test = 0x11223344;
@@ -152,19 +152,19 @@ void lv_init(void)
     }
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
-    LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower")
+    LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower");
 #endif
 
 #if LV_USE_ASSERT_OBJ
-    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower")
+    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower");
 #endif
 
 #if LV_USE_ASSERT_STYLE
-    LV_LOG_WARN("Style sanity checks are enabled that uses more RAM")
+    LV_LOG_WARN("Style sanity checks are enabled that uses more RAM");
 #endif
 
 #if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
-    LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower")
+    LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower");
 #endif
 
     lv_extra_init();
@@ -194,7 +194,7 @@ void lv_deinit(void)
 
 lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;

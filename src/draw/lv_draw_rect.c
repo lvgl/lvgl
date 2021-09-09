@@ -147,7 +147,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 
     /*Complex case: there is gradient, mask, or radius*/
 #if LV_DRAW_COMPLEX == 0
-    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_COMPLEX = 0")
+    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_COMPLEX = 0");
 #else
     /*Get clipped fill area which is the real draw area.
      *It is always the same or inside `fill_area`*/

@@ -51,7 +51,7 @@ static lv_coord_t tabsize_create;
 
 lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab_size)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     tabpos_create = tab_pos;
     tabsize_create = tab_size;
 
