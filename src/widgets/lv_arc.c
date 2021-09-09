@@ -837,12 +837,11 @@ static void value_update(lv_obj_t * obj)
             break;
         case LV_ARC_MODE_REVERSE:
             angle = lv_map(arc->value,arc->min_value,arc->max_value,arc->bg_angle_start, bg_end);
-            lv_arc_set_start_angle(obj, angle);
+            lv_arc_set_angles(obj, angle ,arc->bg_angle_end);
             break;
         case LV_ARC_MODE_NORMAL:
             angle = lv_map(arc->value,arc->min_value,arc->max_value,arc->bg_angle_start, bg_end);
-            lv_arc_set_end_angle(obj, angle);
-            lv_arc_set_start_angle(obj,arc->bg_angle_start);
+            lv_arc_set_angles(obj, arc->bg_angle_start, angle);
             break;
         default:
             LV_LOG_WARN("Invalid mode: %d", arc->type);
