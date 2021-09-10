@@ -185,7 +185,9 @@ void lv_init(void)
 
 void lv_deinit(void)
 {
+#if LV_USE_GPU_SDL
     lv_gpu_sdl_deinit();
+#endif
     _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
