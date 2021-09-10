@@ -60,7 +60,8 @@ static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip,
 
 static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc);
 
-static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc);
+static void draw_shadow(SDL_Renderer *renderer, const lv_area_t * coords, const lv_area_t * clip,
+                        const lv_draw_rect_dsc_t *dsc);
 
 static void draw_outline(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc);
 
@@ -106,27 +107,29 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_rect(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
+void lv_draw_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
     lv_area_t draw_area;
-    if (!_lv_area_intersect(&draw_area, coords, mask)) {
-        return;
-    }
+    bool has_draw_content = _lv_area_intersect(&draw_area, coords, clip);
 
     if (lv_draw_mask_is_any(&draw_area)) {
-        draw_rect_masked(coords, mask, dsc);
+        draw_rect_masked(coords, clip, dsc);
         return;
     }
 
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer *renderer = (SDL_Renderer *) disp->driver->user_data;
 
-    SDL_Rect mask_rect;
-    lv_area_to_sdl_rect(mask, &mask_rect);
-    SDL_RenderSetClipRect(renderer, &mask_rect);
 
-    draw_shadow(renderer, coords, dsc);
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(clip, &clip_rect);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    draw_shadow(renderer, coords, clip, dsc);
+    /* Only shadow will also draw extended area */
+    if (!has_draw_content) {
+        return;
+    }
     draw_bg_color(renderer, coords, dsc);
-    draw_bg_img(coords, mask, dsc);
+    draw_bg_img(coords, clip, dsc);
     draw_border(renderer, coords, dsc);
     draw_outline(coords, dsc);
 }
@@ -244,33 +247,39 @@ static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip, const lv
     }
 }
 
-static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc) {
+static void draw_shadow(SDL_Renderer *renderer, const lv_area_t * coords, const lv_area_t * clip,
+                        const lv_draw_rect_dsc_t *dsc) {
     /*Check whether the shadow is visible*/
     if (SKIP_SHADOW(dsc)) return;
 
     lv_coord_t sw = dsc->shadow_width;
 
-    lv_area_t sh_rect_area;
-    sh_rect_area.x1 = coords->x1 + dsc->shadow_ofs_x - dsc->shadow_spread;
-    sh_rect_area.x2 = coords->x2 + dsc->shadow_ofs_x + dsc->shadow_spread;
-    sh_rect_area.y1 = coords->y1 + dsc->shadow_ofs_y - dsc->shadow_spread;
-    sh_rect_area.y2 = coords->y2 + dsc->shadow_ofs_y + dsc->shadow_spread;
+    lv_area_t core_area;
+    core_area.x1 = coords->x1 + dsc->shadow_ofs_x - dsc->shadow_spread;
+    core_area.x2 = coords->x2 + dsc->shadow_ofs_x + dsc->shadow_spread;
+    core_area.y1 = coords->y1 + dsc->shadow_ofs_y - dsc->shadow_spread;
+    core_area.y2 = coords->y2 + dsc->shadow_ofs_y + dsc->shadow_spread;
 
-    lv_area_t sh_area;
-    sh_area.x1 = sh_rect_area.x1 - sw / 2 - 1;
-    sh_area.x2 = sh_rect_area.x2 + sw / 2 + 1;
-    sh_area.y1 = sh_rect_area.y1 - sw / 2 - 1;
-    sh_area.y2 = sh_rect_area.y2 + sw / 2 + 1;
+    lv_area_t shadow_area;
+    shadow_area.x1 = core_area.x1 - sw / 2 - 1;
+    shadow_area.x2 = core_area.x2 + sw / 2 + 1;
+    shadow_area.y1 = core_area.y1 - sw / 2 - 1;
+    shadow_area.y2 = core_area.y2 + sw / 2 + 1;
 
     lv_opa_t opa = dsc->shadow_opa;
 
     if (opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
-    SDL_Rect sh_area_rect;
-    lv_area_to_sdl_rect(&sh_area, &sh_area_rect);
+    /*Get clipped draw area which is the real draw area.
+     *It is always the same or inside `shadow_area`*/
+    lv_area_t draw_area;
+    if(!_lv_area_intersect(&draw_area, &shadow_area, clip)) return;
+
+    SDL_Rect core_area_rect;
+    lv_area_to_sdl_rect(&shadow_area, &core_area_rect);
 
     lv_coord_t radius = dsc->radius;
-    lv_coord_t sh_width = lv_area_get_width(&sh_rect_area), sh_height = lv_area_get_height(&sh_rect_area),
+    lv_coord_t sh_width = lv_area_get_width(&core_area), sh_height = lv_area_get_height(&core_area),
             sh_min = LV_MIN(sh_width, sh_height);
     /* If size isn't times of 2, increase 1 px */
     lv_coord_t min_half = sh_min % 2 == 0 ? sh_min / 2 : sh_min / 2 + 1;
@@ -282,13 +291,13 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
     lv_draw_rect_shadow_key_t key = rect_shadow_key_create(radius, frag_size, sw);
 
     lv_area_t blur_frag;
-    lv_area_copy(&blur_frag, &sh_area);
+    lv_area_copy(&blur_frag, &shadow_area);
     lv_area_set_width(&blur_frag, blur_frag_size * 2);
     lv_area_set_height(&blur_frag, blur_frag_size * 2);
     SDL_Texture *texture = lv_gpu_draw_cache_get(&key, sizeof(key), NULL);
     if (texture == NULL) {
         lv_draw_mask_radius_param_t mask_rout_param;
-        lv_draw_mask_radius_init(&mask_rout_param, &sh_rect_area, radius, false);
+        lv_draw_mask_radius_init(&mask_rout_param, &core_area, radius, false);
         int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
         lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag, &mask_id, 1);
         lv_stack_blur_grayscale(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
@@ -306,9 +315,9 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
     SDL_SetTextureAlphaMod(texture, opa);
     SDL_SetTextureColorMod(texture, shadow_color.r, shadow_color.g, shadow_color.b);
 
-    frag_render_corners(renderer, texture, blur_frag_size, &sh_area);
-    frag_render_borders(renderer, texture, blur_frag_size, &sh_area);
-    frag_render_center(renderer, texture, blur_frag_size, &sh_area);
+    frag_render_corners(renderer, texture, blur_frag_size, &shadow_area);
+    frag_render_borders(renderer, texture, blur_frag_size, &shadow_area);
+    frag_render_center(renderer, texture, blur_frag_size, &shadow_area);
 }
 
 
@@ -607,7 +616,7 @@ static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, con
     lv_area_copy(&content_coords, coords);
     lv_area_move(&content_coords, -sh_area.x1, -sh_area.y1);
 
-    draw_shadow(renderer, &content_coords, dsc);
+    draw_shadow(renderer, &content_coords, mask, dsc);
     draw_bg_color(renderer, &content_coords, dsc);
     draw_bg_img(&content_coords, mask, dsc);
     draw_border(renderer, &content_coords, dsc);
