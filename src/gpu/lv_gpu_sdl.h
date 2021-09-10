@@ -18,13 +18,6 @@ extern "C" {
 
 #if LV_USE_GPU_SDL
 
-#include "../hal/lv_hal_disp.h"
-#include "../misc/lv_color.h"
-#include "../misc/lv_area.h"
-#include "../misc/lv_style.h"
-#include "../font/lv_font.h"
-#include "../draw/lv_draw_mask.h"
-
 #include LV_GPU_SDL_INCLUDE_PATH
 
 /*********************
@@ -40,12 +33,13 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_disp_t *lv_sdl_display_init(SDL_Window *window);
+void lv_gpu_sdl_init();
 
-void lv_sdl_display_deinit(lv_disp_t *disp);
-
-void lv_sdl_display_resize(lv_disp_t *disp, int width, int height);
-
+/**
+ * @brief Free caches
+ * 
+ */
+void lv_gpu_sdl_deinit();
 
 /*======================
  * Add/remove functions

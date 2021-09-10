@@ -35,6 +35,10 @@
     #include "../gpu/lv_gpu_nxp_pxp_osa.h"
 #endif
 
+#if LV_USE_GPU_SDL
+    #include "../gpu/lv_gpu_sdl.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -121,6 +125,9 @@ void lv_init(void)
         for(; ;) ;
     }
 #endif
+#if LV_USE_GPU_SDL
+    lv_gpu_sdl_init();
+#endif
 
     _lv_obj_style_init();
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
@@ -174,10 +181,11 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM || LV_USE_GPU_SDL
 
 void lv_deinit(void)
 {
+    lv_gpu_sdl_deinit();
     _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
