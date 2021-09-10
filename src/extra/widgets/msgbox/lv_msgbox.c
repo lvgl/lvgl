@@ -39,7 +39,7 @@ const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class, .instance_s
 
 lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     bool auto_parent = false;
     if(parent == NULL) {
         auto_parent = true;
@@ -63,11 +63,16 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
-    mbox->title = lv_label_create(obj);
-    lv_label_set_text(mbox->title, title);
-    lv_label_set_long_mode(mbox->title, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    if(add_close_btn) lv_obj_set_flex_grow(mbox->title, 1);
-    else lv_obj_set_width(mbox->title, LV_PCT(100));
+    bool has_title = title && strlen(title) > 0;
+
+    /*When a close button is required, we need the empty label as spacer to push the button to the right*/
+    if (add_close_btn || has_title) {
+        mbox->title = lv_label_create(obj);
+        lv_label_set_text(mbox->title, has_title ? title : "");
+        lv_label_set_long_mode(mbox->title, LV_LABEL_LONG_SCROLL_CIRCULAR);
+        if(add_close_btn) lv_obj_set_flex_grow(mbox->title, 1);
+        else lv_obj_set_width(mbox->title, LV_PCT(100));
+    }
 
     if(add_close_btn) {
         mbox->close_btn = lv_btn_create(obj);
@@ -128,6 +133,12 @@ lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj)
 {
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->btns;
+}
+
+uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox)
+{
+    lv_obj_t * btnm = lv_msgbox_get_btns(mbox);
+    return lv_btnmatrix_get_selected_btn(btnm);
 }
 
 const char * lv_msgbox_get_active_btn_text(lv_obj_t * mbox)

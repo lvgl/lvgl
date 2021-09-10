@@ -20,7 +20,7 @@ ESP-IDF v4 framework is the suggested version to use.
 
 ### Get LVGL
 
-You are suggested to add LVGL as a "component". This component can be located inside a directory named "components" on your project root directory.
+It is suggested that you add LVGL as a "component" to your project. This component can be located inside a directory named "components" in the project root directory.
 
 When your project is a git repository you can include LVGL as a git submodule:
 
@@ -30,11 +30,11 @@ git submodule add https://github.com/lvgl/lvgl.git components/lvgl
 
 The above command will clone LVGL's main repository into the `components/lvgl` directory. LVGL includes a `CMakeLists.txt` file that sets some configuration options so you can use LVGL right away.
 
-When you are ready to configure LVGL launch the configuration menu with `idf.py menuconfig` on your project root directory, go to `Component config` and then `LVGL configuration`.
+When you are ready to configure LVGL, launch the configuration menu with `idf.py menuconfig` on your project root directory, go to `Component config` and then `LVGL configuration`.
 
 ## Use lvgl_esp32_drivers in your project
 
-You are suggested to add `lvgl_esp32_drivers` as a "component". This component can be located inside a directory named "components" on your project root directory.
+You can also add `lvgl_esp32_drivers` as a "component". This component can be located inside a directory named "components" on your project root directory.
 
 When your project is a git repository you can include `lvgl_esp32_drivers` as a git submodule:
 

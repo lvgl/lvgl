@@ -41,7 +41,7 @@ void lv_style_init(lv_style_t * style)
 {
 #if LV_USE_ASSERT_STYLE
     if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->prop_cnt > 1) {
-        LV_LOG_WARN("Style might be already inited. (Potential memory leak)")
+        LV_LOG_WARN("Style might be already inited. (Potential memory leak)");
     }
 #endif
 
