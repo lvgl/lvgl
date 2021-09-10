@@ -4,6 +4,7 @@ CSRCS += lv_btn.c
 CSRCS += lv_btnmatrix.c
 CSRCS += lv_canvas.c
 CSRCS += lv_checkbox.c
+CSRCS += lv_circlelist.c
 CSRCS += lv_dropdown.c
 CSRCS += lv_img.c
 CSRCS += lv_label.c
