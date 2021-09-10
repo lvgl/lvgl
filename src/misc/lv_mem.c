@@ -99,7 +99,7 @@ void lv_mem_init(void)
 #endif
 
 #if LV_MEM_ADD_JUNK
-    LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower")
+    LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower");
 #endif
 }
 
@@ -324,7 +324,7 @@ void lv_mem_buf_release(void * p)
         }
     }
 
-    LV_LOG_ERROR("p is not a known buffer")
+    LV_LOG_ERROR("p is not a known buffer");
 }
 
 /**

@@ -1,7 +1,9 @@
 # Changelog
 
 ## v8.1.0 (In progress)
-- lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
+- renamed lv_obj_get_child_id(obj) to lv_obj_get_index(obj).
+- added lv_obj_move_to_index(obj, index). (#2461)
+- redefined lv_obj_move_foreground(obj) and lv_obj_move_background(obj) as inline functions now calling lv_obj_move_to_index(obj, index).
 - lv_obj_swap(obj1, obj2) added. (#2461)
 - feat(anim) add interface for handling lv_anim user data. (#2415)
 - feat(obj) add lv_is_initialized (#2402)
@@ -24,6 +26,11 @@
 - perf(draw) reimplement circle drawing algorithms (#2374) (Also [change masking](https://docs.lvgl.io/master/overview/drawing.html#masking))
 - fix(draw) false assertion error in lv_draw_mask caused by wrong pointer
 - fix(color) Bad cast in lv_color_mix() caused UB with 16bpp or less
+- fix(examples) don't compile assets unless needed
+- docs(all) Proofread, fix typos and add clarifications in confusing areas
+- fix(zoom) multiplication overflow with zoom calculations on 16-bit platforms
+- feat(msgbox): omit title label unless needed
+- feat(msgbox): add function to get selected button index
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard

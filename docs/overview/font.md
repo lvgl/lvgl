@@ -4,16 +4,16 @@
 ```
 # Fonts
 
-In LVGL fonts are collections of bitmaps and other information required to render the images of the letters (glyph). 
+In LVGL fonts are collections of bitmaps and other information required to render images of individual letters (glyph). 
 A font is stored in a `lv_font_t` variable and can be set in a style's *text_font* field. For example:
 ```c
 lv_style_set_text_font(&my_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);  /*Set a larger font*/
 ```
 
-The fonts have a **bpp (bits per pixel)** property. It shows how many bits are used to describe a pixel in the font. The value stored for a pixel determines the pixel's opacity.
-This way, with higher *bpp*, the edges of the letter can be smoother. The possible *bpp* values are 1, 2, 4 and 8 (higher value means better quality).
+Fonts have a **bpp (bits per pixel)** property. It shows how many bits are used to describe a pixel in a font. The value stored for a pixel determines the pixel's opacity.
+This way, with higher *bpp*, the edges of the letter can be smoother. The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
 
-The *bpp* also affects the required memory size to store the font. For example, *bpp = 4* makes the font nearly 4 times larger compared to *bpp = 1*.  
+The *bpp* property also affects the amount of memory needed to store a font. For example, *bpp = 4* makes a font nearly four times larger compared to *bpp = 1*.  
 
 ## Unicode support
 
@@ -30,7 +30,7 @@ If all works well, a ✓ character should be displayed.
 
 ## Built-in fonts
 
-There are several built-in fonts in different sizes, which can be enabled in `lv_conf.h` by *LV_FONT_...* defines.
+There are several built-in fonts in different sizes, which can be enabled in `lv_conf.h` with *LV_FONT_...* defines.
 ### Normal fonts
 Containing all the ASCII characters, the degree symbol (U+00B0), the bullet symbol (U+2022) and the built-in symbols (see below).
 - `LV_FONT_MONTSERRAT_12` 12 px font
@@ -55,9 +55,9 @@ Containing all the ASCII characters, the degree symbol (U+00B0), the bullet symb
 
 ### Special fonts
 - `LV_FONT_MONTSERRAT_12_SUBPX` Same as normal 12 px font but with [subpixel rendering](#subpixel-rendering) 
-- `LV_FONT_MONTSERRAT_28_COMPRESSED` Same as normal 28 px font but  [compressed font](#compress-fonts) with 3 bpp
+- `LV_FONT_MONTSERRAT_28_COMPRESSED` Same as normal 28 px font but stored as a [compressed font](#compress-fonts) with 3 bpp
 - `LV_FONT_DEJAVU_16_PERSIAN_HEBREW` 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
-- `LV_FONT_SIMSUN_16_CJK`16 px font with normal range + 1000 most common CJK radicals
+- `LV_FONT_SIMSUN_16_CJK`16 px font with normal range plus 1000 of the most common CJK radicals
 - `LV_FONT_UNSCII_8` 8 px pixel perfect font with only ASCII characters
 - `LV_FONT_UNSCII_16` 16 px pixel perfect font with only ASCII characters
 
@@ -70,12 +70,12 @@ In addition to the ASCII range, the following symbols are also added to the buil
 
 ![](/misc/symbols.png "Built-in Symbols in LVGL")
 
-The symbols can be used as:
+The symbols can be used singly as:
 ```c
 lv_label_set_text(my_label, LV_SYMBOL_OK);
 ```
 
-Or with together with strings:
+Or with together with strings (compile time string concatenation):
 ```c
 lv_label_set_text(my_label, LV_SYMBOL_OK "Apply");
 ```
@@ -88,7 +88,7 @@ lv_label_set_text(my_label, LV_SYMBOL_OK LV_SYMBOL_WIFI LV_SYMBOL_PLAY);
 ## Special features
 
 ### Bidirectional support
-Most of the languages use Left-to-Right (LTR for short) writing direction, however some languages (such as Hebrew, Persian or Arabic) uses Right-to-Left (RTL for short) direction. 
+Most languages use a Left-to-Right (LTR for short) writing direction, however some languages (such as Hebrew, Persian or Arabic) use Right-to-Left (RTL for short) direction. 
 
 LVGL not only supports RTL texts but supports mixed (a.k.a. bidirectional, BiDi) text rendering too. Some examples:
 
@@ -97,94 +97,94 @@ LVGL not only supports RTL texts but supports mixed (a.k.a. bidirectional, BiDi)
 BiDi support is enabled by `LV_USE_BIDI` in *lv_conf.h*
 
 All texts have a base direction (LTR or RTL) which determines some rendering rules and the default alignment of the text (Left or Right).
-However, in LVGL, base direction is applied not only for labels. It's a general property which can be set for every object. 
-If unset then it will be inherited from the parent. 
-So it's enough to set the base direction of the screen and every object will inherit it.
+However, in LVGL, the base direction is not only applied to labels. It's a general property which can be set for every object. 
+If not set then it will be inherited from the parent. 
+This means it's enough to set the base direction of a screen and every object will inherit it.
 
-The default base direction of screen can be set by `LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the base direction from their parent.
+The default base direction for screens can be set by `LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the base direction from their parent.
 
-To set an object's base direction use `lv_obj_set_base_dir(obj, base_dir)`.  The possible base direction are:
+To set an object's base direction use `lv_obj_set_base_dir(obj, base_dir)`.  The possible base directions are:
 - `LV_BIDI_DIR_LTR`: Left to Right base direction
 - `LV_BIDI_DIR_RTL`: Right to Left base direction
 - `LV_BIDI_DIR_AUTO`: Auto detect base direction
-- `LV_BIDI_DIR_INHERIT`: Inherit the base direction from the parent (default for non-screen objects)
+- `LV_BIDI_DIR_INHERIT`: Inherit base direction from the parent (or a default value for non-screen objects)
 
 This list summarizes the effect of RTL base direction on objects:
 - Create objects by default on the right
-- `lv_tabview`: displays tabs from right to left
-- `lv_checkbox`: Show the box on the right
-- `lv_btnmatrix`: Show buttons from right to left
-- `lv_list`: Show the icon on the right
-- `lv_dropdown`: Align the options to the right
+- `lv_tabview`: Displays tabs from right to left
+- `lv_checkbox`: Shows the box on the right
+- `lv_btnmatrix`: Shows buttons from right to left
+- `lv_list`: Shows icons on the right
+- `lv_dropdown`: Aligns options to the right
 - The texts in `lv_table`, `lv_btnmatrix`, `lv_keyboard`, `lv_tabview`, `lv_dropdown`, `lv_roller` are "BiDi processed" to be displayed correctly
 
 ### Arabic and Persian support
-There are some special rules to display Arabic and Persian characters: the *form* of the character depends on their position in the text. 
-A different form of the same letter needs to be used if it isolated, start, middle or end position. Besides these some conjunction rules also should be taken into account.
+There are some special rules to display Arabic and Persian characters: the *form* of a character depends on its position in the text. 
+A different form of the same letter needs to be used if is isolated, at start, middle or end positions. Besides these, some conjunction rules should also be taken into account.
 
-LVGL supports to apply these rules if `LV_USE_ARABIC_PERSIAN_CHARS` is enabled.  
+LVGL supports these rules if `LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
 
 However, there some limitations:
-- Only displaying texts is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
+- Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
 - Static text (i.e. const) is not processed. E.g. texts set by `lv_label_set_text()` will be "Arabic processed" but `lv_lable_set_text_static()` won't.
-- Text get functions (e.g. `lv_label_get_text()`) will return the processed text. 
+- Text get functions (e.g. `lv_label_get_text()`) will return the processed text.
 
 ### Subpixel rendering
 
-Subpixel rendering allows for tripling the horizontal resolution by rendering on Red, Green and Blue channel instead of pixel level. This takes advantage of the position of physical color channels of each pixel, resulting in higher quality letter anti-aliasing. Learn more [here](https://en.wikipedia.org/wiki/Subpixel_rendering).
+Subpixel rendering allows for tripling the horizontal resolution by rendering anti-aliased edges on Red, Green and Blue channels instead of at pixel level granularity. This takes advantage of the position of physical color channels of each pixel, resulting in higher quality letter anti-aliasing. Learn more [here](https://en.wikipedia.org/wiki/Subpixel_rendering).
 
-For subpixel rendering the fonts need to be generated with special settings: 
+For subpixel rendering, the fonts need to be generated with special settings: 
 - In the online converter tick the `Subpixel` box
-- In the command line tool use `--lcd` flag. Note that the generated font needs about 3 times more memory.
+- In the command line tool use `--lcd` flag. Note that the generated font needs about three times more memory.
 
 Subpixel rendering works only if the color channels of the pixels have a horizontal layout. That is the R, G, B channels are next each other and not above each other. 
 The order of color channels also needs to match with the library settings. By default, LVGL assumes `RGB` order, however this can be swapped by setting `LV_SUBPX_BGR  1` in *lv_conf.h*.
 
-### Compress fonts
-The bitmaps of the fonts can be compressed by 
+### Compressed fonts
+The bitmaps of fonts can be compressed by 
 - ticking the `Compressed` check box in the online converter
-- not passing `--no-compress` flag to the offline converter (compression is applied by default) 
+- not passing the `--no-compress` flag to the offline converter (compression is applied by default) 
 
-The compression is more effective with larger fonts and higher bpp. However, it's about 30% slower to render the compressed fonts.
-Therefore it's recommended to compress only the largest fonts of user interface, because
+Compression is more effective with larger fonts and higher bpp. However, it's about 30% slower to render compressed fonts.
+Therefore it's recommended to compress only the largest fonts of a user interface, because
 - they need the most memory 
 - they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
 
-## Add new font
+## Add a new font
 
 There are several ways to add a new font to your project:
 1. The simplest method is to use the [Online font converter](https://lvgl.io/tools/fontconverter). Just set the parameters, click the *Convert* button, copy the font to your project and use it. **Be sure to carefully read the steps provided on that site or you will get an error while converting.**
 2. Use the [Offline font converter](https://github.com/lvgl/lv_font_conv). (Requires Node.js to be installed)
-3. If you want to create something like the built-in fonts (Roboto font and symbols) but in different size and/or ranges, you can use the `built_in_font_gen.py` script in `lvgl/scripts/built_in_font` folder.
+3. If you want to create something like the built-in fonts (Montserrat font and symbols) but in a different size and/or ranges, you can use the `built_in_font_gen.py` script in `lvgl/scripts/built_in_font` folder.
 (This requires Python and `lv_font_conv` to be installed)
 
-To declare the font in a file, use `LV_FONT_DECLARE(my_font_name)`.
+To declare a font in a file, use `LV_FONT_DECLARE(my_font_name)`.
 
-To make the fonts globally available (like the builtin fonts), add them to `LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
+To make fonts globally available (like the builtin fonts), add them to `LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
 
 ## Add new symbols
 The built-in symbols are created from the [FontAwesome](https://fontawesome.com/) font. 
 
-1. Search symbol on [https://fontawesome.com](https://fontawesome.com). For example the [USB symbol](https://fontawesome.com/icons/usb?style=brands). Copy it's Unicode ID which is `0xf287` in this case.
+1. Search for a symbol on [https://fontawesome.com](https://fontawesome.com). For example the [USB symbol](https://fontawesome.com/icons/usb?style=brands). Copy its Unicode ID which is `0xf287` in this case.
 2. Open the [Online font converter](https://lvgl.io/tools/fontconverter). Add [FontAwesome.woff](https://lvgl.io/assets/others/FontAwesome5-Solid+Brands+Regular.woff). . 
 3. Set the parameters such as Name, Size, BPP. You'll use this name to declare and use the font in your code.
 4. Add the Unicode ID of the symbol to the range field. E.g.` 0xf287` for the USB symbol. More symbols can be enumerated with `,`.
-5. Convert the font and copy it to your project. Make sure to compile the .c file of your font.
-6. Declare the font using `extern lv_font_t my_font_name;` or simply `LV_FONT_DECLARE(my_font_name);`.
+5. Convert the font and copy the generated source code to your project. Make sure to compile the .c file of your font.
+6. Declare the font using `extern lv_font_t my_font_name;` or simply use `LV_FONT_DECLARE(my_font_name);`.
 
 **Using the symbol**
 1. Convert the Unicode value to UTF8, for example on [this site](http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex). For `0xf287` the *Hex UTF-8 bytes* are `EF 8A 87`.
-2. Create a `define` from the UTF8 values: `#define MY_USB_SYMBOL "\xEF\x8A\x87"`
+2. Create a `define` string from the UTF8 values: `#define MY_USB_SYMBOL "\xEF\x8A\x87"`
 3. Create a label and set the text. Eg. `lv_label_set_text(label, MY_USB_SYMBOL)`
 
 Note - `lv_label_set_text(label, MY_USB_SYMBOL)` searches for this symbol in the font defined in `style.text.font` properties. To use the symbol you may need to change it. Eg ` style.text.font = my_font_name` 
 
-## Load font at run-time
-`lv_font_load` can be used to load a font from a file. The font to load needs to have a special binary format. (Not TTF or WOFF). 
-Use [lv_font_conv](https://github.com/lvgl/lv_font_conv/) with `--format bin` option to generate an LVGL compatible font file.
+## Load a font at run-time
+`lv_font_load` can be used to load a font from a file. The font needs to have a special binary format. (Not TTF or WOFF). 
+Use [lv_font_conv](https://github.com/lvgl/lv_font_conv/) with the `--format bin` option to generate an LVGL compatible font file.
 
-Note that to load a font [LVGL's filesystem](/overview/file-system) needs to be enabled and a driver needs to be added.
+Note that to load a font [LVGL's filesystem](/overview/file-system) needs to be enabled and a driver must be added.
 
 Example
 ```c
@@ -200,13 +200,12 @@ lv_font_free(my_font);
 
 ## Add a new font engine
 
-LVGL's font interface is designed to be very flexible.
-But even so you don't need to use LVGL's internal font engine: you can add your own.
-For example, use [FreeType](https://www.freetype.org/) to real-time render glyphs from TTF fonts or use an external flash to store the font's bitmap and read them when the library needs them.
+LVGL's font interface is designed to be very flexible but, even so, you can add your own font engine in place of LVGL's internal one.
+For example, you can use [FreeType](https://www.freetype.org/) to real-time render glyphs from TTF fonts or use an external flash to store the font's bitmap and read them when the library needs them.
 
 A ready to use FreeType can be found in [lv_freetype](https://github.com/lvgl/lv_lib_freetype) repository.
 
-To do this a custom `lv_font_t` variable needs to be created:
+To do this, a custom `lv_font_t` variable needs to be created:
 ```c
 /*Describe the properties of a font*/
 lv_font_t my_font;

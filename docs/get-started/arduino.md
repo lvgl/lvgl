@@ -19,7 +19,7 @@ LVGL can be installed via the Arduino IDE Library Manager or as a .ZIP library.
 ## Set up drivers
 
 To get started it's recommended to use [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) library as a TFT driver to simplify testing. 
-To make it work setup `TFT_eSPI` according to your TFT display type via editing either
+To make it work, setup `TFT_eSPI` according to your TFT display type via editing either
 - `User_Setup.h` 
 - or by selecting a configuration in the `User_Setup_Select.h`
 
@@ -27,7 +27,7 @@ Both files are located in `TFT_eSPI` library's folder.
 
 ## Configure LVGL
 
-LVGL has its own configuration file called `lv_conf.h`. When LVGL is installed the followings needs to be done to configure it:
+LVGL has its own configuration file called `lv_conf.h`. When LVGL is installed, follow these configuration steps:
 1. Go to directory of the installed Arduino libraries
 2. Go to `lvgl` and copy `lv_conf_template.h` as `lv_conf.h` into the Arduino Libraries directory next to the `lvgl` library folder.
 3. Open `lv_conf.h` and change the first `#if 0` to `#if 1`
@@ -46,9 +46,9 @@ Most of the examples are available in the [`lvgl/examples`](https://github.com/l
 
 ## Debugging and logging
 
-In case of trouble LVGL can display debug information. 
-In the `LVGL_Arduino.ino` example there is `my_print` method, which allow to send this debug information to the serial interface. 
-To enable this feature you have to edit `lv_conf.h` file and enable logging in the section `log settings`:
+LVGL can display debug information in case of trouble. 
+In the `LVGL_Arduino.ino` example there is a `my_print` method, which sends this debug information to the serial interface. 
+To enable this feature you have to edit the `lv_conf.h` file and enable logging in the section `log settings`:
 
 ```c
 /*Log settings*/
@@ -64,5 +64,5 @@ To enable this feature you have to edit `lv_conf.h` file and enable logging in t
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 ```
 
-After enabling the log module and setting LV_LOG_LEVEL accordingly the output log is sent to the `Serial` port @ 115200 bps.
+After enabling the log module and setting LV_LOG_LEVEL accordingly, the output log is sent to the `Serial` port @ 115200 bps.
 

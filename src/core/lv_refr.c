@@ -531,7 +531,7 @@ static void lv_refr_area_part(const lv_area_t * area_p)
                 lv_draw_img(&a, &start_mask, disp_refr->bg_img, &dsc);
             }
             else {
-                LV_LOG_WARN("Can't draw the background image")
+                LV_LOG_WARN("Can't draw the background image");
             }
         }
         else {
