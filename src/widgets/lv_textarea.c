@@ -259,8 +259,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
     }
 
     if(ta->pwd_mode != 0) {
-        uint32_t byte_pos = _lv_txt_encoded_get_byte_id(ta->pwd_tmp, ta->cursor.pos - 1);
-        _lv_txt_cut(ta->pwd_tmp, ta->cursor.pos - 1, _lv_txt_encoded_size(&ta->pwd_tmp[byte_pos]));
+        _lv_txt_cut(ta->pwd_tmp, ta->cursor.pos - 1, 1);
 
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + 1);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
