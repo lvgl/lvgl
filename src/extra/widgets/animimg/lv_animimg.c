@@ -56,7 +56,7 @@ const lv_obj_class_t lv_animimg_class = {
 
 lv_obj_t * lv_animimg_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_animimg_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;

@@ -28,6 +28,11 @@
 - perf(draw) reimplement circle drawing algorithms (#2374) (Also [change masking](https://docs.lvgl.io/master/overview/drawing.html#masking))
 - fix(draw) false assertion error in lv_draw_mask caused by wrong pointer
 - fix(color) Bad cast in lv_color_mix() caused UB with 16bpp or less
+- fix(examples) don't compile assets unless needed
+- docs(all) Proofread, fix typos and add clarifications in confusing areas
+- fix(zoom) multiplication overflow with zoom calculations on 16-bit platforms
+- feat(msgbox): omit title label unless needed
+- feat(msgbox): add function to get selected button index
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard

@@ -4,6 +4,7 @@
 #include "lvgl/lvgl.h"
 #endif
 
+#if LV_BUILD_EXAMPLES
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
@@ -69,3 +70,4 @@ const lv_img_dsc_t img_caret_down = {
   .data = img_caret_down_map,
 };
 
+#endif /* LV_BUILD_EXAMPLES */

@@ -147,7 +147,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 
     /*Complex case: there is gradient, mask, or radius*/
 #if LV_DRAW_COMPLEX == 0
-    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_COMPLEX = 0")
+    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_COMPLEX = 0");
 #else
     /*Get clipped fill area which is the real draw area.
      *It is always the same or inside `fill_area`*/
@@ -420,7 +420,6 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
                                               const lv_draw_rect_dsc_t * dsc)
 {
-
     /*Check whether the shadow is visible*/
     if(dsc->shadow_width == 0) return;
     if(dsc->shadow_opa <= LV_OPA_MIN) return;
@@ -539,7 +538,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
 
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
         mask_act = simple_sub ? &sh_buf_tmp : &mask_buf;
         if(w > 0) {
@@ -575,7 +574,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
         mask_act = simple_sub ? &sh_buf_tmp : &mask_buf;
 
@@ -608,7 +607,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
 
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
 
         if(w > 0) {
@@ -648,7 +647,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                 blend_area.y2 = y;
 
                 /*Do not mask if out of the bg*/
-                if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+                if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
                 else simple_sub = simple;
 
                 if(!simple_sub) {
@@ -682,7 +681,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
 
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
         mask_act = simple_sub ? &sh_buf_tmp : &mask_buf;
 
@@ -736,7 +735,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
 
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
         mask_act = simple_sub ? &sh_buf_tmp : &mask_buf;
         if(w > 0) {
@@ -771,7 +770,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
 
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
         mask_act = simple_sub ? &sh_buf_tmp : &mask_buf;
 
@@ -809,7 +808,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
 
         /*Do not mask if out of the bg*/
-        if(!mask_any && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
         mask_act = simple_sub ? &sh_buf_tmp : &mask_buf;
         if(w > 0) {

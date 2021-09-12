@@ -23,7 +23,7 @@ Options are passed to the Roller as a string with `lv_roller_set_options(roller,
 You can select an option manually with `lv_roller_set_selected(roller, id, LV_ANIM_ON/OFF)`, where *id* is the index of an option.
 
 ### Get selected option
-The get the *index* of the currently selected option use `lv_roller_get_selected(roller)`.
+To get the *index* of the currently selected option use `lv_roller_get_selected(roller)`.
 
 `lv_roller_get_selected_str(roller, buf, buf_size)` will copy the name of the selected option to `buf`.
 
