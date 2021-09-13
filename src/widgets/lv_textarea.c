@@ -489,6 +489,7 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
     if(en) {
         ta->one_line = 1;
         lv_obj_set_width(ta->label, LV_SIZE_CONTENT);
+        lv_obj_set_style_min_width(ta->label, lv_pct(100), 0);
 
         lv_obj_set_height(obj, LV_SIZE_CONTENT);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
@@ -496,6 +497,7 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
     else {
         ta->one_line = 0;
         lv_obj_set_width(ta->label, lv_pct(100));
+        lv_obj_set_style_min_width(ta->label, 0, 0);
         lv_obj_remove_local_style_prop(obj, LV_STYLE_HEIGHT, LV_PART_MAIN);
         lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
@@ -553,6 +555,7 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time)
 
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
+    LV_LOG_WARN("Deprecated: use the normal text_align style property instead");
     lv_obj_set_style_text_align(obj, align, 0);
 
     switch(align) {

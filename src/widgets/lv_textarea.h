@@ -199,6 +199,7 @@ void lv_textarea_set_text_selection(lv_obj_t * obj, bool en);
 void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time);
 
 /**
+ * Deprecated: use the normal text_align style property instead
  * Set the label's alignment.
  * It sets where the label is aligned (in one line mode it can be smaller than the text area)
  * and how the lines of the area align in case of multiline text area
