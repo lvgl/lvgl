@@ -47,7 +47,8 @@ enum {
 
 typedef uint16_t lv_btnmatrix_ctrl_t;
 
-typedef bool (*lv_btnmatrix_btn_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area, const lv_area_t * clip_area);
+typedef bool (*lv_btnmatrix_btn_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
+                                           const lv_area_t * clip_area);
 
 /*Data of button matrix*/
 typedef struct {
@@ -68,7 +69,7 @@ extern const lv_obj_class_t lv_btnmatrix_class;
  */
 typedef enum {
     LV_BTNMATRIX_DRAW_PART_BTN,    /**< The rectangle and label of buttons*/
-}lv_btnmatrix_draw_part_type_t;
+} lv_btnmatrix_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES

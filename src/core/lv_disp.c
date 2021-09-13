@@ -126,14 +126,13 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
  */
 void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
 {
-	if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_disp_get_default();
     disp->theme = th;
 
     if(disp->screen_cnt == 3 &&
-        lv_obj_get_child_cnt(disp->screens[0]) == 0 &&
-        lv_obj_get_child_cnt(disp->screens[1]) == 0 &&
-        lv_obj_get_child_cnt(disp->screens[2]) == 0)
-    {
+       lv_obj_get_child_cnt(disp->screens[0]) == 0 &&
+       lv_obj_get_child_cnt(disp->screens[1]) == 0 &&
+       lv_obj_get_child_cnt(disp->screens[2]) == 0) {
         lv_theme_apply(disp->screens[0]);
     }
 }
@@ -144,7 +143,7 @@ void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
  */
 lv_theme_t * lv_disp_get_theme(lv_disp_t * disp)
 {
-	if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_disp_get_default();
     return disp->theme;
 }
 

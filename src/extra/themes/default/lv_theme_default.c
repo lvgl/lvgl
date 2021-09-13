@@ -147,14 +147,14 @@ typedef struct {
 
 typedef struct {
     lv_theme_t base;
-    uint8_t light :1;
-}my_theme_t;
+    uint8_t light : 1;
+} my_theme_t;
 
 typedef enum {
     DISP_SMALL = 3,
     DISP_MEDIUM = 2,
     DISP_LARGE = 1,
-}disp_size_t;
+} disp_size_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -200,12 +200,12 @@ static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t col
 static void style_init(void)
 {
     static const lv_style_prop_t trans_props[] = {
-            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
-            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
-            LV_STYLE_TRANSLATE_Y, LV_STYLE_TRANSLATE_X,
-            LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,
-            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
-            0
+        LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
+        LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
+        LV_STYLE_TRANSLATE_Y, LV_STYLE_TRANSLATE_X,
+        LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,
+        LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
+        0
     };
 
     color_scr = theme.flags & MODE_DARK ? DARK_COLOR_SCR : LIGHT_COLOR_SCR;
@@ -226,7 +226,8 @@ static void style_init(void)
     lv_style_set_transition(&styles->transition_normal, &trans_normal); /*Go back to default state with delay*/
 
     style_init_reset(&styles->scrollbar);
-    lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 2) : lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY,
+                                                                                            2) : lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_right(&styles->scrollbar, lv_disp_dpx(theme.disp, 7));
     lv_style_set_pad_top(&styles->scrollbar,  lv_disp_dpx(theme.disp, 7));
@@ -270,7 +271,8 @@ static void style_init(void)
     lv_style_set_outline_opa(&styles->outline_secondary, LV_OPA_50);
 
     style_init_reset(&styles->btn);
-    lv_style_set_radius(&styles->btn, (disp_size == DISP_LARGE ? lv_disp_dpx(theme.disp, 16) : disp_size == DISP_MEDIUM ? lv_disp_dpx(theme.disp, 12) : lv_disp_dpx(theme.disp, 8)));
+    lv_style_set_radius(&styles->btn, (disp_size == DISP_LARGE ? lv_disp_dpx(theme.disp,
+                                                                             16) : disp_size == DISP_MEDIUM ? lv_disp_dpx(theme.disp, 12) : lv_disp_dpx(theme.disp, 8)));
     lv_style_set_bg_opa(&styles->btn, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->btn, color_grey);
     if(!(theme.flags & MODE_DARK)) {
@@ -440,7 +442,7 @@ static void style_init(void)
     lv_style_set_pad_column(&styles->chart_series, lv_disp_dpx(theme.disp, 2));
 
     style_init_reset(&styles->chart_indic);
-    lv_style_set_radius(&styles->chart_indic,LV_RADIUS_CIRCLE);
+    lv_style_set_radius(&styles->chart_indic, LV_RADIUS_CIRCLE);
     lv_style_set_size(&styles->chart_indic, lv_disp_dpx(theme.disp, 8));
     lv_style_set_bg_color(&styles->chart_indic, theme.color_primary);
     lv_style_set_bg_opa(&styles->chart_indic, LV_OPA_COVER);
@@ -470,7 +472,7 @@ static void style_init(void)
     style_init_reset(&styles->table_cell);
     lv_style_set_border_width(&styles->table_cell, lv_disp_dpx(theme.disp, 1));
     lv_style_set_border_color(&styles->table_cell, color_grey);
-    lv_style_set_border_side(&styles->table_cell, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM );
+    lv_style_set_border_side(&styles->table_cell, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
 #endif
 
 #if LV_USE_TEXTAREA
@@ -482,7 +484,8 @@ static void style_init(void)
     lv_style_set_anim_time(&styles->ta_cursor, 400);
 
     style_init_reset(&styles->ta_placeholder);
-    lv_style_set_text_color(&styles->ta_placeholder, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 2) : lv_palette_lighten(LV_PALETTE_GREY, 1));
+    lv_style_set_text_color(&styles->ta_placeholder, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY,
+                                                                                                   2) : lv_palette_lighten(LV_PALETTE_GREY, 1));
 #endif
 
 #if LV_USE_CALENDAR
@@ -562,7 +565,8 @@ static void style_init(void)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark, const lv_font_t * font)
+lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark,
+                                   const lv_font_t * font)
 {
 
     /*This trick is required only to avoid the garbage collection of
@@ -648,7 +652,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
     }
-    #if LV_USE_BTN
+#if LV_USE_BTN
     else if(lv_obj_check_type(obj, &lv_btn_class)) {
         lv_obj_add_style(obj, &styles->btn, 0);
         lv_obj_add_style(obj, &styles->bg_color_primary, 0);
@@ -999,8 +1003,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_LED
     else if(lv_obj_check_type(obj, &lv_led_class)) {
-            lv_obj_add_style(obj, &styles->led, 0);
-        }
+        lv_obj_add_style(obj, &styles->led, 0);
+    }
 #endif
 }
 

@@ -76,7 +76,7 @@ typedef struct _lv_group_t {
 typedef enum {
     LV_GROUP_REFOCUS_POLICY_NEXT = 0,
     LV_GROUP_REFOCUS_POLICY_PREV = 1
-}lv_group_refocus_policy_t;
+} lv_group_refocus_policy_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -79,7 +79,7 @@ typedef enum {
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     _LV_EVENT_LAST                /** Number of default events*/
-}lv_event_code_t;
+} lv_event_code_t;
 
 typedef struct _lv_event_t {
     struct _lv_obj_t * target;
@@ -88,8 +88,8 @@ typedef struct _lv_event_t {
     void * user_data;
     void * param;
     struct _lv_event_t * prev;
-    uint8_t deleted :1;
-}lv_event_t;
+    uint8_t deleted : 1;
+} lv_event_t;
 
 /**
  * @brief Event callback.
@@ -209,7 +209,8 @@ void _lv_event_mark_deleted(struct _lv_obj_t * obj);
  * @param           user_data custom data data will be available in `event_cb`
  * @return          a pointer the event descriptor. Can be used in ::lv_obj_remove_event_dsc
  */
-struct _lv_event_dsc_t * lv_obj_add_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+struct _lv_event_dsc_t * lv_obj_add_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                             void * user_data);
 
 /**
  * Remove an event handler function for an object.
@@ -226,7 +227,8 @@ bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
  * @param event_user_data   the user_data specified in ::lv_obj_add_event_cb
  * @return                  true if any event handlers were removed
  */
-bool lv_obj_remove_event_cb_with_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb, const void * event_user_data);
+bool lv_obj_remove_event_cb_with_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb,
+                                           const void * event_user_data);
 
 /**
  * DEPRACTED because doesn't work if multiple event handlers are added to an object.

@@ -91,7 +91,7 @@ void lv_obj_set_parent(struct _lv_obj_t * obj, struct _lv_obj_t * parent);
  * @param obj1  pointer to the first object
  * @param obj2  pointer to the second object
  */
-void lv_obj_swap(struct _lv_obj_t* obj1, struct _lv_obj_t* obj2);
+void lv_obj_swap(struct _lv_obj_t * obj1, struct _lv_obj_t * obj2);
 
 /**
  * moves the object to the given index in its parent.
@@ -99,9 +99,9 @@ void lv_obj_swap(struct _lv_obj_t* obj1, struct _lv_obj_t* obj2);
  * @param obj  pointer to the object to be moved.
  * @param index  new index in parent.
  * @note to move to the foreground: lv_obj_move_to_index(obj, 0)
- * @note to move forward (up): lv_obj_move_to_index(obj, lv_obj_get_index(obj) - 1) 
+ * @note to move forward (up): lv_obj_move_to_index(obj, lv_obj_get_index(obj) - 1)
  */
-void lv_obj_move_to_index(struct _lv_obj_t* obj, int32_t index);
+void lv_obj_move_to_index(struct _lv_obj_t * obj, int32_t index);
 
 /**
  * Get the screen of an object
@@ -150,7 +150,7 @@ uint32_t lv_obj_get_child_cnt(const struct _lv_obj_t * obj);
  * @return          the child index of the object.
  *                  E.g. 0: the oldest (firstly created child)
  */
-uint32_t lv_obj_get_index(const struct _lv_obj_t* obj);
+uint32_t lv_obj_get_index(const struct _lv_obj_t * obj);
 
 /**
  * Iterate through all children of any object.

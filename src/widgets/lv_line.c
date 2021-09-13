@@ -159,7 +159,8 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
             p->x = w;
             p->y = h;
         }
-    } else if(code == LV_EVENT_DRAW_MAIN) {
+    }
+    else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
         const lv_area_t * clip_area = lv_event_get_param(e);
 

@@ -100,7 +100,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
     if(*mask_tmp_x) {          \
         if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[x] = map_buf_first[x];                                 \
         else if(disp->driver->screen_transp) lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha,              \
-                                                                        map_buf_first[x], *mask_tmp_x, &disp_buf_first[x], &disp_buf_first[x].ch.alpha);                  \
+                                                                         map_buf_first[x], *mask_tmp_x, &disp_buf_first[x], &disp_buf_first[x].ch.alpha);                  \
         else disp_buf_first[x] = lv_color_mix(map_buf_first[x], disp_buf_first[x], *mask_tmp_x);            \
     }                                                                                               \
     mask_tmp_x++;
@@ -210,8 +210,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-    if(mask && disp->driver->antialiasing == 0)
-    {
+    if(mask && disp->driver->antialiasing == 0) {
         int32_t mask_w = lv_area_get_width(&draw_area);
         int32_t i;
         for(i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
@@ -266,7 +265,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x]) {
                     disp->driver->set_px_cb(disp->driver, (void *)disp_buf, disp_w, x, y, color,
-                                           (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
+                                            (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
                 }
             }
             mask_tmp += draw_area_w;
@@ -404,11 +403,12 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 #if LV_COLOR_DEPTH == 16
                         if((lv_uintptr_t)disp_buf_first & 0x3) {
                             *(disp_buf_first + 0) = color;
-                            uint32_t * d = (uint32_t * )(disp_buf_first + 1);
+                            uint32_t * d = (uint32_t *)(disp_buf_first + 1);
                             *d = c32;
                             *(disp_buf_first + 3) = color;
-                        } else {
-                            uint32_t * d = (uint32_t * )disp_buf_first;
+                        }
+                        else {
+                            uint32_t * d = (uint32_t *)disp_buf_first;
                             *d = c32;
                             *(d + 1) = c32;
                         }
@@ -418,7 +418,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                         disp_buf_first[2] = color;
                         disp_buf_first[3] = color;
 #endif
-                        disp_buf_first+= 4;
+                        disp_buf_first += 4;
                         mask += 4;
                     }
                     else if(mask32) {
@@ -426,7 +426,8 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                         FILL_NORMAL_MASK_PX(color)
                         FILL_NORMAL_MASK_PX(color)
                         FILL_NORMAL_MASK_PX(color)
-                    } else {
+                    }
+                    else {
                         mask += 4;
                         disp_buf_first += 4;
                     }
@@ -435,7 +436,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 for(; x < draw_area_w ; x++) {
                     FILL_NORMAL_MASK_PX(color)
                 }
-                disp_buf_first += (disp_w-draw_area_w);
+                disp_buf_first += (disp_w - draw_area_w);
             }
         }
         /*Handle opa and mask values too*/
@@ -614,7 +615,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x]) {
                     disp->driver->set_px_cb(disp->driver, (void *)disp_buf, disp_w, x, y, map_buf_tmp[x],
-                                           (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
+                                            (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
                 }
             }
             mask_tmp += draw_area_w;
