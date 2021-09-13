@@ -495,7 +495,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
 #endif
 
-
     /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
     bool mask_any = lv_draw_mask_is_any(&shadow_area);
     bool simple = true;
@@ -601,6 +600,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     blend_area.x2 = shadow_area.x2 - corner_size;
     blend_area.y1 = shadow_area.y1;
     blend_area.y2 = shadow_area.y1 + corner_size - 1;
+    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, clip) && !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
@@ -638,6 +638,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     blend_area.x2 = shadow_area.x2 - corner_size;
     blend_area.y1 = shadow_area.y2 - corner_size + 1;
     blend_area.y2 = shadow_area.y2;
+    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, clip) && !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
@@ -678,12 +679,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     /*Do not overdraw the other corners*/
     blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
     blend_area.y2 = LV_MAX(blend_area.y2, h_half);
+    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, clip) && !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (corner_size - 1) * corner_size;
-        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
+        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
 
         /*Do not mask if out of the bg*/
         if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
@@ -723,7 +725,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         sh_buf_tmp += corner_size;
     }
 
-
     /*Left side*/
     blend_area.x1 = shadow_area.x1;
     blend_area.x2 = shadow_area.x1 + corner_size - 1;
@@ -732,6 +733,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     /*Do not overdraw the other corners*/
     blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
     blend_area.y2 = LV_MAX(blend_area.y2, h_half);
+    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, clip) && !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
