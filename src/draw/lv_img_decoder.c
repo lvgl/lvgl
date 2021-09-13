@@ -435,7 +435,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         /*Free the potentially allocated memories*/
         lv_img_decoder_built_in_close(decoder, dsc);
 
-        LV_LOG_WARN("Image decoder open: unknown color format")
+        LV_LOG_WARN("Image decoder open: unknown color format");
         return LV_RES_INV;
     }
 }

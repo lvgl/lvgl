@@ -34,16 +34,16 @@ For images, *clicking* is disabled by default.
 
 ## Keypad and encoder
 
-You can fully control the user interface without touchpad or mouse using a keypad or encoder(s). It works similar to the *TAB* key on the PC to select the element in an application or a web page.
+You can fully control the user interface without a touchpad or mouse by using a keypad or encoder(s). It works similar to the *TAB* key on the PC to select an element in an application or a web page.
 
 ### Groups
 
-The objects, you want to control with keypad or encoder, need to be added to a *Group*.
-In every group, there is exactly one focused object which receives the pressed keys or the encoder actions.
-For example, if a [Text area](/widgets/core/textarea) is focused, and you press some letter on a keyboard, the keys will be sent and inserted into the text area.
-Similarly, if a [Slider](/widgets/core/slider) is focused, and you press the left or right arrows, the slider's value will be changed.
+Objects you want to control with a keypad or encoder need to be added to a *Group*.
+In every group there is exactly one focused object which receives the pressed keys or the encoder actions.
+For example, if a [Text area](/widgets/core/textarea) is focused and you press some letter on a keyboard, the keys will be sent and inserted into the text area.
+Similarly, if a [Slider](/widgets/core/slider) is focused and you press the left or right arrows, the slider's value will be changed.
 
-You need to associate an input device with a group. An input device can send the keys to only one group but, a group can receive data from more than one input device too.
+You need to associate an input device with a group. An input device can send key events to only one group but a group can receive data from more than one input device.
 
 To create a group use `lv_group_t * g = lv_group_create()` and to add an object to the group use `lv_group_add_obj(g, obj)`.
 
@@ -65,34 +65,34 @@ There are some predefined keys which have special meaning:
 - **LV_KEY_END** Go to the end (E.g. in a [Text area](/widgets/core/textarea))
 
 The most important special keys are `LV_KEY_NEXT/PREV`, `LV_KEY_ENTER` and `LV_KEY_UP/DOWN/LEFT/RIGHT`.
-In your `read_cb` function, you should translate some of your keys to these special keys to navigate in the group and interact with the selected object.
+In your `read_cb` function, you should translate some of your keys to these special keys to support navigation in a group and interact with selected objects.
 
-Usually, it's enough to use only `LV_KEY_LEFT/RIGHT` because most of the objects can be fully controlled with them.
+Usually, it's enough to use only `LV_KEY_LEFT/RIGHT` because most objects can be fully controlled with them.
 
-With an encoder, you should use only `LV_KEY_LEFT`, `LV_KEY_RIGHT`, and `LV_KEY_ENTER`.
+With an encoder you should use only `LV_KEY_LEFT`, `LV_KEY_RIGHT`, and `LV_KEY_ENTER`.
 
 #### Edit and navigate mode
 
-Since a keypad has plenty of keys, it's easy to navigate between the objects and edit them using the keypad. But the encoders have a limited number of "keys" and hence it is difficult to navigate using the default options. *Navigate* and *Edit* are created to avoid this problem with the encoders.
+Since a keypad has plenty of keys, it's easy to navigate between objects and edit them using the keypad. But encoders have a limited number of "keys" and hence it is difficult to navigate using the default options. *Navigate* and *Edit* modes are used to avoid this problem with encoders.
 
-In *Navigate* mode, the encoders `LV_KEY_LEFT/RIGHT` is translated to `LV_KEY_NEXT/PREV`. Therefore, the next or previous object will be selected by turning the encoder.
+In *Navigate* mode, an encoder's `LV_KEY_LEFT/RIGHT` is translated to `LV_KEY_NEXT/PREV`. Therefore, the next or previous object will be selected by turning the encoder.
 Pressing `LV_KEY_ENTER` will change to *Edit* mode.
 
-In *Edit* mode, `LV_KEY_NEXT/PREV` is usually used to edit the object.
+In *Edit* mode, `LV_KEY_NEXT/PREV` is usually used to modify an object.
 Depending on the object's type, a short or long press of `LV_KEY_ENTER` changes back to *Navigate* mode.
-Usually, an object which can not be pressed (like a [Slider](/widgets/core/slider)) leaves *Edit* mode on short click. But with objects where short click has meaning (e.g. [Button](/widgets/core/btn)), a long press is required.
+Usually, an object which cannot be pressed (like a [Slider](/widgets/core/slider)) leaves *Edit* mode upon a short click. But with objects where a short click has meaning (e.g. [Button](/widgets/core/btn)), a long press is required.
 
 #### Default group
 Interactive widgets - such as buttons, checkboxes, sliders, etc. - can be automatically added to a default group.
 Just create a group with `lv_group_t * g = lv_group_create();` and set the default group with `lv_group_set_default(g);`
 
-Don't forget to assign the input device(s) to the default group with ` lv_indev_set_group(my_indev, g);`.
+Don't forget to assign one or more input devices to the default group with ` lv_indev_set_group(my_indev, g);`.
 
 ### Styling
 
-If an object is focused either by clicking it via touchpad, or focused via an encoder or keypad it goes to `LV_STATE_FOCUSED`. Hence, focused styles will be applied on it. 
+If an object is focused either by clicking it via touchpad or focused via an encoder or keypad it goes to the `LV_STATE_FOCUSED` state. Hence, focused styles will be applied to it. 
 
-If the object goes to edit mode it goes to `LV_STATE_FOCUSED | LV_STATE_EDITED` state so these style properties will be shown. 
+If an object switches to edit mode it enters the `LV_STATE_FOCUSED | LV_STATE_EDITED` states so these style properties will be shown. 
 
 For a more detailed description read the [Style](https://docs.lvgl.io/v7/en/html/overview/style.html) section.
 

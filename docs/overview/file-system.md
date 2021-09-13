@@ -5,17 +5,17 @@
 # File system
 
 LVGL has a 'File system' abstraction module that enables you to attach any type of file system.
-The file system is identified by a drive letter.
-For example, if the SD card is associated with the letter `'S'`, a file can be reached like `"S:path/to/file.txt"`.
+A file system is identified by an assigned drive letter.
+For example, if an SD card is associated with the letter `'S'`, a file can be reached using `"S:path/to/file.txt"`.
 
 ## Ready to use drivers
-The [lv_fs_if](https://github.com/lvgl/lv_fs_if) repository contains ready to use drivers using POSIX, standard C and [FATFS](http://elm-chan.org/fsw/ff/00index_e.html) API.
+The [lv_fs_if](https://github.com/lvgl/lv_fs_if) repository contains prepared drivers using POSIX, standard C and the [FATFS](http://elm-chan.org/fsw/ff/00index_e.html) API.
 See its [README](https://github.com/lvgl/lv_fs_if#readme) for the details.
 
-## Add a driver
+## Adding a driver
 
 ### Registering a driver
-To add a driver, `lv_fs_drv_t` needs to be initialized like below. `lv_fs_drv_t` needs to be static, global or dynamically allocated and not a local variable.
+To add a driver, a `lv_fs_drv_t` needs to be initialized like below. The `lv_fs_drv_t` needs to be static, global or dynamically allocated and not a local variable.
 ```c
 static lv_fs_drv_t drv;                   /*Needs to be static or global*/
 lv_fs_drv_init(&drv);                     /*Basic initialization*/
@@ -50,9 +50,9 @@ The prototype of `open_cb` looks like this:
 void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 ```
 
-`path` is path after the driver letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt"). `mode` can be `LV_FS_MODE_WR` or `LV_FS_MODE_RD` to open for write or read.
+`path` is the path after the drive letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt"). `mode` can be `LV_FS_MODE_WR` or `LV_FS_MODE_RD` to open for writes or reads.
 
-The return value is a pointer the *file object* the describes the opened file or `NULL` if there were any issues (e.g. the file wasn't found). 
+The return value is a pointer to a *file object* that describes the opened file or `NULL` if there were any issues (e.g. the file wasn't found). 
 The returned file object will be passed to other file system related callbacks. (see below)
 
 ### Other callbacks
@@ -61,9 +61,9 @@ The other callbacks are quite similar. For example `write_cb` looks like this:
 lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 ```
 
-As `file_p` LVGL passes the return value of `open_cb`, `buf` is the data to write, `btw` is the Bytes To Write, `bw` is the actually written bytes. 
+For `file_p`, LVGL passes the return value of `open_cb`, `buf` is the data to write, `btw` is the Bytes To Write, `bw` is the actually written bytes. 
 
-For a template to the callbacks see [lv_fs_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c).
+For a template of these callbacks see [lv_fs_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c).
 
 
 ## Usage example
@@ -82,9 +82,9 @@ if(res != LV_FS_RES_OK || read_num != 8) my_error_handling();
 
 lv_fs_close(&f);
 ```
-*The mode in `lv_fs_open` can be `LV_FS_MODE_WR` to open for write or `LV_FS_MODE_RD | LV_FS_MODE_WR` for both*
+*The mode in `lv_fs_open` can be `LV_FS_MODE_WR` to open for writes only or `LV_FS_MODE_RD | LV_FS_MODE_WR` for both*
 
-This example shows how to read a directory's content. It's up to the driver how to mark the directories, but it can be a good practice to insert a `'/'` in front of the directory name.
+This example shows how to read a directory's content. It's up to the driver how to mark directories in the result but it can be a good practice to insert a `'/'` in front of each directory name.
 ```c
 lv_fs_dir_t dir;
 lv_fs_res_t res;
@@ -110,9 +110,9 @@ while(1) {
 lv_fs_dir_close(&dir);
 ```
 
-## Use drivers for images
+## Use drives for images
 
-[Image](/widgets/core/img) objects can be opened from files too (besides variables stored in the flash).
+[Image](/widgets/core/img) objects can be opened from files too (besides variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
 - open

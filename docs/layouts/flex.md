@@ -39,8 +39,8 @@ The possible values for `flex_flow` are:
 - `LV_FLEX_FLOW_COLUMN_WRAP` Place the children in a column with wrapping
 - `LV_FLEX_FLOW_ROW_REVERSE` Place the children in a row without wrapping but in reversed order
 - `LV_FLEX_FLOW_COLUMN_REVERSE` Place the children in a column without wrapping but in reversed order
-- `LV_FLEX_FLOW_ROW_WRAP_REVERSE` Place the children in a row without wrapping but in reversed order
-- `LV_FLEX_FLOW_COLUMN_WRAP_REVERSE` Place the children in a column without wrapping but in reversed order
+- `LV_FLEX_FLOW_ROW_WRAP_REVERSE` Place the children in a row with wrapping but in reversed order
+- `LV_FLEX_FLOW_COLUMN_WRAP_REVERSE` Place the children in a column with wrapping but in reversed order
 
 ### Flex align
 To manage the placement of the children use `lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`

@@ -9,6 +9,8 @@ else()
 cmake_minimum_required(VERSION 3.13)
 project(lvgl_tests LANGUAGES C)
 
+include(CTest)
+
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
@@ -189,17 +191,17 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
 )
 
 if (OPTIONS_MINIMAL_MONOCHROME)
-    set (TEST_OPTIONS ${LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME})
 elseif (OPTIONS_NORMAL_8BIT)
-    set (TEST_OPTIONS ${LVGL_TEST_OPTIONS_NORMAL_8BIT})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NORMAL_8BIT})
 elseif (OPTIONS_16BIT)
-    set (TEST_OPTIONS ${LVGL_TEST_OPTIONS_16BIT})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT})
 elseif (OPTIONS_16BIT_SWAP)
-    set (TEST_OPTIONS ${LVGL_TEST_OPTIONS_16BIT_SWAP})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT_SWAP})
 elseif (OPTIONS_FULL_32BIT)
-    set (TEST_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST)
-    set (TEST_OPTIONS ${LVGL_TEST_OPTIONS_TEST})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST})
     set (TEST_LIBS --coverage)
 else()
     message(FATAL_ERROR "Must provide an options value.")
@@ -233,7 +235,7 @@ set(COMPILE_OPTIONS
     -Wundef
     -Wuninitialized
     -Wunreachable-code
-    ${TEST_OPTIONS}
+    ${BUILD_OPTIONS}
 )
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
@@ -289,6 +291,11 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     target_link_libraries(${test_name} test_common lvgl_examples lvgl png ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${COMPILE_OPTIONS})
+
+    add_test(
+        NAME ${test_name} 
+        WORKING_DIRECTORY ${LVGL_TEST_DIR}
+        COMMAND ${test_name})
 endforeach( test_case_fname ${TEST_CASE_FILES} )
 
 endif()

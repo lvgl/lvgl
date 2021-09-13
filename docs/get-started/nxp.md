@@ -14,9 +14,7 @@ configured with LVGL (and with PXP support if module is present), no additional 
 work is required.
 
 ## Adding HW acceleration for NXP iMX RT platforms using PXP (PiXel Pipeline) engine for existing projects
-Several drawing features in LVGL can be offloaded to PXP engine. In order to use CPU time while PXP
-is running, RTOS is required to block the LVGL drawing thread and switch to another task, or simply to
-idle task, where CPU could be suspended to save power.
+Several drawing features in LVGL can be offloaded to the PXP engine. The CPU is available for other operations while the PXP is running. An RTOS is required to block the LVGL drawing thread and switch to another task or suspend the CPU for power savings.
 
 #### Features supported:
   - RGB565 color format
@@ -59,13 +57,13 @@ idle task, where CPU could be suspended to save power.
       - fsl_cache.c, fsl_cache.h: CPU cache handling functions
 
 #### Advanced configuration:
-  - Implementation depends on multiple OS-specific functions. Structure `lv_nxp_pxp_cfg_t` with callback pointers is used
-    as a parameter for `lv_gpu_nxp_pxp_init()` function. Default implementation for FreeRTOS and baremetal is provided in lv_gpu_nxp_osa.c
+  - Implementation depends on multiple OS-specific functions. The struct `lv_nxp_pxp_cfg_t` with callback pointers is used
+    as a parameter for the `lv_gpu_nxp_pxp_init()` function. Default implementation for FreeRTOS and baremetal is provided in lv_gpu_nxp_osa.c
       - `pxp_interrupt_init()`: Initialize PXP interrupt (HW setup, OS setup)
       - `pxp_interrupt_deinit()`: Deinitialize PXP interrupt (HW setup, OS setup)
       - `pxp_run()`: Start PXP job. Use OS-specific mechanism to block drawing thread. PXP must finish drawing before leaving this function.
-  - There are configurable area thresholds which are used to decide whether the area will be processed by CPU, or by PXP. Areas smaller than
-    defined value will be processed by CPU, areas bigger than the threshold will be processed by PXP. These thresholds may be defined as a
+  - There are configurable area thresholds which are used to decide whether the area will be processed by CPU, or by PXP. Areas smaller than a
+    defined value will be processed by CPU and those bigger than the threshold will be processed by PXP. These thresholds may be defined as
     preprocessor variables. Default values are defined lv_gpu/lv_gpu_nxp_pxp.h
       - `GPU_NXP_PXP_BLIT_SIZE_LIMIT`: size threshold for image BLIT, BLIT with color keying, and BLIT with recolor (OPA > LV_OPA_MAX)
       - `GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT`: size threshold for image BLIT and BLIT with color keying with transparency (OPA < LV_OPA_MAX)

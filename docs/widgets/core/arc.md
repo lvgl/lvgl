@@ -50,7 +50,7 @@ The change rate is defined in degree/second unit and can be set with `lv_arc_set
 It's also possible to set the angles of the indicator arc directly with `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)`.
 In this case the set "value" and "mode" are ignored.
 
-In other words, settings angles and values are independent. You should use either value or angle settings. Mixing the two might result in unintended behavior. 
+In other words, the angle and value settings are independent. You should exclusively use one or the other. Mixing the two might result in unintended behavior.
 
 To make the arc non-adjustable, remove the style of the knob and make the object non-clickable:
 ```c

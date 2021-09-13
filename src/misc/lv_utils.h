@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdint.h>
-#include <stddef.h>
 
 /*********************
  *      DEFINES

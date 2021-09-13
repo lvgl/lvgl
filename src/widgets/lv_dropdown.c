@@ -90,7 +90,7 @@ const lv_obj_class_t lv_dropdownlist_class = {
 
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_dropdown_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -153,6 +153,9 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
     /*Now the text is dynamically allocated*/
     dropdown->static_txt = 0;
+
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
@@ -179,6 +182,9 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 
     dropdown->static_txt = 1;
     dropdown->options = (char *)options;
+
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
@@ -249,6 +255,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     dropdown->option_cnt++;
 
     lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
@@ -265,6 +272,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->option_cnt = 0;
 
     lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
@@ -374,7 +382,7 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     uint32_t c;
     for(c = 0; i < txt_len && dropdown->options[i] != '\n'; c++, i++) {
         if(buf_size && c >= buf_size - 1) {
-            LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small")
+            LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small");
             break;
         }
         buf[c] = dropdown->options[i];
@@ -527,7 +535,7 @@ void lv_dropdown_close(lv_obj_t * obj)
 
 static lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_dropdownlist_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
