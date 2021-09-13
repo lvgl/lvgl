@@ -34,6 +34,11 @@ The possible states are:
 If you set sources only in `LV_IMGBTN_STATE_RELEASED`, these sources will be used in other states too. 
 If you set e.g. `LV_IMGBTN_STATE_PRESSED` they will be used in pressed state instead of the released images.
 
+
+### States
+Instead of the regular `lv_obj_add/clear_state()` functions the `lv_imgbtn_set_state(imgbtn, LV_IMGBTN_STATE_...)` functions should be used to manually set a state.
+
+
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the button is toggled.
 
