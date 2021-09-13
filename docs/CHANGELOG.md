@@ -1,6 +1,8 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- added sample lv_example_list_2.py
+- lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
 - feat(example) stacked area chart lv_example_chart_8 added.
 - renamed lv_obj_get_child_id(obj) to lv_obj_get_index(obj).
 - added lv_obj_move_to_index(obj, index). (#2461)
