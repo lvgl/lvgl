@@ -39,9 +39,9 @@ static bool timer_created;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_TIMER
-#  define TIMER_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define TIMER_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
 #else
-#  define TIMER_TRACE(...)
+    #define TIMER_TRACE(...)
 #endif
 
 /**********************

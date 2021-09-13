@@ -153,6 +153,9 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
     /*Now the text is dynamically allocated*/
     dropdown->static_txt = 0;
+
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
@@ -179,6 +182,9 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 
     dropdown->static_txt = 1;
     dropdown->options = (char *)options;
+
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
@@ -249,6 +255,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     dropdown->option_cnt++;
 
     lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
@@ -265,6 +272,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->option_cnt = 0;
 
     lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
@@ -416,7 +424,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 
     if(dropdown->list == NULL) {
         lv_obj_t * list_obj = lv_dropdown_list_create(lv_obj_get_screen(dropdown_obj));
-        ((lv_dropdown_list_t*) list_obj)->dropdown = dropdown_obj;
+        ((lv_dropdown_list_t *) list_obj)->dropdown = dropdown_obj;
         dropdown->list = list_obj;
         lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_CLICK_FOCUSABLE);
         lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -496,16 +504,16 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, dropdown->options);
 
     switch(align) {
-    default:
-    case LV_TEXT_ALIGN_LEFT:
-        lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);
-        break;
-    case LV_TEXT_ALIGN_RIGHT:
-        lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
-        break;
-    case LV_TEXT_ALIGN_CENTER:
-        lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-        break;
+        default:
+        case LV_TEXT_ALIGN_LEFT:
+            lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);
+            break;
+        case LV_TEXT_ALIGN_RIGHT:
+            lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
+            break;
+        case LV_TEXT_ALIGN_CENTER:
+            lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+            break;
 
     }
 }
@@ -755,16 +763,19 @@ static void draw_main(lv_event_t * e)
         lv_coord_t symbol_h;
         if(symbol_type == LV_IMG_SRC_SYMBOL) {
             lv_point_t size;
-            lv_txt_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX, symbol_dsc.flag);
+            lv_txt_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
+                            symbol_dsc.flag);
             symbol_w = size.x;
             symbol_h = size.y;
-        } else {
+        }
+        else {
             lv_img_header_t header;
             lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header);
             if(res == LV_RES_OK) {
                 symbol_w = header.w;
                 symbol_h = header.h;
-            } else {
+            }
+            else {
                 symbol_w = -1;
                 symbol_h = -1;
             }
@@ -774,7 +785,8 @@ static void draw_main(lv_event_t * e)
         if(symbol_to_left) {
             symbol_area.x1 = obj->coords.x1 + left;
             symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
-        } else {
+        }
+        else {
             symbol_area.x1 = obj->coords.x2 - right - symbol_w;
             symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
         }
@@ -783,7 +795,8 @@ static void draw_main(lv_event_t * e)
             symbol_area.y1 = obj->coords.y1 + top;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             lv_draw_label(&symbol_area, clip_area, &symbol_dsc, dropdown->symbol, NULL);
-        } else {
+        }
+        else {
             symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             lv_draw_img_dsc_t img_dsc;
@@ -801,7 +814,8 @@ static void draw_main(lv_event_t * e)
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
     lv_point_t size;
-    lv_txt_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+    lv_txt_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                    label_dsc.flag);
 
     lv_area_t txt_area;
     txt_area.y1 = obj->coords.y1 + top;
@@ -816,7 +830,8 @@ static void draw_main(lv_event_t * e)
         if(symbol_to_left) {
             txt_area.x1 = obj->coords.x2 - right - size.x;
             txt_area.x2 = txt_area.x1 + size.x;
-        } else {
+        }
+        else {
             txt_area.x1 = obj->coords.x1 + left;
             txt_area.x2 = txt_area.x1 + size.x;
         }
@@ -848,13 +863,15 @@ static void draw_list(lv_event_t * e)
                 if(dropdown->pr_opt_id == dropdown->sel_opt_id) {
                     draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
                     draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
-                } else {
+                }
+                else {
                     draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
                     draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
                     draw_box(dropdown_obj, &clip_area_core, dropdown->sel_opt_id, LV_STATE_CHECKED);
                     draw_box_label(dropdown_obj, &clip_area_core, dropdown->sel_opt_id, LV_STATE_CHECKED);
                 }
-            } else {
+            }
+            else {
                 draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
                 draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
             }
@@ -917,7 +934,8 @@ static void draw_box_label(lv_obj_t * dropdown_obj, const lv_area_t * clip_area,
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(list_obj, LV_PART_SELECTED, &label_dsc);
 
-    label_dsc.line_space = lv_obj_get_style_text_line_space(list_obj, LV_PART_SELECTED);  /*Line space should come from the list*/
+    label_dsc.line_space = lv_obj_get_style_text_line_space(list_obj,
+                                                            LV_PART_SELECTED);  /*Line space should come from the list*/
 
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
@@ -981,7 +999,7 @@ static lv_res_t btn_release_handler(lv_obj_t * obj)
  */
 static lv_res_t list_release_handler(lv_obj_t * list_obj)
 {
-    lv_dropdown_list_t * list = (lv_dropdown_list_t*) list_obj;
+    lv_dropdown_list_t * list = (lv_dropdown_list_t *) list_obj;
     lv_obj_t * dropdown_obj = list->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
@@ -1017,7 +1035,7 @@ static lv_res_t list_release_handler(lv_obj_t * list_obj)
 
 static void list_press_handler(lv_obj_t * list_obj)
 {
-    lv_dropdown_list_t * list = (lv_dropdown_list_t*) list_obj;
+    lv_dropdown_list_t * list = (lv_dropdown_list_t *) list_obj;
     lv_obj_t * dropdown_obj = list->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 

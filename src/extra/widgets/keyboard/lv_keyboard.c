@@ -179,7 +179,8 @@ void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnmatrix_set_map()' for more info.
  */
-void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * map[], const lv_btnmatrix_ctrl_t ctrl_map[])
+void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * map[],
+                         const lv_btnmatrix_ctrl_t ctrl_map[])
 {
     kb_map[mode] = map;
     kb_ctrl[mode] = ctrl_map;
@@ -282,13 +283,17 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
             lv_res_t res = lv_event_send(keyboard->ta, LV_EVENT_READY, NULL);
             if(res != LV_RES_OK) return;
         }
-    } else if(strcmp(txt, LV_SYMBOL_LEFT) == 0) {
+    }
+    else if(strcmp(txt, LV_SYMBOL_LEFT) == 0) {
         lv_textarea_cursor_left(keyboard->ta);
-    } else if(strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
+    }
+    else if(strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
         lv_textarea_cursor_right(keyboard->ta);
-    } else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
+    }
+    else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
         lv_textarea_del_char(keyboard->ta);
-    } else if(strcmp(txt, "+/-") == 0) {
+    }
+    else if(strcmp(txt, "+/-") == 0) {
         uint16_t cur        = lv_textarea_get_cursor_pos(keyboard->ta);
         const char * ta_txt = lv_textarea_get_text(keyboard->ta);
         if(ta_txt[0] == '-') {

@@ -37,7 +37,7 @@ static void highlight_update(lv_obj_t * calendar);
 const lv_obj_class_t lv_calendar_class = {
     .constructor_cb = lv_calendar_constructor,
     .width_def = (LV_DPI_DEF * 3) / 2,
-    .height_def =(LV_DPI_DEF * 3) / 2,
+    .height_def = (LV_DPI_DEF * 3) / 2,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_calendar_t),
     .base_class = &lv_btnmatrix_class
@@ -238,9 +238,11 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
         /*Every 8th string is "\n"*/
         if(i != 0 && (i + 1) % 8 == 0) {
             calendar->map[i] = "\n";
-        } else if(i < 8){
+        }
+        else if(i < 8) {
             calendar->map[i] = day_names_def[i];
-        } else {
+        }
+        else {
             calendar->nums[j][0] = 'x';
             calendar->map[i] = calendar->nums[j];
             j++;
@@ -359,7 +361,8 @@ static void highlight_update(lv_obj_t * obj)
     uint8_t day_first = get_day_of_week(calendar->showed_date.year, calendar->showed_date.month, 1);
     if(calendar->highlighted_dates) {
         for(i = 0; i < calendar->highlighted_dates_num; i++) {
-            if(calendar->highlighted_dates[i].year == calendar->showed_date.year && calendar->highlighted_dates[i].month == calendar->showed_date.month) {
+            if(calendar->highlighted_dates[i].year == calendar->showed_date.year &&
+               calendar->highlighted_dates[i].month == calendar->showed_date.month) {
                 lv_btnmatrix_set_btn_ctrl(obj, calendar->highlighted_dates[i].day - 1 + day_first + 7, LV_CALENDAR_CTRL_HIGHLIGHT);
             }
         }

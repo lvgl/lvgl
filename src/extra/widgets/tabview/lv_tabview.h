@@ -25,14 +25,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct
-{
+typedef struct {
     lv_obj_t obj;
     char ** map;
     uint16_t tab_cnt;
     uint16_t tab_cur;
     lv_dir_t tab_pos;
-}lv_tabview_t;
+} lv_tabview_t;
 
 extern const lv_obj_class_t lv_tabview_class;
 

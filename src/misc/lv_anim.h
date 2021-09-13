@@ -31,7 +31,7 @@ extern "C" {
 typedef enum {
     LV_ANIM_OFF,
     LV_ANIM_ON,
-}lv_anim_enable_t;
+} lv_anim_enable_t;
 
 #define LV_ANIM_REPEAT_INFINITE      0xFFFF
 LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);

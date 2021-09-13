@@ -121,7 +121,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     int32_t w;
 
     /*No need to waste processor time if string is empty*/
-    if (txt == NULL || txt[0] == '\0')
+    if(txt == NULL || txt[0] == '\0')
         return;
 
     lv_area_t clipped_area;
@@ -141,7 +141,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
         lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
-                         dsc->flag);
+                        dsc->flag);
         w = p.x;
     }
 
@@ -419,8 +419,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         /*Add warning if the dsc is not found
          *but do not print warning for non printable ASCII chars (e.g. '\n')*/
         if(letter >= 0x20 &&
-            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
-            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
+           letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
+           letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", letter);
         }
         return;
@@ -448,11 +448,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
 
     if(font_p->subpx) {
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-    draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
+        draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
 #else
-    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
+        LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
 #endif
-    } else {
+    }
+    else {
         draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
 }

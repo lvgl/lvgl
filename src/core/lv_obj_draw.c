@@ -95,9 +95,10 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
             draw_dsc->bg_img_opa = lv_obj_get_style_bg_img_opa(obj, part);
             if(draw_dsc->bg_img_opa > LV_OPA_MIN) {
                 if(lv_img_src_get_type(draw_dsc->bg_img_src) == LV_IMG_SRC_SYMBOL) {
-                    draw_dsc->bg_img_symbol_font= lv_obj_get_style_text_font(obj, part);
+                    draw_dsc->bg_img_symbol_font = lv_obj_get_style_text_font(obj, part);
                     draw_dsc->bg_img_recolor = lv_obj_get_style_text_color_filtered(obj, part);
-                } else {
+                }
+                else {
                     draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor_filtered(obj, part);
                     draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
                     draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
@@ -167,13 +168,14 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
             draw_dsc->bg_img_opa = lv_obj_get_style_bg_img_opa(obj, part);
             if(draw_dsc->bg_img_opa > LV_OPA_MIN) {
                 if(lv_img_src_get_type(draw_dsc->bg_img_src) == LV_IMG_SRC_SYMBOL) {
-                   draw_dsc->bg_img_symbol_font= lv_obj_get_style_text_font(obj, part);
-                   draw_dsc->bg_img_recolor = lv_obj_get_style_text_color_filtered(obj, part);
-               } else {
-                   draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor_filtered(obj, part);
-                   draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
-                   draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
-               }
+                    draw_dsc->bg_img_symbol_font = lv_obj_get_style_text_font(obj, part);
+                    draw_dsc->bg_img_recolor = lv_obj_get_style_text_color_filtered(obj, part);
+                }
+                else {
+                    draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor_filtered(obj, part);
+                    draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
+                    draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
+                }
             }
         }
     }

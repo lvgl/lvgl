@@ -30,9 +30,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_del_async_cb(void* obj);
+static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
-static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void* user_data);
+static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -166,15 +166,18 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     }
     old_parent->spec_attr->child_cnt--;
     if(old_parent->spec_attr->child_cnt) {
-        old_parent->spec_attr->children = lv_mem_realloc(old_parent->spec_attr->children, old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    } else {
+        old_parent->spec_attr->children = lv_mem_realloc(old_parent->spec_attr->children,
+                                                         old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    }
+    else {
         lv_mem_free(old_parent->spec_attr->children);
         old_parent->spec_attr->children = NULL;
     }
 
     /*Add the child to the new parent as the last (newest child)*/
     parent->spec_attr->child_cnt++;
-    parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children,
+                                                 parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
     parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     obj->parent = parent;
@@ -211,13 +214,13 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 
     int32_t i = old_index;
     if(index < old_index) {
-        while (i > index)  {
+        while(i > index)  {
             parent->spec_attr->children[i] = parent->spec_attr->children[i - 1];
             i--;
         }
     }
     else {
-        while (i < index) {
+        while(i < index) {
             parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
             i++;
         }
@@ -247,8 +250,7 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
 
     lv_obj_invalidate(parent);
 
-    if(parent != parent2)
-    {
+    if(parent != parent2) {
         lv_obj_invalidate(parent2);
     }
     lv_group_swap_obj(obj1, obj2);
@@ -309,7 +311,8 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t id)
         id = obj->spec_attr->child_cnt + id;
         if(id < 0) return NULL;
         idu = (uint32_t) id;
-    } else {
+    }
+    else {
         idu = id;
     }
 
@@ -339,7 +342,7 @@ uint32_t lv_obj_get_index(const lv_obj_t * obj)
     return 0xFFFFFFFF; /*Shouldn't happen*/
 }
 
-void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void* user_data)
+void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {
     walk_core(start_obj, cb, user_data);
 }
@@ -348,7 +351,7 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void* user
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_del_async_cb(void* obj)
+static void lv_obj_del_async_cb(void * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -368,10 +371,10 @@ static void obj_del_core(lv_obj_t * obj)
         child = lv_obj_get_child(obj, 0);
     }
 
-    lv_group_t* group = lv_obj_get_group(obj);
+    lv_group_t * group = lv_obj_get_group(obj);
 
     /*Reset all input devices if the object to delete is used*/
-    lv_indev_t* indev = lv_indev_get_next(NULL);
+    lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev, obj);
@@ -413,7 +416,8 @@ static void obj_del_core(lv_obj_t * obj)
             obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
         }
         obj->parent->spec_attr->child_cnt--;
-        obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+        obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children,
+                                                          obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
     }
 
     /*Free the object itself*/
@@ -421,7 +425,7 @@ static void obj_del_core(lv_obj_t * obj)
 }
 
 
-static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void* user_data)
+static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {
     lv_obj_tree_walk_res_t res = LV_OBJ_TREE_WALK_NEXT;
 

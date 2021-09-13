@@ -67,7 +67,7 @@ void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
-    lv_anim_set_values(&animimg->anim, 0 , num);
+    lv_anim_set_values(&animimg->anim, 0, num);
 }
 
 void lv_animimg_start(lv_obj_t * obj)
@@ -115,7 +115,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_anim_set_var(&animimg->anim, obj);
     lv_anim_set_time(&animimg->anim, 30);
     lv_anim_set_exec_cb(&animimg->anim, (lv_anim_exec_xcb_t)index_change);
-    lv_anim_set_values(&animimg->anim, 0 , 1);
+    lv_anim_set_values(&animimg->anim, 0, 1);
     lv_anim_set_repeat_count(&animimg->anim, LV_ANIM_REPEAT_INFINITE);
 }
 

@@ -55,7 +55,7 @@ const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
     .destructor_cb = lv_switch_destructor,
     .event_cb = lv_switch_event,
-    .width_def =  (4 * LV_DPI_DEF) / 10,
+    .width_def = (4 * LV_DPI_DEF) / 10,
     .height_def = (4 * LV_DPI_DEF) / 17,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_switch_t),
@@ -247,7 +247,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
 
     uint32_t anim_dur_full = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
-    if(anim_dur_full>0) {
+    if(anim_dur_full > 0) {
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
         int32_t anim_start;
         int32_t anim_end;
@@ -262,7 +262,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
             anim_end   = chk ? LV_SWITCH_ANIM_STATE_END : LV_SWITCH_ANIM_STATE_START;
         }
         /*Calculate actual animation duration*/
-        uint32_t anim_dur = (anim_dur_full * LV_ABS(anim_start - anim_end))/LV_SWITCH_ANIM_STATE_END;
+        uint32_t anim_dur = (anim_dur_full * LV_ABS(anim_start - anim_end)) / LV_SWITCH_ANIM_STATE_END;
 
         /*Stop the previous animation if it exists*/
         lv_anim_del(sw, NULL);

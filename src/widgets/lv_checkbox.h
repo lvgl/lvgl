@@ -29,8 +29,8 @@ extern "C" {
 typedef struct {
     lv_obj_t obj;
     char * txt;
-    uint32_t static_txt :1;
-}lv_checkbox_t;
+    uint32_t static_txt : 1;
+} lv_checkbox_t;
 
 extern const lv_obj_class_t lv_checkbox_class;
 
@@ -40,7 +40,7 @@ extern const lv_obj_class_t lv_checkbox_class;
  */
 typedef enum {
     LV_CHECKBOX_DRAW_PART_BOX,    /**< The tick box*/
-}lv_checkbox_draw_part_type_t;
+} lv_checkbox_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES
