@@ -153,6 +153,9 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
     /*Now the text is dynamically allocated*/
     dropdown->static_txt = 0;
+
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
@@ -179,6 +182,9 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 
     dropdown->static_txt = 1;
     dropdown->options = (char *)options;
+
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
@@ -249,6 +255,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     dropdown->option_cnt++;
 
     lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
@@ -265,6 +272,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->option_cnt = 0;
 
     lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
