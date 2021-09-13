@@ -60,10 +60,10 @@ static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip,
 
 static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc);
 
-static void draw_shadow(SDL_Renderer *renderer, const lv_area_t * coords, const lv_area_t * clip,
+static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const lv_area_t *clip,
                         const lv_draw_rect_dsc_t *dsc);
 
-static void draw_outline(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc);
+static void draw_outline(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc);
 
 static void draw_border_generic(const lv_area_t *outer_area, const lv_area_t *inner_area, lv_coord_t rout,
                                 lv_coord_t rin, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
@@ -71,7 +71,7 @@ static void draw_border_generic(const lv_area_t *outer_area, const lv_area_t *in
 static void draw_border_simple(const lv_area_t *outer_area, const lv_area_t *inner_area, lv_color_t color,
                                lv_opa_t opa);
 
-static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc);
+static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc);
 
 static void draw_rect_masked_simple(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc);
 
@@ -124,14 +124,13 @@ void lv_draw_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_
     lv_area_to_sdl_rect(clip, &clip_rect);
     SDL_RenderSetClipRect(renderer, &clip_rect);
     draw_shadow(renderer, coords, clip, dsc);
-    /* Only shadow will also draw extended area */
-    if (!has_draw_content) {
-        return;
+    /* Shadows and outlines will also draw in extended area */
+    if (has_draw_content) {
+        draw_bg_color(renderer, coords, dsc);
+        draw_bg_img(coords, clip, dsc);
+        draw_border(renderer, coords, dsc);
     }
-    draw_bg_color(renderer, coords, dsc);
-    draw_bg_img(coords, clip, dsc);
-    draw_border(renderer, coords, dsc);
-    draw_outline(coords, dsc);
+    draw_outline(coords, clip, dsc);
 }
 
 /**********************
@@ -247,7 +246,7 @@ static void draw_bg_img(const lv_area_t *coords, const lv_area_t *clip, const lv
     }
 }
 
-static void draw_shadow(SDL_Renderer *renderer, const lv_area_t * coords, const lv_area_t * clip,
+static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const lv_area_t *clip,
                         const lv_draw_rect_dsc_t *dsc) {
     /*Check whether the shadow is visible*/
     if (SKIP_SHADOW(dsc)) return;
@@ -273,7 +272,7 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t * coords, const 
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &shadow_area, clip)) return;
+    if (!_lv_area_intersect(&draw_area, &shadow_area, clip)) return;
 
     SDL_Rect core_area_rect;
     lv_area_to_sdl_rect(&shadow_area, &core_area_rect);
@@ -367,7 +366,7 @@ static void draw_border(SDL_Renderer *renderer, const lv_area_t *coords, const l
     }
 }
 
-static void draw_outline(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc) {
+static void draw_outline(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
     if (SKIP_OUTLINE(dsc)) return;
 
     lv_opa_t opa = dsc->outline_opa;
@@ -393,6 +392,8 @@ static void draw_outline(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc)
     area_outer.y1 -= dsc->outline_width;
     area_outer.y2 += dsc->outline_width;
 
+    lv_area_t draw_area;
+    if (!_lv_area_intersect(&draw_area, &area_outer, clip)) return;
 
     int32_t inner_w = lv_area_get_width(&area_inner);
     int32_t inner_h = lv_area_get_height(&area_inner);
@@ -584,9 +585,9 @@ frag_render_center(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_si
     }
 }
 
-static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
+static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
     if (dsc->radius <= 0 && SKIP_BORDER(dsc) && SKIP_SHADOW(dsc) && SKIP_IMAGE(dsc) && SKIP_OUTLINE(dsc)) {
-        draw_rect_masked_simple(coords, mask, dsc);
+        draw_rect_masked_simple(coords, clip, dsc);
         return;
     }
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
@@ -616,30 +617,30 @@ static void draw_rect_masked(const lv_area_t *coords, const lv_area_t *mask, con
     lv_area_copy(&content_coords, coords);
     lv_area_move(&content_coords, -sh_area.x1, -sh_area.y1);
 
-    draw_shadow(renderer, &content_coords, mask, dsc);
+    draw_shadow(renderer, &content_coords, clip, dsc);
     draw_bg_color(renderer, &content_coords, dsc);
-    draw_bg_img(&content_coords, mask, dsc);
+    draw_bg_img(&content_coords, clip, dsc);
     draw_border(renderer, &content_coords, dsc);
-    draw_outline(&content_coords, dsc);
+    draw_outline(&content_coords, clip, dsc);
 
-    SDL_Texture *clip = lv_sdl_gen_mask_texture(renderer, &sh_area, NULL, 0);
+    SDL_Texture *clip_mask = lv_sdl_gen_mask_texture(renderer, &sh_area, NULL, 0);
     SDL_Rect src_rect = {.w = draw_w, .h = draw_h, .x = 0, .y = 0};
 #if SDL_VERSION_ATLEAST(2, 0, 6)
     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
                                                     SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
                                                     SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-    SDL_SetTextureBlendMode(clip, mode);
-    SDL_RenderCopy(renderer, clip, NULL, &src_rect);
+    SDL_SetTextureBlendMode(clip_mask, mode);
+    SDL_RenderCopy(renderer, clip_mask, NULL, &src_rect);
 #endif
 
     SDL_Rect draw_rect, mask_rect;
     lv_area_to_sdl_rect(&sh_area, &draw_rect);
-    lv_area_to_sdl_rect(mask, &mask_rect);
+    lv_area_to_sdl_rect(clip, &mask_rect);
 
     SDL_SetRenderTarget(renderer, screen);
     SDL_RenderSetClipRect(renderer, &mask_rect);
     SDL_RenderCopy(renderer, content, &src_rect, &draw_rect);
-    SDL_DestroyTexture(clip);
+    SDL_DestroyTexture(clip_mask);
 }
 
 static void draw_rect_masked_simple(const lv_area_t *coords, const lv_area_t *mask, const lv_draw_rect_dsc_t *dsc) {
