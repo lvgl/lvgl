@@ -40,7 +40,8 @@ typedef struct {
     /*New data for this type*/
     lv_calendar_date_t today;               /*Date of today*/
     lv_calendar_date_t showed_date;         /*Currently visible month (day is ignored)*/
-    lv_calendar_date_t * highlighted_dates; /*Apply different style on these days (pointer to an array defined by the user)*/
+    lv_calendar_date_t *
+    highlighted_dates; /*Apply different style on these days (pointer to an array defined by the user)*/
     uint16_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     const char * map[8 * 7];
     char nums [7 * 6][4];

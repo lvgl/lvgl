@@ -28,12 +28,12 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_led_class  = {
-        .base_class = &lv_obj_class,
-        .constructor_cb = lv_led_constructor,
-        .width_def = LV_DPI_DEF / 5,
-        .height_def = LV_DPI_DEF / 5,
-        .event_cb = lv_led_event,
-        .instance_size = sizeof(lv_led_t),
+    .base_class = &lv_obj_class,
+    .constructor_cb = lv_led_constructor,
+    .width_def = LV_DPI_DEF / 5,
+    .height_def = LV_DPI_DEF / 5,
+    .event_cb = lv_led_event,
+    .instance_size = sizeof(lv_led_t),
 };
 
 /**********************
@@ -186,9 +186,9 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/
         rect_dsc.shadow_width = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_width) /
-                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
+                                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
         rect_dsc.shadow_spread = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
-                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
+                                 (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
         const lv_area_t * clip_area = lv_event_get_param(e);
 

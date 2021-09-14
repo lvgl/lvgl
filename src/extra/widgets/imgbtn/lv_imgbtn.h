@@ -28,7 +28,7 @@ typedef enum {
     LV_IMGBTN_STATE_CHECKED_PRESSED,
     LV_IMGBTN_STATE_CHECKED_DISABLED,
     _LV_IMGBTN_STATE_NUM,
-}lv_imgbtn_state_t;
+} lv_imgbtn_state_t;
 
 /**********************
  *      TYPEDEFS
@@ -75,8 +75,15 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * parent);
  * to a file)
  */
 void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * src_left, const void * src_mid,
-                             const void * src_right);
+                       const void * src_right);
 
+
+/**
+ * Use this function instead of `lv_obj_add/clear_state` to set a state manually
+ * @param imgbtn pointer to an image button object
+ * @param state  the new state
+ */
+void lv_imgbtn_set_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 
 /*=====================
  * Getter functions

@@ -207,10 +207,10 @@ They are useful to add local customization to an object.
 
 Unlike in CSS, LVGL local styles can be assigned to states (*pseudo-classes*) and parts (*pseudo-elements*).
 
-To set a local property use functions like `lv_obj_set_style_local_<property_name>(obj, <value>, <selector>);`  
+To set a local property use functions like `lv_obj_set_style_<property_name>(obj, <value>, <selector>);`  
 For example:
 ```c
-lv_obj_set_style_local_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
+lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
 ```
 ## Properties
 For the full list of style properties click [here](/overview/style-props).

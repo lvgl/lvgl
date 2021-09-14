@@ -40,7 +40,7 @@ typedef struct {
     lv_obj_t * close_btn;
     lv_obj_t * text;
     lv_obj_t * btns;
-}lv_msgbox_t;
+} lv_msgbox_t;
 
 extern const lv_obj_class_t lv_msgbox_class;
 
@@ -57,7 +57,8 @@ extern const lv_obj_class_t lv_msgbox_class;
  * @param add_close_btn true: add a close button
  * @return              pointer to the message box object
  */
-lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[], bool add_close_btn);
+lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[],
+                            bool add_close_btn);
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);
 

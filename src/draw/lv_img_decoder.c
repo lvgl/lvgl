@@ -159,7 +159,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     }
 
     if(dsc->src_type == LV_IMG_SRC_FILE)
-        lv_mem_free((void*)dsc->src);
+        lv_mem_free((void *)dsc->src);
 
     return res;
 }
@@ -191,7 +191,7 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
 
         if(dsc->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free((void*)dsc->src);
+            lv_mem_free((void *)dsc->src);
             dsc->src = NULL;
         }
     }
@@ -594,7 +594,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     uint8_t * fs_buf = lv_mem_buf_get(w);
-    if (fs_buf == NULL) return LV_RES_INV;
+    if(fs_buf == NULL) return LV_RES_INV;
 
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
@@ -663,7 +663,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
     uint8_t * fs_buf = lv_mem_buf_get(w);
-    if (fs_buf == NULL) return LV_RES_INV;
+    if(fs_buf == NULL) return LV_RES_INV;
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;

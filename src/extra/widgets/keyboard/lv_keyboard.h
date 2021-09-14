@@ -89,7 +89,8 @@ void lv_keyboard_set_mode(lv_obj_t * kb, lv_keyboard_mode_t mode);
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnmatrix_set_map()' for more info.
  */
-void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_btnmatrix_ctrl_t ctrl_map[]);
+void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
+                         const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /*=====================
  * Getter functions

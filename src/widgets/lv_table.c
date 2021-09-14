@@ -131,7 +131,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     lv_table_cell_ctrl_t ctrl = 0;
 
     /*Save the control byte*/
-    if(table->cell_data[cell]) ctrl= table->cell_data[cell][0];
+    if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
 
     va_list ap, ap2;
     va_start(ap, fmt);
@@ -191,7 +191,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
 
     lv_coord_t h = get_row_height(obj, row, font, letter_space, line_space,
-                                       cell_left, cell_right, cell_top, cell_bottom);
+                                  cell_left, cell_right, cell_top, cell_bottom);
 
 
     lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
@@ -251,13 +251,13 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 
     /*Free the unused cells*/
     if(old_col_cnt > col_cnt) {
-       uint16_t old_cell_cnt = old_col_cnt * table->row_cnt;
-       uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
-       uint32_t i;
-       for(i = new_cell_cnt; i < old_cell_cnt; i++) {
-           lv_mem_free(table->cell_data[i]);
-       }
-   }
+        uint16_t old_cell_cnt = old_col_cnt * table->row_cnt;
+        uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
+        uint32_t i;
+        for(i = new_cell_cnt; i < old_cell_cnt; i++) {
+            lv_mem_free(table->cell_data[i]);
+        }
+    }
 
     char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
     LV_ASSERT_MALLOC(new_cell_data);
@@ -282,7 +282,8 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
         old_col_start = row * old_col_cnt;
         new_col_start = row * col_cnt;
 
-        lv_memcpy_small(&new_cell_data[new_col_start], &table->cell_data[old_col_start], sizeof(new_cell_data[0]) * min_col_cnt);
+        lv_memcpy_small(&new_cell_data[new_col_start], &table->cell_data[old_col_start],
+                        sizeof(new_cell_data[0]) * min_col_cnt);
     }
 
     lv_mem_free(table->cell_data);
@@ -522,7 +523,8 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_FOCUSED) {
         lv_obj_invalidate(obj);
-    } else if(code == LV_EVENT_KEY) {
+    }
+    else if(code == LV_EVENT_KEY) {
         int32_t c = *((int32_t *)lv_event_get_param(e));
         int32_t col = table->col_act;
         int32_t row = table->row_act;
@@ -546,21 +548,25 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(row < table->row_cnt - 1) {
                 col = 0;
                 row++;
-            } else {
+            }
+            else {
                 col = table->col_cnt - 1;
             }
-        } else if (col < 0) {
+        }
+        else if(col < 0) {
             if(row != 0) {
                 col = table->col_cnt - 1;
                 row--;
-            } else {
+            }
+            else {
                 col = 0;
             }
         }
 
         if(row >= table->row_cnt) {
             row = table->row_cnt - 1;
-        } else if(row < 0) {
+        }
+        else if(row < 0) {
             row = 0;
         }
 
@@ -572,7 +578,8 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
-    } else if(code == LV_EVENT_DRAW_MAIN) {
+    }
+    else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
     }
 }
@@ -694,7 +701,7 @@ static void draw_main(lv_event_t * e)
                 cell_area_border.x2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
             }
             if((rect_dsc_def.border_side & LV_BORDER_SIDE_BOTTOM) &&
-                    cell_area_border.y2 < obj->coords.y2 - bg_bottom - 1) {
+               cell_area_border.y2 < obj->coords.y2 - bg_bottom - 1) {
                 cell_area_border.y2 += rect_dsc_def.border_width / 2 + (rect_dsc_def.border_width & 0x1);
             }
 
@@ -741,8 +748,8 @@ static void draw_main(lv_event_t * e)
                 else txt_flags = LV_TEXT_FLAG_NONE;
 
                 lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
-                        label_dsc_act.letter_space, label_dsc_act.line_space,
-                        lv_area_get_width(&txt_area), txt_flags);
+                                label_dsc_act.letter_space, label_dsc_act.line_space,
+                                lv_area_get_width(&txt_area), txt_flags);
 
                 /*Align the content to the middle if not cropped*/
                 if(!crop) {
@@ -786,7 +793,7 @@ static void refr_size(lv_obj_t * obj, uint32_t strat_row)
 
     for(i = strat_row; i < table->row_cnt; i++) {
         table->row_h[i] = get_row_height(obj, i, font, letter_space, line_space,
-                                       cell_left, cell_right, cell_top, cell_bottom);
+                                         cell_left, cell_right, cell_top, cell_bottom);
         table->row_h[i] = LV_CLAMP(minh, table->row_h[i], maxh);
     }
 
@@ -832,14 +839,14 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
             /*With text crop assume 1 line*/
             if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
                 h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
-                                    h_max);
+                               h_max);
             }
             /*Without text crop calculate the height of the text in the cell*/
             else {
                 txt_w -= cell_left + cell_right;
 
                 lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
-                                 letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
+                                letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
                 h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
                 cell += col_merge;
@@ -853,7 +860,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
 
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 {
-   lv_table_t * table = (lv_table_t *)obj;
+    lv_table_t * table = (lv_table_t *)obj;
 
     lv_indev_type_t type = lv_indev_get_type(lv_indev_get_act());
     if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {

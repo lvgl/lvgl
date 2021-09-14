@@ -64,7 +64,8 @@ typedef struct {
 #endif
 
 #if LV_LABEL_TEXT_SELECTION
-    uint32_t sel_start; uint32_t sel_end;
+    uint32_t sel_start;
+    uint32_t sel_end;
 #endif
 
     lv_point_t offset; /*Text draw position offset*/
@@ -73,7 +74,7 @@ typedef struct {
     uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/
     uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters*/
-}lv_label_t;
+} lv_label_t;
 
 extern const lv_obj_class_t lv_label_class;
 

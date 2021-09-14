@@ -149,13 +149,16 @@ void lv_init(void)
     }
 
     uint32_t endianess_test = 0x11223344;
-    uint8_t * endianess_test_p = (uint8_t*) &endianess_test;
+    uint8_t * endianess_test_p = (uint8_t *) &endianess_test;
     bool big_endian = endianess_test_p[0] == 0x11 ? true : false;
 
     if(big_endian) {
-        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1, "It's a big endian system but LV_BIG_ENDIAN_SYSTEM is not enabled in lv_conf.h");
-    } else {
-        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 0, "It's a little endian system but LV_BIG_ENDIAN_SYSTEM is enabled in lv_conf.h");
+        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1,
+                      "It's a big endian system but LV_BIG_ENDIAN_SYSTEM is not enabled in lv_conf.h");
+    }
+    else {
+        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 0,
+                      "It's a little endian system but LV_BIG_ENDIAN_SYSTEM is enabled in lv_conf.h");
     }
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
@@ -470,7 +473,7 @@ static void lv_obj_draw(lv_event_t * e)
 
         if(_lv_area_is_in(info->area, &coords, r) == false) {
             info->res = LV_COVER_RES_NOT_COVER;
-           return;
+            return;
         }
 
         if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
@@ -638,7 +641,8 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         dsc->border_width = lv_obj_get_style_border_width(obj, LV_PART_SCROLLBAR);
         if(dsc->border_width > 0) {
             dsc->border_color = lv_obj_get_style_border_color(obj, LV_PART_SCROLLBAR);
-        } else {
+        }
+        else {
             dsc->border_opa = LV_OPA_TRANSP;
         }
     }
@@ -650,7 +654,8 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         if(dsc->shadow_width > 0) {
             dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, LV_PART_SCROLLBAR);
             dsc->shadow_color = lv_obj_get_style_shadow_color(obj, LV_PART_SCROLLBAR);
-        } else {
+        }
+        else {
             dsc->shadow_opa = LV_OPA_TRANSP;
         }
     }
@@ -662,10 +667,11 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         dsc->shadow_opa = (dsc->bg_opa * opa) >> 8;
     }
 
-    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP || dsc->shadow_opa != LV_OPA_TRANSP ) {
+    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP || dsc->shadow_opa != LV_OPA_TRANSP) {
         dsc->radius = lv_obj_get_style_radius(obj, LV_PART_SCROLLBAR);
         return LV_RES_OK;
-    } else {
+    }
+    else {
         return LV_RES_INV;
     }
 #else
@@ -883,7 +889,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         }
     }
 
-    for(i = 0;i < tsi; i++) {
+    for(i = 0; i < tsi; i++) {
         lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
         _lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
     }
