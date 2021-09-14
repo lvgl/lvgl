@@ -50,7 +50,7 @@ static void lv_lru_remove_item(lv_lru_t * cache, lruc_item * prev, lruc_item * i
 static void lv_lru_remove_lru_item(lv_lru_t * cache);
 
 /** pop an existing item off the free queue, or create a new one */
-lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache);
+static lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache);
 
 /**********************
  *  STATIC VARIABLES
