@@ -18,7 +18,7 @@
 #include "../core/lv_refr.h"
 #include "../core/lv_theme.h"
 #if LV_USE_THEME_DEFAULT
-#include "../extra/themes/default/lv_theme_default.h"
+    #include "../extra/themes/default/lv_theme_default.h"
 #endif
 
 /*********************
@@ -77,7 +77,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 
     driver->hor_res          = 320;
     driver->ver_res          = 240;
-    driver->antialiasing     = LV_COLOR_DEPTH > 8 ? 1: 0;
+    driver->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
     driver->dpi              = LV_DPI_DEF;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
@@ -151,7 +151,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {
-        disp->theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), LV_THEME_DEFAULT_DARK, LV_FONT_DEFAULT);
+        disp->theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
+                                            LV_THEME_DEFAULT_DARK, LV_FONT_DEFAULT);
     }
 #endif
 
@@ -185,7 +186,8 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
 {
     disp->driver = new_drv;
 
-    if(disp->driver->full_refresh && disp->driver->draw_buf->size < (uint32_t)disp->driver->hor_res * disp->driver->ver_res) {
+    if(disp->driver->full_refresh &&
+       disp->driver->draw_buf->size < (uint32_t)disp->driver->hor_res * disp->driver->ver_res) {
         disp->driver->full_refresh = 0;
         LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)");
     }
@@ -237,15 +239,15 @@ void lv_disp_remove(lv_disp_t * disp)
     }
 
     /** delete screen and other obj */
-    if (disp->sys_layer) {
+    if(disp->sys_layer) {
         lv_obj_del(disp->sys_layer);
         disp->sys_layer = NULL;
     }
-    if (disp->top_layer) {
+    if(disp->top_layer) {
         lv_obj_del(disp->top_layer);
         disp->top_layer = NULL;
     }
-    while (disp->screen_cnt != 0) {
+    while(disp->screen_cnt != 0) {
         /*Delete the screenst*/
         lv_obj_del(disp->screens[0]);
     }
@@ -286,7 +288,8 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
 
     if(disp == NULL) {
         return 0;
-    } else {
+    }
+    else {
         switch(disp->driver->rotated) {
             case LV_DISP_ROT_90:
             case LV_DISP_ROT_270:
@@ -308,7 +311,8 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 
     if(disp == NULL) {
         return 0;
-    } else {
+    }
+    else {
         switch(disp->driver->rotated) {
             case LV_DISP_ROT_90:
             case LV_DISP_ROT_270:

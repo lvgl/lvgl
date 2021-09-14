@@ -37,7 +37,8 @@ const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class, .instance_s
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[], bool add_close_btn)
+lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * txt, const char * btn_txts[],
+                            bool add_close_btn)
 {
     LV_LOG_INFO("begin");
     bool auto_parent = false;

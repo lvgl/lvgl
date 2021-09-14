@@ -30,7 +30,7 @@ extern "C" {
 typedef struct {
     lv_obj_t obj;
     int32_t anim_state;
-}lv_switch_t;
+} lv_switch_t;
 
 extern const lv_obj_class_t lv_switch_class;
 

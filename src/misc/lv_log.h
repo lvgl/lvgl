@@ -47,7 +47,7 @@ typedef int8_t lv_log_level_t;
 /**
  * Log print function. Receives a string buffer to print".
  */
-typedef void (*lv_log_print_g_cb_t)(const char *buf);
+typedef void (*lv_log_print_g_cb_t)(const char * buf);
 
 /**********************
  * GLOBAL PROTOTYPES

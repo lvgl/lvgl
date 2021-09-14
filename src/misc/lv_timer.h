@@ -48,7 +48,7 @@ typedef struct _lv_timer_t {
     lv_timer_cb_t timer_cb; /**< Timer function*/
     void * user_data; /**< Custom user data*/
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
-    uint32_t paused :1;
+    uint32_t paused : 1;
 } lv_timer_t;
 
 /**********************

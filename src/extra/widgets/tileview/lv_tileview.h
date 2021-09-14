@@ -27,12 +27,12 @@ extern "C" {
 typedef struct {
     lv_obj_t obj;
     lv_obj_t * tile_act;
-}lv_tileview_t;
+} lv_tileview_t;
 
 typedef struct {
     lv_obj_t obj;
     lv_dir_t dir;
-}lv_tileview_tile_t;
+} lv_tileview_tile_t;
 
 extern const lv_obj_class_t lv_tileview_class;
 extern const lv_obj_class_t lv_tileview_tile_class;

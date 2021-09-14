@@ -41,7 +41,7 @@ typedef enum {
     LV_FLEX_ALIGN_SPACE_EVENLY,
     LV_FLEX_ALIGN_SPACE_AROUND,
     LV_FLEX_ALIGN_SPACE_BETWEEN,
-}lv_flex_align_t;
+} lv_flex_align_t;
 
 typedef enum {
     LV_FLEX_FLOW_ROW                 = 0x00,
@@ -52,7 +52,7 @@ typedef enum {
     LV_FLEX_FLOW_COLUMN_WRAP         = LV_FLEX_FLOW_COLUMN | _LV_FLEX_WRAP,
     LV_FLEX_FLOW_COLUMN_REVERSE      = LV_FLEX_FLOW_COLUMN | _LV_FLEX_REVERSE,
     LV_FLEX_FLOW_COLUMN_WRAP_REVERSE = LV_FLEX_FLOW_COLUMN | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
-}lv_flex_flow_t;
+} lv_flex_flow_t;
 
 /**********************
  * GLOBAL VARIABLES
@@ -88,7 +88,8 @@ void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow);
  * @param cross_place where to place the item in their track on the cross axis. `LV_FLEX_ALIGN_START/END/CENTER`
  * @param track_place where to place the tracks in the cross direction. Any value of `lv_flex_align_t`.
  */
-void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place, lv_flex_align_t track_cross_place);
+void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
+                           lv_flex_align_t track_cross_place);
 
 /**
  * Sets the width or height (on main axis) to grow the object in order fill the free space

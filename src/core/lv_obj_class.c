@@ -63,7 +63,8 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
             disp->screens = lv_mem_alloc(sizeof(lv_obj_t *));
             disp->screens[0] = obj;
             disp->screen_cnt = 1;
-        } else {
+        }
+        else {
             disp->screen_cnt++;
             disp->screens = lv_mem_realloc(disp->screens, sizeof(lv_obj_t *) * disp->screen_cnt);
             disp->screens[disp->screen_cnt - 1] = obj;
@@ -87,9 +88,11 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
             parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *));
             parent->spec_attr->children[0] = obj;
             parent->spec_attr->child_cnt = 1;
-        } else {
+        }
+        else {
             parent->spec_attr->child_cnt++;
-            parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
+            parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children,
+                                                         sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
             parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
         }
     }
