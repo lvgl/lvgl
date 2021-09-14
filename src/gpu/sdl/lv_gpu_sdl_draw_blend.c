@@ -1,15 +1,47 @@
+/**
+ * @file lv_gpu_sdl_draw_blend.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
 
-#include "../../hal/lv_hal.h"
-#include "../../core/lv_refr.h"
 #include "../../draw/lv_draw_blend.h"
+#include "../../core/lv_refr.h"
 #include "lv_gpu_sdl_texture_cache.h"
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_mask.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 
 void _lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area, lv_color_t color,
                     lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode)
@@ -55,5 +87,9 @@ void _lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area,
 {
 
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 #endif /*LV_USE_GPU_SDL*/

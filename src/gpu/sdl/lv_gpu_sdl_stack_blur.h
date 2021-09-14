@@ -29,7 +29,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_stack_blur_grayscale(lv_opa_t *buf, uint16_t w, uint16_t h, uint16_t r);
+void lv_stack_blur_grayscale(lv_opa_t * buf, uint16_t w, uint16_t h, uint16_t r);
 
 /**********************
  *      MACROS

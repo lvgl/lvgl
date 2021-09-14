@@ -244,7 +244,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_USE_USER_DATA      1
 
 /*Garbage Collector settings
- *Used if lvgl is binded to higher level language and the memory is managed by that language*/
+ *Used if lvgl is bound to higher level language and the memory is managed by that language*/
 #define LV_ENABLE_GC 0
 #if LV_ENABLE_GC != 0
 #  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/

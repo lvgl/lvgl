@@ -1,3 +1,12 @@
+/**
+ * @file lv_gpu_sdl_lru.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -8,127 +17,57 @@
 #include <string.h>
 #include <stdio.h>
 
-// ------------------------------------------
-// private functions
-// ------------------------------------------
-// MurmurHash2, by Austin Appleby
-// http://sites.google.com/site/murmurhash/
-static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_length)
-{
-    uint32_t m = 0x5bd1e995;
-    uint32_t r = 24;
-    uint32_t h = cache->seed ^ key_length;
-    char * data = (char *) key;
+/*********************
+ *      DEFINES
+ *********************/
 
-    while(key_length >= 4) {
-        uint32_t k = *(uint32_t *) data;
-        k *= m;
-        k ^= k >> r;
-        k *= m;
-        h *= m;
-        h ^= k;
-        data += 4;
-        key_length -= 4;
-    }
+/**********************
+ *      TYPEDEFS
+ **********************/
 
-    switch(key_length) {
-        case 3:
-            h ^= data[2] << 16;
-        case 2:
-            h ^= data[1] << 8;
-        case 1:
-            h ^= data[0];
-            h *= m;
-    };
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
 
-    h ^= h >> 13;
-    h *= m;
-    h ^= h >> 15;
-    return h % cache->hash_table_size;
-}
+/**
+ * MurmurHash2
+ * @author Austin Appleby
+ * @see http://sites.google.com/site/murmurhash/
+ */
+static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_length);
 
-// compare a key against an existing item's key
-static int lv_lru_cmp_keys(lruc_item * item, const void * key, uint32_t key_length)
-{
-    if(key_length != item->key_length)
-        return 1;
-    else
-        return memcmp(key, item->key, key_length);
-}
+/** compare a key against an existing item's key */
+static int lv_lru_cmp_keys(lruc_item * item, const void * key, uint32_t key_length);
 
-// remove an item and push it to the free items queue
-static void lv_lru_remove_item(lv_lru_t * cache, lruc_item * prev, lruc_item * item, uint32_t hash_index)
-{
-    if(prev)
-        prev->next = item->next;
-    else
-        cache->items[hash_index] = (lruc_item *) item->next;
+/** remove an item and push it to the free items queue */
+static void lv_lru_remove_item(lv_lru_t * cache, lruc_item * prev, lruc_item * item, uint32_t hash_index);
 
-    // free memory and update the free memory counter
-    cache->free_memory += item->value_length;
-    cache->value_free(item->value);
-    cache->key_free(item->key);
+/**
+ * remove the least recently used item
+ *
+ * @todo we can optimise this by finding the n lru items, where n = required_space / average_length
+ */
+static void lv_lru_remove_lru_item(lv_lru_t * cache);
 
-    // push the item to the free items queue
-    memset(item, 0, sizeof(lruc_item));
-    item->next = cache->free_items;
-    cache->free_items = item;
-}
+/** pop an existing item off the free queue, or create a new one */
+lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache);
 
-// remove the least recently used item
-// TODO: we can optimise this by finding the n lru items, where n = required_space / average_length
-static void lv_lru_remove_lru_item(lv_lru_t * cache)
-{
-    lruc_item * min_item = NULL, *min_prev = NULL;
-    lruc_item * item = NULL, *prev = NULL;
-    uint32_t i = 0, min_index = -1;
-    uint64_t min_access_count = -1;
+/**********************
+ *  STATIC VARIABLES
+ **********************/
 
-    for(; i < cache->hash_table_size; i++) {
-        item = cache->items[i];
-        prev = NULL;
+/**********************
+ *      MACROS
+ **********************/
 
-        while(item) {
-            if(item->access_count < min_access_count || min_access_count == -1) {
-                min_access_count = item->access_count;
-                min_item = item;
-                min_prev = prev;
-                min_index = i;
-            }
-            prev = item;
-            item = item->next;
-        }
-    }
-
-    if(min_item)
-        lv_lru_remove_item(cache, min_prev, min_item, min_index);
-}
-
-// pop an existing item off the free queue, or create a new one
-lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache)
-{
-    lruc_item * item = NULL;
-
-    if(cache->free_items) {
-        item = cache->free_items;
-        cache->free_items = item->next;
-        memset(item, 0, sizeof(lruc_item));
-    }
-    else {
-        item = (lruc_item *) calloc(sizeof(lruc_item), 1);
-    }
-
-    return item;
-}
-
-// error helpers
+/* error helpers */
 #define error_for(conditions, error)  if(conditions) {return error;}
 #define test_for_missing_cache()      error_for(!cache, LV_LRU_MISSING_CACHE)
 #define test_for_missing_key()        error_for(!key, LV_LRU_MISSING_KEY)
 #define test_for_missing_value()      error_for(!value || value_length == 0, LV_LRU_MISSING_VALUE)
 #define test_for_value_too_large()    error_for(value_length > cache->total_memory, LV_LRU_VALUE_TOO_LARGE)
 
-// lock helpers
+/* lock helpers */
 #define lock_cache()    if(SDL_LockMutex(cache->mutex)) {\
         perror("LRU Cache unable to obtain mutex lock");\
         return LV_LRU_LOCK_ERROR;\
@@ -140,9 +79,10 @@ lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache)
     }
 
 
-// ------------------------------------------
-// public api
-// ------------------------------------------
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
 lv_lru_t * lv_lru_new(uint64_t cache_size, uint32_t average_length, lv_lru_free_t * value_free,
                       lv_lru_free_t * key_free)
 {
@@ -323,6 +263,113 @@ lruc_error lv_lru_delete(lv_lru_t * cache, const void * key, size_t key_size)
 
     unlock_cache();
     return LV_LRU_NO_ERROR;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_length)
+{
+    uint32_t m = 0x5bd1e995;
+    uint32_t r = 24;
+    uint32_t h = cache->seed ^ key_length;
+    char * data = (char *) key;
+
+    while(key_length >= 4) {
+        uint32_t k = *(uint32_t *) data;
+        k *= m;
+        k ^= k >> r;
+        k *= m;
+        h *= m;
+        h ^= k;
+        data += 4;
+        key_length -= 4;
+    }
+
+    switch(key_length) {
+        case 3:
+            h ^= data[2] << 16;
+        case 2:
+            h ^= data[1] << 8;
+        case 1:
+            h ^= data[0];
+            h *= m;
+    };
+
+    h ^= h >> 13;
+    h *= m;
+    h ^= h >> 15;
+    return h % cache->hash_table_size;
+}
+
+static int lv_lru_cmp_keys(lruc_item * item, const void * key, uint32_t key_length)
+{
+    if(key_length != item->key_length)
+        return 1;
+    else
+        return memcmp(key, item->key, key_length);
+}
+
+static void lv_lru_remove_item(lv_lru_t * cache, lruc_item * prev, lruc_item * item, uint32_t hash_index)
+{
+    if(prev)
+        prev->next = item->next;
+    else
+        cache->items[hash_index] = (lruc_item *) item->next;
+
+    // free memory and update the free memory counter
+    cache->free_memory += item->value_length;
+    cache->value_free(item->value);
+    cache->key_free(item->key);
+
+    // push the item to the free items queue
+    memset(item, 0, sizeof(lruc_item));
+    item->next = cache->free_items;
+    cache->free_items = item;
+}
+
+static void lv_lru_remove_lru_item(lv_lru_t * cache)
+{
+    lruc_item * min_item = NULL, *min_prev = NULL;
+    lruc_item * item = NULL, *prev = NULL;
+    uint32_t i = 0, min_index = -1;
+    uint64_t min_access_count = -1;
+
+    for(; i < cache->hash_table_size; i++) {
+        item = cache->items[i];
+        prev = NULL;
+
+        while(item) {
+            if(item->access_count < min_access_count || min_access_count == -1) {
+                min_access_count = item->access_count;
+                min_item = item;
+                min_prev = prev;
+                min_index = i;
+            }
+            prev = item;
+            item = item->next;
+        }
+    }
+
+    if(min_item)
+        lv_lru_remove_item(cache, min_prev, min_item, min_index);
+}
+
+static lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache)
+{
+    lruc_item * item = NULL;
+
+    if(cache->free_items) {
+        item = cache->free_items;
+        cache->free_items = item->next;
+        memset(item, 0, sizeof(lruc_item));
+    }
+    else {
+        item = (lruc_item *) calloc(sizeof(lruc_item), 1);
+    }
+
+    return item;
 }
 
 #endif /*LV_USE_GPU_SDL*/

@@ -628,7 +628,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Garbage Collector settings
- *Used if lvgl is binded to higher level language and the memory is managed by that language*/
+ *Used if lvgl is bound to higher level language and the memory is managed by that language*/
 #ifndef LV_ENABLE_GC
 #  ifdef CONFIG_LV_ENABLE_GC
 #    define LV_ENABLE_GC CONFIG_LV_ENABLE_GC

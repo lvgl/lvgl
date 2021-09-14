@@ -20,6 +20,10 @@
 #include "lv_gpu_sdl_texture_cache.h"
 #include "lv_gpu_sdl_mask.h"
 
+#ifndef M_PI
+    #include <math.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/

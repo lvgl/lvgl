@@ -1,3 +1,11 @@
+/**
+ * @file lv_gpu_sdl_utils.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -6,11 +14,35 @@
 
 #include "../../draw/lv_draw_label.h"
 
-SDL_Palette * lv_sdl_palette_grayscale1 = NULL;
-SDL_Palette * lv_sdl_palette_grayscale2 = NULL;
-SDL_Palette * lv_sdl_palette_grayscale3 = NULL;
-SDL_Palette * lv_sdl_palette_grayscale4 = NULL;
-SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+static SDL_Palette * lv_sdl_palette_grayscale1 = NULL;
+static SDL_Palette * lv_sdl_palette_grayscale2 = NULL;
+static SDL_Palette * lv_sdl_palette_grayscale3 = NULL;
+static SDL_Palette * lv_sdl_palette_grayscale4 = NULL;
+static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 
 void _lv_gpu_sdl_utils_init()
 {
@@ -139,5 +171,9 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
         }
     }
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 #endif /*LV_USE_GPU_SDL*/

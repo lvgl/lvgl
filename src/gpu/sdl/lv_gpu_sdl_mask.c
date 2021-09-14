@@ -1,3 +1,12 @@
+/**
+ * @file lv_gpu_sdl_mask.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
@@ -6,6 +15,30 @@
 #include "../../misc/lv_mem.h"
 #include "lv_gpu_sdl_mask.h"
 #include "lv_gpu_sdl_utils.h"
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 
 
 SDL_Surface * lv_sdl_create_mask_surface(lv_opa_t * pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride)
@@ -68,6 +101,10 @@ SDL_Texture * lv_sdl_gen_mask_texture(SDL_Renderer * renderer, const lv_area_t *
     return texture;
 }
 
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 
 #endif /*LV_USE_GPU_SDL*/
