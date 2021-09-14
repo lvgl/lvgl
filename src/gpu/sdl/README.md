@@ -4,7 +4,7 @@ In LVGL, drawing was performed by CPU. To improve drawing performance on platfor
 we should perform drawing operations on GPU if possible.
 
 This implementation has moved most bitmap blending and drawing procedures to utilize SDL_Renderer,
-which takes advantages hardware acceleration APIs like DirectX or OpenGL.
+which takes advantages of hardware acceleration APIs like DirectX or OpenGL.
 
 This implementation can be also considered as a reference implementation, for contributors wants to
 develop accelerated drawing functions with other APIs such as OpenGL/OpenGL ES.
