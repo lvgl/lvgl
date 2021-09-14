@@ -711,4 +711,8 @@ menu "LVGL configuration"
             default y
     endmenu
 
+    config LV_BUILD_EXAMPLES
+        bool "Enable the examples to be built with the library."
+        default y
+
 endmenu
