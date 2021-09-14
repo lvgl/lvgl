@@ -211,7 +211,7 @@ SDL_Texture * font_atlas_bake(SDL_Renderer * renderer, const lv_font_t * font_p,
     int atlas_w = font_p->line_height * atlas_size;
     int atlas_h = font_p->line_height * (glyph_count / atlas_size + 1);
     if(atlas_w > 2048 || atlas_h > 2048) {
-        // This atlas texture will be too large to load
+        /*This atlas texture will be too large to load*/
         return NULL;
     }
     lv_opa_t * s1 = lv_mem_buf_get(atlas_w * atlas_h * sizeof(lv_opa_t));

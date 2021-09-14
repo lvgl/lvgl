@@ -27,4 +27,4 @@ SDL_Palette *lv_sdl_get_grayscale_palette(uint8_t bpp);
 
 void lv_sdl_to_8bpp(uint8_t *dest, const uint8_t *src, int width, int height, int stride, uint8_t bpp);
 
-#endif //LV_GPU_SDL2_UTILS_H
+#endif /*LV_GPU_SDL2_UTILS_H*/

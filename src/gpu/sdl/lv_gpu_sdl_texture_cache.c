@@ -162,14 +162,14 @@ lv_gpu_sdl_cache_key_head_img_t * lv_gpu_sdl_img_cache_key_create(const void * s
         key_size = sizeof(header) + srclen;
         key = SDL_malloc(key_size);
         SDL_memcpy(key, &header, sizeof(header));
-        // Copy string content as key value
+        /*Copy string content as key value*/
         SDL_memcpy(key + sizeof(header), src, srclen);
     }
     else {
         key_size = sizeof(header) + sizeof(void *);
         key = SDL_malloc(key_size);
         SDL_memcpy(key, &header, sizeof(header));
-        // Copy address number as key value
+        /*Copy address number as key value*/
         SDL_memcpy(key + sizeof(header), &src, sizeof(void *));
     }
     *size = key_size;

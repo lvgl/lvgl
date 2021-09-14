@@ -73,7 +73,7 @@ void lv_draw_arc2(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, uin
     area_in.x2 -= dsc->width;
     area_in.y2 -= dsc->width;
 
-    // Increase 1 px each side to texture, to have better rotation result
+    /*Increase 1 px each side to texture, to have better rotation result*/
     lv_area_t texture_area_out;
     lv_area_copy(&texture_area_out, &area_out);
     lv_area_increase(&texture_area_out, 1, 1);

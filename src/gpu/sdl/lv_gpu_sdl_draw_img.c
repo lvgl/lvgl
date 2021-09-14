@@ -100,15 +100,15 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
 
     SDL_Color recolor;
     lv_color_to_sdl_color(&draw_dsc->recolor, &recolor);
-    // Draw original image if not fully recolored
-    // TODO: what if the image is translucent as well?
+    /*Draw original image if not fully recolored*/
+    /*TODO: what if the image is translucent as well?*/
     if(draw_dsc->recolor_opa < LV_OPA_MAX) {
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
 
     SDL_SetTextureColorMod(texture, recolor.r, recolor.g, recolor.b);
     if(draw_dsc->recolor_opa >= LV_OPA_MAX) {
-        // Draw fully colored image
+        /*Draw fully colored image*/
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }

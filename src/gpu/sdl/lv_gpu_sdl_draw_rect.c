@@ -144,7 +144,7 @@ static void draw_bg_color(SDL_Renderer * renderer, const lv_area_t * coords, con
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
     lv_coord_t radius = dsc->radius;
     if(radius > 0) {
-        // A small texture with a quarter of the rect is enough
+        /*A small texture with a quarter of the rect is enough*/
         lv_coord_t bg_w = lv_area_get_width(coords), bg_h = lv_area_get_height(coords), bg_min = LV_MIN(bg_w, bg_h);
         /* If size isn't times of 2, increase 1 px */
         lv_coord_t min_half = bg_min % 2 == 0 ? bg_min / 2 : bg_min / 2 + 1;
@@ -496,22 +496,22 @@ static void draw_border_simple(const lv_area_t * outer_area, const lv_area_t * i
     SDL_Rect simple_rect;
     simple_rect.w = inner_area->x2 - outer_area->x1 + 1;
     simple_rect.h = inner_area->y1 - outer_area->y1 + 1;
-    // Top border
+    /*Top border*/
     simple_rect.x = outer_area->x1;
     simple_rect.y = outer_area->y1;
     SDL_RenderFillRect(renderer, &simple_rect);
-    // Bottom border
+    /*Bottom border*/
     simple_rect.x = inner_area->x1;
     simple_rect.y = inner_area->y2;
     SDL_RenderFillRect(renderer, &simple_rect);
 
     simple_rect.w = inner_area->x1 - outer_area->x1 + 1;
     simple_rect.h = inner_area->y2 - outer_area->y1 + 1;
-    /* Left border */
+    /*Left border*/
     simple_rect.x = outer_area->x1;
     simple_rect.y = inner_area->y1;
     SDL_RenderFillRect(renderer, &simple_rect);
-    // Right border
+    /*Right border*/
     simple_rect.x = inner_area->x2;
     simple_rect.y = outer_area->y1;
     SDL_RenderFillRect(renderer, &simple_rect);
