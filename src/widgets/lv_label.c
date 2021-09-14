@@ -501,7 +501,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 #if LV_USE_BIDI
     /*Handle Bidi*/
     uint32_t cid = _lv_txt_encoded_get_char_id(bidi_txt, i);
-    if(txt[line_start + cid] == '\0') {
+    if(txt[line_start + i] == '\0') {
         logical_pos = i;
     }
     else {
