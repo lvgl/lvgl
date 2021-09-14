@@ -27,7 +27,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of template*/
 
 /**********************
  * GLOBAL PROTOTYPES
