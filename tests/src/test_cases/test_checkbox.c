@@ -7,6 +7,7 @@
 
 void test_checkbox_creation_successfull(void);
 void test_checkbox_should_call_event_handler_on_click_when_enabled(void);
+void test_checkbox_should_have_default_text_when_created(void);
 
 static lv_obj_t *active_screen = NULL;
 static lv_obj_t *checkbox = NULL;
@@ -43,6 +44,17 @@ void test_checkbox_should_call_event_handler_on_click_when_enabled(void)
     TEST_ASSERT_TRUE(event_called);
     
     event_called = false;
+}
+
+void test_checkbox_should_have_default_text_when_created(void)
+{
+    const char *default_text = "Check box";
+
+    active_screen = lv_scr_act();
+    checkbox = lv_checkbox_create(active_screen);
+
+    TEST_ASSERT_EQUAL_STRING(default_text, lv_checkbox_get_text(checkbox));
+    TEST_ASSERT_NOT_NULL(lv_checkbox_get_text(checkbox));
 }
 
 #endif
