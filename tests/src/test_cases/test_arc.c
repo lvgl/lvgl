@@ -3,9 +3,10 @@
 
 #include "unity/unity.h"
 
-void test_bugfix_for_2522(void);
+void test_arc_angles_when_reversed(void);
 
-void test_bugfix_for_2522(void)
+/* See #2522 for more information */
+void test_arc_angles_when_reversed(void)
 {
     uint16_t expected_start_angle = 36;
     uint16_t expected_end_angle = 90;
@@ -18,7 +19,6 @@ void test_bugfix_for_2522(void)
 
     lv_arc_set_bg_angles(arcBlack, 0, 90);
     
-    /* lv_arc_set_value calls value_update, where the fix is done */
     lv_arc_set_value(arcBlack, expected_value);
 
     TEST_ASSERT_EQUAL_UINT16(expected_start_angle, lv_arc_get_angle_start(arcBlack));
