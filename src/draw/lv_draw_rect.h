@@ -80,10 +80,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 /**
  * Draw a rectangle
  * @param coords the coordinates of the rectangle
- * @param mask the rectangle will be drawn only in this mask
+ * @param clip the rectangle will be drawn only in this area
  * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_draw_rect_dsc_t * dsc);
+void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 
 /**
  * Draw a pixel

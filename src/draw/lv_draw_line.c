@@ -34,7 +34,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
                                                 const lv_draw_line_dsc_t * dsc);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -116,6 +115,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
