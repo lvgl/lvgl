@@ -88,27 +88,30 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
 
     lv_checkbox_set_text_static(checkbox, static_text);
 
+    lv_mem_monitor(&m1);
+
     TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size);
 }
 
 void test_checkbox_should_free_memory_when_static_text_is_refreshed(void)
 {
-    uint32_t available_memory = 0;
-    const char *static_text = "Keep me while you exist, ";
+    uint32_t initial_available_memory = 0;
+    const char *static_text = "Keep me while you exist";
 
     lv_mem_monitor_t m1;
     lv_mem_monitor(&m1);
 
     active_screen = lv_scr_act();
     checkbox = lv_checkbox_create(active_screen);
+    
+    initial_available_memory = m1.free_size;
 
     lv_checkbox_set_text_static(checkbox, static_text);
-
-    available_memory = m1.free_size;
- 
     lv_checkbox_set_text_static(checkbox, NULL);
 
-    TEST_ASSERT_GREATER_THAN(available_memory, m1.free_size);
+    lv_mem_monitor(&m1);
+
+    TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size);
 }
 
 #endif
