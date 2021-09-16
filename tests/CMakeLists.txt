@@ -235,6 +235,7 @@ set(COMPILE_OPTIONS
     -Wundef
     -Wuninitialized
     -Wunreachable-code
+    -O2
     ${BUILD_OPTIONS}
 )
 
