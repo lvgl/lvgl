@@ -1375,6 +1375,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+#ifndef LV_USE_DIALOG
+#  ifdef CONFIG_LV_USE_DIALOG
+#    define LV_USE_DIALOG CONFIG_LV_USE_DIALOG
+#  else
+#    define  LV_USE_DIALOG       1
+#  endif
+#endif
+
 #ifndef LV_USE_IMGBTN
 #  ifdef CONFIG_LV_USE_IMGBTN
 #    define LV_USE_IMGBTN CONFIG_LV_USE_IMGBTN

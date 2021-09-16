@@ -31,6 +31,7 @@ extern "C" {
 #include "led/lv_led.h"
 #include "imgbtn/lv_imgbtn.h"
 #include "span/lv_span.h"
+#include "dialog/lv_dialog.h"
 
 /*********************
  *      DEFINES

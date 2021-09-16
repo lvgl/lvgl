@@ -49,7 +49,7 @@ extern const lv_obj_class_t lv_msgbox_class;
  **********************/
 
 /**
- * Create a message box objects
+ * Create a message box object
  * @param parent        pointer to parent or NULL to create a full screen modal message box
  * @param title         the title of the message box
  * @param txt           the text of the message box
