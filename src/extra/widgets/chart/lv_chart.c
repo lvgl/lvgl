@@ -976,7 +976,7 @@ static void draw_series_line(lv_obj_t * obj, const lv_area_t * clip_area)
                         lv_draw_line(&p1, &p2, &series_mask, &line_dsc_default);
                     }
 
-                    if(point_w && point_h && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
+                    if(point_w && point_h && ser->y_points[p_prev] != LV_CHART_POINT_NONE) {
                         lv_draw_rect(&point_area, &series_mask, &point_dsc_default);
                     }
 
