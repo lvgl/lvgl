@@ -972,6 +972,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_set_style_flex_cross_place(obj, LV_FLEX_ALIGN_START, 0);
         return;
     }
+    else if(lv_obj_check_type(obj, &lv_dialog_backdrop_class)) {
+        lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_GREY), 0);
+        lv_obj_set_style_bg_opa(obj, LV_OPA_50, 0);
+    }
 #endif
 #if LV_USE_SPINBOX
     else if(lv_obj_check_type(obj, &lv_spinbox_class)) {

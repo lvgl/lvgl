@@ -44,6 +44,8 @@ typedef struct {
 
 extern const lv_obj_class_t lv_dialog_class;
 
+extern const lv_obj_class_t lv_dialog_backdrop_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
