@@ -63,6 +63,8 @@ lv_obj_t * lv_dialog_create(lv_obj_t * parent, const char * title, const char * 
     if(parent == NULL) {
         auto_parent = true;
         parent = lv_obj_class_create_obj(&lv_dialog_backdrop_class, lv_layer_top());
+        LV_ASSERT_MALLOC(parent);
+        lv_obj_class_init_obj(parent);
         lv_obj_clear_flag(parent, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
     }
