@@ -472,8 +472,7 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
     len = _lv_txt_encoded_get_byte_id(&txt[pos], len);
 
     /*Copy the second part into the end to make place to text to insert*/
-    uint32_t i;
-    for(i = pos; i <= old_len - len; i++) {
+    for(int i = (int) pos; i <= (int) (old_len - len); i++) {
         txt[i] = txt[i + len];
     }
 }
