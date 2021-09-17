@@ -28,17 +28,17 @@ static void dialog_close_click_event_cb(lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_dialog_class = {
-        .base_class = &lv_obj_class,
-        .width_def = LV_DPI_DEF * 2,
-        .height_def = LV_SIZE_CONTENT,
-        .instance_size = sizeof(lv_dialog_t)
+    .base_class = &lv_obj_class,
+    .width_def = LV_DPI_DEF * 2,
+    .height_def = LV_SIZE_CONTENT,
+    .instance_size = sizeof(lv_dialog_t)
 };
 
 const lv_obj_class_t lv_dialog_content_class = {
-        .base_class = &lv_obj_class,
-        .width_def = LV_PCT(100),
-        .height_def = LV_SIZE_CONTENT,
-        .instance_size = sizeof(lv_obj_t)
+    .base_class = &lv_obj_class,
+    .width_def = LV_PCT(100),
+    .height_def = LV_SIZE_CONTENT,
+    .instance_size = sizeof(lv_obj_t)
 };
 
 /**********************
@@ -78,7 +78,7 @@ lv_obj_t * lv_dialog_create(lv_obj_t * parent, const char * title, const char * 
     bool has_title = title && strlen(title) > 0;
 
     /*When a close button is required, we need the empty label as spacer to push the button to the right*/
-    if (add_close_btn || has_title) {
+    if(add_close_btn || has_title) {
         dialog->title = lv_label_create(obj);
         lv_label_set_text(dialog->title, has_title ? title : "");
         lv_label_set_long_mode(dialog->title, LV_LABEL_LONG_SCROLL_CIRCULAR);
