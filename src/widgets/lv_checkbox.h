@@ -69,7 +69,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt);
  * Set the text of a check box. `txt` must not be deallocated during the life
  * of this checkbox.
  * @param cb    pointer to a check box
- * @param txt   the text of the check box. NULL to refresh with the current text.
+ * @param txt   the text of the check box.
  */
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt);
 
