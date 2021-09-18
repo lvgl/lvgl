@@ -149,6 +149,25 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE   0
 
+/*Use SDL renderer API*/
+#ifndef LV_USE_GPU_SDL
+#  ifdef CONFIG_LV_USE_GPU_SDL
+#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  else
+#    define  LV_USE_GPU_SDL   0
+#  endif
+#endif
+#if LV_USE_GPU_SDL
+#  define LV_USE_EXTERNAL_RENDERER 1
+#  ifndef LV_GPU_SDL_INCLUDE
+#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+#  endif
+#endif
+
+#ifndef LV_USE_EXTERNAL_RENDERER
+#  define LV_USE_EXTERNAL_RENDERER 0
+#endif
+
 /*-------------
  * Logging
  *-----------*/
@@ -225,7 +244,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_USE_USER_DATA      1
 
 /*Garbage Collector settings
- *Used if lvgl is binded to higher level language and the memory is managed by that language*/
+ *Used if lvgl is bound to higher level language and the memory is managed by that language*/
 #define LV_ENABLE_GC 0
 #if LV_ENABLE_GC != 0
 #  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/

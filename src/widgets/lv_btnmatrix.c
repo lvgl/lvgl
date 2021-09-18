@@ -653,7 +653,6 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_rect_dsc_def;
     lv_draw_label_dsc_t draw_label_dsc_def;
 
-
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
     obj->skip_trans = 1;
@@ -694,8 +693,9 @@ static void draw_main(lv_event_t * e)
         /*Get the state of the button*/
         lv_state_t btn_state = LV_STATE_DEFAULT;
         if(button_get_checked(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_CHECKED;
+
         if(button_is_inactive(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_DISABLED;
-        if(btn_i == btnm->btn_id_sel) {
+        else if(btn_i == btnm->btn_id_sel) {
             if(state_ori & LV_STATE_PRESSED) btn_state |= LV_STATE_PRESSED;
             if(state_ori & LV_STATE_FOCUSED) btn_state |= LV_STATE_FOCUSED;
             if(state_ori & LV_STATE_FOCUS_KEY) btn_state |= LV_STATE_FOCUS_KEY;

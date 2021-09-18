@@ -13,6 +13,9 @@
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_assert.h"
 
+#if LV_USE_GPU_SDL
+    #include "../gpu/lv_gpu_sdl.h"
+#endif
 /*********************
  *      DEFINES
  *********************/
@@ -32,9 +35,13 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+#endif
+
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
@@ -387,6 +394,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     LV_ASSERT_MEM_INTEGRITY();
 }
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -616,6 +624,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
     lv_mem_buf_release(mask_buf);
 }
+#endif
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
