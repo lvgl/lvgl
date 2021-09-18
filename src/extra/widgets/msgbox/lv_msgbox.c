@@ -27,7 +27,26 @@ static void msgbox_close_click_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_msgbox_class = {.base_class = &lv_obj_class, .instance_size = sizeof(lv_msgbox_t)};
+const lv_obj_class_t lv_msgbox_class = {
+        .base_class = &lv_obj_class,
+        .width_def = LV_DPI_DEF * 2,
+        .height_def = LV_SIZE_CONTENT,
+        .instance_size = sizeof(lv_msgbox_t)
+};
+
+const lv_obj_class_t lv_msgbox_content_class = {
+        .base_class = &lv_obj_class,
+        .width_def = LV_PCT(100),
+        .height_def = LV_SIZE_CONTENT,
+        .instance_size = sizeof(lv_obj_t)
+};
+
+const lv_obj_class_t lv_msgbox_backdrop_class = {
+        .base_class = &lv_obj_class,
+        .width_def = LV_PCT(100),
+        .height_def = LV_PCT(100),
+        .instance_size = sizeof(lv_obj_t)
+};
 
 /**********************
  *      MACROS
@@ -44,11 +63,10 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     bool auto_parent = false;
     if(parent == NULL) {
         auto_parent = true;
-        parent = lv_obj_create(lv_layer_top());
-        lv_obj_remove_style_all(parent);
+        parent = lv_obj_class_create_obj(&lv_msgbox_backdrop_class, lv_layer_top());
+        LV_ASSERT_MALLOC(parent);
+        lv_obj_class_init_obj(parent);
         lv_obj_clear_flag(parent, LV_OBJ_FLAG_IGNORE_LAYOUT);
-        lv_obj_set_style_bg_color(parent, lv_palette_main(LV_PALETTE_GREY), 0);
-        lv_obj_set_style_bg_opa(parent, LV_OPA_50, 0);
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
     }
 
@@ -60,9 +78,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
 
     if(auto_parent) lv_obj_add_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT);
 
-    lv_obj_set_size(obj, LV_DPI_DEF * 2, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
     bool has_title = title && strlen(title) > 0;
 
@@ -87,10 +103,15 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
     }
 
-    mbox->text = lv_label_create(obj);
-    lv_label_set_text(mbox->text, txt);
-    lv_label_set_long_mode(mbox->text, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(mbox->text, lv_pct(100));
+    mbox->content = lv_obj_class_create_obj(&lv_msgbox_content_class, obj);
+
+    bool has_txt = txt && strlen(txt) > 0;
+    if (has_txt) {
+        mbox->text = lv_label_create(mbox->content);
+        lv_label_set_text(mbox->text, txt);
+        lv_label_set_long_mode(mbox->text, LV_LABEL_LONG_WRAP);
+        lv_obj_set_width(mbox->text, lv_pct(100));
+    }
 
     if(btn_txts) {
         mbox->btns = lv_btnmatrix_create(obj);
@@ -130,6 +151,12 @@ lv_obj_t * lv_msgbox_get_text(lv_obj_t * obj)
     return mbox->text;
 }
 
+lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)
+{
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+    return mbox->content;
+}
+
 lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj)
 {
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
@@ -154,6 +181,11 @@ void lv_msgbox_close(lv_obj_t * mbox)
     else lv_obj_del(mbox);
 }
 
+void lv_msgbox_close_async(lv_obj_t * dialog)
+{
+    if(lv_obj_has_flag(dialog, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_del_async(lv_obj_get_parent(dialog));
+    else lv_obj_del_async(dialog);
+}
 
 /**********************
  *   STATIC FUNCTIONS

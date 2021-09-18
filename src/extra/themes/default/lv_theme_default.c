@@ -125,7 +125,7 @@ typedef struct {
     lv_style_t colorwheel_main;
 #endif
 
-#if LV_USE_MSGBOX || LV_USE_DIALOG
+#if LV_USE_MSGBOX
     lv_style_t msgbox_bg, msgbox_btn_bg;
 #endif
 
@@ -506,7 +506,7 @@ static void style_init(void)
     lv_style_set_arc_width(&styles->colorwheel_main, lv_disp_dpx(theme.disp, 10));
 #endif
 
-#if LV_USE_MSGBOX || LV_USE_DIALOG
+#if LV_USE_MSGBOX
     /*To add space for for the button shadow*/
     style_init_reset(&styles->msgbox_btn_bg);
     lv_style_set_pad_all(&styles->msgbox_btn_bg, lv_disp_dpx(theme.disp, 4));
@@ -676,15 +676,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_BTNMATRIX
     else if(lv_obj_check_type(obj, &lv_btnmatrix_class)) {
-#if LV_USE_MSGBOX || LV_USE_DIALOG
-        bool is_msgbox_or_dialog = false;
 #if LV_USE_MSGBOX
-        is_msgbox_or_dialog |= lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class);
-#endif
-#if LV_USE_DIALOG
-        is_msgbox_or_dialog |= lv_obj_check_type(lv_obj_get_parent(obj), &lv_dialog_class);
-#endif
-        if(is_msgbox_or_dialog) {
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
             lv_obj_add_style(obj, &styles->msgbox_btn_bg, 0);
             lv_obj_add_style(obj, &styles->pad_gap, 0);
             lv_obj_add_style(obj, &styles->btn, LV_PART_ITEMS);
@@ -962,17 +955,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->msgbox_bg, 0);
+        lv_obj_set_style_flex_main_place(obj, LV_FLEX_ALIGN_START, 0);
+        lv_obj_set_style_flex_cross_place(obj, LV_FLEX_ALIGN_CENTER, 0);
+        lv_obj_set_style_flex_track_place(obj, LV_FLEX_ALIGN_START, 0);
         return;
     }
-#endif
-#if LV_USE_DIALOG
-    else if(lv_obj_check_type(obj, &lv_dialog_class)) {
-        lv_obj_add_style(obj, &styles->card, 0);
-        lv_obj_add_style(obj, &styles->msgbox_bg, 0);
-        lv_obj_set_style_flex_cross_place(obj, LV_FLEX_ALIGN_START, 0);
-        return;
-    }
-    else if(lv_obj_check_type(obj, &lv_dialog_backdrop_class)) {
+    else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
         lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_GREY), 0);
         lv_obj_set_style_bg_opa(obj, LV_OPA_50, 0);
     }
