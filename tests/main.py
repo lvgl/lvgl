@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     for options_name in options_to_build:
         is_test = options_name in test_options
-        build_type = 'Release' if is_test else 'Debug'
+        build_type = 'Debug'
         build_tests(options_name, build_type, args.clean)
         if is_test:
             try:
