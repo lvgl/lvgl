@@ -10,7 +10,6 @@ void test_checkbox_should_call_event_handler_on_click_when_enabled(void);
 void test_checkbox_should_have_default_text_when_created(void);
 void test_checkbox_should_return_dinamically_allocated_text(void);
 void test_checkbox_should_allocate_memory_for_static_text(void);
-void test_checkbox_should_free_memory_when_static_text_is_refreshed(void);
 
 static lv_obj_t *active_screen = NULL;
 static lv_obj_t *checkbox = NULL;
@@ -87,27 +86,6 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     initial_available_memory = m1.free_size;
 
     lv_checkbox_set_text_static(checkbox, static_text);
-
-    lv_mem_monitor(&m1);
-
-    TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size);
-}
-
-void test_checkbox_should_free_memory_when_static_text_is_refreshed(void)
-{
-    uint32_t initial_available_memory = 0;
-    const char *static_text = "Keep me while you exist";
-
-    lv_mem_monitor_t m1;
-    lv_mem_monitor(&m1);
-
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
-    
-    initial_available_memory = m1.free_size;
-
-    lv_checkbox_set_text_static(checkbox, static_text);
-    lv_checkbox_set_text_static(checkbox, NULL);
 
     lv_mem_monitor(&m1);
 
