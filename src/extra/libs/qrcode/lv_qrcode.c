@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_qrcode.h"
+#if LV_USE_QRCODE
+
 #include "qrcodegen.h"
 
 /*********************
@@ -161,3 +163,4 @@ void lv_qrcode_delete(lv_obj_t * qrcode)
  *   STATIC FUNCTIONS
  **********************/
 
+#endif /*LV_USE_QRCODE*/

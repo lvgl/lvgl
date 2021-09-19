@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
+#if LV_USE_PNG
 
 #include "lv_png.h"
 #include "lodepng.h"
@@ -231,5 +232,6 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
 #endif
 }
 
+#endif /*LV_USE_PNG*/
 
 

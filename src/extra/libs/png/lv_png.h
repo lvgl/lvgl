@@ -13,6 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../../lv_conf_internal.h"
+#if LV_USE_PNG
 
 /*********************
  *      DEFINES
@@ -35,6 +37,7 @@ void lv_png_init(void);
  *      MACROS
  **********************/
 
+#endif /*LV_USE_PNG*/
 
 #ifdef __cplusplus
 } /* extern "C" */
