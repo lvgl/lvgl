@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
+#if LV_USE_BMP
+
 #include <string.h>
 
 /*********************
@@ -222,3 +224,5 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     lv_mem_free(dsc->user_data);
 
 }
+
+#endif /*LV_USE_BMP*/

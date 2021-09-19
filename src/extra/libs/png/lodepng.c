@@ -343,7 +343,6 @@ static void lodepng_set32bitInt(unsigned char* buffer, unsigned value) {
 
 /* returns negative value on error. This should be pure C compatible, so no fstat. */
 static long lodepng_filesize(const char* filename) {
-#if LV_PNG_USE_LV_FILESYSTEM
     lv_fs_file_t f;
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return -1;
@@ -356,29 +355,10 @@ static long lodepng_filesize(const char* filename) {
     lv_fs_tell(&f, &size);
     lv_fs_close(&f);
     return size;
-#else
-  FILE* file;
-  long size;
-  file = fopen(filename, "rb");
-  if(!file) return -1;
-
-  if(fseek(file, 0, SEEK_END) != 0) {
-    fclose(file);
-    return -1;
-  }
-
-  size = ftell(file);
-  /* It may give LONG_MAX as directory size, this is invalid for us. */
-  if(size == LONG_MAX) size = -1;
-
-  fclose(file);
-  return size;
-#endif
 }
 
 /* load file into buffer that already has the correct allocated size. Returns error code.*/
 static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename) {
-#if LV_PNG_USE_LV_FILESYSTEM
     lv_fs_file_t f;
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return 78;
@@ -389,18 +369,6 @@ static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char*
     if (br != size) return 78;
     lv_fs_close(&f);
     return 0;
-#else
-  FILE* file;
-  size_t readsize;
-  file = fopen(filename, "rb");
-  if(!file) return 78;
-
-  readsize = fread(out, 1, size, file);
-  fclose(file);
-
-  if(readsize != size) return 78;
-  return 0;
-#endif
 }
 
 unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* filename) {

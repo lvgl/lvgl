@@ -544,8 +544,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*File system interfaces for common APIs
  *To enable set a driver letter for that API*/
 #define LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
+//#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+
 #define LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
-#define LV_USE_FS_FATFS '\0'        /*Uses f_open, F_read, etc*/
+//#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+
+#define LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
 
 /*PNG decoder library*/
 #define LV_USE_PNG 0
@@ -553,7 +557,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*BMP decoder library*/
 #define LV_USE_BMP 0
 
-/* JPG + Split JPG decoder library.
+/* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
 #define LV_USE_SJPG 0
 

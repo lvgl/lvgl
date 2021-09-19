@@ -1,8 +1,5 @@
-#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "../../../lvgl.h"
+#if LV_USE_PNG && LV_BUILD_EXAMPLES
 
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
@@ -13,7 +10,7 @@
 #define LV_ATTRIBUTE_IMG_PNG_DECODER_TEST
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_PNG_DECODER_TEST uint8_t png_decoder_test_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_PNG_DECODER_TEST uint8_t img_wink_png_map[] = {
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
   0x00, 0x00, 0x00, 0x32, 0x00, 0x00, 0x00, 0x32, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1e, 0x3f, 0x88,
   0xb1, 0x00, 0x00, 0x00, 0x06, 0x62, 0x4b, 0x47, 0x44, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0xa0,
@@ -339,11 +336,13 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_PNG_DECOD
   0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 };
 
-const lv_img_dsc_t png_decoder_test = {
+const lv_img_dsc_t img_wink_png = {
   .header.always_zero = 0,
   .header.w = 50,
   .header.h = 50,
   .data_size = 5158,
   .header.cf = LV_IMG_CF_RAW_ALPHA,
-  .data = png_decoder_test_map,
+  .data = img_wink_png_map,
 };
+
+#endif /*LV_USE_PNG && LV_BUILD_EXAMPLES*/

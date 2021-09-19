@@ -41,8 +41,8 @@ extern const lv_obj_class_t lv_gif_class;
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_gif_create_from_file(lv_obj_t * parent, const char * path);
-lv_obj_t * lv_gif_create_from_data(lv_obj_t * parent, const void * data);
+lv_obj_t * lv_gif_create(lv_obj_t * parent);
+void lv_gif_set_src(lv_obj_t * obj, const void * src);
 void lv_gif_restart(lv_obj_t * gif);
 
 /**********************

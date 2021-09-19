@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_FS_STDIO
+#if LV_USE_FS_STDIO != '\0'
 
 #include <stdio.h>
 #include <errno.h>
@@ -21,6 +21,13 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_FS_STDIO_PATH
+# ifndef WIN32
+#  define LV_FS_STDIO_PATH "./" /*Project root*/
+# else
+#  define LV_FS_STDIO_PATH ".\\" /*Project root*/
+# endif
+#endif /*LV_FS_STDIO_PATH*/
 
 /**********************
  *      TYPEDEFS
@@ -65,7 +72,7 @@ void lv_fs_stdio_init(void)
 	lv_fs_drv_init(&fs_drv);
 
 	/*Set up fields...*/
-	fs_drv.letter = LV_FS_IF_PC;
+	fs_drv.letter = LV_USE_FS_STDIO;
 	fs_drv.open_cb = fs_open;
 	fs_drv.close_cb = fs_close;
 	fs_drv.read_cb = fs_read;
@@ -81,7 +88,7 @@ void lv_fs_stdio_init(void)
 
 	char cur_path[512];
 	getcwd(cur_path, sizeof(cur_path));
-	LV_LOG_USER("STDIO filesystem is initialized with %s root directory.", cur_path);
+	LV_LOG_INFO("STDIO file system is initialized with %s root directory.", cur_path);
 }
 
 /**********************
@@ -111,10 +118,10 @@ static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
 #ifndef WIN32
 	char buf[256];
-	sprintf(buf, LV_FS_PC_PATH "%s", path);
+	sprintf(buf, LV_FS_STDIO_PATH "%s", path);
 #else
 	char buf[256];
-	sprintf(buf, LV_FS_PC_PATH "%s", path);
+	sprintf(buf, LV_FS_STDIO_PATH "%s", path);
 #endif
 
 	FILE * f = fopen(buf, flags);
@@ -222,7 +229,7 @@ static void * fs_dir_open (lv_fs_drv_t * drv, const char *path)
 #ifndef WIN32
 	/*Make the path relative to the current directory (the projects root folder)*/
 	char buf[256];
-	sprintf(buf, LV_FS_PC_PATH "/%s", path);
+	sprintf(buf, LV_FS_STDIO_PATH "/%s", path);
 	return opendir(buf);
 #else
 	HANDLE d = INVALID_HANDLE_VALUE;

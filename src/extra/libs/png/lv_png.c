@@ -77,7 +77,6 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
               * [24..27]: height
               */
              uint32_t size[2];
-#if LV_PNG_USE_LV_FILESYSTEM
              lv_fs_file_t f;
              lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
              if(res != LV_FS_RES_OK) return LV_RES_INV;
@@ -86,15 +85,6 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
              lv_fs_read(&f, &size, 8, &rn);
              if(rn != 8) return LV_RES_INV;
              lv_fs_close(&f);
-#else
-             FILE* file;
-             file = fopen(fn, "rb" );
-             if(!file) return LV_RES_INV;
-             fseek(file, 16, SEEK_SET);
-             size_t rn = fread(size, 1 , 8, file);
-             fclose(file);
-             if(rn != 8) return LV_RES_INV;
-#endif
              /*Save the data in the header*/
              header->always_zero = 0;
              header->cf = LV_IMG_CF_RAW_ALPHA;

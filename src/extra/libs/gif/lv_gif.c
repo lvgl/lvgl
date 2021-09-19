@@ -38,9 +38,6 @@ const lv_obj_class_t lv_gif_class = {
     .base_class = &lv_img_class
 };
 
-static const void * create_data;
-static const char * create_path;
-
 /**********************
  *      MACROS
  **********************/
@@ -49,27 +46,52 @@ static const char * create_path;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_gif_create_from_file(lv_obj_t * parent, const char * path)
+lv_obj_t * lv_gif_create(lv_obj_t * parent)
 {
-    create_data = NULL;
-    create_path = path;
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
-
 }
 
-lv_obj_t * lv_gif_create_from_data(lv_obj_t * parent, const void * data)
+void lv_gif_set_src(lv_obj_t * obj, const void * src)
 {
-    create_data = data;
-    create_path = NULL;
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-    LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
-    lv_obj_class_init_obj(obj);
-    return obj;
+    /*Close previous gif if any*/
+    if(gifobj->gif) {
+        lv_img_cache_invalidate_src(&gifobj->imgdsc);
+        gd_close_gif(gifobj->gif);
+        gifobj->gif = NULL;
+        gifobj->imgdsc.data = NULL;
+    }
+
+    if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * img_dsc = src;
+       gifobj->gif = gd_open_gif_data(img_dsc->data);
+    }
+    else if(lv_img_src_get_type(src) == LV_IMG_SRC_FILE) {
+       gifobj->gif = gd_open_gif_file(src);
+    }
+    if(gifobj->gif == NULL) {
+        LV_LOG_WARN("Could't load the source");
+        return;
+    }
+
+   gifobj->imgdsc.data = gifobj->gif->canvas;
+   gifobj->imgdsc.header.always_zero = 0;
+   gifobj->imgdsc.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+   gifobj->imgdsc.header.h = gifobj->gif->height;
+   gifobj->imgdsc.header.w = gifobj->gif->width;
+   gifobj->last_call = lv_tick_get();
+
+   lv_img_set_src(obj, &gifobj->imgdsc);
+
+   lv_timer_resume(gifobj->timer);
+   lv_timer_reset(gifobj->timer);
+
+   next_frame_task_cb(gifobj->timer);
 
 }
 
@@ -82,25 +104,14 @@ void lv_gif_restart(lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
 static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+
     lv_gif_t * gifobj = (lv_gif_t *) obj;
-    if(create_data) gifobj->gif = gd_open_gif_data(create_data);
-    else if(create_path) gifobj->gif = gd_open_gif_file(create_path);
-
-    if(gifobj->gif == NULL) return;
-
-    gifobj->imgdsc.data = gifobj->gif->canvas;
-    gifobj->imgdsc.header.always_zero = 0;
-    gifobj->imgdsc.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-    gifobj->imgdsc.header.h = gifobj->gif->height;
-    gifobj->imgdsc.header.w = gifobj->gif->width;
-    gifobj->last_call = lv_tick_get();
-
-    lv_img_set_src(obj, &gifobj->imgdsc);
 
     gifobj->timer = lv_timer_create(next_frame_task_cb, 10, obj);
-    next_frame_task_cb(gifobj->timer);    /*Immediately process the first frame*/
+    lv_timer_pause(gifobj->timer);
 }
 
 static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

@@ -610,7 +610,7 @@ static bool f_gif_open(gd_GIF * gif, const void * path, bool is_file)
 
     if(is_file) {
         lv_fs_res_t res = lv_fs_open(&gif->fd, path, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) return false;
+        if(res != LV_FS_RES_OK) return false;
         else return true;
     } else {
         gif->data = path;

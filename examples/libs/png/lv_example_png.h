@@ -1,10 +1,10 @@
 /**
- * @file lv_templ.h
+ * @file lv_example_png.h
  *
  */
 
-#ifndef LV_BMP_H
-#define LV_BMP_H
+#ifndef LV_EXAMPLE_PNG_H
+#define LV_EXAMPLE_PNG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
-#if LV_USE_BMP
 
 /*********************
  *      DEFINES
@@ -27,16 +25,14 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_bmp_init(void);
+void lv_example_png_1(void);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_BMP*/
-
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
-#endif /*LV_BMP_H*/
+#endif /*LV_EXAMPLE_PNG_H*/
