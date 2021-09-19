@@ -1563,6 +1563,84 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+/*---------------------
+ * 3rd party libraries
+ *--------------------*/
+
+/*File system interfaces for common APIs
+ *To enable set a driver letter for that API*/
+#ifndef LV_USE_FS_STDIO
+#  ifdef CONFIG_LV_USE_FS_STDIO
+#    define LV_USE_FS_STDIO CONFIG_LV_USE_FS_STDIO
+#  else
+#    define  LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
+#  endif
+#endif
+//#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+
+#ifndef LV_USE_FS_POSIX
+#  ifdef CONFIG_LV_USE_FS_POSIX
+#    define LV_USE_FS_POSIX CONFIG_LV_USE_FS_POSIX
+#  else
+#    define  LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
+#  endif
+#endif
+//#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+
+#ifndef LV_USE_FS_FATFS
+#  ifdef CONFIG_LV_USE_FS_FATFS
+#    define LV_USE_FS_FATFS CONFIG_LV_USE_FS_FATFS
+#  else
+#    define  LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
+#  endif
+#endif
+
+/*PNG decoder library*/
+#ifndef LV_USE_PNG
+#  ifdef CONFIG_LV_USE_PNG
+#    define LV_USE_PNG CONFIG_LV_USE_PNG
+#  else
+#    define  LV_USE_PNG 0
+#  endif
+#endif
+
+/*BMP decoder library*/
+#ifndef LV_USE_BMP
+#  ifdef CONFIG_LV_USE_BMP
+#    define LV_USE_BMP CONFIG_LV_USE_BMP
+#  else
+#    define  LV_USE_BMP 0
+#  endif
+#endif
+
+/* JPG + split JPG decoder library.
+ * Split JPG is a custom format optimized for embedded systems. */
+#ifndef LV_USE_SJPG
+#  ifdef CONFIG_LV_USE_SJPG
+#    define LV_USE_SJPG CONFIG_LV_USE_SJPG
+#  else
+#    define  LV_USE_SJPG 0
+#  endif
+#endif
+
+/*GIF decoder library*/
+#ifndef LV_USE_GIF
+#  ifdef CONFIG_LV_USE_GIF
+#    define LV_USE_GIF CONFIG_LV_USE_GIF
+#  else
+#    define  LV_USE_GIF 0
+#  endif
+#endif
+
+/*QR code library*/
+#ifndef LV_USE_QRCODE
+#  ifdef CONFIG_LV_USE_QRCODE
+#    define LV_USE_QRCODE CONFIG_LV_USE_QRCODE
+#  else
+#    define  LV_USE_QRCODE 0
+#  endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
