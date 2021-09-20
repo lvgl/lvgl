@@ -38,18 +38,21 @@ typedef struct {
     lv_obj_t obj;
     lv_obj_t * title;
     lv_obj_t * close_btn;
+    lv_obj_t * content;
     lv_obj_t * text;
     lv_obj_t * btns;
 } lv_msgbox_t;
 
 extern const lv_obj_class_t lv_msgbox_class;
 
+extern const lv_obj_class_t lv_msgbox_backdrop_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Create a message box objects
+ * Create a message box object
  * @param parent        pointer to parent or NULL to create a full screen modal message box
  * @param title         the title of the message box
  * @param txt           the text of the message box
@@ -66,6 +69,8 @@ lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * obj);
 
 lv_obj_t * lv_msgbox_get_text(lv_obj_t * obj);
 
+lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj);
+
 lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj);
 
 /**
@@ -78,6 +83,8 @@ uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox);
 const char * lv_msgbox_get_active_btn_text(lv_obj_t * mbox);
 
 void lv_msgbox_close(lv_obj_t * mbox);
+
+void lv_msgbox_close_async(lv_obj_t * mbox);
 
 /**********************
  *      MACROS
