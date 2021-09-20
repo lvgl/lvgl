@@ -126,7 +126,7 @@ typedef struct {
 #endif
 
 #if LV_USE_MSGBOX
-    lv_style_t msgbox_bg, msgbox_btn_bg;
+    lv_style_t msgbox_bg, msgbox_btn_bg, msgbox_backdrop_bg;
 #endif
 
 #if LV_USE_KEYBOARD
@@ -513,6 +513,10 @@ static void style_init(void)
 
     style_init_reset(&styles->msgbox_bg);
     lv_style_set_max_width(&styles->msgbox_bg, lv_pct(100));
+
+    style_init_reset(&styles->msgbox_backdrop_bg);
+    lv_style_set_bg_color(&styles->msgbox_backdrop_bg, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_bg_opa(&styles->msgbox_backdrop_bg, LV_OPA_50);
 #endif
 #if LV_USE_KEYBOARD
     style_init_reset(&styles->keyboard_btn_bg);
@@ -955,14 +959,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->msgbox_bg, 0);
-        lv_obj_set_style_flex_main_place(obj, LV_FLEX_ALIGN_START, 0);
-        lv_obj_set_style_flex_cross_place(obj, LV_FLEX_ALIGN_CENTER, 0);
-        lv_obj_set_style_flex_track_place(obj, LV_FLEX_ALIGN_START, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
-        lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_GREY), 0);
-        lv_obj_set_style_bg_opa(obj, LV_OPA_50, 0);
+        lv_obj_add_style(obj, &styles->msgbox_backdrop_bg, 0);
     }
 #endif
 #if LV_USE_SPINBOX
