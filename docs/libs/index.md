@@ -10,11 +10,12 @@
 .. toctree::
    :maxdepth: 1
    
+   fs
    bpm
    jpg
    png
    gif
-   qrCode
-   
+   freetype
+   qrcode
 ```
 

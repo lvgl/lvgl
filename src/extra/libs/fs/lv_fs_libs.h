@@ -27,15 +27,15 @@ extern "C" {
  **********************/
 
 #if LV_USE_FS_FATFS != '\0'
-	lv_fs_fatfs_init();
+	void lv_fs_fatfs_init(void);
 #endif
 
 #if LV_USE_FS_STDIO != '\0'
-	lv_fs_stdio_init();
+	void lv_fs_stdio_init(void);
 #endif
 
 #if LV_USE_FS_POSIX != '\0'
-    lv_fs_posix_init();
+	void lv_fs_posix_init(void);
 #endif
 
 /**********************

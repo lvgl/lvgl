@@ -1600,7 +1600,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_PNG
 #    define LV_USE_PNG CONFIG_LV_USE_PNG
 #  else
-#    define  LV_USE_PNG 0
+#    define  LV_USE_PNG      0
 #  endif
 #endif
 
@@ -1609,7 +1609,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_BMP
 #    define LV_USE_BMP CONFIG_LV_USE_BMP
 #  else
-#    define  LV_USE_BMP 0
+#    define  LV_USE_BMP      0
 #  endif
 #endif
 
@@ -1619,7 +1619,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_SJPG
 #    define LV_USE_SJPG CONFIG_LV_USE_SJPG
 #  else
-#    define  LV_USE_SJPG 0
+#    define  LV_USE_SJPG     0
 #  endif
 #endif
 
@@ -1628,7 +1628,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_GIF
 #    define LV_USE_GIF CONFIG_LV_USE_GIF
 #  else
-#    define  LV_USE_GIF 0
+#    define  LV_USE_GIF      0
 #  endif
 #endif
 
@@ -1637,9 +1637,29 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_QRCODE
 #    define LV_USE_QRCODE CONFIG_LV_USE_QRCODE
 #  else
-#    define  LV_USE_QRCODE 0
+#    define  LV_USE_QRCODE   0
 #  endif
 #endif
+
+/*FreeType library*/
+#ifndef LV_USE_FREETYPE
+#  ifdef CONFIG_LV_USE_FREETYPE
+#    define LV_USE_FREETYPE CONFIG_LV_USE_FREETYPE
+#  else
+#    define  LV_USE_FREETYPE 0
+#  endif
+#endif
+#if LV_USE_FREETYPE
+/*Memory used by FreeType to cache characters [bytes]*/
+#ifndef LV_FREETYPE_CACHE_SIZE
+#  ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
+#    define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
+#  else
+#    define  LV_FREETYPE_CACHE_SIZE  (16 * 1024)
+#  endif
+#endif
+#endif
+
 
 /*==================
 * EXAMPLES

@@ -16,7 +16,9 @@ extern "C" {
 #include "bmp/lv_example_bmp.h"
 #include "gif/lv_example_gif.h"
 #include "png/lv_example_png.h"
+#include "sjpg/lv_example_sjpg.h"
 #include "qrcode/lv_example_qrcode.h"
+#include "freetype/lv_example_freetype.h"
 
 /*********************
  *      DEFINES

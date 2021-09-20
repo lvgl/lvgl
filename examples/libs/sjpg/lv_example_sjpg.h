@@ -1,10 +1,10 @@
 /**
- * @file lv_libs.h
+ * @file lv_example_sjpg.h
  *
  */
 
-#ifndef LV_LIBS_H
-#define LV_LIBS_H
+#ifndef LV_EXAMPLE_SJPG_H
+#define LV_EXAMPLE_SJPG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,13 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "bmp/lv_bmp.h"
-#include "fs/lv_fs_libs.h"
-#include "png/lv_png.h"
-#include "gif/lv_gif.h"
-#include "qrcode/lv_qrcode.h"
-#include "sjpg/lv_sjpg.h"
-#include "freetype/lv_freetype.h"
 
 /*********************
  *      DEFINES
@@ -32,18 +25,14 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_sjpg_1(void);
 
 /**********************
  *      MACROS
  **********************/
-#if LV_USE_LOG && LV_LOG_TRACE_LAYOUT
-#  define LV_TRACE_LAYOUT(...) LV_LOG_TRACE( __VA_ARGS__)
-#else
-#  define LV_TRACE_LAYOUT(...)
-#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_LAYOUTS_H*/
+#endif /*LV_EXAMPLE_SJPG_H*/

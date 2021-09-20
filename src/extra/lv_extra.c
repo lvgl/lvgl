@@ -66,6 +66,13 @@ void lv_extra_init(void)
     lv_bmp_init();
 #endif
 
+#if LV_USE_FREETYPE
+    /*Init freetype library
+     *Cache max 64 faces and 1 size*/
+    lv_freetype_init(0, 0, LV_FREETYPE_CACHE_SIZE);
+
+#endif
+
 }
 
 /**********************
