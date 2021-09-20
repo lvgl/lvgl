@@ -77,8 +77,10 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
 
-    uint8_t qr0[qrcodegen_BUFFER_LEN_MAX];
-    uint8_t data_tmp[qrcodegen_BUFFER_LEN_MAX];
+    uint8_t * qr0 = lv_mem_alloc(qrcodegen_BUFFER_LEN_MAX);
+    LV_ASSERT_MALLOC(qr0);
+    uint8_t * data_tmp = lv_mem_alloc(qrcodegen_BUFFER_LEN_MAX);
+    LV_ASSERT_MALLOC(data_tmp);
     memcpy(data_tmp, data, data_len);
 
     bool ok = qrcodegen_encodeBinary(data_tmp, data_len,
@@ -86,7 +88,11 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
             qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX,
             qrcodegen_Mask_AUTO, true);
 
-    if (!ok) return LV_RES_INV;
+    if (!ok) {
+        lv_mem_free(qr0);
+        lv_mem_free(data_tmp);
+        return LV_RES_INV;
+    }
 
 
     lv_img_dsc_t * imgdsc = lv_canvas_get_img(qrcode);
@@ -144,6 +150,8 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
       }
     }
 
+    lv_mem_free(qr0);
+    lv_mem_free(data_tmp);
     return LV_RES_OK;
 }
 
@@ -155,7 +163,7 @@ void lv_qrcode_delete(lv_obj_t * qrcode)
 {
     lv_img_dsc_t * img = lv_canvas_get_img(qrcode);
     lv_img_cache_invalidate_src(img);
-    lv_mem_free(img->data);
+    lv_mem_free((void*)img->data);
     lv_obj_del(qrcode);
 }
 

@@ -580,6 +580,7 @@ static unsigned readBits(LodePNGBitReader* reader, size_t nbits) {
   return result;
 }
 
+#if 0 /*Disable because tests fail due to unused declaration*/
 /* Public for testing only. steps and result must have numsteps values. */
 static unsigned lode_png_test_bitreader(const unsigned char* data, size_t size,
                                  size_t numsteps, const size_t* steps, unsigned* result) {
@@ -599,6 +600,8 @@ static unsigned lode_png_test_bitreader(const unsigned char* data, size_t size,
   }
   return 1;
 }
+#endif
+
 #endif /*LODEPNG_COMPILE_DECODER*/
 
 static unsigned reverseBits(unsigned bits, unsigned num) {

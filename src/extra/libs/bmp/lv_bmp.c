@@ -53,7 +53,6 @@ static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
  **********************/
 void lv_bmp_init(void)
 {
-
     lv_img_decoder_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
@@ -73,45 +72,46 @@ void lv_bmp_init(void)
  */
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
-    (void) decoder; /*Unused*/
-     lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
+    LV_UNUSED(decoder);
 
-     /*If it's a BMP file...*/
-     if(src_type == LV_IMG_SRC_FILE) {
-         const char * fn = src;
-         if(!strcmp(&fn[strlen(fn) - 3], "bmp")) {              /*Check the extension*/
-             /*Save the data in the header*/
-             lv_fs_file_t f;
-             lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
-             if(res != LV_FS_RES_OK) return LV_RES_INV;
-             uint8_t headers[54];
+    lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
 
-             lv_fs_read(&f, headers, 54, NULL);
-             uint32_t w;
-             uint32_t h;
-             memcpy(&w, headers + 18, 4);
-             memcpy(&h, headers + 22, 4);
-             header->w = w;
-             header->h = h;
-             header->always_zero = 0;
-             lv_fs_close(&f);
+    /*If it's a BMP file...*/
+    if(src_type == LV_IMG_SRC_FILE) {
+        const char * fn = src;
+        if(!strcmp(&fn[strlen(fn) - 3], "bmp")) {              /*Check the extension*/
+            /*Save the data in the header*/
+            lv_fs_file_t f;
+            lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
+            if(res != LV_FS_RES_OK) return LV_RES_INV;
+            uint8_t headers[54];
+
+            lv_fs_read(&f, headers, 54, NULL);
+            uint32_t w;
+            uint32_t h;
+            memcpy(&w, headers + 18, 4);
+            memcpy(&h, headers + 22, 4);
+            header->w = w;
+            header->h = h;
+            header->always_zero = 0;
+            lv_fs_close(&f);
 #if LV_COLOR_DEPTH == 32
-             uint16_t bpp;
-             memcpy(&bpp, headers + 28, 2);
-             header->cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+            uint16_t bpp;
+            memcpy(&bpp, headers + 28, 2);
+            header->cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
 #else
-             header->cf = LV_IMG_CF_TRUE_COLOR;
+            header->cf = LV_IMG_CF_TRUE_COLOR;
 #endif
-             return LV_RES_OK;
-         }
-     }
-     /* BMP file as data not supported for simplicity.
-      * Convert them to LVGL compatible C arrays directly. */
-     else if(src_type == LV_IMG_SRC_VARIABLE) {
-         return LV_RES_INV;
-     }
+            return LV_RES_OK;
+        }
+    }
+    /* BMP file as data not supported for simplicity.
+     * Convert them to LVGL compatible C arrays directly. */
+    else if(src_type == LV_IMG_SRC_VARIABLE) {
+        return LV_RES_INV;
+    }
 
-     return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
+    return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
 }
 
 
@@ -123,8 +123,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
  */
 static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
-
-    (void) decoder; /*Unused*/
+    LV_UNUSED(decoder);
 
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
@@ -172,6 +171,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
                                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
+    LV_UNUSED(decoder);
 
     bmp_dsc_t * b = dsc->user_data;
     y = (b->px_height - 1) - y; /*BMP images are stored upside down*/
@@ -218,7 +218,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
  */
 static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
-    (void) decoder; /*Unused*/
+    LV_UNUSED(decoder);
     bmp_dsc_t * b = dsc->user_data;
     lv_fs_close(&b->f);
     lv_mem_free(dsc->user_data);

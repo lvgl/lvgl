@@ -788,8 +788,8 @@ static JRESULT mcu_load (
 static JRESULT mcu_output (
 	JDEC* jd,			/* Pointer to the decompressor object */
 	int (*outfunc)(JDEC*, void*, JRECT*),	/* RGB output function */
-	unsigned int x,		/* MCU location in the image */
-	unsigned int y		/* MCU location in the image */
+	unsigned int img_x,		/* MCU location in the image */
+	unsigned int img_y		/* MCU location in the image */
 )
 {
 	const int CVACC = (sizeof (int) > 2) ? 1024 : 128;	/* Adaptive accuracy for both 16-/32-bit systems */
@@ -801,15 +801,15 @@ static JRESULT mcu_output (
 
 
 	mx = jd->msx * 8; my = jd->msy * 8;					/* MCU size (pixel) */
-	rx = (x + mx <= jd->width) ? mx : jd->width - x;	/* Output rectangular size (it may be clipped at right/bottom end of image) */
-	ry = (y + my <= jd->height) ? my : jd->height - y;
+	rx = (img_x + mx <= jd->width) ? mx : jd->width - img_x;	/* Output rectangular size (it may be clipped at right/bottom end of image) */
+	ry = (img_y + my <= jd->height) ? my : jd->height - img_y;
 	if (JD_USE_SCALE) {
 		rx >>= jd->scale; ry >>= jd->scale;
 		if (!rx || !ry) return JDR_OK;					/* Skip this MCU if all pixel is to be rounded off */
-		x >>= jd->scale; y >>= jd->scale;
+		img_x >>= jd->scale; img_y >>= jd->scale;
 	}
-	rect.left = x; rect.right = x + rx - 1;				/* Rectangular area in the frame buffer */
-	rect.top = y; rect.bottom = y + ry - 1;
+	rect.left = img_x; rect.right = img_x + rx - 1;				/* Rectangular area in the frame buffer */
+	rect.top = img_y; rect.bottom = img_y + ry - 1;
 
 
 	if (!JD_USE_SCALE || jd->scale != 3) {	/* Not for 1/8 scaling */

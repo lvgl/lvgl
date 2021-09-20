@@ -226,7 +226,8 @@ static char next_fn[256];
  */
 static void * fs_dir_open (lv_fs_drv_t * drv, const char *path)
 {
-    (void) drv;     /*Unused*/
+    LV_UNUSED(drv);
+
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
@@ -271,7 +272,9 @@ static void * fs_dir_open (lv_fs_drv_t * drv, const char *path)
  */
 static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * dir_p, char *fn)
 {
-//     (void) drv;     /*Unused*/
+    LV_UNUSED(drv);
+    LV_UNUSED(dir_p);
+    LV_UNUSED(fn);
 
 // #ifndef WIN32
 //     struct dirent *entry;
@@ -319,7 +322,7 @@ static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * dir_p, char *fn)
  */
 static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p)
 {
-    (void) drv;     /*Unused*/
+    LV_UNUSED(drv);
 #ifndef WIN32
     closedir(dir_p);
 #else

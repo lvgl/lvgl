@@ -4,7 +4,6 @@
 void lv_example_sjpg_1(void)
 {
   lv_obj_t * wp;
-  lv_obj_t * img;
 
   wp = lv_img_create(lv_scr_act());
   /* Assuming a File system is attached to letter 'A'

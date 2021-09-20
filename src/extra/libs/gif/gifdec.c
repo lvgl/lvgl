@@ -583,12 +583,6 @@ gd_render_frame(gd_GIF *gif, uint8_t *buffer)
     render_frame_rect(gif, buffer);
 }
 
-int
-gd_is_bgcolor(gd_GIF *gif, uint8_t color[3])
-{
-    return !memcmp(&gif->palette->colors[gif->bgindex*3], color, 3);
-}
-
 void
 gd_rewind(gd_GIF *gif)
 {
