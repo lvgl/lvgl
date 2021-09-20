@@ -331,7 +331,7 @@ bool lv_btnmatrix_has_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
     if(btn_id >= btnm->btn_cnt) return false;
 
-    return (btnm->ctrl_bits[btn_id] & ctrl) ? true : false;
+    return ((btnm->ctrl_bits[btn_id] & ctrl) == ctrl) ? true : false;
 }
 
 bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)

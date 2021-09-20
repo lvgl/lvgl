@@ -32,6 +32,7 @@
 - fix(zoom) multiplication overflow with zoom calculations on 16-bit platforms
 - feat(msgbox): omit title label unless needed
 - feat(msgbox): add function to get selected button index
+- fix(btnmatrix): make ORed values work correctly with lv_btnmatrix_has_btn_ctrl
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
