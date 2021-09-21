@@ -334,6 +334,16 @@ void * lv_obj_get_child_group(const lv_obj_t * obj)
     else return NULL;
 }
 
+lv_group_t * lv_obj_find_top_child_group(lv_obj_t * obj)
+{
+    lv_group_t *group = NULL;
+    do {
+        group = lv_obj_get_child_group(obj);
+        obj = lv_obj_get_parent(obj);
+    } while(group == NULL && obj != NULL);
+    return group;
+}
+
 /*-------------------
  * OTHER FUNCTIONS
  *------------------*/

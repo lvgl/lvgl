@@ -324,6 +324,13 @@ void * lv_obj_get_group(const lv_obj_t * obj);
 void * lv_obj_get_child_group(const lv_obj_t * obj);
 
 /**
+ * Get child group of the object, and find from parent if not set.
+ * @param obj pointer to an object
+ * @return associated group object
+ */
+lv_group_t * lv_obj_find_top_child_group(lv_obj_t * obj);
+
+/**
  * Get the user_data field of the object
  * @param obj   pointer to an object
  * @return      the pointer to the user_data of the object

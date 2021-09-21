@@ -116,7 +116,7 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_group_t * def_group = NULL;
     if (parent){
-        def_group = lv_group_get_child_group(parent);
+        def_group = lv_obj_find_top_child_group(parent);
     }
     if (!def_group) {
         def_group = lv_group_get_default();

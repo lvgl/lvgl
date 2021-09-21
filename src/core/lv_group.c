@@ -97,16 +97,6 @@ lv_group_t * lv_group_get_default(void)
     return default_group;
 }
 
-lv_group_t * lv_group_get_child_group(lv_obj_t * obj)
-{
-    lv_group_t *group = NULL;
-    do {
-        group = lv_obj_get_child_group(obj);
-        obj = lv_obj_get_parent(obj);
-    } while(group == NULL && obj != NULL);
-    return group;
-}
-
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
