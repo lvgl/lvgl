@@ -217,6 +217,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
+void lv_obj_set_child_group(lv_obj_t * obj, lv_group_t * group)
+{
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
+    obj->spec_attr->child_group_p = group;
+}
+
 /*-----------------
  * Attribute set
  *----------------*/
@@ -317,6 +323,14 @@ void * lv_obj_get_group(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr) return obj->spec_attr->group_p;
+    else return NULL;
+}
+
+void * lv_obj_get_child_group(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(obj->spec_attr) return obj->spec_attr->child_group_p;
     else return NULL;
 }
 

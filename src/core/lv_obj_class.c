@@ -113,12 +113,19 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
 
     lv_obj_refresh_self_size(obj);
 
-    lv_group_t * def_group = lv_group_get_default();
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    lv_group_t * def_group = NULL;
+    if (parent){
+        def_group = lv_group_get_child_group(parent);
+    }
+    if (!def_group) {
+        def_group = lv_group_get_default();
+    }
+
     if(def_group && lv_obj_is_group_def(obj)) {
         lv_group_add_obj(def_group, obj);
     }
 
-    lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
         /*Call the ancestor's event handler to the parent to notify it about the new child.
          *Also triggers layout update*/

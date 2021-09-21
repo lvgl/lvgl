@@ -150,6 +150,7 @@ typedef struct {
     struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
     uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
+    lv_group_t * child_group_p;
 
     struct _lv_event_dsc_t * event_dsc; /**< Dynamically allocated event callback and user data array*/
     lv_point_t scroll;                  /**< The current X/Y scroll offset*/
@@ -253,6 +254,14 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
 /**
+ * Sets the child group of the object. All children will be added to this group
+ * if specified
+ * @param obj   pointer to an object
+ * @param group group for added children
+ */
+void lv_obj_set_child_group(lv_obj_t * obj, lv_group_t * group);
+
+/**
  * Set the user_data field of the object
  * @param obj   pointer to an object
  * @param user_data   pointer to the new user_data.
@@ -305,6 +314,14 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
  * @return      the pointer to group of the object
  */
 void * lv_obj_get_group(const lv_obj_t * obj);
+
+/**
+ * Get associated child group of the object. Children should be assigned
+ * to this group if set
+ * @param obj  pointer to an object
+ * @return     associated group object
+ */
+void * lv_obj_get_child_group(const lv_obj_t * obj);
 
 /**
  * Get the user_data field of the object

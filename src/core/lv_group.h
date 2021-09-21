@@ -112,6 +112,8 @@ void lv_group_set_default(lv_group_t * group);
  */
 lv_group_t * lv_group_get_default(void);
 
+lv_group_t * lv_group_get_child_group(struct _lv_obj_t * obj);
+
 /**
  * Add an object to a group
  * @param group     pointer to a group
