@@ -80,6 +80,11 @@ typedef struct _lv_disp_drv_t {
     lv_coord_t hor_res;         /**< Horizontal resolution.*/
     lv_coord_t ver_res;         /**< Vertical resolution.*/
 
+    lv_coord_t physical_hor_res;     /**< Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
+    lv_coord_t physical_ver_res;     /**< Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
+    lv_coord_t offset_x;             /**< Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
+    lv_coord_t offset_y;             /**< Vertical offset from the full / physical display. Set to 0 for fullscreen mode.*/
+
     /** Pointer to a buffer initialized with `lv_disp_draw_buf_init()`.
      * LVGL will use this buffer(s) to draw the screens contents*/
     lv_disp_draw_buf_t * draw_buf;
