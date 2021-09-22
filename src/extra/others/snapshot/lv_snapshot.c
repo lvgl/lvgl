@@ -61,6 +61,9 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
     /*Width and height determine snapshot image size.*/
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    w += ext_size * 2;
+    h += ext_size * 2;
 
     uint8_t px_size = lv_img_cf_get_px_size(cf);
     return w * h * ((px_size + 7) >> 3);
@@ -98,10 +101,14 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     /*Width and height determine snapshot image size.*/
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    w += ext_size * 2;
+    h += ext_size * 2;
 
     /*Backup obj original info.*/
-    lv_disp_t * disp_old = lv_obj_get_disp(obj);
     lv_obj_t * parent_old = lv_obj_get_parent(obj);
+    lv_area_t coords_bkp;
+    lv_area_copy(&coords_bkp, &obj->coords);
 
     lv_memset(buf, 0x00, buff_size);
     lv_memset_00(dsc, sizeof(lv_img_dsc_t));
@@ -116,8 +123,8 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     lv_disp_drv_init(&driver);
     driver.draw_buf = &draw_buf;
-    driver.hor_res = lv_disp_get_hor_res(disp_old);
-    driver.ver_res = lv_disp_get_ver_res(disp_old);
+    driver.hor_res = w;
+    driver.ver_res = h;
     lv_disp_drv_use_generic_set_px_cb(&driver, cf);
 
     disp = lv_disp_drv_register(&driver);
@@ -139,10 +146,10 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     disp->inv_p = 0;
 
-    obj->coords.x2 = lv_area_get_width(&obj->coords) - 1;
-    obj->coords.x1 = 0;
-    obj->coords.y2 = lv_area_get_height(&obj->coords) - 1;
-    obj->coords.y1 = 0;
+    obj->coords.x2 = w - ext_size - 1;
+    obj->coords.x1 = ext_size;
+    obj->coords.y2 = h - ext_size - 1;
+    obj->coords.y1 = ext_size;
 
     lv_obj_invalidate(obj);
 
@@ -156,8 +163,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     lv_disp_remove(disp);
 
-    lv_obj_mark_layout_as_dirty(obj);
-    lv_obj_invalidate(obj);
+    lv_area_copy(&obj->coords, &coords_bkp);
 
     dsc->data = buf;
     dsc->header.w = lv_area_get_width(&draw_buf.area);
