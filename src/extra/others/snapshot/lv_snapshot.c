@@ -138,6 +138,12 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     obj->parent = screen;
 
     disp->inv_p = 0;
+
+    obj->coords.x2 = lv_area_get_width(&obj->coords) - 1;
+    obj->coords.x1 = 0;
+    obj->coords.y2 = lv_area_get_height(&obj->coords) - 1;
+    obj->coords.y1 = 0;
+
     lv_obj_invalidate(obj);
 
     /*Don't call lv_refr_now to avoid animation disruption */
@@ -150,9 +156,12 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     lv_disp_remove(disp);
 
+    lv_obj_mark_layout_as_dirty(obj);
+    lv_obj_invalidate(obj);
+
     dsc->data = buf;
-    dsc->header.w = w;
-    dsc->header.h = h;
+    dsc->header.w = lv_area_get_width(&draw_buf.area);
+    dsc->header.h = lv_area_get_height(&draw_buf.area);
     dsc->header.cf = cf;
     return LV_RES_OK;
 }
