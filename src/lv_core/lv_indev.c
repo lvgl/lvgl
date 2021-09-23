@@ -307,14 +307,14 @@ void lv_indev_wait_release(lv_indev_t * indev)
  * @param indev pointer to an input device
  * @return pointer to the indev read refresher task. (NULL on error)
  */
-lv_task_t * lv_indev_get_read_task(lv_disp_t * indev)
+lv_task_t * lv_indev_get_read_task(lv_indev_t * indev)
 {
     if(!indev) {
         LV_LOG_WARN("lv_indev_get_read_task: indev was NULL");
         return NULL;
     }
 
-    return indev->refr_task;
+    return indev->driver.read_task;
 }
 
 /**
