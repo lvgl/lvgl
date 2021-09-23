@@ -33,6 +33,7 @@
 - feat(msgbox): omit title label unless needed
 - feat(msgbox): add function to get selected button index
 - fix(btnmatrix): make ORed values work correctly with lv_btnmatrix_has_btn_ctrl
+- fix(snapshot): snapshot is affected by parent's style because of wrong coordinates.
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
