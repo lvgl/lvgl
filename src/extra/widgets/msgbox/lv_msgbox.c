@@ -9,11 +9,13 @@
 #include "lv_msgbox.h"
 #if LV_USE_MSGBOX
 
+#include "../../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_MSGBOX_FLAG_AUTO_PARENT  LV_OBJ_FLAG_WIDGET_1        /*Mark that the parent was automatically created*/
+#define MY_CLASS    &lv_msgbox_class
 
 /**********************
  *      TYPEDEFS
@@ -135,30 +137,35 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->title;
 }
 
 lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->close_btn;
 }
 
 lv_obj_t * lv_msgbox_get_text(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->text;
 }
 
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->content;
 }
 
 lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->btns;
 }

@@ -9,6 +9,8 @@
 #include "lv_meter.h"
 #if LV_USE_METER != 0
 
+#include "../../../misc/lv_assert.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -63,6 +65,7 @@ lv_obj_t * lv_meter_create(lv_obj_t * parent)
 
 lv_meter_scale_t * lv_meter_add_scale(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
 
     lv_meter_scale_t * scale = _lv_ll_ins_head(&meter->scale_ll);
@@ -119,6 +122,7 @@ void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t 
 lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width,
                                                 lv_color_t color, int16_t r_mod)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
@@ -138,6 +142,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
 lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src,
                                                lv_coord_t pivot_x, lv_coord_t pivot_y)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
@@ -157,6 +162,7 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
 lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color,
                                         int16_t r_mod)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
@@ -176,6 +182,7 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale
 lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t * scale, lv_color_t color_start,
                                                 lv_color_t color_end, bool local, int16_t width_mod)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
@@ -272,6 +279,7 @@ static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
     _lv_ll_clear(&meter->indicator_ll);
     _lv_ll_clear(&meter->scale_ll);

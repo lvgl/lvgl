@@ -9,6 +9,8 @@
 #include "lv_chart.h"
 #if LV_USE_CHART != 0
 
+#include "../../../misc/lv_assert.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -268,6 +270,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(ser);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(id >= chart->point_cnt) {

@@ -9,9 +9,12 @@
 #include "lv_tabview.h"
 #if LV_USE_TABVIEW
 
+#include "../../../misc/lv_assert.h"
+
 /*********************
  *      DEFINES
  *********************/
+#define MY_CLASS    &lv_tabview_class
 
 /**********************
  *      TYPEDEFS
@@ -63,6 +66,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
     lv_obj_t * cont = lv_tabview_get_content(obj);
 
@@ -119,6 +123,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
 void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     if(id >= tabview->tab_cnt) {
@@ -147,6 +152,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 
 uint16_t lv_tabview_get_tab_act(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
     return tabview->tab_cur;
 }

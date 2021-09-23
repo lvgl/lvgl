@@ -11,10 +11,12 @@
 #if LV_USE_KEYBOARD
 
 #include "../../../widgets/lv_textarea.h"
+#include "../../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define MY_CLASS    &lv_keyboard_class
 
 /**********************
  *      TYPEDEFS
@@ -142,6 +144,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
         LV_ASSERT_OBJ(ta, &lv_textarea_class);
     }
 
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
     /*Hide the cursor of the old Text area if cursor management is enabled*/
@@ -164,6 +167,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
  */
 void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     if(keyboard->mode == mode) return;
 
@@ -198,6 +202,7 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * m
  */
 lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->ta;
 }
@@ -209,6 +214,7 @@ lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
  */
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->mode;
 }
@@ -228,6 +234,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
 
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     uint16_t btn_id   = lv_btnmatrix_get_selected_btn(obj);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
