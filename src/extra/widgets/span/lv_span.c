@@ -804,6 +804,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);;
     lv_coord_t max_width = lv_area_get_width(coords);
     lv_coord_t max_w  = max_width - spans->indent; /* first line need minus indent */
+    lv_opa_t obj_opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
 
     /* coords of draw span-txt */
     lv_point_t txt_pos;
@@ -945,6 +946,9 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             pos.y = txt_pos.y + max_line_h - pinfo->line_h;
             lv_color_t letter_color = lv_span_get_style_text_color(obj, pinfo->span);
             lv_opa_t letter_opa = lv_span_get_style_text_opa(obj, pinfo->span);
+            if(obj_opa < LV_OPA_MAX) {
+                letter_opa = (uint16_t)((uint16_t)letter_opa * obj_opa) >> 8;
+            }
             lv_blend_mode_t blend_mode = lv_span_get_style_text_blend_mode(obj, pinfo->span);
             uint32_t txt_bytes = pinfo->bytes;
 
