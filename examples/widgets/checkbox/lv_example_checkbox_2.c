@@ -16,8 +16,8 @@ static void radio_event_handler(lv_event_t * e)
     /*Do nothing if the container was clicked*/
     if(act_cb == cont) return;
 
-    lv_obj_clear_state(old_cb, LV_STATE_CHECKED);   /*Uncheck the previous radio button*/
-    lv_obj_add_state(act_cb, LV_STATE_CHECKED);     /*Uncheck the curernt radio button*/
+    lv_obj_clear_state(old_cb, LV_STATE_CHECKED);   /*Uncheck the previous radio box1 button*/
+    lv_obj_add_state(act_cb, LV_STATE_CHECKED);     /*Uncheck the curernt radio box2 button*/
 
     *active_id = lv_obj_get_index(act_cb);
 
