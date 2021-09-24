@@ -123,8 +123,10 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     lv_disp_drv_init(&driver);
     driver.draw_buf = &draw_buf;
-    driver.hor_res = w;
-    driver.ver_res = h;
+
+    /*Make the display big enough to involve the objects on its original places. */
+    driver.hor_res = obj->coords.x1 + w;
+    driver.ver_res = obj->coords.y1 + h;
     lv_disp_drv_use_generic_set_px_cb(&driver, cf);
 
     disp = lv_disp_drv_register(&driver);
@@ -146,10 +148,11 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     disp->inv_p = 0;
 
-    obj->coords.x2 = w - ext_size - 1;
-    obj->coords.x1 = ext_size;
-    obj->coords.y2 = h - ext_size - 1;
-    obj->coords.y1 = ext_size;
+    /*Shift obj by ext_size, so there is room for shadow etc.*/
+    obj->coords.x2 += ext_size;
+    obj->coords.x1 += ext_size;
+    obj->coords.y2 += ext_size;
+    obj->coords.y1 += ext_size;
 
     lv_obj_invalidate(obj);
 
