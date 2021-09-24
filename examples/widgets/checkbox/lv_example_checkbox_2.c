@@ -21,7 +21,7 @@ static void radio_event_handler(lv_event_t * e)
 
     *active_id = lv_obj_get_index(act_cb);
 
-    LV_LOG_USER("Selected radio buttons: %d, %d\n", active_index_1, active_index_2);
+    LV_LOG_USER("Selected radio buttons: %d, %d", active_index_1, active_index_2);
 }
 
 
@@ -42,7 +42,7 @@ void lv_example_checkbox_2(void)
     /* The idea is to enable `LV_OBJ_FLAG_EVENT_BUBBLE` on checkboxes and process the
      * `LV_EVENT_CLICKED` on the container.
      * A variable is passed as event user data where the index of the active
-     * redio butto nis saved */
+     * radiobutton is saved */
 
 
     lv_style_init(&style_radio);
@@ -59,7 +59,7 @@ void lv_example_checkbox_2(void)
     lv_obj_set_size(cont1, lv_pct(40), lv_pct(80));
     lv_obj_add_event_cb(cont1, radio_event_handler, LV_EVENT_CLICKED, &active_index_1);
 
-    for (i = 0;i < 5;i++) {
+    for (i = 0;i < 1;i++) {
         lv_snprintf(buf, sizeof(buf), "A %d", i + 1);
         radiobutton_create(cont1, buf);
 
