@@ -106,6 +106,7 @@ static void lv_menu_back_event_cb(lv_event_t * e);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+lv_menu_item_t * lv_menu_item_create(void);
 
 lv_obj_t * lv_menu_create(lv_obj_t * parent)
 {
@@ -371,8 +372,6 @@ lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_
 
 bool lv_menu_item_remove_obj(lv_menu_item_t * menu_item, lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(menu, MY_CLASS);
-
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {
@@ -418,8 +417,6 @@ lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv
 
 bool lv_menu_item_remove_menu(lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
 {
-    LV_ASSERT_OBJ(menu, MY_CLASS);
-
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {
