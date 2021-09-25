@@ -173,6 +173,10 @@ menu "LVGL configuration"
                     lv_init().
             config LV_USE_GPU_NXP_VG_LITE
                 bool "Use NXP's VG-Lite GPU iMX RTxxx platforms."
+
+            config LV_USE_GPU_SDL
+                bool "Use SDL renderer API"
+                default n
         endmenu
 
         menu "Logging"
