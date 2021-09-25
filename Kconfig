@@ -128,6 +128,16 @@ menu "LVGL configuration"
                     shadow size is `shadow_width + radius`.
                     Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
 
+            config LV_CIRCLE_CACHE_SIZE
+                int "Set number of maximally cached circle data"
+                depends on LV_DRAW_COMPLEX
+                default 4
+                help
+                    The circumference of 1/4 circle are saved for anti-aliasing
+                    radius * 4 bytes are used per circle (the most often used
+                    radiuses are saved).
+                    Set to 0 to disable caching.
+
             config LV_IMG_CACHE_DEF_SIZE
                 int "Default image cache size. 0 to disable caching."
                 default 0
