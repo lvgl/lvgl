@@ -88,6 +88,8 @@ void lv_example_line_1(void);
 void lv_example_list_1(void);
 void lv_example_list_2(void);
 
+void lv_example_menu_1(void);
+
 void lv_example_meter_1(void);
 void lv_example_meter_2(void);
 void lv_example_meter_3(void);
