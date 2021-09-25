@@ -1,6 +1,7 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- Fixed lv_deinit declaration when LV_USE_GPU_SDL is enabled
 - added sample lv_example_list_2.py
 - lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
 - feat(example) stacked area chart lv_example_chart_8 added.
