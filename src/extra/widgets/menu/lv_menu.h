@@ -124,10 +124,10 @@ void lv_menu_item_del_recursive(lv_menu_item_t * menu_item);
 lv_obj_t * lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
 lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
                                 lv_obj_t * obj);
-bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
+bool lv_menu_item_remove_obj(lv_menu_item_t * menu_item, lv_obj_t * obj);
 lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
                                  lv_menu_item_t * new_menu_item);
-bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove);
+bool lv_menu_item_remove_menu(lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove);
 void lv_menu_refresh(lv_obj_t * obj);
 bool lv_menu_item_back_btn_is_root(lv_obj_t * obj);
 lv_obj_t * lv_menu_item_create_text(lv_obj_t * parent, const char * icon, const char * txt,

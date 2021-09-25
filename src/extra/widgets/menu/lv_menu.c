@@ -329,7 +329,7 @@ void lv_menu_item_del_recursive(lv_menu_item_t * menu_item)
 lv_obj_t * lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
-    LV_ASSERT_OBJ(cont, &lv_menu_cont_class); /* Must be `lv_menu_cont_class` */
+    LV_ASSERT_OBJ(obj, &lv_menu_cont_class); /* Must be `lv_menu_cont_class` */
     menu_item->obj = obj;
 
     /* Make the object clickable */
@@ -369,7 +369,7 @@ lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_
     return menu_item->items[menu_item->child_cnt - 1]->obj;
 }
 
-bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
+bool lv_menu_item_remove_obj(lv_menu_item_t * menu_item, lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
 
@@ -408,6 +408,7 @@ lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv
 
     menu_item->items = lv_mem_realloc(menu_item->items, menu_item->child_cnt * sizeof(lv_menu_item_t *));
 
+    new_menu_item->section = section;
     menu_item->items[menu_item->child_cnt - 1] = new_menu_item;
 
     lv_obj_set_parent(menu_item->items[menu_item->child_cnt - 1]->obj, ((lv_menu_t *)menu)->storage);
@@ -415,7 +416,7 @@ lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv
     return menu_item->items[menu_item->child_cnt - 1]->obj;
 }
 
-bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
+bool lv_menu_item_remove_menu(lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
 
@@ -788,7 +789,7 @@ static void lv_menu_clear_contents(lv_obj_t * obj, lv_obj_t * target_content)
 
         if(lv_obj_check_type(child, &lv_menu_section_class)) {
             uint32_t  section_child_cnt = lv_obj_get_child_cnt(child);
-            for(uint32_t  i = 0; i < section_child_cnt; i++) {
+            for(uint32_t  i2 = 0; i2 < section_child_cnt; i2++) {
                 lv_obj_set_parent(lv_obj_get_child(child, -1), menu->storage);
             }
             lv_obj_del(child);
