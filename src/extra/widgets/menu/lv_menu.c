@@ -306,7 +306,7 @@ void lv_menu_set_sidebar_back_btn_text(lv_obj_t * obj, const char * icon, const 
 }
 
 /* Core menu item functions */
-lv_menu_item_t * lv_menu_item_create()
+lv_menu_item_t * lv_menu_item_create(void)
 {
     lv_menu_item_t * menu_item = lv_mem_alloc(sizeof(lv_menu_item_t));
     menu_item->obj = NULL;
