@@ -119,17 +119,17 @@ void lv_menu_set_sidebar_back_btn_text(lv_obj_t * obj, const char * icon, const 
 
 /* Core menu item functions */
 lv_menu_item_t * lv_menu_item_create();
-void lv_menu_item_del(lv_menu_item_t * menu_item);
-void lv_menu_item_del_recursive(lv_menu_item_t * menu_item);
+void lv_menu_item_del(lv_obj_t * menu, lv_menu_item_t * menu_item);
+void lv_menu_item_del_recursive(lv_obj_t * menu, lv_menu_item_t * menu_item);
 lv_obj_t * lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
 lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
                                 lv_obj_t * obj);
-bool lv_menu_item_remove_obj(lv_menu_item_t * menu_item, lv_obj_t * obj);
+bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
 lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
                                  lv_menu_item_t * new_menu_item);
-bool lv_menu_item_remove_menu(lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove);
+bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove);
 void lv_menu_refresh(lv_obj_t * obj);
-bool lv_menu_item_back_btn_is_root(lv_obj_t * obj);
+bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
 lv_obj_t * lv_menu_item_create_text(lv_obj_t * parent, const char * icon, const char * txt,
                                         lv_menu_builder_variant_t builder_variant);
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent);

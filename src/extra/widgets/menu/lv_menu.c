@@ -263,8 +263,9 @@ void lv_menu_set_mode_sidebar(lv_obj_t * obj, lv_menu_mode_sidebar_t mode_sideba
     }
 }
 
-bool lv_menu_item_back_btn_is_root(lv_obj_t * obj)
+bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj)
 {
+    LV_UNUSED(menu);
     if(lv_obj_check_type(obj, &lv_menu_cont_class)) {
         lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
         if(cont->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
@@ -317,13 +318,15 @@ lv_menu_item_t * lv_menu_item_create(void)
     return menu_item;
 }
 
-void lv_menu_item_del(lv_menu_item_t * menu_item)
+void lv_menu_item_del(lv_obj_t * menu, lv_menu_item_t * menu_item)
 {
+	LV_UNUSED(menu);
     lv_menu_item_del_internal(menu_item, false, true);
 }
 
-void lv_menu_item_del_recursive(lv_menu_item_t * menu_item)
+void lv_menu_item_del_recursive(lv_obj_t * menu, lv_menu_item_t * menu_item)
 {
+	LV_UNUSED(menu);
     lv_menu_item_del_internal(menu_item, true, true);
 }
 
@@ -370,8 +373,9 @@ lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_
     return menu_item->items[menu_item->child_cnt - 1]->obj;
 }
 
-bool lv_menu_item_remove_obj(lv_menu_item_t * menu_item, lv_obj_t * obj)
-{
+bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
+{	
+	LV_UNUSED(menu)
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {
@@ -415,8 +419,9 @@ lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv
     return menu_item->items[menu_item->child_cnt - 1]->obj;
 }
 
-bool lv_menu_item_remove_menu(lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
+bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
 {
+	LV_UNUSED(menu);
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {

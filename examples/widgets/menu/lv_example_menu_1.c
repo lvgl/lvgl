@@ -8,7 +8,7 @@ static void back_event_handler(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(lv_menu_item_back_btn_is_root(obj)) {
+    if(lv_menu_item_back_btn_is_root(menu, obj)) {
         lv_obj_t * mbox1 = lv_msgbox_create(NULL, "Hello", "Root back btn click.", NULL, true);
         lv_obj_center(mbox1);
     }
