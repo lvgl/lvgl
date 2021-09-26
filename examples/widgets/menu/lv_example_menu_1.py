@@ -38,11 +38,11 @@ menu.item_add_slider(sub_menu_mechanics_items, lv.menu.SECTION.ON, lv.SYMBOL.SET
 sub_menu_mode_items = menu.item_create()
 menu.item_set_text(sub_menu_mode_items, lv.SYMBOL.SETTINGS, "Menu mode")
 menu.item_add_seperator(sub_menu_mode_items, lv.menu.SECTION.OFF)
-switch_cont = menu.item_add_switch(sub_menu_mode_items, lv.menu.SECTION.ON, lv.SYMBOL.SETTINGS, "Sidebar enable", True);
+switch_cont = menu.item_add_switch(sub_menu_mode_items, lv.menu.SECTION.ON, lv.SYMBOL.SETTINGS, "Sidebar enable", True)
 switch = switch_cont.get_child(2)
 switch.add_event_cb(switch_handler, lv.EVENT.VALUE_CHANGED, None)
 
-sub_menu_about_softwareinfo_items = menu.item_create();
+sub_menu_about_softwareinfo_items = menu.item_create()
 menu.item_set_text(sub_menu_about_softwareinfo_items, None, "Software information")
 menu.item_add_text(sub_menu_about_softwareinfo_items, lv.menu.SECTION.ON, None, "Version 1.0")
 

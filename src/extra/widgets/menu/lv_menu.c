@@ -375,7 +375,7 @@ lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_
 
 bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
 {	
-	LV_UNUSED(menu)
+	LV_UNUSED(menu);
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {
@@ -657,7 +657,7 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_t * main_content = lv_obj_class_create_obj(&lv_menu_main_content_cont_class, main_cont);
     lv_obj_class_init_obj(main_content);
-    lv_obj_set_size(main_content, LV_PCT(100), LV_SIZE_CONTENT);;
+    lv_obj_set_size(main_content, LV_PCT(100), LV_SIZE_CONTENT);
     if(menu->mode_header == LV_MENU_MODE_HEADER_FIXED) {
         /* Content should fill the remaining space */
         lv_obj_set_flex_grow(main_content, 1);
