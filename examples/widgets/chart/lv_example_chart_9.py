@@ -9,8 +9,6 @@ def add_data(t):
     a = chart.get_y_array(ser)
 
     a[(s + 1) % p] = lv.CHART_POINT.NONE
-    a[(s + 2) % p] = lv.CHART_POINT.NONE
-    a[(s + 2) % p] = lv.CHART_POINT.NONE
 
     chart.refresh()
 
