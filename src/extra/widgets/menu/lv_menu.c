@@ -107,6 +107,7 @@ static void lv_menu_back_event_cb(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 lv_menu_item_t * lv_menu_item_create(void);
+bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
 
 lv_obj_t * lv_menu_create(lv_obj_t * parent)
 {
@@ -122,37 +123,49 @@ void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item)
 
     lv_menu_t * menu = (lv_menu_t *)obj;
 
-    /* Clean or move objects on screen */
     lv_menu_clear_contents(obj, menu->main_content);
-
-    if(menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_DISABLED) {
-        lv_menu_clear_contents(obj, menu->sidebar_content);
-    }
 
     lv_ll_t * history_ll = &(menu->history_ll);
 
     /* The root menu */
     lv_menu_history_t * root_hist = _lv_ll_get_tail(history_ll);
 
-    /* The current menu */
-    lv_menu_history_t * act_hist = _lv_ll_get_head(history_ll);
-
-    /* The previous menu */
-    lv_menu_history_t * prev_hist = NULL;
-    if(act_hist != NULL) {
-        prev_hist = _lv_ll_get_next(history_ll, act_hist);
-    }
-
     /* Add a new node */
     lv_menu_history_t * new_node = _lv_ll_ins_head(history_ll);
     new_node->menu_item = menu_item;
+    menu->cur_depth++;
+
+    /* Sidebar management*/
+    if(menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED) {
+        /* Sidebar should be enabled */
+        if(!menu->sidebar_generated) {
+            /* Generate and show sidebar */
+            if(root_hist != NULL) lv_menu_generate(obj, root_hist->menu_item, true);
+            lv_obj_clear_flag(menu->sidebar, LV_OBJ_FLAG_HIDDEN);
+            menu->sidebar_generated = true;
+        }
+        /* Show checked state */
+        if(menu->selected_tab != NULL) {
+            lv_obj_add_state(menu->selected_tab, LV_STATE_CHECKED);
+        }
+    }
+    else {
+        /* Sidebar should be disabled */
+        if(menu->sidebar_generated) {
+            /* Clear and hide sidebar */
+            lv_menu_clear_contents(obj, menu->sidebar_content);
+            lv_obj_add_flag(menu->sidebar, LV_OBJ_FLAG_HIDDEN);
+            menu->sidebar_generated = false;
+        }
+        /* Clear previous checked state */
+        if(menu->selected_tab != NULL) {
+            lv_obj_clear_state(menu->selected_tab, LV_STATE_CHECKED);
+        }
+    }
 
     /* Back btn management */
-    /* Show/hide btns if required */
     if(menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED) {
         /* With sidebar enabled */
-        lv_obj_clear_flag(menu->sidebar, LV_OBJ_FLAG_HIDDEN);
-
         if(menu->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
             /* Root back btn is always shown if enabled*/
             lv_obj_clear_flag(menu->sidebar_back_btn, LV_OBJ_FLAG_HIDDEN);
@@ -161,7 +174,7 @@ void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item)
             lv_obj_add_flag(menu->sidebar_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
 
-        if(prev_hist != NULL) {
+        if(menu->cur_depth >= 3) {
             lv_obj_clear_flag(menu->main_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
         else {
@@ -170,9 +183,7 @@ void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item)
     }
     else {
         /* With sidebar disabled */
-        lv_obj_add_flag(menu->sidebar, LV_OBJ_FLAG_HIDDEN);
-
-        if(act_hist != NULL || menu->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
+        if(menu->cur_depth >= 2 || menu->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
             lv_obj_clear_flag(menu->main_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
         else {
@@ -180,30 +191,7 @@ void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item)
         }
     }
 
-    lv_menu_generate(obj, menu_item, menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED && act_hist == NULL ? true : false);
-
-    if(menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED) {
-        /* Check that sidebar contents are not removed, if not regenerate them */
-        if(root_hist != NULL) {
-            uint32_t menu_content_child_cnt = lv_obj_get_child_cnt(menu->sidebar_content);
-            uint32_t menu_content_actual_child_cnt = 0;
-            for(uint32_t  i = 0; i < menu_content_child_cnt; i++) {
-                lv_obj_t * child = lv_obj_get_child(menu->sidebar_content, i);
-                menu_content_actual_child_cnt = lv_obj_check_type(child,
-                                                                  &lv_menu_section_class) ? menu_content_actual_child_cnt + lv_obj_get_child_cnt(child) : menu_content_actual_child_cnt +
-                                                1;
-            }
-
-            if(root_hist->menu_item->child_cnt != menu_content_actual_child_cnt) {
-                lv_menu_generate(obj, root_hist->menu_item, true);
-            }
-
-            /* Check selected obj */
-            if(menu->selected_tab != NULL) {
-                lv_obj_add_state(menu->selected_tab, LV_STATE_CHECKED);
-            }
-        }
-    }
+    lv_menu_generate(obj, menu_item, menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED && menu->cur_depth <= 1 ? true : false);
 
     /* Refresh size */
     lv_obj_refr_size(menu->main_header);
@@ -250,15 +238,7 @@ void lv_menu_set_mode_sidebar(lv_obj_t * obj, lv_menu_mode_sidebar_t mode_sideba
     lv_menu_t * menu = (lv_menu_t *)obj;
 
     if(menu->mode_sidebar != mode_sidebar) {
-        if(menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED) {
-            /* Clear previous checked state */
-            if(menu->selected_tab != NULL) {
-                lv_obj_clear_state(menu->selected_tab, LV_STATE_CHECKED);
-            }
-        }
-
         menu->mode_sidebar = mode_sidebar;
-
         lv_menu_refresh(obj);
     }
 }
@@ -268,7 +248,7 @@ bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj)
     LV_UNUSED(menu);
     if(lv_obj_check_type(obj, &lv_menu_cont_class)) {
         lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
-        if(cont->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
+        if(cont->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED || ((lv_menu_t *)cont->menu)->prev_depth <= 1) {
             return true;
         }
     }
@@ -320,13 +300,13 @@ lv_menu_item_t * lv_menu_item_create(void)
 
 void lv_menu_item_del(lv_obj_t * menu, lv_menu_item_t * menu_item)
 {
-	LV_UNUSED(menu);
+    LV_UNUSED(menu);
     lv_menu_item_del_internal(menu_item, false, true);
 }
 
 void lv_menu_item_del_recursive(lv_obj_t * menu, lv_menu_item_t * menu_item)
 {
-	LV_UNUSED(menu);
+    LV_UNUSED(menu);
     lv_menu_item_del_internal(menu_item, true, true);
 }
 
@@ -343,7 +323,6 @@ lv_obj_t * lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_
     cont->menu = menu;
     cont->menu_item = menu_item;
     cont->mode_sidebar = LV_MENU_MODE_SIDEBAR_DISABLED;
-    cont->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_DISABLED;
 
     lv_obj_add_event_cb(obj, lv_menu_traverse_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -374,8 +353,8 @@ lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_
 }
 
 bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
-{	
-	LV_UNUSED(menu);
+{
+    LV_UNUSED(menu);
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {
@@ -421,7 +400,7 @@ lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv
 
 bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
 {
-	LV_UNUSED(menu);
+    LV_UNUSED(menu);
     uint32_t menu_item_remove_pos = 0xFFFFFFFF;
 
     for(uint32_t i = 0; i < menu_item->child_cnt; i++) {
@@ -461,6 +440,7 @@ void lv_menu_refresh(lv_obj_t * obj)
         /* Delete the current item from the history */
         _lv_ll_remove(history_ll, act_hist);
         lv_mem_free(act_hist);
+        menu->cur_depth--;
         /* Set it back */
         lv_menu_set(obj, menu_item);
     }
@@ -607,8 +587,11 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_menu_t * menu = (lv_menu_t *)obj;
 
     menu->mode_header = LV_MENU_MODE_HEADER_FIXED;
-    menu->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_ENABLED;
+    menu->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_DISABLED;
     menu->mode_sidebar = LV_MENU_MODE_SIDEBAR_DISABLED;
+    menu->cur_depth = 0;
+    menu->prev_depth = 0;
+    menu->sidebar_generated = false;
 
     _lv_ll_init(&(menu->history_ll), sizeof(lv_menu_history_t));
 
@@ -676,7 +659,6 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_t * sidebar_back_btn = lv_menu_item_create_text(menu->sidebar_header, LV_SYMBOL_LEFT, "Back", LV_MENU_ITEM_BUILDER_VARIANT_1);
     lv_obj_add_event_cb(sidebar_back_btn, lv_menu_back_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(sidebar_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
-    ((lv_menu_cont_t *)sidebar_back_btn)->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_ENABLED; /* Sidebar back btn is always root */
     ((lv_menu_cont_t *)sidebar_back_btn)->mode_sidebar = LV_MENU_MODE_SIDEBAR_ENABLED;
     ((lv_menu_cont_t *)sidebar_back_btn)->menu = obj;
     menu->sidebar_back_btn = sidebar_back_btn;
@@ -829,7 +811,7 @@ static void lv_menu_traverse_event_cb(lv_event_t * e)
                     lv_obj_clear_state(menu->selected_tab, LV_STATE_CHECKED);
                 }
 
-                /* Delete all previous histories except root*/
+                /* Delete all previous histories except root (depth = 1)*/
                 void * i;
                 void * i_next;
 
@@ -844,6 +826,8 @@ static void lv_menu_traverse_event_cb(lv_event_t * e)
 
                     i = i_next;
                 }
+
+                menu->cur_depth = 1;
             }
 
             menu->selected_tab = obj;
@@ -861,6 +845,11 @@ static void lv_menu_back_event_cb(lv_event_t * e)
         lv_obj_t * obj = lv_event_get_target(e);
         lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
         lv_menu_t * menu = (lv_menu_t *)(cont->menu);
+
+        menu->prev_depth = menu->cur_depth; /* Save the previous value for user event handler */
+
+        if(lv_menu_item_back_btn_is_root(NULL, obj)) return;
+
         lv_ll_t * history_ll = &(menu->history_ll);
 
         /* The current menu */
@@ -875,26 +864,17 @@ static void lv_menu_back_event_cb(lv_event_t * e)
             prev_prev_hist = _lv_ll_get_next(history_ll, prev_hist);
         }
 
-        if(menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED){
-           /* Main back btn cannot be root when sidebar is enabled */
-            ((lv_menu_cont_t *)menu->main_back_btn)->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_DISABLED;
-        }else{
-            if(prev_hist == NULL){
-                ((lv_menu_cont_t *)menu->main_back_btn)->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_ENABLED;
-            }else{
-                ((lv_menu_cont_t *)menu->main_back_btn)->mode_root_back_btn = LV_MENU_MODE_ROOT_BACK_BTN_DISABLED;
-            }
-        }
-
-        if((menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED && prev_prev_hist != NULL && cont->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_DISABLED) ||
-           (menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_DISABLED && prev_hist != NULL && cont->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_DISABLED)) {
+        if((menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED && prev_prev_hist != NULL) ||
+           (menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_DISABLED && prev_hist != NULL)) {
             /* Previous menu exists */
             /* Delete the current item from the history */
             _lv_ll_remove(history_ll, act_hist);
             lv_mem_free(act_hist);
+            menu->cur_depth--;
             /* Create the previous menu.
             *  Remove it from the history because `lv_menu_set` will add it again */
             _lv_ll_remove(history_ll, prev_hist);
+            menu->cur_depth--;
             lv_menu_set(&(menu->obj), prev_hist->menu_item);
 
             lv_mem_free(prev_hist);

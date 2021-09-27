@@ -69,7 +69,6 @@ typedef struct {
     lv_obj_t obj;
     lv_obj_t * menu;
     lv_menu_item_t * menu_item;
-    lv_menu_mode_root_back_btn_t mode_root_back_btn : 1;
     lv_menu_mode_sidebar_t mode_sidebar : 1;
 } lv_menu_cont_t;
 
@@ -90,6 +89,9 @@ typedef struct {
     lv_obj_t * sidebar_back_btn;
     lv_obj_t * selected_tab;
     lv_ll_t history_ll;
+    uint8_t cur_depth;
+    uint8_t prev_depth;
+    bool sidebar_generated : 1;
     lv_menu_mode_header_t mode_header : 1;
     lv_menu_mode_root_back_btn_t mode_root_back_btn : 1;
     lv_menu_mode_sidebar_t mode_sidebar : 1;

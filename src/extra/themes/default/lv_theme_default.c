@@ -465,7 +465,7 @@ static void style_init(void)
     lv_style_set_bg_color(&styles->menu_bg, color_scr);
 
     style_init_reset(&styles->menu_section);
-    lv_style_set_radius(&styles->menu_section, RADIUS_DEFAULT);;
+    lv_style_set_radius(&styles->menu_section, RADIUS_DEFAULT);
     lv_style_set_clip_corner(&styles->menu_section, true);
     lv_style_set_bg_opa(&styles->menu_section, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->menu_section, color_card);
