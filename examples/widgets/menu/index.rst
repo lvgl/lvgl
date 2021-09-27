@@ -4,3 +4,16 @@ Simple Menu
 
 .. lv_example:: widgets/list/lv_example_menu_1
   :language: c
+  
+Simple Menu with root btn
+""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/list/lv_example_menu_2
+  :language: c
+  
+Complex Menu
+""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/list/lv_example_menu_3
+  :language: c
+

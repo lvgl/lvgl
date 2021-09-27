@@ -497,7 +497,9 @@ static void style_init(void)
     lv_style_set_pad_gap(&styles->menu_main_cont, 0);
 
     style_init_reset(&styles->menu_header_cont);
-    lv_style_set_pad_hor(&styles->menu_header_cont, 0);
+    lv_style_set_pad_hor(&styles->menu_header_cont, PAD_SMALL);
+    lv_style_set_pad_ver(&styles->menu_header_cont, PAD_SMALL);
+    lv_style_set_pad_gap(&styles->menu_header_cont, PAD_SMALL);
 
     style_init_reset(&styles->menu_content_cont);
     lv_style_set_pad_hor(&styles->menu_content_cont, PAD_SMALL);
@@ -1035,6 +1037,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
     else if(lv_obj_check_type(obj, &lv_menu_sidebar_header_cont_class) || lv_obj_check_type(obj, &lv_menu_main_header_cont_class)) {
         lv_obj_add_style(obj, &styles->menu_header_cont, 0);
+        lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
     }
     else if(lv_obj_check_type(obj, &lv_menu_sidebar_content_cont_class) || lv_obj_check_type(obj, &lv_menu_main_content_cont_class)) {
         lv_obj_add_style(obj, &styles->menu_content_cont, 0);

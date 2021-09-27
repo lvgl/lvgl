@@ -22,14 +22,6 @@
 #include "../../../widgets/lv_img.h"
 #include "../../../widgets/lv_btn.h"
 
-#if LV_USE_SLIDER
-    #include "../../../widgets/lv_slider.h"
-#endif
-
-#if LV_USE_SWITCH
-    #include "../../../widgets/lv_switch.h"
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -39,6 +31,7 @@
  **********************/
 static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_menu_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_menu_cont_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 const lv_obj_class_t lv_menu_class = {
     .constructor_cb = lv_menu_constructor,
@@ -50,6 +43,7 @@ const lv_obj_class_t lv_menu_class = {
 };
 
 const lv_obj_class_t lv_menu_cont_class = {
+    .constructor_cb = lv_menu_cont_constructor,
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
@@ -67,27 +61,27 @@ const lv_obj_class_t lv_menu_seperator_class = {
 };
 
 const lv_obj_class_t lv_menu_sidebar_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_menu_cont_class
 };
 
 const lv_obj_class_t lv_menu_main_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_menu_cont_class
 };
 
 const lv_obj_class_t lv_menu_main_header_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_menu_cont_class
 };
 
 const lv_obj_class_t lv_menu_sidebar_header_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_menu_cont_class
 };
 
 const lv_obj_class_t lv_menu_sidebar_content_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_menu_cont_class
 };
 
 const lv_obj_class_t lv_menu_main_content_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_menu_cont_class
 };
 
 static void lv_menu_item_del_internal(lv_menu_item_t * menu_item, bool recursive, bool del_child);
@@ -116,6 +110,49 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent)
     lv_obj_class_init_obj(obj);
     return obj;
 }
+
+lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
+{
+    LV_LOG_INFO("begin");
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_cont_class, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
+}
+
+lv_menu_item_t * lv_menu_item_create(void)
+{
+    lv_menu_item_t * menu_item = lv_mem_alloc(sizeof(lv_menu_item_t));
+    menu_item->obj = NULL;
+    menu_item->items = NULL;
+    menu_item->child_cnt = 0;
+    menu_item->section = LV_MENU_SECTION_ON;
+    return menu_item;
+}
+
+void lv_menu_refr(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    lv_ll_t * history_ll = &(menu->history_ll);
+
+    /* The current menu */
+    lv_menu_history_t * act_hist = _lv_ll_get_head(history_ll);
+
+    if(act_hist != NULL) {
+        lv_menu_item_t * menu_item = act_hist->menu_item;
+        /* Delete the current item from the history */
+        _lv_ll_remove(history_ll, act_hist);
+        lv_mem_free(act_hist);
+        menu->cur_depth--;
+        /* Set it back */
+        lv_menu_set(obj, menu_item);
+    }
+}
+
+/*=====================
+ * Setter functions
+ *====================*/
 
 void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item)
 {
@@ -168,32 +205,32 @@ void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item)
         /* With sidebar enabled */
         if(menu->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
             /* Root back btn is always shown if enabled*/
-            lv_obj_clear_flag(menu->sidebar_back_btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(menu->sidebar_header_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
         else {
-            lv_obj_add_flag(menu->sidebar_back_btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(menu->sidebar_header_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
 
         if(menu->cur_depth >= 3) {
-            lv_obj_clear_flag(menu->main_back_btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
         else {
-            lv_obj_add_flag(menu->main_back_btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
     }
     else {
         /* With sidebar disabled */
         if(menu->cur_depth >= 2 || menu->mode_root_back_btn == LV_MENU_MODE_ROOT_BACK_BTN_ENABLED) {
-            lv_obj_clear_flag(menu->main_back_btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
         else {
-            lv_obj_add_flag(menu->main_back_btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
         }
     }
 
     lv_menu_generate(obj, menu_item, menu->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED && menu->cur_depth <= 1 ? true : false);
 
-    /* Refresh size */
+    /* Refr size */
     lv_obj_refr_size(menu->main_header);
     lv_obj_refr_size(menu->sidebar_header);
 }
@@ -227,7 +264,7 @@ void lv_menu_set_mode_root_back_btn(lv_obj_t * obj, lv_menu_mode_root_back_btn_t
 
     if(menu->mode_root_back_btn != mode_root_back_btn) {
         menu->mode_root_back_btn = mode_root_back_btn;
-        lv_menu_refresh(obj);
+        lv_menu_refr(obj);
     }
 }
 
@@ -239,63 +276,24 @@ void lv_menu_set_mode_sidebar(lv_obj_t * obj, lv_menu_mode_sidebar_t mode_sideba
 
     if(menu->mode_sidebar != mode_sidebar) {
         menu->mode_sidebar = mode_sidebar;
-        lv_menu_refresh(obj);
+        lv_menu_refr(obj);
     }
 }
 
-bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj)
-{
-    LV_UNUSED(menu);
-    if(lv_obj_check_type(obj, &lv_menu_cont_class)) {
-        lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
-        if(cont->mode_sidebar == LV_MENU_MODE_SIDEBAR_ENABLED || ((lv_menu_t *)cont->menu)->prev_depth <= 1) {
-            return true;
-        }
-    }
-    return false;
+void lv_menu_set_main_header_back_btn(lv_obj_t * menu, lv_obj_t * obj){
+    LV_ASSERT_OBJ(menu, MY_CLASS);
+
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE);
+
+    ((lv_menu_t *)menu)->main_header_back_btn = obj;
 }
 
-void lv_menu_set_main_back_btn_text(lv_obj_t * obj, const char * icon, const char * txt)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+void lv_menu_set_sidebar_header_back_btn(lv_obj_t * menu, lv_obj_t * obj){
+    LV_ASSERT_OBJ(menu, MY_CLASS);
 
-    lv_obj_t * img = lv_obj_get_child(((lv_menu_t *)(obj))->main_back_btn, 0);
-    lv_obj_t * label = lv_obj_get_child(((lv_menu_t *)(obj))->main_back_btn, 1);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    if(img != NULL) {
-        lv_img_set_src(img, icon);
-    }
-
-    if(label != NULL) {
-        lv_label_set_text(label, txt);
-    }
-}
-
-void lv_menu_set_sidebar_back_btn_text(lv_obj_t * obj, const char * icon, const char * txt)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * img = lv_obj_get_child(((lv_menu_t *)(obj))->sidebar_back_btn, 0);
-    lv_obj_t * label = lv_obj_get_child(((lv_menu_t *)(obj))->sidebar_back_btn, 1);
-
-    if(img != NULL) {
-        lv_img_set_src(img, icon);
-    }
-
-    if(label != NULL) {
-        lv_label_set_text(label, txt);
-    }
-}
-
-/* Core menu item functions */
-lv_menu_item_t * lv_menu_item_create(void)
-{
-    lv_menu_item_t * menu_item = lv_mem_alloc(sizeof(lv_menu_item_t));
-    menu_item->obj = NULL;
-    menu_item->items = NULL;
-    menu_item->child_cnt = 0;
-    menu_item->section = LV_MENU_SECTION_ON;
-    return menu_item;
+    ((lv_menu_t *)menu)->main_header_back_btn = obj;
 }
 
 void lv_menu_item_del(lv_obj_t * menu, lv_menu_item_t * menu_item)
@@ -308,48 +306,6 @@ void lv_menu_item_del_recursive(lv_obj_t * menu, lv_menu_item_t * menu_item)
 {
     LV_UNUSED(menu);
     lv_menu_item_del_internal(menu_item, true, true);
-}
-
-lv_obj_t * lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(menu, MY_CLASS);
-    LV_ASSERT_OBJ(obj, &lv_menu_cont_class); /* Must be `lv_menu_cont_class` */
-    menu_item->obj = obj;
-
-    /* Make the object clickable */
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
-    lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
-    cont->menu = menu;
-    cont->menu_item = menu_item;
-    cont->mode_sidebar = LV_MENU_MODE_SIDEBAR_DISABLED;
-
-    lv_obj_add_event_cb(obj, lv_menu_traverse_event_cb, LV_EVENT_CLICKED, NULL);
-
-    lv_obj_set_parent(obj, ((lv_menu_t *)menu)->storage);
-
-    return obj;
-}
-
-lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(menu, MY_CLASS);
-
-    menu_item->child_cnt++;
-
-    menu_item->items = lv_mem_realloc(menu_item->items, menu_item->child_cnt * sizeof(lv_menu_item_t *));
-
-    lv_menu_item_t * new_menu_item = lv_menu_item_create();
-    new_menu_item->obj = obj;
-    new_menu_item->items = NULL;
-    new_menu_item->child_cnt = 0;
-    new_menu_item->section = section;
-    menu_item->items[menu_item->child_cnt - 1] = new_menu_item;
-
-    lv_obj_set_parent(menu_item->items[menu_item->child_cnt - 1]->obj, ((lv_menu_t *)menu)->storage);
-
-    return menu_item->items[menu_item->child_cnt - 1]->obj;
 }
 
 bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
@@ -381,7 +337,7 @@ bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj
     return true;
 }
 
-lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
+void lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
                                  lv_menu_item_t * new_menu_item)
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
@@ -394,8 +350,6 @@ lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv
     menu_item->items[menu_item->child_cnt - 1] = new_menu_item;
 
     lv_obj_set_parent(menu_item->items[menu_item->child_cnt - 1]->obj, ((lv_menu_t *)menu)->storage);
-
-    return menu_item->items[menu_item->child_cnt - 1]->obj;
 }
 
 bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove)
@@ -422,102 +376,46 @@ bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_me
     }
 
     menu_item->items = lv_mem_realloc(menu_item->items, menu_item->child_cnt * sizeof(lv_menu_item_t *));
+
     return true;
 }
 
-void lv_menu_refresh(lv_obj_t * obj)
+void lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_OBJ(menu, MY_CLASS);
+    LV_ASSERT_OBJ(obj, &lv_menu_cont_class); /* Must be `lv_menu_cont_class` */
+    menu_item->obj = obj;
 
-    lv_menu_t * menu = (lv_menu_t *)obj;
-    lv_ll_t * history_ll = &(menu->history_ll);
+    /* Make the object clickable */
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
-    /* The current menu */
-    lv_menu_history_t * act_hist = _lv_ll_get_head(history_ll);
+    lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
+    cont->menu = menu;
+    cont->menu_item = menu_item;
+    cont->mode_sidebar = LV_MENU_MODE_SIDEBAR_DISABLED;
 
-    if(act_hist != NULL) {
-        lv_menu_item_t * menu_item = act_hist->menu_item;
-        /* Delete the current item from the history */
-        _lv_ll_remove(history_ll, act_hist);
-        lv_mem_free(act_hist);
-        menu->cur_depth--;
-        /* Set it back */
-        lv_menu_set(obj, menu_item);
-    }
+    lv_obj_add_event_cb(obj, lv_menu_traverse_event_cb, LV_EVENT_CLICKED, NULL);
+
+    lv_obj_set_parent(obj, ((lv_menu_t *)menu)->storage);
 }
 
-/* Icon + Label */
-lv_obj_t * lv_menu_item_create_text(lv_obj_t * parent, const char * icon, const char * txt,
-                                        lv_menu_builder_variant_t builder_variant)
+void lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
+                                lv_obj_t * obj)
 {
-    lv_obj_t * obj = lv_menu_cont_create(parent);
-    lv_obj_set_flex_align(obj, LV_FLEX_FLOW_ROW, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    LV_ASSERT_OBJ(menu, MY_CLASS);
 
-    lv_obj_t * img = NULL;
-    lv_obj_t * label = NULL;
+    menu_item->child_cnt++;
 
-    if(icon) {
-        img = lv_img_create(obj);
-        lv_img_set_src(img, icon);
-    }
+    menu_item->items = lv_mem_realloc(menu_item->items, menu_item->child_cnt * sizeof(lv_menu_item_t *));
 
-    if(txt) {
-        label = lv_label_create(obj);
-        lv_label_set_text(label, txt);
-        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-        lv_obj_set_flex_grow(label, 1);
-    }
+    lv_menu_item_t * new_menu_item = lv_menu_item_create();
+    new_menu_item->obj = obj;
+    new_menu_item->items = NULL;
+    new_menu_item->child_cnt = 0;
+    new_menu_item->section = section;
+    menu_item->items[menu_item->child_cnt - 1] = new_menu_item;
 
-    if(builder_variant == LV_MENU_ITEM_BUILDER_VARIANT_2 && icon && txt) {
-        lv_obj_add_flag(img, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-        lv_obj_swap(img, label);
-    }
-
-    return obj;
-}
-
-lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
-{
-    LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_cont_class, parent);
-    lv_obj_class_init_obj(obj);
-    return obj;
-}
-
-/* Extra convenience menu item functions */
-lv_obj_t * lv_menu_item_set_text(lv_obj_t * menu, lv_menu_item_t * menu_item, const char * icon, const char * txt)
-{
-    if(menu_item->obj != NULL) {
-        lv_obj_del(menu_item->obj);
-    }
-
-    lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
-
-    lv_menu_item_set_obj(menu, menu_item, obj);
-
-    return obj;
-}
-
-lv_obj_t * lv_menu_item_add_text(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                 const char * icon, const char * txt)
-{
-    lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
-
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
-    lv_menu_item_add_obj(menu, menu_item, section, obj);
-
-    return obj;
-}
-
-lv_obj_t * lv_menu_item_add_btn(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                const char * icon, const char * txt)
-{
-    lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
-
-    lv_menu_item_add_obj(menu, menu_item, section, obj);
-
-    return obj;
+    lv_obj_set_parent(menu_item->items[menu_item->child_cnt - 1]->obj, ((lv_menu_t *)menu)->storage);
 }
 
 lv_obj_t * lv_menu_item_add_seperator(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section)
@@ -532,45 +430,51 @@ lv_obj_t * lv_menu_item_add_seperator(lv_obj_t * menu, lv_menu_item_t * menu_ite
     return obj;
 }
 
-#if LV_USE_SLIDER
-lv_obj_t * lv_menu_item_add_slider(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                   const char * icon, const char * txt, int32_t min, int32_t max, int32_t val)
+/*=====================
+ * Getter functions
+ *====================*/
+lv_obj_t * lv_menu_get_main_header(lv_obj_t * obj){
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->main_header;
+}
+
+lv_obj_t * lv_menu_get_main_header_back_btn(lv_obj_t * obj){
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->main_header_back_btn;
+}
+
+lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj){
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->sidebar_header;
+}
+
+lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj){
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->sidebar_header_back_btn;
+}
+
+bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj)
 {
-    lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_2);
+    LV_ASSERT_OBJ(menu, MY_CLASS);
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
-    lv_obj_t * slider = lv_slider_create(obj);
-    lv_obj_set_flex_grow(slider, 1);
-    lv_slider_set_range(slider, min, max);
-    lv_slider_set_value(slider, val, LV_ANIM_OFF);
-
-    if(icon == NULL) {
-        lv_obj_add_flag(slider, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    if(obj == ((lv_menu_t *)menu)->sidebar_header_back_btn) {
+        return true;
     }
 
-    lv_menu_item_add_obj(menu, menu_item, section, obj);
+    if(obj == ((lv_menu_t *)menu)->main_header_back_btn && ((lv_menu_t *)menu)->prev_depth <= 1){
+        return true;
+    }
 
-    return obj;
+    return false;
 }
-#endif
-
-#if LV_USE_SWITCH
-lv_obj_t * lv_menu_item_add_switch(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                   const char * icon, const char * txt, bool chk)
-{
-    lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
-
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
-    lv_obj_t * sw = lv_switch_create(obj);
-    lv_obj_add_state(sw, chk ? LV_STATE_CHECKED : 0);
-
-    lv_menu_item_add_obj(menu, menu_item, section, obj);
-
-    return obj;
-}
-#endif
 
 /**********************
  *   STATIC FUNCTIONS
@@ -604,12 +508,14 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_flow(sidebar_cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_add_flag(sidebar_cont, LV_OBJ_FLAG_EVENT_BUBBLE);
     lv_obj_clear_flag(sidebar_cont, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(sidebar_cont, LV_OBJ_FLAG_HIDDEN);
     menu->sidebar = sidebar_cont;
 
     lv_obj_t * sidebar_header = lv_obj_class_create_obj(&lv_menu_sidebar_header_cont_class, sidebar_cont);
     lv_obj_class_init_obj(sidebar_header);
     lv_obj_set_size(sidebar_header, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_add_flag(sidebar_header, LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_add_event_cb(sidebar_header, lv_menu_back_event_cb, LV_EVENT_CLICKED, menu);
     menu->sidebar_header = sidebar_header;
 
     lv_obj_t * sidebar_content = lv_obj_class_create_obj(&lv_menu_sidebar_content_cont_class, sidebar_cont);
@@ -636,6 +542,7 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_class_init_obj(main_header);
     lv_obj_set_size(main_header, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_add_flag(main_header, LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_add_event_cb(main_header, lv_menu_back_event_cb, LV_EVENT_CLICKED, menu);
     menu->main_header = main_header;
 
     lv_obj_t * main_content = lv_obj_class_create_obj(&lv_menu_main_content_cont_class, main_cont);
@@ -649,19 +556,16 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_add_flag(main_content, LV_OBJ_FLAG_EVENT_BUBBLE);
     menu->main_content = main_content;
 
-    /* Create the back button(s) */
-    lv_obj_t * main_back_btn = lv_menu_item_create_text(menu->main_header, LV_SYMBOL_LEFT, "Back", LV_MENU_ITEM_BUILDER_VARIANT_1);
-    lv_obj_add_event_cb(main_back_btn, lv_menu_back_event_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_flag(main_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
-    ((lv_menu_cont_t *)main_back_btn)->menu = obj;
-    menu->main_back_btn = main_back_btn;
+    /* Create the default simple back button(s) */
+    lv_obj_t * main_header_back_btn = lv_img_create(menu->main_header);
+    lv_img_set_src(main_header_back_btn, LV_SYMBOL_LEFT);
+    lv_obj_add_flag(main_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
+    menu->main_header_back_btn = menu->main_header; /* Let the entire header be the back btn */
 
-    lv_obj_t * sidebar_back_btn = lv_menu_item_create_text(menu->sidebar_header, LV_SYMBOL_LEFT, "Back", LV_MENU_ITEM_BUILDER_VARIANT_1);
-    lv_obj_add_event_cb(sidebar_back_btn, lv_menu_back_event_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_flag(sidebar_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
-    ((lv_menu_cont_t *)sidebar_back_btn)->mode_sidebar = LV_MENU_MODE_SIDEBAR_ENABLED;
-    ((lv_menu_cont_t *)sidebar_back_btn)->menu = obj;
-    menu->sidebar_back_btn = sidebar_back_btn;
+    lv_obj_t * sidebar_header_back_btn = lv_img_create(menu->sidebar_header);
+    lv_img_set_src(sidebar_header_back_btn, LV_SYMBOL_LEFT);
+    lv_obj_add_flag(sidebar_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
+    menu->sidebar_header_back_btn = menu->sidebar_header;  /* Let the entire header be the back btn */
 
     menu->selected_tab = NULL;
 
@@ -686,6 +590,12 @@ static void lv_menu_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     _lv_ll_clear(history_ll);
 
     LV_TRACE_OBJ_CREATE("finished");
+}
+
+static void lv_menu_cont_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+    lv_obj_set_flex_align(obj, LV_FLEX_FLOW_ROW, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 }
 
 static void lv_menu_item_del_internal(lv_menu_item_t * menu_item, bool recursive, bool del_child)
@@ -843,12 +753,13 @@ static void lv_menu_back_event_cb(lv_event_t * e)
     /* LV_EVENT_CLICKED */
     if(code == LV_EVENT_CLICKED) {
         lv_obj_t * obj = lv_event_get_target(e);
-        lv_menu_cont_t * cont = (lv_menu_cont_t *)obj;
-        lv_menu_t * menu = (lv_menu_t *)(cont->menu);
+        lv_menu_t * menu = (lv_menu_t *)lv_event_get_user_data(e);
+
+        if(!(obj == menu->main_header_back_btn || obj == menu->sidebar_header_back_btn)) return;
 
         menu->prev_depth = menu->cur_depth; /* Save the previous value for user event handler */
 
-        if(lv_menu_item_back_btn_is_root(NULL, obj)) return;
+        if(lv_menu_item_back_btn_is_root((lv_obj_t *)menu, obj)) return;
 
         lv_ll_t * history_ll = &(menu->history_ll);
 

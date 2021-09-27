@@ -50,12 +50,6 @@ enum {
 };
 typedef uint8_t lv_menu_mode_sidebar_t;
 
-enum {
-    LV_MENU_ITEM_BUILDER_VARIANT_1,
-    LV_MENU_ITEM_BUILDER_VARIANT_2
-};
-typedef uint8_t lv_menu_builder_variant_t;
-
 typedef struct lv_menu_item_t lv_menu_item_t;
 
 typedef struct lv_menu_item_t {
@@ -82,16 +76,16 @@ typedef struct {
     lv_obj_t * main;
     lv_obj_t * main_content;
     lv_obj_t * main_header;
-    lv_obj_t * main_back_btn;
+    lv_obj_t * main_header_back_btn; /* a pointer to obj that on click triggers back btn event handler, can be same as 'main_header' */
     lv_obj_t * sidebar;
     lv_obj_t * sidebar_content;
     lv_obj_t * sidebar_header;
-    lv_obj_t * sidebar_back_btn;
+    lv_obj_t * sidebar_header_back_btn; /* a pointer to obj that on click triggers back btn event handler, can be same as 'sidebar_header' */
     lv_obj_t * selected_tab;
     lv_ll_t history_ll;
     uint8_t cur_depth;
     uint8_t prev_depth;
-    bool sidebar_generated : 1;
+    uint8_t sidebar_generated : 1;
     lv_menu_mode_header_t mode_header : 1;
     lv_menu_mode_root_back_btn_t mode_root_back_btn : 1;
     lv_menu_mode_sidebar_t mode_sidebar : 1;
@@ -111,48 +105,184 @@ extern const lv_obj_class_t lv_menu_main_content_cont_class;
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create a menu object
+ * @param parent pointer to an object, it will be the parent of the new menu
+ * @return pointer to the created menu
+ */
 lv_obj_t * lv_menu_create(lv_obj_t * parent);
-void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item);
-void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode_header);
-void lv_menu_set_mode_root_back_btn(lv_obj_t * obj, lv_menu_mode_root_back_btn_t mode_root_back_btn);
-void lv_menu_set_mode_sidebar(lv_obj_t * obj, lv_menu_mode_sidebar_t mode_sidebar);
-void lv_menu_set_main_back_btn_text(lv_obj_t * obj, const char * icon, const char * txt);
-void lv_menu_set_sidebar_back_btn_text(lv_obj_t * obj, const char * icon, const char * txt);
 
-/* Core menu item functions */
-lv_menu_item_t * lv_menu_item_create();
-void lv_menu_item_del(lv_obj_t * menu, lv_menu_item_t * menu_item);
-void lv_menu_item_del_recursive(lv_obj_t * menu, lv_menu_item_t * menu_item);
-lv_obj_t * lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
-lv_obj_t * lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                lv_obj_t * obj);
-bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
-lv_obj_t * lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                 lv_menu_item_t * new_menu_item);
-bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove);
-void lv_menu_refresh(lv_obj_t * obj);
-bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
-lv_obj_t * lv_menu_item_create_text(lv_obj_t * parent, const char * icon, const char * txt,
-                                        lv_menu_builder_variant_t builder_variant);
+/**
+ * Create a menu cont object
+ * @param parent pointer to an object, it will be the parent of the new menu cont object
+ * @return pointer to the created menu cont object
+ */
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent);
 
-/* Extra convenience menu item functions */
-lv_obj_t * lv_menu_item_set_text(lv_obj_t * menu, lv_menu_item_t * menu_item, const char * icon, const  char * txt);
-lv_obj_t * lv_menu_item_add_text(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                 const char * icon, const char * txt);
-lv_obj_t * lv_menu_item_add_btn(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                const char * icon, const char * txt);
+/**
+ * Create a menu item
+ * @return pointer to the created menu item
+ */
+lv_menu_item_t * lv_menu_item_create();
+
+/**
+ * Refresh menu after adding/removing menu items
+ * @param obj pointer to the menu
+ */
+void lv_menu_refr(lv_obj_t * obj);
+
+/*=====================
+ * Setter functions
+ *====================*/
+/**
+ * Set menu item to display
+ * @param obj pointer to the menu
+ * @param menu_item pointer to the menu item to set
+ */
+void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item);
+
+/**
+ * Set the how the header should behave
+ * @param obj pointer to a menu
+ * @param mode_header
+ */
+void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode_header);
+
+/**
+ * Set whether back button should appear at root
+ * @param obj pointer to a menu
+ * @param mode_root_back_btn
+ */
+void lv_menu_set_mode_root_back_btn(lv_obj_t * obj, lv_menu_mode_root_back_btn_t mode_root_back_btn);
+
+/**
+ * Set whether to display sidebar
+ * @param obj pointer to a menu
+ * @param mode_sidebar
+ */
+void lv_menu_set_mode_sidebar(lv_obj_t * obj, lv_menu_mode_sidebar_t mode_sidebar);
+
+/**
+ * Set main header back btn obj that on click triggers back btn event handler
+ * @param menu pointer to the menu
+ * @param obj pointer to the obj
+ */
+void lv_menu_set_main_header_back_btn(lv_obj_t * menu, lv_obj_t * obj);
+
+/**
+ * Set sidebar header back btn obj that on click triggers back btn event handler
+ * @param menu pointer to the menu
+ * @param obj pointer to the obj
+ */
+void lv_menu_set_sidebar_header_back_btn(lv_obj_t * menu, lv_obj_t * obj);
+
+/**
+ * Deletes the provided menu item
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ */
+void lv_menu_item_del(lv_obj_t * menu, lv_menu_item_t * menu_item);
+
+/**
+ * Deletes the provided menu item to delete recursively
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ */
+void lv_menu_item_del_recursive(lv_obj_t * menu, lv_menu_item_t * menu_item);
+
+/**
+ * Remove the provided obj from menu item and deletes it
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ * @param obj pointer to the obj to be removed
+ * @return true if obj was removed
+ */
+bool lv_menu_item_remove_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
+
+ /**
+ * Remove the provided menu from menu item and the menu item is not freed
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ * @param menu_item_remove pointer to the menu item to be removed
+ * @return true if menu item was removed
+ */
+bool lv_menu_item_remove_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_t * menu_item_remove);
+
+/**
+ * Set obj that represents the menu item
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ * @param obj pointer to the obj, must be of type lv_menu_cont_class
+ */
+void lv_menu_item_set_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_obj_t * obj);
+
+/**
+ * Add obj to the menu item
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ * @param section
+ * @param obj pointer to the new obj to be added
+ */
+void lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
+                                lv_obj_t * obj);
+
+/**
+ * Add menu to the menu item
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ * @param section
+ * @param new_menu_item pointer to the new menu to be added
+ */
+void lv_menu_item_add_menu(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
+                                 lv_menu_item_t * new_menu_item);
+
+/**
+ * Add seperator obj to the menu item
+ * @param menu pointer to the menu
+ * @param menu_item pointer to the menu item
+ * @param section
+ * @return seperator obj
+ */
 lv_obj_t * lv_menu_item_add_seperator(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section);
 
-#if LV_USE_SLIDER
-lv_obj_t * lv_menu_item_add_slider(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                   const char * icon, const char * txt, int32_t min, int32_t max, int32_t val);
-#endif
+/*=====================
+ * Getter functions
+ *====================*/
 
-#if LV_USE_SWITCH
-lv_obj_t * lv_menu_item_add_switch(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                   const char * icon, const char * txt, bool chk);
-#endif
+ /**
+ * Get a pointer to main header obj
+ * @param obj pointer to the menu
+ * @return pointer to main header obj
+ */
+lv_obj_t * lv_menu_get_main_header(lv_obj_t * obj);
+
+ /**
+ * Get a pointer to main header back btn obj
+ * @param obj pointer to the menu
+ * @return pointer to main header back btn obj
+ */
+lv_obj_t * lv_menu_get_main_header_back_btn(lv_obj_t * obj);
+
+ /**
+ * Get a pointer to sidebar header obj
+ * @param obj pointer to the menu
+ * @return pointer to sidebar header back btn obj
+ */
+lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj);
+
+ /**
+ * Get a pointer to sidebar header obj
+ * @param obj pointer to the menu
+ * @return pointer to sidebar header back btn obj
+ */
+lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
+
+/**
+ * Check if a obj is a root back btn
+ * @param menu pointer to the menu
+ * @return true if it is a root back btn
+ */
+bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
