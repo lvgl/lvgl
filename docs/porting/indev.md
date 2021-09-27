@@ -36,8 +36,7 @@ indev_drv.read_cb = my_input_read;
 
 ...
 
-void my_input_read(
-* drv, lv_indev_data_t*data)
+void my_input_read(* drv, lv_indev_data_t*data)
 {
   if(touchpad_pressed) {
     data->point.x = touchpad_x;
