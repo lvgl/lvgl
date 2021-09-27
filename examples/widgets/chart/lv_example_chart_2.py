@@ -45,10 +45,10 @@ def draw_event_cb(e):
 def add_data(timer):
     # LV_UNUSED(timer);
     cnt = 0;
-    char1.set_next_value(ser1, lv.rand(20, 90))
+    chart1.set_next_value(ser1, lv.rand(20, 90))
 
     if cnt % 4 == 0:
-        chart1.set_next_value(ser2, lv_rand(40, 60))
+        chart1.set_next_value(ser2, lv.rand(40, 60))
 
     cnt +=1
 
@@ -73,5 +73,4 @@ for i in range(10):
     chart1.set_next_value(ser1, lv.rand(20, 90))
     chart1.set_next_value(ser2, lv.rand(30, 70))
 
-# timer = lv.timer_t(add_data, 200, None)
-
+timer = lv.timer_create(add_data, 200, None)
