@@ -16,8 +16,6 @@ static lv_obj_t * lv_menu_item_add_slider(lv_obj_t * menu, lv_menu_item_t * menu
                                    const char * icon, const char * txt, int32_t min, int32_t max, int32_t val);
 static lv_obj_t * lv_menu_item_set_text(lv_obj_t * menu, lv_menu_item_t * menu_item, const char * icon, const char * txt);
 static lv_obj_t * lv_menu_item_add_text(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section, const char * icon, const char * txt);
-static lv_obj_t * lv_menu_item_add_btn(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                const char * icon, const char * txt);
 static lv_obj_t * lv_menu_item_add_switch(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
                                    const char * icon, const char * txt, bool chk);
 
@@ -173,16 +171,6 @@ static lv_obj_t * lv_menu_item_add_text(lv_obj_t * menu, lv_menu_item_t * menu_i
     lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
-    lv_menu_item_add_obj(menu, menu_item, section, obj);
-
-    return obj;
-}
-
-static lv_obj_t * lv_menu_item_add_btn(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_item_section_type_t section,
-                                const char * icon, const char * txt)
-{
-    lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
 
     lv_menu_item_add_obj(menu, menu_item, section, obj);
 
