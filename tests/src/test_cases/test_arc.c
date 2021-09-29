@@ -36,7 +36,7 @@ void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void)
 void test_arc_should_truncate_to_min_range_when_new_value_is_inferior(void)
 {
     /* Default min range is 100 */
-    int16_t value_after_truncation = 1;
+    int16_t value_after_truncation = 0;
 
     active_screen = lv_scr_act();
     arc = lv_arc_create(active_screen);
