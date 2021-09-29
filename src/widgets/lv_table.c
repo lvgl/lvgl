@@ -503,8 +503,8 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(pr_res == LV_RES_OK && (table->col_act != col || table->row_act != row)) {
             table->col_act = col;
             table->row_act = row;
+            lv_obj_invalidate(obj);
         }
-        lv_obj_invalidate(obj);
     }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_invalidate(obj);
