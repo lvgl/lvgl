@@ -33,8 +33,9 @@ enum {
 typedef uint8_t lv_menu_item_section_type_t;
 
 enum {
-    LV_MENU_MODE_HEADER_NOT_FIXED,
-    LV_MENU_MODE_HEADER_FIXED
+    LV_MENU_MODE_HEADER_TOP_FIXED, /* Header is positioned at the top */
+    LV_MENU_MODE_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
+    LV_MENU_MODE_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
 };
 typedef uint8_t lv_menu_mode_header_t;
 
@@ -86,7 +87,7 @@ typedef struct {
     uint8_t cur_depth;
     uint8_t prev_depth;
     uint8_t sidebar_generated : 1;
-    lv_menu_mode_header_t mode_header : 1;
+    lv_menu_mode_header_t mode_header : 2;
     lv_menu_mode_root_back_btn_t mode_root_back_btn : 1;
     lv_menu_mode_sidebar_t mode_sidebar : 1;
 } lv_menu_t;
@@ -142,7 +143,7 @@ void lv_menu_refr(lv_obj_t * obj);
 void lv_menu_set(lv_obj_t * obj, lv_menu_item_t * menu_item);
 
 /**
- * Set the how the header should behave
+ * Set the how the header should behave and its position
  * @param obj pointer to a menu
  * @param mode_header
  */
