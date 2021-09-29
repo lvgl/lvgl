@@ -821,20 +821,19 @@ static void draw_main(lv_event_t * e)
  */
 static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** map)
 {
+    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
+    btnm->row_cnt = 1;
     /*Count the buttons in the map*/
     uint16_t btn_cnt = 0;
-    uint16_t row_cnt = 1;
     uint16_t i       = 0;
     while(map[i] && map[i][0] != '\0') {
         if(strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
             btn_cnt++;
         } else {
-            row_cnt++;
+            btnm->row_cnt++;
         }
         i++;
     }
-
-    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
 
     /*Do not allocate memory for the same amount of buttons*/
     if(btn_cnt == btnm->btn_cnt) return;
@@ -857,7 +856,6 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** 
     lv_memset_00(btnm->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
 
     btnm->btn_cnt = btn_cnt;
-    btnm->row_cnt = row_cnt;
 }
 
 /**
