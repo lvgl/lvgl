@@ -3,7 +3,19 @@
 
 #include "unity/unity.h"
 
+void test_arc_creation_successfull(void);
 void test_arc_angles_when_reversed(void);
+
+static lv_obj_t *active_screen = NULL;
+static lv_obj_t *arc = NULL;
+
+void test_arc_creation_successfull(void)
+{
+    active_screen = lv_scr_act();
+    arc = lv_arc_create(active_screen);
+
+    TEST_ASSERT_NOT_NULL(arc);
+}
 
 /* See #2522 for more information */
 void test_arc_angles_when_reversed(void)
