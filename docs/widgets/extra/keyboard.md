@@ -32,6 +32,12 @@ To set the mode manually, use `lv_keyboard_set_mode(kb, mode)`. The default mode
 You can assign a [Text area](/widgets/core/textarea) to the Keyboard to automatically put the clicked characters there.
 To assign the text area, use `lv_keyboard_set_textarea(kb, ta)`.
 
+### Key Popovers
+To enable key popovers on press, like on common Android and iOS keyboards, use `lv_keyboard_set_popovers(kb, true)`. The default control maps are preconfigured to only show the popovers on keys that produce a symbol and not on e.g. space. If you use a custom keymap, set the `LV_BTNMATRIX_CTRL_POPOVER` flag for all keys that you want to show a popover.
+
+Note that popovers for keys in the top row will draw outside the widget boundaries. To account for this, reserve extra free space on top of the keyboard or ensure that the keyboard is added _after_ any widgets adjacent to its top boundary so that the popovers can draw over those.
+
+The popovers currently are merely a visual effect and don't allow selecting additional characters such as accents yet.
 
 ### New Keymap
 You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, map)` and `lv_keyboard_set_ctrl_map(kb, ctrl_map)`.
