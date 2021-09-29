@@ -509,6 +509,8 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
                 cur_txt = cur_span->txt;
                 span_text_check(&cur_txt);
                 cur_txt_ofs = 0;
+                /* maybe also cur_txt[cur_txt_ofs] == '\0' */
+                continue;
             }
 
             /* init span info to snippet. */
@@ -668,6 +670,12 @@ static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font,
                                lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag,
                                lv_coord_t * use_width, uint32_t * end_ofs)
 {
+    if(txt == NULL || txt[0] == '\0') {
+        *end_ofs = 0;
+        *use_width = 0;
+        return false;
+    }
+
     uint32_t ofs = _lv_txt_get_next_line(txt, font, letter_space, max_width, flag);
     lv_coord_t width = lv_txt_get_width(txt, ofs, font, letter_space, flag);
     *end_ofs = ofs;
@@ -851,6 +859,8 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
                 cur_txt = cur_span->txt;
                 span_text_check(&cur_txt);
                 cur_txt_ofs = 0;
+                /* maybe also cur_txt[cur_txt_ofs] == '\0' */
+                continue;
             }
 
             /* init span info to snippet. */
