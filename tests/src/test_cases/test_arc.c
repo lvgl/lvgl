@@ -6,6 +6,7 @@
 void test_arc_creation_successfull(void);
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void);
 void test_arc_should_truncate_to_min_range_when_new_value_is_inferior(void);
+void test_arc_should_update_value_after_updating_range(void);
 void test_arc_angles_when_reversed(void);
 
 static lv_obj_t *active_screen = NULL;
@@ -43,6 +44,25 @@ void test_arc_should_truncate_to_min_range_when_new_value_is_inferior(void)
     lv_arc_set_value(arc, 0);
 
     TEST_ASSERT_EQUAL_INT16(value_after_truncation, lv_arc_get_value(arc));
+}
+
+void test_arc_should_update_value_after_updating_range(void)
+{
+    int16_t value_after_updating_max_range = 50;
+    int16_t value_after_updating_min_range = 30;
+
+    active_screen = lv_scr_act();
+    arc = lv_arc_create(active_screen);
+
+    lv_arc_set_value(arc, 80);
+    lv_arc_set_range(arc, 1, 50);
+
+    TEST_ASSERT_EQUAL_INT16(value_after_updating_max_range, lv_arc_get_value(arc));
+
+    lv_arc_set_value(arc, 10);
+    lv_arc_set_range(arc, 30, 50);
+
+    TEST_ASSERT_EQUAL_INT16(value_after_updating_min_range, lv_arc_get_value(arc));
 }
 
 /* See #2522 for more information */
