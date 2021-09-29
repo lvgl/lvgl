@@ -226,11 +226,11 @@ static void flex_update(lv_obj_t * cont, void * user_data)
     lv_coord_t item_gap = f.row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont,
                                                                                                              LV_PART_MAIN);
     lv_coord_t max_main_size = (f.row ? lv_obj_get_content_width(cont) : lv_obj_get_content_height(cont));
-    lv_coord_t border_widt = lv_obj_get_style_border_width(cont, LV_PART_MAIN);
+    lv_coord_t border_width = lv_obj_get_style_border_width(cont, LV_PART_MAIN);
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont,
-                                                                  LV_PART_MAIN) + border_widt - lv_obj_get_scroll_y(cont);
+                                                                  LV_PART_MAIN) + border_width - lv_obj_get_scroll_y(cont);
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont,
-                                                                   LV_PART_MAIN) + border_widt - lv_obj_get_scroll_x(cont);
+                                                                   LV_PART_MAIN) + border_width - lv_obj_get_scroll_x(cont);
 
     lv_flex_align_t track_cross_place = f.track_place;
     lv_coord_t * cross_pos = (f.row ? &abs_y : &abs_x);

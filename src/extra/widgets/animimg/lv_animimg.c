@@ -27,6 +27,8 @@
  *********************/
 #define LV_OBJX_NAME "lv_animimg"
 
+#define MY_CLASS &lv_animimg_class
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -64,6 +66,7 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
 
 void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
@@ -72,6 +75,7 @@ void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
 
 void lv_animimg_start(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_start(&animimg->anim);
 }
@@ -82,6 +86,7 @@ void lv_animimg_start(lv_obj_t * obj)
 
 void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_set_time(&animimg->anim, duration);
     lv_anim_set_playback_delay(&animimg->anim, duration);
@@ -89,6 +94,7 @@ void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
 
 void lv_animimg_set_repeat_count(lv_obj_t * obj, uint16_t count)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_set_repeat_count(&animimg->anim, count);
 }

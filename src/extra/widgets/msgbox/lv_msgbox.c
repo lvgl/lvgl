@@ -9,11 +9,13 @@
 #include "lv_msgbox.h"
 #if LV_USE_MSGBOX
 
+#include "../../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_MSGBOX_FLAG_AUTO_PARENT  LV_OBJ_FLAG_WIDGET_1        /*Mark that the parent was automatically created*/
+#define MY_CLASS    &lv_msgbox_class
 
 /**********************
  *      TYPEDEFS
@@ -126,6 +128,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         const lv_font_t * font = lv_obj_get_style_text_font(mbox->btns, LV_PART_ITEMS);
         lv_coord_t btn_h = lv_font_get_line_height(font) + LV_DPI_DEF / 10;
         lv_obj_set_size(mbox->btns, btn_cnt * (2 * LV_DPI_DEF / 3), btn_h);
+        lv_obj_set_style_max_width(mbox->btns, lv_pct(100), 0);
         lv_obj_add_flag(mbox->btns, LV_OBJ_FLAG_EVENT_BUBBLE);    /*To see the event directly on the message box*/
     }
 
@@ -135,30 +138,35 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->title;
 }
 
 lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->close_btn;
 }
 
 lv_obj_t * lv_msgbox_get_text(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->text;
 }
 
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->content;
 }
 
 lv_obj_t * lv_msgbox_get_btns(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->btns;
 }

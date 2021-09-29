@@ -38,7 +38,7 @@ Various built-in color formats are supported:
 - **LV_IMG_CF_TRUE_COLOR_ALPHA** Like `LV_IMG_CF_TRUE_COLOR` but it also adds an alpha (transparency) byte for every pixel.
 - **LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED** Like `LV_IMG_CF_TRUE_COLOR` but if a pixel has the `LV_COLOR_TRANSP` color (set in *lv_conf.h*) it will be transparent.
 - **LV_IMG_CF_INDEXED_1/2/4/8BIT** Uses a palette with 2, 4, 16 or 256 colors and stores each pixel in 1, 2, 4 or 8 bits.
-- **LV_IMG_CF_ALPHA_1/2/4/8BIT** **Only stores the Alpha value with 1, 2, 4 or 8 bits.** The pixels take the color of `style.image.color` and the set opacity. The source image has to be an alpha channel. This is ideal for bitmaps similar to fonts where the whole image is one color that can be altered.
+- **LV_IMG_CF_ALPHA_1/2/4/8BIT** **Only stores the Alpha value with 1, 2, 4 or 8 bits.** The pixels take the color of `style.img_recolor` and the set opacity. The source image has to be an alpha channel. This is ideal for bitmaps similar to fonts where the whole image is one color that can be altered.
 
 The bytes of `LV_IMG_CF_TRUE_COLOR` images are stored in the following order.
 
@@ -267,11 +267,15 @@ To indicate that the *line read* function should be used, set `dsc->img_data = N
 
 LVGL will use registered image decoders automatically if you try and draw a raw image (i.e. using the `lv_img` object) but you can use them manually too. Create an `lv_img_decoder_dsc_t` variable to describe the decoding session and call `lv_img_decoder_open()`.
 
+The `color` paramter is used only with `LV_IMG_CF_ALPHA_1/2/4/8BIT` images to tell color of the image. 
+`frame_id` can be used if the image to open is an animation. 
+
+
 ```c
 
 lv_res_t res;
 lv_img_decoder_dsc_t dsc;
-res = lv_img_decoder_open(&dsc, &my_img_dsc, LV_COLOR_WHITE);
+res = lv_img_decoder_open(&dsc, &my_img_dsc, color, frame_id);
 
 if(res == LV_RES_OK) {
   /*Do something with `dsc->img_data`*/

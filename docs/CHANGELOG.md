@@ -1,6 +1,7 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- Fixed lv_deinit declaration when LV_USE_GPU_SDL is enabled
 - added sample lv_example_list_2.py
 - lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
 - feat(example) stacked area chart lv_example_chart_8 added.
@@ -32,6 +33,9 @@
 - fix(zoom) multiplication overflow with zoom calculations on 16-bit platforms
 - feat(msgbox): omit title label unless needed
 - feat(msgbox): add function to get selected button index
+- fix(btnmatrix): make ORed values work correctly with lv_btnmatrix_has_btn_ctrl
+- fix(snapshot): snapshot is affected by parent's style because of wrong coordinates.
+- feat(btnmatrix/keyboard): add option to show popovers on button press
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard

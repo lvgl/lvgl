@@ -10,6 +10,8 @@
 
 #if LV_USE_SPAN != 0
 
+#include "../../../misc/lv_assert.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -107,6 +109,7 @@ lv_span_t * lv_spangroup_new_span(lv_obj_t * obj)
         return NULL;
     }
 
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_span_t * span = _lv_ll_ins_tail(&spans->child_ll);
     LV_ASSERT_MALLOC(span);
@@ -132,6 +135,7 @@ void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span)
         return;
     }
 
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_span_t * cur_span;
     _LV_LL_READ(&spans->child_ll, cur_span) {
@@ -214,6 +218,7 @@ void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
  */
 void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->overflow == overflow) return;
 
@@ -228,6 +233,7 @@ void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
  */
 void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->indent == indent) return;
 
@@ -243,6 +249,7 @@ void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent)
  */
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     spans->mode = mode;
     lv_spangroup_refr_mode(obj);
@@ -270,6 +277,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
         return NULL;
     }
 
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_ll_t * linked_list = &spans->child_ll;
 
@@ -313,6 +321,7 @@ uint32_t lv_spangroup_get_child_cnt(const lv_obj_t * obj)
         return 0;
     }
 
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return _lv_ll_get_len(&(spans->child_ll));
 }
@@ -334,6 +343,7 @@ lv_text_align_t lv_spangroup_get_align(lv_obj_t * obj)
  */
 lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->overflow;
 }
@@ -345,6 +355,7 @@ lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj)
  */
 lv_coord_t lv_spangroup_get_indent(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->indent;
 }
@@ -356,6 +367,7 @@ lv_coord_t lv_spangroup_get_indent(lv_obj_t * obj)
  */
 lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->mode;
 }
@@ -366,6 +378,7 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
  */
 void lv_spangroup_refr_mode(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     if(spans->mode == LV_SPAN_MODE_EXPAND) {
@@ -403,6 +416,7 @@ void lv_spangroup_refr_mode(lv_obj_t * obj)
  */
 lv_coord_t lv_spangroup_get_max_line_h(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     lv_coord_t max_line_h = 0;
@@ -424,6 +438,7 @@ lv_coord_t lv_spangroup_get_max_line_h(lv_obj_t * obj)
  */
 lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     if(_lv_ll_get_head(&spans->child_ll) == NULL) {
@@ -456,6 +471,7 @@ lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj)
  */
 lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(_lv_ll_get_head(&spans->child_ll) == NULL || width <= 0) {
         return 0;
@@ -804,6 +820,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);;
     lv_coord_t max_width = lv_area_get_width(coords);
     lv_coord_t max_w  = max_width - spans->indent; /* first line need minus indent */
+    lv_opa_t obj_opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
 
     /* coords of draw span-txt */
     lv_point_t txt_pos;
@@ -945,6 +962,9 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
             pos.y = txt_pos.y + max_line_h - pinfo->line_h;
             lv_color_t letter_color = lv_span_get_style_text_color(obj, pinfo->span);
             lv_opa_t letter_opa = lv_span_get_style_text_opa(obj, pinfo->span);
+            if(obj_opa < LV_OPA_MAX) {
+                letter_opa = (uint16_t)((uint16_t)letter_opa * obj_opa) >> 8;
+            }
             lv_blend_mode_t blend_mode = lv_span_get_style_text_blend_mode(obj, pinfo->span);
             uint32_t txt_bytes = pinfo->bytes;
 
