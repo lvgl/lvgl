@@ -457,6 +457,20 @@ lv_obj_t * lv_menu_item_add_seperator(lv_obj_t * menu, lv_menu_item_t * menu_ite
 /*=====================
  * Getter functions
  *====================*/
+lv_menu_item_t * lv_menu_get_main_item(lv_obj_t * obj){
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_menu_t * menu = (lv_menu_t *)obj;
+
+    lv_menu_history_t * act_hist = _lv_ll_get_head(&(menu->history_ll));
+
+    if(act_hist != NULL){
+        return act_hist->menu_item;
+    }
+
+    return NULL;
+}
+
 lv_obj_t * lv_menu_get_main_header(lv_obj_t * obj){
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -782,6 +796,7 @@ static void lv_menu_traverse_event_cb(lv_event_t * e)
         }
 
         lv_menu_set(cont->menu, cont->menu_item);
+        lv_event_send(cont->menu, LV_EVENT_VALUE_CHANGED, NULL);
     }
 }
 
@@ -827,6 +842,7 @@ static void lv_menu_back_event_cb(lv_event_t * e)
             lv_menu_set(&(menu->obj), prev_hist->menu_item);
 
             lv_mem_free(prev_hist);
+            lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
         }
     }
 }

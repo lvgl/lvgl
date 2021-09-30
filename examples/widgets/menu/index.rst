@@ -11,9 +11,15 @@ Simple Menu with root btn
 .. lv_example:: widgets/list/lv_example_menu_2
   :language: c
   
-Complex Menu
+Simple Menu with custom header
 """"""""""""""""""""""""""""
 
 .. lv_example:: widgets/list/lv_example_menu_3
+  :language: c
+
+Complex Menu
+""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/list/lv_example_menu_4
   :language: c
 

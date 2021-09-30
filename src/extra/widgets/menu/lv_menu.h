@@ -249,6 +249,12 @@ lv_obj_t * lv_menu_item_add_seperator(lv_obj_t * menu, lv_menu_item_t * menu_ite
 /*=====================
  * Getter functions
  *====================*/
+ /**
+ * Get a pointer to menu item that is currently displayed in main content
+ * @param obj pointer to the menu
+ * @return pointer to menu_item
+ */
+lv_menu_item_t * lv_menu_get_main_item(lv_obj_t * obj);
 
  /**
  * Get a pointer to main header obj
