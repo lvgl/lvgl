@@ -254,6 +254,12 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     bool was_on_layout = lv_obj_is_layout_positioned(obj);
     bool scrollable_chg = (f & LV_OBJ_FLAG_SCROLLABLE) != (obj->flags & LV_OBJ_FLAG_SCROLLABLE);
+    if(scrollable_chg) {
+        lv_area_t hor_area, ver_area;
+        lv_obj_get_scrollbar_area(obj, &hor_area, &ver_area);
+        lv_obj_invalidate_area(obj, &hor_area);
+        lv_obj_invalidate_area(obj, &ver_area);
+    }
 
     obj->flags &= (~f);
 
@@ -266,13 +272,6 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-    }
-
-    if(scrollable_chg) {
-        lv_area_t hor_area, ver_area;
-        lv_obj_get_scrollbar_area(obj, &hor_area, &ver_area);
-        lv_obj_invalidate_area(obj, &hor_area);
-        lv_obj_invalidate_area(obj, &ver_area);
     }
 }
 
