@@ -3,10 +3,11 @@
 
 #include "unity/unity.h"
 
-void test_txt_should_identify_empty_string_txt_parameter_when_trying_to_get_next_line(void);
+void test_txt_next_line_should_handle_empty_string(void);
+
 
 /* See #2615 for more information */
-void test_txt_should_identify_empty_string_txt_parameter_when_trying_to_get_next_line(void)
+void test_txt_next_line_should_handle_empty_string(void)
 {
     const lv_font_t *font_ptr = NULL;
     lv_coord_t letter_space = 0;
