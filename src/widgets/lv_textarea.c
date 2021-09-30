@@ -1321,18 +1321,16 @@ static void draw_cursor(lv_event_t * e)
     char letter_buf[8] = {0};
     lv_memcpy(letter_buf, &txt[ta->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ta->cursor.txt_byte_pos]));
 
-    if(cur_dsc.bg_opa == LV_OPA_COVER) {
-        lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
-        lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
-        lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
-        cur_area.x1 += left + border_width;
-        cur_area.y1 += top + border_width;
+    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
+    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
+    cur_area.x1 += left + border_width;
+    cur_area.y1 += top + border_width;
 
-        lv_draw_label_dsc_t cur_label_dsc;
-        lv_draw_label_dsc_init(&cur_label_dsc);
-        lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
-        lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
-    }
+    lv_draw_label_dsc_t cur_label_dsc;
+    lv_draw_label_dsc_init(&cur_label_dsc);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
+    lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
 }
 
 #endif
