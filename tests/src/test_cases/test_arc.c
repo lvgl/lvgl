@@ -7,6 +7,7 @@ void test_arc_creation_successfull(void);
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void);
 void test_arc_should_truncate_to_min_range_when_new_value_is_inferior(void);
 void test_arc_should_update_value_after_updating_range(void);
+void test_arc_should_update_angles_when_changing_to_symmetrical_mode(void);
 void test_arc_angles_when_reversed(void);
 
 static lv_obj_t *active_screen = NULL;
@@ -63,6 +64,20 @@ void test_arc_should_update_value_after_updating_range(void)
     lv_arc_set_range(arc, 30, 50);
 
     TEST_ASSERT_EQUAL_INT16(value_after_updating_min_range, lv_arc_get_value(arc));
+}
+
+void test_arc_should_update_angles_when_changing_to_symmetrical_mode(void)
+{
+    int16_t expected_angle_start = 135;
+    int16_t expected_angle_end = 270;
+
+    active_screen = lv_scr_act();
+    /* start angle is 135, end angle is 45 at creation */
+    arc = lv_arc_create(active_screen);
+    lv_arc_set_mode(arc, LV_ARC_MODE_SYMMETRICAL);
+
+    TEST_ASSERT_EQUAL_INT16(expected_angle_start, lv_arc_get_angle_start(arc));
+    TEST_ASSERT_EQUAL_INT16(expected_angle_end, lv_arc_get_angle_end(arc));
 }
 
 /* See #2522 for more information */
