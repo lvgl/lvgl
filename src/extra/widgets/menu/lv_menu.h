@@ -267,7 +267,7 @@ lv_obj_t * lv_menu_get_main_header_back_btn(lv_obj_t * obj);
  /**
  * Get a pointer to sidebar header obj
  * @param obj pointer to the menu
- * @return pointer to sidebar header back btn obj
+ * @return pointer to sidebar header obj
  */
 lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj);
 

@@ -425,6 +425,9 @@ void lv_menu_item_add_obj(lv_obj_t * menu, lv_menu_item_t * menu_item, lv_menu_i
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
 
+    /* Make the object unclickable */
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+
     menu_item->child_cnt++;
 
     menu_item->items = lv_mem_realloc(menu_item->items, menu_item->child_cnt * sizeof(lv_menu_item_t *));

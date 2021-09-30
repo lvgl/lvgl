@@ -28,13 +28,11 @@ void lv_example_menu_2(void)
     lv_menu_item_t * main_menu_items = lv_menu_item_create();
 
     cont = lv_menu_cont_create(menu);
-    lv_obj_clear_flag(cont, LV_OBJ_FLAG_CLICKABLE);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Item 1");
     lv_menu_item_add_obj(menu, main_menu_items, LV_MENU_SECTION_ON, cont);
 
     cont = lv_menu_cont_create(menu);
-    lv_obj_clear_flag(cont, LV_OBJ_FLAG_CLICKABLE);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Item 2");
     lv_menu_item_add_obj(menu, main_menu_items, LV_MENU_SECTION_ON, cont);
@@ -48,7 +46,6 @@ void lv_example_menu_2(void)
     lv_menu_item_set_obj(menu, sub_menu_items, cont);
 
     cont = lv_menu_cont_create(menu);
-    lv_obj_clear_flag(cont, LV_OBJ_FLAG_CLICKABLE);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Hello, I am hiding here");
     lv_menu_item_add_obj(menu, sub_menu_items, LV_MENU_SECTION_ON, cont);

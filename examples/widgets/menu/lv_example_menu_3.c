@@ -136,8 +136,6 @@ static lv_obj_t * lv_menu_item_add_slider(lv_obj_t * menu, lv_menu_item_t * menu
 {
     lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_2);
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
     lv_obj_t * slider = lv_slider_create(obj);
     lv_obj_set_flex_grow(slider, 1);
     lv_slider_set_range(slider, min, max);
@@ -170,8 +168,6 @@ static lv_obj_t * lv_menu_item_add_text(lv_obj_t * menu, lv_menu_item_t * menu_i
 {
     lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-
     lv_menu_item_add_obj(menu, menu_item, section, obj);
 
     return obj;
@@ -181,8 +177,6 @@ static lv_obj_t * lv_menu_item_add_switch(lv_obj_t * menu, lv_menu_item_t * menu
                                    const char * icon, const char * txt, bool chk)
 {
     lv_obj_t * obj = lv_menu_item_create_text(((lv_menu_t *)menu)->storage, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
-
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_t * sw = lv_switch_create(obj);
     lv_obj_add_state(sw, chk ? LV_STATE_CHECKED : 0);
