@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#define LV_USE_MENU 1 //TODO
 #if LV_USE_MENU && LV_USE_MSGBOX && LV_BUILD_EXAMPLES
 
 static void back_event_handler(lv_event_t * e)

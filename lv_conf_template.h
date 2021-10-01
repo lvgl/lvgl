@@ -483,6 +483,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 #define LV_USE_LIST         1
 
+#define LV_USE_MENU         1
+
 #define LV_USE_METER        1
 
 #define LV_USE_MSGBOX       1

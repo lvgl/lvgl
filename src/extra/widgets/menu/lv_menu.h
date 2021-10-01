@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "../../../core/lv_obj.h"
 
-#define LV_USE_MENU 1
 #if LV_USE_MENU
 
 /*********************

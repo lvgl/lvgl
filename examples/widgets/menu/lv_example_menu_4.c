@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#define LV_USE_MENU 1 //TODO
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
 static uint32_t btn_cnt = 1;

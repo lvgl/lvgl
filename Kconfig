@@ -686,6 +686,8 @@ menu "LVGL configuration"
             bool "LED."
         config LV_USE_LIST
             bool "List."
+		config LV_USE_MENU
+            bool "Menu."
         config LV_USE_MSGBOX
             bool "Msgbox."
         config LV_USE_SPINBOX

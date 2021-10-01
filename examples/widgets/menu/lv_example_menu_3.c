@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#define LV_USE_MENU 1 //TODO
 #if LV_USE_MENU && LV_USE_USER_DATA && LV_BUILD_EXAMPLES
 
 static lv_obj_t * header_label;

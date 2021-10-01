@@ -1407,6 +1407,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+#ifndef LV_USE_MENU
+#  ifdef LV_USE_MENU
+#    define LV_USE_MENU CONFIG_LV_USE_MENU
+#  else
+#    define LV_USE_MENU         1
+#  endif
+#endif
+
 #ifndef LV_USE_METER
 #  ifdef CONFIG_LV_USE_METER
 #    define LV_USE_METER CONFIG_LV_USE_METER

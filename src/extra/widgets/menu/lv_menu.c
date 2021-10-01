@@ -8,7 +8,6 @@
  *********************/
 #include "lv_menu.h"
 
-#define LV_USE_MENU 1
 #if LV_USE_MENU
 
 /*********************
