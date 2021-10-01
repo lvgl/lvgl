@@ -3,8 +3,81 @@
 
 #include "unity/unity.h"
 
-void test_txt_next_line_should_handle_empty_string(void);
+static const char color_cmd = LV_TXT_COLOR_CMD[0];
 
+void test_txt_next_line_should_handle_empty_string(void);
+void test_txt_should_identify_valid_start_of_command(void);
+void test_txt_should_identify_invalid_start_of_command(void);
+void test_txt_should_identify_scaped_command_in_parameter(void);
+void test_txt_should_skip_color_parameter_in_parameter(void);
+void test_txt_should_reset_state_when_receiving_color_cmd_while_processing_commands(void);
+void test_txt_should_identify_space_after_parameter(void);
+
+void test_txt_should_identify_valid_start_of_command(void)
+{
+    uint32_t character = color_cmd;
+    lv_text_cmd_state_t state = LV_TEXT_CMD_STATE_WAIT;
+
+    bool is_cmd = _lv_txt_is_cmd(&state, character);
+
+    TEST_ASSERT_TRUE(is_cmd);
+    TEST_ASSERT_EQUAL_UINT8(state, LV_TEXT_CMD_STATE_PAR);
+}
+
+void test_txt_should_identify_invalid_start_of_command(void)
+{
+    uint32_t character = '$';
+    lv_text_cmd_state_t state = LV_TEXT_CMD_STATE_WAIT;
+
+    bool is_cmd = _lv_txt_is_cmd(&state, character);
+
+    TEST_ASSERT_FALSE(is_cmd);
+    TEST_ASSERT_EQUAL_UINT8(state, LV_TEXT_CMD_STATE_WAIT);
+}
+
+void test_txt_should_identify_scaped_command_in_parameter(void)
+{
+    uint32_t character = color_cmd;
+    lv_text_cmd_state_t state = LV_TEXT_CMD_STATE_PAR;
+
+    bool is_cmd = _lv_txt_is_cmd(&state, character);
+
+    TEST_ASSERT_FALSE(is_cmd);
+    TEST_ASSERT_EQUAL_UINT8(state, LV_TEXT_CMD_STATE_WAIT);
+}
+
+void test_txt_should_skip_color_parameter_in_parameter(void)
+{
+    uint32_t character = '$';
+    lv_text_cmd_state_t state = LV_TEXT_CMD_STATE_PAR;
+
+    bool is_cmd = _lv_txt_is_cmd(&state, character);
+
+    TEST_ASSERT_TRUE(is_cmd);
+    TEST_ASSERT_EQUAL_UINT8(state, LV_TEXT_CMD_STATE_PAR);
+}
+
+void test_txt_should_reset_state_when_receiving_color_cmd_while_processing_commands(void)
+{
+    uint32_t character = color_cmd;
+    lv_text_cmd_state_t state = LV_TEXT_CMD_STATE_IN;
+
+    bool is_cmd = _lv_txt_is_cmd(&state, character);
+
+    TEST_ASSERT_TRUE(is_cmd);
+    TEST_ASSERT_EQUAL_UINT8(state, LV_TEXT_CMD_STATE_WAIT);
+}
+
+void test_txt_should_identify_space_after_parameter(void)
+{
+    uint32_t character = ' ';
+    lv_text_cmd_state_t state = LV_TEXT_CMD_STATE_PAR;
+
+    bool is_cmd = _lv_txt_is_cmd(&state, character);
+
+    TEST_ASSERT_TRUE(is_cmd);
+    TEST_ASSERT_EQUAL_UINT8(state, LV_TEXT_CMD_STATE_IN);
+}
 
 /* See #2615 for more information */
 void test_txt_next_line_should_handle_empty_string(void)
