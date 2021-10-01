@@ -328,6 +328,52 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 }
 
 /**
+ * Get the full / physical horizontal resolution of a display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the full / physical horizontal resolution of the display
+ */
+lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    if(disp == NULL) {
+        return 0;
+    }
+    else {
+        switch(disp->driver->rotated) {
+            case LV_DISP_ROT_90:
+            case LV_DISP_ROT_270:
+                return disp->driver->physical_ver_res;
+            default:
+                return disp->driver->physical_hor_res;
+        }
+    }
+}
+
+/**
+ * Get the full / physical vertical resolution of a display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the full / physical vertical resolution of the display
+ */
+lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    if(disp == NULL) {
+        return 0;
+    }
+    else {
+        switch(disp->driver->rotated) {
+            case LV_DISP_ROT_90:
+            case LV_DISP_ROT_270:
+                return disp->driver->physical_hor_res;
+            default:
+                return disp->driver->physical_ver_res;
+        }
+    }
+}
+
+/**
  * Get if anti-aliasing is enabled for a display or not
  * @param disp pointer to a display (NULL to use the default display)
  * @return true: anti-aliasing is enabled; false: disabled
