@@ -126,7 +126,7 @@ typedef struct {
 #endif
 #define LV_USE_MENU 1 //TODO
 #if LV_USE_MENU
-    lv_style_t menu_bg, menu_info, menu_cont, menu_sidebar_cont, menu_main_cont, menu_content_cont, menu_header_cont, menu_section, menu_pressed, menu_seperator;
+    lv_style_t menu_bg, menu_info, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_section, menu_pressed, menu_separator;
 #endif
 #if LV_USE_MSGBOX
     lv_style_t msgbox_bg, msgbox_btn_bg, msgbox_backdrop_bg;
@@ -460,7 +460,9 @@ static void style_init(void)
     style_init_reset(&styles->menu_bg);
     lv_style_set_pad_all(&styles->menu_bg, 0);
     lv_style_set_pad_gap(&styles->menu_bg, 0);
+    lv_style_set_radius(&styles->menu_bg, 0);
     lv_style_set_clip_corner(&styles->menu_bg, true);
+    lv_style_set_border_side(&styles->menu_bg, LV_BORDER_SIDE_NONE);
     lv_style_set_bg_opa(&styles->menu_bg, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->menu_bg, color_scr);
 
@@ -501,17 +503,17 @@ static void style_init(void)
     lv_style_set_pad_ver(&styles->menu_header_cont, PAD_SMALL);
     lv_style_set_pad_gap(&styles->menu_header_cont, PAD_SMALL);
 
-    style_init_reset(&styles->menu_content_cont);
-    lv_style_set_pad_hor(&styles->menu_content_cont, PAD_SMALL);
-    lv_style_set_pad_gap(&styles->menu_content_cont, 0);
+    style_init_reset(&styles->menu_page);
+    lv_style_set_pad_hor(&styles->menu_page, 0);
+    lv_style_set_pad_gap(&styles->menu_page, 0);
 
     style_init_reset(&styles->menu_pressed);
     lv_style_set_bg_opa(&styles->menu_pressed, LV_OPA_20);
     lv_style_set_bg_color(&styles->menu_pressed, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 1) : lv_palette_main(LV_PALETTE_GREY));
 
-    style_init_reset(&styles->menu_seperator);
-    lv_style_set_bg_opa(&styles->menu_seperator, LV_OPA_TRANSP);
-    lv_style_set_pad_ver(&styles->menu_seperator, PAD_TINY);
+    style_init_reset(&styles->menu_separator);
+    lv_style_set_bg_opa(&styles->menu_separator, LV_OPA_TRANSP);
+    lv_style_set_pad_ver(&styles->menu_separator, PAD_TINY);
 #endif
 #if LV_USE_METER
     style_init_reset(&styles->meter_marker);
@@ -1039,8 +1041,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->menu_header_cont, 0);
         lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
     }
-    else if(lv_obj_check_type(obj, &lv_menu_sidebar_content_cont_class) || lv_obj_check_type(obj, &lv_menu_main_content_cont_class)) {
-        lv_obj_add_style(obj, &styles->menu_content_cont, 0);
+    else if(lv_obj_check_type(obj, &lv_menu_page_class)) {
+        lv_obj_add_style(obj, &styles->menu_page, 0);
         lv_obj_add_style(obj, &styles->menu_info, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
@@ -1048,8 +1050,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_menu_section_class)) {
         lv_obj_add_style(obj, &styles->menu_section, 0);
     }
-    else if(lv_obj_check_type(obj, &lv_menu_seperator_class)) {
-        lv_obj_add_style(obj, &styles->menu_seperator, 0);
+    else if(lv_obj_check_type(obj, &lv_menu_separator_class)) {
+        lv_obj_add_style(obj, &styles->menu_separator, 0);
     }
 #endif
 #if LV_USE_MSGBOX

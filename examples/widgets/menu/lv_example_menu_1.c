@@ -12,37 +12,30 @@ void lv_example_menu_1(void)
     lv_obj_t * cont;
     lv_obj_t * label;
 
-    /*Create a menu item*/
-    lv_menu_item_t * main_menu_items = lv_menu_item_create();
+    /*Create a sub page*/
+    lv_obj_t * sub_page = lv_menu_page_create(menu);
 
-    lv_menu_item_add_seperator(menu, main_menu_items, LV_MENU_SECTION_OFF);
-
-    cont = lv_menu_cont_create(menu);
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Item 1");
-    lv_menu_item_add_obj(menu, main_menu_items, LV_MENU_SECTION_ON, cont);
-
-    cont = lv_menu_cont_create(menu);
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Item 2");
-    lv_menu_item_add_obj(menu, main_menu_items, LV_MENU_SECTION_ON, cont);
-
-    /*Create a sub menu item*/
-    lv_menu_item_t * sub_menu_items = lv_menu_item_create();
-
-    cont = lv_menu_cont_create(menu);
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Item 3 (Click me!)");
-    lv_menu_item_set_obj(menu, sub_menu_items, cont);
-
-    cont = lv_menu_cont_create(menu);
+    cont = lv_menu_cont_create(sub_page);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Hello, I am hiding here");
-    lv_menu_item_add_obj(menu, sub_menu_items, LV_MENU_SECTION_ON, cont);
 
-    lv_menu_item_add_menu(menu, main_menu_items, LV_MENU_SECTION_ON, sub_menu_items);
+    /*Create a main page*/
+    lv_obj_t * main_page = lv_menu_page_create(menu);
 
-    lv_menu_set(menu, main_menu_items);
+    cont = lv_menu_cont_create(main_page);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Item 1");
+
+    cont = lv_menu_cont_create(main_page);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Item 2");
+
+    cont = lv_menu_cont_create(main_page);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Item 3 (Click me!)");
+    lv_menu_set_load_page_event(menu, cont, sub_page);
+
+    lv_menu_set_page(menu, main_page);
 }
 
 #endif
