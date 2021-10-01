@@ -114,7 +114,7 @@ void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * 
     int32_t x, y;
     for(y = area->y1; y <= area->y2; y++) {
         for(x = area->x1; x <= area->x2; x++) {
-            put_px(x, y, *color_p)
+            put_px(x, y, *color_p);
             color_p++;
         }
     }

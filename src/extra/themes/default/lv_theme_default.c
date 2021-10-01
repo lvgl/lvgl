@@ -603,6 +603,13 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     return (lv_theme_t *)&theme;
 }
 
+lv_theme_t * lv_theme_default_get(void)
+{
+    if(!inited) return NULL;
+
+    return (lv_theme_t *)&theme;
+}
+
 bool lv_theme_default_is_inited(void)
 {
     return inited;
