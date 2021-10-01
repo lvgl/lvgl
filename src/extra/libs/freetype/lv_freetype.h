@@ -18,7 +18,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_USE_FT_CACHE_MANAGER  1
 
 /**********************
  *      TYPEDEFS

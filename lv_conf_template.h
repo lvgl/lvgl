@@ -570,7 +570,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*FreeType library*/
 #define LV_USE_FREETYPE 0
 #if LV_USE_FREETYPE
-/*Memory used by FreeType to cache characters [bytes]*/
+/*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
 # define LV_FREETYPE_CACHE_SIZE  (16 * 1024)
 #endif
 

@@ -31,7 +31,7 @@ typedef struct {
 } lv_faces_control_t;
 
 typedef struct {
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
     void * face_id;
 #else
     FT_Size     size;
@@ -44,7 +44,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
 static FT_Error font_face_requester(FTC_FaceID face_id,
                                     FT_Library library_is, FT_Pointer req_data, FT_Face * aface);
 static bool lv_ft_font_init_cache(lv_ft_info_t * info);
@@ -65,7 +65,7 @@ static void lv_ft_font_destroy_nocache(lv_font_t * font);
 **********************/
 static FT_Library library;
 
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
     static FTC_Manager cache_manager;
     static FTC_CMapCache cmap_cache;
     static FTC_SBitCache sbit_cache;
@@ -90,7 +90,7 @@ bool lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes
         return false;
     }
 
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
     error = FTC_Manager_New(library, max_faces, max_sizes,
                             max_bytes, font_face_requester, NULL, &cache_manager);
     if(error) {
@@ -122,12 +122,12 @@ Fail:
     LV_UNUSED(max_bytes);
     _lv_ll_init(&face_control.face_ll, sizeof(FT_Face *));
     return true;
-#endif/* LV_USE_FT_CACHE_MANAGER */
+#endif/* LV_FREETYPE_CACHE_SIZE */
 }
 
 void lv_freetype_destroy(void)
 {
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
     FTC_Manager_Done(cache_manager);
 #endif
     FT_Done_FreeType(library);
@@ -135,7 +135,7 @@ void lv_freetype_destroy(void)
 
 bool lv_ft_font_init(lv_ft_info_t * info)
 {
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
     return lv_ft_font_init_cache(info);
 #else
     return lv_ft_font_init_nocache(info);
@@ -144,7 +144,7 @@ bool lv_ft_font_init(lv_ft_info_t * info)
 
 void lv_ft_font_destroy(lv_font_t * font)
 {
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
     lv_ft_font_destroy_cache(font);
 #else
     lv_ft_font_destroy_nocache(font);
@@ -154,7 +154,7 @@ void lv_ft_font_destroy(lv_font_t * font)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_USE_FT_CACHE_MANAGER
+#if LV_FREETYPE_CACHE_SIZE >= 0
 
 static FT_Error font_face_requester(FTC_FaceID face_id,
                                     FT_Library library_is, FT_Pointer req_data, FT_Face * aface)
@@ -292,7 +292,7 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
     }
 }
 
-#else/* LV_USE_FT_CACHE_MANAGER */
+#else/* LV_FREETYPE_CACHE_SIZE */
 
 static FT_Face face_find_in_list(lv_ft_info_t * info)
 {
@@ -475,6 +475,6 @@ static void lv_ft_font_destroy_nocache(lv_font_t * font)
     }
 }
 
-#endif/* LV_USE_FT_CACHE_MANAGER */
+#endif/* LV_FREETYPE_CACHE_SIZE */
 
 #endif /*LV_USE_FREETYPE*/

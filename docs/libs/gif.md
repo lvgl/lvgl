@@ -4,27 +4,45 @@
 ```
 
 # GIF decoder
-Allow to use of GIF images in LVGL from. 
+Allow to use of GIF images in LVGL. Based on https://github.com/lecram/gifdec
 
-Based on https://github.com/lecram/gifdec
+When enabled in `lv_conf.h` with `LV_USE_GIF` `lv_gif_create(parent)` can be used to create a gif widget.
 
-## Get started
-- Download or clone this repository
-  - [Download from GitHub](https://github.com/lvgl/lv_lib_gif/archive/master.zip)
-  - Clone: `git clone https://github.com/lvgl/lv_lib_gif.git`
-- Include the library: `#include "lv_lib_gif/lv_gif.h"`
+`lv_gif_set_src(obj, src)` works very similarly to `lv_img_set_src`. As source It also accepts images as variables (`lv_img_dsc_t`) or files.
+
+
+## Convert GIF files to C array
+To convert a GIF file to byte values array use [LVGL's online converter](https://lvgl.io/tools/imageconverter). Select "Raw" color format and "C array" Output format.
+ 
 
 ## Use GIF images from file
+
+For example:
 ```c
-lv_obj_t * img = lv_gif_create_from_file(parent, "S/path/to/example.gif");
+lv_gif_set_src(obj, "S:path/to/example.gif");
 ```
 
-## Use GIF images from flash
-If the gif file stored in the flash as a C array: 
-```c
-extern const uint8_t example_gif_map[];  /*Use the example gif*/
-lv_obj_t * img = lv_gif_create_from_data(parent, example_gif_map);
-```
-### Convert GIF files to C array
-To convert a GIF file to byte values array use [LVGL's online converter](https://lvgl.io/tools/imageconverter). Select "Raw" color format and "C array" Output format.
+Note that, a file system driver needs to regsitered to open images from files. Read more about it [here](https://docs.lvgl.io/master/overview/file-system.html) or just enable one in `lv_conf.h` with `LV_USE_FS_...` 
 
+
+## Memory requirements
+To decode and display a GIF animation the following amount of RAM is required:
+- `LV_COLOR_DEPTH 8`: 3 x image width x image height 
+- `LV_COLOR_DEPTH 16`: 4 x image width x image height 
+- `LV_COLOR_DEPTH 32`: 5 x image width x image height 
+
+## Example
+```eval_rst
+
+.. include:: ../../../examples/libs/gif/index.rst
+
+```
+
+## API
+
+```eval_rst
+
+.. doxygenfile:: lv_gif.h
+  :project: lvgl
+
+```
