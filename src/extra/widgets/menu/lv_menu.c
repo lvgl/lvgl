@@ -86,6 +86,7 @@ const lv_obj_class_t lv_menu_sidebar_header_cont_class = {
     .base_class = &lv_obj_class
 };
 
+static void lv_menu_refr(lv_obj_t * obj);
 static void lv_menu_refr_sidebar_header_mode(lv_obj_t * obj);
 static void lv_menu_refr_main_header_mode(lv_obj_t * obj);
 static void lv_menu_load_page_event_cb(lv_event_t * e);
