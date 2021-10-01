@@ -485,6 +485,7 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_img_set_src(main_header_back_btn, LV_SYMBOL_LEFT);
     lv_obj_add_flag(main_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
     menu->main_header_back_btn = menu->main_header; /* Let the entire header be the back btn */
+    lv_obj_add_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
 
     menu->selected_tab = NULL;
 
