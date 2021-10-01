@@ -1,0 +1,92 @@
+```eval_rst
+.. include:: /header.rst 
+:github_url: |github_link_base|/widgets/extra/menu.md
+```
+# Menu (lv_menu)
+
+## Overview
+The menu widget can be used to easily create multi-level menus. It handles the traversal of between pages automatically.
+
+## Parts and Styles
+The Menu widget is built from the following objects:
+- Main container: lv_menu_main_cont
+  - Main header: lv_menu_main_header_cont
+    - Default back button: [lv_btn](/widgets/core/btn)
+  - Main page: lv_menu_page
+- Sidebar container: lv_menu_sidebar_cont
+  - Sidebar header: lv_menu_sidebar_header_cont
+    - Default back button: [lv_btn](/widgets/core/btn)
+  - Sidebar page: lv_menu_page
+  
+## Usage
+
+### Create a menu
+`lv_menu_create(parent)` creates a new empty menu.
+
+### Sidebar mode
+The following sidebar modes exist:
+- `LV_MENU_MODE_SIDEBAR_DISABLED`
+- `LV_MENU_MODE_SIDEBAR_ENABLED`
+
+You can set sidebar modes with `lv_menu_set_mode_sidebar(menu, LV_MENU_MODE_SIDEBAR...)`.
+
+### Header mode
+The following header modes exist:
+- `LV_MENU_MODE_HEADER_TOP_FIXED` Header is positioned at the top.
+- `LV_MENU_MODE_HEADER_TOP_UNFIXED` Header is positioned at the top and can be scrolled out of view.
+- `LV_MENU_MODE_HEADER_BOTTOM_FIXED` Header is positioned at the bottom.
+
+You can set header modes with `lv_menu_set_mode_header(menu, LV_MENU_MODE_HEADER...)`. 
+
+### Root back button mode
+The following root back button modes exist:
+- `LV_MENU_MODE_ROOT_BACK_BTN_DISABLED`
+- `LV_MENU_MODE_ROOT_BACK_BTN_ENABLED`
+
+You can set root back button modes with `lv_menu_set_mode_root_back_btn(menu, LV_MENU_MODE_ROOT_BACK_BTN...)`.
+
+### Create a menu page
+`lv_menu_page_create(menu)` creates a new empty menu page.
+You can add any widgets to the page.
+
+### Set a menu page
+Once the main page has been created, you must set it to the menu widget with `lv_menu_set_page(menu, page)`.
+
+### Linking between menu pages
+For instance, you have created a btn obj in the main page. When you click the btn obj, you want it to open up a new page, use `lv_menu_set_load_page_event(menu, obj, new page)`.
+
+### Create a menu container, section, separator
+The following objects can be created so that it is easier to style the menu:
+`lv_menu_cont_create(parent page)` creates a new empty container.
+`lv_menu_section_create(parent page)` creates a new empty section.
+`lv_menu_separator_create(parent page)` creates a seperator.
+
+## Events
+- `LV_EVENT_VALUE_CHANGED` Sent when a page is shown.  `lv_menu_get_cur_main_page(menu)` returns a pointer to menu page that is currently displayed in main.
+    
+See the events of the [Base object](/widgets/obj) too.
+    
+Learn more about [Events](/overview/event).
+
+## Keys
+No keys are handled by the menu widget.
+
+Learn more about [Keys](/overview/indev).
+
+
+## Example
+
+```eval_rst
+
+.. include:: ../../../examples/widgets/menu/index.rst
+
+```
+
+## API 
+
+```eval_rst
+
+.. doxygenfile:: lv_menu.h
+  :project: lvgl
+        
+```
