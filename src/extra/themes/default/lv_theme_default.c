@@ -124,10 +124,11 @@ typedef struct {
 #if LV_USE_COLORWHEEL
     lv_style_t colorwheel_main;
 #endif
-#define LV_USE_MENU 1 //TODO
+
 #if LV_USE_MENU
     lv_style_t menu_bg, menu_info, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_section, menu_pressed, menu_separator;
 #endif
+
 #if LV_USE_MSGBOX
     lv_style_t msgbox_bg, msgbox_btn_bg, msgbox_backdrop_bg;
 #endif
