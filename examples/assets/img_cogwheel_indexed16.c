@@ -1,5 +1,7 @@
 #include "../../lvgl.h"
 
+#if LV_BUILD_EXAMPLES
+
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
@@ -136,3 +138,5 @@ const lv_img_dsc_t img_cogwheel_indexed16 = {
   .header.cf = LV_IMG_CF_INDEXED_4BIT,
   .data = img_cogwheel_indexed16_map,
 };
+
+#endif /* LV_BUILD_EXAMPLES */

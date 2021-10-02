@@ -3,11 +3,11 @@
 #
 
 opts = "\n".join([
-    "Apple\n"
-    "Banana\n"
-    "Orange\n"
-    "Melon\n"
-    "Grape\n"
+    "Apple",
+    "Banana",
+    "Orange",
+    "Melon",
+    "Grape",
     "Raspberry"])
 
 dd = lv.dropdown(lv.scr_act())

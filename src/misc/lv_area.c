@@ -134,7 +134,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
     res_p->x2 = LV_MIN(a1_p->x2, a2_p->x2);
     res_p->y2 = LV_MIN(a1_p->y2, a2_p->y2);
 
-    /*If x1 or y1 greater then x2 or y2 then the areas union is empty*/
+    /*If x1 or y1 greater than x2 or y2 then the areas union is empty*/
     bool union_ok = true;
     if((res_p->x1 > res_p->x2) || (res_p->y1 > res_p->y2)) {
         union_ok = false;
@@ -276,6 +276,44 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coo
     p.x = ain_p->x2;
     p.y = ain_p->y2;
     if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
+
+    return true;
+}
+
+/**
+ * Check if an area is fully out of an other
+ * @param aout_p pointer to an area which could be in 'aholder_p'
+ * @param aholder_p pointer to an area which could involve 'ain_p'
+ * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
+ * @return true: `aout_p` is fully outside `aholder_p`
+ */
+bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_coord_t radius)
+{
+    if(aout_p->x2 < aholder_p->x1 || aout_p->y2 < aholder_p->y1 || aout_p->x1 > aholder_p->x2 ||
+       aout_p->y1 > aholder_p->y2) {
+        return true;
+    }
+
+    if(radius == 0) return true;
+
+    /*Check if the corner points are outside the radius or not*/
+    lv_point_t p;
+
+    p.x = aout_p->x1;
+    p.y = aout_p->y1;
+    if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
+
+    p.x = aout_p->x2;
+    p.y = aout_p->y1;
+    if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
+
+    p.x = aout_p->x1;
+    p.y = aout_p->y2;
+    if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
+
+    p.x = aout_p->x2;
+    p.y = aout_p->y2;
+    if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
 
     return true;
 }

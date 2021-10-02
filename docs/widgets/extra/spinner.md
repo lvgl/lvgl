@@ -17,7 +17,7 @@ The parts are identical to the parts of [lv_arc](/widgets/core/arc).
 To create a spinner use `lv_spinner_create(parent, spin_time, arc_length)`. `spin time` sets the spin time in milliseconds, `arc_length` sets the length of the spinning arc in degrees.
 
 ## Events
-No special events are sent the the Spinner.
+No special events are sent to the Spinner.
 
 See the events of the [Arc](/widgets/core/arc) too.
 

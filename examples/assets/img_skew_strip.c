@@ -1,9 +1,6 @@
-#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "../../lvgl.h"
 
+#if LV_BUILD_EXAMPLES
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
@@ -117,3 +114,4 @@ const lv_img_dsc_t img_skew_strip = {
   .data = img_skew_strip_map,
 };
 
+#endif /* LV_BUILD_EXAMPLES */

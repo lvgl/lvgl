@@ -62,10 +62,7 @@ void lv_anim_timeline_del(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
 
-    for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
-        lv_anim_t * a = &(at->anim_dsc[i].anim);
-        lv_anim_custom_del(a, (lv_anim_custom_exec_cb_t)a->exec_cb);
-    }
+    lv_anim_timeline_stop(at);
 
     lv_mem_free(at->anim_dsc);
     lv_mem_free(at);
@@ -109,6 +106,16 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     }
 
     return playtime;
+}
+
+void lv_anim_timeline_stop(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+
+    for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
+        lv_anim_t * a = &(at->anim_dsc[i].anim);
+        lv_anim_custom_del(a, (lv_anim_custom_exec_cb_t)a->exec_cb);
+    }
 }
 
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)

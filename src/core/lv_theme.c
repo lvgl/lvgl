@@ -33,7 +33,7 @@ static void apply_theme(lv_theme_t * th, lv_obj_t * obj);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_theme_t *  lv_theme_get_from_obj(lv_obj_t * obj)
+lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
 {
     lv_disp_t * disp = obj ? lv_obj_get_disp(obj) : lv_disp_get_default();
     return lv_disp_get_theme(disp);

@@ -23,14 +23,14 @@ Options are passed to the Roller as a string with `lv_roller_set_options(roller,
 You can select an option manually with `lv_roller_set_selected(roller, id, LV_ANIM_ON/OFF)`, where *id* is the index of an option.
 
 ### Get selected option
-The get the *index* of the currently selected option use `lv_roller_get_selected(roller)`.
+To get the *index* of the currently selected option use `lv_roller_get_selected(roller)`.
 
 `lv_roller_get_selected_str(roller, buf, buf_size)` will copy the name of the selected option to `buf`.
 
 ### Visible rows
 The number of visible rows can be adjusted with `lv_roller_set_visible_row_count(roller, num)`.
 
-This function calculates the height with the current style. If the font, line space, border width, etc of the roller changes this function needs to be called again. 
+This function calculates the height with the current style. If the font, line space, border width, etc. of the roller changes this function needs to be called again. 
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.

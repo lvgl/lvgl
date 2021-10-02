@@ -79,7 +79,7 @@ void lv_group_del(lv_group_t * group)
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
     _LV_LL_READ(&group->obj_ll, obj) {
-        if((*obj)->spec_attr) (*obj)->spec_attr->group_p = NULL;
+        if((*obj)->spec_attr)(*obj)->spec_attr->group_p = NULL;
     }
 
     _lv_ll_clear(&(group->obj_ll));
@@ -139,6 +139,25 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     LV_LOG_TRACE("finished");
 }
 
+void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
+{
+    lv_group_t * g1 = lv_obj_get_group(obj1);
+    lv_group_t * g2 = lv_obj_get_group(obj2);
+    if(g1 != g2) return;
+    if(g1 == NULL) return;
+
+    /*Do not add the object twice*/
+    lv_obj_t ** obj_i;
+    _LV_LL_READ(&g1->obj_ll, obj_i) {
+        if((*obj_i) == obj1)(*obj_i) =  obj2;
+        else if((*obj_i) == obj2)(*obj_i) =  obj1;
+    }
+
+    if(*g1->obj_focus == obj1) lv_group_focus_obj(obj2);
+    else if(*g1->obj_focus == obj2) lv_group_focus_obj(obj1);
+
+}
+
 void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = lv_obj_get_group(obj);
@@ -192,7 +211,7 @@ void lv_group_remove_all_objs(lv_group_t * group)
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
     _LV_LL_READ(&group->obj_ll, obj) {
-        if((*obj)->spec_attr) (*obj)->spec_attr->group_p = NULL;
+        if((*obj)->spec_attr)(*obj)->spec_attr->group_p = NULL;
     }
 
     _lv_ll_clear(&(group->obj_ll));

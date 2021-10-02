@@ -7,14 +7,14 @@
 LVGL has a built-in timer system. You can register a function to have it be called periodically. The timers are handled and called in `lv_timer_handler()`, which needs to be called every few milliseconds.
 See [Porting](/porting/task-handler) for more information.
 
-The timers are non-preemptive, which means a timer cannot interrupt another timer. Therefore, you can call any LVGL related function in a timer.
+Timers are non-preemptive, which means a timer cannot interrupt another timer. Therefore, you can call any LVGL related function in a timer.
 
 
 ## Create a timer
 To create a new timer, use `lv_timer_create(timer_cb, period_ms, user_data)`. It will create an `lv_timer_t *` variable, which can be used later to modify the parameters of the timer.
 `lv_timer_create_basic()` can also be used. This allows you to create a new timer without specifying any parameters.
 
-A timer callback should have `void (*lv_timer_cb_t)(lv_timer_t *);` prototype.
+A timer callback should have a `void (*lv_timer_cb_t)(lv_timer_t *);` prototype.
 
 For example:
 ```c
@@ -40,19 +40,19 @@ lv_timer_t * timer = lv_timer_create(my_timer, 500,  &user_data);
 
 ## Ready and Reset
 
-`lv_timer_ready(timer)` makes the timer run on the next call of `lv_timer_handler()`.
+`lv_timer_ready(timer)` makes a timer run on the next call of `lv_timer_handler()`.
 
 `lv_timer_reset(timer)` resets the period of a timer. It will be called again after the defined period of milliseconds has elapsed.
 
 
 ## Set parameters
-You can modify some parameters of the timers later:
+You can modify some timer parameters later:
 - `lv_timer_set_cb(timer, new_cb)`
 - `lv_timer_set_period(timer, new_period)`
 
 ## Repeat count
 
-You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after being called the defined number of times. Set the count to `-1` to repeat indefinitely. 
+You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after it's called the defined number of times. Set the count to `-1` to repeat indefinitely. 
 
 
 ## Measure idle time
@@ -62,9 +62,9 @@ It can be misleading if you use an operating system and call `lv_timer_handler` 
 
 ## Asynchronous calls
 
-In some cases, you can't do an action immediately. For example, you can't delete an object because something else is still using it or you don't want to block the execution now.
-For these cases, `lv_async_call(my_function, data_p)` can be used to make `my_function` be called on the next call of `lv_timer_handler`. `data_p` will be passed to function when it's called.
-Note that, only the pointer of the data is saved so you need to ensure that the variable will be "alive" while the function is called. It can be *static*, global or dynamically allocated data.
+In some cases, you can't perform an action immediately. For example, you can't delete an object because something else is still using it, or you don't want to block the execution now.
+For these cases, `lv_async_call(my_function, data_p)` can be used to call `my_function` on the next invocation of `lv_timer_handler`. `data_p` will be passed to the function when it's called.
+Note that only the data pointer is saved, so you need to ensure that the variable will be "alive" while the function is called. It can be *static*, global or dynamically allocated data.
 
 For example:
 ```c
@@ -78,16 +78,16 @@ void my_screen_clean_up(void * scr)
 
 ...
 
-/*Do somethings with the object on the current screen*/
+/*Do something with the object on the current screen*/
 
-/*Delete screen on next call of `lv_timer_handler`, so not now.*/
+/*Delete screen on next call of `lv_timer_handler`, not right now.*/
 lv_async_call(my_screen_clean_up, lv_scr_act());
 
 /*The screen is still valid so you can do other things with it*/
 
 ```
 
-If you just want to delete an object, and don't need to clean anything up in `my_screen_cleanup`, you could just use `lv_obj_del_async`, which will delete the object on the next call to `lv_timer_handler`.
+If you just want to delete an object and don't need to clean anything up in `my_screen_cleanup` you could just use `lv_obj_del_async` which will delete the object on the next call to `lv_timer_handler`.
 
 ## API
 

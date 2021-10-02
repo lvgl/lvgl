@@ -191,7 +191,8 @@ void lv_obj_set_style_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selec
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -223,7 +224,8 @@ void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_styl
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_SPEED, v, selector);
 }
 
-void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
+void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
+                                 lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -631,7 +633,7 @@ void lv_obj_set_style_line_dash_gap(struct _lv_obj_t * obj, lv_coord_t value, lv
     lv_obj_set_local_style_prop(obj, LV_STYLE_LINE_DASH_GAP, v, selector);
 }
 
-void lv_obj_set_style_line_rounded(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+void lv_obj_set_style_line_rounded(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -671,7 +673,7 @@ void lv_obj_set_style_arc_width(struct _lv_obj_t * obj, lv_coord_t value, lv_sty
     lv_obj_set_local_style_prop(obj, LV_STYLE_ARC_WIDTH, v, selector);
 }
 
-void lv_obj_set_style_arc_rounded(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+void lv_obj_set_style_arc_rounded(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value

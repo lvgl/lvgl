@@ -58,7 +58,7 @@ const lv_obj_class_t lv_slider_class = {
 
 lv_obj_t * lv_slider_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -134,11 +134,11 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_coord_t dist_left, dist_right;
             if(hor) {
                 if((base_dir != LV_BASE_DIR_RTL && p.x > slider->right_knob_area.x2) || (base_dir == LV_BASE_DIR_RTL &&
-                                                                                      p.x < slider->right_knob_area.x1)) {
+                                                                                         p.x < slider->right_knob_area.x1)) {
                     slider->value_to_set = &slider->bar.cur_value;
                 }
                 else if((base_dir != LV_BASE_DIR_RTL && p.x < slider->left_knob_area.x1) || (base_dir == LV_BASE_DIR_RTL &&
-                                                                                          p.x > slider->left_knob_area.x2)) {
+                                                                                             p.x > slider->left_knob_area.x2)) {
                     slider->value_to_set = &slider->bar.start_value;
                 }
                 else {
@@ -277,7 +277,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,LV_PART_KNOB);
+        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
         lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
@@ -313,7 +313,8 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
-    } else if(code == LV_EVENT_DRAW_MAIN) {
+    }
+    else if(code == LV_EVENT_DRAW_MAIN) {
         draw_knob(e);
     }
 }
@@ -383,7 +384,8 @@ static void draw_knob(lv_event_t * e)
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
-    } else {
+    }
+    else {
         /*Save the draw part_draw_dsc. because it can be modified in the event*/
         lv_draw_rect_dsc_t knob_rect_dsc_tmp;
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));

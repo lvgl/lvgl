@@ -82,17 +82,17 @@ typedef struct {
     lv_color_t color;
     lv_chart_series_t * ser;
     lv_dir_t dir;
-    uint8_t pos_set:1;  /*1: pos is set; 0: point_id is set*/
+    uint8_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
 } lv_chart_cursor_t;
 
 typedef struct {
     lv_coord_t major_len;
     lv_coord_t minor_len;
     lv_coord_t draw_size;
-    uint32_t minor_cnt :15;
-    uint32_t major_cnt :15;
-    uint32_t label_en  :1;
-}lv_chart_tick_dsc_t;
+    uint32_t minor_cnt : 15;
+    uint32_t major_cnt : 15;
+    uint32_t label_en  : 1;
+} lv_chart_tick_dsc_t;
 
 
 typedef struct {
@@ -110,9 +110,9 @@ typedef struct {
     uint16_t point_cnt;    /**< Point number in a data line*/
     uint16_t zoom_x;
     uint16_t zoom_y;
-    lv_chart_type_t type  :3; /**< Line or column chart*/
+    lv_chart_type_t type  : 3; /**< Line or column chart*/
     lv_chart_update_mode_t update_mode : 1;
-}lv_chart_t;
+} lv_chart_t;
 
 extern const lv_obj_class_t lv_chart_class;
 
@@ -128,7 +128,7 @@ typedef enum {
     LV_CHART_DRAW_PART_BAR,              /**< Used on bar charts for the rectangles*/
     LV_CHART_DRAW_PART_CURSOR,           /**< Used on cursor lines and points*/
     LV_CHART_DRAW_PART_TICK_LABEL,       /**< Used on tick lines and labels*/
-}lv_chart_draw_part_type_t;
+} lv_chart_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -218,7 +218,8 @@ uint16_t lv_chart_get_zoom_y(const lv_obj_t * obj);
  * @param draw_size     extra size required to draw the tick and labels
  *                      (start with 20 px and increase if the ticks/labels are clipped)
  */
-void lv_chart_set_axis_tick(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t major_len, lv_coord_t minor_len, lv_coord_t major_cnt, lv_coord_t minor_cnt, bool label_en, lv_coord_t draw_size);
+void lv_chart_set_axis_tick(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t major_len, lv_coord_t minor_len,
+                            lv_coord_t major_cnt, lv_coord_t minor_cnt, bool label_en, lv_coord_t draw_size);
 
 /**
  * Get the type of a chart
@@ -306,7 +307,7 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint16_
  * Get the next series.
  * @param chart     pointer to a chart
  * @param ser      the previous series or NULL to get the first
- * @return          the next series or NULL if thre is no more.
+ * @return          the next series or NULL if there is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser);
 
@@ -340,7 +341,8 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
  * @param ser       pointer to a series
  * @param point_id  the point's index or  `LV_CHART_POINT_NONE` to not assign to any points.
  */
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint16_t point_id);
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser,
+                               uint16_t point_id);
 
 /**
  * Get the coordinate of the cursor with respect to the paddings
@@ -358,7 +360,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
  * Initialize all data points of a series with a value
  * @param obj       pointer to chart object
  * @param ser       pointer to a data series on 'chart'
- * @param value     the new value for all points. `LV_CHART_POINT_DEF` can be used to hide the points.
+ * @param value     the new value for all points. `LV_CHART_POINT_NONE` can be used to hide the points.
  */
 void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value);
 
@@ -397,7 +399,8 @@ void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t 
  * @param x_value   the new X value of the next data
  * @param y_value   the new Y value of the next data
  */
-void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t x_value, lv_coord_t y_value);
+void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t x_value,
+                               lv_coord_t y_value);
 
 /**
  * Set an external array for the y data points to use for the chart

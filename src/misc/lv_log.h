@@ -47,7 +47,7 @@ typedef int8_t lv_log_level_t;
 /**
  * Log print function. Receives a string buffer to print".
  */
-typedef void (*lv_log_print_g_cb_t)(const char *buf);
+typedef void (*lv_log_print_g_cb_t)(const char * buf);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -84,44 +84,44 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
  **********************/
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_TRACE
-#define LV_LOG_TRACE(...) _lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_TRACE(...) _lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
-#define LV_LOG_TRACE(...)
+#define LV_LOG_TRACE(...) do {}while(0)
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
-#define LV_LOG_INFO(...) _lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_INFO(...) _lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
-#define LV_LOG_INFO(...)
+#define LV_LOG_INFO(...) do {}while(0)
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN
-#define LV_LOG_WARN(...) _lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_WARN(...) _lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
-#define LV_LOG_WARN(...)
+#define LV_LOG_WARN(...) do {}while(0)
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_ERROR
-#define LV_LOG_ERROR(...) _lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_ERROR(...) _lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
-#define LV_LOG_ERROR(...)
+#define LV_LOG_ERROR(...) do {}while(0)
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_USER
-#define LV_LOG_USER(...) _lv_log_add(LV_LOG_LEVEL_USER, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_USER(...) _lv_log_add(LV_LOG_LEVEL_USER, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
-#define LV_LOG_USER(...)
+#define LV_LOG_USER(...) do {}while(0)
 #endif
 
 #else /*LV_USE_LOG*/
 
 /*Do nothing if `LV_USE_LOG 0`*/
 #define _lv_log_add(level, file, line, ...)
-#define LV_LOG_TRACE(...)
-#define LV_LOG_INFO(...)
-#define LV_LOG_WARN(...)
-#define LV_LOG_ERROR(...)
-#define LV_LOG_USER(...)
+#define LV_LOG_TRACE(...) do {}while(0)
+#define LV_LOG_INFO(...) do {}while(0)
+#define LV_LOG_WARN(...) do {}while(0)
+#define LV_LOG_ERROR(...) do {}while(0)
+#define LV_LOG_USER(...) do {}while(0)
 #endif /*LV_USE_LOG*/
 
 #ifdef __cplusplus

@@ -9,7 +9,7 @@
 To register an input device an `lv_indev_drv_t` variable has to be initialized:
 
 ```c
-lv_indev_drv_t indev_drv;
+static lv_indev_drv_t indev_drv;
 lv_indev_drv_init(&indev_drv);      /*Basic initialization*/
 indev_drv.type =...                 /*See below.*/
 indev_drv.read_cb =...              /*See below.*/
@@ -17,7 +17,7 @@ indev_drv.read_cb =...              /*See below.*/
 lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv);
 ```
 
-`type` can be
+The `type` member can be:
 - `LV_INDEV_TYPE_POINTER` touchpad or mouse
 - `LV_INDEV_TYPE_KEYPAD` keyboard or keypad
 - `LV_INDEV_TYPE_ENCODER` encoder with left/right turn and push options
@@ -75,7 +75,7 @@ void keyboard_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
 ```
 
 ### Encoder
-With an encoder you can do 4 things:
+With an encoder you can do the following:
 1. Press its button
 2. Long-press its button
 3. Turn left
@@ -84,8 +84,8 @@ With an encoder you can do 4 things:
 In short, the Encoder input devices work like this:
 - By turning the encoder you can focus on the next/previous object.
 - When you press the encoder on a simple object (like a button), it will be clicked.
-- If you press the encoder on a complex object (like a list, message box, etc.) the object will go to edit mode whereby turning the encoder you can navigate inside the object.
-- To leave edit mode press long the button.
+- If you press the encoder on a complex object (like a list, message box, etc.) the object will go to edit mode whereby you can navigate inside the object by turning the encoder.
+- To leave edit mode, long press the button.
 
 
 To use an *Encoder* (similarly to the *Keypads*) the objects should be added to groups.
@@ -115,7 +115,7 @@ You need to have 3 buttons available:
 - `LV_KEY_RIGHT` will simulate turning encoder right
 - other keys will be passed to the focused widget
 
-If you hold the keys it will simulate encoder click with period specified in `indev_drv.long_press_rep_time`.
+If you hold the keys it will simulate an encoder advance with period specified in `indev_drv.long_press_rep_time`.
 
 ```c
 indev_drv.type = LV_INDEV_TYPE_ENCODER;
@@ -169,7 +169,7 @@ void button_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
 
 ### Parameters
 
-The default value of the following parameters can changed in `lv_indev_drv_t`:
+The default value of the following parameters can be changed in `lv_indev_drv_t`:
 - `scroll_limit` Number of pixels to slide before actually scrolling the object.
 - `scroll_throw`  Scroll throw (momentum) slow-down in [%]. Greater value means faster slow-down.
 - `long_press_time` Press time to send `LV_EVENT_LONG_PRESSED` (in milliseconds)
@@ -179,18 +179,18 @@ The default value of the following parameters can changed in `lv_indev_drv_t`:
 ### Feedback
 
 Besides `read_cb` a `feedback_cb` callback can be also specified in `lv_indev_drv_t`.
-`feedback_cb` is called when any type of event is sent by the input devices (independently from its type). This allows generating feedback for the user, e.g. to play a sound on `LV_EVENT_CLICKED`.
+`feedback_cb` is called when any type of event is sent by the input devices (independently of its type). This allows generating feedback for the user, e.g. to play a sound on `LV_EVENT_CLICKED`.
 
 
 ### Associating with a display
-Every input device is associated with a display. By default, a new input device is added to the lastly created or the explicitly selected (using `lv_disp_set_default()`) display.
+Every input device is associated with a display. By default, a new input device is added to the last  display created or explicitly selected (using `lv_disp_set_default()`).
 The associated display is stored and can be changed in `disp` field of the driver.
 
 ### Buffered reading
-By default LVGL calls `read_cb` periodically. This way there is a chance that some user gestures are missed. 
+By default, LVGL calls `read_cb` periodically. Because of this intermittent polling there is a chance that some user gestures are missed. 
 
-To solve this you can write an event driven driver for your input device that buffers measured data. In `read_cb` you can set the buffered data instead of reading the input device. 
-You can set the `data->continue_reading` flag to tell that LVGL there is more data to read and it should call the `read_cb` again.
+To solve this you can write an event driven driver for your input device that buffers measured data. In `read_cb` you can report the buffered data instead of directly reading the input device. 
+Setting the `data->continue_reading` flag will tell LVGL there is more data to read and it should call `read_cb` again.
 
 ## Further reading
 

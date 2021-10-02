@@ -39,7 +39,7 @@ You can specify the display type with `lv_chart_set_type(chart, LV_CHART_TYPE_..
 
 
 ### Data series
-You can add any number of series to the charts by `lv_chart_add_series(chart, color, axis)`. This will allocates a `lv_chart_series_t` structure which contains the chosen `color` and an array for the data points.
+You can add any number of series to the charts by `lv_chart_add_series(chart, color, axis)`. This allocates an `lv_chart_series_t` structure which contains the chosen `color` and an array for the data points.
 `axis` can have the following values:
 - `LV_CHART_AXIS_PRIMARY_Y` Left axis
 - `LV_CHART_AXIS_SECONDARY_Y` Right axis
@@ -65,7 +65,7 @@ You have several options to set the data of series:
 3. Use the `lv_chart_set_next_value(chart, ser, value)`.
 4. Initialize all points to a given value with: `lv_chart_set_all_value(chart, ser, value)`.
 
-Use `LV_CHART_POINT_DEF` as value to make the library skip drawing that point, column, or line segment.
+Use `LV_CHART_POINT_NONE` as value to make the library skip drawing that point, column, or line segment.
 
 For `LV_CHART_TYPE_SCATTER` type  `lv_chart_set_value_by_id2(chart, ser, id, value)` and `lv_chart_set_next_value2(chart, ser, x_valuem y_value)` can be used as well.
 
@@ -73,7 +73,7 @@ For `LV_CHART_TYPE_SCATTER` type  `lv_chart_set_value_by_id2(chart, ser, id, val
 ### Update modes
 `lv_chart_set_next_value` can behave in two ways depending on *update mode*:
 - `LV_CHART_UPDATE_MODE_SHIFT` Shift old data to the left and add the new one to the right.
-- `LV_CHART_UPDATE_MODE_CIRCULAR` - Add the new data in circular fashion, like an ECG diagram).
+- `LV_CHART_UPDATE_MODE_CIRCULAR` - Add the new data in circular fashion, like an ECG diagram.
 
 The update mode can be changed with `lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_...)`.
 
@@ -82,7 +82,7 @@ The number of points in the series can be modified by `lv_chart_set_point_count(
 Note: this also affects the number of points processed when an external buffer is assigned to a series, so you need to be sure the external array is large enough. 
 
 #### Handling large number of points
-On line charts if the number of points is greater than the pixels horizontally, the Chart will draw only vertical lines to make the drawing of large amount of data effective. 
+On line charts, if the number of points is greater than the pixels horizontally, the Chart will draw only vertical lines to make the drawing of large amount of data effective. 
 If there are, let's say, 10 points to a pixel, LVGL searches the smallest and the largest value and draws a vertical lines between them to ensure no peaks are missed.
 
 ### Vertical range

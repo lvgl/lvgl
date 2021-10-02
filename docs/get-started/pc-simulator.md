@@ -5,13 +5,13 @@
 # Simulator on PC
 
 
-You can try out LVGL **using only your PC** (i.e. without any development boards). LVGL will run on a simulator environment on the PC where anyone can write and experiment the real LVGL applications.
+You can try out LVGL **using only your PC** (i.e. without any development boards). LVGL will run on a simulator environment on the PC where anyone can write and experiment with real LVGL applications.
 
-Using the simulator on the PC has the following advantages:
-- Hardware independent - Write code, run it on the PC and see the result on the PC monitor.
-- Cross-platform - Any Windows, Linux or MacOS system can run the PC simulator.  
-- Portability - the written code is portable, which means you can simply copy it when using an embedded hardware.
-- Easy Validation - The simulator is also very useful to report bugs because it means common platform for every user. So it's a good idea to reproduce a bug in the simulator and use the code snippet in the [Forum](https://forum.lvgl.io).
+Using the simulator on a PC has the following advantages:
+- Hardware independent - Write code, run it on the PC and see the result on a monitor.
+- Cross-platform - Any Windows, Linux or macOS system can run the PC simulator.  
+- Portability - The written code is portable, which means you can simply copy it when migrating to embedded hardware.
+- Easy Validation - The simulator is also very useful to report bugs because it provides a common platform for every user. So it's a good idea to reproduce a bug in the simulator and use that code snippet in the [Forum](https://forum.lvgl.io).
 
 ## Select an IDE
 
@@ -23,8 +23,8 @@ The simulator is ported to various IDEs (Integrated Development Environments). C
 - [VSCode with SDL driver](https://github.com/lvgl/lv_sim_vscode_sdl): Recommended on Linux and Mac
 - [PlatformIO with SDL driver](https://github.com/lvgl/lv_platformio): Recommended on Linux and Mac
 
-You can use any IDE for the development but, for simplicity, the configuration for Eclipse CDT is what we'll focus on in this tutorial.
-The following section describes the set-up guide of Eclipse CDT in more details.
+You can use any IDE for development but, for simplicity, the configuration for Eclipse CDT is what we'll focus on in this tutorial.
+The following section describes the set-up guide of Eclipse CDT in more detail.
 
 **Note: If you are on Windows, it's usually better to use the Visual Studio or CodeBlocks projects instead. They work out of the box without requiring extra steps.**
 
@@ -34,18 +34,18 @@ The following section describes the set-up guide of Eclipse CDT in more details.
 
 [Eclipse CDT](https://eclipse.org/cdt/) is a C/C++ IDE.
 
-Eclipse is a Java based software therefore be sure **Java Runtime Environment** is installed on your system.   
+Eclipse is a Java-based tool so be sure **Java Runtime Environment** is installed on your system.   
 
 On Debian-based distros (e.g. Ubuntu): `sudo apt-get install default-jre`
 
-Note: If you are using other distros, then please refer and install 'Java Runtime Environment' suitable to your distro.
+Note: If you are using other distros, then please install a 'Java Runtime Environment' suitable to your distro.
 Note: If you are using macOS and get a "Failed to create the Java Virtual Machine" error, uninstall any other Java JDK installs and install Java JDK 8u. This should fix the problem.
 
 You can download Eclipse's CDT from: [https://www.eclipse.org/cdt/downloads.php](https://www.eclipse.org/cdt/downloads.php). Start the installer and choose *Eclipse CDT* from the list.
 
 ### Install SDL 2
 
-The PC simulator uses the [SDL 2](https://www.libsdl.org/download-2.0.php) cross platform library to simulate a TFT display and a touch pad. 
+The PC simulator uses the [SDL 2](https://www.libsdl.org/download-2.0.php) cross-platform library to simulate a TFT display and a touchpad. 
 
 #### Linux
 On **Linux** you can easily install SDL2 using a terminal:
@@ -80,19 +80,19 @@ You can find the latest one on [GitHub](https://github.com/lvgl/lv_sim_eclipse_s
 
 ### Add the pre-configured project to Eclipse CDT
 
-Run Eclipse CDT. It will show a dialogue about the **workspace path**. Before accepting the path, check that path and copy (and unzip) the downloaded pre-configured project there. After that, you can accept the workspace path. Of course you can modify this path but, in that case copy the project to the corresponding location.
+Run Eclipse CDT. It will show a dialogue about the **workspace path**. Before accepting the path, check that path and copy (and unzip) the downloaded pre-configured project there. After that, you can accept the workspace path. Of course you can modify this path but in that case copy the project to the corresponding location.
 
-Close the start up window and go to **File-&gt;Import** and choose **General-&gt;Existing project into Workspace**. **Browse the root directory** of the project and click **Finish**
+Close the start-up window and go to **File-&gt;Import** and choose **General-&gt;Existing project into Workspace**. **Browse the root directory** of the project and click **Finish**
 
 On **Windows** you have to do two additional things:
 
 - Copy the **SDL2.dll** into the project's Debug folder 
-- Right click on the project -&gt; Project properties -&gt; C/C++ Build -&gt; Settings -&gt; Libraries -&gt; Add ... and add _mingw32_ above SDLmain and SDL. (The order is important: mingw32, SDLmain, SDL)
+- Right-click on the project -&gt; Project properties -&gt; C/C++ Build -&gt; Settings -&gt; Libraries -&gt; Add ... and add _mingw32_ above SDLmain and SDL. (The order is important: mingw32, SDLmain, SDL)
 
 ### Compile and Run
 
-Now you are ready to run LVGL on your PC. Click on the Hammer Icon on the top menu bar to Build the project. If you have done everything right, then you will not get any errors. Note that on some systems additional steps might be required to "see" SDL 2 from Eclipse but, in most of cases the configurations in the downloaded project is enough.
+Now you are ready to run LVGL on your PC. Click on the Hammer Icon on the top menu bar to Build the project. If you have done everything right, then you will not get any errors. Note that on some systems additional steps might be required to "see" SDL 2 from Eclipse but in most cases the configuration in the downloaded project is enough.
 
-After a success build, click on the Play button on the top menu bar to run the project. Now a window should appear in the middle of your screen.
+After a successful build, click on the Play button on the top menu bar to run the project. Now a window should appear in the middle of your screen.
 
 Now you are ready to use LVGL and begin development on your PC.

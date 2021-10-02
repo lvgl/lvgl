@@ -52,9 +52,9 @@ static lv_obj_t * indev_obj_act = NULL;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_INDEV
-#  define INDEV_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define INDEV_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
 #else
-#  define INDEV_TRACE(...)
+    #define INDEV_TRACE(...)
 #endif
 
 /**********************
@@ -290,8 +290,9 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     /*If the point is on this object check its children too*/
     if(lv_obj_hit_test(obj, point)) {
         int32_t i;
-        for(i = lv_obj_get_child_cnt(obj) - 1; i >= 0; i--) {
-            lv_obj_t * child = lv_obj_get_child(obj, i);
+        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        for(i = child_cnt - 1; i >= 0; i--) {
+            lv_obj_t * child = obj->spec_attr->children[i];
             found_p = lv_indev_search_obj(child, point);
 
             /*If a child was found then break*/
@@ -325,7 +326,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    lv_disp_t *disp = i->driver->disp;
+    lv_disp_t * disp = i->driver->disp;
     /*Save the raw points so they can be used again in _lv_indev_read*/
     i->proc.types.pointer.last_raw_point.x = data->point.x;
     i->proc.types.pointer.last_raw_point.y = data->point.y;
@@ -342,9 +343,11 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Simple sanity check*/
     if(data->point.x < 0) LV_LOG_WARN("X is %d which is smaller than zero", data->point.x);
-    if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) LV_LOG_WARN("X is %d which is greater than hor. res", data->point.x);
+    if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) LV_LOG_WARN("X is %d which is greater than hor. res",
+                                                                              data->point.x);
     if(data->point.y < 0) LV_LOG_WARN("Y is %d which is smaller than zero", data->point.y);
-    if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) LV_LOG_WARN("Y is %d which is greater than hor. res", data->point.y);
+    if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) LV_LOG_WARN("Y is %d which is greater than hor. res",
+                                                                              data->point.y);
 
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&
@@ -671,7 +674,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
 
                     lv_group_send_data(g, LV_KEY_ENTER);
-                } else {
+                }
+                else {
                     lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                 }
             }
@@ -844,6 +848,11 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
             if(indev_reset_check(proc)) return;
 
             if(indev_act->proc.wait_until_release) return;
+
+            /*Handle focus*/
+            indev_click_focus(&indev_act->proc);
+            if(indev_reset_check(proc)) return;
+
         }
     }
 
@@ -923,11 +932,6 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
 
         /*Send CLICK if no scrolling*/
         if(scroll_obj == NULL) {
-
-            /*Handle focus*/
-            indev_click_focus(&indev_act->proc);
-            if(indev_reset_check(proc)) return;
-
             if(proc->long_pr_sent == 0) {
                 lv_event_send(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(proc)) return;

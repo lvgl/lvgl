@@ -42,7 +42,7 @@ menu "LVGL configuration"
             default 32 if LV_COLOR_DEPTH_32
 
         config LV_COLOR_16_SWAP
-            bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
+            bool "Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)."
             depends on LV_COLOR_DEPTH_16
 
         config LV_COLOR_SCREEN_TRANSP
@@ -52,7 +52,7 @@ menu "LVGL configuration"
                 Can be used if the UI is above another layer, e.g. an OSD menu or video player.
                 Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to
                 non LV_OPA_COVER value
-    
+
         config LV_COLOR_CHROMA_KEY_HEX
             hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
             range 0x000000 0xFFFFFF
@@ -128,6 +128,16 @@ menu "LVGL configuration"
                     shadow size is `shadow_width + radius`.
                     Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
 
+            config LV_CIRCLE_CACHE_SIZE
+                int "Set number of maximally cached circle data"
+                depends on LV_DRAW_COMPLEX
+                default 4
+                help
+                    The circumference of 1/4 circle are saved for anti-aliasing
+                    radius * 4 bytes are used per circle (the most often used
+                    radiuses are saved).
+                    Set to 0 to disable caching.
+
             config LV_IMG_CACHE_DEF_SIZE
                 int "Default image cache size. 0 to disable caching."
                 default 0
@@ -145,7 +155,7 @@ menu "LVGL configuration"
                 help
                     Only used if software rotation is enabled in the display driver.
         endmenu
-        
+
         menu "GPU"
             config LV_USE_GPU_STM32_DMA2D
                 bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
@@ -173,6 +183,10 @@ menu "LVGL configuration"
                     lv_init().
             config LV_USE_GPU_NXP_VG_LITE
                 bool "Use NXP's VG-Lite GPU iMX RTxxx platforms."
+
+            config LV_USE_GPU_SDL
+                bool "Use SDL renderer API"
+                default n
         endmenu
 
         menu "Logging"
@@ -498,8 +512,8 @@ menu "LVGL configuration"
         config LV_USE_THEME_DEFAULT
             bool "A simple, impressive and very complete theme"
             default y
-        config LV_THEME_DEFAULT_PALETTE_LIGHT
-            bool "Yes to set light mode, No to set dark mode"
+        config LV_THEME_DEFAULT_DARK
+            bool "Yes to set dark mode, No to set light mode"
             default y
             depends on LV_USE_THEME_DEFAULT
         config LV_THEME_DEFAULT_GROW

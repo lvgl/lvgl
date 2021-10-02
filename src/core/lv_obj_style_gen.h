@@ -142,7 +142,8 @@ static inline lv_opa_t lv_obj_get_style_opa(const struct _lv_obj_t * obj, uint32
     return (lv_opa_t)v.num;
 }
 
-static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj, uint32_t part)
+static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj,
+                                                                              uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_DSC);
     return (const lv_color_filter_dsc_t *)v.ptr;
@@ -472,10 +473,10 @@ static inline lv_coord_t lv_obj_get_style_line_dash_gap(const struct _lv_obj_t *
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_line_rounded(const struct _lv_obj_t * obj, uint32_t part)
+static inline bool lv_obj_get_style_line_rounded(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_ROUNDED);
-    return (lv_coord_t)v.num;
+    return (bool)v.num;
 }
 
 static inline lv_color_t lv_obj_get_style_line_color(const struct _lv_obj_t * obj, uint32_t part)
@@ -502,10 +503,10 @@ static inline lv_coord_t lv_obj_get_style_arc_width(const struct _lv_obj_t * obj
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_arc_rounded(const struct _lv_obj_t * obj, uint32_t part)
+static inline bool lv_obj_get_style_arc_rounded(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_ROUNDED);
-    return (lv_coord_t)v.num;
+    return (bool)v.num;
 }
 
 static inline lv_color_t lv_obj_get_style_arc_color(const struct _lv_obj_t * obj, uint32_t part)
@@ -556,11 +557,13 @@ void lv_obj_set_style_pad_column(struct _lv_obj_t * obj, lv_coord_t value, lv_st
 void lv_obj_set_style_radius(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_clip_corner(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector);
 void lv_obj_set_style_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
-void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector);
+void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector);
 void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
-void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector);
+void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
+                                 lv_style_selector_t selector);
 void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector);
 void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint16_t value, lv_style_selector_t selector);
 void lv_obj_set_style_base_dir(struct _lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector);
@@ -611,12 +614,12 @@ void lv_obj_set_style_shadow_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_styl
 void lv_obj_set_style_line_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_line_dash_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_line_dash_gap(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
-void lv_obj_set_style_line_rounded(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_line_rounded(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector);
 void lv_obj_set_style_line_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_line_color_filtered(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_line_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_arc_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
-void lv_obj_set_style_arc_rounded(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_arc_rounded(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector);
 void lv_obj_set_style_arc_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_arc_color_filtered(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_arc_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);

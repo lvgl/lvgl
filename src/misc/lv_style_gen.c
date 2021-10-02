@@ -632,7 +632,7 @@ void lv_style_set_line_dash_gap(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_LINE_DASH_GAP, v);
 }
 
-void lv_style_set_line_rounded(lv_style_t * style, lv_coord_t value)
+void lv_style_set_line_rounded(lv_style_t * style, bool value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -672,7 +672,7 @@ void lv_style_set_arc_width(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_ARC_WIDTH, v);
 }
 
-void lv_style_set_arc_rounded(lv_style_t * style, lv_coord_t value)
+void lv_style_set_arc_rounded(lv_style_t * style, bool value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value

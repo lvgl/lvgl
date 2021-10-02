@@ -13,7 +13,7 @@ The text will be broken into multiple lines automatically and the height will be
 The message box can be modal (blocking clicks on the rest of the screen) or not modal.
 
 ## Parts and Styles
-The mesasge box is built from other widgets so you can check these widget's documentation for details.
+The message box is built from other widgets, so you can check these widgets' documentation for details.
 - Background: [lv_obj](/widgets/obj)
 - Close button: [lv_btn](/widgets/core/btn)
 - Title and text: [lv_label](/widgets/core/label)
@@ -43,7 +43,7 @@ lv_obj_t * lv_msgbox_get_btns(lv_obj_t * mbox);
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` is sent by the buttons if one of them is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the message box itself. 
-In the event handler, `lv_event_get_target(e)` will return the button matrix and `lv_event_get_current_target(e)` will givreturn the message box. `lv_msgbox_get_active_btn_text(msgbox)` can be used to get the text of the clicked button. 
+In the event handler, `lv_event_get_target(e)` will return the button matrix and `lv_event_get_current_target(e)` will return the message box. `lv_msgbox_get_active_btn(msgbox)` and `lv_msgbox_get_active_btn_text(msgbox)` can be used to get the index and text of the clicked button.
 
 Learn more about [Events](/overview/event).
 

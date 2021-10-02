@@ -41,7 +41,7 @@ void lv_style_init(lv_style_t * style)
 {
 #if LV_USE_ASSERT_STYLE
     if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->prop_cnt > 1) {
-        LV_LOG_WARN("Style might be already inited. (Potential memory leak)")
+        LV_LOG_WARN("Style might be already inited. (Potential memory leak)");
     }
 #endif
 
@@ -106,7 +106,8 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 style->prop_cnt = 1;
                 style->prop1 = i == 0 ? old_props[1] : old_props[0];
                 style->v_p.value1 = i == 0 ? old_values[1] : old_values[0];
-            } else {
+            }
+            else {
                 size_t size = (style->prop_cnt - 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
                 uint8_t * new_values_and_props = lv_mem_alloc(size);
                 if(new_values_and_props == NULL) return false;
@@ -118,7 +119,8 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
 
                 uint32_t j;
-                for(i = j = 0; j <= style->prop_cnt; j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
+                for(i = j = 0; j <= style->prop_cnt;
+                    j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
                     if(old_props[j] != prop) {
                         new_values[i] = old_values[j];
                         new_props[i++] = old_props[j];
@@ -164,7 +166,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         props = (uint16_t *)tmp;
         /*Shift all props to make place for the value before them*/
         for(i = style->prop_cnt - 1; i >= 0; i--) {
-            props[i + sizeof(lv_style_value_t) /sizeof(uint16_t)] = props[i];
+            props[i + sizeof(lv_style_value_t) / sizeof(uint16_t)] = props[i];
         }
         style->prop_cnt++;
 
@@ -176,7 +178,8 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         /*Set the new property and value*/
         props[style->prop_cnt - 1] = prop;
         values[style->prop_cnt - 1] = value;
-    } else if(style->prop_cnt == 1) {
+    }
+    else if(style->prop_cnt == 1) {
         if(style->prop1 == prop) {
             style->v_p.value1 = value;
             return;
@@ -195,7 +198,8 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         props[1] = prop;
         values[0] = value_tmp;
         values[1] = value;
-    } else {
+    }
+    else {
         style->prop_cnt = 1;
         style->prop1 = prop;
         style->v_p.value1 = value;
@@ -207,10 +211,11 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
-   return lv_style_get_prop_inlined(style, prop, value);
+    return lv_style_get_prop_inlined(style, prop, value);
 }
 
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
+                                  lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
 {
     lv_memset_00(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
@@ -233,6 +238,16 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             break;
         case LV_STYLE_BG_COLOR:
             value.color = lv_color_white();
+            break;
+        case LV_STYLE_BG_GRAD_COLOR:
+        case LV_STYLE_BORDER_COLOR:
+        case LV_STYLE_SHADOW_COLOR:
+        case LV_STYLE_OUTLINE_COLOR:
+        case LV_STYLE_ARC_COLOR:
+        case LV_STYLE_LINE_COLOR:
+        case LV_STYLE_TEXT_COLOR:
+        case LV_STYLE_IMG_RECOLOR:
+            value.color = lv_color_black();
             break;
         case LV_STYLE_OPA:
         case LV_STYLE_BORDER_OPA:

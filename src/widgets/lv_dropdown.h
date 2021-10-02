@@ -45,15 +45,15 @@ typedef struct {
     uint16_t sel_opt_id;            /**< Index of the currently selected option*/
     uint16_t sel_opt_id_orig;       /**< Store the original index on focus*/
     uint16_t pr_opt_id;             /**< Index of the currently pressed option*/
-    lv_dir_t dir              :4;   /**< Direction in which the list should open*/
-    uint8_t static_txt        :1;   /**< 1: Only a pointer is saved in `options`*/
-    uint8_t selected_highlight:1;   /**< 1: Make the selected option highlighted in the list*/
-}lv_dropdown_t;
+    lv_dir_t dir              : 4;  /**< Direction in which the list should open*/
+    uint8_t static_txt        : 1;  /**< 1: Only a pointer is saved in `options`*/
+    uint8_t selected_highlight: 1;  /**< 1: Make the selected option highlighted in the list*/
+} lv_dropdown_t;
 
 typedef struct {
-  lv_obj_t obj;
-  lv_obj_t * dropdown;
-}lv_dropdown_list_t;
+    lv_obj_t obj;
+    lv_obj_t * dropdown;
+} lv_dropdown_list_t;
 
 extern const  lv_obj_class_t lv_dropdown_class;
 extern const  lv_obj_class_t lv_dropdownlist_class;
@@ -78,7 +78,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless the selected option.
  * @param obj       pointer to a drop-down list object
- * @param txt       the text as a string (Only it's pointer is saved)
+ * @param txt       the text as a string (Only its pointer is saved)
  */
 void lv_dropdown_set_text(lv_obj_t * obj, const char * txt);
 

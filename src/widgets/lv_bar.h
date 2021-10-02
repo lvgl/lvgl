@@ -54,7 +54,7 @@ typedef struct {
     _lv_bar_anim_t cur_value_anim;
     _lv_bar_anim_t start_value_anim;
     lv_bar_mode_t mode : 2;     /**< Type of bar*/
-}lv_bar_t;
+} lv_bar_t;
 
 extern const lv_obj_class_t lv_bar_class;
 
@@ -64,7 +64,7 @@ extern const lv_obj_class_t lv_bar_class;
  */
 typedef enum {
     LV_BAR_DRAW_PART_INDICATOR,    /**< The indicator*/
-}lv_bar_draw_part_type_t;
+} lv_bar_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES

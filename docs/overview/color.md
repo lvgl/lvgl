@@ -6,14 +6,14 @@
 
 The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.
 
-`lv_color_t` is used to store a color, its fileds are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
+The type `lv_color_t` is used to store a color. Its fields are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
 
-You may set `LV_COLOR_16_SWAP` in `lv_conf.h` to swap the bytes of *RGB565* colors. You may need this to send the 16-bit colors via a byte-oriented interface like SPI. As 16-bit numbers are stored in Little Endian format (lower byte on the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. A mismatch in the byte order will result in highly distorted colors.
+You may set `LV_COLOR_16_SWAP` in `lv_conf.h` to swap bytes of *RGB565* colors. You may need this when sending 16-bit colors via a byte-oriented interface like SPI. As 16-bit numbers are stored in little-endian format (lower byte at the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. A mismatch in the byte order will result in highly distorted colors.
 
 ## Creating colors
 
 ### RGB
-Create colors from Red, Green and Blue channel values
+Create colors from Red, Green and Blue channel values:
 ```c
 //All channels are 0-255
 lv_color_t c = lv_color_make(red, green, blue);
@@ -26,7 +26,7 @@ lv_color_t c = lv_color_hex3(0x123);
 ```
 
 ### HSV
-Create colors from Hue, Saturation and Value values
+Create colors from Hue, Saturation and Value values:
 
 ```c
 //h = 0..359, s = 0..100, v = 0..100
@@ -41,7 +41,7 @@ lv_color_hsv_t c_hsv = lv_color_to_hsv(color);
 ```
 
 ### Palette
-LVGL includes [material design's palette](https://vuetifyjs.com/en/styles/colors/#material-colors). In this all color have a main as well as four darker and five lighter variants.
+LVGL includes [Material Design's palette](https://vuetifyjs.com/en/styles/colors/#material-colors) of colors. In this system all named colors have a nominal main color as well as four darker and five lighter variants.
 
 The names of the colors are as follows:
 - `LV_PALETTE_RED`
@@ -83,7 +83,7 @@ lv_color_t c = lv_color_darken(lv_color_t c, lv_opa_t lvl);
 lv_color_t c = lv_color_change_lightness(lv_color_t c, lv_opa_t lvl);
 
 
-// Mix 2 colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
+// Mix two colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
 lv_color_t c = lv_color_mix(c1, c2, ratio);
 ```
 
@@ -91,15 +91,15 @@ lv_color_t c = lv_color_mix(c1, c2, ratio);
 `lv_color_white()` and `lv_color_black()` return `0xFFFFFF` and `0x000000` respectively.
 
 ## Opacity
-To describe opacity the `lv_opa_t` type is created as a wrapper to `uint8_t`. Some defines are also introduced:
+To describe opacity the `lv_opa_t` type is created from `uint8_t`. Some special purpose defines are also introduced:
 
-- `LV_OPA_TRANSP` Value: 0, means the opacity makes the color completely transparent
+- `LV_OPA_TRANSP` Value: 0, means no opacity making the color completely transparent
 - `LV_OPA_10` Value: 25, means the color covers only a little
-- `LV_OPA_20 ... OPA_80` come logically
+- `LV_OPA_20 ... OPA_80` follow logically
 - `LV_OPA_90` Value: 229, means the color near completely covers
-- `LV_OPA_COVER` Value: 255, means the color completely covers
+- `LV_OPA_COVER` Value: 255, means the color completely covers (full opacity)
 
-You can also use the `LV_OPA_*` defines in `lv_color_mix()` as a *ratio*.
+You can also use the `LV_OPA_*` defines in `lv_color_mix()` as a mixing *ratio*.
 
 
 ## Color types
@@ -109,8 +109,8 @@ The following variable types are defined by the color module:
 - `lv_color8_t` A structure to store R (3 bit),G (3 bit),B (2 bit) components for 8-bit colors (1 byte)
 - `lv_color16_t` A structure to store R (5 bit),G (6 bit),B (5 bit) components for 16-bit colors (2 byte)
 - `lv_color32_t` A structure to store R (8 bit),G (8 bit), B (8 bit) components for 24-bit colors (4 byte)
-- `lv_color_t` Equal to `lv_color1/8/16/24_t` depending on current color depth setting
-- `lv_color_int_t` `uint8_t`, `uint16_t` or `uint32_t` depending on color depth setting. Used to build color arrays from plain numbers.
+- `lv_color_t` Equal to `lv_color1/8/16/24_t` depending on the configured color depth setting
+- `lv_color_int_t` `uint8_t`, `uint16_t` or `uint32_t` depending on the color depth setting. Used to build color arrays from plain numbers.
 - `lv_opa_t` A simple `uint8_t` type to describe opacity.
 
 The `lv_color_t`, `lv_color1_t`, `lv_color8_t`, `lv_color16_t` and `lv_color32_t` types have four fields:
@@ -124,7 +124,7 @@ You can set the current color depth in *lv_conf.h*, by setting the `LV_COLOR_DEP
 
 
 ### Convert color
-You can convert a color from the current color depth to another. The converter functions return with a number, so you have to use the `full` field:
+You can convert a color from the current color depth to another. The converter functions return with a number, so you have to use the `full` field to map a converted color back into a structure:
 
 ```c
 lv_color_t c;

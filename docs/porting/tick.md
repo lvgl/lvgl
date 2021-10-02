@@ -12,7 +12,7 @@ You need to call the `lv_tick_inc(tick_period)` function periodically and provid
 
 With FreeRTOS `lv_tick_inc` can be called in `vApplicationTickHook`.
 
-On Linux based operating system (e.g. on Raspberry Pi) `lv_tick_inc` can be called in a thread like below:
+On Linux based operating systems (e.g. on Raspberry Pi) `lv_tick_inc` can be called in a thread like below:
 ```c
 void * tick_thread (void *args)
 {

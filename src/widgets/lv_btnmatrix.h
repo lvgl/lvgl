@@ -39,6 +39,7 @@ enum {
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< The button can be toggled.*/
     LV_BTNMATRIX_CTRL_CHECKED    = 0x0080, /**< Button is currently toggled (e.g. checked).*/
     LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
+    LV_BTNMATRIX_CTRL_POPOVER    = 0x0200, /**< Show a popover when pressing this key*/
     LV_BTNMATRIX_CTRL_RECOLOR    = 0x1000, /**< Enable text recoloring with `#color`*/
     _LV_BTNMATRIX_CTRL_RESERVED  = 0x2000, /**< Reserved for later use*/
     LV_BTNMATRIX_CTRL_CUSTOM_1   = 0x4000, /**< Custom free to use flag*/
@@ -47,7 +48,8 @@ enum {
 
 typedef uint16_t lv_btnmatrix_ctrl_t;
 
-typedef bool (*lv_btnmatrix_btn_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area, const lv_area_t * clip_area);
+typedef bool (*lv_btnmatrix_btn_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
+                                           const lv_area_t * clip_area);
 
 /*Data of button matrix*/
 typedef struct {
@@ -56,6 +58,7 @@ typedef struct {
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
+    uint16_t row_cnt;                                 /*Number of rows in 'map_p'(Handled by the library)*/
     uint16_t btn_id_sel;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE*/
     uint8_t one_check : 1;  /*Single button toggled at once*/
 } lv_btnmatrix_t;
@@ -68,7 +71,7 @@ extern const lv_obj_class_t lv_btnmatrix_class;
  */
 typedef enum {
     LV_BTNMATRIX_DRAW_PART_BTN,    /**< The rectangle and label of buttons*/
-}lv_btnmatrix_draw_part_type_t;
+} lv_btnmatrix_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -129,7 +132,7 @@ void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
  * @param btn_id    0 based index of the button to modify. (Not counting new lines)
  * @param ctrl      OR-ed attributs. E.g. `LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_CHECKABLE`
  */
-void lv_btnmatrix_clear_btn_ctrl(const lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
+void lv_btnmatrix_clear_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
 
 /**
  * Set attributes of all buttons of a button matrix
@@ -159,10 +162,10 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * obj, uint16_t btn_id, uint8_t width);
 
 /**
  * Make the button matrix like a selector widget (only one button may be checked at a time).
- * `LV_BTNMATRIX_CTRL_CHECKABLE` must be enabled on the buttons to be selected useing
+ * `LV_BTNMATRIX_CTRL_CHECKABLE` must be enabled on the buttons to be selected using
  *  `lv_btnmatrix_set_ctrl()` or `lv_btnmatrix_set_btn_ctrl_all()`.
  * @param obj       pointer to a button matrix object
- * @param           en:  whether "one check" mode is enabled
+ * @param en        whether "one check" mode is enabled
  */
 void lv_btnmatrix_set_one_checked(lv_obj_t * obj, bool en);
 
@@ -208,7 +211,6 @@ bool lv_btnmatrix_has_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
  * @return          true: "one check" mode is enabled; false: disabled
  */
 bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj);
-
 
 /**********************
  *      MACROS

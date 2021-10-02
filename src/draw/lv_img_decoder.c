@@ -82,7 +82,15 @@ void _lv_img_decoder_init(void)
  */
 lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 {
-   lv_memset_00(header, sizeof(lv_img_header_t));
+    lv_memset_00(header, sizeof(lv_img_header_t));
+
+    if(src == NULL) return LV_RES_INV;
+
+    lv_img_src_t src_type = lv_img_src_get_type(src);
+    if(src_type == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * img_dsc = src;
+        if(img_dsc->data == NULL) return LV_RES_INV;
+    }
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
@@ -100,8 +108,15 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 {
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
+    if(src == NULL) return LV_RES_INV;
+    lv_img_src_t src_type = lv_img_src_get_type(src);
+    if(src_type == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * img_dsc = src;
+        if(img_dsc->data == NULL) return LV_RES_INV;
+    }
+
     dsc->color    = color;
-    dsc->src_type = lv_img_src_get_type(src);
+    dsc->src_type = src_type;
     dsc->frame_id = frame_id;
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
@@ -144,7 +159,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     }
 
     if(dsc->src_type == LV_IMG_SRC_FILE)
-        lv_mem_free((void*)dsc->src);
+        lv_mem_free((void *)dsc->src);
 
     return res;
 }
@@ -176,7 +191,7 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
 
         if(dsc->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free((void*)dsc->src);
+            lv_mem_free((void *)dsc->src);
             dsc->src = NULL;
         }
     }
@@ -420,7 +435,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         /*Free the potentially allocated memories*/
         lv_img_decoder_built_in_close(decoder, dsc);
 
-        LV_LOG_WARN("Image decoder open: unknown color format")
+        LV_LOG_WARN("Image decoder open: unknown color format");
         return LV_RES_INV;
     }
 }
@@ -579,7 +594,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     uint8_t * fs_buf = lv_mem_buf_get(w);
-    if (fs_buf == NULL) return LV_RES_INV;
+    if(fs_buf == NULL) return LV_RES_INV;
 
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
@@ -648,7 +663,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
     uint8_t * fs_buf = lv_mem_buf_get(w);
-    if (fs_buf == NULL) return LV_RES_INV;
+    if(fs_buf == NULL) return LV_RES_INV;
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;

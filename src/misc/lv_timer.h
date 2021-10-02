@@ -48,7 +48,7 @@ typedef struct _lv_timer_t {
     lv_timer_cb_t timer_cb; /**< Timer function*/
     void * user_data; /**< Custom user data*/
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
-    uint32_t paused :1;
+    uint32_t paused : 1;
 } lv_timer_t;
 
 /**********************
@@ -80,7 +80,7 @@ lv_timer_t * lv_timer_create_basic(void);
 /**
  * Create a new lv_timer
  * @param timer_xcb a callback to call periodically.
- *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param user_data custom parameter
