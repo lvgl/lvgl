@@ -404,7 +404,7 @@ static void lv_keyboard_update_ctrl_map(lv_obj_t * obj)
     } else {
         /*Make a copy of the current control map*/
         lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-        lv_btnmatrix_ctrl_t * ctrl_map = malloc(btnm->btn_cnt * sizeof(lv_btnmatrix_ctrl_t));
+        lv_btnmatrix_ctrl_t * ctrl_map = lv_mem_alloc(btnm->btn_cnt * sizeof(lv_btnmatrix_ctrl_t));
         lv_memcpy(ctrl_map, kb_ctrl[keyboard->mode], sizeof(lv_btnmatrix_ctrl_t) * btnm->btn_cnt);
 
         /*Remove all LV_BTNMATRIX_CTRL_POPOVER flags*/
@@ -414,7 +414,7 @@ static void lv_keyboard_update_ctrl_map(lv_obj_t * obj)
 
         /*Apply new control map and clean up*/
         lv_btnmatrix_set_ctrl_map(obj, ctrl_map);
-        free(ctrl_map);
+        lv_mem_free(ctrl_map);
     }
 }
 
