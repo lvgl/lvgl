@@ -2,9 +2,7 @@ name: Build Micropython with LVGL submodule
 
 on:
   push:
-    branches: [ master, dev ]
   pull_request:
-    branches: [ master, dev ]
 
 jobs:
   build:
@@ -40,3 +38,14 @@ jobs:
       run: |
         export XDG_RUNTIME_DIR=/tmp
         lib/lv_bindings/tests/run.sh
+    - name: Build ESP32 port
+      run: |
+        source tools/ci.sh && ci_esp32_idf43_setup
+        source tools/ci.sh && ci_esp32_build
+    - name: arm-none-eabi-gcc
+      uses: fiam/arm-none-eabi-gcc@v1
+      with:
+        release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
+    - name: Build STM32 port
+      run: |
+          make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
