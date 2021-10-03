@@ -91,9 +91,9 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    void *file_d = drv->open_cb(drv, real_path, mode);
+    void * file_d = drv->open_cb(drv, real_path, mode);
 
-    if(file_d == NULL || file_d == (void*)(-1)) {
+    if(file_d == NULL || file_d == (void *)(-1)) {
         return LV_FS_RES_UNKNOWN;
     }
 
@@ -207,9 +207,9 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    void *dir_d = drv->dir_open_cb(drv, real_path);
+    void * dir_d = drv->dir_open_cb(drv, real_path);
 
-    if(dir_d == NULL || dir_d == (void*)(-1)) {
+    if(dir_d == NULL || dir_d == (void *)(-1)) {
         return LV_FS_RES_UNKNOWN;
     }
 

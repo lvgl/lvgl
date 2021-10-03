@@ -57,8 +57,11 @@ void lv_example_chart_4(void);
 void lv_example_chart_5(void);
 void lv_example_chart_6(void);
 void lv_example_chart_7(void);
+void lv_example_chart_8(void);
+void lv_example_chart_9(void);
 
 void lv_example_checkbox_1(void);
+void lv_example_checkbox_2(void);
 
 void lv_example_colorwheel_1(void);
 

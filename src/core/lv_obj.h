@@ -126,7 +126,7 @@ typedef enum {
     LV_OBJ_DRAW_PART_RECTANGLE,  /**< The main rectangle*/
     LV_OBJ_DRAW_PART_BORDER_POST,/**< The border if style_border_post = true*/
     LV_OBJ_DRAW_PART_SCROLLBAR,  /**< The scrollbar*/
-}lv_obj_draw_part_type_t;
+} lv_obj_draw_part_type_t;
 
 #include "lv_obj_tree.h"
 #include "lv_obj_pos.h"
@@ -157,12 +157,12 @@ typedef struct {
     lv_coord_t ext_click_pad;           /**< Extra click padding in all direction*/
     lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
-    lv_scrollbar_mode_t scrollbar_mode :2;  /**< How to display scrollbars*/
+    lv_scrollbar_mode_t scrollbar_mode : 2; /**< How to display scrollbars*/
     lv_scroll_snap_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally*/
     lv_scroll_snap_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
-    lv_dir_t scroll_dir :4;                 /**< The allowed scroll direction(s)*/
+    lv_dir_t scroll_dir : 4;                /**< The allowed scroll direction(s)*/
     uint8_t event_dsc_cnt;                  /**< Number of event callbacks stored in `event_dsc` array*/
-}_lv_obj_spec_attr_t;
+} _lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t {
     const lv_obj_class_t * class_p;
@@ -175,13 +175,13 @@ typedef struct _lv_obj_t {
     lv_area_t coords;
     lv_obj_flag_t flags;
     lv_state_t state;
-    uint16_t layout_inv :1;
-    uint16_t scr_layout_inv :1;
-    uint16_t skip_trans :1;
-    uint16_t style_cnt  :6;
-    uint16_t h_layout   :1;
-    uint16_t w_layout   :1;
-}lv_obj_t;
+    uint16_t layout_inv : 1;
+    uint16_t scr_layout_inv : 1;
+    uint16_t skip_trans : 1;
+    uint16_t style_cnt  : 6;
+    uint16_t h_layout   : 1;
+    uint16_t w_layout   : 1;
+} lv_obj_t;
 
 
 /**********************
@@ -194,7 +194,7 @@ typedef struct _lv_obj_t {
  */
 void lv_init(void);
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM || LV_USE_GPU_SDL
 
 /**
  * Deinit the 'lv' library
@@ -379,9 +379,9 @@ static inline lv_coord_t lv_obj_dpx(const lv_obj_t * obj, lv_coord_t n)
 
 #if LV_USE_ASSERT_OBJ
 #  define LV_ASSERT_OBJ(obj_p, obj_class)                                    \
-            LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");               \
-            LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type."); \
-            LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?");
+    LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");               \
+    LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type."); \
+    LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?");
 
 # else
 # define LV_ASSERT_OBJ(obj_p, obj_class) do{}while(0)

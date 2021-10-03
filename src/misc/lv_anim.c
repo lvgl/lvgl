@@ -46,9 +46,9 @@ static lv_timer_t * _lv_anim_tmr;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_ANIM
-#  define TRACE_ANIM(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define TRACE_ANIM(...) LV_LOG_TRACE( __VA_ARGS__)
 #else
-#  define TRACE_ANIM(...)
+    #define TRACE_ANIM(...)
 #endif
 
 
@@ -151,7 +151,7 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
     _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
-        if(a->var == var && a->exec_cb == exec_cb) {
+        if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             return a;
         }
     }

@@ -27,11 +27,11 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_win_class = {
-        .constructor_cb = lv_win_constructor,
-        .width_def = LV_PCT(100),
-        .height_def = LV_PCT(100),
-        .base_class = &lv_obj_class,
-        .instance_size = sizeof(lv_win_t)
+    .constructor_cb = lv_win_constructor,
+    .width_def = LV_PCT(100),
+    .height_def = LV_PCT(100),
+    .base_class = &lv_obj_class,
+    .instance_size = sizeof(lv_win_t)
 };
 static lv_coord_t create_header_height;
 /**********************
@@ -44,7 +44,7 @@ static lv_coord_t create_header_height;
 
 lv_obj_t * lv_win_create(lv_obj_t * parent, lv_coord_t header_height)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     create_header_height = header_height;
 
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_win_class, parent);

@@ -40,11 +40,11 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 #if LV_DRAW_COMPLEX
-static void draw_quarter_0(quarter_draw_dsc_t * q);
-static void draw_quarter_1(quarter_draw_dsc_t * q);
-static void draw_quarter_2(quarter_draw_dsc_t * q);
-static void draw_quarter_3(quarter_draw_dsc_t * q);
-static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness, lv_area_t * res_area);
+    static void draw_quarter_0(quarter_draw_dsc_t * q);
+    static void draw_quarter_1(quarter_draw_dsc_t * q);
+    static void draw_quarter_2(quarter_draw_dsc_t * q);
+    static void draw_quarter_3(quarter_draw_dsc_t * q);
+    static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness, lv_area_t * res_area);
 #endif /*LV_DRAW_COMPLEX*/
 
 /**********************
@@ -85,7 +85,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         cir_dsc.bg_opa = LV_OPA_TRANSP;
         cir_dsc.bg_img_src = dsc->img_src;
         cir_dsc.bg_img_opa = dsc->opa;
-    } else {
+    }
+    else {
         cir_dsc.bg_opa = dsc->opa;
         cir_dsc.bg_color = dsc->color;
     }
@@ -217,7 +218,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 #endif /*LV_DRAW_COMPLEX*/
 }
 
-void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle, lv_coord_t w, bool rounded, lv_area_t * area)
+void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
+                          lv_coord_t w, bool rounded, lv_area_t * area)
 {
     lv_coord_t rout = radius;
 
@@ -275,7 +277,7 @@ void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t
     else if(start_quarter == 0 && end_quarter == 1) {
         area->x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
         area->y1 = y + ((LV_MIN(lv_trigo_sin(end_angle),
-                                        lv_trigo_sin(start_angle))  * rin) >> LV_TRIGO_SHIFT) - extra_area;
+                                lv_trigo_sin(start_angle))  * rin) >> LV_TRIGO_SHIFT) - extra_area;
         area->x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
         area->y2 = y + rout + extra_area;
     }
@@ -283,7 +285,7 @@ void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t
         area->x1 = x - rout - extra_area;
         area->y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
         area->x2 = x + ((LV_MAX(lv_trigo_sin(start_angle + 90),
-                                        lv_trigo_sin(end_angle + 90)) * rin) >> LV_TRIGO_SHIFT) + extra_area;
+                                lv_trigo_sin(end_angle + 90)) * rin) >> LV_TRIGO_SHIFT) + extra_area;
         area->y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
     }
     else if(start_quarter == 2 && end_quarter == 3) {
@@ -291,11 +293,11 @@ void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t
         area->y1 = y - rout - extra_area;
         area->x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
         area->y2 = y + (LV_MAX(lv_trigo_sin(end_angle) * rin,
-                                       lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
+                               lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
     }
     else if(start_quarter == 3 && end_quarter == 0) {
         area->x1 = x + ((LV_MIN(lv_trigo_sin(end_angle + 90),
-                                        lv_trigo_sin(start_angle + 90)) * rin) >> LV_TRIGO_SHIFT) - extra_area;
+                                lv_trigo_sin(start_angle + 90)) * rin) >> LV_TRIGO_SHIFT) - extra_area;
         area->y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
         area->x2 = x + rout + extra_area;
         area->y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;

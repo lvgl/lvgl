@@ -34,6 +34,15 @@
 #ifndef _LV_PRINTF_H_
 #define _LV_PRINTF_H_
 
+#if defined(__has_include) && __has_include(<inttypes.h>)
+    #include<inttypes.h>
+    /* platform-specific printf format for int32_t, usually "d" or "ld" */
+    #define LV_PRId32 PRId32
+#else
+    /* hope this is correct for ports without __has_include or without inttypes.h */
+    #define LV_PRId32 "d"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

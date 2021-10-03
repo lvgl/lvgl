@@ -29,12 +29,14 @@ static void tileview_event_cb(lv_event_t * e);
  **********************/
 
 const lv_obj_class_t lv_tileview_class = {.constructor_cb = lv_tileview_constructor,
-                                    .base_class = &lv_obj_class,
-                                    .instance_size = sizeof(lv_tileview_t)};
+                                          .base_class = &lv_obj_class,
+                                          .instance_size = sizeof(lv_tileview_t)
+                                         };
 
 const lv_obj_class_t lv_tileview_tile_class = {.constructor_cb = lv_tileview_tile_constructor,
-                                         .base_class = &lv_obj_class,
-                                         .instance_size = sizeof(lv_tileview_tile_t)};
+                                               .base_class = &lv_obj_class,
+                                               .instance_size = sizeof(lv_tileview_tile_t)
+                                              };
 
 static lv_dir_t create_dir;
 static uint32_t create_col_id;
@@ -50,7 +52,7 @@ static uint32_t create_row_id;
 
 lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_tileview_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -62,7 +64,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 
 lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, lv_dir_t dir)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     create_dir = dir;
     create_col_id = col_id;
     create_row_id = row_id;
@@ -135,7 +137,8 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_update_layout(obj);  /*Be sure the size is correct*/
-    lv_obj_set_pos(obj, create_col_id * lv_obj_get_content_width(parent),  create_row_id * lv_obj_get_content_height(parent));
+    lv_obj_set_pos(obj, create_col_id * lv_obj_get_content_width(parent),
+                   create_row_id * lv_obj_get_content_height(parent));
 
     lv_tileview_tile_t * tile = (lv_tileview_tile_t *)obj;
     tile->dir = create_dir;

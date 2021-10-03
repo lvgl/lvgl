@@ -34,7 +34,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
                                                 const lv_draw_line_dsc_t * dsc);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -117,6 +116,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
  *   STATIC FUNCTIONS
  **********************/
 
+
 LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
                                                 const lv_area_t * clip,
                                                 const lv_draw_line_dsc_t * dsc)
@@ -182,7 +182,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h,
+                                                             draw_area_w);
 
             if(dashed) {
                 if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
@@ -285,7 +286,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
             lv_memset_ff(mask_buf, draw_area_w);
-            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h, draw_area_w);
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, draw_buf->area.x1 + draw_area.x1, draw_buf->area.y1 + h,
+                                                             draw_area_w);
 
             if(dashed) {
                 if(mask_res != LV_DRAW_MASK_RES_TRANSP) {

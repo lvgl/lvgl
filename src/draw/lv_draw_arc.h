@@ -62,7 +62,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
  * @param rounded       true: the arc is rounded
  * @param area          store the area to invalidate here
  */
-void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle, lv_coord_t w, bool rounded, lv_area_t * area);
+void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
+                          lv_coord_t w, bool rounded, lv_area_t * area);
 
 /**********************
  *      MACROS

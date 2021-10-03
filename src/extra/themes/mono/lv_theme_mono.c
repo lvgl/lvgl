@@ -78,7 +78,7 @@ static void style_init(bool dark_bg, const lv_font_t * font)
 {
     style_init_reset(&styles->scrollbar);
     lv_style_set_bg_opa(&styles->scrollbar, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->scrollbar,COLOR_FG);
+    lv_style_set_bg_color(&styles->scrollbar, COLOR_FG);
     lv_style_set_width(&styles->scrollbar,  PAD_DEF);
 
     style_init_reset(&styles->scr);
@@ -219,13 +219,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_WIN
         /*Header*/
-        if(lv_obj_get_child_id(obj) == 0 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
+        if(lv_obj_get_index(obj) == 0 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
             lv_obj_add_style(obj, &styles->card, 0);
             lv_obj_add_style(obj, &styles->no_radius, 0);
             return;
         }
         /*Content*/
-        else if(lv_obj_get_child_id(obj) == 1 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
+        else if(lv_obj_get_index(obj) == 1 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
             lv_obj_add_style(obj, &styles->card, 0);
             lv_obj_add_style(obj, &styles->no_radius, 0);
             lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
@@ -279,7 +279,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->inv, LV_PART_ITEMS | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->underline, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &styles->large_border, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &styles->large_border, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
     }
 #endif
 
@@ -476,8 +476,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_LED
     else if(lv_obj_check_type(obj, &lv_led_class)) {
-            lv_obj_add_style(obj, &styles->card, 0);
-        }
+        lv_obj_add_style(obj, &styles->card, 0);
+    }
 #endif
 }
 

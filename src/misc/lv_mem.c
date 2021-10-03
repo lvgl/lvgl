@@ -26,15 +26,15 @@
  *********************/
 /*memset the allocated memories to 0xaa and freed memories to 0xbb (just for testing purposes)*/
 #ifndef LV_MEM_ADD_JUNK
-#  define LV_MEM_ADD_JUNK  0
+    #define LV_MEM_ADD_JUNK  0
 #endif
 
 #ifdef LV_ARCH_64
-#  define MEM_UNIT         uint64_t
-#  define ALIGN_MASK       0x7
+    #define MEM_UNIT         uint64_t
+    #define ALIGN_MASK       0x7
 #else
-#  define MEM_UNIT         uint32_t
-#  define ALIGN_MASK       0x7
+    #define MEM_UNIT         uint32_t
+    #define ALIGN_MASK       0x7
 #endif
 
 #define ZERO_MEM_SENTINEL  0xa1b2c3d4
@@ -63,9 +63,9 @@ static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variabl
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_MEM
-#  define MEM_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define MEM_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
 #else
-#  define MEM_TRACE(...)
+    #define MEM_TRACE(...)
 #endif
 
 #define COPY32 *d32 = *s32; d32++; s32++;
@@ -99,7 +99,7 @@ void lv_mem_init(void)
 #endif
 
 #if LV_MEM_ADD_JUNK
-    LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower")
+    LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower");
 #endif
 }
 
@@ -143,8 +143,8 @@ void * lv_mem_alloc(size_t size)
         lv_mem_monitor_t mon;
         lv_mem_monitor(&mon);
         LV_LOG_ERROR("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
-               (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-               (int)mon.free_biggest_size);
+                     (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+                     (int)mon.free_biggest_size);
     }
 
     MEM_TRACE("allocated at %p", alloc);
@@ -216,7 +216,7 @@ lv_res_t lv_mem_test(void)
         return LV_RES_INV;
     }
 
-    if (lv_tlsf_check_pool(lv_tlsf_get_pool(tlsf))) {
+    if(lv_tlsf_check_pool(lv_tlsf_get_pool(tlsf))) {
         LV_LOG_WARN("pool failed");
         return LV_RES_INV;
     }
@@ -284,7 +284,8 @@ void * lv_mem_buf_get(uint32_t size)
 
     if(i_guess >= 0) {
         LV_GC_ROOT(lv_mem_buf[i_guess]).used = 1;
-        MEM_TRACE("returning already allocated buffer (buffer id: %d, address: %p)", i_guess, LV_GC_ROOT(lv_mem_buf[i_guess]).p);
+        MEM_TRACE("returning already allocated buffer (buffer id: %d, address: %p)", i_guess,
+                  LV_GC_ROOT(lv_mem_buf[i_guess]).p);
         return LV_GC_ROOT(lv_mem_buf[i_guess]).p;
     }
 
@@ -324,7 +325,7 @@ void lv_mem_buf_release(void * p)
         }
     }
 
-    LV_LOG_ERROR("p is not a known buffer")
+    LV_LOG_ERROR("p is not a known buffer");
 }
 
 /**

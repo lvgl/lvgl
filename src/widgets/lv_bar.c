@@ -77,7 +77,7 @@ const lv_obj_class_t lv_bar_class = {
 
 lv_obj_t * lv_bar_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -310,8 +310,7 @@ static void draw_indic(lv_event_t * e)
 
         anim_start_value_x += anim_start_value_start_x;
     }
-    else
-    {
+    else {
         anim_start_value_x = (int32_t)((int32_t)anim_length * (bar->start_value - bar->min_value)) / range;
     }
 
@@ -325,8 +324,7 @@ static void draw_indic(lv_event_t * e)
                                                       bar->cur_value_anim.anim_state) /
                                                      LV_BAR_ANIM_STATE_END);
     }
-    else
-    {
+    else {
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (bar->cur_value - bar->min_value)) / range;
     }
 
@@ -411,9 +409,9 @@ static void draw_indic(lv_event_t * e)
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
     part_draw_dsc.rect_dsc = &draw_rect_dsc;
-	part_draw_dsc.draw_area = &bar->indic_area;
+    part_draw_dsc.draw_area = &bar->indic_area;
 
-	lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
     /*Draw only the shadow if the indicator is long enough.
      *The radius of the bg and the indicator can make a strange shape where
@@ -526,10 +524,12 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(pad < 0) {
             *s = LV_MAX(*s, -pad);
         }
-    } else if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
+    }
+    else if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
         lv_bar_t * bar = (lv_bar_t *)obj;
         lv_obj_invalidate_area(obj, &bar->indic_area);
-    } else if(code == LV_EVENT_DRAW_MAIN) {
+    }
+    else if(code == LV_EVENT_DRAW_MAIN) {
         draw_indic(e);
     }
 }
@@ -560,7 +560,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
 {
     if(en == LV_ANIM_OFF) {
         *value_ptr = new_value;
-        lv_obj_invalidate((lv_obj_t*)obj);
+        lv_obj_invalidate((lv_obj_t *)obj);
     }
     else {
         /*No animation in progress -> simply set the values*/

@@ -47,7 +47,7 @@ struct _lv_theme_t;
 /**
  * Structure for holding display buffer information.
  */
-typedef struct _lv_disp_draw_buf_t{
+typedef struct _lv_disp_draw_buf_t {
     void * buf1; /**< First display buffer.*/
     void * buf2; /**< Second display buffer.*/
 
@@ -161,11 +161,13 @@ typedef struct _lv_disp_t {
     struct _lv_obj_t * top_layer;   /**< @see lv_disp_get_layer_top*/
     struct _lv_obj_t * sys_layer;   /**< @see lv_disp_get_layer_sys*/
     uint32_t screen_cnt;
-    uint8_t del_prev  : 1;          /**< 1: Automatically delete the previous screen when the screen load animation is ready*/
+uint8_t del_prev  :
+    1;          /**< 1: Automatically delete the previous screen when the screen load animation is ready*/
 
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
     const void * bg_img;            /**< An image source to display as wallpaper*/
+    void (*bg_fn)(lv_area_t*);/**< A function to handle drawing*/
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];

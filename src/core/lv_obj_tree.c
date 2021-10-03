@@ -6,6 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdlib.h>
+
 #include "lv_obj.h"
 #include "lv_indev.h"
 #include "../misc/lv_anim.h"
@@ -46,7 +48,7 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
 void lv_obj_del(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", obj)
+    LV_LOG_TRACE("begin (delete %p)", obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
@@ -73,18 +75,18 @@ void lv_obj_del(lv_obj_t * obj)
     }
 
     /*Handle if the active screen was deleted*/
-    if(act_scr_del)  {
-        LV_LOG_WARN("the active screen was deleted")
+    if(act_scr_del) {
+        LV_LOG_WARN("the active screen was deleted");
         disp->act_scr = NULL;
     }
 
     LV_ASSERT_MEM_INTEGRITY();
-    LV_LOG_TRACE("finished (delete %p)", obj)
+    LV_LOG_TRACE("finished (delete %p)", obj);
 }
 
 void lv_obj_clean(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", obj)
+    LV_LOG_TRACE("begin (delete %p)", obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
@@ -103,7 +105,7 @@ void lv_obj_clean(lv_obj_t * obj)
 
     LV_ASSERT_MEM_INTEGRITY();
 
-    LV_LOG_TRACE("finished (delete %p)", obj)
+    LV_LOG_TRACE("finished (delete %p)", obj);
 }
 
 void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
@@ -159,20 +161,23 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     /*Remove the object from the old parent's child list*/
     int32_t i;
-    for(i = lv_obj_get_child_id(obj); i <= (int32_t)lv_obj_get_child_cnt(old_parent) - 2; i++) {
-        old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i+1];
+    for(i = lv_obj_get_index(obj); i <= (int32_t)lv_obj_get_child_cnt(old_parent) - 2; i++) {
+        old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i + 1];
     }
     old_parent->spec_attr->child_cnt--;
     if(old_parent->spec_attr->child_cnt) {
-        old_parent->spec_attr->children = lv_mem_realloc(old_parent->spec_attr->children, old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    } else {
+        old_parent->spec_attr->children = lv_mem_realloc(old_parent->spec_attr->children,
+                                                         old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    }
+    else {
         lv_mem_free(old_parent->spec_attr->children);
         old_parent->spec_attr->children = NULL;
     }
 
     /*Add the child to the new parent as the last (newest child)*/
     parent->spec_attr->child_cnt++;
-    parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children,
+                                                 parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
     parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
 
     obj->parent = parent;
@@ -195,39 +200,34 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_invalidate(obj);
 }
 
-void lv_obj_move_foreground(lv_obj_t * obj)
+void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    uint32_t i;
-    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 1; i++) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
-    }
-    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
-
-    /*Notify the new parent about the child*/
-    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-
-    lv_obj_invalidate(parent);
-}
-
-void lv_obj_move_background(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    const int32_t old_index = lv_obj_get_index(obj);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
 
-    int32_t i;
-    for(i = lv_obj_get_child_id(obj); i > 0; i--) {
-        parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
+    if(index < 0) return;
+    if(index >= (int32_t) lv_obj_get_child_cnt(parent)) return;
+    if(index == old_index) return;
+
+    int32_t i = old_index;
+    if(index < old_index) {
+        while(i > index)  {
+            parent->spec_attr->children[i] = parent->spec_attr->children[i - 1];
+            i--;
+        }
     }
-    parent->spec_attr->children[0] = obj;
+    else {
+        while(i < index) {
+            parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
+            i++;
+        }
+    }
 
-    /*Notify the new parent about the child*/
-    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-
+    parent->spec_attr->children[index] = obj;
+    lv_event_send(parent, LV_EVENT_CHILD_CHANGED, NULL);
     lv_obj_invalidate(parent);
 }
 
@@ -236,11 +236,11 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     LV_ASSERT_OBJ(obj1, MY_CLASS);
     LV_ASSERT_OBJ(obj2, MY_CLASS);
 
-    lv_obj_t* parent = lv_obj_get_parent(obj1);
-    lv_obj_t* parent2 = lv_obj_get_parent(obj2);
+    lv_obj_t * parent = lv_obj_get_parent(obj1);
+    lv_obj_t * parent2 = lv_obj_get_parent(obj2);
 
-    uint_fast32_t index1 = lv_obj_get_child_id(obj1);
-    uint_fast32_t index2 = lv_obj_get_child_id(obj2);
+    uint_fast32_t index1 = lv_obj_get_index(obj1);
+    uint_fast32_t index2 = lv_obj_get_index(obj2);
 
     parent->spec_attr->children[index1] = obj2;
     parent2->spec_attr->children[index2] = obj1;
@@ -249,55 +249,11 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     lv_event_send(parent2, LV_EVENT_CHILD_CHANGED, obj1);
 
     lv_obj_invalidate(parent);
-    if( parent != parent2) {
+
+    if(parent != parent2) {
         lv_obj_invalidate(parent2);
     }
-
     lv_group_swap_obj(obj1, obj2);
-}
-
-void lv_obj_move_up(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t* parent = lv_obj_get_parent(obj);
-
-    uint_fast32_t index = lv_obj_get_child_id(obj);
-    if (index > 0)
-    {
-        lv_obj_t* obj2 = parent->spec_attr->children[index - 1];
-        parent->spec_attr->children[index - 1] = obj;
-        parent->spec_attr->children[index] = obj2;
-
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj2);
-
-        lv_obj_invalidate(parent);
-
-        lv_group_swap_obj(obj, obj2);
-    }
-}
-
-void lv_obj_move_down(lv_obj_t* obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t* parent = lv_obj_get_parent(obj);
-
-    uint_fast32_t index = lv_obj_get_child_id(obj);
-    if (index < lv_obj_get_child_cnt(parent) - 1)
-    {
-        lv_obj_t* obj2 = parent->spec_attr->children[index + 1];
-        parent->spec_attr->children[index + 1] = obj;
-        parent->spec_attr->children[index] = obj2;
-
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj2);
-
-        lv_obj_invalidate(parent);
-
-        lv_group_swap_obj(obj, obj2);
-    }
 }
 
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
@@ -309,10 +265,10 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 
     do {
         act_par = par;
-        par   = lv_obj_get_parent(act_par);
+        par = lv_obj_get_parent(act_par);
     } while(par != NULL);
 
-    return (lv_obj_t*)act_par;
+    return (lv_obj_t *)act_par;
 }
 
 lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
@@ -332,7 +288,7 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
         }
     }
 
-    LV_LOG_WARN("No screen found")
+    LV_LOG_WARN("No screen found");
     return NULL;
 }
 
@@ -355,7 +311,8 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t id)
         id = obj->spec_attr->child_cnt + id;
         if(id < 0) return NULL;
         idu = (uint32_t) id;
-    } else {
+    }
+    else {
         idu = id;
     }
 
@@ -370,7 +327,7 @@ uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
     return obj->spec_attr->child_cnt;
 }
 
-uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
+uint32_t lv_obj_get_index(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -384,7 +341,6 @@ uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
 
     return 0xFFFFFFFF; /*Shouldn't happen*/
 }
-
 
 void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {
@@ -454,13 +410,14 @@ static void obj_del_core(lv_obj_t * obj)
     }
     /*Remove the object from the child list of its parent*/
     else {
-        uint32_t id = lv_obj_get_child_id(obj);
+        uint32_t id = lv_obj_get_index(obj);
         uint32_t i;
         for(i = id; i < obj->parent->spec_attr->child_cnt - 1; i++) {
             obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
         }
         obj->parent->spec_attr->child_cnt--;
-        obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children, obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+        obj->parent->spec_attr->children = lv_mem_realloc(obj->parent->spec_attr->children,
+                                                          obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
     }
 
     /*Free the object itself*/

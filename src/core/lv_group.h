@@ -53,7 +53,7 @@ typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
 
 /**
  * Groups can be used to logically hold objects so that they can be individually focused.
- * They are NOT for laying out objects on a screen (try `lv_cont` for that).
+ * They are NOT for laying out objects on a screen (try layouts for that).
  */
 typedef struct _lv_group_t {
     lv_ll_t obj_ll;        /**< Linked list to store the objects in the group*/
@@ -76,7 +76,7 @@ typedef struct _lv_group_t {
 typedef enum {
     LV_GROUP_REFOCUS_POLICY_NEXT = 0,
     LV_GROUP_REFOCUS_POLICY_PREV = 1
-}lv_group_refocus_policy_t;
+} lv_group_refocus_policy_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -49,6 +49,7 @@ typedef struct {
     lv_btnmatrix_t btnm;
     lv_obj_t * ta;              /*Pointer to the assigned text area*/
     lv_keyboard_mode_t mode;    /*Key map type*/
+    uint8_t popovers : 1;       /*Show button titles in popovers on press*/
 } lv_keyboard_t;
 
 extern const lv_obj_class_t lv_keyboard_class;
@@ -83,13 +84,21 @@ void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta);
 void lv_keyboard_set_mode(lv_obj_t * kb, lv_keyboard_mode_t mode);
 
 /**
+ * Show the button title in a popover when pressed.
+ * @param kb pointer to a Keyboard object
+ * @param en whether "popovers" mode is enabled
+ */
+void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
+
+/**
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
  * @param mode keyboard map to alter 'lv_keyboard_mode_t'
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnmatrix_set_map()' for more info.
  */
-void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_btnmatrix_ctrl_t ctrl_map[]);
+void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
+                         const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /*=====================
  * Getter functions
@@ -108,6 +117,13 @@ lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * kb);
  * @return the current mode from 'lv_keyboard_mode_t'
  */
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
+
+/**
+ * Tell whether "popovers" mode is enabled or not.
+ * @param kb pointer to a Keyboard object
+ * @return true: "popovers" mode is enabled; false: disabled
+ */
+bool lv_btnmatrix_get_popovers(const lv_obj_t * obj);
 
 /**
  * Get the current map of a keyboard

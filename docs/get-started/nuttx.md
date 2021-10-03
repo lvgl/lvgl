@@ -45,10 +45,10 @@ Using LVGL, Linux and NuttX you can reduce this process and just test everything
 
 ## How to get started with NuttX and LVGL?
 
-There are many boards in the NuttX mainline (https://github.com/apache/incubator-nuttx) with support for LVGL.
-Let's use the [STM32F429IDISCOVERY](https://www.st.com/en/evaluation-tools/32f429idiscovery.html) as example because it is a very popular board.
+There are many boards in the [NuttX mainline](https://github.com/apache/incubator-nuttx) with support for LVGL.
+Let's use the [STM32F429IDISCOVERY](https://www.st.com/en/evaluation-tools/32f429idiscovery.html) as an example because it is a very popular board.
 
-### First you need to install the pre-requisite on your system
+### First you need to install the pre-requisites on your system
 
 Let's use the [Windows Subsystem for Linux](https://acassis.wordpress.com/2018/01/10/how-to-build-nuttx-on-windows-10/)
 

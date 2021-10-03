@@ -28,7 +28,7 @@ typedef void (*lv_layout_update_cb_t)(struct _lv_obj_t *, void * user_data);
 typedef struct {
     lv_layout_update_cb_t cb;
     void * user_data;
-}lv_layout_dsc_t;
+} lv_layout_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -176,7 +176,8 @@ void lv_obj_align(struct _lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv
  * @param y_ofs     y coordinate offset after alignment
  * @note            if the position or size of `base` changes `obj` needs to be aligned manually again
  */
-void lv_obj_align_to(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+void lv_obj_align_to(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs,
+                     lv_coord_t y_ofs);
 
 /**
  * Align an object to the center on its parent.

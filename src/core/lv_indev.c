@@ -52,9 +52,9 @@ static lv_obj_t * indev_obj_act = NULL;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_INDEV
-#  define INDEV_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define INDEV_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
 #else
-#  define INDEV_TRACE(...)
+    #define INDEV_TRACE(...)
 #endif
 
 /**********************
@@ -326,7 +326,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    lv_disp_t *disp = i->driver->disp;
+    lv_disp_t * disp = i->driver->disp;
     /*Save the raw points so they can be used again in _lv_indev_read*/
     i->proc.types.pointer.last_raw_point.x = data->point.x;
     i->proc.types.pointer.last_raw_point.y = data->point.y;
@@ -343,9 +343,11 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Simple sanity check*/
     if(data->point.x < 0) LV_LOG_WARN("X is %d which is smaller than zero", data->point.x);
-    if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) LV_LOG_WARN("X is %d which is greater than hor. res", data->point.x);
+    if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) LV_LOG_WARN("X is %d which is greater than hor. res",
+                                                                              data->point.x);
     if(data->point.y < 0) LV_LOG_WARN("Y is %d which is smaller than zero", data->point.y);
-    if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) LV_LOG_WARN("Y is %d which is greater than hor. res", data->point.y);
+    if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) LV_LOG_WARN("Y is %d which is greater than hor. res",
+                                                                              data->point.y);
 
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&
@@ -672,7 +674,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
 
                     lv_group_send_data(g, LV_KEY_ENTER);
-                } else {
+                }
+                else {
                     lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                 }
             }

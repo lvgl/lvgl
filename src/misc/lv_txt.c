@@ -94,7 +94,7 @@
  * line breaks
  */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag)
+                     lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -123,7 +123,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
 
         /*Calculate the longest line*/
         lv_coord_t act_line_length = lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
-                                                       flag);
+                                                      flag);
 
         size_res->x = LV_MAX(act_line_length, size_res->x);
         line_start  = new_line_start;
@@ -296,6 +296,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                                lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
+    if(txt[0] == '\0') return 0;
     if(font == NULL) return 0;
 
     /*If max_width doesn't mater simply find the new line character
@@ -353,7 +354,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
  * @return length of a char_num long text
  */
 lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                             lv_text_flag_t flag)
+                            lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
@@ -526,7 +527,7 @@ LV_FORMAT_ATTRIBUTE(1, 0) char * _lv_txt_set_text_vfmt(const char * fmt, va_list
     return text;
 }
 
-void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t *ofs)
+void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t * ofs)
 {
     *letter = _lv_txt_encoded_next(txt, ofs);
     *letter_next = *letter != '\0' ? _lv_txt_encoded_next(&txt[*ofs], NULL) : 0;

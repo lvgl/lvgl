@@ -13,16 +13,13 @@ scripts/install-prerequisites.sh
 ```
 
 ### Run test
-1. Enter `lvgl/tests/`
-2. Run the tests with `./main.py [OPTIONS]`. The options are
-  - `report` Create a html page in the `report` folder with the coverage report.
-  - `test` Build and run only test. Without this option LVGL will be built with various configurations.
-  - `noclean` Do not clean the project before building. Useful while writing test to save some times. 
+1. Run all executable tests with `./tests/main.py test`.
+2. Build all build-only tests with `./tests/main.py build`.
+3. Clean prior test build, build all build-only tests,
+   run executable tests, and generate code coverage
+   report `./tests/main.py --clean --report build test`.
 
-For example: 
-- `./main.py` Run all the test as they run in the CI.
-- `./main.py report test noclean` Run only the test, should be used when writing tests.
-
+For full information on running tests run: `./tests/main.py --help`.
 
 ## Running automatically
 

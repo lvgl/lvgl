@@ -86,42 +86,22 @@ void lv_obj_del_async(struct _lv_obj_t * obj);
 void lv_obj_set_parent(struct _lv_obj_t * obj, struct _lv_obj_t * parent);
 
 /**
- * Move the object to the foreground.
- * It will look like if it was created as the last child of its parent.
- * It also means it can cover any of the siblings.
- * @param obj       pointer to an object
- */
-void lv_obj_move_foreground(struct _lv_obj_t * obj);
-
-/**
- * Move the object to the background.
- * It will look like if it was created as the first child of its parent.
- * It also means any of the siblings can cover the object.
- * @param obj       pointer to an object
- */
-void lv_obj_move_background(struct _lv_obj_t * obj);
-
-/**
  * Swap the positions of two objects.
  * When used in listboxes, it can be used to sort the listbox items.
  * @param obj1  pointer to the first object
  * @param obj2  pointer to the second object
  */
-void lv_obj_swap(struct _lv_obj_t* obj1, struct _lv_obj_t* obj2);
+void lv_obj_swap(struct _lv_obj_t * obj1, struct _lv_obj_t * obj2);
 
 /**
- * moves the object one position up in the hierarchy.
+ * moves the object to the given index in its parent.
  * When used in listboxes, it can be used to sort the listbox items.
- * @param obj  pointer to the object to be moved upwards.
+ * @param obj  pointer to the object to be moved.
+ * @param index  new index in parent.
+ * @note to move to the foreground: lv_obj_move_to_index(obj, 0)
+ * @note to move forward (up): lv_obj_move_to_index(obj, lv_obj_get_index(obj) - 1)
  */
-void lv_obj_move_up(struct _lv_obj_t* obj);
-
-/**
- * moves the object one position down in the hierarchy.
- * When used in listboxes, it can be used to sort the listbox items.
- * @param obj  pointer to the object to be moved downwards.
- */
-void lv_obj_move_down(struct _lv_obj_t* obj);
+void lv_obj_move_to_index(struct _lv_obj_t * obj, int32_t index);
 
 /**
  * Get the screen of an object
@@ -166,11 +146,11 @@ uint32_t lv_obj_get_child_cnt(const struct _lv_obj_t * obj);
 
 /**
  * Get the index of a child.
- * @param obj       pointer to an obejct
+ * @param obj       pointer to an object
  * @return          the child index of the object.
  *                  E.g. 0: the oldest (firstly created child)
  */
-uint32_t lv_obj_get_child_id(const struct _lv_obj_t * obj);
+uint32_t lv_obj_get_index(const struct _lv_obj_t * obj);
 
 /**
  * Iterate through all children of any object.

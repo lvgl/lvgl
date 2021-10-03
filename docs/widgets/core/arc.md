@@ -20,7 +20,7 @@ Larger padding makes it larger, smaller padding makes it smaller.
 
 A new value can be set using `lv_arc_set_value(arc, new_value)`. 
 The value is interpreted in a range (minimum and maximum values) which can be modified with `lv_arc_set_range(arc, min, max)`.
-The default range is 1..100.
+The default range is 0..100.
 
 The indicator arc is drawn on the main part's arc. This if the value is set to maximum the indicator arc will cover the entire "background" arc.
 To set the start and end angle of the background arc use the `lv_arc_set_bg_angles(arc, start_angle, end_angle)` functions or `lv_arc_set_bg_start/end_angle(arc, angle)`. 
@@ -50,7 +50,7 @@ The change rate is defined in degree/second unit and can be set with `lv_arc_set
 It's also possible to set the angles of the indicator arc directly with `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)`.
 In this case the set "value" and "mode" are ignored.
 
-In other words, settings angles and values are independent. You should use either value or angle settings. Mixing the two might result in unintended behavior. 
+In other words, the angle and value settings are independent. You should exclusively use one or the other. Mixing the two might result in unintended behavior.
 
 To make the arc non-adjustable, remove the style of the knob and make the object non-clickable:
 ```c
