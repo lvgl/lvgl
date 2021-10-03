@@ -114,7 +114,11 @@ void lv_anim_timeline_stop(lv_anim_timeline_t * at)
 
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
-        lv_anim_custom_del(a, (lv_anim_custom_exec_cb_t)a->exec_cb);
+
+        /*Avoid calling lv_anim_del(NULL, NULL) to cause all animations to be deleted*/
+        if (a->var != NULL || a->exec_cb != NULL) {
+            lv_anim_custom_del(a, (lv_anim_custom_exec_cb_t)a->exec_cb);
+        }
     }
 }
 
