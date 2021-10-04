@@ -37,6 +37,7 @@
 - fix(snapshot): snapshot is affected by parent's style because of wrong coordinates.
 - fix(disp) set default theme also for non-default displays
 - feat(btnmatrix/keyboard): add option to show popovers on button press
+- feat(event) add add LV_EVENT_CHILD_CREATED/DELETED
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
