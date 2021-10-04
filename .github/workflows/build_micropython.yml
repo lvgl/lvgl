@@ -1,4 +1,4 @@
-name: Build Micropython with LVGL submodule
+name: Micropython CI
 
 on:
   push:
@@ -6,9 +6,11 @@ on:
 
 jobs:
   build:
-
+    name: Build ${{ matrix.port }} port
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        port: ['unix', 'esp32', 'stm32']
     steps:
     - name: Install Dependencies
       run: |
@@ -21,8 +23,10 @@ jobs:
         git checkout master
     - name: Initialize lv_bindings submodule
       run: git submodule update --init --recursive lib/lv_bindings
-    - name: Update Unix port submodules
-      run: make -C ports/unix VARIANT=dev DEBUG=1 submodules
+    - name: Update ${{ matrix.port }} port submodules
+      if: matrix.port != 'esp32'
+      # VARIANT needed for unix
+      run: make -C ports/${{ matrix.port }} VARIANT=dev DEBUG=1 submodules 
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
       run: |
@@ -32,20 +36,31 @@ jobs:
         git submodule update --init --recursive
     - name: Build mpy-cross
       run: make -j $(nproc) -C mpy-cross
-    - name: Build the unix port
-      run: make -j $(nproc) -C ports/unix VARIANT=dev DEBUG=1
-    - name: Run tests      
-      run: |
-        export XDG_RUNTIME_DIR=/tmp
-        lib/lv_bindings/tests/run.sh
+
+    # ESP32 port
     - name: Build ESP32 port
+      if: matrix.port == 'esp32'
       run: |
         source tools/ci.sh && ci_esp32_idf43_setup
         source tools/ci.sh && ci_esp32_build
+
+    # STM32 port
     - name: arm-none-eabi-gcc
+      if: matrix.port == 'stm32'
       uses: fiam/arm-none-eabi-gcc@v1
       with:
         release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
     - name: Build STM32 port
+      if: matrix.port == 'stm32'
+      run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
+    
+    # Unix port
+    - name: Build Unix port
+      if: matrix.port == 'unix'
+      run: make -j $(nproc) -C ports/unix VARIANT=dev DEBUG=1
+    - name: Run tests
+      if: success() && matrix.port == 'unix'
       run: |
-          make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
+        export XDG_RUNTIME_DIR=/tmp
+        lib/lv_bindings/tests/run.sh
+        
