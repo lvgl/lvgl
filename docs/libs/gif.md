@@ -34,7 +34,7 @@ To decode and display a GIF animation the following amount of RAM is required:
 ## Example
 ```eval_rst
 
-.. include:: ../../../examples/libs/gif/index.rst
+.. include:: ../../examples/libs/gif/index.rst
 
 ```
 

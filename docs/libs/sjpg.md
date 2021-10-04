@@ -65,7 +65,7 @@ All good!
 ## Example
 ```eval_rst
 
-.. include:: ../../../examples/libs/sjpg/index.rst
+.. include:: ../../examples/libs/sjpg/index.rst
 
 ```
 

@@ -28,7 +28,7 @@ Note that, a file system driver needs to registered to open images from files. R
 ## Example
 ```eval_rst
 
-.. include:: ../../../examples/libs/bmp/index.rst
+.. include:: ../../examples/libs/bmp/index.rst
 
 ```
 

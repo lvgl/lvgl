@@ -18,7 +18,7 @@ As it might take significant time to decode PNG images LVGL's [images caching](h
 ## Example
 ```eval_rst
 
-.. include:: ../../../examples/libs/png/index.rst
+.. include:: ../../examples/libs/png/index.rst
 
 ```
 
