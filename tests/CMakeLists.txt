@@ -220,6 +220,7 @@ set(COMPILE_OPTIONS
     -Werror
     -Wextra
     -Wformat-security
+    -Wformat=2
     -Wmaybe-uninitialized
     -Wmissing-prototypes
     -Wpointer-arith
