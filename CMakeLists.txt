@@ -94,6 +94,8 @@ else()
 
 endif()
 
+option(install "Enable install to system" OFF)
+if(install)
 include_directories(${CMAKE_SOURCE_DIR})
 
 file(GLOB LVGL_PUBLIC_HEADERS
@@ -122,4 +124,4 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 install(TARGETS ${CMAKE_PROJECT_NAME}
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
     PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
-
+endif(install)
