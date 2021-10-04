@@ -137,6 +137,11 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
+
+        if(a->exec_cb == NULL) {
+            continue;
+        }
+
         uint32_t start_time = at->anim_dsc[i].start_time;
         int32_t value = 0;
 
