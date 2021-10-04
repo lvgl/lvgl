@@ -1,6 +1,6 @@
-Create a QR Code
+Load an SJPG image
 """""""""""""""""""""""""""""""""""""""""""""""
 
-.. lv_example:: libs/qrcode/lv_example_qrcode_1
+.. lv_example:: libs/sjpg/lv_example_sjpg_1
   :language: c
 

@@ -11,8 +11,8 @@
    :maxdepth: 1
    
    fs
-   bpm
-   jpg
+   bmp
+   sjpg
    png
    gif
    freetype

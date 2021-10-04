@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_SJPG && LV_BUILD_EXAMPLES
 
+/**
+ * Load an SJPG image
+ */
 void lv_example_sjpg_1(void)
 {
   lv_obj_t * wp;
