@@ -1,4 +1,4 @@
-project(lvgl
+project(lvgl LANGUAGES C
   HOMEPAGE_URL https://github.com/lvgl/lvgl/)
 
 if(ESP_PLATFORM)
