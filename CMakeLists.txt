@@ -1,3 +1,6 @@
+project(lvgl
+  HOMEPAGE_URL https://github.com/lvgl/lvgl/)
+
 if(ESP_PLATFORM)
 
 file(GLOB_RECURSE SOURCES src/*.c)
@@ -65,3 +68,35 @@ file(GLOB_RECURSE SOURCES src/*.c)
 add_library(lvgl STATIC ${SOURCES})
 
 endif()
+
+option(install "Enable install to system" OFF)
+if(install)
+include_directories(${CMAKE_SOURCE_DIR})
+
+file(GLOB LVGL_PUBLIC_HEADERS
+  "${CMAKE_SOURCE_DIR}/lv_conf.h"
+  "${CMAKE_SOURCE_DIR}/lvgl.h")
+
+
+if("${LIB_INSTALL_DIR}" STREQUAL "")
+    set(LIB_INSTALL_DIR "lib")
+endif()
+
+if("${INC_INSTALL_DIR}" STREQUAL "")
+    set(INC_INSTALL_DIR "include/${CMAKE_PROJECT_NAME}")
+endif()
+
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/src"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+    FILES_MATCHING
+    PATTERN "*.h")
+
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    OUTPUT_NAME ${CMAKE_PROJECT_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+
+install(TARGETS ${CMAKE_PROJECT_NAME}
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif(install)
