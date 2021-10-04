@@ -117,7 +117,7 @@ void lv_anim_timeline_stop(lv_anim_timeline_t * at)
 
         /*Avoid calling lv_anim_del(NULL, NULL) to cause all animations to be deleted*/
         if (a->var != NULL || a->exec_cb != NULL) {
-            lv_anim_custom_del(a, (lv_anim_custom_exec_cb_t)a->exec_cb);
+            lv_anim_del(a->var, a->exec_cb);
         }
     }
 }
