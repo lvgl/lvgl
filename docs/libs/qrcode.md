@@ -9,8 +9,8 @@ QR code generation with LVGL. Uses [QR-Code-generator](https://github.com/nayuki
 
 ## Get started
 - Download or clone this repository
-  - [Download](https://github.com/littlevgl/lv_lib_qrcode.git) from GitHub
-  - Clone: git clone https://github.com/littlevgl/lv_lib_qrcode.git
+  - [Download](https://github.com/lvgl/lv_lib_qrcode.git) from GitHub
+  - Clone: git clone https://github.com/lvgl/lv_lib_qrcode.git
 - Include the library: `#include "lv_lib_qrcode/lv_qrcode.h"`
 - Test with the following code:
 ```c
