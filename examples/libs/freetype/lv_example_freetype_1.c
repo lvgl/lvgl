@@ -26,5 +26,16 @@ void lv_example_freetype_1(void)
     lv_label_set_text(label, "Hello world\nI'm a font created with FreeType");
     lv_obj_center(label);
 }
+#else
+
+void lv_example_freetype_1(void)
+{
+    /*TODO
+     *fallback for online examples*/
+
+    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_label_set_text(label, "FreeType is not installed");
+    lv_obj_center(label);
+}
 
 #endif

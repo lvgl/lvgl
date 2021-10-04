@@ -145,7 +145,7 @@ static void next_frame_task_cb(lv_timer_t * t)
         }
     }
 
-    gd_render_frame(gifobj->gif, gifobj->imgdsc.data);
+    gd_render_frame(gifobj->gif, (uint8_t *)gifobj->imgdsc.data);
 
     lv_img_cache_invalidate_src(lv_img_get_src(obj));
     lv_obj_invalidate(obj);
