@@ -148,7 +148,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         memcpy(&b.px_width, header + 18, 4);
         memcpy(&b.px_height, header + 22, 4);
         memcpy(&b.bpp, header + 28, 2);
-        b.row_size_bytes = (b.bpp * b.px_width) / 8;
+        b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
 
         dsc->user_data = lv_mem_alloc(sizeof(bmp_dsc_t));
         LV_ASSERT_MALLOC(dsc->user_data);
