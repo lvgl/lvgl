@@ -38,10 +38,13 @@ jobs:
       run: make -j $(nproc) -C mpy-cross
 
     # ESP32 port
-    - name: Build ESP32 port
+    - name: Setup ESP-IDF
       if: matrix.port == 'esp32'
       run: |
         source tools/ci.sh && ci_esp32_idf43_setup
+    - name: Build ESP32 port
+      if: matrix.port == 'esp32'
+      run: |
         source tools/ci.sh && ci_esp32_build
 
     # STM32 port
