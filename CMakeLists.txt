@@ -1,6 +1,3 @@
-project(lvgl
-  HOMEPAGE_URL https://github.com/lvgl/lvgl/)
-
 if(ESP_PLATFORM)
 
 file(GLOB_RECURSE SOURCES src/*.c)
@@ -83,7 +80,7 @@ if("${LIB_INSTALL_DIR}" STREQUAL "")
 endif()
 
 if("${INC_INSTALL_DIR}" STREQUAL "")
-    set(INC_INSTALL_DIR "include/${CMAKE_PROJECT_NAME}")
+    set(INC_INSTALL_DIR "include/lvgl")
 endif()
 
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/src"
@@ -91,12 +88,12 @@ install(DIRECTORY "${CMAKE_SOURCE_DIR}/src"
     FILES_MATCHING
     PATTERN "*.h")
 
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+set_target_properties(lvgl PROPERTIES
     OUTPUT_NAME ${CMAKE_PROJECT_NAME}
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
-install(TARGETS ${CMAKE_PROJECT_NAME}
+install(TARGETS lvgl
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
     PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
 endif(install)
