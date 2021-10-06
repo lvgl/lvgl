@@ -19,7 +19,6 @@
 #include "../../layouts/flex/lv_flex.h"
 #include "../../../widgets/lv_label.h"
 #include "../../../widgets/lv_img.h"
-#include "../../../widgets/lv_btn.h"
 
 /**********************
  *      TYPEDEFS
@@ -211,11 +210,11 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
             lv_obj_add_flag(sidebar_header, LV_OBJ_FLAG_EVENT_BUBBLE);
             lv_obj_add_event_cb(sidebar_header, lv_menu_back_event_cb, LV_EVENT_CLICKED, menu);
             menu->sidebar_header = sidebar_header;
-
-            lv_obj_t * sidebar_header_back_btn = lv_img_create(menu->sidebar_header);
-            lv_img_set_src(sidebar_header_back_btn, LV_SYMBOL_LEFT);
-            lv_obj_add_flag(sidebar_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
             menu->sidebar_header_back_btn = menu->sidebar_header;  /* Let the entire header be the back btn */
+
+            lv_obj_t * sidebar_header_back_icon = lv_img_create(menu->sidebar_header);
+            lv_img_set_src(sidebar_header_back_icon, LV_SYMBOL_LEFT);
+            lv_obj_add_flag(sidebar_header_back_icon, LV_OBJ_FLAG_EVENT_BUBBLE);
 
             /* Place page in sidebar */
             if(root_hist != NULL){
@@ -474,18 +473,17 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_size(main_header, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_add_flag(main_header, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(main_header, LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_add_flag(main_header, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_event_cb(main_header, lv_menu_back_event_cb, LV_EVENT_CLICKED, menu);
     menu->main_header = main_header;
+    menu->main_header_back_btn = menu->main_header; /* Let the entire header be the back btn */
+
+    /* Create the default simple back icon */
+    lv_obj_t * main_header_back_icon = lv_img_create(menu->main_header);
+    lv_img_set_src(main_header_back_icon, LV_SYMBOL_LEFT);
+    lv_obj_add_flag(main_header_back_icon, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     menu->main_page = NULL;
-
-    /* Create the default simple back button(s) */
-    lv_obj_t * main_header_back_btn = lv_img_create(menu->main_header);
-    lv_img_set_src(main_header_back_btn, LV_SYMBOL_LEFT);
-    lv_obj_add_flag(main_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
-    menu->main_header_back_btn = menu->main_header; /* Let the entire header be the back btn */
-    lv_obj_add_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
-
     menu->selected_tab = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");

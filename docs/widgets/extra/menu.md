@@ -5,17 +5,17 @@
 # Menu (lv_menu)
 
 ## Overview
-The menu widget can be used to easily create multi-level menus. It handles the traversal of between pages automatically.
+The menu widget can be used to easily create multi-level menus. It handles the traversal between pages automatically.
 
 ## Parts and Styles
-The Menu widget is built from the following objects:
+The menu widget is built from the following objects:
 - Main container: lv_menu_main_cont
   - Main header: lv_menu_main_header_cont
-    - Default back button: [lv_btn](/widgets/core/btn)
+    - Default back icon: [lv_img](/widgets/core/img)
   - Main page: lv_menu_page
 - Sidebar container: lv_menu_sidebar_cont
   - Sidebar header: lv_menu_sidebar_header_cont
-    - Default back button: [lv_btn](/widgets/core/btn)
+    - Default back icon: [lv_img](/widgets/core/img)
   - Sidebar page: lv_menu_page
   
 ## Usage
@@ -59,10 +59,12 @@ For instance, you have created a btn obj in the main page. When you click the bt
 The following objects can be created so that it is easier to style the menu:
 `lv_menu_cont_create(parent page)` creates a new empty container.
 `lv_menu_section_create(parent page)` creates a new empty section.
-`lv_menu_separator_create(parent page)` creates a seperator.
+`lv_menu_separator_create(parent page)` creates a separator.
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent when a page is shown.  `lv_menu_get_cur_main_page(menu)` returns a pointer to menu page that is currently displayed in main.
+- `LV_EVENT_VALUE_CHANGED` Sent when a page is shown.
+  - `lv_menu_get_cur_main_page(menu)` returns a pointer to menu page that is currently displayed in main.
+  - `lv_menu_get_cur_sidebar_page(menu)` returns a pointer to menu page that is currently displayed in sidebar.
     
 See the events of the [Base object](/widgets/obj) too.
     
