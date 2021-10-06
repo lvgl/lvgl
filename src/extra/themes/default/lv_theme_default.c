@@ -126,7 +126,7 @@ typedef struct {
 #endif
 
 #if LV_USE_MENU
-    lv_style_t menu_bg, menu_info, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_section, menu_pressed, menu_separator;
+    lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_section, menu_pressed, menu_separator;
 #endif
 
 #if LV_USE_MSGBOX
@@ -457,6 +457,7 @@ static void style_init(void)
     lv_style_set_pad_all(&styles->chart_ticks, lv_disp_dpx(theme.disp, 2));
     lv_style_set_text_color(&styles->chart_ticks, lv_palette_main(LV_PALETTE_GREY));
 #endif
+
 #if LV_USE_MENU
     style_init_reset(&styles->menu_bg);
     lv_style_set_pad_all(&styles->menu_bg, 0);
@@ -473,10 +474,6 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->menu_section, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->menu_section, color_card);
     lv_style_set_text_color(&styles->menu_section, color_text);
-
-    style_init_reset(&styles->menu_info);
-    lv_style_set_text_color(&styles->menu_info, grey_filter_cb(NULL, color_text, LV_OPA_30));
-    lv_style_set_text_font(&styles->menu_info, theme.font_small);
 
     style_init_reset(&styles->menu_cont);
     lv_style_set_pad_hor(&styles->menu_cont, PAD_SMALL);
@@ -516,6 +513,7 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->menu_separator, LV_OPA_TRANSP);
     lv_style_set_pad_ver(&styles->menu_separator, PAD_TINY);
 #endif
+
 #if LV_USE_METER
     style_init_reset(&styles->meter_marker);
     lv_style_set_line_width(&styles->meter_marker, lv_disp_dpx(theme.disp, 5));
@@ -1044,7 +1042,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
     else if(lv_obj_check_type(obj, &lv_menu_page_class)) {
         lv_obj_add_style(obj, &styles->menu_page, 0);
-        lv_obj_add_style(obj, &styles->menu_info, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
     }
