@@ -25,8 +25,15 @@ void lv_example_menu_3(void)
 
     /*Create a custom header*/
     lv_obj_t * header = lv_menu_get_main_header(menu);
+    lv_obj_clear_flag(header, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clean(header);
+    lv_obj_t * back_btn = lv_btn_create(header);
+    lv_obj_t * back_btn_label = lv_label_create(back_btn);
+    lv_label_set_text(back_btn_label, "Back");
+    lv_menu_set_main_header_back_btn(menu, back_btn);
+
     header_label = lv_label_create(header);
-    lv_label_set_text(header_label, "Placeholder text");
+    lv_label_set_text(header_label, "Main page");
 
     lv_obj_t * cont;
     lv_obj_t * label;
@@ -55,6 +62,8 @@ void lv_example_menu_3(void)
 
     /*Create a main page*/
     lv_obj_t * main_page = lv_menu_page_create(menu);
+    lv_obj_set_user_data(main_page, "Main page");
+
     cont = lv_menu_cont_create(main_page);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Item 1 (Click me!)");
