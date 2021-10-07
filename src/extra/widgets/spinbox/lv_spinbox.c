@@ -177,7 +177,7 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
  */
 void lv_spinbox_set_digit_step_direction(lv_obj_t *obj, uint8_t direction)
 {
-    LV_ASSERT_OBJ(obj, MYCLASS);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     spinbox->digit_step_dir = direction;
 
@@ -345,16 +345,6 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
 static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
-	uint32_t Power10(uint8_t exp)
-	{
-		uint32_t res = 1;
-		for (uint8_t t = 0; t < exp; t++)
-		{
-			res = res * 10;
-		}
-		return res;
-	}
-	
     LV_UNUSED(class_p);
 
     /*Call the ancestor's event handler*/
@@ -377,12 +367,12 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
                         }
                         else {
                             /*Restart from the MSB*/
-                            spinbox->step = Power10(spinbox->digit_count - 2);
+                            spinbox->step = lv_pow(10, spinbox->digit_count - 2);
                             lv_spinbox_step_prev(obj);
                         }
                     }
                     else {
-                        if(spinbox->step < Power10(spinbox->digit_count - 1)) {
+                        if(spinbox->step < lv_pow(10, spinbox->digit_count - 1)) {
                             lv_spinbox_step_prev(obj);
                         }
                         else {
