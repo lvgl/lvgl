@@ -27,6 +27,9 @@ extern "C" {
  *********************/
 #define LV_SPINBOX_MAX_DIGIT_COUNT 10
 
+#define LV_SPINBOX_DIGIT_DIR_TO_RIGHT 0
+#define LV_SPINBOX_DIGIT_DIR_TO_LEFT 1
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -42,6 +45,7 @@ typedef struct {
     uint16_t digit_count : 4;
     uint16_t dec_point_pos : 4; /*if 0, there is no separator and the number is an integer*/
     uint16_t rollover : 1;   // Set to true for rollover functionality
+    uint16_t digit_step_dir : 1; // the direction the digit will step on encoder button press when editing
 } lv_spinbox_t;
 
 extern const lv_obj_class_t lv_spinbox_class;
@@ -105,15 +109,24 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max);
  * @param pos selected position in spinbox
  */
 void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos);
-/*=====================
+
+/**
+ * Set direction of digit step when clicking an encoder button while in editing mode
+ * @param spinbox pointer to spinbox
+ * @param direction the direction
+ */
+void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, uint8_t direction);
+
+    /*=====================
  * Getter functions
  *====================*/
 
-/**
+    /**
  * Get spinbox rollover function status
  * @param spinbox pointer to spinbox
  */
-bool lv_spinbox_get_rollover(lv_obj_t * obj);
+    bool
+    lv_spinbox_get_rollover(lv_obj_t *obj);
 
 /**
  * Get the spinbox numeral value (user has to convert to float according to its digit format)
