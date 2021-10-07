@@ -170,6 +170,11 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
     lv_spinbox_updatevalue(obj);
 }
 
+/**
+ * Set direction of digit step when clicking an encoder button while in editing mode
+ * @param spinbox pointer to spinbox
+ * @param direction the direction (LV_SPINBOX_DIGIT_DIR_TO_RIGHT or LV_SPINBOX_DIGIT_DIR_TO_LEFT)
+ */
 void lv_spinbox_set_digit_step_direction(lv_obj_t *obj, uint8_t direction)
 {
     LV_ASSERT_OBJ(obj, MYCLASS);
