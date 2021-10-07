@@ -169,6 +169,15 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
 
     lv_spinbox_updatevalue(obj);
 }
+
+void lv_spinbox_set_digit_step_direction(lv_obj_t *obj, uint8_t direction)
+{
+    LV_ASSERT_OBJ(obj, MYCLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    spinbox->digit_step_dir = direction;
+
+    lv_spinbox_updatevalue(obj);
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -363,7 +372,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
                         }
                         else {
                             /*Restart from the MSB*/
-                            spinbox->step = Power10(spinbox->digit_count - 2)
+                            spinbox->step = Power10(spinbox->digit_count - 2);
                             lv_spinbox_step_prev(obj);
                         }
                     }
