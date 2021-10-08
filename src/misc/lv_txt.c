@@ -484,7 +484,7 @@ void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t
 /**
  * Give the size of an UTF-8 coded character
  * @param str pointer to a character in a string
- * @return length of the UTF-8 character (1,2,3 or 4). O on invalid code
+ * @return length of the UTF-8 character (1,2,3 or 4), 0 on invalid code.
  */
 static uint8_t lv_txt_utf8_size(const char * str)
 {
@@ -496,7 +496,7 @@ static uint8_t lv_txt_utf8_size(const char * str)
         return 3;
     else if((str[0] & 0xF8) == 0xF0)
         return 4;
-    return 0; /*If the char was invalid tell it's 1 byte long*/
+    return 0;
 }
 
 /**
@@ -679,7 +679,8 @@ static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
     uint32_t byte_cnt = 0;
     for(i = 0; i < utf8_id && txt[byte_cnt] != '\0'; i++) {
         uint8_t c_size = _lv_txt_encoded_size(&txt[byte_cnt]);
-        byte_cnt += c_size > 0 ? c_size : 1;
+        /* If the char was invalid tell it's 1 byte long*/
+        byte_cnt += c_size ? c_size : 1;
     }
 
     return byte_cnt;
