@@ -440,6 +440,8 @@ bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
  */
 void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
+    if(txt_buf == NULL || ins_txt == NULL) return;
+
     size_t old_len = strlen(txt_buf);
     size_t ins_len = strlen(ins_txt);
     if(ins_len == 0) return;
@@ -466,6 +468,7 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
  */
 void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 {
+    if(txt == NULL) return;
 
     size_t old_len = strlen(txt);
 
