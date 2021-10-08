@@ -82,17 +82,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Get size of a text
- * @param size_res pointer to a 'point_t' variable to store the result
- * @param text pointer to a text
- * @param font pointer to font of the text
- * @param letter_space letter space of the text
- * @param txt.line_space line space of the text
- * @param flags settings for the text from ::lv_text_flag_t
- * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
- * line breaks
- */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
@@ -280,18 +269,6 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 #endif
 }
 
-/**
- * Get the next line of text. Check line length and break chars too.
- *
- * A line of txt includes the \n character.
- *
- * @param txt a '\0' terminated string
- * @param font pointer to a font
- * @param letter_space letter space
- * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
- * @param flags settings for the text from 'txt_flag_type' enum
- * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
- */
 uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                                lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
@@ -343,16 +320,6 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     return i;
 }
 
-/**
- * Give the length of a text with a given font
- * @param txt a '\0' terminate string
- * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in
- * UTF-8)
- * @param font pointer to a font
- * @param letter_space letter space
- * @param flags settings for the text from 'txt_flag_t' enum
- * @return length of a char_num long text
- */
 lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
                             lv_text_flag_t flag)
 {
@@ -392,14 +359,6 @@ lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t *
     return width;
 }
 
-/**
- * Check next character in a string and decide if the character is part of the command or not
- * @param state pointer to a txt_cmd_state_t variable which stores the current state of command
- * processing (Inited to TXT_CMD_STATE_WAIT )
- * @param c the current character
- * @return true: the character is part of a command and should not be written,
- *         false: the character should be written
- */
 bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
 {
     bool ret = false;
@@ -431,13 +390,6 @@ bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
     return ret;
 }
 
-/**
- * Insert a string into an other
- * @param txt_buf the original text (must be big enough for the result text)
- * @param pos position to insert. Expressed in character index and not byte index (Different in
- * UTF-8) 0: before the original text, 1: after the first char etc.
- * @param ins_txt text to insert
- */
 void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
     if(txt_buf == NULL || ins_txt == NULL) return;
@@ -459,13 +411,6 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
 }
 
-/**
- * Delete a part of a string
- * @param txt string to modify
- * @param pos position where to start the deleting (0: before the first char, 1: after the first
- * char etc.)
- * @param len number of characters to delete
- */
 void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 {
     if(txt == NULL) return;
@@ -482,11 +427,6 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
     }
 }
 
-/**
- * return a new formatted text. Memory will be allocated to store the text.
- * @param fmt `printf`-like format
- * @return pointer to the allocated text string.
- */
 LV_FORMAT_ATTRIBUTE(1, 0) char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 {
     /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12*/
