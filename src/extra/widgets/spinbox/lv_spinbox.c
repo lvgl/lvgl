@@ -173,9 +173,9 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
 /**
  * Set direction of digit step when clicking an encoder button while in editing mode
  * @param spinbox pointer to spinbox
- * @param direction the direction (LV_SPINBOX_DIGIT_DIR_TO_RIGHT or LV_SPINBOX_DIGIT_DIR_TO_LEFT)
+ * @param direction the direction (LV_DIR_RIGHT or LV_DIR_LEFT)
  */
-void lv_spinbox_set_digit_step_direction(lv_obj_t *obj, uint8_t direction)
+void lv_spinbox_set_digit_step_direction(lv_obj_t *obj, lv_dir_t direction)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
@@ -361,7 +361,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             if(lv_group_get_editing(lv_obj_get_group(obj))) {
                 if (spinbox->digit_count > 1) {
-                    if (spinbox->digit_step_dir == LV_SPINBOX_DIGIT_DIR_TO_RIGHT) {
+                    if (spinbox->digit_step_dir == LV_DIR_RIGHT) {
                         if(spinbox->step > 1) {
                            lv_spinbox_step_next(obj);
                         }
