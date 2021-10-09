@@ -5,19 +5,6 @@
 
 static const char color_cmd = LV_TXT_COLOR_CMD[0];
 
-void test_txt_next_line_should_handle_empty_string(void);
-void test_txt_should_identify_valid_start_of_command(void);
-void test_txt_should_identify_invalid_start_of_command(void);
-void test_txt_should_identify_scaped_command_in_parameter(void);
-void test_txt_should_skip_color_parameter_in_parameter(void);
-void test_txt_should_reset_state_when_receiving_color_cmd_while_processing_commands(void);
-void test_txt_should_identify_space_after_parameter(void);
-void test_txt_should_insert_string_into_another(void);
-void test_txt_should_handle_null_pointers_when_inserting(void);
-void test_txt_cut_should_handle_null_pointer_to_txt(void);
-void test_txt_cut_happy_path(void);
-void test_txt_cut_len_longer_than_string(void);
-
 void test_txt_should_identify_valid_start_of_command(void)
 {
     uint32_t character = color_cmd;
