@@ -14,6 +14,9 @@ void test_txt_should_reset_state_when_receiving_color_cmd_while_processing_comma
 void test_txt_should_identify_space_after_parameter(void);
 void test_txt_should_insert_string_into_another(void);
 void test_txt_should_handle_null_pointers_when_inserting(void);
+void test_txt_cut_should_handle_null_pointer_to_txt(void);
+void test_txt_cut_happy_path(void);
+void test_txt_cut_len_longer_than_string(void);
 
 void test_txt_should_identify_valid_start_of_command(void)
 {
@@ -106,6 +109,31 @@ void test_txt_should_handle_null_pointers_when_inserting(void)
     _lv_txt_ins(target, msg_len, NULL);
 
     TEST_ASSERT_EQUAL_STRING("Hello ", target);
+}
+
+void test_txt_cut_should_handle_null_pointer_to_txt(void)
+{
+    _lv_txt_cut(NULL, 0, 6);
+}
+
+void test_txt_cut_happy_path(void)
+{
+    char msg[] = "Hello World";
+
+    _lv_txt_cut(msg, 0, 6);
+
+    TEST_ASSERT_EQUAL_STRING("World", msg);
+}
+
+void test_txt_cut_len_longer_than_string(void)
+{
+    char msg[] = "Hello World";
+
+    _lv_txt_cut(msg, 0, 30);
+
+    // msg ends up being all NULL, len and old_len are equal, so we
+    // set up all of the txt array members to one element past txt len
+    // which is the NULL terminator
 }
 
 /* See #2615 for more information */
