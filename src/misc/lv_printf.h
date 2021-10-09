@@ -54,6 +54,11 @@ extern "C" {
 #include <stdarg.h>
 #include <stddef.h>
 
+typedef struct {
+  const char * fmt;
+  va_list * va;
+} lv_vaformat_t;
+
 /**
  * Tiny snprintf/vsnprintf implementation
  * \param buffer A pointer to the buffer where to store the formatted string
