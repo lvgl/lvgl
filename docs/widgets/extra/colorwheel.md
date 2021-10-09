@@ -25,9 +25,9 @@ The color can be set manually with `lv_colorwheel_set_hue/saturation/value(color
 
 ### Color mode
 
-The current color mode can be manually selected with `lv_colorwheel_set_color_mode(colorwheel, LV_COLORWHEEL_MODE_HUE/SATURATION/VALUE)`.
+The current color mode can be manually selected with `lv_colorwheel_set_mode(colorwheel, LV_COLORWHEEL_MODE_HUE/SATURATION/VALUE)`.
 
-The color mode can be fixed (so as to not change with long press) using `lv_colorwheel_set_color_mode_fixed(colorwheel, true)`
+The color mode can be fixed (so as to not change with long press) using `lv_colorwheel_set_mode_fixed(colorwheel, true)`
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent if a new color is selected.
