@@ -764,9 +764,57 @@ menu "LVGL configuration"
             default y if !LV_CONF_MINIMAL
     endmenu
 
+    menu "3rd Party Libraries"
+        config LV_USE_FS_STDIO
+            int "File system on top of stdio API"
+            default 0
+        config LV_FS_STDIO_PATH
+            string "Set the working directory"
+            depends on LV_USE_FS_STDIO
+
+        config LV_USE_FS_POSIX
+            int "File system on top of posix API"
+            default 0
+        config LV_FS_POSIX_PATH
+            string "Set the working directory"
+            depends on LV_USE_FS_POSIX
+
+        config LV_USE_FS_FATFS
+            int "File system on top of FatFS"
+            default 0
+
+        config LV_USE_PNG
+            bool "PNG decoder library"
+
+        config LV_USE_BMP
+            bool "BMP decoder library"
+
+        config LV_USE_SJPG
+            bool "JPG + split JPG decoder library"
+
+        config LV_USE_GIF
+            bool "GIF decoder library"
+
+        config LV_USE_QRCODE
+            bool "QR code library"
+
+        config LV_USE_FREETYPE
+            bool "FreeType library"
+        config LV_FREETYPE_CACHE_SIZE
+            int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
+            depends on LV_USE_FREETYPE
+            default 16384
+    endmenu
+
     menu "Others"
         config LV_USE_SNAPSHOT
             bool "Enable API to take snapshot"
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "Examples"
+        config LV_BUILD_EXAMPLES
+            bool "Enable the examples to be built"
             default y if !LV_CONF_MINIMAL
     endmenu
 
