@@ -630,15 +630,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif /*LV_ENABLE_GC*/
 
-/*1: Enable API to take snapshot for object*/
-#ifndef LV_USE_SNAPSHOT
-#  ifdef CONFIG_LV_USE_SNAPSHOT
-#    define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
-#  else
-#    define LV_USE_SNAPSHOT 1
-#  endif
-#endif
-
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
@@ -1642,6 +1633,19 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_FREETYPE_CACHE_SIZE (16 * 1024)
 #  endif
 #endif
+#endif
+
+/*-----------
+ * Others
+ *----------*/
+
+/*1: Enable API to take snapshot for object*/
+#ifndef LV_USE_SNAPSHOT
+#  ifdef CONFIG_LV_USE_SNAPSHOT
+#    define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
+#  else
+#    define LV_USE_SNAPSHOT 1
+#  endif
 #endif
 
 
