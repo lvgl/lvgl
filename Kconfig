@@ -155,6 +155,9 @@ menu "LVGL configuration"
         endmenu
 
         menu "GPU"
+            config LV_USE_EXTERNAL_RENDERER
+                bool
+
             config LV_USE_GPU_STM32_DMA2D
                 bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
             config LV_GPU_DMA2D_CMSIS_INCLUDE
@@ -179,12 +182,18 @@ menu "LVGL configuration"
                     selected.
                     0: lv_gpu_nxp_pxp_init() has to be called manually before
                     lv_init().
+
             config LV_USE_GPU_NXP_VG_LITE
                 bool "Use NXP's VG-Lite GPU iMX RTxxx platforms."
 
             config LV_USE_GPU_SDL
                 bool "Use SDL renderer API"
+                select LV_USE_EXTERNAL_RENDERER
                 default n
+            config LV_GPU_SDL_INCLUDE_PATH
+                string "include path of SDL header"
+                depends on LV_USE_GPU_SDL
+                default "SDL2/SDL.h"
         endmenu
 
         menu "Logging"

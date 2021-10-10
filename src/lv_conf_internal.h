@@ -347,45 +347,29 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*Use SDL renderer API*/
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  else
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  endif
-#endif
-#  else
-#    define  LV_USE_GPU_SDL 0
-#  endif
-#endif
-#if LV_USE_GPU_SDL
-#ifndef LV_USE_EXTERNAL_RENDERER
-#  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
-#    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
-#  else
-#    define LV_USE_EXTERNAL_RENDERER 1
-#  endif
-#endif
-#  ifndef LV_GPU_SDL_INCLUDE
-#ifndef LV_GPU_SDL_INCLUDE_PATH
-#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
-#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
-#  else
-#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
-#  endif
-#endif
-#  endif
-#endif
-
-#ifndef LV_USE_EXTERNAL_RENDERER
+/*Use exnternal renderer*/
 #ifndef LV_USE_EXTERNAL_RENDERER
 #  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
 #    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
 #  else
 #    define LV_USE_EXTERNAL_RENDERER 0
+#  endif
+#endif
+
+/*Use SDL renderer API*/
+#ifndef LV_USE_GPU_SDL
+#  ifdef CONFIG_LV_USE_GPU_SDL
+#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  else
+#    define LV_USE_GPU_SDL 0
+#  endif
+#endif
+#if LV_USE_GPU_SDL
+#ifndef LV_GPU_SDL_INCLUDE_PATH
+#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#  else
+#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
 #  endif
 #endif
 #endif
