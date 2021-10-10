@@ -684,7 +684,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
 #    define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
 #  else
-#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
 #  endif
 #endif
 

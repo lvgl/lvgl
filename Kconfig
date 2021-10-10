@@ -293,6 +293,10 @@ menu "LVGL configuration"
 
             config LV_USE_ASSERT_OBJ
                 bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)."
+
+            config LV_ASSERT_HANDLER_INCLUDE
+                string "Header to include for the custom assert function"
+                default "assert.h"
         endmenu
 
         menu "Others"
@@ -300,13 +304,19 @@ menu "LVGL configuration"
                 bool "Show CPU usage and FPS count in the right bottom corner."
 
             config LV_USE_MEM_MONITOR
-                bool "Show the used memory and the memory fragmentation in the left bottom corner. Requires LV_MEM_CUSTOM = 0"
+                bool "Show the used memory and the memory fragmentation in the left bottom corner."
+                depends on !LV_MEM_CUSTOM
 
             config LV_USE_REFR_DEBUG
                 bool "Draw random colored rectangles over the redrawn areas."
 
             config LV_SPRINTF_CUSTOM
                 bool "Change the built-in (v)snprintf functions"
+
+            config LV_SPRINTF_INCLUDE
+                string "Header to include for the custom sprintf function"
+                depends on LV_SPRINTF_CUSTOM
+                default "stdio.h"
 
             config LV_SPRINTF_USE_FLOAT
                 bool "Enable float in built-in (v)snprintf functions"
@@ -315,11 +325,23 @@ menu "LVGL configuration"
             config LV_USE_USER_DATA
                 bool "Add a 'user_data' to drivers and objects."
                 default y
+
+            config LV_ENABLE_GC
+                bool "Enable garbage collector"
+
+            config LV_GC_INCLUDE
+                string "Header to include for the garbage collector related things"
+                depends on LV_ENABLE_GC
+                default "gc.h"
         endmenu
 
         menu "Compiler settings"
             config LV_BIG_ENDIAN_SYSTEM
                 bool "For big endian systems set to 1"
+
+            config LV_ATTRIBUTE_MEM_ALIGN_SIZE
+                int "Required alignment size for buffers"
+                default 1
 
             config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
                 bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
@@ -391,6 +413,12 @@ menu "LVGL configuration"
                 default y if LV_CONF_MINIMAL
             config LV_FONT_UNSCII_16
                 bool "Enable UNSCII 16 (Perfect monospace font)"
+
+            config LV_FONT_CUSTOM
+                bool "Enable the custom font"
+            config LV_FONT_CUSTOM_DECLARE
+                string "Header to include for the custom font"
+                depends on LV_FONT_CUSTOM
         endmenu
 
         choice LV_FONT_DEFAULT
