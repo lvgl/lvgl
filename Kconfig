@@ -317,24 +317,6 @@ menu "LVGL configuration"
             config LV_USE_LARGE_COORD
                 bool "Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t"
         endmenu
-
-        config LV_USE_USER_DATA_FREE
-            bool "Free the user data field upon object deletion"
-            depends on LV_USE_USER_DATA
-        config LV_USER_DATA_FREE_INCLUDE
-            string "Header for user data free function"
-            default "something.h"
-            depends on LV_USE_USER_DATA_FREE
-        config LV_USER_DATA_FREE
-            string "Invoking for user data free function. It has the lv_obj_t pointer as single parameter."
-            default "(user_data_free)"
-            depends on LV_USE_USER_DATA_FREE
-        config LV_USE_API_EXTENSION_V6
-            bool "Use the functions and types from the older (v6) API if possible."
-            default y if !LV_CONF_MINIMAL
-        config LV_USE_API_EXTENSION_V7
-            bool "Use the functions and types from the older (v7) API if possible."
-            default y if !LV_CONF_MINIMAL
     endmenu
 
     menu "Font usage"
