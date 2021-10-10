@@ -377,46 +377,25 @@ menu "LVGL configuration"
             config LV_FONT_MONTSERRAT_48
                 bool "Enable Montserrat 48"
 
-            config LV_FONT_UNSCII_8
-                bool "Enable UNSCII 8 (Perfect monospace font)"
-                default y if LV_CONF_MINIMAL
-            config LV_FONT_UNSCII_16
-                bool "Enable UNSCII 16 (Perfect monospace font)"
-
-            config LV_FONT_MONTSERRAT12SUBPX
+            config LV_FONT_MONTSERRAT_12_SUBPX
                 bool "Enable Montserrat 12 sub-pixel"
-            config LV_FONT_MONTSERRAT28COMPRESSED
+            config LV_FONT_MONTSERRAT_28_COMPRESSED
                 bool "Enable Montserrat 28 compressed"
             config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
                 bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
             config LV_FONT_SIMSUN_16_CJK
                 bool "Enable Simsun 16 CJK"
+
+            config LV_FONT_UNSCII_8
+                bool "Enable UNSCII 8 (Perfect monospace font)"
+                default y if LV_CONF_MINIMAL
+            config LV_FONT_UNSCII_16
+                bool "Enable UNSCII 16 (Perfect monospace font)"
         endmenu
-
-        config LV_FONT_FMT_TXT_LARGE
-            bool "Enable it if you have fonts with a lot of characters."
-            help
-                The limit depends on the font size, font face and bpp
-                but with > 10,000 characters if you see issues probably you
-                need to enable it.
-
-        config LV_USE_FONT_COMPRESSED
-            bool "Sets support for compressed fonts."
-
-        config LV_USE_FONT_SUBPX
-            bool "Enable subpixel rendering."
-
-        config LV_FONT_SUBPX_BGR
-            bool "Use BGR instead RGB for sub-pixel rendering."
-            depends on LV_USE_FONT_SUBPX
-            help
-                Set the pixel order of the display.
-                Important only if "subpx fonts" are used.
-                With "normal" font it doesn't matter.
 
         choice LV_FONT_DEFAULT
             prompt "Select theme default title font"
-            default LV_FONT_DEFAULT_MONTSERRAT_16 if !LV_CONF_MINIMAL
+            default LV_FONT_DEFAULT_MONTSERRAT_14 if !LV_CONF_MINIMAL
             default LV_FONT_DEFAULT_UNSCII_8 if LV_CONF_MINIMAL
             help
                 Select theme default title font
@@ -481,25 +460,46 @@ menu "LVGL configuration"
             config LV_FONT_DEFAULT_MONTSERRAT_48
                 bool "Montserrat 48"
                 select LV_FONT_MONTSERRAT_48
-            config LV_FONT_DEFAULT_UNSCII_8
-                bool "UNSCII 8 (Perfect monospace font)"
-                select LV_FONT_UNSCII_8
-            config LV_FONT_DEFAULT_UNSCII_16
-                bool "UNSCII 16 (Perfect monospace font)"
-                select LV_FONT_UNSCII_16
-            config LV_FONT_DEFAULT_MONTSERRAT12SUBPX
+            config LV_FONT_DEFAULT_MONTSERRAT_12_SUBPX
                 bool "Montserrat 12 sub-pixel"
-                select LV_FONT_MONTSERRAT12SUBPX
-            config LV_FONT_DEFAULT_MONTSERRAT28COMPRESSED
+                select LV_FONT_MONTSERRAT_12_SUBPX
+            config LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
                 bool "Montserrat 28 compressed"
-                select LV_FONT_MONTSERRAT28COMPRESSED
+                select LV_FONT_MONTSERRAT_28_COMPRESSED
             config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
                 bool "Dejavu 16 Persian, Hebrew, Arabic letters"
                 select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
             config LV_FONT_DEFAULT_SIMSUN_16_CJK
                 bool "Simsun 16 CJK"
                 select LV_FONT_SIMSUN_16_CJK
+            config LV_FONT_DEFAULT_UNSCII_8
+                bool "UNSCII 8 (Perfect monospace font)"
+                select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_UNSCII_16
+                bool "UNSCII 16 (Perfect monospace font)"
+                select LV_FONT_UNSCII_16
         endchoice
+
+        config LV_FONT_FMT_TXT_LARGE
+            bool "Enable it if you have fonts with a lot of characters."
+            help
+                The limit depends on the font size, font face and bpp
+                but with > 10,000 characters if you see issues probably you
+                need to enable it.
+
+        config LV_USE_FONT_COMPRESSED
+            bool "Sets support for compressed fonts."
+
+        config LV_USE_FONT_SUBPX
+            bool "Enable subpixel rendering."
+
+        config LV_FONT_SUBPX_BGR
+            bool "Use BGR instead RGB for sub-pixel rendering."
+            depends on LV_USE_FONT_SUBPX
+            help
+                Set the pixel order of the display.
+                Important only if "subpx fonts" are used.
+                With "normal" font it doesn't matter.
     endmenu
 
     menu "Themes"
