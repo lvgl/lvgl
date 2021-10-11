@@ -69,6 +69,10 @@ LVGL might render the screen in multiple chunks and therefore call `flush_cb` mu
 
 ### Optional fields 
 There are some optional display driver data fields:
+- `physical_hor_res` horizontal resolution of the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to -1 / same as `hor_res`).
+- `physical_ver_res` vertical resolution of the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to -1 / same as `ver_res`).
+- `offset_x` horizontal offset from the the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to 0).
+- `offset_y` vertical offset from the the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to 0).
 - `color_chroma_key` A color which will be drawn as transparent on chrome keyed images. Set to `LV_COLOR_CHROMA_KEY` from `lv_conf.h` by default.
 - `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
 - `rotated` and `sw_rotate` See the [Rotation](#rotation) section below.
