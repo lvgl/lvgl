@@ -707,7 +707,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
 #endif
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
-        lv_obj_get_coords(obj, &obj_area);
+        lv_obj_get_content_coords(obj, &obj_area);
         union_ok = _lv_area_intersect(&obj_mask, mask_ori_p, &obj_area);
         if(union_ok != false) {
             lv_area_t mask_child; /*Mask from obj and its child*/
