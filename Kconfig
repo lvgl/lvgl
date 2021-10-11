@@ -71,6 +71,11 @@ menu "LVGL configuration"
             default 32
             depends on !LV_MEM_CUSTOM
 
+        config LV_MEM_ADDR
+            hex "Address for the memory pool instead of allocating it as a normal array"
+            default 0x0
+            depends on !LV_MEM_CUSTOM
+
         config LV_MEM_CUSTOM_INCLUDE
             string "Header to include for the custom memory function"
             default "stdlib.h"
