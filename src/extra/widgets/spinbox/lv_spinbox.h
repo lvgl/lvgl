@@ -114,7 +114,7 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos);
  */
 void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, lv_dir_t direction);
 
- /*=====================
+/*=====================
  * Getter functions
  *====================*/
 
