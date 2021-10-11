@@ -124,7 +124,7 @@ bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
  * Insert a string into an other
  * @param txt_buf the original text (must be big enough for the result text and NULL terminated)
  * @param pos position to insert (0: before the original text, 1: after the first char etc.)
- * @param ins_txt text to insert, must be NULL terminated
+ * @param ins_txt text to insert, must be '\0' terminated
  */
 void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 
