@@ -130,7 +130,7 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 
 /**
  * Delete a part of a string
- * @param txt string to modify, must be NULL terminated and should point to a heap or stack frame, not read-only memory.
+ * @param txt string to modify, must be '\0' terminated and should point to a heap or stack frame, not read-only memory.
  * @param pos position where to start the deleting (0: before the first char, 1: after the first
  * char etc.)
  * @param len number of characters to delete
