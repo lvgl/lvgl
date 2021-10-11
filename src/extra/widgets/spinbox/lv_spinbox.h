@@ -118,7 +118,7 @@ void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, lv_dir_t direction);
  * Getter functions
  *====================*/
 
- /**
+/**
  * Get spinbox rollover function status
  * @param spinbox pointer to spinbox
  */
