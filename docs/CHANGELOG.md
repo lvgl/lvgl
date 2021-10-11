@@ -41,6 +41,7 @@
 - fix(types) LV_FORMAT_ATTRIBUTE now works with gnu version greater than 4.4
 - feat(event) add add LV_EVENT_CHILD_CREATED/DELETED
 - feat(disp): Enable rendering to display subsection
+- feat(keyboard): add user-defined modes
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
