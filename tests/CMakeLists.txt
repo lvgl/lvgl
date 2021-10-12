@@ -221,6 +221,7 @@ set(COMPILE_OPTIONS
     -Wextra
     -Wformat-security
     -Wmaybe-uninitialized
+    -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
     -Wno-discarded-qualifiers
