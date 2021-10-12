@@ -42,6 +42,7 @@
 - feat(event) add add LV_EVENT_CHILD_CREATED/DELETED
 - feat(disp): Enable rendering to display subsection
 - feat(keyboard): add user-defined modes
+- Add support for RT-Thread RTOS
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
@@ -269,7 +270,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 - feat(img_cache) allow disabling image caching
 - calendar: make get_day_of_week() public
 - Added support for Zephyr integration
- 
+
 ### Bugfixes
 - fix(draw_rect) free buffer used for arabic processing
 - fix(win) arabic process the title of the window
