@@ -365,7 +365,6 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
         if(obj->styles[i].is_trans) continue;
 
         lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
-        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
         /*The style is valid for a stat but not the other*/
         bool valid1 = state_act & (~state1) ? false : true;
         bool valid2 = state_act & (~state2) ? false : true;
@@ -394,13 +393,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ZOOM, &v)) layout_diff = true;
 
             if(layout_diff) {
-                if(part_act == LV_PART_MAIN) {
-                    return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                }
-                else {
-                    res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-                    continue;
-                }
+                return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             }
 
             /*Check for draw pad changes*/

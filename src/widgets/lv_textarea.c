@@ -398,16 +398,13 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
     ta->cursor.pos = pos;
 
     /*Position the label to make the cursor visible*/
+    lv_obj_update_layout(obj);
+
     lv_point_t cur_pos;
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_area_t label_cords;
-    lv_area_t ta_cords;
     lv_label_get_letter_pos(ta->label, pos, &cur_pos);
-    lv_obj_get_coords(obj, &ta_cords);
-    lv_obj_get_coords(ta->label, &label_cords);
 
     /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
-    lv_obj_update_layout(obj);
 
     /*Check the top*/
     lv_coord_t font_h = lv_font_get_line_height(font);
@@ -811,8 +808,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->accepted_chars    = NULL;
     ta->max_length        = 0;
     ta->cursor.show      = 1;
-    ta->cursor.pos        =
-        1;  /*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); woldn't do anything as there is no difference)*/
+    /*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); woldn't do anything as there is no difference)*/
+    ta->cursor.pos        = 1;
     ta->cursor.click_pos  = 1;
     ta->cursor.valid_x    = 0;
     ta->one_line          = 0;
@@ -1006,7 +1003,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     /*If no restriction accept it*/
-    if(ta->accepted_chars == NULL && ta->max_length == 0) return true;
+    if((ta->accepted_chars == NULL || ta->accepted_chars[0] == '\0') && ta->max_length == 0) return true;
 
     /*Too many characters?*/
     if(ta->max_length > 0 && _lv_txt_get_encoded_length(lv_textarea_get_text(obj)) >= ta->max_length) {
@@ -1106,10 +1103,11 @@ static void refr_cursor_area(lv_obj_t * obj)
     ta->cursor.txt_byte_pos = byte_pos;
 
     /*Calculate the cursor according to its type*/
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR);
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
-    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
+    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
+    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR) + border_width;
+    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
+    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR) + border_width;
 
     lv_area_t cur_area;
     cur_area.x1 = letter_pos.x - left;
@@ -1311,6 +1309,7 @@ static void draw_cursor(lv_event_t * e)
     lv_area_t cur_area;
     lv_area_copy(&cur_area, &ta->cursor.area);
 
+
     cur_area.x1 += ta->label->coords.x1;
     cur_area.y1 += ta->label->coords.y1;
     cur_area.x2 += ta->label->coords.x1;
@@ -1318,19 +1317,25 @@ static void draw_cursor(lv_event_t * e)
 
     lv_draw_rect(&cur_area, clip_area, &cur_dsc);
 
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
+    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
+    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
     char letter_buf[8] = {0};
     lv_memcpy(letter_buf, &txt[ta->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ta->cursor.txt_byte_pos]));
 
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR);
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
-    cur_area.x1 += left + border_width;
-    cur_area.y1 += top + border_width;
+    cur_area.x1 += left;
+    cur_area.y1 += top;
 
+    /*Draw the letter over the cursor only if
+     *the cursor has background or the letter has different color than the original.
+     *Else the original letter is drawn twice which makes it look bolder*/
+    lv_color_t label_color = lv_obj_get_style_text_color(ta->label, 0);
     lv_draw_label_dsc_t cur_label_dsc;
     lv_draw_label_dsc_init(&cur_label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
-    lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
+    if(cur_dsc.bg_opa > LV_OPA_MIN || cur_label_dsc.color.full != label_color.full) {
+        lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
+    }
 }
 
 #endif
