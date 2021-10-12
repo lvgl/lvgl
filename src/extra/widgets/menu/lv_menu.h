@@ -38,12 +38,6 @@ enum {
 };
 typedef uint8_t lv_menu_mode_root_back_btn_t;
 
-enum {
-    LV_MENU_MODE_SIDEBAR_DISABLED,
-    LV_MENU_MODE_SIDEBAR_ENABLED
-};
-typedef uint8_t lv_menu_mode_sidebar_t;
-
 typedef struct lv_menu_load_page_event_data_t {
     lv_obj_t * menu;
     lv_obj_t * page;
@@ -71,7 +65,6 @@ typedef struct {
     uint8_t sidebar_generated : 1;
     lv_menu_mode_header_t mode_header : 2;
     lv_menu_mode_root_back_btn_t mode_root_back_btn : 1;
-    lv_menu_mode_sidebar_t mode_sidebar : 1;
 } lv_menu_t;
 
 extern const lv_obj_class_t lv_menu_class;
@@ -125,11 +118,18 @@ lv_obj_t * lv_menu_separator_create(lv_obj_t * parent);
  * Setter functions
  *====================*/
 /**
- * Set menu page to display
+ * Set menu page to display in main
  * @param obj pointer to the menu
- * @param page pointer to the menu page to set
+ * @param page pointer to the menu page to set (NULL to clear main and clear menu history)
  */
 void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page);
+
+/**
+ * Set menu page to display in sidebar
+ * @param obj pointer to the menu
+ * @param page pointer to the menu page to set (NULL to clear sidebar)
+ */
+void lv_menu_set_sidebar_page(lv_obj_t * obj, lv_obj_t * page);
 
 /**
  * Set the how the header should behave and its position
@@ -144,13 +144,6 @@ void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode_header);
  * @param mode_root_back_btn
  */
 void lv_menu_set_mode_root_back_btn(lv_obj_t * obj, lv_menu_mode_root_back_btn_t mode_root_back_btn);
-
-/**
- * Set whether to display sidebar
- * @param obj pointer to a menu
- * @param mode_sidebar
- */
-void lv_menu_set_mode_sidebar(lv_obj_t * obj, lv_menu_mode_sidebar_t mode_sidebar);
 
 /**
  * Set main header back btn obj that on click triggers back btn event handler
@@ -224,7 +217,13 @@ lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
  * @param menu pointer to the menu
  * @return true if it is a root back btn
  */
-bool lv_menu_item_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
+bool lv_menu_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
+
+/**
+ * Clear menu history
+ * @param obj pointer to the menu
+ */
+void lv_menu_clear_history(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/

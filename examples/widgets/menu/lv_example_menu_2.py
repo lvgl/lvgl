@@ -1,6 +1,6 @@
 def back_event_handler(e):
     obj = e.get_target()
-    if menu.item_back_btn_is_root(obj):
+    if menu.back_btn_is_root(obj):
         mbox1 = lv.msgbox(lv.scr_act(), "Hello", "Root back btn click.", None, True)
         mbox1.center()
        

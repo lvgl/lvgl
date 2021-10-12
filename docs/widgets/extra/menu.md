@@ -23,13 +23,6 @@ The menu widget is built from the following objects:
 ### Create a menu
 `lv_menu_create(parent)` creates a new empty menu.
 
-### Sidebar mode
-The following sidebar modes exist:
-- `LV_MENU_MODE_SIDEBAR_DISABLED`
-- `LV_MENU_MODE_SIDEBAR_ENABLED`
-
-You can set sidebar modes with `lv_menu_set_mode_sidebar(menu, LV_MENU_MODE_SIDEBAR...)`.
-
 ### Header mode
 The following header modes exist:
 - `LV_MENU_MODE_HEADER_TOP_FIXED` Header is positioned at the top.
@@ -49,8 +42,11 @@ You can set root back button modes with `lv_menu_set_mode_root_back_btn(menu, LV
 `lv_menu_page_create(menu)` creates a new empty menu page.
 You can add any widgets to the page.
 
-### Set a menu page
-Once the main page has been created, you must set it to the menu widget with `lv_menu_set_page(menu, page)`.
+### Set a menu page in the main area
+Once the main page has been created, you must set it to the main area with `lv_menu_set_page(menu, page)`. NULL to clear main and clear menu history.
+
+### Set a menu page in the sidebar
+Once the main page has been created, you must set it to the sidebar with `lv_menu_set_sidebar_page(menu, page)`. NULL to clear sidebar.
 
 ### Linking between menu pages
 For instance, you have created a btn obj in the main page. When you click the btn obj, you want it to open up a new page, use `lv_menu_set_load_page_event(menu, obj, new page)`.
