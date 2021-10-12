@@ -332,7 +332,7 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     spinbox->range_max          = 99999;
     spinbox->range_min          = -99999;
     spinbox->rollover           = false;
-    spinbox->digit_step_dir     = LV_SPINBOX_DIGIT_DIR_TO_RIGHT;
+    spinbox->digit_step_dir     = LV_DIR_RIGHT;
 
     lv_textarea_set_one_line(obj, true);
     lv_textarea_set_cursor_click_pos(obj, true);
