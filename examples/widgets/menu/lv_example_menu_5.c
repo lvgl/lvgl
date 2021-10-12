@@ -9,7 +9,6 @@ typedef uint8_t lv_menu_builder_variant_t;
 
 static void back_event_handler(lv_event_t * e);
 static void switch_handler(lv_event_t * e);
-static bool sidebar_mode = true;
 lv_obj_t * root_page;
 static lv_obj_t * create_text(lv_obj_t * parent, const char * icon, const char * txt,
                                         lv_menu_builder_variant_t builder_variant);
@@ -121,16 +120,14 @@ static void switch_handler(lv_event_t * e)
     lv_obj_t * menu = lv_event_get_user_data(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_VALUE_CHANGED) {
-        if(sidebar_mode) {
-            sidebar_mode = false;
-            lv_menu_set_sidebar_page(menu, NULL);
-            lv_menu_clear_history(menu); /* Clear history because we will be showing the root page later */
-            lv_menu_set_page(menu, root_page);
-        }else {
-            sidebar_mode = true;
+        if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
             lv_menu_set_page(menu, NULL);
             lv_menu_set_sidebar_page(menu, root_page);
             lv_event_send(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 1), 0), LV_EVENT_CLICKED, NULL);
+        }else {
+            lv_menu_set_sidebar_page(menu, NULL);
+            lv_menu_clear_history(menu); /* Clear history because we will be showing the root page later */
+            lv_menu_set_page(menu, root_page);
         }
     }
 }
