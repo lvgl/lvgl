@@ -59,7 +59,7 @@ static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font, lv_coor
                                uint32_t * end_ofs);
 
 static void lv_snippet_clear(void);
-static uint16_t lv_get_snippet_cnt();
+static uint16_t lv_get_snippet_cnt(void);
 static void lv_snippet_push(lv_snippet_t * item);
 static lv_snippet_t * lv_get_snippet(uint16_t index);
 
@@ -700,7 +700,7 @@ static void lv_snippet_push(lv_snippet_t * item)
     }
 }
 
-static uint16_t lv_get_snippet_cnt()
+static uint16_t lv_get_snippet_cnt(void)
 {
     return snippet_stack.index;
 }
