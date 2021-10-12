@@ -365,7 +365,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
         if(obj->styles[i].is_trans) continue;
 
         lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
-        /*The style is valid for a stat but not the other*/
+        /*The style is valid for a state but not the other*/
         bool valid1 = state_act & (~state1) ? false : true;
         bool valid2 = state_act & (~state2) ? false : true;
         if(valid1 != valid2) {
