@@ -539,7 +539,7 @@ static void style_init(void)
     style_init_reset(&styles->ta_cursor);
     lv_style_set_border_color(&styles->ta_cursor, color_text);
     lv_style_set_border_width(&styles->ta_cursor, lv_disp_dpx(theme.disp, 2));
-    lv_style_set_pad_left(&styles->ta_cursor, lv_disp_dpx(theme.disp, 1));
+    lv_style_set_pad_left(&styles->ta_cursor, - lv_disp_dpx(theme.disp, 1));
     lv_style_set_border_side(&styles->ta_cursor, LV_BORDER_SIDE_LEFT);
     lv_style_set_anim_time(&styles->ta_cursor, 400);
 
@@ -659,6 +659,13 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     inited = true;
 
     if(disp == NULL || lv_disp_get_theme(disp) == &theme) lv_obj_report_style_change(NULL);
+
+    return (lv_theme_t *)&theme;
+}
+
+lv_theme_t * lv_theme_default_get(void)
+{
+    if(!inited) return NULL;
 
     return (lv_theme_t *)&theme;
 }
