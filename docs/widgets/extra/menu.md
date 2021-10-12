@@ -39,7 +39,7 @@ The following root back button modes exist:
 You can set root back button modes with `lv_menu_set_mode_root_back_btn(menu, LV_MENU_MODE_ROOT_BACK_BTN...)`.
 
 ### Create a menu page
-`lv_menu_page_create(menu)` creates a new empty menu page.
+`lv_menu_page_create(menu, title)` creates a new empty menu page.
 You can add any widgets to the page.
 
 ### Set a menu page in the main area

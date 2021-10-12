@@ -4,13 +4,13 @@ menu.set_size(320, 240)
 menu.center()
 
 # Create a sub page
-sub_page = lv.menu_page(menu)
+sub_page = lv.menu_page(menu, None)
 cont = lv.menu_cont(sub_page)
 label = lv.label(cont)
 label.set_text("Hello, I am hiding here")
 
 # Create a main page
-main_page = lv.menu_page(menu)
+main_page = lv.menu_page(menu, None)
 
 cont = lv.menu_cont(main_page)
 label = lv.label(cont)

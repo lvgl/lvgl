@@ -24,14 +24,14 @@ void lv_example_menu_2(void)
     lv_obj_t * label;
 
     /*Create a sub page*/
-    lv_obj_t * sub_page = lv_menu_page_create(menu);
+    lv_obj_t * sub_page = lv_menu_page_create(menu, NULL);
 
     cont = lv_menu_cont_create(sub_page);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Hello, I am hiding here");
 
     /*Create a main page*/
-    lv_obj_t * main_page = lv_menu_page_create(menu);
+    lv_obj_t * main_page = lv_menu_page_create(menu, NULL);
 
     cont = lv_menu_cont_create(main_page);
     label = lv_label_create(cont);
