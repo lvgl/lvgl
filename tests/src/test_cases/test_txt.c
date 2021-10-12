@@ -3,9 +3,6 @@
 
 #include "unity/unity.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-prototypes"
-
 static const char color_cmd = LV_TXT_COLOR_CMD[0];
 
 void test_txt_should_identify_valid_start_of_command(void)
@@ -138,7 +135,5 @@ void test_txt_next_line_should_handle_empty_string(void)
 
     TEST_ASSERT_EQUAL_UINT32(0, next_line);
 }
-
-#pragma GCC diagnostic pop
 
 #endif
