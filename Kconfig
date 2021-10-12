@@ -2,20 +2,15 @@
 
 menu "LVGL configuration"
 
-    config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
-        bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
-        help
-            Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
-
-    config LV_CONF_MINIMAL
-        bool "LVGL minimal configuration."
-
     # Define CONFIG_LV_CONF_SKIP so we can use LVGL
     # without lv_conf.h file, the lv_conf_internal.h and
     # lv_conf_kconfig.h files are used instead.
     config LV_CONF_SKIP
         bool
         default y
+
+    config LV_CONF_MINIMAL
+        bool "LVGL minimal configuration."
 
     menu "Color settings"
         choice
@@ -97,12 +92,10 @@ menu "LVGL configuration"
             default 30
 
         config LV_TICK_CUSTOM
-            bool
-            prompt "Use a custom tick source"
+            bool "Use a custom tick source"
 
         config LV_TICK_CUSTOM_INCLUDE
-            string
-            prompt "Header for the system time function"
+            string "Header for the system time function"
             default "Arduino.h"
             depends on LV_TICK_CUSTOM
 
@@ -318,6 +311,11 @@ menu "LVGL configuration"
         menu "Compiler settings"
             config LV_BIG_ENDIAN_SYSTEM
                 bool "For big endian systems set to 1"
+
+            config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+                bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
+                help
+                    Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
 
             config LV_USE_LARGE_COORD
                 bool "Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t"
