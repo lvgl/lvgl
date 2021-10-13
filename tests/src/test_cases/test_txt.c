@@ -131,6 +131,26 @@ void test_txt_get_encoded_next_should_decode_valid_ascii(void)
     TEST_ASSERT_EQUAL_UINT32((uint32_t) 'H', result);
 }
 
+void test_txt_get_encoded_next_detect_valid_2_byte_input(void)
+{
+    char msg[] = "\xc3\xb1";
+    uint32_t result = 0;
+
+    result = _lv_txt_encoded_next(msg, NULL);
+
+    TEST_ASSERT_EQUAL_UINT32(241, result);
+}
+
+void test_txt_get_encoded_next_detect_invalid_2_byte_input(void)
+{
+    char msg[] = "\xc3\x28";
+    uint32_t result = 0;
+
+    result = _lv_txt_encoded_next(msg, NULL);
+
+    TEST_ASSERT_EQUAL_UINT32(0, result);
+}
+
 /* See #2615 for more information */
 void test_txt_next_line_should_handle_empty_string(void)
 {
