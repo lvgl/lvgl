@@ -171,6 +171,26 @@ void test_txt_get_encoded_next_detect_invalid_3_byte_input(void)
     TEST_ASSERT_EQUAL_UINT32(0, result);
 }
 
+void test_txt_get_encoded_next_detect_valid_4_byte_input(void)
+{
+    char msg[] = "\xf0\x90\x8c\xbc";
+    uint32_t result = 0;
+
+    result = _lv_txt_encoded_next(msg, NULL);
+
+    TEST_ASSERT_EQUAL_UINT32(66364, result);
+}
+
+void test_txt_get_encoded_next_detect_invalid_4_byte_input(void)
+{
+    char msg[] = "\xf0\x28\x8c\x28";
+    uint32_t result = 0;
+
+    result = _lv_txt_encoded_next(msg, NULL);
+
+    TEST_ASSERT_EQUAL_UINT32(0, result);
+}
+
 /* See #2615 for more information */
 void test_txt_next_line_should_handle_empty_string(void)
 {
