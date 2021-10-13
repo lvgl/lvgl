@@ -77,6 +77,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 
     driver->hor_res          = 320;
     driver->ver_res          = 240;
+    driver->physical_hor_res = -1;
+    driver->physical_ver_res = -1;
+    driver->offset_x         = 0;
+    driver->offset_y         = 0;
     driver->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
     driver->dpi              = LV_DPI_DEF;
@@ -321,6 +325,52 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
                 return disp->driver->hor_res;
             default:
                 return disp->driver->ver_res;
+        }
+    }
+}
+
+/**
+ * Get the full / physical horizontal resolution of a display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the full / physical horizontal resolution of the display
+ */
+lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    if(disp == NULL) {
+        return 0;
+    }
+    else {
+        switch(disp->driver->rotated) {
+            case LV_DISP_ROT_90:
+            case LV_DISP_ROT_270:
+                return disp->driver->physical_ver_res;
+            default:
+                return disp->driver->physical_hor_res;
+        }
+    }
+}
+
+/**
+ * Get the full / physical vertical resolution of a display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the full / physical vertical resolution of the display
+ */
+lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    if(disp == NULL) {
+        return 0;
+    }
+    else {
+        switch(disp->driver->rotated) {
+            case LV_DISP_ROT_90:
+            case LV_DISP_ROT_270:
+                return disp->driver->physical_hor_res;
+            default:
+                return disp->driver->physical_ver_res;
         }
     }
 }

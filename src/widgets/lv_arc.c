@@ -57,11 +57,6 @@ const lv_obj_class_t lv_arc_class  = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create an arc object
- * @param par pointer to an object, it will be the parent of the new arc
- * @return pointer to the created arc
- */
 lv_obj_t * lv_arc_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
@@ -82,11 +77,6 @@ lv_obj_t * lv_arc_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-/**
- * Set the start angle of an arc. 0 deg: right, 90 bottom, etc.
- * @param arc pointer to an arc object
- * @param start the start angle [0..360]
- */
 void lv_arc_set_start_angle(lv_obj_t * obj, uint16_t start)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -107,11 +97,6 @@ void lv_arc_set_start_angle(lv_obj_t * obj, uint16_t start)
     arc->indic_angle_start = start;
 }
 
-/**
- * Set the start angle of an arc. 0 deg: right, 90 bottom, etc.
- * @param arc pointer to an arc object
- * @param start the start angle [0..360]
- */
 void lv_arc_set_end_angle(lv_obj_t * obj, uint16_t end)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -131,23 +116,12 @@ void lv_arc_set_end_angle(lv_obj_t * obj, uint16_t end)
     arc->indic_angle_end = end;
 }
 
-/**
- * Set the start and end angles
- * @param arc pointer to an arc object
- * @param start the start angle
- * @param end the end angle
- */
 void lv_arc_set_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
 {
     lv_arc_set_end_angle(obj, end);
     lv_arc_set_start_angle(obj, start);
 }
 
-/**
- * Set the start angle of an arc background. 0 deg: right, 90 bottom, etc.
- * @param arc pointer to an arc object
- * @param start the start angle
- */
 void lv_arc_set_bg_start_angle(lv_obj_t * obj, uint16_t start)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -170,11 +144,6 @@ void lv_arc_set_bg_start_angle(lv_obj_t * obj, uint16_t start)
     value_update(obj);
 }
 
-/**
- * Set the start angle of an arc background. 0 deg: right, 90 bottom etc.
- * @param arc pointer to an arc object
- * @param end the end angle
- */
 void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint16_t end)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -197,23 +166,12 @@ void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint16_t end)
     value_update(obj);
 }
 
-/**
- * Set the start and end angles of the arc background
- * @param arc pointer to an arc object
- * @param start the start angle
- * @param end the end angle
- */
 void lv_arc_set_bg_angles(lv_obj_t * obj, uint16_t start, uint16_t end)
 {
     lv_arc_set_bg_end_angle(obj, end);
     lv_arc_set_bg_start_angle(obj, start);
 }
 
-/**
- * Set the rotation for the whole arc
- * @param arc pointer to an arc object
- * @param rotation rotation angle
- */
 void lv_arc_set_rotation(lv_obj_t * obj, uint16_t rotation)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -224,11 +182,6 @@ void lv_arc_set_rotation(lv_obj_t * obj, uint16_t rotation)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set the type of arc.
- * @param arc pointer to arc object
- * @param type arc type
- */
 void lv_arc_set_mode(lv_obj_t * obj, lv_arc_mode_t type)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -258,11 +211,6 @@ void lv_arc_set_mode(lv_obj_t * obj, lv_arc_mode_t type)
     lv_arc_set_value(obj, val);
 }
 
-/**
- * Set a new value on the arc
- * @param arc pointer to an arc object
- * @param value new value
- */
 void lv_arc_set_value(lv_obj_t * obj, int16_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -280,12 +228,6 @@ void lv_arc_set_value(lv_obj_t * obj, int16_t value)
     value_update(obj);
 }
 
-/**
- * Set minimum and the maximum values of an arc
- * @param arc pointer to the arc object
- * @param min minimum value
- * @param max maximum value
- */
 void lv_arc_set_range(lv_obj_t * obj, int16_t min, int16_t max)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -306,12 +248,6 @@ void lv_arc_set_range(lv_obj_t * obj, int16_t min, int16_t max)
     value_update(obj); /*value has changed relative to the new range*/
 }
 
-/**
- * Set the threshold of arc knob increments
- * position.
- * @param arc pointer to an arc object
- * @param threshold increment threshold
- */
 void lv_arc_set_change_rate(lv_obj_t * obj, uint16_t rate)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -324,102 +260,53 @@ void lv_arc_set_change_rate(lv_obj_t * obj, uint16_t rate)
  * Getter functions
  *====================*/
 
-/**
- * Get the start angle of an arc.
- * @param arc pointer to an arc object
- * @return the start angle [0..360]
- */
 uint16_t lv_arc_get_angle_start(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->indic_angle_start;
 }
 
-/**
- * Get the end angle of an arc.
- * @param arc pointer to an arc object
- * @return the end angle [0..360]
- */
 uint16_t lv_arc_get_angle_end(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->indic_angle_end;
 }
 
-/**
- * Get the start angle of an arc background.
- * @param arc pointer to an arc object
- * @return the start angle [0..360]
- */
 uint16_t lv_arc_get_bg_angle_start(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->bg_angle_start;
 }
 
-/**
- * Get the end angle of an arc background.
- * @param arc pointer to an arc object
- * @return the end angle [0..360]
- */
 uint16_t lv_arc_get_bg_angle_end(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->bg_angle_end;
 }
 
-
-/**
- * Get the value of an arc
- * @param arc pointer to an arc object
- * @return the value of the arc
- */
 int16_t lv_arc_get_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->value;
 }
 
-/**
- * Get the minimum value of an arc
- * @param arc pointer to an arc object
- * @return the minimum value of the arc
- */
 int16_t lv_arc_get_min_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->min_value;
 }
 
-/**
- * Get the maximum value of an arc
- * @param arc pointer to an arc object
- * @return the maximum value of the arc
- */
 int16_t lv_arc_get_max_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->max_value;
 }
 
-/**
- * Get whether the arc is type or not.
- * @param arc pointer to an arc object
- * @return arc type
- */
 lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *) obj)->type;
 }
-
-/*=====================
- * Other functions
- *====================*/
-
-/*
- * New object specific "other" functions come here
- */
 
 /**********************
  *   STATIC FUNCTIONS
