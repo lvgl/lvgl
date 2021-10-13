@@ -121,6 +121,16 @@ void test_txt_cut_should_handle_len_longer_than_string_length(void)
     TEST_ASSERT_EQUAL_UINT8(msg[0], 0x00);
 }
 
+void test_txt_get_encoded_next_should_decode_valid_ascii(void)
+{
+    char msg[] = "Hello World!";
+    uint32_t result = 0;
+
+    result = _lv_txt_encoded_next(msg, NULL);
+
+    TEST_ASSERT_EQUAL_UINT32((uint32_t) 'H', result);
+}
+
 /* See #2615 for more information */
 void test_txt_next_line_should_handle_empty_string(void)
 {
