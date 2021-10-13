@@ -82,7 +82,12 @@ void lv_disp_load_scr(lv_obj_t * scr)
 {
     lv_disp_t * d = lv_obj_get_disp(scr);
     if(!d) return;  /*Shouldn't happen, just to be sure*/
+
+    if(d->act_scr) lv_event_send(d->act_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+
     d->act_scr = scr;
+
+    if(d->act_scr) lv_event_send(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
 
     lv_obj_invalidate(scr);
 }

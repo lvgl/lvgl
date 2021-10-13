@@ -110,6 +110,8 @@ The following event codes exist:
 - `LV_EVENT_STYLE_CHANGED`    Object's style has changed
 - `LV_EVENT_BASE_DIR_CHANGED` The base dir has changed
 - `LV_EVENT_GET_SELF_SIZE`    Get the internal size of a widget
+- `LV_EVENT_SCREEN_LOADED`    A screen was loaded
+- `LV_EVENT_SCREEN_UNLOADED`  A screen was unloaded
 
 ### Special events
 - `LV_EVENT_VALUE_CHANGED`    The object's value has changed (i.e. slider moved)

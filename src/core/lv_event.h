@@ -75,6 +75,9 @@ typedef enum {
     LV_EVENT_CHILD_CHANGED,       /**< Child was removed, added, or its size, position were changed */
     LV_EVENT_CHILD_CREATED,       /**< Child was created, always bubbles up to all parents*/
     LV_EVENT_CHILD_DELETED,       /**< Child was deleted, always bubbles up to all parents*/
+    LV_EVENT_SCREEN_LOADED,       /**< A screen was loaded*/
+    LV_EVENT_SCREEN_UNLOADED,     /**< A screen was unloaded*/
+
     LV_EVENT_SIZE_CHANGED,        /**< Object coordinates/size have changed*/
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed*/
     LV_EVENT_LAYOUT_CHANGED,      /**< The children position has changed due to a layout recalculation*/
