@@ -99,9 +99,9 @@ void lv_log(const char * buf)
 {
 #if LV_LOG_PRINTF
     puts(buf);
-#endif
+#else
     if(custom_print_cb) custom_print_cb(buf);
-
+#endif
 }
 
 /**********************
