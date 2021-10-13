@@ -34,6 +34,7 @@ struct _lv_anim_timeline_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_anim_timeline_virtual_exec_cb(void * var, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -79,6 +80,12 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, lv_anim_
 
     at->anim_dsc[at->anim_dsc_cnt - 1].anim = *a;
     at->anim_dsc[at->anim_dsc_cnt - 1].start_time = start_time;
+
+    /*Add default var and virtual exec_cb, used to delete animation.*/
+    if(a->var == NULL && a->exec_cb == NULL) {
+        at->anim_dsc[at->anim_dsc_cnt - 1].anim.var = at;
+        at->anim_dsc[at->anim_dsc_cnt - 1].anim.exec_cb = lv_anim_timeline_virtual_exec_cb;
+    }
 }
 
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
@@ -114,11 +121,7 @@ void lv_anim_timeline_stop(lv_anim_timeline_t * at)
 
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
-
-        /*Avoid calling lv_anim_del(NULL, NULL) to cause all animations to be deleted*/
-        if (a->var != NULL || a->exec_cb != NULL) {
-            lv_anim_del(a->var, a->exec_cb);
-        }
+        lv_anim_del(a->var, a->exec_cb);
     }
 }
 
@@ -179,4 +182,14 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
     return at->reverse;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_anim_timeline_virtual_exec_cb(void * var, int32_t v)
+{
+    LV_UNUSED(var);
+    LV_UNUSED(v);
 }
