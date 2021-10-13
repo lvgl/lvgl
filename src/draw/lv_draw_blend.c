@@ -969,6 +969,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 #endif
 
 #if LV_COLOR_DEPTH == 8
+    tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 7);
 #elif LV_COLOR_DEPTH == 16
 #if LV_COLOR_16_SWAP == 0
@@ -982,6 +983,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 #endif
 
 #elif LV_COLOR_DEPTH == 32
+    tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 255);
 #endif
 

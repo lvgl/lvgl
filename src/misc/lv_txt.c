@@ -296,6 +296,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                                lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag)
 {
     if(txt == NULL) return 0;
+    if(txt[0] == '\0') return 0;
     if(font == NULL) return 0;
 
     /*If max_width doesn't mater simply find the new line character

@@ -503,8 +503,8 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(pr_res == LV_RES_OK && (table->col_act != col || table->row_act != row)) {
             table->col_act = col;
             table->row_act = row;
+            lv_obj_invalidate(obj);
         }
-        lv_obj_invalidate(obj);
     }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_invalidate(obj);
@@ -593,12 +593,12 @@ static void draw_main(lv_event_t * e)
     lv_area_t clip_area;
     if(!_lv_area_intersect(&clip_area, &obj->coords, clip_area_ori)) return;
 
-
     lv_point_t txt_size;
     lv_area_t cell_area;
     lv_area_t txt_area;
     lv_text_flag_t txt_flags;
 
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
     lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
@@ -628,7 +628,7 @@ static void draw_main(lv_event_t * e)
     uint16_t row;
     uint16_t cell = 0;
 
-    cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) ;
+    cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) + border_width;
     lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
     bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL ? true : false;
 
@@ -649,8 +649,8 @@ static void draw_main(lv_event_t * e)
 
         if(cell_area.y1 > clip_area.y2) return;
 
-        if(rtl) cell_area.x1 = obj->coords.x2 - bg_right - 1 - scroll_x;
-        else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x;
+        if(rtl) cell_area.x1 = obj->coords.x2 - bg_right - 1 - scroll_x - border_width;
+        else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x + border_width;
 
         for(col = 0; col < table->col_cnt; col++) {
             lv_table_cell_ctrl_t ctrl = 0;

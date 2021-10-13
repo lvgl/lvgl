@@ -15,26 +15,6 @@ if(ESP_PLATFORM)
 
     target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
-    if (CONFIG_LV_MEM_CUSTOM)
-        if (CONFIG_LV_MEM_CUSTOM_ALLOC)
-            target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_MEM_CUSTOM_ALLOC=${CONFIG_LV_MEM_CUSTOM_ALLOC}")
-        endif()
-
-        if (CONFIG_LV_MEM_CUSTOM_FREE)
-            target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_MEM_CUSTOM_FREE=${CONFIG_LV_MEM_CUSTOM_FREE}")
-        endif()
-    endif()
-
-    if (CONFIG_LV_TICK_CUSTOM)
-        if (CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR)
-            target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_TICK_CUSTOM_SYS_TIME_EXPR=${CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR}")
-        endif()
-    endif()
-
-    if (CONFIG_LV_USER_DATA_FREE)
-        target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_USER_DATA_FREE=${CONFIG_LV_USER_DATA_FREE}")
-    endif()
-
     if (CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
         target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
     endif()
@@ -48,16 +28,6 @@ elseif(ZEPHYR_BASE)
         target_include_directories(lvgl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
         zephyr_compile_definitions(LV_CONF_KCONFIG_EXTERNAL_INCLUDE=<autoconf.h>)
-
-        zephyr_compile_definitions_ifdef(CONFIG_LV_MEM_CUSTOM
-            LV_MEM_CUSTOM_ALLOC=${CONFIG_LV_MEM_CUSTOM_ALLOC}
-            )
-        zephyr_compile_definitions_ifdef(CONFIG_LV_MEM_CUSTOM
-            LV_MEM_CUSTOM_FREE=${CONFIG_LV_MEM_CUSTOM_FREE}
-            )
-        zephyr_compile_definitions_ifdef(CONFIG_LV_TICK_CUSTOM
-            LV_TICK_CUSTOM_SYS_TIME_EXPR=${CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR}
-            )
 
         zephyr_library()
 
@@ -85,8 +55,40 @@ else()
         target_compile_options(lvgl_interface INTERFACE -Wno-unused-function)
     else(MICROPY_DIR)
         # without micropython, build lvgl and examples libs normally
+        # default linux build uses this scope
         add_library(lvgl STATIC ${SOURCES})
         add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
+
+        include_directories(${CMAKE_SOURCE_DIR})
+
+        # Lbrary and headers can be installed to system using make install
+        file(GLOB LVGL_PUBLIC_HEADERS
+          "${CMAKE_SOURCE_DIR}/lv_conf.h"
+          "${CMAKE_SOURCE_DIR}/lvgl.h")
+
+        if("${LIB_INSTALL_DIR}" STREQUAL "")
+            set(LIB_INSTALL_DIR "lib")
+        endif()
+        if("${INC_INSTALL_DIR}" STREQUAL "")
+            set(INC_INSTALL_DIR "include/lvgl")
+        endif()
+
+        install(DIRECTORY "${CMAKE_SOURCE_DIR}/src"
+            DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+            FILES_MATCHING
+            PATTERN "*.h")
+
+        set_target_properties(lvgl PROPERTIES
+            OUTPUT_NAME lvgl
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+            PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+
+        install(TARGETS lvgl
+            ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+            PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+
     endif(MICROPY_DIR)
 
 endif()
+
+

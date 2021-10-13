@@ -1114,10 +1114,13 @@ static void lv_label_refr_text(lv_obj_t * obj)
             /*Save letters under the dots and replace them with dots*/
             uint32_t byte_id_ori = byte_id;
             uint32_t i;
-            uint8_t len          = 0;
+            uint8_t len = 0;
             for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
                 len += _lv_txt_encoded_size(&label->text[byte_id]);
                 _lv_txt_encoded_next(label->text, &byte_id);
+                if (len > LV_LABEL_DOT_NUM || byte_id > txt_len) {
+                    break;
+                }
             }
 
             if(lv_label_set_dot_tmp(obj, &label->text[byte_id_ori], len)) {

@@ -9,7 +9,7 @@
 To register an input device an `lv_indev_drv_t` variable has to be initialized:
 
 ```c
-lv_indev_drv_t indev_drv;
+static lv_indev_drv_t indev_drv;
 lv_indev_drv_init(&indev_drv);      /*Basic initialization*/
 indev_drv.type =...                 /*See below.*/
 indev_drv.read_cb =...              /*See below.*/

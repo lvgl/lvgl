@@ -71,6 +71,7 @@ extern "C" {
 #include "src/extra/layouts/lv_layouts.h"
 #include "src/extra/themes/lv_themes.h"
 #include "src/extra/others/lv_others.h"
+#include "src/extra/libs/lv_libs.h"
 
 /*********************
  *      DEFINES
