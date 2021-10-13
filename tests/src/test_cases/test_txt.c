@@ -112,15 +112,13 @@ void test_txt_cut_happy_path(void)
     TEST_ASSERT_EQUAL_STRING("World", msg);
 }
 
-void test_txt_cut_len_longer_than_string(void)
+void test_txt_cut_should_handle_len_longer_than_string_length(void)
 {
     char msg[] = "Hello World";
 
     _lv_txt_cut(msg, 0, 30);
 
-    // msg ends up being all NULL, len and old_len are equal, so we
-    // set up all of the txt array members to one element past txt len
-    // which is the NULL terminator
+    TEST_ASSERT_EQUAL_UINT8(msg[0], 0x00);
 }
 
 /* See #2615 for more information */
