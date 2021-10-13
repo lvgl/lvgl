@@ -395,8 +395,16 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
         if(obj_next == NULL) continue;
         if(lv_obj_get_state(*obj_next) & LV_STATE_DISABLED) continue;
 
-        /*Hidden objects don't receive focus*/
-        if(lv_obj_has_flag(*obj_next, LV_OBJ_FLAG_HIDDEN) == false) break;
+        /*Hidden objects don't receive focus.
+         *If any parent is hidden, the object is also hidden)*/
+        lv_obj_t * parent = *obj_next;
+        while(parent) {
+            if(lv_obj_has_flag(parent, LV_OBJ_FLAG_HIDDEN)) continue;
+            parent = lv_obj_get_parent(parent);
+        }
+
+        /*If we got her a good candidate is found*/
+        break;
     }
 
     if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
