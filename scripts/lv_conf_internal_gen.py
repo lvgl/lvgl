@@ -59,6 +59,10 @@ fout.write(
 #  endif
 #endif
 
+/*Check if there is a Kconfig environment*/
+#ifdef LV_COLOR_DEPTH
+#define LV_KCONFIG_PRESENT
+#endif
 
 /*----------------------------------
  * Start parsing lv_conf_template.h
@@ -95,8 +99,12 @@ for i in fin.read().splitlines():
 		
     fout.write(
       f'#ifndef {line}\n'
-      f'#  ifdef CONFIG_{line.upper()}\n'
-      f'#    define {line} CONFIG_{line.upper()}\n'
+      f'#  ifdef LV_KCONFIG_PRESENT\n'
+      f'#    ifdef CONFIG_{line.upper()}\n'
+      f'#      define {line} CONFIG_{line.upper()}\n'
+      f'#    else\n'
+      f'#      define {line} 0\n'
+      f'#    endif\n'
       f'#  else\n'
       f'{d}\n'
       f'#  endif\n'
