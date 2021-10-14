@@ -695,24 +695,16 @@ static void lv_menu_load_page_event_cb(lv_event_t * e)
 
     if(menu->sidebar_page != NULL) {
         /* Check if clicked obj is in the sidebar */
-        uint32_t max_up = 4;
-        uint32_t up = 0;
         bool sidebar = false;
         lv_obj_t * parent = obj;
 
-        while(up < max_up) {
-            parent = lv_obj_get_parent(parent);
-
-            if(parent == NULL) {
-                break;
-            }
-
+        while(parent) {
+            if(parent == (lv_obj_t *)menu) break;
             if(parent == menu->sidebar) {
                 sidebar = true;
                 break;
             }
-
-            up++;
+            parent = lv_obj_get_parent(parent);
         }
 
         if(sidebar) {
