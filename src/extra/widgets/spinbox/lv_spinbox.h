@@ -122,8 +122,7 @@ void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, lv_dir_t direction);
  * Get spinbox rollover function status
  * @param spinbox pointer to spinbox
  */
-bool
-lv_spinbox_get_rollover(lv_obj_t *obj);
+bool lv_spinbox_get_rollover(lv_obj_t *obj);
 
 /**
  * Get the spinbox numeral value (user has to convert to float according to its digit format)
