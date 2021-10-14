@@ -49,6 +49,7 @@
 #if LV_USE_SJPG
 
 #include "tjpgd.h"
+#include "tjdec.h"
 #include "lv_sjpg.h"
 
 

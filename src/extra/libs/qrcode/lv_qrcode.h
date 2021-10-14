@@ -20,6 +20,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define lv_qrcode_class lv_canvas_class
+
 /**********************
  *      TYPEDEFS
  **********************/
