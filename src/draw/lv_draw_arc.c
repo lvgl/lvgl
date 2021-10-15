@@ -173,6 +173,10 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
 
     if(dsc->rounded) {
+        if (cir_dsc.bg_opa < LV_OPA_COVER) {
+            lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, end_angle, start_angle);
+            mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
+        }
 
         lv_draw_mask_radius_param_t mask_end_param;
 
@@ -204,6 +208,11 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
             lv_draw_rect(&area_out, &clip_area2, &cir_dsc);
             lv_draw_mask_remove_id(mask_end_id);
             lv_draw_mask_free_param(&mask_end_param);
+        }
+
+        if (cir_dsc.bg_opa < LV_OPA_COVER) {
+            lv_draw_mask_free_param(&mask_angle_param);
+            lv_draw_mask_remove_id(mask_angle_id);
         }
     }
 #else
