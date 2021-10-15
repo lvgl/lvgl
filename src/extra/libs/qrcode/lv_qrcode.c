@@ -28,6 +28,10 @@
  *  STATIC VARIABLES
  **********************/
 
+const lv_obj_class_t lv_qrcode_class = {
+    .base_class = &lv_canvas_class
+};
+
 /**********************
  *      MACROS
  **********************/
