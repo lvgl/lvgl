@@ -6,9 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "lv_fs_if.h"
 
-#if LV_USE_FS_FATFS != '\0'
+#if LV_USE_FS_IF
+#if LV_FS_IF_FATFS != '\0'
 #include "ff.h"
 
 /*********************
@@ -62,7 +63,7 @@ void lv_fs_if_fatfs_init(void)
 	lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
-    fs_drv.letter = LV_USE_FS_FATFS;
+    fs_drv.letter = LV_FS_IF_FATFS;
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;
     fs_drv.read_cb = fs_read;
@@ -113,6 +114,7 @@ static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     	f_lseek(f, 0);
     	return f;
     } else {
+        lv_mem_free(f);
     	return NULL;
     }
 }
@@ -128,6 +130,7 @@ static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 static lv_fs_res_t fs_close (lv_fs_drv_t * drv, void * file_p)
 {
     f_close(file_p);
+    lv_mem_free(file_p);
     return LV_FS_RES_OK;
 }
 
@@ -175,8 +178,20 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek (lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    LV_UNUSED(whence);
-    f_lseek(file_p, pos);
+    switch (whence)
+    {
+    case LV_FS_SEEK_SET:
+        f_lseek(file_p, pos);
+        break;
+    case LV_FS_SEEK_CUR:
+        f_lseek(file_p, f_tell((FIL *)file_p) + pos);
+        break;
+    case LV_FS_SEEK_END:
+        f_lseek(file_p, f_size((FIL *)file_p) + pos);
+        break;
+    default:
+        break;
+    }
     return LV_FS_RES_OK;
 }
 
@@ -252,7 +267,9 @@ static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * dir_p, char *fn)
 static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p)
 {
 	f_closedir(dir_p);
+    lv_mem_free(dir_p);
     return LV_FS_RES_OK;
 }
 
-#endif  /*LV_USE_FS_FATFS*/
+#endif	/*LV_USE_FS_IF*/
+#endif  /*LV_FS_IF_FATFS*/
