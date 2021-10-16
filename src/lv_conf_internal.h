@@ -347,45 +347,29 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*Use SDL renderer API*/
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  else
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  endif
-#endif
-#  else
-#    define  LV_USE_GPU_SDL 0
-#  endif
-#endif
-#if LV_USE_GPU_SDL
-#ifndef LV_USE_EXTERNAL_RENDERER
-#  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
-#    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
-#  else
-#    define LV_USE_EXTERNAL_RENDERER 1
-#  endif
-#endif
-#  ifndef LV_GPU_SDL_INCLUDE
-#ifndef LV_GPU_SDL_INCLUDE_PATH
-#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
-#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
-#  else
-#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
-#  endif
-#endif
-#  endif
-#endif
-
-#ifndef LV_USE_EXTERNAL_RENDERER
+/*Use exnternal renderer*/
 #ifndef LV_USE_EXTERNAL_RENDERER
 #  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
 #    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
 #  else
 #    define LV_USE_EXTERNAL_RENDERER 0
+#  endif
+#endif
+
+/*Use SDL renderer API*/
+#ifndef LV_USE_GPU_SDL
+#  ifdef CONFIG_LV_USE_GPU_SDL
+#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  else
+#    define LV_USE_GPU_SDL 0
+#  endif
+#endif
+#if LV_USE_GPU_SDL
+#ifndef LV_GPU_SDL_INCLUDE_PATH
+#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#  else
+#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
 #  endif
 #endif
 #endif
@@ -646,15 +630,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif /*LV_ENABLE_GC*/
 
-/*1: Enable API to take snapshot for object*/
-#ifndef LV_USE_SNAPSHOT
-#  ifdef CONFIG_LV_USE_SNAPSHOT
-#    define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
-#  else
-#    define LV_USE_SNAPSHOT 1
-#  endif
-#endif
-
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
@@ -700,7 +675,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
 #    define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
 #  else
-#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
 #  endif
 #endif
 
@@ -1514,11 +1489,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Default transition time in [ms]*/
-#ifndef LV_THEME_DEFAULT_TRANSITON_TIME
-#  ifdef CONFIG_LV_THEME_DEFAULT_TRANSITON_TIME
-#    define LV_THEME_DEFAULT_TRANSITON_TIME CONFIG_LV_THEME_DEFAULT_TRANSITON_TIME
+#ifndef LV_THEME_DEFAULT_TRANSITION_TIME
+#  ifdef CONFIG_LV_THEME_DEFAULT_TRANSITION_TIME
+#    define LV_THEME_DEFAULT_TRANSITION_TIME CONFIG_LV_THEME_DEFAULT_TRANSITION_TIME
 #  else
-#    define LV_THEME_DEFAULT_TRANSITON_TIME 80
+#    define LV_THEME_DEFAULT_TRANSITION_TIME 80
 #  endif
 #endif
 #endif /*LV_USE_THEME_DEFAULT*/
@@ -1658,6 +1633,19 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_FREETYPE_CACHE_SIZE (16 * 1024)
 #  endif
 #endif
+#endif
+
+/*-----------
+ * Others
+ *----------*/
+
+/*1: Enable API to take snapshot for object*/
+#ifndef LV_USE_SNAPSHOT
+#  ifdef CONFIG_LV_USE_SNAPSHOT
+#    define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
+#  else
+#    define LV_USE_SNAPSHOT 1
+#  endif
 #endif
 
 
