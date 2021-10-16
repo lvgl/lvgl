@@ -113,6 +113,7 @@ static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     	f_lseek(f, 0);
     	return f;
     } else {
+        lv_mem_free(f);
     	return NULL;
     }
 }
@@ -128,6 +129,7 @@ static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 static lv_fs_res_t fs_close (lv_fs_drv_t * drv, void * file_p)
 {
     f_close(file_p);
+    lv_mem_free(file_p);
     return LV_FS_RES_OK;
 }
 
@@ -175,8 +177,20 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek (lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    LV_UNUSED(whence);
-    f_lseek(file_p, pos);
+    switch (whence)
+    {
+    case LV_FS_SEEK_SET:
+        f_lseek(file_p, pos);
+        break;
+    case LV_FS_SEEK_CUR:
+        f_lseek(file_p, f_tell((FIL *)file_p) + pos);
+        break;
+    case LV_FS_SEEK_END:
+        f_lseek(file_p, f_size((FIL *)file_p) + pos);
+        break;
+    default:
+        break;
+    }
     return LV_FS_RES_OK;
 }
 
@@ -252,6 +266,7 @@ static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * dir_p, char *fn)
 static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p)
 {
 	f_closedir(dir_p);
+    lv_mem_free(dir_p);
     return LV_FS_RES_OK;
 }
 
