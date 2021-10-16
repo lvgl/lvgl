@@ -35,6 +35,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
+LV_EXPORT_CONST_INT(LV_COLOR_16_SWAP);
 
 /**
  * Opacity percentages.
