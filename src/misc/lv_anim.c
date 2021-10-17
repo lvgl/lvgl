@@ -8,10 +8,8 @@
  *********************/
 #include "lv_anim.h"
 
-#include <stddef.h>
-#include <string.h>
-#include "../misc/lv_assert.h"
 #include "../hal/lv_hal_tick.h"
+#include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
 #include "lv_mem.h"
@@ -67,9 +65,9 @@ void _lv_anim_core_init(void)
 void lv_anim_init(lv_anim_t * a)
 {
     lv_memset_00(a, sizeof(lv_anim_t));
-    a->time    = 500;
-    a->start_value   = 0;
-    a->end_value     = 100;
+    a->time = 500;
+    a->start_value = 0;
+    a->end_value = 100;
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
@@ -100,7 +98,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Set the start value*/
     if(new_anim->early_apply) {
         if(new_anim->get_value_cb) {
-            int32_t v_ofs  = new_anim->get_value_cb(new_anim);
+            int32_t v_ofs = new_anim->get_value_cb(new_anim);
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
         }
@@ -151,7 +149,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
             _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
             lv_mem_free(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
-                                         the linked list*/
+                                       the linked list*/
             del = true;
         }
 
@@ -345,7 +343,7 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
  */
 static void anim_timer(lv_timer_t * param)
 {
-    (void)param;
+    LV_UNUSED(param);
 
     uint32_t elaps = lv_tick_elaps(last_timer_run);
 
@@ -368,7 +366,7 @@ static void anim_timer(lv_timer_t * param)
             int32_t new_act_time = a->act_time + elaps;
             if(!a->start_cb_called && a->act_time <= 0 && new_act_time >= 0) {
                 if(a->early_apply == 0 && a->get_value_cb) {
-                    int32_t v_ofs  = a->get_value_cb(a);
+                    int32_t v_ofs = a->get_value_cb(a);
                     a->start_value += v_ofs;
                     a->end_value += v_ofs;
                 }
@@ -444,8 +442,7 @@ static void anim_ready_handler(lv_anim_t * a)
             /*Toggle the play back state*/
             a->playback_now = a->playback_now == 0 ? 1 : 0;
             /*Swap the start and end values*/
-            int32_t tmp;
-            tmp      = a->start_value;
+            int32_t tmp    = a->start_value;
             a->start_value = a->end_value;
             a->end_value   = tmp;
             /*Swap the time and playback_time*/
@@ -455,6 +452,7 @@ static void anim_ready_handler(lv_anim_t * a)
         }
     }
 }
+
 static void anim_mark_list_change(void)
 {
     anim_list_changed = true;

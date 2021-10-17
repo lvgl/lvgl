@@ -14,6 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#include "lv_log.h"
+#include "lv_mem.h"
 #include <stdbool.h>
 #include LV_ASSERT_HANDLER_INCLUDE
 
@@ -33,21 +35,21 @@ extern "C" {
  *      MACROS
  **********************/
 
-#define LV_ASSERT(expr)              \
-    do {                             \
-        if(!(expr)) {                \
-            LV_LOG_ERROR("Asserted at expression: %s", #expr);     \
-            LV_ASSERT_HANDLER        \
-        }                            \
-    } while(0)
+#define LV_ASSERT(expr)                                        \
+    do {                                                       \
+        if(!(expr)) {                                          \
+            LV_LOG_ERROR("Asserted at expression: %s", #expr); \
+            LV_ASSERT_HANDLER                                  \
+        }                                                      \
+    } while (0)
 
-#define LV_ASSERT_MSG(expr, msg)                     \
-    do {                                             \
-        if(!(expr)) {                                \
-            LV_LOG_ERROR("Asserted at expression: %s (%s)", #expr, msg);     \
-            LV_ASSERT_HANDLER                        \
-        }                                            \
-    } while(0)
+#define LV_ASSERT_MSG(expr, msg)                                         \
+    do {                                                                 \
+        if(!(expr)) {                                                    \
+            LV_LOG_ERROR("Asserted at expression: %s (%s)", #expr, msg); \
+            LV_ASSERT_HANDLER                                            \
+        }                                                                \
+    } while (0)
 
 /*-----------------
  * ASSERTS
