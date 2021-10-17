@@ -12,10 +12,11 @@
 
 #include <fcntl.h>
 #include <errno.h>
+#include <stdio.h>
+#ifndef WIN32
 #include <dirent.h>
 #include <unistd.h>
-#include <stdio.h>
-#ifdef WIN32
+#else
 #include <windows.h>
 #endif
 
@@ -226,7 +227,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_POSIX_PATH "/%s", path);
+    sprintf(buf, LV_FS_POSIX_PATH "%s", path);
     return opendir(buf);
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
@@ -234,7 +235,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_POSIX_PATH "\\%s\\*", path);
+    sprintf(buf, LV_FS_POSIX_PATH "%s\\*", path);
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
@@ -266,44 +267,40 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 {
     LV_UNUSED(drv);
-    LV_UNUSED(dir_p);
-    LV_UNUSED(fn);
 
-// #ifndef WIN32
-//     struct dirent *entry;
-//     do {
-//         entry = readdir(dir_p);
+#ifndef WIN32
+    struct dirent *entry;
+    do {
+        entry = readdir(dir_p);
 
-//         if(entry) {
-//             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
-//             else strcpy(fn, entry->d_name);
-//         } else {
-//             strcpy(fn, "");
-//         }
-//     } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
-// #else
-//     strcpy(fn, next_fn);
+        if(entry) {
+            if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
+            else strcpy(fn, entry->d_name);
+        } else {
+            strcpy(fn, "");
+        }
+    } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
+#else
+    strcpy(fn, next_fn);
 
-//     strcpy(next_fn, "");
-//     WIN32_FIND_DATA fdata;
+    strcpy(next_fn, "");
+    WIN32_FIND_DATA fdata;
 
-//     if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
-//     do {
-//         if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
-//             continue;
-//         } else {
+    if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
+    do {
+        if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
+            continue;
+        } else {
+            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                sprintf(next_fn, "/%s", fdata.cFileName);
+            } else {
+                sprintf(next_fn, "%s", fdata.cFileName);
+            }
+            break;
+        }
+    } while(FindNextFile(dir_p, &fdata));
 
-//             if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-//             {
-//                 sprintf(next_fn, "/%s", fdata.cFileName);
-//             } else {
-//                 sprintf(next_fn, "%s", fdata.cFileName);
-//             }
-//             break;
-//         }
-//     } while(FindNextFile(dir_p, &fdata));
-
-// #endif
+#endif
     return LV_FS_RES_OK;
 }
 
