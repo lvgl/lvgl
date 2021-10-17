@@ -12,9 +12,10 @@
 
 #include <stdio.h>
 #include <errno.h>
+#ifndef WIN32
 #include <dirent.h>
 #include <unistd.h>
-#ifdef WIN32
+#else
 #include <windows.h>
 #endif
 
@@ -85,10 +86,6 @@ void lv_fs_stdio_init(void)
     fs_drv.dir_read_cb = fs_dir_read;
 
     lv_fs_drv_register(&fs_drv);
-
-    char cur_path[512];
-    getcwd(cur_path, sizeof(cur_path));
-    LV_LOG_INFO("STDIO file system is initialized with %s root directory.", cur_path);
 }
 
 /**********************
@@ -115,13 +112,8 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     /*Make the path relative to the current directory (the projects root folder)*/
 
-#ifndef WIN32
-     char buf[256];
-     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
-#else
     char buf[256];
     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
-#endif
 
     FILE * f = fopen(buf, flags);
     if(f == NULL) return NULL;
@@ -225,7 +217,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_STDIO_PATH "/%s", path);
+    sprintf(buf, LV_FS_STDIO_PATH "%s", path);
     return opendir(buf);
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
@@ -233,7 +225,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_STDIO_PATH "\\%s\\*", path);
+    sprintf(buf, LV_FS_STDIO_PATH "%s\\*", path);
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
