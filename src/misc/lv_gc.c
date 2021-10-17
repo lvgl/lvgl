@@ -8,7 +8,6 @@
  *********************/
 
 #include "lv_gc.h"
-#include "string.h"
 
 /*********************
  *      DEFINES
@@ -27,7 +26,8 @@
  **********************/
 
 #if(!defined(LV_ENABLE_GC)) || LV_ENABLE_GC == 0
-    LV_ROOTS
+#define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
+    LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
 #endif /*LV_ENABLE_GC*/
 
 /**********************
