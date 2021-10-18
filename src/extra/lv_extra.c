@@ -70,9 +70,7 @@ void lv_extra_init(void)
     /*Init freetype library
      *Cache max 64 faces and 1 size*/
     lv_freetype_init(0, 0, LV_FREETYPE_CACHE_SIZE);
-
 #endif
-
 }
 
 /**********************
