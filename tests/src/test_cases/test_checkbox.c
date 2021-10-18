@@ -79,7 +79,8 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
 
     lv_mem_monitor(&m1);
 
-    TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size);
+    /* Assert no memory was allocated by text_static */
+    TEST_ASSERT_EQUAL_UINT32(initial_available_memory, m1.free_size);
 }
 
 #endif
