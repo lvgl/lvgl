@@ -8,6 +8,8 @@
  * 2021-10-18     Meco Man     The first version
  */
 
+#ifdef __RTTHREAD__
+
 #include <rtthread.h>
 #include <lvgl.h>
 #define DBG_TAG    "LVGL"
@@ -30,3 +32,5 @@ static int lv_port_init(void)
     return 0;
 }
 INIT_COMPONENT_EXPORT(lv_port_init);
+
+#endif /*__RTTHREAD__*/
