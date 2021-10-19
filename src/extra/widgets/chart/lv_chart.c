@@ -19,6 +19,7 @@
 #define LV_CHART_HDIV_DEF 3
 #define LV_CHART_VDIV_DEF 5
 #define LV_CHART_POINT_CNT_DEF 10
+#define LV_CHART_LABEL_MAX_TEXT_LENGTH 16
 
 /**********************
  *      TYPEDEFS
@@ -1426,10 +1427,11 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
 
         /*add text only to major tick*/
         if(major && t->label_en)  {
-            char buf[16];
+            char buf[LV_CHART_LABEL_MAX_TEXT_LENGTH];
             lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, tick_value);
             part_draw_dsc.label_dsc = &label_dsc;
             part_draw_dsc.text = buf;
+            part_draw_dsc.text_length = LV_CHART_LABEL_MAX_TEXT_LENGTH;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
             /*reserve appropriate area*/
@@ -1459,6 +1461,7 @@ static void draw_y_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
         else {
             part_draw_dsc.label_dsc = NULL;
             part_draw_dsc.text = NULL;
+            part_draw_dsc.text_length = 0;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         }
 
@@ -1560,10 +1563,11 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
         part_draw_dsc.value = tick_value;
 
         if(major && t->label_en) {
-            char buf[16];
+            char buf[LV_CHART_LABEL_MAX_TEXT_LENGTH];
             lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, tick_value);
             part_draw_dsc.label_dsc = &label_dsc;
             part_draw_dsc.text = buf;
+            part_draw_dsc.text_length = LV_CHART_LABEL_MAX_TEXT_LENGTH;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
@@ -1593,6 +1597,7 @@ static void draw_x_ticks(lv_obj_t * obj, const lv_area_t * clip_area, lv_chart_a
         else {
             part_draw_dsc.label_dsc = NULL;
             part_draw_dsc.text = NULL;
+            part_draw_dsc.text_length = 0;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         }
 
