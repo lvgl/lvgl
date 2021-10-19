@@ -8,6 +8,7 @@
   *********************/
 
 #include "lv_rlottie.h"
+#if LV_USE_RLOTTIE
 
 /*********************
 *      DEFINES
@@ -178,3 +179,5 @@ static void next_frame_task_cb(lv_timer_t* t)
     lv_obj_invalidate(obj);
 
 }
+
+#endif /*LV_USE_RLOTTIE*/
