@@ -20,6 +20,7 @@ extern "C" {
 #include "qrcode/lv_qrcode.h"
 #include "sjpg/lv_sjpg.h"
 #include "freetype/lv_freetype.h"
+#include "rlottie/lv_rlottie.h"
 
 /*********************
  *      DEFINES

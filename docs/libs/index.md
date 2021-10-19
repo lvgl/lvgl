@@ -17,5 +17,6 @@
    gif
    freetype
    qrcode
+   rlottie
 ```
 

@@ -564,6 +564,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 # define LV_FREETYPE_CACHE_SIZE (16 * 1024)
 #endif
 
+/*Rlottie library*/
+#define LV_USE_RLOTTIE 0
+
 /*-----------
  * Others
  *----------*/

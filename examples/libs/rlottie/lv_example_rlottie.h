@@ -1,10 +1,10 @@
 /**
- * @file lv_example_libs.h
+ * @file lv_example_rlottie.h
  *
  */
 
-#ifndef LV_EXAMPLE_LIBS_H
-#define LV_EXAMPLE_LIBS_H
+#ifndef LV_EXAMPLE_RLOTTIE_H
+#define LV_EXAMPLE_RLOTTIE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,13 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "bmp/lv_example_bmp.h"
-#include "gif/lv_example_gif.h"
-#include "png/lv_example_png.h"
-#include "sjpg/lv_example_sjpg.h"
-#include "qrcode/lv_example_qrcode.h"
-#include "freetype/lv_example_freetype.h"
-#include "rlottie/lv_example_rlottie.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +25,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_rlottie_1(void);
+void lv_example_rlottie_2(void);
 
 /**********************
  *      MACROS
@@ -41,4 +36,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_LIBS_H*/
+#endif /*LV_EXAMPLE_SJPG_H*/
