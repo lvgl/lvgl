@@ -379,7 +379,16 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(arc->dragging == false) {
             lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
             r -=  indic_width;
-            r -= r / 2; /*Add some more sensitive area*/
+            /*Add some more sensitive area if there is no advanced git testing.
+             * (Advanced hit testing is more precise)*/
+            if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
+                r -= indic_width;
+
+            } else {
+                r -= LV_MAX(r / 4, indic_width);
+            }
+            if(r < 1) r = 1;
+
             if(p.x * p.x + p.y * p.y > r * r) {
                 arc->dragging = true;
                 arc->last_tick = lv_tick_get(); /*Capture timestamp at dragging start*/
@@ -487,6 +496,31 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
+    }
+    else if(code == LV_EVENT_HIT_TEST) {
+        lv_hit_test_info_t * info = lv_event_get_param(e);;
+
+        lv_point_t p;
+        lv_coord_t r;
+        get_center(obj, &p, &r);
+
+        lv_coord_t ext_click_area = 0;
+        if(obj->spec_attr) ext_click_area = obj->spec_attr->ext_click_pad;
+
+        lv_coord_t w = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
+        r -= w + ext_click_area;
+
+        lv_area_t a;
+        /*Invalid if clicked inside*/
+        lv_area_set(&a, p.x - r, p.y - r, p.x + r, p.y + r);
+        if(_lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE)) {
+            info->res = false;
+             return;
+        }
+
+        /*Valid if no clicked outside*/
+        lv_area_increase(&a, w + ext_click_area * 2, w + ext_click_area * 2);
+        info->res = _lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);

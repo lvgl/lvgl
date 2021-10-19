@@ -58,6 +58,13 @@ lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
 lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 ```
 
+### Advanced hit test
+
+If the `LV_OBJ_FLAG_ADV_HITTEST` flag is enabled the arc can be clicked through in the middle. Clicks are recognized only on the ring of the background arc. `lv_obj_set_ext_click_size()` makes the sensitive area larger inside and outside with the given number of pixels. 
+
+
+
+
 ## Events
 - `LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.
 - `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent with the following types:
