@@ -122,7 +122,7 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_SHADOW_CACHE_SIZE=1
     -DLV_IMG_CACHE_DEF_SIZE=32
     -DLV_USE_LOG=1
-    -DLV_USE_LOG_LEVEL=LV_LOG_LEVEL_TRACE
+    -DLV_LOG_LEVEL=LV_LOG_LEVEL_TRACE
     -DLV_LOG_PRINTF=1
     -DLV_USE_FONT_SUBPX=1
     -DLV_FONT_SUBPX_BGR=1
@@ -233,7 +233,7 @@ else()
     message(FATAL_ERROR "Must provide an options value.")
 endif()
 
-# Options lvgl and all test files are compiled with.
+# Options lvgl and examples are compiled with.
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
     -DLV_BUILD_TEST
@@ -264,6 +264,12 @@ set(COMPILE_OPTIONS
     ${BUILD_OPTIONS}
 )
 
+# Options test cases are compiled with.
+set(LVGL_TESTFILE_COMPILE_OPTIONS
+    ${COMPILE_OPTIONS}
+    -Wno-missing-prototypes
+)
+
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
@@ -289,7 +295,7 @@ add_library(test_common
         unity/unity.c
 )
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
-target_compile_options(test_common PUBLIC ${COMPILE_OPTIONS})
+target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
 # Some examples `#include "lvgl/lvgl.h"` - which is a path which is not
 # in this source repository. If this repo is in a directory names 'lvgl'
@@ -316,7 +322,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     )
     target_link_libraries(${test_name} test_common lvgl_examples lvgl png ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
-    target_compile_options(${test_name} PUBLIC ${COMPILE_OPTIONS})
+    target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
     add_test(
         NAME ${test_name} 

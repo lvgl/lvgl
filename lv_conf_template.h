@@ -149,23 +149,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE 0
 
-/*Use SDL renderer API*/
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  else
-#    define  LV_USE_GPU_SDL 0
-#  endif
-#endif
-#if LV_USE_GPU_SDL
-#  define LV_USE_EXTERNAL_RENDERER 1
-#  ifndef LV_GPU_SDL_INCLUDE
-#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
-#  endif
-#endif
+/*Use exnternal renderer*/
+#define LV_USE_EXTERNAL_RENDERER 0
 
-#ifndef LV_USE_EXTERNAL_RENDERER
-#  define LV_USE_EXTERNAL_RENDERER 0
+/*Use SDL renderer API*/
+#define LV_USE_GPU_SDL 0
+#if LV_USE_GPU_SDL
+#  define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
 #endif
 
 /*-------------
@@ -250,9 +240,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
 #endif /*LV_ENABLE_GC*/
 
-/*1: Enable API to take snapshot for object*/
-#define LV_USE_SNAPSHOT 1
-
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
@@ -270,7 +257,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_ATTRIBUTE_FLUSH_READY
 
 /*Required alignment size for buffers*/
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
@@ -518,7 +505,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 # define LV_THEME_DEFAULT_GROW 1
 
 /*Default transition time in [ms]*/
-# define LV_THEME_DEFAULT_TRANSITON_TIME 80
+# define LV_THEME_DEFAULT_TRANSITION_TIME 80
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /*A very simple theme that is a good starting point for a custom theme*/
@@ -573,6 +560,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
 # define LV_FREETYPE_CACHE_SIZE (16 * 1024)
 #endif
+
+/*-----------
+ * Others
+ *----------*/
+
+/*1: Enable API to take snapshot for object*/
+#define LV_USE_SNAPSHOT 1
 
 
 /*==================

@@ -29,7 +29,7 @@
 #define DARK_COLOR_TEXT        lv_palette_lighten(LV_PALETTE_GREY, 5)
 #define DARK_COLOR_GREY        lv_color_hex(0x2f3237)
 
-#define TRANSITION_TIME         LV_THEME_DEFAULT_TRANSITON_TIME
+#define TRANSITION_TIME         LV_THEME_DEFAULT_TRANSITION_TIME
 #define BORDER_WIDTH            lv_disp_dpx(theme.disp, 2)
 #define OUTLINE_WIDTH           lv_disp_dpx(theme.disp, 3)
 

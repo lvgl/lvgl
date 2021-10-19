@@ -156,7 +156,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
             gif->canvas[i*2 + 1] = 0xff;
 #endif
         }
-    gif->anim_start = f_gif_seek(gif, 0, SEEK_CUR);
+    gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
     goto ok;
 fail:
     f_gif_close(gif_base);
@@ -171,7 +171,7 @@ discard_sub_blocks(gd_GIF *gif)
 
     do {
         f_gif_read(gif, &size, 1);
-        f_gif_seek(gif, size, SEEK_CUR);
+        f_gif_seek(gif, size, LV_FS_SEEK_CUR);
     } while (size);
 }
 
@@ -181,8 +181,8 @@ read_plain_text_ext(gd_GIF *gif)
     if (gif->plain_text) {
         uint16_t tx, ty, tw, th;
         uint8_t cw, ch, fg, bg;
-        off_t sub_block;
-        f_gif_seek(gif, 1, SEEK_CUR); /* block size = 12 */
+        size_t sub_block;
+        f_gif_seek(gif, 1, LV_FS_SEEK_CUR); /* block size = 12 */
         tx = read_num(gif);
         ty = read_num(gif);
         tw = read_num(gif);
@@ -191,12 +191,12 @@ read_plain_text_ext(gd_GIF *gif)
         f_gif_read(gif, &ch, 1);
         f_gif_read(gif, &fg, 1);
         f_gif_read(gif, &bg, 1);
-        sub_block = f_gif_seek(gif, 0, SEEK_CUR);
+        sub_block = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
         gif->plain_text(gif, tx, ty, tw, th, cw, ch, fg, bg);
-        f_gif_seek(gif, sub_block, SEEK_SET);
+        f_gif_seek(gif, sub_block, LV_FS_SEEK_SET);
     } else {
         /* Discard plain text metadata. */
-        f_gif_seek(gif, 13, SEEK_CUR);
+        f_gif_seek(gif, 13, LV_FS_SEEK_CUR);
     }
     /* Discard plain text sub-blocks. */
     discard_sub_blocks(gif);
@@ -208,7 +208,7 @@ read_graphic_control_ext(gd_GIF *gif)
     uint8_t rdit;
 
     /* Discard block size (always 0x04). */
-    f_gif_seek(gif, 1, SEEK_CUR);
+    f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
     f_gif_read(gif, &rdit, 1);
     gif->gce.disposal = (rdit >> 2) & 3;
     gif->gce.input = rdit & 2;
@@ -216,16 +216,16 @@ read_graphic_control_ext(gd_GIF *gif)
     gif->gce.delay = read_num(gif);
     f_gif_read(gif, &gif->gce.tindex, 1);
     /* Skip block terminator. */
-    f_gif_seek(gif, 1, SEEK_CUR);
+    f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
 }
 
 static void
 read_comment_ext(gd_GIF *gif)
 {
     if (gif->comment) {
-        off_t sub_block = f_gif_seek(gif, 0, SEEK_CUR);
+        size_t sub_block = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
         gif->comment(gif);
-        f_gif_seek(gif, sub_block, SEEK_SET);
+        f_gif_seek(gif, sub_block, LV_FS_SEEK_SET);
     }
     /* Discard comment sub-blocks. */
     discard_sub_blocks(gif);
@@ -238,21 +238,21 @@ read_application_ext(gd_GIF *gif)
     char app_auth_code[3];
 
     /* Discard block size (always 0x0B). */
-    f_gif_seek(gif, 1, SEEK_CUR);
+    f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
     /* Application Identifier. */
     f_gif_read(gif, app_id, 8);
     /* Application Authentication Code. */
     f_gif_read(gif, app_auth_code, 3);
     if (!strncmp(app_id, "NETSCAPE", sizeof(app_id))) {
         /* Discard block size (0x03) and constant byte (0x01). */
-        f_gif_seek(gif, 2, SEEK_CUR);
+        f_gif_seek(gif, 2, LV_FS_SEEK_CUR);
         gif->loop_count = read_num(gif);
         /* Skip block terminator. */
-        f_gif_seek(gif, 1, SEEK_CUR);
+        f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
     } else if (gif->application) {
-        off_t sub_block = f_gif_seek(gif, 0, SEEK_CUR);
+        size_t sub_block = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
         gif->application(gif, app_id, app_auth_code);
-        f_gif_seek(gif, sub_block, SEEK_SET);
+        f_gif_seek(gif, sub_block, LV_FS_SEEK_SET);
         discard_sub_blocks(gif);
     } else {
         discard_sub_blocks(gif);
@@ -384,14 +384,14 @@ read_image_data(gd_GIF *gif, int interlace)
     int ret;
     Table *table;
     Entry entry = {0};
-    off_t start, end;
+    size_t start, end;
 
     f_gif_read(gif, &byte, 1);
     key_size = (int) byte;
-    start = f_gif_seek(gif, 0, SEEK_CUR);
+    start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
     discard_sub_blocks(gif);
-    end = f_gif_seek(gif, 0, SEEK_CUR);
-    f_gif_seek(gif, start, SEEK_SET);
+    end = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
+    f_gif_seek(gif, start, LV_FS_SEEK_SET);
     clear = 1 << key_size;
     stop = clear + 1;
     table = new_table(key_size);
@@ -442,7 +442,7 @@ read_image_data(gd_GIF *gif, int interlace)
     }
     lv_mem_free(table);
     if (key == stop) f_gif_read(gif, &sub_len, 1); /* Must be zero! */
-    f_gif_seek(gif, end, SEEK_SET);
+    f_gif_seek(gif, end, LV_FS_SEEK_SET);
     return 0;
 }
 
@@ -595,7 +595,7 @@ gd_render_frame(gd_GIF *gif, uint8_t *buffer)
 void
 gd_rewind(gd_GIF *gif)
 {
-    f_gif_seek(gif, gif->anim_start, SEEK_SET);
+    f_gif_seek(gif, gif->anim_start, LV_FS_SEEK_SET);
 }
 
 void
@@ -634,8 +634,6 @@ static void f_gif_read(gd_GIF * gif, void * buf, size_t len)
 
 static int f_gif_seek(gd_GIF * gif, size_t pos, int k)
 {
-    if(k == SEEK_CUR) k = LV_FS_SEEK_CUR;
-    else if(k == SEEK_SET) k = LV_FS_SEEK_SET;
     if(gif->is_file) {
         lv_fs_seek(&gif->fd, pos, k);
         uint32_t x;

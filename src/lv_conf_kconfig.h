@@ -18,6 +18,9 @@ extern "C" {
 
 #  ifdef __NuttX__
 #    include <nuttx/config.h>
+#  elif defined(__RTTHREAD__)
+#    define LV_CONF_INCLUDE_SIMPLE
+#    include <lv_rt_thread_conf.h>
 #  endif
 
 #endif /*LV_CONF_KCONFIG_EXTERNAL_INCLUDE*/
@@ -93,18 +96,18 @@ extern "C" {
 #  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_montserrat_46
 #elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_48)
 #  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_montserrat_48
-#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
-#  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_unscii_8
-#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_16)
-#  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_unscii_16
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT12SUBPX)
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_12_SUBPX)
 #  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_montserrat_12_subpx
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT28COMPRESSED)
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED)
 #  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_montserrat_28_compressed
 #elif defined(CONFIG_LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW)
 #  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_dejavu_16_persian_hebrew
 #elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_16_CJK)
 #  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_simsun_16_cjk
+#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
+#  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_unscii_8
+#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_16)
+#  define CONFIG_LV_THEME_DEFAULT_FONT &lv_font_unscii_16
 #endif
 
 /*------------------

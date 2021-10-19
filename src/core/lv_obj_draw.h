@@ -51,8 +51,8 @@ typedef struct {
     const lv_point_t *
     p1;              /**< A point calculated during drawing. E.g. a point of chart or the center of an arc.*/
     const lv_point_t * p2;              /**< A point calculated during drawing. E.g. a point of chart.*/
-    const char *
-    text;                  /**< A text calculated during drawing. Can be modified. E.g. tick labels on a chart axis.*/
+    const char * text;                  /**< A text calculated during drawing. Can be modified. E.g. tick labels on a chart axis.*/
+    uint32_t text_length;               /**< Size of the text buffer containing null-terminated text string calculated during drawing.*/
     uint32_t part;                      /**< The current part for which the event is sent*/
     uint32_t id;                        /**< The index of the part. E.g. a button's index on button matrix or table cell index.*/
     lv_coord_t radius;                  /**< E.g. the radius of an arc (not the corner radius).*/
