@@ -51,9 +51,6 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(lv_obj_is_layout_positioned(obj)) {
-        return;
-    }
 
     lv_res_t res_x;
     lv_style_value_t v_x;
@@ -67,9 +64,6 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 
 void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 {
-    if(lv_obj_is_layout_positioned(obj)) {
-        return;
-    }
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_res_t res_y;
