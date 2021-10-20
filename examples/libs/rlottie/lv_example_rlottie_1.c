@@ -6,8 +6,8 @@
  */
 void lv_example_rlottie_1(void)
 {
-    extern const char lv_rlottie_example_card[];
-    lv_obj_t * lottie = lv_rlottie_create_from_raw(lv_scr_act(), 100, 100, lv_rlottie_example_card);
+    extern const uint8_t lv_rlottie_example_card[];
+    lv_obj_t * lottie = lv_rlottie_create_from_raw(lv_scr_act(), 100, 100, (const void *)lv_rlottie_example_card);
     lv_obj_center(lottie);
 }
 
