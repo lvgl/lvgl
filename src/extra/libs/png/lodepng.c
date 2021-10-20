@@ -76,7 +76,7 @@ static void* lodepng_malloc(size_t size) {
 #ifdef LODEPNG_MAX_ALLOC
   if(size > LODEPNG_MAX_ALLOC) return 0;
 #endif
-  return malloc(size);
+  return lv_mem_alloc(size);
 }
 
 /* NOTE: when realloc returns NULL, it leaves the original memory untouched */
@@ -84,11 +84,11 @@ static void* lodepng_realloc(void* ptr, size_t new_size) {
 #ifdef LODEPNG_MAX_ALLOC
   if(new_size > LODEPNG_MAX_ALLOC) return 0;
 #endif
-  return realloc(ptr, new_size);
+  return lv_mem_realloc(ptr, new_size);
 }
 
 static void lodepng_free(void* ptr) {
-  free(ptr);
+  lv_mem_free(ptr);
 }
 #else /*LODEPNG_COMPILE_ALLOCATORS*/
 /* TODO: support giving additional void* payload to the custom allocators */
@@ -348,7 +348,7 @@ static long lodepng_filesize(const char* filename) {
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return -1;
     uint32_t size = 0;
-    if(lv_fs_seek(&f, 0, SEEK_END) != 0) {
+    if(lv_fs_seek(&f, 0, LV_FS_SEEK_END) != 0) {
       lv_fs_close(&f);
       return -1;
     }
@@ -385,11 +385,13 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
 
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
 unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename) {
-  FILE* file;
-  file = fopen(filename, "wb" );
-  if(!file) return 79;
-  fwrite(buffer, 1, buffersize, file);
-  fclose(file);
+  lv_fs_file_t f;
+  lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_WR);
+  if(res != LV_FS_RES_OK) return 79;
+
+  uint32_t bw;
+  res = lv_fs_write(&f, buffer, buffersize, &bw);
+  lv_fs_close(&f);
   return 0;
 }
 

@@ -10,7 +10,7 @@
 .. toctree::
    :maxdepth: 1
    
-   fs
+   fsdrv
    bmp
    sjpg
    png

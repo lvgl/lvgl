@@ -50,6 +50,7 @@
 
 #include "tjpgd.h"
 #include "lv_sjpg.h"
+#include "../../../misc/lv_fs.h"
 
 
 /*********************
@@ -68,6 +69,39 @@
 /**********************
  *      TYPEDEFS
  **********************/
+
+enum io_source_type {
+    SJPEG_IO_SOURCE_C_ARRAY,
+    SJPEG_IO_SOURCE_DISK,
+};
+
+typedef struct {
+    enum io_source_type type;
+    lv_fs_file_t lv_file;
+    uint8_t* img_cache_buff;
+    int img_cache_x_res;
+    int img_cache_y_res;
+    uint8_t *raw_sjpg_data;               //Used when type==SJPEG_IO_SOURCE_C_ARRAY.
+    uint32_t raw_sjpg_data_size;          //Num bytes pointed to by raw_sjpg_data.
+    uint32_t raw_sjpg_data_next_read_pos; //Used for all types.
+} io_source_t;
+
+
+typedef struct {
+    uint8_t *sjpeg_data;
+    uint32_t sjpeg_data_size;
+    int sjpeg_x_res;
+    int sjpeg_y_res;
+    int sjpeg_total_frames;
+    int sjpeg_single_frame_height;
+    int sjpeg_cache_frame_index;
+    uint8_t **frame_base_array;         //to save base address of each split frames upto sjpeg_total_frames.
+    int *frame_base_offset;             //to save base offset for fseek
+    uint8_t *frame_cache;
+    uint8_t* workb;                     //JPG work buffer for jpeg library
+    JDEC *tjpeg_jd;
+    io_source_t io;
+} SJPEG;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -833,11 +867,11 @@ static void decoder_close( lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * ds
         if(sjpeg->io.lv_file.file_d) {
             lv_fs_close(&(sjpeg->io.lv_file));
         }
-        lv_sjpg_free(sjpeg);
+        lv_sjpg_cleanup(sjpeg);
         break;
 
     case LV_IMG_SRC_VARIABLE:
-        lv_sjpg_free(sjpeg);
+        lv_sjpg_cleanup(sjpeg);
         break;
 
     default:
@@ -847,7 +881,7 @@ static void decoder_close( lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * ds
 
 static int is_jpg( const uint8_t *raw_data )
 {
-    const uint8_t jpg_signature[] = {0xFF, 0xD8, 0xFF,  0xE0,  0x00,  0x10, 0x4A,  0x46, 0x49, 0x46};//ÿØÿà�JFIF
+    const uint8_t jpg_signature[] = {0xFF, 0xD8, 0xFF,  0xE0,  0x00,  0x10, 0x4A,  0x46, 0x49, 0x46};
     return memcmp( jpg_signature, raw_data, sizeof( jpg_signature ) ) == 0;
 }
 

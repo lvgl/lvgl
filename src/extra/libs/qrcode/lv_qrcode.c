@@ -28,6 +28,10 @@
  *  STATIC VARIABLES
  **********************/
 
+const lv_obj_class_t lv_qrcode_class = {
+    .base_class = &lv_canvas_class
+};
+
 /**********************
  *      MACROS
  **********************/
@@ -120,7 +124,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
 
             if(aligned == false) {
                 c.full = a ? 0 : 1;
-                lv_canvas_set_px(qrcode, x, y, c);
+                lv_canvas_set_px_color(qrcode, x, y, c);
             } else {
                 if(!a) b |= (1 << (7 - p));
                 p++;
