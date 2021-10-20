@@ -327,7 +327,6 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     lv_coord_t(*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width : lv_obj_get_height);
     lv_coord_t(*get_cross_size)(const lv_obj_t *) = (!f->row ? lv_obj_get_width : lv_obj_get_height);
 
-    lv_coord_t grow_sum = 0;
     t->track_main_size = 0;
     t->track_fix_main_size = 0;
     t->grow_item_cnt = 0;
@@ -344,7 +343,6 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
             if(grow_value) {
-                grow_sum += grow_value;
                 t->grow_item_cnt++;
                 t->track_fix_main_size += item_gap;
                 if(t->grow_dsc_calc) {

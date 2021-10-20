@@ -33,9 +33,12 @@ For `LV_IMG_CF_INDEXED_1/2/4/8` color formats a palette needs to be
 initialized with  `lv_canvas_set_palette(canvas, 3, LV_COLOR_RED)`. It sets pixels with *index=3* to red.
 
 ### Drawing
-To set a pixel on the canvas, use `lv_canvas_set_px(canvas, x, y, LV_COLOR_RED)`.
-With `LV_IMG_CF_INDEXED_...` or `LV_IMG_CF_ALPHA_...`, the index of the color or the alpha value needs to be passed as color. 
+To set a pixel's color on the canvas, use `lv_canvas_set_px_color(canvas, x, y, LV_COLOR_RED)`.
+With `LV_IMG_CF_INDEXED_...`  the index of the color needs to be passed as color. 
 E.g. `lv_color_t c; c.full = 3;`
+
+To set a pixel's opacity with `LV_IMG_CF_TRUE_COLOR_ALPHA` or `LV_IMG_CF_ALPHA_...` format on the canvas, use `lv_canvas_set_px_opa(canvas, x, y, opa)`.
+
 
 `lv_canvas_fill_bg(canvas, LV_COLOR_BLUE, LV_OPA_50)` fills the whole canvas to blue with 50% opacity. Note that if the current color format doesn't support colors (e.g. `LV_IMG_CF_ALPHA_2BIT`) the color will be ignored. 
 Similarly, if opacity is not supported (e.g. `LV_IMG_CF_TRUE_COLOR`) it will be ignored.

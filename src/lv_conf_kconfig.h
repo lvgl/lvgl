@@ -19,7 +19,8 @@ extern "C" {
 #  ifdef __NuttX__
 #    include <nuttx/config.h>
 #  elif defined(__RTTHREAD__)
-#    define LV_CONF_SKIP
+#    define LV_CONF_INCLUDE_SIMPLE
+#    include <lv_rt_thread_conf.h>
 #  endif
 
 #endif /*LV_CONF_KCONFIG_EXTERNAL_INCLUDE*/
