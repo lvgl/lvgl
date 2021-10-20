@@ -378,12 +378,12 @@ static int
 read_image_data(gd_GIF *gif, int interlace)
 {
     uint8_t sub_len, shift, byte;
-    int init_key_size, key_size, table_is_full;
-    int frm_off, frm_size, str_len, i, p, x, y;
+    int init_key_size, key_size, table_is_full=0;
+    int frm_off, frm_size, str_len=0, i, p, x, y;
     uint16_t key, clear, stop;
     int ret;
     Table *table;
-    Entry entry;
+    Entry entry = {0};
     size_t start, end;
 
     f_gif_read(gif, &byte, 1);
