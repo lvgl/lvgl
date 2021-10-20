@@ -11,8 +11,9 @@ LVG has build in support for
 - [FATFS](http://elm-chan.org/fsw/ff/00index_e.html)
 - STDIO (Linux and Windows using C standard function .e.g fopen, fread)
 - POSIX (Linux and Windows using POSIX function .e.g open, read)
+- WIN32 (Windows using Win32 API function .e.g CreateFileA, ReadFile)
 
-You still need to provide the drivers and libraries, this extensions provide only the bridge between FATFS, STDIO, POSIX and LVGL.
+You still need to provide the drivers and libraries, this extensions provide only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.
 
 ## Usage
 
