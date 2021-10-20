@@ -146,7 +146,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
             /*Decode the loaded image in ARGB8888 */
             error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
-            free(png_data); /*Free the loaded file*/
+            lv_mem_free(png_data); /*Free the loaded file*/
             if(error) {
                 printf("error %u: %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
@@ -188,7 +188,7 @@ static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 {
     (void)decoder; /*Unused*/
     if (dsc->img_data) {
-        free((uint8_t *)dsc->img_data);
+        lv_mem_free((uint8_t *)dsc->img_data);
         dsc->img_data = NULL;
     }
 }
