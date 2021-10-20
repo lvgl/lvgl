@@ -18,6 +18,8 @@ extern "C" {
 
 #  ifdef __NuttX__
 #    include <nuttx/config.h>
+#  elif defined(__RTTHREAD__)
+#    define LV_CONF_SKIP
 #  endif
 
 #endif /*LV_CONF_KCONFIG_EXTERNAL_INCLUDE*/

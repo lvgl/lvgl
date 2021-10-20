@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "bmp/lv_bmp.h"
-#include "fs/lv_fs_libs.h"
+#include "fsdrv/lv_fsdrv.h"
 #include "png/lv_png.h"
 #include "gif/lv_gif.h"
 #include "qrcode/lv_qrcode.h"

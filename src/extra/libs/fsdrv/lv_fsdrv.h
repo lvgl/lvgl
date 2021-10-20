@@ -1,10 +1,10 @@
 /**
- * @file lv_fs_libs.h
+ * @file lv_fsdrv.h
  *
  */
 
-#ifndef LV_FS_LIBS_H
-#define LV_FS_LIBS_H
+#ifndef LV_FSDRV_H
+#define LV_FSDRV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,5 +46,5 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-#endif /*LV_FS_LIBS_H*/
+#endif /*LV_FSDRV_H*/
 
