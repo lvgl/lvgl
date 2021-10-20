@@ -34,7 +34,7 @@ void lv_example_event_3(void)
         lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
 
         lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "%d", i);
+        lv_label_set_text_fmt(label, "%ld", i);
         lv_obj_center(label);
     }
 

@@ -32,10 +32,10 @@ void lv_example_scroll_2(void)
 
         lv_obj_t * label = lv_label_create(btn);
         if(i == 3) {
-            lv_label_set_text_fmt(label, "Panel %d\nno snap", i);
+            lv_label_set_text_fmt(label, "Panel %ld\nno snap", i);
             lv_obj_clear_flag(btn, LV_OBJ_FLAG_SNAPPABLE);
         } else {
-            lv_label_set_text_fmt(label, "Panel %d", i);
+            lv_label_set_text_fmt(label, "Panel %ld", i);
         }
 
         lv_obj_center(label);

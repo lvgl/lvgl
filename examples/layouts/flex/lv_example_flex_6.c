@@ -19,7 +19,7 @@ void lv_example_flex_6(void)
         lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
 
         lv_obj_t * label = lv_label_create(obj);
-        lv_label_set_text_fmt(label, "%d", i);
+        lv_label_set_text_fmt(label, "%ld", i);
         lv_obj_center(label);
     }
 }

@@ -8,7 +8,7 @@ static void event_cb(lv_event_t * e)
     static uint32_t cnt = 1;
     lv_obj_t * btn = lv_event_get_target(e);
     lv_obj_t * label = lv_obj_get_child(btn, 0);
-    lv_label_set_text_fmt(label, "%d", cnt);
+    lv_label_set_text_fmt(label, "%ld", cnt);
     cnt++;
 }
 

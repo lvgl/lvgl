@@ -91,8 +91,8 @@ void lv_example_table_2(void)
     uint32_t elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(label, "%d items were created in %d ms\n"
-                                  "using %d bytes of memory",
+    lv_label_set_text_fmt(label, "%d items were created in %ld ms\n"
+                                  "using %ld bytes of memory",
                                   ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
