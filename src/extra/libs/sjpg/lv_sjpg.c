@@ -833,11 +833,11 @@ static void decoder_close( lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * ds
         if(sjpeg->io.lv_file.file_d) {
             lv_fs_close(&(sjpeg->io.lv_file));
         }
-        lv_sjpg_free(sjpeg);
+        lv_sjpg_cleanup(sjpeg);
         break;
 
     case LV_IMG_SRC_VARIABLE:
-        lv_sjpg_free(sjpeg);
+        lv_sjpg_cleanup(sjpeg);
         break;
 
     default:
@@ -847,7 +847,7 @@ static void decoder_close( lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * ds
 
 static int is_jpg( const uint8_t *raw_data )
 {
-    const uint8_t jpg_signature[] = {0xFF, 0xD8, 0xFF,  0xE0,  0x00,  0x10, 0x4A,  0x46, 0x49, 0x46};//ÿØÿà�JFIF
+    const uint8_t jpg_signature[] = {0xFF, 0xD8, 0xFF,  0xE0,  0x00,  0x10, 0x4A,  0x46, 0x49, 0x46};
     return memcmp( jpg_signature, raw_data, sizeof( jpg_signature ) ) == 0;
 }
 
