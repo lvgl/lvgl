@@ -53,11 +53,13 @@ else()
         # 29316 | STATIC int32_t lv_style_transition_dsc_t_path_xcb_callback(const struct _lv_anim_t * arg0)
         #       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         target_compile_options(lvgl_interface INTERFACE -Wno-unused-function)
+        target_include_directories(lvgl_interface INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR})
     else(MICROPY_DIR)
         # without micropython, build lvgl and examples libs normally
         # default linux build uses this scope
         add_library(lvgl STATIC ${SOURCES})
         add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
+        target_include_directories(lvgl INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR})
 
         include_directories(${CMAKE_SOURCE_DIR})
 
