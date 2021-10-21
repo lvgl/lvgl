@@ -24,6 +24,8 @@ make -j
 make install
 ```
 
+And finally add the `-lrlottie` flag to your linker.
+
 On embedded systems you need to take care of integrating Rlottie to the given build system. 
 
 
