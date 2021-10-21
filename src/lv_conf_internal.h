@@ -1562,6 +1562,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 //#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
 
+#ifndef LV_USE_FS_WIN32
+#  ifdef CONFIG_LV_USE_FS_WIN32
+#    define LV_USE_FS_WIN32 CONFIG_LV_USE_FS_WIN32
+#  else
+#    define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
+#  endif
+#endif
+//#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
+
 #ifndef LV_USE_FS_FATFS
 #  ifdef CONFIG_LV_USE_FS_FATFS
 #    define LV_USE_FS_FATFS CONFIG_LV_USE_FS_FATFS

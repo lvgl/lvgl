@@ -954,6 +954,12 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                         /*Normal right aligns. Other are ignored due to possible circular dependencies*/
                         child_res = LV_MAX(child_res, obj->coords.x2 - child->coords.x1 + 1);
                         break;
+                    default:
+                    	/* Consider other cases only if x=0 and use the width of the object.
+                    	 * With x!=0 circular dependency could occur. */
+                    	if(lv_obj_get_style_y(child, 0) == 0) {
+                    		child_res = LV_MAX(child_res, lv_area_get_width(&child->coords));
+                    	}
                 }
             } else {
                 child_res = LV_MAX(child_res, obj->coords.x2 - child->coords.x1 + 1);
@@ -976,9 +982,15 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                     case LV_ALIGN_TOP_LEFT:
                     case LV_ALIGN_BOTTOM_LEFT:
                     case LV_ALIGN_LEFT_MID:
-                        /*Normal left aligns. Other are ignored due to possible circular dependencies*/
+                        /*Normal left aligns.*/
                         child_res = LV_MAX(child_res, child->coords.x2 - obj->coords.x1 + 1);
                         break;
+                    default:
+                    	/* Consider other cases only if x=0 and use the width of the object.
+                    	 * With x!=0 circular dependency could occur. */
+                    	if(lv_obj_get_style_y(child, 0) == 0) {
+                    		child_res = LV_MAX(child_res, lv_area_get_width(&child->coords));
+                    	}
                 }
             } else {
                 child_res = LV_MAX(child_res, child->coords.x2 - obj->coords.x1 + 1);
@@ -1020,9 +1032,16 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
                 case LV_ALIGN_TOP_RIGHT:
                 case LV_ALIGN_TOP_MID:
                 case LV_ALIGN_TOP_LEFT:
-                    /*Normal top aligns. Other are ignored due to possible circular dependencies*/
+                    /*Normal top aligns. */
                     child_res = LV_MAX(child_res, child->coords.y2 - obj->coords.y1 + 1);
                     break;
+                default:
+                	/* Consider other cases only if y=0 and use the height of the object.
+                	 * With y!=0 circular dependency could occur. */
+                	if(lv_obj_get_style_y(child, 0) == 0) {
+                		child_res = LV_MAX(child_res, lv_area_get_height(&child->coords));
+                	}
+                	break;
             }
         } else {
             child_res = LV_MAX(child_res, child->coords.y2 - obj->coords.y1 + 1);
