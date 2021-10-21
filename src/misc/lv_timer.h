@@ -63,7 +63,7 @@ void _lv_timer_core_init(void);
 //! @cond Doxygen_Suppress
 
 /**
- * Call it  periodically to handle lv_timers.
+ * Call it periodically to handle lv_timers.
  * @return time till it needs to be run next (in ms)
  */
 LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
@@ -97,7 +97,6 @@ void lv_timer_del(lv_timer_t * timer);
 /**
  * Pause/resume a timer.
  * @param timer pointer to an lv_timer
- * @param pause true: pause the timer; false: resume
  */
 void lv_timer_pause(lv_timer_t * timer);
 
