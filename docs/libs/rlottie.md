@@ -4,88 +4,81 @@
 ```
 
 
-# Lottie library for LVGL
-Allows to use Rlottie animations in LVGL. Taken from [base repository](https://github.com/ValentiWorkLearning/lv_rlottie)
-Uses [Samsung/rlottie](https://github.com/Samsung/rlottie) library with C-api header.
+# Lottie player
+Allows to use Lottie animations in LVGL. Taken from this [base repository](https://github.com/ValentiWorkLearning/lv_rlottie)
 
-Rlottie build requires C++14-compatible compiler, optionally CMake 3.14.
+LVGL provides the interface to [Samsung/rlottie](https://github.com/Samsung/rlottie) library's C API. That is the actual Lottie player is not part of LVGL, it needs to be built separately.
 
-![lv_lib_rlottie_demo](https://github.com/lvgl/lv_lib_rlottie/raw/master/lv_rlottie.gif)
+## Build Rlottie
+To build Samsung's Rlottie C++14-compatible compiler and optionally CMake 3.14 or higher is required.
 
-## Build setup
-`lv_lib_rottile` can be built with CMake.
-
-1. Download or clone this repository with `git clone https://github.com/lvgl/lv_lib_rlottie.git --recurse-submodules` next to the `lvgl` folder. If you have downlaoded it run `git submodule update --init` for fetching the dependencies.
-2. In you `CMakeFile.txt`
-  - add:
-```cmake
-set(LOTTIE_MODULE OFF)
-set(LOTTIE_THREAD OFF)
-set(BUILD_SHARED_LIBS OFF)
+To build on desktop you can follow the instrutions from Rlottie's [README](https://github.com/Samsung/rlottie/blob/master/README.md). In the most basic case it looks like this:
 ```
-  - include `lv_lib_rlottie`s CMakeFile with `include(${CMAKE_CURRENT_SOURCE_DIR}/lv_lib_rlottie/CMakeLists.txt)`
-  - link `lv_lib_rlottie` with your target. E.g. `target_link_libraries(my_target PRIVATE lv_lib_rlottie)`
-
-#### Example CMakeList
-An example CMakeList.txt file that builds `lvgl`, `lv_demos`, `lv_driver` and `lv_lib_rlottie` with SDL can look like tihs:
-```cmake
-cmake_minimum_required(VERSION 3.10)
-project(lvgl)
-set(CMAKE_C_STANDARD 11)#C11
-set(CMAKE_CXX_STANDARD 17)#C17
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
-
-file(GLOB_RECURSE INCLUDES "lv_drivers/*.h" "lv_demos/*.h"  "lvgl/*.h"  "./*.h" )
-file(GLOB_RECURSE SOURCES  "lv_drivers/*.c" "lv_demos/*.c"  "lvgl/*.c" )
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/lv_lib_rlottie/CMakeLists.txt)
-
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
-SET(CMAKE_CXX_FLAGS "-O3")
-
-find_package(SDL2 REQUIRED SDL2)
-include_directories(${SDL2_INCLUDE_DIRS})
-add_executable(main main.c lv_lib_rlottie/lv_rlottie_example_fingerprint.c ${SOURCES} ${INCLUDES})
-add_compile_definitions(LV_CONF_INCLUDE_SIMPLE)
-target_link_libraries(main PRIVATE SDL2 lv_lib_rlottie)
-add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main)
+mkdir rlottie_workdir
+cd rlottie_workdir
+git clone https://github.com/Samsung/rlottie.git
+mkdir build 
+cd build 
+cmake ../rlottie
+make -j
+make install
 ```
+
+On embedded systems you need to take care of integrating Rlottie to the given build system. 
+
 
 ## Usage
 
-You can use animation from raw data (text) or files. In either case first include `lv_lib_rlottie/lv_rlottie.h`.
+You can use animation from files or raw data (text). In either case first you need to enable `LV_USE_RLOTTIE` in `lv_conf.h`.
 
-The `width` and `height` os the object be set in the *craete* function. The animation will be scaled accordingly.
+
+The `width` and `height` of the object be set in the *create* function and the animation will be scaled accordingly.
+
+### Use Rlottie from file
+
+To create a Lottie animation from file use:
+```c
+  lv_obj_t * lottie = lv_rlottie_create_from_file(parent, width, height, "path/to/lottie.json");
+```
+
+Note that, Rlottie uses the standard STDIO C file API, so you can use the path "normally" and no LVGL specific driver letter is required.
+
  
 ### Use Rlottie from raw string data
 
-`lv_rlottie_example_fingerprint.c` contains an example animation in raw string format. It can be used like this:
+`lv_example_rlottie_approve.c` contains an example animation in raw format. Instead storing the JSON string a hex array is stored for the following reasons:
+- avoid escaping `"` in the JSON file
+- some compilers don't support very long strings
 
-```c
-extern const char FingerprintRaw[];
-lv_obj_t* r1 = lv_rlottie_create_from_raw(parent, width, height, FingerprintRaw);
+`lvgl/scripts/filetohex.py` can be used to convert a Lottie file a hex array. E.g.:
 ```
-#### JSON escaping
-
-For using raw strings it's necessary to escape an image data. For this purpose the following escape tool can be used:
-https://www.freeformatter.com/json-escape.html
-
-
-### Use Rlottie from external file
-
-You can use `card.json` at first:
-
-```c
-  lv_obj_t* r2 = lv_rlottie_create_from_file(lv_scr_act(), width, height, "../lv_lib_rlottie/card.json");
+./filetohex.py path/to/lottie.json > out.txt
 ```
 
+To create an animation from raw data:
 
-## Getting aniamtions
+```c
+extern const uint8_t lottie_data[];
+lv_obj_t* lottie = lv_rlottie_create_from_raw(parent, width, height, (const char *)lottie_data);
+```
+
+## Getting animations
 
 Lottie is standard and popular format so you can find many animation files on the web.
 For example: https://lottiefiles.com/ 
 
 You can also create your own animations with Adobe After Effects or similar software.
 
+## Example
+```eval_rst
+
+.. include:: ../../examples/libs/rlottie/index.rst
+
+```
+
+## API
+
+```eval_rst
+
+.. doxygenfile:: lv_rlottie.h
+  :project: lvgl
