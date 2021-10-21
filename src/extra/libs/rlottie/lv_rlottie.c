@@ -57,7 +57,7 @@ lv_obj_t* lv_rlottie_create_from_file(lv_obj_t* parent, lv_coord_t width, lv_coo
     path_create = path;
     rlottie_desc_create = NULL;
 
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
 
@@ -73,7 +73,7 @@ lv_obj_t* lv_rlottie_create_from_raw(lv_obj_t* parent, lv_coord_t width, lv_coor
     rlottie_desc_create = rlottie_desc;
     path_create = NULL;
 
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
 
