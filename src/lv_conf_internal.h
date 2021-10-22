@@ -1644,6 +1644,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif
 
+/*Rlottie library*/
+#ifndef LV_USE_RLOTTIE
+#  ifdef CONFIG_LV_USE_RLOTTIE
+#    define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
+#  else
+#    define LV_USE_RLOTTIE 0
+#  endif
+#endif
+
 /*-----------
  * Others
  *----------*/

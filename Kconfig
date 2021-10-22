@@ -811,6 +811,9 @@ menu "LVGL configuration"
             int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
             depends on LV_USE_FREETYPE
             default 16384
+
+        config LV_USE_RLOTTIE
+            bool "Lottie library"
     endmenu
 
     menu "Others"
