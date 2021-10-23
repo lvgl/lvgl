@@ -18,6 +18,15 @@ void lv_example_animimg_1(void)
     lv_animimg_set_duration(animimg0, 1000);
     lv_animimg_set_repeat_count(animimg0, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(animimg0);
+
+    /*Stop the animation image and hide the image*/
+    // lv_animimg_stop(animimg0, true);
+
+    /*Stop the animation image and don't hide the image*/
+    // lv_animimg_stop(animimg0, false);
+
+    /*Delete the animation image*/
+    // lv_animimg_del(animimg0);
 }
 
 #endif

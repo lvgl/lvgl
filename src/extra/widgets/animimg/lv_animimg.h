@@ -79,6 +79,19 @@ void lv_animimg_set_src(lv_obj_t * img,  lv_img_dsc_t * dsc[], uint8_t num);
 void lv_animimg_start(lv_obj_t * obj);
 
 /**
+ * Stop the image animation.
+ * @param obj pointer to an animation image object
+ * @param hidden hide the animation image object
+ */
+void lv_animimg_stop(lv_obj_t * obj, bool hidden);
+
+/**
+ * Delete the image animation.
+ * @param obj pointer to an animation image object
+ */
+void lv_animimg_del(lv_obj_t * obj);
+
+/**
  * Set the  image animation duration time. unit:ms
  * @param img pointer to an animation image object
  */

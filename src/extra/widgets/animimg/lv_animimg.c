@@ -77,7 +77,28 @@ void lv_animimg_start(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    if(lv_obj_has_flag(&animimg->img.obj, LV_OBJ_FLAG_HIDDEN)) {
+        lv_obj_clear_flag(&animimg->img.obj, LV_OBJ_FLAG_HIDDEN);
+    }
     lv_anim_start(&animimg->anim);
+}
+
+void lv_animimg_stop(lv_obj_t * obj, bool hidden)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    lv_anim_del(animimg->anim.var, animimg->anim.exec_cb);
+    if(hidden) {
+        lv_obj_add_flag(&animimg->img.obj, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
+void lv_animimg_del(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    lv_anim_del(animimg->anim.var, animimg->anim.exec_cb);
+    lv_obj_del((lv_obj_t *)animimg);
 }
 
 /*=====================
