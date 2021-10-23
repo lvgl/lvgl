@@ -86,13 +86,13 @@ void lv_example_table_2(void)
     lv_mem_monitor_t mon2;
     lv_mem_monitor(&mon2);
 
-    uint32_t mem_used = mon1.free_size - mon2.free_size;
+    long unsigned int mem_used = mon1.free_size - mon2.free_size;
 
-    uint32_t elaps = lv_tick_elaps(t);
+    unsigned int elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(label, "%d items were created in %d ms\n"
-                                  "using %d bytes of memory",
+    lv_label_set_text_fmt(label, "%d items were created in %u ms\n"
+                                  "using %lu bytes of memory",
                                   ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
