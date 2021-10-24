@@ -11,7 +11,6 @@
 #if LV_USE_FS_STDIO != '\0'
 
 #include <stdio.h>
-#include <errno.h>
 #ifndef WIN32
 #include <dirent.h>
 #include <unistd.h>
@@ -22,13 +21,6 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_FS_STDIO_PATH
-# ifndef WIN32
-#  define LV_FS_STDIO_PATH "./" /*Project root*/
-# else
-#  define LV_FS_STDIO_PATH ".\\" /*Project root*/
-# endif
-#endif /*LV_FS_STDIO_PATH*/
 
 /**********************
  *      TYPEDEFS
@@ -68,7 +60,7 @@ void lv_fs_stdio_init(void)
      * Register the file system interface in LittlevGL
      *--------------------------------------------------*/
 
-    /* Add a simple drive to open images */
+    /*Add a simple drive to open images*/
     static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
@@ -102,7 +94,6 @@ void lv_fs_stdio_init(void)
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     LV_UNUSED(drv);
-    errno = 0;
 
     const char * flags = "";
 
@@ -110,12 +101,16 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == LV_FS_MODE_RD) flags = "rb";
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = "rb+";
 
+#ifdef LV_FS_STDIO_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
 
     char buf[256];
     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
 
     FILE * f = fopen(buf, flags);
+#else
+    FILE * f = fopen(path, flags);
+#endif
     if(f == NULL) return NULL;
 
     /*Be sure we are the beginning of the file*/
@@ -215,17 +210,25 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
 #ifndef WIN32
+# ifdef LV_FS_STDIO_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
     return opendir(buf);
+# else
+    return opendir(path);
+# endif
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
+# ifdef LV_FS_STDIO_PATH
     sprintf(buf, LV_FS_STDIO_PATH "%s\\*", path);
+# else
+    sprintf(buf, "%s\\*", path);
+# endif
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
@@ -262,7 +265,6 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     struct dirent *entry;
     do {
         entry = readdir(dir_p);
-
         if(entry) {
             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
             else strcpy(fn, entry->d_name);
@@ -311,4 +313,4 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     return LV_FS_RES_OK;
 }
 
-#endif  /*LV_USE_FS_STDIO*/
+#endif /*LV_USE_FS_STDIO*/

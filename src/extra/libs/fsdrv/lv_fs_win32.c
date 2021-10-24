@@ -15,9 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_FS_WIN32_PATH
-#define LV_FS_WIN32_PATH ".\\" /*Project root*/
-#endif /*LV_FS_WIN32_PATH*/
 
 /**********************
  *      TYPEDEFS
@@ -27,7 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static bool is_dots_name(LPCSTR name);
+static bool is_dots_name(const char * name);
 static lv_fs_res_t fs_error_from_win32(DWORD error);
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
@@ -60,7 +57,7 @@ void lv_fs_win32_init(void)
      * Register the file system interface in LittlevGL
      *--------------------------------------------------*/
 
-    /* Add a simple drive to open images */
+    /*Add a simple drive to open images*/
     static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
@@ -86,12 +83,12 @@ void lv_fs_win32_init(void)
 
 /**
  * Check the dots name
- * @param name Win32 error code
+ * @param name file or dir name
  * @return true if the name is dots name
  */
-static bool is_dots_name(LPCSTR name)
+static bool is_dots_name(const char * name)
 {
-    return name[0] == L'.' && (!name[1] || (name[1] == L'.' && !name[2]));
+    return name[0] == '.' && (!name[1] || (name[1] == '.' && !name[2]));
 }
 
 /**
@@ -210,13 +207,19 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
         desired_access |= GENERIC_WRITE;
     }
 
+#ifdef LV_FS_WIN32_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
 
     char buf[MAX_PATH];
     sprintf(buf, LV_FS_WIN32_PATH "%s", path);
+#endif
 
     return (void*)CreateFileA(
+#ifdef LV_FS_WIN32_PATH
         buf,
+#else
+        path,
+#endif
         desired_access,
         FILE_SHARE_READ,
         NULL,
@@ -320,7 +323,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     if (!pos_p) {
         return LV_FS_RES_INV_PARAM;
     }
-    *pos_p = (uint32_t)-1;
 
     LARGE_INTEGER file_pointer;
     file_pointer.QuadPart = 0;
@@ -363,7 +365,11 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
+#ifdef LV_FS_WIN32_PATH
     sprintf(buf, LV_FS_WIN32_PATH "%s\\*", path);
+#else
+    sprintf(buf, "%s\\*", path);
+#endif
 
     strcpy(next_fn, "");
     d = FindFirstFileA(buf, &fdata);
@@ -384,12 +390,11 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     } while (FindNextFileA(d, &fdata));
 
     next_error = fs_error_from_win32(GetLastError());
-
     return d;
 }
 
 /**
- * Read the next filename form a directory.
+ * Read the next filename from a directory.
  * The name of the directories will begin with '/'
  * @param drv pointer to a driver where this function belongs
  * @param dir_p pointer to an initialized 'DIR' or 'HANDLE' variable
@@ -443,4 +448,4 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
         : fs_error_from_win32(GetLastError());
 }
 
-#endif  /*LV_USE_FS_WIN32*/
+#endif /*LV_USE_FS_WIN32*/

@@ -11,7 +11,6 @@
 #if LV_USE_FS_POSIX != '\0'
 
 #include <fcntl.h>
-#include <errno.h>
 #include <stdio.h>
 #ifndef WIN32
 #include <dirent.h>
@@ -23,13 +22,6 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_FS_POSIX_PATH
-# ifndef WIN32
-#  define LV_FS_POSIX_PATH "./" /*Project root*/
-# else
-#  define LV_FS_POSIX_PATH ".\\" /*Project root*/
-# endif
-#endif /*LV_FS_POSIX_PATH*/
 
 /**********************
  *      TYPEDEFS
@@ -66,10 +58,10 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 void lv_fs_posix_init(void)
 {
     /*---------------------------------------------------
-     * Register the file system interface  in LittlevGL
+     * Register the file system interface in LittlevGL
      *--------------------------------------------------*/
 
-    /* Add a simple drive to open images */
+    /*Add a simple drive to open images*/
     static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
@@ -103,18 +95,21 @@ void lv_fs_posix_init(void)
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     LV_UNUSED(drv);
-    errno = 0;
 
     uint32_t flags = 0;
     if(mode == LV_FS_MODE_WR) flags = O_WRONLY;
     else if(mode == LV_FS_MODE_RD) flags = O_RDONLY;
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = O_RDWR;
 
+#ifdef LV_FS_POSIX_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_POSIX_PATH "%s", path);
 
     int f = open(buf, flags);
+#else
+    int f = open(path, flags);
+#endif
     if(f < 0) return NULL;
 
     /*Be sure we are the beginning of the file*/
@@ -215,17 +210,25 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     LV_UNUSED(drv);
 
 #ifndef WIN32
+# ifdef LV_FS_POSIX_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_POSIX_PATH "%s", path);
     return opendir(buf);
+# else
+    return opendir(path);
+# endif
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
+# ifdef LV_FS_POSIX_PATH
     sprintf(buf, LV_FS_POSIX_PATH "%s\\*", path);
+# else
+    sprintf(buf, "%s\\*", path);
+# endif
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
@@ -247,7 +250,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 }
 
 /**
- * Read the next filename form a directory.
+ * Read the next filename from a directory.
  * The name of the directories will begin with '/'
  * @param drv pointer to a driver where this function belongs
  * @param dir_p pointer to an initialized 'DIR' or 'HANDLE' variable
@@ -262,7 +265,6 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     struct dirent *entry;
     do {
         entry = readdir(dir_p);
-
         if(entry) {
             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
             else strcpy(fn, entry->d_name);
@@ -311,4 +313,4 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     return LV_FS_RES_OK;
 }
 
-#endif  /*LV_USE_FS_POSIX*/
+#endif /*LV_USE_FS_POSIX*/

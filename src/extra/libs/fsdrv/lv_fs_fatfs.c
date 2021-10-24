@@ -57,7 +57,7 @@ void lv_fs_fatfs_init(void)
      * Register the file system interface in LittlevGL
      *--------------------------------------------------*/
 
-    /* Add a simple drive to open images */
+    /*Add a simple drive to open images*/
     static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
@@ -81,11 +81,11 @@ void lv_fs_fatfs_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-/* Initialize your Storage device and File system. */
+/*Initialize your Storage device and File system.*/
 static void fs_init(void)
 {
-    /* Initialize the SD card and FatFS itself.
-     * Better to do it in your code to keep this library utouched for easy updating*/
+    /*Initialize the SD card and FatFS itself.
+     *Better to do it in your code to keep this library untouched for easy updating*/
 }
 
 /**
@@ -108,7 +108,6 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     if(f == NULL) return NULL;
 
     FRESULT res = f_open(f, path, flags);
-
     if(res == FR_OK) {
         f_lseek(f, 0);
         return f;
@@ -146,7 +145,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     LV_UNUSED(drv);
-    FRESULT res = f_read(file_p, buf, btr, (UINT*)br);
+    FRESULT res = f_read(file_p, buf, btr, (UINT *)br);
     if(res == FR_OK) return LV_FS_RES_OK;
     else return LV_FS_RES_UNKNOWN;
 }
@@ -163,7 +162,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
-    FRESULT res = f_write(file_p, buf, btw, (UINT*)bw);
+    FRESULT res = f_write(file_p, buf, btw, (UINT *)bw);
     if(res == FR_OK) return LV_FS_RES_OK;
     else return LV_FS_RES_UNKNOWN;
 }
@@ -232,7 +231,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 }
 
 /**
- * Read the next filename form a directory.
+ * Read the next filename from a directory.
  * The name of the directories will begin with '/'
  * @param drv pointer to a driver where this function belongs
  * @param dir_p pointer to an initialized 'DIR' variable
