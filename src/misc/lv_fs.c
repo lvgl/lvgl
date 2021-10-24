@@ -302,10 +302,10 @@ const char * lv_fs_get_ext(const char * fn)
 {
     size_t i;
     for(i = strlen(fn); i > 0; i--) {
-        if(fn[i] == '.') {
-            return &fn[i + 1];
+        if(fn[i - 1] == '.') {
+            return &fn[i];
         }
-        else if(fn[i] == '/' || fn[i] == '\\') {
+        else if(fn[i - 1] == '/' || fn[i - 1] == '\\') {
             return ""; /*No extension if a '\' or '/' found*/
         }
     }
@@ -331,10 +331,11 @@ char * lv_fs_up(char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i - 1] == '/' || path[i - 1] == '\\') {
+            path[i - 1] = '\0';
+            break;
+        }
     }
-
-    if(i > 0) path[i] = '\0';
 
     return path;
 }
@@ -356,13 +357,10 @@ const char * lv_fs_get_last(const char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i - 1] == '/' || path[i - 1] == '\\') break;
     }
 
-    /*No '/' or '\' in the path so return with path itself*/
-    if(i == 0) return path;
-
-    return &path[i + 1];
+    return &path[i];
 }
 /**********************
  *   STATIC FUNCTIONS
