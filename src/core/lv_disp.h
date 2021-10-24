@@ -210,34 +210,6 @@ static inline void lv_scr_load(lv_obj_t * scr)
 #define LV_VER_RES lv_disp_get_ver_res(lv_disp_get_default())
 #endif
 
-#ifndef LV_PHYS_HOR_RES
-/**
- * The full / physical horizontal resolution of the currently active display.
- */
-#define LV_PHYS_HOR_RES lv_disp_get_physical_hor_res(lv_disp_get_default())
-#endif
-
-#ifndef LV_PHYS_VER_RES
-/**
- * The full / physical vertical resolution of the currently active display.
- */
-#define LV_PHYS_VER_RES lv_disp_get_physical_ver_res(lv_disp_get_default())
-#endif
-
-#ifndef LV_OFFSET_X
-/**
- * The horizontal offset from the full / physical display.
- */
-#define LV_OFFSET_X lv_disp_get_offset_x(lv_disp_get_default())
-#endif
-
-#ifndef LV_OFFSET_Y
-/**
- * The vertical offset from the full / physical display.
- */
-#define LV_OFFSET_Y lv_disp_get_offset_y(lv_disp_get_default())
-#endif
-
 /**
  * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
  * considering the DPI of the default display.
