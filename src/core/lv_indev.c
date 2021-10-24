@@ -52,7 +52,7 @@ static lv_obj_t * indev_obj_act = NULL;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_INDEV
-    #define INDEV_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define INDEV_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define INDEV_TRACE(...)
 #endif

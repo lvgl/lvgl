@@ -57,9 +57,9 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_DISP_REFR
-    #define TRACE_REFR(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define REFR_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define TRACE_REFR(...)
+    #define REFR_TRACE(...)
 #endif
 
 /**********************
@@ -181,7 +181,7 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  */
 void _lv_disp_refr_timer(lv_timer_t * tmr)
 {
-    TRACE_REFR("begin");
+    REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
     volatile uint32_t elaps = 0;
@@ -207,7 +207,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
         LV_LOG_WARN("there is no active screen");
-        TRACE_REFR("finished");
+        REFR_TRACE("finished");
         return;
     }
 
@@ -312,7 +312,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
-    TRACE_REFR("finished");
+    REFR_TRACE("finished");
 }
 
 #if LV_USE_PERF_MONITOR
@@ -962,8 +962,8 @@ static void draw_buf_flush(void)
 
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2,
-               color_p);
+    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2,
+               (void *)color_p);
 
     lv_area_t offset_area = {
         .x1 = area->x1 + drv->offset_x,

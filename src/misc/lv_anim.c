@@ -46,7 +46,7 @@ static lv_timer_t * _lv_anim_tmr;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_ANIM
-    #define TRACE_ANIM(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define TRACE_ANIM(...)
 #endif

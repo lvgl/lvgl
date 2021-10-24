@@ -40,7 +40,7 @@ static lv_event_t * event_head;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_EVENT
-    #define EVENT_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define EVENT_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define EVENT_TRACE(...)
 #endif
@@ -402,7 +402,7 @@ static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id)
 
 static lv_res_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", e->code, e->current_target, e->param);
+    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->current_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();

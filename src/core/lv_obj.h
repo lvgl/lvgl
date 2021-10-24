@@ -388,7 +388,7 @@ static inline lv_coord_t lv_obj_dpx(const lv_obj_t * obj, lv_coord_t n)
 #endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE
-#  define LV_TRACE_OBJ_CREATE(...) LV_LOG_TRACE( __VA_ARGS__)
+#  define LV_TRACE_OBJ_CREATE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
 #  define LV_TRACE_OBJ_CREATE(...)
 #endif
