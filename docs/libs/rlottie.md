@@ -17,11 +17,11 @@ To build on desktop you can follow the instrutions from Rlottie's [README](https
 mkdir rlottie_workdir
 cd rlottie_workdir
 git clone https://github.com/Samsung/rlottie.git
-mkdir build >
+mkdir build
 cd build
 cmake ../rlottie
 make -j
-make install
+sudo make install
 ```
 
 And finally add the `-lrlottie` flag to your linker.
