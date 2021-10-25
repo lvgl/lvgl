@@ -104,14 +104,6 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char ** day_names);
  *====================*/
 
 /**
- * Get the header object of the calendar.
- * Date selectors can be created here
- * @param obj   pointer to a calendar object
- * @return      pointer to a container (lv_obj) for a header
- */
-lv_obj_t * lv_calendar_get_header(const lv_obj_t * obj);
-
-/**
  * Get the button matrix object of the calendar.
  * It shows the dates and day names.
  * @param obj   pointer to a calendar object
