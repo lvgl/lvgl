@@ -107,16 +107,10 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     char buf[256];
     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
 
-    FILE * f = fopen(buf, flags);
+    return fopen(buf, flags);
 #else
-    FILE * f = fopen(path, flags);
+    return fopen(path, flags);
 #endif
-    if(f == NULL) return NULL;
-
-    /*Be sure we are the beginning of the file*/
-    fseek(f, 0, SEEK_SET);
-
-    return f;
 }
 
 /**
