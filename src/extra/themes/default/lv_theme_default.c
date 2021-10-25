@@ -118,7 +118,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CALENDAR
-    lv_style_t calendar_bg, calendar_day;
+    lv_style_t calendar_btnm_bg, calendar_btnm_day, calendar_header;
 #endif
 
 #if LV_USE_COLORWHEEL
@@ -489,16 +489,21 @@ static void style_init(void)
 #endif
 
 #if LV_USE_CALENDAR
-    style_init_reset(&styles->calendar_bg);
-    lv_style_set_pad_all(&styles->calendar_bg, PAD_SMALL);
-    lv_style_set_pad_gap(&styles->calendar_bg, PAD_SMALL / 2);
-    lv_style_set_radius(&styles->calendar_bg, 0);
+    style_init_reset(&styles->calendar_btnm_bg);
+    lv_style_set_pad_all(&styles->calendar_btnm_bg, PAD_SMALL);
+    lv_style_set_pad_gap(&styles->calendar_btnm_bg, PAD_SMALL / 2);
 
-    style_init_reset(&styles->calendar_day);
-    lv_style_set_border_width(&styles->calendar_day, lv_disp_dpx(theme.disp, 1));
-    lv_style_set_border_color(&styles->calendar_day, color_grey);
-    lv_style_set_bg_color(&styles->calendar_day, color_card);
-    lv_style_set_bg_opa(&styles->calendar_day, LV_OPA_20);
+    style_init_reset(&styles->calendar_btnm_day);
+    lv_style_set_border_width(&styles->calendar_btnm_day, lv_disp_dpx(theme.disp, 1));
+    lv_style_set_border_color(&styles->calendar_btnm_day, color_grey);
+    lv_style_set_bg_color(&styles->calendar_btnm_day, color_card);
+    lv_style_set_bg_opa(&styles->calendar_btnm_day, LV_OPA_20);
+
+    style_init_reset(&styles->calendar_header);
+    lv_style_set_pad_hor(&styles->calendar_header, PAD_SMALL);
+    lv_style_set_pad_top(&styles->calendar_header, PAD_SMALL);
+    lv_style_set_pad_bottom(&styles->calendar_header, PAD_TINY);
+    lv_style_set_pad_gap(&styles->calendar_header, PAD_SMALL);
 #endif
 
 #if LV_USE_COLORWHEEL
@@ -659,6 +664,15 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             return;
         }
 #endif
+
+
+#if LV_USE_CALENDAR
+    else if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
+        /*No style*/
+        return;
+    }
+#endif
+
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
@@ -711,6 +725,20 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
             lv_obj_add_style(obj, &styles->outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
             lv_obj_add_style(obj, &styles->tab_bg_focus, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+            return;
+        }
+#endif
+
+#if LV_USE_CALENDAR
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
+            lv_obj_add_style(obj, &styles->calendar_btnm_bg, 0);
+            lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
+            lv_obj_add_style(obj, &styles->outline_secondary, LV_STATE_EDITED);
+            lv_obj_add_style(obj, &styles->calendar_btnm_day, LV_PART_ITEMS);
+            lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
+            lv_obj_add_style(obj, &styles->disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
+            lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+            lv_obj_add_style(obj, &styles->outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
             return;
         }
 #endif
@@ -901,26 +929,19 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_CALENDAR
     else if(lv_obj_check_type(obj, &lv_calendar_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
-        lv_obj_add_style(obj, &styles->calendar_bg, 0);
-        lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &styles->outline_secondary, LV_STATE_EDITED);
-        lv_obj_add_style(obj, &styles->calendar_day, LV_PART_ITEMS);
-        lv_obj_add_style(obj, &styles->pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
-        lv_obj_add_style(obj, &styles->disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
-        lv_obj_add_style(obj, &styles->outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &styles->outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
+        lv_obj_add_style(obj, &styles->pad_zero, 0);
     }
 #endif
 
 #if LV_USE_CALENDAR_HEADER_ARROW
     else if(lv_obj_check_type(obj, &lv_calendar_header_arrow_class)) {
-        lv_obj_add_style(obj, &styles->card, 0);
+        lv_obj_add_style(obj, &styles->calendar_header, 0);
     }
 #endif
 
 #if LV_USE_CALENDAR_HEADER_DROPDOWN
     else if(lv_obj_check_type(obj, &lv_calendar_header_dropdown_class)) {
-        lv_obj_add_style(obj, &styles->card, 0);
+        lv_obj_add_style(obj, &styles->calendar_header, 0);
     }
 #endif
 
