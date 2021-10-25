@@ -167,7 +167,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 {
     LV_UNUSED(drv);
     *bw = write((lv_uintptr_t)file_p, buf, btw);
-    return (int32_t)*bw ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+    return (int32_t)*bw < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
