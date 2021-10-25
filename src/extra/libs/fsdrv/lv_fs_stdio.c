@@ -152,7 +152,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 {
     LV_UNUSED(drv);
     *br = fread(buf, 1, btr, file_p);
-    return LV_FS_RES_OK;
+    return (int32_t)*br < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
@@ -168,7 +168,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 {
     LV_UNUSED(drv);
     *bw = fwrite(buf, 1, btw, file_p);
-    return LV_FS_RES_OK;
+    return (int32_t)*bw ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
