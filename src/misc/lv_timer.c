@@ -39,7 +39,7 @@ static bool timer_created;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_TIMER
-    #define TIMER_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define TIMER_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define TIMER_TRACE(...)
 #endif
@@ -308,16 +308,16 @@ static bool lv_timer_exec(lv_timer_t * timer)
         int32_t original_repeat_count = timer->repeat_count;
         if(timer->repeat_count > 0) timer->repeat_count--;
         timer->last_run = lv_tick_get();
-        TIMER_TRACE("calling timer callback: %p", timer->timer_cb);
+        TIMER_TRACE("calling timer callback: %p", *((void **)&timer->timer_cb));
         if(timer->timer_cb && original_repeat_count != 0) timer->timer_cb(timer);
-        TIMER_TRACE("timer callback %p finished", timer->timer_cb);
+        TIMER_TRACE("timer callback %p finished", *((void **)&timer->timer_cb));
         LV_ASSERT_MEM_INTEGRITY();
         exec = true;
     }
 
     if(timer_deleted == false) { /*The timer might be deleted by itself as well*/
         if(timer->repeat_count == 0) { /*The repeat count is over, delete the timer*/
-            TIMER_TRACE("deleting timer with %p callback because the repeat count is over", timer->timer_cb);
+            TIMER_TRACE("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
             lv_timer_del(timer);
         }
     }

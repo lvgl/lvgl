@@ -16,6 +16,8 @@ extern "C" {
 #include "../lv_conf_internal.h"
 #include <stdint.h>
 
+#include "lv_types.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -77,7 +79,8 @@ void lv_log(const char * buf);
  * @param format    printf-like format string
  * @param ...       parameters for `format`
  */
-void _lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...);
+void _lv_log_add(lv_log_level_t level, const char * file, int line,
+                 const char * func, const char * format, ...) LV_FORMAT_ATTRIBUTE(5, 6);
 
 /**********************
  *      MACROS

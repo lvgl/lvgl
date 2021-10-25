@@ -208,7 +208,7 @@ void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector
 
 static void flex_update(lv_obj_t * cont, void * user_data)
 {
-    LV_LOG_INFO("update %p container", cont);
+    LV_LOG_INFO("update %p container", (void *)cont);
     LV_UNUSED(user_data);
 
     flex_t f;
