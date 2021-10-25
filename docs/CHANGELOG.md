@@ -43,6 +43,7 @@
 - feat(disp): Enable rendering to display subsection
 - feat(keyboard): add user-defined modes
 - Add support for RT-Thread RTOS
+- feat(disp): add utility functions/macros for dealing with non-fullscreen displays
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard

@@ -274,6 +274,20 @@ lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp);
 lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp);
 
 /**
+ * Get the horizontal offset from the full / physical display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the horizontal offset from the full / physical display
+ */
+lv_coord_t lv_disp_get_offset_x(lv_disp_t * disp);
+
+/**
+ * Get the vertical offset from the full / physical display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the horizontal offset from the full / physical display
+ */
+lv_coord_t lv_disp_get_offset_y(lv_disp_t * disp);
+
+/**
  * Get if anti-aliasing is enabled for a display or not
  * @param disp pointer to a display (NULL to use the default display)
  * @return true: anti-aliasing is enabled; false: disabled
