@@ -8,7 +8,7 @@ static void draw_event_cb(lv_event_t * e)
 
     if(dsc->id == LV_CHART_AXIS_PRIMARY_X && dsc->text) {
         const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-        lv_snprintf(dsc->text, dsc->text_length, month[dsc->value]);
+        lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
     }
 }
 
