@@ -63,7 +63,7 @@ static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variabl
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_MEM
-    #define MEM_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define MEM_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define MEM_TRACE(...)
 #endif
@@ -122,7 +122,7 @@ void lv_mem_deinit(void)
  */
 void * lv_mem_alloc(size_t size)
 {
-    MEM_TRACE("allocating %d bytes", size);
+    MEM_TRACE("allocating %lu bytes", (unsigned long)size);
     if(size == 0) {
         MEM_TRACE("using zero_mem");
         return &zero_mem;
@@ -139,7 +139,7 @@ void * lv_mem_alloc(size_t size)
 #endif
 
     if(alloc == NULL) {
-        LV_LOG_ERROR("couldn't allocate memory (%d bytes)", size);
+        LV_LOG_ERROR("couldn't allocate memory (%lu bytes)", (unsigned long)size);
         lv_mem_monitor_t mon;
         lv_mem_monitor(&mon);
         LV_LOG_ERROR("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
@@ -180,7 +180,7 @@ void lv_mem_free(void * data)
  */
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
-    MEM_TRACE("reallocating %p with %d size", data_p, new_size);
+    MEM_TRACE("reallocating %p with %lu size", data_p, (unsigned long)new_size);
     if(new_size == 0) {
         MEM_TRACE("using zero_mem");
         lv_mem_free(data_p);

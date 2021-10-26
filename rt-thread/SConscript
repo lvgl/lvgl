@@ -1,0 +1,63 @@
+from building import *
+import rtconfig
+import os
+import shutil
+
+# get current dir path
+cwd = GetCurrentDir()
+
+src = []
+inc = []
+
+lvgl_cwd = cwd + '/../'
+lvgl_src_cwd = lvgl_cwd + 'src/'
+
+inc = inc + [lvgl_src_cwd]
+
+for root, dirs, files in os.walk(lvgl_src_cwd):
+    for dir in dirs:
+        src = src + Glob(os.path.join(root,dir,'*.c'))
+        inc = inc + [os.path.join(root,dir)]
+
+LOCAL_CCFLAGS = ''
+if rtconfig.CROSS_TOOL == 'gcc':
+    LOCAL_CCFLAGS += ' -std=c99'
+elif rtconfig.CROSS_TOOL == 'keil':
+    LOCAL_CCFLAGS += ' --c99 --gnu -g -W'
+
+group = DefineGroup('LVGL', src, depend = ['PKG_USING_LVGL'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
+
+port_src = Glob('*.c')
+port_inc = [cwd]
+group = group + DefineGroup('LVGL-port', port_src, depend = ['PKG_USING_LVGL'], CPPPATH = port_inc)
+
+list = os.listdir(cwd)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        group = group + SConscript(os.path.join(d, 'SConscript'))
+
+#
+# try:
+#     shutil.rmtree(os.path.join(lvgl_cwd, '.github'))
+#     shutil.rmtree(os.path.join(lvgl_cwd, 'docs'))
+#     shutil.rmtree(os.path.join(lvgl_cwd, 'scripts'))
+#     shutil.rmtree(os.path.join(lvgl_cwd, 'tests'))
+#     shutil.rmtree(os.path.join(lvgl_cwd, 'zephyr'))
+#     os.remove(os.path.join(lvgl_cwd, '.codecov.yml'))
+#     os.remove(os.path.join(lvgl_cwd, '.editorconfig'))
+#     os.remove(os.path.join(lvgl_cwd, '.gitignore'))
+#     os.remove(os.path.join(lvgl_cwd, '.gitmodules'))
+#     os.remove(os.path.join(lvgl_cwd, 'CMakeLists.txt'))
+#     os.remove(os.path.join(lvgl_cwd, 'component.mk'))
+#     os.remove(os.path.join(lvgl_cwd, 'idf_component.yml'))
+#     os.remove(os.path.join(lvgl_cwd, 'Kconfig'))
+#     os.remove(os.path.join(lvgl_cwd, 'library.json'))
+#     os.remove(os.path.join(lvgl_cwd, 'library.properties'))
+#     os.remove(os.path.join(lvgl_cwd, 'lv_conf_template.h'))
+#     os.remove(os.path.join(lvgl_cwd, 'lvgl.mk'))
+# except:
+#     pass
+#
+
+Return('group')

@@ -19,10 +19,6 @@
  *********************/
 #define MY_CLASS &lv_obj_class
 
-#if defined(LV_USER_DATA_FREE_INCLUDE)
-    #include LV_USER_DATA_FREE_INCLUDE
-#endif /*LV_USE_USER_DATA_FREE*/
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -48,7 +44,7 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
 void lv_obj_del(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", obj);
+    LV_LOG_TRACE("begin (delete %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
@@ -72,6 +68,7 @@ void lv_obj_del(lv_obj_t * obj)
         lv_obj_readjust_scroll(par, LV_ANIM_OFF);
         lv_obj_scrollbar_invalidate(par);
         lv_event_send(par, LV_EVENT_CHILD_CHANGED, NULL);
+        lv_event_send(par, LV_EVENT_CHILD_DELETED, NULL);
     }
 
     /*Handle if the active screen was deleted*/
@@ -81,12 +78,12 @@ void lv_obj_del(lv_obj_t * obj)
     }
 
     LV_ASSERT_MEM_INTEGRITY();
-    LV_LOG_TRACE("finished (delete %p)", obj);
+    LV_LOG_TRACE("finished (delete %p)", (void *)obj);
 }
 
 void lv_obj_clean(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", obj);
+    LV_LOG_TRACE("begin (delete %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
@@ -105,7 +102,7 @@ void lv_obj_clean(lv_obj_t * obj)
 
     LV_ASSERT_MEM_INTEGRITY();
 
-    LV_LOG_TRACE("finished (delete %p)", obj);
+    LV_LOG_TRACE("finished (delete %p)", (void *)obj);
 }
 
 void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
@@ -193,9 +190,11 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     /*Notify the original parent because one of its children is lost*/
     lv_event_send(old_parent, LV_EVENT_CHILD_CHANGED, obj);
+    lv_event_send(old_parent, LV_EVENT_CHILD_DELETED, NULL);
 
     /*Notify the new parent about the child*/
     lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
+    lv_event_send(parent, LV_EVENT_CHILD_CREATED, NULL);
 
     lv_obj_invalidate(obj);
 }
@@ -242,11 +241,16 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     uint_fast32_t index1 = lv_obj_get_index(obj1);
     uint_fast32_t index2 = lv_obj_get_index(obj2);
 
+    lv_event_send(parent2, LV_EVENT_CHILD_DELETED, obj2);
+    lv_event_send(parent, LV_EVENT_CHILD_DELETED, obj1);
+
     parent->spec_attr->children[index1] = obj2;
     parent2->spec_attr->children[index2] = obj1;
 
     lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj2);
+    lv_event_send(parent, LV_EVENT_CHILD_CREATED, obj2);
     lv_event_send(parent2, LV_EVENT_CHILD_CHANGED, obj1);
+    lv_event_send(parent2, LV_EVENT_CHILD_CREATED, obj1);
 
     lv_obj_invalidate(parent);
 

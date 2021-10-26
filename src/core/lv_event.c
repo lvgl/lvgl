@@ -28,7 +28,8 @@ typedef struct _lv_event_dsc_t {
  **********************/
 static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id);
 static lv_res_t event_send_core(lv_event_t * e);
-static bool event_is_bubbled(lv_event_code_t e);
+static bool event_is_bubbled(lv_event_t * e);
+
 
 /**********************
  *  STATIC VARIABLES
@@ -39,7 +40,7 @@ static lv_event_t * event_head;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_EVENT
-    #define EVENT_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define EVENT_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define EVENT_TRACE(...)
 #endif
@@ -401,7 +402,7 @@ static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id)
 
 static lv_res_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", e->code, e->current_target, e->param);
+    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->current_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
@@ -427,20 +428,32 @@ static lv_res_t event_send_core(lv_event_t * e)
         event_dsc = lv_obj_get_event_dsc(e->current_target, i);
     }
 
-    if(res == LV_RES_OK && event_is_bubbled(e->code)) {
-        if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) && e->current_target->parent) {
+    if(res == LV_RES_OK && e->current_target->parent && event_is_bubbled(e))
+    {
             e->current_target = e->current_target->parent;
             res = event_send_core(e);
             if(res != LV_RES_OK) return LV_RES_INV;
-        }
+
     }
 
     return res;
 }
 
-static bool event_is_bubbled(lv_event_code_t e)
+static bool event_is_bubbled(lv_event_t * e)
 {
-    switch(e) {
+    /*Event codes that always bubble*/
+    switch(e->code) {
+        case LV_EVENT_CHILD_CREATED:
+        case LV_EVENT_CHILD_DELETED:
+            return true;
+        default:
+            break;
+    }
+
+    /*Check other codes only if bubbling is enabled*/
+    if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
+
+    switch(e->code) {
         case LV_EVENT_HIT_TEST:
         case LV_EVENT_COVER_CHECK:
         case LV_EVENT_REFR_EXT_DRAW_SIZE:
@@ -454,6 +467,8 @@ static bool event_is_bubbled(lv_event_code_t e)
         case LV_EVENT_DRAW_PART_END:
         case LV_EVENT_REFRESH:
         case LV_EVENT_DELETE:
+        case LV_EVENT_CHILD_CREATED:
+        case LV_EVENT_CHILD_DELETED:
         case LV_EVENT_CHILD_CHANGED:
         case LV_EVENT_SIZE_CHANGED:
         case LV_EVENT_STYLE_CHANGED:

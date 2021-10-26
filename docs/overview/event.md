@@ -104,10 +104,14 @@ The following event codes exist:
 ### Other events
 - `LV_EVENT_DELETE`       Object is being deleted
 - `LV_EVENT_CHILD_CHANGED`    Child was removed/added
+- `LV_EVENT_CHILD_CREATED`    Child was created, always bubbles up to all parents
+- `LV_EVENT_CHILD_DELETED`    Child was deleted, always bubbles up to all parents
 - `LV_EVENT_SIZE_CHANGED`    Object coordinates/size have changed
 - `LV_EVENT_STYLE_CHANGED`    Object's style has changed
 - `LV_EVENT_BASE_DIR_CHANGED` The base dir has changed
 - `LV_EVENT_GET_SELF_SIZE`    Get the internal size of a widget
+- `LV_EVENT_SCREEN_LOADED`    A screen was loaded
+- `LV_EVENT_SCREEN_UNLOADED`  A screen was unloaded
 
 ### Special events
 - `LV_EVENT_VALUE_CHANGED`    The object's value has changed (i.e. slider moved)

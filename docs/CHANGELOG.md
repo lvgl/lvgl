@@ -1,6 +1,7 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- fix(docs) API colorwheel reference from 'lv_colorwheel_colour_set_mode...' to 'lv_colorwheel_set_mode...'
 - Fixed lv_deinit declaration when LV_USE_GPU_SDL is enabled
 - added sample lv_example_list_2.py
 - lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
@@ -37,6 +38,12 @@
 - fix(snapshot): snapshot is affected by parent's style because of wrong coordinates.
 - fix(disp) set default theme also for non-default displays
 - feat(btnmatrix/keyboard): add option to show popovers on button press
+- fix(types) LV_FORMAT_ATTRIBUTE now works with gnu version greater than 4.4
+- feat(event) add add LV_EVENT_CHILD_CREATED/DELETED
+- feat(disp): Enable rendering to display subsection
+- feat(keyboard): add user-defined modes
+- Add support for RT-Thread RTOS
+- feat(disp): add utility functions/macros for dealing with non-fullscreen displays
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
@@ -264,7 +271,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 - feat(img_cache) allow disabling image caching
 - calendar: make get_day_of_week() public
 - Added support for Zephyr integration
- 
+
 ### Bugfixes
 - fix(draw_rect) free buffer used for arabic processing
 - fix(win) arabic process the title of the window

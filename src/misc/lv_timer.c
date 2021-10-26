@@ -39,7 +39,7 @@ static bool timer_created;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_TIMER
-    #define TIMER_TRACE(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define TIMER_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define TIMER_TRACE(...)
 #endif
@@ -60,7 +60,7 @@ void _lv_timer_core_init(void)
 }
 
 /**
- * Call it  periodically to handle lv_timers.
+ * Call it periodically to handle lv_timers.
  * @return the time after which it must be called again
  */
 LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
@@ -69,12 +69,14 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     /*Avoid concurrent running of the timer handler*/
     static bool already_running = false;
-    if(already_running) return 1;
+    if(already_running) {
+        TIMER_TRACE("already running, concurrent calls are not allow, returning");
+        return 1;
+    }
     already_running = true;
 
     if(lv_timer_run == false) {
         already_running = false; /*Release mutex*/
-        TIMER_TRACE("already running, concurrent calls are not allow, returning");
         return 1;
     }
 
@@ -85,7 +87,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     if(handler_start == 0) {
         static uint32_t run_cnt = 0;
-        run_cnt ++;
+        run_cnt++;
         if(run_cnt > 100) {
             run_cnt = 0;
             LV_LOG_WARN("It seems lv_tick_inc() is not called.");
@@ -141,6 +143,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     TIMER_TRACE("finished (%d ms until the next timer call)", time_till_next);
     return time_till_next;
 }
+
 /**
  * Create an "empty" timer. It needs to initialized with at least
  * `lv_timer_set_cb` and `lv_timer_set_period`
@@ -168,7 +171,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
     LV_ASSERT_MALLOC(new_timer);
     if(new_timer == NULL) return NULL;
 
-    new_timer->period  = period;
+    new_timer->period = period;
     new_timer->timer_cb = timer_xcb;
     new_timer->repeat_count = -1;
     new_timer->paused = 0;
@@ -297,12 +300,6 @@ static bool lv_timer_exec(lv_timer_t * timer)
 {
     if(timer->paused) return false;
 
-    if(timer->repeat_count == 0) {
-        TIMER_TRACE("deleting timer with %p callback because the repeat count is over", timer->timer_cb);
-        lv_timer_del(timer);
-        return false;
-    }
-
     bool exec = false;
     if(lv_timer_time_remaining(timer) == 0) {
         /* Decrement the repeat count before executing the timer_cb.
@@ -311,19 +308,18 @@ static bool lv_timer_exec(lv_timer_t * timer)
         int32_t original_repeat_count = timer->repeat_count;
         if(timer->repeat_count > 0) timer->repeat_count--;
         timer->last_run = lv_tick_get();
-        TIMER_TRACE("calling timer callback: %p", timer->timer_cb);
+        TIMER_TRACE("calling timer callback: %p", *((void **)&timer->timer_cb));
         if(timer->timer_cb && original_repeat_count != 0) timer->timer_cb(timer);
-        TIMER_TRACE("timer callback %p finished", timer->timer_cb);
+        TIMER_TRACE("timer callback %p finished", *((void **)&timer->timer_cb));
         LV_ASSERT_MEM_INTEGRITY();
-
-        /*Delete if it was a one shot lv_timer*/
-        if(timer_deleted == false) { /*The timer might be deleted by itself as well*/
-            if(timer->repeat_count == 0) {
-                TIMER_TRACE("deleting timer with %p callback because the repeat count is over", timer->timer_cb);
-                lv_timer_del(timer);
-            }
-        }
         exec = true;
+    }
+
+    if(timer_deleted == false) { /*The timer might be deleted by itself as well*/
+        if(timer->repeat_count == 0) { /*The repeat count is over, delete the timer*/
+            TIMER_TRACE("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
+            lv_timer_del(timer);
+        }
     }
 
     return exec;

@@ -98,18 +98,26 @@ static const lv_btnmatrix_ctrl_t default_kb_ctrl_num_map[] = {
     1, 1, 1, 1, 1
 };
 
-static const char * * kb_map[5] = {
+static const char * * kb_map[9] = {
     (const char * *)default_kb_map_lc,
     (const char * *)default_kb_map_uc,
     (const char * *)default_kb_map_spec,
     (const char * *)default_kb_map_num,
+    (const char * *)default_kb_map_lc,
+    (const char * *)default_kb_map_lc,
+    (const char * *)default_kb_map_lc,
+    (const char * *)default_kb_map_lc,
     (const char * *)NULL,
 };
-static const lv_btnmatrix_ctrl_t * kb_ctrl[5] = {
+static const lv_btnmatrix_ctrl_t * kb_ctrl[9] = {
     default_kb_ctrl_lc_map,
     default_kb_ctrl_uc_map,
     default_kb_ctrl_spec_map,
     default_kb_ctrl_num_map,
+    default_kb_ctrl_lc_map,
+    default_kb_ctrl_lc_map,
+    default_kb_ctrl_lc_map,
+    default_kb_ctrl_lc_map,
     NULL,
 };
 

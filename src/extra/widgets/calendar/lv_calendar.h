@@ -36,7 +36,8 @@ typedef struct {
 
 /*Data of calendar*/
 typedef struct {
-    lv_btnmatrix_t btnm;
+    lv_obj_t obj;
+    lv_obj_t * btnm;
     /*New data for this type*/
     lv_calendar_date_t today;               /*Date of today*/
     lv_calendar_date_t showed_date;         /*Currently visible month (day is ignored)*/
@@ -101,6 +102,14 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char ** day_names);
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the button matrix object of the calendar.
+ * It shows the dates and day names.
+ * @param obj   pointer to a calendar object
+ * @return      pointer to a the button matrix
+ */
+lv_obj_t * lv_calendar_get_btnmatrix(const lv_obj_t * obj);
 
 /**
  * Get the today's date

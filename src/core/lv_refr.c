@@ -57,9 +57,9 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_DISP_REFR
-    #define TRACE_REFR(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define REFR_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define TRACE_REFR(...)
+    #define REFR_TRACE(...)
 #endif
 
 /**********************
@@ -181,7 +181,7 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  */
 void _lv_disp_refr_timer(lv_timer_t * tmr)
 {
-    TRACE_REFR("begin");
+    REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
     volatile uint32_t elaps = 0;
@@ -207,7 +207,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
         LV_LOG_WARN("there is no active screen");
-        TRACE_REFR("finished");
+        REFR_TRACE("finished");
         return;
     }
 
@@ -268,7 +268,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     else {
         perf_last_time = lv_tick_get();
         uint32_t fps_limit = 1000 / disp_refr->refr_timer->period;
-        uint32_t fps;
+        unsigned int fps;
 
         if(elaps_sum == 0) elaps_sum = 1;
         if(frame_cnt == 0) fps = fps_limit;
@@ -279,8 +279,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
         fps_sum_all += fps;
         fps_sum_cnt ++;
-        uint32_t cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
+        unsigned int cpu = 100 - lv_timer_get_idle();
+        lv_label_set_text_fmt(perf_label, "%u FPS\n%u%% CPU", fps, cpu);
     }
 #endif
 
@@ -312,7 +312,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
-    TRACE_REFR("finished");
+    REFR_TRACE("finished");
 }
 
 #if LV_USE_PERF_MONITOR
@@ -962,7 +962,15 @@ static void draw_buf_flush(void)
 
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2,
-               color_p);
-    drv->flush_cb(drv, area, color_p);
+    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2,
+               (void *)color_p);
+
+    lv_area_t offset_area = {
+        .x1 = area->x1 + drv->offset_x,
+        .y1 = area->y1 + drv->offset_y,
+        .x2 = area->x2 + drv->offset_x,
+        .y2 = area->y2 + drv->offset_y
+    };
+
+    drv->flush_cb(drv, &offset_area, color_p);
 }
