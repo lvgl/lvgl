@@ -20,10 +20,12 @@ for root, dirs, files in os.walk(lvgl_src_cwd):
         inc = inc + [os.path.join(root,dir)]
 
 LOCAL_CCFLAGS = ''
-if rtconfig.CROSS_TOOL == 'gcc':
+if rtconfig.PLATFORM == 'gcc': # GCC
     LOCAL_CCFLAGS += ' -std=c99'
-elif rtconfig.CROSS_TOOL == 'keil':
+elif rtconfig.PLATFORM == 'armcc': # Keil AC5
     LOCAL_CCFLAGS += ' --c99 --gnu -g -W'
+elif rtconfig.PLATFORM == 'armclang': # Keil AC6
+    LOCAL_CCFLAGS += ' -std=c99 -g -w'
 
 group = DefineGroup('LVGL', src, depend = ['PKG_USING_LVGL'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
 
