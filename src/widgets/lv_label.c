@@ -656,18 +656,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
         pos = _lv_txt_get_encoded_length(label->text);
     }
 
-#if LV_USE_BIDI
-    char * bidi_buf = lv_mem_buf_get(ins_len + 1);
-    LV_ASSERT_MALLOC(bidi_buf);
-    if(bidi_buf == NULL) return;
-
-    _lv_bidi_process(txt, bidi_buf, lv_obj_get_style_base_dir(obj, LV_PART_MAIN));
-    _lv_txt_ins(label->text, pos, bidi_buf);
-
-    lv_mem_buf_release(bidi_buf);
-#else
     _lv_txt_ins(label->text, pos, txt);
-#endif
     lv_label_set_text(obj, NULL);
 }
 
