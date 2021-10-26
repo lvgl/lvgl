@@ -2552,6 +2552,8 @@ unsigned char* lodepng_chunk_find(unsigned char* chunk, unsigned char* end, cons
     if(lodepng_chunk_type_equals(chunk, type)) return chunk;
     chunk = lodepng_chunk_next(chunk, end);
   }
+
+  return 0; /*Shouldn't reach this*/
 }
 
 const unsigned char* lodepng_chunk_find_const(const unsigned char* chunk, const unsigned char* end, const char type[5]) {
@@ -2560,6 +2562,8 @@ const unsigned char* lodepng_chunk_find_const(const unsigned char* chunk, const 
     if(lodepng_chunk_type_equals(chunk, type)) return chunk;
     chunk = lodepng_chunk_next_const(chunk, end);
   }
+
+  return 0; /*Shouldn't reach this*/
 }
 
 unsigned lodepng_chunk_append(unsigned char** out, size_t* outsize, const unsigned char* chunk) {
