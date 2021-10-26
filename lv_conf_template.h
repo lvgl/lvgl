@@ -152,7 +152,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Use exnternal renderer*/
 #define LV_USE_EXTERNAL_RENDERER 0
 
-/*Use SDL renderer API*/
+/*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
 #define LV_USE_GPU_SDL 0
 #if LV_USE_GPU_SDL
 #  define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>

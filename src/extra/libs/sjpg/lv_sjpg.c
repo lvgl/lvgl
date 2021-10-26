@@ -52,7 +52,6 @@
 #include "lv_sjpg.h"
 #include "../../../misc/lv_fs.h"
 
-
 /*********************
  *      DEFINES
  *********************/

@@ -4,7 +4,6 @@
 #include "../../../misc/lv_color.h"
 #if LV_USE_GIF
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>

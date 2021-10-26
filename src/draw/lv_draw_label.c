@@ -40,12 +40,13 @@ typedef uint8_t cmd_state_t;
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-#endif
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-#endif
+#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
+#endif /*LV_USE_EXTERNAL_RENDERER*/
+
 static uint8_t hex_char_to_num(char hex);
 
 /**********************
@@ -624,7 +625,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
     lv_mem_buf_release(mask_buf);
 }
-#endif
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
@@ -830,8 +830,9 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     lv_mem_buf_release(mask_buf);
     lv_mem_buf_release(color_buf);
 }
-#endif
+#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
+#endif /*LV_USE_EXTERNAL_RENDERER*/
 /**
  * Convert a hexadecimal characters to a number (0..15)
  * @param hex Pointer to a hexadecimal character (0..9, A..F)
@@ -874,3 +875,4 @@ static uint8_t hex_char_to_num(char hex)
 
     return result;
 }
+

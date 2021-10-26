@@ -18,6 +18,10 @@ extern "C" {
 
 #if LV_USE_GPU_SDL
 
+#if LV_USE_EXTERNAL_RENDERER == 0
+#error "SDL GPU requires LV_USE_EXTERNAL_RENDERER 1. Enable it in lv_conf.h"
+#endif
+
 #include LV_GPU_SDL_INCLUDE_PATH
 
 /*********************

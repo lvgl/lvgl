@@ -14,8 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include <stdio.h>
-
 #if LV_USE_SJPG
 
 /*********************
