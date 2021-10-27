@@ -95,7 +95,6 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Initialize the animation descriptor*/
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
     if(a->var == a) new_anim->var = new_anim;
-    new_anim->time_orig = a->time;
     new_anim->run_round = anim_run_round;
 
     /*Set the start value*/
@@ -430,8 +429,10 @@ static void anim_ready_handler(lv_anim_t * a)
             tmp      = a->start_value;
             a->start_value = a->end_value;
             a->end_value   = tmp;
-
-            a->time = a->playback_now == 0 ? a->time_orig : a->playback_time;
+            /*Swap the time and playback_time*/
+            tmp = a->time;
+            a->time = a->playback_time;
+            a->playback_time = tmp;
         }
     }
 }
