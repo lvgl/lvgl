@@ -185,7 +185,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
  */
 static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 {
-    (void)decoder; /*Unused*/
+    LV_UNUSED(decoder); /*Unused*/
     if (dsc->img_data) {
         lv_mem_free((uint8_t *)dsc->img_data);
         dsc->img_data = NULL;

@@ -714,7 +714,7 @@ void lv_textarea_clear_selection(lv_obj_t * obj)
         lv_label_set_text_sel_end(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
     }
 #else
-    (void)obj; /*Unused*/
+    LV_UNUSED(obj); /*Unused*/
 #endif
 }
 

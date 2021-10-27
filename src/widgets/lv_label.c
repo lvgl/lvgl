@@ -238,8 +238,8 @@ void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index)
     label->sel_start   = index;
     lv_obj_invalidate(obj);
 #else
-    (void)obj;    /*Unused*/
-    (void)index;    /*Unused*/
+    LV_UNUSED(obj);    /*Unused*/
+    LV_UNUSED(index);  /*Unused*/
 #endif
 }
 

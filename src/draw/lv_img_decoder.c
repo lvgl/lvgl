@@ -272,7 +272,7 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
-    (void)decoder; /*Unused*/
+    LV_UNUSED(decoder); /*Unused*/
 
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {

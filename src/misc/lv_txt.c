@@ -743,7 +743,7 @@ static uint32_t lv_txt_utf8_get_length(const char * txt)
  */
 static uint8_t lv_txt_iso8859_1_size(const char * str)
 {
-    (void)str; /*Unused*/
+    LV_UNUSED(str); /*Unused*/
     return 1;
 }
 
