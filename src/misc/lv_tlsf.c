@@ -7,6 +7,7 @@
 #include "lv_mem.h"
 #include "lv_log.h"
 #include "lv_assert.h"
+#undef  printf
 #define printf LV_LOG_ERROR
 
 #define TLSF_MAX_POOL_SIZE LV_MEM_SIZE
