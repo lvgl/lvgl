@@ -133,10 +133,10 @@ static inline void _out_buffer(char character, void * buffer, size_t idx, size_t
 // internal null output
 static inline void _out_null(char character, void * buffer, size_t idx, size_t maxlen)
 {
-    (void)character;
-    (void)buffer;
-    (void)idx;
-    (void)maxlen;
+    LV_UNUSED(character);
+    LV_UNUSED(buffer);
+    LV_UNUSED(idx);
+    LV_UNUSED(maxlen);
 }
 
 // internal secure strlen

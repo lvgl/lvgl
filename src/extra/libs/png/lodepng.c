@@ -2310,7 +2310,7 @@ static unsigned zlib_compress(unsigned char** out, size_t* outsize, const unsign
 static unsigned zlib_decompress(unsigned char** out, size_t* outsize, size_t expected_size,
                                 const unsigned char* in, size_t insize, const LodePNGDecompressSettings* settings) {
   if(!settings->custom_zlib) return 87; /*no custom zlib function provided */
-  (void)expected_size;
+  LV_UNUSED(expected_size);
   return settings->custom_zlib(out, outsize, in, insize, settings);
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
