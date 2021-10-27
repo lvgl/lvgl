@@ -352,6 +352,20 @@ static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t ex
 }
 
 /**
+ * Get the animation of a variable and its `exec_cb`.
+ * This function exists because it's logical that all anim. functions receives an
+ * `lv_anim_t` as their first parameter. It's not practical in C but might make
+ * the API more consequent and makes easier to generate bindings.
+ * @param a         pointer to an animation.
+ * @param exec_cb   a function pointer which is animating 'var', or NULL to return first matching 'var'
+ * @return          pointer to the animation.
+ */
+static inline lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
+{
+    return lv_anim_get(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
+}
+
+/**
  * Get the number of currently running animations
  * @return      the number of running animations
  */
