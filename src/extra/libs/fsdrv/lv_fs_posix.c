@@ -112,9 +112,6 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 #endif
     if(f < 0) return NULL;
 
-    /*Be sure we are the beginning of the file*/
-    lseek(f, 0, SEEK_SET);
-
     return (void *)(lv_uintptr_t)f;
 }
 

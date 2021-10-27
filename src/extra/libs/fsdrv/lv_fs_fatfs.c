@@ -109,7 +109,6 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     FRESULT res = f_open(f, path, flags);
     if(res == FR_OK) {
-        f_lseek(f, 0);
         return f;
     } else {
         lv_mem_free(f);
