@@ -57,8 +57,6 @@ enum {
     LV_OPA_COVER  = 255,
 };
 
-#define LV_OPA(opa) ((opa * LV_OPA_COVER) / 100) /* Opacity in percent 0..100*/
-
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
@@ -452,6 +450,16 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 }
 
 //! @cond Doxygen_Suppress
+
+/**
+ * Set opacity in percent
+ * @param value opacity value in percent
+ * @return the opacity value
+ */
+static inline lv_opa_t lv_opa_pct(lv_opa_t value)
+{
+    return ((value * LV_OPA_COVER) / 100)
+}
 
 /**
  * Mix two colors with a given ratio.
