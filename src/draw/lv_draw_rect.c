@@ -1080,7 +1080,7 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
 {
     opa = opa >= LV_OPA_COVER ? LV_OPA_COVER : opa;
 
-    if(rout == 0 || rin == 0) {
+    if(rout == 0 && rin == 0) {
         draw_border_simple(clip_area, outer_area, inner_area, color, opa);
         return;
     }
