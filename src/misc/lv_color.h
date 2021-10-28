@@ -458,7 +458,7 @@ static inline uint32_t lv_color_to32(lv_color_t color)
  */
 static inline lv_opa_t lv_opa_pct(lv_opa_t value)
 {
-    return ((value * LV_OPA_COVER) / 100)
+    return ((value * LV_OPA_COVER) / 100);
 }
 
 /**
