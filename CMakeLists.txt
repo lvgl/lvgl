@@ -65,3 +65,35 @@ file(GLOB_RECURSE SOURCES src/*.c)
 add_library(lvgl STATIC ${SOURCES})
 
 endif()
+
+option(install "Enable install to system" OFF)
+if(install)
+include_directories(${CMAKE_SOURCE_DIR})
+
+file(GLOB LVGL_PUBLIC_HEADERS
+  "${CMAKE_SOURCE_DIR}/lv_conf.h"
+  "${CMAKE_SOURCE_DIR}/lvgl.h")
+
+
+if("${LIB_INSTALL_DIR}" STREQUAL "")
+    set(LIB_INSTALL_DIR "lib")
+endif()
+
+if("${INC_INSTALL_DIR}" STREQUAL "")
+    set(INC_INSTALL_DIR "include/lvgl")
+endif()
+
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/src"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+    FILES_MATCHING
+    PATTERN "*.h")
+
+set_target_properties(lvgl PROPERTIES
+    OUTPUT_NAME lvgl
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+
+install(TARGETS lvgl
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif(install)
