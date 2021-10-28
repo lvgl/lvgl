@@ -348,10 +348,11 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     const char * bidi_txt;
     uint32_t visual_byte_pos;
 #if LV_USE_BIDI
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
     char * mutable_bidi_txt = NULL;
     /*Handle Bidi*/
     if(new_line_start == byte_id) {
-        visual_byte_pos = 0;
+        visual_byte_pos = base_dir == LV_BASE_DIR_RTL ? 0 : byte_id - line_start;
         bidi_txt =  &txt[line_start];
     }
     else {
@@ -359,7 +360,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
         bool is_rtl;
         uint32_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
-                                                           lv_obj_get_style_base_dir(obj, LV_PART_MAIN), line_char_id, &is_rtl);
+                                                           base_dir, line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if(is_rtl) visual_char_pos++;
 
