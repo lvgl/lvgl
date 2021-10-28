@@ -57,6 +57,8 @@ enum {
     LV_OPA_COVER  = 255,
 };
 
+#define LV_OPA(opa) ((opa * LV_OPA_COVER) / 100) /* Opacity in percent 0..100*/
+
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
