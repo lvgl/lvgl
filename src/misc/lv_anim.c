@@ -401,7 +401,7 @@ static void anim_ready_handler(lv_anim_t * a)
     /*Delete the animation if
      * - no repeat left and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready*/
-    if(a->repeat_cnt == 0 && ((a->playback_time == 0) || (a->playback_time && a->playback_now == 1))) {
+    if(a->repeat_cnt == 0 && (a->playback_time == 0 || a->playback_now == 1)) {
 
         /*Create copy from the animation and delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
