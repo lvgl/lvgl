@@ -349,6 +349,8 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     uint32_t visual_byte_pos;
 #if LV_USE_BIDI
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    if(base_dir == LV_BASE_DIR_AUTO) base_dir = _lv_bidi_detect_base_dir(txt);
+
     char * mutable_bidi_txt = NULL;
     /*Handle Bidi*/
     if(new_line_start == byte_id) {
