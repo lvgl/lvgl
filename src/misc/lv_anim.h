@@ -196,7 +196,7 @@ static inline void lv_anim_set_path_cb(lv_anim_t * a, lv_anim_path_cb_t path_cb)
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param start_cb  a function call when the animation starts
  */
-static inline void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_ready_cb_t start_cb)
+static inline void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_start_cb_t start_cb)
 {
     a->start_cb = start_cb;
 }
@@ -349,6 +349,20 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb);
 static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
     return lv_anim_del(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
+}
+
+/**
+ * Get the animation of a variable and its `exec_cb`.
+ * This function exists because it's logical that all anim. functions receives an
+ * `lv_anim_t` as their first parameter. It's not practical in C but might make
+ * the API more consequent and makes easier to generate bindings.
+ * @param a         pointer to an animation.
+ * @param exec_cb   a function pointer which is animating 'var', or NULL to return first matching 'var'
+ * @return          pointer to the animation.
+ */
+static inline lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
+{
+    return lv_anim_get(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
 }
 
 /**
