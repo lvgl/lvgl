@@ -203,12 +203,12 @@ int32_t lv_anim_path_linear(const lv_anim_t * a)
 int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 50, 100, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 50, 100, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -217,12 +217,12 @@ int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 900, 950, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 900, 950, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -231,12 +231,12 @@ int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 50, 952, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 50, 952, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -245,12 +245,12 @@ int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 1000, 1300, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 1000, 1300, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -259,20 +259,20 @@ int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 int32_t lv_anim_path_bounce(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    int32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    int32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
     int32_t diff = (a->end_value - a->start_value);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
 
     if(t < 408) {
         /*Go down*/
-        t = (t * 2500) >> 10; /*[0..1024] range*/
+        t = (t * 2500) >> LV_BEZIER_VAL_SHIFT; /*[0..1024] range*/
     }
     else if(t >= 408 && t < 614) {
         /*First bounce back*/
         t -= 408;
         t    = t * 5; /*to [0..1024] range*/
-        t    = 1024 - t;
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 20;
     }
     else if(t >= 614 && t < 819) {
@@ -285,23 +285,23 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
         /*Second bounce back*/
         t -= 819;
         t    = t * 10; /*to [0..1024] range*/
-        t    = 1024 - t;
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 40;
     }
-    else if(t >= 921 && t <= 1024) {
+    else if(t >= 921 && t <= LV_BEZIER_VAL_MAX) {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
         diff = diff / 40;
     }
 
-    if(t > 1024) t = 1024;
+    if(t > LV_BEZIER_VAL_MAX) t = LV_BEZIER_VAL_MAX;
     if(t < 0) t = 0;
-    int32_t step = lv_bezier3(t, 1024, 800, 500, 0);
+    int32_t step = lv_bezier3(t, LV_BEZIER_VAL_MAX, 800, 500, 0);
 
     int32_t new_value;
     new_value = step * diff;
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value = a->end_value - new_value;
 
     return new_value;
