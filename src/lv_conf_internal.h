@@ -158,6 +158,16 @@
 #endif
 #endif     /*LV_MEM_CUSTOM*/
 
+/*Number of the intermediate memory buffer used during rendering and other internal processing mechanisms.
+ *You will see an error log message if there wasn't enough buffers. */
+#ifndef LV_MEM_BUF_MAX_NUM
+#  ifdef CONFIG_LV_MEM_BUF_MAX_NUM
+#    define LV_MEM_BUF_MAX_NUM CONFIG_LV_MEM_BUF_MAX_NUM
+#  else
+#    define LV_MEM_BUF_MAX_NUM 16
+#  endif
+#endif
+
 /*Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster).*/
 #ifndef LV_MEMCPY_MEMSET_STD
 #  ifdef CONFIG_LV_MEMCPY_MEMSET_STD
