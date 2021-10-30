@@ -34,7 +34,7 @@
     #define ALIGN_MASK       0x7
 #else
     #define MEM_UNIT         uint32_t
-    #define ALIGN_MASK       0x7
+    #define ALIGN_MASK       0x3
 #endif
 
 #define ZERO_MEM_SENTINEL  0xa1b2c3d4
