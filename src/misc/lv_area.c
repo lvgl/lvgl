@@ -294,7 +294,7 @@ bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_c
         return true;
     }
 
-    if(radius == 0) return true;
+    if(radius == 0) return false;
 
     /*Check if the corner points are outside the radius or not*/
     lv_point_t p;
