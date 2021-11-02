@@ -23,6 +23,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_ANIM_REPEAT_INFINITE      0xFFFF
+#define LV_ANIM_PLAYTIME_INFINITE    0xFFFFFFFF
+
+LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
+LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -32,9 +38,6 @@ typedef enum {
     LV_ANIM_OFF,
     LV_ANIM_ON,
 } lv_anim_enable_t;
-
-#define LV_ANIM_REPEAT_INFINITE      0xFFFF
-LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
 
 struct _lv_anim_t;
 
@@ -299,6 +302,13 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 {
     return -a->act_time;
 }
+
+/**
+ * Get the time used to play the animation.
+ * @param a pointer to an animation.
+ * @return the play time in milliseconds.
+ */
+uint32_t lv_anim_get_playtime(lv_anim_t * a);
 
 /**
  * Get the user_data field of the animation
