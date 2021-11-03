@@ -18,7 +18,7 @@ static void event_cb(lv_event_t * e)
         int32_t id = lv_chart_get_pressed_point(chart);
         if(id == LV_CHART_POINT_NONE) return;
 
-        LV_LOG_USER("Selected point %d", id);
+        LV_LOG_USER("Selected point %d", (int)id);
 
         lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
         while(ser) {

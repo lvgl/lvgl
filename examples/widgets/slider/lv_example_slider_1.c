@@ -25,7 +25,7 @@ static void slider_event_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target(e);
     char buf[8];
-    lv_snprintf(buf, sizeof(buf), "%d%%", lv_slider_get_value(slider));
+    lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
     lv_label_set_text(slider_label, buf);
     lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 }

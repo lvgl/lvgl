@@ -430,7 +430,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", letter);
+            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", (unsigned int)letter);
         }
         return;
     }
