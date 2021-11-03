@@ -110,7 +110,6 @@ enum {
 
     LV_OBJ_FLAG_WIDGET_1        = (1L << 25), /**< Custom flag, free to use by widget*/
     LV_OBJ_FLAG_WIDGET_2        = (1L << 26), /**< Custom flag, free to use by widget*/
-L
     LV_OBJ_FLAG_USER_1          = (1L << 27), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
