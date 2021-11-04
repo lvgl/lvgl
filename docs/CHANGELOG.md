@@ -44,7 +44,7 @@
 - feat(keyboard): add user-defined modes
 - Add support for RT-Thread RTOS
 - feat(disp): add utility functions/macros for dealing with non-fullscreen displays
-- fix(draw) skip basic arabic vowel characters when processing conjunction
+- fix(txt) skip basic arabic vowel characters when processing conjunction
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
