@@ -553,6 +553,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_USE_PERF_MONITOR 0
 #  endif
 #endif
+#if LV_USE_PERF_MONITOR
+#ifndef LV_USE_PERF_MONITOR_POS
+#  ifdef CONFIG_LV_USE_PERF_MONITOR_POS
+#    define LV_USE_PERF_MONITOR_POS CONFIG_LV_USE_PERF_MONITOR_POS
+#  else
+#    define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+#  endif
+#endif
+#endif
 
 /*1: Show the used memory and the memory fragmentation in the left bottom corner
  * Requires LV_MEM_CUSTOM = 0*/
@@ -562,6 +571,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  else
 #    define LV_USE_MEM_MONITOR 0
 #  endif
+#endif
+#if LV_USE_PERF_MONITOR
+#ifndef LV_USE_MEM_MONITOR_POS
+#  ifdef CONFIG_LV_USE_MEM_MONITOR_POS
+#    define LV_USE_MEM_MONITOR_POS CONFIG_LV_USE_MEM_MONITOR_POS
+#  else
+#    define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+#  endif
+#endif
 #endif
 
 /*1: Draw random colored rectangles over the redrawn areas*/
