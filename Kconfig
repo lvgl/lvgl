@@ -48,6 +48,18 @@ menu "LVGL configuration"
                 Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to
                 non LV_OPA_COVER value
 
+        config LV_COLOR_MIX_ROUND_OFS
+            int "Adjust color mix functions rounding"
+            default 128 if !LV_COLOR_DEPTH_32
+            default 0 if LV_COLOR_DEPTH_32
+            range 0 254
+            help
+                0: no adjustment, get the integer part of the result (round down)
+                64: round up from x.75
+                128: round up from half
+                192: round up from x.25
+                254: round up
+
         config LV_COLOR_CHROMA_KEY_HEX
             hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
             range 0x000000 0xFFFFFF

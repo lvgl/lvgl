@@ -85,6 +85,16 @@
 #  endif
 #endif
 
+/* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
+ * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
+#ifndef LV_COLOR_MIX_ROUND_OFS
+#  ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
+#    define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
+#  else
+#    define LV_COLOR_MIX_ROUND_OFS (LV_COLOR_DEPTH == 32 ? 0: 128)
+#  endif
+#endif
+
 /*Images pixels with this color will not be drawn if they are chroma keyed)*/
 #ifndef LV_COLOR_CHROMA_KEY
 #  ifdef CONFIG_LV_COLOR_CHROMA_KEY
