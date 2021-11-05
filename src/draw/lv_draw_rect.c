@@ -1080,7 +1080,9 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
 {
     opa = opa >= LV_OPA_COVER ? LV_OPA_COVER : opa;
 
-    if(rout == 0 && rin == 0) {
+    bool mask_any = lv_draw_mask_is_any(outer_area);
+
+    if(!mask_any && rout == 0 && rin == 0) {
         draw_border_simple(clip_area, outer_area, inner_area, color, opa);
         return;
     }
@@ -1091,8 +1093,6 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
     lv_area_t draw_area;
     if(!_lv_area_intersect(&draw_area, outer_area, clip_area)) return;
     int32_t draw_area_w = lv_area_get_width(&draw_area);
-
-    bool mask_any = lv_draw_mask_is_any(outer_area);
 
     /*Create a mask if there is a radius*/
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
