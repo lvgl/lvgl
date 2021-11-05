@@ -45,7 +45,9 @@
 - Add support for RT-Thread RTOS
 - feat(disp): add utility functions/macros for dealing with non-fullscreen displays
 - fix(core): force the use of 32bit integers in the enumerations so that LVGL can be compiled on 16bit architectures
+- fix(msgbox) add declaration for lv_msgbox_content_class
 - fix(txt) skip basic arabic vowel characters when processing conjunction
+
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
