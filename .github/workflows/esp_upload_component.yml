@@ -1,0 +1,19 @@
+name: Push LVGL release to Espressif Component Service
+
+# Upload on successful release
+on:
+  release:
+    types:
+      - released
+
+jobs:
+  upload_components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Upload component to component service
+        uses: espressif/github-actions/upload_components@master
+        with:
+          name: "lvgl"
+          namespace: "lvgl"
+          api_token: ${{ secrets.ESP_IDF_COMPONENT_API_TOKEN }}

@@ -38,7 +38,7 @@ Similary, the policies can be applied if the height of the text is greater than 
 - `LV_LABEL_LONG_DOT` Replaces the last 3 characters from bottom right corner of the label with dots (`.`) 
 - `LV_LABEL_LONG_SCROLL` If the text is wider than the label scroll it horizontally back and forth. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
 - `LV_LABEL_LONG_SCROLL_CIRCULAR` If the text is wider than the label scroll it horizontally continously. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
-- `LV_LABEL_LONG_CLIP` Simply clip the parts of the text outside of the label.
+- `LV_LABEL_LONG_CLIP` Simply clip the parts of the text outside the label.
 
 You can specify the long mode with `lv_label_set_long_mode(label, LV_LABEL_LONG_...)`
 
@@ -51,7 +51,7 @@ In the text, you can use commands to recolor parts of the text. For example: `"W
 This feature can be enabled individually for each label by `lv_label_set_recolor()` function. 
 
 ### Text selection
-If enabled by `LV_LABEL_TEXT_SELECTION` part of the text can be selected. It's similar when on PC a you use your mouse to select a text. 
+If enabled by `LV_LABEL_TEXT_SELECTION` part of the text can be selected. It's similar to when you use your mouse on a PC to select a text. 
 The whole mechanism (click and select the text as you drag your finger/mouse) is implemented in [Text area](/widgets/core/textarea) and the Label widget only allows manual text selection with
 `lv_label_get_text_selection_start(label, start_char_index)` and `lv_label_get_text_selection_start(label, end_char_index)`.
  

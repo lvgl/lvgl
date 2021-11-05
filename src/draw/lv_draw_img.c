@@ -30,6 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        const lv_draw_img_dsc_t * draw_dsc);
@@ -41,6 +42,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg);
 static void draw_cleanup(_lv_img_cache_entry_t * cache);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -63,6 +65,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -89,6 +92,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
         return;
     }
 }
+#endif //LV_USE_GPU_SDL_RENDER
 
 /**
  * Get the pixel size of a color format in bits
@@ -229,6 +233,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        const lv_draw_img_dsc_t * draw_dsc)
@@ -289,7 +294,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         int32_t width = lv_area_get_width(&mask_com);
 
         uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) *
-                                         LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
+                                        LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -381,7 +386,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 #endif
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
-//#if LV_DRAW_COMPLEX
+        //#if LV_DRAW_COMPLEX
         /*The pixel size in byte is different if an alpha byte is added too*/
         uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
 
@@ -591,7 +596,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 /*Apply the masks if any*/
                 if(mask_any) {
                     lv_draw_mask_res_t mask_res_sub;
-                    mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + draw_buf->area.x1, y + draw_area.y1 + draw_buf->area.y1,
+                    mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + draw_buf->area.x1,
+                                                      y + draw_area.y1 + draw_buf->area.y1,
                                                       lv_area_get_width(&draw_area));
                     if(mask_res_sub == LV_DRAW_MASK_RES_TRANSP) {
                         lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));
@@ -658,3 +664,5 @@ static void draw_cleanup(_lv_img_cache_entry_t * cache)
     LV_UNUSED(cache);
 #endif
 }
+
+#endif //LV_USE_GPU_SDL_RENDER

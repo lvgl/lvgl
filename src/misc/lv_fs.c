@@ -91,9 +91,9 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    void *file_d = drv->open_cb(drv, real_path, mode);
+    void * file_d = drv->open_cb(drv, real_path, mode);
 
-    if(file_d == NULL || file_d == (void*)(-1)) {
+    if(file_d == NULL || file_d == (void *)(-1)) {
         return LV_FS_RES_UNKNOWN;
     }
 
@@ -207,9 +207,9 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    void *dir_d = drv->dir_open_cb(drv, real_path);
+    void * dir_d = drv->dir_open_cb(drv, real_path);
 
-    if(dir_d == NULL || dir_d == (void*)(-1)) {
+    if(dir_d == NULL || dir_d == (void *)(-1)) {
         return LV_FS_RES_UNKNOWN;
     }
 
@@ -302,10 +302,10 @@ const char * lv_fs_get_ext(const char * fn)
 {
     size_t i;
     for(i = strlen(fn); i > 0; i--) {
-        if(fn[i] == '.') {
-            return &fn[i + 1];
+        if(fn[i - 1] == '.') {
+            return &fn[i];
         }
-        else if(fn[i] == '/' || fn[i] == '\\') {
+        else if(fn[i - 1] == '/' || fn[i - 1] == '\\') {
             return ""; /*No extension if a '\' or '/' found*/
         }
     }
@@ -331,10 +331,11 @@ char * lv_fs_up(char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i - 1] == '/' || path[i - 1] == '\\') {
+            path[i - 1] = '\0';
+            break;
+        }
     }
-
-    if(i > 0) path[i] = '\0';
 
     return path;
 }
@@ -356,13 +357,10 @@ const char * lv_fs_get_last(const char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i - 1] == '/' || path[i - 1] == '\\') break;
     }
 
-    /*No '/' or '\' in the path so return with path itself*/
-    if(i == 0) return path;
-
-    return &path[i + 1];
+    return &path[i];
 }
 /**********************
  *   STATIC FUNCTIONS

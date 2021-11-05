@@ -12,7 +12,7 @@ The Slider object looks like a [Bar](/widgets/core/bar) supplemented with a knob
 ## Parts and Styles 
 - `LV_PART_MAIN` The background of the slider. Uses all the typical background style properties. `padding` makes the indicator smaller in the respective direction.
 - `LV_PART_INDICATOR` The indicator that shows the current state of the slider. Also uses all the typical background style properties.
-- `LV_PART_KNOB` A rectangle (or circle) drawn at the current value. Also uses all the typical background properties to describe the knob(s). By default the knob is square (with a optional corner radius) with side length equal to the smaller side of the slider. The knob can be made larger with the `padding` values. Padding values can be asymmetric too. 
+- `LV_PART_KNOB` A rectangle (or circle) drawn at the current value. Also uses all the typical background properties to describe the knob(s). By default, the knob is square (with an optional corner radius) with side length equal to the smaller side of the slider. The knob can be made larger with the `padding` values. Padding values can be asymmetric too. 
 
 ## Usage
 
@@ -22,9 +22,9 @@ To set an initial value use `lv_slider_set_value(slider, new_value, LV_ANIM_ON/O
 To specify the range (min, max values), `lv_slider_set_range(slider, min , max)` can be used.
 
 ### Modes
-The slider can be one the following modes:
+The slider can be one of the following modes:
 - `LV_SLIDER_MODE_NORMAL` A normal slider as described above
-- `LV_SLIDER_SYMMETRICAL` Draw the indicator form the zero value to current value. Requires negaitve minimum range and positive maximum range.
+- `LV_SLIDER_SYMMETRICAL` Draw the indicator form the zero value to current value. Requires negative minimum range and positive maximum range.
 - `LV_SLIDER_RANGE` Allows setting the start value too by `lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start value has to be always smaller than the end value.
 
 The mode can be changed with `lv_slider_set_mode(slider, LV_SLIDER_MODE_...)`
@@ -35,7 +35,7 @@ In the latter case the knob moves to the point clicked and slider value changes 
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or changed with keys. 
-The event is sent continuously while the slider is dragged and once when released. Use `lv_slider_is_dragged` to detemine whether the Slider is still being dragged or has just been released.
+The event is sent continuously while the slider is dragged and once when released. Use `lv_slider_is_dragged` to determine whether the Slider is still being dragged or has just been released.
 - `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following parts. 
     - `LV_SLIDER_DRAW_PART_KNOB` The main (right) knob of the slider
         - `part`: `LV_PART_KNOB` 

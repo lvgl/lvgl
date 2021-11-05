@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-Generates a checker file for lv_conf.h from lv_conf_template.h define all the not defined values
+Generates lv_conf_internal.h from lv_conf_template.h to provide default values
 '''
 
 import sys
@@ -29,24 +29,24 @@ fout.write(
 
 /* Handle special Kconfig options */
 #ifndef LV_KCONFIG_IGNORE
-#   include "lv_conf_kconfig.h"
-#   ifdef CONFIG_LV_CONF_SKIP
-#       define LV_CONF_SKIP
-#   endif
+#  include "lv_conf_kconfig.h"
+#  ifdef CONFIG_LV_CONF_SKIP
+#    define LV_CONF_SKIP
+#  endif
 #endif
 
 /*If "lv_conf.h" is available from here try to use it later.*/
-#if defined __has_include
+#ifdef __has_include
 #  if __has_include("lv_conf.h")
-#   ifndef LV_CONF_INCLUDE_SIMPLE
-#    define LV_CONF_INCLUDE_SIMPLE
-#   endif
+#    ifndef LV_CONF_INCLUDE_SIMPLE
+#      define LV_CONF_INCLUDE_SIMPLE
+#    endif
 #  endif
 #endif
 
 /*If lv_conf.h is not skipped include it*/
-#if !defined(LV_CONF_SKIP)
-#  if defined(LV_CONF_PATH)											/*If there is a path defined for lv_conf.h use it*/
+#ifndef LV_CONF_SKIP
+#  ifdef LV_CONF_PATH                           /*If there is a path defined for lv_conf.h use it*/
 #    define __LV_TO_STR_AUX(x) #x
 #    define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
 #    include __LV_TO_STR(LV_CONF_PATH)
@@ -80,18 +80,18 @@ for i in fin.read().splitlines():
 
   r = re.search(r'^ *# *define ([^\s]+).*$', i)
 
-#ifndef LV_USE_BTN               /*Only if not defined in lv_conf.h*/
+#ifndef LV_USE_BTN            /*Only if not defined in lv_conf.h*/
 #  ifdef CONFIG_LV_USE_BTN    /*Use KConfig value if set*/
-#    define LV_USE_BTN  CONFIG_LV_USE_BTN
+#    define LV_USE_BTN CONFIG_LV_USE_BTN
 #  else
-#    define LV_USE_BTN      1      /*Use default value*/
+#    define LV_USE_BTN 1      /*Use default value*/
 #  endif
 #endif
 
   if r:
     line = re.sub('\(.*?\)', '', r[1], 1)    #remove parentheses from macros
     dr = re.sub('.*# *define', '', i, 1)
-    d = "#    define " + dr
+    d = "#    define" + dr
 		
     fout.write(
       f'#ifndef {line}\n'
@@ -117,12 +117,10 @@ fout.write(
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
 /*If running without lv_conf.h add typdesf with default value*/
-#if defined(LV_CONF_SKIP)
-
-# if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
-#  define _CRT_SECURE_NO_WARNINGS
-# endif
-
+#ifdef LV_CONF_SKIP
+#  if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
+#    define _CRT_SECURE_NO_WARNINGS
+#  endif
 #endif  /*defined(LV_CONF_SKIP)*/
 
 #endif  /*LV_CONF_INTERNAL_H*/

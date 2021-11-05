@@ -35,6 +35,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
+LV_EXPORT_CONST_INT(LV_COLOR_16_SWAP);
 
 /**
  * Opacity percentages.
@@ -272,7 +274,7 @@ typedef lv_color_t (*lv_color_filter_cb_t)(const struct _lv_color_filter_dsc_t *
 typedef struct _lv_color_filter_dsc_t {
     lv_color_filter_cb_t filter_cb;
     void * user_data;
-}lv_color_filter_dsc_t;
+} lv_color_filter_dsc_t;
 
 
 typedef enum {
@@ -297,7 +299,7 @@ typedef enum {
     LV_PALETTE_GREY,
     _LV_PALETTE_LAST,
     LV_PALETTE_NONE = 0xff,
-}lv_palette_t;
+} lv_palette_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -462,19 +464,20 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0
     /*Source: https://stackoverflow.com/a/50012418/1999969*/
-    mix = ( mix + 4 ) >> 3;
-    uint32_t bg = (uint32_t)((uint32_t)c2.full | ((uint32_t)c2.full << 16)) & 0x7E0F81F; /*0b00000111111000001111100000011111*/
-    uint32_t fg = (uint32_t)((uint32_t)c1.full | (uint32_t)(c1.full << 16)) & 0x7E0F81F;
+    mix = (mix + 4) >> 3;
+    uint32_t bg = (uint32_t)((uint32_t)c2.full | ((uint32_t)c2.full << 16)) &
+                  0x7E0F81F; /*0b00000111111000001111100000011111*/
+    uint32_t fg = (uint32_t)((uint32_t)c1.full | ((uint32_t)c1.full << 16)) & 0x7E0F81F;
     uint32_t result = ((((fg - bg) * mix) >> 5) + bg) & 0x7E0F81F;
     ret.full = (uint16_t)((result >> 16) | result);
 #elif LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
     LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
-                                        (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
+                                   (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_G(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_G(c1) * mix + LV_COLOR_GET_G(c2) *
-                                        (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
+                                   (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_B(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_B(c1) * mix + LV_COLOR_GET_B(c2) *
-                                        (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
+                                   (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
 #else
     /*LV_COLOR_DEPTH == 1*/
@@ -512,12 +515,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0
-    /*For compatibility with lv_color_mix on 16 bit color depth*/
-    LV_COLOR_SET_R(ret, (premult_c1[0] + LV_COLOR_GET_R(c2) * mix) >> 8);
-    LV_COLOR_SET_G(ret, (premult_c1[1] + LV_COLOR_GET_G(c2) * mix) >> 8);
-    LV_COLOR_SET_B(ret, (premult_c1[2] + LV_COLOR_GET_B(c2) * mix) >> 8);
-#elif LV_COLOR_DEPTH != 1
+#if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8 or 32*/
     LV_COLOR_SET_R(ret, LV_UDIV255(premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_G(ret, LV_UDIV255(premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
@@ -684,8 +682,14 @@ static inline lv_color_t lv_color_chroma_key(void)
 /*Source: https://vuetifyjs.com/en/styles/colors/#material-colors*/
 
 lv_color_t lv_palette_main(lv_palette_t p);
-static inline lv_color_t lv_color_white(void) { return lv_color_make(0xff, 0xff, 0xff);}
-static inline lv_color_t lv_color_black(void) { return lv_color_make(0x00, 0x0, 0x00);}
+static inline lv_color_t lv_color_white(void)
+{
+    return lv_color_make(0xff, 0xff, 0xff);
+}
+static inline lv_color_t lv_color_black(void)
+{
+    return lv_color_make(0x00, 0x0, 0x00);
+}
 lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl);
 lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl);
 

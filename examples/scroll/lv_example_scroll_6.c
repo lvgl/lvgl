@@ -29,7 +29,7 @@ static void scroll_event_cb(lv_event_t * e)
             x = r;
         } else {
             /*Use Pythagoras theorem to get x from radius and y*/
-            lv_coord_t x_sqr = r * r - diff_y * diff_y;
+            uint32_t x_sqr = r * r - diff_y * diff_y;
             lv_sqrt_res_t res;
             lv_sqrt(x_sqr, &res, 0x8000);   /*Use lvgl's built in sqrt root function*/
             x = r - res.i;
@@ -60,13 +60,13 @@ void lv_example_scroll_6(void)
     lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
-    uint32_t i;
+    unsigned int i;
     for(i = 0; i < 20; i++) {
         lv_obj_t * btn = lv_btn_create(cont);
         lv_obj_set_width(btn, lv_pct(100));
 
         lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "Button %d", i);
+        lv_label_set_text_fmt(label, "Button %u", i);
     }
 
     /*Update the buttons position manually for first*/

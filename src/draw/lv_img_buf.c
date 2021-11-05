@@ -367,7 +367,7 @@ void lv_img_buf_free(lv_img_dsc_t * dsc)
 {
     if(dsc != NULL) {
         if(dsc->data != NULL)
-            lv_mem_free((void*)dsc->data);
+            lv_mem_free((void *)dsc->data);
 
         lv_mem_free(dsc);
     }
@@ -483,10 +483,10 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
         return;
     }
 
-    res->x1 = (((-pivot->x) * zoom) >> 8) - 1;
-    res->y1 = (((-pivot->y) * zoom) >> 8) - 1;
-    res->x2 = (((w - pivot->x) * zoom) >> 8) + 2;
-    res->y2 = (((h - pivot->y) * zoom) >> 8) + 2;
+    res->x1 = (((int32_t)(-pivot->x) * zoom) >> 8) - 1;
+    res->y1 = (((int32_t)(-pivot->y) * zoom) >> 8) - 1;
+    res->x2 = (((int32_t)(w - pivot->x) * zoom) >> 8) + 2;
+    res->y2 = (((int32_t)(h - pivot->y) * zoom) >> 8) + 2;
 
     if(angle == 0) {
         res->x1 += pivot->x;
@@ -710,7 +710,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
         lv_memcpy_small(&c01, &src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn], sizeof(lv_color_t));
         lv_memcpy_small(&c10, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn], sizeof(lv_color_t));
         lv_memcpy_small(&c11, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn + dsc->tmp.px_size * xn],
-                         sizeof(lv_color_t));
+                        sizeof(lv_color_t));
         if(dsc->tmp.has_alpha) {
             a10 = src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn + dsc->tmp.px_size - 1];
             a01 = src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn + dsc->tmp.px_size - 1];

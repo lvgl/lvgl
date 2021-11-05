@@ -9,7 +9,7 @@ def draw_event_cb(e):
     if not dsc.p1 or not dsc.p2:
         return
 
-    # Add  a line mask that keeps the area below the line
+    # Add a line mask that keeps the area below the line
     line_mask_param = lv.draw_mask_line_param_t()
     line_mask_param.points_init(dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y, lv.DRAW_MASK_LINE_SIDE.BOTTOM)
     # line_mask_id = line_mask_param.draw_mask_add(None)
@@ -45,10 +45,10 @@ def draw_event_cb(e):
 def add_data(timer):
     # LV_UNUSED(timer);
     cnt = 0;
-    char1.set_next_value(ser1, lv.rand(20, 90))
+    chart1.set_next_value(ser1, lv.rand(20, 90))
 
     if cnt % 4 == 0:
-        chart1.set_next_value(ser2, lv_rand(40, 60))
+        chart1.set_next_value(ser2, lv.rand(40, 60))
 
     cnt +=1
 
@@ -73,5 +73,4 @@ for i in range(10):
     chart1.set_next_value(ser1, lv.rand(20, 90))
     chart1.set_next_value(ser2, lv.rand(30, 70))
 
-# timer = lv.timer_t(add_data, 200, None)
-
+timer = lv.timer_create(add_data, 200, None)

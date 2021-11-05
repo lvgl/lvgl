@@ -19,9 +19,9 @@ Note that the flex layout feature of LVGL needs to be globally enabled with `LV_
 - tracks: the rows or columns
 - main direction: row or column, the direction in which the items are placed
 - cross direction: perpendicular to the main direction
-- wrap: if there there is no more space in the track a new track is started
+- wrap: if there is no more space in the track a new track is started
 - grow: if set on an item it will grow to fill the remaining space on the track. 
-The available space will be distributed among items respective to the their grow value (larger value means more space)
+The available space will be distributed among items respective to their grow value (larger value means more space)
 - gap: the space between the rows and columns or the items on a track
 
 ## Simple interface
@@ -39,8 +39,8 @@ The possible values for `flex_flow` are:
 - `LV_FLEX_FLOW_COLUMN_WRAP` Place the children in a column with wrapping
 - `LV_FLEX_FLOW_ROW_REVERSE` Place the children in a row without wrapping but in reversed order
 - `LV_FLEX_FLOW_COLUMN_REVERSE` Place the children in a column without wrapping but in reversed order
-- `LV_FLEX_FLOW_ROW_WRAP_REVERSE` Place the children in a row without wrapping but in reversed order
-- `LV_FLEX_FLOW_COLUMN_WRAP_REVERSE` Place the children in a column without wrapping but in reversed order
+- `LV_FLEX_FLOW_ROW_WRAP_REVERSE` Place the children in a row with wrapping but in reversed order
+- `LV_FLEX_FLOW_COLUMN_WRAP_REVERSE` Place the children in a column with wrapping but in reversed order
 
 ### Flex align
 To manage the placement of the children use `lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`
@@ -62,8 +62,8 @@ The first item will have one unit of space against the container edge, but two u
 
 ### Flex grow
 
-Flex grow can be used to make one or more children fill the available space on the track. If more children has grow the available space will be distributed proportionally to the grow values.
-For example let's there is 400 px remaining space and 4 object with grow:
+Flex grow can be used to make one or more children fill the available space on the track. When more children have grow parameters, the available space will be distributed proportionally to the grow values.
+For example, there is 400 px remaining space and 4 objects with grow:
 - `A` with grow = 1
 - `B` with grow = 1
 - `C` with grow = 2

@@ -236,6 +236,22 @@ int16_t lv_draw_mask_add(void * param, void * custom_id);
 LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
                                                             lv_coord_t len);
 
+/**
+ * Apply the specified buffers on a line. Used internally by the library's drawing routines.
+ * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
+ * @param abs_x absolute X coordinate where the line to calculate start
+ * @param abs_y absolute Y coordinate where the line to calculate start
+ * @param len length of the line to calculate (in pixel count)
+ * @param ids ID array of added buffers
+ * @param ids_count number of ID array
+ * @return One of these values:
+ * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
+ * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
+ * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
+ */
+LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                                lv_coord_t len, const int16_t *ids, int16_t ids_count);
+
 //! @endcond
 
 /**
@@ -279,7 +295,7 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void);
 
 
 /**
- * Check is there is any added draw mask
+ * Check if there is any added draw mask
  * @param a     an area to test for affecting masks.
  * @return true: there is t least 1 draw mask; false: there are no draw masks
  */

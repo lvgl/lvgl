@@ -49,7 +49,7 @@ const lv_obj_class_t lv_canvas_class = {
 
 lv_obj_t * lv_canvas_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -74,13 +74,23 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     lv_img_set_src(obj, &canvas->dsc);
 }
 
-void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t c)
+void lv_canvas_set_px_color(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t c)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
     lv_img_buf_set_px_color(&canvas->dsc, x, y, c);
+    lv_obj_invalidate(obj);
+}
+
+void lv_canvas_set_px_opa(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_opa_t opa)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_canvas_t * canvas = (lv_canvas_t *)obj;
+
+    lv_img_buf_set_px_alpha(&canvas->dsc, x, y, opa);
     lv_obj_invalidate(obj);
 }
 

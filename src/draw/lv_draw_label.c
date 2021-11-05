@@ -13,6 +13,9 @@
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_assert.h"
 
+#if LV_USE_GPU_SDL
+    #include "../gpu/lv_gpu_sdl.h"
+#endif
 /*********************
  *      DEFINES
  *********************/
@@ -32,13 +35,18 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-#endif
+#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
+#endif /*LV_USE_EXTERNAL_RENDERER*/
+
 static uint8_t hex_char_to_num(char hex);
 
 /**********************
@@ -121,7 +129,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     int32_t w;
 
     /*No need to waste processor time if string is empty*/
-    if (txt == NULL || txt[0] == '\0')
+    if(txt == NULL || txt[0] == '\0')
         return;
 
     lv_area_t clipped_area;
@@ -141,7 +149,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
         lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
-                         dsc->flag);
+                        dsc->flag);
         w = p.x;
     }
 
@@ -387,6 +395,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     LV_ASSERT_MEM_INTEGRITY();
 }
 
+#if LV_USE_EXTERNAL_RENDERER == 0
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -419,9 +428,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         /*Add warning if the dsc is not found
          *but do not print warning for non printable ASCII chars (e.g. '\n')*/
         if(letter >= 0x20 &&
-            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
-            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", letter);
+           letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
+           letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
+            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", (unsigned int)letter);
         }
         return;
     }
@@ -448,11 +457,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
 
     if(font_p->subpx) {
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-    draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
+        draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
 #else
-    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
+        LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
 #endif
-    } else {
+    }
+    else {
         draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
 }
@@ -820,8 +830,9 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     lv_mem_buf_release(mask_buf);
     lv_mem_buf_release(color_buf);
 }
-#endif
+#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
+#endif /*LV_USE_EXTERNAL_RENDERER*/
 /**
  * Convert a hexadecimal characters to a number (0..15)
  * @param hex Pointer to a hexadecimal character (0..9, A..F)
@@ -864,3 +875,4 @@ static uint8_t hex_char_to_num(char hex)
 
     return result;
 }
+

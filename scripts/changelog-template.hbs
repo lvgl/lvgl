@@ -1,0 +1,28 @@
+{{#each releases}}
+  ## [{{title}}]({{href}}) {{niceDate}}
+
+  {{#commit-list commits heading='### Breaking Changes' message='BREAKING CHANGE:'}}
+    - :warning: {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+
+  {{#commit-list commits heading='### New Features' message='^feat' exclude='BREAKING CHANGE:'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  
+  {{#commit-list commits heading='### Performance' message='^perf' exclude='BREAKING CHANGE:'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  
+  {{#commit-list commits heading='### Fixes' message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE:)'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  
+  {{#commit-list commits heading='### Docs' message='^docs'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  
+  {{#commit-list commits heading='### Others' exclude='(^fix|^feat|^perf|^docs)'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  
+{{/each}}

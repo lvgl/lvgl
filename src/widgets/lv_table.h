@@ -66,7 +66,7 @@ extern const lv_obj_class_t lv_table_class;
  */
 typedef enum {
     LV_TABLE_DRAW_PART_CELL,       /**< A cell*/
-}lv_table_draw_part_type_t;
+} lv_table_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES

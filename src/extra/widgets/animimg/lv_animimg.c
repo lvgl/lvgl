@@ -27,6 +27,8 @@
  *********************/
 #define LV_OBJX_NAME "lv_animimg"
 
+#define MY_CLASS &lv_animimg_class
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -56,7 +58,7 @@ const lv_obj_class_t lv_animimg_class = {
 
 lv_obj_t * lv_animimg_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_animimg_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -64,14 +66,16 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
 
 void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
-    lv_anim_set_values(&animimg->anim, 0 , num);
+    lv_anim_set_values(&animimg->anim, 0, num);
 }
 
 void lv_animimg_start(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_start(&animimg->anim);
 }
@@ -82,6 +86,7 @@ void lv_animimg_start(lv_obj_t * obj)
 
 void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_set_time(&animimg->anim, duration);
     lv_anim_set_playback_delay(&animimg->anim, duration);
@@ -89,6 +94,7 @@ void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
 
 void lv_animimg_set_repeat_count(lv_obj_t * obj, uint16_t count)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_set_repeat_count(&animimg->anim, count);
 }
@@ -115,7 +121,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_anim_set_var(&animimg->anim, obj);
     lv_anim_set_time(&animimg->anim, 30);
     lv_anim_set_exec_cb(&animimg->anim, (lv_anim_exec_xcb_t)index_change);
-    lv_anim_set_values(&animimg->anim, 0 , 1);
+    lv_anim_set_values(&animimg->anim, 0, 1);
     lv_anim_set_repeat_count(&animimg->anim, LV_ANIM_REPEAT_INFINITE);
 }
 

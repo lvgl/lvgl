@@ -81,7 +81,7 @@ typedef uint8_t lv_text_align_t;
  * line breaks
  */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag);
+                     lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -108,7 +108,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * @return length of a char_num long text
  */
 lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                             lv_text_flag_t flag);
+                            lv_text_flag_t flag);
 
 /**
  * Check next character in a string and decide if the character is part of the command or not
@@ -122,15 +122,15 @@ bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
 
 /**
  * Insert a string into an other
- * @param txt_buf the original text (must be big enough for the result text)
+ * @param txt_buf the original text (must be big enough for the result text and NULL terminated)
  * @param pos position to insert (0: before the original text, 1: after the first char etc.)
- * @param ins_txt text to insert
+ * @param ins_txt text to insert, must be '\0' terminated
  */
 void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 
 /**
  * Delete a part of a string
- * @param txt string to modify
+ * @param txt string to modify, must be '\0' terminated and should point to a heap or stack frame, not read-only memory.
  * @param pos position where to start the deleting (0: before the first char, 1: after the first
  * char etc.)
  * @param len number of characters to delete
@@ -153,7 +153,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap) LV_FORMAT_ATTRIBUTE(1
  *                After the call it will point to the next encoded char in 'txt'.
  *                NULL to use txt[0] as index
  */
-void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t *ofs);
+void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t * ofs);
 
 /**
  * Test if char is break char or not (a text can broken here or not)
@@ -166,7 +166,7 @@ static inline bool _lv_txt_is_break_char(uint32_t letter)
     bool ret = false;
 
     /* each chinese character can be break */
-    if (letter >= 0x4E00 && letter <= 0x9FA5) {
+    if(letter >= 0x4E00 && letter <= 0x9FA5) {
         return true;
     }
 
@@ -226,7 +226,7 @@ extern uint32_t (*_lv_txt_encoded_next)(const char *, uint32_t *);
 extern uint32_t (*_lv_txt_encoded_prev)(const char *, uint32_t *);
 
 /**
- * Convert a letter index (in an the encoded text) to byte index.
+ * Convert a letter index (in the encoded text) to byte index.
  * E.g. in UTF-8 "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
  * @param txt a '\0' terminated UTF-8 string
  * @param enc_id letter index

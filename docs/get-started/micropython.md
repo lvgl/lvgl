@@ -14,7 +14,7 @@ Using Micropython, you can write Python3 code and run it even on a bare metal ar
 - **Compact** - Fits and runs within just 256k of code space and 16k of RAM. No OS is needed, although you can also run it with an OS, if you want.
 - **Compatible** - Strives to be as compatible as possible with normal Python (known as CPython).
 - **Versatile** - Supports many architectures (x86, x86-64, ARM, ARM Thumb, Xtensa).
-- **Interactive** - No need for the compile-flash-boot cycle. With the REPL (interactive prompt) you can type commands and execute them immediately, run scripts etc.
+- **Interactive** - No need for the compile-flash-boot cycle. With the REPL (interactive prompt) you can type commands and execute them immediately, run scripts, etc.
 - **Popular** - Many platforms are supported. The user base is growing bigger. Notable forks: [MicroPython](https://github.com/micropython/micropython), [CircuitPython](https://github.com/adafruit/circuitpython), [MicroPython_ESP32_psRAM_LoBo](https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo)
 - **Embedded Oriented** - Comes with modules specifically for embedded systems, such as the [machine module](https://docs.micropython.org/en/latest/library/machine.html#classes) for accessing low-level hardware (I/O pins, ADC, UART, SPI, I2C, RTC, Timers etc.)
 
@@ -26,7 +26,7 @@ Currently, Micropython [does not have a good high-level GUI library](https://for
 
 ### Here are some advantages of using LVGL in Micropython:
 
-- Develop GUI in Python, a very popular high level language. Use paradigms such as Object Oriented Programming.
+- Develop GUI in Python, a very popular high level language. Use paradigms such as Object-Oriented Programming.
 - Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of **`Change code` > `Build` > `Flash` > `Run`**.  
 In Micropython it's just **`Change code` > `Run`** ! You can even run commands interactively using the [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) (the interactive prompt)
 
@@ -35,7 +35,7 @@ In Micropython it's just **`Change code` > `Run`** ! You can even run commands i
 - Fast prototyping GUI.  
 - Shortening the cycle of changing and fine-tuning the GUI.
 - Modelling the GUI in a more abstract way by defining reusable composite objects, taking advantage of Python's language features such as Inheritance, Closures, List Comprehension, Generators, Exception Handling, Arbitrary Precision Integers and others.
-- Make LVGL accessible to a larger audience. No need to know C in order to create a nice GUI on an embedded system.  
+- Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.  
 This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython). CircuitPython was designed with education in mind, to make it easier for new or unexperienced users to get started with embedded development.
 - Creating tools to work with LVGL at a higher level (e.g. drag-and-drop designer).
 
@@ -44,7 +44,7 @@ This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to
 ## So what does it look like?
 
 > TL;DR:
-> It's very much like the C API, but Object Oriented for LVGL components.
+> It's very much like the C API, but Object-Oriented for LVGL components.
 
 Let's dive right into an example!  
 

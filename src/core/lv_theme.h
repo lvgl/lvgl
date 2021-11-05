@@ -50,7 +50,7 @@ typedef struct _lv_theme_t {
  * @param obj       pointer to object
  * @return          the theme of the object's display (can be NULL)
  */
-lv_theme_t *  lv_theme_get_from_obj(lv_obj_t * obj);
+lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj);
 
 /**
  * Apply the active theme on an object

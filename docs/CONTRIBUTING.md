@@ -9,7 +9,7 @@
 
 Join LVGL's community and leave your footprint in the library!
 
-There are a lot of ways to contribute to LVGL even if you are are new to the library or even new to programming. 
+There are a lot of ways to contribute to LVGL even if you are new to the library or even new to programming. 
 
 It might be scary to make the first step but you have nothing to be afraid of. 
 A friendly and helpful community is waiting for you. Get to know like-minded people and make something great together.
@@ -217,9 +217,9 @@ Participating in the discussions is one of the best ways to become part of the p
 ### Add features
 If you have created a cool widget, or added useful feature to LVGL feel free to open a new PR for it. 
 We collect the optional features (a.k.a. plugins) in [lvgl/src/extra](https://github.com/lvgl/lvgl/tree/master/src/extra) folder so if you are interested in adding a new features please use this folder. 
-The [README](https://github.com/lvgl/lvgl/blob/master/src/extra/README.md) file describes the basics rules of contribution and and also lists some ideas.
+The [README](https://github.com/lvgl/lvgl/blob/master/src/extra/README.md) file describes the basics rules of contribution and also lists some ideas.
 
-For further ideas take a look at the our [Roadmap](/ROADMAP) page. If you are interested in any of them feel free to share your opinion and/or participate in the the implementation.
+For further ideas take a look at the [Roadmap](/ROADMAP) page. If you are interested in any of them feel free to share your opinion and/or participate in the implementation.
 
 Other features which are (still) not on the road map are listed in the [Feature request](https://forum.lvgl.io/c/feature-request/9) category of the Forum. 
 

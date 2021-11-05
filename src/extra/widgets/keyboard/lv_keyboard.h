@@ -41,6 +41,10 @@ enum {
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
     LV_KEYBOARD_MODE_NUMBER,
+    LV_KEYBOARD_MODE_USER_1,
+    LV_KEYBOARD_MODE_USER_2,
+    LV_KEYBOARD_MODE_USER_3,
+    LV_KEYBOARD_MODE_USER_4,
 };
 typedef uint8_t lv_keyboard_mode_t;
 
@@ -49,6 +53,7 @@ typedef struct {
     lv_btnmatrix_t btnm;
     lv_obj_t * ta;              /*Pointer to the assigned text area*/
     lv_keyboard_mode_t mode;    /*Key map type*/
+    uint8_t popovers : 1;       /*Show button titles in popovers on press*/
 } lv_keyboard_t;
 
 extern const lv_obj_class_t lv_keyboard_class;
@@ -83,13 +88,21 @@ void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta);
 void lv_keyboard_set_mode(lv_obj_t * kb, lv_keyboard_mode_t mode);
 
 /**
+ * Show the button title in a popover when pressed.
+ * @param kb pointer to a Keyboard object
+ * @param en whether "popovers" mode is enabled
+ */
+void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
+
+/**
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
  * @param mode keyboard map to alter 'lv_keyboard_mode_t'
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnmatrix_set_map()' for more info.
  */
-void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_btnmatrix_ctrl_t ctrl_map[]);
+void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
+                         const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /*=====================
  * Getter functions
@@ -110,6 +123,13 @@ lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * kb);
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
 
 /**
+ * Tell whether "popovers" mode is enabled or not.
+ * @param kb pointer to a Keyboard object
+ * @return true: "popovers" mode is enabled; false: disabled
+ */
+bool lv_btnmatrix_get_popovers(const lv_obj_t * obj);
+
+/**
  * Get the current map of a keyboard
  * @param kb pointer to a keyboard object
  * @return the current map
@@ -125,9 +145,9 @@ static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
 
 /**
  * Default keyboard event to add characters to the Text area and change the map.
- * If a custom `event_cb` is added to the keyboard this function be called from it to handle the
+ * If a custom `event_cb` is added to the keyboard this function can be called from it to handle the
  * button clicks
- * @param kb pointer to a  keyboard
+ * @param kb pointer to a keyboard
  * @param event the triggering event
  */
 void lv_keyboard_def_event_cb(lv_event_t * e);

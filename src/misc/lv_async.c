@@ -49,7 +49,6 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
         return LV_RES_INV;
 
     /*Create a new timer*/
-    /*Use highest priority so that it will run before a refresh*/
     lv_timer_t * timer = lv_timer_create(lv_async_timer_cb, 0, info);
 
     if(timer == NULL) {

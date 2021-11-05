@@ -38,9 +38,9 @@ lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_SER /
 static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
 lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
 disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-disp_drv.buffer = &draw_buf;          /*Assign the buffer to the display*/
+disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
 disp_drv.hor_res = MY_DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
-disp_drv.hor_res = MY_DISP_VER_RES;   /*Set the verizontal resolution of the display*/
+disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the vertical resolution of the display*/
 lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
 
 void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * color_p)
@@ -59,7 +59,7 @@ void my_disp_flush(lv_disp_drv_t * disp, const lv_area_t * area, lv_color_t * co
 }
 
 ```
-- Implement and register a function which can read an input device. E.g. for a touch pad:
+- Implement and register a function which can read an input device. E.g. for a touchpad:
 ```c
 static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
 lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
@@ -67,7 +67,7 @@ indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
     if(touchpad_is_pressed()) {
@@ -90,11 +90,11 @@ For a more detailed guide go to the [Porting](/porting/index) section.
 
 The graphical elements like Buttons, Labels, Sliders, Charts etc. are called objects or widgets. Go to [Widgets](/widgets/index) to see the full list of available widgets.
 
-Every object has a parent object where it is created. For example if a label is created on a button, the button is the parent of label. 
+Every object has a parent object where it is created. For example, if a label is created on a button, the button is the parent of label. 
 
 The child object moves with the parent and if the parent is deleted the children will be deleted too. 
 
-Children can be visible only on their parent. It other words, the parts of the children outside of the parent are clipped.
+Children can be visible only within their parent's bounding area. In other words, the parts of the children outside the parent are clipped.
 
 A Screen is the "root" parent. You can have any number of screens. 
 
@@ -114,7 +114,7 @@ lv_obj_set_y(btn1, 10);
 lv_obj_set_size(btn1, 200, 50);
 ```
 
-The widgets have type specific parameters too which can be set by `lv_<widget_type>_set_<parameter_name>(obj, <value>)` functions. For example:
+Along with the basic attributes, widgets can have type specific parameters which are set by `lv_<widget_type>_set_<parameter_name>(obj, <value>)` functions. For example:
 ```c
 lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 ```
@@ -125,7 +125,7 @@ To see the full API visit the documentation of the widgets or the related header
 
 ### Events
 Events are used to inform the user that something has happened with an object. 
-You can assign one or more callbacks to an object which will be called if the object is clicked, released, dragged, being deleted etc. 
+You can assign one or more callbacks to an object which will be called if the object is clicked, released, dragged, being deleted, etc. 
 
 A callback is assigned like this:
 
@@ -140,14 +140,14 @@ void btn_event_cb(lv_event_t * e)
 }
 ```
 
-Instead of `LV_EVENT_CLICKED` `LV_EVENT_ALL` can be used too to call the callback for any event. 
+`LV_EVENT_ALL` can be used instead of `LV_EVENT_CLICKED` to invoke the callback for any event. 
 
-From `lv_event_t * e` the current event code can be get with
+From `lv_event_t * e` the current event code can be retrieved with:
 ```c
 lv_event_code_t code = lv_event_get_code(e);
 ```
 
-The object that triggered the event can be retrieved with
+The object that triggered the event can be retrieved with:
 ```c
 lv_obj_t * obj = lv_event_get_target(e);
 ```
@@ -155,15 +155,15 @@ lv_obj_t * obj = lv_event_get_target(e);
 To learn all features of the events go to the [Event overview](/overview/event) section.
 
 ### Parts
-Widgets might be built from one or more *parts*. For example a button has only one part called `LV_PART_MAIN`.
+Widgets might be built from one or more *parts*. For example, a button has only one part called `LV_PART_MAIN`.
 However, a [Slider](/widgets/core/slider) has `LV_PART_MAIN`, `LV_PART_INDICATOR` and `LV_PART_KNOB`.
 
-By using parts you can apply different styles to different parts. (See below)
+By using parts you can apply different styles to sub-elements of a widget. (See below)
 
-To learn which parts are used by which object read the widgets' documentation.
+Read the widgets' documentation to learn which parts each uses.
 
 ### States
-The objects can be in a combination of the following states:
+LVGL objects can be in a combination of the following states:
 - `LV_STATE_DEFAULT`  Normal, released state
 - `LV_STATE_CHECKED`  Toggled or checked state
 - `LV_STATE_FOCUSED` Focused via keypad or encoder or clicked via touchpad/mouse 
@@ -174,21 +174,21 @@ The objects can be in a combination of the following states:
 - `LV_STATE_SCROLLED` Being scrolled
 - `LV_STATE_DISABLED` Disabled 
 
-For example, if you press an object it will automatically go to `LV_STATE_FOCUSED` and `LV_STATE_PRESSED` state and when you release it, the  `LV_STATE_PRESSED` state will be removed.
- 
-To check if an object is in a given state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object is in that state at that time.
+For example, if you press an object it will automatically go to the `LV_STATE_FOCUSED` and `LV_STATE_PRESSED` states and when you release it the `LV_STATE_PRESSED` state will be removed while focus remains active.
 
-To manually add or remove states use
+To check if an object is in a given state use `lv_obj_has_state(obj, LV_STATE_...)`. It will return `true` if the object is currently in that state.
+
+To manually add or remove states use:
 ```c
 lv_obj_add_state(obj, LV_STATE_...);
 lv_obj_clear_state(obj, LV_STATE_...);
 ```
 
 ### Styles
-Styles contains properties such as background color, border width, font, etc to describe the appearance of the objects.
+A style instance contains properties such as background color, border width, font, etc. that describe the appearance of objects.
 
-The styles are `lv_style_t` variables. Only their pointer is saved in the objects so they need to be static or global.
-Before using a style it needs to be initialized with `lv_style_init(&style1)`. After that properties can be added. For example:
+Styles are represented with `lv_style_t` variables. Only their pointer is saved in the objects so they need to be defined as static or global.
+Before using a style it needs to be initialized with `lv_style_init(&style1)`. After that, properties can be added to configure the style. For example:
 ```
 static lv_style_t style1;
 lv_style_init(&style1);
@@ -198,7 +198,7 @@ lv_style_set_border_width(&style1, 2))
 See the full list of properties [here](/overview/style.html#properties).
 
 
-The styles are assigned to an object's part and state. For example to *"Use this style on the slider's indicator when the slider is pressed"*:
+Styles are assigned using the ORed combination of an object's part and state. For example to use this style on the slider's indicator when the slider is pressed:
 ```c
 lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR | LV_STATE_PRESSED);
 ```
@@ -219,7 +219,7 @@ lv_obj_add_style(btn1, &style1, 0); /*Equal to LV_PART_MAIN | LV_STATE_DEFAULT*/
 ```
 
 
-The styles can be cascaded (similarly to CSS). It means you can add more styles to a part of an object. 
+Styles can be cascaded (similarly to CSS). It means you can add more styles to a part of an object. 
 For example `style_btn` can set a default button appearance, and `style_btn_red` can overwrite the background color to make the button red: 
 ```c
 lv_obj_add_style(btn1, &style_btn, 0);
@@ -227,13 +227,13 @@ lv_obj_add_style(btn1, &style1_btn_red, 0);
 ```
 
 
-If a property is not set on for the current state the style with `LV_STATE_DEFAULT` will be used. If the property is not defined even in the default state a default value is used.
+If a property is not set on for the current state, the style with `LV_STATE_DEFAULT` will be used. A default value is used if the property is not defined in the default state.
 
-Some properties (typically the text-related ones) can be inherited. It means if a property is not set in an object it will be searched in its parents too. 
+Some properties (typically the text-related ones) can be inherited. This means if a property is not set in an object it will be searched for in its parents too. 
 For example, you can set the font once in the screen's style and all text on that screen will inherit it by default. 
 
 
-Local style properties also can be added to the objects. It creates a style which resides inside the object and which is used only by the object:
+Local style properties also can be added to objects. This creates a style which resides inside the object and is used only by the object:
 ```c
 lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 ``` 
@@ -242,10 +242,10 @@ To learn all the features of styles see the [Style overview](/overview/style) se
 
 
 ### Themes
-Themes are the default styles of the objects. 
-The styles from the themes are applied automatically when the objects are created. 
 
-You can select the theme to use in `lv_conf.h`. 
+Themes are the default styles for objects. Styles from a theme are applied automatically when objects are created. 
+
+The theme for your application is a compile time configuration set in `lv_conf.h`. 
 
 ## Examples
 

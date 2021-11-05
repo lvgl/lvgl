@@ -49,14 +49,15 @@ typedef struct {
     int16_t r_mod;
     uint16_t angle_range;
     int16_t rotation;
-}lv_meter_scale_t;
+} lv_meter_scale_t;
 
-typedef enum {
+enum {
     LV_METER_INDICATOR_TYPE_NEEDLE_IMG,
     LV_METER_INDICATOR_TYPE_NEEDLE_LINE,
     LV_METER_INDICATOR_TYPE_SCALE_LINES,
     LV_METER_INDICATOR_TYPE_ARC,
-}lv_meter_indicator_type_t;
+};
+typedef uint8_t lv_meter_indicator_type_t;
 
 typedef struct {
     lv_meter_scale_t * scale;
@@ -68,26 +69,26 @@ typedef struct {
         struct {
             const void * src;
             lv_point_t pivot;
-        }needle_img;
+        } needle_img;
         struct {
             uint16_t width;
             int16_t r_mod;
             lv_color_t color;
-        }needle_line;
+        } needle_line;
         struct {
             uint16_t width;
             const void * src;
             lv_color_t color;
             int16_t r_mod;
-        }arc;
+        } arc;
         struct {
             int16_t width_mod;
             lv_color_t color_start;
             lv_color_t color_end;
-            uint8_t local_grad  :1;
-        }scale_lines;
+            uint8_t local_grad  : 1;
+        } scale_lines;
     } type_data;
-}lv_meter_indicator_t;
+} lv_meter_indicator_t;
 
 /*Data of line meter*/
 typedef struct {
@@ -107,7 +108,7 @@ typedef enum {
     LV_METER_DRAW_PART_NEEDLE_LINE,     /**< The needle lines*/
     LV_METER_DRAW_PART_NEEDLE_IMG,      /**< The needle images*/
     LV_METER_DRAW_PART_TICK,            /**< The tick lines and labels*/
-}lv_meter_draw_part_type_t;
+} lv_meter_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -141,7 +142,8 @@ lv_meter_scale_t * lv_meter_add_scale(lv_obj_t * obj);
  * @param len       length of tick lines
  * @param color     color of tick lines
  */
-void lv_meter_set_scale_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t cnt, uint16_t width, uint16_t len, lv_color_t color);
+void lv_meter_set_scale_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t cnt, uint16_t width, uint16_t len,
+                              lv_color_t color);
 
 /**
  * Make some "normal" ticks major ticks and set their attributes.
@@ -154,7 +156,8 @@ void lv_meter_set_scale_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t
  * @param color         color of the major ticks
  * @param label_gap     gap between the major ticks and the labels
  */
-void lv_meter_set_scale_major_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t nth, uint16_t width, uint16_t len, lv_color_t color, int16_t label_gap);
+void lv_meter_set_scale_major_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t nth, uint16_t width,
+                                    uint16_t len, lv_color_t color, int16_t label_gap);
 
 /**
  * Set the value and angular range of a scale.
@@ -165,7 +168,8 @@ void lv_meter_set_scale_major_ticks(lv_obj_t * obj, lv_meter_scale_t * scale, ui
  * @param angle_range   the angular range of the scale
  * @param rotation      the angular offset from the 3 o'clock position (clock-wise)
  */
-void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range, uint32_t rotation);
+void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t min, int32_t max, uint32_t angle_range,
+                              uint32_t rotation);
 
 /*=====================
  * Add indicator
@@ -180,7 +184,8 @@ void lv_meter_set_scale_range(lv_obj_t * obj, lv_meter_scale_t * scale, int32_t 
  * @param r_mod         the radius modifier (added to the scale's radius) to get the lines length
  * @return              the new indicator
  */
-lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color, int16_t r_mod);
+lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width,
+                                                lv_color_t color, int16_t r_mod);
 
 /**
  * Add a needle image indicator the scale
@@ -192,7 +197,8 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
  * @return              the new indicator
  * @note                the needle image should point to the right, like -O----->
  */
-lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src, lv_coord_t pivot_x, lv_coord_t pivot_y);
+lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src,
+                                               lv_coord_t pivot_x, lv_coord_t pivot_y);
 
 /**
  * Add an arc indicator the scale
@@ -203,7 +209,8 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
  * @param r_mod         the radius modifier (added to the scale's radius) to get the outer radius of the arc
  * @return              the new indicator
  */
-lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color, int16_t r_mod);
+lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color,
+                                        int16_t r_mod);
 
 
 /**
@@ -216,7 +223,8 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale
  * @param width_mod     add this the affected tick's width
  * @return              the new indicator
  */
-lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t * scale, lv_color_t color_start, lv_color_t color_end, bool local, int16_t width_mod);
+lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t * scale, lv_color_t color_start,
+                                                lv_color_t color_end, bool local, int16_t width_mod);
 
 /*=====================
  * Set indicator value

@@ -36,7 +36,7 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 * Scalable to operate with little memory (64 kB Flash, 16 kB RAM)
 * Multi-language support with UTF-8 handling, CJK, Bidirectional and Arabic script support
 * Fully customizable graphical elements via [CSS-like styles](https://docs.lvgl.io/master/overview/style.html)
-* Powerfule layouts inspired by CSS: [Flexbox](https://docs.lvgl.io/master/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/layouts/grid.html)
+* Powerful layouts inspired by CSS: [Flexbox](https://docs.lvgl.io/master/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/layouts/grid.html)
 * OS, External memory and GPU are supported but not required. (built in support for STM32 DMA2D, and NXP PXP and VGLite)
 * Smooth rendering even with a [single frame buffer](https://docs.lvgl.io/master/porting/display.html)
 * Written in C and compatibile with C++
@@ -175,7 +175,7 @@ Feel free to contact us if you have any questions.
 
 
 ## Contributing
-LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosing your own project under the LVGL organization.
+LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosting your own project under the LVGL organization.
 
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
  

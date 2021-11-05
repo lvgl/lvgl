@@ -13,14 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include <stdint.h>
 
 /*********************
  *      DEFINES
  *********************/
-
-#if defined(__cplusplus) || __STDC_VERSION__ >= 199901L  // If c99 or newer, use stdint.h to determine arch size
-#include <stdint.h>
-#endif
 
 // If __UINTPTR_MAX__ or UINTPTR_MAX are available, use them to determine arch size
 #if defined(__UINTPTR_MAX__) && __UINTPTR_MAX__ > 0xFFFFFFFF
@@ -80,14 +77,18 @@ typedef uint32_t lv_uintptr_t;
 #define _LV_CONCAT3(x, y, z) x ## y ## z
 #define LV_CONCAT3(x, y, z) _LV_CONCAT3(x, y, z)
 
-#if (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)) && !defined(PYCPARSER)
-#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__ ((format(printf, fmtstr, vararg)))
+#if defined(PYCPARSER)
+#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
+#elif defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 4) || __GNUC__ > 4)
+#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__((format(gnu_printf, fmtstr, vararg)))
+#elif (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__))
+#define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__((format(printf, fmtstr, vararg)))
 #else
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
 #endif
 
 #ifdef __cplusplus
-} /*extern "C"*/
+} /*extern "C"*/ 
 #endif
 
 #endif /*LV_TYPES_H*/

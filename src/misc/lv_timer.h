@@ -48,7 +48,7 @@ typedef struct _lv_timer_t {
     lv_timer_cb_t timer_cb; /**< Timer function*/
     void * user_data; /**< Custom user data*/
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
-    uint32_t paused :1;
+    uint32_t paused : 1;
 } lv_timer_t;
 
 /**********************
@@ -63,7 +63,7 @@ void _lv_timer_core_init(void);
 //! @cond Doxygen_Suppress
 
 /**
- * Call it  periodically to handle lv_timers.
+ * Call it periodically to handle lv_timers.
  * @return time till it needs to be run next (in ms)
  */
 LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
@@ -80,7 +80,7 @@ lv_timer_t * lv_timer_create_basic(void);
 /**
  * Create a new lv_timer
  * @param timer_xcb a callback to call periodically.
- *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param user_data custom parameter
@@ -97,7 +97,6 @@ void lv_timer_del(lv_timer_t * timer);
 /**
  * Pause/resume a timer.
  * @param timer pointer to an lv_timer
- * @param pause true: pause the timer; false: resume
  */
 void lv_timer_pause(lv_timer_t * timer);
 

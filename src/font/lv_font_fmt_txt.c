@@ -128,7 +128,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                    (uint8_t)fdsc->bpp, prefilter);
         return LV_GC_ROOT(_lv_font_decompr_buf);
 #else /*!LV_USE_FONT_COMPRESSED*/
-//        LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h")
+        LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;
 #endif
     }

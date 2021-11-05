@@ -36,13 +36,14 @@ In addition to the width, each button can be customized with the following param
 - `LV_BTNMATRIX_CTRL_NO_REPEAT` Disable repeating when the button is long pressed
 - `LV_BTNMATRIX_CTRL_DISABLED` Makes a button disabled Like `LV_STATE_DISABLED` on normal objects
 - `LV_BTNMATRIX_CTRL_CHECKABLE` Enable toggling of a button. I.e. `LV_STATE_CHECHED` will be added/removed as the button is clicked
-- `LV_BTNMATRIX_CTRL_CHECKED` MAke the button checked. It will use the `LV_STATE_CHECHKED` styles.
-- `LV_BTNMATRIX_CTRL_CLICK_TRIG` Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send LV_EVENT_VALUE_CHANGE on PRESS*/
+- `LV_BTNMATRIX_CTRL_CHECKED` Make the button checked. It will use the `LV_STATE_CHECHKED` styles.
+- `LV_BTNMATRIX_CTRL_CLICK_TRIG` Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send LV_EVENT_VALUE_CHANGE on PRESS
+- `LV_BTNMATRIX_CTRL_POPOVER` Show the button label in a popover when pressing this key
 - `LV_BTNMATRIX_CTRL_RECOLOR` Enable recoloring of button texts with `#`. E.g. `"It's #ff0000 red#"`
 - `LV_BTNMATRIX_CTRL_CUSTOM_1` Custom free to use flag
 - `LV_BTNMATRIX_CTRL_CUSTOM_2` Custom free to use flag
 
-By default all flags are disabled.
+By default, all flags are disabled.
 
 To set or clear a button's control attribute, use `lv_btnmatrix_set_btn_ctrl(btnm, btn_id, LV_BTNM_CTRL_...)` and 
 `lv_btnmatrix_clear_btn_ctrl(btnm, btn_id, LV_BTNMATRIX_CTRL_...)` respectively. More `LV_BTNM_CTRL_...` values can be OR-ed

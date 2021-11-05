@@ -6,11 +6,11 @@
 
 ## Overview
 
-The Arc consists of a background and a foreground arc. The foregrond (indicator) can be touch-adjusted.
+The Arc consists of a background and a foreground arc. The foreground (indicator) can be touch-adjusted.
 
 ## Parts and Styles
 - `LV_PART_MAIN`  Draws a background using the typical background style properties and an arc using the arc style properties. The arc's size and position will respect the *padding* style properties.
-- `LV_PART_INDICATOR` Draws an other arc using the *arc* style properties. Its padding values are interpreted relative to the background arc. 
+- `LV_PART_INDICATOR` Draws another arc using the *arc* style properties. Its padding values are interpreted relative to the background arc. 
 - `LV_PART_KNOB` Draws a handle on the end of the indicator using all background properties and padding values. With zero padding the knob size is the same as the indicator's width. 
 Larger padding makes it larger, smaller padding makes it smaller. 
 
@@ -20,7 +20,7 @@ Larger padding makes it larger, smaller padding makes it smaller.
 
 A new value can be set using `lv_arc_set_value(arc, new_value)`. 
 The value is interpreted in a range (minimum and maximum values) which can be modified with `lv_arc_set_range(arc, min, max)`.
-The default range is 1..100.
+The default range is 0..100.
 
 The indicator arc is drawn on the main part's arc. This if the value is set to maximum the indicator arc will cover the entire "background" arc.
 To set the start and end angle of the background arc use the `lv_arc_set_bg_angles(arc, start_angle, end_angle)` functions or `lv_arc_set_bg_start/end_angle(arc, angle)`. 
@@ -47,16 +47,23 @@ The change rate is defined in degree/second unit and can be set with `lv_arc_set
 
 
 ### Setting the indicator manually
-It also possible to set the angles of the indicator arc directly with `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)`.
-In this case the set "value" and "mode" is ignored.
+It's also possible to set the angles of the indicator arc directly with `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)`.
+In this case the set "value" and "mode" are ignored.
 
-In other words, settings angles and values are independent. You should use either value and angle settings. Mixing the two might result in unintended behavior. 
+In other words, the angle and value settings are independent. You should exclusively use one or the other. Mixing the two might result in unintended behavior.
 
-To make the arc non-adjustabe remove the style of the knob and make the object non-clickable:
+To make the arc non-adjustable, remove the style of the knob and make the object non-clickable:
 ```c
 lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
 lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 ```
+
+### Advanced hit test
+
+If the `LV_OBJ_FLAG_ADV_HITTEST` flag is enabled the arc can be clicked through in the middle. Clicks are recognized only on the ring of the background arc. `lv_obj_set_ext_click_size()` makes the sensitive area larger inside and outside with the given number of pixels. 
+
+
+
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.
@@ -73,7 +80,7 @@ lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
         - `arc_dsc`
     - LV_ARC_DRAW_PART_KNOB The knob
         - `part`: `LV_PART_KNOB`
-        - `draw_area`: the arae of the knob
+        - `draw_area`: the area of the knob
         - `rect_dsc`:
     
 See the events of the [Base object](/widgets/obj) too.

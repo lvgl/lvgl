@@ -134,7 +134,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
     res_p->x2 = LV_MIN(a1_p->x2, a2_p->x2);
     res_p->y2 = LV_MIN(a1_p->y2, a2_p->y2);
 
-    /*If x1 or y1 greater then x2 or y2 then the areas union is empty*/
+    /*If x1 or y1 greater than x2 or y2 then the areas union is empty*/
     bool union_ok = true;
     if((res_p->x1 > res_p->x2) || (res_p->y1 > res_p->y2)) {
         union_ok = false;
@@ -294,7 +294,7 @@ bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_c
         return true;
     }
 
-    if(radius == 0) return true;
+    if(radius == 0) return false;
 
     /*Check if the corner points are outside the radius or not*/
     lv_point_t p;

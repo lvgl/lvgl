@@ -24,6 +24,7 @@ extern "C" {
 #include "event/lv_example_event.h"
 #include "styles/lv_example_style.h"
 #include "others/lv_example_others.h"
+#include "libs/lv_example_libs.h"
 
 /*********************
  *      DEFINES

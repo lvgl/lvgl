@@ -8,18 +8,38 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        # A valid option parameter to the cmake file.
+        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        build_option: ['OPTIONS_MINIMAL_MONOCHROME',
+                       'OPTIONS_NORMAL_8BIT',
+                       'OPTIONS_16BIT',
+                       'OPTIONS_16BIT_SWAP',
+                       'OPTIONS_FULL_32BIT']
+    name: Build ${{ matrix.build_option }}
     steps:
     - uses: actions/checkout@v2
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Building ${{ matrix.build_option }}
+      run: python tests/main.py --build-option=${{ matrix.build_option }} build
+
+  test:
+    runs-on: ubuntu-latest
+    name: Executable Tests
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
     - name: Run tests
-      run: sudo apt-get install libpng-dev ruby-full; cd tests; python ./main.py report
+      run: python tests/main.py --report test
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       if: github.event_name == 'push'
       with:
         fail_ci_if_error: true
         verbose: true
-

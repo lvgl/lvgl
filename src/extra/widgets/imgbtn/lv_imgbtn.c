@@ -34,10 +34,10 @@ lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_imgbtn_class = {
-        .base_class = &lv_obj_class,
-        .instance_size = sizeof(lv_imgbtn_t),
-        .constructor_cb = lv_imgbtn_constructor,
-        .event_cb = lv_imgbtn_event,
+    .base_class = &lv_obj_class,
+    .instance_size = sizeof(lv_imgbtn_t),
+    .constructor_cb = lv_imgbtn_constructor,
+    .event_cb = lv_imgbtn_event,
 };
 
 /**********************
@@ -55,7 +55,7 @@ const lv_obj_class_t lv_imgbtn_class = {
  */
 lv_obj_t * lv_imgbtn_create(lv_obj_t * parent)
 {
-    LV_LOG_INFO("begin")
+    LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -77,7 +77,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * parent)
  * to a file)
  */
 void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src_left, const void * src_mid,
-                             const void * src_right)
+                       const void * src_right)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -88,6 +88,23 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
     imgbtn->img_src_right[state] = src_right;
 
     refr_img(obj);
+}
+
+void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
+{
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+
+	lv_state_t obj_state = LV_STATE_DEFAULT;
+	if(state == LV_IMGBTN_STATE_PRESSED || state == LV_IMGBTN_STATE_CHECKED_PRESSED) obj_state |= LV_STATE_PRESSED;
+	if(state == LV_IMGBTN_STATE_DISABLED || state == LV_IMGBTN_STATE_CHECKED_DISABLED) obj_state |= LV_STATE_DISABLED;
+	if(state == LV_IMGBTN_STATE_CHECKED_DISABLED || state == LV_IMGBTN_STATE_CHECKED_PRESSED || state == LV_IMGBTN_STATE_CHECKED_RELEASED) {
+		obj_state |= LV_STATE_CHECKED;
+	}
+
+	lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
+	lv_obj_add_state(obj, obj_state);
+
+	refr_img(obj);
 }
 
 /*=====================
@@ -146,13 +163,13 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
 static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-   lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-   /*Initialize the allocated 'ext'*/
-   lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
-   lv_memset_00(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
-   lv_memset_00(imgbtn->img_src_right, sizeof(imgbtn->img_src_right));
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
+    /*Initialize the allocated 'ext'*/
+    lv_memset_00((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
+    lv_memset_00(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
+    lv_memset_00(imgbtn->img_src_right, sizeof(imgbtn->img_src_right));
 
-   imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
+    imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
 }
 
 
@@ -181,8 +198,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
         if(imgbtn->img_src_left[state] == NULL &&
            imgbtn->img_src_mid[state] != NULL &&
-           imgbtn->img_src_right[state] == NULL)
-        {
+           imgbtn->img_src_right[state] == NULL) {
             lv_img_header_t header;
             lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header);
             p->x = LV_MAX(p->x, header.w);
@@ -260,8 +276,7 @@ static void draw_main(lv_event_t * e)
             coords_part.x2 = coords_part.x1 + header.w - 1;
             coords_part.y2 = coords_part.y1 + header.h - 1;
 
-            for(i = 0; i < clip_center_area.x2 + header.w - 1; i += header.w) {
-
+            for(i = coords_part.x1; i < (lv_coord_t)(clip_center_area.x2 + header.w - 1); i += header.w) {
                 lv_draw_img(&coords_part, &clip_center_area, src, &img_dsc);
                 coords_part.x1 = coords_part.x2 + 1;
                 coords_part.x2 += header.w;

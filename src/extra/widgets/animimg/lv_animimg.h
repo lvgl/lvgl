@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_IMG == 0
-#error "lv_animing: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG 1)"
+#error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG 1)"
 #endif
 
 /*********************
@@ -37,8 +37,8 @@ typedef struct {
     lv_img_t img;
     lv_anim_t anim;
     /*picture sequence */
-    lv_img_dsc_t **dsc;
-    int8_t	pic_count;
+    lv_img_dsc_t ** dsc;
+    int8_t  pic_count;
 } lv_animimg_t;
 
 
