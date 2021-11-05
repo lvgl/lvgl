@@ -38,6 +38,7 @@ typedef struct {
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
 static uint32_t lv_ap_get_char_index(uint16_t c);
 static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next);
+static bool lv_txt_is_arabic_vowel(uint16_t c);
 
 /**********************
  *  STATIC VARIABLES
@@ -166,6 +167,16 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
         index_current = lv_ap_get_char_index(ch_enc[i]);
         idx_next = lv_ap_get_char_index(ch_enc[i + 1]);
 
+        if(lv_txt_is_arabic_vowel(ch_enc[i])) {  // Current character is a vowel
+            ch_fin[j] = ch_enc[i];
+            i++;
+            j++;
+            continue;   // Skip this character
+        }
+        else if(lv_txt_is_arabic_vowel(ch_enc[i + 1])) {    // Next character is a vowel
+            idx_next = lv_ap_get_char_index(ch_enc[i + 2]); // Skip the vowel character to join with the character after it
+        }
+
         if(index_current == LV_UNDEF_ARABIC_PERSIAN_CHARS) {
             ch_fin[j] = ch_enc[i];
             j++;
@@ -280,6 +291,11 @@ static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next)
         return 0xFEFB;    // (lam-alef) alef
     }
     return 0;
+}
+
+static bool lv_txt_is_arabic_vowel(uint16_t c)
+{
+    return (c >= 0x064B) && (c <= 0x0652);
 }
 
 #endif
