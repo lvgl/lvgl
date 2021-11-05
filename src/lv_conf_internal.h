@@ -168,10 +168,14 @@
 /*Number of the intermediate memory buffer used during rendering and other internal processing mechanisms.
  *You will see an error log message if there wasn't enough buffers. */
 #ifndef LV_MEM_BUF_MAX_NUM
-#  ifdef CONFIG_LV_MEM_BUF_MAX_NUM
-#    define LV_MEM_BUF_MAX_NUM CONFIG_LV_MEM_BUF_MAX_NUM
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_MEM_BUF_MAX_NUM
+#      define LV_MEM_BUF_MAX_NUM CONFIG_LV_MEM_BUF_MAX_NUM
+#    else
+#      define LV_MEM_BUF_MAX_NUM 0
+#    endif
 #  else
-#    define LV_MEM_BUF_MAX_NUM 16
+#    define  LV_MEM_BUF_MAX_NUM 16
 #  endif
 #endif
 
@@ -613,7 +617,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_PERF_MONITOR_POS
 #    define LV_USE_PERF_MONITOR_POS CONFIG_LV_USE_PERF_MONITOR_POS
 #  else
-#    define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+#    define  LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #  endif
 #endif
 #endif
@@ -632,7 +636,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_MEM_MONITOR_POS
 #    define LV_USE_MEM_MONITOR_POS CONFIG_LV_USE_MEM_MONITOR_POS
 #  else
-#    define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+#    define  LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
 #  endif
 #endif
 #endif
