@@ -8,6 +8,7 @@ jobs:
   build:
     name: Build ${{ matrix.port }} port
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       matrix:
         port: ['unix', 'esp32', 'stm32', 'rp2']
