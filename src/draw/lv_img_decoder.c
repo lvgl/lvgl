@@ -454,7 +454,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
                                            lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
-    (void)decoder; /*Unused*/
+    LV_UNUSED(decoder); /*Unused*/
 
     lv_res_t res = LV_RES_INV;
 
@@ -489,7 +489,7 @@ lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_de
  */
 void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
-    (void)decoder; /*Unused*/
+    LV_UNUSED(decoder); /*Unused*/
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     if(user_data) {
