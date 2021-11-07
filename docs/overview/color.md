@@ -69,6 +69,8 @@ To get the main color use `lv_color_t c = lv_palette_main(LV_PALETTE_...)`.
 
 For the lighter variants of a palette color use `lv_color_t c = lv_palette_lighten(LV_PALETTE_..., v)`. `v` can be 1..5.
 For the darker variants of a palette color use `lv_color_t c = lv_palette_darken(LV_PALETTE_..., v)`. `v` can be 1..4.
+For the accent variants of a palette color use `lv_color_t c = lv_palette_accent(LV_PALETTE_..., v)`. `v` can be 1..4. Not available for the brown or grey hues.
+
 
 ### Modify and mix colors
 The following functions can modify a color:

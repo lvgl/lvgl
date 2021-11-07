@@ -692,6 +692,7 @@ static inline lv_color_t lv_color_black(void)
 }
 lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl);
 lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl);
+lv_color_t lv_palette_accent(lv_palette_t p, uint8_t lvl);
 
 /**********************
  *      MACROS
