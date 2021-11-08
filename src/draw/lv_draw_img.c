@@ -331,11 +331,11 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 
 /**
  * Draw a color map to the display (image)
- * @param cords_p coordinates the color map
- * @param mask_p the map will drawn only on this area  (truncated to draw_buf area)
+ * @param map_area coordinates the color map
+ * @param clip_area the map will drawn only on this area  (truncated to draw_buf area)
  * @param map_p pointer to a lv_color_t array
  * @param draw_dsc pointer to an initialized `lv_draw_img_dsc_t` variable
- * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
+ * @param chroma_key true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
  * @param alpha_byte true: extra alpha byte is inserted for every pixel
  */
 LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
