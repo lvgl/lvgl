@@ -48,6 +48,7 @@
 - fix(msgbox) add declaration for lv_msgbox_content_class
 - fix(txt) skip basic arabic vowel characters when processing conjunction
 - fix(proto) Remove redundant prototype declarations
+- fix(config) Add default trace macros when LV_USE_LOG is disabled
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
