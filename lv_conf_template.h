@@ -197,6 +197,19 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  define LV_LOG_TRACE_LAYOUT     1
 #  define LV_LOG_TRACE_ANIM       1
 
+#else /*LV_USE_LOG*/
+#  pragma LVGL no_expand push
+#  define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
+#  define LV_LOG_PRINTF           0
+#  define LV_LOG_TRACE_MEM        0
+#  define LV_LOG_TRACE_TIMER      0
+#  define LV_LOG_TRACE_INDEV      0
+#  define LV_LOG_TRACE_DISP_REFR  0
+#  define LV_LOG_TRACE_EVENT      0
+#  define LV_LOG_TRACE_OBJ_CREATE 0
+#  define LV_LOG_TRACE_LAYOUT     0
+#  define LV_LOG_TRACE_ANIM       0
+#  pragma LVGL no_expand pop
 #endif  /*LV_USE_LOG*/
 
 /*-------------

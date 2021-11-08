@@ -71,6 +71,8 @@ fout.write(
 
 started = 0
 
+no_expand_depth = 0   #Stack depth of LVGL no_expand pragmas
+
 for line in fin.read().splitlines():
   if not started:
     if '#define LV_CONF_H' in line:
@@ -81,10 +83,25 @@ for line in fin.read().splitlines():
 
   if '/*--END OF LV_CONF_H--*/' in line: break
 
+  #Check for LVGL template pragmas. Never seen by compiler
+  r = re.search(r'^[\s]*#[\s]*pragma[\s]+(.+)$', line)   # \s means any white space character
+  if r:
+    pargs = r[1].lower().split()
+
+    #Parse template pragmas of the form "#pragma LVGL no_expand [push|pop]"
+    if len(pargs) > 0 and pargs[0] == 'lvgl':
+      if len(pargs) > 1 and pargs[1] == 'no_expand':
+        if len(pargs) > 2 and pargs[2] == 'push':
+          no_expand_depth = no_expand_depth + 1
+        elif len(pargs) > 2 and pargs[2] == 'pop':
+          if no_expand_depth > 0:
+            no_expand_depth = no_expand_depth - 1
+      continue #Remove LVGL pragma from output
+
   #Is there a #define in this line?
   r = re.search(r'^[\s]*#[\s]*define[\s]+([^\s]+).*$', line)   # \s means any white space character
 
-  if r:
+  if r and no_expand_depth == 0:
     name = r[1]
     name = re.sub('\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
 
