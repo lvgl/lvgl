@@ -59,7 +59,7 @@ fout.write(
 #  endif
 #endif
 
-#ifdef CONFIG_LV_COLOR_DEPTH	
+#ifdef CONFIG_LV_COLOR_DEPTH
 #  define _LV_KCONFIG_PRESENT
 #endif
 
@@ -88,44 +88,44 @@ for line in fin.read().splitlines():
     name = r[1]
     name = re.sub('\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
 
-    name_and_value = re.sub('.*# *define', '', line, 1)
-    
-    #If the value should be 1 (enabled) by default use a more complex structure for Kconfig checks because 
-    #if a not defined  CONFIG_... value should be interpreted as 0 and not the LVGL default
-    is_one = re.search(r'.*#.*define +[A-Z0-9_]+ +1[^0-9]*', line)
+    name_and_value = re.sub('[\s]*#[\s]*define', '', line, 1)
+
+    #If the value should be 1 (enabled) by default use a more complex structure for Kconfig checks because
+    #if a not defined CONFIG_... value should be interpreted as 0 and not the LVGL default
+    is_one = re.search(r'[\s]*#[\s]*define[\s]*[A-Z0-9_]+[\s]+1[\s]*$', line)
     if(is_one):
       #1. Use the value if already set from lv_conf.h or anything else (i.e. do nothing)
       #2. In Kconfig environment use the CONFIG_... value if set, else use 0
       #3. In not Kconfig environment use the LVGL's default value
-      
+
       fout.write(
-		    f'#ifndef {name}\n'
-				f'#  ifdef _LV_KCONFIG_PRESENT\n'
-		    f'#    ifdef CONFIG_{name.upper()}\n'
-		    f'#      define {name} CONFIG_{name.upper()}\n'
-		    f'#    else\n'
-		    f'#      define {name} 0\n'
-		    f'#    endif\n'
-		    f'#  else\n'
-		    f'#    define {name_and_value}\n'
-		    f'#  endif\n'
-		    f'#endif\n'
-		  )
+        f'#ifndef {name}\n'
+        f'#  ifdef _LV_KCONFIG_PRESENT\n'
+        f'#    ifdef CONFIG_{name.upper()}\n'
+        f'#      define {name} CONFIG_{name.upper()}\n'
+        f'#    else\n'
+        f'#      define {name} 0\n'
+        f'#    endif\n'
+        f'#  else\n'
+        f'#    define{name_and_value}\n'
+        f'#  endif\n'
+        f'#endif\n'
+      )
     else:
       #1. Use the value if already set from lv_conf.h or anything else  (i.e. do nothing)
       #2. Use the Kconfig value if set
       #3. Use the LVGL's default value
-      
+
       fout.write(
-		    f'#ifndef {name}\n'
-		    f'#  ifdef CONFIG_{name.upper()}\n'
-		    f'#    define {name} CONFIG_{name.upper()}\n'
-		    f'#  else\n'
-		    f'#    define {name_and_value}\n'
-		    f'#  endif\n'
-		    f'#endif\n'
-		  )
-    
+        f'#ifndef {name}\n'
+        f'#  ifdef CONFIG_{name.upper()}\n'
+        f'#    define {name} CONFIG_{name.upper()}\n'
+        f'#  else\n'
+        f'#    define{name_and_value}\n'
+        f'#  endif\n'
+        f'#endif\n'
+      )
+
   elif re.search('^ *typedef .*;.*$', line):
     continue   #ignore typedefs to avoide redeclaration
   else:

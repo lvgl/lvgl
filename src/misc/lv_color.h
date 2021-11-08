@@ -73,23 +73,6 @@ enum {
 #error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
 #endif
 
-/**
- * Adjust color mix functions rounding.
- * GPUs might calculate color mix (blending) differently.
- * Should be in range of 0..254
- * 0: no adjustment, get the integer part of the result (round down)
- * 64: round up from x.75
- * 128: round up from half
- * 192: round up from x.25
- * 254: round up*/
-#ifndef LV_COLOR_MIX_ROUND_OFS
-#if LV_COLOR_DEPTH == 32
-#define LV_COLOR_MIX_ROUND_OFS 0
-#else
-#define LV_COLOR_MIX_ROUND_OFS 128
-#endif
-#endif
-
 #if defined(__cplusplus) && !defined(_LV_COLOR_HAS_MODERN_CPP)
 /**
 * MSVC compiler's definition of the __cplusplus indicating 199711L regardless to C++ standard version
