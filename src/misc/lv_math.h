@@ -129,6 +129,7 @@ uint32_t lv_rand(uint32_t min, uint32_t max);
 #define LV_CLAMP(min, val, max) (LV_MAX(min, (LV_MIN(val, max))))
 
 #define LV_ABS(x) ((x) > 0 ? (x) : (-(x)))
+#define LV_UDIV255(x) (((x) * 0x8081U) >> 0x17)
 
 #define LV_IS_SIGNED(t) (((t)(-1)) < ((t)0))
 #define LV_UMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
