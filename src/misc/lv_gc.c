@@ -6,9 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_gc.h"
-#include "string.h"
 
 /*********************
  *      DEFINES

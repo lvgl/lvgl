@@ -813,7 +813,7 @@ static uint32_t lv_txt_iso8859_1_prev(const char * txt, uint32_t * i)
  */
 static uint32_t lv_txt_iso8859_1_get_byte_id(const char * txt, uint32_t utf8_id)
 {
-    (void)txt;      /*Unused*/
+    LV_UNUSED(txt); /*Unused*/
     return utf8_id; /*In Non encoded no difference*/
 }
 
@@ -826,7 +826,7 @@ static uint32_t lv_txt_iso8859_1_get_byte_id(const char * txt, uint32_t utf8_id)
  */
 static uint32_t lv_txt_iso8859_1_get_char_id(const char * txt, uint32_t byte_id)
 {
-    (void)txt;      /*Unused*/
+    LV_UNUSED(txt); /*Unused*/
     return byte_id; /*In Non encoded no difference*/
 }
 

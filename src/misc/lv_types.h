@@ -41,7 +41,7 @@ extern "C" {
  */
 enum {
     LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
-                       function or an operation was failed*/
+                      function or an operation was failed*/
     LV_RES_OK,      /*The object is valid (no deleted) after the action*/
 };
 typedef uint8_t lv_res_t;
@@ -69,7 +69,7 @@ typedef uint32_t lv_uintptr_t;
  *      MACROS
  **********************/
 
-#define LV_UNUSED(x) ((void) x)
+#define LV_UNUSED(x) ((void)x)
 
 #define _LV_CONCAT(x, y) x ## y
 #define LV_CONCAT(x, y) _LV_CONCAT(x, y)

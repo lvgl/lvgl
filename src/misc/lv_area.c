@@ -142,6 +142,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
 
     return union_ok;
 }
+
 /**
  * Join two areas into a third which involves the other two
  * @param res_p pointer to an area, the result will be stored here

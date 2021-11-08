@@ -6,9 +6,10 @@
  *      INCLUDES
  *********************/
 #include "lv_timer.h"
-#include <stddef.h>
-#include "../misc/lv_assert.h"
 #include "../hal/lv_hal_tick.h"
+#include "lv_assert.h"
+#include "lv_mem.h"
+#include "lv_ll.h"
 #include "lv_gc.h"
 
 /*********************
@@ -292,7 +293,7 @@ lv_timer_t * lv_timer_get_next(lv_timer_t * timer)
  **********************/
 
 /**
- * Execute timer if its priority is appropriate
+ * Execute timer if its remaining time is zero
  * @param timer pointer to lv_timer
  * @return true: execute, false: not executed
  */

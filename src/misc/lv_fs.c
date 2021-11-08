@@ -8,9 +8,9 @@
  *********************/
 #include "lv_fs.h"
 
-#include "../misc/lv_assert.h"
-#include "lv_ll.h"
 #include <string.h>
+#include "lv_assert.h"
+#include "lv_ll.h"
 #include "lv_gc.h"
 
 /*********************
@@ -163,26 +163,22 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
-
-    return res;
+    return file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
 }
 
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
 {
+    *pos = 0;
+
     if(file_p->drv == NULL) {
-        *pos = 0;
         return LV_FS_RES_INV_PARAM;
     }
 
     if(file_p->drv->tell_cb == NULL) {
-        *pos = 0;
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
-
-    return res;
+    return file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
 }
 
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
@@ -221,19 +217,17 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
 lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
 {
+    fn[0] = '\0';
+
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
-        fn[0] = '\0';
         return LV_FS_RES_INV_PARAM;
     }
 
     if(rddir_p->drv->dir_read_cb == NULL) {
-        fn[0] = '\0';
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
-
-    return res;
+    return rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
 }
 
 lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
@@ -362,6 +356,7 @@ const char * lv_fs_get_last(const char * path)
 
     return &path[i];
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

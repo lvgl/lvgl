@@ -8,7 +8,7 @@
  *********************/
 #include "lv_anim_timeline.h"
 #include "lv_mem.h"
-#include "../misc/lv_assert.h"
+#include "lv_assert.h"
 
 /*********************
  *      DEFINES
