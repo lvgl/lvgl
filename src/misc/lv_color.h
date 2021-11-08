@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#include "lv_assert.h"
 #include "lv_math.h"
 #include "lv_types.h"
 
@@ -202,8 +203,6 @@ enum {
 
 #define _LV_COLOR_ZERO_INITIALIZER LV_CONCAT(_LV_COLOR_ZERO_INITIALIZER, LV_COLOR_DEPTH)
 #define LV_COLOR_MAKE(r8, g8, b8) LV_CONCAT(LV_COLOR_MAKE, LV_COLOR_DEPTH)(r8, g8, b8)
-
-#define LV_UDIV255(x) ((uint32_t)((uint32_t) (x) * 0x8081) >> 0x17)
 
 /**********************
  *      TYPEDEFS
@@ -581,10 +580,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
             /*Info:
              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
             res_opa_saved = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
-            if(res_opa_saved == 0) {
-                while(1)
-                    ;
-            }
+            LV_ASSERT(res_opa_saved != 0);
             lv_opa_t ratio = (uint16_t)((uint16_t)fg_opa * 255) / res_opa_saved;
             res_color_saved = lv_color_mix(fg_color, bg_color, ratio);
 
