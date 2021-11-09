@@ -48,6 +48,7 @@
 - fix(msgbox) add declaration for lv_msgbox_content_class
 - fix(txt) skip basic arabic vowel characters when processing conjunction
 - fix(proto) Remove redundant prototype declarations
+- fix(refresh) Switch to portable format specifiers
 - fix(stm32) Mark unused variable in stm32 DMA2D driver
 
 ## v8.0.2 (16.07.2021)

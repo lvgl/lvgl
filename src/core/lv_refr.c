@@ -307,7 +307,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         uint32_t used_size = mon.total_size - mon.free_size;;
         uint32_t used_kb = used_size / 1024;
         uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
-        lv_label_set_text_fmt(mem_label, "%d.%d kB used (%d %%)\n%d%% frag.", used_kb,  used_kb_tenth, mon.used_pct,
+        lv_label_set_text_fmt(mem_label, "%" LV_PRIu32 ".%" LV_PRIu32 " kB used (%d %%)\n" \
+                              "%d%% frag.", used_kb, used_kb_tenth, mon.used_pct,
                               mon.frag_pct);
     }
 #endif
