@@ -1,11 +1,11 @@
 # Style properties
 
 ## Size and position
-Properties related to size, position, alignment and layout of objects.
+Properties related to size, position, alignment and layout of the objects.
 
 
 ### width
-Sets the width of an object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area.
+Sets the width of object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> widget dependent</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -18,7 +18,7 @@ Sets the width of an object. Pixel, percentage and `LV_SIZE_CONTENT` values can 
 ### min_width
 Sets a minimal width. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area.
 <ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> widget dependent</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
@@ -38,7 +38,7 @@ Sets a maximal width. Pixel and percentage values can be used. Percentage values
 
 
 ### height
-Sets the height of an object. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area.
+Sets the height of object. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> widget dependent</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -71,7 +71,7 @@ Sets a maximal height. Pixel and percentage values can be used. Percentage value
 
 
 ### x
-Set the X coordinate of an object considering the current `align` mode. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area.
+Set the X coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -82,7 +82,7 @@ Set the X coordinate of an object considering the current `align` mode. Pixel an
 
 
 ### y
-Set the Y coordinate of an object considering the current `align` mode. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area.
+Set the Y coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -104,7 +104,7 @@ Set the alignment which tells from which point of the parent the X and Y coordin
 
 
 ### transform_width
-Make an object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
+Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -115,7 +115,7 @@ Make an object wider on both sides with this value. Pixel and percentage (with `
 
 
 ### transform_height
-Make an object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
+Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -126,7 +126,7 @@ Make an object higher on both sides with this value. Pixel and percentage (with 
 
 
 ### translate_x
-Move an object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
+Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -137,7 +137,7 @@ Move an object with this value in X direction. Applied after layouts, aligns and
 
 
 ### translate_y
-Move an object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
+Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -148,7 +148,7 @@ Move an object with this value in Y direction. Applied after layouts, aligns and
 
 
 ### transform_zoom
-Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on (Q8.8 or Q24.8 fixed-point format)
+Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -169,7 +169,7 @@ Zoom image-like objects. Multiplied with the zoom set on the object. The value 2
 
 
 ## Padding
-Properties to describe spacing between a parent's sides and among its children. Very similar to the padding properties in HTML.
+Properties to describe spacing betwwen the parent's sides and the children and among the children. Very similar to the padding properties in HTML.
 
 
 ### pad_top
@@ -217,7 +217,7 @@ Sets the padding on the right. It makes the content area smaller in this directi
 
 
 ### pad_row
-Sets the padding between the rows. Used by layouts.
+Sets the padding between the rows. Used by the layouts.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -228,7 +228,7 @@ Sets the padding between the rows. Used by layouts.
 
 
 ### pad_column
-Sets the padding between the columns. Used by layouts.
+Sets the padding between the columns. Used by the layouts.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -238,11 +238,11 @@ Sets the padding between the columns. Used by layouts.
 
 
 ## Miscellaneous
-Mixed properties for various purposes.
+Mixed proprites for various purposes.
 
 
 ### radius
-Set a radius on every corner. The value is interpreted in pixels (>= 0) or use `LV_RADIUS_CIRCLE` for the max. possible radius for an object's size
+Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -253,7 +253,7 @@ Set a radius on every corner. The value is interpreted in pixels (>= 0) or use `
 
 
 ### clip_corner
-Enable to clip any overflowed content on a rounded corner. Can be `true` or `false`.
+Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -264,7 +264,7 @@ Enable to clip any overflowed content on a rounded corner. Can be `true` or `fal
 
 
 ### opa
-Scale down all opacity values of an object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering (opaque), other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -275,7 +275,7 @@ Scale down all opacity values of an object by this factor. Value 0, `LV_OPA_0` o
 
 
 ### color_filter_dsc
-Mix a color with all colors of an object.
+Mix a color to all colors of the object.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -286,7 +286,7 @@ Mix a color with all colors of an object.
 
 
 ### color_filter_opa
-The intensity of mixing for the color filter.
+The intensity of mixing of color filter.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_TRANSP`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -297,7 +297,7 @@ The intensity of mixing for the color filter.
 
 
 ### anim_time
-The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on a text area or scroll time of a roller. See the widgets' documentation to learn more.
+The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -308,7 +308,7 @@ The animation time in milliseconds. Its meaning is widget specific. E.g. blink t
 
 
 ### anim_speed
-The animation speed in pixels/sec. Its meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
+The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -319,7 +319,7 @@ The animation speed in pixels/sec. Its meaning is widget specific. E.g. scroll s
 
 
 ### transition
-An initialized `lv_style_transition_dsc_t` that describes a transition.
+An initialized `lv_style_transition_dsc_t` to describe a transition.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -330,7 +330,7 @@ An initialized `lv_style_transition_dsc_t` that describes a transition.
 
 
 ### blend_mode
-Describes how to blend object colors with the background. The possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE`
+Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BLEND_MODE_NORMAL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -341,7 +341,7 @@ Describes how to blend object colors with the background. The possible values ar
 
 
 ### layout
-Set the layout of an object. Its children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of layouts.
+Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -352,7 +352,7 @@ Set the layout of an object. Its children will be repositioned and resized accor
 
 
 ### base_dir
-Set the base direction of an object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`.
+Set the base direction of the obejct. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BASE_DIR_AUTO`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -362,11 +362,11 @@ Set the base direction of an object. The possible values are `LV_BIDI_DIR_LTR/RT
 
 
 ## Background
-Properties to describe the background color and image of objects.
+Properties for to describe the background color and image of the objects.
 
 
 ### bg_color
-Set the background color of an object.
+Set the background color of the object.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0xffffff`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -377,7 +377,7 @@ Set the background color of an object.
 
 
 ### bg_opa
-Set the opacity of the background. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering (opaque), other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opacity of the background. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_TRANSP`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -399,7 +399,7 @@ Set the gradient color of the background. Used only if `grad_dir` is not `LV_GRA
 
 
 ### bg_grad_dir
-Set the gradient direction for the background. The possible values are `LV_GRAD_DIR_NONE/HOR/VER`.
+Set the direction of the gradient of the background. The possible values are `LV_GRAD_DIR_NONE/HOR/VER`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_GRAD_DIR_NONE`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -410,7 +410,7 @@ Set the gradient direction for the background. The possible values are `LV_GRAD_
 
 
 ### bg_main_stop
-Set the point from which the background color should start for gradients. 0 indicates the top/left side, 255 the bottom/right side, 128 the center, and so on
+Set the point from which the background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -421,7 +421,7 @@ Set the point from which the background color should start for gradients. 0 indi
 
 
 ### bg_grad_stop
-Set the point from which the background's gradient color should start. 0 indicates the top/left side, 255 the bottom/right side, 128 the center, and so on
+Set the point from which the background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 255</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -443,7 +443,7 @@ Set a background image. Can be a pointer to `lv_img_dsc_t`, a path to a file or 
 
 
 ### bg_img_opa
-Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering (opaque), other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -454,7 +454,7 @@ Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` 
 
 
 ### bg_img_recolor
-Set a color to mix with the background image.
+Set a color to mix to the background image.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -465,7 +465,7 @@ Set a color to mix with the background image.
 
 
 ### bg_img_recolor_opa
-Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 256, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. are interpreted proportionally.
+Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 256, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportionally.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_TRANSP`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -476,7 +476,7 @@ Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA
 
 
 ### bg_img_tiled
-If enabled the background image will be tiled. The possible values are `true` or `false`.
+If enbaled the background image will be tiled. The possible values are `true` or `false`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -486,11 +486,11 @@ If enabled the background image will be tiled. The possible values are `true` or
 
 
 ## Border
-Properties to describe object borders
+Properties to describe the borders
 
 
 ### border_color
-Set the color of a border
+Set the color of the border
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -501,7 +501,7 @@ Set the color of a border
 
 
 ### border_opa
-Set the opacity of a border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opcitiy of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -512,7 +512,7 @@ Set the opacity of a border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 
 
 ### border_width
-Set the width of a border. Only pixel values can be used.
+Set hte width of the border. Only pixel values can be used.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -523,7 +523,7 @@ Set the width of a border. Only pixel values can be used.
 
 
 ### border_side
-Set on which side(s) a border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
+Set ony which side(s) the border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed calues an be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BORDER_SIDE_NONE`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -534,7 +534,7 @@ Set on which side(s) a border should be drawn. The possible values are `LV_BORDE
 
 
 ### border_post
-Sets whether the border should be drawn before or after an object's children are drawn. `true`: after children, `false`: before children
+Sets whether the the border should be drawn before or after the children ar drawn. `true`: after children, `false`: before children
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -544,7 +544,7 @@ Sets whether the border should be drawn before or after an object's children are
 
 
 ## Text
-Properties to describe the properties of text. All these properties are inherited.
+Properties to describe the propeties of text. All these properties are inherited.
 
 
 ### text_color
@@ -559,7 +559,7 @@ Sets the color of the text.
 
 
 ### text_opa
-Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -614,7 +614,7 @@ Set decoration for the text. The possible values are `LV_TEXT_DECOR_NONE/UNDERLI
 
 
 ### text_align
-Set how to align lines of text. Note that it doesn't align the object itself, only the lines inside the object. The possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detects the text base direction and uses left or right alignment accordingly.
+Set how to align the lines of the text. Note that it doesn't align the object itself, only the lines inside the object. The possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_TEXT_ALIGN_AUTO`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -624,11 +624,11 @@ Set how to align lines of text. Note that it doesn't align the object itself, on
 
 
 ## Image
-Properties to describe images
+Properties to describe the images
 
 
 ### img_opa
-Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -639,7 +639,7 @@ Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 
 
 ### img_recolor
-Set color to mix with an image.
+Set color to mixt to the image.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -650,7 +650,7 @@ Set color to mix with an image.
 
 
 ### img_recolor_opa
-Set the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering (opaque), other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the intensity of the color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -660,11 +660,11 @@ Set the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means 
 
 
 ## Outline
-Properties to describe an object's outline. It's like a border but drawn outside the bounding area.
+Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
 
 ### outline_width
-Set the width of an outline in pixels. 
+Set the width of the outline in pixels. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -675,7 +675,7 @@ Set the width of an outline in pixels.
 
 
 ### outline_color
-Set the color of an outline.
+Set the color of the outline.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -686,7 +686,7 @@ Set the color of an outline.
 
 
 ### outline_opa
-Set the opacity of an outline. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering (opaque), other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opacity of the outline. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -697,7 +697,7 @@ Set the opacity of an outline. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means full
 
 
 ### outline_pad
-Set the padding of an outline, i.e. the gap between an object and its outline.
+Set the padding of the outline, i.e. the gap between object and the outline.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -707,7 +707,7 @@ Set the padding of an outline, i.e. the gap between an object and its outline.
 
 
 ## Shadow
-Properties to describe the shadow drawn under rectangles.
+Properties to describe the shadow drawn under the rectangles.
 
 
 ### shadow_width
@@ -744,7 +744,7 @@ Set an offset on the shadow in pixels in Y direction.
 
 
 ### shadow_spread
-Make the shadow calculation use a larger or smaller rectangle as base. The value can be in pixels to make the area larger/smaller
+Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -766,7 +766,7 @@ Set the color of the shadow
 
 
 ### shadow_opa
-Set the opacity of the shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering (opaque), other numeric values or the constants LV_OPA_10, LV_OPA_20, etc. mean semi-transparency.
+Set the opacity of the shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -780,7 +780,7 @@ Properties to describe line-like objects
 
 
 ### line_width
-Set the width of lines in pixels.
+Set the width of the lines in pixel.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -791,7 +791,7 @@ Set the width of lines in pixels.
 
 
 ### line_dash_width
-Set the width of dashes in pixels. Note that dash works only on horizontal and vertical lines.
+Set the width of dashes in pixel. Note that dash works only on horizontal and vertical lines
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -802,7 +802,7 @@ Set the width of dashes in pixels. Note that dash works only on horizontal and v
 
 
 ### line_dash_gap
-Set the gap between dashes in pixels. Note that dash works only on horizontal and vertical lines.
+Set the gap between dashes in pixel. Note that dash works only on horizontal and vertical lines
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -813,7 +813,7 @@ Set the gap between dashes in pixels. Note that dash works only on horizontal an
 
 
 ### line_rounded
-Make the end points of lines rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -824,7 +824,7 @@ Make the end points of lines rounded. `true`: rounded, `false`: perpendicular li
 
 
 ### line_color
-Set the color of lines.
+Set the color fo the lines.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -835,7 +835,7 @@ Set the color of lines.
 
 
 ### line_opa
-Set the opacity of lines.
+Set the opacity of the lines.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -849,7 +849,7 @@ TODO
 
 
 ### arc_width
-Set the width (thickness) of arcs in pixels.
+Set the width (ticjkness) of the arcs in pixel.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -860,7 +860,7 @@ Set the width (thickness) of arcs in pixels.
 
 
 ### arc_rounded
-Make the end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -893,7 +893,7 @@ Set the opacity of the arcs.
 
 
 ### arc_img_src
-Set an image from which the arc will be masked out. It's useful to display complex effects on arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file
+Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
