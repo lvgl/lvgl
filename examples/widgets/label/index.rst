@@ -17,3 +17,9 @@ Show LTR, RTL and Chinese texts
 .. lv_example:: widgets/label/lv_example_label_3
   :language: c
 
+Draw label with gradient color
+""""""""""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/label/lv_example_label_4
+  :language: c
+

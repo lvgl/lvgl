@@ -2,7 +2,7 @@
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES && LV_FONT_DEJAVU_16_PERSIAN_HEBREW && LV_FONT_SIMSUN_16_CJK && LV_USE_BIDI
 
 /**
- * Show mixed LTR, RTL and Chiease label
+ * Show mixed LTR, RTL and Chinese label
  */
 void lv_example_label_3(void)
 {
