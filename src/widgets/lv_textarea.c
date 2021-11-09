@@ -537,8 +537,8 @@ void lv_textarea_set_text_selection(lv_obj_t * obj, bool en)
 
     if(!en) lv_textarea_clear_selection(obj);
 #else
-    (void)obj; /*Unused*/
-    (void)en; /*Unused*/
+    LV_UNUSED(obj); /*Unused*/
+    LV_UNUSED(en);  /*Unused*/
 #endif
 }
 
@@ -671,7 +671,7 @@ bool lv_textarea_text_is_selected(const lv_obj_t * obj)
         return false;
     }
 #else
-    (void)obj; /*Unused*/
+    LV_UNUSED(obj); /*Unused*/
     return false;
 #endif
 }
@@ -684,7 +684,7 @@ bool lv_textarea_get_text_selection(lv_obj_t * obj)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     return ta->text_sel_en;
 #else
-    (void)obj; /*Unused*/
+    LV_UNUSED(obj); /*Unused*/
     return false;
 #endif
 }
