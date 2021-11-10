@@ -174,7 +174,12 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
             continue;   // Skip this character
         }
         else if(lv_txt_is_arabic_vowel(ch_enc[i + 1])) {    // Next character is a vowel
-            idx_next = lv_ap_get_char_index(ch_enc[i + 2]); // Skip the vowel character to join with the character after it
+            if(lv_txt_is_arabic_vowel(ch_enc[i + 2])) {
+                idx_next = lv_ap_get_char_index(ch_enc[i + 3]); // Skip the vowel character to join with the character after it
+            }
+            else {
+                idx_next = lv_ap_get_char_index(ch_enc[i + 2]); // Need to skip one more character as the next one is also a vowel
+            }
         }
 
         if(index_current == LV_UNDEF_ARABIC_PERSIAN_CHARS) {

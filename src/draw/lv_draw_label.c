@@ -53,6 +53,10 @@ static uint8_t hex_char_to_num(char hex);
  *  STATIC VARIABLES
  **********************/
 
+// Temporary
+static uint32_t next_letter_temp;
+static uint32_t next_next_letter_temp;
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -335,6 +339,16 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                 }
             }
 
+            // Capture the next 2 characters's glyphs
+            next_letter_temp = letter_next;
+            next_next_letter_temp = 0;
+            if((letter_next >= 0x064B && letter_next <= 0x0652) &&
+                (letter >= 0x064B && letter <= 0x0652)) {
+                uint32_t throw_away_letter = letter_next;
+                uint32_t j = i;
+                _lv_txt_encoded_letter_next_2(bidi_txt, &throw_away_letter, &next_next_letter_temp, &j);
+            }
+
             lv_draw_letter(&pos, mask, font, letter, color, opa, dsc->blend_mode);
 
             if(letter_w > 0) {
@@ -447,6 +461,29 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
        pos_y + g.box_h < clip_area->y1 ||
        pos_y > clip_area->y2)  {
         return;
+    }
+
+    /*If the letter is an arabic vowel it's x and y positions need to be calculated based on the following character*/
+    if (letter >= 0x064B && letter <= 0x0652)
+    {
+        lv_font_glyph_dsc_t next_glyph;
+        lv_font_get_glyph_dsc(font_p, &next_glyph, next_letter_temp, '\0');
+
+        pos_x = pos_p->x + ((next_glyph.box_w - g.box_w) / 2) - 1;  // Center the vowel character based on the width of the next character
+
+        int32_t next_letter_pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - next_glyph.box_h - next_glyph.ofs_y;
+        if(letter == 0x064D || letter == 0x0650) {  // Kasra and tanween kasra vowel sits below a normal character
+            pos_y = next_letter_pos_y + next_glyph.box_h;
+        }
+        else {
+            if (next_next_letter_temp) {  // If the next character's also a vowel then the character after it has to be used for calculations
+                lv_font_glyph_dsc_t next_next_glyph;    
+                lv_font_get_glyph_dsc(font_p, &next_next_glyph, next_next_letter_temp, '\0');
+                int32_t next_next_letter_pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - next_next_glyph.box_h - next_next_glyph.ofs_y;
+                next_letter_pos_y = next_next_letter_pos_y - next_glyph.box_h;
+            }
+            pos_y = next_letter_pos_y - g.box_h;
+        }        
     }
 
     const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
