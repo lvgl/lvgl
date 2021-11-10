@@ -331,11 +331,11 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 
 /**
  * Draw a color map to the display (image)
- * @param cords_p coordinates the color map
- * @param mask_p the map will drawn only on this area  (truncated to draw_buf area)
+ * @param map_area coordinates the color map
+ * @param clip_area the map will drawn only on this area  (truncated to draw_buf area)
  * @param map_p pointer to a lv_color_t array
  * @param draw_dsc pointer to an initialized `lv_draw_img_dsc_t` variable
- * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
+ * @param chroma_key true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
  * @param alpha_byte true: extra alpha byte is inserted for every pixel
  */
 LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
@@ -358,8 +358,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    bool mask_any = lv_draw_mask_is_any(map_area);
-
+    bool mask_any = lv_draw_mask_is_any(&draw_area);
     /*The simplest case just copy the pixels into the draw_buf*/
     if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
@@ -402,14 +401,14 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
         const uint8_t * map_px;
 
-        lv_area_t blend_area;
-        blend_area.x1 = draw_area.x1 + disp_area->x1;
-        blend_area.x2 = blend_area.x1 + lv_area_get_width(&draw_area) - 1;
-        blend_area.y1 = disp_area->y1 + draw_area.y1;
-        blend_area.y2 = blend_area.y1;
-
         lv_coord_t draw_area_h = lv_area_get_height(&draw_area);
         lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+
+        lv_area_t blend_area;
+        blend_area.x1 = draw_area.x1 + disp_area->x1;
+        blend_area.x2 = blend_area.x1 + draw_area_w - 1;
+        blend_area.y1 = disp_area->y1 + draw_area.y1;
+        blend_area.y2 = blend_area.y1;
 
         bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
         /*Simple ARGB image. Handle it as special case because it's very common*/
@@ -452,7 +451,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 }
 
                 map_buf_tmp += map_w * px_size_byte;
-                if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
+                if(px_i + draw_area_w < mask_buf_size) {
                     blend_area.y2 ++;
                 }
                 else {
@@ -598,9 +597,9 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                     lv_draw_mask_res_t mask_res_sub;
                     mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + draw_buf->area.x1,
                                                       y + draw_area.y1 + draw_buf->area.y1,
-                                                      lv_area_get_width(&draw_area));
+                                                      draw_area_w);
                     if(mask_res_sub == LV_DRAW_MASK_RES_TRANSP) {
-                        lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));
+                        lv_memset_00(mask_buf + px_i_start, draw_area_w);
                         mask_res = LV_DRAW_MASK_RES_CHANGED;
                     }
                     else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
@@ -610,7 +609,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 #endif
 
                 map_buf_tmp += map_w * px_size_byte;
-                if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
+                if(px_i + draw_area_w < mask_buf_size) {
                     blend_area.y2 ++;
                 }
                 else {

@@ -17,7 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
+#include <stddef.h>
 
 /*********************
  *      DEFINES
@@ -173,7 +173,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
  * `lv_anim_t * ` as its first parameter instead of `void *`.
  * This function might be used when LVGL is bound to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
- * The variable to animate can be stored in the animation's `user_sata`
+ * The variable to animate can be stored in the animation's `user_data`
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param exec_cb   a function to execute.
  */
@@ -223,10 +223,11 @@ static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_
 {
     a->ready_cb = ready_cb;
 }
+
 /**
  * Make the animation to play back to when the forward direction is ready
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param time      the duration of the playback animation in in milliseconds. 0: disable playback
+ * @param time      the duration of the playback animation in milliseconds. 0: disable playback
  */
 static inline void lv_anim_set_playback_time(lv_anim_t * a, uint32_t time)
 {

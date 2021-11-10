@@ -252,8 +252,8 @@ void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index)
     label->sel_end     = index;
     lv_obj_invalidate(obj);
 #else
-    (void)obj;    /*Unused*/
-    (void)index;    /*Unused*/
+    LV_UNUSED(obj);   /*Unused*/
+    LV_UNUSED(index); /*Unused*/
 #endif
 }
 
@@ -613,7 +613,7 @@ uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj)
     return label->sel_start;
 
 #else
-    (void)obj;    /*Unused*/
+    LV_UNUSED(obj); /*Unused*/
     return LV_LABEL_TEXT_SELECTION_OFF;
 #endif
 }
@@ -626,7 +626,7 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj)
     lv_label_t * label = (lv_label_t *)obj;
     return label->sel_end;
 #else
-    (void)obj; /*Unused*/
+    LV_UNUSED(obj); /*Unused*/
     return LV_LABEL_TEXT_SELECTION_OFF;
 #endif
 }

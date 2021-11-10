@@ -41,7 +41,7 @@ typedef struct {
 
 /**
  * Initialize linked list
- * @param ll_dsc pointer to ll_dsc variable
+ * @param ll_p pointer to lv_ll_t variable
  * @param node_size the size of 1 node in bytes
  */
 void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size);
@@ -57,7 +57,7 @@ void * _lv_ll_ins_head(lv_ll_t * ll_p);
  * Insert a new node in front of the n_act node
  * @param ll_p pointer to linked list
  * @param n_act pointer a node
- * @return pointer to the new head
+ * @return pointer to the new node
  */
 void * _lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act);
 
@@ -88,7 +88,7 @@ void _lv_ll_clear(lv_ll_t * ll_p);
  * @param ll_new_p pointer to the new linked list
  * @param node pointer to a node
  * @param head true: be the head in the new list
- *             false be the head in the new list
+ *             false be the tail in the new list
  */
 void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head);
 
@@ -102,7 +102,7 @@ void * _lv_ll_get_head(const lv_ll_t * ll_p);
 /**
  * Return with tail node of the linked list
  * @param ll_p pointer to linked list
- * @return pointer to the head of 'll_p'
+ * @return pointer to the tail of 'll_p'
  */
 void * _lv_ll_get_tail(const lv_ll_t * ll_p);
 

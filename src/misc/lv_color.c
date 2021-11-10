@@ -36,7 +36,7 @@
 LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num)
 {
 #if LV_COLOR_DEPTH == 16
-    uintptr_t buf_int = (uintptr_t) buf;
+    uintptr_t buf_int = (uintptr_t)buf;
     if(buf_int & 0x3) {
         *buf = color;
         buf++;
@@ -73,7 +73,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
     while(px_num) {
         *buf = color;
         buf++;
-        px_num --;
+        px_num--;
     }
 #else
     while(px_num > 16) {
@@ -118,7 +118,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
     while(px_num) {
         *buf = color;
         buf++;
-        px_num --;
+        px_num--;
     }
 #endif
 }
@@ -368,7 +368,6 @@ lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl)
     return colors[p][lvl];
 }
 
-
 lv_color_t lv_palette_accent(lv_palette_t p, uint8_t lvl)
 {
     static const lv_color_t colors[][4] = {
@@ -404,4 +403,3 @@ lv_color_t lv_palette_accent(lv_palette_t p, uint8_t lvl)
 
     return colors[p][lvl];
 }
-

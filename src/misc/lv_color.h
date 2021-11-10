@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#include "lv_assert.h"
 #include "lv_math.h"
 #include "lv_types.h"
 
@@ -70,23 +71,6 @@ enum {
 #define LV_COLOR_SIZE 32
 #else
 #error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
-#endif
-
-/**
- * Adjust color mix functions rounding.
- * GPUs might calculate color mix (blending) differently.
- * Should be in range of 0..254
- * 0: no adjustment, get the integer part of the result (round down)
- * 64: round up from x.75
- * 128: round up from half
- * 192: round up from x.25
- * 254: round up*/
-#ifndef LV_COLOR_MIX_ROUND_OFS
-#if LV_COLOR_DEPTH == 32
-#define LV_COLOR_MIX_ROUND_OFS 0
-#else
-#define LV_COLOR_MIX_ROUND_OFS 128
-#endif
 #endif
 
 #if defined(__cplusplus) && !defined(_LV_COLOR_HAS_MODERN_CPP)
@@ -202,8 +186,6 @@ enum {
 
 #define _LV_COLOR_ZERO_INITIALIZER LV_CONCAT(_LV_COLOR_ZERO_INITIALIZER, LV_COLOR_DEPTH)
 #define LV_COLOR_MAKE(r8, g8, b8) LV_CONCAT(LV_COLOR_MAKE, LV_COLOR_DEPTH)(r8, g8, b8)
-
-#define LV_UDIV255(x) ((uint32_t)((uint32_t) (x) * 0x8081) >> 0x17)
 
 /**********************
  *      TYPEDEFS
@@ -472,11 +454,11 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
     ret.full = (uint16_t)((result >> 16) | result);
 #elif LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
-    LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
+    LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t)LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
                                    (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_G(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_G(c1) * mix + LV_COLOR_GET_G(c2) *
+    LV_COLOR_SET_G(ret, LV_UDIV255((uint16_t)LV_COLOR_GET_G(c1) * mix + LV_COLOR_GET_G(c2) *
                                    (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
-    LV_COLOR_SET_B(ret, LV_UDIV255((uint16_t) LV_COLOR_GET_B(c1) * mix + LV_COLOR_GET_B(c2) *
+    LV_COLOR_SET_B(ret, LV_UDIV255((uint16_t)LV_COLOR_GET_B(c1) * mix + LV_COLOR_GET_B(c2) *
                                    (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
 #else
@@ -490,9 +472,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
 {
 #if LV_COLOR_DEPTH != 1
-    out[0] = (uint16_t) LV_COLOR_GET_R(c) * mix;
-    out[1] = (uint16_t) LV_COLOR_GET_G(c) * mix;
-    out[2] = (uint16_t) LV_COLOR_GET_B(c) * mix;
+    out[0] = (uint16_t)LV_COLOR_GET_R(c) * mix;
+    out[1] = (uint16_t)LV_COLOR_GET_G(c) * mix;
+    out[2] = (uint16_t)LV_COLOR_GET_B(c) * mix;
 #else
     (void) mix;
     /*Pre-multiplication can't be used with 1 bpp*/
@@ -581,10 +563,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
             /*Info:
              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
             res_opa_saved = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
-            if(res_opa_saved == 0) {
-                while(1)
-                    ;
-            }
+            LV_ASSERT(res_opa_saved != 0);
             lv_opa_t ratio = (uint16_t)((uint16_t)fg_opa * 255) / res_opa_saved;
             res_color_saved = lv_color_mix(fg_color, bg_color, ratio);
 

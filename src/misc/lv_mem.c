@@ -11,7 +11,7 @@
 #include "lv_tlsf.h"
 #include "lv_gc.h"
 #include "lv_assert.h"
-#include <string.h>
+#include "lv_log.h"
 
 #if LV_MEM_CUSTOM != 0
     #include LV_MEM_CUSTOM_INCLUDE
@@ -134,10 +134,6 @@ void * lv_mem_alloc(size_t size)
     void * alloc = LV_MEM_CUSTOM_ALLOC(size);
 #endif
 
-#if LV_MEM_ADD_JUNK
-    if(alloc != NULL) lv_memset(alloc, 0xaa, size);
-#endif
-
     if(alloc == NULL) {
         LV_LOG_ERROR("couldn't allocate memory (%lu bytes)", (unsigned long)size);
         lv_mem_monitor_t mon;
@@ -146,6 +142,11 @@ void * lv_mem_alloc(size_t size)
                      (int)(mon.total_size - mon.free_size), mon.used_pct, mon.frag_pct,
                      (int)mon.free_biggest_size);
     }
+#if LV_MEM_ADD_JUNK
+    else {
+        lv_memset(alloc, 0xaa, size);
+    }
+#endif
 
     MEM_TRACE("allocated at %p", alloc);
     return alloc;
@@ -227,7 +228,7 @@ lv_res_t lv_mem_test(void)
 
 /**
  * Give information about the work memory of dynamic allocation
- * @param mon_p pointer to a dm_mon_p variable,
+ * @param mon_p pointer to a lv_mem_monitor_t variable,
  *              the result of the analysis will be stored here
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p)

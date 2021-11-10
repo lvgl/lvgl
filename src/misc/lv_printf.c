@@ -37,7 +37,6 @@
 #if LV_SPRINTF_CUSTOM == 0
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_SPRINTF_USE_FLOAT)
 
