@@ -358,7 +358,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    bool mask_any = lv_draw_mask_is_any(&draw_area);
+    bool mask_any = lv_draw_mask_is_any(clip_area);
+
     /*The simplest case just copy the pixels into the draw_buf*/
     if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
