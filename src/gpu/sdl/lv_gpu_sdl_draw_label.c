@@ -59,6 +59,12 @@ static bool font_cmap_find_index(const lv_font_fmt_txt_dsc_t * dsc, uint32_t let
 
 static lv_font_key_t font_key_create(const lv_font_t * font_p, uint32_t cmap_index);
 
+static bool is_bulitin_font(const lv_font_t * font_p);
+
+static void draw_letter_builtin(int32_t pos_x, int32_t pos_y, const lv_area_t *clip_area, const lv_font_t *font_p,
+                                uint32_t letter, lv_color_t color, lv_opa_t opa, lv_font_glyph_dsc_t *g);
+
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -109,43 +115,14 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
        pos_y > clip_area->y2) {
         return;
     }
-    lv_area_t dst = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
-    uint32_t atlas_index;
-    uint32_t cmap_index;
-    if(!font_cmap_find_index(font_p->dsc, letter, &cmap_index, &atlas_index)) {
-        return;
-    }
-    lv_font_key_t key = font_key_create(font_p, cmap_index);
-    lv_sdl_font_atlas_t * atlas = NULL;
-    bool found = false;
-    SDL_Texture * texture = lv_gpu_draw_cache_get_with_userdata(&key, sizeof(key), &found, (void **) &atlas);
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    if (is_bulitin_font(font_p)) {
+        draw_letter_builtin(pos_x, pos_y, clip_area, font_p, letter, color, opa, &g);
+    } else {
 
-    if(!found) {
-        atlas = SDL_malloc(sizeof(lv_sdl_font_atlas_t));
-        texture = font_atlas_bake(renderer, font_p, cmap_index, atlas);
-        lv_gpu_draw_cache_put_advanced(&key, sizeof(key), texture, atlas, (lv_lru_free_t *) font_atlas_free, 0);
-    }
-    if(texture == NULL) return;
-    SDL_Rect dstrect = {.x = pos_x, .y = pos_y, .w = g.box_w, .h = g.box_h};
-
-    SDL_Rect clip_area_rect;
-    lv_area_to_sdl_rect(clip_area, &clip_area_rect);
-
-    if(lv_draw_mask_is_any(&dst)) {
-        draw_letter_masked(renderer, texture, &atlas->pos[atlas_index], &dstrect, &clip_area_rect, color, opa);
-        return;
     }
 
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureAlphaMod(texture, opa);
-    SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
-    SDL_RenderSetClipRect(renderer, &clip_area_rect);
-    SDL_RenderCopy(renderer, texture, &atlas->pos[atlas_index], &dstrect);
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -329,4 +306,49 @@ static lv_font_key_t font_key_create(const lv_font_t * font_p, uint32_t cmap_ind
     return key;
 }
 
+static bool is_bulitin_font(const lv_font_t *font_p)
+{
+    return font_p->get_glyph_dsc == lv_font_get_glyph_dsc_fmt_txt
+           && font_p->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt;
+}
+
+static void draw_letter_builtin(int32_t pos_x, int32_t pos_y, const lv_area_t *clip_area, const lv_font_t *font_p,
+                         uint32_t letter, lv_color_t color, lv_opa_t opa, lv_font_glyph_dsc_t *g)
+{
+    lv_area_t dst = {pos_x, pos_y, pos_x + (*g).box_w - 1, pos_y + (*g).box_h - 1};
+    uint32_t atlas_index;
+    uint32_t cmap_index;
+    if(!font_cmap_find_index(font_p->dsc, letter, &cmap_index, &atlas_index)) {
+        return;
+    }
+    lv_font_key_t key = font_key_create(font_p, cmap_index);
+    lv_sdl_font_atlas_t * atlas = NULL;
+    bool found = false;
+    SDL_Texture * texture = lv_gpu_draw_cache_get_with_userdata(&key, sizeof(key), &found, (void **) &atlas);
+
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+
+    if(!found) {
+        atlas = SDL_malloc(sizeof(lv_sdl_font_atlas_t));
+        texture = font_atlas_bake(renderer, font_p, cmap_index, atlas);
+        lv_gpu_draw_cache_put_advanced(&key, sizeof(key), texture, atlas, (lv_lru_free_t *) font_atlas_free, 0);
+    }
+    if(texture == NULL) return;
+    SDL_Rect dstrect = {.x = pos_x, .y = pos_y, .w = (*g).box_w, .h = (*g).box_h};
+
+    SDL_Rect clip_area_rect;
+    lv_area_to_sdl_rect(clip_area, &clip_area_rect);
+
+    if(lv_draw_mask_is_any(&dst)) {
+        draw_letter_masked(renderer, texture, &atlas->pos[atlas_index], &dstrect, &clip_area_rect, color, opa);
+        return;
+    }
+
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(texture, opa);
+    SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
+    SDL_RenderSetClipRect(renderer, &clip_area_rect);
+    SDL_RenderCopy(renderer, texture, &atlas->pos[atlas_index], &dstrect);
+}
 #endif /*LV_USE_GPU_SDL*/
