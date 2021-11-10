@@ -60,6 +60,8 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_nocache(lv_font_t * font);
 #endif
 
+static bool lv_ft_font_has_cb(const lv_font_t * font);
+
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -149,6 +151,11 @@ void lv_ft_font_destroy(lv_font_t * font)
 #else
     lv_ft_font_destroy_nocache(font);
 #endif
+}
+
+bool lv_ft_font_check_type(const lv_font_t * font)
+{
+    return font != NULL && lv_ft_font_has_cb(font);
 }
 
 /**********************
@@ -290,6 +297,11 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
         lv_mem_free(dsc->font);
         lv_mem_free(dsc);
     }
+}
+
+static bool lv_ft_font_has_cb(const lv_font_t * font)
+{
+    return font->get_glyph_bitmap == get_glyph_bitmap_cb_cache && font->get_glyph_dsc == get_glyph_dsc_cb_cache;
 }
 
 #else/* LV_FREETYPE_CACHE_SIZE */
@@ -475,6 +487,10 @@ static void lv_ft_font_destroy_nocache(lv_font_t * font)
     }
 }
 
+static bool lv_ft_font_has_cb(const lv_font_t * font)
+{
+    return font->get_glyph_bitmap == get_glyph_bitmap_cb_nocache && font->get_glyph_dsc == get_glyph_dsc_cb_nocache;
+}
 #endif/* LV_FREETYPE_CACHE_SIZE */
 
 #endif /*LV_USE_FREETYPE*/
