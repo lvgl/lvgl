@@ -445,10 +445,9 @@ static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint
         dir = lv_bidi_get_letter_dir(letter);
         if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(txt, i, max_len, letter, base_dir);
  
-         if(dir==LV_BASE_DIR_LTR || dir==LV_BASE_DIR_RTL)
-         break;
-
-        if(i >=max_len || txt[i] == '\0' || txt[i] == '\n' || txt[i] == '\r') {
+        if(dir==LV_BASE_DIR_LTR || dir==LV_BASE_DIR_RTL)  break;
+         
+        if(i >= max_len || txt[i] == '\0' || txt[i] == '\n' || txt[i] == '\r') {
             *len = i;
             *pos_conv_len = pos_conv_i;
             return base_dir;
@@ -470,9 +469,7 @@ static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint
         next_dir  = lv_bidi_get_letter_dir(letter);
         if(next_dir == LV_BASE_DIR_NEUTRAL)  next_dir = bracket_process(txt, i, max_len, letter, base_dir);
    
-
-
-         if(next_dir == LV_BASE_DIR_WEAK){
+        if(next_dir == LV_BASE_DIR_WEAK){
              if(run_dir == LV_BASE_DIR_RTL){
                  if(base_dir == LV_BASE_DIR_RTL){
                      next_dir = LV_BASE_DIR_LTR;
