@@ -70,9 +70,27 @@ void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_
  * @param canvas
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
- * @param c color of the point
+ * @param c color of the pixel
  */
-void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c);
+void lv_canvas_set_px_color(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c);
+
+/**
+ * DEPRECATED: added only for backward compatibility
+ */
+static inline void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c)
+{
+    lv_canvas_set_px_color(canvas, x, y, c);
+}
+
+/**
+ * Set the opacity of a pixel on the canvas
+ * @param canvas
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @param opa opacity of the pixel (0..255)
+ */
+void lv_canvas_set_px_opa(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
+
 
 /**
  * Set the palette color of a canvas with index format. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`

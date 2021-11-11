@@ -42,6 +42,9 @@
 #  endif
 #endif
 
+#ifdef CONFIG_LV_COLOR_DEPTH
+#  define _LV_KCONFIG_PRESENT
+#endif
 
 /*----------------------------------
  * Start parsing lv_conf_template.h
@@ -79,6 +82,16 @@
 #    define LV_COLOR_SCREEN_TRANSP CONFIG_LV_COLOR_SCREEN_TRANSP
 #  else
 #    define LV_COLOR_SCREEN_TRANSP 0
+#  endif
+#endif
+
+/* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
+ * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
+#ifndef LV_COLOR_MIX_ROUND_OFS
+#  ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
+#    define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
+#  else
+#    define LV_COLOR_MIX_ROUND_OFS (LV_COLOR_DEPTH == 32 ? 0: 128)
 #  endif
 #endif
 
@@ -158,6 +171,16 @@
 #endif
 #endif     /*LV_MEM_CUSTOM*/
 
+/*Number of the intermediate memory buffer used during rendering and other internal processing mechanisms.
+ *You will see an error log message if there wasn't enough buffers. */
+#ifndef LV_MEM_BUF_MAX_NUM
+#  ifdef CONFIG_LV_MEM_BUF_MAX_NUM
+#    define LV_MEM_BUF_MAX_NUM CONFIG_LV_MEM_BUF_MAX_NUM
+#  else
+#    define LV_MEM_BUF_MAX_NUM 16
+#  endif
+#endif
+
 /*Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster).*/
 #ifndef LV_MEMCPY_MEMSET_STD
 #  ifdef CONFIG_LV_MEMCPY_MEMSET_STD
@@ -236,8 +259,12 @@
 /*Enable complex draw engine.
  *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
 #ifndef LV_DRAW_COMPLEX
-#  ifdef CONFIG_LV_DRAW_COMPLEX
-#    define LV_DRAW_COMPLEX CONFIG_LV_DRAW_COMPLEX
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_DRAW_COMPLEX
+#      define LV_DRAW_COMPLEX CONFIG_LV_DRAW_COMPLEX
+#    else
+#      define LV_DRAW_COMPLEX 0
+#    endif
 #  else
 #    define LV_DRAW_COMPLEX 1
 #  endif
@@ -347,45 +374,29 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
-/*Use SDL renderer API*/
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#ifndef LV_USE_GPU_SDL
-#  ifdef CONFIG_LV_USE_GPU_SDL
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  else
-#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-#  endif
-#endif
-#  else
-#    define  LV_USE_GPU_SDL 0
-#  endif
-#endif
-#if LV_USE_GPU_SDL
-#ifndef LV_USE_EXTERNAL_RENDERER
-#  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
-#    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
-#  else
-#    define LV_USE_EXTERNAL_RENDERER 1
-#  endif
-#endif
-#  ifndef LV_GPU_SDL_INCLUDE
-#ifndef LV_GPU_SDL_INCLUDE_PATH
-#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
-#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
-#  else
-#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
-#  endif
-#endif
-#  endif
-#endif
-
-#ifndef LV_USE_EXTERNAL_RENDERER
+/*Use exnternal renderer*/
 #ifndef LV_USE_EXTERNAL_RENDERER
 #  ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
 #    define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
 #  else
 #    define LV_USE_EXTERNAL_RENDERER 0
+#  endif
+#endif
+
+/*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
+#ifndef LV_USE_GPU_SDL
+#  ifdef CONFIG_LV_USE_GPU_SDL
+#    define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+#  else
+#    define LV_USE_GPU_SDL 0
+#  endif
+#endif
+#if LV_USE_GPU_SDL
+#ifndef LV_GPU_SDL_INCLUDE_PATH
+#  ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#    define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#  else
+#    define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
 #  endif
 #endif
 #endif
@@ -431,57 +442,89 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
 #ifndef LV_LOG_TRACE_MEM
-#  ifdef CONFIG_LV_LOG_TRACE_MEM
-#    define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_MEM
+#      define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
+#    else
+#      define LV_LOG_TRACE_MEM 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_MEM        1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_TIMER
-#  ifdef CONFIG_LV_LOG_TRACE_TIMER
-#    define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_TIMER
+#      define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
+#    else
+#      define LV_LOG_TRACE_TIMER 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_TIMER      1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_INDEV
-#  ifdef CONFIG_LV_LOG_TRACE_INDEV
-#    define LV_LOG_TRACE_INDEV CONFIG_LV_LOG_TRACE_INDEV
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_INDEV
+#      define LV_LOG_TRACE_INDEV CONFIG_LV_LOG_TRACE_INDEV
+#    else
+#      define LV_LOG_TRACE_INDEV 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_INDEV      1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_DISP_REFR
-#  ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
-#    define LV_LOG_TRACE_DISP_REFR CONFIG_LV_LOG_TRACE_DISP_REFR
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
+#      define LV_LOG_TRACE_DISP_REFR CONFIG_LV_LOG_TRACE_DISP_REFR
+#    else
+#      define LV_LOG_TRACE_DISP_REFR 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_DISP_REFR  1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_EVENT
-#  ifdef CONFIG_LV_LOG_TRACE_EVENT
-#    define LV_LOG_TRACE_EVENT CONFIG_LV_LOG_TRACE_EVENT
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_EVENT
+#      define LV_LOG_TRACE_EVENT CONFIG_LV_LOG_TRACE_EVENT
+#    else
+#      define LV_LOG_TRACE_EVENT 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_EVENT      1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_OBJ_CREATE
-#  ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
-#    define LV_LOG_TRACE_OBJ_CREATE CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#      define LV_LOG_TRACE_OBJ_CREATE CONFIG_LV_LOG_TRACE_OBJ_CREATE
+#    else
+#      define LV_LOG_TRACE_OBJ_CREATE 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_OBJ_CREATE 1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_LAYOUT
-#  ifdef CONFIG_LV_LOG_TRACE_LAYOUT
-#    define LV_LOG_TRACE_LAYOUT CONFIG_LV_LOG_TRACE_LAYOUT
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_LAYOUT
+#      define LV_LOG_TRACE_LAYOUT CONFIG_LV_LOG_TRACE_LAYOUT
+#    else
+#      define LV_LOG_TRACE_LAYOUT 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_LAYOUT     1
 #  endif
 #endif
 #ifndef LV_LOG_TRACE_ANIM
-#  ifdef CONFIG_LV_LOG_TRACE_ANIM
-#    define LV_LOG_TRACE_ANIM CONFIG_LV_LOG_TRACE_ANIM
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_LOG_TRACE_ANIM
+#      define LV_LOG_TRACE_ANIM CONFIG_LV_LOG_TRACE_ANIM
+#    else
+#      define LV_LOG_TRACE_ANIM 0
+#    endif
 #  else
 #    define LV_LOG_TRACE_ANIM       1
 #  endif
@@ -559,6 +602,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #    define LV_USE_PERF_MONITOR 0
 #  endif
 #endif
+#if LV_USE_PERF_MONITOR
+#ifndef LV_USE_PERF_MONITOR_POS
+#  ifdef CONFIG_LV_USE_PERF_MONITOR_POS
+#    define LV_USE_PERF_MONITOR_POS CONFIG_LV_USE_PERF_MONITOR_POS
+#  else
+#    define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+#  endif
+#endif
+#endif
 
 /*1: Show the used memory and the memory fragmentation in the left bottom corner
  * Requires LV_MEM_CUSTOM = 0*/
@@ -568,6 +620,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  else
 #    define LV_USE_MEM_MONITOR 0
 #  endif
+#endif
+#if LV_USE_PERF_MONITOR
+#ifndef LV_USE_MEM_MONITOR_POS
+#  ifdef CONFIG_LV_USE_MEM_MONITOR_POS
+#    define LV_USE_MEM_MONITOR_POS CONFIG_LV_USE_MEM_MONITOR_POS
+#  else
+#    define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+#  endif
+#endif
 #endif
 
 /*1: Draw random colored rectangles over the redrawn areas*/
@@ -620,8 +681,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif  /*LV_SPRINTF_CUSTOM*/
 
 #ifndef LV_USE_USER_DATA
-#  ifdef CONFIG_LV_USE_USER_DATA
-#    define LV_USE_USER_DATA CONFIG_LV_USE_USER_DATA
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_USER_DATA
+#      define LV_USE_USER_DATA CONFIG_LV_USE_USER_DATA
+#    else
+#      define LV_USE_USER_DATA 0
+#    endif
 #  else
 #    define LV_USE_USER_DATA 1
 #  endif
@@ -645,15 +710,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 #endif /*LV_ENABLE_GC*/
-
-/*1: Enable API to take snapshot for object*/
-#ifndef LV_USE_SNAPSHOT
-#  ifdef CONFIG_LV_USE_SNAPSHOT
-#    define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
-#  else
-#    define LV_USE_SNAPSHOT 1
-#  endif
-#endif
 
 /*=====================
  *  COMPILER SETTINGS
@@ -697,10 +753,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*Required alignment size for buffers*/
 #ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
-#  ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
-#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#      define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#    else
+#      define LV_ATTRIBUTE_MEM_ALIGN_SIZE 0
+#    endif
 #  else
-#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
 #  endif
 #endif
 
@@ -797,8 +857,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 #ifndef LV_FONT_MONTSERRAT_14
-#  ifdef CONFIG_LV_FONT_MONTSERRAT_14
-#    define LV_FONT_MONTSERRAT_14 CONFIG_LV_FONT_MONTSERRAT_14
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_FONT_MONTSERRAT_14
+#      define LV_FONT_MONTSERRAT_14 CONFIG_LV_FONT_MONTSERRAT_14
+#    else
+#      define LV_FONT_MONTSERRAT_14 0
+#    endif
 #  else
 #    define LV_FONT_MONTSERRAT_14 1
 #  endif
@@ -1135,56 +1199,84 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
 #ifndef LV_USE_ARC
-#  ifdef CONFIG_LV_USE_ARC
-#    define LV_USE_ARC CONFIG_LV_USE_ARC
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_ARC
+#      define LV_USE_ARC CONFIG_LV_USE_ARC
+#    else
+#      define LV_USE_ARC 0
+#    endif
 #  else
 #    define LV_USE_ARC        1
 #  endif
 #endif
 
 #ifndef LV_USE_ANIMIMG
-#  ifdef CONFIG_LV_USE_ANIMIMG
-#    define LV_USE_ANIMIMG CONFIG_LV_USE_ANIMIMG
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_ANIMIMG
+#      define LV_USE_ANIMIMG CONFIG_LV_USE_ANIMIMG
+#    else
+#      define LV_USE_ANIMIMG 0
+#    endif
 #  else
-#    define LV_USE_ANIMIMG	  1
+#    define LV_USE_ANIMIMG    1
 #  endif
 #endif
 
 #ifndef LV_USE_BAR
-#  ifdef CONFIG_LV_USE_BAR
-#    define LV_USE_BAR CONFIG_LV_USE_BAR
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_BAR
+#      define LV_USE_BAR CONFIG_LV_USE_BAR
+#    else
+#      define LV_USE_BAR 0
+#    endif
 #  else
 #    define LV_USE_BAR        1
 #  endif
 #endif
 
 #ifndef LV_USE_BTN
-#  ifdef CONFIG_LV_USE_BTN
-#    define LV_USE_BTN CONFIG_LV_USE_BTN
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_BTN
+#      define LV_USE_BTN CONFIG_LV_USE_BTN
+#    else
+#      define LV_USE_BTN 0
+#    endif
 #  else
 #    define LV_USE_BTN        1
 #  endif
 #endif
 
 #ifndef LV_USE_BTNMATRIX
-#  ifdef CONFIG_LV_USE_BTNMATRIX
-#    define LV_USE_BTNMATRIX CONFIG_LV_USE_BTNMATRIX
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_BTNMATRIX
+#      define LV_USE_BTNMATRIX CONFIG_LV_USE_BTNMATRIX
+#    else
+#      define LV_USE_BTNMATRIX 0
+#    endif
 #  else
 #    define LV_USE_BTNMATRIX  1
 #  endif
 #endif
 
 #ifndef LV_USE_CANVAS
-#  ifdef CONFIG_LV_USE_CANVAS
-#    define LV_USE_CANVAS CONFIG_LV_USE_CANVAS
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_CANVAS
+#      define LV_USE_CANVAS CONFIG_LV_USE_CANVAS
+#    else
+#      define LV_USE_CANVAS 0
+#    endif
 #  else
 #    define LV_USE_CANVAS     1
 #  endif
 #endif
 
 #ifndef LV_USE_CHECKBOX
-#  ifdef CONFIG_LV_USE_CHECKBOX
-#    define LV_USE_CHECKBOX CONFIG_LV_USE_CHECKBOX
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_CHECKBOX
+#      define LV_USE_CHECKBOX CONFIG_LV_USE_CHECKBOX
+#    else
+#      define LV_USE_CHECKBOX 0
+#    endif
 #  else
 #    define LV_USE_CHECKBOX   1
 #  endif
@@ -1207,8 +1299,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 #ifndef LV_USE_LABEL
-#  ifdef CONFIG_LV_USE_LABEL
-#    define LV_USE_LABEL CONFIG_LV_USE_LABEL
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_LABEL
+#      define LV_USE_LABEL CONFIG_LV_USE_LABEL
+#    else
+#      define LV_USE_LABEL 0
+#    endif
 #  else
 #    define LV_USE_LABEL      1
 #  endif
@@ -1231,8 +1327,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 #ifndef LV_USE_LINE
-#  ifdef CONFIG_LV_USE_LINE
-#    define LV_USE_LINE CONFIG_LV_USE_LINE
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_LINE
+#      define LV_USE_LINE CONFIG_LV_USE_LINE
+#    else
+#      define LV_USE_LINE 0
+#    endif
 #  else
 #    define LV_USE_LINE       1
 #  endif
@@ -1264,8 +1364,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 #ifndef LV_USE_SWITCH
-#  ifdef CONFIG_LV_USE_SWITCH
-#    define LV_USE_SWITCH CONFIG_LV_USE_SWITCH
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_SWITCH
+#      define LV_USE_SWITCH CONFIG_LV_USE_SWITCH
+#    else
+#      define LV_USE_SWITCH 0
+#    endif
 #  else
 #    define LV_USE_SWITCH     1
 #  endif
@@ -1289,8 +1393,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 #ifndef LV_USE_TABLE
-#  ifdef CONFIG_LV_USE_TABLE
-#    define LV_USE_TABLE CONFIG_LV_USE_TABLE
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_TABLE
+#      define LV_USE_TABLE CONFIG_LV_USE_TABLE
+#    else
+#      define LV_USE_TABLE 0
+#    endif
 #  else
 #    define LV_USE_TABLE      1
 #  endif
@@ -1304,8 +1412,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  * Widgets
  *----------*/
 #ifndef LV_USE_CALENDAR
-#  ifdef CONFIG_LV_USE_CALENDAR
-#    define LV_USE_CALENDAR CONFIG_LV_USE_CALENDAR
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_CALENDAR
+#      define LV_USE_CALENDAR CONFIG_LV_USE_CALENDAR
+#    else
+#      define LV_USE_CALENDAR 0
+#    endif
 #  else
 #    define LV_USE_CALENDAR   1
 #  endif
@@ -1344,15 +1456,23 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 #ifndef LV_USE_CALENDAR_HEADER_ARROW
-#  ifdef CONFIG_LV_USE_CALENDAR_HEADER_ARROW
-#    define LV_USE_CALENDAR_HEADER_ARROW CONFIG_LV_USE_CALENDAR_HEADER_ARROW
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_CALENDAR_HEADER_ARROW
+#      define LV_USE_CALENDAR_HEADER_ARROW CONFIG_LV_USE_CALENDAR_HEADER_ARROW
+#    else
+#      define LV_USE_CALENDAR_HEADER_ARROW 0
+#    endif
 #  else
 #    define LV_USE_CALENDAR_HEADER_ARROW 1
 #  endif
 #endif
 #ifndef LV_USE_CALENDAR_HEADER_DROPDOWN
-#  ifdef CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
-#    define LV_USE_CALENDAR_HEADER_DROPDOWN CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+#      define LV_USE_CALENDAR_HEADER_DROPDOWN CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+#    else
+#      define LV_USE_CALENDAR_HEADER_DROPDOWN 0
+#    endif
 #  else
 #    define LV_USE_CALENDAR_HEADER_DROPDOWN 1
 #  endif
@@ -1360,112 +1480,168 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif  /*LV_USE_CALENDAR*/
 
 #ifndef LV_USE_CHART
-#  ifdef CONFIG_LV_USE_CHART
-#    define LV_USE_CHART CONFIG_LV_USE_CHART
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_CHART
+#      define LV_USE_CHART CONFIG_LV_USE_CHART
+#    else
+#      define LV_USE_CHART 0
+#    endif
 #  else
 #    define LV_USE_CHART      1
 #  endif
 #endif
 
 #ifndef LV_USE_COLORWHEEL
-#  ifdef CONFIG_LV_USE_COLORWHEEL
-#    define LV_USE_COLORWHEEL CONFIG_LV_USE_COLORWHEEL
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_COLORWHEEL
+#      define LV_USE_COLORWHEEL CONFIG_LV_USE_COLORWHEEL
+#    else
+#      define LV_USE_COLORWHEEL 0
+#    endif
 #  else
 #    define LV_USE_COLORWHEEL 1
 #  endif
 #endif
 
 #ifndef LV_USE_IMGBTN
-#  ifdef CONFIG_LV_USE_IMGBTN
-#    define LV_USE_IMGBTN CONFIG_LV_USE_IMGBTN
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_IMGBTN
+#      define LV_USE_IMGBTN CONFIG_LV_USE_IMGBTN
+#    else
+#      define LV_USE_IMGBTN 0
+#    endif
 #  else
 #    define LV_USE_IMGBTN     1
 #  endif
 #endif
 
 #ifndef LV_USE_KEYBOARD
-#  ifdef CONFIG_LV_USE_KEYBOARD
-#    define LV_USE_KEYBOARD CONFIG_LV_USE_KEYBOARD
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_KEYBOARD
+#      define LV_USE_KEYBOARD CONFIG_LV_USE_KEYBOARD
+#    else
+#      define LV_USE_KEYBOARD 0
+#    endif
 #  else
 #    define LV_USE_KEYBOARD   1
 #  endif
 #endif
 
 #ifndef LV_USE_LED
-#  ifdef CONFIG_LV_USE_LED
-#    define LV_USE_LED CONFIG_LV_USE_LED
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_LED
+#      define LV_USE_LED CONFIG_LV_USE_LED
+#    else
+#      define LV_USE_LED 0
+#    endif
 #  else
 #    define LV_USE_LED        1
 #  endif
 #endif
 
 #ifndef LV_USE_LIST
-#  ifdef CONFIG_LV_USE_LIST
-#    define LV_USE_LIST CONFIG_LV_USE_LIST
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_LIST
+#      define LV_USE_LIST CONFIG_LV_USE_LIST
+#    else
+#      define LV_USE_LIST 0
+#    endif
 #  else
 #    define LV_USE_LIST       1
 #  endif
 #endif
 
 #ifndef LV_USE_METER
-#  ifdef CONFIG_LV_USE_METER
-#    define LV_USE_METER CONFIG_LV_USE_METER
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_METER
+#      define LV_USE_METER CONFIG_LV_USE_METER
+#    else
+#      define LV_USE_METER 0
+#    endif
 #  else
 #    define LV_USE_METER      1
 #  endif
 #endif
 
 #ifndef LV_USE_MSGBOX
-#  ifdef CONFIG_LV_USE_MSGBOX
-#    define LV_USE_MSGBOX CONFIG_LV_USE_MSGBOX
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_MSGBOX
+#      define LV_USE_MSGBOX CONFIG_LV_USE_MSGBOX
+#    else
+#      define LV_USE_MSGBOX 0
+#    endif
 #  else
 #    define LV_USE_MSGBOX     1
 #  endif
 #endif
 
 #ifndef LV_USE_SPINBOX
-#  ifdef CONFIG_LV_USE_SPINBOX
-#    define LV_USE_SPINBOX CONFIG_LV_USE_SPINBOX
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_SPINBOX
+#      define LV_USE_SPINBOX CONFIG_LV_USE_SPINBOX
+#    else
+#      define LV_USE_SPINBOX 0
+#    endif
 #  else
 #    define LV_USE_SPINBOX    1
 #  endif
 #endif
 
 #ifndef LV_USE_SPINNER
-#  ifdef CONFIG_LV_USE_SPINNER
-#    define LV_USE_SPINNER CONFIG_LV_USE_SPINNER
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_SPINNER
+#      define LV_USE_SPINNER CONFIG_LV_USE_SPINNER
+#    else
+#      define LV_USE_SPINNER 0
+#    endif
 #  else
 #    define LV_USE_SPINNER    1
 #  endif
 #endif
 
 #ifndef LV_USE_TABVIEW
-#  ifdef CONFIG_LV_USE_TABVIEW
-#    define LV_USE_TABVIEW CONFIG_LV_USE_TABVIEW
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_TABVIEW
+#      define LV_USE_TABVIEW CONFIG_LV_USE_TABVIEW
+#    else
+#      define LV_USE_TABVIEW 0
+#    endif
 #  else
 #    define LV_USE_TABVIEW    1
 #  endif
 #endif
 
 #ifndef LV_USE_TILEVIEW
-#  ifdef CONFIG_LV_USE_TILEVIEW
-#    define LV_USE_TILEVIEW CONFIG_LV_USE_TILEVIEW
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_TILEVIEW
+#      define LV_USE_TILEVIEW CONFIG_LV_USE_TILEVIEW
+#    else
+#      define LV_USE_TILEVIEW 0
+#    endif
 #  else
 #    define LV_USE_TILEVIEW   1
 #  endif
 #endif
 
 #ifndef LV_USE_WIN
-#  ifdef CONFIG_LV_USE_WIN
-#    define LV_USE_WIN CONFIG_LV_USE_WIN
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_WIN
+#      define LV_USE_WIN CONFIG_LV_USE_WIN
+#    else
+#      define LV_USE_WIN 0
+#    endif
 #  else
 #    define LV_USE_WIN        1
 #  endif
 #endif
 
 #ifndef LV_USE_SPAN
-#  ifdef CONFIG_LV_USE_SPAN
-#    define LV_USE_SPAN CONFIG_LV_USE_SPAN
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_SPAN
+#      define LV_USE_SPAN CONFIG_LV_USE_SPAN
+#    else
+#      define LV_USE_SPAN 0
+#    endif
 #  else
 #    define LV_USE_SPAN       1
 #  endif
@@ -1487,8 +1663,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*A simple, impressive and very complete theme*/
 #ifndef LV_USE_THEME_DEFAULT
-#  ifdef CONFIG_LV_USE_THEME_DEFAULT
-#    define LV_USE_THEME_DEFAULT CONFIG_LV_USE_THEME_DEFAULT
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_THEME_DEFAULT
+#      define LV_USE_THEME_DEFAULT CONFIG_LV_USE_THEME_DEFAULT
+#    else
+#      define LV_USE_THEME_DEFAULT 0
+#    endif
 #  else
 #    define LV_USE_THEME_DEFAULT 1
 #  endif
@@ -1506,27 +1686,35 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*1: Enable grow on press*/
 #ifndef LV_THEME_DEFAULT_GROW
-#  ifdef CONFIG_LV_THEME_DEFAULT_GROW
-#    define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_THEME_DEFAULT_GROW
+#      define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
+#    else
+#      define LV_THEME_DEFAULT_GROW 0
+#    endif
 #  else
 #    define LV_THEME_DEFAULT_GROW 1
 #  endif
 #endif
 
 /*Default transition time in [ms]*/
-#ifndef LV_THEME_DEFAULT_TRANSITON_TIME
-#  ifdef CONFIG_LV_THEME_DEFAULT_TRANSITON_TIME
-#    define LV_THEME_DEFAULT_TRANSITON_TIME CONFIG_LV_THEME_DEFAULT_TRANSITON_TIME
+#ifndef LV_THEME_DEFAULT_TRANSITION_TIME
+#  ifdef CONFIG_LV_THEME_DEFAULT_TRANSITION_TIME
+#    define LV_THEME_DEFAULT_TRANSITION_TIME CONFIG_LV_THEME_DEFAULT_TRANSITION_TIME
 #  else
-#    define LV_THEME_DEFAULT_TRANSITON_TIME 80
+#    define LV_THEME_DEFAULT_TRANSITION_TIME 80
 #  endif
 #endif
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /*A very simple theme that is a good starting point for a custom theme*/
 #ifndef LV_USE_THEME_BASIC
-#  ifdef CONFIG_LV_USE_THEME_BASIC
-#    define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_THEME_BASIC
+#      define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
+#    else
+#      define LV_USE_THEME_BASIC 0
+#    endif
 #  else
 #    define LV_USE_THEME_BASIC 1
 #  endif
@@ -1534,8 +1722,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*A theme designed for monochrome displays*/
 #ifndef LV_USE_THEME_MONO
-#  ifdef CONFIG_LV_USE_THEME_MONO
-#    define LV_USE_THEME_MONO CONFIG_LV_USE_THEME_MONO
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_THEME_MONO
+#      define LV_USE_THEME_MONO CONFIG_LV_USE_THEME_MONO
+#    else
+#      define LV_USE_THEME_MONO 0
+#    endif
 #  else
 #    define LV_USE_THEME_MONO 1
 #  endif
@@ -1547,8 +1739,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*A layout similar to Flexbox in CSS.*/
 #ifndef LV_USE_FLEX
-#  ifdef CONFIG_LV_USE_FLEX
-#    define LV_USE_FLEX CONFIG_LV_USE_FLEX
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_FLEX
+#      define LV_USE_FLEX CONFIG_LV_USE_FLEX
+#    else
+#      define LV_USE_FLEX 0
+#    endif
 #  else
 #    define LV_USE_FLEX 1
 #  endif
@@ -1556,8 +1752,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*A layout similar to Grid in CSS.*/
 #ifndef LV_USE_GRID
-#  ifdef CONFIG_LV_USE_GRID
-#    define LV_USE_GRID CONFIG_LV_USE_GRID
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_GRID
+#      define LV_USE_GRID CONFIG_LV_USE_GRID
+#    else
+#      define LV_USE_GRID 0
+#    endif
 #  else
 #    define LV_USE_GRID 1
 #  endif
@@ -1586,6 +1786,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 //#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+
+#ifndef LV_USE_FS_WIN32
+#  ifdef CONFIG_LV_USE_FS_WIN32
+#    define LV_USE_FS_WIN32 CONFIG_LV_USE_FS_WIN32
+#  else
+#    define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
+#  endif
+#endif
+//#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
 
 #ifndef LV_USE_FS_FATFS
 #  ifdef CONFIG_LV_USE_FS_FATFS
@@ -1660,6 +1869,32 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif
 
+/*Rlottie library*/
+#ifndef LV_USE_RLOTTIE
+#  ifdef CONFIG_LV_USE_RLOTTIE
+#    define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
+#  else
+#    define LV_USE_RLOTTIE 0
+#  endif
+#endif
+
+/*-----------
+ * Others
+ *----------*/
+
+/*1: Enable API to take snapshot for object*/
+#ifndef LV_USE_SNAPSHOT
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_USE_SNAPSHOT
+#      define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
+#    else
+#      define LV_USE_SNAPSHOT 0
+#    endif
+#  else
+#    define LV_USE_SNAPSHOT 1
+#  endif
+#endif
+
 
 /*==================
 * EXAMPLES
@@ -1667,8 +1902,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*Enable the examples to be built with the library*/
 #ifndef LV_BUILD_EXAMPLES
-#  ifdef CONFIG_LV_BUILD_EXAMPLES
-#    define LV_BUILD_EXAMPLES CONFIG_LV_BUILD_EXAMPLES
+#  ifdef _LV_KCONFIG_PRESENT
+#    ifdef CONFIG_LV_BUILD_EXAMPLES
+#      define LV_BUILD_EXAMPLES CONFIG_LV_BUILD_EXAMPLES
+#    else
+#      define LV_BUILD_EXAMPLES 0
+#    endif
 #  else
 #    define LV_BUILD_EXAMPLES 1
 #  endif
@@ -1681,6 +1920,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  -----------------------------------*/
 
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
+
+#undef _LV_KCONFIG_PRESENT
 
 /*If running without lv_conf.h add typdesf with default value*/
 #ifdef LV_CONF_SKIP

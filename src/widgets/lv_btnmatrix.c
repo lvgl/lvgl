@@ -47,7 +47,6 @@ static bool button_is_popover(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_checkable(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_is_recolor(lv_btnmatrix_ctrl_t ctrl_bits);
 static bool button_get_checked(lv_btnmatrix_ctrl_t ctrl_bits);
-static bool button_is_recolor(lv_btnmatrix_ctrl_t ctrl_bits);
 static uint16_t get_button_from_point(lv_obj_t * obj, lv_point_t * p);
 static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** map);
 static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx);

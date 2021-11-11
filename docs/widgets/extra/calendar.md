@@ -14,7 +14,7 @@ The Calendar object is a classic calendar which can:
 
 The Calendar is added to the default group (if it is set). Calendar is an editable object which allow selecting and clicking the dates with encoder navigation too.
 
-To make the Calendar flexible, by default it doesn't show the current year or month. Instead, there are external "headers" that can be attached to the calendar.
+To make the Calendar flexible, by default it doesn't show the current year or month. Instead, there are optional "headers" that can be attached to the calendar.
 
 ## Parts and Styles
 The calendar object uses the [Button matrix](/widgets/core/btnmatrix) object under the hood to arrange the days into a matrix.
@@ -57,15 +57,16 @@ Learn more about [Keys](/overview/indev).
 
 ## Headers
 
+**From v8.1 the header is added directly into the Calendar widget and the API of the headers has been changed. **
+
 ### Arrow buttons
 
-`lv_calendar_header_arrow_create(parent, calendar, button_size)` creates a header that contains a left and right arrow on the sides and a text with the current year and month between them.
+`lv_calendar_header_arrow_create(calendar)` creates a header that contains a left and right arrow on the sides and a text with the current year and month between them.
 
 
 ### Drop-down
-`lv_calendar_header_dropdown_create(parent, calendar)` creates a header that contains 2 drop-drown lists: one for the year and another for the month.
+`lv_calendar_header_dropdown_create(calendar)` creates a header that contains 2 drop-drown lists: one for the year and another for the month.
  
-
 
 ## Example
 

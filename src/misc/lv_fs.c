@@ -8,9 +8,9 @@
  *********************/
 #include "lv_fs.h"
 
-#include "../misc/lv_assert.h"
-#include "lv_ll.h"
 #include <string.h>
+#include "lv_assert.h"
+#include "lv_ll.h"
 #include "lv_gc.h"
 
 /*********************
@@ -163,26 +163,22 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
-
-    return res;
+    return file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
 }
 
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
 {
+    *pos = 0;
+
     if(file_p->drv == NULL) {
-        *pos = 0;
         return LV_FS_RES_INV_PARAM;
     }
 
     if(file_p->drv->tell_cb == NULL) {
-        *pos = 0;
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
-
-    return res;
+    return file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
 }
 
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
@@ -221,19 +217,17 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
 lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
 {
+    fn[0] = '\0';
+
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
-        fn[0] = '\0';
         return LV_FS_RES_INV_PARAM;
     }
 
     if(rddir_p->drv->dir_read_cb == NULL) {
-        fn[0] = '\0';
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
-
-    return res;
+    return rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
 }
 
 lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
@@ -302,10 +296,10 @@ const char * lv_fs_get_ext(const char * fn)
 {
     size_t i;
     for(i = strlen(fn); i > 0; i--) {
-        if(fn[i] == '.') {
-            return &fn[i + 1];
+        if(fn[i - 1] == '.') {
+            return &fn[i];
         }
-        else if(fn[i] == '/' || fn[i] == '\\') {
+        else if(fn[i - 1] == '/' || fn[i - 1] == '\\') {
             return ""; /*No extension if a '\' or '/' found*/
         }
     }
@@ -331,10 +325,11 @@ char * lv_fs_up(char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i - 1] == '/' || path[i - 1] == '\\') {
+            path[i - 1] = '\0';
+            break;
+        }
     }
-
-    if(i > 0) path[i] = '\0';
 
     return path;
 }
@@ -356,14 +351,12 @@ const char * lv_fs_get_last(const char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i - 1] == '/' || path[i - 1] == '\\') break;
     }
 
-    /*No '/' or '\' in the path so return with path itself*/
-    if(i == 0) return path;
-
-    return &path[i + 1];
+    return &path[i];
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

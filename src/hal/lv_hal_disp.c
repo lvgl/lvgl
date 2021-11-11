@@ -345,9 +345,9 @@ lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp)
         switch(disp->driver->rotated) {
             case LV_DISP_ROT_90:
             case LV_DISP_ROT_270:
-                return disp->driver->physical_ver_res;
+                return disp->driver->physical_ver_res > 0 ? disp->driver->physical_ver_res : disp->driver->ver_res;
             default:
-                return disp->driver->physical_hor_res;
+                return disp->driver->physical_hor_res > 0 ? disp->driver->physical_hor_res : disp->driver->hor_res;
         }
     }
 }
@@ -368,9 +368,61 @@ lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp)
         switch(disp->driver->rotated) {
             case LV_DISP_ROT_90:
             case LV_DISP_ROT_270:
-                return disp->driver->physical_hor_res;
+                return disp->driver->physical_hor_res > 0 ? disp->driver->physical_hor_res : disp->driver->hor_res;
             default:
-                return disp->driver->physical_ver_res;
+                return disp->driver->physical_ver_res > 0 ? disp->driver->physical_ver_res : disp->driver->ver_res;
+        }
+    }
+}
+
+/**
+ * Get the horizontal offset from the full / physical display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the horizontal offset from the full / physical display
+ */
+lv_coord_t lv_disp_get_offset_x(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    if(disp == NULL) {
+        return 0;
+    }
+    else {
+        switch(disp->driver->rotated) {
+            case LV_DISP_ROT_90:
+                return disp->driver->offset_y;
+            case LV_DISP_ROT_180:
+                return lv_disp_get_physical_hor_res(disp) - disp->driver->offset_x;
+            case LV_DISP_ROT_270:
+                return lv_disp_get_physical_hor_res(disp) - disp->driver->offset_y;
+            default:
+                return disp->driver->offset_x;
+        }
+    }
+}
+
+/**
+ * Get the vertical offset from the full / physical display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the horizontal offset from the full / physical display
+ */
+lv_coord_t lv_disp_get_offset_y(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+
+    if(disp == NULL) {
+        return 0;
+    }
+    else {
+        switch(disp->driver->rotated) {
+            case LV_DISP_ROT_90:
+                return disp->driver->offset_x;
+            case LV_DISP_ROT_180:
+                return lv_disp_get_physical_ver_res(disp) - disp->driver->offset_y;
+            case LV_DISP_ROT_270:
+                return lv_disp_get_physical_ver_res(disp) - disp->driver->offset_x;
+            default:
+                return disp->driver->offset_y;
         }
     }
 }

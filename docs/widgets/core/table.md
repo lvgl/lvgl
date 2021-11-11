@@ -10,6 +10,7 @@ Tables, as usual, are built from rows, columns, and cells containing texts.
 
 The Table object is very lightweight because only the texts are stored. No real objects are created for cells but they are just drawn on the fly.
 
+The Table is added to the default group (if it is set). Besides the Table is an editable object to allow selecting a cell with encoder navigation too.
 
 ## Parts and Styles
 - `LV_PART_MAIN` The background of the table uses all the typical background style properties.
@@ -49,6 +50,7 @@ E.g. `lv_obj_set_size(table, LV_SIZE_CONTENT, LV_SIZE_CONTENT)` automatically se
 If the width or height is set to a smaller number than the "intrinsic" size then the table becomes scrollable.
 
 ## Events
+- `LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with keys.
 - `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
     - `LV_TABLE_DRAW_PART_CELL` The individual cells of the table
         - `part`: `LV_PART_ITEMS` 
@@ -63,7 +65,12 @@ Learn more about [Events](/overview/event).
 
 ## Keys
 
-No *Keys* are processed by the object type.
+The following *Keys* are processed by the Tables:
+- `LV_KEY_RIGHT/LEFT/UP/DOWN/` Select a cell.
+
+Note that, as usual, the state of `LV_KEY_ENTER` is translated to `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
+
+`lv_table_get_selected_cell(table, &row, &col)` can be sued the get currentéy selected cell. Row and column eill be set to `LV_TABLE_CELL_NONE` no cell is celected.
 
 Learn more about [Keys](/overview/indev).
 

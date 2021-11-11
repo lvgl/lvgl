@@ -11,24 +11,17 @@
 #if LV_USE_FS_POSIX != '\0'
 
 #include <fcntl.h>
-#include <errno.h>
+#include <stdio.h>
+#ifndef WIN32
 #include <dirent.h>
 #include <unistd.h>
-#include <stdio.h>
-#ifdef WIN32
+#else
 #include <windows.h>
 #endif
 
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_FS_POSIX_PATH
-# ifndef WIN32
-#  define LV_FS_POSIX_PATH "./" /*Project root*/
-# else
-#  define LV_FS_POSIX_PATH ".\\" /*Project root*/
-# endif
-#endif /*LV_FS_PATH*/
 
 /**********************
  *      TYPEDEFS
@@ -37,15 +30,15 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
-static lv_fs_res_t fs_close (lv_fs_drv_t * drv, void * file_p);
-static lv_fs_res_t fs_read (lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
+static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-static lv_fs_res_t fs_seek (lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
-static lv_fs_res_t fs_tell (lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
-static void * fs_dir_open (lv_fs_drv_t * drv, const char *path);
-static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * dir_p, char *fn);
-static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p);
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn);
+static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -65,11 +58,11 @@ static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p);
 void lv_fs_posix_init(void)
 {
     /*---------------------------------------------------
-     * Register the file system interface  in LittlevGL
+     * Register the file system interface in LittlevGL
      *--------------------------------------------------*/
 
-    /* Add a simple drive to open images */
-    static lv_fs_drv_t fs_drv;                         /*A driver descriptor*/
+    /*Add a simple drive to open images*/
+    static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
@@ -95,78 +88,68 @@ void lv_fs_posix_init(void)
 /**
  * Open a file
  * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a file_t variable
  * @param path path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
- * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return a file handle or -1 in case of fail
  */
-static void * fs_open (lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
-    (void) drv;     /*Unused*/
-    errno = 0;
+    LV_UNUSED(drv);
 
     uint32_t flags = 0;
     if(mode == LV_FS_MODE_WR) flags = O_WRONLY;
     else if(mode == LV_FS_MODE_RD) flags = O_RDONLY;
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = O_RDWR;
 
+#ifdef LV_FS_POSIX_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_POSIX_PATH "%s", path);
 
-
     int f = open(buf, flags);
+#else
+    int f = open(path, flags);
+#endif
     if(f < 0) return NULL;
 
-    /*Be sure we are the beginning of the file*/
-    lseek(f, 0, SEEK_SET);
-
-    int * fp = lv_mem_alloc(sizeof(int));
-    if(fp == NULL) return NULL;
-    *fp = f;
-
-    return fp;
+    return (void *)(lv_uintptr_t)f;
 }
-
 
 /**
  * Close an opened file
  * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a file_t variable. (opened with lv_ufs_open)
+ * @param file_p a file handle. (opened with fs_open)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_close (lv_fs_drv_t * drv, void * file_p)
+static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
-    (void) drv;     /*Unused*/
-    int * fp = file_p;
-    close(*fp);
-    lv_mem_free(file_p);
+    LV_UNUSED(drv);
+    close((lv_uintptr_t)file_p);
     return LV_FS_RES_OK;
 }
 
 /**
  * Read data from an opened file
  * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a file_t variable.
+ * @param file_p a file handle variable.
  * @param buf pointer to a memory block where to store the read data
  * @param btr number of Bytes To Read
  * @param br the real number of read bytes (Byte Read)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_read (lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    (void) drv;     /*Unused*/
-    int * fp = file_p;
-    *br = read(*fp, buf,  btr);
-    return LV_FS_RES_OK;
+    LV_UNUSED(drv);
+    *br = read((lv_uintptr_t)file_p, buf, btr);
+    return (int32_t)*br < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
  * Write into a file
  * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a file_t variable
+ * @param file_p a file handle variable
  * @param buf pointer to a buffer with the bytes to write
  * @param btr Bytes To Write
  * @param br the number of real written bytes (Bytes Written). NULL if unused.
@@ -174,44 +157,40 @@ static lv_fs_res_t fs_read (lv_fs_drv_t * drv, void * file_p, void * buf, uint32
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
-    (void) drv;     /*Unused*/
-    int * fp = file_p;
-    *bw = write(*fp, buf, btw);
-    return LV_FS_RES_OK;
+    LV_UNUSED(drv);
+    *bw = write((lv_uintptr_t)file_p, buf, btw);
+    return (int32_t)*bw < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
  * Set the read write pointer. Also expand the file size if necessary.
  * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a file_t variable. (opened with lv_ufs_open )
+ * @param file_p a file handle variable. (opened with fs_open )
  * @param pos the new position of read write pointer
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_seek (lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    (void) drv;     /*Unused*/
-    int * fp = file_p;
-    lseek(*fp, pos, whence);
+    LV_UNUSED(drv);
+    lseek((lv_uintptr_t)file_p, pos, whence);
     return LV_FS_RES_OK;
 }
 
 /**
  * Give the position of the read write pointer
  * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a file_t variable.
+ * @param file_p a file handle variable.
  * @param pos_p pointer to to store the result
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_tell (lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
-    (void) drv;     /*Unused*/
-    int * fp = file_p;
-    *pos_p = lseek(*fp, 0, SEEK_CUR);
+    LV_UNUSED(drv);
+    *pos_p = lseek((lv_uintptr_t)file_p, 0, SEEK_CUR);
     return LV_FS_RES_OK;
 }
-
 
 #ifdef WIN32
 static char next_fn[256];
@@ -220,26 +199,33 @@ static char next_fn[256];
 /**
  * Initialize a 'fs_read_dir_t' variable for directory reading
  * @param drv pointer to a driver where this function belongs
- * @param dir_p pointer to a 'fs_read_dir_t' variable
  * @param path path to a directory
- * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
+ * @return pointer to an initialized 'DIR' or 'HANDLE' variable
  */
-static void * fs_dir_open (lv_fs_drv_t * drv, const char *path)
+static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
 
 #ifndef WIN32
+# ifdef LV_FS_POSIX_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_POSIX_PATH "/%s", path);
+    sprintf(buf, LV_FS_POSIX_PATH "%s", path);
     return opendir(buf);
+# else
+    return opendir(path);
+# endif
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_PC_PATH "\\%s\\*", path);
+# ifdef LV_FS_POSIX_PATH
+    sprintf(buf, LV_FS_POSIX_PATH "%s\\*", path);
+# else
+    sprintf(buf, "%s\\*", path);
+# endif
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
@@ -247,9 +233,7 @@ static void * fs_dir_open (lv_fs_drv_t * drv, const char *path)
         if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
             continue;
         } else {
-
-            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            {
+            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
                 sprintf(next_fn, "/%s", fdata.cFileName);
             } else {
                 sprintf(next_fn, "%s", fdata.cFileName);
@@ -263,64 +247,59 @@ static void * fs_dir_open (lv_fs_drv_t * drv, const char *path)
 }
 
 /**
- * Read the next filename form a directory.
+ * Read the next filename from a directory.
  * The name of the directories will begin with '/'
  * @param drv pointer to a driver where this function belongs
- * @param dir_p pointer to an initialized 'fs_read_dir_t' variable
+ * @param dir_p pointer to an initialized 'DIR' or 'HANDLE' variable
  * @param fn pointer to a buffer to store the filename
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * dir_p, char *fn)
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 {
     LV_UNUSED(drv);
-    LV_UNUSED(dir_p);
-    LV_UNUSED(fn);
 
-// #ifndef WIN32
-//     struct dirent *entry;
-//     do {
-//         entry = readdir(dir_p);
+#ifndef WIN32
+    struct dirent *entry;
+    do {
+        entry = readdir(dir_p);
+        if(entry) {
+            if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
+            else strcpy(fn, entry->d_name);
+        } else {
+            strcpy(fn, "");
+        }
+    } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
+#else
+    strcpy(fn, next_fn);
 
-//         if(entry) {
-//             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
-//             else strcpy(fn, entry->d_name);
-//         } else {
-//             strcpy(fn, "");
-//         }
-//     } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
-// #else
-//     strcpy(fn, next_fn);
+    strcpy(next_fn, "");
+    WIN32_FIND_DATA fdata;
 
-//     strcpy(next_fn, "");
-//     WIN32_FIND_DATA fdata;
+    if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
+    do {
+        if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
+            continue;
+        } else {
+            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                sprintf(next_fn, "/%s", fdata.cFileName);
+            } else {
+                sprintf(next_fn, "%s", fdata.cFileName);
+            }
+            break;
+        }
+    } while(FindNextFile(dir_p, &fdata));
 
-//     if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
-//     do {
-//         if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
-//             continue;
-//         } else {
-
-//             if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-//             {
-//                 sprintf(next_fn, "/%s", fdata.cFileName);
-//             } else {
-//                 sprintf(next_fn, "%s", fdata.cFileName);
-//             }
-//             break;
-//         }
-//     } while(FindNextFile(dir_p, &fdata));
-
-// #endif
+#endif
     return LV_FS_RES_OK;
 }
 
 /**
  * Close the directory reading
  * @param drv pointer to a driver where this function belongs
- * @param dir_p pointer to an initialized 'fs_read_dir_t' variable
+ * @param dir_p pointer to an initialized 'DIR' or 'HANDLE' variable
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p)
+static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
 #ifndef WIN32
@@ -331,4 +310,4 @@ static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * dir_p)
     return LV_FS_RES_OK;
 }
 
-#endif  /*LV_USE_FS_POSIX*/
+#endif /*LV_USE_FS_POSIX*/

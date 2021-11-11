@@ -343,7 +343,7 @@ void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_coord_t value, lv_sty
 
 static void grid_update(lv_obj_t * cont, void * user_data)
 {
-    LV_LOG_INFO("update %p container", cont);
+    LV_LOG_INFO("update %p container", (void *)cont);
     LV_UNUSED(user_data);
 
     const lv_coord_t * col_templ = get_col_dsc(cont);

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        port: ['unix', 'esp32', 'stm32']
+        port: ['unix', 'esp32', 'stm32', 'rp2']
     steps:
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install Dependencies
@@ -27,12 +27,12 @@ jobs:
     - name: Update ${{ matrix.port }} port submodules
       if: matrix.port != 'esp32'
       # VARIANT needed for unix
-      run: make -C ports/${{ matrix.port }} VARIANT=dev DEBUG=1 submodules 
+      run: make -C ports/${{ matrix.port }} VARIANT=dev DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules 
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
       run: |
-        git fetch --force ${{ github.event.repository.git_url }} "+refs/heads/*:refs/remotes/origin/*"
-        git fetch --force ${{ github.event.repository.git_url }} "+refs/pull/*:refs/remotes/origin/pr/*"
+        git fetch --force ${{ github.event.repository.html_url }} "+refs/heads/*:refs/remotes/origin/*"
+        git fetch --force ${{ github.event.repository.html_url }} "+refs/pull/*:refs/remotes/origin/pr/*"
         git checkout ${{ github.sha }} || git checkout ${{ github.event.pull_request.head.sha }}
         git submodule update --init --recursive
     - name: Build mpy-cross
@@ -48,16 +48,18 @@ jobs:
       run: |
         source tools/ci.sh && ci_esp32_build
 
-    # STM32 port
+    # STM32 & RPi Pico port
     - name: arm-none-eabi-gcc
-      if: matrix.port == 'stm32'
+      if: matrix.port == 'stm32' || matrix.port == 'rp2'
       uses: fiam/arm-none-eabi-gcc@v1
       with:
         release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
     - name: Build STM32 port
       if: matrix.port == 'stm32'
       run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
-    
+    - name: Build Raspberry Pi PICO port
+      if: matrix.port == 'rp2'
+      run: make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
     # Unix port
     - name: Build Unix port
       if: matrix.port == 'unix'

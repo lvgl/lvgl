@@ -72,6 +72,7 @@ static FT_Library library;
     static FTC_CMapCache cmap_cache;
     static FTC_SBitCache sbit_cache;
     static FTC_SBit sbit;
+    static bool missing_glyph;
 #else
     static lv_faces_control_t face_control;
 #endif
@@ -205,6 +206,12 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     desc_sbit_type.width = dsc->height;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(cmap_cache, face_id, charmap_index, unicode_letter);
+    missing_glyph = glyph_index == 0;
+
+    if (missing_glyph && font->fallback) {
+        return lv_font_get_glyph_dsc(font->fallback, dsc_out, unicode_letter, unicode_letter_next);
+    }
+
     FT_Error error = FTC_SBitCache_Lookup(sbit_cache, &desc_sbit_type, glyph_index, &sbit, NULL);
     if(error) {
         LV_LOG_ERROR("SBitCache_Lookup error");
@@ -222,8 +229,9 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
 
 static const uint8_t * get_glyph_bitmap_cb_cache(const lv_font_t * font, uint32_t unicode_letter)
 {
-    LV_UNUSED(font);
-    LV_UNUSED(unicode_letter);
+    if (missing_glyph && font->fallback) {
+        return lv_font_get_glyph_bitmap(font->fallback, unicode_letter);
+    }
     return (const uint8_t *)sbit->buffer;
 }
 
@@ -237,6 +245,7 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
 
     lv_face_info_t * face_info = NULL;
     face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
@@ -271,8 +280,11 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
     font->subpx = LV_FONT_SUBPX_NONE;
     font->line_height = (face_size->face->size->metrics.height >> 6);
     font->base_line = -(face_size->face->size->metrics.descender >> 6);
-    font->underline_position = face_size->face->underline_position;
-    font->underline_thickness = face_size->face->underline_thickness;
+
+    FT_Fixed scale = face_size->face->size->metrics.y_scale;
+    int8_t thickness = FT_MulFix(scale, face_size->face->underline_thickness) >> 6;
+    font->underline_position = FT_MulFix(scale, face_size->face->underline_position) >> 6;
+    font->underline_thickness = thickness < 1 ? 1 : thickness;
 
     /* return to user */
     info->font = font;
@@ -372,6 +384,11 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
 
     FT_UInt glyph_index = FT_Get_Char_Index(face, unicode_letter);
 
+    if (glyph_index == 0) {
+        /* We don't support fallback without cache yet */
+        LV_ASSERT(!font->fallback);
+    }
+
     if(face->size != dsc->size) {
         FT_Activate_Size(dsc->size);
     }
@@ -399,7 +416,6 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
 
 static const uint8_t * get_glyph_bitmap_cb_nocache(const lv_font_t * font, uint32_t unicode_letter)
 {
-    LV_UNUSED(unicode_letter);
     lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
     FT_Face face = dsc->size->face;
     return (const uint8_t *)(face->glyph->bitmap.buffer);
@@ -415,6 +431,7 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
 
     lv_face_info_t * face_info = NULL;
     FT_Face face = face_find_in_list(info);
@@ -458,9 +475,12 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
     font->get_glyph_bitmap = get_glyph_bitmap_cb_nocache;
     font->line_height = (face->size->metrics.height >> 6);
     font->base_line = -(face->size->metrics.descender >> 6);
-    font->underline_position = face->underline_position;
-    font->underline_thickness = face->underline_thickness;
     font->subpx = LV_FONT_SUBPX_NONE;
+
+    FT_Fixed scale = face->size->metrics.y_scale;
+    int8_t thickness = FT_MulFix(scale, face->underline_thickness) >> 6;
+    font->underline_position = FT_MulFix(scale, face->underline_position) >> 6;
+    font->underline_thickness = thickness < 1 ? 1 : thickness;
 
     info->font = font;
     return true;

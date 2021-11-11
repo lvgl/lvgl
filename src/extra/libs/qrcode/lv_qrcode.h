@@ -20,6 +20,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+extern const lv_obj_class_t lv_qrcode_class;
+
 /**********************
  *      TYPEDEFS
  **********************/
