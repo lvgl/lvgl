@@ -81,7 +81,7 @@
     </release>
     <release date="2022-08-30" version="1.0.8" url="https://github.com/lvgl/lvgl/raw/eb2e296d23b009aca7daf0e9be062d05b4b0048a/env_support/cmsis-pack/LVGL.lvgl.1.0.8.pack">
       - LVGL 9.0.0-dev
-      - Add the binding for pikascript (an ultra-light-weight python VM) 
+      - Add the binding for pikascript (an ultra-light-weight python VM)
       - Montyly update for August
     </release>
     <release date="2022-07-29" version="1.0.7" url="https://github.com/lvgl/lvgl/raw/b454a66e0be85976385c81cf9c9025f272a66f5d/env_support/cmsis-pack/LVGL.lvgl.1.0.7.pack">
@@ -212,7 +212,7 @@
             <description>Require Arm-2D Support</description>
             <require Cclass="Acceleration" Cgroup="Arm-2D"/>
         </condition>
-        
+
         <condition id="LVGL-GPU-Arm-2D">
             <description>Enable LVGL Arm-2D GPU Support</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
@@ -223,7 +223,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
         </condition>
-        
+
         <condition id="LVGL-GPU-STM32-DMA2D">
             <description>Enable LVGL Arm-2D GPU Support</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
@@ -234,7 +234,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
         </condition>
-        
+
         <condition id="LVGL-GPU-SWM341-DMA2D">
             <description>Enable LVGL Arm-2D GPU Support</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
@@ -245,7 +245,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
         </condition>
-        
+
         <condition id="LVGL-GPU-NXP-PXP">
             <description>Enable LVGL Arm-2D GPU Support</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
@@ -256,7 +256,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
         </condition>
-        
+
         <condition id="LVGL-GPU-NXP-VGLite">
             <description>Enable LVGL Arm-2D GPU Support</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
@@ -267,7 +267,7 @@
             <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>-->
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
         </condition>
-        
+
         <condition id="LVGL-GPU-GD32-IPA">
             <description>Enable LVGL Arm-2D GPU Support</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
@@ -500,7 +500,7 @@
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
-                
+
                 <!-- code template -->
                 <file category="header"       name="examples/porting/lv_port_disp_template.h" attr="template" select="Display port template" version="2.0.0"/>
                 <file category="sourceC"      name="examples/porting/lv_port_disp_template.c" attr="template" select="Display port template" version="2.0.0"/>
@@ -782,6 +782,21 @@
 #define LV_USE_GIF         1
               </RTE_Components_h>
 
+/*! \brief enable RLE compressed bin image decoder support */
+#define LV_USE_RLE          1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs RLE"  condition="LVGL-Essential">
+              <description>Add RLE compressed bin image decoder support</description>
+              <files>
+                <!-- src/libs/rle -->
+                <file category="sourceC"    name="src/libs/rle/lv_rle_decoder.c" />
+              </files>
+
+              <RTE_Components_h>
+
             </component>
 
             <component Cgroup="lvgl" Csub="Libs sJPG"  condition="LVGL-Essential">
@@ -799,7 +814,7 @@
               </RTE_Components_h>
 
             </component>
-      
+
             <component Cgroup="lvgl" Csub="Libs QRCode"  condition="LVGL-Essential">
               <description>Add QRCode support</description>
               <files>

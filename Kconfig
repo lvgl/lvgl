@@ -1066,6 +1066,9 @@ menu "LVGL configuration"
 		config LV_USE_GIF
 			bool "GIF decoder library"
 
+		config LV_USE_RLE
+			bool "RLE compressed bin image decoder library"
+
 		config LV_USE_QRCODE
 			bool "QR code library"
 
