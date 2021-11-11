@@ -1146,8 +1146,10 @@ void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_ar
 
         lv_draw_mask_free_param(&mask_rin_param);
         lv_draw_mask_remove_id(mask_rin_id);
-        lv_draw_mask_free_param(&mask_rout_param);
-        lv_draw_mask_remove_id(mask_rout_id);
+        if(mask_rout_id != LV_MASK_ID_INV) {
+            lv_draw_mask_free_param(&mask_rout_param);
+            lv_draw_mask_remove_id(mask_rout_id);
+        }
         lv_mem_buf_release(mask_buf);
         return;
     }
