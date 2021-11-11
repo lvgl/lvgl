@@ -97,7 +97,6 @@ This works much like when you select text on your PC with your mouse.
 The event paramter is the text about to be inserted. `lv_textarea_set_insert_replace(textarea, "New text")` replaces the text to insert. 
 The new text cannot be in a local variable which is destroyed when the event callback exists. `""` means do not insert anything.
 - `LV_EVENT_VALUE_CHANGED` Sent when the content of the text area has been changed. 
-- `LV_EVENT_APPLY` Sent when `LV_KEY_ENTER` is pressed (or(sent) to a one line text area.
 
 See the events of the [Base object](/widgets/obj) too.
 
