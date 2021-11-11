@@ -210,6 +210,10 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
         LV_LOG_ERROR("SBitCache_Lookup error");
     }
 
+    if (glyph_index == 0 && font->fallback) {
+        return get_glyph_dsc_cb_cache(font->fallback, dsc_out, unicode_letter, unicode_letter_next);
+    }
+
     dsc_out->adv_w = sbit->xadvance;
     dsc_out->box_h = sbit->height;  /*Height of the bitmap in [px]*/
     dsc_out->box_w = sbit->width;   /*Width of the bitmap in [px]*/
@@ -237,6 +241,7 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
 
     lv_face_info_t * face_info = NULL;
     face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
