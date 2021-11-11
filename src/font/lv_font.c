@@ -8,7 +8,6 @@
  *********************/
 
 #include "lv_font.h"
-#include "../core/lv_disp.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_assert.h"
@@ -85,11 +84,6 @@ uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32
     else return 0;
 }
 
-const lv_font_t* lv_font_get_normal()
-{
-    lv_theme_t *theme = lv_disp_get_default()->theme;
-    return theme->font_normal ? theme->font_normal : LV_FONT_DEFAULT;
-}
 /**********************
  *   STATIC FUNCTIONS
  **********************/

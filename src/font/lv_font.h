@@ -111,8 +111,6 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
  */
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
 
-const lv_font_t* lv_font_get_normal();
-
 /**
  * Get the line height of a font. All characters fit into this height
  * @param font_p pointer to a font
