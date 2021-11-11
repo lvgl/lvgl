@@ -471,9 +471,9 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 {
     lv_coord_t w = lv_area_get_width(rect);
     lv_coord_t h = lv_area_get_height(rect);
-    if(radius < 0) radius = 0;
     int32_t short_side = LV_MIN(w, h);
     if(radius > short_side >> 1) radius = short_side >> 1;
+    if(radius < 0) radius = 0;
 
     lv_area_copy(&param->cfg.rect, rect);
     param->cfg.radius = radius;
