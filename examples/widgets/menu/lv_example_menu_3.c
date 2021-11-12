@@ -8,15 +8,10 @@ void lv_example_menu_3(void)
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
 
-    /*Create a custom header*/
-    lv_obj_t * header = lv_menu_get_main_header(menu);
-    lv_obj_clear_flag(header, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_del(lv_obj_get_child(header, 0)); /* Delete default back icon */
-    lv_obj_t * back_btn = lv_btn_create(header);
+    /*Modify the header*/
+    lv_obj_t * back_btn = lv_menu_get_main_header_back_btn(menu);
     lv_obj_t * back_btn_label = lv_label_create(back_btn);
     lv_label_set_text(back_btn_label, "Back");
-    lv_menu_set_main_header_back_btn(menu, back_btn);
-    lv_menu_set_main_header_back_icon(menu, back_btn);
 
     lv_obj_t * cont;
     lv_obj_t * label;

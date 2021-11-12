@@ -11,11 +11,13 @@ The menu widget can be used to easily create multi-level menus. It handles the t
 The menu widget is built from the following objects:
 - Main container: lv_menu_main_cont
   - Main header: lv_menu_main_header_cont
-    - Default back icon: [lv_img](/widgets/core/img)
+    - Back btn: [lv_btn](/widgets/core/btn)
+      - Back btn icon: [lv_img](/widgets/core/img)
   - Main page: lv_menu_page
 - Sidebar container: lv_menu_sidebar_cont
   - Sidebar header: lv_menu_sidebar_header_cont
-    - Default back icon: [lv_img](/widgets/core/img)
+    - Back btn: [lv_btn](/widgets/core/btn)
+      - Back btn icon: [lv_img](/widgets/core/img)
   - Sidebar page: lv_menu_page
   
 ## Usage
@@ -25,18 +27,18 @@ The menu widget is built from the following objects:
 
 ### Header mode
 The following header modes exist:
-- `LV_MENU_MODE_HEADER_TOP_FIXED` Header is positioned at the top.
-- `LV_MENU_MODE_HEADER_TOP_UNFIXED` Header is positioned at the top and can be scrolled out of view.
-- `LV_MENU_MODE_HEADER_BOTTOM_FIXED` Header is positioned at the bottom.
+- `LV_MENU_HEADER_TOP_FIXED` Header is positioned at the top.
+- `LV_MENU_HEADER_TOP_UNFIXED` Header is positioned at the top and can be scrolled out of view.
+- `LV_MENU_HEADER_BOTTOM_FIXED` Header is positioned at the bottom.
 
-You can set header modes with `lv_menu_set_mode_header(menu, LV_MENU_MODE_HEADER...)`. 
+You can set header modes with `lv_menu_set_mode_header(menu, LV_MENU_HEADER...)`. 
 
 ### Root back button mode
 The following root back button modes exist:
-- `LV_MENU_MODE_ROOT_BACK_BTN_DISABLED`
-- `LV_MENU_MODE_ROOT_BACK_BTN_ENABLED`
+- `LV_MENU_ROOT_BACK_BTN_DISABLED`
+- `LV_MENU_ROOT_BACK_BTN_ENABLED`
 
-You can set root back button modes with `lv_menu_set_mode_root_back_btn(menu, LV_MENU_MODE_ROOT_BACK_BTN...)`.
+You can set root back button modes with `lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN...)`.
 
 ### Create a menu page
 `lv_menu_page_create(menu, title)` creates a new empty menu page.

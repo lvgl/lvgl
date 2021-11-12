@@ -126,7 +126,7 @@ typedef struct {
 #endif
 
 #if LV_USE_MENU
-    lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_section, menu_pressed, menu_separator;
+    lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_header_btn, menu_section, menu_pressed, menu_separator;
 #endif
 
 #if LV_USE_MSGBOX
@@ -465,8 +465,6 @@ static void style_init(void)
     lv_style_set_radius(&styles->menu_bg, 0);
     lv_style_set_clip_corner(&styles->menu_bg, true);
     lv_style_set_border_side(&styles->menu_bg, LV_BORDER_SIDE_NONE);
-    lv_style_set_bg_opa(&styles->menu_bg, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->menu_bg, color_scr);
 
     style_init_reset(&styles->menu_section);
     lv_style_set_radius(&styles->menu_section, RADIUS_DEFAULT);
@@ -498,8 +496,15 @@ static void style_init(void)
 
     style_init_reset(&styles->menu_header_cont);
     lv_style_set_pad_hor(&styles->menu_header_cont, PAD_SMALL);
-    lv_style_set_pad_ver(&styles->menu_header_cont, PAD_SMALL);
+    lv_style_set_pad_ver(&styles->menu_header_cont, PAD_TINY);
     lv_style_set_pad_gap(&styles->menu_header_cont, PAD_SMALL);
+
+    style_init_reset(&styles->menu_header_btn);
+    lv_style_set_pad_hor(&styles->menu_header_btn, PAD_TINY);
+    lv_style_set_pad_ver(&styles->menu_header_btn, PAD_TINY);
+    lv_style_set_shadow_opa(&styles->menu_header_btn, LV_OPA_TRANSP);
+    lv_style_set_bg_opa(&styles->menu_header_btn, LV_OPA_TRANSP);
+    lv_style_set_text_color(&styles->menu_header_btn, color_text);
 
     style_init_reset(&styles->menu_page);
     lv_style_set_pad_hor(&styles->menu_page, 0);
@@ -507,7 +512,7 @@ static void style_init(void)
 
     style_init_reset(&styles->menu_pressed);
     lv_style_set_bg_opa(&styles->menu_pressed, LV_OPA_20);
-    lv_style_set_bg_color(&styles->menu_pressed, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 1) : lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_bg_color(&styles->menu_pressed, lv_palette_main(LV_PALETTE_GREY));
 
     style_init_reset(&styles->menu_separator);
     lv_style_set_bg_opa(&styles->menu_separator, LV_OPA_TRANSP);
@@ -736,6 +741,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
         lv_obj_add_style(obj, &styles->bg_color_secondary, LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
+
+#if LV_USE_MENU
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_sidebar_header_cont_class) || lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_main_header_cont_class)) {
+            lv_obj_add_style(obj, &styles->menu_header_btn, 0);
+            lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
+        }
+#endif
     }
 #endif
 

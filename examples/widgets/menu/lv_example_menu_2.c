@@ -15,7 +15,7 @@ static void back_event_handler(lv_event_t * e)
 void lv_example_menu_2(void)
 {
     lv_obj_t * menu = lv_menu_create(lv_scr_act());
-    lv_menu_set_mode_root_back_btn(menu, LV_MENU_MODE_ROOT_BACK_BTN_ENABLED);
+    lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
     lv_obj_add_event_cb(menu, back_event_handler, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);

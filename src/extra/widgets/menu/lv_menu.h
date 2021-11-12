@@ -26,15 +26,15 @@ extern "C" {
  **********************/
 
 enum {
-    LV_MENU_MODE_HEADER_TOP_FIXED, /* Header is positioned at the top */
-    LV_MENU_MODE_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
-    LV_MENU_MODE_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
+    LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
+    LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
+    LV_MENU_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
 };
 typedef uint8_t lv_menu_mode_header_t;
 
 enum {
-    LV_MENU_MODE_ROOT_BACK_BTN_DISABLED,
-    LV_MENU_MODE_ROOT_BACK_BTN_ENABLED
+    LV_MENU_ROOT_BACK_BTN_DISABLED,
+    LV_MENU_ROOT_BACK_BTN_ENABLED
 };
 typedef uint8_t lv_menu_mode_root_back_btn_t;
 
@@ -55,14 +55,12 @@ typedef struct {
     lv_obj_t * main_header;
     lv_obj_t *
     main_header_back_btn; /* a pointer to obj that on click triggers back btn event handler, can be same as 'main_header' */
-    lv_obj_t * main_header_back_icon;
     lv_obj_t * main_header_title;
     lv_obj_t * sidebar;
     lv_obj_t * sidebar_page;
     lv_obj_t * sidebar_header;
     lv_obj_t *
     sidebar_header_back_btn; /* a pointer to obj that on click triggers back btn event handler, can be same as 'sidebar_header' */
-    lv_obj_t * sidebar_header_back_icon;
     lv_obj_t * sidebar_header_title;
     lv_obj_t * selected_tab;
     lv_ll_t history_ll;
@@ -158,34 +156,6 @@ void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode_header);
 void lv_menu_set_mode_root_back_btn(lv_obj_t * obj, lv_menu_mode_root_back_btn_t mode_root_back_btn);
 
 /**
- * Set main header back btn obj that on click triggers back btn event handler
- * @param menu pointer to the menu
- * @param obj pointer to the obj
- */
-void lv_menu_set_main_header_back_btn(lv_obj_t * menu, lv_obj_t * obj);
-
-/**
- * Set main header back icon obj that is hidden or shown when there is a previous page to go back to
- * @param menu pointer to the menu
- * @param obj pointer to the obj
- */
-void lv_menu_set_main_header_back_icon(lv_obj_t * menu, lv_obj_t * obj);
-
-/**
- * Set sidebar header back btn obj that on click triggers back btn event handler
- * @param menu pointer to the menu
- * @param obj pointer to the obj
- */
-void lv_menu_set_sidebar_header_back_btn(lv_obj_t * menu, lv_obj_t * obj);
-
-/**
- * Set main header back icon obj that is hidden or shown when there is a previous page to go back to
- * @param menu pointer to the menu
- * @param obj pointer to the obj
- */
-void lv_menu_set_sidebar_header_back_icon(lv_obj_t * menu, lv_obj_t * obj);
-
-/**
  * Add menu to the menu item
  * @param menu pointer to the menu
  * @param obj pointer to the obj
@@ -225,13 +195,6 @@ lv_obj_t * lv_menu_get_main_header(lv_obj_t * obj);
 lv_obj_t * lv_menu_get_main_header_back_btn(lv_obj_t * obj);
 
 /**
-* Get a pointer to main header back icon obj
-* @param obj pointer to the menu
-* @return pointer to main header back icon obj
-*/
-lv_obj_t * lv_menu_get_main_header_back_icon(lv_obj_t * obj);
-
-/**
 * Get a pointer to sidebar header obj
 * @param obj pointer to the menu
 * @return pointer to sidebar header obj
@@ -244,13 +207,6 @@ lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj);
 * @return pointer to sidebar header back btn obj
 */
 lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
-
-/**
-* Get a pointer to sidebar header back icon obj
-* @param obj pointer to the menu
-* @return pointer to sidebar header back icon obj
-*/
-lv_obj_t * lv_menu_get_sidebar_header_back_icon(lv_obj_t * obj);
 
 /**
  * Check if a obj is a root back btn
