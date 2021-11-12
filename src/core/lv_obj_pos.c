@@ -538,6 +538,17 @@ lv_coord_t lv_obj_get_y2(const lv_obj_t * obj)
     return lv_obj_get_y(obj) + lv_obj_get_height(obj);
 }
 
+lv_coord_t lv_obj_get_x_aligned(const lv_obj_t * obj)
+{
+    return lv_obj_get_style_x(obj, LV_PART_MAIN);
+}
+
+lv_coord_t lv_obj_get_y_aligned(const lv_obj_t * obj)
+{
+    return lv_obj_get_style_y(obj, LV_PART_MAIN);
+}
+
+
 lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
