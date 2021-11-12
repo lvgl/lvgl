@@ -481,11 +481,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         }
 
         // Add a small offset between base character and vowel unless the base character
-        // has a tall edge like the character below (base: 0x0643 | end: 0xFEDA)
-        if(!(next_letter_temp == 0xFEDB || next_letter_temp == 0xFEDC) && !next_next_letter_temp)
-            next_y -= 2;
-
-        pos_x = pos_p->x + (adv_w - g.box_w) / 2;
+        // has a tall edge like the character below (base: 0x0643 | end: 0xFEDA).
+        // Also, tall characters tend to not have centered vowels
+        if(!(next_letter_temp == 0xFEDB || next_letter_temp == 0xFEDC)) {
+            pos_x = pos_p->x + (adv_w - g.box_w) / 2;
+            if(!next_next_letter_temp)
+                next_y -= 2;
+        }
 
         if(!(letter == 0x064D || letter == 0x0650))    // Don't do anything if vowel is a below diacritic mark
             pos_y = next_y - g.box_h;
