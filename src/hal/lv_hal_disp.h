@@ -89,6 +89,7 @@ typedef struct _lv_disp_drv_t {
      * LVGL will use this buffer(s) to draw the screens contents*/
     lv_disp_draw_buf_t * draw_buf;
 
+    uint32_t direct_mode : 1;        /**< 1: Use screen-sized buffers and draw to absolute coordinates*/
     uint32_t full_refresh : 1;       /**< 1: Always make the whole screen redrawn*/
     uint32_t sw_rotate : 1;          /**< 1: use software rotation (slower)*/
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
@@ -272,6 +273,20 @@ lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp);
  * @return the full / physical vertical resolution of the display
  */
 lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp);
+
+/**
+ * Get the horizontal offset from the full / physical display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the horizontal offset from the full / physical display
+ */
+lv_coord_t lv_disp_get_offset_x(lv_disp_t * disp);
+
+/**
+ * Get the vertical offset from the full / physical display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return the horizontal offset from the full / physical display
+ */
+lv_coord_t lv_disp_get_offset_y(lv_disp_t * disp);
 
 /**
  * Get if anti-aliasing is enabled for a display or not

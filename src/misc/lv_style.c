@@ -295,6 +295,7 @@ uint8_t _lv_style_get_prop_group(lv_style_prop_t prop)
     if(group > 7) group = 7;    /*The MSB marks all the custom properties*/
     return (uint8_t)group;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

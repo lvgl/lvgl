@@ -8,10 +8,8 @@
  *********************/
 #include "lv_anim.h"
 
-#include <stddef.h>
-#include <string.h>
-#include "../misc/lv_assert.h"
 #include "../hal/lv_hal_tick.h"
+#include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
 #include "lv_mem.h"
@@ -46,7 +44,7 @@ static lv_timer_t * _lv_anim_tmr;
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_ANIM
-    #define TRACE_ANIM(...) LV_LOG_TRACE( __VA_ARGS__)
+    #define TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define TRACE_ANIM(...)
 #endif
@@ -67,9 +65,9 @@ void _lv_anim_core_init(void)
 void lv_anim_init(lv_anim_t * a)
 {
     lv_memset_00(a, sizeof(lv_anim_t));
-    a->time    = 500;
-    a->start_value   = 0;
-    a->end_value     = 100;
+    a->time = 500;
+    a->start_value = 0;
+    a->end_value = 100;
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
@@ -95,13 +93,12 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Initialize the animation descriptor*/
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
     if(a->var == a) new_anim->var = new_anim;
-    new_anim->time_orig = a->time;
     new_anim->run_round = anim_run_round;
 
     /*Set the start value*/
     if(new_anim->early_apply) {
         if(new_anim->get_value_cb) {
-            int32_t v_ofs  = new_anim->get_value_cb(new_anim);
+            int32_t v_ofs = new_anim->get_value_cb(new_anim);
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
         }
@@ -115,6 +112,27 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
 
     TRACE_ANIM("finished");
     return new_anim;
+}
+
+uint32_t lv_anim_get_playtime(lv_anim_t * a)
+{
+    uint32_t playtime = LV_ANIM_PLAYTIME_INFINITE;
+
+    if(a->repeat_cnt == LV_ANIM_REPEAT_INFINITE)
+        return playtime;
+
+    playtime = a->time - a->act_time;
+    if(a->playback_now == 0)
+        playtime += a->playback_delay + a->playback_time;
+
+    if(a->repeat_cnt <= 1)
+        return playtime;
+
+    playtime += (a->repeat_delay + a->time +
+                 a->playback_delay + a->playback_time) *
+                (a->repeat_cnt - 1);
+
+    return playtime;
 }
 
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
@@ -131,7 +149,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
             _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
             lv_mem_free(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
-                                         the linked list*/
+                                       the linked list*/
             del = true;
         }
 
@@ -203,12 +221,12 @@ int32_t lv_anim_path_linear(const lv_anim_t * a)
 int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 50, 100, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 50, 100, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -217,12 +235,12 @@ int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 900, 950, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 900, 950, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -231,12 +249,12 @@ int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 50, 952, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 50, 952, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -245,12 +263,12 @@ int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
-    int32_t step = lv_bezier3(t, 0, 1000, 1300, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_bezier3(t, 0, 1000, 1300, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value += a->start_value;
 
     return new_value;
@@ -259,20 +277,20 @@ int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 int32_t lv_anim_path_bounce(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    int32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    int32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
     int32_t diff = (a->end_value - a->start_value);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
 
     if(t < 408) {
         /*Go down*/
-        t = (t * 2500) >> 10; /*[0..1024] range*/
+        t = (t * 2500) >> LV_BEZIER_VAL_SHIFT; /*[0..1024] range*/
     }
     else if(t >= 408 && t < 614) {
         /*First bounce back*/
         t -= 408;
         t    = t * 5; /*to [0..1024] range*/
-        t    = 1024 - t;
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 20;
     }
     else if(t >= 614 && t < 819) {
@@ -285,23 +303,23 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
         /*Second bounce back*/
         t -= 819;
         t    = t * 10; /*to [0..1024] range*/
-        t    = 1024 - t;
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 40;
     }
-    else if(t >= 921 && t <= 1024) {
+    else if(t >= 921 && t <= LV_BEZIER_VAL_MAX) {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
         diff = diff / 40;
     }
 
-    if(t > 1024) t = 1024;
+    if(t > LV_BEZIER_VAL_MAX) t = LV_BEZIER_VAL_MAX;
     if(t < 0) t = 0;
-    int32_t step = lv_bezier3(t, 1024, 800, 500, 0);
+    int32_t step = lv_bezier3(t, LV_BEZIER_VAL_MAX, 800, 500, 0);
 
     int32_t new_value;
     new_value = step * diff;
-    new_value = new_value >> 10;
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
     new_value = a->end_value - new_value;
 
     return new_value;
@@ -325,7 +343,7 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
  */
 static void anim_timer(lv_timer_t * param)
 {
-    (void)param;
+    LV_UNUSED(param);
 
     uint32_t elaps = lv_tick_elaps(last_timer_run);
 
@@ -348,7 +366,7 @@ static void anim_timer(lv_timer_t * param)
             int32_t new_act_time = a->act_time + elaps;
             if(!a->start_cb_called && a->act_time <= 0 && new_act_time >= 0) {
                 if(a->early_apply == 0 && a->get_value_cb) {
-                    int32_t v_ofs  = a->get_value_cb(a);
+                    int32_t v_ofs = a->get_value_cb(a);
                     a->start_value += v_ofs;
                     a->end_value += v_ofs;
                 }
@@ -401,19 +419,17 @@ static void anim_ready_handler(lv_anim_t * a)
     /*Delete the animation if
      * - no repeat left and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready*/
-    if(a->repeat_cnt == 0 && ((a->playback_time == 0) || (a->playback_time && a->playback_now == 1))) {
+    if(a->repeat_cnt == 0 && (a->playback_time == 0 || a->playback_now == 1)) {
 
-        /*Create copy from the animation and delete the animation from the list.
+        /*Delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
-        lv_anim_t a_tmp;
-        lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
         _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
-        lv_mem_free(a);
         /*Flag that the list has changed*/
         anim_mark_list_change();
 
         /*Call the callback function at the end*/
-        if(a_tmp.ready_cb != NULL) a_tmp.ready_cb(&a_tmp);
+        if(a->ready_cb != NULL) a->ready_cb(a);
+        lv_mem_free(a);
     }
     /*If the animation is not deleted then restart it*/
     else {
@@ -426,15 +442,17 @@ static void anim_ready_handler(lv_anim_t * a)
             /*Toggle the play back state*/
             a->playback_now = a->playback_now == 0 ? 1 : 0;
             /*Swap the start and end values*/
-            int32_t tmp;
-            tmp      = a->start_value;
+            int32_t tmp    = a->start_value;
             a->start_value = a->end_value;
             a->end_value   = tmp;
-
-            a->time = a->playback_now == 0 ? a->time_orig : a->playback_time;
+            /*Swap the time and playback_time*/
+            tmp = a->time;
+            a->time = a->playback_time;
+            a->playback_time = tmp;
         }
     }
 }
+
 static void anim_mark_list_change(void)
 {
     anim_list_changed = true;

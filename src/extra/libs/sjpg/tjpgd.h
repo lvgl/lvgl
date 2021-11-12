@@ -13,16 +13,7 @@ extern "C" {
 
 #include "tjpgdcnf.h"
 #include <string.h>
-
-#if defined(_WIN32)	/* VC++ or some compiler without stdint.h */
-typedef unsigned char	uint8_t;
-typedef unsigned short	uint16_t;
-typedef short			int16_t;
-typedef unsigned long	uint32_t;
-typedef long			int32_t;
-#else				/* Embedded platform */
 #include <stdint.h>
-#endif
 
 #if JD_FASTDECODE >= 1
 typedef int16_t jd_yuv_t;

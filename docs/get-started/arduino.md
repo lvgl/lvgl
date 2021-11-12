@@ -41,8 +41,10 @@ TFT_eSPI is used as the display driver.
 
 In the INO file you can see how to register a display and a touchpad for LVGL and call an example.
 
-Note that, there is no dedicated INO file for every example, but you can call functions like `lv_example_btn_1()` or `lv_example_slider_1()` to run an example.
-Most of the examples are available in the [`lvgl/examples`](https://github.com/lvgl/lvgl/tree/master/examples) folder. Some are also available in [`lv_demos`](https://github.com/lvgl/lv_demos), which needs to be installed and configured separately.
+Note that, there is no dedicated INO file for every example, but you can open the examples in `lvgl/examples` folder and copy-paste them to your INO file. 
+You can NOT call the examples like `lv_example_btn_1()` because the Arduino doesn't compile the examples.
+
+You can the [lv_demos](https://github.com/lvgl/lv_demos) library which needs to be installed and configured separately.
 
 ## Debugging and logging
 

@@ -1,10 +1,10 @@
 /**
- * @file lv_fs_libs.h
+ * @file lv_example_rlottie.h
  *
  */
 
-#ifndef LV_FS_LIBS_H
-#define LV_FS_LIBS_H
+#ifndef LV_EXAMPLE_RLOTTIE_H
+#define LV_EXAMPLE_RLOTTIE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,26 +25,15 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-#if LV_USE_FS_FATFS != '\0'
-	void lv_fs_fatfs_init(void);
-#endif
-
-#if LV_USE_FS_STDIO != '\0'
-	void lv_fs_stdio_init(void);
-#endif
-
-#if LV_USE_FS_POSIX != '\0'
-	void lv_fs_posix_init(void);
-#endif
+void lv_example_rlottie_1(void);
+void lv_example_rlottie_2(void);
 
 /**********************
  *      MACROS
  **********************/
 
 #ifdef __cplusplus
-} /* extern "C" */
+} /*extern "C"*/
 #endif
 
-#endif /*LV_FS_LIBS_H*/
-
+#endif /*LV_EXAMPLE_SJPG_H*/

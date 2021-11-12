@@ -169,6 +169,20 @@ void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
 
     lv_spinbox_updatevalue(obj);
 }
+
+/**
+ * Set direction of digit step when clicking an encoder button while in editing mode
+ * @param spinbox pointer to spinbox
+ * @param direction the direction (LV_DIR_RIGHT or LV_DIR_LEFT)
+ */
+void lv_spinbox_set_digit_step_direction(lv_obj_t *obj, lv_dir_t direction)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    spinbox->digit_step_dir = direction;
+
+    lv_spinbox_updatevalue(obj);
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -318,6 +332,7 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     spinbox->range_max          = 99999;
     spinbox->range_min          = -99999;
     spinbox->rollover           = false;
+    spinbox->digit_step_dir     = LV_DIR_RIGHT;
 
     lv_textarea_set_one_line(obj, true);
     lv_textarea_set_cursor_click_pos(obj, true);
@@ -345,19 +360,27 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             if(lv_group_get_editing(lv_obj_get_group(obj))) {
-                if(spinbox->step > 1) {
-                    lv_spinbox_step_next(obj);
-                }
-                else {
-                    /*Restart from the MSB*/
-                    spinbox->step = 1;
-                    uint32_t i;
-                    for(i = 0; i < spinbox->digit_count; i++) {
-                        int32_t new_step = spinbox->step * 10;
-                        if(new_step >= spinbox->range_max) break;
-                        spinbox->step = new_step;
+                if (spinbox->digit_count > 1) {
+                    if (spinbox->digit_step_dir == LV_DIR_RIGHT) {
+                        if(spinbox->step > 1) {
+                           lv_spinbox_step_next(obj);
+                        }
+                        else {
+                            /*Restart from the MSB*/
+                            spinbox->step = lv_pow(10, spinbox->digit_count - 2);
+                            lv_spinbox_step_prev(obj);
+                        }
                     }
-                    lv_spinbox_step_prev(obj);
+                    else {
+                        if(spinbox->step < lv_pow(10, spinbox->digit_count - 1)) {
+                            lv_spinbox_step_prev(obj);
+                        }
+                        else {
+                            /*Restart from the LSB*/
+                            spinbox->step = 10;
+                            lv_spinbox_step_next(obj);
+                        }
+                    }
                 }
             }
         }

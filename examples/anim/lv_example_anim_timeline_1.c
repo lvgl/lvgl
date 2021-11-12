@@ -1,7 +1,7 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES
 
-static lv_anim_timeline_t * anim_timeline = NULL; 
+static lv_anim_timeline_t * anim_timeline = NULL;
 
 static lv_obj_t * obj1 = NULL;
 static lv_obj_t * obj2 = NULL;

@@ -54,6 +54,10 @@ void lv_extra_init(void)
     lv_fs_posix_init();
 #endif
 
+#if LV_USE_FS_WIN32 != '\0'
+    lv_fs_win32_init();
+#endif
+
 #if LV_USE_PNG
     lv_png_init();
 #endif
@@ -70,9 +74,7 @@ void lv_extra_init(void)
     /*Init freetype library
      *Cache max 64 faces and 1 size*/
     lv_freetype_init(0, 0, LV_FREETYPE_CACHE_SIZE);
-
 #endif
-
 }
 
 /**********************

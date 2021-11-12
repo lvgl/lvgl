@@ -110,6 +110,10 @@ The following event codes exist:
 - `LV_EVENT_STYLE_CHANGED`    Object's style has changed
 - `LV_EVENT_BASE_DIR_CHANGED` The base dir has changed
 - `LV_EVENT_GET_SELF_SIZE`    Get the internal size of a widget
+- `LV_EVENT_SCREEN_UNLOAD_START` A screen unload started, fired immediately when lv_scr_load/lv_scr_load_anim is called
+- `LV_EVENT_SCREEN_LOAD_START` A screen load started, fired when the screen change delay is expired
+- `LV_EVENT_SCREEN_LOADED`    A screen was loaded, called when all animations are finished
+- `LV_EVENT_SCREEN_UNLOADED`  A screen was unloaded, called when all animations are finished
 
 ### Special events
 - `LV_EVENT_VALUE_CHANGED`    The object's value has changed (i.e. slider moved)

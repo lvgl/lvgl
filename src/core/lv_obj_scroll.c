@@ -646,6 +646,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
                                   lv_anim_enable_t anim_en)
 {
     lv_obj_t * parent = lv_obj_get_parent(child);
+    if(!lv_obj_has_flag(parent, LV_OBJ_FLAG_SCROLLABLE)) return;
+
     lv_dir_t scroll_dir = lv_obj_get_scroll_dir(parent);
     lv_coord_t snap_goal = 0;
     lv_coord_t act = 0;

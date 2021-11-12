@@ -33,7 +33,6 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 
 #ifdef LODEPNG_COMPILE_DISK
 #include <limits.h> /* LONG_MAX */
-#include <stdio.h> /* file handling */
 #endif /* LODEPNG_COMPILE_DISK */
 
 #ifdef LODEPNG_COMPILE_ALLOCATORS
@@ -76,7 +75,7 @@ static void* lodepng_malloc(size_t size) {
 #ifdef LODEPNG_MAX_ALLOC
   if(size > LODEPNG_MAX_ALLOC) return 0;
 #endif
-  return malloc(size);
+  return lv_mem_alloc(size);
 }
 
 /* NOTE: when realloc returns NULL, it leaves the original memory untouched */
@@ -84,11 +83,11 @@ static void* lodepng_realloc(void* ptr, size_t new_size) {
 #ifdef LODEPNG_MAX_ALLOC
   if(new_size > LODEPNG_MAX_ALLOC) return 0;
 #endif
-  return realloc(ptr, new_size);
+  return lv_mem_realloc(ptr, new_size);
 }
 
 static void lodepng_free(void* ptr) {
-  free(ptr);
+  lv_mem_free(ptr);
 }
 #else /*LODEPNG_COMPILE_ALLOCATORS*/
 /* TODO: support giving additional void* payload to the custom allocators */
@@ -348,7 +347,7 @@ static long lodepng_filesize(const char* filename) {
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return -1;
     uint32_t size = 0;
-    if(lv_fs_seek(&f, 0, SEEK_END) != 0) {
+    if(lv_fs_seek(&f, 0, LV_FS_SEEK_END) != 0) {
       lv_fs_close(&f);
       return -1;
     }
@@ -385,11 +384,13 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
 
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
 unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename) {
-  FILE* file;
-  file = fopen(filename, "wb" );
-  if(!file) return 79;
-  fwrite(buffer, 1, buffersize, file);
-  fclose(file);
+  lv_fs_file_t f;
+  lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_WR);
+  if(res != LV_FS_RES_OK) return 79;
+
+  uint32_t bw;
+  res = lv_fs_write(&f, buffer, buffersize, &bw);
+  lv_fs_close(&f);
   return 0;
 }
 
@@ -2309,7 +2310,7 @@ static unsigned zlib_compress(unsigned char** out, size_t* outsize, const unsign
 static unsigned zlib_decompress(unsigned char** out, size_t* outsize, size_t expected_size,
                                 const unsigned char* in, size_t insize, const LodePNGDecompressSettings* settings) {
   if(!settings->custom_zlib) return 87; /*no custom zlib function provided */
-  (void)expected_size;
+  LV_UNUSED(expected_size);
   return settings->custom_zlib(out, outsize, in, insize, settings);
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
@@ -2551,6 +2552,8 @@ unsigned char* lodepng_chunk_find(unsigned char* chunk, unsigned char* end, cons
     if(lodepng_chunk_type_equals(chunk, type)) return chunk;
     chunk = lodepng_chunk_next(chunk, end);
   }
+
+  return 0; /*Shouldn't reach this*/
 }
 
 const unsigned char* lodepng_chunk_find_const(const unsigned char* chunk, const unsigned char* end, const char type[5]) {
@@ -2559,6 +2562,8 @@ const unsigned char* lodepng_chunk_find_const(const unsigned char* chunk, const 
     if(lodepng_chunk_type_equals(chunk, type)) return chunk;
     chunk = lodepng_chunk_next_const(chunk, end);
   }
+
+  return 0; /*Shouldn't reach this*/
 }
 
 unsigned lodepng_chunk_append(unsigned char** out, size_t* outsize, const unsigned char* chunk) {

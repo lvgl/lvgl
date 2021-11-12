@@ -105,7 +105,7 @@ int64_t lv_pow(int64_t base, int8_t exp);
  * @param max_out max output range
  * @return the mapped number
  */
-int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min, int32_t max);
+int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out);
 
 /**
  * Get a pseudo random number in the given range
@@ -129,11 +129,12 @@ uint32_t lv_rand(uint32_t min, uint32_t max);
 #define LV_CLAMP(min, val, max) (LV_MAX(min, (LV_MIN(val, max))))
 
 #define LV_ABS(x) ((x) > 0 ? (x) : (-(x)))
+#define LV_UDIV255(x) (((x) * 0x8081U) >> 0x17)
 
-#define LV_IS_SIGNED(t) (((t)(-1)) < ((t) 0))
+#define LV_IS_SIGNED(t) (((t)(-1)) < ((t)0))
 #define LV_UMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
-#define LV_MAX_OF(t) ((unsigned long) (LV_IS_SIGNED(t) ? LV_SMAX_OF(t) : LV_UMAX_OF(t)))
+#define LV_MAX_OF(t) ((unsigned long)(LV_IS_SIGNED(t) ? LV_SMAX_OF(t) : LV_UMAX_OF(t)))
 
 #ifdef __cplusplus
 } /*extern "C"*/

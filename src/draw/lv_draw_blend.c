@@ -65,6 +65,7 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
+static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 #endif
 #endif //LV_USE_GPU_SDL_RENDER
 
@@ -518,6 +519,9 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         case LV_BLEND_MODE_SUBTRACTIVE:
             blend_fp = color_blend_true_color_subtractive;
             break;
+        case LV_BLEND_MODE_MULTIPLY:
+            blend_fp = color_blend_true_color_multiply;
+            break;
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
             return;
@@ -904,6 +908,9 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         case LV_BLEND_MODE_SUBTRACTIVE:
             blend_fp = color_blend_true_color_subtractive;
             break;
+        case LV_BLEND_MODE_MULTIPLY:
+            blend_fp = color_blend_true_color_multiply;
+            break;
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
             return;
@@ -1004,7 +1011,6 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
 {
-
     if(opa <= LV_OPA_MIN) return bg;
 
     int32_t tmp;
@@ -1028,6 +1034,30 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
     return lv_color_mix(fg, bg, opa);
 }
+
+static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
+{
+    if(opa <= LV_OPA_MIN) return bg;
+
+#if LV_COLOR_DEPTH == 32
+    fg.ch.red = (fg.ch.red * bg.ch.red) >> 8;
+    fg.ch.green = (fg.ch.green * bg.ch.green) >> 8;
+    fg.ch.blue = (fg.ch.blue * bg.ch.blue) >> 8;
+#elif LV_COLOR_DEPTH == 16
+    fg.ch.red = (fg.ch.red * bg.ch.red) >> 5;
+    fg.ch.blue = (fg.ch.blue * bg.ch.blue) >> 5;
+    LV_COLOR_SET_G(fg, (LV_COLOR_GET_G(fg) * LV_COLOR_GET_G(bg)) >> 6);
+#elif LV_COLOR_DEPTH == 8
+    fg.ch.red = (fg.ch.red * bg.ch.red) >> 3;
+    fg.ch.green = (fg.ch.green * bg.ch.green) >> 3;
+    fg.ch.blue = (fg.ch.blue * bg.ch.blue) >> 2;
+#endif
+
+    if(opa == LV_OPA_COVER) return fg;
+
+    return lv_color_mix(fg, bg, opa);
+}
+
 #endif
 
 #endif // LV_USE_GPU_SDL_RENDER

@@ -40,12 +40,13 @@ typedef uint8_t cmd_state_t;
 LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
                                                      const lv_area_t * clip_area,
                                                      const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-#endif
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-#endif
+#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
+#endif /*LV_USE_EXTERNAL_RENDERER*/
+
 static uint8_t hex_char_to_num(char hex);
 
 /**********************
@@ -429,7 +430,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", letter);
+            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", (unsigned int)letter);
         }
         return;
     }
@@ -548,7 +549,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
 #if LV_DRAW_COMPLEX
-    bool mask_any = lv_draw_mask_is_any(&fill_area);
+    lv_area_t mask_area;
+    lv_area_copy(&mask_area, &fill_area);
+    mask_area.y2 = mask_area.y1 + row_end;
+    bool mask_any = lv_draw_mask_is_any(&mask_area);
 #endif
 
     uint32_t col_bit_max = 8 - bpp;
@@ -624,7 +628,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 
     lv_mem_buf_release(mask_buf);
 }
-#endif
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
@@ -705,6 +708,9 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     /*If the letter is partially out of mask the move there on draw_buf*/
     disp_buf_buf_tmp += (row_start * disp_buf_width) + col_start / 3;
 
+    lv_area_t mask_area;
+    lv_area_copy(&mask_area, &map_area);
+    mask_area.y2 = mask_area.y1 + row_end;
     bool mask_any = lv_draw_mask_is_any(&map_area);
     uint8_t font_rgb[3];
 
@@ -830,8 +836,9 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     lv_mem_buf_release(mask_buf);
     lv_mem_buf_release(color_buf);
 }
-#endif
+#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
+#endif /*LV_USE_EXTERNAL_RENDERER*/
 /**
  * Convert a hexadecimal characters to a number (0..15)
  * @param hex Pointer to a hexadecimal character (0..9, A..F)
@@ -874,3 +881,4 @@ static uint8_t hex_char_to_num(char hex)
 
     return result;
 }
+

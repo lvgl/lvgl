@@ -106,7 +106,7 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
         }
     }
 
-    LV_LOG_WARN("No tile found with at (%d,%d) index", col_id, row_id);
+    LV_LOG_WARN("No tile found with at (%d,%d) index", (int)col_id, (int)row_id);
 }
 
 lv_obj_t * lv_tileview_get_tile_act(lv_obj_t * obj)

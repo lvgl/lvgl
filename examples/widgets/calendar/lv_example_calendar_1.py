@@ -1,8 +1,9 @@
+
 def event_handler(evt):
     code = evt.get_code()
 
     if code == lv.EVENT.VALUE_CHANGED:
-        source = evt.get_target()
+        source = evt.get_current_target()
         date = lv.calendar_date_t()
         if source.get_pressed_date(date) == lv.RES.OK:        
             calendar.set_today_date(date.year, date.month, date.day)
@@ -26,24 +27,4 @@ highlighted_days=[
 
 calendar.set_highlighted_dates(highlighted_days, len(highlighted_days))
 
-# 2 options for header
-header1 = lv.calendar_header_dropdown(lv.scr_act(),calendar)
-header2 = lv.calendar_header_arrow(lv.scr_act(),calendar,25)
-
-# Switch to switch headeres
-header2.add_flag(lv.obj.FLAG.HIDDEN)
-header1.clear_flag(lv.obj.FLAG.HIDDEN)
-
-sw = lv.switch(lv.scr_act())
-sw.set_pos(20,20)
-
-def sw_cb(e):
-    obj = e.get_target()
-    if obj.has_state(lv.STATE.CHECKED):
-        header1.add_flag(lv.obj.FLAG.HIDDEN)
-        header2.clear_flag(lv.obj.FLAG.HIDDEN)
-    else:
-        header2.add_flag(lv.obj.FLAG.HIDDEN)
-        header1.clear_flag(lv.obj.FLAG.HIDDEN)
-
-sw.add_event_cb(sw_cb, lv.EVENT.VALUE_CHANGED, None)
+lv.calendar_header_dropdown(calendar)

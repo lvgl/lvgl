@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include "lv_test_indev.h"
 
 /* This function runs before each test */
 void setUp(void);
@@ -16,6 +17,9 @@ void test_arc_angles_when_reversed(void);
 
 static lv_obj_t *active_screen = NULL;
 static lv_obj_t *arc = NULL;
+static uint32_t event_cnt;
+
+static void dummy_event_cb(lv_event_t * e);
 
 void setUp(void)
 {
@@ -117,6 +121,47 @@ void test_arc_angles_when_reversed(void)
     TEST_ASSERT_EQUAL_UINT16(expected_start_angle, lv_arc_get_angle_start(arcBlack));
     TEST_ASSERT_EQUAL_UINT16(expected_end_angle, lv_arc_get_angle_end(arcBlack));
     TEST_ASSERT_EQUAL_INT16(expected_value, lv_arc_get_value(arcBlack));
+}
+
+void test_arc_click_area_with_adv_hittest(void)
+{
+    arc = lv_arc_create(lv_scr_act());
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_set_style_arc_width(arc, 10, 0);
+    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_set_ext_click_area(arc, 5);
+      
+    /*No click detected at the middle*/
+    event_cnt = 0;
+    lv_test_mouse_click_at(50, 50);
+    TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
+    
+    /*No click close to the radius - bg_arc - ext_click_area*/
+    event_cnt = 0;
+    lv_test_mouse_click_at(83, 50);
+    TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
+    
+    /*Click on the radius - bg_arc - ext_click_area*/
+    event_cnt = 0;
+    lv_test_mouse_click_at(86, 50);
+    TEST_ASSERT_GREATER_THAN(0, event_cnt);
+    
+    /*Click on the radius + ext_click_area*/
+    event_cnt = 0;
+    lv_test_mouse_click_at(104, 50);
+    TEST_ASSERT_GREATER_THAN(0, event_cnt);
+
+    /*No click beyond to the radius + ext_click_area*/
+    event_cnt = 0;
+    lv_test_mouse_click_at(106, 50);
+    TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
+}
+
+static void dummy_event_cb(lv_event_t * e) 
+{
+  LV_UNUSED(e);
+  event_cnt++;
 }
 
 #endif

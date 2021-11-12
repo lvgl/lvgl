@@ -85,6 +85,13 @@ void _lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area,
                    const lv_color_t * map_buf, lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa,
                    lv_blend_mode_t mode)
 {
+    LV_UNUSED(clip_area);
+    LV_UNUSED(map_area);
+    LV_UNUSED(map_buf);
+    LV_UNUSED(mask);
+    LV_UNUSED(mask_res);
+    LV_UNUSED(opa);
+    LV_UNUSED(mode);
 
 }
 
