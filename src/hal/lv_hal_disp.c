@@ -259,7 +259,7 @@ void lv_disp_remove(lv_disp_t * disp)
     }
 
     _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
-    lv_timer_del(disp->refr_timer);
+    if(disp->refr_timer) lv_timer_del(disp->refr_timer);
     lv_mem_free(disp);
 
     if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
