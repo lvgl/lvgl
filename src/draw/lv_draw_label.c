@@ -463,27 +463,32 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         return;
     }
 
-    /*If the letter is an arabic vowel it's x and y positions need to be calculated based on the following character*/
-    if (letter >= 0x064B && letter <= 0x0652)
-    {
+    /*Arabic vowels need special xy calculation*/
+    if(letter >= 0x064B && letter <= 0x0652) {
         lv_font_glyph_dsc_t next_glyph;
         lv_font_get_glyph_dsc(font_p, &next_glyph, next_letter_temp, '\0');
 
-        pos_x = pos_p->x + ((next_glyph.box_w - g.box_w) / 2) - 1;  // Center the vowel character based on the width of the next character
+        uint32_t adv_w = next_glyph.adv_w;
+        int32_t next_y = pos_p->y + (font_p->line_height - font_p->base_line) - next_glyph.box_h - next_glyph.ofs_y;
+        if(next_next_letter_temp) { // Next character is a vowel
+            lv_font_glyph_dsc_t next_next_glyph;
+            lv_font_get_glyph_dsc(font_p, &next_next_glyph, next_next_letter_temp, '\0');
 
-        int32_t next_letter_pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - next_glyph.box_h - next_glyph.ofs_y;
-        if(letter == 0x064D || letter == 0x0650) {  // Kasra and tanween kasra vowel sits below a normal character
-            pos_y = next_letter_pos_y + next_glyph.box_h;
+            adv_w = next_next_glyph.adv_w;
+
+            int32_t next_next_y = pos_p->y + (font_p->line_height - font_p->base_line) - next_next_glyph.box_h - next_next_glyph.ofs_y;
+            next_y = next_next_y - next_glyph.box_h;
         }
-        else {
-            if (next_next_letter_temp) {  // If the next character's also a vowel then the character after it has to be used for calculations
-                lv_font_glyph_dsc_t next_next_glyph;    
-                lv_font_get_glyph_dsc(font_p, &next_next_glyph, next_next_letter_temp, '\0');
-                int32_t next_next_letter_pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - next_next_glyph.box_h - next_next_glyph.ofs_y;
-                next_letter_pos_y = next_next_letter_pos_y - next_glyph.box_h;
-            }
-            pos_y = next_letter_pos_y - g.box_h;
-        }        
+
+        // Add a small offset between base character and vowel unless the base character
+        // has a tall edge like the character below (base: 0x0643 | end: 0xFEDA)
+        if(!(next_letter_temp == 0xFEDB || next_letter_temp == 0xFEDC) && !next_next_letter_temp)
+            next_y -= 2;
+
+        pos_x = pos_p->x + (adv_w - g.box_w) / 2;
+
+        if(!(letter == 0x064D || letter == 0x0650))    // Don't do anything if vowel is a below diacritic mark
+            pos_y = next_y - g.box_h;
     }
 
     const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
