@@ -11,8 +11,8 @@ option(LV_CONF_INCLUDE_SIMPLE
 option(LV_CONF_PATH "Path defined for lv_conf.h")
 get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 
-file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
-file(GLOB_RECURSE EXAMPLE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.c)
+file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
+file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 
 add_library(lvgl STATIC ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
@@ -24,12 +24,11 @@ target_compile_definitions(
               $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
 
 # Include root and optional parent path of LV_CONF_PATH
-target_include_directories(lvgl SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-                                              ${LV_CONF_DIR})
+target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
 
 # Include /examples folder
 target_include_directories(lvgl_examples SYSTEM
-                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/examples)
+                           PUBLIC ${LVGL_ROOT_DIR}/examples)
 
 target_link_libraries(lvgl_examples PUBLIC lvgl)
 
