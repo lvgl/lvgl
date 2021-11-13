@@ -68,8 +68,6 @@ bool lv_ft_font_init(lv_ft_info_t * info);
  */
 void lv_ft_font_destroy(lv_font_t * font);
 
-bool lv_ft_font_check_type(const lv_font_t * font);
-
 /**********************
  *      MACROS
  **********************/

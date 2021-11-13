@@ -49,8 +49,6 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
                                     FT_Library library_is, FT_Pointer req_data, FT_Face * aface);
 static bool lv_ft_font_init_cache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_cache(lv_font_t * font);
-static bool lv_ft_font_init_cache(lv_ft_info_t * info);
-static void lv_ft_font_destroy_cache(lv_font_t * font);
 #else
 static FT_Face face_find_in_list(lv_ft_info_t * info);
 static void face_add_to_list(FT_Face face);
@@ -152,11 +150,6 @@ void lv_ft_font_destroy(lv_font_t * font)
 #else
     lv_ft_font_destroy_nocache(font);
 #endif
-}
-
-bool lv_ft_font_check_type(const lv_font_t * font)
-{
-    return font != NULL && lv_ft_font_has_cb(font);
 }
 
 /**********************
