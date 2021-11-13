@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -22,20 +21,11 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define _LV_COORD_MAX_REDUCE    8192
-
 #if LV_USE_LARGE_COORD
 typedef int32_t lv_coord_t;
 #else
 typedef int16_t lv_coord_t;
 #endif
-
-/*To allow some special values in the end reduce the max value*/
-#define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - _LV_COORD_MAX_REDUCE))
-#define LV_COORD_MIN (-LV_COORD_MAX)
-
-LV_EXPORT_CONST_INT(LV_COORD_MAX);
-LV_EXPORT_CONST_INT(LV_COORD_MIN);
 
 /**********************
  *      TYPEDEFS
@@ -250,16 +240,18 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
 #endif
 
 #define _LV_COORD_TYPE_MASK     (3 << _LV_COORD_TYPE_SHIFT)
-#define _LV_COORD_PLAIN(x)      ((x) & (~_LV_COORD_TYPE_MASK))  /*Remove type specifiers*/
+#define _LV_COORD_TYPE(x)       ((x) & _LV_COORD_TYPE_MASK)  /*Extract type specifiers*/
+#define _LV_COORD_PLAIN(x)      ((x) & ~_LV_COORD_TYPE_MASK) /*Remove type specifiers*/
 
 #define _LV_COORD_TYPE_PX       (0 << _LV_COORD_TYPE_SHIFT)
 #define _LV_COORD_TYPE_SPEC     (1 << _LV_COORD_TYPE_SHIFT)
-#define _LV_COORD_TYPE_RESERVED (3 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_PX_NEG   (3 << _LV_COORD_TYPE_SHIFT)
 
-#define LV_COORD_IS_PX(x)     ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_PX) ? true : false)
-#define LV_COORD_IS_SPEC(x)   ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_SPEC) ? true : false)
+#define LV_COORD_IS_PX(x)       (_LV_COORD_TYPE(x) == _LV_COORD_TYPE_PX) || \
+                                 _LV_COORD_TYPE(x) == _LV_COORD_TYPE_PX_NEG ? true : false)
+#define LV_COORD_IS_SPEC(x)     (_LV_COORD_TYPE(x) == _LV_COORD_TYPE_SPEC ? true : false)
 
-#define LV_COORD_SET_SPEC(x)   ((x) | _LV_COORD_TYPE_SPEC)
+#define LV_COORD_SET_SPEC(x)    ((x) | _LV_COORD_TYPE_SPEC)
 
 /*Special coordinates*/
 #define LV_PCT(x)               (x < 0 ? LV_COORD_SET_SPEC(1000 - (x)) : LV_COORD_SET_SPEC(x))
@@ -268,6 +260,13 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
 #define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(2001)
 
 LV_EXPORT_CONST_INT(LV_SIZE_CONTENT);
+
+/*Max coordinate value*/
+#define LV_COORD_MAX            ((1 << _LV_COORD_TYPE_SHIFT) - 1)
+#define LV_COORD_MIN            (-LV_COORD_MAX)
+
+LV_EXPORT_CONST_INT(LV_COORD_MAX);
+LV_EXPORT_CONST_INT(LV_COORD_MIN);
 
 /**
  * Convert a percentage value to `lv_coord_t`.

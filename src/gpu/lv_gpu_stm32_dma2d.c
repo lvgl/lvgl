@@ -76,6 +76,7 @@ void lv_gpu_stm32_dma2d_init(void)
 
     /*Delay after setting peripheral clock*/
     volatile uint32_t temp = RCC->AHB1ENR;
+    LV_UNUSED(temp);
 
     /*set output colour mode*/
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;

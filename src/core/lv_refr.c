@@ -253,7 +253,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_obj_set_style_pad_right(perf_label, 3, 0);
         lv_obj_set_style_text_align(perf_label, LV_TEXT_ALIGN_RIGHT, 0);
         lv_label_set_text(perf_label, "?");
-        lv_obj_align(perf_label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+        lv_obj_align(perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
     }
 
     static uint32_t perf_last_time = 0;
@@ -296,7 +296,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_obj_set_style_pad_left(mem_label, 3, 0);
         lv_obj_set_style_pad_right(mem_label, 3, 0);
         lv_label_set_text(mem_label, "?");
-        lv_obj_align(mem_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+        lv_obj_align(mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
     }
 
     static uint32_t mem_last_time = 0;
@@ -307,7 +307,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         uint32_t used_size = mon.total_size - mon.free_size;;
         uint32_t used_kb = used_size / 1024;
         uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
-        lv_label_set_text_fmt(mem_label, "%d.%d kB used (%d %%)\n%d%% frag.", used_kb,  used_kb_tenth, mon.used_pct,
+        lv_label_set_text_fmt(mem_label, "%" LV_PRIu32 ".%" LV_PRIu32 " kB used (%d %%)\n" \
+                              "%d%% frag.", used_kb, used_kb_tenth, mon.used_pct,
                               mon.frag_pct);
     }
 #endif
@@ -457,31 +458,43 @@ static void lv_refr_area(const lv_area_t * area_p)
         }
     }
 
-    /*Always use the full row*/
-    lv_coord_t row;
-    lv_coord_t row_last = 0;
-    for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
-        /*Calc. the next y coordinates of draw_buf*/
-        draw_buf->area.x1 = area_p->x1;
-        draw_buf->area.x2 = area_p->x2;
-        draw_buf->area.y1 = row;
-        draw_buf->area.y2 = row + max_row - 1;
-        if(draw_buf->area.y2 > y2) draw_buf->area.y2 = y2;
-        row_last = draw_buf->area.y2;
-        if(y2 == row_last) disp_refr->driver->draw_buf->last_part = 1;
+    /*In direct mode draw directly on the absolute coordinates of the buffer*/
+    if(disp_refr->driver->direct_mode) {
+        draw_buf->area.x1 = 0;
+        draw_buf->area.x2 = lv_disp_get_hor_res(disp_refr) - 1;
+        draw_buf->area.y1 = 0;
+        draw_buf->area.y2 = lv_disp_get_ver_res(disp_refr) - 1;
+        disp_refr->driver->draw_buf->last_part = disp_refr->driver->draw_buf->last_area;
         lv_refr_area_part(area_p);
     }
+    /*Else assume the buffer starts at the given area*/
+    else {
+        /*Always use the full row*/
+        lv_coord_t row;
+        lv_coord_t row_last = 0;
+        for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
+            /*Calc. the next y coordinates of draw_buf*/
+            draw_buf->area.x1 = area_p->x1;
+            draw_buf->area.x2 = area_p->x2;
+            draw_buf->area.y1 = row;
+            draw_buf->area.y2 = row + max_row - 1;
+            if(draw_buf->area.y2 > y2) draw_buf->area.y2 = y2;
+            row_last = draw_buf->area.y2;
+            if(y2 == row_last) disp_refr->driver->draw_buf->last_part = 1;
+            lv_refr_area_part(area_p);
+        }
 
-    /*If the last y coordinates are not handled yet ...*/
-    if(y2 != row_last) {
-        /*Calc. the next y coordinates of draw_buf*/
-        draw_buf->area.x1 = area_p->x1;
-        draw_buf->area.x2 = area_p->x2;
-        draw_buf->area.y1 = row;
-        draw_buf->area.y2 = y2;
+        /*If the last y coordinates are not handled yet ...*/
+        if(y2 != row_last) {
+            /*Calc. the next y coordinates of draw_buf*/
+            draw_buf->area.x1 = area_p->x1;
+            draw_buf->area.x2 = area_p->x2;
+            draw_buf->area.y1 = row;
+            draw_buf->area.y2 = y2;
 
-        disp_refr->driver->draw_buf->last_part = 1;
-        lv_refr_area_part(area_p);
+            disp_refr->driver->draw_buf->last_part = 1;
+            lv_refr_area_part(area_p);
+        }
     }
 }
 

@@ -148,14 +148,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_allocate_spec_attr(parent);
 
     lv_obj_t * old_parent = obj->parent;
-    lv_point_t old_pos;
-    old_pos.y = lv_obj_get_y(obj);
-
-    lv_base_dir_t new_base_dir = lv_obj_get_style_base_dir(parent, LV_PART_MAIN);
-
-    if(new_base_dir != LV_BASE_DIR_RTL) old_pos.x = lv_obj_get_x(obj);
-    else  old_pos.x = old_parent->coords.x2 - obj->coords.x2;
-
     /*Remove the object from the old parent's child list*/
     int32_t i;
     for(i = lv_obj_get_index(obj); i <= (int32_t)lv_obj_get_child_cnt(old_parent) - 2; i++) {
@@ -179,15 +171,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     obj->parent = parent;
 
-    if(new_base_dir != LV_BASE_DIR_RTL) {
-        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
-    }
-    else {
-        /*Align to the right in case of RTL base dir*/
-        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
-        lv_obj_set_pos(obj, new_x, old_pos.y);
-    }
-
     /*Notify the original parent because one of its children is lost*/
     lv_event_send(old_parent, LV_EVENT_CHILD_CHANGED, obj);
     lv_event_send(old_parent, LV_EVENT_CHILD_DELETED, NULL);
@@ -195,6 +178,8 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     /*Notify the new parent about the child*/
     lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
     lv_event_send(parent, LV_EVENT_CHILD_CREATED, NULL);
+
+    lv_obj_mark_layout_as_dirty(obj);
 
     lv_obj_invalidate(obj);
 }

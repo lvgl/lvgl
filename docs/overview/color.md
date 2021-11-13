@@ -79,7 +79,7 @@ lv_color_t c = lv_color_lighten(c, lvl);
 // Darken a color. 0: no change, 255: black
 lv_color_t c = lv_color_darken(lv_color_t c, lv_opa_t lvl);
 
-// Lighten or darken a color. 0: black, 128: no change 255: black
+// Lighten or darken a color. 0: black, 128: no change 255: white
 lv_color_t c = lv_color_change_lightness(lv_color_t c, lv_opa_t lvl);
 
 

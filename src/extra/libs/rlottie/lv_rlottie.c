@@ -101,10 +101,8 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 
     rlottie->total_frames = lottie_animation_get_totalframe(rlottie->animation);
-    rlottie->framerate = lottie_animation_get_framerate(rlottie->animation);
+    rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->animation);
     rlottie->current_frame = 0;
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
 
     rlottie->scanline_width = create_width * LV_COLOR_DEPTH / 8;
 
@@ -120,7 +118,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     rlottie->imgdsc.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
     rlottie->imgdsc.header.h = create_height;
     rlottie->imgdsc.header.w = create_width;
-    rlottie->imgdsc.data = rlottie->allocated_buf;
+    rlottie->imgdsc.data = (void*)rlottie->allocated_buf;
     rlottie->imgdsc.data_size = allocaled_buf_size;
 
     lv_img_set_src(obj, &rlottie->imgdsc);

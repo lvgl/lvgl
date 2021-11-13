@@ -142,6 +142,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
 
     return union_ok;
 }
+
 /**
  * Join two areas into a third which involves the other two
  * @param res_p pointer to an area, the result will be stored here
@@ -294,7 +295,7 @@ bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_c
         return true;
     }
 
-    if(radius == 0) return true;
+    if(radius == 0) return false;
 
     /*Check if the corner points are outside the radius or not*/
     lv_point_t p;

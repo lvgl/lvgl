@@ -48,6 +48,18 @@ menu "LVGL configuration"
                 Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to
                 non LV_OPA_COVER value
 
+        config LV_COLOR_MIX_ROUND_OFS
+            int "Adjust color mix functions rounding"
+            default 128 if !LV_COLOR_DEPTH_32
+            default 0 if LV_COLOR_DEPTH_32
+            range 0 254
+            help
+                0: no adjustment, get the integer part of the result (round down)
+                64: round up from x.75
+                128: round up from half
+                192: round up from x.25
+                254: round up
+
         config LV_COLOR_CHROMA_KEY_HEX
             hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
             range 0x000000 0xFFFFFF
@@ -75,6 +87,14 @@ menu "LVGL configuration"
             string "Header to include for the custom memory function"
             default "stdlib.h"
             depends on LV_MEM_CUSTOM
+
+        config LV_MEM_BUF_MAX_NUM
+            int "Number of the memory buffer"
+            default 16
+            help
+                Number of the intermediate memory buffer used during rendering and other
+                internal processing mechanisms.  You will see an error log message if
+                there wasn't enough buffers.
 
         config LV_MEMCPY_MEMSET_STD
             bool "Use the standard memcpy and memset instead of LVGL's own functions"
@@ -827,5 +847,9 @@ menu "LVGL configuration"
             bool "Enable the examples to be built"
             default y if !LV_CONF_MINIMAL
     endmenu
+
+    config LV_BUILD_EXAMPLES
+        bool "Enable the examples to be built with the library."
+        default y
 
 endmenu

@@ -326,12 +326,12 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
         int32_t m;
 
         if(dx) {
-            m = (1 << 20) / dx;  /*m is multiplier to normalize y (upscaled by 1024)*/
+            m = (1L << 20) / dx;  /*m is multiplier to normalize y (upscaled by 1024)*/
             param->yx_steep = (m * dy) >> 10;
         }
 
         if(dy) {
-            m = (1 << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
+            m = (1L << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
             param->xy_steep = (m * dx) >> 10;
         }
         param->steep = param->yx_steep;
@@ -341,12 +341,12 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
         int32_t m;
 
         if(dy) {
-            m = (1 << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
+            m = (1L << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
             param->xy_steep = (m * dx) >> 10;
         }
 
         if(dx) {
-            m = (1 << 20) / dx;  /*m is multiplier to normalize x (upscaled by 1024)*/
+            m = (1L << 20) / dx;  /*m is multiplier to normalize x (upscaled by 1024)*/
             param->yx_steep = (m * dy) >> 10;
         }
         param->steep = param->xy_steep;

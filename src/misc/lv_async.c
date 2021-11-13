@@ -8,6 +8,8 @@
  *********************/
 
 #include "lv_async.h"
+#include "lv_mem.h"
+#include "lv_timer.h"
 
 /*********************
  *      DEFINES
@@ -72,6 +74,5 @@ static void lv_async_timer_cb(lv_timer_t * timer)
     lv_async_info_t * info = (lv_async_info_t *)timer->user_data;
 
     info->cb(info->user_data);
-
     lv_mem_free(info);
 }

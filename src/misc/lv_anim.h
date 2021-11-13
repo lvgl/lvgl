@@ -17,11 +17,17 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
+#include <stddef.h>
 
 /*********************
  *      DEFINES
  *********************/
+
+#define LV_ANIM_REPEAT_INFINITE      0xFFFF
+#define LV_ANIM_PLAYTIME_INFINITE    0xFFFFFFFF
+
+LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
+LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
 
 /**********************
  *      TYPEDEFS
@@ -32,9 +38,6 @@ typedef enum {
     LV_ANIM_OFF,
     LV_ANIM_ON,
 } lv_anim_enable_t;
-
-#define LV_ANIM_REPEAT_INFINITE      0xFFFF
-LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
 
 struct _lv_anim_t;
 
@@ -170,7 +173,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
  * `lv_anim_t * ` as its first parameter instead of `void *`.
  * This function might be used when LVGL is bound to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
- * The variable to animate can be stored in the animation's `user_sata`
+ * The variable to animate can be stored in the animation's `user_data`
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param exec_cb   a function to execute.
  */
@@ -220,10 +223,11 @@ static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_
 {
     a->ready_cb = ready_cb;
 }
+
 /**
  * Make the animation to play back to when the forward direction is ready
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param time      the duration of the playback animation in in milliseconds. 0: disable playback
+ * @param time      the duration of the playback animation in milliseconds. 0: disable playback
  */
 static inline void lv_anim_set_playback_time(lv_anim_t * a, uint32_t time)
 {
@@ -299,6 +303,13 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 {
     return -a->act_time;
 }
+
+/**
+ * Get the time used to play the animation.
+ * @param a pointer to an animation.
+ * @return the play time in milliseconds.
+ */
+uint32_t lv_anim_get_playtime(lv_anim_t * a);
 
 /**
  * Get the user_data field of the animation
