@@ -201,10 +201,6 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     FT_UInt glyph_index = FTC_CMapCache_Lookup(cmap_cache, face_id, charmap_index, unicode_letter);
     missing_glyph = glyph_index == 0;
 
-    if (missing_glyph && font->fallback) {
-        return lv_font_get_glyph_dsc(font->fallback, dsc_out, unicode_letter, unicode_letter_next);
-    }
-
     FT_Error error = FTC_SBitCache_Lookup(sbit_cache, &desc_sbit_type, glyph_index, &sbit, NULL);
     if(error) {
         LV_LOG_ERROR("SBitCache_Lookup error");
@@ -216,15 +212,13 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     dsc_out->ofs_x = sbit->left;    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = sbit->top - sbit->height; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;               /*Bit per pixel: 1/2/4/8*/
+    dsc_out->missing = missing_glyph;
 
     return true;
 }
 
 static const uint8_t * get_glyph_bitmap_cb_cache(const lv_font_t * font, uint32_t unicode_letter)
 {
-    if (missing_glyph && font->fallback) {
-        return lv_font_get_glyph_bitmap(font->fallback, unicode_letter);
-    }
     return (const uint8_t *)sbit->buffer;
 }
 

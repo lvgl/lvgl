@@ -163,7 +163,7 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
     while(cur < src_len) {
         curbit = 8 - bpp;
         uint8_t src_byte = src[cur * bpp / 8];
-        while(curbit >= 0) {
+        while(curbit >= 0 && cur < src_len) {
             uint8_t src_bits = opa_mask & (src_byte >> curbit);
             dest[(cur / width * stride) + (cur % width)] = opa_table[src_bits];
             curbit -= bpp;

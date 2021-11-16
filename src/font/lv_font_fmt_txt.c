@@ -155,7 +155,10 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     }
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
-    if(!gid) return false;
+    if(!gid) {
+        dsc_out->missing = true;
+        return false;
+    }
 
     int8_t kvalue = 0;
     if(fdsc->kern_dsc) {
@@ -182,6 +185,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
     dsc_out->bpp   = (uint8_t)fdsc->bpp;
+    dsc_out->missing = false;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
