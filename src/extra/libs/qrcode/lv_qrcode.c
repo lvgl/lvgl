@@ -14,6 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define MY_CLASS &lv_qrcode_class
 #define QR_SIZE     140
 
 /**********************
@@ -23,14 +24,22 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 const lv_obj_class_t lv_qrcode_class = {
+    .constructor_cb = lv_qrcode_constructor,
+    .destructor_cb = lv_qrcode_destructor,
     .base_class = &lv_canvas_class
 };
+
+static lv_coord_t size_param;
+static lv_color_t dark_color_param;
+static lv_color_t light_color_param;
 
 /**********************
  *      MACROS
@@ -50,19 +59,14 @@ const lv_obj_class_t lv_qrcode_class = {
  */
 lv_obj_t * lv_qrcode_create(lv_obj_t * parent, lv_coord_t size, lv_color_t dark_color, lv_color_t light_color)
 {
-   uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(size, size);
-   uint8_t * buf = lv_mem_alloc(buf_size);
-   LV_ASSERT_MALLOC(buf);
-   if(buf == NULL) return NULL;
+    LV_LOG_INFO("begin");
+    size_param = size;
+    light_color_param = light_color;
+    dark_color_param = dark_color;
 
-   lv_obj_t * canvas = lv_canvas_create(parent);
-   if(canvas == NULL) return NULL;
-
-   lv_canvas_set_buffer(canvas, buf, size, size, LV_IMG_CF_INDEXED_1BIT);
-   lv_canvas_set_palette(canvas, 0, dark_color);
-   lv_canvas_set_palette(canvas, 1, light_color);
-
-   return canvas;
+    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    lv_obj_class_init_obj(obj);
+    return obj;
 
 }
 
@@ -159,20 +163,40 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
     return LV_RES_OK;
 }
 
-/**
- * Delete a QR code object
- * @param qrcode pointer to a QR code obejct
- */
+
 void lv_qrcode_delete(lv_obj_t * qrcode)
 {
-    lv_img_dsc_t * img = lv_canvas_get_img(qrcode);
-    lv_img_cache_invalidate_src(img);
-    lv_mem_free((void*)img->data);
     lv_obj_del(qrcode);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+
+    uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(size_param, size_param);
+    uint8_t * buf = lv_mem_alloc(buf_size);
+    LV_ASSERT_MALLOC(buf);
+    if(buf == NULL) return;
+
+    lv_canvas_set_buffer(obj, buf, size_param, size_param, LV_IMG_CF_INDEXED_1BIT);
+    lv_canvas_set_palette(obj, 0, dark_color_param);
+    lv_canvas_set_palette(obj, 1, light_color_param);
+
+
+}
+
+static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+
+    lv_img_dsc_t * img = lv_canvas_get_img(obj);
+    lv_img_cache_invalidate_src(img);
+    lv_mem_free((void*)img->data);
+    img->data = NULL;
+}
 
 #endif /*LV_USE_QRCODE*/
