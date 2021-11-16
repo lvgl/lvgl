@@ -73,7 +73,7 @@ typedef struct _lv_font_t {
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
-    const struct _lv_font_t * fallback;   /**< Fallback font for missing glyph. Only supported by freetype font now */
+    const struct _lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
 #if LV_USE_USER_DATA
     void * user_data;               /**< Custom user data for font.*/
 #endif
