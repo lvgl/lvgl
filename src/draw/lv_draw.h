@@ -63,13 +63,33 @@ typedef struct _lv_draw_backend_t{
                         const lv_draw_rect_dsc_t * draw_dsc);
 
 
-   void (*blend_fill)(const lv_area_t * clip_area, const lv_area_t * fill_area, lv_color_t color,
-                                             lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode);
+   /**
+    * Fill an arae of a buffer with a color
+    * @param dest_buf       pointer to a buffer to fill
+    * @param dest_stride    stride of `dest_buf` (number of pixel in a line)
+    * @param fill_area      the area to fill on `dest_buf`
+    * @param color          fill color
+    * @param mask           NULL if ignored, or an alpha mask to apply on `fill_area`
+    * @param opa            overall opacity
+    * @param blend_mode     e.g. LV_BLEND_MODE_ADDITIVE
+    */
+   void (*blend_fill)(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
+                      lv_color_t color, const lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
-   void (*blend_map)(const lv_area_t * clip_area, const lv_area_t * map_area,
-                                            const lv_color_t * map_buf,
-                                            lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode);
-
+   /**
+    * Blend a source buffer to a destination buffer
+    * @param dest_buf       pointer to the destination buffer
+    * @param dest_stride    stride of `dest_buf` (number of pixel in a line)
+    * @param clip_area      clip the blending to this area
+    * @param src_buf        pointer to the destination buffer
+    * @param src_area       coordinates of the `src_buf` relative to the `dest_buf`
+    * @param mask           NULL if ignored, or an alpha mask to apply on `clip_area` (it's size is equal to the `clip_area`)
+    * @param opa            overall opacity
+    * @param blend_mode     e.g. LV_BLEND_MODE_ADDITIVE
+    */
+   void (*blend_map)(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
+                     const lv_color_t * src_buf, const lv_area_t * src_area,
+                     const lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
 }lv_draw_backend_t;
 
