@@ -57,9 +57,6 @@ static void face_generic_finalizer(void * object);
 static bool lv_ft_font_init_nocache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_nocache(lv_font_t * font);
 #endif
-
-static bool lv_ft_font_has_cb(const lv_font_t * font);
-
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -70,7 +67,6 @@ static FT_Library library;
     static FTC_CMapCache cmap_cache;
     static FTC_SBitCache sbit_cache;
     static FTC_SBit sbit;
-    static bool missing_glyph;
 #else
     static lv_faces_control_t face_control;
 #endif
@@ -199,8 +195,6 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     desc_sbit_type.width = dsc->height;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(cmap_cache, face_id, charmap_index, unicode_letter);
-    missing_glyph = glyph_index == 0;
-
     FT_Error error = FTC_SBitCache_Lookup(sbit_cache, &desc_sbit_type, glyph_index, &sbit, NULL);
     if(error) {
         LV_LOG_ERROR("SBitCache_Lookup error");
@@ -212,7 +206,7 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     dsc_out->ofs_x = sbit->left;    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = sbit->top - sbit->height; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;               /*Bit per pixel: 1/2/4/8*/
-    dsc_out->missing = missing_glyph;
+    dsc_out->missing = glyph_index == 0;
 
     return true;
 }
@@ -297,12 +291,6 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
         lv_mem_free(dsc);
     }
 }
-
-static bool lv_ft_font_has_cb(const lv_font_t * font)
-{
-    return font->get_glyph_bitmap == get_glyph_bitmap_cb_cache && font->get_glyph_dsc == get_glyph_dsc_cb_cache;
-}
-
 #else/* LV_FREETYPE_CACHE_SIZE */
 
 static FT_Face face_find_in_list(lv_ft_info_t * info)
@@ -371,14 +359,10 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
 
     FT_UInt glyph_index = FT_Get_Char_Index(face, unicode_letter);
 
-    if (glyph_index == 0) {
-        /* We don't support fallback without cache yet */
-        LV_ASSERT(!font->fallback);
-    }
-
     if(face->size != dsc->size) {
         FT_Activate_Size(dsc->size);
     }
+    dsc_out->missing = glyph_index == 0;
 
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     if(error) {
@@ -494,10 +478,6 @@ static void lv_ft_font_destroy_nocache(lv_font_t * font)
     }
 }
 
-static bool lv_ft_font_has_cb(const lv_font_t * font)
-{
-    return font->get_glyph_bitmap == get_glyph_bitmap_cb_nocache && font->get_glyph_dsc == get_glyph_dsc_cb_nocache;
-}
 #endif/* LV_FREETYPE_CACHE_SIZE */
 
 #endif /*LV_USE_FREETYPE*/
