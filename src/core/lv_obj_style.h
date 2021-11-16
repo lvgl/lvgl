@@ -230,15 +230,6 @@ static inline void lv_obj_set_style_size(struct _lv_obj_t * obj,  lv_coord_t val
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
 
-static inline lv_coord_t lv_obj_get_x_aligned(const struct _lv_obj_t * obj)
-{
-    return lv_obj_get_style_x(obj, LV_PART_MAIN);
-}
-
-static inline lv_coord_t lv_obj_get_y_aligned(const struct _lv_obj_t * obj)
-{
-    return lv_obj_get_style_y(obj, LV_PART_MAIN);
-}
 
 /**********************
  *      MACROS
