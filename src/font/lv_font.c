@@ -87,7 +87,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
 {
     LV_ASSERT_NULL(font);
-    lv_font_glyph_dsc_t g = {};
+    lv_font_glyph_dsc_t g = {.resolved_font = NULL};
     bool ret;
     ret = lv_font_get_glyph_dsc(font, &g, letter, letter_next);
     if(ret) return g.adv_w;
