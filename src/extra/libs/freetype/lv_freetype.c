@@ -213,6 +213,8 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
 
 static const uint8_t * get_glyph_bitmap_cb_cache(const lv_font_t * font, uint32_t unicode_letter)
 {
+    LV_UNUSED(font);
+    LV_UNUSED(unicode_letter);
     return (const uint8_t *)sbit->buffer;
 }
 
@@ -387,6 +389,7 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
 
 static const uint8_t * get_glyph_bitmap_cb_nocache(const lv_font_t * font, uint32_t unicode_letter)
 {
+    LV_UNUSED(unicode_letter);
     lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
     FT_Face face = dsc->size->face;
     return (const uint8_t *)(face->glyph->bitmap.buffer);

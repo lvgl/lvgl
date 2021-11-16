@@ -26,6 +26,10 @@
  *      DEFINES
  *********************/
 
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     const lv_font_t * font_p;
