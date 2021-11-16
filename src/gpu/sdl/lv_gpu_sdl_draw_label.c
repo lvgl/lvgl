@@ -116,7 +116,10 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
     bool glyph_found = false;
     SDL_Texture *texture = lv_gpu_draw_cache_get(&glyph_key, sizeof(glyph_key), &glyph_found);
     if (!glyph_found) {
-        const uint8_t *bmp = lv_font_get_glyph_bitmap(g.resolved_font ? g.resolved_font : font_p, letter);
+        if (g.resolved_font) {
+            font_p = g.resolved_font;
+        }
+        const uint8_t *bmp = lv_font_get_glyph_bitmap(font_p, letter);
         uint8_t *buf = lv_mem_alloc(g.box_w * g.box_h);
         lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
         SDL_Surface * mask = lv_sdl_create_mask_surface(buf, g.box_w, g.box_h, g.box_w);
