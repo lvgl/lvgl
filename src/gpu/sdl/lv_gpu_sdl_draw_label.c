@@ -26,20 +26,6 @@
  *      DEFINES
  *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct lv_sdl_font_atlas_t {
-    SDL_Rect * pos;
-} lv_sdl_font_atlas_t;
-
-typedef struct {
-    lv_gpu_cache_key_magic_t magic;
-    const lv_font_t * font_p;
-    uint32_t cmap_index;
-} lv_font_key_t;
-
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     const lv_font_t * font_p;
@@ -52,8 +38,6 @@ typedef struct {
 
 static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL_Rect * src, SDL_Rect * dst,
                                SDL_Rect * clip, lv_color_t color, lv_opa_t opa);
-
-static int32_t unicode_list_compare(const void * ref, const void * element);
 
 static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter);
 
@@ -131,10 +115,17 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
     if (!texture) {
         return;
     }
-    SDL_Rect dstrect = {.x = pos_x, .y = pos_y, .w = g.box_w, .h = g.box_h};
+    lv_area_t dst = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
+    SDL_Rect dstrect;
+    lv_area_to_sdl_rect(&dst, &dstrect);
 
     SDL_Rect clip_area_rect;
     lv_area_to_sdl_rect(clip_area, &clip_area_rect);
+
+    if(lv_draw_mask_is_any(&dst)) {
+        draw_letter_masked(renderer, texture, NULL, &dstrect, &clip_area_rect, color, opa);
+        return;
+    }
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, opa);
@@ -186,11 +177,6 @@ static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL
     SDL_RenderSetClipRect(renderer, clip);
     SDL_RenderCopy(renderer, content, &mask_rect, dst);
     SDL_DestroyTexture(mask);
-}
-
-static int32_t unicode_list_compare(const void * ref, const void * element)
-{
-    return ((int32_t)(*(uint16_t *) ref)) - ((int32_t)(*(uint16_t *) element));
 }
 
 static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter)
