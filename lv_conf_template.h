@@ -581,6 +581,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
+/*FFmpeg library*/
+#define LV_USE_FFMPEG  0
+#if LV_USE_FFMPEG
+/*Dump input information to stderr*/
+#define LV_FFMPEG_AV_DUMP_FORMAT 0
+#endif
+
 /*-----------
  * Others
  *----------*/

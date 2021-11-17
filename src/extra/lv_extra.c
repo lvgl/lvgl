@@ -75,6 +75,10 @@ void lv_extra_init(void)
      *Cache max 64 faces and 1 size*/
     lv_freetype_init(0, 0, LV_FREETYPE_CACHE_SIZE);
 #endif
+
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
+#endif
 }
 
 /**********************
