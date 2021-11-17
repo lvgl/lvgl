@@ -101,4 +101,4 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * ffmpeg_player, bool en);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_FFMPEG*/
+#endif /*LV_FFMPEG_H*/

@@ -834,6 +834,13 @@ menu "LVGL configuration"
 
         config LV_USE_RLOTTIE
             bool "Lottie library"
+
+        config LV_USE_FFMPEG
+            bool "FFmpeg library"
+        config LV_FFMPEG_AV_DUMP_FORMAT
+            bool "Dump av format"
+            depends on LV_USE_FFMPEG
+            default n
     endmenu
 
     menu "Others"
