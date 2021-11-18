@@ -65,16 +65,20 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 {
     LV_ASSERT_NULL(font_p);
     LV_ASSERT_NULL(dsc_out);
-    LV_ASSERT_MSG(dsc_out->missing == 1 || dsc_out->missing == 0, "dsc_out must be properly reset before use");
-    if (font_p->get_glyph_dsc(font_p, dsc_out, letter, letter_next) && (!dsc_out->missing || !font_p->fallback)) {
-        dsc_out->resolved_font = font_p;
-        return true;
-    } else if (font_p->fallback) {
-        return lv_font_get_glyph_dsc(font_p->fallback, dsc_out, letter, letter_next);
-    } else {
-        dsc_out->resolved_font = NULL;
-        return false;
+    dsc_out->resolved_font = NULL;
+    const lv_font_t * f = font_p;
+    bool found = false;
+    while(f) {
+        if (f->get_glyph_dsc(f, dsc_out, letter, letter_next)) {
+            if (!dsc_out->missing) {
+                dsc_out->resolved_font = f;
+                return true;
+            }
+            found = true;
+        }
+        f = f->fallback;
     }
+    return found;
 }
 
 /**
@@ -87,7 +91,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
 {
     LV_ASSERT_NULL(font);
-    lv_font_glyph_dsc_t g = {.resolved_font = NULL};
+    lv_font_glyph_dsc_t g;
     bool ret;
     ret = lv_font_get_glyph_dsc(font, &g, letter, letter_next);
     if(ret) return g.adv_w;

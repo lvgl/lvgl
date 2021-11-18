@@ -70,7 +70,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
         return;
     }
 
-    lv_font_glyph_dsc_t g = {.resolved_font = NULL};
+    lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(font_p, &g, letter, '\0');
     if(g_ret == false) {
         /*Add warning if the dsc is not found
