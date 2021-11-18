@@ -8,7 +8,7 @@ void lv_example_ffmpeg_1(void)
 {
     lv_obj_t * par = lv_scr_act();
     lv_obj_set_flex_flow(par, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(par, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(par, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * img = lv_img_create(par);
     lv_img_set_src(img, "./lvgl/examples/libs/ffmpeg/ffmpeg.png");
