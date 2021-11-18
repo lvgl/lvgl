@@ -25,7 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_ffmpeg_1(const char * path);
+void lv_example_ffmpeg_1(void);
 
 /**********************
  *      MACROS
