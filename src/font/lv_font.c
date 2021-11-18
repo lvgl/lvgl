@@ -69,12 +69,10 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     const lv_font_t * f = font_p;
     bool found = false;
     while(f) {
-        if (f->get_glyph_dsc(f, dsc_out, letter, letter_next)) {
-            if (!dsc_out->missing) {
-                dsc_out->resolved_font = f;
-                return true;
-            }
-            found = true;
+        found = f->get_glyph_dsc(f, dsc_out, letter, letter_next);
+        if (found && !dsc_out->missing) {
+            dsc_out->resolved_font = f;
+            break;
         }
         f = f->fallback;
     }
