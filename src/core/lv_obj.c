@@ -199,7 +199,7 @@ void lv_deinit(void)
 
     LV_LOG_INFO("lv_deinit done");
 
-#if LV_USE_LOG
+#if LV_USE_LOG && !LV_LOG_PRINTF
     lv_log_register_print_cb(NULL);
 #endif
 }

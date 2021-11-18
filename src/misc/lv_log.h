@@ -45,16 +45,17 @@ typedef int8_t lv_log_level_t;
 /**********************
  *      TYPEDEFS
  **********************/
-
+#if !LV_LOG_PRINTF
 /**
  * Log print function. Receives a string buffer to print".
  */
 typedef void (*lv_log_print_g_cb_t)(const char * buf);
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
+#if !LV_LOG_PRINTF
 /**
  * Register custom print/write function to call when a log is added.
  * It can format its "File path", "Line number" and "Description" as required
@@ -62,6 +63,7 @@ typedef void (*lv_log_print_g_cb_t)(const char * buf);
  * @param           print_cb a function pointer to print a log
  */
 void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb);
+#endif
 
 /**
  * Print a log message via `printf` if enabled with `LV_LOG_PRINTF` in `lv_conf.h`

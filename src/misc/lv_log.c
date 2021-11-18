@@ -33,7 +33,9 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if !LV_LOG_PRINTF
 static lv_log_print_g_cb_t custom_print_cb;
+#endif
 
 /**********************
  *      MACROS
@@ -42,7 +44,7 @@ static lv_log_print_g_cb_t custom_print_cb;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+#if !LV_LOG_PRINTF
 /**
  * Register custom print/write function to call when a log is added.
  * It can format its "File path", "Line number" and "Description" as required
@@ -53,6 +55,7 @@ void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb)
 {
     custom_print_cb = print_cb;
 }
+#endif
 
 /**
  * Add a log
