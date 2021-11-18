@@ -69,7 +69,6 @@ The get the redrawn areas to copy use the following functions
 `disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
 `disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into an other one and should be ignored
 `disp->inv_p` number of valid elements in `inv_areas`
-```
 
 ## Display driver
 
