@@ -23,6 +23,8 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
+    const void * mem;
+    long size;
     char * name;
 } lv_face_info_t;
 
@@ -160,7 +162,12 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
     LV_UNUSED(req_data);
 
     lv_face_info_t * info = (lv_face_info_t *)face_id;
-    FT_Error error = FT_New_Face(library, info->name, 0, aface);
+    FT_Error error;
+    if (info->mem) {
+        error = FT_New_Memory_Face(library, info->mem, info->size, 0, aface);
+    } else {
+        error = FT_New_Face(library, info->name, 0, aface);
+    }
     if(error) {
         LV_LOG_ERROR("FT_New_Face error:%d\n", error);
         return error;
@@ -229,12 +236,13 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
         return false;
     }
     lv_memset_00(dsc->font, sizeof(lv_font_t));
-
     lv_face_info_t * face_info = NULL;
     face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
     if(face_info == NULL) {
         goto Fail;
     }
+    face_info->mem = info->mem;
+    face_info->size = info->mem_size;
     face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
     strcpy(face_info->name, info->name);
 
@@ -414,7 +422,12 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         if(face_info == NULL) {
             goto Fail;
         }
-        FT_Error error = FT_New_Face(library, info->name, 0, &face);
+        FT_Error error;
+        if (info->mem) {
+            error = FT_New_Memory_Face(library, info->mem, (FT_Long) info->mem_size, 0, &face);
+        } else {
+            error = FT_New_Face(library, info->name, 0, &face);
+        }
         if(error) {
             lv_mem_free(face_info);
             LV_LOG_WARN("create face error(%d)", error);
@@ -422,6 +435,8 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         }
 
         /* link face and face info */
+        face_info->mem = info->mem;
+        face_info->size = (long) info->mem_size;
         face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
         strcpy(face_info->name, info->name);
         face->generic.data = face_info;
