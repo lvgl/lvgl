@@ -6,6 +6,8 @@
  */
 void lv_example_ffmpeg_2(void)
 {
+    /*birds.mp4 is downloaded from http://www.videezy.com (Free Stock Footage by Videezy!)
+     *https://www.videezy.com/abstract/44864-silhouettes-of-birds-over-the-sunset*/
     lv_obj_t * player = lv_ffmpeg_player_create(lv_scr_act());
     lv_ffmpeg_player_set_src(player, "./lvgl/examples/libs/ffmpeg/birds.mp4");
     lv_ffmpeg_player_set_auto_restart(player, true);
