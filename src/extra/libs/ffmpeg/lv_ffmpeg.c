@@ -139,11 +139,12 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
     return obj;
 }
 
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * ffmpeg_player, const char * path)
+lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_res_t res = LV_RES_INV;
 
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)ffmpeg_player;
+    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(player->ffmpeg_ctx) {
         ffmpeg_close(player->ffmpeg_ctx);
@@ -155,7 +156,7 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * ffmpeg_player, const char * path)
     player->ffmpeg_ctx = ffmpeg_open_file(path);
 
     if(!player->ffmpeg_ctx) {
-        LV_LOG_ERROR("ffmpeg file: %s open failed", path);
+        LV_LOG_ERROR("ffmpeg file open failed: %s", path);
         goto failed;
     }
 
@@ -203,9 +204,10 @@ failed:
     return res;
 }
 
-void lv_ffmpeg_player_set_cmd(lv_obj_t * ffmpeg_player, lv_ffmpeg_player_cmd_t cmd)
+void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd)
 {
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)ffmpeg_player;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(!player->ffmpeg_ctx) {
         LV_LOG_ERROR("ffmpeg_ctx is NULL");
@@ -241,9 +243,10 @@ void lv_ffmpeg_player_set_cmd(lv_obj_t * ffmpeg_player, lv_ffmpeg_player_cmd_t c
     }
 }
 
-void lv_ffmpeg_player_set_auto_restart(lv_obj_t * ffmpeg_player, bool en)
+void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
 {
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)ffmpeg_player;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
     player->auto_restart = en;
 }
 

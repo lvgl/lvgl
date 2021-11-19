@@ -67,25 +67,25 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent);
 
 /**
  * Set the path of the file to be played
- * @param ffmpeg_player pointer to an ffmpeg_player
+ * @param obj pointer to a ffmpeg_player object
  * @param path video file path
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info.
  */
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * ffmpeg_player, const char * path);
+lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path);
 
 /**
  * Set command control video player
- * @param ffmpeg_player pointer to an ffmpeg_player
+ * @param obj pointer to a ffmpeg_player object
  * @param cmd control commands
  */
-void lv_ffmpeg_player_set_cmd(lv_obj_t * ffmpeg_player, lv_ffmpeg_player_cmd_t cmd);
+void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd);
 
 /**
  * Set the video to automatically replay
- * @param ffmpeg_player pointer to an ffmpeg_player
+ * @param obj pointer to a ffmpeg_player object
  * @param en true: enable the auto restart
  */
-void lv_ffmpeg_player_set_auto_restart(lv_obj_t * ffmpeg_player, bool en);
+void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en);
 
 /*=====================
  * Other functions
