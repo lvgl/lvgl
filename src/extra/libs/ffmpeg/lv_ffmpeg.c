@@ -15,7 +15,6 @@
 #include <libavutil/samplefmt.h>
 #include <libavutil/timestamp.h>
 #include <libswscale/swscale.h>
-#include <lvgl/src/draw/lv_img_cache.h>
 
 /*********************
  *      DEFINES
