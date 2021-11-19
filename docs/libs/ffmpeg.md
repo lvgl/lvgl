@@ -13,7 +13,7 @@
 - `sudo make install`
 
 ## Add FFmpeg to your project
-- Add library: `FFmpeg` (for GCC: `-lavformat -lavcodec -lavutil -lswscale -lm -lz`)
+- Add library: `FFmpeg` (for GCC: `-lavformat -lavcodec -lavutil -lswscale -lm -lz -lpthread`)
 
 ## Usage
 

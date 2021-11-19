@@ -36,6 +36,8 @@
 
 #define MY_CLASS &lv_ffmpeg_player_class
 
+#define FRAME_DEF_REFR_PERIOD   33  /*[ms]*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -78,7 +80,7 @@ static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_get_img_header(const char * path, lv_img_header_t * header);
-static int ffmpeg_get_frame_interval_time(struct ffmpeg_context_s * ffmpeg_ctx);
+static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx);
 static uint8_t * ffmpeg_get_img_data(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -185,12 +187,15 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * ffmpeg_player, const char * path)
 
     lv_img_set_src(&player->img.obj, &(player->imgdsc));
 
-    int time = ffmpeg_get_frame_interval_time(player->ffmpeg_ctx);
+    int period = ffmpeg_get_frame_refr_period(player->ffmpeg_ctx);
 
-    if(time > 0) {
-        LV_LOG_INFO("frame interval time = %d ms, %d fps",
-                    time, 1000 / time);
-        lv_timer_set_period(player->timer, time);
+    if(period > 0) {
+        LV_LOG_INFO("frame refresh period = %d ms, rate = %d fps",
+                    period, 1000 / period);
+        lv_timer_set_period(player->timer, period);
+    }
+    else {
+        LV_LOG_WARN("unable to get frame refresh period");
     }
 
     res = LV_RES_OK;
@@ -605,13 +610,13 @@ failed:
     return ret;
 }
 
-static int ffmpeg_get_frame_interval_time(struct ffmpeg_context_s * ffmpeg_ctx)
+static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     int avg_frame_rate_num = ffmpeg_ctx->video_stream->avg_frame_rate.num;
     if(avg_frame_rate_num > 0) {
-        int interval_time = 1000 * ffmpeg_ctx->video_stream->avg_frame_rate.den
+        int period = 1000 * (int64_t)ffmpeg_ctx->video_stream->avg_frame_rate.den
                             / avg_frame_rate_num;
-        return interval_time;
+        return period;
     }
 
     return -1;
@@ -835,7 +840,7 @@ static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
     player->auto_restart = false;
     player->ffmpeg_ctx = NULL;
     player->timer = lv_timer_create(lv_ffmpeg_player_frame_update_cb,
-                                    1000, obj);
+                                    FRAME_DEF_REFR_PERIOD, obj);
     lv_timer_pause(player->timer);
 
     LV_TRACE_OBJ_CREATE("finished");
