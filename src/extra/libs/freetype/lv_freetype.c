@@ -206,7 +206,7 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     dsc_out->ofs_x = sbit->left;    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = sbit->top - sbit->height; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;               /*Bit per pixel: 1/2/4/8*/
-    dsc_out->missing = glyph_index == 0;
+    dsc_out->is_placeholder = glyph_index == 0;
 
     return true;
 }
@@ -364,7 +364,7 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
     if(face->size != dsc->size) {
         FT_Activate_Size(dsc->size);
     }
-    dsc_out->missing = glyph_index == 0;
+    dsc_out->is_placeholder = glyph_index == 0;
 
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     if(error) {

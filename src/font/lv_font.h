@@ -42,7 +42,7 @@ typedef struct {
     int16_t ofs_x;   /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
     uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
-    bool missing; /** Glyph is missing. But placeholder will still be displayed */
+    bool is_placeholder; /** Glyph is missing. But placeholder will still be displayed */
     const struct _lv_font_t *resolved_font;
 } lv_font_glyph_dsc_t;
 
