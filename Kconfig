@@ -855,8 +855,4 @@ menu "LVGL configuration"
             default y if !LV_CONF_MINIMAL
     endmenu
 
-    config LV_BUILD_EXAMPLES
-        bool "Enable the examples to be built with the library."
-        default y
-
 endmenu
