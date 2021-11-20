@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdbool.h>
+#include <stdint.h>
 #include "../font/lv_font.h"
 #include "lv_color.h"
 #include "lv_area.h"
@@ -411,7 +412,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
 /**
  * Checks if a style is empty (has no properties)
  * @param style pointer to a style
- * @return
+ * @return true if the style is empty
  */
 bool lv_style_is_empty(const lv_style_t * style);
 
@@ -467,10 +468,13 @@ static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
  **********************/
 
 #if LV_USE_ASSERT_STYLE
-#  define LV_ASSERT_STYLE(style_p)    LV_ASSERT_MSG(style_p != NULL, "The style is NULL");          \
-    LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted");
+#  define LV_ASSERT_STYLE(style_p)                                                                            \
+    do {                                                                                                      \
+        LV_ASSERT_MSG(style_p != NULL, "The style is NULL");                                                  \
+        LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted"); \
+    } while(0)
 #else
-# define LV_ASSERT_STYLE(p)
+#  define LV_ASSERT_STYLE(p) do{}while(0)
 #endif
 
 #ifdef __cplusplus

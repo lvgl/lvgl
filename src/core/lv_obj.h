@@ -377,13 +377,14 @@ static inline lv_coord_t lv_obj_dpx(const lv_obj_t * obj, lv_coord_t n)
  **********************/
 
 #if LV_USE_ASSERT_OBJ
-#  define LV_ASSERT_OBJ(obj_p, obj_class)                                    \
-    LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");               \
-    LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type."); \
-    LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?");
-
+#  define LV_ASSERT_OBJ(obj_p, obj_class)                                                               \
+    do {                                                                                                \
+        LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
+        LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
+        LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
+    } while(0)
 # else
-# define LV_ASSERT_OBJ(obj_p, obj_class) do{}while(0)
+#  define LV_ASSERT_OBJ(obj_p, obj_class) do{}while(0)
 #endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE
