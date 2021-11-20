@@ -426,6 +426,12 @@ uint8_t _lv_style_get_prop_group(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
 
+static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_width(style, value);
+    lv_style_set_height(style, value);
+}
+
 static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 {
     lv_style_set_pad_left(style, value);
@@ -450,12 +456,6 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
 {
     lv_style_set_pad_row(style, value);
     lv_style_set_pad_column(style, value);
-}
-
-static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_set_width(style, value);
-    lv_style_set_height(style, value);
 }
 
 
