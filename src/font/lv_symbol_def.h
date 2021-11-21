@@ -8,16 +8,21 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 /*-------------------------------
+ * Symbols from "normal" font
+ *-----------------------------*/
+#define LV_SYMBOL_BULLET          "\xE2\x80\xA2" /*20042, 0x2022*/
+
+/*-------------------------------
  * Symbols from FontAwesome font
  *-----------------------------*/
 
 /*In the font converter use this list as range:
       61441, 61448, 61451, 61452, 61453, 61457, 61459, 61461, 61465, 61468,
-      61473, 61478, 61479, 61480, 61502, 61512, 61515, 61516, 61517, 61521,
-      61522, 61523, 61524, 61543, 61544, 61550, 61552, 61553, 61556, 61559,
-      61560, 61561, 61563, 61587, 61589, 61636, 61637, 61639, 61671, 61674,
-      61683, 61724, 61732, 61787, 61931, 62016, 62017, 62018, 62019, 62020,
-      62087, 62099, 62212, 62189, 62810, 63426, 63650
+      61473, 61478, 61479, 61480, 61502, 61507, 61512, 61515, 61516, 61517,
+      61521, 61522, 61523, 61524, 61543, 61544, 61550, 61552, 61553, 61556,
+      61559, 61560, 61561, 61563, 61587, 61589, 61636, 61637, 61639, 61641,
+      61664, 61671, 61674, 61683, 61724, 61732, 61787, 61931, 62016, 62017,
+      62018, 62019, 62020, 62087, 62099, 62189, 62212, 62810, 63426, 63650
 */
 
 #define LV_SYMBOL_AUDIO           "\xef\x80\x81" /*61441, 0xF001*/
@@ -35,8 +40,6 @@ extern "C" {
 #define LV_SYMBOL_VOLUME_MID      "\xef\x80\xa7" /*61479, 0xF027*/
 #define LV_SYMBOL_VOLUME_MAX      "\xef\x80\xa8" /*61480, 0xF028*/
 #define LV_SYMBOL_IMAGE           "\xef\x80\xbe" /*61502, 0xF03E*/
-#define LV_SYMBOL_ENVELOPE        "\xef\x83\xa0" /*61664, 0xF0E0*/
-#define LV_SYMBOL_EDIT            "\xef\x8C\x84" /*62212, 0xF304*/
 #define LV_SYMBOL_TINT            "\xef\x81\x83" /*61507, 0xF043*/
 #define LV_SYMBOL_PREV            "\xef\x81\x88" /*61512, 0xF048*/
 #define LV_SYMBOL_PLAY            "\xef\x81\x8b" /*61515, 0xF04B*/
@@ -62,6 +65,7 @@ extern "C" {
 #define LV_SYMBOL_COPY            "\xef\x83\x85" /*61637, 0xF0C5*/
 #define LV_SYMBOL_SAVE            "\xef\x83\x87" /*61639, 0xF0C7*/
 #define LV_SYMBOL_BARS            "\xef\x83\x89" /*61641, 0xF0C9*/
+#define LV_SYMBOL_ENVELOPE        "\xef\x83\xa0" /*61664, 0xF0E0*/
 #define LV_SYMBOL_CHARGE          "\xef\x83\xa7" /*61671, 0xF0E7*/
 #define LV_SYMBOL_PASTE           "\xef\x83\xAA" /*61674, 0xF0EA*/
 #define LV_SYMBOL_BELL            "\xef\x83\xb3" /*61683, 0xF0F3*/
@@ -77,6 +81,7 @@ extern "C" {
 #define LV_SYMBOL_USB             "\xef\x8a\x87" /*62087, 0xF287*/
 #define LV_SYMBOL_BLUETOOTH       "\xef\x8a\x93" /*62099, 0xF293*/
 #define LV_SYMBOL_TRASH           "\xef\x8B\xad" /*62189, 0xF2ED*/
+#define LV_SYMBOL_EDIT            "\xef\x8C\x84" /*62212, 0xF304*/
 #define LV_SYMBOL_BACKSPACE       "\xef\x95\x9A" /*62810, 0xF55A*/
 #define LV_SYMBOL_SD_CARD         "\xef\x9F\x82" /*63426, 0xF7C2*/
 #define LV_SYMBOL_NEW_LINE        "\xef\xA2\xA2" /*63650, 0xF8A2*/
@@ -84,16 +89,12 @@ extern "C" {
 /** Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"
 
-/*-------------------------------
- * Symbols from "normal" font
- *-----------------------------*/
-#define LV_SYMBOL_BULLET          "\xE2\x80\xA2" /*20042, 0x2022*/
-
 /*
  * The following list is generated using
  * cat src/font/lv_symbol_def.h | sed -E -n 's/^#define\s+LV_(SYMBOL_\w+).*".*$/    _LV_STR_\1,/p'
  */
 enum {
+    _LV_STR_SYMBOL_BULLET,
     _LV_STR_SYMBOL_AUDIO,
     _LV_STR_SYMBOL_VIDEO,
     _LV_STR_SYMBOL_LIST,
@@ -109,7 +110,7 @@ enum {
     _LV_STR_SYMBOL_VOLUME_MID,
     _LV_STR_SYMBOL_VOLUME_MAX,
     _LV_STR_SYMBOL_IMAGE,
-    _LV_STR_SYMBOL_EDIT,
+    _LV_STR_SYMBOL_TINT,
     _LV_STR_SYMBOL_PREV,
     _LV_STR_SYMBOL_PLAY,
     _LV_STR_SYMBOL_PAUSE,
@@ -133,6 +134,8 @@ enum {
     _LV_STR_SYMBOL_CUT,
     _LV_STR_SYMBOL_COPY,
     _LV_STR_SYMBOL_SAVE,
+    _LV_STR_SYMBOL_BARS,
+    _LV_STR_SYMBOL_ENVELOPE,
     _LV_STR_SYMBOL_CHARGE,
     _LV_STR_SYMBOL_PASTE,
     _LV_STR_SYMBOL_BELL,
@@ -148,11 +151,11 @@ enum {
     _LV_STR_SYMBOL_USB,
     _LV_STR_SYMBOL_BLUETOOTH,
     _LV_STR_SYMBOL_TRASH,
+    _LV_STR_SYMBOL_EDIT,
     _LV_STR_SYMBOL_BACKSPACE,
     _LV_STR_SYMBOL_SD_CARD,
     _LV_STR_SYMBOL_NEW_LINE,
     _LV_STR_SYMBOL_DUMMY,
-    _LV_STR_SYMBOL_BULLET,
 };
 
 #ifdef __cplusplus
