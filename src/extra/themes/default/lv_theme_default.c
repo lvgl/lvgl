@@ -667,10 +667,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 
 #if LV_USE_CALENDAR
-    else if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
-        /*No style*/
-        return;
-    }
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
+            /*No style*/
+            return;
+        }
 #endif
 
         lv_obj_add_style(obj, &styles->card, 0);

@@ -1878,6 +1878,26 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  endif
 #endif
 
+/*FFmpeg library for image decoding and playing videos
+ *Supports all major image formats so do not enable other image decoder with it*/
+#ifndef LV_USE_FFMPEG
+#  ifdef CONFIG_LV_USE_FFMPEG
+#    define LV_USE_FFMPEG CONFIG_LV_USE_FFMPEG
+#  else
+#    define LV_USE_FFMPEG  0
+#  endif
+#endif
+#if LV_USE_FFMPEG
+/*Dump input information to stderr*/
+#ifndef LV_FFMPEG_AV_DUMP_FORMAT
+#  ifdef CONFIG_LV_FFMPEG_AV_DUMP_FORMAT
+#    define LV_FFMPEG_AV_DUMP_FORMAT CONFIG_LV_FFMPEG_AV_DUMP_FORMAT
+#  else
+#    define LV_FFMPEG_AV_DUMP_FORMAT 0
+#  endif
+#endif
+#endif
+
 /*-----------
  * Others
  *----------*/
