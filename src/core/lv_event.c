@@ -429,11 +429,10 @@ static lv_res_t event_send_core(lv_event_t * e)
         event_dsc = lv_obj_get_event_dsc(e->current_target, i);
     }
 
-    if(res == LV_RES_OK && e->current_target->parent && event_is_bubbled(e))
-    {
-            e->current_target = e->current_target->parent;
-            res = event_send_core(e);
-            if(res != LV_RES_OK) return LV_RES_INV;
+    if(res == LV_RES_OK && e->current_target->parent && event_is_bubbled(e)) {
+        e->current_target = e->current_target->parent;
+        res = event_send_core(e);
+        if(res != LV_RES_OK) return LV_RES_INV;
 
     }
 

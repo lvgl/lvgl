@@ -994,8 +994,7 @@ static void indev_click_focus(_lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
     if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) == false ||
-       proc->types.pointer.last_pressed == indev_obj_act)
-    {
+       proc->types.pointer.last_pressed == indev_obj_act) {
         return;
     }
 

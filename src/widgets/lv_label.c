@@ -852,7 +852,8 @@ static void draw_main(lv_event_t * e)
 
     if(label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
-    } else {
+    }
+    else {
         lv_draw_label(&txt_coords, clip_area, &label_draw_dsc, label->text, hint);
     }
 
@@ -1123,7 +1124,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
                 len += _lv_txt_encoded_size(&label->text[byte_id]);
                 _lv_txt_encoded_next(label->text, &byte_id);
-                if (len > LV_LABEL_DOT_NUM || byte_id > txt_len) {
+                if(len > LV_LABEL_DOT_NUM || byte_id > txt_len) {
                     break;
                 }
             }

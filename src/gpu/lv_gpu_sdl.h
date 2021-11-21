@@ -40,7 +40,7 @@ void lv_gpu_sdl_init();
 
 /**
  * @brief Free caches
- * 
+ *
  */
 void lv_gpu_sdl_deinit();
 

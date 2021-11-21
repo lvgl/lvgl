@@ -80,9 +80,12 @@ typedef struct _lv_disp_drv_t {
     lv_coord_t hor_res;         /**< Horizontal resolution.*/
     lv_coord_t ver_res;         /**< Vertical resolution.*/
 
-    lv_coord_t physical_hor_res;     /**< Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t physical_ver_res;     /**< Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t offset_x;             /**< Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
+    lv_coord_t
+    physical_hor_res;     /**< Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
+    lv_coord_t
+    physical_ver_res;     /**< Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
+    lv_coord_t
+    offset_x;             /**< Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
     lv_coord_t offset_y;             /**< Vertical offset from the full / physical display. Set to 0 for fullscreen mode.*/
 
     /** Pointer to a buffer initialized with `lv_disp_draw_buf_init()`.
@@ -173,7 +176,7 @@ uint8_t del_prev  :
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
     const void * bg_img;            /**< An image source to display as wallpaper*/
-    void (*bg_fn)(lv_area_t*);/**< A function to handle drawing*/
+    void (*bg_fn)(lv_area_t *); /**< A function to handle drawing*/
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
