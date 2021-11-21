@@ -435,10 +435,7 @@ def style_const_set(p):
   print("")
   print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
   print("    { \\")
-  print("        .prop = LV_STYLE_" + p['name'] + ", \\")
-  print("        .value = { \\")
-  print("            ." + p['style_type'] +" = " + cast + "val \\")
-  print("        } \\")
+  print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
   print("    }")
 
 
