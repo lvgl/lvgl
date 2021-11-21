@@ -29,38 +29,38 @@ fout.write(
 
 /* Handle special Kconfig options */
 #ifndef LV_KCONFIG_IGNORE
-#  include "lv_conf_kconfig.h"
-#  ifdef CONFIG_LV_CONF_SKIP
-#    define LV_CONF_SKIP
-#  endif
+    #include "lv_conf_kconfig.h"
+    #ifdef CONFIG_LV_CONF_SKIP
+        #define LV_CONF_SKIP
+    #endif
 #endif
 
 /*If "lv_conf.h" is available from here try to use it later.*/
 #ifdef __has_include
-#  if __has_include("lv_conf.h")
-#    ifndef LV_CONF_INCLUDE_SIMPLE
-#      define LV_CONF_INCLUDE_SIMPLE
-#    endif
-#  endif
+    #if __has_include("lv_conf.h")
+        #ifndef LV_CONF_INCLUDE_SIMPLE
+            #define LV_CONF_INCLUDE_SIMPLE
+        #endif
+    #endif
 #endif
 
 /*If lv_conf.h is not skipped include it*/
 #ifndef LV_CONF_SKIP
-#  ifdef LV_CONF_PATH                           /*If there is a path defined for lv_conf.h use it*/
-#    define __LV_TO_STR_AUX(x) #x
-#    define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
-#    include __LV_TO_STR(LV_CONF_PATH)
-#    undef __LV_TO_STR_AUX
-#    undef __LV_TO_STR
-#  elif defined(LV_CONF_INCLUDE_SIMPLE)        /*Or simply include lv_conf.h is enabled*/
-#    include "lv_conf.h"
-#  else
-#    include "../../lv_conf.h"                 /*Else assume lv_conf.h is next to the lvgl folder*/
-#  endif
+    #ifdef LV_CONF_PATH                           /*If there is a path defined for lv_conf.h use it*/
+        #define __LV_TO_STR_AUX(x) #x
+        #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
+        #include __LV_TO_STR(LV_CONF_PATH)
+        #undef __LV_TO_STR_AUX
+        #undef __LV_TO_STR
+    #elif defined(LV_CONF_INCLUDE_SIMPLE)         /*Or simply include lv_conf.h is enabled*/
+        #include "lv_conf.h"
+    #else
+        #include "../../lv_conf.h"                /*Else assume lv_conf.h is next to the lvgl folder*/
+    #endif
 #endif
 
 #ifdef CONFIG_LV_COLOR_DEPTH
-#  define _LV_KCONFIG_PRESENT
+    #define _LV_KCONFIG_PRESENT
 #endif
 
 /*----------------------------------
@@ -82,10 +82,12 @@ for line in fin.read().splitlines():
   if '/*--END OF LV_CONF_H--*/' in line: break
 
   #Is there a #define in this line?
-  r = re.search(r'^[\s]*#[\s]*define[\s]+([^\s]+).*$', line)   # \s means any white space character
+  r = re.search(r'^([\s]*)#[\s]*define[\s]+([^\s]+).*$', line)   # \s means any white space character
 
   if r:
-    name = r[1]
+    indent = r[1]
+
+    name = r[2]
     name = re.sub('\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
 
     name_and_value = re.sub('[\s]*#[\s]*define', '', line, 1)
@@ -99,17 +101,17 @@ for line in fin.read().splitlines():
       #3. In not Kconfig environment use the LVGL's default value
 
       fout.write(
-        f'#ifndef {name}\n'
-        f'#  ifdef _LV_KCONFIG_PRESENT\n'
-        f'#    ifdef CONFIG_{name.upper()}\n'
-        f'#      define {name} CONFIG_{name.upper()}\n'
-        f'#    else\n'
-        f'#      define {name} 0\n'
-        f'#    endif\n'
-        f'#  else\n'
-        f'#    define{name_and_value}\n'
-        f'#  endif\n'
-        f'#endif\n'
+        f'{indent}#ifndef {name}\n'
+        f'{indent}    #ifdef _LV_KCONFIG_PRESENT\n'
+        f'{indent}        #ifdef CONFIG_{name.upper()}\n'
+        f'{indent}            #define {name} CONFIG_{name.upper()}\n'
+        f'{indent}        #else\n'
+        f'{indent}            #define {name} 0\n'
+        f'{indent}        #endif\n'
+        f'{indent}    #else\n'
+        f'{indent}        #define{name_and_value}\n'
+        f'{indent}    #endif\n'
+        f'{indent}#endif\n'
       )
     else:
       #1. Use the value if already set from lv_conf.h or anything else  (i.e. do nothing)
@@ -117,13 +119,13 @@ for line in fin.read().splitlines():
       #3. Use the LVGL's default value
 
       fout.write(
-        f'#ifndef {name}\n'
-        f'#  ifdef CONFIG_{name.upper()}\n'
-        f'#    define {name} CONFIG_{name.upper()}\n'
-        f'#  else\n'
-        f'#    define{name_and_value}\n'
-        f'#  endif\n'
-        f'#endif\n'
+        f'{indent}#ifndef {name}\n'
+        f'{indent}    #ifdef CONFIG_{name.upper()}\n'
+        f'{indent}        #define {name} CONFIG_{name.upper()}\n'
+        f'{indent}    #else\n'
+        f'{indent}        #define{name_and_value}\n'
+        f'{indent}    #endif\n'
+        f'{indent}#endif\n'
       )
 
   elif re.search('^ *typedef .*;.*$', line):
@@ -144,9 +146,9 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
 /*If running without lv_conf.h add typdesf with default value*/
 #ifdef LV_CONF_SKIP
-#  if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
-#    define _CRT_SECURE_NO_WARNINGS
-#  endif
+    #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
+        #define _CRT_SECURE_NO_WARNINGS
+    #endif
 #endif  /*defined(LV_CONF_SKIP)*/
 
 #endif  /*LV_CONF_INTERNAL_H*/
