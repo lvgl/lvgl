@@ -552,7 +552,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
 #if LV_DRAW_COMPLEX
-    bool mask_any = lv_draw_mask_is_any(&fill_area);
+    lv_area_t mask_area;
+    lv_area_copy(&mask_area, &fill_area);
+    mask_area.y2 = mask_area.y1 + row_end;
+    bool mask_any = lv_draw_mask_is_any(&mask_area);
 #endif
 
     uint32_t col_bit_max = 8 - bpp;
@@ -708,6 +711,9 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     /*If the letter is partially out of mask the move there on draw_buf*/
     disp_buf_buf_tmp += (row_start * disp_buf_width) + col_start / 3;
 
+    lv_area_t mask_area;
+    lv_area_copy(&mask_area, &map_area);
+    mask_area.y2 = mask_area.y1 + row_end;
     bool mask_any = lv_draw_mask_is_any(&map_area);
     uint8_t font_rgb[3];
 

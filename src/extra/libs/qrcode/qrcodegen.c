@@ -1007,3 +1007,28 @@ static int numCharCountBits(enum qrcodegen_Mode mode, int version) {
 		default:  assert(false);  return -1;  // Dummy value
 	}
 }
+
+int qrcodegen_getMinFitVersion(enum qrcodegen_Ecc ecl, size_t dataLen)
+{
+	struct qrcodegen_Segment seg;
+	seg.mode = qrcodegen_Mode_BYTE;
+	seg.bitLength = calcSegmentBitLength(seg.mode, dataLen);
+	seg.numChars = (int)dataLen;
+
+	for (int version = qrcodegen_VERSION_MIN; version <= qrcodegen_VERSION_MAX; version++) {
+		int dataCapacityBits = getNumDataCodewords(version, ecl) * 8;  // Number of data bits available
+		int dataUsedBits = getTotalBits(&seg, 1, version);
+		if (dataUsedBits != -1 && dataUsedBits <= dataCapacityBits)
+			return version;
+	}
+	return -1;
+}
+
+int qrcodegen_version2size(int version)
+{
+	if (version < qrcodegen_VERSION_MIN || version > qrcodegen_VERSION_MAX) {
+		return -1;
+	}
+
+	return ((version - 1)*4 + 21);
+}

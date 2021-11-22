@@ -57,6 +57,7 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
  * @param font_p pointer to font
  * @param dsc_out store the result descriptor here
  * @param letter an UNICODE letter code
+ * @param letter_next the next letter after `letter`. Used for kerning
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
