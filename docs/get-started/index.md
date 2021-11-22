@@ -30,5 +30,6 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
    arduino
    micropython
    nuttx
+   cmake
 ```
 
