@@ -59,15 +59,49 @@ It will "copy" the `lvgl` repository to your GitHub account (`https://github.com
 9. If you need to make more changes, just update your forked `lvgl` repo with new commits. They will automatically appear in the PR.
 
 ### Commit message format
-In commit messages please follow the [Angular Commit Format](https://gist.github.com/brianclements/841ea7bffdb01346392c).
+The commit messages format is inspired by [Angular Commit Format](https://gist.github.com/brianclements/841ea7bffdb01346392c).
+
+The following structure should be used:
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+Possible `<type>`s:
+- `fix` bugfix in the source code.
+- `feat` new feature  
+- `arch` architectural changes
+- `perf` changes that affect the performance
+- `example` anything related to examples (even fixes and new examples)
+- `docs` anything related to the documentation (even fixes, formatting, and new pages)
+- `test` anything related to tests (new and updated tests or CI actions)
+- `chore` any minor formatting or style changes that would make the changelog noisy
+
+`<scope>` is the module, file, or sub-system that is affected by the commit. It's usually one word and can be chosen freely.
+For example `img`, `layout`, `txt`, `anim`. The scope can be omitted.
+
+`<subject>` contains a short description of the change:
+- use the imperative, present tense: "change" not "changed" nor "changes"
+- don't capitalize the first letter
+- no dot (.) at the end
+- max 90 characters
+
+`<body>` optional and can be used to describe the details of this change.
+
+`<footer>` shall contain 
+- the words "BREAKING CHANGE" if the changes break the API 
+- reference to the GitHub issue or Pull Request if applicable.
 
 Some examples:
 ```
-fix(img) update size if a new source is set
+fix(img): update size if a new source is set
 ```
 
 ```
-fix(bar) fix memory leak
+fix(bar): fix memory leak
 
 The animations weren't deleted in the destructor.
 
@@ -75,14 +109,14 @@ Fixes: #1234
 ```
 
 ```
-feat add span widget
+feat: add span widget
 
 The span widget allows mixing different font sizes, colors and styles.
 It's similar to HTML <span>
 ```
 
 ```
-docs(porting) fix typo
+docs(porting): fix typo
 ```
 
 ## Developer Certification of Origin (DCO)
