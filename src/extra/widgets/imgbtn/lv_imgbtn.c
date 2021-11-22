@@ -92,19 +92,20 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
 
 void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
-	LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
-	lv_state_t obj_state = LV_STATE_DEFAULT;
-	if(state == LV_IMGBTN_STATE_PRESSED || state == LV_IMGBTN_STATE_CHECKED_PRESSED) obj_state |= LV_STATE_PRESSED;
-	if(state == LV_IMGBTN_STATE_DISABLED || state == LV_IMGBTN_STATE_CHECKED_DISABLED) obj_state |= LV_STATE_DISABLED;
-	if(state == LV_IMGBTN_STATE_CHECKED_DISABLED || state == LV_IMGBTN_STATE_CHECKED_PRESSED || state == LV_IMGBTN_STATE_CHECKED_RELEASED) {
-		obj_state |= LV_STATE_CHECKED;
-	}
+    lv_state_t obj_state = LV_STATE_DEFAULT;
+    if(state == LV_IMGBTN_STATE_PRESSED || state == LV_IMGBTN_STATE_CHECKED_PRESSED) obj_state |= LV_STATE_PRESSED;
+    if(state == LV_IMGBTN_STATE_DISABLED || state == LV_IMGBTN_STATE_CHECKED_DISABLED) obj_state |= LV_STATE_DISABLED;
+    if(state == LV_IMGBTN_STATE_CHECKED_DISABLED || state == LV_IMGBTN_STATE_CHECKED_PRESSED ||
+       state == LV_IMGBTN_STATE_CHECKED_RELEASED) {
+        obj_state |= LV_STATE_CHECKED;
+    }
 
-	lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
-	lv_obj_add_state(obj, obj_state);
+    lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
+    lv_obj_add_state(obj, obj_state);
 
-	refr_img(obj);
+    refr_img(obj);
 }
 
 /*=====================

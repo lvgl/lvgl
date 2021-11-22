@@ -163,9 +163,10 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
 
     lv_face_info_t * info = (lv_face_info_t *)face_id;
     FT_Error error;
-    if (info->mem) {
+    if(info->mem) {
         error = FT_New_Memory_Face(library, info->mem, info->size, 0, aface);
-    } else {
+    }
+    else {
         error = FT_New_Face(library, info->name, 0, aface);
     }
     if(error) {
@@ -423,9 +424,10 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
             goto Fail;
         }
         FT_Error error;
-        if (info->mem) {
+        if(info->mem) {
             error = FT_New_Memory_Face(library, info->mem, (FT_Long) info->mem_size, 0, &face);
-        } else {
+        }
+        else {
             error = FT_New_Face(library, info->name, 0, &face);
         }
         if(error) {

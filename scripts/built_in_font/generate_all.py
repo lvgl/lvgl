@@ -84,5 +84,5 @@ print("\nGenerating 16 px unscii")
 os.system("lv_font_conv --no-compress --no-prefilter --bpp 1 --size 16 --font unscii-8.ttf -r 0x20-0x7F --format lvgl -o lv_font_unscii_16.c --force-fast-kern-format")
 
 os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_*.c')
-os.system('astyle --options=../code-format.cfg "lv_font_*.c"')
+os.system('astyle --ignore-exclude-errors --options=../code-format.cfg "lv_font_*.c"')
 os.system('mv lv_font_*.c ../../src/font/')
