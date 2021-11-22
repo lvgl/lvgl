@@ -33,14 +33,17 @@ extern "C" {
  * General types
  *-----------------*/
 
+struct _lv_font_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
+    const struct _lv_font_t *resolved_font; /**< Pointer to a font where the gylph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    uint8_t bpp;    /**< Bit-per-pixel: 1, 2, 4, 8*/
+    uint8_t bpp:4;   /**< Bit-per-pixel: 1, 2, 4, 8*/
+    uint8_t is_placeholder:1; /** Glyph is missing. But placeholder will still be displayed */
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
@@ -70,6 +73,7 @@ typedef struct _lv_font_t {
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
+    const struct _lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
 #if LV_USE_USER_DATA
     void * user_data;               /**< Custom user data for font.*/
 #endif
