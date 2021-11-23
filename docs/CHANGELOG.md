@@ -95,6 +95,7 @@ Some of the most important features are
 
 ### Fixes
 
+- fix(checkbox): fixed LV_EVENT_VALUE_CHANGED event [`2829`](https://github.com/lvgl/lvgl/pull/2829)
 - fix(bidi): add weak characters to the previous strong character's run [`2777`](https://github.com/lvgl/lvgl/pull/2777)
 - fix(draw_img): radius mask doesn't work in specific condition [`2786`](https://github.com/lvgl/lvgl/pull/2786)
 - fix(border_post): ignore bg_img_opa draw when draw border_post [`2788`](https://github.com/lvgl/lvgl/pull/2788)
