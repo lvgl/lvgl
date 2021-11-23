@@ -106,7 +106,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
     LV_ASSERT_MALLOC(qr0);
     uint8_t * data_tmp = lv_mem_alloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(data_tmp);
-    memcpy(data_tmp, data, data_len);
+    lv_memcpy(data_tmp, data, data_len);
 
     bool ok = qrcodegen_encodeBinary(data_tmp, data_len,
                                      qr0, qrcodegen_Ecc_MEDIUM,
@@ -170,7 +170,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
         int s;
         const uint8_t * row_ori = buf_u8 + row_byte_cnt * y;
         for(s = 1; s < scale; s++) {
-            memcpy((uint8_t *)buf_u8 + row_byte_cnt * (y + s), row_ori, row_byte_cnt);
+            lv_memcpy((uint8_t *)buf_u8 + row_byte_cnt * (y + s), row_ori, row_byte_cnt);
         }
     }
 
