@@ -16,30 +16,30 @@ void test_dropdown_render_2(void);
 void test_dropdown_create_delete(void)
 {
   lv_dropdown_create(lv_scr_act());
-  TEST_ASSERT_EQUAL(1, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(lv_scr_act()));
   
   lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
   lv_obj_set_pos(dd2, 200, 0);
-  TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(lv_scr_act()));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
   lv_dropdown_open(dd2);
-  TEST_ASSERT_EQUAL(3, lv_obj_get_child_cnt(lv_scr_act()));
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd2));
-  lv_dropdown_open(dd2);    /*Try to pen again*/
-  TEST_ASSERT_EQUAL(3, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd2));
+  lv_dropdown_open(dd2);    /*Try to open again*/
+  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
 
   lv_obj_t * dd3 = lv_dropdown_create(lv_scr_act());
   lv_obj_set_pos(dd3, 400, 0);
-  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
   lv_dropdown_open(dd3);
-  TEST_ASSERT_EQUAL(5, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
   lv_dropdown_close(dd3);
-  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
   lv_dropdown_close(dd3);   /*Try to close again*/
-  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
   
   lv_obj_del(dd2);
-  TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(lv_scr_act()));
+  TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
  
   lv_obj_clean(lv_scr_act());
   TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(lv_scr_act()));
@@ -139,15 +139,15 @@ void test_dropdown_click(void)
   lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
   lv_obj_update_layout(dd1);
   
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   lv_test_mouse_click_at(dd1->coords.x1 + 5, dd1->coords.y1 + 5); 
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd1));
     
   lv_obj_t * list = lv_dropdown_get_list(dd1);
   TEST_ASSERT_EQUAL(0, lv_dropdown_get_selected(dd1));
   lv_test_mouse_click_at(list->coords.x1 + 5, list->coords.y2 - 25);
   TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
 }
 
 static uint32_t event_cnt;
@@ -176,16 +176,16 @@ void test_dropdown_keypad(void)
     
   event_cnt = 0;  
     
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
   
   lv_test_key_hit(LV_KEY_DOWN);
   lv_test_key_hit(LV_KEY_RIGHT);  /*Same as down*/
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(1, event_cnt);
   
@@ -193,7 +193,7 @@ void test_dropdown_keypad(void)
   TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
   lv_test_key_hit(LV_KEY_DOWN);
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(3, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(2, event_cnt);
   
@@ -201,15 +201,15 @@ void test_dropdown_keypad(void)
   TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
   lv_test_key_hit(LV_KEY_RIGHT);
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(4, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(3, event_cnt);
   
   lv_test_key_hit(LV_KEY_LEFT); /*Open the list too*/
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd1));
   lv_test_key_hit(LV_KEY_LEFT);
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(3, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(4, event_cnt);
   
@@ -217,7 +217,7 @@ void test_dropdown_keypad(void)
   TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
   lv_test_key_hit(LV_KEY_UP); 
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(5, event_cnt);
   
@@ -226,7 +226,7 @@ void test_dropdown_keypad(void)
   lv_test_key_hit(LV_KEY_UP); 
   lv_test_key_hit(LV_KEY_UP); 
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(0, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(6, event_cnt);
   
@@ -240,19 +240,19 @@ void test_dropdown_keypad(void)
   lv_test_key_hit(LV_KEY_DOWN);
   lv_test_key_hit(LV_KEY_DOWN); 
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(7, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(7, event_cnt);
   
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd1));
   
   lv_test_key_hit(LV_KEY_NEXT); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
   
   lv_test_key_hit(LV_KEY_ENTER); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd2));
   
   lv_indev_set_group(lv_test_keypad_indev, NULL);
@@ -279,15 +279,15 @@ void test_dropdown_encoder(void)
     
   event_cnt = 0;  
     
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
   lv_test_encoder_click(); 
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd1));
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
   
   lv_test_encoder_turn(5);
   lv_test_encoder_click(); 
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(5, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(1, event_cnt);
   
@@ -303,14 +303,14 @@ void test_dropdown_encoder(void)
   lv_test_indev_wait(1000);  //Long press
   lv_test_encoder_release(); 
   lv_test_indev_wait(50);
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
   TEST_ASSERT_EQUAL(4, lv_dropdown_get_selected(dd1));
   TEST_ASSERT_EQUAL(2, event_cnt);
   
   lv_test_encoder_turn(1);
   lv_test_encoder_click();
-  TEST_ASSERT_NULL(lv_dropdown_get_list(dd1));
-  TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd2));
+  TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
+  TEST_ASSERT_TRUE(lv_dropdown_is_open(dd2));
   
   lv_indev_set_group(lv_test_encoder_indev, NULL);
   lv_group_del(g);
