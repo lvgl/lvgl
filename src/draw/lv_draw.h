@@ -74,7 +74,7 @@ typedef struct _lv_draw_backend_t{
     * @param blend_mode     e.g. LV_BLEND_MODE_ADDITIVE
     */
    void (*blend_fill)(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                      lv_color_t color, const lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                      lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
    /**
     * Blend a source buffer to a destination buffer
@@ -89,13 +89,15 @@ typedef struct _lv_draw_backend_t{
     */
    void (*blend_map)(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
                      const lv_color_t * src_buf, const lv_area_t * src_area,
-                     const lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                     lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
 }lv_draw_backend_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+void lv_draw_init(void);
 
 void lv_draw_backend_init(lv_draw_backend_t * backend);
 

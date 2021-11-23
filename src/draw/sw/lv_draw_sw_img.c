@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw_img.h"
+#include "lv_draw_sw.h"
 #include "../lv_img_cache.h"
 #include "../lv_draw_blend.h"
 #include "../../hal/lv_hal_disp.h"

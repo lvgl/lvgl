@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_sw.h"
 #include "../../misc/lv_math.h"
 #include "../../hal/lv_hal_disp.h"
 #include "../../core/lv_refr.h"
@@ -103,10 +104,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_blend_sw_fill(lv_color_t * dest_buf, lv_coord_t de
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-    lv_coord_t draw_area_w = lv_area_get_width(fill_area);
+    lv_coord_t area_w = lv_area_get_width(fill_area);
     if(mask && disp->driver->antialiasing == 0 && mask) {
-        int32_t i;
-        for(i = 0; i < draw_area_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
+        lv_coord_t i;
+        for(i = 0; i < area_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
     }
 
     if(disp->driver->set_px_cb) {
@@ -131,7 +132,7 @@ void lv_blend_sw_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_are
     /*Round the values in the mask if anti-aliasing is disabled*/
     int32_t area_w = lv_area_get_width(clip_area);
     if(mask && disp->driver->antialiasing == 0) {
-        int32_t i;
+        lv_coord_t i;
         for(i = 0; i < area_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
     }
 

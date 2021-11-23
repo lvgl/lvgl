@@ -6,9 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw_arc.h"
-#include "../lv_draw_rect.h"
-#include "../lv_draw_mask.h"
+#include "lv_draw_sw.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_mem.h"

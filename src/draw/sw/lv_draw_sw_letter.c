@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_sw.h"
 #include "../lv_draw_mask.h"
 #include "../../hal/lv_hal_disp.h"
 #include "../../misc/lv_math.h"

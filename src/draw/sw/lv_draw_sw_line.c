@@ -7,8 +7,7 @@
  *      INCLUDES
  *********************/
 #include <stdbool.h>
-#include "../lv_draw_mask.h"
-#include "../lv_draw_blend.h"
+#include "lv_draw_sw.h"
 #include "../../misc/lv_math.h"
 #include "../../core/lv_refr.h"
 
