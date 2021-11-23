@@ -294,7 +294,7 @@ static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_len
         case 1:
             h ^= data[0];
             h *= m;
-        break;
+            break;
     };
 
     h ^= h >> 13;

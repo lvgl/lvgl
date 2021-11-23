@@ -22,7 +22,7 @@ For example:
 lv_gif_set_src(obj, "S:path/to/example.gif");
 ```
 
-Note that, a file system driver needs to regsitered to open images from files. Read more about it [here](https://docs.lvgl.io/master/overview/file-system.html) or just enable one in `lv_conf.h` with `LV_USE_FS_...` 
+Note that, a file system driver needs to be registered to open images from files. Read more about it [here](https://docs.lvgl.io/master/overview/file-system.html) or just enable one in `lv_conf.h` with `LV_USE_FS_...` 
 
 
 ## Memory requirements

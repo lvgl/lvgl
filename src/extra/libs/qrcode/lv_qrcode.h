@@ -50,6 +50,7 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent, lv_coord_t size, lv_color_t dark_
 lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_len);
 
 /**
+ * DEPRECATED: Use normal lv_obj_del instead
  * Delete a QR code object
  * @param qrcode pointer to a QR code object
  */

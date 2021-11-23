@@ -1,5 +1,5 @@
 #include "lv_style.h"
-#include <stdbool.h>
+
 void lv_style_set_width(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
@@ -168,94 +168,6 @@ void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, v);
 }
 
-void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_RADIUS, v);
-}
-
-void lv_style_set_clip_corner(lv_style_t * style, bool value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, v);
-}
-
-void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_OPA, v);
-}
-
-void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
-{
-    lv_style_value_t v = {
-        .ptr = value
-    };
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, v);
-}
-
-void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v);
-}
-
-void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v);
-}
-
-void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, v);
-}
-
-void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
-{
-    lv_style_value_t v = {
-        .ptr = value
-    };
-    lv_style_set_prop(style, LV_STYLE_TRANSITION, v);
-}
-
-void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_BLEND_MODE, v);
-}
-
-void lv_style_set_layout(lv_style_t * style, uint16_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_LAYOUT, v);
-}
-
-void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_BASE_DIR, v);
-}
-
 void lv_style_set_bg_color(lv_style_t * style, lv_color_t value)
 {
     lv_style_value_t v = {
@@ -416,102 +328,6 @@ void lv_style_set_border_post(lv_style_t * style, bool value)
     lv_style_set_prop(style, LV_STYLE_BORDER_POST, v);
 }
 
-void lv_style_set_text_color(lv_style_t * style, lv_color_t value)
-{
-    lv_style_value_t v = {
-        .color = value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, v);
-}
-
-void lv_style_set_text_color_filtered(lv_style_t * style, lv_color_t value)
-{
-    lv_style_value_t v = {
-        .color = value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR_FILTERED, v);
-}
-
-void lv_style_set_text_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_OPA, v);
-}
-
-void lv_style_set_text_font(lv_style_t * style, const lv_font_t * value)
-{
-    lv_style_value_t v = {
-        .ptr = value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_FONT, v);
-}
-
-void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_LETTER_SPACE, v);
-}
-
-void lv_style_set_text_line_space(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_LINE_SPACE, v);
-}
-
-void lv_style_set_text_decor(lv_style_t * style, lv_text_decor_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_DECOR, v);
-}
-
-void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_TEXT_ALIGN, v);
-}
-
-void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_IMG_OPA, v);
-}
-
-void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value)
-{
-    lv_style_value_t v = {
-        .color = value
-    };
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, v);
-}
-
-void lv_style_set_img_recolor_filtered(lv_style_t * style, lv_color_t value)
-{
-    lv_style_value_t v = {
-        .color = value
-    };
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_FILTERED, v);
-}
-
-void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_OPA, v);
-}
-
 void lv_style_set_outline_width(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
@@ -606,6 +422,38 @@ void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value)
         .num = (int32_t)value
     };
     lv_style_set_prop(style, LV_STYLE_SHADOW_OPA, v);
+}
+
+void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_IMG_OPA, v);
+}
+
+void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value)
+{
+    lv_style_value_t v = {
+        .color = value
+    };
+    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, v);
+}
+
+void lv_style_set_img_recolor_filtered(lv_style_t * style, lv_color_t value)
+{
+    lv_style_value_t v = {
+        .color = value
+    };
+    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_FILTERED, v);
+}
+
+void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_OPA, v);
 }
 
 void lv_style_set_line_width(lv_style_t * style, lv_coord_t value)
@@ -712,3 +560,154 @@ void lv_style_set_arc_img_src(lv_style_t * style, const void * value)
     lv_style_set_prop(style, LV_STYLE_ARC_IMG_SRC, v);
 }
 
+void lv_style_set_text_color(lv_style_t * style, lv_color_t value)
+{
+    lv_style_value_t v = {
+        .color = value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, v);
+}
+
+void lv_style_set_text_color_filtered(lv_style_t * style, lv_color_t value)
+{
+    lv_style_value_t v = {
+        .color = value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_COLOR_FILTERED, v);
+}
+
+void lv_style_set_text_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_OPA, v);
+}
+
+void lv_style_set_text_font(lv_style_t * style, const lv_font_t * value)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_FONT, v);
+}
+
+void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_LETTER_SPACE, v);
+}
+
+void lv_style_set_text_line_space(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_LINE_SPACE, v);
+}
+
+void lv_style_set_text_decor(lv_style_t * style, lv_text_decor_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_DECOR, v);
+}
+
+void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_ALIGN, v);
+}
+
+void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_RADIUS, v);
+}
+
+void lv_style_set_clip_corner(lv_style_t * style, bool value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_CLIP_CORNER, v);
+}
+
+void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_OPA, v);
+}
+
+void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_DSC, v);
+}
+
+void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v);
+}
+
+void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v);
+}
+
+void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, v);
+}
+
+void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSITION, v);
+}
+
+void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BLEND_MODE, v);
+}
+
+void lv_style_set_layout(lv_style_t * style, uint16_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_LAYOUT, v);
+}
+
+void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BASE_DIR, v);
+}

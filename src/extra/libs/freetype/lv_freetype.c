@@ -23,6 +23,8 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
+    const void * mem;
+    long size;
     char * name;
 } lv_face_info_t;
 
@@ -49,8 +51,6 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
                                     FT_Library library_is, FT_Pointer req_data, FT_Face * aface);
 static bool lv_ft_font_init_cache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_cache(lv_font_t * font);
-static bool lv_ft_font_init_cache(lv_ft_info_t * info);
-static void lv_ft_font_destroy_cache(lv_font_t * font);
 #else
 static FT_Face face_find_in_list(lv_ft_info_t * info);
 static void face_add_to_list(FT_Face face);
@@ -59,7 +59,6 @@ static void face_generic_finalizer(void * object);
 static bool lv_ft_font_init_nocache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_nocache(lv_font_t * font);
 #endif
-
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -163,7 +162,13 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
     LV_UNUSED(req_data);
 
     lv_face_info_t * info = (lv_face_info_t *)face_id;
-    FT_Error error = FT_New_Face(library, info->name, 0, aface);
+    FT_Error error;
+    if(info->mem) {
+        error = FT_New_Memory_Face(library, info->mem, info->size, 0, aface);
+    }
+    else {
+        error = FT_New_Face(library, info->name, 0, aface);
+    }
     if(error) {
         LV_LOG_ERROR("FT_New_Face error:%d\n", error);
         return error;
@@ -209,6 +214,7 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     dsc_out->ofs_x = sbit->left;    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = sbit->top - sbit->height; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;               /*Bit per pixel: 1/2/4/8*/
+    dsc_out->is_placeholder = glyph_index == 0;
 
     return true;
 }
@@ -230,12 +236,14 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
-
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
     lv_face_info_t * face_info = NULL;
     face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
     if(face_info == NULL) {
         goto Fail;
     }
+    face_info->mem = info->mem;
+    face_info->size = info->mem_size;
     face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
     strcpy(face_info->name, info->name);
 
@@ -294,7 +302,6 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
         lv_mem_free(dsc);
     }
 }
-
 #else/* LV_FREETYPE_CACHE_SIZE */
 
 static FT_Face face_find_in_list(lv_ft_info_t * info)
@@ -366,6 +373,7 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
     if(face->size != dsc->size) {
         FT_Activate_Size(dsc->size);
     }
+    dsc_out->is_placeholder = glyph_index == 0;
 
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     if(error) {
@@ -406,6 +414,7 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
 
     lv_face_info_t * face_info = NULL;
     FT_Face face = face_find_in_list(info);
@@ -414,7 +423,13 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         if(face_info == NULL) {
             goto Fail;
         }
-        FT_Error error = FT_New_Face(library, info->name, 0, &face);
+        FT_Error error;
+        if(info->mem) {
+            error = FT_New_Memory_Face(library, info->mem, (FT_Long) info->mem_size, 0, &face);
+        }
+        else {
+            error = FT_New_Face(library, info->name, 0, &face);
+        }
         if(error) {
             lv_mem_free(face_info);
             LV_LOG_WARN("create face error(%d)", error);
@@ -422,6 +437,8 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         }
 
         /* link face and face info */
+        face_info->mem = info->mem;
+        face_info->size = (long) info->mem_size;
         face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
         strcpy(face_info->name, info->name);
         face->generic.data = face_info;

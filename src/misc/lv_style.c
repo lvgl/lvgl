@@ -65,7 +65,6 @@ void lv_style_reset(lv_style_t * style)
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
-
 }
 
 lv_style_prop_t lv_style_register_prop(void)

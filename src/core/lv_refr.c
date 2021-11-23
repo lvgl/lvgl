@@ -86,13 +86,13 @@ void lv_refr_now(lv_disp_t * disp)
     lv_anim_refr_now();
 
     if(disp) {
-        _lv_disp_refr_timer(disp->refr_timer);
+        if(disp->refr_timer) _lv_disp_refr_timer(disp->refr_timer);
     }
     else {
         lv_disp_t * d;
         d = lv_disp_get_next(NULL);
         while(d) {
-            _lv_disp_refr_timer(d->refr_timer);
+            if(d->refr_timer) _lv_disp_refr_timer(d->refr_timer);
             d = lv_disp_get_next(d);
         }
     }
@@ -131,7 +131,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(disp->driver->full_refresh) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
-        lv_timer_resume(disp->refr_timer);
+        if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
         return;
     }
 
@@ -152,7 +152,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
     }
     disp->inv_p++;
-    lv_timer_resume(disp->refr_timer);
+    if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
 }
 
 /**
@@ -186,15 +186,19 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     uint32_t start = lv_tick_get();
     volatile uint32_t elaps = 0;
 
-    disp_refr = tmr->user_data;
-
+    if(tmr) {
+        disp_refr = tmr->user_data;
 #if LV_USE_PERF_MONITOR == 0 && LV_USE_MEM_MONITOR == 0
-    /**
-     * Ensure the timer does not run again automatically.
-     * This is done before refreshing in case refreshing invalidates something else.
-     */
-    lv_timer_pause(tmr);
+        /**
+         * Ensure the timer does not run again automatically.
+         * This is done before refreshing in case refreshing invalidates something else.
+         */
+        lv_timer_pause(tmr);
 #endif
+    }
+    else {
+        disp_refr = lv_disp_get_default();
+    }
 
     /*Refresh the screen's layout if required*/
     lv_obj_update_layout(disp_refr->act_scr);
@@ -532,7 +536,8 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     if(top_act_scr == NULL && top_prev_scr == NULL) {
         if(disp_refr->bg_fn) {
             disp_refr->bg_fn(&start_mask);
-        } else if(disp_refr->bg_img) {
+        }
+        else if(disp_refr->bg_img) {
             lv_draw_img_dsc_t dsc;
             lv_draw_img_dsc_init(&dsc);
             dsc.opa = disp_refr->bg_opa;

@@ -68,7 +68,7 @@ LVGL has the following built-in mask types which can be calculated and applied r
 - `LV_DRAW_MASK_TYPE_LINE` Removes a side from a line (top, bottom, left or right). `lv_draw_line` uses four instances of it. 
 Essentially, every (skew) line is bounded with four line masks forming a rectangle.
 - `LV_DRAW_MASK_TYPE_RADIUS` Removes the inner or outer corners of a rectangle with a radiused transition. It's also used to create circles by setting the radius to large value (`LV_RADIUS_CIRCLE`) 
-- `LV_DRAW_MASK_TYPE_ANGLE` Removes a circlular sector. It is used by `lv_draw_arc` to remove the "empty" sector. 
+- `LV_DRAW_MASK_TYPE_ANGLE` Removes a circular sector. It is used by `lv_draw_arc` to remove the "empty" sector. 
 - `LV_DRAW_MASK_TYPE_FADE` Create a vertical fade (change opacity) 
 - `LV_DRAW_MASK_TYPE_MAP` The mask is stored in a bitmap array and the necessary parts are applied 
 
@@ -170,7 +170,7 @@ lv_draw_line_dsc_t * line_dsc;      // A draw descriptor that can be modified to
 lv_draw_img_dsc_t *  img_dsc;       // A draw descriptor that can be modified to changed what LVGL will draw. Set only for image-like parts
 lv_draw_arc_dsc_t *  arc_dsc;       // A draw descriptor that can be modified to changed what LVGL will draw. Set only for arc-like parts
 
-// Other paramters 
+// Other parameters 
 lv_area_t * draw_area;              // The area of the part being drawn
 const lv_point_t * p1;              // A point calculated during drawing. E.g. a point of a chart or the center of an arc.
 const lv_point_t * p2;              // A point calculated during drawing. E.g. a point of a chart.

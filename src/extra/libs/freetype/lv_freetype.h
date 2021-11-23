@@ -30,6 +30,8 @@ typedef enum {
 
 typedef struct {
     const char * name;  /* The name of the font file */
+    const void * mem;   /* The pointer of the font file */
+    size_t mem_size;    /* The size of the memory */
     lv_font_t * font;   /* point to lvgl font */
     uint16_t weight;    /* font size */
     uint16_t style;     /* font style */
