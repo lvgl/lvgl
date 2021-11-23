@@ -6,7 +6,7 @@
 
 ## Overview
 
-Buttons have no new features compared to the [Base object](/widgets/obj). They are usuful for semantic purposes and have slightly different default settings.
+Buttons have no new features compared to the [Base object](/widgets/obj). They are useful for semantic purposes and have slightly different default settings.
 
 Buttons, by default, differ from Base object in the following ways:
 - Not scrollable

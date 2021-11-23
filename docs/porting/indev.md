@@ -183,7 +183,7 @@ Besides `read_cb` a `feedback_cb` callback can be also specified in `lv_indev_dr
 
 
 ### Associating with a display
-Every input device is associated with a display. By default, a new input device is added to the last  display created or explicitly selected (using `lv_disp_set_default()`).
+Every input device is associated with a display. By default, a new input device is added to the last display created or explicitly selected (using `lv_disp_set_default()`).
 The associated display is stored and can be changed in `disp` field of the driver.
 
 ### Buffered reading

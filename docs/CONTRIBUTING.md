@@ -144,7 +144,7 @@ In this case you can just send a Pull Request without worrying about any licensi
 
 If the code you would like to add is based on an article, post or comment on a website (e.g. StackOverflow) the license and/or rules of that site should be followed.
 
-For example in case of StackOwerflow a notice like this can be used:
+For example in case of StackOverflow a notice like this can be used:
 ```
 /* The original version of this code-snippet was published on StackOverflow.
  * Post: http://stackoverflow.com/questions/12345
