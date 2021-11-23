@@ -30,16 +30,16 @@ The angles should be in the [0;360] range.
 
 ### Rotation
 
-An offset to the 0 degree position can added with `lv_arc_set_rotation(arc, deg)`.
+An offset to the 0 degree position can be added with `lv_arc_set_rotation(arc, deg)`.
 
 ### Mode
 
 The arc can be one of the following modes:
-- `LV_ARC_MODE_NORMAL` The indicator arc is drawn from the minimimum value to the current.
+- `LV_ARC_MODE_NORMAL` The indicator arc is drawn from the minimum value to the current.
 - `LV_ARC_MODE_REVERSE` The indicator arc is drawn counter-clockwise from the maximum value to the current.
 - `LV_ARC_MODE_SYMMETRICAL` The indicator arc is drawn from the middle point to the current value.
 
-The mode can be set by `lv_arc_set_mode(arc, LV_ARC_MODE_...)` and used only if the the angle is set by `lv_arc_set_value()` or the arc is adjusted by finger.
+The mode can be set by `lv_arc_set_mode(arc, LV_ARC_MODE_...)` and used only if the angle is set by `lv_arc_set_value()` or the arc is adjusted by finger.
 
 ### Change rate
 If the arc is pressed the current value will set with a limited speed according to the set *change rate*. 

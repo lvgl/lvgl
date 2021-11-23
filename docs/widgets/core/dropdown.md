@@ -30,7 +30,7 @@ The button goes to `LV_STATE_CHECKED` when it's opened.
 - `LV_PART_SELECTED` Refers to the currently pressed, checked or pressed+checked option. Also uses the typical background properties. 
 
 As list does not exist when the drop-down list is closed it's not possible to simply add styles to it.
-Insteada add an event handler to the button for `LV_EVENT_READY` (triggered when the list is opened) and add styles to the list in it like this:
+Instead, add an event handler to the button for `LV_EVENT_READY` (triggered when the list is opened) and add styles to the list in it like this:
 ```c
 lv_obj_t * list = lv_dropdown_get_list(dropdown) /*Get the list*/
 lv_obj_add_style(list, &my_style, ...)           /*Add the styles to the list*/}`

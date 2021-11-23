@@ -6,7 +6,7 @@
 
 ## Overview
 
-The animation image is similar to the norlmal 'Image' object. The only difference is that instead of one source image, you set an array of multiple source images.
+The animation image is similar to the normal 'Image' object. The only difference is that instead of one source image, you set an array of multiple source images.
 
 You can specify a duration and repeat count.
 

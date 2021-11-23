@@ -145,7 +145,7 @@ void lv_init(void)
 
     uint8_t * txt_u8 = (uint8_t *)txt;
     if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
-        LV_LOG_WARN("The strings has no UTF-8 encoding. Non-ASCII characters won't be displayed.");
+        LV_LOG_WARN("The strings have no UTF-8 encoding. Non-ASCII characters won't be displayed.");
     }
 
     uint32_t endianess_test = 0x11223344;
@@ -174,7 +174,7 @@ void lv_init(void)
 #endif
 
 #if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
-    LV_LOG_WARN("Log level is set the Trace which makes LVGL much slower");
+    LV_LOG_WARN("Log level is set to 'Trace' which makes LVGL much slower");
 #endif
 
     lv_extra_init();
