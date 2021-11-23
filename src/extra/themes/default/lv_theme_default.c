@@ -126,7 +126,8 @@ typedef struct {
 #endif
 
 #if LV_USE_MENU
-    lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_header_btn, menu_section, menu_pressed, menu_separator;
+    lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_header_btn,
+               menu_section, menu_pressed, menu_separator;
 #endif
 
 #if LV_USE_MSGBOX
@@ -757,7 +758,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
 
 #if LV_USE_MENU
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_sidebar_header_cont_class) || lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_main_header_cont_class)) {
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_sidebar_header_cont_class) ||
+           lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_main_header_cont_class)) {
             lv_obj_add_style(obj, &styles->menu_header_btn, 0);
             lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
         }
@@ -1076,7 +1078,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_PRESSED | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_CHECKED);
     }
-    else if(lv_obj_check_type(obj, &lv_menu_sidebar_header_cont_class) || lv_obj_check_type(obj, &lv_menu_main_header_cont_class)) {
+    else if(lv_obj_check_type(obj, &lv_menu_sidebar_header_cont_class) ||
+            lv_obj_check_type(obj, &lv_menu_main_header_cont_class)) {
         lv_obj_add_style(obj, &styles->menu_header_cont, 0);
         lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
     }
