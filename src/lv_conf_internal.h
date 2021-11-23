@@ -1552,11 +1552,15 @@
 #endif
 
 #ifndef LV_USE_MENU
-#  ifdef LV_USE_MENU
-#    define LV_USE_MENU CONFIG_LV_USE_MENU
-#  else
-#    define LV_USE_MENU         1
-#  endif
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_MENU
+            #define LV_USE_MENU CONFIG_LV_USE_MENU
+        #else
+            #define LV_USE_MENU 0
+        #endif
+    #else
+        #define LV_USE_MENU       1
+    #endif
 #endif
 
 #ifndef LV_USE_METER
