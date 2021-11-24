@@ -92,6 +92,34 @@ void test_switch_animation(void)
     TEST_ASSERT_GREATER_THAN(initial_anim_state, anim_sw->anim_state);
 }
 
+void test_switch_should_not_have_extra_draw_size_at_creation(void)
+{
+    lv_coord_t extra_size = _lv_obj_get_ext_draw_size(sw);
+
+    TEST_ASSERT_EQUAL(0, extra_size);
+}
+
+void test_switch_should_update_extra_draw_size_after_editing_padding(void)
+{
+    lv_coord_t pad = 6;
+    lv_coord_t actual = 0;
+    // expected = 8; pad + SWITCH_ROUNDING_ERROR (2)
+    lv_coord_t expected = 8;
+
+    static lv_style_t style_knob;
+    lv_style_init(&style_knob);
+    lv_style_set_pad_all(&style_knob, pad);
+
+    lv_obj_remove_style_all(sw);
+    lv_obj_add_style(sw, &style_knob, LV_PART_KNOB);
+    lv_obj_center(sw);
+
+    /* Get extra draw size */
+    actual = _lv_obj_get_ext_draw_size(sw);
+
+    TEST_ASSERT_EQUAL(expected, actual);
+}
+
 /* See #2330 for context */
 void test_switch_should_trigger_value_changed_event_only_once(void)
 {
