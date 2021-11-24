@@ -51,7 +51,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
 }
 
 void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area,
-                     const lv_draw_rect_dsc_t * draw_dsc)
+                      const lv_draw_rect_dsc_t * draw_dsc)
 {
 
     const lv_draw_backend_t * backend = lv_draw_backend_get();

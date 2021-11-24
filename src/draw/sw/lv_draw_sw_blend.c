@@ -37,12 +37,12 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
 
 
 static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                        const lv_color_t * src_buf, const lv_area_t * src_area,
-                        const lv_opa_t * mask, lv_opa_t opa);
+                       const lv_color_t * src_buf, const lv_area_t * src_area,
+                       const lv_opa_t * mask, lv_opa_t opa);
 
 LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                        const lv_color_t * src_buf, const lv_area_t * src_area,
-                        const lv_opa_t * mask, lv_opa_t opa);
+                                             const lv_color_t * src_buf, const lv_area_t * src_area,
+                                             const lv_opa_t * mask, lv_opa_t opa);
 
 #if LV_DRAW_COMPLEX
 static void map_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
@@ -99,7 +99,7 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 
 
 LV_ATTRIBUTE_FAST_MEM void lv_blend_sw_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                          lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
+                                            lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
@@ -185,7 +185,8 @@ static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
+LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                              const lv_area_t * fill_area,
                                               lv_color_t color, lv_opa_t opa, const lv_opa_t * mask)
 {
 
@@ -308,7 +309,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
                 for(x = 0; x < area_w; x++) {
                     if(*mask_line) {
                         if(*mask_line != last_mask) opa_tmp = *mask_line == LV_OPA_COVER ? opa :
-                                                                   (uint32_t)((uint32_t)(*mask_line) * opa) >> 8;
+                                                                  (uint32_t)((uint32_t)(*mask_line) * opa) >> 8;
                         if(*mask_line != last_mask || last_dest_color.full != dest_buf[x].full) {
 #if LV_COLOR_SCREEN_TRANSP
                             if(disp->driver->screen_transp) {
@@ -408,8 +409,8 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
 #endif
 
 static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                        const lv_color_t * src_buf, const lv_area_t * src_area,
-                        const lv_opa_t * mask, lv_opa_t opa)
+                       const lv_color_t * src_buf, const lv_area_t * src_area,
+                       const lv_opa_t * mask, lv_opa_t opa)
 
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
@@ -430,7 +431,8 @@ static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_a
     if(mask == NULL) {
         for(y = 0; y < clip_h; y++) {
             for(x = 0; x <= clip_w; x++) {
-                disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, clip_area->x1 + x, clip_area->y1 + y, src_buf[x], opa);
+                disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, clip_area->x1 + x, clip_area->y1 + y, src_buf[x],
+                                        opa);
             }
             src_buf += src_stride;
         }
@@ -555,7 +557,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t d
 #endif
                 }
 #endif
-                dest_buf+= dest_stride;
+                dest_buf += dest_stride;
                 src_buf += src_stride;
                 mask += clip_w;
             }

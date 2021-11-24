@@ -43,7 +43,7 @@ extern "C" {
  * @param mode          blend mode from `lv_blend_mode_t`
  */
 void lv_draw_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area, lv_color_t color,
-                                          lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode);
+                        lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode);
 
 /**
  * Copy a source buffer to the display's draw buffer.
@@ -58,8 +58,8 @@ void lv_draw_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area
  * @param mode          blend mode from `lv_blend_mode_t`
  */
 void lv_draw_blend_map(const lv_area_t * clip_area, const lv_area_t * src_area,
-                        const lv_color_t * src_buf,
-                        lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode);
+                       const lv_color_t * src_buf,
+                       lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode);
 
 /**********************
  *      MACROS

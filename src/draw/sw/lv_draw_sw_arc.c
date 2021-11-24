@@ -57,8 +57,9 @@ typedef struct {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
-                 const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
+void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle,
+                    uint16_t end_angle,
+                    const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {
 #if LV_DRAW_COMPLEX
     if(dsc->opa <= LV_OPA_MIN) return;

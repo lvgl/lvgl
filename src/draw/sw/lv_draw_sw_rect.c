@@ -124,7 +124,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     /*Most simple case: just a plain rectangle*/
     if(!mask_any && dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
         lv_draw_blend_fill(clip_area, &coords_bg, dsc->bg_color, NULL,
-                       LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->blend_mode);
+                           LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->blend_mode);
         return;
     }
 
@@ -538,7 +538,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -575,7 +576,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -607,12 +609,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
-                    lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                    lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa,
+                                       dsc->blend_mode);
                 }
                 else {
                     lv_opa_t line_opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
                     lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, line_opa,
-                                   dsc->blend_mode);
+                                       dsc->blend_mode);
                 }
                 sh_buf_tmp += corner_size;
             }
@@ -644,12 +647,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
-                    lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                    lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa,
+                                       dsc->blend_mode);
                 }
                 else {
                     lv_opa_t line_opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
                     lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, line_opa,
-                                   dsc->blend_mode);
+                                       dsc->blend_mode);
 
                 }
                 sh_buf_tmp += corner_size;
@@ -689,7 +693,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
             }
         }
     }
@@ -742,7 +747,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
             }
         }
     }
@@ -778,7 +784,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -815,7 +822,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                     mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, *mask_act, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -836,7 +844,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 
                 lv_memset_ff(mask_buf, w);
                 mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->blend_mode);
+                lv_draw_blend_fill(&clip_area_sub, &blend_area, dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa,
+                                   dsc->blend_mode);
             }
         }
     }

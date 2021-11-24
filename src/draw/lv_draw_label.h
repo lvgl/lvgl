@@ -83,9 +83,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                                          const char * txt, lv_draw_label_hint_t * hint);
 
 void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-        const lv_font_t * font_p,
-        uint32_t letter,
-        lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                    const lv_font_t * font_p,
+                    uint32_t letter,
+                    lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 /***********************
  * GLOBAL VARIABLES
  ***********************/

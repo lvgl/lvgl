@@ -40,9 +40,9 @@
  **********************/
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(const lv_area_t * map_area, const lv_area_t * clip_area,
-                                              const uint8_t * map_p,
-                                              const lv_draw_img_dsc_t * draw_dsc,
-                                              bool chroma_key, bool alpha_byte)
+                                          const uint8_t * map_p,
+                                          const lv_draw_img_dsc_t * draw_dsc,
+                                          bool chroma_key, bool alpha_byte)
 {
     /*Use the clip area as draw area*/
     lv_area_t draw_area;
@@ -65,7 +65,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(const lv_area_t * map_area, const lv_a
     if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         lv_draw_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
-                      draw_dsc->blend_mode);
+                          draw_dsc->blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -128,7 +128,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(const lv_area_t * map_area, const lv_a
                     blend_area.y2 ++;
                 }
                 else {
-                    lv_draw_blend_map(clip_area, &blend_area, map2, mask_buf, LV_DRAW_MASK_RES_CHANGED, draw_dsc->opa, draw_dsc->blend_mode);
+                    lv_draw_blend_map(clip_area, &blend_area, map2, mask_buf, LV_DRAW_MASK_RES_CHANGED, draw_dsc->opa,
+                                      draw_dsc->blend_mode);
 
                     blend_area.y1 = blend_area.y2 + 1;
                     blend_area.y2 = blend_area.y1;
@@ -139,7 +140,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(const lv_area_t * map_area, const lv_a
             /*Flush the last part*/
             if(blend_area.y1 != blend_area.y2) {
                 blend_area.y2--;
-                lv_draw_blend_map(clip_area, &blend_area, map2, mask_buf, LV_DRAW_MASK_RES_CHANGED, draw_dsc->opa, draw_dsc->blend_mode);
+                lv_draw_blend_map(clip_area, &blend_area, map2, mask_buf, LV_DRAW_MASK_RES_CHANGED, draw_dsc->opa,
+                                  draw_dsc->blend_mode);
             }
 
             lv_mem_buf_release(mask_buf);

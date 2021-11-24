@@ -96,9 +96,9 @@ const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1
  * @param opa opacity of letter (0..255)
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                                          const lv_font_t * font_p,
-                                          uint32_t letter,
-                                          lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
+                                             const lv_font_t * font_p,
+                                             uint32_t letter,
+                                             lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -294,8 +294,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
         }
         else {
             lv_draw_blend_fill(clip_area, &fill_area,
-                           color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                           blend_mode);
+                               color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
+                               blend_mode);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -311,8 +311,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         lv_draw_blend_fill(clip_area, &fill_area,
-                       color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                       blend_mode);
+                           color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
+                           blend_mode);
         mask_p = 0;
     }
 
