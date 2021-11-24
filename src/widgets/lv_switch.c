@@ -33,6 +33,9 @@
 /** Mark no animation is in progress*/
 #define LV_SWITCH_ANIM_STATE_INV   -1
 
+/** Switch rounding error for know calculation */
+#define LV_SWITCH_KNOB_ROUNDING_ERROR   2
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -127,7 +130,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
-        knob_size += 2;         /*For rounding error*/
+        knob_size += LV_SWITCH_KNOB_ROUNDING_ERROR;
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
         lv_coord_t * s = lv_event_get_param(e);
