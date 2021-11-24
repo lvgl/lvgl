@@ -22,6 +22,11 @@ void tearDown(void)
     value_changed = 0;
 }
 
+static void mouse_click_on_switch(void)
+{
+    lv_test_mouse_click_at(sw->coords.x1, sw->coords.y1);
+}
+
 static void event_handler(lv_event_t *e)
 {
     lv_event_code_t event = lv_event_get_code(e);
@@ -73,7 +78,7 @@ void test_switch_animation(void)
     int32_t initial_anim_state = anim_sw->anim_state;
 
     /* Trigger animation */
-    lv_test_mouse_click_at(sw->coords.x1, sw->coords.y1);
+    mouse_click_on_switch();
 
     /* Let 50 ticks pass so the assert doesn't get executed right away */
     time = custom_tick_get();
@@ -91,7 +96,7 @@ void test_switch_animation(void)
 void test_switch_should_trigger_value_changed_event_only_once(void)
 {
     lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
-    lv_test_mouse_click_at(sw->coords.x1, sw->coords.y1);
+    mouse_click_on_switch();
 
     TEST_ASSERT_EQUAL(1, value_changed);
 }
@@ -100,7 +105,7 @@ void test_switch_should_trigger_value_changed_event_only_once(void)
 void test_switch_should_state_change_when_event_bubbling_is_enabled(void)
 {
     lv_obj_add_flag(sw, LV_OBJ_FLAG_EVENT_BUBBLE);
-    lv_test_mouse_click_at(sw->coords.x1, sw->coords.y1);
+    mouse_click_on_switch();
 
     TEST_ASSERT(lv_obj_has_state(sw, LV_STATE_CHECKED));
 }
