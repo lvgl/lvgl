@@ -139,6 +139,28 @@ static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
     return lv_btnmatrix_get_map(kb);
 }
 
+/**
+ * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)
+ * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
+ * @param obj       pointer to button matrix object
+ * @return          index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
+ */
+static inline uint16_t lv_keyboard_get_selected_btn(const lv_obj_t * obj)
+{
+    return lv_btnmatrix_get_selected_btn(obj);
+}
+
+/**
+ * Get the button's text
+ * @param obj       pointer to button matrix object
+ * @param btn_id    the index a button not counting new line characters.
+ * @return          text of btn_index` button
+ */
+static inline const char * lv_keyboard_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
+{
+    return lv_btnmatrix_get_btn_text(obj, btn_id);
+}
+
 /*=====================
  * Other functions
  *====================*/
