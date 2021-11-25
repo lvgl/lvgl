@@ -65,47 +65,47 @@ void lv_png_init(void)
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
     (void) decoder; /*Unused*/
-     lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
+    lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
 
-     /*If it's a PNG file...*/
-     if(src_type == LV_IMG_SRC_FILE) {
-         const char * fn = src;
-         if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
+    /*If it's a PNG file...*/
+    if(src_type == LV_IMG_SRC_FILE) {
+        const char * fn = src;
+        if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
 
-             /* Read the width and height from the file. They have a constant location:
-              * [16..23]: width
-              * [24..27]: height
-              */
-             uint32_t size[2];
-             lv_fs_file_t f;
-             lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-             if(res != LV_FS_RES_OK) return LV_RES_INV;
-             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
-             uint32_t rn;
-             lv_fs_read(&f, &size, 8, &rn);
-             if(rn != 8) return LV_RES_INV;
-             lv_fs_close(&f);
-             /*Save the data in the header*/
-             header->always_zero = 0;
-             header->cf = LV_IMG_CF_RAW_ALPHA;
-             /*The width and height are stored in Big endian format so convert them to little endian*/
-             header->w = (lv_coord_t) ((size[0] & 0xff000000) >> 24) +  ((size[0] & 0x00ff0000) >> 8);
-             header->h = (lv_coord_t) ((size[1] & 0xff000000) >> 24) +  ((size[1] & 0x00ff0000) >> 8);
+            /* Read the width and height from the file. They have a constant location:
+             * [16..23]: width
+             * [24..27]: height
+             */
+            uint32_t size[2];
+            lv_fs_file_t f;
+            lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
+            if(res != LV_FS_RES_OK) return LV_RES_INV;
+            lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
+            uint32_t rn;
+            lv_fs_read(&f, &size, 8, &rn);
+            if(rn != 8) return LV_RES_INV;
+            lv_fs_close(&f);
+            /*Save the data in the header*/
+            header->always_zero = 0;
+            header->cf = LV_IMG_CF_RAW_ALPHA;
+            /*The width and height are stored in Big endian format so convert them to little endian*/
+            header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
+            header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
 
-             return LV_RES_OK;
-         }
-     }
-     /*If it's a PNG file in a  C array...*/
-     else if(src_type == LV_IMG_SRC_VARIABLE) {
-         const lv_img_dsc_t * img_dsc = src;
-         header->always_zero = 0;
-         header->cf = img_dsc->header.cf;       /*Save the color format*/
-         header->w = img_dsc->header.w;         /*Save the color width*/
-         header->h = img_dsc->header.h;         /*Save the color height*/
-         return LV_RES_OK;
-     }
+            return LV_RES_OK;
+        }
+    }
+    /*If it's a PNG file in a  C array...*/
+    else if(src_type == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * img_dsc = src;
+        header->always_zero = 0;
+        header->cf = img_dsc->header.cf;       /*Save the color format*/
+        header->w = img_dsc->header.w;         /*Save the color width*/
+        header->h = img_dsc->header.h;         /*Save the color height*/
+        return LV_RES_OK;
+    }
 
-     return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
+    return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
 }
 
 
@@ -183,10 +183,10 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
+static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    if (dsc->img_data) {
+    if(dsc->img_data) {
         lv_mem_free((uint8_t *)dsc->img_data);
         dsc->img_data = NULL;
     }
@@ -200,7 +200,7 @@ static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
 {
 #if LV_COLOR_DEPTH == 32
-    lv_color32_t * img_argb = (lv_color32_t*)img;
+    lv_color32_t * img_argb = (lv_color32_t *)img;
     lv_color_t c;
     lv_color_t * img_c = (lv_color_t *) img;
     uint32_t i;
@@ -210,32 +210,32 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
         img_c[i].ch.blue = c.ch.red;
     }
 #elif LV_COLOR_DEPTH == 16
-    lv_color32_t * img_argb = (lv_color32_t*)img;
+    lv_color32_t * img_argb = (lv_color32_t *)img;
     lv_color_t c;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
         c = lv_color_make(img_argb[i].ch.blue, img_argb[i].ch.green, img_argb[i].ch.red);
-        img[i*3 + 2] = img_argb[i].ch.alpha;
-        img[i*3 + 1] = c.full >> 8;
-        img[i*3 + 0] = c.full & 0xFF;
+        img[i * 3 + 2] = img_argb[i].ch.alpha;
+        img[i * 3 + 1] = c.full >> 8;
+        img[i * 3 + 0] = c.full & 0xFF;
     }
 #elif LV_COLOR_DEPTH == 8
-    lv_color32_t * img_argb = (lv_color32_t*)img;
+    lv_color32_t * img_argb = (lv_color32_t *)img;
     lv_color_t c;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
         c = lv_color_make(img_argb[i].ch.red, img_argb[i].ch.green, img_argb[i].ch.blue);
-        img[i*2 + 1] = img_argb[i].ch.alpha;
-        img[i*2 + 0] = c.full;
+        img[i * 2 + 1] = img_argb[i].ch.alpha;
+        img[i * 2 + 0] = c.full;
     }
 #elif LV_COLOR_DEPTH == 1
-    lv_color32_t * img_argb = (lv_color32_t*)img;
+    lv_color32_t * img_argb = (lv_color32_t *)img;
     uint8_t b;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
         b = img_argb[i].ch.red | img_argb[i].ch.green | img_argb[i].ch.blue;
-        img[i*2 + 1] = img_argb[i].ch.alpha;
-        img[i*2 + 0] = b > 128 ? 1 : 0;
+        img[i * 2 + 1] = img_argb[i].ch.alpha;
+        img[i * 2 + 0] = b > 128 ? 1 : 0;
     }
 #endif
 }

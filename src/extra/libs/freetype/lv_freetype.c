@@ -14,6 +14,8 @@
 #include FT_GLYPH_H
 #include FT_CACHE_H
 #include FT_SIZES_H
+#include FT_IMAGE_H
+#include FT_OUTLINE_H
 
 /*********************
  *      DEFINES
@@ -23,6 +25,8 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
+    const void * mem;
+    long size;
     char * name;
 } lv_face_info_t;
 
@@ -49,8 +53,6 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
                                     FT_Library library_is, FT_Pointer req_data, FT_Face * aface);
 static bool lv_ft_font_init_cache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_cache(lv_font_t * font);
-static bool lv_ft_font_init_cache(lv_ft_info_t * info);
-static void lv_ft_font_destroy_cache(lv_font_t * font);
 #else
 static FT_Face face_find_in_list(lv_ft_info_t * info);
 static void face_add_to_list(FT_Face face);
@@ -59,7 +61,6 @@ static void face_generic_finalizer(void * object);
 static bool lv_ft_font_init_nocache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_nocache(lv_font_t * font);
 #endif
-
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -68,8 +69,16 @@ static FT_Library library;
 #if LV_FREETYPE_CACHE_SIZE >= 0
     static FTC_Manager cache_manager;
     static FTC_CMapCache cmap_cache;
-    static FTC_SBitCache sbit_cache;
-    static FTC_SBit sbit;
+    static FT_Face current_face = NULL;
+
+    #if LV_FREETYPE_SBIT_CACHE
+        static FTC_SBitCache sbit_cache;
+        static FTC_SBit sbit;
+    #else
+        static FTC_ImageCache image_cache;
+        static FT_Glyph       image_glyph;
+    #endif
+
 #else
     static lv_faces_control_t face_control;
 #endif
@@ -105,11 +114,19 @@ bool lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes
         goto Fail;
     }
 
+#if LV_FREETYPE_SBIT_CACHE
     error = FTC_SBitCache_New(cache_manager, &sbit_cache);
     if(error) {
         LV_LOG_ERROR("Failed to open sbit cache");
         goto Fail;
     }
+#else
+    error = FTC_ImageCache_New(cache_manager, &image_cache);
+    if(error) {
+        LV_LOG_ERROR("Failed to open image cache");
+        goto Fail;
+    }
+#endif
 
     return true;
 Fail:
@@ -163,12 +180,48 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
     LV_UNUSED(req_data);
 
     lv_face_info_t * info = (lv_face_info_t *)face_id;
-    FT_Error error = FT_New_Face(library, info->name, 0, aface);
+    FT_Error error;
+    if(info->mem) {
+        error = FT_New_Memory_Face(library, info->mem, info->size, 0, aface);
+    }
+    else {
+        error = FT_New_Face(library, info->name, 0, aface);
+    }
     if(error) {
         LV_LOG_ERROR("FT_New_Face error:%d\n", error);
         return error;
     }
     return FT_Err_Ok;
+}
+
+static bool get_bold_glyph(const lv_font_t * font, FT_Face face,
+                           FT_UInt glyph_index, lv_font_glyph_dsc_t * dsc_out)
+{
+    if(FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT)) {
+        return false;
+    }
+
+    lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
+    if(face->glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+        if(dsc->style & FT_FONT_STYLE_BOLD) {
+            int strength = 1 << 6;
+            FT_Outline_Embolden(&face->glyph->outline, strength);
+        }
+    }
+
+    if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
+        return false;
+    }
+
+    dsc_out->adv_w = (face->glyph->metrics.horiAdvance >> 6);
+    dsc_out->box_h = face->glyph->bitmap.rows;         /*Height of the bitmap in [px]*/
+    dsc_out->box_w = face->glyph->bitmap.width;         /*Width of the bitmap in [px]*/
+    dsc_out->ofs_x = face->glyph->bitmap_left;         /*X offset of the bitmap in [pf]*/
+    dsc_out->ofs_y = face->glyph->bitmap_top -
+                     face->glyph->bitmap.rows;         /*Y offset of the bitmap measured from the as line*/
+    dsc_out->bpp = 8;         /*Bit per pixel: 1/2/4/8*/
+
+    return true;
 }
 
 static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
@@ -187,20 +240,51 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
 
     lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
 
-    FT_Face face;
-    FTC_ImageTypeRec desc_sbit_type;
     FTC_FaceID face_id = (FTC_FaceID)dsc->face_id;
-    FTC_Manager_LookupFace(cache_manager, face_id, &face);
+    FT_Size face_size;
+    struct FTC_ScalerRec_ scaler;
+    scaler.face_id = face_id;
+    scaler.width = dsc->height;
+    scaler.height = dsc->height;
+    scaler.pixel = 1;
+    if(FTC_Manager_LookupSize(cache_manager, &scaler, &face_size) != 0) {
+        return false;
+    }
 
-    desc_sbit_type.face_id = face_id;
-    desc_sbit_type.flags = FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL;
-    desc_sbit_type.height = dsc->height;
-    desc_sbit_type.width = dsc->height;
+    FT_Face face = face_size->face;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(cmap_cache, face_id, charmap_index, unicode_letter);
-    FT_Error error = FTC_SBitCache_Lookup(sbit_cache, &desc_sbit_type, glyph_index, &sbit, NULL);
+    dsc_out->is_placeholder = glyph_index == 0;
+
+    if(dsc->style & FT_FONT_STYLE_ITALIC) {
+        FT_Matrix italic_matrix;
+        italic_matrix.xx = 1 << 16;
+        italic_matrix.xy = 0x5800;
+        italic_matrix.yx = 0;
+        italic_matrix.yy = 1 << 16;
+        FT_Set_Transform(face, &italic_matrix, NULL);
+    }
+
+    if(dsc->style & FT_FONT_STYLE_BOLD) {
+        current_face = face;
+        if(!get_bold_glyph(font, face, glyph_index, dsc_out)) {
+            current_face = NULL;
+            return false;
+        }
+        goto end;
+    }
+
+    FTC_ImageTypeRec desc_type;
+    desc_type.face_id = face_id;
+    desc_type.flags = FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL;
+    desc_type.height = dsc->height;
+    desc_type.width = dsc->height;
+
+#if LV_FREETYPE_SBIT_CACHE
+    FT_Error error = FTC_SBitCache_Lookup(sbit_cache, &desc_type, glyph_index, &sbit, NULL);
     if(error) {
         LV_LOG_ERROR("SBitCache_Lookup error");
+        return false;
     }
 
     dsc_out->adv_w = sbit->xadvance;
@@ -209,15 +293,53 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
     dsc_out->ofs_x = sbit->left;    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = sbit->top - sbit->height; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;               /*Bit per pixel: 1/2/4/8*/
+#else
+    FT_Error error = FTC_ImageCache_Lookup(image_cache, &desc_type, glyph_index, &image_glyph, NULL);
+    if(error) {
+        LV_LOG_ERROR("ImageCache_Lookup error");
+        return false;
+    }
+    if(image_glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+        LV_LOG_ERROR("Glyph_To_Bitmap error");
+        return false;
+    }
+
+    FT_BitmapGlyph glyph_bitmap = (FT_BitmapGlyph)image_glyph;
+    dsc_out->adv_w = (glyph_bitmap->root.advance.x >> 16);
+    dsc_out->box_h = glyph_bitmap->bitmap.rows;         /*Height of the bitmap in [px]*/
+    dsc_out->box_w = glyph_bitmap->bitmap.width;        /*Width of the bitmap in [px]*/
+    dsc_out->ofs_x = glyph_bitmap->left;                /*X offset of the bitmap in [pf]*/
+    dsc_out->ofs_y = glyph_bitmap->top -
+                     glyph_bitmap->bitmap.rows;         /*Y offset of the bitmap measured from the as line*/
+    dsc_out->bpp = 8;         /*Bit per pixel: 1/2/4/8*/
+#endif
+
+end:
+    if((dsc->style & FT_FONT_STYLE_ITALIC) && (unicode_letter_next == '\0')) {
+        dsc_out->adv_w = dsc_out->box_w + dsc_out->ofs_x;
+    }
 
     return true;
 }
 
 static const uint8_t * get_glyph_bitmap_cb_cache(const lv_font_t * font, uint32_t unicode_letter)
 {
-    LV_UNUSED(font);
     LV_UNUSED(unicode_letter);
+
+    lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
+    if(dsc->style & FT_FONT_STYLE_BOLD) {
+        if(current_face && current_face->glyph->format == FT_GLYPH_FORMAT_BITMAP) {
+            return (const uint8_t *)(current_face->glyph->bitmap.buffer);
+        }
+        return NULL;
+    }
+
+#if LV_FREETYPE_SBIT_CACHE
     return (const uint8_t *)sbit->buffer;
+#else
+    FT_BitmapGlyph glyph_bitmap = (FT_BitmapGlyph)image_glyph;
+    return (const uint8_t *)glyph_bitmap->bitmap.buffer;
+#endif
 }
 
 static bool lv_ft_font_init_cache(lv_ft_info_t * info)
@@ -230,12 +352,14 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
-
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
     lv_face_info_t * face_info = NULL;
     face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
     if(face_info == NULL) {
         goto Fail;
     }
+    face_info->mem = info->mem;
+    face_info->size = info->mem_size;
     face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
     strcpy(face_info->name, info->name);
 
@@ -289,12 +413,12 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
 
     lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
     if(dsc) {
+        FTC_Manager_RemoveFaceID(cache_manager, (FTC_FaceID)dsc->face_id);
         lv_mem_free(dsc->face_id);
         lv_mem_free(dsc->font);
         lv_mem_free(dsc);
     }
 }
-
 #else/* LV_FREETYPE_CACHE_SIZE */
 
 static FT_Face face_find_in_list(lv_ft_info_t * info)
@@ -366,10 +490,27 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
     if(face->size != dsc->size) {
         FT_Activate_Size(dsc->size);
     }
+    dsc_out->is_placeholder = glyph_index == 0;
 
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     if(error) {
         return false;
+    }
+
+    if(face->glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+        if(dsc->style & FT_FONT_STYLE_BOLD) {
+            int strength = 1 << 6;
+            FT_Outline_Embolden(&face->glyph->outline, strength);
+        }
+
+        if(dsc->style & FT_FONT_STYLE_ITALIC) {
+            FT_Matrix italic_matrix;
+            italic_matrix.xx = 1 << 16;
+            italic_matrix.xy = 0x5800;
+            italic_matrix.yx = 0;
+            italic_matrix.yy = 1 << 16;
+            FT_Outline_Transform(&face->glyph->outline, &italic_matrix);
+        }
     }
 
     error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
@@ -384,6 +525,10 @@ static bool get_glyph_dsc_cb_nocache(const lv_font_t * font,
     dsc_out->ofs_y = face->glyph->bitmap_top -
                      face->glyph->bitmap.rows;         /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;         /*Bit per pixel: 1/2/4/8*/
+
+    if((dsc->style & FT_FONT_STYLE_ITALIC) && (unicode_letter_next == '\0')) {
+        dsc_out->adv_w = dsc_out->box_w + dsc_out->ofs_x;
+    }
 
     return true;
 }
@@ -406,6 +551,7 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         lv_mem_free(dsc);
         return false;
     }
+    lv_memset_00(dsc->font, sizeof(lv_font_t));
 
     lv_face_info_t * face_info = NULL;
     FT_Face face = face_find_in_list(info);
@@ -414,7 +560,13 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         if(face_info == NULL) {
             goto Fail;
         }
-        FT_Error error = FT_New_Face(library, info->name, 0, &face);
+        FT_Error error;
+        if(info->mem) {
+            error = FT_New_Memory_Face(library, info->mem, (FT_Long) info->mem_size, 0, &face);
+        }
+        else {
+            error = FT_New_Face(library, info->name, 0, &face);
+        }
         if(error) {
             lv_mem_free(face_info);
             LV_LOG_WARN("create face error(%d)", error);
@@ -422,6 +574,8 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
         }
 
         /* link face and face info */
+        face_info->mem = info->mem;
+        face_info->size = (long) info->mem_size;
         face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
         strcpy(face_info->name, info->name);
         face->generic.data = face_info;

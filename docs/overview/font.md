@@ -251,3 +251,19 @@ const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_
     return bitmap;    /*Or NULL if not found*/
 }
 ```
+
+## Use font fallback
+
+You can specify `fallback` in `lv_font_t` to provide fallback to the font. When the font 
+fails to find glyph to a letter, it will try to let font from `fallback` to handle.
+
+`fallback` can be chained, so it will try to solve until there is no `fallback` set.
+
+```c
+/* Roboto font doesn't have support for CJK glyphs */
+lv_font_t *roboto = my_font_load_function();
+/* Droid Sans Fallback has more glyphs but its typeface doesn't look good as Roboto */
+lv_font_t *droid_sans_fallback = my_font_load_function();
+/* So now we can display Roboto for supported characters while having wider characters set support */
+roboto->fallback = droid_sans_fallback;
+```

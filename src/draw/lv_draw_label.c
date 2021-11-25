@@ -449,6 +449,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(const lv_point_t * pos_p, const lv_are
         return;
     }
 
+    if(g.resolved_font) {
+        font_p = g.resolved_font;
+    }
     const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
     if(map_p == NULL) {
         LV_LOG_WARN("lv_draw_letter: character's bitmap not found");

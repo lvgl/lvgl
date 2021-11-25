@@ -31,13 +31,13 @@ Constant strings are safe to use with `lv_label_set_text_static` (except when us
 Newline characters are handled automatically by the label object. You can use `\n` to make a line break. For example: `"line1\nline2\n\nline4"`
 
 ### Long modes
-By default, the width and height of the label is set to `LV_SIZE_CONTENT`. Therefore the size of the label is automatically expanded to the text size. 
-Otherwise, if the width or height are explicitly set (useing  e.g.`lv_obj_set_width` or a layout), the lines wider than the label's width can be manipulated according to several long mode policies. 
-Similary, the policies can be applied if the height of the text is greater than the height of the label.
+By default, the width and height of the label is set to `LV_SIZE_CONTENT`. Therefore, the size of the label is automatically expanded to the text size. 
+Otherwise, if the width or height are explicitly set (using  e.g.`lv_obj_set_width` or a layout), the lines wider than the label's width can be manipulated according to several long mode policies. 
+Similarly, the policies can be applied if the height of the text is greater than the height of the label.
 - `LV_LABEL_LONG_WRAP` Wrap too long lines. If the height is `LV_SIZE_CONTENT` the label's height will be expanded, otherwise the text will be clipped. (Default)
 - `LV_LABEL_LONG_DOT` Replaces the last 3 characters from bottom right corner of the label with dots (`.`) 
 - `LV_LABEL_LONG_SCROLL` If the text is wider than the label scroll it horizontally back and forth. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
-- `LV_LABEL_LONG_SCROLL_CIRCULAR` If the text is wider than the label scroll it horizontally continously. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
+- `LV_LABEL_LONG_SCROLL_CIRCULAR` If the text is wider than the label scroll it horizontally continuously. If it's higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
 - `LV_LABEL_LONG_CLIP` Simply clip the parts of the text outside the label.
 
 You can specify the long mode with `lv_label_set_long_mode(label, LV_LABEL_LONG_...)`

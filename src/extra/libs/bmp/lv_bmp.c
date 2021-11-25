@@ -36,7 +36,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc)
 
 
 static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
-                                                 lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 
@@ -140,7 +140,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         uint8_t header[54];
         lv_fs_read(&b.f, header, 54, NULL);
 
-        if (0x42 != header[0] || 0x4d != header[1]) {
+        if(0x42 != header[0] || 0x4d != header[1]) {
             return LV_RES_INV;
         }
 
@@ -169,7 +169,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
 
 static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
-                                                 lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
+                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
     LV_UNUSED(decoder);
 
@@ -188,7 +188,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
             uint8_t b1 = buf[i * 4 + 1];
             uint8_t b2 = buf[i * 4 + 2];
             uint8_t b3 = buf[i * 4 + 3];
-            lv_color32_t *c = (lv_color32_t*)&buf[i*4];
+            lv_color32_t * c = (lv_color32_t *)&buf[i * 4];
             c->ch.red = b2;
             c->ch.green = b1;
             c->ch.blue = b0;
@@ -200,7 +200,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
 
         for(i = len - 1; i >= 0; i--) {
             uint8_t * t = &buf[i * 3];
-            lv_color32_t *c = (lv_color32_t*)&buf[i*4];
+            lv_color32_t * c = (lv_color32_t *)&buf[i * 4];
             c->ch.red = t[2];
             c->ch.green = t[1];
             c->ch.blue = t[0];

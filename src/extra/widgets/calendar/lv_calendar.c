@@ -388,7 +388,8 @@ static void highlight_update(lv_obj_t * obj)
         for(i = 0; i < calendar->highlighted_dates_num; i++) {
             if(calendar->highlighted_dates[i].year == calendar->showed_date.year &&
                calendar->highlighted_dates[i].month == calendar->showed_date.month) {
-                lv_btnmatrix_set_btn_ctrl(calendar->btnm, calendar->highlighted_dates[i].day - 1 + day_first + 7, LV_CALENDAR_CTRL_HIGHLIGHT);
+                lv_btnmatrix_set_btn_ctrl(calendar->btnm, calendar->highlighted_dates[i].day - 1 + day_first + 7,
+                                          LV_CALENDAR_CTRL_HIGHLIGHT);
             }
         }
     }

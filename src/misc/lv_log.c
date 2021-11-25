@@ -91,7 +91,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
         vprintf(format, args);
         printf(" \t(in %s line #%d)\n", &file[p], line);
 #else
-        if (custom_print_cb) {
+        if(custom_print_cb) {
             char buf[512];
 #if LV_SPRINTF_CUSTOM
             char msg[256];

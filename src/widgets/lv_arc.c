@@ -384,7 +384,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
                 r -= indic_width;
 
-            } else {
+            }
+            else {
                 r -= LV_MAX(r / 4, indic_width);
             }
             if(r < 1) r = 1;
@@ -515,7 +516,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_area_set(&a, p.x - r, p.y - r, p.x + r, p.y + r);
         if(_lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE)) {
             info->res = false;
-             return;
+            return;
         }
 
         /*Valid if no clicked outside*/
