@@ -152,7 +152,6 @@ static void draw_main(lv_event_t * e)
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     const lv_area_t * clip_area = lv_event_get_param(e);
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     /*Calculate the indicator area*/
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -175,15 +174,9 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect(&indic_area, clip_area, &draw_indic_dsc);
 
     /*Draw the knob*/
-    lv_coord_t objh = lv_obj_get_height(obj);
-    lv_coord_t knob_size = objh;
-    lv_area_t knob_area;
-
+    lv_coord_t anim_value_x = 0;
+    lv_coord_t knob_size = lv_obj_get_height(obj);
     lv_coord_t anim_length = obj->coords.x2 - bg_right - obj->coords.x1 - bg_left - knob_size;
-
-    lv_coord_t anim_value_x;
-
-    bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
 
     if(LV_SWITCH_IS_ANIMATING(sw)) {
         /* Use the animation's coordinate */
@@ -191,13 +184,15 @@ static void draw_main(lv_event_t * e)
     }
     else {
         /* Use LV_STATE_CHECKED to decide the coordinate */
+        bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
         anim_value_x = chk ? anim_length : 0;
     }
 
-    if(base_dir == LV_BASE_DIR_RTL) {
+    if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
         anim_value_x = anim_length - anim_value_x;
     }
 
+    lv_area_t knob_area;
     knob_area.x1 = obj->coords.x1 + bg_left + anim_value_x;
     knob_area.x2 = knob_area.x1 + knob_size;
 
