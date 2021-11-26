@@ -321,8 +321,17 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 }
 
 #if LV_USE_PERF_MONITOR
+void lv_refr_reset_fps_counter(void)
+{
+    fps_sum_all = 0;
+    fps_sum_cnt = 0;
+}
+
 uint32_t lv_refr_get_fps_avg(void)
 {
+    if(fps_sum_cnt == 0)
+        return 0;
+
     return fps_sum_all / fps_sum_cnt;
 }
 #endif
