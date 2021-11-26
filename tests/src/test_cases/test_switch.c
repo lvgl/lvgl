@@ -72,24 +72,23 @@ void test_switch_should_not_leak_memory_after_deletion(void)
 
 void test_switch_animation(void)
 {
-    uint32_t target_time = 0;
-    uint32_t time = 0;
     lv_switch_t * anim_sw = (lv_switch_t *) sw;
     int32_t initial_anim_state = anim_sw->anim_state;
 
     /* Trigger animation */
     mouse_click_on_switch();
+    /* Wait some time  */
+    lv_test_indev_wait(50);
 
-    /* Let 50 ticks pass so the assert doesn't get executed right away */
-    time = custom_tick_get();
-    target_time = time + 50;
+    int32_t checked_anim_state = anim_sw->anim_state;
+    TEST_ASSERT_GREATER_THAN(initial_anim_state, checked_anim_state);
+    TEST_ASSERT(lv_obj_has_state(sw, LV_STATE_CHECKED));
 
-    while (time < target_time) {
-        time = custom_tick_get();
-    }
+    mouse_click_on_switch();
+    lv_test_indev_wait(50);
 
-    /* The anim_state value got bigger after pressing the switch */
-    TEST_ASSERT_GREATER_THAN(initial_anim_state, anim_sw->anim_state);
+    TEST_ASSERT_LESS_THAN(checked_anim_state, anim_sw->anim_state);
+    TEST_ASSERT_FALSE(lv_obj_has_state(sw, LV_STATE_CHECKED));
 }
 
 void test_switch_should_not_have_extra_draw_size_at_creation(void)
