@@ -28,8 +28,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct lv_gpu_sdl_backend_context_t {
-    SDL_Renderer *renderer;
-    SDL_Texture *texture;
+    SDL_Renderer * renderer;
+    SDL_Texture * texture;
 } lv_gpu_sdl_backend_context_t;
 /**********************
  * GLOBAL PROTOTYPES

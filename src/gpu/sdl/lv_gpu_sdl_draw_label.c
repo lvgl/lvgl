@@ -58,8 +58,8 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  **********************/
 
 void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                    const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
-                    lv_blend_mode_t blend_mode)
+                            const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
+                            lv_blend_mode_t blend_mode)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -96,7 +96,7 @@ void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_are
         return;
     }
 
-    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);

@@ -187,7 +187,8 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
     }
 }
 
-lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context() {
+lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context()
+{
     return lv_draw_backend_get()->ctx;
 }
 

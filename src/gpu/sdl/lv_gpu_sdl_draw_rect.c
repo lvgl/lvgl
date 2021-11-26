@@ -117,7 +117,7 @@ void lv_gpu_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, cons
         return;
     }
 
-    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
 
@@ -429,7 +429,7 @@ static void draw_border_generic(const lv_area_t * outer_area, const lv_area_t * 
         return;
     }
 
-    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_coord_t border_width = lv_area_get_width(outer_area);
@@ -485,7 +485,7 @@ static void draw_border_simple(const lv_area_t * outer_area, const lv_area_t * i
                                lv_opa_t opa)
 {
 
-    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Color color_sdl;
@@ -613,7 +613,7 @@ static void draw_rect_masked(const lv_area_t * coords, const lv_area_t * clip, c
         draw_rect_masked_simple(coords, clip, dsc);
         return;
     }
-    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Texture * screen = SDL_GetRenderTarget(renderer);
@@ -673,7 +673,7 @@ static void draw_rect_masked_simple(const lv_area_t * coords, const lv_area_t * 
     SDL_Color bg_color;
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
 
-    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Surface * indexed = lv_sdl_apply_mask_surface(coords, NULL, 0);

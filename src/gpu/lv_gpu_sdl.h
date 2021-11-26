@@ -46,7 +46,7 @@ void lv_gpu_sdl_init();
  */
 void lv_gpu_sdl_deinit();
 
-void lv_gpu_sdl_backend_init(lv_draw_backend_t *backend, SDL_Renderer *renderer, SDL_Texture *texture);
+void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * renderer, SDL_Texture * texture);
 
 /*======================
  * Add/remove functions
