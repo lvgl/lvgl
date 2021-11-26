@@ -57,7 +57,7 @@ Learn more about [Keys](/overview/indev).
 
 ## Headers
 
-**From v8.1 the header is added directly into the Calendar widget and the API of the headers has been changed. **
+**From v8.1 the header is added directly into the Calendar widget and the API of the headers has been changed.**
 
 ### Arrow buttons
 
