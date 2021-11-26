@@ -23,7 +23,7 @@
 #  include <lv_port_indev.h>
 #endif
 
-#if LV_USE_LOG && LV_LOG_PRINTF
+#if LV_USE_LOG
 static void lv_rt_log(const char *buf)
 {
     LOG_I(buf);
@@ -32,7 +32,7 @@ static void lv_rt_log(const char *buf)
 
 static int lv_port_init(void)
 {
-#if LV_USE_LOG && LV_LOG_PRINTF
+#if LV_USE_LOG
     lv_log_register_print_cb(lv_rt_log);
 #endif
 

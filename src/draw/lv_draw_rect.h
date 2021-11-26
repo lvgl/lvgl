@@ -13,15 +13,16 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_blend.h"
-#include "../font/lv_font.h"
+#include "../lv_conf_internal.h"
+#include "../misc/lv_color.h"
+#include "../misc/lv_area.h"
+#include "../misc/lv_style.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_RADIUS_CIRCLE 0x7FFF /**< A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE        0x7FFF /**< A very big radius to always draw as circle*/
 LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
-
 
 /**********************
  *      TYPEDEFS
@@ -75,7 +76,6 @@ typedef struct {
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
-//! @endcond
 
 /**
  * Draw a rectangle
@@ -84,14 +84,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
  * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
 void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
-
-/**
- * Draw a pixel
- * @param point the coordinates of the point to draw
- * @param mask the pixel will be drawn only in this mask
- * @param style pointer to a style
- */
-//void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_style_t * style);
 
 /**********************
  *      MACROS

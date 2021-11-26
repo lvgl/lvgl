@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_mask.h"
+#include "lv_draw_sw.h"
 #if LV_DRAW_COMPLEX
-#include "../misc/lv_math.h"
-#include "../misc/lv_log.h"
-#include "../misc/lv_assert.h"
-#include "../misc/lv_gc.h"
+#include "../../misc/lv_math.h"
+#include "../../misc/lv_log.h"
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
