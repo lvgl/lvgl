@@ -117,6 +117,10 @@ void lv_ffmpeg_init(void)
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
+
+#if LV_FFMPEG_AV_DUMP_FORMAT == 0
+    av_log_set_level(AV_LOG_QUIET);
+#endif
 }
 
 int lv_ffmpeg_get_frame_num(const char * path)
