@@ -11,7 +11,10 @@
 
 #if LV_USE_GPU_SDL
 
-#include "../../core/lv_refr.h"
+#include "../../draw/lv_draw_img.h"
+#include "../../draw/lv_img_cache.h"
+#include "../../draw/lv_draw_mask.h"
+
 #include "lv_gpu_sdl_utils.h"
 #include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_sdl_texture_cache.h"
@@ -45,13 +48,18 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+void lv_gpu_sdl_draw_img(const lv_area_t *map_area, const lv_area_t *clip_area, const uint8_t *map_p,
+                         const lv_draw_img_dsc_t *draw_dsc, bool chroma_key, bool alpha_byte) {
+
+}
+
+void lv_draw_img_2(const lv_area_t * coords, const lv_area_t * mask, const void * src,
                  const lv_draw_img_dsc_t * draw_dsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     size_t key_size;
     lv_gpu_sdl_cache_key_head_img_t * key = lv_gpu_sdl_img_cache_key_create(src, draw_dsc->frame_id, &key_size);

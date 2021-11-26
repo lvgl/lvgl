@@ -12,8 +12,7 @@
 #if LV_USE_GPU_SDL
 
 #include "../../draw/lv_draw_label.h"
-#include "../../font/lv_font_fmt_txt.h"
-#include "../../core/lv_refr.h"
+#include "../../draw/lv_draw_mask.h"
 #include "../../misc/lv_utils.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
@@ -58,7 +57,7 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
                     const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
                     lv_blend_mode_t blend_mode)
 {
@@ -97,8 +96,8 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
         return;
     }
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
     bool glyph_found = false;

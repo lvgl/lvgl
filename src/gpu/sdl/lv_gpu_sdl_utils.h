@@ -27,7 +27,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
+typedef struct lv_gpu_sdl_backend_context_t {
+    SDL_Renderer *renderer;
+    SDL_Texture *texture;
+} lv_gpu_sdl_backend_context_t;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -49,6 +52,8 @@ SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
 SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp);
 
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
+
+lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context();
 
 /**********************
  *      MACROS

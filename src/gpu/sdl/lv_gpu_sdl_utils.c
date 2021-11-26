@@ -12,6 +12,7 @@
 
 #include "lv_gpu_sdl_utils.h"
 
+#include "../../draw/lv_draw.h"
 #include "../../draw/lv_draw_label.h"
 
 /*********************
@@ -29,6 +30,11 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+extern const uint8_t _lv_bpp1_opa_table[2];
+extern const uint8_t _lv_bpp2_opa_table[4];
+extern const uint8_t _lv_bpp3_opa_table[8];
+extern const uint8_t _lv_bpp4_opa_table[16];
+extern const uint8_t _lv_bpp8_opa_table[256];
 
 static SDL_Palette * lv_sdl_palette_grayscale1 = NULL;
 static SDL_Palette * lv_sdl_palette_grayscale2 = NULL;
@@ -117,19 +123,28 @@ SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
 
 SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp)
 {
+    SDL_Palette * palette;
     switch(bpp) {
         case 1:
-            return lv_sdl_palette_grayscale1;
+            palette = lv_sdl_palette_grayscale1;
+            break;
         case 2:
-            return lv_sdl_palette_grayscale2;
+            palette = lv_sdl_palette_grayscale2;
+            break;
         case 3:
-            return lv_sdl_palette_grayscale3;
+            palette = lv_sdl_palette_grayscale3;
+            break;
         case 4:
-            return lv_sdl_palette_grayscale4;
+            palette = lv_sdl_palette_grayscale4;
+            break;
         case 8:
-            return lv_sdl_palette_grayscale8;
+            palette = lv_sdl_palette_grayscale8;
+            break;
+        default:
+            return NULL;
     }
-    return NULL;
+    LV_ASSERT_MSG(lv_sdl_palette_grayscale8, "lv_gpu_sdl was not initialized properly");
+    return palette;
 }
 
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp)
@@ -170,6 +185,10 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
             cur++;
         }
     }
+}
+
+lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context() {
+    return lv_draw_backend_get()->ctx;
 }
 
 /**********************

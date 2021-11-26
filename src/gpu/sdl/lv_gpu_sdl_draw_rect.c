@@ -12,10 +12,10 @@
 #if LV_USE_GPU_SDL
 
 #include "../../draw/lv_draw_rect.h"
-#include "../../hal/lv_hal_disp.h"
-#include "../../core/lv_refr.h"
+#include "../../draw/lv_draw_img.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_mask.h"
 #include "lv_gpu_sdl_utils.h"
-#include "lv_gpu_sdl_lru.h"
 #include "lv_gpu_sdl_texture_cache.h"
 #include "lv_gpu_sdl_mask.h"
 #include "lv_gpu_sdl_stack_blur.h"
@@ -107,7 +107,7 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
+void lv_gpu_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     lv_area_t draw_area;
     bool has_draw_content = _lv_area_intersect(&draw_area, coords, clip);
@@ -117,8 +117,8 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_dra
         return;
     }
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
 
     SDL_Rect clip_rect;
@@ -429,8 +429,8 @@ static void draw_border_generic(const lv_area_t * outer_area, const lv_area_t * 
         return;
     }
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     lv_coord_t border_width = lv_area_get_width(outer_area);
     lv_coord_t border_height = lv_area_get_height(outer_area);
@@ -485,8 +485,8 @@ static void draw_border_simple(const lv_area_t * outer_area, const lv_area_t * i
                                lv_opa_t opa)
 {
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Color color_sdl;
     lv_color_to_sdl_color(&color, &color_sdl);
@@ -613,8 +613,8 @@ static void draw_rect_masked(const lv_area_t * coords, const lv_area_t * clip, c
         draw_rect_masked_simple(coords, clip, dsc);
         return;
     }
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Texture * screen = SDL_GetRenderTarget(renderer);
 
@@ -673,8 +673,8 @@ static void draw_rect_masked_simple(const lv_area_t * coords, const lv_area_t * 
     SDL_Color bg_color;
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_gpu_sdl_backend_context_t *ctx = lv_gpu_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Surface * indexed = lv_sdl_apply_mask_surface(coords, NULL, 0);
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, indexed);
