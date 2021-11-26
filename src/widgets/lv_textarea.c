@@ -45,7 +45,7 @@
 static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void key_event_cb(lv_event_t *e);
+static void key_event_cb(lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
