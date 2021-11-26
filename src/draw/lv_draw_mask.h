@@ -25,9 +25,6 @@ extern "C" {
 #define LV_MASK_ID_INV  (-1)
 #if LV_DRAW_COMPLEX
 # define _LV_MASK_MAX_NUM     16
-# ifndef _LV_MASK_BUF_MAX_SIZE
-#  define _LV_MASK_BUF_MAX_SIZE  2048    /*Should be >= than the max hor res*/
-# endif
 #else
 # define _LV_MASK_MAX_NUM     1
 #endif
