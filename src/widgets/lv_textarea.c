@@ -45,6 +45,7 @@
 static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void key_event_cb(lv_event_t *e);
 static void label_event_cb(lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
@@ -639,6 +640,24 @@ bool lv_textarea_get_one_line(const lv_obj_t * obj)
     return ta->one_line == 0 ? false : true;
 }
 
+void lv_textarea_set_key(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    if(ta->key_event == en) return;
+
+    if(en) {
+        ta->key_event = 1;
+        lv_obj_add_event_cb(obj, key_event_cb, LV_EVENT_KEY, NULL);
+    }
+
+    else {
+        ta->key_event = 0;
+        lv_obj_remove_event_cb(obj, key_event_cb);
+    }
+}
+
 const char * lv_textarea_get_accepted_chars(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -803,6 +822,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
+    ta->key_event         = 1;
     ta->pwd_mode          = 0;
     ta->pwd_tmp           = NULL;
     ta->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
@@ -826,6 +846,11 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_textarea_set_cursor_pos(obj, 0);
+
+    if(ta->key_event)
+    {
+        lv_obj_add_event_cb(obj, key_event_cb, LV_EVENT_KEY, NULL);
+    }
 
     start_cursor_blink(obj);
 
@@ -862,30 +887,6 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);
     }
-    else if(code == LV_EVENT_KEY) {
-        uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
-        if(c == LV_KEY_RIGHT)
-            lv_textarea_cursor_right(obj);
-        else if(c == LV_KEY_LEFT)
-            lv_textarea_cursor_left(obj);
-        else if(c == LV_KEY_UP)
-            lv_textarea_cursor_up(obj);
-        else if(c == LV_KEY_DOWN)
-            lv_textarea_cursor_down(obj);
-        else if(c == LV_KEY_BACKSPACE)
-            lv_textarea_del_char(obj);
-        else if(c == LV_KEY_DEL)
-            lv_textarea_del_char_forward(obj);
-        else if(c == LV_KEY_HOME)
-            lv_textarea_set_cursor_pos(obj, 0);
-        else if(c == LV_KEY_END)
-            lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
-        else if(c == LV_KEY_ENTER && lv_textarea_get_one_line(obj))
-            lv_event_send(obj, LV_EVENT_READY, NULL);
-        else {
-            lv_textarea_add_char(obj, c);
-        }
-    }
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING || code == LV_EVENT_PRESS_LOST ||
             code == LV_EVENT_RELEASED) {
         update_cursor_position_on_click(e);
@@ -895,6 +896,34 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_POST) {
         draw_cursor(e);
+    }
+}
+
+static void key_event_cb(lv_event_t *e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+
+    uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
+    if(c == LV_KEY_RIGHT)
+        lv_textarea_cursor_right(obj);
+    else if(c == LV_KEY_LEFT)
+        lv_textarea_cursor_left(obj);
+    else if(c == LV_KEY_UP)
+        lv_textarea_cursor_up(obj);
+    else if(c == LV_KEY_DOWN)
+        lv_textarea_cursor_down(obj);
+    else if(c == LV_KEY_BACKSPACE)
+        lv_textarea_del_char(obj);
+    else if(c == LV_KEY_DEL)
+        lv_textarea_del_char_forward(obj);
+    else if(c == LV_KEY_HOME)
+        lv_textarea_set_cursor_pos(obj, 0);
+    else if(c == LV_KEY_END)
+        lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
+    else if(c == LV_KEY_ENTER && lv_textarea_get_one_line(obj))
+        lv_event_send(obj, LV_EVENT_READY, NULL);
+    else {
+        lv_textarea_add_char(obj, c);
     }
 }
 

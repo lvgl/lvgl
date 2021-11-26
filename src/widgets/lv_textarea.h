@@ -63,6 +63,7 @@ typedef struct {
 #endif
     uint8_t pwd_mode : 1; /*Replace characters with '*'*/
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
+    uint8_t key_event : 1;
 } lv_textarea_t;
 
 extern const lv_obj_class_t lv_textarea_class;
@@ -160,6 +161,13 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en);
  * @param en        true: one line, false: normal
  */
 void lv_textarea_set_one_line(lv_obj_t * obj, bool en);
+
+/**
+ * Enable/Disable key event
+ * @param obj       pointer to a text area object
+ * @param en        true: enable, false: disable
+ */
+void lv_textarea_set_key(lv_obj_t * obj, bool en);
 
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
