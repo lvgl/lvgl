@@ -48,17 +48,9 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gpu_sdl_draw_img(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
-                         const lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
-{
-
-}
-
-void lv_draw_img_2(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
                    const lv_draw_img_dsc_t * draw_dsc)
 {
-    if(draw_dsc->opa <= LV_OPA_MIN) return;
-
     lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
@@ -93,7 +85,7 @@ void lv_draw_img_2(const lv_area_t * coords, const lv_area_t * mask, const void 
     }
     SDL_free(key);
     if(!texture) {
-        return;
+        return LV_RES_INV;
     }
 
     SDL_Rect mask_rect, coords_rect;
@@ -125,6 +117,7 @@ void lv_draw_img_2(const lv_area_t * coords, const lv_area_t * mask, const void 
         SDL_SetTextureAlphaMod(texture, draw_dsc->recolor_opa);
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
+    return LV_RES_OK;
 }
 
 /**********************

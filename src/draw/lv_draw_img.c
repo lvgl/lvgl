@@ -70,8 +70,14 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
+    const lv_draw_backend_t * backend = lv_draw_backend_get();
+
     lv_res_t res;
-    res = lv_img_draw_core(coords, mask, src, dsc);
+    if (backend->draw_img_core) {
+        res = backend->draw_img_core(coords, mask, src, dsc);
+    } else {
+        res = lv_img_draw_core(coords, mask, src, dsc);
+    }
 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");

@@ -23,8 +23,8 @@
  *********************/
 void lv_gpu_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 
-void lv_gpu_sdl_draw_img(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
-                         const lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte);
+lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+                              const lv_draw_img_dsc_t * draw_dsc);
 
 void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
@@ -78,8 +78,7 @@ void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * rendere
     backend->ctx = ctx;
     backend->draw_rect = lv_gpu_sdl_draw_rect;
     backend->draw_arc = lv_draw_sw_arc;
-    //    backend->draw_img = lv_gpu_sdl_draw_img;
-    backend->draw_img = lv_draw_sw_img;
+    backend->draw_img_core = lv_draw_sdl_img_core;
     backend->draw_letter = lv_gpu_sdl_draw_letter;
     backend->draw_line = lv_draw_sw_line;
     backend->draw_polygon = lv_draw_sw_polygon;
