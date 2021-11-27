@@ -54,9 +54,6 @@ void lv_gpu_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, c
     lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
-
     /*Get clipped fill area which is the real draw area.
      *It is always the same or inside `fill_area`*/
     lv_area_t draw_area = *fill_area;
@@ -64,10 +61,6 @@ void lv_gpu_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, c
 
     SDL_Rect draw_area_rect;
     lv_area_to_sdl_rect(&draw_area, &draw_area_rect);
-
-    // TODO: this function needs absolute coordinate
-    draw_area_rect.x += draw_buf->area.x1;
-    draw_area_rect.y += draw_buf->area.y1;
 
     if(mask) {
         SDL_Surface * mask_surface = lv_sdl_create_mask_surface(mask, lv_area_get_width(&draw_area),
@@ -101,15 +94,8 @@ void lv_gpu_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, co
     lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp);
-
     SDL_Rect draw_area_rect;
     lv_area_to_sdl_rect(clip_area, &draw_area_rect);
-
-    // TODO: this function needs absolute coordinate
-    draw_area_rect.x += draw_buf->area.x1;
-    draw_area_rect.y += draw_buf->area.y1;
 
     Uint32 rmask = 0x00FF0000;
     Uint32 gmask = 0x0000FF00;
