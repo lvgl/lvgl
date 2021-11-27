@@ -19,7 +19,7 @@ The menu widget is built from the following objects:
     - Back btn: [lv_btn](/widgets/core/btn)
       - Back btn icon: [lv_img](/widgets/core/img)
   - Sidebar page: lv_menu_page
-  
+
 ## Usage
 
 ### Create a menu
@@ -45,27 +45,32 @@ You can set root back button modes with `lv_menu_set_mode_root_back_btn(menu, LV
 You can add any widgets to the page.
 
 ### Set a menu page in the main area
-Once the main page has been created, you must set it to the main area with `lv_menu_set_page(menu, page)`. NULL to clear main and clear menu history.
+Once a menu page has been created, you can set it to the main area with `lv_menu_set_page(menu, page)`. NULL to clear main and clear menu history.
 
 ### Set a menu page in the sidebar
-Once the main page has been created, you must set it to the sidebar with `lv_menu_set_sidebar_page(menu, page)`. NULL to clear sidebar.
+Once a menu page has been created, you can set it to the sidebar with `lv_menu_set_sidebar_page(menu, page)`. NULL to clear sidebar.
 
 ### Linking between menu pages
 For instance, you have created a btn obj in the main page. When you click the btn obj, you want it to open up a new page, use `lv_menu_set_load_page_event(menu, obj, new page)`.
 
 ### Create a menu container, section, separator
 The following objects can be created so that it is easier to style the menu:
+
 `lv_menu_cont_create(parent page)` creates a new empty container.
+
 `lv_menu_section_create(parent page)` creates a new empty section.
+
 `lv_menu_separator_create(parent page)` creates a separator.
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a page is shown.
   - `lv_menu_get_cur_main_page(menu)` returns a pointer to menu page that is currently displayed in main.
   - `lv_menu_get_cur_sidebar_page(menu)` returns a pointer to menu page that is currently displayed in sidebar.
-    
+- `LV_EVENT_CLICKED` Sent when a back btn in a header from either main or sidebar is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the menu itself. 
+  - `lv_menu_back_btn_is_root(menu, btn)` to check if btn is root back btn
+
 See the events of the [Base object](/widgets/obj) too.
-    
+
 Learn more about [Events](/overview/event).
 
 ## Keys
@@ -77,15 +82,12 @@ Learn more about [Keys](/overview/indev).
 ## Example
 
 ```eval_rst
-
 .. include:: ../../../examples/widgets/menu/index.rst
-
 ```
 
 ## API 
 
 ```eval_rst
-
 .. doxygenfile:: lv_menu.h
   :project: lvgl
         
