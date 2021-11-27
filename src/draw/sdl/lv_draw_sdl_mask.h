@@ -1,10 +1,10 @@
 /**
- * @file lv_gpu_sdl_mask.h
+ * @file lv_draw_sdl_mask.h
  *
  */
 
-#ifndef LV_GPU_SDL_MASK_H
-#define LV_GPU_SDL_MASK_H
+#ifndef LV_DRAW_SDL_MASK_H
+#define LV_DRAW_SDL_MASK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,12 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
+#include "lvgl/src/misc/lv_area.h"
+#include "lvgl/src/misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -54,4 +54,4 @@ lv_sdl_gen_mask_texture(SDL_Renderer * renderer, const lv_area_t * coords, const
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_SDL_MASK_H*/
+#endif /*LV_DRAW_SDL_MASK_H*/

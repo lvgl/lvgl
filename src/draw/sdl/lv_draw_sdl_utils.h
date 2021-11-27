@@ -1,9 +1,9 @@
 /**
- * @file lv_gpu_sdl_utils.h
+ * @file lv_draw_sdl_utils.h
  *
  */
-#ifndef LV_GPU_SDL_UTILS_H
-#define LV_GPU_SDL_UTILS_H
+#ifndef LV_DRAW_SDL_UTILS_H
+#define LV_DRAW_SDL_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,10 +13,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
-#include "../../misc/lv_color.h"
-#include "../../misc/lv_area.h"
+#include "lvgl/src/misc/lv_color.h"
+#include "lvgl/src/misc/lv_area.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
@@ -27,17 +27,17 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct lv_gpu_sdl_backend_context_t {
+typedef struct lv_draw_sdl_backend_context_t {
     SDL_Renderer * renderer;
     SDL_Texture * texture;
-} lv_gpu_sdl_backend_context_t;
+} lv_draw_sdl_backend_context_t;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void _lv_gpu_sdl_utils_init();
+void _lv_draw_sdl_utils_init();
 
-void _lv_gpu_sdl_utils_deinit();
+void _lv_draw_sdl_utils_deinit();
 
 void lv_area_to_sdl_rect(const lv_area_t * in, SDL_Rect * out);
 
@@ -53,7 +53,7 @@ SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp);
 
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
 
-lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context();
+lv_draw_sdl_backend_context_t * lv_draw_sdl_get_context();
 
 /**********************
  *      MACROS
@@ -63,4 +63,4 @@ lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context();
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_SDL_UTILS_H*/
+#endif /*LV_DRAW_SDL_UTILS_H*/

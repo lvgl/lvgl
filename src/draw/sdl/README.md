@@ -18,11 +18,11 @@ such as OpenGL.
 
 ## Notices for files
 
-### `lv_gpu_sdl_stack_blur.c`
+### `lv_draw_sdl_stack_blur.c`
 
 Contains modified code from [android-stackblur](https://github.com/kikoso/android-stackblur) project.
 Apache License 2.0
 
-### `lv_gpu_sdl_lru.c`/`lv_gpu_sdl_lru.h`
+### `lv_draw_sdl_lru.c`/`lv_draw_sdl_lru.h`
 
 Contains modified code from [C-LRU-Cache](https://github.com/willcannings/C-LRU-Cache) project. No license defined.

@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_draw_blend.c
+ * @file lv_draw_sdl_draw_blend.c
  *
  */
 
@@ -7,16 +7,14 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
 
-#include "../../draw/lv_draw_blend.h"
-#include "../../hal/lv_hal_disp.h"
-#include "../../core/lv_refr.h"
-#include "lv_gpu_sdl_texture_cache.h"
-#include "lv_gpu_sdl_utils.h"
-#include "lv_gpu_sdl_mask.h"
+#include "lvgl/src/draw/lv_draw_blend.h"
+#include "lv_draw_sdl_texture_cache.h"
+#include "lv_draw_sdl_utils.h"
+#include "lv_draw_sdl_mask.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
@@ -44,14 +42,14 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gpu_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
+void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
                                 lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     LV_UNUSED(dest_buf);
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
 
-    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
+    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     /*Get clipped fill area which is the real draw area.
@@ -83,7 +81,7 @@ void lv_gpu_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, c
     }
 }
 
-void lv_gpu_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
+void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
                                const lv_color_t * src_buf, const lv_area_t * src_area,
                                lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
@@ -91,7 +89,7 @@ void lv_gpu_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, co
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
 
-    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
+    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Rect draw_area_rect;

@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_lru.h
+ * @file lv_draw_sdl_lru.h
  *
  */
 
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 

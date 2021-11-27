@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_draw_img.c
+ * @file lv_draw_sdl_draw_img.c
  *
  */
 
@@ -7,17 +7,17 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
 
-#include "../../draw/lv_draw_img.h"
-#include "../../draw/lv_img_cache.h"
-#include "../../draw/lv_draw_mask.h"
+#include "lvgl/src/draw/lv_draw_img.h"
+#include "lvgl/src/draw/lv_img_cache.h"
+#include "lvgl/src/draw/lv_draw_mask.h"
 
-#include "lv_gpu_sdl_utils.h"
-#include "lv_gpu_sdl_lru.h"
-#include "lv_gpu_sdl_texture_cache.h"
+#include "lv_draw_sdl_utils.h"
+#include "lv_draw_sdl_lru.h"
+#include "lv_draw_sdl_texture_cache.h"
 
 /*********************
  *      DEFINES
@@ -51,21 +51,21 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
                    const lv_draw_img_dsc_t * draw_dsc)
 {
-    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
+    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     size_t key_size;
-    lv_gpu_sdl_cache_key_head_img_t * key = lv_gpu_sdl_img_cache_key_create(src, draw_dsc->frame_id, &key_size);
+    lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_img_cache_key_create(src, draw_dsc->frame_id, &key_size);
     bool texture_found = false;
     SDL_Texture * texture = lv_gpu_draw_cache_get(key, key_size, &texture_found);
     if(!texture_found) {
         _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
-        lv_gpu_sdl_cache_flag_t tex_flags = 0;
+        lv_draw_sdl_cache_flag_t tex_flags = 0;
         if(cdsc) {
             lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
-            if(dsc->user_data && SDL_memcmp(dsc->user_data, LV_GPU_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
-                texture = ((lv_gpu_sdl_dec_dsc_userdata_t *) dsc->user_data)->texture;
-                tex_flags |= LV_GPU_SDL_CACHE_FLAG_MANAGED;
+            if(dsc->user_data && SDL_memcmp(dsc->user_data, LV_DRAW_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
+                texture = ((lv_draw_sdl_dec_dsc_userdata_t *) dsc->user_data)->texture;
+                tex_flags |= LV_DRAW_SDL_CACHE_FLAG_MANAGED;
             }
             else {
                 texture = upload_img_texture(renderer, dsc);
@@ -77,10 +77,10 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
         if(texture && cdsc) {
             lv_img_header_t * header = SDL_malloc(sizeof(lv_img_header_t));
             SDL_memcpy(header, &cdsc->dec_dsc.header, sizeof(lv_img_header_t));
-            lv_gpu_draw_cache_put_advanced(key, key_size, texture, header, SDL_free, tex_flags);
+            lv_draw_sdl_draw_cache_put_advanced(key, key_size, texture, header, SDL_free, tex_flags);
         }
         else {
-            lv_gpu_draw_cache_put(key, key_size, NULL);
+            lv_draw_sdl_draw_cache_put(key, key_size, NULL);
         }
     }
     SDL_free(key);

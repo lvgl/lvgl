@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_mask.c
+ * @file lv_draw_sdl_mask.c
  *
  */
 
@@ -7,14 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
 
-#include "../../draw/lv_draw_mask.h"
-#include "../../misc/lv_mem.h"
-#include "lv_gpu_sdl_mask.h"
-#include "lv_gpu_sdl_utils.h"
+#include "lvgl/src/draw/lv_draw_mask.h"
+#include "lv_draw_sdl_mask.h"
+#include "lv_draw_sdl_utils.h"
 
 /*********************
  *      DEFINES

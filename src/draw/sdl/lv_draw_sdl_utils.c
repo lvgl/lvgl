@@ -1,19 +1,19 @@
 /**
- * @file lv_gpu_sdl_utils.c
+ * @file lv_draw_sdl_utils.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
 
-#include "lv_gpu_sdl_utils.h"
+#include "lv_draw_sdl_utils.h"
 
-#include "../../draw/lv_draw.h"
-#include "../../draw/lv_draw_label.h"
+#include "lvgl/src/draw/lv_draw.h"
+#include "lvgl/src/draw/lv_draw_label.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +50,7 @@ static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_gpu_sdl_utils_init()
+void _lv_draw_sdl_utils_init()
 {
     lv_sdl_palette_grayscale1 = lv_sdl_alloc_palette_for_bpp(_lv_bpp1_opa_table, 1);
     lv_sdl_palette_grayscale2 = lv_sdl_alloc_palette_for_bpp(_lv_bpp2_opa_table, 2);
@@ -59,7 +59,7 @@ void _lv_gpu_sdl_utils_init()
     lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
 }
 
-void _lv_gpu_sdl_utils_deinit()
+void _lv_draw_sdl_utils_deinit()
 {
     SDL_FreePalette(lv_sdl_palette_grayscale1);
     SDL_FreePalette(lv_sdl_palette_grayscale2);
@@ -143,7 +143,7 @@ SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp)
         default:
             return NULL;
     }
-    LV_ASSERT_MSG(lv_sdl_palette_grayscale8, "lv_gpu_sdl was not initialized properly");
+    LV_ASSERT_MSG(lv_sdl_palette_grayscale8, "lv_draw_sdl was not initialized properly");
     return palette;
 }
 
@@ -187,7 +187,7 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
     }
 }
 
-lv_gpu_sdl_backend_context_t * lv_gpu_sdl_get_context()
+lv_draw_sdl_backend_context_t * lv_draw_sdl_get_context()
 {
     return lv_draw_backend_get()->ctx;
 }

@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_draw_label.c
+ * @file lv_draw_sdl_draw_label.c
  *
  */
 
@@ -7,19 +7,19 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
 
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_mask.h"
-#include "../../misc/lv_utils.h"
+#include "lvgl/src/draw/lv_draw_label.h"
+#include "lvgl/src/draw/lv_draw_mask.h"
+#include "lvgl/src/misc/lv_utils.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
-#include "lv_gpu_sdl_utils.h"
-#include "lv_gpu_sdl_texture_cache.h"
-#include "lv_gpu_sdl_mask.h"
+#include "lv_draw_sdl_utils.h"
+#include "lv_draw_sdl_texture_cache.h"
+#include "lv_draw_sdl_mask.h"
 
 /*********************
  *      DEFINES
@@ -57,7 +57,7 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
                             lv_blend_mode_t blend_mode)
 {
@@ -96,7 +96,7 @@ void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_are
         return;
     }
 
-    lv_gpu_sdl_backend_context_t * ctx = lv_gpu_sdl_get_context();
+    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
@@ -113,7 +113,7 @@ void lv_gpu_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_are
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
         lv_mem_free(buf);
-        lv_gpu_draw_cache_put(&glyph_key, sizeof(glyph_key), texture);
+        lv_draw_sdl_draw_cache_put(&glyph_key, sizeof(glyph_key), texture);
     }
     if(!texture) {
         return;
