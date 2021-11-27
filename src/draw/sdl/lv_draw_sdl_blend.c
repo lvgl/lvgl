@@ -43,7 +43,7 @@
  **********************/
 
 void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
+                                 lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     LV_UNUSED(dest_buf);
     /*Do not draw transparent things*/
@@ -82,8 +82,8 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
 }
 
 void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                               const lv_color_t * src_buf, const lv_area_t * src_area,
-                               lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
+                                const lv_color_t * src_buf, const lv_area_t * src_area,
+                                lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     LV_UNUSED(dest_buf);
     /*Do not draw transparent things*/
