@@ -17,8 +17,8 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
-#include "lvgl/src/draw/lv_img_decoder.h"
-#include "lvgl/src/misc/lv_area.h"
+#include "../../draw/lv_img_decoder.h"
+#include "../../misc/lv_area.h"
 #include "lv_draw_sdl_lru.h"
 
 /*********************

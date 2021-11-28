@@ -18,8 +18,8 @@ extern "C" {
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
-#include "lvgl/src/misc/lv_area.h"
-#include "lvgl/src/misc/lv_color.h"
+#include "../../misc/lv_area.h"
+#include "../../misc/lv_color.h"
 
 /*********************
  *      DEFINES

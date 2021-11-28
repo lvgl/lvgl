@@ -11,7 +11,7 @@
 
 #if LV_USE_GPU_SDL
 
-#include "lvgl/src/draw/lv_draw_blend.h"
+#include "../../draw/lv_draw_blend.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_mask.h"

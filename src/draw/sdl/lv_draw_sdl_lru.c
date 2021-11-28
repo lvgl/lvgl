@@ -10,7 +10,7 @@
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SDL
-#include "lvgl/src/misc/lv_log.h"
+#include "../../misc/lv_log.h"
 #include "lv_draw_sdl_lru.h"
 
 #include <stdlib.h>

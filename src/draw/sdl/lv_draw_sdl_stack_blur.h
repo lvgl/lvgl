@@ -15,7 +15,7 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
-#include "lvgl/src/misc/lv_color.h"
+#include "../../misc/lv_color.h"
 
 /*********************
  *      DEFINES

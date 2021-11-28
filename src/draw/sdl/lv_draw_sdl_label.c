@@ -11,9 +11,9 @@
 
 #if LV_USE_GPU_SDL
 
-#include "lvgl/src/draw/lv_draw_label.h"
-#include "lvgl/src/draw/lv_draw_mask.h"
-#include "lvgl/src/misc/lv_utils.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_mask.h"
+#include "../../misc/lv_utils.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 

@@ -73,9 +73,10 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     const lv_draw_backend_t * backend = lv_draw_backend_get();
 
     lv_res_t res;
-    if (backend->draw_img_core) {
+    if(backend->draw_img_core) {
         res = backend->draw_img_core(coords, mask, src, dsc);
-    } else {
+    }
+    else {
         res = lv_img_draw_core(coords, mask, src, dsc);
     }
 

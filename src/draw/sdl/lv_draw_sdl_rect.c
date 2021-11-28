@@ -11,10 +11,10 @@
 
 #if LV_USE_GPU_SDL
 
-#include "lvgl/src/draw/lv_draw_rect.h"
-#include "lvgl/src/draw/lv_draw_img.h"
-#include "lvgl/src/draw/lv_draw_label.h"
-#include "lvgl/src/draw/lv_draw_mask.h"
+#include "../../draw/lv_draw_rect.h"
+#include "../../draw/lv_draw_img.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_mask.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_mask.h"

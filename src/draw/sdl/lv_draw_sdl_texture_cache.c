@@ -13,9 +13,9 @@
 
 #include "lv_draw_sdl_texture_cache.h"
 
-#include "lvgl/src/misc/lv_log.h"
-#include "lvgl/src/draw/lv_draw_label.h"
-#include "lvgl/src/draw/lv_draw_img.h"
+#include "../../misc/lv_log.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_img.h"
 
 /*********************
  *      DEFINES

@@ -12,8 +12,8 @@
 
 #include "lv_draw_sdl_utils.h"
 
-#include "lvgl/src/draw/lv_draw.h"
-#include "lvgl/src/draw/lv_draw_label.h"
+#include "../../draw/lv_draw.h"
+#include "../../draw/lv_draw_label.h"
 
 /*********************
  *      DEFINES
