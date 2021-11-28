@@ -27,15 +27,15 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
                               const lv_draw_img_dsc_t * draw_dsc);
 
 void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                            const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
-                            lv_blend_mode_t blend_mode);
+                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
+                             lv_blend_mode_t blend_mode);
 
 void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                                 lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
 void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                               const lv_color_t * src_buf, const lv_area_t * src_area,
-                               lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                                const lv_color_t * src_buf, const lv_area_t * src_area,
+                                lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 /**********************
  *      TYPEDEFS
  **********************/
