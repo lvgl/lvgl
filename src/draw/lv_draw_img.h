@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_img_decoder.h"
 #include "lv_img_buf.h"
-#include "lv_draw_blend.h"
+#include "../misc/lv_style.h"
 
 /*********************
  *      DEFINES

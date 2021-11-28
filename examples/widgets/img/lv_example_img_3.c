@@ -32,12 +32,14 @@ void lv_example_img_3(void)
     lv_anim_set_values(&a, 0, 3600);
     lv_anim_set_time(&a, 5000);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_start(&a);
+//    lv_anim_start(&a);
 
     lv_anim_set_exec_cb(&a, set_zoom);
     lv_anim_set_values(&a, 128, 256);
     lv_anim_set_playback_time(&a, 3000);
-    lv_anim_start(&a);
+//    lv_anim_start(&a);
+
+    lv_obj_set_style_blend_mode(img, LV_BLEND_MODE_MULTIPLY, 0);
 
 }
 

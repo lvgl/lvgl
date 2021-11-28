@@ -22,7 +22,14 @@ Enable `LV_USE_FFMPEG` in `lv_conf.h`.
 See the examples below.
 
 Note that, the FFmpeg extension doesn't use LVGL's file system. 
-You can simply pass the path to the font as usual on your operating system or platform.
+You can simply pass the path to the image or video as usual on your operating system or platform.
+
+## Example
+```eval_rst
+
+.. include:: ../../examples/libs/ffmpeg/index.rst
+
+```
 
 ## API
 
