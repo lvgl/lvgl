@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lvgl/src/lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
