@@ -61,7 +61,7 @@ For `LV_CHART_TYPE_SCATTER` type  `lv_chart_set_ext_x_array(chart, ser, value_ar
 ### Modify the data
 You have several options to set the data of series:
 1. Set the values manually in the array like `ser1->points[3] = 7` and refresh the chart with `lv_chart_refresh(chart)`.
-2. Use `lv_chart_set_value_by_id(chart, ser, value, id)` where `id` is the index of the point you wish to update.
+2. Use `lv_chart_set_value_by_id(chart, ser, id, value)` where `id` is the index of the point you wish to update.
 3. Use the `lv_chart_set_next_value(chart, ser, value)`.
 4. Initialize all points to a given value with: `lv_chart_set_all_value(chart, ser, value)`.
 
