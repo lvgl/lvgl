@@ -31,10 +31,10 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
+#include "lv_gpu_nxp_pxp_osa.h"
+#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 #include "../misc/lv_log.h"
 
-#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 
 #include "lv_gpu_nxp_pxp.h"
 #include "fsl_pxp.h"

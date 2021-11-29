@@ -374,16 +374,7 @@
     #endif
 #endif
 
-/*Use exnternal renderer*/
-#ifndef LV_USE_EXTERNAL_RENDERER
-    #ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
-        #define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
-    #else
-        #define LV_USE_EXTERNAL_RENDERER 0
-    #endif
-#endif
-
-/*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
+/*Use SDL renderer API*/
 #ifndef LV_USE_GPU_SDL
     #ifdef CONFIG_LV_USE_GPU_SDL
         #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
@@ -397,6 +388,13 @@
             #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
         #else
             #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+        #endif
+    #endif
+    #ifndef LV_GPU_SDL_LRU_SIZE
+        #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
+            #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
+        #else
+            #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
         #endif
     #endif
 #endif

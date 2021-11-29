@@ -1,5 +1,7 @@
 #include "../../lv_examples.h"
-#if LV_USE_FFMPEG && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+#if LV_USE_FFMPEG
+
 
 /**
  * Open an image from a file
@@ -23,4 +25,5 @@ void lv_example_ffmpeg_1(void)
     lv_obj_center(label);
 }
 
+#endif
 #endif

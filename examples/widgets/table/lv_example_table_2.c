@@ -21,7 +21,7 @@ static void draw_event_cb(lv_event_t * e)
         sw_area.x2 = sw_area.x1 + 40;
         sw_area.y1 =  dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
         sw_area.y2 = sw_area.y1 + 20;
-        lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
+        lv_draw_rect(dsc->draw_ctx, &rect_dsc, &sw_area);
 
         rect_dsc.bg_color = lv_color_white();
         if(chk) {
@@ -33,7 +33,7 @@ static void draw_event_cb(lv_event_t * e)
         }
         sw_area.y1 += 2;
         sw_area.y2 -= 2;
-        lv_draw_rect(&sw_area, dsc->clip_area, &rect_dsc);
+        lv_draw_rect(dsc->draw_ctx, &rect_dsc, &sw_area);
     }
 }
 

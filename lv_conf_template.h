@@ -157,13 +157,11 @@
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE 0
 
-/*Use exnternal renderer*/
-#define LV_USE_EXTERNAL_RENDERER 0
-
-/*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
+/*Use SDL renderer API*/
 #define LV_USE_GPU_SDL 0
 #if LV_USE_GPU_SDL
     #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+    #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
 #endif
 
 /*-------------

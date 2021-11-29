@@ -37,21 +37,28 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_init(void)
+void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 {
-    static lv_draw_backend_t backend;
-    lv_draw_backend_init(&backend);
+    LV_UNUSED(drv);
 
-    backend.draw_arc = lv_draw_sw_arc;
-    backend.draw_rect = lv_draw_sw_rect;
-    backend.draw_letter = lv_draw_sw_letter;
-    backend.draw_img = lv_draw_sw_img;
-    backend.draw_line = lv_draw_sw_line;
-    backend.draw_polygon = lv_draw_sw_polygon;
-    backend.blend_fill = lv_blend_sw_fill;
-    backend.blend_map  = lv_blend_sw_map;
+    lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
+    lv_memset_00(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
 
-    lv_draw_backend_add(&backend);
+    draw_sw_ctx->base_draw.draw_arc = lv_draw_sw_arc;
+    draw_sw_ctx->base_draw.draw_rect = lv_draw_sw_rect;
+    draw_sw_ctx->base_draw.draw_letter = lv_draw_sw_letter;
+    draw_sw_ctx->base_draw.draw_img_decoded = lv_draw_sw_img_decoded;
+    draw_sw_ctx->base_draw.draw_line = lv_draw_sw_line;
+    draw_sw_ctx->base_draw.draw_polygon = lv_draw_sw_polygon;
+    draw_sw_ctx->blend = lv_draw_sw_blend_basic;
+}
+
+void lv_draw_sw_deinit_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+{
+    LV_UNUSED(drv);
+
+    lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
+    lv_memset_00(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
 }
 
 /**********************

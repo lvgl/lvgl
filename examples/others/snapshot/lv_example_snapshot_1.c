@@ -31,11 +31,12 @@ void lv_example_snapshot_1(void)
     lv_obj_set_style_bg_color(snapshot_obj, lv_palette_main(LV_PALETTE_PURPLE), 0);
     lv_obj_set_style_bg_opa(snapshot_obj, LV_OPA_100, 0);
     lv_img_set_zoom(snapshot_obj, 128);
+    lv_img_set_angle(snapshot_obj, 300);
 
     /*Create the container and its children*/
     lv_obj_t * container = lv_obj_create(root);
 
-    lv_obj_align(container, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(container);
     lv_obj_set_size(container, 180, 180);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(container, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);

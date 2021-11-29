@@ -37,7 +37,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc/lv_area.h"
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_NXP_VG_LITE
 
 /*********************
  *      DEFINES
@@ -133,6 +135,8 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
+
+#endif /*LV_USE_GPU_NXP_VG_LITE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

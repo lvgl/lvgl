@@ -194,7 +194,7 @@ typedef struct _lv_obj_t {
  */
 void lv_init(void);
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM || LV_USE_GPU_SDL
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM
 
 /**
  * Deinit the 'lv' library
