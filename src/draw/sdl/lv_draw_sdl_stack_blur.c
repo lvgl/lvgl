@@ -1,12 +1,12 @@
 /**
- * @file lv_gpu_sdl_stack_blur.c
+ * @file lv_draw_sdl_stack_blur.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_gpu_sdl_stack_blur.h"
+#include "lv_draw_sdl_stack_blur.h"
 
 /*********************
  *      DEFINES

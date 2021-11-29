@@ -26,7 +26,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_EXTERNAL_RENDERER == 0
 LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
                                           const lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv_area_t * clip,
@@ -52,7 +51,6 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
 
 #if LV_DRAW_COMPLEX
     LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
-#endif
 #endif
 
 /**********************
