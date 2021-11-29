@@ -35,12 +35,20 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_draw_backend_t {
-    struct _lv_draw_backend_t * base;
 
-    void * ctx;
+struct _lv_draw_t;
 
-    void (*draw_rect)(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
+typedef struct _lv_draw_backend_class_t {
+    struct _lv_draw_backend_class_t * base_class;
+
+    void (*constructor_cb)(const struct _lv_draw_backend_class_t * class_p, struct _lv_draw_backend_t * backend);
+    void (*destructor_cb)(const struct _lv_draw_backend_class_t * class_p, struct _lv_draw_backend_t * backend);
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
+    uint32_t instance_size : 16;
+
+    void (*draw_rect)(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
 
     void (*draw_arc)(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
                      const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
@@ -67,34 +75,22 @@ typedef struct _lv_draw_backend_t {
 
 
     /**
-     * Fill an arae of a buffer with a color
-     * @param dest_buf       pointer to a buffer to fill
-     * @param dest_stride    stride of `dest_buf` (number of pixel in a line)
-     * @param fill_area      the area to fill on `dest_buf`
-     * @param color          fill color
-     * @param mask           NULL if ignored, or an alpha mask to apply on `fill_area`
-     * @param opa            overall opacity
-     * @param blend_mode     e.g. LV_BLEND_MODE_ADDITIVE
+     * Wait until all background operation are finished. (E.g. GPU opertions)
      */
-    void (*blend_fill)(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                       lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+    void (*wait_for_finish)(void);
 
-    /**
-     * Blend a source buffer to a destination buffer
-     * @param dest_buf       pointer to the destination buffer
-     * @param dest_stride    stride of `dest_buf` (number of pixel in a line)
-     * @param clip_area      clip the blending to this area
-     * @param src_buf        pointer to the destination buffer
-     * @param src_area       coordinates of the `src_buf` relative to the `dest_buf`
-     * @param mask           NULL if ignored, or an alpha mask to apply on `clip_area` (it's size is equal to the `clip_area`)
-     * @param opa            overall opacity
-     * @param blend_mode     e.g. LV_BLEND_MODE_ADDITIVE
-     */
-    void (*blend_map)(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                      const lv_color_t * src_buf, const lv_area_t * src_area,
-                      lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+} lv_draw_class_t;
 
-} lv_draw_backend_t;
+
+typedef struct _lv_draw_t
+{
+    lv_draw_class_t * class_p;
+    void * user_data;
+    lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
+    lv_coord_t dest_stride;         /**< stride of `dest_buf` (number of pixel in a line)*/
+    const lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
+    const lv_area_t * clip_area;
+}lv_draw_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -102,11 +98,11 @@ typedef struct _lv_draw_backend_t {
 
 void lv_draw_init(void);
 
-void lv_draw_backend_init(lv_draw_backend_t * backend);
+void lv_draw_backend_init(lv_draw_t * backend);
 
-void lv_draw_backend_add(lv_draw_backend_t * backend);
+void lv_draw_backend_add(lv_draw_t * backend);
 
-const lv_draw_backend_t * lv_draw_backend_get(void);
+const lv_draw_t * lv_draw_backend_get(void);
 
 /**********************
  *  GLOBAL VARIABLES

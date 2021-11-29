@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_blend.c
+ * @file lv_draw_sw_blend.c
  *
  */
 
@@ -14,7 +14,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define GPU_SIZE_LIMIT      240
 
 /**********************
  *      TYPEDEFS
@@ -24,9 +23,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * area,
-                        lv_color_t color, lv_opa_t opa, const lv_opa_t * mask);
-
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * area,
                                               lv_color_t color, lv_opa_t opa, const lv_opa_t * mask);
 
@@ -34,11 +30,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
 static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * area,
                          lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_blend_mode_t mode);
 #endif  /*LV_DRAW_COMPLEX*/
-
-
-static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                       const lv_color_t * src_buf, const lv_area_t * src_area,
-                       const lv_opa_t * mask, lv_opa_t opa);
 
 LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
                                              const lv_color_t * src_buf, const lv_area_t * src_area,
@@ -63,10 +54,10 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
  **********************/
 #if LV_COLOR_SCREEN_TRANSP == 0
 #define FILL_NORMAL_MASK_PX(color)                                                          \
-    if(*mask == LV_OPA_COVER) *dest_buf = color;                                 \
-    else *dest_buf = lv_color_mix(color, *dest_buf, *mask);            \
+    if(*mask == LV_OPA_COVER) *dest_buf_rel = color;                                 \
+    else *dest_buf_rel = lv_color_mix(color, *dest_buf_rel, *mask);            \
     mask++;                                                         \
-    dest_buf++;
+    dest_buf_rel++;
 
 #else
 #define FILL_NORMAL_MASK_PX(color)                                               \
@@ -93,62 +84,34 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
     }                                                                                               \
     mask_tmp_x++;
 
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
 
-LV_ATTRIBUTE_FAST_MEM void lv_blend_sw_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                            lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, lv_draw_sw_blend_dsc_t * dsc)
 {
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    /*Do not draw transparent things*/
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
-    /*Round the values in the mask if anti-aliasing is disabled*/
-    lv_coord_t area_size = lv_area_get_size(fill_area);
-    if(mask && disp->driver->antialiasing == 0 && mask) {
-        lv_coord_t i;
-        for(i = 0; i < area_size; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
-    }
+    if(!_lv_area_intersect(draw->clip_area, dsc->fill_area)) return;
 
-    if(disp->driver->set_px_cb) {
-        fill_set_px(dest_buf, dest_stride, fill_area, color, opa, mask);
-    }
-    else if(blend_mode == LV_BLEND_MODE_NORMAL) {
-        fill_normal(dest_buf, dest_stride, fill_area, color, opa, mask);
-    }
+    if(dsc->src_buf && dsc->src_area) {
+        if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) fill_normal(draw, &dsc);
+
+    #if LV_DRAW_COMPLEX
+        else fill_blended(draw, &dsc);
+    #endif
+    } else {
+        if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) fill_normal(draw, &dsc);
 #if LV_DRAW_COMPLEX
-    else {
-        fill_blended(dest_buf, dest_stride, fill_area, color, opa, mask, blend_mode);
-    }
+        else fill_blended(draw, &dsc);
 #endif
+    }
 }
 
-void lv_blend_sw_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                     const lv_color_t * src_buf, const lv_area_t * src_area,
-                     lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t mode)
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    /*Round the values in the mask if anti-aliasing is disabled*/
-    int32_t area_size = lv_area_get_size(clip_area);
-    if(mask && disp->driver->antialiasing == 0) {
-        lv_coord_t i;
-        for(i = 0; i < area_size; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
-    }
-
-
-    if(disp->driver->set_px_cb) {
-        map_set_px(dest_buf, dest_stride, clip_area, src_buf, src_area, mask, opa);
-    }
-    else if(mode == LV_BLEND_MODE_NORMAL) {
-        map_normal(dest_buf, dest_stride, clip_area, src_buf, src_area, mask, opa);
-    }
-#if LV_DRAW_COMPLEX
-    else {
-        map_blended(dest_buf, dest_stride, clip_area, src_buf, src_area, mask, opa, mode);
-    }
-#endif
-}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -185,25 +148,27 @@ static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                              const lv_area_t * fill_area,
-                                              lv_color_t color, lv_opa_t opa, const lv_opa_t * mask)
+LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
 
-    int32_t area_w = lv_area_get_width(fill_area);
-    int32_t area_h = lv_area_get_height(fill_area);
-
-    dest_buf += dest_stride * fill_area->y1 + fill_area->x1;
-
+    lv_coord_t dest_buf_rel = draw->dest_buf + draw->dest_stride * fill_area->y1 + fill_area->x1;
+    lv_area_t fill_area_rel;
+    if(!_lv_area_intersect(&fill_area_rel, dsc->fill_area, dsc->clip_area)) return;
+    lv_area_move(&fill_area_rel, -dsc->dest_area.x1, -dsc->dest_area.y1);
+    int32_t area_w = lv_area_get_width(dsc->fill_area);
+    int32_t area_h = lv_area_get_height(dsc->fill_area);
     int32_t x;
     int32_t y;
+    lv_color_t color = dsc->color;
+    lv_opa_t opa = dsc->opa;
+    lv_opa_t dest_stride = draw->dest_stride;
 
     /*Simple fill (maybe with opacity), no masking*/
-    if(mask == NULL) {
-        if(opa > LV_OPA_MAX) {
+    if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
+        if(dsc->opa >= LV_OPA_MAX) {
             for(y = 0; y < area_h; y++) {
-                lv_color_fill(dest_buf, color, area_w);
-                dest_buf += dest_stride;
+                lv_color_fill(dest_buf_rel, color, area_w);
+                dest_buf_rel += dest_stride;
             }
         }
         /*No mask with opacity*/
@@ -217,28 +182,29 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
 
             for(y = 0; y < area_h; y++) {
                 for(x = 0; x < area_w; x++) {
-                    if(last_dest_color.full != dest_buf[x].full) {
-                        last_dest_color = dest_buf[x];
+                    if(last_dest_color.full != dest_buf_rel[x].full) {
+                        last_dest_color = dest_buf_rel[x];
 
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver->screen_transp) {
-                            lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha, color, opa, &last_res_color,
+                            lv_color_mix_with_alpha(dest_buf_rel[x], dest_buf_rel[x].ch.alpha, color, opa, &last_res_color,
                                                     &last_res_color.ch.alpha);
                         }
                         else
 #endif
                         {
-                            last_res_color = lv_color_mix_premult(color_premult, dest_buf[x], opa_inv);
+                            last_res_color = lv_color_mix_premult(color_premult, dest_buf_rel[x], opa_inv);
                         }
                     }
-                    dest_buf[x] = last_res_color;
+                    dest_buf_rel[x] = last_res_color;
                 }
-                dest_buf += dest_stride;
+                dest_buf_rel += dest_stride;
             }
         }
     }
     /*Masked*/
     else {
+        const lv_opa_t * mask = dsc->mask;
         int32_t x_end4 = area_w - 4;
 
 #if LV_COLOR_DEPTH == 16
@@ -256,24 +222,24 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
                     uint32_t mask32 = *((uint32_t *)mask);
                     if(mask32 == 0xFFFFFFFF) {
 #if LV_COLOR_DEPTH == 16
-                        if((lv_uintptr_t)dest_buf & 0x3) {
-                            *(dest_buf + 0) = color;
-                            uint32_t * d = (uint32_t *)(dest_buf + 1);
+                        if((lv_uintptr_t)dest_buf_rel & 0x3) {
+                            *(dest_buf_rel + 0) = color;
+                            uint32_t * d = (uint32_t *)(dest_buf_rel + 1);
                             *d = c32;
-                            *(dest_buf + 3) = color;
+                            *(dest_buf_rel + 3) = color;
                         }
                         else {
-                            uint32_t * d = (uint32_t *)dest_buf;
+                            uint32_t * d = (uint32_t *)dest_buf_rel;
                             *d = c32;
                             *(d + 1) = c32;
                         }
 #else
-                        dest_buf[0] = color;
-                        dest_buf[1] = color;
-                        dest_buf[2] = color;
-                        dest_buf[3] = color;
+                        dest_buf_rel[0] = color;
+                        dest_buf_rel[1] = color;
+                        dest_buf_rel[2] = color;
+                        dest_buf_rel[3] = color;
 #endif
-                        dest_buf += 4;
+                        dest_buf_rel += 4;
                         mask += 4;
                     }
                     else if(mask32) {
@@ -284,14 +250,14 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
                     }
                     else {
                         mask += 4;
-                        dest_buf += 4;
+                        dest_buf_rel += 4;
                     }
                 }
 
                 for(; x < area_w ; x++) {
                     FILL_NORMAL_MASK_PX(color)
                 }
-                dest_buf += (dest_stride - area_w);
+                dest_buf_rel += (dest_stride - area_w);
             }
         }
         /*Handle opa and mask values too*/
@@ -300,8 +266,8 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
             lv_color_t last_dest_color;
             lv_color_t last_res_color;
             lv_opa_t last_mask = LV_OPA_TRANSP;
-            last_dest_color.full = dest_buf[0].full;
-            last_res_color.full = dest_buf[0].full;
+            last_dest_color.full = dest_buf_rel[0].full;
+            last_res_color.full = dest_buf_rel[0].full;
             lv_opa_t opa_tmp = LV_OPA_TRANSP;
 
             for(y = 0; y < area_h; y++) {
@@ -310,26 +276,26 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
                     if(*mask_line) {
                         if(*mask_line != last_mask) opa_tmp = *mask_line == LV_OPA_COVER ? opa :
                                                                   (uint32_t)((uint32_t)(*mask_line) * opa) >> 8;
-                        if(*mask_line != last_mask || last_dest_color.full != dest_buf[x].full) {
+                        if(*mask_line != last_mask || last_dest_color.full != dest_buf_rel[x].full) {
 #if LV_COLOR_SCREEN_TRANSP
                             if(disp->driver->screen_transp) {
-                                lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha, color, opa_tmp, &last_res_color,
+                                lv_color_mix_with_alpha(dest_buf_rel[x], dest_buf_rel[x].ch.alpha, color, opa_tmp, &last_res_color,
                                                         &last_res_color.ch.alpha);
                             }
                             else
 #endif
                             {
                                 if(opa_tmp == LV_OPA_COVER) last_res_color = color;
-                                else last_res_color = lv_color_mix(color, dest_buf[x], opa_tmp);
+                                else last_res_color = lv_color_mix(color, dest_buf_rel[x], opa_tmp);
                             }
                             last_mask = *mask_line;
-                            last_dest_color.full = dest_buf[x].full;
+                            last_dest_color.full = dest_buf_rel[x].full;
                         }
-                        dest_buf[x] = last_res_color;
+                        dest_buf_rel[x] = last_res_color;
                     }
                     mask_line++;
                 }
-                dest_buf += dest_stride;
+                dest_buf_rel += dest_stride;
                 mask += area_w;
             }
         }
@@ -337,13 +303,23 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t 
 }
 
 #if LV_DRAW_COMPLEX
-static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                         lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_blend_mode_t mode)
+static void fill_blended(lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * dsc)
 {
-    dest_buf += dest_stride * fill_area->y1 + fill_area->x1;
 
+    lv_coord_t dest_buf_rel = draw->dest_buf_rel = draw->dest_stride * fill_area->y1 + fill_area->x1;
+    lv_area_t blend_area_rel;
+    if(!_lv_area_intersect(&blend_area_rel, dsc->blend_area, dsc->clip_area)) return;
+    lv_area_move(&blend_area_rel, -draw->dest_area.x1, -draw->dest_area.y1);
+    int32_t area_w = lv_area_get_width(dsc->blend_area);
+    int32_t area_h = lv_area_get_height(dsc->blend_area);
+    int32_t x;
+    int32_t y;
+    lv_color_t color = dsc->color;
+    lv_opa_t opa = dsc->opa;
+    lv_opa_t dest_stride = draw->dest_stride;
     lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
-    switch(mode) {
+
+    switch(dsc->blend_mode) {
         case LV_BLEND_MODE_ADDITIVE:
             blend_fp = color_blend_true_color_additive;
             break;
@@ -358,8 +334,8 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
             return;
     }
 
-    int32_t area_w = lv_area_get_width(fill_area);
-    int32_t area_h = lv_area_get_height(fill_area);
+    int32_t area_w = lv_area_get_width(&dsc->clip_area);
+    int32_t area_h = lv_area_get_height(&dsc->clip_area);
 
     int32_t x;
     int32_t y;
@@ -374,9 +350,9 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
                     last_dest_color = dest_buf[x];
                     last_res_color = blend_fp(color, dest_buf[x], opa);
                 }
-                dest_buf[x] = last_res_color;
+                dest_buf_rel[x] = last_res_color;
             }
-            dest_buf += dest_stride;
+            dest_buf_rel += dest_stride;
         }
     }
     /*Masked*/
@@ -386,73 +362,33 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
         lv_color_t last_dest_color;
         lv_color_t last_res_color;
         lv_opa_t last_mask = LV_OPA_TRANSP;
-        last_dest_color.full = dest_buf[0].full;
-        last_res_color.full = dest_buf[0].full;
+        last_dest_color.full = dest_buf_rel[0].full;
+        last_res_color.full = dest_buf_rel[0].full;
 
         for(y = 0; y < area_h; y++) {
             for(x = 0; x < area_w; x++) {
                 if(mask[x] == 0) continue;
-                if(mask[x] != last_mask || last_dest_color.full != dest_buf[x].full) {
+                if(mask[x] != last_mask || last_dest_color.full != dest_buf_rel[x].full) {
                     lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : (uint32_t)((uint32_t)mask[x] * opa) >> 8;
 
-                    last_res_color = blend_fp(color, dest_buf[x], opa_tmp);
+                    last_res_color = blend_fp(color, dest_buf_rel[x], opa_tmp);
                     last_mask = mask[x];
-                    last_dest_color.full = dest_buf[x].full;
+                    last_dest_color.full = dest_buf_rel[x].full;
                 }
-                dest_buf[x] = last_res_color;
+                dest_buf_rel[x] = last_res_color;
             }
-            dest_buf += dest_stride;
+            dest_buf_rel += dest_stride;
             mask += area_w;
         }
     }
 }
 #endif
 
-static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                       const lv_color_t * src_buf, const lv_area_t * src_area,
-                       const lv_opa_t * mask, lv_opa_t opa)
-
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    int32_t clip_w = lv_area_get_width(clip_area);
-    int32_t clip_h = lv_area_get_height(clip_area);
-
-    int32_t src_stride = lv_area_get_width(src_area);
-
-    src_buf += src_stride * (clip_area->y1 - src_area->y1);
-    src_buf += (clip_area->x1 - src_area->x1);
-
-    int32_t x;
-    int32_t y;
-
-    if(mask == NULL) {
-        for(y = 0; y < clip_h; y++) {
-            for(x = 0; x < clip_w; x++) {
-                disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, clip_area->x1 + x, clip_area->y1 + y, src_buf[x],
-                                        opa);
-            }
-            src_buf += src_stride;
-        }
-    }
-    else {
-        for(y = 0; y < clip_h; y++) {
-            for(x = 0; x < clip_w; x++) {
-                if(mask[x]) {
-                    disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, clip_area->x1 + x, clip_area->y1 + y, src_buf[x],
-                                            (uint32_t)((uint32_t)opa * mask[x]) >> 8);
-                }
-            }
-            mask += clip_w;
-            src_buf += src_stride;
-        }
-    }
-}
-
 LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
                                              const lv_color_t * src_buf, const lv_area_t * src_area,
                                              const lv_opa_t * mask, lv_opa_t opa)
 {
+
     int32_t clip_w = lv_area_get_width(clip_area);
     int32_t clip_h = lv_area_get_height(clip_area);
 
@@ -586,22 +522,22 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t d
     }
 }
 #if LV_DRAW_COMPLEX
-static void map_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                        const lv_color_t * src_buf, const lv_area_t * src_area,
-                        const lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t mode)
+static void map_blended(lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * dsc)
 {
-    int32_t clip_w = lv_area_get_width(clip_area);
-    int32_t clip_h = lv_area_get_height(clip_area);
-
-    int32_t src_stride = lv_area_get_width(src_area);
-
-    dest_buf += dest_stride * clip_area->y1 + clip_area->x1;
-
-    src_buf += src_stride * (clip_area->y1 - src_area->y1);
-    src_buf += (clip_area->x1 - src_area->x1);
+    lv_coord_t dest_buf_rel = draw->dest_buf_rel = draw->dest_stride * fill_area->y1 + fill_area->x1;
+    lv_area_t fill_area_rel;
+    lv_area_copy(&fill_area_rel, dsc->fill_area);
+    lv_area_move(&fill_area_rel, -dsc->dest_area.x1, -dsc->dest_area.y1);
+    int32_t area_w = lv_area_get_width(dsc->fill_area);
+    int32_t area_h = lv_area_get_height(dsc->fill_area);
+    int32_t x;
+    int32_t y;
+    lv_color_t color = dsc->color;
+    lv_opa_t opa = dsc->opa;
+    lv_opa_t dest_stride = draw->dest_stride;
 
     lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
-    switch(mode) {
+    switch(dsc->blend_mode) {
         case LV_BLEND_MODE_ADDITIVE:
             blend_fp = color_blend_true_color_additive;
             break;

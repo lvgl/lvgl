@@ -28,6 +28,8 @@ extern "C" {
 typedef struct {
     lv_color_t color;
     lv_coord_t width;
+    uint16_t start_angle;
+    uint16_t end_angle;
     const void * img_src;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;

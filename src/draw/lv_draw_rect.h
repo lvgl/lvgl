@@ -29,6 +29,8 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
  **********************/
 
 typedef struct {
+    const lv_area_t * coords;
+
     lv_coord_t radius;
     lv_blend_mode_t blend_mode;
 
