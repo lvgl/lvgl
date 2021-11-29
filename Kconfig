@@ -775,6 +775,9 @@ menu "LVGL configuration"
         config LV_USE_LIST
             bool "List."
             default y if !LV_CONF_MINIMAL
+        config LV_USE_MENU
+            bool "Menu."
+            default y if !LV_CONF_MINIMAL
         config LV_USE_METER
             bool "Meter."
             default y if !LV_CONF_MINIMAL

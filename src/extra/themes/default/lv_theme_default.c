@@ -125,6 +125,11 @@ typedef struct {
     lv_style_t colorwheel_main;
 #endif
 
+#if LV_USE_MENU
+    lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_header_btn,
+               menu_section, menu_pressed, menu_separator;
+#endif
+
 #if LV_USE_MSGBOX
     lv_style_t msgbox_bg, msgbox_btn_bg, msgbox_backdrop_bg;
 #endif
@@ -454,6 +459,67 @@ static void style_init(void)
     lv_style_set_text_color(&styles->chart_ticks, lv_palette_main(LV_PALETTE_GREY));
 #endif
 
+#if LV_USE_MENU
+    style_init_reset(&styles->menu_bg);
+    lv_style_set_pad_all(&styles->menu_bg, 0);
+    lv_style_set_pad_gap(&styles->menu_bg, 0);
+    lv_style_set_radius(&styles->menu_bg, 0);
+    lv_style_set_clip_corner(&styles->menu_bg, true);
+    lv_style_set_border_side(&styles->menu_bg, LV_BORDER_SIDE_NONE);
+
+    style_init_reset(&styles->menu_section);
+    lv_style_set_radius(&styles->menu_section, RADIUS_DEFAULT);
+    lv_style_set_clip_corner(&styles->menu_section, true);
+    lv_style_set_bg_opa(&styles->menu_section, LV_OPA_COVER);
+    lv_style_set_bg_color(&styles->menu_section, color_card);
+    lv_style_set_text_color(&styles->menu_section, color_text);
+
+    style_init_reset(&styles->menu_cont);
+    lv_style_set_pad_hor(&styles->menu_cont, PAD_SMALL);
+    lv_style_set_pad_ver(&styles->menu_cont, PAD_SMALL);
+    lv_style_set_pad_gap(&styles->menu_cont, PAD_SMALL);
+    lv_style_set_border_width(&styles->menu_cont, lv_disp_dpx(theme.disp, 1));
+    lv_style_set_border_opa(&styles->menu_cont, LV_OPA_10);
+    lv_style_set_border_color(&styles->menu_cont, color_text);
+    lv_style_set_border_side(&styles->menu_cont, LV_BORDER_SIDE_NONE);
+
+    style_init_reset(&styles->menu_sidebar_cont);
+    lv_style_set_pad_all(&styles->menu_sidebar_cont, 0);
+    lv_style_set_pad_gap(&styles->menu_sidebar_cont, 0);
+    lv_style_set_border_width(&styles->menu_sidebar_cont, lv_disp_dpx(theme.disp, 1));
+    lv_style_set_border_opa(&styles->menu_sidebar_cont, LV_OPA_10);
+    lv_style_set_border_color(&styles->menu_sidebar_cont, color_text);
+    lv_style_set_border_side(&styles->menu_sidebar_cont, LV_BORDER_SIDE_RIGHT);
+
+    style_init_reset(&styles->menu_main_cont);
+    lv_style_set_pad_all(&styles->menu_main_cont, 0);
+    lv_style_set_pad_gap(&styles->menu_main_cont, 0);
+
+    style_init_reset(&styles->menu_header_cont);
+    lv_style_set_pad_hor(&styles->menu_header_cont, PAD_SMALL);
+    lv_style_set_pad_ver(&styles->menu_header_cont, PAD_TINY);
+    lv_style_set_pad_gap(&styles->menu_header_cont, PAD_SMALL);
+
+    style_init_reset(&styles->menu_header_btn);
+    lv_style_set_pad_hor(&styles->menu_header_btn, PAD_TINY);
+    lv_style_set_pad_ver(&styles->menu_header_btn, PAD_TINY);
+    lv_style_set_shadow_opa(&styles->menu_header_btn, LV_OPA_TRANSP);
+    lv_style_set_bg_opa(&styles->menu_header_btn, LV_OPA_TRANSP);
+    lv_style_set_text_color(&styles->menu_header_btn, color_text);
+
+    style_init_reset(&styles->menu_page);
+    lv_style_set_pad_hor(&styles->menu_page, 0);
+    lv_style_set_pad_gap(&styles->menu_page, 0);
+
+    style_init_reset(&styles->menu_pressed);
+    lv_style_set_bg_opa(&styles->menu_pressed, LV_OPA_20);
+    lv_style_set_bg_color(&styles->menu_pressed, lv_palette_main(LV_PALETTE_GREY));
+
+    style_init_reset(&styles->menu_separator);
+    lv_style_set_bg_opa(&styles->menu_separator, LV_OPA_TRANSP);
+    lv_style_set_pad_ver(&styles->menu_separator, PAD_TINY);
+#endif
+
 #if LV_USE_METER
     style_init_reset(&styles->meter_marker);
     lv_style_set_line_width(&styles->meter_marker, lv_disp_dpx(theme.disp, 5));
@@ -690,6 +756,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
         lv_obj_add_style(obj, &styles->bg_color_secondary, LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
+
+#if LV_USE_MENU
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_sidebar_header_cont_class) ||
+           lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_main_header_cont_class)) {
+            lv_obj_add_style(obj, &styles->menu_header_btn, 0);
+            lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
+        }
+#endif
     }
 #endif
 
@@ -981,6 +1055,44 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->list_item_grow, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &styles->pressed, LV_STATE_PRESSED);
 
+    }
+#endif
+#if LV_USE_MENU
+    else if(lv_obj_check_type(obj, &lv_menu_class)) {
+        lv_obj_add_style(obj, &styles->card, 0);
+        lv_obj_add_style(obj, &styles->menu_bg, 0);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_sidebar_cont_class)) {
+        lv_obj_add_style(obj, &styles->menu_sidebar_cont, 0);
+        lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_main_cont_class)) {
+        lv_obj_add_style(obj, &styles->menu_main_cont, 0);
+        lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_cont_class)) {
+        lv_obj_add_style(obj, &styles->menu_cont, 0);
+        lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_PRESSED | LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_CHECKED);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_sidebar_header_cont_class) ||
+            lv_obj_check_type(obj, &lv_menu_main_header_cont_class)) {
+        lv_obj_add_style(obj, &styles->menu_header_cont, 0);
+        lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_page_class)) {
+        lv_obj_add_style(obj, &styles->menu_page, 0);
+        lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &styles->scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_section_class)) {
+        lv_obj_add_style(obj, &styles->menu_section, 0);
+    }
+    else if(lv_obj_check_type(obj, &lv_menu_separator_class)) {
+        lv_obj_add_style(obj, &styles->menu_separator, 0);
     }
 #endif
 #if LV_USE_MSGBOX
