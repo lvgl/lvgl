@@ -422,7 +422,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_values(&a, LV_OPA_TRANSP, lv_obj_get_style_opa(obj, 0));
+    lv_anim_set_values(&a, lv_obj_get_style_opa(obj, 0), LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
     lv_anim_set_ready_cb(&a, fade_in_anim_ready);
     lv_anim_set_time(&a, time);
