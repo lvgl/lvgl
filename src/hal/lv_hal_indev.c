@@ -106,19 +106,18 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
  */
 void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
 {
-    LV_ASSERT_NULL( indev );
-    LV_ASSERT_NULL( indev->driver );
-    LV_ASSERT_NULL( indev->driver->read_timer );
-    lv_timer_del( indev->driver->read_timer );
+    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NULL(indev->driver);
+    LV_ASSERT_NULL(indev->driver->read_timer);
+    lv_timer_del(indev->driver->read_timer);
 
-    LV_ASSERT_NULL( new_drv );
-    if ( new_drv->disp == NULL )
-    {
+    LV_ASSERT_NULL(new_drv);
+    if (new_drv->disp == NULL) {
         new_drv->disp = lv_disp_get_default();
     }
     if(new_drv->disp == NULL) {
         LV_LOG_WARN("lv_indev_drv_register: no display registered hence can't attach the indev to "
-                     "a display");
+                    "a display");
         indev->proc.disabled = true;
         return;
     }
