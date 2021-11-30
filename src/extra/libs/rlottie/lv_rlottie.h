@@ -25,6 +25,14 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum
+{
+    lv_rlottie_forward = 0,
+    lv_rlottie_pause,
+    lv_rlottie_goto,
+    lv_rlottie_backward,
+} lv_rlottie_play_control_t;
+
 typedef struct {
     lv_img_t img_ext;
     Lottie_Animation * animation;
@@ -36,6 +44,8 @@ typedef struct {
     uint32_t * allocated_buf;
     size_t allocated_buffer_size;
     size_t scanline_width;
+    lv_rlottie_play_control_t play_ctrl;
+    size_t dest_frame;
 } lv_rlottie_t;
 
 extern const lv_obj_class_t lv_rlottie_class;
@@ -48,6 +58,8 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
 
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height,
                                       const char * rlottie_desc);
+
+void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_play_control_t ctrl, size_t param);
 
 /**********************
  *      MACROS

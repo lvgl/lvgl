@@ -19,6 +19,7 @@
 /**********************
 *      TYPEDEFS
 **********************/
+#define LV_ARGB32   32
 
 /**********************
  *  STATIC PROTOTYPES
@@ -81,6 +82,13 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     return obj;
 }
 
+void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_play_control_t ctrl, size_t param)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->dest_frame = param; /* Must be set before the control */
+    rlottie->play_ctrl = ctrl;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -123,6 +131,9 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_img_set_src(obj, &rlottie->imgdsc);
 
+    rlottie->play_ctrl = lv_rlottie_forward;
+    rlottie->dest_frame = 0;
+
     rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
 
     lv_obj_update_layout(obj);
@@ -146,6 +157,8 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     if(rlottie->task) {
         lv_timer_del(rlottie->task);
         rlottie->task = NULL;
+        rlottie->play_ctrl = lv_rlottie_forward;
+        rlottie->dest_frame = 0;
     }
 
     if(rlottie->allocated_buf) {
@@ -197,10 +210,30 @@ static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    if(rlottie->current_frame == rlottie->total_frames)
-        rlottie->current_frame = 0;
-    else
-        ++rlottie->current_frame;
+
+    switch(rlottie->play_ctrl)
+    {
+    case lv_rlottie_forward:
+        if(rlottie->current_frame == rlottie->total_frames)
+            rlottie->current_frame = 0;
+        else
+            ++rlottie->current_frame;
+        break;
+    case lv_rlottie_pause:
+        return;
+    case lv_rlottie_goto:
+        rlottie->current_frame = rlottie->dest_frame <= rlottie->total_frames ? rlottie->total_frames - 1 : rlottie->dest_frame;
+        rlottie->play_ctrl = lv_rlottie_pause;
+        break;
+    case lv_rlottie_backward:
+        if(rlottie->current_frame == 0)
+            rlottie->current_frame = rlottie->total_frames - 1;
+        else
+            --rlottie->current_frame;
+        break;
+    default:
+        break;
+    }
 
     lottie_animation_render(
         rlottie->animation,
