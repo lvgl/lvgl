@@ -80,6 +80,26 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     return obj;
 }
 
+void lv_rlottie_pause(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    if (rlottie->task) {
+        lv_timer_pause(rlottie->task);
+    }
+}
+
+void lv_rlottie_resume(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    if (rlottie->task) {
+        lv_timer_resume(rlottie->task);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

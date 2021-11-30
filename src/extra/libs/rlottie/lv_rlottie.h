@@ -49,6 +49,9 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height,
                                       const char * rlottie_desc);
 
+void lv_rlottie_pause(lv_obj_t * obj);
+void lv_rlottie_resume(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/
