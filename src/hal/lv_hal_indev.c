@@ -113,7 +113,7 @@ void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
 * Remove the provided input device. Make sure not to use the provided input device afterwards anymore.
 * @param indev pointer to delete
 */
-void lv_indev_delete(lv_indev_t* indev)
+void lv_indev_delete(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
     LV_ASSERT_NULL(indev->driver);
