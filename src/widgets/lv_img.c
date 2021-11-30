@@ -195,6 +195,7 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
 
     lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
 
+    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -227,6 +228,7 @@ void lv_img_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
     transf_angle += img->angle;
 
+    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -261,6 +263,7 @@ void lv_img_set_zoom(lv_obj_t * obj, uint16_t zoom)
     lv_coord_t transf_angle = lv_obj_get_style_transform_angle(obj, LV_PART_MAIN);
     transf_angle += img->angle;
 
+    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_area_t a;
