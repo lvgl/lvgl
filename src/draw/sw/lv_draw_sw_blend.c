@@ -104,6 +104,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, lv_draw_sw_blend_d
     #if LV_DRAW_COMPLEX
         else fill_blended(draw, &dsc);
     #endif
+
     } else {
         if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) fill_normal(draw, &dsc);
 #if LV_DRAW_COMPLEX

@@ -36,17 +36,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_t;
 
-typedef struct _lv_draw_backend_class_t {
-    struct _lv_draw_backend_class_t * base_class;
+typedef struct  {
+    lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
+    lv_coord_t dest_stride;         /**< stride of `dest_buf` (number of pixel in a line)*/
+    const lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
+    const lv_area_t * clip_area;
 
-    void (*constructor_cb)(const struct _lv_draw_backend_class_t * class_p, struct _lv_draw_backend_t * backend);
-    void (*destructor_cb)(const struct _lv_draw_backend_class_t * class_p, struct _lv_draw_backend_t * backend);
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
-    uint32_t instance_size : 16;
 
     void (*draw_rect)(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
 
@@ -73,24 +72,12 @@ typedef struct _lv_draw_backend_class_t {
     void (*draw_polygon)(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
                          const lv_draw_rect_dsc_t * draw_dsc);
 
-
     /**
      * Wait until all background operation are finished. (E.g. GPU opertions)
      */
     void (*wait_for_finish)(void);
 
-} lv_draw_class_t;
-
-
-typedef struct _lv_draw_t
-{
-    lv_draw_class_t * class_p;
-    void * user_data;
-    lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
-    lv_coord_t dest_stride;         /**< stride of `dest_buf` (number of pixel in a line)*/
-    const lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
-    const lv_area_t * clip_area;
-}lv_draw_t;
+} lv_draw_t;
 
 /**********************
  * GLOBAL PROTOTYPES

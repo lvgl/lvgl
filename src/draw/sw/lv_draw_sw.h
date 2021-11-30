@@ -31,17 +31,10 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_class_t base;
+    lv_draw_t base_draw;
 
     /** Fill an area of the destination buffer with a color*/
-    void (*blend_fill)(const lv_draw_class_t * class_p, lv_draw_t * draw, const lv_draw_sw_blend_fill_dsc_t * dsc);
-
-    /** Blend a source buffer to a destination buffer*/
-    void (*blend_map)(const lv_draw_class_t * class_p, lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * dsc);
-}lv_draw_sw_class_t;
-
-typedef struct {
-    lv_draw_t base;
+    void (*blend)(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 }lv_draw_sw_t;
 
 /**********************

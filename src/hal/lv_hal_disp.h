@@ -54,7 +54,6 @@ typedef struct _lv_disp_draw_buf_t {
     /*Internal, used by the library*/
     void * buf_act;
     uint32_t size; /*In pixel count*/
-    lv_area_t area;
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
     /*1: It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
@@ -128,19 +127,14 @@ typedef struct _lv_disp_drv_t {
     /** OPTIONAL: Called when lvgl needs any CPU cache that affects rendering to be cleaned*/
     void (*clean_dcache_cb)(struct _lv_disp_drv_t * disp_drv);
 
-    /** OPTIONAL: called to wait while the gpu is working*/
-    void (*gpu_wait_cb)(struct _lv_disp_drv_t * disp_drv);
-
     /** OPTIONAL: called when driver parameters are updated */
     void (*drv_update_cb)(struct _lv_disp_drv_t * disp_drv);
-
-    /** OPTIONAL: Fill a memory with a color (GPU only)*/
-    void (*gpu_fill_cb)(struct _lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
-                        const lv_area_t * fill_area, lv_color_t color);
 
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
+
+    lv_draw_t * draw_backend;
 
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom display driver user data*/
@@ -176,7 +170,6 @@ uint8_t del_prev  :
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
     const void * bg_img;            /**< An image source to display as wallpaper*/
-    void (*bg_fn)(lv_area_t *); /**< A function to handle drawing*/
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];

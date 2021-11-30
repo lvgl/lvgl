@@ -40,6 +40,7 @@ static void lv_refr_area_part(const lv_area_t * area_p);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p);
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
+static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h);
 static void draw_buf_flush(void);
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
 
@@ -418,15 +419,24 @@ static void lv_refr_areas(void)
  */
 static void lv_refr_area(const lv_area_t * area_p)
 {
+    lv_draw_t * draw = disp_refr->driver->draw_backend;
+    draw->dest_buf = disp_refr->driver->draw_buf->buf_act;
+
     /*With full refresh just redraw directly into the buffer*/
-    if(disp_refr->driver->full_refresh) {
-        lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
-        draw_buf->area.x1        = 0;
-        draw_buf->area.x2        = lv_disp_get_hor_res(disp_refr) - 1;
-        draw_buf->area.y1        = 0;
-        draw_buf->area.y2        = lv_disp_get_ver_res(disp_refr) - 1;
-        disp_refr->driver->draw_buf->last_part = 1;
-        lv_refr_area_part(area_p);
+    /*In direct mode draw directly on the absolute coordinates of the buffer*/
+    if(disp_refr->driver->full_refresh || disp_refr->driver->direct_mode) {
+        lv_area_t disp_area;
+        lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+        draw->dest_area = &disp_area;
+        draw->dest_stride = lv_disp_get_hor_res(disp_refr) - 1;
+
+        if(disp_refr->driver->full_refresh) {
+            disp_refr->driver->draw_buf->last_part = 1;
+            lv_refr_area_part(draw, &disp_area);
+        } else {
+            disp_refr->driver->draw_buf->last_part = disp_refr->driver->draw_buf->last_area;
+            lv_refr_area_part(draw, area_p);
+        }
         return;
     }
 
@@ -438,76 +448,35 @@ static void lv_refr_area(const lv_area_t * area_p)
     lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(disp_refr) ?
                     lv_disp_get_ver_res(disp_refr) - 1 : area_p->y2;
 
-    int32_t max_row = (uint32_t)draw_buf->size / w;
+    int32_t max_row = get_max_row(disp_refr, w, h);
 
-    if(max_row > h) max_row = h;
-
-    /*Round down the lines of draw_buf if rounding is added*/
-    if(disp_refr->driver->rounder_cb) {
-        lv_area_t tmp;
-        tmp.x1 = 0;
-        tmp.x2 = 0;
-        tmp.y1 = 0;
-
-        lv_coord_t h_tmp = max_row;
-        do {
-            tmp.y2 = h_tmp - 1;
-            disp_refr->driver->rounder_cb(disp_refr->driver, &tmp);
-
-            /*If this height fits into `max_row` then fine*/
-            if(lv_area_get_height(&tmp) <= max_row) break;
-
-            /*Decrement the height of the area until it fits into `max_row` after rounding*/
-            h_tmp--;
-        } while(h_tmp > 0);
-
-        if(h_tmp <= 0) {
-            LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or to "
-                        "small draw_buf)");
-            return;
-        }
-        else {
-            max_row = tmp.y2 + 1;
-        }
+    lv_coord_t row;
+    lv_coord_t row_last = 0;
+    lv_area_t sub_area;
+    draw->dest_stride = w;
+    for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
+        /*Calc. the next y coordinates of draw_buf*/
+        sub_area.x1 = area_p->x1;
+        sub_area.x2 = area_p->x2;
+        sub_area.y1 = row;
+        sub_area.y2 = row + max_row - 1;
+        draw->dest_area = &sub_area;
+        if(sub_area.y2 > y2) sub_area.y2 = y2;
+        row_last = sub_area.y2;
+        if(y2 == row_last) disp_refr->driver->draw_buf->last_part = 1;
+        lv_refr_area_part(draw, &sub_area);
     }
 
-    /*In direct mode draw directly on the absolute coordinates of the buffer*/
-    if(disp_refr->driver->direct_mode) {
-        draw_buf->area.x1 = 0;
-        draw_buf->area.x2 = lv_disp_get_hor_res(disp_refr) - 1;
-        draw_buf->area.y1 = 0;
-        draw_buf->area.y2 = lv_disp_get_ver_res(disp_refr) - 1;
-        disp_refr->driver->draw_buf->last_part = disp_refr->driver->draw_buf->last_area;
-        lv_refr_area_part(area_p);
-    }
-    /*Else assume the buffer starts at the given area*/
-    else {
-        /*Always use the full row*/
-        lv_coord_t row;
-        lv_coord_t row_last = 0;
-        for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
-            /*Calc. the next y coordinates of draw_buf*/
-            draw_buf->area.x1 = area_p->x1;
-            draw_buf->area.x2 = area_p->x2;
-            draw_buf->area.y1 = row;
-            draw_buf->area.y2 = row + max_row - 1;
-            if(draw_buf->area.y2 > y2) draw_buf->area.y2 = y2;
-            row_last = draw_buf->area.y2;
-            if(y2 == row_last) disp_refr->driver->draw_buf->last_part = 1;
-            lv_refr_area_part(area_p);
-        }
-
-        /*If the last y coordinates are not handled yet ...*/
-        if(y2 != row_last) {
-            /*Calc. the next y coordinates of draw_buf*/
-            draw_buf->area.x1 = area_p->x1;
-            draw_buf->area.x2 = area_p->x2;
-            draw_buf->area.y1 = row;
-            draw_buf->area.y2 = y2;
-
-            disp_refr->driver->draw_buf->last_part = 1;
-            lv_refr_area_part(area_p);
-        }
+    /*If the last y coordinates are not handled yet ...*/
+    if(y2 != row_last) {
+        /*Calc. the next y coordinates of draw_buf*/
+        sub_area.x1 = area_p->x1;
+        sub_area.x2 = area_p->x2;
+        sub_area.y1 = row;
+        sub_area.y2 = y2;
+        draw->dest_area = &sub_area;
+        disp_refr->driver->draw_buf->last_part = 1;
+        lv_refr_area_part(draw, &sub_area);
     }
 }
 
@@ -515,7 +484,7 @@ static void lv_refr_area(const lv_area_t * area_p)
  * Refresh a part of an area which is on the actual Virtual Display Buffer
  * @param area_p pointer to an area to refresh
  */
-static void lv_refr_area_part(const lv_area_t * area_p)
+static void lv_refr_area_part(lv_draw_t * draw, const lv_area_t * area_p)
 {
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
@@ -530,33 +499,25 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     lv_obj_t * top_act_scr = NULL;
     lv_obj_t * top_prev_scr = NULL;
 
-    /*Get the new mask from the original area and the act. draw_buf
-     It will be a part of 'area_p'*/
-    lv_area_t start_mask;
-    _lv_area_intersect(&start_mask, area_p, &draw_buf->area);
-
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(&start_mask, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(area_p, lv_disp_get_scr_act(disp_refr));
     if(disp_refr->prev_scr) {
-        top_prev_scr = lv_refr_get_top_obj(&start_mask, disp_refr->prev_scr);
+        top_prev_scr = lv_refr_get_top_obj(area_p, disp_refr->prev_scr);
     }
 
     /*Draw a display background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
-        if(disp_refr->bg_fn) {
-            disp_refr->bg_fn(&start_mask);
-        }
-        else if(disp_refr->bg_img) {
-            lv_draw_img_dsc_t dsc;
-            lv_draw_img_dsc_init(&dsc);
-            dsc.opa = disp_refr->bg_opa;
+        if(disp_refr->bg_img) {
             lv_img_header_t header;
             lv_res_t res;
             res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
             if(res == LV_RES_OK) {
                 lv_area_t a;
                 lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
-                lv_draw_img(&a, &start_mask, disp_refr->bg_img, &dsc);
+                lv_draw_img_dsc_t dsc;
+                lv_draw_img_dsc_init(&dsc);
+                dsc.opa = disp_refr->bg_opa;
+                lv_draw_img(&a, area_p, disp_refr->bg_img, &dsc);
             }
             else {
                 LV_LOG_WARN("Can't draw the background image");
@@ -567,30 +528,21 @@ static void lv_refr_area_part(const lv_area_t * area_p)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
-            lv_draw_rect(&start_mask, &start_mask, &dsc);
-
-        }
+            dsc.coords = area_p;
+            lv_draw_rect(draw, &dsc);
     }
     /*Refresh the previous screen if any*/
     if(disp_refr->prev_scr) {
-        /*Get the most top object which is not covered by others*/
-        if(top_prev_scr == NULL) {
-            top_prev_scr = disp_refr->prev_scr;
-        }
-        /*Do the refreshing from the top object*/
-        lv_refr_obj_and_children(top_prev_scr, &start_mask);
-
+        if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
+        lv_refr_obj_and_children(draw, top_prev_scr, area_p);
     }
 
-    if(top_act_scr == NULL) {
-        top_act_scr = disp_refr->act_scr;
-    }
-    /*Do the refreshing from the top object*/
-    lv_refr_obj_and_children(top_act_scr, &start_mask);
+    if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
+    lv_refr_obj_and_children(draw, top_act_scr, &area_p);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_obj_and_children(lv_disp_get_layer_top(disp_refr), &start_mask);
-    lv_refr_obj_and_children(lv_disp_get_layer_sys(disp_refr), &start_mask);
+    lv_refr_obj_and_children(draw, lv_disp_get_layer_top(disp_refr), area_p);
+    lv_refr_obj_and_children(draw, lv_disp_get_layer_sys(disp_refr), area_p);
 
     /*In true double buffered mode flush only once when all areas were rendered.
      *In normal mode flush after every area*/
@@ -645,7 +597,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
  * @param top_p pointer to an objects. Start the drawing from it.
  * @param mask_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
+static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_p, const lv_area_t * mask_p)
 {
     /*Normally always will be a top_obj (at least the screen)
      *but in special cases (e.g. if the screen has alpha) it won't.
@@ -766,6 +718,44 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         lv_event_send(obj, LV_EVENT_DRAW_POST, &obj_ext_mask);
         lv_event_send(obj, LV_EVENT_DRAW_POST_END, &obj_ext_mask);
     }
+}
+
+static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)
+{
+    int32_t max_row = (uint32_t)disp->driver->draw_buf->size / area_w;
+
+    if(max_row > area_h) max_row = area_h;
+
+    /*Round down the lines of draw_buf if rounding is added*/
+    if(disp_refr->driver->rounder_cb) {
+        lv_area_t tmp;
+        tmp.x1 = 0;
+        tmp.x2 = 0;
+        tmp.y1 = 0;
+
+        lv_coord_t h_tmp = max_row;
+        do {
+            tmp.y2 = h_tmp - 1;
+            disp_refr->driver->rounder_cb(disp_refr->driver, &tmp);
+
+            /*If this height fits into `max_row` then fine*/
+            if(lv_area_get_height(&tmp) <= max_row) break;
+
+            /*Decrement the height of the area until it fits into `max_row` after rounding*/
+            h_tmp--;
+        } while(h_tmp > 0);
+
+        if(h_tmp <= 0) {
+            LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or to "
+                        "small draw_buf)");
+            return 0;
+        }
+        else {
+            max_row = tmp.y2 + 1;
+        }
+    }
+
+    return max_row;
 }
 
 static void draw_buf_rotate_180(lv_disp_drv_t * drv, lv_area_t * area, lv_color_t * color_p)
