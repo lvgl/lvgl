@@ -110,6 +110,23 @@ void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
 }
 
 /**
+* Remove the provided input device. Make sure not to use the provided input device afterwards anymore.
+* @param indev pointer to delete
+*/
+void lv_indev_delete(lv_indev_t* indev)
+{
+    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NULL(indev->driver);
+    LV_ASSERT_NULL(indev->driver->read_timer);
+    /*Clean up the read timer first*/
+    lv_timer_del(indev->driver->read_timer);
+    /*Remove the input device from the list*/
+    _lv_ll_remove(&LV_GC_ROOT(_lv_indev_ll), indev);
+    /*Free the memory of the input device*/
+    lv_mem_free(indev);
+}
+
+/**
  * Get the next input device.
  * @param indev pointer to the current input device. NULL to initialize.
  * @return the next input devise or NULL if no more. Give the first input device when the parameter

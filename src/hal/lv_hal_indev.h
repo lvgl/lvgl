@@ -208,6 +208,12 @@ lv_indev_t * lv_indev_drv_register(struct _lv_indev_drv_t * driver);
 void lv_indev_drv_update(lv_indev_t * indev, struct _lv_indev_drv_t * new_drv);
 
 /**
+* Remove the provided input device. Make sure not to use the provided input device afterwards anymore.
+* @param indev pointer to delete
+*/
+void lv_indev_delete(lv_indev_t* indev);
+
+/**
  * Get the next input device.
  * @param indev pointer to the current input device. NULL to initialize.
  * @return the next input device or NULL if there are no more. Provide the first input device when
