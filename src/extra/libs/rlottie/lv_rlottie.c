@@ -82,11 +82,16 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     return obj;
 }
 
-void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_play_control_t ctrl, size_t param)
+void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_play_control_t ctrl)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    rlottie->dest_frame = param; /* Must be set before the control */
     rlottie->play_ctrl = ctrl;
+}
+
+void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->dest_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
 }
 
 /**********************
@@ -131,7 +136,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_img_set_src(obj, &rlottie->imgdsc);
 
-    rlottie->play_ctrl = lv_rlottie_forward;
+    rlottie->play_ctrl = lv_rlottie_forward | lv_rlottie_play | lv_rlottie_loop;
     rlottie->dest_frame = 0;
 
     rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
@@ -211,28 +216,36 @@ static void next_frame_task_cb(lv_timer_t * t)
     lv_obj_t * obj = t->user_data;
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
-    switch(rlottie->play_ctrl)
-    {
-    case lv_rlottie_forward:
-        if(rlottie->current_frame == rlottie->total_frames)
-            rlottie->current_frame = 0;
-        else
-            ++rlottie->current_frame;
-        break;
-    case lv_rlottie_pause:
-        return;
-    case lv_rlottie_goto:
-        rlottie->current_frame = rlottie->dest_frame <= rlottie->total_frames ? rlottie->total_frames - 1 : rlottie->dest_frame;
-        rlottie->play_ctrl = lv_rlottie_pause;
-        break;
-    case lv_rlottie_backward:
-        if(rlottie->current_frame == 0)
-            rlottie->current_frame = rlottie->total_frames - 1;
-        else
-            --rlottie->current_frame;
-        break;
-    default:
-        break;
+    if((rlottie->play_ctrl & lv_rlottie_pause) == lv_rlottie_pause) {
+        if(rlottie->current_frame == rlottie->dest_frame)
+            return;
+        rlottie->current_frame = rlottie->dest_frame;
+    }
+    else {
+        if((rlottie->play_ctrl & lv_rlottie_backward) == lv_rlottie_backward) {
+            if(rlottie->current_frame > 0)
+                --rlottie->current_frame;
+            else {
+                if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
+                    rlottie->current_frame = rlottie->total_frames - 1;
+                else {
+                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    return;
+                }
+            }
+        }
+        else {
+            if(rlottie->current_frame < rlottie->total_frames)
+                ++rlottie->current_frame;
+            else {
+                if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
+                    rlottie->current_frame = 0;
+                else {
+                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    return;
+                }
+            }
+        }
     }
 
     lottie_animation_render(
