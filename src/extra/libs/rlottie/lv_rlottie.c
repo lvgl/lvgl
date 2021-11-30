@@ -14,6 +14,7 @@
 *      DEFINES
 *********************/
 #define MY_CLASS &lv_rlottie_class
+#define LV_ARGB32   32
 
 /**********************
 *      TYPEDEFS
@@ -104,9 +105,9 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->animation);
     rlottie->current_frame = 0;
 
-    rlottie->scanline_width = create_width * LV_COLOR_DEPTH / 8;
+    rlottie->scanline_width = create_width * LV_ARGB32 / 8;
 
-    size_t allocaled_buf_size = (create_width * create_height * LV_COLOR_DEPTH / 8);
+    size_t allocaled_buf_size = (create_width * create_height * LV_ARGB32 / 8);
     rlottie->allocated_buf = lv_mem_alloc(allocaled_buf_size);
     if(rlottie->allocated_buf != NULL) {
         rlottie->allocated_buffer_size = allocaled_buf_size;
@@ -155,6 +156,43 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
 }
 
+#if LV_COLOR_DEPTH == 16
+static void convert_to_rgba5658(uint8_t * pix, const size_t width, const size_t height)
+{
+    /* rlottie draws in ARGB32 format, but LVGL only deal with RGB565 format with (optional 8 bit alpha channel)
+       so convert in place here the received buffer to LVGL format. */
+    uint8_t * dest = pix;
+    uint32_t * src = (uint32_t *)pix;
+    for(size_t y = 0; y < height; y++) {
+        /* Convert a 4 bytes per pixel in format ARGB to R5G6B5A8 format
+            naive way:
+                        r = ((c & 0xFF0000) >> 19)
+                        g = ((c & 0xFF00) >> 10)
+                        b = ((c & 0xFF) >> 3)
+                        rgb565 = (r << 11) | (g << 5) | b
+                        a = c >> 24;
+            That's 3 mask, 6 bitshift and 2 or operations
+
+            A bit better:
+                        r = ((c & 0xF80000) >> 8)
+                        g = ((c & 0xFC00) >> 5)
+                        b = ((c & 0xFF) >> 3)
+                        rgb565 = r | g | b
+                        a = c >> 24;
+            That's 3 mask, 3 bitshifts and 2 or operations */
+        for(size_t x = 0; x < width; x++) {
+            uint32_t in = src[x];
+            uint16_t r = (uint16_t)(((in & 0xF80000) >> 8) | ((in & 0xFC00) >> 5) | ((in & 0xFF) >> 3));
+
+            memcpy(dest, &r, sizeof(r));
+            dest[sizeof(r)] = (uint8_t)(in >> 24);
+            dest += LV_IMG_PX_SIZE_ALPHA_BYTE;
+        }
+        src += width;
+    }
+}
+#endif
+
 static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
@@ -172,6 +210,10 @@ static void next_frame_task_cb(lv_timer_t * t)
         rlottie->imgdsc.header.h,
         rlottie->scanline_width
     );
+
+#if LV_COLOR_DEPTH == 16
+    convert_to_rgba5658(rlottie->allocated_buf, rlottie->imgdsc.header.w, rlottie->imgdsc.header.h);
+#endif
 
     lv_obj_invalidate(obj);
 
