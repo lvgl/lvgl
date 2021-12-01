@@ -141,7 +141,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_img_set_src(obj, &rlottie->imgdsc);
 
     rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_LOOP;
-    rlottie->dest_frame = 0;
+    rlottie->dest_frame = (size_t) -1; /* invalid destination frame so it's possible to pause on frame 0 */
 
     rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
 
@@ -276,7 +276,6 @@ static void next_frame_task_cb(lv_timer_t * t)
 #endif
 
     lv_obj_invalidate(obj);
-
 }
 
 #endif /*LV_USE_RLOTTIE*/
