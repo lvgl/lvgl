@@ -112,7 +112,7 @@ void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
     lv_timer_del(indev->driver->read_timer);
 
     LV_ASSERT_NULL(new_drv);
-    if (new_drv->disp == NULL) {
+    if(new_drv->disp == NULL) {
         new_drv->disp = lv_disp_get_default();
     }
     if(new_drv->disp == NULL) {
