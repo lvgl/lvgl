@@ -51,7 +51,7 @@ static void mask_event_cb(lv_event_t * e)
 }
 
 /**
- * Add an fade mask to roller.
+ * Add a fade mask to roller.
  */
 void lv_example_roller_3(void)
 {

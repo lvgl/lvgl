@@ -1,5 +1,5 @@
 /**
- * @file lv_sw.h
+ * @file lv_switch.h
  *
  */
 
@@ -39,7 +39,7 @@ extern const lv_obj_class_t lv_switch_class;
  **********************/
 
 /**
- * Create a switch objects
+ * Create a switch object
  * @param parent pointer to an object, it will be the parent of the new switch
  * @return pointer to the created switch
  */

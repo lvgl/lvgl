@@ -76,4 +76,4 @@ void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_ARC*/
+#endif /*LV_DRAW_ARC_H*/

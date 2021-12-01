@@ -66,7 +66,7 @@ extern const lv_obj_class_t lv_spangroup_class;
  **********************/
 
 /**
- * Create a spangroup objects
+ * Create a spangroup object
  * @param par pointer to an object, it will be the parent of the new spangroup
  * @return pointer to the created spangroup
  */

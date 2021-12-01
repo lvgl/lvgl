@@ -53,7 +53,7 @@ extern const lv_obj_class_t lv_roller_class;
  **********************/
 
 /**
- * Create a roller objects
+ * Create a roller object
  * @param parent    pointer to an object, it will be the parent of the new roller.
  * @return          pointer to the created roller
  */

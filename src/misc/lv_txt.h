@@ -1,5 +1,5 @@
 /**
- * @file lv_text.h
+ * @file lv_txt.h
  *
  */
 
@@ -259,4 +259,4 @@ extern uint32_t (*_lv_txt_get_encoded_length)(const char *);
 } /*extern "C"*/
 #endif
 
-#endif /*USE_TXT*/
+#endif /*LV_TXT_H*/
