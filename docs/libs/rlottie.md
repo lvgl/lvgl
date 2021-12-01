@@ -80,13 +80,13 @@ lv_obj_t * lottie = lv_rlottie_create_from_file(scr, 128, 128, "test.json");
 lv_obj_center(lottie);
 // Pause to a specific frame
 lv_rlottie_set_current_frame(lottie, 50);
-lv_rlottie_set_play_mode(lottie, lv_rlottie_pause);
+lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PAUSE); // The specified frame will be displayed and then the animation will pause
 
 // Play backward and loop
-lv_rlottie_set_play_mode(lottie, lv_rlottie_play | lv_rlottie_backward | lv_rlottie_loop);
+lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_BACKWARD | LV_RLOTTIE_CTRL_LOOP);
 
 // Play forward once (no looping)
-lv_rlottie_set_play_mode(lottie, lv_rlottie_play | lv_rlottie_forward);
+lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_FORWARD);
 ```
 
 The default animation mode is **play forward with loop**.

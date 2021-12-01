@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_rlottie.h"
 #if LV_USE_RLOTTIE
 
@@ -82,12 +81,13 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     return obj;
 }
 
-void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_play_control_t ctrl)
+void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->play_ctrl = ctrl;
 
-    if((rlottie->play_ctrl & lv_rlottie_pause) == lv_rlottie_play && rlottie->task) {
+    if(rlottie->task && (rlottie->dest_frame != rlottie->current_frame ||
+                         (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
         lv_timer_resume(rlottie->task);
     }
 }
@@ -140,7 +140,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_img_set_src(obj, &rlottie->imgdsc);
 
-    rlottie->play_ctrl = lv_rlottie_forward | lv_rlottie_play | lv_rlottie_loop;
+    rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_LOOP;
     rlottie->dest_frame = 0;
 
     rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
@@ -166,7 +166,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     if(rlottie->task) {
         lv_timer_del(rlottie->task);
         rlottie->task = NULL;
-        rlottie->play_ctrl = lv_rlottie_forward;
+        rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD;
         rlottie->dest_frame = 0;
     }
 
@@ -179,12 +179,12 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 }
 
 #if LV_COLOR_DEPTH == 16
-static void convert_to_rgba5658(uint8_t * pix, const size_t width, const size_t height)
+static void convert_to_rgba5658(uint32_t * pix, const size_t width, const size_t height)
 {
     /* rlottie draws in ARGB32 format, but LVGL only deal with RGB565 format with (optional 8 bit alpha channel)
        so convert in place here the received buffer to LVGL format. */
-    uint8_t * dest = pix;
-    uint32_t * src = (uint32_t *)pix;
+    uint8_t * dest = (uint8_t *)pix;
+    uint32_t * src = pix;
     for(size_t y = 0; y < height; y++) {
         /* Convert a 4 bytes per pixel in format ARGB to R5G6B5A8 format
             naive way:
@@ -204,9 +204,10 @@ static void convert_to_rgba5658(uint8_t * pix, const size_t width, const size_t 
             That's 3 mask, 3 bitshifts and 2 or operations */
         for(size_t x = 0; x < width; x++) {
             uint32_t in = src[x];
+
             uint16_t r = (uint16_t)(((in & 0xF80000) >> 8) | ((in & 0xFC00) >> 5) | ((in & 0xFF) >> 3));
 
-            memcpy(dest, &r, sizeof(r));
+            lv_memcpy(dest, &r, sizeof(r));
             dest[sizeof(r)] = (uint8_t)(in >> 24);
             dest += LV_IMG_PX_SIZE_ALPHA_BYTE;
         }
@@ -220,7 +221,7 @@ static void next_frame_task_cb(lv_timer_t * t)
     lv_obj_t * obj = t->user_data;
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
-    if((rlottie->play_ctrl & lv_rlottie_pause) == lv_rlottie_pause) {
+    if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PAUSE) {
         if(rlottie->current_frame == rlottie->dest_frame) {
             /* Pause the timer too when it has run once to avoid CPU consumption */
             lv_timer_pause(t);
@@ -229,11 +230,11 @@ static void next_frame_task_cb(lv_timer_t * t)
         rlottie->current_frame = rlottie->dest_frame;
     }
     else {
-        if((rlottie->play_ctrl & lv_rlottie_backward) == lv_rlottie_backward) {
+        if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_BACKWARD) == LV_RLOTTIE_CTRL_BACKWARD) {
             if(rlottie->current_frame > 0)
                 --rlottie->current_frame;
             else { /* Looping ? */
-                if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
+                if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
                     rlottie->current_frame = rlottie->total_frames - 1;
                 else {
                     lv_event_send(obj, LV_EVENT_READY, NULL);
@@ -246,7 +247,7 @@ static void next_frame_task_cb(lv_timer_t * t)
             if(rlottie->current_frame < rlottie->total_frames)
                 ++rlottie->current_frame;
             else { /* Looping ? */
-                if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
+                if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
                     rlottie->current_frame = 0;
                 else {
                     lv_event_send(obj, LV_EVENT_READY, NULL);
