@@ -208,7 +208,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
  */
 void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
-    lv_obj_set_style_text_align(obj, align, LV_TEXT_ALIGN_LEFT);
+    lv_obj_set_style_text_align(obj, align, LV_PART_MAIN);
 }
 
 /**
@@ -977,7 +977,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
 
         /* align deal with */
         lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-        if(align != LV_TEXT_ALIGN_LEFT) {
+        if(align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT) {
             lv_coord_t align_ofs = 0;
             lv_coord_t txts_w = is_first_line ? indent : 0;
             for(int i = 0; i < item_cnt; i++) {
