@@ -596,7 +596,36 @@ static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 
 static inline lv_color_t lv_color_hex(uint32_t c)
 {
+#if LV_COLOR_DEPTH == 16
+    lv_color_t r;
+#if LV_COLOR_16_SWAP == 0
+    /* Convert a 4 bytes per pixel in format ARGB32 to R5G6B5 format
+        naive way (by calling lv_color_make with components):
+                    r = ((c & 0xFF0000) >> 19)
+                    g = ((c & 0xFF00) >> 10)
+                    b = ((c & 0xFF) >> 3)
+                    rgb565 = (r << 11) | (g << 5) | b
+        That's 3 mask, 5 bitshift and 2 or operations
+
+        A bit better:
+                    r = ((c & 0xF80000) >> 8)
+                    g = ((c & 0xFC00) >> 5)
+                    b = ((c & 0xFF) >> 3)
+                    rgb565 = r | g | b
+        That's 3 mask, 3 bitshifts and 2 or operations */
+    r.full = (uint16_t)(((c & 0xF80000) >> 8) | ((c & 0xFC00) >> 5) | ((c & 0xFF) >> 3));
+#else
+    /* We want: rrrr rrrr GGGg gggg bbbb bbbb => gggb bbbb rrrr rGGG */
+    r.full = (uint16_t)(((c & 0xF80000) >> 16) | ((c & 0xFC00) >> 13) | ((c & 0x1C00) << 3) | ((c & 0xF8) << 5));
+#endif
+    return r;
+#elif LV_COLOR_DEPTH == 32
+    lv_color_t r;
+    r.full = c | 0xFF000000;
+    return r;
+#else
     return lv_color_make((uint8_t)((c >> 16) & 0xFF), (uint8_t)((c >> 8) & 0xFF), (uint8_t)(c & 0xFF));
+#endif
 }
 
 static inline lv_color_t lv_color_hex3(uint32_t c)
