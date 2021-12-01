@@ -368,8 +368,8 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
     if(mask == NULL) {
         lv_color_t last_dest_color = lv_color_black();
         lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
-        for(y = 0; y < area_w; y++) {
-            for(x = 0; x < area_h; x++) {
+        for(y = 0; y < area_h; y++) {
+            for(x = 0; x < area_w; x++) {
                 if(last_dest_color.full != dest_buf[x].full) {
                     last_dest_color = dest_buf[x];
                     last_res_color = blend_fp(color, dest_buf[x], opa);
