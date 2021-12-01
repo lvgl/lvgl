@@ -95,7 +95,7 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    rlottie->dest_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
+    rlottie->current_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
 }
 
 /**********************
@@ -231,7 +231,7 @@ static void next_frame_task_cb(lv_timer_t * t)
             lv_timer_pause(t);
             return;
         }
-        rlottie->current_frame = rlottie->dest_frame;
+        rlottie->dest_frame = rlottie->current_frame;
     }
     else {
         if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_BACKWARD) == LV_RLOTTIE_CTRL_BACKWARD) {
