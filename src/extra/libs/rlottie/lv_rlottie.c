@@ -236,9 +236,8 @@ static void next_frame_task_cb(lv_timer_t * t)
                 if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
                     rlottie->current_frame = rlottie->total_frames - 1;
                 else {
-                    if(rlottie->dest_frame != rlottie->current_frame)
-                        lv_event_send(obj, LV_EVENT_READY, NULL);
-                    rlottie->dest_frame = rlottie->current_frame; /* Remember we've sent the event */
+                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    lv_timer_pause(t);
                     return;
                 }
             }
@@ -250,9 +249,8 @@ static void next_frame_task_cb(lv_timer_t * t)
                 if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
                     rlottie->current_frame = 0;
                 else {
-                    if(rlottie->dest_frame != rlottie->current_frame)
-                        lv_event_send(obj, LV_EVENT_READY, NULL);
-                    rlottie->dest_frame = rlottie->current_frame; /* Remember we've sent the event */
+                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    lv_timer_pause(t);
                     return;
                 }
             }
