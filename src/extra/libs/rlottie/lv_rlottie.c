@@ -86,6 +86,10 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_play_control_t ct
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->play_ctrl = ctrl;
+
+    if((rlottie->play_ctrl & lv_rlottie_pause) == lv_rlottie_play && rlottie->task) {
+        lv_timer_resume(rlottie->task);
+    }
 }
 
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
@@ -217,15 +221,18 @@ static void next_frame_task_cb(lv_timer_t * t)
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
     if((rlottie->play_ctrl & lv_rlottie_pause) == lv_rlottie_pause) {
-        if(rlottie->current_frame == rlottie->dest_frame)
+        if(rlottie->current_frame == rlottie->dest_frame) {
+            /* Pause the timer too when it has run once to avoid CPU consumption */
+            lv_timer_pause(t);
             return;
+        }
         rlottie->current_frame = rlottie->dest_frame;
     }
     else {
         if((rlottie->play_ctrl & lv_rlottie_backward) == lv_rlottie_backward) {
             if(rlottie->current_frame > 0)
                 --rlottie->current_frame;
-            else {
+            else { /* Looping ? */
                 if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
                     rlottie->current_frame = rlottie->total_frames - 1;
                 else {
@@ -239,7 +246,7 @@ static void next_frame_task_cb(lv_timer_t * t)
         else {
             if(rlottie->current_frame < rlottie->total_frames)
                 ++rlottie->current_frame;
-            else {
+            else { /* Looping ? */
                 if((rlottie->play_ctrl & lv_rlottie_loop) == lv_rlottie_loop)
                     rlottie->current_frame = 0;
                 else {
