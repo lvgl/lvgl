@@ -23,8 +23,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * area,
-                                              lv_color_t color, lv_opa_t opa, const lv_opa_t * mask);
+LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 
 #if LV_DRAW_COMPLEX
 static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * area,
@@ -96,16 +95,17 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, lv_draw_sw_blend_d
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
-    if(!_lv_area_intersect(draw->clip_area, dsc->fill_area)) return;
 
     if(dsc->src_buf && dsc->src_area) {
-        if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) fill_normal(draw, &dsc);
+        if(!_lv_area_intersect(draw->clip_area, dsc->src_area)) return;
+        if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) map_normal(draw, &dsc);
 
     #if LV_DRAW_COMPLEX
-        else fill_blended(draw, &dsc);
+        else map_blended(draw, &dsc);
     #endif
 
     } else {
+        if(!_lv_area_intersect(draw->clip_area, dsc->fill_area)) return;
         if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) fill_normal(draw, &dsc);
 #if LV_DRAW_COMPLEX
         else fill_blended(draw, &dsc);
@@ -151,10 +151,10 @@ static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_
 
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
+    lv_area_t fill_area;
+    if(!_lv_area_intersect(&fill_area, dsc->fill_area, draw->clip_area)) return;
 
     lv_coord_t dest_buf_rel = draw->dest_buf + draw->dest_stride * fill_area->y1 + fill_area->x1;
-    lv_area_t fill_area_rel;
-    if(!_lv_area_intersect(&fill_area_rel, dsc->fill_area, dsc->clip_area)) return;
     lv_area_move(&fill_area_rel, -dsc->dest_area.x1, -dsc->dest_area.y1);
     int32_t area_w = lv_area_get_width(dsc->fill_area);
     int32_t area_h = lv_area_get_height(dsc->fill_area);

@@ -26,7 +26,6 @@ extern "C" {
 #include "lv_draw_line.h"
 #include "lv_draw_triangle.h"
 #include "lv_draw_arc.h"
-#include "lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -37,7 +36,7 @@ extern "C" {
  **********************/
 
 
-typedef struct  {
+typedef struct _lv_draw_t  {
     lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
     lv_coord_t dest_stride;         /**< stride of `dest_buf` (number of pixel in a line)*/
     const lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
@@ -47,7 +46,7 @@ typedef struct  {
     void * user_data;
 #endif
 
-    void (*draw_rect)(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
+    void (*draw_rect)(struct _lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
 
     void (*draw_arc)(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
                      const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);

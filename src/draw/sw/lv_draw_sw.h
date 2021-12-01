@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
+#include "../lv_draw.h"
 #include "../lv_draw_arc.h"
 #include "../lv_draw_rect.h"
 #include "../lv_draw_line.h"
@@ -43,9 +44,11 @@ typedef struct {
 
 void lv_draw_sw_init(void);
 
-void lv_draw_sw_arc(lv_point_t center, uint16_t radius, const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
+void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle,
+        uint16_t end_angle,
+        const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
 
-void lv_draw_sw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
+void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
 
 void lv_draw_sw_letter(const lv_point_t * pos, const lv_area_t * clip_area,
                        const lv_font_t * font_p,
@@ -61,10 +64,6 @@ void lv_draw_sw_line(const lv_point_t * point1, const lv_point_t * point2, const
 
 void lv_draw_sw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area, const lv_draw_rect_dsc_t * draw_dsc);
 
-
-void lv_blend_sw_fill(const lv_draw_class_t * class_p, lv_draw_t * draw, const lv_draw_sw_blend_fill_dsc_t * dsc);
-
-void lv_blend_sw_map(const lv_draw_class_t * class_p, lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * dsc);
 
 /***********************
  * GLOBAL VARIABLES

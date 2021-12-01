@@ -38,7 +38,7 @@ static void lv_refr_areas(void);
 static void lv_refr_area(const lv_area_t * area_p);
 static void lv_refr_area_part(const lv_area_t * area_p);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
-static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p);
+static void lv_refr_obj_and_children(lv_obj_t * top_obj, const lv_area_t * mask_p);
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h);
 static void draw_buf_flush(void);
@@ -432,10 +432,12 @@ static void lv_refr_area(const lv_area_t * area_p)
 
         if(disp_refr->driver->full_refresh) {
             disp_refr->driver->draw_buf->last_part = 1;
-            lv_refr_area_part(draw, &disp_area);
+            draw->clip_area = &disp_area;
+            lv_refr_area_part(draw);
         } else {
             disp_refr->driver->draw_buf->last_part = disp_refr->driver->draw_buf->last_area;
-            lv_refr_area_part(draw, area_p);
+            draw->clip_area = area_p;
+            lv_refr_area_part(draw);
         }
         return;
     }
@@ -461,10 +463,11 @@ static void lv_refr_area(const lv_area_t * area_p)
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
         draw->dest_area = &sub_area;
+        draw->clip_area = &sub_area;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->driver->draw_buf->last_part = 1;
-        lv_refr_area_part(draw, &sub_area);
+        lv_refr_area_part(draw);
     }
 
     /*If the last y coordinates are not handled yet ...*/
@@ -475,16 +478,13 @@ static void lv_refr_area(const lv_area_t * area_p)
         sub_area.y1 = row;
         sub_area.y2 = y2;
         draw->dest_area = &sub_area;
+        draw->clip_area = &sub_area;
         disp_refr->driver->draw_buf->last_part = 1;
-        lv_refr_area_part(draw, &sub_area);
+        lv_refr_area_part(draw);
     }
 }
 
-/**
- * Refresh a part of an area which is on the actual Virtual Display Buffer
- * @param area_p pointer to an area to refresh
- */
-static void lv_refr_area_part(lv_draw_t * draw, const lv_area_t * area_p)
+static void lv_refr_area_part(lv_draw_t * draw)
 {
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
@@ -500,9 +500,9 @@ static void lv_refr_area_part(lv_draw_t * draw, const lv_area_t * area_p)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(area_p, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(draw->dest_area, lv_disp_get_scr_act(disp_refr));
     if(disp_refr->prev_scr) {
-        top_prev_scr = lv_refr_get_top_obj(area_p, disp_refr->prev_scr);
+        top_prev_scr = lv_refr_get_top_obj(draw->dest_area, disp_refr->prev_scr);
     }
 
     /*Draw a display background if there is no top object*/
@@ -517,7 +517,7 @@ static void lv_refr_area_part(lv_draw_t * draw, const lv_area_t * area_p)
                 lv_draw_img_dsc_t dsc;
                 lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
-                lv_draw_img(&a, area_p, disp_refr->bg_img, &dsc);
+                lv_draw_img(&a, draw->dest_area, disp_refr->bg_img, &dsc);
             }
             else {
                 LV_LOG_WARN("Can't draw the background image");
@@ -528,21 +528,21 @@ static void lv_refr_area_part(lv_draw_t * draw, const lv_area_t * area_p)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
-            dsc.coords = area_p;
+            dsc.coords = draw->dest_area;
             lv_draw_rect(draw, &dsc);
     }
     /*Refresh the previous screen if any*/
     if(disp_refr->prev_scr) {
         if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
-        lv_refr_obj_and_children(draw, top_prev_scr, area_p);
+        lv_refr_obj_and_children(draw, top_prev_scr);
     }
 
     if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
-    lv_refr_obj_and_children(draw, top_act_scr, &area_p);
+    lv_refr_obj_and_children(draw, top_act_scr);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_obj_and_children(draw, lv_disp_get_layer_top(disp_refr), area_p);
-    lv_refr_obj_and_children(draw, lv_disp_get_layer_sys(disp_refr), area_p);
+    lv_refr_obj_and_children(draw, lv_disp_get_layer_top(disp_refr));
+    lv_refr_obj_and_children(draw, lv_disp_get_layer_sys(disp_refr));
 
     /*In true double buffered mode flush only once when all areas were rendered.
      *In normal mode flush after every area*/
@@ -597,49 +597,49 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
  * @param top_p pointer to an objects. Start the drawing from it.
  * @param mask_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_p, const lv_area_t * mask_p)
+static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_obj)
 {
     /*Normally always will be a top_obj (at least the screen)
      *but in special cases (e.g. if the screen has alpha) it won't.
      *In this case use the screen directly*/
-    if(top_p == NULL) top_p = lv_disp_get_scr_act(disp_refr);
-    if(top_p == NULL) return;  /*Shouldn't happen*/
+    if(top_obj == NULL) top_obj = lv_disp_get_scr_act(disp_refr);
+    if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/
-    lv_refr_obj(top_p, mask_p);
+    lv_refr_obj(draw, top_obj);
 
     /*Draw the 'younger' sibling objects because they can be on top_obj*/
-    lv_obj_t * par;
-    lv_obj_t * border_p = top_p;
+    lv_obj_t * parent;
+    lv_obj_t * border_p = top_obj;
 
-    par = lv_obj_get_parent(top_p);
+    parent = lv_obj_get_parent(top_obj);
 
     /*Do until not reach the screen*/
-    while(par != NULL) {
+    while(parent != NULL) {
         bool go = false;
         uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(par);
+        uint32_t child_cnt = lv_obj_get_child_cnt(parent);
         for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = par->spec_attr->children[i];
+            lv_obj_t * child = parent->spec_attr->children[i];
             if(!go) {
                 if(child == border_p) go = true;
             }
             else {
                 /*Refresh the objects*/
-                lv_refr_obj(child, mask_p);
+                lv_refr_obj(draw, child);
             }
         }
 
         /*Call the post draw draw function of the parents of the to object*/
-        lv_event_send(par, LV_EVENT_DRAW_POST_BEGIN, (void *)mask_p);
-        lv_event_send(par, LV_EVENT_DRAW_POST, (void *)mask_p);
-        lv_event_send(par, LV_EVENT_DRAW_POST_END, (void *)mask_p);
+        lv_event_send(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)draw);
+        lv_event_send(parent, LV_EVENT_DRAW_POST, (void *)draw);
+        lv_event_send(parent, LV_EVENT_DRAW_POST_END, (void *)draw);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/
-        border_p = par;
+        border_p = parent;
         /*Go a level deeper*/
-        par = lv_obj_get_parent(par);
+        parent = lv_obj_get_parent(parent);
     }
 }
 
@@ -648,76 +648,62 @@ static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_p, const l
  * @param obj pointer to an object to refresh
  * @param mask_ori_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
+static void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
 {
     /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
-    bool union_ok; /*Store the return value of area_union*/
-    /*Truncate the original mask to the coordinates of the parent
-     *because the parent and its children are visible only here*/
-    lv_area_t obj_mask;
-    lv_area_t obj_ext_mask;
-    lv_area_t obj_area;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-    lv_obj_get_coords(obj, &obj_area);
-    obj_area.x1 -= ext_size;
-    obj_area.y1 -= ext_size;
-    obj_area.x2 += ext_size;
-    obj_area.y2 += ext_size;
-    union_ok = _lv_area_intersect(&obj_ext_mask, mask_ori_p, &obj_area);
+    const lv_area_t * clip_ori = draw->clip_area;
+    lv_area_t obj_coords_ext;
+    lv_area_t obj_ext_clip_coords;
+    lv_obj_get_coords(obj, &obj_coords_ext);
+    lv_area_increase(&obj_coords_ext, _lv_obj_get_ext_draw_size(obj));
+    if(!_lv_area_intersect(&obj_ext_clip_coords, clip_ori, &obj_coords_ext)) return;
 
-    /*Draw the parent and its children only if they ore on 'mask_parent'*/
-    if(union_ok != false) {
-        /*Redraw the object*/
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, &obj_ext_mask);
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN, &obj_ext_mask);
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &obj_ext_mask);
+    draw->clip_area = &obj_ext_clip_coords;
+
+    /*Redraw the object*/
+    lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw->clip_area);
+    lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw->clip_area);
+    lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw->clip_area);
 
 #if LV_USE_REFR_DEBUG
-        lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-        draw_dsc.bg_color.full = debug_color.full;
-        draw_dsc.bg_opa = LV_OPA_20;
-        draw_dsc.border_width = 1;
-        draw_dsc.border_opa = LV_OPA_30;
-        draw_dsc.border_color = debug_color;
-        lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
+    lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
+    lv_draw_rect_dsc_t draw_dsc;
+    lv_draw_rect_dsc_init(&draw_dsc);
+    draw_dsc.bg_color.full = debug_color.full;
+    draw_dsc.bg_opa = LV_OPA_20;
+    draw_dsc.border_width = 1;
+    draw_dsc.border_opa = LV_OPA_30;
+    draw_dsc.border_color = debug_color;
+    lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
 #endif
-        /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
-        lv_obj_get_coords(obj, &obj_area);
-        union_ok = _lv_area_intersect(&obj_mask, mask_ori_p, &obj_area);
-        if(union_ok != false) {
-            lv_area_t mask_child; /*Mask from obj and its child*/
-            lv_area_t child_area;
-            uint32_t i;
-            uint32_t child_cnt = lv_obj_get_child_cnt(obj);
-            for(i = 0; i < child_cnt; i++) {
-                lv_obj_t * child = obj->spec_attr->children[i];
-                lv_obj_get_coords(child, &child_area);
-                ext_size = _lv_obj_get_ext_draw_size(child);
-                child_area.x1 -= ext_size;
-                child_area.y1 -= ext_size;
-                child_area.x2 += ext_size;
-                child_area.y2 += ext_size;
-                /*Get the union (common parts) of original mask (from obj)
-                 *and its child*/
-                union_ok = _lv_area_intersect(&mask_child, &obj_mask, &child_area);
 
-                /*If the parent and the child has common area then refresh the child*/
-                if(union_ok) {
-                    /*Refresh the next children*/
-                    lv_refr_obj(child, &mask_child);
-                }
+    /*Create a new 'obj_clip' without 'ext_size' because the children can't be visible there*/
+    lv_area_t obj_clip_coords;
+    if(_lv_area_intersect(&obj_clip_coords, clip_ori, &obj->coords)) {
+        uint32_t i;
+        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            lv_area_t child_coords;
+            lv_obj_get_coords(child, &child_coords);
+            lv_area_increase(&child_coords, _lv_obj_get_ext_draw_size(child));
+            lv_area_t child_clip;
+            if(_lv_area_intersect(&child_clip, &obj_clip_coords, &child_coords)) {
+                /*Refresh the next child*/
+                draw->clip_area = &child_clip;
+                lv_refr_obj(child, draw);
             }
         }
-
-        /*If all the children are redrawn make 'post draw' draw*/
-        lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, &obj_ext_mask);
-        lv_event_send(obj, LV_EVENT_DRAW_POST, &obj_ext_mask);
-        lv_event_send(obj, LV_EVENT_DRAW_POST_END, &obj_ext_mask);
     }
+
+    draw->clip_area = &obj_ext_clip_coords;
+
+    /*If all the children are redrawn make 'post draw' draw*/
+    lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw);
+    lv_event_send(obj, LV_EVENT_DRAW_POST, draw);
+    lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw);
 }
 
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)
