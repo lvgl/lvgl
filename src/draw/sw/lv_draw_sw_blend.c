@@ -173,8 +173,8 @@ static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_
         int32_t area_w = lv_area_get_width(fill_area);
         int32_t area_h = lv_area_get_height(fill_area);
 
-        for(y = 0; y <= area_w; y++) {
-            for(x = 0; x <= area_h; x++) {
+        for(y = 0; y < area_h; y++) {
+            for(x = 0; x < area_w; x++) {
                 if(mask[x]) {
                     disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, fill_area->x1 + x, fill_area->y1 + y, color,
                                             (uint32_t)((uint32_t)opa * mask[x]) >> 8);
