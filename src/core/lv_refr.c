@@ -979,7 +979,7 @@ static void draw_buf_flush(void)
             call_flush_cb(disp->driver, &draw_buf->area, color_p);
         }
     }
-    if(draw_buf->buf1 && draw_buf->buf2) {
+    if(draw_buf->buf1 && draw_buf->buf2 && (!disp->driver->direct_mode || draw_buf->flushing_last)) {
         if(draw_buf->buf_act == draw_buf->buf1)
             draw_buf->buf_act = draw_buf->buf2;
         else
