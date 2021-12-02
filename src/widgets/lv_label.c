@@ -819,8 +819,8 @@ static void draw_main(lv_event_t * e)
         label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
     }
 
-    /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
-     * (In addition they will result misalignment is this case)*/
+    /* In SCROLL and SCROLL_CIRCULAR mode the CENTER and RIGHT are pointless, so remove them.
+     * (In addition, they will create misalignment in this situation)*/
     if((label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) &&
        (label_draw_dsc.align == LV_TEXT_ALIGN_CENTER || label_draw_dsc.align == LV_TEXT_ALIGN_RIGHT)) {
         lv_point_t size;
@@ -911,7 +911,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
     lv_obj_refresh_self_size(obj);
 
-    /*In scroll mode start an offset animations*/
+    /*In scroll mode start an offset animation*/
     if(label->long_mode == LV_LABEL_LONG_SCROLL) {
         uint16_t anim_speed = lv_obj_get_style_anim_speed(obj, LV_PART_MAIN);
         if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;

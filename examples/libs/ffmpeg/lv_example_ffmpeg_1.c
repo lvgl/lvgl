@@ -2,7 +2,7 @@
 #if LV_USE_FFMPEG && LV_BUILD_EXAMPLES
 
 /**
- * Open a image from a file
+ * Open an image from a file
  */
 void lv_example_ffmpeg_1(void)
 {

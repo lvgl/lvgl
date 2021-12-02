@@ -57,8 +57,8 @@ typedef enum {
  **********************/
 
 /**
- * Create a led objects
- * @param par pointer to an object, it will be the parent of the new led
+ * Create a led object
+ * @param parent pointer to an object, it will be the parent of the new led
  * @return pointer to the created led
  */
 lv_obj_t * lv_led_create(lv_obj_t * parent);

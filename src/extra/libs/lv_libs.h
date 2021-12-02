@@ -43,4 +43,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_LAYOUTS_H*/
+#endif /*LV_LIBS_H*/

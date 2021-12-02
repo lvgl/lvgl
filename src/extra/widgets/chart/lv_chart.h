@@ -135,7 +135,7 @@ typedef enum {
  **********************/
 
 /**
- * Create a chart objects
+ * Create a chart object
  * @param parent    pointer to an object, it will be the parent of the new chart
  * @return          pointer to the created chart
  */

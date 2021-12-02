@@ -1,5 +1,5 @@
 /**
- * @file lv_text.c
+ * @file lv_txt.c
  *
  */
 
