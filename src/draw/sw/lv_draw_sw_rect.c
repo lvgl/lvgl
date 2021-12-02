@@ -65,10 +65,12 @@ static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_a
                                lv_color_t color, lv_opa_t opa);
 
 #if LV_DRAW_COMPLEX
-    LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
+LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 #if DITHER_GRADIENT
-    LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
-    LV_ATTRIBUTE_FAST_MEM static void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * nextLine, const lv_coord_t grad_size);
+LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s,
+                                                                lv_coord_t i);
+LV_ATTRIBUTE_FAST_MEM static void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * nextLine,
+                                            const lv_coord_t grad_size);
 #endif
 #endif
 
@@ -116,9 +118,13 @@ void lv_draw_sw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_
  *   STATIC FUNCTIONS
  **********************/
 #if DITHER_GRADIENT
-LV_ATTRIBUTE_FAST_MEM static inline uint8_t clamp(int a) { return (uint8_t)(a < 0 ? 0 : (a > 255 ? 255 : a)); }
+LV_ATTRIBUTE_FAST_MEM static inline uint8_t clamp(int a)
+{
+    return (uint8_t)(a < 0 ? 0 : (a > 255 ? 255 : a));
+}
 
-LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * next_line, const lv_coord_t grad_size)
+LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * next_line,
+                                                   const lv_coord_t grad_size)
 {
     /* Implement Floyd Steinberg algorithm, see https://surma.dev/things/ditherpunk/
         Coefs are:   x 7
@@ -140,7 +146,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
         lv_color_t q;
         /*Add error term*/
         FS_COMPONENTS(t, +, next_px_err, next_l);
-        next_l = next_line[x+1];
+        next_l = next_line[x + 1];
         /*Quantify*/
         q = lv_color_hex(t.full);
         u.full = lv_color_to32(q);
@@ -172,7 +178,8 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
     out[grad_size - 1] = lv_color_hex(src[grad_size - 1].full);
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src, lv_color_t * out, lv_coord_t x, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
+LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src, lv_color_t * out, lv_coord_t x,
+                                                        lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
 {
     /* For vertical dithering, the error is spread on the next column (and not next line).
        Since the renderer is scanline based, it's not obvious what could be used to perform the rendering efficiently.
@@ -181,14 +188,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
          2. Instead an ordered dithering algorithm shift the value a bit, but the influence only spread from the matrix size (used 4x4 here)
          3. It means that a pixel i,j only depends on the value of a pixel i-3, j-3 to i,j and no other one.
 
-       Then we compute a complete row of ordered dither and store it in out.
-       Pseudo code:
-       Threshold = COLOR(256/4, 256/4, 256/4); /* Estimated precision of the palette
-        For each pixel, Input, in the original picture:
-            Factor  = ThresholdMatrix[xcoordinate % X][ycoordinate % Y];
-            Attempt = Input + Factor * Threshold
-            Color = FindClosestColorFrom(Palette, Attempt)
-            Draw pixel using Color */
+       Then we compute a complete row of ordered dither and store it in out. */
 
     const uint8_t threshold_matrix[8 * 8] = {
         0, 48, 12, 60,  3, 51, 15, 63,
@@ -198,7 +198,8 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
         2, 50, 14, 62,  1, 49, 13, 61,
         34, 18, 46, 30, 33, 17, 45, 29,
         10, 58,  6, 54,  9, 57,  5, 53,
-        42, 26, 38, 22, 41, 25, 37, 21}; /* Shift by 6 to normalize */
+        42, 26, 38, 22, 41, 25, 37, 21
+    }; /* Shift by 6 to normalize */
     /*Need to compute the row at pos y*/
     lv_coord_t random_map[8] = { 7, 4, 0, 5, 3, 1, 6, 2 }; /*Some random map to avoid computing unneeded lines*/
     lv_coord_t i = random_map[y & 7];
@@ -207,7 +208,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
 
     /*The apply the algorithm for this patch*/
     for(lv_coord_t j = 0; j < 8; j++) {
-        uint8_t factor = threshold_matrix[i*8 + ((j+x) & 7)];
+        uint8_t factor = threshold_matrix[i * 8 + ((j + x) & 7)];
         lv_color32_t t;
         t.ch.red = tmp.ch.red + factor;
         t.ch.green = tmp.ch.green + factor;
@@ -216,26 +217,42 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
         out[j] = lv_color_hex(t.full);
     }
     /*Finally fill the line*/
-    for (lv_coord_t i = 8; i < w; i+= 8) {
-        lv_memcpy(out+i, out, 8 * sizeof(*out));
+    for(lv_coord_t j = 8; j < w; j += 8) {
+        lv_memcpy(out + j, out, 8 * sizeof(*out));
     }
 }
 
 #endif
 
-typedef void (*blend_func_t)(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * map, lv_coord_t index_x, lv_coord_t index_y, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa, const lv_draw_rect_dsc_t * dsc);
-static void blend_fill_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * map, lv_coord_t x, lv_coord_t y, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa, const lv_draw_rect_dsc_t * dsc) {
-    LV_UNUSED(map); LV_UNUSED(x); LV_UNUSED(y);
+#if LV_DRAW_COMPLEX
+typedef void (*blend_func_t)(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * map,
+                             lv_coord_t index_x, lv_coord_t index_y, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa,
+                             const lv_draw_rect_dsc_t * dsc);
+static void blend_fill_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * map, lv_coord_t x,
+                            lv_coord_t y, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa, const lv_draw_rect_dsc_t * dsc)
+{
+    LV_UNUSED(map);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
     lv_draw_blend_fill(clip_area, blend_area, dsc->bg_color, mask_buf, mask_res, opa, dsc->blend_mode);
 }
-static void blend_map_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * grad_map, lv_coord_t x, lv_coord_t y, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa, const lv_draw_rect_dsc_t * dsc) {
+static void blend_map_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * grad_map,
+                           lv_coord_t x, lv_coord_t y, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa,
+                           const lv_draw_rect_dsc_t * dsc)
+{
     LV_UNUSED(y);
     lv_draw_blend_map(clip_area, blend_area, grad_map + x, mask_buf, mask_res, opa, dsc->blend_mode);
 }
-static void blend_fill_vert_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * grad_map, lv_coord_t x, lv_coord_t c, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa, const lv_draw_rect_dsc_t * dsc) {
+#if !DITHER_GRADIENT
+static void blend_fill_vert_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * grad_map,
+                                 lv_coord_t x, lv_coord_t c, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa,
+                                 const lv_draw_rect_dsc_t * dsc)
+{
     LV_UNUSED(x);
     lv_draw_blend_fill(clip_area, blend_area, grad_map[c], mask_buf, mask_res, opa, dsc->blend_mode);
 }
+#endif
+#endif
 
 
 LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
@@ -284,9 +301,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 
     /*Add a radius mask if there is radius*/
     int32_t draw_area_w = lv_area_get_width(&draw_area);
-#if DITHER_GRADIENT
-    int32_t draw_area_h = lv_area_get_height(&draw_area);
-#endif
     int16_t mask_rout_id = LV_MASK_ID_INV;
     lv_opa_t * mask_buf = NULL;
     lv_draw_mask_radius_param_t mask_rout_param;
@@ -299,7 +313,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     /*In case of horizontal gradient pre-compute a line with a gradient*/
     lv_color_t * grad_map = NULL;
     lv_coord_t off_x = 0;
-    lv_coord_t grad_size = grad_dir == LV_GRAD_DIR_HOR ? coords_w : coords_h;
 #if !DITHER_GRADIENT
     if(grad_dir != LV_GRAD_DIR_NONE) {
         grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
@@ -310,9 +323,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) off_x = draw_area.x1 - coords_bg.x1;
     }
 #else
+    lv_coord_t grad_size = grad_dir == LV_GRAD_DIR_HOR ? coords_w : coords_h;
     lv_color32_t * hires_grad_map = NULL;
     scolor24_t * error_acc = NULL;
-    if (grad_dir != LV_GRAD_DIR_NONE) {
+    if(grad_dir != LV_GRAD_DIR_NONE) {
         /*Precompute the gradient perfect color in 24bits*/
         hires_grad_map = lv_mem_buf_get(grad_size * sizeof(lv_color32_t));
         for(int32_t i = 0; i < grad_size; i++) {
@@ -334,15 +348,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     blend_area.x2 = draw_area.x2;
 
 
-    if (grad_dir == LV_GRAD_DIR_NONE)
-        blend_func = blend_fill_line;
-    else if (grad_dir == LV_GRAD_DIR_HOR)
-        blend_func = blend_map_line;
-    else if (grad_dir == LV_GRAD_DIR_VER) {
+    if(grad_dir == LV_GRAD_DIR_NONE)
+        blend_func = &blend_fill_line;
+    else if(grad_dir == LV_GRAD_DIR_HOR)
+        blend_func = &blend_map_line;
+    else if(grad_dir == LV_GRAD_DIR_VER) {
 #if DITHER_GRADIENT
-        blend_func = blend_map_line;
+        blend_func = &blend_map_line;
 #else
-        blend_func = blend_fill_vert_line;
+        blend_func = &blend_fill_vert_line;
 #endif
     }
 
@@ -359,9 +373,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
 #if DITHER_GRADIENT
-            if (grad_dir == LV_GRAD_DIR_HOR)
+            if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if (grad_dir == LV_GRAD_DIR_VER)
+            else if(grad_dir == LV_GRAD_DIR_VER)
                 dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, h - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
@@ -389,9 +403,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             blend_area.y2 = top_y;
 
 #if DITHER_GRADIENT
-            if (grad_dir == LV_GRAD_DIR_HOR)
+            if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if (grad_dir == LV_GRAD_DIR_VER)
+            else if(grad_dir == LV_GRAD_DIR_VER)
                 dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, top_y - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, top_y - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
@@ -402,9 +416,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             blend_area.y2 = bottom_y;
 
 #if DITHER_GRADIENT
-            if (grad_dir == LV_GRAD_DIR_HOR)
+            if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if (grad_dir == LV_GRAD_DIR_VER)
+            else if(grad_dir == LV_GRAD_DIR_VER)
                 dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, bottom_y - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, bottom_y - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
@@ -434,9 +448,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             blend_area.y2 = h;
 
 #if DITHER_GRADIENT
-            if (grad_dir == LV_GRAD_DIR_HOR)
+            if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if (grad_dir == LV_GRAD_DIR_VER)
+            else if(grad_dir == LV_GRAD_DIR_VER)
                 dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, h - coords_bg.y1, mask_buf, mask_res, opa, dsc);
@@ -571,7 +585,8 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
 }
 
 /*Simple mathematic trick to avoid using a divide or multiplier */
-LV_ATTRIBUTE_FAST_MEM static inline uint8_t divBy255(uint16_t a) {
+LV_ATTRIBUTE_FAST_MEM static inline uint8_t divBy255(uint16_t a)
+{
     /* Mathematical trick here:
         let: (2^n - 1) = (a - b), and since (a-b)(a+b) = a^2 - b^2, then
              x / (2^n - 1) = x * (2^n + 1) / [(2^n + 1)*(2^n - 1)] = (x*2^n + x) / (2^(2n) - 1) ~= (x<<n + x) >> (2*n)
@@ -582,7 +597,8 @@ LV_ATTRIBUTE_FAST_MEM static inline uint8_t divBy255(uint16_t a) {
     return (uint8_t)(num >> 16);
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i)
+LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s,
+                                                                lv_coord_t i)
 {
     lv_color32_t r, one, two;
     one.full = lv_color_to32(dsc->bg_color);
