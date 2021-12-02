@@ -21,4 +21,16 @@ jobs:
         run: python code-format.py
         working-directory: scripts
       - name: Check that repository is clean
-        run: git diff --exit-code --color=always || (echo "Please apply the preceding diff to your code or run scripts/code-format.sh"; false)
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! (git diff --exit-code --color=always | tee /tmp/lvgl_diff.patch); then
+            echo "Please apply the preceding diff to your code or run scripts/code-format.sh"
+            exit 1
+          fi
+      - name: Upload diff
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: formatting-patch
+          path: /tmp/lvgl_diff.patch
