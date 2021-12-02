@@ -73,7 +73,7 @@ typedef struct {
     uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
     uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SCROLL)*/
-    uint8_t dot_tmp_alloc : 1;          /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters*/
+    uint8_t dot_tmp_alloc : 1;         /*1: dot is allocated, 0: dot directly holds up to 4 chars*/
 } lv_label_t;
 
 extern const lv_obj_class_t lv_label_class;
