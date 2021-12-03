@@ -92,7 +92,7 @@ static void style_init(void)
     style_init_reset(&styles->dark);
     lv_style_set_bg_opa(&styles->dark, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->dark, COLOR_DARK);
-    lv_style_set_line_width(&styles->dark,1);
+    lv_style_set_line_width(&styles->dark, 1);
     lv_style_set_line_color(&styles->dark, COLOR_DARK);
     lv_style_set_arc_width(&styles->dark, 2);
     lv_style_set_arc_color(&styles->dark, COLOR_DARK);
@@ -100,7 +100,7 @@ static void style_init(void)
     style_init_reset(&styles->dim);
     lv_style_set_bg_opa(&styles->dim, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->dim, COLOR_DIM);
-    lv_style_set_line_width(&styles->dim,1);
+    lv_style_set_line_width(&styles->dim, 1);
     lv_style_set_line_color(&styles->dim, COLOR_DIM);
     lv_style_set_arc_width(&styles->dim, 2);
     lv_style_set_arc_color(&styles->dim, COLOR_DIM);
