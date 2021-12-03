@@ -37,7 +37,7 @@ A comprehensive mapping of LVGL in Berry language is now available, similar to t
 
 Versions supported: LVGL v8.0.2, LodePNG v20201017, Freetype 2.10.4
 
-### Micropython + LVGL could be used for:
+### Tasmota + Berry + LVGL could be used for:
 
 - Fast prototyping GUI.  
 - Shortening the cycle of changing and fine-tuning the GUI.
