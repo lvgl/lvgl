@@ -12,7 +12,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 3. Read the [Quick overview](https://docs.lvgl.io/latest/en/html/get-started/quick-overview.html) page of the documentation (15 minutes)
 4. Set up a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html) (10 minutes)
 5. Try out some [Examples](https://github.com/lvgl/lv_examples/)
-6. Check out the [Getting started](https://docs.lvgl.io/master/get-started/index.html) guides for platform-specific tutorials. 
+6. Check out the [Platform-specific tutorials](https://docs.lvgl.io/master/get-started/index.html#platform-specific-tutorials). (10 minutes) 
 7. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/latest/en/html/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_&type=&language=)
 8. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library. (2-3 hours)
 9. Check the documentation of the [Widgets](https://docs.lvgl.io/latest/en/html/widgets/index.html) to see their features and usage
