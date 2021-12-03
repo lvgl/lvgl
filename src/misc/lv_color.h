@@ -623,7 +623,7 @@ static inline lv_color_t lv_color_hex(uint32_t c)
     lv_color_t r;
     r.full = c | 0xFF000000;
     return r;
-#else
+#else /*LV_COLOR_DEPTH == 8*/
     return lv_color_make((uint8_t)((c >> 16) & 0xFF), (uint8_t)((c >> 8) & 0xFF), (uint8_t)(c & 0xFF));
 #endif
 }
