@@ -21,10 +21,22 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 
 
 ## Platform-specific tutorials
+
+- [Simulator](/get-started/pc-simulator)
+- [NXP](/get-started/nxp)
+- [Espressif (ESP32)](/get-started/espressif)
+- [Arduino](/get-started/arduino)
+- [Tasmota-Berry](/get-started/tasmota-berry)
+- [Micropython](/get-started/micropython)
+- [NuttX RTOS](/get-started/nuttx)
+- [CMake](/get-started/cmake)
+
+
 ```eval_rst
 
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    quick-overview
    pc-simulator
