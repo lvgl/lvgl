@@ -114,6 +114,10 @@ void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  
 
         lv_draw_mask_remove_id(mask_out_id);
         if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
+
+        lv_draw_mask_free_param(&mask_out_param);
+        lv_draw_mask_free_param(&mask_in_param);
+
         return;
     }
 

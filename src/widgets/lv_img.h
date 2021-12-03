@@ -71,7 +71,7 @@ typedef uint8_t lv_img_size_mode_t;
  **********************/
 
 /**
- * Create a image objects
+ * Create an image object
  * @param parent pointer to an object, it will be the parent of the new image
  * @return pointer to the created image
  */

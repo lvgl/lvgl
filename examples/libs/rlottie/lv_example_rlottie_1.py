@@ -2,7 +2,7 @@
 import lvgl as lv
 import display_driver
 #
-# Load an lottie animation from flash
+# Load a lottie animation from flash
 #
 from lv_example_rlottie_approve import lv_example_rlottie_approve
 

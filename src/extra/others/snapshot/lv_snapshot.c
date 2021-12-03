@@ -177,7 +177,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
  * @param obj    The object to generate snapshot.
  * @param cf     color format for generated image.
  *
- * @return a pointer to a image descriptor, or NULL if failed.
+ * @return a pointer to an image descriptor, or NULL if failed.
  */
 lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
 {

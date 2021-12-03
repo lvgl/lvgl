@@ -63,7 +63,7 @@ extern const  lv_obj_class_t lv_dropdownlist_class;
  **********************/
 
 /**
- * Create a drop-down list objects
+ * Create a drop-down list object
  * @param parent pointer to an object, it will be the parent of the new drop-down list
  * @return pointer to the created drop-down list
  */
