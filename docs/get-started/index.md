@@ -17,7 +17,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 8. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library. (2-3 hours)
 9. Check the documentation of the [Widgets](https://docs.lvgl.io/latest/en/html/widgets/index.html) to see their features and usage
 10. If you have questions got to the [Forum](http://forum.lvgl.io/)
-10. Read the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes) 
+11. Read the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes) 
 
 
 ## Platform-specific tutorials
