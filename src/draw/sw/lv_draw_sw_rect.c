@@ -123,6 +123,8 @@ LV_ATTRIBUTE_FAST_MEM static inline uint8_t clamp(int a)
     return (uint8_t)(a < 0 ? 0 : (a > 255 ? 255 : a));
 }
 
+
+
 LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * next_line,
                                                    const lv_coord_t grad_size)
 {
@@ -133,12 +135,11 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
         Can be implemented as:            x       (x<<3 - x)
                               (x<<2 - x) (x<<2+x)   x
     */
-    int error[3] = { 0, 0, 0 };
     int coef[4] = {0, 0, 0, 0};
 #define FS_COMPUTE_ERROR(e) { coef[0] = (e<<3) - e; coef[1] = (e<<2) - e; coef[2] = (e<<2) + e; coef[3] = e; }
 #define FS_COMPONENTS(A, OP, B, C) A.ch.red = clamp(A.ch.red OP B.r OP C.r); A.ch.green = clamp(A.ch.green OP B.g OP C.g); A.ch.blue = clamp(A.ch.blue OP B.b OP C.b);
-
-    scolor24_t next_px_err, next_l = next_line[1];
+#define FS_QUANT_ERROR(e, t, u) e.r = (int8_t)(t.ch.red - u.ch.red); e.g = (int8_t)(t.ch.green - u.ch.green); e.b = (int8_t)(t.ch.blue - u.ch.blue);
+    scolor24_t next_px_err, next_l = next_line[1], error;
     /*First last pixel are not dithered */
     out[0] = lv_color_hex(src[0].full);
     for(lv_coord_t x = 1; x < grad_size - 1; x++) {
@@ -151,23 +152,21 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
         q = lv_color_hex(t.full);
         u.full = lv_color_to32(q);
         /*Then compute error*/
-        error[0] = t.ch.red - u.ch.red;
-        error[1] = t.ch.green - u.ch.green;
-        error[2] = t.ch.blue - u.ch.blue;
+        FS_QUANT_ERROR(error, t, u);
         /*Dither the error*/
-        FS_COMPUTE_ERROR(error[0]);
+        FS_COMPUTE_ERROR(error.r);
         next_px_err.r      = coef[0] >> 4;
         next_line[x - 1].r += coef[1] >> 4;
         next_line[x].r     += coef[2] >> 4;
         next_line[x + 1].r = coef[3] >> 4;
 
-        FS_COMPUTE_ERROR(error[1]);
+        FS_COMPUTE_ERROR(error.g);
         next_px_err.g      = coef[0] >> 4;
         next_line[x - 1].g += coef[1] >> 4;
         next_line[x].g     += coef[2] >> 4;
         next_line[x + 1].g = coef[3] >> 4;
 
-        FS_COMPUTE_ERROR(error[2]);
+        FS_COMPUTE_ERROR(error.b);
         next_px_err.b      = coef[0] >> 4;
         next_line[x - 1].b += coef[1] >> 4;
         next_line[x].b     += coef[2] >> 4;
@@ -178,7 +177,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
     out[grad_size - 1] = lv_color_hex(src[grad_size - 1].full);
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src, lv_color_t * out, lv_coord_t x,
+LV_ATTRIBUTE_FAST_MEM static inline void dither_o_vert(const lv_color32_t * src, lv_color_t * out, lv_coord_t x,
                                                         lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
 {
     /* For vertical dithering, the error is spread on the next column (and not next line).
@@ -221,6 +220,80 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
         lv_memcpy(out + j, out, 8 * sizeof(*out));
     }
 }
+
+LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src, lv_color_t * out, scolor24_t * next_line, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
+{
+    /* Try to implement error diffusion on a vertical gradient and an horizontal map using those tricks:
+        Since the given hi-resolution gradient (in src) is vertical, the Floyd Steinberg algorithm pass need to be rotated,
+        so we'll get this instead (from top to bottom):
+
+          A   B   C
+       1 [  ][  ][  ]
+       2 [  ][  ][  ]     Pixel A2 will spread its error on pixel A3 with coefficient 7,
+       3 [  ][  ][  ]     Pixel A2 will spread its error on pixel B1 with coefficient 3, B2 with coef 5 and B3 with coef 1
+
+       When taking into account an arbitrary pixel P(i,j), its added error diffusion term is:
+           e(i,j) = 1/16 * [ e(i-1,j) * 5 + e(i-1,j+1) * 3 + e(i-1,j-1) * 1 + e(i,j-1) * 7]
+
+       This means that the error term depends on pixel W, NW, N and SW.
+       If we consider that we are generating the error diffused gradient map from top to bottom, we can remember the previous
+       line (N, NW) in the term above. Also, we remember the (W) term too since we are computing the gradient map from left to right.
+       However, the SW term is painful for us, we can't support it (since to get it, we need its own SW term and so on).
+       Let's remove it and re-dispatch the error factor accordingly so they stays normalized:
+           e(i,j) ~= 1/16 * [ e(i-1,j) * 6 + e(i-1,j-1) * 1 + e(i,j-1) * 9]
+
+       That's the idea of this pseudo Floyd Steinberg dithering */
+    const uint8_t coef[3] = { 6, 1, 9 };
+    /*Compute the error term for the current pixel (first pixel is never dithered)*/
+    out[0] = lv_color_hex(src[y].full);
+    scolor24_t next_px_err =
+    for(lv_coord_t x = 1; x < w; x++) {
+        lv_color32_t t = src[y];
+        /*Add the current error term*/
+        FS_COMPONENTS(t, +, next_px_err, next_l);
+        next_l = next_line[x + 1];
+    }
+
+
+
+
+      /*
+       This looks like a geometric sum, so let's compute the previous iteration, ie. how to get e(i+1,j) from e(i,j):
+           e(i,j) = 1/16 * [ e(i-1,j) * 5 + e(i-1,j+1) * 3 + e(i-1,j-1) * 1 + e(i,j-1) * 7]
+
+       Replacing 2 in 1 gives:
+           e(i+1,j) = 1/256 * [ e(i-1,j) * 25 + e(i-1,j+1) * 15 + e(i-1,j-1) * 5 + e(i,j-1) * 35
+                                              + e(i,j+1) * 48 + e(i,j-1) * 16 + e(i+1,j-1) * 112]
+       Reducing to:
+           e(i+1,j) = 1/256 * [ e(i-1,j) * 25 + e(i-1,j+1) * 15 + e(i-1,j-1) * 5
+                              + e(i,j-1) * 51 + e(i,j+1) * 48 + e(i+1,j-1) * 112]
+
+       By making some error here in the mapping (removing the small coefficients), we get:
+           e(i+1,j) ~= 1/256 * [ e(i,j-1) * 51 + e(i,j+1) * 48 + e(i+1,j-1) * 112]
+       Renormalizing by the lost error term gives:
+           e(i+1,j) ~= 1/256 * [ e(i,j-1) * 62 + e(i,j+1) * 58 + e(i+1,j-1) * 136]
+
+       This means that a pixel error (x, y) now only depends on the pixel N above it (previous processed line),
+       and the pixel on NW and SW
+       SW pixel is painful to get and can't be computed without its own SW pixel and we are fucked up.
+
+       When taking into account an arbitrary pixel P(i+1,j), its added error diffusion term is:
+           e(i+1,j) = 1/16 * [ e(i,j) * 5 + e(i,j+1) * 3 + e(i,j-1) * 1 + e(i+1,j+1) * 7]
+       This looks like a geometric sum, so let's compute the previous iteration, ie. how to get e(i+1,j) from e(i,j+1):
+           e(i+1,j+1) = 1/16 * [ e(i,j+1) * 5 + e(i,j+2) * 3 + e(i,j) * 1 + e(i+1,j+2) * 7]
+           e(i+1,j) = 1/256 * [e(i,j) * 80 + e(i,j+1) * 48 + e(i,j-1) * 16 + e(i+1,j+1) * 112 +
+                                e(i,j+1) * 80 + e(i,j+2) * 48 + e(i,j) * 16 + e(i+1,j+2) * 112]
+                    = 1/256 * [e(i,j) * 96 + e(i,j+1) * 128 + e(i,j-1) * 16 + e(i+1,j+1) * 112 + e(i,j+2) * 48 + e(i+1,j+2) * 112]
+                   ~= 1/256 * [e(i,j+2) * 48 + e(i,j) * 96 + e(i,j+1) * 128 + 112 * [e(i+1,j+1) + e(i+1,j+2)]]
+
+
+       Since we are producing pixels in a scanline fashion, we have:
+        e(0, n) (whatever n), e(i-n, j) (whatever n, j is the current line being processed) and e(i,j+1) and e(i+1, j-1)*/
+
+
+
+}
+
 
 #endif
 
@@ -376,7 +449,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
             else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
+                dither_o_vert(hires_grad_map, grad_map, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, h - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
         }
@@ -406,7 +479,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
             else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, top_y - coords_bg.y1, coords_w, grad_size);
+                dither_o_vert(hires_grad_map, grad_map, blend_area.x1, top_y - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, top_y - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
         }
@@ -419,7 +492,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
             else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, bottom_y - coords_bg.y1, coords_w, grad_size);
+                dither_o_vert(hires_grad_map, grad_map, blend_area.x1, bottom_y - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, bottom_y - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
         }
@@ -451,7 +524,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             if(grad_dir == LV_GRAD_DIR_HOR)
                 dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
             else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
+                dither_o_vert(hires_grad_map, grad_map, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, h - coords_bg.y1, mask_buf, mask_res, opa, dsc);
         }
