@@ -979,7 +979,7 @@ static void draw_buf_flush(void)
             call_flush_cb(disp->driver, &draw_buf->area, color_p);
         }
     }
-    /*If there 2 buffer swap them. With direct mode swap only on the last area*/
+    /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(draw_buf->buf1 && draw_buf->buf2 && (!disp->driver->direct_mode || draw_buf->flushing_last)) {
         if(draw_buf->buf_act == draw_buf->buf1)
             draw_buf->buf_act = draw_buf->buf2;
