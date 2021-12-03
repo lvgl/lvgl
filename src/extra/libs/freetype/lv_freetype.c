@@ -355,7 +355,7 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
     size_t need_size = sizeof(lv_font_fmt_ft_dsc_t) + sizeof(lv_font_t);
     lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(need_size);
     if(dsc == NULL) return false;
-    lv_memset_00(dsc, sizeof(need_size));
+    lv_memset_00(dsc, need_size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(lv_font_fmt_ft_dsc_t));
     dsc->mem = info->mem;
@@ -536,7 +536,7 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
     size_t need_size = sizeof(lv_font_fmt_ft_dsc_t) + sizeof(lv_font_t);
     lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(need_size);
     if(dsc == NULL) return false;
-    lv_memset_00(dsc, sizeof(need_size));
+    lv_memset_00(dsc, need_size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(lv_font_fmt_ft_dsc_t));
     dsc->mem = info->mem;
