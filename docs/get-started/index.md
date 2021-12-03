@@ -13,7 +13,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 4. Set up a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html) (10 minutes)
 5. Try out some [Examples](https://github.com/lvgl/lv_examples/)
 6. Try LVGL on ESP32 M5Stack device with [Tasmota and Berry](https://tasmota.github.io/docs/LVGL_in_10_minutes/) (10 minutes)
-6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/latest/en/html/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_&type=&language=)
+6. Check out the [Getting started](https://docs.lvgl.io/master/get-started/index.html) guides for platform-specific tutorials. 
 7. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library. (2-3 hours)
 8. Check the documentation of the [Widgets](https://docs.lvgl.io/latest/en/html/widgets/index.html) to see their features and usage
 9. If you have questions got to the [Forum](http://forum.lvgl.io/)
