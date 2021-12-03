@@ -26,18 +26,13 @@
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 
 #if LV_DRAW_COMPLEX
-static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * area,
-                         lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_blend_mode_t mode);
+static void fill_blended(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 #endif  /*LV_DRAW_COMPLEX*/
 
-LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                                             const lv_color_t * src_buf, const lv_area_t * src_area,
-                                             const lv_opa_t * mask, lv_opa_t opa);
+LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 
 #if LV_DRAW_COMPLEX
-static void map_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                        const lv_color_t * src_buf, const lv_area_t * src_area,
-                        const lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t mode);
+static void map_blended(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
@@ -154,15 +149,16 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_draw_t * draw, const lv_draw_sw
     lv_area_t fill_area;
     if(!_lv_area_intersect(&fill_area, dsc->fill_area, draw->clip_area)) return;
 
-    lv_coord_t dest_buf_rel = draw->dest_buf + draw->dest_stride * fill_area->y1 + fill_area->x1;
-    lv_area_move(&fill_area_rel, -dsc->dest_area.x1, -dsc->dest_area.y1);
-    int32_t area_w = lv_area_get_width(dsc->fill_area);
-    int32_t area_h = lv_area_get_height(dsc->fill_area);
-    int32_t x;
-    int32_t y;
+    lv_color_t * dest_buf_rel = draw->dest_buf + draw->dest_stride * fill_area.y1 + fill_area.x1;
+    lv_area_move(&fill_area, -draw->dest_area->x1, -draw->dest_area->y1);
+    int32_t area_w = lv_area_get_width(&fill_area);
+    int32_t area_h = lv_area_get_height(&fill_area);
     lv_color_t color = dsc->color;
     lv_opa_t opa = dsc->opa;
     lv_opa_t dest_stride = draw->dest_stride;
+
+    int32_t x;
+    int32_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
     if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
@@ -304,21 +300,20 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_draw_t * draw, const lv_draw_sw
 }
 
 #if LV_DRAW_COMPLEX
-static void fill_blended(lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * dsc)
+static void fill_blended(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
-
-    lv_coord_t dest_buf_rel = draw->dest_buf_rel = draw->dest_stride * fill_area->y1 + fill_area->x1;
-    lv_area_t blend_area_rel;
-    if(!_lv_area_intersect(&blend_area_rel, dsc->blend_area, dsc->clip_area)) return;
-    lv_area_move(&blend_area_rel, -draw->dest_area.x1, -draw->dest_area.y1);
-    int32_t area_w = lv_area_get_width(dsc->blend_area);
-    int32_t area_h = lv_area_get_height(dsc->blend_area);
-    int32_t x;
-    int32_t y;
+    lv_area_t fill_area;
+    lv_color_t * dest_buf_rel = draw->dest_buf + draw->dest_stride * fill_area.y1 + fill_area.x1;
+    lv_area_move(&fill_area, -draw->dest_area->x1, -draw->dest_area->y1);
+    int32_t area_w = lv_area_get_width(&fill_area);
+    int32_t area_h = lv_area_get_height(&fill_area);
     lv_color_t color = dsc->color;
     lv_opa_t opa = dsc->opa;
     lv_opa_t dest_stride = draw->dest_stride;
     lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
+
+    int32_t x;
+    int32_t y;
 
     switch(dsc->blend_mode) {
         case LV_BLEND_MODE_ADDITIVE:
@@ -335,14 +330,8 @@ static void fill_blended(lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * ds
             return;
     }
 
-    int32_t area_w = lv_area_get_width(&dsc->clip_area);
-    int32_t area_h = lv_area_get_height(&dsc->clip_area);
-
-    int32_t x;
-    int32_t y;
-
     /*Simple fill (maybe with opacity), no masking*/
-    if(mask == NULL) {
+    if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         lv_color_t last_dest_color = lv_color_black();
         lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
         for(y = 0; y < area_h; y++) {
@@ -358,6 +347,7 @@ static void fill_blended(lv_draw_t * draw, const lv_draw_sw_blend_map_dsc_t * ds
     }
     /*Masked*/
     else {
+        const lv_opa_t * mask = dsc->mask;
 
         /*Buffer the result color to avoid recalculating the same color*/
         lv_color_t last_dest_color;
