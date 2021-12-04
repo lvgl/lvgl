@@ -28,7 +28,7 @@ static void new_theme_init_and_set(void)
     static lv_theme_t th_new;
     th_new = *th_act;
 
-    /*Set the parent theme ans the style applay callback for the new theme*/
+    /*Set the parent theme and the style apply callback for the new theme*/
     lv_theme_set_parent(&th_new, th_act);
     lv_theme_set_apply_cb(&th_new, new_theme_apply_cb);
 
@@ -59,8 +59,6 @@ void lv_example_style_14(void)
 
     label = lv_label_create(btn);
     lv_label_set_text(label, "New theme");
-
-
 }
 
 #endif

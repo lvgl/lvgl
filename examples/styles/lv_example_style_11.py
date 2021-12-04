@@ -3,7 +3,7 @@
 #
 # A base style
 
-style_base =  lv.style_t()
+style_base = lv.style_t()
 style_base.init()
 style_base.set_bg_color(lv.palette_main(lv.PALETTE.LIGHT_BLUE))
 style_base.set_border_color(lv.palette_darken(lv.PALETTE.LIGHT_BLUE, 3))
@@ -41,4 +41,3 @@ obj_warning.align(lv.ALIGN.RIGHT_MID, -20, 0)
 label = lv.label(obj_warning)
 label.set_text("Warning")
 label.center()
-

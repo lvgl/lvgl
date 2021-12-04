@@ -33,4 +33,3 @@ obj.add_style(style_def, 0)
 obj.add_style(style_pr, lv.STATE.PRESSED)
 
 obj.center()
-
