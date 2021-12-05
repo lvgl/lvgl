@@ -19,7 +19,7 @@ for i in range(9):
     # Stretch the cell horizontally and vertically too
     # Set span to 1 to make the cell 1 column/row sized
     obj.set_grid_cell(lv.GRID_ALIGN.STRETCH, col, 1,
-                      lv.GRID_ALIGN.STRETCH, row, 1);
+                      lv.GRID_ALIGN.STRETCH, row, 1)
     
     label = lv.label(obj)
     label.set_text("{:d},{:d}".format(col, row))
