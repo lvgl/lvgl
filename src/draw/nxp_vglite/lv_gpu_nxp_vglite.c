@@ -31,12 +31,11 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
+#include "lv_gpu_nxp_vglite.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
 
 #include "lvgl.h"
-#include "lv_gpu_nxp_vglite.h"
 #include "../misc/lv_log.h"
 #include "fsl_cache.h"
 #include "vg_lite.h"

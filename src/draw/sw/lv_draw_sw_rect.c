@@ -116,7 +116,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
         lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
         blend_dsc.blend_mode = dsc->blend_mode;
         blend_dsc.color = dsc->bg_color;
-        blend_dsc.fill_area = &bg_coords;
+        blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->bg_opa;
 
         lv_draw_sw_blend(draw, &blend_dsc);
@@ -146,7 +146,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
     }
 
     int32_t h;
-    lv_draw_mask_res_t mask_res;
 
     lv_area_t blend_area;
     blend_area.x1 = clipped_coords.x1;
@@ -158,6 +157,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
     blend_dsc.color = dsc->bg_color;
     blend_dsc.mask = mask_buf;
     blend_dsc.opa = LV_OPA_COVER;
+    blend_dsc.blend_area = &blend_area;
+    blend_dsc.mask_area = &blend_area;
 
     /*In case of horizontal gradient pre-compute a line with a gradient*/
      lv_color_t * grad_map = NULL;
@@ -169,10 +170,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
 
          grad_map_ofs = grad_map;
          if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) grad_map_ofs += clipped_coords.x1 - bg_coords.x1;
-         blend_dsc->src_buf = grad_map_ofs;
-         blend_dsc->src_area = &blend_area;
-     } else {
-        blend_dsc.fill_area = &blend_area;
+         blend_dsc.src_buf = grad_map_ofs;
      }
 
     /*There is another mask too. Draw line by line. */
@@ -213,7 +211,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
 
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad_get(dsc, coords_bg_h, top_y - bg_coords.y1);
 
-            lv_draw_sw_blend_fill(draw, &blend_dsc);
+            lv_draw_sw_blend(draw, &blend_dsc);
         }
 
         if(bottom_y <= clipped_coords.y2) {
@@ -222,7 +220,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
 
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad_get(dsc, coords_bg_h, bottom_y - bg_coords.y1);
 
-            lv_draw_sw_blend_fill(draw, &blend_dsc);
+            lv_draw_sw_blend(draw, &blend_dsc);
         }
     }
 
@@ -234,11 +232,12 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
     center_coords.x2 = bg_coords.x2;
     center_coords.y1 = bg_coords.y1 + rout;
     center_coords.y2 = bg_coords.y2 - rout;
-    bool mask_any_center = lv_draw_mask_is_any(&bg_coords);
+    bool mask_any_center = lv_draw_mask_is_any(&center_coords);
     if(!mask_any_center && grad_dir == LV_GRAD_DIR_NONE) {
         blend_area.y1 = bg_coords.y1 + rout;
         blend_area.y2 = bg_coords.y2 - rout;
         blend_dsc.opa = opa;
+        blend_dsc.mask = NULL;
         lv_draw_sw_blend(draw, &blend_dsc);
     }
     /*With gradient and/or mask draw line by line*/
@@ -256,9 +255,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_d
             blend_area.y1 = h;
             blend_area.y2 = h;
 
-            if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad_get(dsc, coords_bg_h, coords_bg_h, h - bg_coords.y1);
+            if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad_get(dsc, coords_bg_h, h - bg_coords.y1);
 
-            lv_draw_sw_blend_fill(draw, &blend_dsc);
+            lv_draw_sw_blend(draw, &blend_dsc);
         }
     }
 
@@ -1045,7 +1044,8 @@ static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
 //    draw_border_generic(clip, &area_outer, &area_inner, rout, rin, dsc->outline_color, dsc->outline_opa, dsc->blend_mode);
 }
 
-void draw_border_generic(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+void draw_border_generic(const lv_area_t * clip_area, const lv_area_t * outer_area, const lv_area_t * inner_area,
+                         lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
 //    opa = opa >= LV_OPA_COVER ? LV_OPA_COVER : opa;
 //
@@ -1262,8 +1262,8 @@ void draw_border_generic(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
 //    LV_UNUSED(blend_mode);
 //#endif /*LV_DRAW_COMPLEX*/
 }
-
-static void draw_border_simple(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+static void draw_border_simple(const lv_area_t * clip, const lv_area_t * outer_area, const lv_area_t * inner_area,
+                               lv_color_t color, lv_opa_t opa)
 {
 //    bool top_side = outer_area->y1 <= inner_area->y1 ? true : false;
 //    bool bottom_side = outer_area->y2 >= inner_area->y2 ? true : false;

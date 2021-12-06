@@ -38,6 +38,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_NXP_PXP
+
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
 
@@ -179,6 +183,8 @@ void lv_gpu_nxp_pxp_disable_recolor(void);
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_USE_GPU_NXP_PXP*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

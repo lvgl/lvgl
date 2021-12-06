@@ -61,8 +61,7 @@ void lv_draw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
 {
     if(lv_area_get_height(dsc->coords) < 1 || lv_area_get_width(dsc->coords) < 1) return;
 
-
-    draw->class_p->draw_rect(draw, dsc);
+    draw->draw_rect(draw, dsc);
 
     LV_ASSERT_MEM_INTEGRITY();
 }

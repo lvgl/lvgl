@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#include "../lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 extern lv_nxp_pxp_cfg_t pxp_default_cfg;

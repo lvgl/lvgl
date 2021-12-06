@@ -43,6 +43,7 @@ typedef struct {
  **********************/
 
 void lv_draw_sw_init(void);
+lv_draw_t * lv_draw_sw_create(void);
 
 void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle,
         uint16_t end_angle,

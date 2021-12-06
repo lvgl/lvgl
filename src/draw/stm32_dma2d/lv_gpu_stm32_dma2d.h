@@ -13,9 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_area.h"
-#include "../misc/lv_color.h"
-#include "../hal/lv_hal_disp.h"
+#include "../../misc/lv_color.h"
+#include "../../hal/lv_hal_disp.h"
 
 /*********************
  *      DEFINES

@@ -134,7 +134,7 @@ typedef struct _lv_disp_drv_t {
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
-    lv_draw_t * draw_backend;
+    lv_draw_t * draw_ctx;
 
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom display driver user data*/

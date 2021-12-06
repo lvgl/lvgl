@@ -38,8 +38,7 @@ extern "C" {
 
 typedef struct _lv_draw_t  {
     lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
-    lv_coord_t dest_stride;         /**< stride of `dest_buf` (number of pixel in a line)*/
-    const lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
+    lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
     const lv_area_t * clip_area;
 
 #if LV_USE_USER_DATA
@@ -74,7 +73,7 @@ typedef struct _lv_draw_t  {
     /**
      * Wait until all background operation are finished. (E.g. GPU opertions)
      */
-    void (*wait_for_finish)(void);
+    void (*wait_for_finish)(struct _lv_draw_t * draw);
 
 } lv_draw_t;
 
@@ -83,12 +82,6 @@ typedef struct _lv_draw_t  {
  **********************/
 
 void lv_draw_init(void);
-
-void lv_draw_backend_init(lv_draw_t * backend);
-
-void lv_draw_backend_add(lv_draw_t * backend);
-
-const lv_draw_t * lv_draw_backend_get(void);
 
 /**********************
  *  GLOBAL VARIABLES

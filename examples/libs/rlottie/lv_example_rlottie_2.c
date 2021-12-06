@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_RLOTTIE && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+#if LV_USE_RLOTTIE
 
 /**
  * Load an lottie animation from file
@@ -23,4 +24,5 @@ void lv_example_rlottie_2(void)
     lv_obj_center(label);
 }
 
+#endif
 #endif

@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES && LV_USE_FLEX
 
 static void scroll_event_cb(lv_event_t * e)
 {

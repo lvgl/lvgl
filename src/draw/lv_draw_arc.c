@@ -48,8 +48,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     if(dsc->width == 0) return;
     if(start_angle == end_angle) return;
 
-    const lv_draw_backend_t * backend = lv_draw_backend_get();
-    backend->draw_arc(center_x, center_y, radius, start_angle, end_angle, clip_area, dsc);
+//    const lv_draw_backend_t * backend = lv_draw_backend_get();
+//    backend->draw_arc(center_x, center_y, radius, start_angle, end_angle, clip_area, dsc);
 }
 
 void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
