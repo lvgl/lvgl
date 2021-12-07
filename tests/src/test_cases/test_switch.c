@@ -102,8 +102,7 @@ void test_switch_should_update_extra_draw_size_after_editing_padding(void)
 {
     lv_coord_t pad = 6;
     lv_coord_t actual = 0;
-    // expected = 8; pad + SWITCH_ROUNDING_ERROR (2)
-    lv_coord_t expected = 8;
+    lv_coord_t expected = pad + _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
 
     static lv_style_t style_knob;
     lv_style_init(&style_knob);
