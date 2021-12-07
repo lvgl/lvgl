@@ -1,10 +1,10 @@
 /**
- * @file lv_gpu_sdl.h
+ * @file lv_draw_sdl_priv.h
  *
  */
 
-#ifndef LV_GPU_SDL_H
-#define LV_GPU_SDL_H
+#ifndef LV_DRAW_SDL_PRIV_H
+#define LV_DRAW_SDL_PRIV_H
 
 
 #ifdef __cplusplus
@@ -14,17 +14,14 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#if LV_USE_EXTERNAL_RENDERER == 0
-#error "SDL GPU requires LV_USE_EXTERNAL_RENDERER 1. Enable it in lv_conf.h"
-#endif
+#include LV_DRAW_SDL_INCLUDE_PATH
 
-#include LV_GPU_SDL_INCLUDE_PATH
-
-#include "../draw/lv_draw.h"
+#include "../lv_draw.h"
+#include "../../misc/lv_lru.h"
 
 /*********************
  *      DEFINES
@@ -34,19 +31,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct lv_draw_sdl_context_internals_t {
+    lv_lru_t * texture_cache;
+};
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-void lv_gpu_sdl_init();
-
-/**
- * @brief Free caches
- *
- */
-void lv_gpu_sdl_deinit();
-
-void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * renderer, SDL_Texture * texture);
 
 /*======================
  * Add/remove functions
@@ -68,10 +59,10 @@ void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * rendere
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_SDL_H*/
+#endif /*LV_DRAW_SDL_PRIV_H*/

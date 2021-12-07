@@ -8,12 +8,13 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl_utils.h"
 
-#include "../../draw/lv_draw.h"
-#include "../../draw/lv_draw_label.h"
+#include "../lv_draw.h"
+#include "../lv_draw_label.h"
+#include "../../core/lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -182,13 +183,14 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
     }
 }
 
-lv_draw_sdl_backend_context_t * lv_draw_sdl_get_context()
+lv_draw_sdl_context_t * lv_draw_sdl_get_context()
 {
-    return lv_draw_backend_get()->ctx;
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    return disp->driver->user_data;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

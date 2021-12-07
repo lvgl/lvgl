@@ -9,14 +9,14 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include "../../draw/lv_draw_img.h"
-#include "../../draw/lv_img_cache.h"
-#include "../../draw/lv_draw_mask.h"
+#include "../lv_draw_img.h"
+#include "../lv_img_cache.h"
+#include "../lv_draw_mask.h"
+#include "../../misc/lv_lru.h"
 
 #include "lv_draw_sdl_utils.h"
-#include "lv_draw_sdl_lru.h"
 #include "lv_draw_sdl_texture_cache.h"
 
 /*********************
@@ -51,13 +51,13 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
                               const lv_draw_img_dsc_t * draw_dsc)
 {
-    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     size_t key_size;
-    lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_img_cache_key_create(src, draw_dsc->frame_id, &key_size);
+    lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(src, draw_dsc->frame_id, &key_size);
     bool texture_found = false;
-    SDL_Texture * texture = lv_gpu_draw_cache_get(key, key_size, &texture_found);
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(key, key_size, &texture_found);
     if(!texture_found) {
         _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
         lv_draw_sdl_cache_flag_t tex_flags = 0;
@@ -81,10 +81,10 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
         if(texture && cdsc) {
             lv_img_header_t * header = SDL_malloc(sizeof(lv_img_header_t));
             SDL_memcpy(header, &cdsc->dec_dsc.header, sizeof(lv_img_header_t));
-            lv_draw_sdl_draw_cache_put_advanced(key, key_size, texture, header, SDL_free, tex_flags);
+            lv_draw_sdl_texture_cache_put_advanced(key, key_size, texture, header, SDL_free, tex_flags);
         }
         else {
-            lv_draw_sdl_draw_cache_put(key, key_size, NULL);
+            lv_draw_sdl_texture_cache_put(key, key_size, NULL);
         }
     }
     SDL_free(key);
@@ -175,4 +175,4 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 }
 
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

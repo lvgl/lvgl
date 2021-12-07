@@ -15,6 +15,8 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
+#if LV_USE_DRAW_SDL
+
 #include "../../misc/lv_color.h"
 
 /*********************
@@ -34,6 +36,8 @@ void lv_stack_blur_grayscale(lv_opa_t * buf, uint16_t w, uint16_t h, uint16_t r)
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DRAW_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

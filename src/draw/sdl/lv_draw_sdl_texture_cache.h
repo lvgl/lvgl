@@ -1,10 +1,10 @@
 /**
- * @file lv_gpu_sdl_texture_cache.h
+ * @file lv_draw_sdl_texture_cache.h
  *
  */
 
-#ifndef LV_GPU_SDL_TEXTURE_CACHE_H
-#define LV_GPU_SDL_TEXTURE_CACHE_H
+#ifndef LV_DRAW_SDL_TEXTURE_CACHE_H
+#define LV_DRAW_SDL_TEXTURE_CACHE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,16 +16,19 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#if LV_USE_DRAW_SDL
+
+#include LV_DRAW_SDL_INCLUDE_PATH
+#include "lv_draw_sdl.h"
+#include "lv_draw_sdl_priv.h"
 #include "../../draw/lv_img_decoder.h"
 #include "../../misc/lv_area.h"
-#include "lv_gpu_sdl_lru.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-#define LV_GPU_SDL_DEC_DSC_TEXTURE_HEAD "@LVSDLTex"
+#define LV_DRAW_SDL_DEC_DSC_TEXTURE_HEAD "@LVSDLTex"
 
 /**********************
  *      TYPEDEFS
@@ -36,7 +39,7 @@ typedef struct {
     SDL_Texture * texture;
     bool texture_managed;
     bool texture_referenced;
-} lv_gpu_sdl_dec_dsc_userdata_t;
+} lv_draw_sdl_dec_dsc_userdata_t;
 
 typedef enum {
     LV_GPU_CACHE_KEY_MAGIC_ARC = 0x01,
@@ -50,43 +53,44 @@ typedef enum {
 } lv_gpu_cache_key_magic_t;
 
 typedef enum {
-    LV_GPU_SDL_CACHE_FLAG_NONE = 0,
-    LV_GPU_SDL_CACHE_FLAG_MANAGED = 1,
-} lv_gpu_sdl_cache_flag_t;
+    LV_DRAW_SDL_CACHE_FLAG_NONE = 0,
+    LV_DRAW_SDL_CACHE_FLAG_MANAGED = 1,
+} lv_draw_sdl_cache_flag_t;
 
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     lv_img_src_t type;
     int32_t frame_id;
-} lv_gpu_sdl_cache_key_head_img_t;
+} lv_draw_sdl_cache_key_head_img_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void _lv_gpu_sdl_texture_cache_init();
+void lv_draw_sdl_texture_cache_init(struct lv_draw_sdl_context_internals_t *internals);
 
-void _lv_gpu_sdl_texture_cache_deinit();
+void lv_draw_sdl_texture_cache_deinit(struct lv_draw_sdl_context_internals_t *internals);
 
-SDL_Texture * lv_gpu_draw_cache_get(const void * key, size_t key_length, bool * found);
+SDL_Texture * lv_draw_sdl_texture_cache_get(const void * key, size_t key_length, bool * found);
 
-SDL_Texture * lv_gpu_draw_cache_get_with_userdata(const void * key, size_t key_length, bool * found, void ** userdata);
+SDL_Texture * lv_draw_sdl_texture_cache_get_with_userdata(const void * key, size_t key_length, bool * found, void ** userdata);
 
-void lv_gpu_draw_cache_put(const void * key, size_t key_length, SDL_Texture * texture);
+void lv_draw_sdl_texture_cache_put(const void * key, size_t key_length, SDL_Texture * texture);
 
-void lv_gpu_draw_cache_put_advanced(const void * key, size_t key_length, SDL_Texture * texture, void * userdata,
-                                    lv_lru_free_t userdata_free, lv_gpu_sdl_cache_flag_t flags);
+void lv_draw_sdl_texture_cache_put_advanced(const void * key, size_t key_length, SDL_Texture * texture, void * userdata,
+                                            void userdata_free(void*), lv_draw_sdl_cache_flag_t flags);
 
-SDL_Texture * lv_gpu_temp_texture_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height);
+SDL_Texture * lv_draw_sdl_texture_temp_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height);
 
-lv_gpu_sdl_cache_key_head_img_t * lv_gpu_sdl_img_cache_key_create(const void * src, int32_t frame_id, size_t * size);
+lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void * src, int32_t frame_id, size_t * size);
 
 /**********************
  *      MACROS
  **********************/
+#endif /*LV_USE_DRAW_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_SDL_TEXTURE_CACHE_H*/
+#endif /*LV_DRAW_SDL_TEXTURE_CACHE_H*/

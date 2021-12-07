@@ -9,13 +9,13 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_mask.h"
+#include "../lv_draw_label.h"
+#include "../lv_draw_mask.h"
 #include "../../misc/lv_utils.h"
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DRAW_SDL_INCLUDE_PATH
 
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
@@ -96,12 +96,12 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         return;
     }
 
-    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
     bool glyph_found = false;
-    SDL_Texture * texture = lv_gpu_draw_cache_get(&glyph_key, sizeof(glyph_key), &glyph_found);
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(&glyph_key, sizeof(glyph_key), &glyph_found);
     if(!glyph_found) {
         if(g.resolved_font) {
             font_p = g.resolved_font;
@@ -113,7 +113,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
         lv_mem_free(buf);
-        lv_draw_sdl_draw_cache_put(&glyph_key, sizeof(glyph_key), texture);
+        lv_draw_sdl_texture_cache_put(&glyph_key, sizeof(glyph_key), texture);
     }
     if(!texture) {
         return;
@@ -148,7 +148,7 @@ static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL
     SDL_Texture * screen = SDL_GetRenderTarget(renderer);
 
     lv_area_t mask_area = {.x1 = dst->x, .x2 = dst->x + dst->w - 1, .y1 = dst->y, .y2 = dst->y + dst->h - 1};
-    SDL_Texture * content = lv_gpu_temp_texture_obtain(renderer, dst->w, dst->h);
+    SDL_Texture * content = lv_draw_sdl_texture_temp_obtain(renderer, dst->w, dst->h);
     SDL_SetTextureBlendMode(content, SDL_BLENDMODE_NONE);
     SDL_SetRenderTarget(renderer, content);
 
@@ -194,4 +194,4 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
     return key;
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

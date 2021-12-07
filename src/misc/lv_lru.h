@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_lru.h
+ * @file lv_lru.h
  *
  */
 
@@ -14,9 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
-
-#include LV_GPU_SDL_INCLUDE_PATH
+#include "../lv_conf_internal.h"
 
 #include <stdint.h>
 #include <time.h>
@@ -61,7 +59,6 @@ typedef struct {
     lv_lru_free_t * value_free;
     lv_lru_free_t * key_free;
     lruc_item * free_items;
-    SDL_mutex * mutex;
 } lv_lru_t;
 
 

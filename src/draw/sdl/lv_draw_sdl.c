@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl.c
+ * @file lv_draw_sdl.c
  *
  */
 
@@ -8,15 +8,15 @@
  *********************/
 
 
-#include "../lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include "lv_gpu_sdl.h"
-#include "../draw/sdl/lv_draw_sdl_utils.h"
-#include "../draw/sdl/lv_draw_sdl_texture_cache.h"
+#include "lv_draw_sdl.h"
+#include "lv_draw_sdl_utils.h"
+#include "lv_draw_sdl_texture_cache.h"
 
-#include "../draw/sw/lv_draw_sw.h"
+#include "../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -56,26 +56,19 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gpu_sdl_init()
+void lv_draw_sdl_init()
 {
     _lv_draw_sdl_utils_init();
-    _lv_draw_sdl_texture_cache_init();
 }
 
-void lv_gpu_sdl_deinit()
+void lv_draw_sdl_deinit()
 {
-    _lv_draw_sdl_texture_cache_deinit();
     _lv_draw_sdl_utils_deinit();
 }
 
-void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * renderer, SDL_Texture * texture)
+void lv_draw_sdl_backend_init(lv_draw_backend_t *backend)
 {
     lv_draw_backend_init(backend);
-    lv_draw_sdl_backend_context_t * ctx = lv_mem_alloc(sizeof(lv_draw_sdl_backend_context_t));
-    lv_memset_00(ctx, sizeof(lv_draw_sdl_backend_context_t));
-    ctx->renderer = renderer;
-    ctx->texture = texture;
-    backend->ctx = ctx;
     backend->draw_rect = lv_draw_sdl_draw_rect;
     backend->draw_arc = lv_draw_sw_arc;
     backend->draw_img_core = lv_draw_sdl_img_core;
@@ -86,9 +79,24 @@ void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * rendere
     backend->blend_map = lv_draw_sdl_draw_blend_map;
 }
 
+void lv_draw_sdl_context_init(lv_draw_sdl_context_t *context)
+{
+    lv_memset_00(context, sizeof(lv_draw_sdl_context_t));
+    context->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_t));
+    lv_memset_00(context->internals, sizeof(lv_draw_sdl_context_t));
+    lv_draw_sdl_texture_cache_init(context->internals);
+}
+
+void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t *context)
+{
+    lv_draw_sdl_texture_cache_deinit(context->internals);
+    lv_mem_free(context->internals);
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

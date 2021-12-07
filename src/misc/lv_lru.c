@@ -1,17 +1,15 @@
 /**
- * @file lv_draw_sdl_lru.c
+ * @file lv_lru.c
  *
+ * @see https://github.com/willcannings/C-LRU-Cache
  */
 
 /*********************
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
-
-#if LV_USE_GPU_SDL
-#include "../../misc/lv_log.h"
-#include "lv_draw_sdl_lru.h"
+#include "lv_lru.h"
+#include "lv_log.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -66,18 +64,6 @@ static lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache);
 #define test_for_missing_value()      error_for(!value || value_length == 0, LV_LRU_MISSING_VALUE)
 #define test_for_value_too_large()    error_for(value_length > cache->total_memory, LV_LRU_VALUE_TOO_LARGE)
 
-/* lock helpers */
-#define lock_cache()    if(SDL_LockMutex(cache->mutex)) {\
-        LV_LOG_WARN("LRU Cache unable to obtain mutex lock");\
-        return LV_LRU_LOCK_ERROR;\
-    }
-
-#define unlock_cache()  if(SDL_UnlockMutex(cache->mutex)) {\
-        LV_LOG_WARN("LRU Cache unable to release mutex lock");\
-        return LV_LRU_LOCK_ERROR;\
-    }
-
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -103,15 +89,6 @@ lv_lru_t * lv_lru_new(uint64_t cache_size, uint32_t average_length, lv_lru_free_
     cache->items = (lruc_item **) calloc(sizeof(lruc_item *), cache->hash_table_size);
     if(!cache->items) {
         LV_LOG_WARN("LRU Cache unable to create cache hash table");
-        free(cache);
-        return NULL;
-    }
-
-    // all cache calls are guarded by a mutex
-    cache->mutex = SDL_CreateMutex();
-    if(!cache->mutex) {
-        LV_LOG_WARN("LRU Cache unable to initialise mutex");
-        free(cache->items);
         free(cache);
         return NULL;
     }
@@ -151,9 +128,6 @@ lruc_error lv_lru_free(lv_lru_t * cache)
     }
 
     // free the cache
-    if(cache->mutex) {
-        SDL_DestroyMutex(cache->mutex);
-    }
     free(cache);
 
     return LV_LRU_NO_ERROR;
@@ -166,7 +140,6 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
     test_for_missing_key();
     test_for_missing_value();
     test_for_value_too_large();
-    lock_cache();
 
     // see if the key already exists
     uint32_t hash_index = lv_lru_hash(cache, key, key_length);
@@ -210,7 +183,6 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
             lv_lru_remove_lru_item(cache);
     }
     cache->free_memory -= required;
-    unlock_cache();
     return LV_LRU_NO_ERROR;
 }
 
@@ -219,7 +191,6 @@ lruc_error lv_lru_get(lv_lru_t * cache, const void * key, size_t key_size, void 
 {
     test_for_missing_cache();
     test_for_missing_key();
-    lock_cache();
 
     // loop until we find the item, or hit the end of a chain
     uint32_t hash_index = lv_lru_hash(cache, key, key_size);
@@ -236,7 +207,6 @@ lruc_error lv_lru_get(lv_lru_t * cache, const void * key, size_t key_size, void 
         *value = NULL;
     }
 
-    unlock_cache();
     return LV_LRU_NO_ERROR;
 }
 
@@ -244,7 +214,6 @@ lruc_error lv_lru_delete(lv_lru_t * cache, const void * key, size_t key_size)
 {
     test_for_missing_cache();
     test_for_missing_key();
-    lock_cache();
 
     // loop until we find the item, or hit the end of a chain
     lruc_item * item = NULL, *prev = NULL;
@@ -260,7 +229,6 @@ lruc_error lv_lru_delete(lv_lru_t * cache, const void * key, size_t key_size)
         lv_lru_remove_item(cache, prev, item, hash_index);
     }
 
-    unlock_cache();
     return LV_LRU_NO_ERROR;
 }
 
@@ -371,5 +339,3 @@ static lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache)
 
     return item;
 }
-
-#endif /*LV_USE_GPU_SDL*/

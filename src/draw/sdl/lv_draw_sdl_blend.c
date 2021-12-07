@@ -9,14 +9,14 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include "../../draw/lv_draw_blend.h"
+#include "../lv_draw_blend.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_mask.h"
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DRAW_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -49,7 +49,7 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
 
-    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     /*Get clipped fill area which is the real draw area.
@@ -87,7 +87,7 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
 
-    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     SDL_Rect draw_area_rect;
@@ -139,4 +139,4 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

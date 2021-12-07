@@ -9,13 +9,11 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl_texture_cache.h"
 
-#include "../../misc/lv_log.h"
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_img.h"
+#include "lv_draw_sdl_utils.h"
 
 /*********************
  *      DEFINES
@@ -43,14 +41,13 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_lru_t * get_lru();
 
 static void draw_cache_free_value(draw_cache_value_t *);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static lv_lru_t * lv_sdl_texture_cache;
 
 /**********************
  *      MACROS
@@ -60,26 +57,27 @@ static lv_lru_t * lv_sdl_texture_cache;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_draw_sdl_texture_cache_init()
+void lv_draw_sdl_texture_cache_init(struct lv_draw_sdl_context_internals_t *internals)
 {
-    lv_sdl_texture_cache = lv_lru_new(1024 * 1024 * 8, 65536, (lv_lru_free_t *) draw_cache_free_value,
-                                      NULL);
+    internals->texture_cache = lv_lru_new(LV_DRAW_SDL_LRU_SIZE, 65536,
+                                                   (lv_lru_free_t *) draw_cache_free_value, NULL);
 }
 
-void _lv_draw_sdl_texture_cache_deinit()
+void lv_draw_sdl_texture_cache_deinit(struct lv_draw_sdl_context_internals_t *internals)
 {
-    lv_lru_free(lv_sdl_texture_cache);
+    lv_lru_free(internals->texture_cache);
 }
 
-SDL_Texture * lv_gpu_draw_cache_get(const void * key, size_t key_length, bool * found)
+SDL_Texture * lv_draw_sdl_texture_cache_get(const void * key, size_t key_length, bool * found)
 {
-    return lv_gpu_draw_cache_get_with_userdata(key, key_length, found, NULL);
+    return lv_draw_sdl_texture_cache_get_with_userdata(key, key_length, found, NULL);
 }
 
-SDL_Texture * lv_gpu_draw_cache_get_with_userdata(const void * key, size_t key_length, bool * found, void ** userdata)
+SDL_Texture * lv_draw_sdl_texture_cache_get_with_userdata(const void * key, size_t key_length, bool * found, void ** userdata)
 {
+    lv_lru_t *lru = get_lru();
     draw_cache_value_t * value = NULL;
-    lv_lru_get(lv_sdl_texture_cache, key, key_length, (void **) &value);
+    lv_lru_get(lru, key, key_length, (void **) &value);
     if(!value) {
         if(found) {
             *found = false;
@@ -97,27 +95,28 @@ SDL_Texture * lv_gpu_draw_cache_get_with_userdata(const void * key, size_t key_l
     return value->texture;
 }
 
-void lv_draw_sdl_draw_cache_put(const void * key, size_t key_length, SDL_Texture * texture)
+void lv_draw_sdl_texture_cache_put(const void * key, size_t key_length, SDL_Texture * texture)
 {
-    lv_draw_sdl_draw_cache_put_advanced(key, key_length, texture, NULL, NULL, 0);
+    lv_draw_sdl_texture_cache_put_advanced(key, key_length, texture, NULL, NULL, 0);
 }
 
-void lv_draw_sdl_draw_cache_put_advanced(const void * key, size_t key_length, SDL_Texture * texture, void * userdata,
-                                         lv_lru_free_t userdata_free, lv_draw_sdl_cache_flag_t flags)
+void lv_draw_sdl_texture_cache_put_advanced(const void * key, size_t key_length, SDL_Texture * texture, void * userdata,
+                                            void userdata_free(void * ), lv_draw_sdl_cache_flag_t flags)
 {
+    lv_lru_t *lru = get_lru();
     draw_cache_value_t * value = SDL_malloc(sizeof(draw_cache_value_t));
     value->texture = texture;
     value->userdata = userdata;
     value->userdata_free = userdata_free;
     value->flags = flags;
     if(!texture) {
-        lv_lru_set(lv_sdl_texture_cache, key, key_length, value, 1);
+        lv_lru_set(lru, key, key_length, value, 1);
         return;
     }
     if(flags & LV_DRAW_SDL_CACHE_FLAG_MANAGED) {
         /* Managed texture doesn't count into cache size */
         LV_LOG_INFO("cache texture %p, %d*%d@%dbpp", texture, width, height, SDL_BITSPERPIXEL(format));
-        lv_lru_set(lv_sdl_texture_cache, key, key_length, value, 1);
+        lv_lru_set(lru, key, key_length, value, 1);
         return;
     }
     Uint32 format;
@@ -126,16 +125,16 @@ void lv_draw_sdl_draw_cache_put_advanced(const void * key, size_t key_length, SD
         return;
     }
     LV_LOG_INFO("cache texture %p, %d*%d@%dbpp", texture, width, height, SDL_BITSPERPIXEL(format));
-    lv_lru_set(lv_sdl_texture_cache, key, key_length, value, width * height * SDL_BITSPERPIXEL(format) / 8);
+    lv_lru_set(lru, key, key_length, value, width * height * SDL_BITSPERPIXEL(format) / 8);
 }
 
-SDL_Texture * lv_gpu_temp_texture_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height)
+SDL_Texture * lv_draw_sdl_texture_temp_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height)
 {
     temp_texture_key_t key;
     SDL_memset(&key, 0, sizeof(key));
     key.magic = LV_GPU_CACHE_KEY_TEMP;
     temp_texture_userdata_t * userdata = NULL;
-    SDL_Texture * texture = lv_gpu_draw_cache_get_with_userdata(&key, sizeof(key), NULL, (void **) &userdata);
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(&key, sizeof(key), NULL, (void **) &userdata);
     if(texture && userdata->width >= width && userdata->height >= height) {
         return texture;
     }
@@ -143,11 +142,11 @@ SDL_Texture * lv_gpu_temp_texture_obtain(SDL_Renderer * renderer, lv_coord_t wid
     userdata = SDL_malloc(sizeof(temp_texture_userdata_t));
     userdata->width = width;
     userdata->height = height;
-    lv_draw_sdl_draw_cache_put_advanced(&key, sizeof(key), texture, userdata, SDL_free, 0);
+    lv_draw_sdl_texture_cache_put_advanced(&key, sizeof(key), texture, userdata, SDL_free, 0);
     return texture;
 }
 
-lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, int32_t frame_id, size_t * size)
+lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void * src, int32_t frame_id, size_t * size)
 {
     lv_draw_sdl_cache_key_head_img_t header;
     /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
@@ -180,6 +179,11 @@ lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void *
  *   STATIC FUNCTIONS
  **********************/
 
+static lv_lru_t * get_lru()
+{
+    return lv_draw_sdl_get_context()->internals->texture_cache;
+}
+
 static void draw_cache_free_value(draw_cache_value_t * value)
 {
     if(value->texture && !(value->flags & LV_DRAW_SDL_CACHE_FLAG_MANAGED)) {
@@ -193,5 +197,5 @@ static void draw_cache_free_value(draw_cache_value_t * value)
 }
 
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
 

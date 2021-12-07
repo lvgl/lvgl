@@ -14,11 +14,13 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
+#if LV_USE_DRAW_SDL
 
+#include "lv_draw_sdl.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DRAW_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -27,10 +29,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct lv_draw_sdl_backend_context_t {
-    SDL_Renderer * renderer;
-    SDL_Texture * texture;
-} lv_draw_sdl_backend_context_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -51,12 +50,13 @@ SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp);
 
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
 
-lv_draw_sdl_backend_context_t * lv_draw_sdl_get_context();
+lv_draw_sdl_context_t * lv_draw_sdl_get_context();
 
 /**********************
  *      MACROS
  **********************/
 
+#endif /*LV_USE_DRAW_SDL*/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

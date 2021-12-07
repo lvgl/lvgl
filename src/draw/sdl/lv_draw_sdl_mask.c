@@ -9,9 +9,9 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include "../../draw/lv_draw_mask.h"
+#include "../lv_draw_mask.h"
 #include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_utils.h"
 
@@ -106,4 +106,4 @@ SDL_Texture * lv_sdl_gen_mask_texture(SDL_Renderer * renderer, const lv_area_t *
  **********************/
 
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
