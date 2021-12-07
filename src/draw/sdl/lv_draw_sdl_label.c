@@ -135,6 +135,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
     SDL_RenderSetClipRect(renderer, &clip_area_rect);
     SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+    SDL_RenderSetClipRect(renderer, NULL);
 }
 
 /**********************
@@ -150,7 +151,6 @@ static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL
     SDL_Texture * content = lv_gpu_temp_texture_obtain(renderer, dst->w, dst->h);
     SDL_SetTextureBlendMode(content, SDL_BLENDMODE_NONE);
     SDL_SetRenderTarget(renderer, content);
-    SDL_RenderSetClipRect(renderer, NULL);
 
     /* Replace texture with clip mask */
     SDL_Rect mask_rect = {.w = dst->w, .h = dst->h, .x = 0, .y = 0};
@@ -179,6 +179,7 @@ static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL
     SDL_SetRenderTarget(renderer, screen);
     SDL_RenderSetClipRect(renderer, clip);
     SDL_RenderCopy(renderer, content, &mask_rect, dst);
+    SDL_RenderSetClipRect(renderer, NULL);
     SDL_DestroyTexture(mask);
 }
 

@@ -102,11 +102,6 @@ void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoo
     out->h = sh;
 }
 
-double lv_sdl_round(double d)
-{
-    return (d - (long) d) < 0.5 ? SDL_floor(d) : SDL_ceil(d);
-}
-
 SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
 {
     SDL_assert(bpp >= 1 && bpp <= 8);

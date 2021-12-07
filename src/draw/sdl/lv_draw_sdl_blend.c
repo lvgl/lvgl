@@ -68,7 +68,6 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(texture, opa);
         SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
-        SDL_RenderSetClipRect(renderer, &draw_area_rect);
         SDL_RenderCopy(renderer, texture, NULL, &draw_area_rect);
         SDL_DestroyTexture(texture);
         SDL_FreeSurface(mask_surface);
@@ -76,7 +75,6 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
     else {
         SDL_SetRenderDrawColor(renderer, color.ch.red, color.ch.green, color.ch.blue, opa);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_RenderSetClipRect(renderer, &draw_area_rect);
         SDL_RenderFillRect(renderer, &draw_area_rect);
     }
 }
@@ -112,7 +110,6 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
         SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_SetRenderTarget(renderer, masked);
 
-        SDL_RenderSetClipRect(renderer, NULL);
         SDL_SetTextureAlphaMod(mask_texture, opa);
         SDL_SetTextureBlendMode(mask_texture, SDL_BLENDMODE_NONE);
         SDL_RenderCopy(renderer, mask_texture, NULL, NULL);
@@ -120,7 +117,6 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
         SDL_RenderCopy(renderer, texture, NULL, NULL);
 
         SDL_SetRenderTarget(renderer, ctx->texture);
-        SDL_RenderSetClipRect(renderer, &draw_area_rect);
         SDL_SetTextureBlendMode(masked, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(masked, 0xFF);
         SDL_SetTextureColorMod(masked, 0xFF, 0xFF, 0xFF);
@@ -133,7 +129,6 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
         SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_SetTextureAlphaMod(texture, opa);
         SDL_SetRenderTarget(renderer, ctx->texture);
-        SDL_RenderSetClipRect(renderer, &draw_area_rect);
         SDL_RenderCopy(renderer, texture, NULL, &draw_area_rect);
         SDL_DestroyTexture(texture);
     }

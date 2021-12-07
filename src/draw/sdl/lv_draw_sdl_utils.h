@@ -45,8 +45,6 @@ void lv_color_to_sdl_color(const lv_color_t * in, SDL_Color * out);
 
 void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoom, const lv_point_t * pivot);
 
-double lv_sdl_round(double d);
-
 SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp);
 
 SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp);
