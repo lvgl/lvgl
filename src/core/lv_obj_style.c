@@ -422,7 +422,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_values(&a, LV_OPA_TRANSP, lv_obj_get_style_opa(obj, 0));
+    lv_anim_set_values(&a, lv_obj_get_style_opa(obj, 0), LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
     lv_anim_set_ready_cb(&a, fade_in_anim_ready);
     lv_anim_set_time(&a, time);
@@ -468,12 +468,11 @@ lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, 
 /**
  * Get the local style of an object for a given part and for a given state.
  * If the local style for the part-state pair doesn't exist allocate and return it.
- * @param obj   pointer to an object
- * @param part  the part in whose local style to get
- * @param state the state in whose local style to get
+ * @param obj pointer to an object
+ * @param selector OR-ed value of parts and state for which the style should be get
  * @return pointer to the local style
  */
-static lv_style_t * get_local_style(lv_obj_t * obj,  lv_style_selector_t selector)
+static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector)
 {
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -506,8 +505,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj,  lv_style_selector_t selecto
  * Get the transition style of an object for a given part and for a given state.
  * If the transition style for the part-state pair doesn't exist allocate and return it.
  * @param obj   pointer to an object
- * @param part  the part in whose local style to get
- * @param state the state in whose local style to get
+ * @param selector OR-ed value of parts and state for which the style should be get
  * @return pointer to the transition style
  */
 static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t selector)

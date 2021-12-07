@@ -60,7 +60,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * parent)
 
 /**
  * Set spinbox value
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  * @param i value to be set
  */
 void lv_spinbox_set_value(lv_obj_t * obj, int32_t i)
@@ -189,7 +189,7 @@ void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, lv_dir_t direction)
 
 /**
  * Get the spinbox numeral value (user has to convert to float according to its digit format)
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  * @return value integer value of the spinbox
  */
 int32_t lv_spinbox_get_value(lv_obj_t * obj)
@@ -201,7 +201,7 @@ int32_t lv_spinbox_get_value(lv_obj_t * obj)
 }
 /**
  * Get the spinbox step value (user has to convert to float according to its digit format)
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  * @return value integer step value of the spinbox
  */
 int32_t lv_spinbox_get_step(lv_obj_t * obj)
@@ -218,7 +218,7 @@ int32_t lv_spinbox_get_step(lv_obj_t * obj)
 
 /**
  * Select next lower digit for edition
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  */
 void lv_spinbox_step_next(lv_obj_t * obj)
 {
@@ -236,7 +236,7 @@ void lv_spinbox_step_next(lv_obj_t * obj)
 
 /**
  * Select next higher digit for edition
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  */
 void lv_spinbox_step_prev(lv_obj_t * obj)
 {
@@ -252,7 +252,7 @@ void lv_spinbox_step_prev(lv_obj_t * obj)
 
 /**
  * Get spinbox rollover function status
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  */
 bool lv_spinbox_get_rollover(lv_obj_t * obj)
 {
@@ -264,7 +264,7 @@ bool lv_spinbox_get_rollover(lv_obj_t * obj)
 
 /**
  * Increment spinbox value by one step
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  */
 void lv_spinbox_increment(lv_obj_t * obj)
 {
@@ -290,7 +290,7 @@ void lv_spinbox_increment(lv_obj_t * obj)
 
 /**
  * Decrement spinbox value by one step
- * @param spinbox pointer to spinbox
+ * @param obj pointer to spinbox
  */
 void lv_spinbox_decrement(lv_obj_t * obj)
 {

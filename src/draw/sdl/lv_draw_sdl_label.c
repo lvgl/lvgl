@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_draw_label.c
+ * @file lv_draw_sdl_draw_label.c
  *
  */
 
@@ -12,15 +12,14 @@
 #if LV_USE_GPU_SDL
 
 #include "../../draw/lv_draw_label.h"
-#include "../../font/lv_font_fmt_txt.h"
-#include "../../core/lv_refr.h"
+#include "../../draw/lv_draw_mask.h"
 #include "../../misc/lv_utils.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
-#include "lv_gpu_sdl_utils.h"
-#include "lv_gpu_sdl_texture_cache.h"
-#include "lv_gpu_sdl_mask.h"
+#include "lv_draw_sdl_utils.h"
+#include "lv_draw_sdl_texture_cache.h"
+#include "lv_draw_sdl_mask.h"
 
 /*********************
  *      DEFINES
@@ -58,9 +57,9 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                    const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
-                    lv_blend_mode_t blend_mode)
+void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
+                             lv_blend_mode_t blend_mode)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -97,8 +96,8 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
         return;
     }
 
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    SDL_Renderer * renderer = (SDL_Renderer *) disp->driver->user_data;
+    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
+    SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
     bool glyph_found = false;
@@ -114,7 +113,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
         lv_mem_free(buf);
-        lv_gpu_draw_cache_put(&glyph_key, sizeof(glyph_key), texture);
+        lv_draw_sdl_draw_cache_put(&glyph_key, sizeof(glyph_key), texture);
     }
     if(!texture) {
         return;

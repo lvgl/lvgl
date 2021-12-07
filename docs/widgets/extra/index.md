@@ -17,6 +17,7 @@
    keyboard
    led
    list
+   menu
    meter
    msgbox
    span

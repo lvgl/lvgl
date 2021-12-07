@@ -72,7 +72,7 @@ const lv_obj_class_t lv_roller_label_class  = {
 
 /**
  * Create a roller object
- * @param par pointer to an object, it will be the parent of the new roller
+ * @param parent pointer to an object, it will be the parent of the new roller
  * @return pointer to the created roller
  */
 lv_obj_t * lv_roller_create(lv_obj_t * parent)

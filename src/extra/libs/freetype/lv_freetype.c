@@ -25,19 +25,19 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    const void * mem;
-    long size;
-    char * name;
-} lv_face_info_t;
-
-typedef struct {
     lv_ll_t  face_ll;
 } lv_faces_control_t;
 
+typedef struct name_refer_t {
+    const char * name;  /* point to font name string */
+    int32_t cnt;        /* reference count */
+} name_refer_t;
+
 typedef struct {
-#if LV_FREETYPE_CACHE_SIZE >= 0
-    void * face_id;
-#else
+    const void * mem;
+    const char * name;
+    size_t mem_size;
+#if LV_FREETYPE_CACHE_SIZE < 0
     FT_Size     size;
 #endif
     lv_font_t * font;
@@ -61,10 +61,16 @@ static void face_generic_finalizer(void * object);
 static bool lv_ft_font_init_nocache(lv_ft_info_t * info);
 static void lv_ft_font_destroy_nocache(lv_font_t * font);
 #endif
+
+static const char * name_refer_save(const char * name);
+static void name_refer_del(const char * name);
+static const char * name_refer_find(const char * name);
+
 /**********************
 *  STATIC VARIABLES
 **********************/
 static FT_Library library;
+static lv_ll_t names_ll;
 
 #if LV_FREETYPE_CACHE_SIZE >= 0
     static FTC_Manager cache_manager;
@@ -98,6 +104,8 @@ bool lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes
         LV_LOG_ERROR("init freeType error(%d)", error);
         return false;
     }
+
+    _lv_ll_init(&names_ll, sizeof(name_refer_t));
 
 #if LV_FREETYPE_CACHE_SIZE >= 0
     error = FTC_Manager_New(library, max_faces, max_sizes,
@@ -179,13 +187,13 @@ static FT_Error font_face_requester(FTC_FaceID face_id,
     LV_UNUSED(library_is);
     LV_UNUSED(req_data);
 
-    lv_face_info_t * info = (lv_face_info_t *)face_id;
+    lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)face_id;
     FT_Error error;
-    if(info->mem) {
-        error = FT_New_Memory_Face(library, info->mem, info->size, 0, aface);
+    if(dsc->mem) {
+        error = FT_New_Memory_Face(library, dsc->mem, dsc->mem_size, 0, aface);
     }
     else {
-        error = FT_New_Face(library, info->name, 0, aface);
+        error = FT_New_Face(library, dsc->name, 0, aface);
     }
     if(error) {
         LV_LOG_ERROR("FT_New_Face error:%d\n", error);
@@ -240,7 +248,7 @@ static bool get_glyph_dsc_cb_cache(const lv_font_t * font,
 
     lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
 
-    FTC_FaceID face_id = (FTC_FaceID)dsc->face_id;
+    FTC_FaceID face_id = (FTC_FaceID)dsc;
     FT_Size face_size;
     struct FTC_ScalerRec_ scaler;
     scaler.face_id = face_id;
@@ -344,39 +352,27 @@ static const uint8_t * get_glyph_bitmap_cb_cache(const lv_font_t * font, uint32_
 
 static bool lv_ft_font_init_cache(lv_ft_info_t * info)
 {
-    lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(sizeof(lv_font_fmt_ft_dsc_t));
+    size_t need_size = sizeof(lv_font_fmt_ft_dsc_t) + sizeof(lv_font_t);
+    lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(need_size);
     if(dsc == NULL) return false;
+    lv_memset_00(dsc, need_size);
 
-    dsc->font = lv_mem_alloc(sizeof(lv_font_t));
-    if(dsc->font == NULL) {
-        lv_mem_free(dsc);
-        return false;
-    }
-    lv_memset_00(dsc->font, sizeof(lv_font_t));
-    lv_face_info_t * face_info = NULL;
-    face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
-    if(face_info == NULL) {
-        goto Fail;
-    }
-    face_info->mem = info->mem;
-    face_info->size = info->mem_size;
-    face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
-    strcpy(face_info->name, info->name);
-
-    dsc->face_id = face_info;
+    dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(lv_font_fmt_ft_dsc_t));
+    dsc->mem = info->mem;
+    dsc->mem_size = info->mem_size;
+    dsc->name = name_refer_save(info->name);
     dsc->height = info->weight;
     dsc->style = info->style;
 
     /* use to get font info */
     FT_Size face_size;
     struct FTC_ScalerRec_ scaler;
-    scaler.face_id = (FTC_FaceID)dsc->face_id;
+    scaler.face_id = (FTC_FaceID)dsc;
     scaler.width = info->weight;
     scaler.height = info->weight;
     scaler.pixel = 1;
     FT_Error error = FTC_Manager_LookupSize(cache_manager, &scaler, &face_size);
     if(error) {
-        lv_mem_free(face_info);
         LV_LOG_ERROR("Failed to LookupSize");
         goto Fail;
     }
@@ -400,7 +396,6 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
     return true;
 
 Fail:
-    lv_mem_free(dsc->font);
     lv_mem_free(dsc);
     return false;
 }
@@ -413,9 +408,8 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
 
     lv_font_fmt_ft_dsc_t * dsc = (lv_font_fmt_ft_dsc_t *)(font->dsc);
     if(dsc) {
-        FTC_Manager_RemoveFaceID(cache_manager, (FTC_FaceID)dsc->face_id);
-        lv_mem_free(dsc->face_id);
-        lv_mem_free(dsc->font);
+        FTC_Manager_RemoveFaceID(cache_manager, (FTC_FaceID)dsc);
+        name_refer_del(dsc->name);
         lv_mem_free(dsc);
     }
 }
@@ -423,11 +417,11 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
 
 static FT_Face face_find_in_list(lv_ft_info_t * info)
 {
-    lv_face_info_t * face_info;
+    lv_font_fmt_ft_dsc_t * dsc;
     FT_Face * pface = _lv_ll_get_head(&face_control.face_ll);
     while(pface) {
-        face_info = (lv_face_info_t *)(*pface)->generic.data;
-        if(strcmp(face_info->name, info->name) == 0) {
+        dsc = (lv_font_fmt_ft_dsc_t *)(*pface)->generic.data;
+        if(strcmp(dsc->name, info->name) == 0) {
             return *pface;
         }
         pface = _lv_ll_get_next(&face_control.face_ll, pface);
@@ -460,10 +454,6 @@ static void face_generic_finalizer(void * object)
 {
     FT_Face face = (FT_Face)object;
     face_remove_from_list(face);
-    if(face->generic.data) {
-        lv_face_info_t * face_info = (lv_face_info_t *)face->generic.data;
-        lv_mem_free(face_info);
-    }
     LV_LOG_INFO("face finalizer(%p)\n", face);
 }
 
@@ -543,42 +533,34 @@ static const uint8_t * get_glyph_bitmap_cb_nocache(const lv_font_t * font, uint3
 
 static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
 {
-    lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(sizeof(lv_font_fmt_ft_dsc_t));
+    size_t need_size = sizeof(lv_font_fmt_ft_dsc_t) + sizeof(lv_font_t);
+    lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(need_size);
     if(dsc == NULL) return false;
+    lv_memset_00(dsc, need_size);
 
-    dsc->font = lv_mem_alloc(sizeof(lv_font_t));
-    if(dsc->font == NULL) {
-        lv_mem_free(dsc);
-        return false;
-    }
-    lv_memset_00(dsc->font, sizeof(lv_font_t));
+    dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(lv_font_fmt_ft_dsc_t));
+    dsc->mem = info->mem;
+    dsc->mem_size = info->mem_size;
+    dsc->name = name_refer_save(info->name);
+    dsc->height = info->weight;
+    dsc->style = info->style;
 
-    lv_face_info_t * face_info = NULL;
     FT_Face face = face_find_in_list(info);
     if(face == NULL) {
-        face_info = lv_mem_alloc(sizeof(lv_face_info_t) + strlen(info->name) + 1);
-        if(face_info == NULL) {
-            goto Fail;
-        }
         FT_Error error;
-        if(info->mem) {
-            error = FT_New_Memory_Face(library, info->mem, (FT_Long) info->mem_size, 0, &face);
+        if(dsc->mem) {
+            error = FT_New_Memory_Face(library, dsc->mem, (FT_Long) dsc->mem_size, 0, &face);
         }
         else {
-            error = FT_New_Face(library, info->name, 0, &face);
+            error = FT_New_Face(library, dsc->name, 0, &face);
         }
         if(error) {
-            lv_mem_free(face_info);
             LV_LOG_WARN("create face error(%d)", error);
             goto Fail;
         }
 
         /* link face and face info */
-        face_info->mem = info->mem;
-        face_info->size = (long) info->mem_size;
-        face_info->name = ((char *)face_info) + sizeof(lv_face_info_t);
-        strcpy(face_info->name, info->name);
-        face->generic.data = face_info;
+        face->generic.data = dsc;
         face->generic.finalizer = face_generic_finalizer;
         face_add_to_list(face);
     }
@@ -594,8 +576,6 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
 
     FT_Set_Pixel_Sizes(face, 0, info->weight);
     dsc->size = face->size;
-    dsc->height = info->weight;
-    dsc->style = info->style;
 
     lv_font_t * font = dsc->font;
     font->dsc = dsc;
@@ -614,7 +594,6 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
     return true;
 
 Fail:
-    lv_mem_free(dsc->font);
     lv_mem_free(dsc);
     return false;
 }
@@ -630,11 +609,79 @@ static void lv_ft_font_destroy_nocache(lv_font_t * font)
         FT_Face face = dsc->size->face;
         FT_Done_Size(dsc->size);
         FT_Done_Face(face);
-        lv_mem_free(dsc->font);
+        name_refer_del(dsc->name);
         lv_mem_free(dsc);
     }
 }
 
 #endif/* LV_FREETYPE_CACHE_SIZE */
+
+/**
+ * find name string in names list.name string cnt += 1 if find.
+ * @param name name string
+ * @return the string pointer of name.
+ */
+static const char * name_refer_find(const char * name)
+{
+    name_refer_t * refer = _lv_ll_get_head(&names_ll);
+    while(refer) {
+        if(strcmp(refer->name, name) == 0) {
+            refer->cnt += 1;
+            return refer->name;
+        }
+        refer = _lv_ll_get_next(&names_ll, refer);
+    }
+    return NULL;
+}
+
+/**
+ * del name string from list.
+ */
+static void name_refer_del(const char * name)
+{
+    name_refer_t * refer = _lv_ll_get_head(&names_ll);
+    while(refer) {
+        if(strcmp(refer->name, name) == 0) {
+            refer->cnt -= 1;
+            if(refer->cnt <= 0) {
+                _lv_ll_remove(&names_ll, refer);
+                lv_mem_free((void *)refer->name);
+                lv_mem_free(refer);
+            }
+            return;
+        }
+        refer = _lv_ll_get_next(&names_ll, refer);
+    }
+
+    LV_LOG_WARN("name_in_names_del error(not find:%p).", name);
+}
+
+/**
+ * save name string to list.
+ * @param name name string
+ * @return Saved string pointer
+ */
+static const char * name_refer_save(const char * name)
+{
+    const char * pos = name_refer_find(name);
+    if(pos) {
+        return pos;
+    }
+
+    name_refer_t * refer = _lv_ll_ins_tail(&names_ll);
+    if(refer) {
+        uint32_t len = strlen(name) + 1;
+        refer->name = lv_mem_alloc(len);
+        if(refer->name) {
+            lv_memcpy((void *)refer->name, name, len);
+            refer->cnt = 1;
+            return refer->name;
+        }
+        _lv_ll_remove(&names_ll, refer);
+        lv_mem_free(refer);
+    }
+    LV_LOG_WARN("save_name_to_names error(not memory).");
+    return "";
+}
 
 #endif /*LV_USE_FREETYPE*/

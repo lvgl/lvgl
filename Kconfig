@@ -775,6 +775,9 @@ menu "LVGL configuration"
         config LV_USE_LIST
             bool "List."
             default y if !LV_CONF_MINIMAL
+        config LV_USE_MENU
+            bool "Menu."
+            default y if !LV_CONF_MINIMAL
         config LV_USE_METER
             bool "Meter."
             default y if !LV_CONF_MINIMAL
@@ -877,10 +880,24 @@ menu "LVGL configuration"
 
         config LV_USE_FREETYPE
             bool "FreeType library"
-        config LV_FREETYPE_CACHE_SIZE
-            int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
-            depends on LV_USE_FREETYPE
-            default 16384
+        if LV_USE_FREETYPE
+            menu "FreeType cache config"
+                config LV_FREETYPE_CACHE_SIZE
+                int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
+                default 16384
+                if LV_FREETYPE_CACHE_SIZE >= 0
+                    config LV_FREETYPE_SBIT_CACHE
+                        bool "enable sbit cache"
+                        default n
+                    config LV_FREETYPE_CACHE_FT_FACES
+                        int "The maximum number of FT_Face(0: use defaults)"
+                        default 0
+                    config LV_FREETYPE_CACHE_FT_SIZES
+                        int "The maximum number of FT_Size(0: use defaults)"
+                        default 0
+                endif
+            endmenu
+        endif
 
         config LV_USE_RLOTTIE
             bool "Lottie library"

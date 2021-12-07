@@ -29,7 +29,7 @@ style_indic =  lv.style_t()
 
 style_indic.init()
 style_indic.set_bg_img_src(img_skew_strip_dsc)
-style_indic.set_bg_img_tiled(True);
+style_indic.set_bg_img_tiled(True)
 style_indic.set_bg_img_opa(lv.OPA._30)
 
 bar = lv.bar(lv.scr_act())

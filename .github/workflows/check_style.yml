@@ -21,4 +21,4 @@ jobs:
         run: python code-format.py
         working-directory: scripts
       - name: Check that repository is clean
-        run: git diff --exit-code || (echo "Please apply the preceding diff to your code or run scripts/code-format.sh"; false)
+        run: git diff --exit-code --color=always || (echo "Please apply the preceding diff to your code or run scripts/code-format.sh"; false)

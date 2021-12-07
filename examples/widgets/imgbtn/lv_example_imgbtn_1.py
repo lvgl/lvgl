@@ -69,6 +69,6 @@ imgbtn1.align(lv.ALIGN.CENTER, 0, 0)
 
 # Create a label on the image button
 label = lv.label(imgbtn1)
-label.set_text("Button");
+label.set_text("Button")
 label.align(lv.ALIGN.CENTER, 0, -4)
 

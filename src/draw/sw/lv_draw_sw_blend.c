@@ -173,8 +173,8 @@ static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_
         int32_t area_w = lv_area_get_width(fill_area);
         int32_t area_h = lv_area_get_height(fill_area);
 
-        for(y = 0; y <= area_w; y++) {
-            for(x = 0; x <= area_h; x++) {
+        for(y = 0; y < area_h; y++) {
+            for(x = 0; x < area_w; x++) {
                 if(mask[x]) {
                     disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, fill_area->x1 + x, fill_area->y1 + y, color,
                                             (uint32_t)((uint32_t)opa * mask[x]) >> 8);
@@ -368,8 +368,8 @@ static void fill_blended(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv
     if(mask == NULL) {
         lv_color_t last_dest_color = lv_color_black();
         lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
-        for(y = 0; y < area_w; y++) {
-            for(x = 0; x < area_h; x++) {
+        for(y = 0; y < area_h; y++) {
+            for(x = 0; x < area_w; x++) {
                 if(last_dest_color.full != dest_buf[x].full) {
                     last_dest_color = dest_buf[x];
                     last_res_color = blend_fp(color, dest_buf[x], opa);
@@ -420,8 +420,6 @@ static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_a
 
     int32_t src_stride = lv_area_get_width(src_area);
 
-    dest_buf += dest_stride * clip_area->y1 + clip_area->x1;
-
     src_buf += src_stride * (clip_area->y1 - src_area->y1);
     src_buf += (clip_area->x1 - src_area->x1);
 
@@ -430,7 +428,7 @@ static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_a
 
     if(mask == NULL) {
         for(y = 0; y < clip_h; y++) {
-            for(x = 0; x <= clip_w; x++) {
+            for(x = 0; x < clip_w; x++) {
                 disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, clip_area->x1 + x, clip_area->y1 + y, src_buf[x],
                                         opa);
             }
@@ -439,7 +437,7 @@ static void map_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_a
     }
     else {
         for(y = 0; y < clip_h; y++) {
-            for(x = 0; x <= clip_w; x++) {
+            for(x = 0; x < clip_w; x++) {
                 if(mask[x]) {
                     disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, clip_area->x1 + x, clip_area->y1 + y, src_buf[x],
                                             (uint32_t)((uint32_t)opa * mask[x]) >> 8);

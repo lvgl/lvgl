@@ -22,7 +22,7 @@ Not only the end, but also the start value of the bar can be set, which changes 
 ### Value and range
 A new value can be set by `lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)`.
 The value is interpreted in a range (minimum and maximum values) which can be modified with `lv_bar_set_range(bar, min, max)`.
-The default range is 1..100.
+The default range is 0..100.
 
 The new value in `lv_bar_set_value` can be set with or without an animation depending on the last parameter (`LV_ANIM_ON/OFF`).
 

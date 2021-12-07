@@ -6,9 +6,11 @@
 
 ## Types of input devices
 
-To register an input device an `lv_indev_drv_t` variable has to be initialized:
+To register an input device an `lv_indev_drv_t` variable has to be initialized. **Be sure to register at least one display before you register any input devices.**
 
 ```c
+lv_disp_drv_register(&disp_drv);
+
 static lv_indev_drv_t indev_drv;
 lv_indev_drv_init(&indev_drv);      /*Basic initialization*/
 indev_drv.type =...                 /*See below.*/

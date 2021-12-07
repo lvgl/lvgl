@@ -87,7 +87,7 @@ const lv_obj_class_t lv_spangroup_class  = {
  **********************/
 
 /**
- * Create a spangroup objects
+ * Create a spangroup object
  * @param par pointer to an object, it will be the parent of the new spangroup
  * @return pointer to the created spangroup
  */
@@ -531,9 +531,15 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
 
             /* break word deal width */
             if(isfill && next_ofs > 0 && snippet_cnt > 0) {
-                uint32_t letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs - 1];
+                if(max_w < use_width) {
+                    break;
+                }
+
+                uint32_t tmp_ofs = next_ofs;
+                uint32_t letter = _lv_txt_encoded_prev(&cur_txt[cur_txt_ofs], &tmp_ofs);
                 if(!(letter == '\0' || letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter))) {
-                    letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs];
+                    tmp_ofs = 0;
+                    letter = _lv_txt_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], &tmp_ofs);
                     if(!(letter == '\0' || letter == '\n'  || letter == '\r' || _lv_txt_is_break_char(letter))) {
                         break;
                     }
@@ -548,10 +554,10 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
                 max_line_h = snippet.line_h;
             }
             snippet_cnt ++;
-            if(isfill) {
+            max_w = max_w - use_width - snippet.letter_space;
+            if(isfill  || max_w <= 0) {
                 break;
             }
-            max_w -= use_width;
         }
 
         /* next line init */
@@ -925,10 +931,16 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
                     }
                 }
                 else if(next_ofs > 0 && lv_get_snippet_cnt() > 0) {
-                    /* break word deal width */
-                    uint32_t letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs - 1];
+                    /* To prevent infinite loops, the _lv_txt_get_next_line() may return incomplete words, */
+                    /* This phenomenon should be avoided when lv_get_snippet_cnt() > 0 */
+                    if(max_w < use_width) {
+                        break;
+                    }
+                    uint32_t tmp_ofs = next_ofs;
+                    uint32_t letter = _lv_txt_encoded_prev(&cur_txt[cur_txt_ofs], &tmp_ofs);
                     if(!(letter == '\0' || letter == '\n' || letter == '\r' || _lv_txt_is_break_char(letter))) {
-                        letter = (uint32_t)cur_txt[cur_txt_ofs + next_ofs];
+                        tmp_ofs = 0;
+                        letter = _lv_txt_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], &tmp_ofs);
                         if(!(letter == '\0' || letter == '\n'  || letter == '\r' || _lv_txt_is_break_char(letter))) {
                             break;
                         }
@@ -965,7 +977,7 @@ static void lv_draw_span(lv_obj_t * obj, const lv_area_t * coords, const lv_area
 
         /* align deal with */
         lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
-        if(align != LV_TEXT_ALIGN_LEFT) {
+        if(align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT) {
             lv_coord_t align_ofs = 0;
             lv_coord_t txts_w = is_first_line ? indent : 0;
             for(int i = 0; i < item_cnt; i++) {

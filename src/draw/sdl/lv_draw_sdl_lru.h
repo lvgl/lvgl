@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_lru.h
+ * @file lv_draw_sdl_lru.h
  *
  */
 

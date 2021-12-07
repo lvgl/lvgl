@@ -5,7 +5,7 @@ chart.center()
 chart.set_type(lv.chart.TYPE.LINE)   # Show lines and points too
 
 # Add two data series
-ser1 = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y);
+ser1 = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)
 ser2 = chart.add_series(lv.palette_main(lv.PALETTE.GREEN), lv.chart.AXIS.SECONDARY_Y)
 print(ser2)
 # Set next points on ser1

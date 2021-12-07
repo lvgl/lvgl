@@ -31,7 +31,7 @@ extern "C" {
 
 /**
  * Called periodically to read the input devices
- * @param param pointer to and input device to read
+ * @param timer pointer to a timer to read
  */
 void lv_indev_read_timer_cb(lv_timer_t * timer);
 

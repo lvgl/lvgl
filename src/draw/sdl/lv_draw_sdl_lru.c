@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_sdl_lru.c
+ * @file lv_draw_sdl_lru.c
  *
  */
 
@@ -11,7 +11,7 @@
 
 #if LV_USE_GPU_SDL
 #include "../../misc/lv_log.h"
-#include "lv_gpu_sdl_lru.h"
+#include "lv_draw_sdl_lru.h"
 
 #include <stdlib.h>
 #include <string.h>

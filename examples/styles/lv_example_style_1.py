@@ -20,5 +20,5 @@ obj = lv.obj(lv.scr_act())
 obj.add_style(style, 0)
 
 label = lv.label(obj)
-label.set_text("Hello");
+label.set_text("Hello")
 

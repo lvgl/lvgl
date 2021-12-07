@@ -71,7 +71,7 @@ static bool create_knob_recolor;
 
 /**
  * Create a color_picker object
- * @param par pointer to an object, it will be the parent of the new color_picker
+ * @param parent pointer to an object, it will be the parent of the new color_picker
  * @return pointer to the created color_picker
  */
 lv_obj_t * lv_colorwheel_create(lv_obj_t * parent, bool knob_recolor)

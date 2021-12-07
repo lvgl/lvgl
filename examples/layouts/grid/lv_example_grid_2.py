@@ -16,7 +16,7 @@ obj = lv.obj(cont)
 obj.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
 obj.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,
                   lv.GRID_ALIGN.START, 0, 1)
-label = lv.label(obj);
+label = lv.label(obj)
 label.set_text("c0, r0")
 
 # Cell to 1;0 and align to to the start (left) horizontally and center vertically too
@@ -33,7 +33,7 @@ obj.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
 obj.set_grid_cell(lv.GRID_ALIGN.START, 2, 1,
                   lv.GRID_ALIGN.END, 0, 1)
 label = lv.label(obj)
-label.set_text("c2, r0");
+label.set_text("c2, r0")
 
 # Cell to 1;1 but 2 column wide (span = 2).Set width and height to stretched.
 obj = lv.obj(cont)
