@@ -23,6 +23,9 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/** Switch knob extra area correction factor */
+#define _LV_SWITCH_KNOB_EXT_AREA_CORRECTION 2
+
 /**********************
  *      TYPEDEFS
  **********************/
