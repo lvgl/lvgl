@@ -58,11 +58,10 @@ static void lv_monkey_timer_cb(lv_timer_t * timer);
 
 void lv_monkey_config_init(lv_monkey_config_t * config)
 {
+    lv_memset_00(config, sizeof(lv_monkey_config_t));
     config->type = LV_INDEV_TYPE_POINTER;
     config->period_range.min = MONKEY_PERIOD_RANGE_MIN_DEF;
     config->period_range.max = MONKEY_PERIOD_RANGE_MAX_DEF;
-    config->input_range.min = 0;
-    config->input_range.max = 0;
 }
 
 lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
