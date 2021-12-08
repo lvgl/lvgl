@@ -133,7 +133,7 @@ static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig)
     if(howsmall >= howbig) {
         return howsmall;
     }
-    int32_t diff = howbig - howsmall;
+    int32_t diff = howbig - howsmall + 1;
     return rand() % diff + howsmall;
 }
 
@@ -146,17 +146,17 @@ static void lv_monkey_timer_cb(lv_timer_t * timer)
 
     switch(monkey->indev_drv.type) {
         case LV_INDEV_TYPE_POINTER:
-            data->point.x = (lv_coord_t)lv_monkey_random(0, LV_HOR_RES);
-            data->point.y = (lv_coord_t)lv_monkey_random(0, LV_VER_RES);
+            data->point.x = (lv_coord_t)lv_monkey_random(0, LV_HOR_RES - 1);
+            data->point.y = (lv_coord_t)lv_monkey_random(0, LV_VER_RES - 1);
             break;
         case LV_INDEV_TYPE_ENCODER:
-            data->enc_diff = (lv_coord_t)lv_monkey_random(monkey->config.input_range.min, monkey->config.input_range.max);
+            data->enc_diff = (int16_t)lv_monkey_random(monkey->config.input_range.min, monkey->config.input_range.max);
             break;
         case LV_INDEV_TYPE_BUTTON:
-            data->btn_id = (uint32_t)lv_monkey_random(0, monkey->config.input_range.max);
+            data->btn_id = (uint32_t)lv_monkey_random(monkey->config.input_range.min, monkey->config.input_range.max);
             break;
         case LV_INDEV_TYPE_KEYPAD: {
-                int32_t index = lv_monkey_random(0, sizeof(lv_key_map) / sizeof(lv_key_t));
+                int32_t index = lv_monkey_random(0, sizeof(lv_key_map) / sizeof(lv_key_map[0]) - 1);
                 data->key = lv_key_map[index];
                 break;
             }
