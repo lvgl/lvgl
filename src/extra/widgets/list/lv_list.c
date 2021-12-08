@@ -87,7 +87,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt)
         lv_img_set_src(img, icon);
     }
 #endif
-    
+
     if(txt) {
         lv_obj_t * label = lv_label_create(obj);
         lv_label_set_text(label, txt);
