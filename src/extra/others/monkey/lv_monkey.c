@@ -22,11 +22,14 @@
  *      TYPEDEFS
  **********************/
 typedef struct _lv_monkey {
+    lv_monkey_config_t config;
     lv_indev_drv_t indev_drv;
     lv_indev_data_t indev_data;
     lv_indev_t * indev;
     lv_timer_t * timer;
-    lv_monkey_config_t config;
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
 } lv_monkey_t;
 
 static const lv_key_t lv_key_map[] = {
@@ -87,6 +90,12 @@ lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
     return monkey;
 }
 
+lv_indev_t * lv_monkey_get_indev(lv_monkey_t * monkey)
+{
+    LV_ASSERT_NULL(monkey);
+    return monkey->indev;
+}
+
 void lv_monkey_set_enable(lv_monkey_t * monkey, bool en)
 {
     LV_ASSERT_NULL(monkey);
@@ -99,11 +108,21 @@ bool lv_monkey_get_enable(lv_monkey_t * monkey)
     return !monkey->timer->paused;
 }
 
-lv_indev_t * lv_monkey_get_indev(lv_monkey_t * monkey)
+#if LV_USE_USER_DATA
+
+void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
 {
     LV_ASSERT_NULL(monkey);
-    return monkey->indev;
+    monkey->user_data = user_data;
 }
+
+void * lv_monkey_get_user_data(lv_monkey_t * monkey)
+{
+    LV_ASSERT_NULL(monkey);
+    return monkey->user_data;
+}
+
+#endif
 
 void lv_monkey_del(lv_monkey_t * monkey)
 {
