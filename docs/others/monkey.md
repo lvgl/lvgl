@@ -8,6 +8,8 @@ A simple monkey test. Use random input to stress test the application.
 
 ## Usage
 
+Enable `LV_USE_MONKEY` in `lv_conf.h`.
+
 First set the `type`, check [input devices](/overview/indev) for the supported types, and then set the range of `period_range` and `input_range`. The monkey will output random operations at random times within this range.
 
 Note that `input_range` has different meanings in different `type`:
