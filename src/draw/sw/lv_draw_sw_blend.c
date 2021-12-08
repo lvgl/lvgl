@@ -125,8 +125,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, const lv_draw_sw_b
         }
     }
 
-
-
 //    #if LV_DRAW_COMPLEX
 //        else map_blended(draw, dsc);
 //    #endif

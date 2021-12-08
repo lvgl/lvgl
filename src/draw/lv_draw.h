@@ -58,13 +58,10 @@ typedef struct _lv_draw_t  {
     lv_res_t (*draw_img_core)(const lv_area_t * coords, const lv_area_t * clip_area, const void * src,
                               const lv_draw_img_dsc_t * draw_dsc);
 
-    void (*draw_letter)(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                        const lv_font_t * font_p, uint32_t letter,
-                        lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+    void (*draw_letter)(struct _lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter);
 
 
-    void (*draw_line)(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                      const lv_draw_line_dsc_t * dsc);
+    void (*draw_line)(struct _lv_draw_t * draw, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1, const lv_point_t * point2);
 
 
     void (*draw_polygon)(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,

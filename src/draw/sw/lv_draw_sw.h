@@ -51,10 +51,8 @@ void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  
 
 void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
 
-void lv_draw_sw_letter(const lv_point_t * pos, const lv_area_t * clip_area,
-                       const lv_font_t * font_p,
-                       uint32_t letter,
-                       lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+void lv_draw_sw_letter(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter);
+
 
 void lv_draw_sw_img(const lv_area_t * map_area, const lv_area_t * clip_area,
                     const uint8_t * map_p,
