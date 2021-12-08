@@ -80,8 +80,6 @@ void lv_draw_sdl_texture_cache_put(const void * key, size_t key_length, SDL_Text
 void lv_draw_sdl_texture_cache_put_advanced(const void * key, size_t key_length, SDL_Texture * texture, void * userdata,
                                             void userdata_free(void*), lv_draw_sdl_cache_flag_t flags);
 
-SDL_Texture * lv_draw_sdl_texture_temp_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height);
-
 lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void * src, int32_t frame_id, size_t * size);
 
 /**********************

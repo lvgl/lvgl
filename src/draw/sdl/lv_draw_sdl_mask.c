@@ -7,13 +7,16 @@
  *      INCLUDES
  *********************/
 
+
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_SDL
 
+#include "../../core/lv_refr.h"
 #include "../lv_draw_mask.h"
 #include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_utils.h"
+#include "lv_draw_sdl_priv.h"
 
 /*********************
  *      DEFINES
@@ -39,14 +42,55 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_sdl_mask_begin(const lv_area_t * a)
+bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords)
 {
-    return false;
+    if (!lv_draw_mask_is_any(draw_area)) return false;
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+
+    lv_draw_sdl_context_t *context = disp->driver->user_data;
+    lv_draw_sdl_context_internals_t *internals = context->internals;
+    LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
+    internals->mask = lv_sdl_gen_mask_texture(context->renderer, draw_area, NULL, 0);
+    lv_coord_t w = lv_area_get_width(draw_area), h = lv_area_get_height(draw_area);
+    lv_coord_t x = draw_area->x1, y = draw_area->y1;
+    /* Offset draw area to start with (0,0) of coords */
+    lv_area_move(draw_area, -x, -y);
+    lv_area_move(coords, -x, -y);
+    internals->composition = SDL_CreateTexture(context->renderer, SDL_PIXELFORMAT_ARGB8888,
+                                                    SDL_TEXTUREACCESS_TARGET, w, h);
+    SDL_SetRenderTarget(context->renderer, internals->composition);
+    SDL_SetRenderDrawColor(context->renderer, 255, 255, 255, 0);
+    SDL_RenderClear(context->renderer);
+    return true;
 }
 
-void lv_draw_sdl_mask_end(const lv_area_t * a)
+void lv_draw_sdl_mask_end(const lv_area_t * draw_area)
 {
+    lv_draw_sdl_context_t *context = lv_draw_sdl_get_context();
+    lv_draw_sdl_context_internals_t *internals = context->internals;
+    LV_ASSERT(internals->mask != NULL && internals->composition != NULL);
 
+#if SDL_VERSION_ATLEAST(2, 0, 6)
+    SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
+                                                    SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+                                                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+    SDL_SetTextureBlendMode(internals->mask, mode);
+#else
+    SDL_SetTextureBlendMode(internals->mask, SDL_BLENDMODE_BLEND);
+#endif
+
+    SDL_RenderCopy(context->renderer, internals->mask, NULL, NULL);
+
+    SDL_Rect dst_rect;
+    lv_area_to_sdl_rect(draw_area, &dst_rect);
+
+    SDL_SetRenderTarget(context->renderer, context->texture);
+    SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
+    SDL_RenderCopy(context->renderer, internals->composition, NULL, &dst_rect);
+
+    SDL_DestroyTexture(internals->mask);
+    SDL_DestroyTexture(internals->composition);
+    internals->mask = internals->composition = NULL;
 }
 
 SDL_Surface * lv_sdl_create_mask_surface(lv_opa_t * pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride)

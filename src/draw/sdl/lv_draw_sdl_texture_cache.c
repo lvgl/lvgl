@@ -128,24 +128,6 @@ void lv_draw_sdl_texture_cache_put_advanced(const void * key, size_t key_length,
     lv_lru_set(lru, key, key_length, value, width * height * SDL_BITSPERPIXEL(format) / 8);
 }
 
-SDL_Texture * lv_draw_sdl_texture_temp_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height)
-{
-    temp_texture_key_t key;
-    SDL_memset(&key, 0, sizeof(key));
-    key.magic = LV_GPU_CACHE_KEY_TEMP;
-    temp_texture_userdata_t * userdata = NULL;
-    SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(&key, sizeof(key), NULL, (void **) &userdata);
-    if(texture && userdata->width >= width && userdata->height >= height) {
-        return texture;
-    }
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, width, height);
-    userdata = SDL_malloc(sizeof(temp_texture_userdata_t));
-    userdata->width = width;
-    userdata->height = height;
-    lv_draw_sdl_texture_cache_put_advanced(&key, sizeof(key), texture, userdata, SDL_free, 0);
-    return texture;
-}
-
 lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void * src, int32_t frame_id, size_t * size)
 {
     lv_draw_sdl_cache_key_head_img_t header;

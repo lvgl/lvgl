@@ -31,9 +31,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_draw_sdl_context_internals_t {
+typedef struct lv_draw_sdl_context_internals_t {
     lv_lru_t * texture_cache;
-};
+    SDL_Texture * mask;
+    SDL_Texture * composition;
+} lv_draw_sdl_context_internals_t;
 
 /**********************
  * GLOBAL PROTOTYPES

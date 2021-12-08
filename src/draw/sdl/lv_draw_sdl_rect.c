@@ -112,26 +112,23 @@ void lv_draw_sdl_draw_rect(const lv_area_t *coords, const lv_area_t *clip, const
 
     lv_draw_sdl_context_t *ctx = lv_draw_sdl_get_context();
 
-    bool has_mask = lv_draw_sdl_mask_begin(&draw_area);
+    /* Coords will be translated so coords will start at (0,0) */
+    lv_area_t t_coords = *coords, t_area = draw_area;
+    bool has_mask = has_draw_content && lv_draw_sdl_mask_begin(&t_area, &t_coords);
 
     SDL_Rect clip_rect;
     lv_area_to_sdl_rect(clip, &clip_rect);
-    draw_shadow(ctx->renderer, coords, clip, dsc);
+    draw_shadow(ctx->renderer, &t_coords, &t_area, dsc);
     /* Shadows and outlines will also draw in extended area */
     if (has_draw_content) {
-        draw_bg_color(ctx, coords, &draw_area, dsc);
-        draw_bg_img(coords, clip, dsc);
-        draw_border(ctx, coords, &draw_area, dsc);
+        draw_bg_color(ctx, &t_coords, &t_area, dsc);
+        draw_bg_img(&t_coords, &t_area, dsc);
+        draw_border(ctx, &t_coords, &t_area, dsc);
     }
-    draw_outline(coords, clip, dsc);
+    draw_outline(&t_coords, &t_area, dsc);
 
     if (has_mask) {
         lv_draw_sdl_mask_end(&draw_area);
-    }
-
-    if (has_draw_content) {
-        SDL_Rect rect;
-        lv_area_to_sdl_rect(coords, &rect);
     }
 }
 
