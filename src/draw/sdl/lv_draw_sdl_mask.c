@@ -39,6 +39,15 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+bool lv_draw_sdl_mask_begin(const lv_area_t * a)
+{
+    return false;
+}
+
+void lv_draw_sdl_mask_end(const lv_area_t * a)
+{
+
+}
 
 SDL_Surface * lv_sdl_create_mask_surface(lv_opa_t * pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride)
 {
