@@ -43,21 +43,32 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t * clip) {
-    if (!lv_draw_mask_is_any(draw_area)) return false;
+bool lv_draw_sdl_mask_begin(const lv_area_t *coords_in, const lv_area_t *clip_in, const lv_area_t *extension,
+                            lv_area_t *coords_out, lv_area_t *clip_out, lv_area_t *apply_area) {
+    lv_area_t full_area, full_coords = *coords_in;
+    if (extension) {
+        full_coords.x1 -= extension->x1;
+        full_coords.x2 += extension->x2;
+        full_coords.y1 -= extension->y1;
+        full_coords.y2 += extension->y2;
+    }
+    if (!_lv_area_intersect(&full_area, &full_coords, clip_in)) return false;
+    if (!lv_draw_mask_is_any(&full_area)) return false;
 #if HAS_CUSTOM_BLEND_MODE
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
 
     lv_draw_sdl_context_t *context = disp->driver->user_data;
     lv_draw_sdl_context_internals_t *internals = context->internals;
     LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
-    internals->mask = lv_sdl_gen_mask_texture(context->renderer, draw_area, NULL, 0);
-    lv_coord_t w = lv_area_get_width(draw_area), h = lv_area_get_height(draw_area);
-    lv_coord_t x = draw_area->x1, y = draw_area->y1;
+    internals->mask = lv_sdl_gen_mask_texture(context->renderer, &full_area, NULL, 0);
+    *apply_area = full_area;
+    lv_coord_t w = lv_area_get_width(&full_area), h = lv_area_get_height(&full_area);
+    /* Don't need to worry about overflow */
+    lv_coord_t ofs_x = (lv_coord_t) -full_area.x1, ofs_y = (lv_coord_t) -full_area.y1;
     /* Offset draw area to start with (0,0) of coords */
-    lv_area_move(draw_area, -x, -y);
-    if (coords) lv_area_move(coords, -x, -y);
-    if (clip) lv_area_move(clip, -x, -y);
+    lv_area_move(&full_area, ofs_x, ofs_y);
+    lv_area_move(coords_out, ofs_x, ofs_y);
+    lv_area_move(clip_out, ofs_x, ofs_y);
     internals->composition = SDL_CreateTexture(context->renderer, SDL_PIXELFORMAT_ARGB8888,
                                                SDL_TEXTUREACCESS_TARGET, w, h);
     SDL_SetRenderTarget(context->renderer, internals->composition);
@@ -84,7 +95,7 @@ bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t
     return true;
 }
 
-void lv_draw_sdl_mask_end(const lv_area_t * draw_area)
+void lv_draw_sdl_mask_end(const lv_area_t *apply_area)
 {
 #if HAS_CUSTOM_BLEND_MODE
     lv_draw_sdl_context_t *context = lv_draw_sdl_get_context();
@@ -97,7 +108,7 @@ void lv_draw_sdl_mask_end(const lv_area_t * draw_area)
     SDL_RenderCopy(context->renderer, internals->mask, NULL, NULL);
 
     SDL_Rect dst_rect;
-    lv_area_to_sdl_rect(draw_area, &dst_rect);
+    lv_area_to_sdl_rect(apply_area, &dst_rect);
 
     SDL_SetRenderTarget(context->renderer, context->texture);
     SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);

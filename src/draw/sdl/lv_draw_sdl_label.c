@@ -84,7 +84,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
-    lv_area_t letter_area = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
+    const lv_area_t letter_area = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
     lv_area_t draw_area;
 
     /*If the letter is completely out of mask don't draw it*/
@@ -115,22 +115,27 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         return;
     }
 
-    const lv_area_t final_area = draw_area;
-    bool has_mask = lv_draw_sdl_mask_begin(&letter_area, &draw_area, NULL);
+    lv_point_t offset = {0, 0};
+    lv_area_t t_letter = letter_area, t_clip = *clip_area, apply_area;
+    bool has_mask = lv_draw_sdl_mask_begin(&letter_area, clip_area, NULL, &t_letter, &t_clip, &apply_area);
 
+    /*If the letter is completely out of mask don't draw it*/
+    if(!_lv_area_intersect(&draw_area, &t_letter, &t_clip)) {
+        return;
+    }
     SDL_Rect srcrect, dstrect;
     lv_area_to_sdl_rect(&draw_area, &dstrect);
-    srcrect.x = draw_area.x1 - letter_area.x1;
-    srcrect.y = draw_area.y1 - letter_area.y1;
-    srcrect.w = lv_area_get_width(&draw_area);
-    srcrect.h = lv_area_get_height(&draw_area);
+    srcrect.x = draw_area.x1 - t_letter.x1;
+    srcrect.y = draw_area.y1 - t_letter.y1;
+    srcrect.w = dstrect.w;
+    srcrect.h = dstrect.h;
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, opa);
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
     SDL_RenderCopy(renderer, texture, &srcrect, &dstrect);
 
     if (has_mask) {
-        lv_draw_sdl_mask_end(&final_area);
+        lv_draw_sdl_mask_end(&apply_area);
     }
 }
 

@@ -108,21 +108,35 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
  **********************/
 
 void lv_draw_sdl_draw_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
-    lv_area_t draw_area;
-    bool has_draw_content = _lv_area_intersect(&draw_area, coords, clip);
-
     lv_draw_sdl_context_t *ctx = lv_draw_sdl_get_context();
 
+    lv_area_t extension = {0, 0, 0, 0};
+    if (!SKIP_SHADOW(dsc)) {
+        lv_coord_t ext = (lv_coord_t) (dsc->shadow_spread - dsc->shadow_width / 2 + 1);
+        lv_area_t core_area;
+        extension.x1 = LV_MAX(extension.x1, -dsc->shadow_ofs_x + ext);
+        extension.x2 = LV_MAX(extension.x2, dsc->shadow_ofs_x + ext);
+        extension.y1 = LV_MAX(extension.y1, -dsc->shadow_ofs_y + ext);
+        extension.y2 = LV_MAX(extension.y2, dsc->shadow_ofs_y + ext);
+    }
+    if (!SKIP_OUTLINE(dsc)) {
+        lv_coord_t ext = (lv_coord_t) (dsc->outline_pad - 1 + dsc->outline_width);
+        extension.x1 = LV_MAX(extension.x1, ext);
+        extension.x2 = LV_MAX(extension.x2, ext);
+        extension.y1 = LV_MAX(extension.y1, ext);
+        extension.y2 = LV_MAX(extension.y2, ext);
+    }
     /* Coords will be translated so coords will start at (0,0) */
-    lv_area_t t_area = draw_area, t_coords = *coords, t_clip = *clip;
-    bool has_mask = has_draw_content && lv_draw_sdl_mask_begin(&t_area, &t_coords, &t_clip);
+    lv_area_t t_coords = *coords, t_clip = *clip, apply_area, t_area;
+    lv_point_t offset = {0, 0};
+    bool has_mask = lv_draw_sdl_mask_begin(coords, clip, &extension, &t_coords, &t_clip, &apply_area);
+    bool has_content = _lv_area_intersect(&t_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect;
     lv_area_to_sdl_rect(&t_clip, &clip_rect);
-    // TODO: shadow is clipped
     draw_shadow(ctx->renderer, &t_coords, &t_clip, dsc);
     /* Shadows and outlines will also draw in extended area */
-    if (has_draw_content) {
+    if (has_content) {
         draw_bg_color(ctx, &t_coords, &t_area, dsc);
         draw_bg_img(&t_coords, &t_area, dsc);
         draw_border(ctx, &t_coords, &t_area, dsc);
@@ -130,7 +144,7 @@ void lv_draw_sdl_draw_rect(const lv_area_t *coords, const lv_area_t *clip, const
     draw_outline(ctx, &t_coords, &t_clip, dsc);
 
     if (has_mask) {
-        lv_draw_sdl_mask_end(&draw_area);
+        lv_draw_sdl_mask_end(&apply_area);
     }
 }
 
@@ -384,8 +398,8 @@ static void draw_outline(lv_draw_sdl_context_t *ctx, const lv_area_t *coords, co
     lv_area_t area_inner;
     lv_area_copy(&area_inner, coords);
 
-    /*Extend the outline into the background area if it's overlapping the edge*/
-    lv_coord_t pad = (dsc->outline_pad == 0 ? (dsc->outline_pad - 1) : dsc->outline_pad);
+    /*Bring the outline closer to make sure there is no color bleeding with pad=0*/
+    lv_coord_t pad = dsc->outline_pad - 1;
     area_inner.x1 -= pad;
     area_inner.y1 -= pad;
     area_inner.x2 += pad;
