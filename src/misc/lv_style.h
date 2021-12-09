@@ -106,6 +106,18 @@ enum {
 typedef uint8_t lv_grad_dir_t;
 
 /**
+ * The dithering algorithm for the gradient
+ * Depends on LV_DITHER_GRADIENT
+ */
+enum {
+    LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/
+    LV_DITHER_ORDERED,  /**< Ordered dithering. Faster to compute and use less memory but lower quality*/
+    LV_DITHER_ERR_DIFF, /**< Error diffusion mode. Slower to compute and use more memory but give highest dither quality*/
+};
+
+typedef uint8_t lv_dither_mode_t;
+
+/**
  * A common type to handle all the property types in the same way.
  */
 typedef union {
@@ -154,13 +166,15 @@ typedef enum {
     LV_STYLE_BG_GRAD_DIR             = 35,
     LV_STYLE_BG_MAIN_STOP            = 36,
     LV_STYLE_BG_GRAD_STOP            = 37,
+    LV_STYLE_BG_DITHER_MODE          = 38,
 
-    LV_STYLE_BG_IMG_SRC              = 38 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_BG_IMG_OPA              = 39,
-    LV_STYLE_BG_IMG_RECOLOR          = 40,
-    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 40 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_IMG_RECOLOR_OPA      = 41,
-    LV_STYLE_BG_IMG_TILED            = 42,
+
+    LV_STYLE_BG_IMG_SRC              = 39 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_BG_IMG_OPA              = 40,
+    LV_STYLE_BG_IMG_RECOLOR          = 41,
+    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 41 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_BG_IMG_RECOLOR_OPA      = 42,
+    LV_STYLE_BG_IMG_TILED            = 43,
 
     /*Group 3*/
     LV_STYLE_BORDER_COLOR            = 48,

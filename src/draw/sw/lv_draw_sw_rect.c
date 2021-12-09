@@ -19,7 +19,6 @@
 #define SHADOW_ENHANCE          1
 #define SPLIT_LIMIT             50
 
-#define LV_DITHER_GRADIENT 1
 
 #if LV_COLOR_DEPTH < 32 && LV_DRAW_COMPLEX == 1 && LV_DITHER_GRADIENT == 1
     #define DITHER_GRADIENT 1
@@ -69,9 +68,20 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
 #if DITHER_GRADIENT
 LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s,
                                                                 lv_coord_t i);
-LV_ATTRIBUTE_FAST_MEM static void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * nextLine,
-                                            const lv_coord_t grad_size);
-#endif
+
+#if LV_DITHER_ERROR_DIFFUSION
+LV_ATTRIBUTE_FAST_MEM static void dither_fs_hor(const lv_color32_t * src, lv_color_t * out, scolor24_t * nextLine,
+                                                const lv_coord_t xs, const lv_coord_t y, const lv_coord_t w, const lv_coord_t grad_size);
+LV_ATTRIBUTE_FAST_MEM static void dither_fs_ver(const lv_color32_t * src, lv_color_t * out, scolor24_t * prev_err_line,
+                                                const lv_coord_t xs, const lv_coord_t y, const lv_coord_t w, const lv_coord_t grad_size);
+#endif /* LV_DITHER_ERROR_DIFFUSION */
+LV_ATTRIBUTE_FAST_MEM static void dither_ordered_hor(const lv_color32_t * src, lv_color_t * out, scolor24_t * notused,
+                                                     const lv_coord_t xs, const lv_coord_t y, const lv_coord_t w, const lv_coord_t grad_size);
+LV_ATTRIBUTE_FAST_MEM static void dither_ordered_ver(const lv_color32_t * src, lv_color_t * out, scolor24_t * notused,
+                                                     const lv_coord_t xs, const lv_coord_t y, const lv_coord_t w, const lv_coord_t grad_size);
+
+
+#endif /* DITHER_GRADIENT */
 #endif
 
 /**********************
@@ -118,16 +128,112 @@ void lv_draw_sw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_
  *   STATIC FUNCTIONS
  **********************/
 #if DITHER_GRADIENT
-LV_ATTRIBUTE_FAST_MEM static inline uint8_t clamp(int a)
+static int dither_none_cached = 0;
+LV_ATTRIBUTE_FAST_MEM static inline void dither_none(const lv_color32_t * src, lv_color_t * out, scolor24_t * notused,
+                                                     lv_coord_t x, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
 {
-    return (uint8_t)(a < 0 ? 0 : (a > 255 ? 255 : a));
+
+    LV_UNUSED(notused);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(grad_size);
+    if(dither_none_cached) return;
+    for(lv_coord_t i = 0; i < w; i++) {
+        out[i] = lv_color_hex(src[i].full);
+    }
+    dither_none_cached = 1;
+}
+
+LV_ATTRIBUTE_FAST_MEM static inline void dither_ordered_hor(const lv_color32_t * src, lv_color_t * out,
+                                                            scolor24_t * notused, lv_coord_t x, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
+{
+    LV_UNUSED(notused);
+    LV_UNUSED(x);
+    /* For vertical dithering, the error is spread on the next column (and not next line).
+       Since the renderer is scanline based, it's not obvious what could be used to perform the rendering efficiently.
+       The algorithm below is based on few assumptions:
+         1. An error diffusion algorithm (like Floyd Steinberg) here would be hard to implement since it means that a pixel on column n depends on the pixel on row n
+         2. Instead an ordered dithering algorithm shift the value a bit, but the influence only spread from the matrix size (used 4x4 here)
+         3. It means that a pixel i,j only depends on the value of a pixel i-3, j-3 to i,j and no other one.
+       Then we compute a complete row of ordered dither and store it in out. */
+
+    const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
+        0,  48, 12, 60,  3, 51, 15, 63,
+        32, 16, 44, 28, 35, 19, 47, 31,
+        8,  56,  4, 52, 11, 59,  7, 55,
+        40, 24, 36, 20, 43, 27, 39, 23,
+        2,  50, 14, 62,  1, 49, 13, 61,
+        34, 18, 46, 30, 33, 17, 45, 29,
+        10, 58,  6, 54,  9, 57,  5, 53,
+        42, 26, 38, 22, 41, 25, 37, 21
+    }; /* Shift by 6 to normalize */
+
+    /*The apply the algorithm for this patch*/
+    for(lv_coord_t j = 0; j < w; j++) {
+        int8_t factor = dither_ordered_threshold_matrix[(y & 7) * 8 + ((j) & 7)] - 32;
+        lv_color32_t tmp = src[LV_CLAMP(0, j - 4, grad_size)];
+        lv_color32_t t;
+        t.ch.red   = LV_CLAMP(0, tmp.ch.red + factor, 255);
+        t.ch.green = LV_CLAMP(0, tmp.ch.green + factor, 255);
+        t.ch.blue  = LV_CLAMP(0, tmp.ch.blue + factor, 255);
+
+        out[j] = lv_color_hex(t.full);
+    }
+}
+LV_ATTRIBUTE_FAST_MEM static inline void dither_ordered_ver(const lv_color32_t * src, lv_color_t * out,
+                                                            scolor24_t * notused, lv_coord_t x, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
+{
+    LV_UNUSED(notused);
+    /* For vertical dithering, the error is spread on the next column (and not next line).
+       Since the renderer is scanline based, it's not obvious what could be used to perform the rendering efficiently.
+       The algorithm below is based on few assumptions:
+         1. An error diffusion algorithm (like Floyd Steinberg) here would be hard to implement since it means that a pixel on column n depends on the pixel on row n
+         2. Instead an ordered dithering algorithm shift the value a bit, but the influence only spread from the matrix size (used 4x4 here)
+         3. It means that a pixel i,j only depends on the value of a pixel i-3, j-3 to i,j and no other one.
+       Then we compute a complete row of ordered dither and store it in out. */
+
+    const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
+        0, 48, 12, 60,  3, 51, 15, 63,
+        32, 16, 44, 28, 35, 19, 47, 31,
+        8, 56,  4, 52, 11, 59,  7, 55,
+        40, 24, 36, 20, 43, 27, 39, 23,
+        2, 50, 14, 62,  1, 49, 13, 61,
+        34, 18, 46, 30, 33, 17, 45, 29,
+        10, 58,  6, 54,  9, 57,  5, 53,
+        42, 26, 38, 22, 41, 25, 37, 21
+    }; /* Shift by 6 to normalize */
+
+    /*Need to compute the row at pos y*/
+    lv_coord_t random_map[8] = { 7, 4, 0, 5, 3, 1, 6, 2 }; /*Some random map to enhance the visual result*/
+    lv_coord_t i = random_map[y & 7];
+    /*Extract patch for working with, selected pseudo randomly*/
+    lv_color32_t tmp = src[LV_CLAMP(0, y + i - 4, grad_size)];
+
+    /*The apply the algorithm for this patch*/
+    for(lv_coord_t j = 0; j < 8; j++) {
+        int8_t factor = dither_ordered_threshold_matrix[i * 8 + ((j + x) & 7)] - 32;
+        lv_color32_t t;
+        t.ch.red   = LV_CLAMP(0, tmp.ch.red + factor, 255);
+        t.ch.green = LV_CLAMP(0, tmp.ch.green + factor, 255);
+        t.ch.blue  = LV_CLAMP(0, tmp.ch.blue + factor, 255);
+
+        out[j] = lv_color_hex(t.full);
+    }
+    /*Finally fill the line*/
+    for(lv_coord_t j = 8; j < w; j += 8) {
+        lv_memcpy(out + j, out, 8 * sizeof(*out));
+    }
 }
 
 
-
-LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_color_t * out, scolor24_t * next_line,
-                                                   const lv_coord_t grad_size)
+#if LV_DITHER_ERROR_DIFFUSION
+LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_hor(const lv_color32_t * src, lv_color_t * out,
+                                                       scolor24_t * next_line,
+                                                       lv_coord_t xs, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
 {
+    LV_UNUSED(xs);
+    LV_UNUSED(y);
+    LV_UNUSED(w);
     /* Implement Floyd Steinberg algorithm, see https://surma.dev/things/ditherpunk/
         Coefs are:   x 7
                    3 5 1
@@ -137,7 +243,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
     */
     int coef[4] = {0, 0, 0, 0};
 #define FS_COMPUTE_ERROR(e) { coef[0] = (e<<3) - e; coef[1] = (e<<2) - e; coef[2] = (e<<2) + e; coef[3] = e; }
-#define FS_COMPONENTS(A, OP, B, C) A.ch.red = clamp(A.ch.red OP B.r OP C.r); A.ch.green = clamp(A.ch.green OP B.g OP C.g); A.ch.blue = clamp(A.ch.blue OP B.b OP C.b);
+#define FS_COMPONENTS(A, OP, B, C) A.ch.red = LV_CLAMP(0, A.ch.red OP B.r OP C.r, 255); A.ch.green = LV_CLAMP(0, A.ch.green OP B.g OP C.g, 255); A.ch.blue = LV_CLAMP(0, A.ch.blue OP B.b OP C.b, 255);
 #define FS_QUANT_ERROR(e, t, q) { lv_color32_t u; u.full = lv_color_to32(q); e.r = (int8_t)(t.ch.red - u.ch.red); e.g = (int8_t)(t.ch.green - u.ch.green); e.b = (int8_t)(t.ch.blue - u.ch.blue); }
     scolor24_t next_px_err, next_l = next_line[1], error;
     /*First last pixel are not dithered */
@@ -176,8 +282,8 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs(const lv_color32_t * src, lv_
     out[grad_size - 1] = lv_color_hex(src[grad_size - 1].full);
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src, lv_color_t * out,
-                                                        scolor24_t * prev_err_line, lv_coord_t xs, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
+LV_ATTRIBUTE_FAST_MEM static void dither_fs_ver(const lv_color32_t * src, lv_color_t * out,
+                                                scolor24_t * prev_err_line, lv_coord_t xs, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
 {
     /* Try to implement error diffusion on a vertical gradient and an horizontal map using those tricks:
         Since the given hi-resolution gradient (in src) is vertical, the Floyd Steinberg algorithm pass need to be rotated,
@@ -202,11 +308,9 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
     LV_UNUSED(grad_size);
 #define FS_APPLY(d, s, c) d.r = (int8_t)(s.r * c) >> 4; d.g = (int8_t)(s.g * c) >> 4; d.b = (int8_t)(s.b * c) >> 4;
 #define FS_COMPONENTS3(A, OP, B, b, C, c, D, d) \
-    A.ch.red = clamp(A.ch.red OP ((B.r * b OP C.r * c OP D.r * d) >> 4)); \
-    A.ch.green = clamp(A.ch.green OP ((B.r * b OP C.r * c OP D.r * d) >> 4)); \
-    A.ch.blue = clamp(A.ch.blue OP ((B.r * b OP C.r * c OP D.r * d) >> 4));
-
-
+    A.ch.red   = LV_CLAMP(0, A.ch.red   OP ((B.r * b OP C.r * c OP D.r * d) >> 4), 255); \
+    A.ch.green = LV_CLAMP(0, A.ch.green OP ((B.r * b OP C.r * c OP D.r * d) >> 4), 255); \
+    A.ch.blue  = LV_CLAMP(0, A.ch.blue  OP ((B.r * b OP C.r * c OP D.r * d) >> 4), 255);
 
     scolor24_t next_px_err, prev_l = prev_err_line[0];
     /*Compute the error term for the current pixel (first pixel is never dithered)*/
@@ -236,8 +340,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_fs_vert(const lv_color32_t * src
         out[x] = q;
     }
 }
-
-
+#endif
 #endif
 
 #if LV_DRAW_COMPLEX
@@ -259,7 +362,6 @@ static void blend_map_line(const lv_area_t * clip_area, const lv_area_t * blend_
     LV_UNUSED(y);
     lv_draw_blend_map(clip_area, blend_area, grad_map + x, mask_buf, mask_res, opa, dsc->blend_mode);
 }
-#if !DITHER_GRADIENT
 static void blend_fill_vert_line(const lv_area_t * clip_area, const lv_area_t * blend_area, lv_color_t * grad_map,
                                  lv_coord_t x, lv_coord_t c, lv_opa_t * mask_buf, lv_draw_mask_res_t mask_res, lv_opa_t opa,
                                  const lv_draw_rect_dsc_t * dsc)
@@ -267,6 +369,9 @@ static void blend_fill_vert_line(const lv_area_t * clip_area, const lv_area_t * 
     LV_UNUSED(x);
     lv_draw_blend_fill(clip_area, blend_area, grad_map[c], mask_buf, mask_res, opa, dsc->blend_mode);
 }
+#if DITHER_GRADIENT
+typedef void (*dither_func_t)(const lv_color32_t * src, lv_color_t * out, scolor24_t * prev_err_line, lv_coord_t xs,
+                              lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size);
 #endif
 #endif
 
@@ -342,6 +447,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
     lv_coord_t grad_size = grad_dir == LV_GRAD_DIR_HOR ? coords_w : coords_h;
     lv_color32_t * hires_grad_map = NULL;
     scolor24_t * error_acc = NULL;
+    lv_dither_mode_t dither_mode = dsc->bg_grad_dither;
     if(grad_dir != LV_GRAD_DIR_NONE) {
         /*Precompute the gradient perfect color in 24bits*/
         hires_grad_map = lv_mem_buf_get(grad_size * sizeof(lv_color32_t));
@@ -351,9 +457,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         /*Used to store current line gradient after dithering*/
         grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
         if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) off_x = draw_area.x1 - coords_bg.x1;
+#if LV_DITHER_ERROR_DIFFUSION
         /*Used to store error to apply on the next line for dithering*/
         error_acc = lv_mem_buf_get(coords_w * sizeof(scolor24_t));
         lv_memset_00(error_acc, coords_w * sizeof(scolor24_t));
+#endif
     }
 #endif
     int32_t h;
@@ -370,11 +478,23 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
         blend_func = &blend_map_line;
     else if(grad_dir == LV_GRAD_DIR_VER) {
 #if DITHER_GRADIENT
-        blend_func = &blend_map_line;
+        blend_func = dither_mode != LV_DITHER_NONE ? &blend_map_line : &blend_fill_vert_line;
 #else
         blend_func = &blend_fill_vert_line;
 #endif
     }
+
+#if DITHER_GRADIENT
+    dither_func_t dither_func = NULL;
+    if(dither_mode == LV_DITHER_NONE) {
+        dither_none_cached = 0; /*Need to be computed at least once per draw call*/
+        dither_func = &dither_none;
+    }
+    else if(dither_mode == LV_DITHER_ORDERED)
+        dither_func = grad_dir == LV_GRAD_DIR_HOR ? &dither_ordered_hor : &dither_ordered_ver;
+    else if(dither_mode == LV_DITHER_ERR_DIFF)
+        dither_func = grad_dir == LV_GRAD_DIR_HOR ? &dither_fs_hor : &dither_fs_ver;
+#endif
 
     /*There is another mask too. Draw line by line. */
     if(mask_any) {
@@ -389,10 +509,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
 #if DITHER_GRADIENT
-            if(grad_dir == LV_GRAD_DIR_HOR)
-                dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, error_acc, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
+            dither_func(hires_grad_map, grad_map, error_acc, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, h - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
         }
@@ -419,10 +536,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             blend_area.y2 = top_y;
 
 #if DITHER_GRADIENT
-            if(grad_dir == LV_GRAD_DIR_HOR)
-                dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, error_acc, blend_area.x1, top_y - coords_bg.y1, coords_w, grad_size);
+            dither_func(hires_grad_map, grad_map, error_acc, blend_area.x1, top_y - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, top_y - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
         }
@@ -432,10 +546,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             blend_area.y2 = bottom_y;
 
 #if DITHER_GRADIENT
-            if(grad_dir == LV_GRAD_DIR_HOR)
-                dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, error_acc, blend_area.x1, bottom_y - coords_bg.y1, coords_w, grad_size);
+            dither_func(hires_grad_map, grad_map, error_acc, blend_area.x1, bottom_y - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, bottom_y - coords_bg.y1, mask_buf, mask_res, LV_OPA_COVER, dsc);
         }
@@ -464,10 +575,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             blend_area.y2 = h;
 
 #if DITHER_GRADIENT
-            if(grad_dir == LV_GRAD_DIR_HOR)
-                dither_fs(hires_grad_map, grad_map, error_acc, grad_size);
-            else if(grad_dir == LV_GRAD_DIR_VER)
-                dither_fs_vert(hires_grad_map, grad_map, error_acc, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
+            dither_func(hires_grad_map, grad_map, error_acc, blend_area.x1, h - coords_bg.y1, coords_w, grad_size);
 #endif
             blend_func(clip_area, &blend_area, grad_map, off_x, h - coords_bg.y1, mask_buf, mask_res, opa, dsc);
         }
@@ -477,7 +585,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 bg_clean_up:
 #if DITHER_GRADIENT
     if(hires_grad_map) lv_mem_buf_release(hires_grad_map);
+#if LV_DITHER_ERROR_DIFFUSION
     if(error_acc) lv_mem_buf_release(error_acc);
+#endif
 #endif
     if(grad_map) lv_mem_buf_release(grad_map);
     if(mask_buf) lv_mem_buf_release(mask_buf);
@@ -600,18 +710,6 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
     return lv_color_mix(dsc->bg_grad_color, dsc->bg_color, mix);
 }
 
-/*Simple mathematic trick to avoid using a divide or multiplier */
-LV_ATTRIBUTE_FAST_MEM static inline uint8_t divBy255(uint16_t a)
-{
-    /* Mathematical trick here:
-        let: (2^n - 1) = (a - b), and since (a-b)(a+b) = a^2 - b^2, then
-             x / (2^n - 1) = x * (2^n + 1) / [(2^n + 1)*(2^n - 1)] = (x*2^n + x) / (2^(2n) - 1) ~= (x<<n + x) >> (2*n)
-
-        Since 2^(2n) - 1 ~= 2^2n, we commit a smaller error than if we divided by shifting right initially by n.
-        So, for example, for x in [0-65536] range, and dividing by 255, this approximation gives no error */
-    uint32_t num = ((uint32_t)a << 8) + a;
-    return (uint8_t)(num >> 16);
-}
 
 LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s,
                                                                 lv_coord_t i)
@@ -630,9 +728,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t hires_grad_get(const lv_draw_re
     i -= min;
     lv_opa_t mix = (i * 255) / d;
     lv_opa_t imix = 255 - mix;
-    r.ch.red   = divBy255(two.ch.red * mix   + one.ch.red * imix);
-    r.ch.green = divBy255(two.ch.green * mix + one.ch.green * imix);
-    r.ch.blue  = divBy255(two.ch.blue * mix  + one.ch.blue * imix);
+    r.ch.red   = lv_udiv_255(two.ch.red * mix   + one.ch.red * imix);
+    r.ch.green = lv_udiv_255(two.ch.green * mix + one.ch.green * imix);
+    r.ch.blue  = lv_udiv_255(two.ch.blue * mix  + one.ch.blue * imix);
     return r;
 }
 
@@ -685,6 +783,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     int32_t r_sh = dsc->radius;
     short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
     if(r_sh > short_side >> 1) r_sh = short_side >> 1;
+
 
     /*Get how many pixels are affected by the blur on the corners*/
     int32_t corner_size = dsc->shadow_width  + r_sh;

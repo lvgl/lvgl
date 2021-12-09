@@ -51,6 +51,23 @@ static inline LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_cos(int16_t angle)
     return lv_trigo_sin(angle + 90);
 }
 
+/**
+ * Compute the division by 255 without multiplication or divide
+ * @param x The number to divide by 255. Limited to 0-65535, use LV_UDIV255 if the numerator is bigger.
+ * @return x/255 floor rounded.
+ */
+static inline LV_ATTRIBUTE_FAST_MEM uint8_t lv_udiv_255(uint16_t x)
+{
+    /* Mathematical trick here:
+        Since (2^n - 1) = (a - b), and since (a-b)(a+b) = a^2 - b^2, then
+             x / (2^n - 1) = x * (2^n + 1) / [(2^n + 1)*(2^n - 1)] = (x*2^n + x) / (2^(2n) - 1) ~= (x<<n + x) >> (2*n)
+
+        Since 2^(2n) - 1 ~= 2^2n, we commit a smaller error than if we divided by shifting right initially by n.
+        So, for example, for x in [0-65536] range, and dividing by 255, this approximation gives no error */
+    uint32_t num = ((uint32_t)x << 8) + x;
+    return (uint8_t)(num >> 16);
+}
+
 //! @endcond
 
 /**

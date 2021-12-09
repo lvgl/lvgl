@@ -39,6 +39,7 @@ typedef struct {
     uint8_t bg_grad_color_stop;
     lv_opa_t bg_opa;
     lv_grad_dir_t bg_grad_dir : 3;
+    lv_dither_mode_t bg_grad_dither: 3;
 
     /*Background img*/
     const void * bg_img_src;

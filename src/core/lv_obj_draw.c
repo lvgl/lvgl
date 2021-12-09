@@ -64,6 +64,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
                 draw_dsc->bg_main_color_stop =  lv_obj_get_style_bg_main_stop(obj, part);
                 draw_dsc->bg_grad_color_stop =  lv_obj_get_style_bg_grad_stop(obj, part);
             }
+            draw_dsc->bg_grad_dither = lv_obj_get_style_bg_dither_mode(obj, part);
         }
     }
 
