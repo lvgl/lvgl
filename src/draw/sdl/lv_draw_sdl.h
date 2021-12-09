@@ -26,6 +26,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+#define LV_DRAW_SDL_TEXTURE_FORMAT SDL_PIXELFORMAT_ARGB8888
+#else
+#define LV_DRAW_SDL_TEXTURE_FORMAT SDL_PIXELFORMAT_RGBA8888
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

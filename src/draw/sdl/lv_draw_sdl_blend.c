@@ -53,30 +53,34 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
     lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
-    /*Get clipped fill area which is the real draw area.
-     *It is always the same or inside `fill_area`*/
-    lv_area_t draw_area = *fill_area;
-    //    if(!_lv_area_intersect(&draw_area, clip_area, fill_area)) return;
-
-    SDL_Rect draw_area_rect;
-    lv_area_to_sdl_rect(&draw_area, &draw_area_rect);
+    SDL_Rect fill_rect;
+    lv_area_to_sdl_rect(fill_area, &fill_rect);
 
     if(mask) {
-        SDL_Surface * mask_surface = lv_sdl_create_opa_surface(mask, lv_area_get_width(&draw_area),
-                                                               lv_area_get_height(&draw_area),
-                                                               lv_area_get_width(&draw_area));
-        SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, mask_surface);
+        SDL_Texture *texture = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK,
+                                                           lv_area_get_height(fill_area),
+                                                           lv_area_get_width(fill_area));
+        SDL_Surface * mask_surface = lv_sdl_create_opa_surface(mask, lv_area_get_width(fill_area),
+                                                               lv_area_get_height(fill_area),
+                                                               lv_area_get_width(fill_area));
+        SDL_Rect rect = {0, 0, mask_surface->w, mask_surface->h};
+        SDL_Surface *tex_surface = NULL;
+        SDL_LockTextureToSurface(texture, &rect, &tex_surface);
+        SDL_assert(tex_surface);
+        SDL_SetSurfaceBlendMode(mask_surface, SDL_BLENDMODE_NONE);
+        SDL_BlitSurface(mask_surface, NULL, tex_surface, NULL);
+        SDL_UnlockTexture(texture);
+
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(texture, opa);
         SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
-        SDL_RenderCopy(renderer, texture, NULL, &draw_area_rect);
-        SDL_DestroyTexture(texture);
+        SDL_RenderCopy(renderer, texture, &rect, &fill_rect);
         SDL_FreeSurface(mask_surface);
     }
     else {
         SDL_SetRenderDrawColor(renderer, color.ch.red, color.ch.green, color.ch.blue, opa);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_RenderFillRect(renderer, &draw_area_rect);
+        SDL_RenderFillRect(renderer, &fill_rect);
     }
 }
 
@@ -85,6 +89,7 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
                                 lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     LV_UNUSED(dest_buf);
+    LV_UNUSED(dest_stride);
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
 
@@ -103,7 +108,7 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
                                                      lv_area_get_width(src_area) * LV_COLOR_DEPTH / 8,
                                                      rmask, gmask, bmask, amask);
     if(mask) {
-        SDL_Texture * masked = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        SDL_Texture * masked = SDL_CreateTexture(renderer, LV_DRAW_SDL_TEXTURE_FORMAT, SDL_TEXTUREACCESS_TARGET,
                                                  lv_area_get_width(src_area), lv_area_get_height(src_area));
         SDL_Texture * mask_texture = lv_sdl_create_opa_texture(renderer, mask, lv_area_get_width(src_area),
                                                                lv_area_get_height(src_area),
