@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-
+#define HAS_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 /**********************
  *      TYPEDEFS
  **********************/
@@ -42,9 +42,10 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords)
+bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t * clip)
 {
     if (!lv_draw_mask_is_any(draw_area)) return false;
+#if HAS_CUSTOM_BLEND_MODE
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
 
     lv_draw_sdl_context_t *context = disp->driver->user_data;
@@ -55,30 +56,28 @@ bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords)
     lv_coord_t x = draw_area->x1, y = draw_area->y1;
     /* Offset draw area to start with (0,0) of coords */
     lv_area_move(draw_area, -x, -y);
-    lv_area_move(coords, -x, -y);
+    if (coords) lv_area_move(coords, -x, -y);
+    if (clip) lv_area_move(clip, -x, -y);
     internals->composition = SDL_CreateTexture(context->renderer, SDL_PIXELFORMAT_ARGB8888,
                                                     SDL_TEXTUREACCESS_TARGET, w, h);
     SDL_SetRenderTarget(context->renderer, internals->composition);
     SDL_SetRenderDrawColor(context->renderer, 255, 255, 255, 0);
     SDL_RenderClear(context->renderer);
+#else
+#endif
     return true;
 }
 
 void lv_draw_sdl_mask_end(const lv_area_t * draw_area)
 {
+#if HAS_CUSTOM_BLEND_MODE
     lv_draw_sdl_context_t *context = lv_draw_sdl_get_context();
     lv_draw_sdl_context_internals_t *internals = context->internals;
     LV_ASSERT(internals->mask != NULL && internals->composition != NULL);
-
-#if SDL_VERSION_ATLEAST(2, 0, 6)
     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
                                                     SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
                                                     SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
     SDL_SetTextureBlendMode(internals->mask, mode);
-#else
-    SDL_SetTextureBlendMode(internals->mask, SDL_BLENDMODE_BLEND);
-#endif
-
     SDL_RenderCopy(context->renderer, internals->mask, NULL, NULL);
 
     SDL_Rect dst_rect;
@@ -91,6 +90,7 @@ void lv_draw_sdl_mask_end(const lv_area_t * draw_area)
     SDL_DestroyTexture(internals->mask);
     SDL_DestroyTexture(internals->composition);
     internals->mask = internals->composition = NULL;
+#endif
 }
 
 SDL_Surface * lv_sdl_create_mask_surface(lv_opa_t * pixels, lv_coord_t width, lv_coord_t height, lv_coord_t stride)

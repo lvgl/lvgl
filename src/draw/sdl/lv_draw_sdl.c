@@ -43,7 +43,7 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+static void lv_draw_sdl_noop(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -97,6 +97,9 @@ void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t *context)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static void lv_draw_sdl_noop(void)
+{
 
+}
 
 #endif /*LV_USE_DRAW_SDL*/

@@ -46,6 +46,7 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
                                  lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     LV_UNUSED(dest_buf);
+    LV_UNUSED(dest_stride);
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
 

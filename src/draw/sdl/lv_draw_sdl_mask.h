@@ -33,7 +33,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords);
+bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t * clip);
 
 void lv_draw_sdl_mask_end(const lv_area_t * draw_area);
 

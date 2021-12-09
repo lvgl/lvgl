@@ -116,7 +116,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
     }
 
     const lv_area_t final_area = draw_area;
-    bool has_mask = lv_draw_sdl_mask_begin(&letter_area, &draw_area);
+    bool has_mask = lv_draw_sdl_mask_begin(&letter_area, &draw_area, NULL);
 
     SDL_Rect srcrect, dstrect;
     lv_area_to_sdl_rect(&draw_area, &dstrect);
