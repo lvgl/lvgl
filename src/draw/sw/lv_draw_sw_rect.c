@@ -144,6 +144,18 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_none(const lv_color32_t * src, l
     dither_none_cached = 1;
 }
 
+static const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
+    0,  48, 12, 60,  3, 51, 15, 63,
+    32, 16, 44, 28, 35, 19, 47, 31,
+    8,  56,  4, 52, 11, 59,  7, 55,
+    40, 24, 36, 20, 43, 27, 39, 23,
+    2,  50, 14, 62,  1, 49, 13, 61,
+    34, 18, 46, 30, 33, 17, 45, 29,
+    10, 58,  6, 54,  9, 57,  5, 53,
+    42, 26, 38, 22, 41, 25, 37, 21
+}; /* Shift by 6 to normalize */
+
+
 LV_ATTRIBUTE_FAST_MEM static inline void dither_ordered_hor(const lv_color32_t * src, lv_color_t * out,
                                                             scolor24_t * notused, lv_coord_t x, lv_coord_t y, lv_coord_t w, const lv_coord_t grad_size)
 {
@@ -156,17 +168,6 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_ordered_hor(const lv_color32_t *
          2. Instead an ordered dithering algorithm shift the value a bit, but the influence only spread from the matrix size (used 4x4 here)
          3. It means that a pixel i,j only depends on the value of a pixel i-3, j-3 to i,j and no other one.
        Then we compute a complete row of ordered dither and store it in out. */
-
-    const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
-        0,  48, 12, 60,  3, 51, 15, 63,
-        32, 16, 44, 28, 35, 19, 47, 31,
-        8,  56,  4, 52, 11, 59,  7, 55,
-        40, 24, 36, 20, 43, 27, 39, 23,
-        2,  50, 14, 62,  1, 49, 13, 61,
-        34, 18, 46, 30, 33, 17, 45, 29,
-        10, 58,  6, 54,  9, 57,  5, 53,
-        42, 26, 38, 22, 41, 25, 37, 21
-    }; /* Shift by 6 to normalize */
 
     /*The apply the algorithm for this patch*/
     for(lv_coord_t j = 0; j < w; j++) {
@@ -192,26 +193,12 @@ LV_ATTRIBUTE_FAST_MEM static inline void dither_ordered_ver(const lv_color32_t *
          3. It means that a pixel i,j only depends on the value of a pixel i-3, j-3 to i,j and no other one.
        Then we compute a complete row of ordered dither and store it in out. */
 
-    const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
-        0, 48, 12, 60,  3, 51, 15, 63,
-        32, 16, 44, 28, 35, 19, 47, 31,
-        8, 56,  4, 52, 11, 59,  7, 55,
-        40, 24, 36, 20, 43, 27, 39, 23,
-        2, 50, 14, 62,  1, 49, 13, 61,
-        34, 18, 46, 30, 33, 17, 45, 29,
-        10, 58,  6, 54,  9, 57,  5, 53,
-        42, 26, 38, 22, 41, 25, 37, 21
-    }; /* Shift by 6 to normalize */
-
-    /*Need to compute the row at pos y*/
-    lv_coord_t random_map[8] = { 7, 4, 0, 5, 3, 1, 6, 2 }; /*Some random map to enhance the visual result*/
-    lv_coord_t i = random_map[y & 7];
     /*Extract patch for working with, selected pseudo randomly*/
-    lv_color32_t tmp = src[LV_CLAMP(0, y + i - 4, grad_size)];
+    lv_color32_t tmp = src[LV_CLAMP(0, y - 4, grad_size)];
 
     /*The apply the algorithm for this patch*/
     for(lv_coord_t j = 0; j < 8; j++) {
-        int8_t factor = dither_ordered_threshold_matrix[i * 8 + ((j + x) & 7)] - 32;
+        int8_t factor = dither_ordered_threshold_matrix[(y & 7) * 8 + ((j + x) & 7)] - 32;
         lv_color32_t t;
         t.ch.red   = LV_CLAMP(0, tmp.ch.red + factor, 255);
         t.ch.green = LV_CLAMP(0, tmp.ch.green + factor, 255);
