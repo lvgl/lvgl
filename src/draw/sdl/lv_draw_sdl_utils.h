@@ -48,6 +48,11 @@ SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
 
 SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp);
 
+SDL_Surface * lv_sdl_create_opa_surface(lv_opa_t * opa, lv_coord_t width, lv_coord_t height, lv_coord_t stride);
+
+SDL_Texture * lv_sdl_create_opa_texture(SDL_Renderer * renderer, lv_opa_t * pixels, lv_coord_t width,
+                                        lv_coord_t height, lv_coord_t stride);
+
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
 
 lv_draw_sdl_context_t * lv_draw_sdl_get_context();

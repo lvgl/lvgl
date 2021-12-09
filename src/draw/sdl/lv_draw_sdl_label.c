@@ -105,7 +105,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         const uint8_t * bmp = lv_font_get_glyph_bitmap(font_p, letter);
         uint8_t * buf = lv_mem_alloc(g.box_w * g.box_h);
         lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
-        SDL_Surface * mask = lv_sdl_create_mask_surface(buf, g.box_w, g.box_h, g.box_w);
+        SDL_Surface * mask = lv_sdl_create_opa_surface(buf, g.box_w, g.box_h, g.box_w);
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
         lv_mem_free(buf);

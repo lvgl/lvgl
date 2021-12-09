@@ -181,7 +181,7 @@ static void draw_bg_color(lv_draw_sdl_context_t *ctx, const lv_area_t *coords, c
         lv_draw_mask_radius_param_t mask_rout_param;
         lv_draw_mask_radius_init(&mask_rout_param, coords, radius, false);
         int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        texture = lv_sdl_gen_mask_texture(ctx->renderer, &coords_frag, &mask_id, 1);
+        texture = lv_draw_sdl_mask_dump_texture(ctx->renderer, &coords_frag, &mask_id, 1);
         lv_draw_mask_remove_id(mask_id);
         SDL_assert(texture);
         lv_draw_sdl_texture_cache_put(&key, sizeof(key), texture);
@@ -317,10 +317,10 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
         lv_draw_mask_radius_param_t mask_rout_param;
         lv_draw_mask_radius_init(&mask_rout_param, &core_area, radius, false);
         int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        lv_opa_t *mask_buf = lv_draw_mask_dump(&blur_frag, &mask_id, 1);
+        lv_opa_t *mask_buf = lv_draw_sdl_mask_dump_opa(&blur_frag, &mask_id, 1);
         lv_stack_blur_grayscale(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
-        texture = lv_sdl_create_mask_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
-                                             lv_area_get_width(&blur_frag));
+        texture = lv_sdl_create_opa_texture(renderer, mask_buf, lv_area_get_width(&blur_frag),
+                                            lv_area_get_height(&blur_frag), lv_area_get_width(&blur_frag));
         lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_id);
         SDL_assert(texture);
@@ -468,7 +468,7 @@ static void draw_border_generic(lv_draw_sdl_context_t *ctx, const lv_area_t *out
         lv_area_set_width(&frag_area, frag_size);
         lv_area_set_height(&frag_area, frag_size);
 
-        texture = lv_sdl_gen_mask_texture(renderer, &frag_area, mask_ids, 2);
+        texture = lv_draw_sdl_mask_dump_texture(renderer, &frag_area, mask_ids, 2);
 
         lv_draw_mask_remove_id(mask_ids[1]);
         lv_draw_mask_remove_id(mask_ids[0]);

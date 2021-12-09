@@ -62,9 +62,9 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
     lv_area_to_sdl_rect(&draw_area, &draw_area_rect);
 
     if(mask) {
-        SDL_Surface * mask_surface = lv_sdl_create_mask_surface(mask, lv_area_get_width(&draw_area),
-                                                                lv_area_get_height(&draw_area),
-                                                                lv_area_get_width(&draw_area));
+        SDL_Surface * mask_surface = lv_sdl_create_opa_surface(mask, lv_area_get_width(&draw_area),
+                                                               lv_area_get_height(&draw_area),
+                                                               lv_area_get_width(&draw_area));
         SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, mask_surface);
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(texture, opa);
@@ -105,9 +105,9 @@ void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, c
     if(mask) {
         SDL_Texture * masked = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                  lv_area_get_width(src_area), lv_area_get_height(src_area));
-        SDL_Texture * mask_texture = lv_sdl_create_mask_texture(renderer, mask, lv_area_get_width(src_area),
-                                                                lv_area_get_height(src_area),
-                                                                lv_area_get_width(src_area));
+        SDL_Texture * mask_texture = lv_sdl_create_opa_texture(renderer, mask, lv_area_get_width(src_area),
+                                                               lv_area_get_height(src_area),
+                                                               lv_area_get_width(src_area));
         SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_SetRenderTarget(renderer, masked);
 
