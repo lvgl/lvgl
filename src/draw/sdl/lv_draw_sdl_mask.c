@@ -18,18 +18,32 @@
 #include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_priv.h"
+#include "lv_draw_sdl_texture_cache.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define HAS_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+
+#define KEY_ID_MASK 1
+#define KEY_ID_COMPOSITE 2
+
 /**********************
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    lv_sdl_cache_key_magic_t magic;
+    uint32_t id;
+} lv_mask_key_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static lv_mask_key_t mask_key_create(uint32_t id);
+
+static lv_coord_t next_pow_of_2(lv_coord_t num);
 
 /**********************
  *  STATIC VARIABLES
@@ -60,17 +74,30 @@ bool lv_draw_sdl_mask_begin(const lv_area_t *coords_in, const lv_area_t *clip_in
     lv_draw_sdl_context_t *context = disp->driver->user_data;
     lv_draw_sdl_context_internals_t *internals = context->internals;
     LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
-    internals->mask = lv_sdl_gen_mask_texture(context->renderer, &full_area, NULL, 0);
-    *apply_area = full_area;
+    lv_mask_key_t mask_key = mask_key_create(KEY_ID_MASK), composite_key = mask_key_create(KEY_ID_COMPOSITE);
     lv_coord_t w = lv_area_get_width(&full_area), h = lv_area_get_height(&full_area);
+    internals->mask = lv_sdl_gen_mask_texture(context->renderer, &full_area, NULL, 0);
+
+    lv_point_t *compo_size = NULL;
+    internals->composition = lv_draw_sdl_texture_cache_get_with_userdata(&composite_key, sizeof(composite_key),
+                                                                         NULL, (void **) &compo_size);
+    if (!internals->composition || compo_size->x < w || compo_size->y < h) {
+        lv_coord_t size = next_pow_of_2(LV_MAX(w, h));
+        internals->composition = SDL_CreateTexture(context->renderer, SDL_PIXELFORMAT_ARGB8888,
+                                                   SDL_TEXTUREACCESS_TARGET, size, size);
+        compo_size = lv_mem_alloc(sizeof(lv_point_t));
+        compo_size->x = compo_size->y = size;
+        lv_draw_sdl_texture_cache_put_advanced(&composite_key, sizeof(composite_key), internals->composition,
+                                               compo_size, lv_mem_free, 0);
+    }
+
+    *apply_area = full_area;
     /* Don't need to worry about overflow */
     lv_coord_t ofs_x = (lv_coord_t) -full_area.x1, ofs_y = (lv_coord_t) -full_area.y1;
     /* Offset draw area to start with (0,0) of coords */
     lv_area_move(&full_area, ofs_x, ofs_y);
     lv_area_move(coords_out, ofs_x, ofs_y);
     lv_area_move(clip_out, ofs_x, ofs_y);
-    internals->composition = SDL_CreateTexture(context->renderer, SDL_PIXELFORMAT_ARGB8888,
-                                               SDL_TEXTUREACCESS_TARGET, w, h);
     SDL_SetRenderTarget(context->renderer, internals->composition);
     SDL_SetRenderDrawColor(context->renderer, 255, 255, 255, 0);
     SDL_RenderClear(context->renderer);
@@ -105,17 +132,16 @@ void lv_draw_sdl_mask_end(const lv_area_t *apply_area)
                                                     SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
                                                     SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
     SDL_SetTextureBlendMode(internals->mask, mode);
-    SDL_RenderCopy(context->renderer, internals->mask, NULL, NULL);
+    SDL_Rect src_rect = {0, 0, lv_area_get_width(apply_area), lv_area_get_height(apply_area)};
+    SDL_RenderCopy(context->renderer, internals->mask, &src_rect, &src_rect);
 
     SDL_Rect dst_rect;
     lv_area_to_sdl_rect(apply_area, &dst_rect);
 
     SDL_SetRenderTarget(context->renderer, context->texture);
     SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
-    SDL_RenderCopy(context->renderer, internals->composition, NULL, &dst_rect);
+    SDL_RenderCopy(context->renderer, internals->composition, &src_rect, &dst_rect);
 
-    SDL_DestroyTexture(internals->mask);
-    SDL_DestroyTexture(internals->composition);
     internals->mask = internals->composition = NULL;
 #endif
 }
@@ -185,5 +211,23 @@ SDL_Texture * lv_sdl_gen_mask_texture(SDL_Renderer * renderer, const lv_area_t *
  *   STATIC FUNCTIONS
  **********************/
 
+static lv_mask_key_t mask_key_create(uint32_t id)
+{
+    lv_mask_key_t key;
+    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_MASK;
+    key.id = id;
+    return key;
+}
+
+static lv_coord_t next_pow_of_2(lv_coord_t num)
+{
+    lv_coord_t n = 128;
+    while (n < num && n < 16384) {
+        n = n << 1;
+    }
+    return n;
+}
 
 #endif /*LV_USE_DRAW_SDL*/

@@ -29,7 +29,7 @@
  **********************/
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
     const lv_font_t * font_p;
     uint32_t letter;
 } lv_font_glyph_key_t;

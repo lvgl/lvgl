@@ -29,20 +29,20 @@
  **********************/
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
     lv_coord_t radius;
     lv_coord_t size;
 } lv_draw_rect_bg_key_t;
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
     lv_coord_t radius;
     lv_coord_t size;
     lv_coord_t blur;
 } lv_draw_rect_shadow_key_t;
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
     lv_coord_t rout, rin;
     lv_coord_t thickness;
     lv_coord_t size;

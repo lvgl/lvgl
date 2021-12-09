@@ -49,8 +49,8 @@ typedef enum {
     LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW = 0x32,
     LV_GPU_CACHE_KEY_MAGIC_RECT_BORDER = 0x33,
     LV_GPU_CACHE_KEY_MAGIC_FONT_GLYPH = 0x41,
-    LV_GPU_CACHE_KEY_TEMP = 0xFF,
-} lv_gpu_cache_key_magic_t;
+    LV_GPU_CACHE_KEY_MAGIC_MASK = 0x51,
+} lv_sdl_cache_key_magic_t;
 
 typedef enum {
     LV_DRAW_SDL_CACHE_FLAG_NONE = 0,
@@ -58,7 +58,7 @@ typedef enum {
 } lv_draw_sdl_cache_flag_t;
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
     lv_img_src_t type;
     int32_t frame_id;
 } lv_draw_sdl_cache_key_head_img_t;
@@ -71,9 +71,21 @@ void lv_draw_sdl_texture_cache_init(struct lv_draw_sdl_context_internals_t *inte
 
 void lv_draw_sdl_texture_cache_deinit(struct lv_draw_sdl_context_internals_t *internals);
 
+/**
+ * Find cached texture by key. The texture can be destroyed during usage.
+ */
 SDL_Texture * lv_draw_sdl_texture_cache_get(const void * key, size_t key_length, bool * found);
 
-SDL_Texture * lv_draw_sdl_texture_cache_get_with_userdata(const void * key, size_t key_length, bool * found, void ** userdata);
+SDL_Texture * lv_draw_sdl_texture_cache_get_with_userdata(const void * key, size_t key_length, bool * found,
+                                                          void ** userdata);
+
+/**
+ * Find cached texture by key. The texture will be marked so it won't be destroyed.
+ */
+SDL_Texture * lv_draw_sdl_texture_cache_take(const void * key, size_t key_length, bool * found);
+
+SDL_Texture * lv_draw_sdl_texture_cache_take_with_userdata(const void * key, size_t key_length, bool * found,
+                                                          void ** userdata);
 
 void lv_draw_sdl_texture_cache_put(const void * key, size_t key_length, SDL_Texture * texture);
 

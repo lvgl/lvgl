@@ -31,7 +31,7 @@ typedef struct {
 } draw_cache_value_t;
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
 } temp_texture_key_t;
 
 typedef struct {
@@ -45,6 +45,7 @@ static lv_lru_t * get_lru();
 
 static void draw_cache_free_value(draw_cache_value_t *);
 
+static draw_cache_value_t *draw_cache_get_entry(const void * key, size_t key_length, bool * found);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -75,22 +76,10 @@ SDL_Texture * lv_draw_sdl_texture_cache_get(const void * key, size_t key_length,
 
 SDL_Texture * lv_draw_sdl_texture_cache_get_with_userdata(const void * key, size_t key_length, bool * found, void ** userdata)
 {
-    lv_lru_t *lru = get_lru();
-    draw_cache_value_t * value = NULL;
-    lv_lru_get(lru, key, key_length, (void **) &value);
-    if(!value) {
-        if(found) {
-            *found = false;
-        }
-        return NULL;
-    }
-    else {
-        if(userdata) {
-            *userdata = value->userdata;
-        }
-    }
-    if(found) {
-        *found = true;
+    draw_cache_value_t * value = draw_cache_get_entry(key, key_length, found);
+    if (!value) return NULL;
+    if(userdata) {
+        *userdata = value->userdata;
     }
     return value->texture;
 }
@@ -178,6 +167,22 @@ static void draw_cache_free_value(draw_cache_value_t * value)
     SDL_free(value);
 }
 
+static draw_cache_value_t *draw_cache_get_entry(const void * key, size_t key_length, bool * found)
+{
+    lv_lru_t *lru = get_lru();
+    draw_cache_value_t * value = NULL;
+    lv_lru_get(lru, key, key_length, (void **) &value);
+    if(!value) {
+        if(found) {
+            *found = false;
+        }
+        return NULL;
+    }
+    if(found) {
+        *found = true;
+    }
+    return value;
+}
 
 #endif /*LV_USE_DRAW_SDL*/
 
