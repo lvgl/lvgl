@@ -525,8 +525,7 @@ static void lv_refr_area_part(lv_draw_t * draw)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
-            dsc.coords = draw->dest_area;
-            lv_draw_rect(draw, &dsc);
+            lv_draw_rect(draw, &dsc, draw->dest_area);
         }
     }
     /*Refresh the previous screen if any*/
@@ -651,13 +650,13 @@ static void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
     /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
-    const lv_area_t * clip_ori = draw->clip_area;
+    const lv_area_t * clip_area_ori = draw->clip_area;
     lv_area_t obj_coords_ext;
     lv_area_t obj_ext_clip_coords;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
-    if(!_lv_area_intersect(&obj_ext_clip_coords, clip_ori, &obj_coords_ext)) return;
+    if(!_lv_area_intersect(&obj_ext_clip_coords, clip_area_ori, &obj_coords_ext)) return;
 
     draw->clip_area = &obj_ext_clip_coords;
 
@@ -680,7 +679,7 @@ static void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
 
     /*Create a new 'obj_clip' without 'ext_size' because the children can't be visible there*/
     lv_area_t obj_clip_coords;
-    if(_lv_area_intersect(&obj_clip_coords, clip_ori, &obj->coords)) {
+    if(_lv_area_intersect(&obj_clip_coords, clip_area_ori, &obj->coords)) {
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         for(i = 0; i < child_cnt; i++) {
@@ -704,6 +703,8 @@ static void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
     lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw);
     lv_event_send(obj, LV_EVENT_DRAW_POST, draw);
     lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw);
+
+    draw->clip_area = clip_area_ori;
 }
 
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)

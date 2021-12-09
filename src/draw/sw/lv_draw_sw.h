@@ -49,15 +49,13 @@ void lv_draw_sw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  
         uint16_t end_angle,
         const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
 
-void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
+void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_sw_letter(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter);
 
 
-void lv_draw_sw_img(const lv_area_t * map_area, const lv_area_t * clip_area,
-                    const uint8_t * map_p,
-                    const lv_draw_img_dsc_t * draw_dsc,
-                    bool chroma_key, bool alpha_byte);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_draw_img_dsc_t * draw_dsc,
+        const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t cf);
 
 void lv_draw_sw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, const lv_draw_line_dsc_t * dsc);
 

@@ -181,9 +181,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_t * draw, const lv_draw_label_d
         line_width = lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
-
-    lv_opa_t opa = dsc->opa;
-
     uint32_t sel_start = dsc->sel_start;
     uint32_t sel_end = dsc->sel_end;
     if(sel_start > sel_end) {
@@ -295,7 +292,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_t * draw, const lv_draw_label_d
                     sel_coords.y1 = pos.y;
                     sel_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
                     sel_coords.y2 = pos.y + line_height - 1;
-                    lv_draw_rect(draw, &draw_dsc_sel);
+                    lv_draw_rect(draw, &draw_dsc_sel, &sel_coords);
                     color = dsc->sel_color;
                 }
             }

@@ -57,11 +57,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
  * @param mask the rectangle will be drawn only in this mask
  * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+void lv_draw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(lv_area_get_height(dsc->coords) < 1 || lv_area_get_width(dsc->coords) < 1) return;
+    if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
-    draw->draw_rect(draw, dsc);
+    draw->draw_rect(draw, dsc, coords);
 
     LV_ASSERT_MEM_INTEGRITY();
 }

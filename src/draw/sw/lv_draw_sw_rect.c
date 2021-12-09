@@ -26,14 +26,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
+static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 #if LV_DRAW_COMPLEX
-LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s,
                                                          lv_coord_t r);
 LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
@@ -66,18 +66,18 @@ static void draw_border_simple(lv_draw_t * draw, const lv_area_t * outer_area, c
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 #if LV_DRAW_COMPLEX
-    draw_shadow(draw, dsc);
+    draw_shadow(draw, dsc, coords);
 #endif
 
-    draw_bg(draw, dsc);
-    draw_bg_img(draw, dsc);
+    draw_bg(draw, dsc, coords);
+    draw_bg_img(draw, dsc, coords);
 
-    draw_border(draw, dsc);
+    draw_border(draw, dsc, coords);
 
-    draw_outline(draw, dsc);
+    draw_outline(draw, dsc, coords);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -86,12 +86,12 @@ void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
 
     lv_area_t bg_coords;
-    lv_area_copy(&bg_coords, dsc->coords);
+    lv_area_copy(&bg_coords, coords);
 
     /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
     if(dsc->border_width > 1 && dsc->border_opa >= LV_OPA_MAX && dsc->radius != 0) {
@@ -273,7 +273,7 @@ bg_clean_up:
 #endif
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 //    if(dsc->bg_img_src == NULL) return;
 //    if(dsc->bg_img_opa <= LV_OPA_MIN) return;
@@ -337,22 +337,22 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_re
 //    }
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;
     if(dsc->border_side == LV_BORDER_SIDE_NONE) return;
     if(dsc->border_post) return;
 
-    int32_t coords_w = lv_area_get_width(dsc->coords);
-    int32_t coords_h = lv_area_get_height(dsc->coords);
+    int32_t coords_w = lv_area_get_width(coords);
+    int32_t coords_h = lv_area_get_height(coords);
     int32_t rout = dsc->radius;
     int32_t short_side = LV_MIN(coords_w, coords_h);
     if(rout > short_side >> 1) rout = short_side >> 1;
 
     /*Get the inner area*/
     lv_area_t area_inner;
-    lv_area_copy(&area_inner, dsc->coords);
+    lv_area_copy(&area_inner, coords);
     area_inner.x1 += ((dsc->border_side & LV_BORDER_SIDE_LEFT) ? dsc->border_width : - (dsc->border_width + rout));
     area_inner.x2 -= ((dsc->border_side & LV_BORDER_SIDE_RIGHT) ? dsc->border_width : - (dsc->border_width + rout));
     area_inner.y1 += ((dsc->border_side & LV_BORDER_SIDE_TOP) ? dsc->border_width : - (dsc->border_width + rout));
@@ -361,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_re
     lv_coord_t rin = rout - dsc->border_width;
     if(rin < 0) rin = 0;
 
-    draw_border_generic(draw, dsc->coords, &area_inner, rout, rin, dsc->border_color, dsc->border_opa, dsc->blend_mode);
+    draw_border_generic(draw, coords, &area_inner, rout, rin, dsc->border_color, dsc->border_opa, dsc->blend_mode);
 
 }
 
@@ -382,7 +382,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t
     return lv_color_mix(dsc->bg_grad_color, dsc->bg_color, mix);
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     /*Check whether the shadow is visible*/
     if(dsc->shadow_width == 0) return;
@@ -395,10 +395,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
 
     /*Calculate the rectangle which is blurred to get the shadow in `shadow_area`*/
     lv_area_t core_area;
-    core_area.x1 = dsc->coords->x1  + dsc->shadow_ofs_x - dsc->shadow_spread;
-    core_area.x2 = dsc->coords->x2  + dsc->shadow_ofs_x + dsc->shadow_spread;
-    core_area.y1 = dsc->coords->y1  + dsc->shadow_ofs_y - dsc->shadow_spread;
-    core_area.y2 = dsc->coords->y2  + dsc->shadow_ofs_y + dsc->shadow_spread;
+    core_area.x1 = coords->x1  + dsc->shadow_ofs_x - dsc->shadow_spread;
+    core_area.x2 = coords->x2  + dsc->shadow_ofs_x + dsc->shadow_spread;
+    core_area.y1 = coords->y1  + dsc->shadow_ofs_y - dsc->shadow_spread;
+    core_area.y2 = coords->y2  + dsc->shadow_ofs_y + dsc->shadow_spread;
 
     /*Calculate the bounding box of the shadow*/
     lv_area_t shadow_area;
@@ -417,7 +417,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
 
     /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
     lv_area_t bg_area;
-    lv_area_copy(&bg_area, dsc->coords);
+    lv_area_copy(&bg_area, coords);
     lv_area_increase(&bg_area, -1, -1);
 
     /*Get the clamped radius*/
@@ -1025,7 +1025,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 
 #endif
 
-static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
+static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->outline_opa <= LV_OPA_MIN) return;
     if(dsc->outline_width == 0) return;
@@ -1036,7 +1036,7 @@ static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc)
 
     /*Get the inner radius*/
     lv_area_t area_inner;
-    lv_area_copy(&area_inner, dsc->coords);
+    lv_area_copy(&area_inner, coords);
 
     /*Bring the outline closer to make sure there is no color bleeding with pad=0*/
     lv_coord_t pad = dsc->outline_pad - 1;

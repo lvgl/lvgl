@@ -45,18 +45,15 @@ typedef struct _lv_draw_t  {
     void * user_data;
 #endif
 
-    void (*draw_rect)(struct _lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc);
+    void (*draw_rect)(struct _lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
     void (*draw_arc)(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
                      const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
 
-    void (*draw_img)(const lv_area_t * map_area, const lv_area_t * clip_area,
-                     const uint8_t * map_p,
-                     const lv_draw_img_dsc_t * draw_dsc,
-                     bool chroma_key, bool alpha_byte);
+    void (*draw_img)(struct _lv_draw_t * draw, const lv_draw_img_dsc_t * dsc,
+                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
-    lv_res_t (*draw_img_core)(const lv_area_t * coords, const lv_area_t * clip_area, const void * src,
-                              const lv_draw_img_dsc_t * draw_dsc);
+    lv_res_t (*draw_img_core)(struct _lv_draw_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src);
 
     void (*draw_letter)(struct _lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter);
 
