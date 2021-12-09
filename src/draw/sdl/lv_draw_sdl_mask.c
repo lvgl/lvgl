@@ -8,6 +8,7 @@
  *********************/
 
 
+#include <src/misc/lv_gc.h>
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_SDL
@@ -42,8 +43,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t * clip)
-{
+bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t * clip) {
     if (!lv_draw_mask_is_any(draw_area)) return false;
 #if HAS_CUSTOM_BLEND_MODE
     lv_disp_t *disp = _lv_refr_get_disp_refreshing();
@@ -59,11 +59,27 @@ bool lv_draw_sdl_mask_begin(lv_area_t * draw_area, lv_area_t * coords, lv_area_t
     if (coords) lv_area_move(coords, -x, -y);
     if (clip) lv_area_move(clip, -x, -y);
     internals->composition = SDL_CreateTexture(context->renderer, SDL_PIXELFORMAT_ARGB8888,
-                                                    SDL_TEXTUREACCESS_TARGET, w, h);
+                                               SDL_TEXTUREACCESS_TARGET, w, h);
     SDL_SetRenderTarget(context->renderer, internals->composition);
     SDL_SetRenderDrawColor(context->renderer, 255, 255, 255, 0);
     SDL_RenderClear(context->renderer);
 #else
+    /* Fallback mask handling. This will at least make bars looks less bad */
+    for (uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        _lv_draw_mask_common_dsc_t *comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        if (comm_param == NULL) continue;
+        switch (comm_param->type) {
+            case LV_DRAW_MASK_TYPE_RADIUS: {
+                const lv_draw_mask_radius_param_t *param = (const lv_draw_mask_radius_param_t *) comm_param;
+                if (param->cfg.outer) break;
+                const lv_area_t area = *draw_area;
+                _lv_area_intersect(draw_area, &area, &param->cfg.rect);
+                break;
+            }
+            default:
+                break;
+        }
+    }
 #endif
     return true;
 }
