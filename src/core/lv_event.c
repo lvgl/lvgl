@@ -63,7 +63,6 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
     e.param = param;
     e.deleted = 0;
 
-
     /*Build a simple linked list from the objects used in the events
      *It's important to know if an this object was deleted by a nested event
      *called from this `event_cb`.*/
@@ -413,7 +412,7 @@ static lv_res_t event_send_core(lv_event_t * e)
     lv_res_t res = LV_RES_OK;
     res = lv_obj_event_base(NULL, e);
 
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(e->current_target, 0);
+    lv_event_dsc_t * event_dsc = res == LV_RES_INV ? NULL : lv_obj_get_event_dsc(e->current_target, 0);
 
     uint32_t i = 0;
     while(event_dsc && res == LV_RES_OK) {
