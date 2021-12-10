@@ -10,8 +10,6 @@
 
 #if LV_USE_MONKEY != 0
 
-#include <stdlib.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -153,13 +151,11 @@ static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig)
         return howsmall;
     }
     int32_t diff = howbig - howsmall + 1;
-    return rand() % diff + howsmall;
+    return (int32_t)lv_rand(0, diff) + howsmall;
 }
 
 static void lv_monkey_timer_cb(lv_timer_t * timer)
 {
-    srand(lv_tick_get());
-
     lv_monkey_t * monkey = timer->user_data;
     lv_indev_data_t * data = &monkey->indev_data;
 
