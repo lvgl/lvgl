@@ -18,7 +18,7 @@ Note that `input_range` has different meanings in different `type`:
 
 - `LV_INDEV_TYPE_POINTER` No effect, click randomly within the pixels of the screen resolution.
 - `LV_INDEV_TYPE_ENCODER` The minimum and maximum values ​​of `enc_diff`.
-- `LV_INDEV_TYPE_BUTTON` The minimum and maximum values ​​of `btn_id`.
+- `LV_INDEV_TYPE_BUTTON` The minimum and maximum values ​​of `btn_id`. Use `lv_monkey_get_indev()` to get the input device, and use `lv_indev_set_button_points()` to map the key ID to the coordinates.
 - `LV_INDEV_TYPE_KEYPAD` No effect, Send random [Keys](/overview/indev).
 
 ## Example

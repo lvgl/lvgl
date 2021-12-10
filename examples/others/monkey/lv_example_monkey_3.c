@@ -13,7 +13,7 @@ void lv_example_monkey_3(void)
     config.period_range.min = 50;
     config.period_range.max = 500;
     config.input_range.min = 0;
-    config.input_range.max = sizeof(btn_points) / sizeof(lv_point_t);
+    config.input_range.max = sizeof(btn_points) / sizeof(lv_point_t) - 1;
     lv_monkey_t * monkey = lv_monkey_create(&config);
 
     /*Set the coordinates bound to the button*/
