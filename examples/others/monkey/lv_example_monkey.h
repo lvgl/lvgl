@@ -27,6 +27,7 @@ extern "C" {
  **********************/
 void lv_example_monkey_1(void);
 void lv_example_monkey_2(void);
+void lv_example_monkey_3(void);
 
 /**********************
  *      MACROS
