@@ -258,15 +258,19 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_t * draw, const l
             map_area_rot.y2 += coords->y1;
         }
 
-        lv_area_t mask_com; /*Common area of mask and coords*/
+        lv_area_t clip_com; /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = _lv_area_intersect(&mask_com, draw->clip_area, &map_area_rot);
+        union_ok = _lv_area_intersect(&clip_com, draw->clip_area, &map_area_rot);
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
             draw_cleanup(cdsc);
             return LV_RES_OK;
         }
+
+        const lv_area_t * clip_area_ori = draw->clip_area;
+        draw->clip_area = &clip_com;
         draw->draw_img(draw, draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
+        draw->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
