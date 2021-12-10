@@ -150,7 +150,7 @@ static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig)
     if(howsmall >= howbig) {
         return howsmall;
     }
-    int32_t diff = howbig - howsmall + 1;
+    int32_t diff = howbig - howsmall;
     return (int32_t)lv_rand(0, diff) + howsmall;
 }
 

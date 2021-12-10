@@ -85,15 +85,15 @@ bool lv_monkey_get_enable(lv_monkey_t * monkey);
 
 /**
  * Set the user_data field of the monkey
- * @param obj   pointer to a monkey
+ * @param monkey   pointer to a monkey
  * @param user_data   pointer to the new user_data.
  */
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data);
 
 /**
  * Get the user_data field of the monkey
- * @param obj   pointer to a monkey
- * @return      the pointer to the user_data of the monkey
+ * @param monkey pointer to a monkey
+ * @return the pointer to the user_data of the monkey
  */
 void * lv_monkey_get_user_data(lv_monkey_t * monkey);
 
