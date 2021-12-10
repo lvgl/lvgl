@@ -31,6 +31,7 @@ extern "C" {
 #include "colorwheel/lv_colorwheel.h"
 #include "led/lv_led.h"
 #include "imgbtn/lv_imgbtn.h"
+#include "animbtn/lv_animbtn.h"
 #include "span/lv_span.h"
 
 /*********************

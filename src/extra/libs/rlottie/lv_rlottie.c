@@ -98,6 +98,17 @@ void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
     rlottie->current_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
 }
 
+void lv_rlottie_stopat_frame(lv_obj_t * obj, const size_t goto_frame, const int forward)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->dest_frame = goto_frame <= rlottie->total_frames ? goto_frame : rlottie->total_frames;
+    rlottie->play_ctrl = LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_STOPAT | (forward ? LV_RLOTTIE_CTRL_FORWARD : LV_RLOTTIE_CTRL_BACKWARD);
+    if(rlottie->task && rlottie->dest_frame != rlottie->current_frame) {
+        lv_timer_resume(rlottie->task);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -234,6 +245,13 @@ static void next_frame_task_cb(lv_timer_t * t)
         rlottie->dest_frame = rlottie->current_frame;
     }
     else {
+        if ((rlottie->play_ctrl & LV_RLOTTIE_CTRL_STOPAT) == LV_RLOTTIE_CTRL_STOPAT
+           && rlottie->current_frame == rlottie->dest_frame) {
+            lv_timer_pause(t);
+            rlottie->play_ctrl ^= LV_RLOTTIE_CTRL_STOPAT | LV_RLOTTIE_CTRL_PAUSE;
+            lv_event_send(obj, LV_EVENT_READY, NULL);
+            return;
+        }
         if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_BACKWARD) == LV_RLOTTIE_CTRL_BACKWARD) {
             if(rlottie->current_frame > 0)
                 --rlottie->current_frame;

@@ -95,6 +95,9 @@ If you don't enable looping, a `LV_EVENT_READY` is sent when the animation can n
 
 To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members. 
 
+If you need to play an animation until a specific frame, you can use `lv_rlottie_stopat_frame` function. 
+It'll resume playing (if paused) until the specified frame is reached and pause from there and also sending a `LV_EVENT_READY` event.
+
 ## Example
 ```eval_rst
 

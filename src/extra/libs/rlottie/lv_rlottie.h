@@ -31,6 +31,7 @@ typedef enum {
     LV_RLOTTIE_CTRL_PAUSE    = 2,
     LV_RLOTTIE_CTRL_PLAY     = 0, /* Yes, play = 0 is the default mode */
     LV_RLOTTIE_CTRL_LOOP     = 8,
+    LV_RLOTTIE_CTRL_STOPAT   = 4,
 } lv_rlottie_ctrl_t;
 
 typedef struct {
@@ -61,6 +62,7 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
 
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);
 void lv_rlottie_set_current_frame(lv_obj_t * rlottie, const size_t goto_frame);
+void lv_rlottie_stopat_frame(lv_obj_t * rlottie, const size_t goto_frame, const int forward);
 
 /**********************
  *      MACROS
