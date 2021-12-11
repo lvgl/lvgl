@@ -68,7 +68,7 @@ static lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_lru_t * lv_lru_new(uint64_t cache_size, uint32_t average_length, lv_lru_free_t * value_free,
+lv_lru_t * lv_lru_new(size_t cache_size, size_t average_length, lv_lru_free_t * value_free,
                       lv_lru_free_t * key_free)
 {
     // create the cache
@@ -143,7 +143,7 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
 
     // see if the key already exists
     uint32_t hash_index = lv_lru_hash(cache, key, key_length);
-    int64_t required = 0;
+    ssize_t required = 0;
     lruc_item * item = NULL, *prev = NULL;
     item = cache->items[hash_index];
 
@@ -154,7 +154,7 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
 
     if(item) {
         // update the value and value_lengths
-        required = (int)(value_length - item->value_length);
+        required = (ssize_t)(value_length - item->value_length);
         cache->value_free(item->value);
         item->value = value;
         item->value_length = value_length;
@@ -168,7 +168,7 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
         memcpy(item->key, key, key_length);
         item->value_length = value_length;
         item->key_length = key_length;
-        required = value_length;
+        required = (ssize_t) value_length;
 
         if(prev)
             prev->next = item;
@@ -178,8 +178,8 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
     item->access_count = ++cache->access_count;
 
     // remove as many items as necessary to free enough space
-    if(required > 0 && required > cache->free_memory) {
-        while(cache->free_memory < required)
+    if(required > 0 && (size_t) required > cache->free_memory) {
+        while(cache->free_memory < (size_t) required)
             lv_lru_remove_lru_item(cache);
     }
     cache->free_memory -= required;
@@ -254,16 +254,16 @@ static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_len
         key_length -= 4;
     }
 
-    switch(key_length) {
-        case 3:
-            h ^= data[2] << 16;
-        case 2:
-            h ^= data[1] << 8;
-        case 1:
-            h ^= data[0];
-            h *= m;
-            break;
-    };
+    if (key_length >= 3) {
+        h ^= data[2] << 16;
+    }
+    if (key_length >= 2) {
+        h ^= data[1] << 8;
+    }
+    if (key_length >= 1) {
+        h ^= data[0];
+        h *= m;
+    }
 
     h ^= h >> 13;
     h *= m;
