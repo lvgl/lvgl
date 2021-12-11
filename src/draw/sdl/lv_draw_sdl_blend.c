@@ -60,22 +60,23 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
         SDL_Texture *texture = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK,
                                                            lv_area_get_height(fill_area),
                                                            lv_area_get_width(fill_area));
-        SDL_Surface * mask_surface = lv_sdl_create_opa_surface(mask, lv_area_get_width(fill_area),
-                                                               lv_area_get_height(fill_area),
-                                                               lv_area_get_width(fill_area));
-        SDL_Rect rect = {0, 0, mask_surface->w, mask_surface->h};
-        SDL_Surface *tex_surface = NULL;
-        SDL_LockTextureToSurface(texture, &rect, &tex_surface);
-        SDL_assert(tex_surface);
-        SDL_SetSurfaceBlendMode(mask_surface, SDL_BLENDMODE_NONE);
-        SDL_BlitSurface(mask_surface, NULL, tex_surface, NULL);
+        SDL_Rect rect = {0, 0, lv_area_get_width(fill_area), lv_area_get_height(fill_area)};
+        uint8_t *pixels = NULL;
+        int pitch;
+        SDL_LockTexture(texture, &rect, (void **) &pixels, &pitch);
+        SDL_assert(pixels && pitch);
+        for (int y = 0; y < rect.h; y++) {
+            SDL_memset(&pixels[y * pitch], 0xFF, 4 * rect.w);
+            for (int x = 0; x < rect.w; x++) {
+                pixels[y * pitch + x * 4] = mask[y * rect.w + x];
+            }
+        }
         SDL_UnlockTexture(texture);
 
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(texture, opa);
         SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
         SDL_RenderCopy(renderer, texture, &rect, &fill_rect);
-        SDL_FreeSurface(mask_surface);
     }
     else {
         SDL_SetRenderDrawColor(renderer, color.ch.red, color.ch.green, color.ch.blue, opa);

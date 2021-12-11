@@ -147,7 +147,7 @@ SDL_Surface * lv_sdl_create_opa_surface(lv_opa_t * opa, lv_coord_t width, lv_coo
 {
     SDL_Surface * indexed = SDL_CreateRGBSurfaceFrom(opa, width, height, 8, stride, 0, 0, 0, 0);
     SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(8));
-    SDL_Surface * converted = SDL_ConvertSurfaceFormat(indexed, SDL_PIXELFORMAT_ARGB8888, 0);
+    SDL_Surface * converted = SDL_ConvertSurfaceFormat(indexed, LV_DRAW_SDL_TEXTURE_FORMAT, 0);
     SDL_FreeSurface(indexed);
     return converted;
 }
