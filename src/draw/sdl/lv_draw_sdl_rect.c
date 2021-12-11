@@ -295,31 +295,31 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
     lv_area_to_sdl_rect(&shadow_area, &core_area_rect);
 
     lv_coord_t radius = dsc->radius;
-    lv_coord_t sh_width = lv_area_get_width(&core_area);
-    lv_coord_t sh_height = lv_area_get_height(&core_area);
-    lv_coord_t sh_min = LV_MIN(sh_width, sh_height);
-    /* If size isn't times of 2, increase 1 px */
-    lv_coord_t min_half = sh_min % 2 == 0 ? sh_min / 2 : sh_min / 2 + 1;
     /* No matter how big the shadow is, what we need is just a corner */
-    lv_coord_t frag_size = radius == LV_RADIUS_CIRCLE ? min_half : LV_MIN(radius + 1, min_half);
+    lv_coord_t frag_size = LV_MIN3(radius, lv_area_get_width(&core_area) / 2, lv_area_get_height(&core_area) / 2);
+
     /* This is how big the corner is after blurring */
-    lv_coord_t blur_frag_size = frag_size + sw + 2;
+    lv_coord_t blur_growth = (lv_coord_t) (sw / 2 + 1);
+    lv_coord_t blur_frag_size = (lv_coord_t) (frag_size + blur_growth);
 
     lv_draw_rect_shadow_key_t key = rect_shadow_key_create(radius, frag_size, sw);
 
-    lv_area_t blur_frag;
-    lv_area_copy(&blur_frag, &shadow_area);
-    lv_area_set_width(&blur_frag, blur_frag_size * 2);
-    lv_area_set_height(&blur_frag, blur_frag_size * 2);
     SDL_Texture *texture = lv_draw_sdl_texture_cache_get(&key, sizeof(key), NULL);
     if (texture == NULL) {
+        lv_area_t mask_area = {blur_growth, blur_growth}, mask_area_blurred = {0, 0};
+        lv_area_set_width(&mask_area, frag_size * 2);
+        lv_area_set_height(&mask_area, frag_size * 2);
+        lv_area_set_width(&mask_area_blurred, blur_frag_size * 2);
+        lv_area_set_height(&mask_area_blurred, blur_frag_size * 2);
+
         lv_draw_mask_radius_param_t mask_rout_param;
-        lv_draw_mask_radius_init(&mask_rout_param, &core_area, radius, false);
+        lv_draw_mask_radius_init(&mask_rout_param, &mask_area, radius, false);
         int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        lv_opa_t *mask_buf = lv_draw_sdl_mask_dump_opa(&blur_frag, &mask_id, 1);
-        lv_stack_blur_grayscale(mask_buf, lv_area_get_width(&blur_frag), lv_area_get_height(&blur_frag), sw / 2 + 1);
-        texture = lv_sdl_create_opa_texture(renderer, mask_buf, lv_area_get_width(&blur_frag),
-                                            lv_area_get_height(&blur_frag), lv_area_get_width(&blur_frag));
+        lv_opa_t *mask_buf = lv_draw_sdl_mask_dump_opa(&mask_area_blurred, &mask_id, 1);
+        lv_stack_blur_grayscale(mask_buf, lv_area_get_width(&mask_area_blurred), lv_area_get_height(&mask_area_blurred),
+                                sw / 2 + 1);
+        texture = lv_sdl_create_opa_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
+                                            lv_area_get_width(&mask_area_blurred));
         lv_mem_buf_release(mask_buf);
         lv_draw_mask_remove_id(mask_id);
         SDL_assert(texture);
@@ -456,7 +456,6 @@ static void draw_border_generic(lv_draw_sdl_context_t *ctx, const lv_area_t *out
 
 static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size,
                                 const lv_area_t *coords, const lv_area_t *clipped, bool full) {
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 40);
     lv_area_t corner_area, dst_area;
     /* Upper left */
     corner_area.x1 = coords->x1;
@@ -466,6 +465,7 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
     if (_lv_area_intersect(&dst_area, &corner_area, clipped)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
+
         lv_coord_t dw = lv_area_get_width(&dst_area), dh = lv_area_get_height(&dst_area);
         lv_coord_t sx = (lv_coord_t) (dst_area.x1 - corner_area.x1), sy = (lv_coord_t) (dst_area.y1 - corner_area.y1);
         SDL_Rect src_rect = {sx, sy, dw, dh};
@@ -477,6 +477,7 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
     if (_lv_area_intersect(&dst_area, &corner_area, clipped)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
+
         lv_coord_t dw = lv_area_get_width(&dst_area), dh = lv_area_get_height(&dst_area);
         if (full) {
             lv_coord_t sx = (lv_coord_t) (dst_area.x1 - corner_area.x1),
@@ -486,7 +487,6 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
         } else {
             SDL_Rect src_rect = {corner_area.x2 - dst_area.x2, dst_area.y1 - corner_area.y1, dw, dh};
             SDL_RenderCopyEx(renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-//            SDL_RenderDrawRect(renderer, &dst_rect);
         }
     }
     /* Lower right, clip bottom edge if too big */
@@ -495,6 +495,7 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
     if (_lv_area_intersect(&dst_area, &corner_area, clipped)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
+
         lv_coord_t dw = lv_area_get_width(&dst_area), dh = lv_area_get_height(&dst_area);
         if (full) {
             lv_coord_t sx = (lv_coord_t) (dst_area.x1 - corner_area.x1),
@@ -504,7 +505,6 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
         } else {
             SDL_Rect src_rect = {corner_area.x2 - dst_area.x2, corner_area.y2 - dst_area.y2, dw, dh};
             SDL_RenderCopyEx(renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
-//            SDL_RenderDrawRect(renderer, &dst_rect);
         }
     }
     /* Lower left, right edge should not be clipped */
@@ -513,6 +513,7 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
     if (_lv_area_intersect(&dst_area, &corner_area, clipped)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
+
         lv_coord_t dw = lv_area_get_width(&dst_area), dh = lv_area_get_height(&dst_area);
         if (full) {
             lv_coord_t sx = (lv_coord_t) (dst_area.x1 - corner_area.x1),
@@ -520,21 +521,14 @@ static void frag_render_corners(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
             SDL_Rect src_rect = {sx, frag_size + 1 + sy, dw, dh};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         } else {
-            SDL_Rect src_rect = {
-                    .x = dst_area.x1 - corner_area.x1,
-                    .y = corner_area.y2 - dst_area.y2,
-                    .w = dw,
-                    .h = dh,
-            };
+            SDL_Rect src_rect = {dst_area.x1 - corner_area.x1, corner_area.y2 - dst_area.y2, dw, dh};
             SDL_RenderCopyEx(renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_VERTICAL);
-//            SDL_RenderDrawRect(renderer, &dst_rect);
         }
     }
 }
 
 static void frag_render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_coord_t frag_size,
                                 const lv_area_t *coords, const lv_area_t *clipped, bool full) {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 40);
     lv_area_t border_area, dst_area;
     /* Top border */
     border_area.x1 = coords->x1 + frag_size;
@@ -546,8 +540,13 @@ static void frag_render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
 
         lv_coord_t sy = (lv_coord_t) (dst_area.y1 - border_area.y1);
-        SDL_Rect src_rect = {frag_size - 1, sy, 1, lv_area_get_height(&dst_area)};
-        SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
+        if (full) {
+            SDL_Rect src_rect = {frag_size, sy, 1, lv_area_get_height(&dst_area)};
+            SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
+        } else {
+            SDL_Rect src_rect = {frag_size - 1, sy, 1, lv_area_get_height(&dst_area)};
+            SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
+        }
     }
     /* Bottom border */
     border_area.y1 = LV_MAX(coords->y2 - frag_size + 1, coords->y1 + frag_size);
@@ -557,14 +556,14 @@ static void frag_render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
 
         lv_coord_t dh = lv_area_get_height(&dst_area);
-        lv_coord_t sy = (lv_coord_t) (dst_area.y1 - border_area.y1);
         if (full) {
+            lv_coord_t sy = (lv_coord_t) (dst_area.y1 - border_area.y1);
             SDL_Rect src_rect = {frag_size, frag_size + 1 + sy, 1, dh};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         } else {
-            SDL_Rect src_rect = {frag_size - 1, frag_size - dh, 1, dh};
+            lv_coord_t sy = (lv_coord_t) (border_area.y2 - dst_area.y2);
+            SDL_Rect src_rect = {frag_size - 1, sy, 1, dh};
             SDL_RenderCopyEx(renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_VERTICAL);
-//            SDL_RenderDrawRect(renderer, &dst_rect);
         }
     }
     /* Left border */
@@ -573,10 +572,11 @@ static void frag_render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
     border_area.x2 = coords->x1 + frag_size - 1;
     border_area.y2 = coords->y2 - frag_size;
     if (_lv_area_intersect(&dst_area, &border_area, clipped)) {
-        lv_coord_t dw = lv_area_get_width(&dst_area);
-        lv_coord_t sx = (lv_coord_t) (dst_area.x1 - border_area.x1);
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
+
+        lv_coord_t dw = lv_area_get_width(&dst_area);
+        lv_coord_t sx = (lv_coord_t) (dst_area.x1 - border_area.x1);
         if (full) {
             SDL_Rect src_rect = {sx, frag_size, dw, 1};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
@@ -591,15 +591,16 @@ static void frag_render_borders(SDL_Renderer *renderer, SDL_Texture *frag, lv_co
     if (_lv_area_intersect(&dst_area, &border_area, clipped)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
+
         lv_coord_t dw = lv_area_get_width(&dst_area);
         if (full) {
             lv_coord_t sx = (lv_coord_t) (dst_area.x1 - border_area.x1);
             SDL_Rect src_rect = {frag_size + 1 + sx, frag_size, dw, 1};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         } else {
-            SDL_Rect src_rect = {frag_size - dw, frag_size - 1, dw, 1};
+            lv_coord_t sx = (lv_coord_t) (border_area.x2 - dst_area.x2);
+            SDL_Rect src_rect = {sx, frag_size - 1, dw, 1};
             SDL_RenderCopyEx(renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-//            SDL_RenderDrawRect(renderer, &dst_rect);
         }
     }
 }
