@@ -26,9 +26,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
-LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
-LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 static void draw_outline(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
@@ -86,7 +86,7 @@ void lv_draw_sw_rect(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_bg(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
 
@@ -273,71 +273,71 @@ bg_clean_up:
 #endif
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_bg_img(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-//    if(dsc->bg_img_src == NULL) return;
-//    if(dsc->bg_img_opa <= LV_OPA_MIN) return;
-//
-//    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
-//    if(src_type == LV_IMG_SRC_SYMBOL) {
-//        lv_point_t size;
-//        lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-//        lv_area_t a;
-//        a.x1 = coords->x1 + lv_area_get_width(coords) / 2 - size.x / 2;
-//        a.x2 = a.x1 + size.x - 1;
-//        a.y1 = coords->y1 + lv_area_get_height(coords) / 2 - size.y / 2;
-//        a.y2 = a.y1 + size.y - 1;
-//
-//        lv_draw_label_dsc_t label_draw_dsc;
-//        lv_draw_label_dsc_init(&label_draw_dsc);
-//        label_draw_dsc.font = dsc->bg_img_symbol_font;
-//        label_draw_dsc.color = dsc->bg_img_recolor;
-//        label_draw_dsc.opa = dsc->bg_img_opa;
-//        lv_draw_label(&a, clip, &label_draw_dsc, dsc->bg_img_src, NULL);
-//    }
-//    else {
-//        lv_img_header_t header;
-//        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
-//        if(res != LV_RES_OK) {
-//            LV_LOG_WARN("Couldn't read the background image");
-//            return;
-//        }
-//
-//        lv_draw_img_dsc_t img_dsc;
-//        lv_draw_img_dsc_init(&img_dsc);
-//        img_dsc.blend_mode = dsc->blend_mode;
-//        img_dsc.recolor = dsc->bg_img_recolor;
-//        img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
-//        img_dsc.opa = dsc->bg_img_opa;
-//
-//        /*Center align*/
-//        if(dsc->bg_img_tiled == false) {
-//            lv_area_t area;
-//            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
-//            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
-//            area.x2 = area.x1 + header.w - 1;
-//            area.y2 = area.y1 + header.h - 1;
-//
-//            lv_draw_img(&area, clip, dsc->bg_img_src, &img_dsc);
-//        }
-//        else {
-//            lv_area_t area;
-//            area.y1 = coords->y1;
-//            area.y2 = area.y1 + header.h - 1;
-//
-//            for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
-//
-//                area.x1 = coords->x1;
-//                area.x2 = area.x1 + header.w - 1;
-//                for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-//                    lv_draw_img(&area, clip, dsc->bg_img_src, &img_dsc);
-//                }
-//            }
-//        }
-//    }
+    if(dsc->bg_img_src == NULL) return;
+    if(dsc->bg_img_opa <= LV_OPA_MIN) return;
+
+    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
+    if(src_type == LV_IMG_SRC_SYMBOL) {
+        lv_point_t size;
+        lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_area_t a;
+        a.x1 = coords->x1 + lv_area_get_width(coords) / 2 - size.x / 2;
+        a.x2 = a.x1 + size.x - 1;
+        a.y1 = coords->y1 + lv_area_get_height(coords) / 2 - size.y / 2;
+        a.y2 = a.y1 + size.y - 1;
+
+        lv_draw_label_dsc_t label_draw_dsc;
+        lv_draw_label_dsc_init(&label_draw_dsc);
+        label_draw_dsc.font = dsc->bg_img_symbol_font;
+        label_draw_dsc.color = dsc->bg_img_recolor;
+        label_draw_dsc.opa = dsc->bg_img_opa;
+        lv_draw_label(draw, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
+    }
+    else {
+        lv_img_header_t header;
+        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
+        if(res != LV_RES_OK) {
+            LV_LOG_WARN("Couldn't read the background image");
+            return;
+        }
+
+        lv_draw_img_dsc_t img_dsc;
+        lv_draw_img_dsc_init(&img_dsc);
+        img_dsc.blend_mode = dsc->blend_mode;
+        img_dsc.recolor = dsc->bg_img_recolor;
+        img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
+        img_dsc.opa = dsc->bg_img_opa;
+
+        /*Center align*/
+        if(dsc->bg_img_tiled == false) {
+            lv_area_t area;
+            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
+            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
+            area.x2 = area.x1 + header.w - 1;
+            area.y2 = area.y1 + header.h - 1;
+
+            lv_draw_img(draw, &img_dsc, &area, dsc->bg_img_src);
+        }
+        else {
+            lv_area_t area;
+            area.y1 = coords->y1;
+            area.y2 = area.y1 + header.h - 1;
+
+            for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
+
+                area.x1 = coords->x1;
+                area.x2 = area.x1 + header.w - 1;
+                for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
+                    lv_draw_img(draw, &img_dsc, &area, dsc->bg_img_src);
+                }
+            }
+        }
+    }
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_border(lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;

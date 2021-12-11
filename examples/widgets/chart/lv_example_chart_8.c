@@ -40,7 +40,7 @@ static void draw_event_cb(lv_event_t *e)
         a.x2 = dsc->p2->x;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
         a.y2 = obj->coords.y2 - 13; /* -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesnt look like 0 */
-        lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
+        lv_draw_rect(dsc->draw, &draw_rect_dsc, &a);
 
         /*Remove the mask*/
         lv_draw_mask_free_param(&line_mask_param);

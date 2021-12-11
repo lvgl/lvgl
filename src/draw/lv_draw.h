@@ -51,8 +51,7 @@ typedef struct _lv_draw_t  {
 
     void (*draw_rect)(struct _lv_draw_t * draw, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-    void (*draw_arc)(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
-                     const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
+    void (*draw_arc)(struct _lv_draw_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
 
     void (*draw_img)(struct _lv_draw_t * draw, const lv_draw_img_dsc_t * dsc,
                      const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
@@ -65,9 +64,7 @@ typedef struct _lv_draw_t  {
     void (*draw_line)(struct _lv_draw_t * draw, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1, const lv_point_t * point2);
 
 
-    void (*draw_polygon)(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
-                         const lv_draw_rect_dsc_t * draw_dsc);
-
+    void (*draw_polygon)(struct _lv_draw_t * draw, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[], uint16_t point_cnt);
 
     lv_draw_mask_t * (*add_rect_mask)(struct _lv_draw_t * draw, const lv_area_t * coords, lv_coord_t * radius);
     void (*remove_rect_mask)(struct _lv_draw_t * draw, lv_draw_mask_t * mask);

@@ -885,8 +885,8 @@ static void draw_list(lv_event_t * e)
             }
         }
         else {
-            draw_box(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
-            draw_box_label(dropdown_obj, &clip_area_core, dropdown->pr_opt_id, LV_STATE_PRESSED);
+            draw_box(dropdown_obj, draw, dropdown->pr_opt_id, LV_STATE_PRESSED);
+            draw_box_label(dropdown_obj, draw, dropdown->pr_opt_id, LV_STATE_PRESSED);
         }
         draw->clip_area = clip_area_ori;
     }

@@ -580,13 +580,18 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
     disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
+
+    lv_draw_t * draw = lv_draw_sw_create();
+    draw->clip_area = &mask;
+    draw->dest_area = &mask;
+    draw->dest_buf = (void *)dsc->data;
+    disp.driver->draw_ctx = draw;
 
     lv_disp_drv_use_generic_set_px_cb(disp.driver, dsc->header.cf);
 
@@ -600,7 +605,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_rect(&coords, &mask, draw_dsc);
+    lv_draw_rect(draw, draw_dsc, &coords);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 
@@ -641,7 +646,6 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
@@ -649,12 +653,18 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
+    lv_draw_t * draw = lv_draw_sw_create();
+    draw->clip_area = &mask;
+    draw->dest_area = &mask;
+    draw->dest_buf = (void *)dsc->data;
+    disp.driver->draw_ctx = draw;
+
     lv_disp_drv_use_generic_set_px_cb(disp.driver, dsc->header.cf);
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_label(&coords, &mask, draw_dsc, txt, NULL);
+    lv_draw_label(draw, draw_dsc, &coords, txt, NULL);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 
@@ -702,7 +712,6 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
@@ -710,12 +719,18 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
 
+    lv_draw_t * draw = lv_draw_sw_create();
+    draw->clip_area = &mask;
+    draw->dest_area = &mask;
+    draw->dest_buf = (void *)dsc->data;
+    disp.driver->draw_ctx = draw;
+
     lv_disp_drv_use_generic_set_px_cb(disp.driver, dsc->header.cf);
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_img(&coords, &mask, src, draw_dsc);
+    lv_draw_img(draw, draw_dsc, &coords, src);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 
@@ -749,13 +764,18 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
     disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
+
+    lv_draw_t * draw = lv_draw_sw_create();
+    draw->clip_area = &mask;
+    draw->dest_area = &mask;
+    draw->dest_buf = (void *)dsc->data;
+    disp.driver->draw_ctx = draw;
 
     lv_disp_drv_use_generic_set_px_cb(disp.driver, dsc->header.cf);
 
@@ -771,7 +791,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
 
     uint32_t i;
     for(i = 0; i < point_cnt - 1; i++) {
-        lv_draw_line(&points[i], &points[i + 1], &mask, draw_dsc);
+        lv_draw_line(draw, draw_dsc, &points[i], &points[i + 1]);
     }
 
     _lv_refr_set_disp_refreshing(refr_ori);
@@ -807,13 +827,18 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
     disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
+
+    lv_draw_t * draw = lv_draw_sw_create();
+    draw->clip_area = &mask;
+    draw->dest_area = &mask;
+    draw->dest_buf = (void *)dsc->data;
+    disp.driver->draw_ctx = draw;
 
     lv_disp_drv_use_generic_set_px_cb(disp.driver, dsc->header.cf);
 
@@ -827,7 +852,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_polygon(points, point_cnt, &mask, draw_dsc);
+    lv_draw_polygon(draw, draw_dsc, points, point_cnt);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 
@@ -863,13 +888,18 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 
     lv_disp_draw_buf_t draw_buf;
     lv_disp_draw_buf_init(&draw_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
-    lv_area_copy(&draw_buf.area, &mask);
 
     lv_disp_drv_init(disp.driver);
 
     disp.driver->draw_buf = &draw_buf;
     disp.driver->hor_res = dsc->header.w;
     disp.driver->ver_res = dsc->header.h;
+
+    lv_draw_t * draw = lv_draw_sw_create();
+    draw->clip_area = &mask;
+    draw->dest_area = &mask;
+    draw->dest_buf = (void *)dsc->data;
+    disp.driver->draw_ctx = draw;
 
     lv_disp_drv_use_generic_set_px_cb(disp.driver, dsc->header.cf);
 
@@ -883,7 +913,8 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_arc(x, y, r,  start_angle, end_angle, &mask, draw_dsc);
+    lv_point_t p = {x, y};
+    lv_draw_arc(draw, draw_dsc, &p, r,  start_angle, end_angle);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 

@@ -162,7 +162,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
-        const lv_area_t * clip_area = lv_event_get_param(e);
+        lv_draw_t * draw = lv_event_get_draw_ctx(e);
 
         if(line->point_num == 0 || line->point_array == NULL) return;
 
@@ -193,7 +193,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 p1.y = h - line->point_array[i].y + y_ofs;
                 p2.y = h - line->point_array[i + 1].y + y_ofs;
             }
-            lv_draw_line(&p1, &p2, clip_area, &line_dsc);
+            lv_draw_line(draw, &line_dsc, &p1, &p2);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
     }

@@ -298,7 +298,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_t * draw, const lv_draw_label_d
             }
 
             dsc_mod.color = color;
-            draw->draw_letter(draw, &dsc_mod, &pos, letter);
+            lv_draw_letter(draw, &dsc_mod, &pos, letter);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -359,6 +359,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_t * draw, const lv_draw_label_d
 
     LV_ASSERT_MEM_INTEGRITY();
 }
+
+void lv_draw_letter(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
+{
+    draw->draw_letter(draw, dsc, pos_p, letter);
+}
+
 
 /**********************
  *   STATIC FUNCTIONS

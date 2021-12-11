@@ -81,6 +81,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(struct _lv_draw_t * draw, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint);
 
+void lv_draw_letter(struct _lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter);
+
 /***********************
  * GLOBAL VARIABLES
  ***********************/

@@ -512,9 +512,9 @@ static void lv_refr_area_part(lv_draw_t * draw)
                 lv_area_t a;
                 lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
                 lv_draw_img_dsc_t dsc;
-//                lv_draw_img_dsc_init(&dsc);
+                lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
-//                lv_draw_img(&a, draw->dest_area, disp_refr->bg_img, &dsc);
+                lv_draw_img(draw, &dsc, &a, disp_refr->bg_img);
             }
             else {
                 LV_LOG_WARN("Can't draw the background image");
