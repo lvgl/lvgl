@@ -296,10 +296,12 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
 
     lv_coord_t radius = dsc->radius;
     /* No matter how big the shadow is, what we need is just a corner */
-    lv_coord_t frag_size = LV_MIN3(radius, lv_area_get_width(&core_area) / 2, lv_area_get_height(&core_area) / 2);
+    lv_coord_t frag_size = LV_MIN3(lv_area_get_width(&core_area) / 2, lv_area_get_height(&core_area) / 2,
+                                   LV_MAX(sw / 2, radius));
 
     /* This is how big the corner is after blurring */
     lv_coord_t blur_growth = (lv_coord_t) (sw / 2 + 1);
+
     lv_coord_t blur_frag_size = (lv_coord_t) (frag_size + blur_growth);
 
     lv_draw_rect_shadow_key_t key = rect_shadow_key_create(radius, frag_size, sw);
