@@ -125,8 +125,12 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     driver.draw_buf = &draw_buf;
 
     /*Make the display big enough to involve the objects on its original places. */
-    driver.hor_res = obj->coords.x1 + w;
-    driver.ver_res = obj->coords.y1 + h;
+    driver.hor_res = obj->coords.x2 + ext_size + 1;
+    driver.ver_res = obj->coords.y2 + ext_size + 1;
+
+    lv_draw_t * draw = lv_draw_sw_create();
+    driver.draw_ctx = draw;
+
     lv_disp_drv_use_generic_set_px_cb(&driver, cf);
 
     disp = lv_disp_drv_register(&driver);
@@ -169,8 +173,8 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     lv_area_copy(&obj->coords, &coords_bkp);
 
     dsc->data = buf;
-    dsc->header.w = lv_area_get_width(&draw_buf.area);
-    dsc->header.h = lv_area_get_height(&draw_buf.area);
+    dsc->header.w = w;
+    dsc->header.h = h;
     dsc->header.cf = cf;
     return LV_RES_OK;
 }

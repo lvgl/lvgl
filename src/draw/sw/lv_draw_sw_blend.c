@@ -23,10 +23,15 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_coord_t dest_stride,
+                        lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stide);
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride);
 #if LV_DRAW_COMPLEX
 static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
 #endif  /*LV_DRAW_COMPLEX*/
+
+static void map_set_px(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride);
 
 LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
         const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride);
@@ -99,9 +104,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, const lv_draw_sw_b
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw->clip_area)) return;
 
-    lv_color_t * dest_buf = draw->dest_buf + dest_stride * (blend_area.y1 - draw->dest_area->y1) + (blend_area.x1 - draw->dest_area->x1);
-
-
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    lv_color_t * dest_buf = draw->dest_buf;
+    if(disp->driver->set_px_cb == NULL) {
+        dest_buf += dest_stride * (blend_area.y1 - draw->dest_area->y1) + (blend_area.x1 - draw->dest_area->x1);
+    }
 
     lv_color_t * src_buf = dsc->src_buf;
     lv_coord_t src_stride;
@@ -122,8 +129,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, const lv_draw_sw_b
 
     lv_area_move(&blend_area, -draw->dest_area->x1, -draw->dest_area->y1);
 
-
-    if(dsc->src_buf == NULL) {
+    if(disp->driver->set_px_cb) {
+        if(dsc->src_buf == NULL) {
+            fill_set_px(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
+        } else {
+            map_set_px(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
+        }
+    }
+    else if(dsc->src_buf == NULL) {
         if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
             fill_normal(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
         }
@@ -134,53 +147,41 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, const lv_draw_sw_b
     }
 }
 
-//    #if LV_DRAW_COMPLEX
-//        else map_blended(draw, dsc);
-//    #endif
-//
-//    } else {
-//        if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) fill_normal(draw, dsc);
-//#if LV_DRAW_COMPLEX
-//        else fill_blended(draw, dsc);
-//#endif
-//    }
-//}
-
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-//static void fill_set_px(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-//                        lv_color_t color, lv_opa_t opa, const lv_opa_t * mask)
-//{
-//    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-//
-//    int32_t x;
-//    int32_t y;
-//
-//    if(mask == NULL) {
-//        for(y = fill_area->y1; y <= fill_area->y2; y++) {
-//            for(x = fill_area->x1; x <= fill_area->x2; x++) {
-//                disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, x, y, color, opa);
-//            }
-//        }
-//    }
-//    else {
-//        int32_t area_w = lv_area_get_width(fill_area);
-//        int32_t area_h = lv_area_get_height(fill_area);
-//
-//        for(y = 0; y < area_h; y++) {
-//            for(x = 0; x < area_w; x++) {
-//                if(mask[x]) {
-//                    disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, fill_area->x1 + x, fill_area->y1 + y, color,
-//                                            (uint32_t)((uint32_t)opa * mask[x]) >> 8);
-//                }
-//            }
-//            mask += area_w;
-//        }
-//    }
-//}
+static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_coord_t dest_stride,
+                        lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stide)
+{
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+
+    int32_t x;
+    int32_t y;
+
+    if(mask == NULL) {
+        for(y = blend_area->y1; y <= blend_area->y2; y++) {
+            for(x = blend_area->x1; x <= blend_area->x2; x++) {
+                disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, x, y, color, opa);
+            }
+        }
+    }
+    else {
+        int32_t w = lv_area_get_width(blend_area);
+        int32_t h = lv_area_get_height(blend_area);
+
+        for(y = 0; y < h; y++) {
+            for(x = 0; x < w; x++) {
+                if(mask[x]) {
+                    disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, blend_area->x1 + x, blend_area->y1 + y, color,
+                                            (uint32_t)((uint32_t)opa * mask[x]) >> 8);
+                }
+            }
+            mask += mask_stide;
+        }
+    }
+}
 
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
 {
@@ -395,12 +396,45 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_
 }
 #endif
 
+static void map_set_px(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
+
+{
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+
+    int32_t w = lv_area_get_width(dest_area);
+    int32_t h = lv_area_get_height(dest_area);
+
+    int32_t x;
+    int32_t y;
+
+    if(mask == NULL) {
+        for(y = 0; y < h; y++) {
+            for(x = 0; x < w; x++) {
+                disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, dest_area->x1 + x, dest_area->y1 + y, src_buf[x],
+                                        opa);
+            }
+            src_buf += src_stride;
+        }
+    }
+    else {
+        for(y = 0; y < h; y++) {
+            for(x = 0; x < w; x++) {
+                if(mask[x]) {
+                    disp->driver->set_px_cb(disp->driver, (void *)dest_buf, dest_stride, dest_area->x1 + x, dest_area->y1 + y, src_buf[x],
+                                            (uint32_t)((uint32_t)opa * mask[x]) >> 8);
+                }
+            }
+            mask += mask_stride;
+            src_buf += src_stride;
+        }
+    }
+}
+
 LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
         const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
 
 {
-
-
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
 
