@@ -67,9 +67,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_sdl_texture_cache_init(struct lv_draw_sdl_context_internals_t *internals);
+void lv_draw_sdl_texture_cache_init(struct lv_draw_sdl_context_internals_t * internals);
 
-void lv_draw_sdl_texture_cache_deinit(struct lv_draw_sdl_context_internals_t *internals);
+void lv_draw_sdl_texture_cache_deinit(struct lv_draw_sdl_context_internals_t * internals);
 
 /**
  * Find cached texture by key. The texture can be destroyed during usage.
@@ -85,14 +85,15 @@ SDL_Texture * lv_draw_sdl_texture_cache_get_with_userdata(const void * key, size
 SDL_Texture * lv_draw_sdl_texture_cache_take(const void * key, size_t key_length, bool * found);
 
 SDL_Texture * lv_draw_sdl_texture_cache_take_with_userdata(const void * key, size_t key_length, bool * found,
-                                                          void ** userdata);
+                                                           void ** userdata);
 
 void lv_draw_sdl_texture_cache_put(const void * key, size_t key_length, SDL_Texture * texture);
 
 void lv_draw_sdl_texture_cache_put_advanced(const void * key, size_t key_length, SDL_Texture * texture, void * userdata,
-                                            void userdata_free(void*), lv_draw_sdl_cache_flag_t flags);
+                                            void userdata_free(void *), lv_draw_sdl_cache_flag_t flags);
 
-lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void * src, int32_t frame_id, size_t * size);
+lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void * src, int32_t frame_id,
+                                                                      size_t * size);
 
 /**********************
  *      MACROS

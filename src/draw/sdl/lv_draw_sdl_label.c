@@ -134,7 +134,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
     SDL_RenderCopy(renderer, texture, &srcrect, &dstrect);
 
-    if (has_mask) {
+    if(has_mask) {
         lv_draw_sdl_mask_end(&apply_area);
     }
 }

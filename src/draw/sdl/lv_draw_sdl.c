@@ -66,7 +66,7 @@ void lv_draw_sdl_deinit()
     _lv_draw_sdl_utils_deinit();
 }
 
-void lv_draw_sdl_backend_init(lv_draw_backend_t *backend)
+void lv_draw_sdl_backend_init(lv_draw_backend_t * backend)
 {
     lv_draw_backend_init(backend);
     backend->draw_rect = lv_draw_sdl_draw_rect;
@@ -79,7 +79,7 @@ void lv_draw_sdl_backend_init(lv_draw_backend_t *backend)
     backend->blend_map = lv_draw_sdl_draw_blend_map;
 }
 
-void lv_draw_sdl_context_init(lv_draw_sdl_context_t *context)
+void lv_draw_sdl_context_init(lv_draw_sdl_context_t * context)
 {
     lv_memset_00(context, sizeof(lv_draw_sdl_context_t));
     context->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_t));
@@ -87,7 +87,7 @@ void lv_draw_sdl_context_init(lv_draw_sdl_context_t *context)
     lv_draw_sdl_texture_cache_init(context->internals);
 }
 
-void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t *context)
+void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t * context)
 {
     lv_draw_sdl_texture_cache_deinit(context->internals);
     lv_mem_free(context->internals);

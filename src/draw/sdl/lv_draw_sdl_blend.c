@@ -57,17 +57,17 @@ void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, 
     lv_area_to_sdl_rect(fill_area, &fill_rect);
 
     if(mask) {
-        SDL_Texture *texture = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK,
-                                                           lv_area_get_height(fill_area),
-                                                           lv_area_get_width(fill_area));
+        SDL_Texture * texture = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK,
+                                                            lv_area_get_height(fill_area),
+                                                            lv_area_get_width(fill_area));
         SDL_Rect rect = {0, 0, lv_area_get_width(fill_area), lv_area_get_height(fill_area)};
-        uint8_t *pixels = NULL;
+        uint8_t * pixels = NULL;
         int pitch;
         SDL_LockTexture(texture, &rect, (void **) &pixels, &pitch);
         SDL_assert(pixels && pitch);
-        for (int y = 0; y < rect.h; y++) {
+        for(int y = 0; y < rect.h; y++) {
             SDL_memset(&pixels[y * pitch], 0xFF, 4 * rect.w);
-            for (int x = 0; x < rect.w; x++) {
+            for(int x = 0; x < rect.w; x++) {
                 pixels[y * pitch + x * 4] = mask[y * rect.w + x];
             }
         }

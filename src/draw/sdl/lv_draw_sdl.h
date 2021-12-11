@@ -56,11 +56,11 @@ void lv_draw_sdl_init();
  */
 void lv_draw_sdl_deinit();
 
-void lv_draw_sdl_backend_init(lv_draw_backend_t *backend);
+void lv_draw_sdl_backend_init(lv_draw_backend_t * backend);
 
-void lv_draw_sdl_context_init(lv_draw_sdl_context_t *context);
+void lv_draw_sdl_context_init(lv_draw_sdl_context_t * context);
 
-void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t *context);
+void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t * context);
 
 /*======================
  * Add/remove functions
