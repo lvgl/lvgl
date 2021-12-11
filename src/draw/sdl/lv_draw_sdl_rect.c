@@ -317,7 +317,7 @@ static void draw_shadow(SDL_Renderer *renderer, const lv_area_t *coords, const l
         int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
         lv_opa_t *mask_buf = lv_draw_sdl_mask_dump_opa(&mask_area_blurred, &mask_id, 1);
         lv_stack_blur_grayscale(mask_buf, lv_area_get_width(&mask_area_blurred), lv_area_get_height(&mask_area_blurred),
-                                sw / 2 + 1);
+                                sw / 2 + sw % 2);
         texture = lv_sdl_create_opa_texture(renderer, mask_buf, blur_frag_size, blur_frag_size,
                                             lv_area_get_width(&mask_area_blurred));
         lv_mem_buf_release(mask_buf);
