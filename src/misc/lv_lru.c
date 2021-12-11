@@ -309,7 +309,7 @@ static void lv_lru_remove_lru_item(lv_lru_t * cache)
         prev = NULL;
 
         while(item) {
-            if(item->access_count < min_access_count || min_access_count == -1) {
+            if(item->access_count < min_access_count || (int64_t) min_access_count == -1) {
                 min_access_count = item->access_count;
                 min_item = item;
                 min_prev = prev;
