@@ -652,7 +652,7 @@ static void draw_main(lv_event_t * e)
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     if(btnm->btn_cnt == 0) return;
 
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_t * draw = lv_event_get_draw_ctx(e);
     obj->skip_trans = 1;
 
     lv_area_t area_obj;
@@ -690,7 +690,7 @@ static void draw_main(lv_event_t * e)
 #endif
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw);
     part_draw_dsc.part = LV_PART_ITEMS;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_BTNMATRIX_DRAW_PART_BTN;
@@ -768,7 +768,7 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the background*/
-        lv_draw_rect(&btn_area, clip_area, &draw_rect_dsc_act);
+        lv_draw_rect(draw, &draw_rect_dsc_act, &btn_area);
 
         /*Calculate the size of the text*/
         const lv_font_t * font = draw_label_dsc_act.font;
@@ -800,7 +800,7 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the text*/
-        lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
+        lv_draw_label(draw, &draw_label_dsc_act, &btn_area, txt, NULL);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }

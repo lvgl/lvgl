@@ -510,8 +510,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
         /*Do not mask if out of the bg*/
         if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
-        blend_dsc.mask = mask_buf;
         if(w > 0) {
+            blend_dsc.mask = mask_buf;
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
@@ -548,9 +550,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
         /*Do not mask if out of the bg*/
         if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
         else simple_sub = simple;
-        blend_dsc.mask = mask_buf;
 
         if(w > 0) {
+            blend_dsc.mask = mask_buf;
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
                 blend_area.y1 = y;
@@ -591,6 +595,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
             } else {
                 blend_dsc.mask = NULL;
             }
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
 
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
@@ -619,17 +625,23 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
     blend_area.y2 = shadow_area.y2;
     blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
 
+
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw->clip_area) && !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
         if(w > 0) {
+            /*Do not mask if out of the bg*/
+            if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+            else simple_sub = simple;
 
             if(!simple_sub) {
                 blend_dsc.mask = mask_buf;
             } else {
                 blend_dsc.mask = NULL;
             }
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
 
             for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
                 blend_area.y1 = y;
@@ -679,6 +691,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
         blend_dsc.mask = simple_sub ? sh_buf_tmp : mask_buf;
 
         if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
@@ -732,6 +746,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
         else simple_sub = simple;
         blend_dsc.mask = simple_sub ? sh_buf_tmp : mask_buf;
         if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
@@ -769,6 +785,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
         blend_dsc.mask = mask_buf;
 
         if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
@@ -809,6 +827,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
         else simple_sub = simple;
         blend_dsc.mask = mask_buf;
         if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
                 blend_area.y1 = y;
@@ -837,6 +857,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_t * draw, const lv_draw_re
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw->clip_area) && !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;

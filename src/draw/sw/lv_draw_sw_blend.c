@@ -395,19 +395,14 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_
 }
 #endif
 
-LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                                             const lv_color_t * src_buf, const lv_area_t * src_area,
-                                             const lv_opa_t * mask, lv_opa_t opa)
+LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
+
 {
-    lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw->clip_area)) return;
-    lv_area_move(&blend_area, -draw->dest_area->x1, -draw->dest_area->y1);
 
-    int32_t clip_w = lv_area_get_width(clip_area);
-    int32_t clip_h = lv_area_get_height(clip_area);
 
-    int32_t blend_w = lv_area_get_width(&blend_area);
-    int32_t blend_h = lv_area_get_height(&blend_area);
+    int32_t w = lv_area_get_width(dest_area);
+    int32_t h = lv_area_get_height(dest_area);
 
     int32_t x;
     int32_t y;

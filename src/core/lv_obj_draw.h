@@ -34,7 +34,7 @@ typedef enum {
 } lv_cover_res_t;
 
 typedef struct {
-    const lv_draw_t * draw;        /**< Pointer to the current draw context*/
+    lv_draw_t * draw;        /**< Pointer to the current draw context*/
     const struct _lv_obj_class_t * class_p;     /**< The class that sent the event */
     uint32_t type;                      /**< The type if part being draw. Element of `lv_<name>_draw_part_type_t` */
     lv_area_t * draw_area;              /**< The area of the part being drawn*/

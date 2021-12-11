@@ -205,7 +205,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
                 int32_t rot_x = blend_area.x1 - coords->x1;
 #endif
 
-                for(x = 0; x < draw_area_w; x++, px_i++) {
+                for(x = 0; x < draw_area_w; x++, px_i++, map_px += px_size_byte) {
 
 #if LV_DRAW_COMPLEX
                     if(transform) {
@@ -233,7 +233,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
 #if  LV_COLOR_DEPTH == 32
                                 src_buf_rgb[px_i].full = 0;
 #endif
-                                map_px += px_size_byte;
                                 continue;
                             }
                         }
@@ -257,7 +256,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
 #if  LV_COLOR_DEPTH == 32
                                 src_buf_rgb[px_i].full = 0;
 #endif
-                                map_px += px_size_byte;
                                 continue;
                             }
                         }

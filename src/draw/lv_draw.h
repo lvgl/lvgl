@@ -35,6 +35,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    void * user_data;
+}lv_draw_mask_t;
+
 
 typedef struct _lv_draw_t  {
     lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
@@ -64,6 +68,10 @@ typedef struct _lv_draw_t  {
     void (*draw_polygon)(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
                          const lv_draw_rect_dsc_t * draw_dsc);
 
+
+    lv_draw_mask_t * (*add_rect_mask)(struct _lv_draw_t * draw, const lv_area_t * coords, lv_coord_t * radius);
+    void (*remove_rect_mask)(struct _lv_draw_t * draw, lv_draw_mask_t * mask);
+
     /**
      * Wait until all background operation are finished. (E.g. GPU opertions)
      */
@@ -88,6 +96,7 @@ void lv_draw_init(void);
 /**********************
  *   POST INCLUDES
  *********************/
+#include "sw/lv_draw_sw.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

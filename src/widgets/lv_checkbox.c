@@ -195,7 +195,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_t * draw = lv_event_get_draw_ctx(e);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t font_h = lv_font_get_line_height(font);
 
@@ -229,7 +229,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     marker_area_transf.y2 += transf_h;
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw);
     part_draw_dsc.rect_dsc = &indic_dsc;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_CHECKBOX_DRAW_PART_BOX;
@@ -237,7 +237,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     part_draw_dsc.part = LV_PART_INDICATOR;
 
     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-    lv_draw_rect(&marker_area_transf, clip_area, &indic_dsc);
+    lv_draw_rect(draw, &indic_dsc, &marker_area_transf);
     lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -257,6 +257,6 @@ static void lv_checkbox_draw(lv_event_t * e)
     txt_area.y1 = obj->coords.y1 + bg_topp + y_ofs;
     txt_area.y2 = txt_area.y1 + txt_size.y;
 
-    lv_draw_label(&txt_area, clip_area, &txt_dsc, cb->txt, NULL);
+    lv_draw_label(draw, &txt_dsc, &txt_area, cb->txt, NULL);
 }
 #endif

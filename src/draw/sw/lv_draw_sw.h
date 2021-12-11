@@ -15,13 +15,9 @@ extern "C" {
  *********************/
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
-#include "../lv_draw.h"
-#include "../lv_draw_arc.h"
-#include "../lv_draw_rect.h"
-#include "../lv_draw_line.h"
-#include "../lv_draw_img.h"
 #include "lv_draw_sw_mask.h"
 #include "lv_draw_sw_blend.h"
+#include "../lv_draw.h"
 
 /*********************
  *      DEFINES
