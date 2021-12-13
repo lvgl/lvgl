@@ -198,7 +198,7 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         rect_dsc.shadow_spread = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
                                  (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
-        lv_draw_t * draw = lv_event_get_draw_ctx(e);
+        lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
         lv_obj_draw_part_dsc_t  part_draw_dsc;
         lv_obj_draw_dsc_init(&part_draw_dsc, draw);

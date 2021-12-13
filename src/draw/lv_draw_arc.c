@@ -41,7 +41,7 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-void lv_draw_arc(lv_draw_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
+void lv_draw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;

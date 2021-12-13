@@ -25,9 +25,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src);
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src);
 
-static void show_error(lv_draw_t * draw, const lv_area_t * coords, const char * msg);
+static void show_error(lv_draw_ctx_t * draw, const lv_area_t * coords, const char * msg);
 static void draw_cleanup(_lv_img_cache_entry_t * cache);
 
 /**********************
@@ -58,7 +58,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(lv_draw_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
+void lv_draw_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -222,7 +222,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src)
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -322,7 +322,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_t * draw, const l
 }
 
 
-static void show_error(lv_draw_t * draw, const lv_area_t * coords, const char * msg)
+static void show_error(lv_draw_ctx_t * draw, const lv_area_t * coords, const char * msg)
 {
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_rect_dsc_init(&rect_dsc);

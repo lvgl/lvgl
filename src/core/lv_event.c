@@ -278,7 +278,7 @@ lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e)
     }
 }
 
-lv_draw_t * lv_event_get_draw_ctx(lv_event_t * e)
+lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e)
 {
     if(e->code == LV_EVENT_DRAW_MAIN ||
        e->code == LV_EVENT_DRAW_MAIN_BEGIN ||

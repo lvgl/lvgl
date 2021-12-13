@@ -74,7 +74,7 @@ typedef struct _lv_draw_t  {
      */
     void (*wait_for_finish)(struct _lv_draw_t * draw);
 
-} lv_draw_t;
+} lv_draw_ctx_t;
 
 /**********************
  * GLOBAL PROTOTYPES

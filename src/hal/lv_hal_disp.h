@@ -134,9 +134,9 @@ typedef struct _lv_disp_drv_t {
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
-    lv_draw_t * draw_ctx;
-    void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_t * draw);
-    void (*draw_ctx_deinit)(struct _lv_disp_drv_t * disp_drv, lv_draw_t * draw);
+    lv_draw_ctx_t * draw_ctx;
+    void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw);
+    void (*draw_ctx_deinit)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw);
     size_t draw_ctx_size;
 
 #if LV_USE_USER_DATA

@@ -26,9 +26,9 @@
 static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void draw_arcs(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_area);
-static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_area);
-static void draw_needles(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_area);
+static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw, const lv_area_t * scale_area);
+static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw, const lv_area_t * scale_area);
+static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw, const lv_area_t * scale_area);
 static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_value, int32_t new_value);
 static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
@@ -296,7 +296,7 @@ static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_DRAW_MAIN) {
-        lv_draw_t * draw = lv_event_get_draw_ctx(e);
+        lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
@@ -323,7 +323,7 @@ static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-static void draw_arcs(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_area)
+static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw, const lv_area_t * scale_area)
 {
     lv_meter_t * meter = (lv_meter_t *)obj;
 
@@ -370,7 +370,7 @@ static void draw_arcs(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_
     }
 }
 
-static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_area)
+static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw, const lv_area_t * scale_area)
 {
     lv_meter_t * meter    = (lv_meter_t *)obj;
 
@@ -559,7 +559,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_t * draw, const lv_are
 }
 
 
-static void draw_needles(lv_obj_t * obj, lv_draw_t * draw, const lv_area_t * scale_area)
+static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw, const lv_area_t * scale_area)
 {
     lv_meter_t * meter = (lv_meter_t *)obj;
 

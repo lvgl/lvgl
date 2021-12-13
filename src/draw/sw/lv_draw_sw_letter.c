@@ -27,11 +27,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-static void draw_letter_subpx(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+static void draw_letter_subpx(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 #endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
 /**********************
@@ -90,7 +90,7 @@ const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-void lv_draw_sw_letter(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
+void lv_draw_sw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
 {
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(dsc->font, &g, letter, '\0');
@@ -142,7 +142,7 @@ void lv_draw_sw_letter(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
 
     const uint8_t * bpp_opa_table_p;
@@ -313,7 +313,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_t * draw, const lv_
 }
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-static void draw_letter_subpx(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+static void draw_letter_subpx(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;

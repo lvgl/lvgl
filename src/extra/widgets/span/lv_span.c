@@ -52,7 +52,7 @@ static lv_opa_t lv_span_get_style_text_blend_mode(lv_obj_t * par, lv_span_t * sp
 static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span);
 
 static inline void span_text_check(const char ** text);
-static void lv_draw_span(lv_obj_t * obj, lv_draw_t * draw);
+static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw);
 static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font, lv_coord_t letter_space,
                                lv_coord_t max_width, lv_text_flag_t flag, lv_coord_t * use_width,
                                uint32_t * end_ofs);
@@ -663,7 +663,7 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
 static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
     lv_draw_span(obj, draw);
 }
@@ -831,7 +831,7 @@ static lv_coord_t convert_indent_pct(lv_obj_t * obj, lv_coord_t width)
  * @param coords coordinates of the label
  * @param mask the label will be drawn only in this area
  */
-static void lv_draw_span(lv_obj_t * obj, lv_draw_t * draw)
+static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
 
     lv_area_t coords;

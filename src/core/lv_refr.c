@@ -36,9 +36,9 @@
 static void lv_refr_join_area(void);
 static void lv_refr_areas(void);
 static void lv_refr_area(const lv_area_t * area_p);
-static void lv_refr_area_part(lv_draw_t * draw);
+static void lv_refr_area_part(lv_draw_ctx_t * draw);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
-static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_obj);
+static void lv_refr_obj_and_children(lv_draw_ctx_t * draw, lv_obj_t * top_obj);
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h);
 static void draw_buf_flush(lv_disp_t * disp);
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
@@ -91,7 +91,7 @@ void lv_refr_now(lv_disp_t * disp)
     }
 }
 
-void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
+void lv_refr_obj(lv_draw_ctx_t * draw, lv_obj_t * obj)
 {
     /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
@@ -474,7 +474,7 @@ static void lv_refr_areas(void)
  */
 static void lv_refr_area(const lv_area_t * area_p)
 {
-    lv_draw_t * draw = disp_refr->driver->draw_ctx;
+    lv_draw_ctx_t * draw = disp_refr->driver->draw_ctx;
     draw->dest_buf = disp_refr->driver->draw_buf->buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
@@ -536,7 +536,7 @@ static void lv_refr_area(const lv_area_t * area_p)
     }
 }
 
-static void lv_refr_area_part(lv_draw_t * draw)
+static void lv_refr_area_part(lv_draw_ctx_t * draw)
 {
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
@@ -649,7 +649,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
  * @param top_p pointer to an objects. Start the drawing from it.
  * @param mask_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_obj)
+static void lv_refr_obj_and_children(lv_draw_ctx_t * draw, lv_obj_t * top_obj)
 {
     /*Normally always will be a top_obj (at least the screen)
      *but in special cases (e.g. if the screen has alpha) it won't.
@@ -918,7 +918,7 @@ static void draw_buf_flush(lv_disp_t * disp)
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
     /*Flush the rendered content to the display*/
-    lv_draw_t * draw = disp->driver->draw_ctx;
+    lv_draw_ctx_t * draw = disp->driver->draw_ctx;
     if(draw->wait_for_finish) draw->wait_for_finish(draw);
 
     /* In double buffered mode wait until the other buffer is freed

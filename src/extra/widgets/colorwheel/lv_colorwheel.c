@@ -242,7 +242,7 @@ static void lv_colorwheel_constructor(const lv_obj_class_t * class_p, lv_obj_t *
 static void draw_disc_grad(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_coord_t cx = obj->coords.x1 + w / 2;
@@ -306,7 +306,7 @@ static void draw_disc_grad(lv_event_t * e)
 static void draw_knob(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     lv_draw_rect_dsc_t cir_dsc;

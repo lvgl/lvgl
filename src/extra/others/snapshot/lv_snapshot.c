@@ -125,11 +125,11 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     fake_disp.driver = &driver;
 
 
-    lv_draw_t * draw_ctx = lv_mem_alloc(obj_disp->driver->draw_ctx_size);
+    lv_draw_ctx_t * draw_ctx = lv_mem_alloc(obj_disp->driver->draw_ctx_size);
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL) return LV_RES_INV;
     obj_disp->driver->draw_ctx_init(fake_disp.driver, draw_ctx);
-    fake_disp.driver->draw_ctx = (lv_draw_t *) draw_ctx;
+    fake_disp.driver->draw_ctx = (lv_draw_ctx_t *) draw_ctx;
     draw_ctx->clip_area = &snapshot_area;
     draw_ctx->dest_area = &snapshot_area;
     draw_ctx->dest_buf = (void *)buf;

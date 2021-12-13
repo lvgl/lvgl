@@ -74,7 +74,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->font == NULL) {
@@ -360,7 +360,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_t * draw, const lv_draw_label_d
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-void lv_draw_letter(lv_draw_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
+void lv_draw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
 {
     draw->draw_letter(draw, dsc, pos_p, letter);
 }

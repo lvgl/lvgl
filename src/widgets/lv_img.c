@@ -638,7 +638,7 @@ static void draw_img(lv_event_t * e)
             if(img->h == 0 || img->w == 0) return;
             if(zoom_final == 0) return;
 
-            lv_draw_t * draw = lv_event_get_draw_ctx(e);
+            lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
             lv_area_t img_max_area;
             lv_area_copy(&img_max_area, &obj->coords);

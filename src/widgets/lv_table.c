@@ -589,7 +589,7 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_table_t * table = (lv_table_t *)obj;
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     lv_area_t clip_area;
     if(!_lv_area_intersect(&clip_area, &obj->coords, draw->clip_area)) return;
 

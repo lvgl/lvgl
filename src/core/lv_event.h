@@ -265,7 +265,7 @@ lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e);
  * @param e     pointer to an event
  * @return      pointer to a draw context or NULL if called on an unrelated event
  */
-lv_draw_t * lv_event_get_draw_ctx(lv_event_t * e);
+lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e);
 
 /**
  * Get the old area of the object before its size was changed. Can be used in `LV_EVENT_SIZE_CHANGED`

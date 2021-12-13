@@ -44,7 +44,7 @@
  * @param clip_area polygon will be drawn only in this area
  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_sw_polygon( lv_draw_t * draw, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[], uint16_t point_cnt)
+void lv_draw_sw_polygon( lv_draw_ctx_t * draw, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[], uint16_t point_cnt)
 {
 #if LV_DRAW_COMPLEX
     if(point_cnt < 3) return;

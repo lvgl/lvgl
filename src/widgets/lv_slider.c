@@ -323,7 +323,7 @@ static void draw_knob(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     lv_coord_t objw = lv_obj_get_width(obj);

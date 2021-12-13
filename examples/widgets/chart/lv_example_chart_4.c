@@ -45,7 +45,7 @@ static void event_cb(lv_event_t * e)
             a.y1 = chart->coords.y1 + p.y - 30;
             a.y2 = chart->coords.y1 + p.y - 10;
 
-            lv_draw_t * draw = lv_event_get_draw_ctx(e);
+            lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
             lv_draw_rect(draw, &draw_rect_dsc, &a);
 
             ser = lv_chart_get_series_next(chart, ser);

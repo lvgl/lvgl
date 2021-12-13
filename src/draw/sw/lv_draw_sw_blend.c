@@ -37,7 +37,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
         const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride);
 
 #if LV_DRAW_COMPLEX
-static void map_blended(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
+static void map_blended(lv_draw_ctx_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
@@ -89,7 +89,7 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
  **********************/
 
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_ctx_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
     /*Do not draw transparent things*/
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -561,7 +561,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
     }
 }
 #if LV_DRAW_COMPLEX
-static void map_blended(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
+static void map_blended(lv_draw_ctx_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw->clip_area)) return;

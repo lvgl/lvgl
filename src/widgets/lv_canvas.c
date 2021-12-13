@@ -846,11 +846,11 @@ static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * 
 
     lv_disp_t * canvas_disp = lv_obj_get_disp(canvas);
 
-    lv_draw_t * draw_ctx = lv_mem_alloc(canvas_disp->driver->draw_ctx_size);
+    lv_draw_ctx_t * draw_ctx = lv_mem_alloc(canvas_disp->driver->draw_ctx_size);
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL)  return;
     canvas_disp->driver->draw_ctx_init(disp->driver, draw_ctx);
-    disp->driver->draw_ctx = (lv_draw_t *) draw_ctx;
+    disp->driver->draw_ctx = (lv_draw_ctx_t *) draw_ctx;
     draw_ctx->clip_area = clip_area;
     draw_ctx->dest_area = clip_area;
     draw_ctx->dest_buf = (void *)dsc->data;

@@ -47,8 +47,8 @@ static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t 
 static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_list(lv_event_t * e);
 
-static void draw_box(lv_obj_t * dropdown_obj, lv_draw_t * draw, uint16_t id, lv_state_t state);
-static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_t * draw, uint16_t id, lv_state_t state);
+static void draw_box(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw, uint16_t id, lv_state_t state);
+static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw, uint16_t id, lv_state_t state);
 static lv_res_t btn_release_handler(lv_obj_t * obj);
 static lv_res_t list_release_handler(lv_obj_t * list_obj);
 static void list_press_handler(lv_obj_t * page);
@@ -746,7 +746,7 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
@@ -862,7 +862,7 @@ static void draw_list(lv_event_t * e)
     lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
     lv_obj_t * dropdown_obj = list->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
     /* Clip area might be too large too to shadow but
      * the selected option can be drawn on only the background*/
@@ -892,7 +892,7 @@ static void draw_list(lv_event_t * e)
     }
 }
 
-static void draw_box(lv_obj_t * dropdown_obj, lv_draw_t * draw, uint16_t id, lv_state_t state)
+static void draw_box(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw, uint16_t id, lv_state_t state)
 {
     if(id == LV_DROPDOWN_PR_NONE) return;
 
@@ -930,7 +930,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_draw_t * draw, uint16_t id, lv_
     list_obj->skip_trans = 0;
 }
 
-static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_t * draw, uint16_t id, lv_state_t state)
+static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw, uint16_t id, lv_state_t state)
 {
     if(id == LV_DROPDOWN_PR_NONE) return;
 

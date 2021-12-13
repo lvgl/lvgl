@@ -41,7 +41,7 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_draw_sw_blend(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_sw_blend(lv_draw_ctx_t * draw, const lv_draw_sw_blend_dsc_t * dsc);
 
 /**********************
  *      MACROS

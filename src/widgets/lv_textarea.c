@@ -1271,7 +1271,7 @@ static void draw_placeholder(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     const char * txt = lv_label_get_text(ta->label);
 
     /*Draw the place holder*/
@@ -1296,7 +1296,7 @@ static void draw_cursor(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     const char * txt = lv_label_get_text(ta->label);
 
     if(ta->cursor.show == 0) return;

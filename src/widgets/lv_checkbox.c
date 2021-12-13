@@ -195,7 +195,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t font_h = lv_font_get_line_height(font);
 

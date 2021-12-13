@@ -30,7 +30,7 @@ typedef struct {
     lv_coord_t width;
     lv_draw_rect_dsc_t * draw_dsc;
     const lv_area_t * draw_area;
-    lv_draw_t * draw;
+    lv_draw_ctx_t * draw;
 } quarter_draw_dsc_t;
 
 /**********************
@@ -56,7 +56,7 @@ typedef struct {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_arc(lv_draw_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
+void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
 {
 #if LV_DRAW_COMPLEX
     if(dsc->opa <= LV_OPA_MIN) return;

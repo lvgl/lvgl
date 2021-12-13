@@ -652,7 +652,7 @@ static void draw_main(lv_event_t * e)
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     if(btnm->btn_cnt == 0) return;
 
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
     obj->skip_trans = 1;
 
     lv_area_t area_obj;

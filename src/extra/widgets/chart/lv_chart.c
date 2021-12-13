@@ -32,12 +32,12 @@ static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
-static void draw_div_lines(lv_obj_t * obj, lv_draw_t * draw);
-static void draw_series_line(lv_obj_t * obj, lv_draw_t * draw);
-static void draw_series_bar(lv_obj_t * obj, lv_draw_t * draw);
-static void draw_series_scatter(lv_obj_t * obj, lv_draw_t * draw);
-static void draw_cursors(lv_obj_t * obj, lv_draw_t * draw);
-static void draw_axes(lv_obj_t * obj, lv_draw_t * draw);
+static void draw_div_lines(lv_obj_t * obj, lv_draw_ctx_t * draw);
+static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw);
+static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw);
+static void draw_series_scatter(lv_obj_t * obj, lv_draw_ctx_t * draw);
+static void draw_cursors(lv_obj_t * obj, lv_draw_ctx_t * draw);
+static void draw_axes(lv_obj_t * obj, lv_draw_ctx_t * draw);
 static uint32_t get_index_from_x(lv_obj_t * obj, lv_coord_t x);
 static void invalidate_point(lv_obj_t * obj, uint16_t i);
 static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, lv_coord_t ** a);
@@ -736,7 +736,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
         p->y = ((int32_t)lv_obj_get_content_height(obj) * chart->zoom_y) >> 8;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
-        lv_draw_t * draw = lv_event_get_draw_ctx(e);
+        lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
         draw_div_lines(obj, draw);
         draw_axes(obj, draw);
 
@@ -750,7 +750,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-static void draw_div_lines(lv_obj_t * obj, lv_draw_t * draw)
+static void draw_div_lines(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -858,7 +858,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_draw_t * draw)
     draw->clip_area = clip_area_ori;
 }
 
-static void draw_series_line(lv_obj_t * obj, lv_draw_t * draw)
+static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
     lv_area_t clip_area;
     if(_lv_area_intersect(&clip_area, &obj->coords, draw->clip_area) == false) return;
@@ -1027,7 +1027,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_t * draw)
     draw->clip_area = clip_area_ori;
 }
 
-static void draw_series_scatter(lv_obj_t * obj, lv_draw_t * draw)
+static void draw_series_scatter(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
 
     lv_area_t clip_area;
@@ -1170,7 +1170,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_draw_t * draw)
     draw->clip_area = clip_area_ori;
 }
 
-static void draw_series_bar(lv_obj_t * obj, lv_draw_t * draw)
+static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
     lv_area_t clip_area;
     if(_lv_area_intersect(&clip_area, &obj->coords, draw->clip_area) == false) return;
@@ -1253,7 +1253,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_t * draw)
     draw->clip_area = clip_area_ori;
 }
 
-static void draw_cursors(lv_obj_t * obj, lv_draw_t * draw)
+static void draw_cursors(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -1361,7 +1361,7 @@ static void draw_cursors(lv_obj_t * obj, lv_draw_t * draw)
     draw->clip_area = clip_area_ori;
 }
 
-static void draw_y_ticks(lv_obj_t * obj, lv_draw_t * draw, lv_chart_axis_t axis)
+static void draw_y_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw, lv_chart_axis_t axis)
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -1492,7 +1492,7 @@ static void draw_y_ticks(lv_obj_t * obj, lv_draw_t * draw, lv_chart_axis_t axis)
     }
 }
 
-static void draw_x_ticks(lv_obj_t * obj, lv_draw_t * draw, lv_chart_axis_t axis)
+static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw, lv_chart_axis_t axis)
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -1629,7 +1629,7 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_t * draw, lv_chart_axis_t axis)
     }
 }
 
-static void draw_axes(lv_obj_t * obj, lv_draw_t * draw)
+static void draw_axes(lv_obj_t * obj, lv_draw_ctx_t * draw)
 {
     draw_y_ticks(obj, draw, LV_CHART_AXIS_PRIMARY_Y);
     draw_y_ticks(obj, draw, LV_CHART_AXIS_SECONDARY_Y);

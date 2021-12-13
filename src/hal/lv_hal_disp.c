@@ -106,7 +106,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 #else
         driver->draw_ctx_init = lv_draw_sw_init_ctx;
         driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
-        driver->draw_ctx_size = sizeof(lv_draw_sw_t);
+        driver->draw_ctx_size = sizeof(lv_draw_sw_ctx_t);
 #endif
 
 }
@@ -152,11 +152,11 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     /*Create a draw context if not created yet*/
     if(driver->draw_ctx == NULL) {
-        lv_draw_t * draw_ctx = lv_mem_alloc(driver->draw_ctx_size);
+        lv_draw_ctx_t * draw_ctx = lv_mem_alloc(driver->draw_ctx_size);
         LV_ASSERT_MALLOC(draw_ctx);
         if(draw_ctx == NULL)  return NULL;
         driver->draw_ctx_init(driver, draw_ctx);
-        driver->draw_ctx = (lv_draw_t *) draw_ctx;
+        driver->draw_ctx = (lv_draw_ctx_t *) draw_ctx;
     }
 
     lv_memset_00(disp, sizeof(lv_disp_t));

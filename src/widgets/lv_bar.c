@@ -237,7 +237,7 @@ static void draw_indic(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);

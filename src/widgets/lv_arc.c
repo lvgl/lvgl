@@ -549,7 +549,7 @@ static void lv_arc_draw(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
     lv_point_t center;
     lv_coord_t arc_r;

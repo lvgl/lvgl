@@ -450,7 +450,7 @@ static void draw_main(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_DRAW_MAIN) {
         /*Draw the selected rectangle*/
-        lv_draw_t * draw = lv_event_get_draw_ctx(e);
+        lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
         lv_area_t sel_area;
         get_sel_area(obj, &sel_area);
         lv_draw_rect_dsc_t sel_dsc;
@@ -460,7 +460,7 @@ static void draw_main(lv_event_t * e)
     }
     /*Post draw when the children are drawn*/
     else if(code == LV_EVENT_DRAW_POST) {
-        lv_draw_t * draw = lv_event_get_draw_ctx(e);
+        lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
@@ -526,7 +526,7 @@ static void draw_label(lv_event_t * e)
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
     lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
-    lv_draw_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
 
     lv_area_t sel_area;
     get_sel_area(roller, &sel_area);
