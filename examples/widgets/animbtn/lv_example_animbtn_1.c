@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_ANIMBTN && LV_BUILD_EXAMPLES
+#if LV_USE_ANIMBTN == 1 && LV_USE_RLOTTIE == 1 && LV_BUILD_EXAMPLES
 
 void lv_example_animbtn_1(void)
 {

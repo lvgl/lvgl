@@ -22,8 +22,7 @@ You'll construct this button with `lv_animbtn_create(parent, lottie)`.
 The `lottie` instance is constructed as usual (for example like this: `lv_obj_t * lottie = lv_rlottie_create_from_file(parent, 64, 64, "test.json")`).
 It's orphaned and attached as a child of this button so the given parent is not important. 
 
-Then, to set the button's states from the animation, you'll have to build a `lv_animbtn_state_desc_t` containing the first frame to play when in the state, the last frame not to play (or said differently, if you want to play only one frame, `last_frame` will be `first_frame + 1`).
-You'll also set the `control` mode for this animation state (forward, backward, with or without looping), see `lv_rlottie_ctrl_t`).
+Then, to set the button's states from the animation, you'll have to build a `lv_animbtn_state_desc_t` containing the first frame to play when in the state, the last frame to play and the `control` mode for this animation state (forward, backward, with or without looping), see `lv_rlottie_ctrl_t`).
 
 Then attach your state descriptor to a state with `lv_animbtn_set_state_desc(btn, state, desc)`.
 By default, state descriptors are invalid and not used.

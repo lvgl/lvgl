@@ -1515,6 +1515,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_ANIMBTN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ANIMBTN
+            #define LV_USE_ANIMBTN CONFIG_LV_USE_ANIMBTN
+        #else
+            #define LV_USE_ANIMBTN 0
+        #endif
+    #else
+        #define LV_USE_ANIMBTN    1
+    #endif
+#endif
+
 #ifndef LV_USE_KEYBOARD
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_KEYBOARD
