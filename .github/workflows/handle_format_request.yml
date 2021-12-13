@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@v2
         if: success()
         with:
+          token: ${{ secrets.LVGL_BOT_TOKEN }}
           ref: ${{ steps.comment-branch.outputs.head_ref }}
       - name: Format code
         run: python code-format.py
