@@ -4,16 +4,15 @@ on:
     types: [created]
 
 jobs:
-  test-github:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo '${{ toJSON(github) }}'
   update-formatting:
     continue-on-error: true
     if: github.event.issue.user.login == 'embeddedt'
     runs-on: ubuntu-latest
     steps:
+      - uses: xt0rted/pull-request-comment-branch@v1
+        id: comment-branch
       - uses: khan/pull-request-comment-trigger@bb03972cc9f423111f3b5a23fcc9fd32741acabb
+        if: success()
         id: check-comment
         with:
           trigger: '@lvgl-bot format'
@@ -24,12 +23,11 @@ jobs:
       - run: exit 1
         if: steps.check.outputs.triggered != 'true'
       - name: Install astyle
+        if: success()
         run: |
           sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
           sudo apt-get update -y -qq
           sudo apt-get install astyle
-      - uses: xt0rted/pull-request-comment-branch@v1
-        id: comment-branch
       - uses: actions/checkout@v2
         if: success()
         with:
