@@ -66,6 +66,7 @@ void lv_gpu_sdl_deinit()
 {
     _lv_draw_sdl_texture_cache_deinit();
     _lv_draw_sdl_utils_deinit();
+                   
 }
 
 void lv_gpu_sdl_backend_init(lv_draw_backend_t * backend, SDL_Renderer * renderer, SDL_Texture * texture)
