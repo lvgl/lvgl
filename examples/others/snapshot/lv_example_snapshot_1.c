@@ -36,7 +36,7 @@ void lv_example_snapshot_1(void)
     /*Create the container and its children*/
     lv_obj_t * container = lv_obj_create(root);
 
-    lv_obj_align(container, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_center(container);
     lv_obj_set_size(container, 180, 180);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(container, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);

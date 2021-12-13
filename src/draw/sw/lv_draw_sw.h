@@ -17,7 +17,7 @@ extern "C" {
 #include "../../misc/lv_color.h"
 #include "lv_draw_sw_mask.h"
 #include "lv_draw_sw_blend.h"
-#include "../lv_draw.h"
+#include "../../hal/lv_hal_disp.h"
 
 /*********************
  *      DEFINES
@@ -26,6 +26,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_disp_drv_t;
 
 typedef struct {
     lv_draw_t base_draw;
@@ -39,7 +41,8 @@ typedef struct {
  **********************/
 
 void lv_draw_sw_init(void);
-lv_draw_t * lv_draw_sw_create(void);
+void lv_draw_sw_init_ctx(struct _lv_disp_drv_t * drv, lv_draw_t * draw);
+void lv_draw_sw_deinit_ctx(struct _lv_disp_drv_t * drv, lv_draw_t * draw);
 
 void lv_draw_sw_arc(lv_draw_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
 

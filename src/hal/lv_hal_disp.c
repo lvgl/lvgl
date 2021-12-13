@@ -85,6 +85,30 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
     driver->dpi              = LV_DPI_DEF;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
+
+
+#if LV_USE_GPU_STM32_DMA2D
+    driver->draw_ctx_init = lv_draw_stm32_dma2d_init;
+    driver->draw_ctx_deinit = lv_draw_stm32_dma2d_init;
+    driver->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_t);
+#elif LV_USE_GPU_NXP_PXP
+        driver->draw_ctx_init = lv_draw_nxp_pxp_init;
+        driver->draw_ctx_deinit = lv_draw_nxp_pxp_init;
+        driver->draw_ctx_size = sizeof(lv_draw_nxp_pxp_t);
+#elif LV_USE_GPU_NXP_VG_LITE
+        driver->draw_ctx_init = lv_draw_nxp_vglite_init;
+        driver->draw_ctx_deinit = lv_draw_nxp_vglite_init;
+        driver->draw_ctx_size = sizeof(lv_draw_nxp_vglite_t);
+#elif LV_USE_GPU_SDL
+        driver->draw_ctx_init = lv_draw_sdl_init;
+        driver->draw_ctx_deinit = lv_draw_sdl_init;
+        driver->draw_ctx_size = sizeof(lv_draw_sdl_t);
+#else
+        driver->draw_ctx_init = lv_draw_sw_init_ctx;
+        driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
+        driver->draw_ctx_size = sizeof(lv_draw_sw_t);
+#endif
+
 }
 
 /**
@@ -124,6 +148,15 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     if(!disp) {
         LV_ASSERT_MALLOC(disp);
         return NULL;
+    }
+
+    /*Create a draw context if not created yet*/
+    if(driver->draw_ctx == NULL) {
+        lv_draw_t * draw_ctx = lv_mem_alloc(driver->draw_ctx_size);
+        LV_ASSERT_MALLOC(draw_ctx);
+        if(draw_ctx == NULL)  return NULL;
+        driver->draw_ctx_init(driver, draw_ctx);
+        driver->draw_ctx = (lv_draw_t *) draw_ctx;
     }
 
     lv_memset_00(disp, sizeof(lv_disp_t));

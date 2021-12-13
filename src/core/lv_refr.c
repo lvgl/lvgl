@@ -39,7 +39,6 @@ static void lv_refr_area(const lv_area_t * area_p);
 static void lv_refr_area_part(lv_draw_t * draw);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_obj);
-static void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj);
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h);
 static void draw_buf_flush(lv_disp_t * disp);
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
@@ -75,13 +74,6 @@ void _lv_refr_init(void)
     /*Nothing to do*/
 }
 
-/**
- * Redraw the invalidated areas now.
- * Normally the redrawing is periodically executed in `lv_timer_handler` but a long blocking process
- * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process
- * (e.g. progress bar) this function can be called when the screen should be updated.
- * @param disp pointer to display to refresh. NULL to refresh all displays.
- */
 void lv_refr_now(lv_disp_t * disp)
 {
     lv_anim_refr_now();
@@ -97,6 +89,68 @@ void lv_refr_now(lv_disp_t * disp)
             d = lv_disp_get_next(d);
         }
     }
+}
+
+void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
+{
+    /*Do not refresh hidden objects*/
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
+
+    const lv_area_t * clip_area_ori = draw->clip_area;
+    lv_area_t obj_coords_ext;
+    lv_area_t obj_ext_clip_coords;
+    lv_obj_get_coords(obj, &obj_coords_ext);
+    lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
+    if(!_lv_area_intersect(&obj_ext_clip_coords, clip_area_ori, &obj_coords_ext)) return;
+
+    draw->clip_area = &obj_ext_clip_coords;
+
+    /*Redraw the object*/
+    lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw);
+    lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw);
+    lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw);
+
+#if LV_USE_REFR_DEBUG
+    lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
+    lv_draw_rect_dsc_t draw_dsc;
+    lv_draw_rect_dsc_init(&draw_dsc);
+    draw_dsc.bg_color.full = debug_color.full;
+    draw_dsc.bg_opa = LV_OPA_20;
+    draw_dsc.border_width = 1;
+    draw_dsc.border_opa = LV_OPA_30;
+    draw_dsc.border_color = debug_color;
+    lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
+#endif
+
+    /*Create a new 'obj_clip' without 'ext_size' because the children can't be visible there*/
+    lv_area_t obj_clip_coords;
+    if(_lv_area_intersect(&obj_clip_coords, clip_area_ori, &obj->coords)) {
+        uint32_t i;
+        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            lv_area_t child_coords;
+            lv_obj_get_coords(child, &child_coords);
+            ext_draw_size = _lv_obj_get_ext_draw_size(child);
+            lv_area_increase(&child_coords, ext_draw_size, ext_draw_size);
+            lv_area_t child_clip;
+            if(_lv_area_intersect(&child_clip, &obj_clip_coords, &child_coords)) {
+                /*Refresh the next child*/
+                draw->clip_area = &child_clip;
+                lv_refr_obj(draw, child);
+            }
+        }
+    }
+
+    draw->clip_area = &obj_ext_clip_coords;
+
+    /*If all the children are redrawn make 'post draw' draw*/
+    lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw);
+    lv_event_send(obj, LV_EVENT_DRAW_POST, draw);
+    lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw);
+
+    draw->clip_area = clip_area_ori;
 }
 
 /**
@@ -336,6 +390,7 @@ uint32_t lv_refr_get_fps_avg(void)
     return fps_sum_all / fps_sum_cnt;
 }
 #endif
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -638,73 +693,6 @@ static void lv_refr_obj_and_children(lv_draw_t * draw, lv_obj_t * top_obj)
         /*Go a level deeper*/
         parent = lv_obj_get_parent(parent);
     }
-}
-
-/**
- * Refresh an object an all of its children. (Called recursively)
- * @param obj pointer to an object to refresh
- * @param mask_ori_p pointer to an area, the objects will be drawn only here
- */
-static void lv_refr_obj(lv_draw_t * draw, lv_obj_t * obj)
-{
-    /*Do not refresh hidden objects*/
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
-
-    const lv_area_t * clip_area_ori = draw->clip_area;
-    lv_area_t obj_coords_ext;
-    lv_area_t obj_ext_clip_coords;
-    lv_obj_get_coords(obj, &obj_coords_ext);
-    lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
-    lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
-    if(!_lv_area_intersect(&obj_ext_clip_coords, clip_area_ori, &obj_coords_ext)) return;
-
-    draw->clip_area = &obj_ext_clip_coords;
-
-    /*Redraw the object*/
-    lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw);
-    lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw);
-    lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw);
-
-#if LV_USE_REFR_DEBUG
-    lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
-    lv_draw_rect_dsc_t draw_dsc;
-    lv_draw_rect_dsc_init(&draw_dsc);
-    draw_dsc.bg_color.full = debug_color.full;
-    draw_dsc.bg_opa = LV_OPA_20;
-    draw_dsc.border_width = 1;
-    draw_dsc.border_opa = LV_OPA_30;
-    draw_dsc.border_color = debug_color;
-    lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
-#endif
-
-    /*Create a new 'obj_clip' without 'ext_size' because the children can't be visible there*/
-    lv_area_t obj_clip_coords;
-    if(_lv_area_intersect(&obj_clip_coords, clip_area_ori, &obj->coords)) {
-        uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
-        for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = obj->spec_attr->children[i];
-            lv_area_t child_coords;
-            lv_obj_get_coords(child, &child_coords);
-            ext_draw_size = _lv_obj_get_ext_draw_size(child);
-            lv_area_increase(&child_coords, ext_draw_size, ext_draw_size);
-            lv_area_t child_clip;
-            if(_lv_area_intersect(&child_clip, &obj_clip_coords, &child_coords)) {
-                /*Refresh the next child*/
-                draw->clip_area = &child_clip;
-                lv_refr_obj(draw, child);
-            }
-        }
-    }
-
-    draw->clip_area = &obj_ext_clip_coords;
-
-    /*If all the children are redrawn make 'post draw' draw*/
-    lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw);
-    lv_event_send(obj, LV_EVENT_DRAW_POST, draw);
-    lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw);
-
-    draw->clip_area = clip_area_ori;
 }
 
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)

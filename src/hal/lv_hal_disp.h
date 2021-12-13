@@ -135,6 +135,9 @@ typedef struct _lv_disp_drv_t {
     lv_color_t color_chroma_key;
 
     lv_draw_t * draw_ctx;
+    void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_t * draw);
+    void (*draw_ctx_deinit)(struct _lv_disp_drv_t * disp_drv, lv_draw_t * draw);
+    size_t draw_ctx_size;
 
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom display driver user data*/
