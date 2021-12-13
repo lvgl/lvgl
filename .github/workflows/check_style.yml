@@ -28,9 +28,11 @@ jobs:
             echo "Please apply the preceding diff to your code or run scripts/code-format.sh"
             exit 1
           fi
-      - name: Upload diff
-        uses: actions/upload-artifact@v2
-        if: failure()
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@a35cf36e5301d70b76f316e867e7788a55a31dae
         with:
-          name: formatting-patch
-          path: /tmp/lvgl_diff.patch
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Your PR needs its formatting corrected before it can be merged upstream.
+            
+            Please comment `@lvgl-bot format` if you would like our bot to commit this change for you.
