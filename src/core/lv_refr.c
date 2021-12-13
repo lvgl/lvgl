@@ -475,14 +475,14 @@ static void lv_refr_areas(void)
 static void lv_refr_area(const lv_area_t * area_p)
 {
     lv_draw_ctx_t * draw_ctx = disp_refr->driver->draw_ctx;
-    draw_ctx->dest_buf = disp_refr->driver->draw_buf->buf_act;
+    draw_ctx->buf = disp_refr->driver->draw_buf->buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
     if(disp_refr->driver->full_refresh || disp_refr->driver->direct_mode) {
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-        draw_ctx->dest_area = &disp_area;
+        draw_ctx->buf_area = &disp_area;
 
         if(disp_refr->driver->full_refresh) {
             disp_refr->driver->draw_buf->last_part = 1;
@@ -514,7 +514,7 @@ static void lv_refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        draw_ctx->dest_area = &sub_area;
+        draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
@@ -529,7 +529,7 @@ static void lv_refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        draw_ctx->dest_area = &sub_area;
+        draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
         disp_refr->driver->draw_buf->last_part = 1;
         lv_refr_area_part(draw_ctx);
@@ -552,9 +552,9 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(draw_ctx->dest_area, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(draw_ctx->buf_area, lv_disp_get_scr_act(disp_refr));
     if(disp_refr->prev_scr) {
-        top_prev_scr = lv_refr_get_top_obj(draw_ctx->dest_area, disp_refr->prev_scr);
+        top_prev_scr = lv_refr_get_top_obj(draw_ctx->buf_area, disp_refr->prev_scr);
     }
 
     /*Draw a display background if there is no top object*/
@@ -580,7 +580,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
-            lv_draw_rect(draw_ctx,&dsc, draw_ctx->dest_area);
+            lv_draw_rect(draw_ctx,&dsc, draw_ctx->buf_area);
         }
     }
     /*Refresh the previous screen if any*/
@@ -937,10 +937,10 @@ static void draw_buf_flush(lv_disp_t * disp)
     if(disp->driver->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
         if(disp->driver->rotated != LV_DISP_ROT_NONE && disp->driver->sw_rotate) {
-            draw_buf_rotate(draw_ctx->dest_area, draw_ctx->dest_buf);
+            draw_buf_rotate(draw_ctx->buf_area, draw_ctx->buf);
         }
         else {
-            call_flush_cb(disp->driver, draw_ctx->dest_area, draw_ctx->dest_buf);
+            call_flush_cb(disp->driver, draw_ctx->buf_area, draw_ctx->buf);
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/

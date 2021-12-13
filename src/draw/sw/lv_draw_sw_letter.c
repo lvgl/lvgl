@@ -380,11 +380,11 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
     lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
 
-    int32_t dest_buf_stride = lv_area_get_width(draw_ctx->dest_area);
-    lv_color_t * dest_buf_tmp = draw_ctx->dest_buf;
+    int32_t dest_buf_stride = lv_area_get_width(draw_ctx->buf_area);
+    lv_color_t * dest_buf_tmp = draw_ctx->buf;
 
     /*Set a pointer on draw_buf to the first pixel of the letter*/
-    dest_buf_tmp += ((pos->y - draw_ctx->dest_area->y1) * dest_buf_stride) + pos->x - draw_ctx->dest_area->x1;
+    dest_buf_tmp += ((pos->y - draw_ctx->buf_area->y1) * dest_buf_stride) + pos->x - draw_ctx->buf_area->x1;
 
     /*If the letter is partially out of mask the move there on draw_buf*/
     dest_buf_tmp += (row_start * dest_buf_stride) + col_start / 3;

@@ -41,13 +41,21 @@ typedef struct {
 
 
 typedef struct _lv_draw_ctx_t  {
-    lv_color_t * dest_buf;          /**< pointer to a buffer to fill*/
-    lv_area_t * dest_area;    /**< The the position and size of `dest_buf` (absolute coordinates)*/
+    /**
+     *  Pointer to a buffer to draw into
+     */
+    lv_color_t * buf;
+
+    /**
+     * The the position and size of `buf` (absolute coordinates)
+     */
+    lv_area_t * buf_area;
+
+    /**
+     * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
+     */
     const lv_area_t * clip_area;
 
-#if LV_USE_USER_DATA
-    void * user_data;
-#endif
 
     void (*draw_rect)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
@@ -66,13 +74,14 @@ typedef struct _lv_draw_ctx_t  {
 
     void (*draw_polygon)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[], uint16_t point_cnt);
 
-    lv_draw_mask_t * (*add_rect_mask)(struct _lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, lv_coord_t * radius);
-    void (*remove_rect_mask)(struct _lv_draw_ctx_t * draw_ctx, lv_draw_mask_t * mask);
-
     /**
      * Wait until all background operation are finished. (E.g. GPU opertions)
      */
     void (*wait_for_finish)(struct _lv_draw_ctx_t * draw);
+
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
 
 } lv_draw_ctx_t;
 

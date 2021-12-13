@@ -87,7 +87,10 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+{
+    ((lv_draw_sw_ctx_t *)draw_ctx)->blend(draw_ctx, dsc);
+}
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
