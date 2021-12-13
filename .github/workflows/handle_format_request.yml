@@ -42,5 +42,6 @@ jobs:
         run: |
           git config --global user.name 'lvgl-bot'
           git config --global user.email 'lvgl-bot@users.noreply.github.com'
+          git config push.default upstream
           git commit -am "style automatic formatting"
           git push
