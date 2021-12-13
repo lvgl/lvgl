@@ -45,7 +45,7 @@ typedef struct _lv_draw_ctx_t  {
     /**
      *  Pointer to a buffer to draw into
      */
-    lv_color_t * buf;
+    void * buf;
 
     /**
      * The the position and size of `buf` (absolute coordinates)
