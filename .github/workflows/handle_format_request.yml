@@ -21,7 +21,7 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - run: exit 1
-        if: steps.check.outputs.triggered != 'true'
+        if: steps.check-comment.outputs.triggered == 'false'
       - name: Install astyle
         if: success()
         run: |
