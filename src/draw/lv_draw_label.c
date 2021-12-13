@@ -74,7 +74,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->font == NULL) {
@@ -82,7 +82,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
         return;
     }
 
-    if(draw->draw_letter == NULL) {
+    if(draw_ctx->draw_letter == NULL) {
         LV_LOG_WARN("draw->draw_letter == NULL (there is no function to draw letters)");
         return;
     }
@@ -97,7 +97,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
         return;
 
     lv_area_t clipped_area;
-    bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw->clip_area);
+    bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw_ctx->clip_area);
     if(!clip_ok) return;
 
     lv_text_align_t align = dsc->align;
@@ -153,7 +153,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
     uint32_t line_end = line_start + _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
 
     /*Go the first visible line*/
-    while(pos.y + line_height_font < draw->clip_area->y1) {
+    while(pos.y + line_height_font < draw_ctx->clip_area->y1) {
         /*Go to next line*/
         line_start = line_end;
         line_end += _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
@@ -292,13 +292,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
                     sel_coords.y1 = pos.y;
                     sel_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
                     sel_coords.y2 = pos.y + line_height - 1;
-                    lv_draw_rect(draw, &draw_dsc_sel, &sel_coords);
+                    lv_draw_rect(draw_ctx,&draw_dsc_sel, &sel_coords);
                     color = dsc->sel_color;
                 }
             }
 
             dsc_mod.color = color;
-            lv_draw_letter(draw, &dsc_mod, &pos, letter);
+            lv_draw_letter(draw_ctx,&dsc_mod, &pos, letter);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -313,7 +313,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
             p2.x = pos.x;
             p2.y = p1.y;
             line_dsc.color = color;
-            lv_draw_line(draw, &line_dsc, &p1, &p2);
+            lv_draw_line(draw_ctx,&line_dsc, &p1, &p2);
         }
 
         if(dsc->decor  & LV_TEXT_DECOR_UNDERLINE) {
@@ -324,7 +324,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
             p2.x = pos.x;
             p2.y = p1.y;
             line_dsc.color = color;
-            lv_draw_line(draw, &line_dsc, &p1, &p2);
+            lv_draw_line(draw_ctx,&line_dsc, &p1, &p2);
         }
 
 #if LV_USE_BIDI
@@ -354,15 +354,15 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw, const lv_draw_lab
         /*Go the next line position*/
         pos.y += line_height;
 
-        if(pos.y > draw->clip_area->y2) return;
+        if(pos.y > draw_ctx->clip_area->y2) return;
     }
 
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-void lv_draw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
+void lv_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
 {
-    draw->draw_letter(draw, dsc, pos_p, letter);
+    draw_ctx->draw_letter(draw_ctx,dsc, pos_p, letter);
 }
 
 

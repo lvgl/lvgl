@@ -54,7 +54,7 @@ static void event_cb(lv_event_t * e)
             img_draw_dsc.recolor = lv_color_black();
             if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  img_draw_dsc.recolor_opa = LV_OPA_30;
 
-            lv_draw_img(dsc->draw, &img_draw_dsc, &a, &img_star);
+            lv_draw_img(dsc->draw_ctx, &img_draw_dsc, &a, &img_star);
         }
     }
 }

@@ -30,7 +30,7 @@ typedef struct {
     lv_coord_t width;
     lv_draw_rect_dsc_t * draw_dsc;
     const lv_area_t * draw_area;
-    lv_draw_ctx_t * draw;
+    lv_draw_ctx_t * draw_ctx;
 } quarter_draw_dsc_t;
 
 /**********************
@@ -56,7 +56,7 @@ typedef struct {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
+void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
 {
 #if LV_DRAW_COMPLEX
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -107,7 +107,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle || start_angle == end_angle + 360) {
         cir_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(draw, &cir_dsc, &area_out);
+        lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
 
         lv_draw_mask_remove_id(mask_out_id);
         if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
@@ -133,7 +133,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
         angle_gap = start_angle - end_angle;
     }
 
-    const lv_area_t * clip_area_ori = draw->clip_area;
+    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
 
     if(angle_gap > SPLIT_ANGLE_GAP_LIMIT && radius > SPLIT_RADIUS_LIMIT) {
         /*Handle each quarter individually and skip which is empty*/
@@ -147,7 +147,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
         q_dsc.width = width;
         q_dsc.draw_dsc =  &cir_dsc;
         q_dsc.draw_area = &area_out;
-        q_dsc.draw = draw;
+        q_dsc.draw_ctx = draw_ctx;
 
         draw_quarter_0(&q_dsc);
         draw_quarter_1(&q_dsc);
@@ -155,7 +155,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
         draw_quarter_3(&q_dsc);
     }
     else {
-        lv_draw_rect(draw, &cir_dsc, &area_out);
+        lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
     }
 
     lv_draw_mask_free_param(&mask_angle_param);
@@ -181,8 +181,8 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
             lv_draw_mask_radius_init(&mask_end_param, &round_area, LV_RADIUS_CIRCLE, false);
             int16_t mask_end_id = lv_draw_mask_add(&mask_end_param, NULL);
 
-            draw->clip_area = &clip_area2;
-            lv_draw_rect(draw, &cir_dsc, &area_out);
+            draw_ctx->clip_area = &clip_area2;
+            lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
             lv_draw_mask_remove_id(mask_end_id);
             lv_draw_mask_free_param(&mask_end_param);
         }
@@ -196,12 +196,12 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
             lv_draw_mask_radius_init(&mask_end_param, &round_area, LV_RADIUS_CIRCLE, false);
             int16_t mask_end_id = lv_draw_mask_add(&mask_end_param, NULL);
 
-            draw->clip_area = &clip_area2;
-            lv_draw_rect(draw, &cir_dsc, &area_out);
+            draw_ctx->clip_area = &clip_area2;
+            lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
             lv_draw_mask_remove_id(mask_end_id);
             lv_draw_mask_free_param(&mask_end_param);
         }
-        draw->clip_area = clip_area_ori;
+        draw_ctx->clip_area = clip_area_ori;
     }
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_COMPLEX == 0");
@@ -222,7 +222,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw, const lv_draw_arc_dsc_t * dsc, const l
 #if LV_DRAW_COMPLEX
 static void draw_quarter_0(quarter_draw_dsc_t * q)
 {
-    const lv_area_t * clip_area_ori = q->draw->clip_area;
+    const lv_area_t * clip_area_ori = q->draw_ctx->clip_area;
     lv_area_t quarter_area;
 
     if(q->start_quarter == 0 && q->end_quarter == 0 && q->start_angle < q->end_angle) {
@@ -235,8 +235,8 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
     else if(q->start_quarter == 0 || q->end_quarter == 0) {
@@ -250,8 +250,8 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }
         }
         if(q->end_quarter == 0) {
@@ -263,8 +263,8 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }        }
     }
     else if((q->start_quarter == q->end_quarter && q->start_quarter != 0 && q->end_angle < q->start_angle) ||
@@ -279,16 +279,16 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
-    q->draw->clip_area = clip_area_ori;
+    q->draw_ctx->clip_area = clip_area_ori;
 }
 
 static void draw_quarter_1(quarter_draw_dsc_t * q)
 {
-    const lv_area_t * clip_area_ori = q->draw->clip_area;
+    const lv_area_t * clip_area_ori = q->draw_ctx->clip_area;
     lv_area_t quarter_area;
 
     if(q->start_quarter == 1 && q->end_quarter == 1 && q->start_angle < q->end_angle) {
@@ -301,8 +301,8 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }    }
     else if(q->start_quarter == 1 || q->end_quarter == 1) {
         /*Start and/or end arcs here*/
@@ -315,8 +315,8 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }        }
         if(q->end_quarter == 1) {
             quarter_area.x2 = q->center->x - 1;
@@ -327,8 +327,8 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }
         }
     }
@@ -344,16 +344,16 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
-    q->draw->clip_area = clip_area_ori;
+    q->draw_ctx->clip_area = clip_area_ori;
 }
 
 static void draw_quarter_2(quarter_draw_dsc_t * q)
 {
-    const lv_area_t * clip_area_ori = q->draw->clip_area;
+    const lv_area_t * clip_area_ori = q->draw_ctx->clip_area;
     lv_area_t quarter_area;
 
     if(q->start_quarter == 2 && q->end_quarter == 2 && q->start_angle < q->end_angle) {
@@ -366,8 +366,8 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
     else if(q->start_quarter == 2 || q->end_quarter == 2) {
@@ -381,8 +381,8 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }
         }
         if(q->end_quarter == 2) {
@@ -394,8 +394,8 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }
         }
     }
@@ -411,16 +411,16 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
-    q->draw->clip_area = clip_area_ori;
+    q->draw_ctx->clip_area = clip_area_ori;
 }
 
 static void draw_quarter_3(quarter_draw_dsc_t * q)
 {
-    const lv_area_t * clip_area_ori = q->draw->clip_area;
+    const lv_area_t * clip_area_ori = q->draw_ctx->clip_area;
     lv_area_t quarter_area;
 
     if(q->start_quarter == 3 && q->end_quarter == 3 && q->start_angle < q->end_angle) {
@@ -433,8 +433,8 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
     else if(q->start_quarter == 3 || q->end_quarter == 3) {
@@ -448,8 +448,8 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }
         }
         if(q->end_quarter == 3) {
@@ -461,8 +461,8 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
 
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
-                q->draw->clip_area = &quarter_area;
-                lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+                q->draw_ctx->clip_area = &quarter_area;
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
             }
         }
     }
@@ -478,12 +478,12 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
 
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
-            q->draw->clip_area = &quarter_area;
-            lv_draw_rect(q->draw, q->draw_dsc, &quarter_area);
+            q->draw_ctx->clip_area = &quarter_area;
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
         }
     }
 
-    q->draw->clip_area = clip_area_ori;
+    q->draw_ctx->clip_area = clip_area_ori;
 }
 
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness, lv_area_t * res_area)

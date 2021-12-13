@@ -111,13 +111,13 @@ lv_draw_t * lv_draw_stm32_dma2d_create(void)
 
 void lv_draw_stm32_dma2d_blend(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    lv_draw_sw_blend(draw, dsc);
+    lv_draw_sw_blend(draw_ctx,dsc);
 }
 
 
 void lv_draw_stm32_dma2d_img_core(lv_draw_t * draw, const lv_draw_img_dsc_t * dsc)
 {
-    lv_draw_sw_img(draw, dsc);
+    lv_draw_sw_img(draw_ctx,dsc);
 }
 
 //void lv_draw_stm32_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
@@ -205,7 +205,7 @@ void lv_draw_stm32_dma2d_img_core(lv_draw_t * draw, const lv_draw_img_dsc_t * ds
 //        base = (const lv_draw_sw_class_t *)base->base_class;
 //    }
 //
-//    if(base) base->blend_map(base, draw, dsc);
+//    if(base) base->blend_map(base, draw_ctx, dsc);
 //}
 //
 //

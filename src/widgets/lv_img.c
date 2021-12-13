@@ -638,7 +638,7 @@ static void draw_img(lv_event_t * e)
             if(img->h == 0 || img->w == 0) return;
             if(zoom_final == 0) return;
 
-            lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
+            lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
             lv_area_t img_max_area;
             lv_area_copy(&img_max_area, &obj->coords);
@@ -677,10 +677,10 @@ static void draw_img(lv_event_t * e)
                 img_clip_area.y1 = bg_coords.y1 + ptop;
                 img_clip_area.x2 = bg_coords.x2 - pright;
                 img_clip_area.y2 = bg_coords.y2 - pbottom;
-                const lv_area_t * clip_area_ori = draw->clip_area;
+                const lv_area_t * clip_area_ori = draw_ctx->clip_area;
 
-                if(!_lv_area_intersect(&img_clip_area, draw->clip_area, &img_clip_area)) return;
-                draw->clip_area = &img_clip_area;
+                if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) return;
+                draw_ctx->clip_area = &img_clip_area;
 
                 lv_area_t coords_tmp;
                 coords_tmp.y1 = img_max_area.y1 + img->offset.y;
@@ -693,22 +693,22 @@ static void draw_img(lv_event_t * e)
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                     for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                        lv_draw_img(draw, &img_dsc, &coords_tmp, img->src);
+                        lv_draw_img(draw_ctx,&img_dsc, &coords_tmp, img->src);
                     }
                 }
-                draw->clip_area = clip_area_ori;
+                draw_ctx->clip_area = clip_area_ori;
             }
             else if(img->src_type == LV_IMG_SRC_SYMBOL) {
                 lv_draw_label_dsc_t label_dsc;
                 lv_draw_label_dsc_init(&label_dsc);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-                lv_draw_label(draw, &label_dsc, &obj->coords, img->src, NULL);
+                lv_draw_label(draw_ctx,&label_dsc, &obj->coords, img->src, NULL);
             }
             else {
                 /*Trigger the error handler of image draw*/
                 LV_LOG_WARN("draw_img: image source type is unknown");
-                lv_draw_img(draw, NULL, &obj->coords, NULL);
+                lv_draw_img(draw_ctx,NULL, &obj->coords, NULL);
             }
         }
     }

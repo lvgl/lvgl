@@ -148,8 +148,7 @@ static void draw_main(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     /*Calculate the indicator area*/
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -169,7 +168,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-    lv_draw_rect(draw, &draw_indic_dsc, &indic_area);
+    lv_draw_rect(draw_ctx,&draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
     lv_coord_t anim_value_x = 0;
@@ -212,7 +211,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-    lv_draw_rect(draw, &knob_rect_dsc, &knob_area);
+    lv_draw_rect(draw_ctx,&knob_rect_dsc, &knob_area);
 }
 
 static void lv_switch_anim_exec_cb(void * var, int32_t value)

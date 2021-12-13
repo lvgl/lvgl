@@ -25,9 +25,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src);
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src);
 
-static void show_error(lv_draw_ctx_t * draw, const lv_area_t * coords, const char * msg);
+static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg);
 static void draw_cleanup(_lv_img_cache_entry_t * cache);
 
 /**********************
@@ -58,27 +58,27 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
+void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
-        show_error(draw, coords, "No\ndata");
+        show_error(draw_ctx,coords, "No\ndata");
         return;
     }
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_res_t res;
-    if(draw->draw_img_core) {
-        res = draw->draw_img_core(draw, dsc, coords, src);
+    if(draw_ctx->draw_img_core) {
+        res = draw_ctx->draw_img_core(draw_ctx,dsc, coords, src);
     }
     else {
-        res = lv_img_draw_core(draw, dsc, coords, src);
+        res = lv_img_draw_core(draw_ctx,dsc, coords, src);
     }
 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
-        show_error(draw, coords, "No\ndata");
+        show_error(draw_ctx,coords, "No\ndata");
         return;
     }
 }
@@ -222,7 +222,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src)
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const void * src)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -239,7 +239,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, con
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 
-        show_error(draw, coords, cdsc->dec_dsc.error_msg);
+        show_error(draw_ctx,coords, cdsc->dec_dsc.error_msg);
     }
     /*The decoder could open the image and gave the entire uncompressed image.
      *Just draw it!*/
@@ -260,23 +260,23 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, con
 
         lv_area_t clip_com; /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = _lv_area_intersect(&clip_com, draw->clip_area, &map_area_rot);
+        union_ok = _lv_area_intersect(&clip_com, draw_ctx->clip_area, &map_area_rot);
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
             draw_cleanup(cdsc);
             return LV_RES_OK;
         }
 
-        const lv_area_t * clip_area_ori = draw->clip_area;
-        draw->clip_area = &clip_com;
-        draw->draw_img(draw, draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
-        draw->clip_area = clip_area_ori;
+        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+        draw_ctx->clip_area = &clip_com;
+        draw_ctx->draw_img(draw_ctx,draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
+        draw_ctx->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
         lv_area_t mask_com; /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = _lv_area_intersect(&mask_com, draw->clip_area, coords);
+        union_ok = _lv_area_intersect(&mask_com, draw_ctx->clip_area, coords);
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
             draw_cleanup(cdsc);
@@ -297,7 +297,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, con
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
             lv_area_t mask_line;
-            union_ok = _lv_area_intersect(&mask_line, draw->clip_area, &line);
+            union_ok = _lv_area_intersect(&mask_line, draw_ctx->clip_area, &line);
             if(union_ok == false) continue;
 
             read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);
@@ -309,7 +309,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, con
                 return LV_RES_INV;
             }
 
-            draw->draw_img(draw, draw_dsc, &line, buf, cf);
+            draw_ctx->draw_img(draw_ctx,draw_dsc, &line, buf, cf);
             line.y1++;
             line.y2++;
             y++;
@@ -322,16 +322,16 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(lv_draw_ctx_t * draw, con
 }
 
 
-static void show_error(lv_draw_ctx_t * draw, const lv_area_t * coords, const char * msg)
+static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg)
 {
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_rect_dsc_init(&rect_dsc);
     rect_dsc.bg_color = lv_color_white();
-    lv_draw_rect(draw, &rect_dsc, coords);
+    lv_draw_rect(draw_ctx,&rect_dsc, coords);
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
-    lv_draw_label(draw, &label_dsc, coords, msg, NULL);
+    lv_draw_label(draw_ctx,&label_dsc, coords, msg, NULL);
 }
 
 static void draw_cleanup(_lv_img_cache_entry_t * cache)

@@ -27,11 +27,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-static void draw_letter_subpx(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 #endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
 /**********************
@@ -90,7 +90,7 @@ const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-void lv_draw_sw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
+void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
 {
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(dsc->font, &g, letter, '\0');
@@ -113,10 +113,10 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  c
     gpos.y = pos_p->y + (dsc->font->line_height - dsc->font->base_line) - g.box_h - g.ofs_y;
 
     /*If the letter is completely out of mask don't draw it*/
-    if(gpos.x + g.box_w < draw->clip_area->x1 ||
-       gpos.x > draw->clip_area->x2 ||
-       gpos.y + g.box_h < draw->clip_area->y1 ||
-       gpos.y > draw->clip_area->y2)  {
+    if(gpos.x + g.box_w < draw_ctx->clip_area->x1 ||
+       gpos.x > draw_ctx->clip_area->x2 ||
+       gpos.y + g.box_h < draw_ctx->clip_area->y1 ||
+       gpos.y > draw_ctx->clip_area->y2)  {
         return;
     }
 
@@ -128,13 +128,13 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  c
 
     if(g.resolved_font->subpx) {
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-        draw_letter_subpx(draw, dsc, &gpos, &g, map_p);
+        draw_letter_subpx(draw_ctx,dsc, &gpos, &g, map_p);
 #else
         LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
 #endif
     }
     else {
-        draw_letter_normal(draw, dsc, &gpos, &g, map_p);
+        draw_letter_normal(draw_ctx,dsc, &gpos, &g, map_p);
     }
 }
 
@@ -142,7 +142,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc,  c
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
 
     const uint8_t * bpp_opa_table_p;
@@ -200,10 +200,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
     /*Calculate the col/row start/end on the map*/
-    int32_t col_start = pos->x >= draw->clip_area->x1 ? 0 : draw->clip_area->x1 - pos->x;
-    int32_t col_end   = pos->x + box_w <= draw->clip_area->x2 ? box_w : draw->clip_area->x2 - pos->x + 1;
-    int32_t row_start = pos->y >= draw->clip_area->y1 ? 0 : draw->clip_area->y1 - pos->y;
-    int32_t row_end   = pos->y + box_h <= draw->clip_area->y2 ? box_h : draw->clip_area->y2 - pos->y + 1;
+    int32_t col_start = pos->x >= draw_ctx->clip_area->x1 ? 0 : draw_ctx->clip_area->x1 - pos->x;
+    int32_t col_end   = pos->x + box_w <= draw_ctx->clip_area->x2 ? box_w : draw_ctx->clip_area->x2 - pos->x + 1;
+    int32_t row_start = pos->y >= draw_ctx->clip_area->y1 ? 0 : draw_ctx->clip_area->y1 - pos->y;
+    int32_t row_end   = pos->y + box_h <= draw_ctx->clip_area->y2 ? box_h : draw_ctx->clip_area->y2 - pos->y + 1;
 
     /*Move on the map too*/
     uint32_t bit_ofs = (row_start * width_bit) + (col_start * bpp);
@@ -289,7 +289,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const
         }
         else {
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-            lv_draw_sw_blend(draw, &blend_dsc);
+            lv_draw_sw_blend(draw_ctx,&blend_dsc);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -305,7 +305,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(draw, &blend_dsc);
+        lv_draw_sw_blend(draw_ctx,&blend_dsc);
         mask_p = 0;
     }
 
@@ -313,7 +313,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw, const
 }
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-static void draw_letter_subpx(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;
@@ -351,10 +351,10 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * 
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
     /*Calculate the col/row start/end on the map*/
-    int32_t col_start = pos->x >= draw->clip_area->x1 ? 0 : (draw->clip_area->x1 - pos->x) * 3;
-    int32_t col_end   = pos->x + box_w / 3 <= draw->clip_area->x2 ? box_w : (draw->clip_area->x2 - pos->x + 1) * 3;
-    int32_t row_start = pos->y >= draw->clip_area->y1 ? 0 : draw->clip_area->y1 - pos->y;
-    int32_t row_end   = pos->y + box_h <= draw->clip_area->y2 ? box_h : draw->clip_area->y2 - pos->y + 1;
+    int32_t col_start = pos->x >= draw_ctx->clip_area->x1 ? 0 : (draw_ctx->clip_area->x1 - pos->x) * 3;
+    int32_t col_end   = pos->x + box_w / 3 <= draw_ctx->clip_area->x2 ? box_w : (draw_ctx->clip_area->x2 - pos->x + 1) * 3;
+    int32_t row_start = pos->y >= draw_ctx->clip_area->y1 ? 0 : draw_ctx->clip_area->y1 - pos->y;
+    int32_t row_end   = pos->y + box_h <= draw_ctx->clip_area->y2 ? box_h : draw_ctx->clip_area->y2 - pos->y + 1;
 
     /*Move on the map too*/
     int32_t bit_ofs = (row_start * width_bit) + (col_start * bpp);
@@ -380,11 +380,11 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw, const lv_draw_label_dsc_t * 
 
     lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
 
-    int32_t dest_buf_stride = lv_area_get_width(draw->dest_area);
-    lv_color_t * dest_buf_tmp = draw->dest_buf;
+    int32_t dest_buf_stride = lv_area_get_width(draw_ctx->dest_area);
+    lv_color_t * dest_buf_tmp = draw_ctx->dest_buf;
 
     /*Set a pointer on draw_buf to the first pixel of the letter*/
-    dest_buf_tmp += ((pos->y - draw->dest_area->y1) * dest_buf_stride) + pos->x - draw->dest_area->x1;
+    dest_buf_tmp += ((pos->y - draw_ctx->dest_area->y1) * dest_buf_stride) + pos->x - draw_ctx->dest_area->x1;
 
     /*If the letter is partially out of mask the move there on draw_buf*/
     dest_buf_tmp += (row_start * dest_buf_stride) + col_start / 3;

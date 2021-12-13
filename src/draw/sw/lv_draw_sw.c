@@ -37,9 +37,9 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw)
+void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 {
-    lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw;
+    lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
     lv_memset_00(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
 
     draw_sw_ctx->base_draw.draw_arc = lv_draw_sw_arc;
@@ -51,9 +51,9 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw)
     draw_sw_ctx->blend = lv_draw_sw_blend;
 }
 
-void lv_draw_sw_deinit_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw)
+void lv_draw_sw_deinit_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 {
-    lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw;
+    lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
     lv_memset_00(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
 }
 

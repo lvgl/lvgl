@@ -322,10 +322,10 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
     return s;
 }
 
-void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw)
+void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx)
 {
     lv_memset_00(dsc, sizeof(lv_obj_draw_part_dsc_t));
-    dsc->draw = draw;
+    dsc->draw_ctx = draw_ctx;
 }
 
 bool lv_obj_draw_part_check_type(lv_obj_draw_part_dsc_t * dsc, const lv_obj_class_t * class_p, uint32_t type)

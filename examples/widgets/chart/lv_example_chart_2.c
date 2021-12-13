@@ -36,7 +36,7 @@ static void draw_event_cb(lv_event_t * e)
         a.x2 = dsc->p2->x - 1;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
         a.y2 = obj->coords.y2;
-        lv_draw_rect(dsc->draw, &draw_rect_dsc, &a);
+        lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
         /*Remove the masks*/
         lv_draw_mask_free_param(&line_mask_param);

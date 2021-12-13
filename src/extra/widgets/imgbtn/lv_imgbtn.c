@@ -211,7 +211,7 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     /*Just draw_main an image*/
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
@@ -244,7 +244,7 @@ static void draw_main(lv_event_t * e)
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x1 + header.w - 1;
         coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw, &img_dsc, &coords_part, src);
+        lv_draw_img(draw_ctx,&img_dsc, &coords_part, src);
     }
 
     src = imgbtn->img_src_right[state];
@@ -255,7 +255,7 @@ static void draw_main(lv_event_t * e)
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
         coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw, &img_dsc, &coords_part, src);
+        lv_draw_img(draw_ctx,&img_dsc, &coords_part, src);
     }
 
     src = imgbtn->img_src_mid[state];
@@ -268,13 +268,13 @@ static void draw_main(lv_event_t * e)
 
 
         bool comm_res;
-        comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, draw->clip_area);
+        comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, draw_ctx->clip_area);
         if(comm_res) {
             lv_coord_t i;
             lv_img_decoder_get_info(src, &header);
 
-            const lv_area_t * clip_area_ori = draw->clip_area;
-            draw->clip_area = &clip_area_center;
+            const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+            draw_ctx->clip_area = &clip_area_center;
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
@@ -282,11 +282,11 @@ static void draw_main(lv_event_t * e)
             coords_part.y2 = coords_part.y1 + header.h - 1;
 
             for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + header.w - 1); i += header.w) {
-                lv_draw_img(draw, &img_dsc, &coords_part, src);
+                lv_draw_img(draw_ctx,&img_dsc, &coords_part, src);
                 coords_part.x1 = coords_part.x2 + 1;
                 coords_part.x2 += header.w;
             }
-            draw->clip_area = clip_area_ori;
+            draw_ctx->clip_area = clip_area_ori;
         }
     }
 }

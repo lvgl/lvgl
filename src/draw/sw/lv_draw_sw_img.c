@@ -38,12 +38,12 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_draw_img_dsc_t * draw_dsc,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
         const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t cf)
 {
     /*Use the clip area as draw area*/
     lv_area_t draw_area;
-    lv_area_copy(&draw_area, draw->clip_area);
+    lv_area_copy(&draw_area, draw_ctx->clip_area);
 
     bool mask_any = lv_draw_mask_is_any(&draw_area);
 
@@ -58,7 +58,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
     {
         blend_dsc.blend_area = coords;
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
-        lv_draw_sw_blend(draw, &blend_dsc);
+        lv_draw_sw_blend(draw_ctx,&blend_dsc);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -127,7 +127,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
                     blend_area.y2 ++;
                 }
                 else {
-                    lv_draw_sw_blend(draw, &blend_dsc);
+                    lv_draw_sw_blend(draw_ctx,&blend_dsc);
 
                     blend_area.y1 = blend_area.y2 + 1;
                     blend_area.y2 = blend_area.y1;
@@ -138,7 +138,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
             /*Flush the last part*/
             if(blend_area.y1 != blend_area.y2) {
                 blend_area.y2--;
-                lv_draw_sw_blend(draw, &blend_dsc);
+                lv_draw_sw_blend(draw_ctx,&blend_dsc);
             }
 
             lv_mem_buf_release(mask_buf);
@@ -289,7 +289,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
                 }
                 else {
 
-                    lv_draw_sw_blend(draw, &blend_dsc);
+                    lv_draw_sw_blend(draw_ctx,&blend_dsc);
 
                     blend_area.y1 = blend_area.y2 + 1;
                     blend_area.y2 = blend_area.y1;
@@ -308,7 +308,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_t * draw, const lv_dra
             /*Flush the last part*/
             if(blend_area.y1 != blend_area.y2) {
                 blend_area.y2--;
-                lv_draw_sw_blend(draw, &blend_dsc);
+                lv_draw_sw_blend(draw_ctx,&blend_dsc);
             }
 
             lv_mem_buf_release(mask_buf);

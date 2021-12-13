@@ -323,7 +323,7 @@ static void draw_knob(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
-    lv_draw_ctx_t * draw = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     lv_coord_t objw = lv_obj_get_width(obj);
@@ -372,7 +372,7 @@ static void draw_knob(lv_event_t * e)
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.part = LV_PART_KNOB;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_SLIDER_DRAW_PART_KNOB;
@@ -382,7 +382,7 @@ static void draw_knob(lv_event_t * e)
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw, &knob_rect_dsc, &slider->right_knob_area);
+        lv_draw_rect(draw_ctx,&knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
     else {
@@ -391,7 +391,7 @@ static void draw_knob(lv_event_t * e)
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw, &knob_rect_dsc, &slider->right_knob_area);
+        lv_draw_rect(draw_ctx,&knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Draw a second knob for the start_value side*/
@@ -411,7 +411,7 @@ static void draw_knob(lv_event_t * e)
         part_draw_dsc.id = 1;
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw, &knob_rect_dsc, &slider->left_knob_area);
+        lv_draw_rect(draw_ctx,&knob_rect_dsc, &slider->left_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
