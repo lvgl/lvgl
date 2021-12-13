@@ -1,0 +1,30 @@
+name: Reformat PR code
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  update-formatting:
+    if: github.event.issue.pull_request && github.event.issue.user.login == github.event.pull_request.user.login
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install astyle
+        run: |
+          sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
+          sudo apt-get update -y -qq
+          sudo apt-get install astyle
+      - uses: xt0rted/pull-request-comment-branch@v1
+        id: comment-branch
+      - uses: actions/checkout@v2
+        if: success()
+        with:
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
+      - name: Format code
+        run: python code-format.py
+        working-directory: scripts
+      - name: Commit changes
+        run: |
+          git config --global user.name 'lvgl-bot'
+          git config --global user.email 'lvgl-bot@users.noreply.github.com'
+          git commit -am "style automatic formatting"
+          git push
