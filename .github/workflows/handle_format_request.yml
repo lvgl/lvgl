@@ -9,8 +9,6 @@ jobs:
     if: github.event.issue.user.login == 'embeddedt'
     runs-on: ubuntu-latest
     steps:
-      - uses: xt0rted/pull-request-comment-branch@v1
-        id: comment-branch
       - uses: khan/pull-request-comment-trigger@bb03972cc9f423111f3b5a23fcc9fd32741acabb
         if: success()
         id: check-comment
@@ -32,7 +30,11 @@ jobs:
         if: success()
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
-          ref: ${{ steps.comment-branch.outputs.head_ref }}
+      - name: Checkout pull request
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{secrets.LVGL_BOT_TOKEN}}
+        run: hub pr checkout ${{github.event.issue.number}}
       - name: Format code
         run: python code-format.py
         working-directory: scripts
