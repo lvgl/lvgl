@@ -28,12 +28,12 @@ jobs:
             echo "Please apply the preceding diff to your code or run scripts/code-format.sh"
             exit 1
           fi
-      - name: Add comment
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
         if: github.event_name == 'pull_request' && failure()
-        uses: peter-evans/create-or-update-comment@a35cf36e5301d70b76f316e867e7788a55a31dae
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
+          message: |
             Your PR needs its formatting corrected before it can be merged upstream.
             
             Please comment `@lvgl-bot format` if you would like our bot to commit this change for you.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
