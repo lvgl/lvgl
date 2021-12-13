@@ -10,7 +10,7 @@ jobs:
       - run: echo '${{ toJSON(github) }}'
   update-formatting:
     continue-on-error: true
-    if: github.event.issue.pull_request && github.event.issue.user.login == github.event.pull_request.user.login
+    if: github.event.issue.user.login == 'embeddedt'
     runs-on: ubuntu-latest
     steps:
       - uses: khan/pull-request-comment-trigger@bb03972cc9f423111f3b5a23fcc9fd32741acabb
