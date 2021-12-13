@@ -1,4 +1,4 @@
-/**raw
+/**
  * @file lv_draw_sw.c
  *
  */

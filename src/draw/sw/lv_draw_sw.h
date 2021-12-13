@@ -13,10 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_sw_blend.h"
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
-#include "lv_draw_sw_mask.h"
-#include "lv_draw_sw_blend.h"
 #include "../../hal/lv_hal_disp.h"
 
 /*********************

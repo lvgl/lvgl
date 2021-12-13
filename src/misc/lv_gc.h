@@ -20,7 +20,7 @@ extern "C" {
 #include "lv_timer.h"
 #include "lv_types.h"
 #include "../draw/lv_img_cache.h"
-#include "../draw/sw/lv_draw_sw_mask.h"
+#include "../draw/lv_draw_mask.h"
 #include "../core/lv_obj_pos.h"
 
 /*********************

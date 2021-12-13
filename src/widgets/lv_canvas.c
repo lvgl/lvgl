@@ -852,8 +852,8 @@ static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * 
     canvas_disp->driver->draw_ctx_init(disp->driver, draw_ctx);
     disp->driver->draw_ctx = draw_ctx;
     draw_ctx->clip_area = clip_area;
-    draw_ctx->dest_area = clip_area;
-    draw_ctx->dest_buf = (void *)dsc->data;
+    draw_ctx->buf_area = clip_area;
+    draw_ctx->buf = (void *)dsc->data;
 
     lv_disp_drv_use_generic_set_px_cb(disp->driver, dsc->header.cf);
 }
