@@ -46,7 +46,6 @@
 
 #ifdef PKG_LVGL_ENABLE_LOG
 #  define LV_USE_LOG 1
-#  define LV_LOG_PRINTF 0
 #else
 #  define LV_USE_LOG 0
 #endif
