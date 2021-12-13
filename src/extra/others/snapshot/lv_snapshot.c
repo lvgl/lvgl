@@ -131,8 +131,8 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     obj_disp->driver->draw_ctx_init(fake_disp.driver, draw_ctx);
     fake_disp.driver->draw_ctx = draw_ctx;
     draw_ctx->clip_area = &snapshot_area;
-    draw_ctx->dest_area = &snapshot_area;
-    draw_ctx->dest_buf = (void *)buf;
+    draw_ctx->buf_area = &snapshot_area;
+    draw_ctx->buf = (void *)buf;
     driver.draw_ctx = draw_ctx;
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
