@@ -5,9 +5,20 @@ on:
 
 jobs:
   update-formatting:
+    continue-on-error: true
     if: github.event.issue.pull_request && github.event.issue.user.login == github.event.pull_request.user.login
     runs-on: ubuntu-latest
     steps:
+      - uses: khan/pull-request-comment-trigger@bb03972cc9f423111f3b5a23fcc9fd32741acabb
+        id: check-comment
+        with:
+          trigger: '@lvgl-bot format'
+          prefix_only: true
+          reaction: rocket
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - run: exit 1
+        if: steps.check.outputs.triggered != 'true'
       - name: Install astyle
         run: |
           sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
