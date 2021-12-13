@@ -78,7 +78,7 @@ void _lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_di
 {
     if(base_dir == LV_BASE_DIR_AUTO) base_dir = _lv_bidi_detect_base_dir(str_in);
 
-        
+
     uint32_t par_start = 0;
     uint32_t par_len;
 
