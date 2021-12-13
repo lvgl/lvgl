@@ -16,6 +16,8 @@ extern "C" {
 #include "../../misc/lv_color.h"
 #include "../../hal/lv_hal_disp.h"
 
+#if LV_USE_GPU_STM32_DMA2D
+
 /*********************
  *      DEFINES
  *********************/
@@ -39,10 +41,16 @@ extern "C" {
  */
 void lv_draw_stm32_dma2d_init(void);
 
+void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+
+void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+
 
 /**********************
  *      MACROS
  **********************/
+
+#endif  /*LV_USE_GPU_STM32_DMA2D*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

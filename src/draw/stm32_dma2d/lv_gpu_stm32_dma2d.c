@@ -97,27 +97,29 @@ void lv_draw_stm32_dma2d_init(void)
 }
 
 
-lv_draw_t * lv_draw_stm32_dma2d_create(void)
+void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 {
-    lv_draw_sw_t * draw = (lv_draw_sw_t *)lv_draw_sw_create();
+    lv_draw_stm32_dma2d_ctx_t * draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
     draw->blend = lv_draw_stm32_dma2d_blend;
     draw->base_draw.draw_img_core = lv_draw_stm32_dma2d_img_core;
-
-    return (lv_draw_t *)draw;
 }
 
+void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+{
+
+}
 
 
 void lv_draw_stm32_dma2d_blend(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    lv_draw_sw_blend(draw_ctx,dsc);
+    lv_draw_sw_blend_basic(draw_ctx,dsc);
 }
 
 
 void lv_draw_stm32_dma2d_img_core(lv_draw_t * draw, const lv_draw_img_dsc_t * dsc)
 {
-    lv_draw_sw_img(draw_ctx,dsc);
+    lv_draw_sw_img_basic(draw_ctx,dsc);
 }
 
 //void lv_draw_stm32_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
