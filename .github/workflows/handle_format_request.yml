@@ -30,11 +30,12 @@ jobs:
         if: success()
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
-      - name: Checkout pull request
+      - name: Checkout PR
+        uses: dawidd6/action-checkout-pr@v1
         if: success()
-        env:
-          GITHUB_TOKEN: ${{secrets.LVGL_BOT_TOKEN}}
-        run: hub pr checkout ${{github.event.issue.number}}
+        with:
+          pr: ${{github.event.issue.number}}
+          token: ${{ secrets.LVGL_BOT_TOKEN }}
       - name: Format code
         run: python code-format.py
         working-directory: scripts
