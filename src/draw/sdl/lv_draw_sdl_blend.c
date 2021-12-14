@@ -107,8 +107,7 @@ void blend_map(lv_draw_sdl_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
     if(opa < LV_OPA_MIN) return;
     lv_coord_t sw = lv_area_get_width(dsc->blend_area), sh = lv_area_get_height(dsc->blend_area);
 
-    lv_draw_sdl_ctx_t * ctx = lv_draw_sdl_get_context();
-    SDL_Renderer * renderer = ctx->renderer;
+    SDL_Renderer * renderer = draw_ctx->renderer;
 
     SDL_Rect draw_area_rect;
     lv_area_to_sdl_rect(draw_ctx->base_draw.base_draw.clip_area, &draw_area_rect);
@@ -132,7 +131,7 @@ void blend_map(lv_draw_sdl_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
 
-        SDL_SetRenderTarget(renderer, ctx->base_draw.base_draw.buf);
+        SDL_SetRenderTarget(renderer, draw_ctx->base_draw.base_draw.buf);
         SDL_SetTextureBlendMode(masked, SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(masked, 0xFF);
         SDL_SetTextureColorMod(masked, 0xFF, 0xFF, 0xFF);
@@ -144,7 +143,7 @@ void blend_map(lv_draw_sdl_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
     else {
         SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_SetTextureAlphaMod(texture, opa);
-        SDL_SetRenderTarget(renderer, ctx->base_draw.base_draw.buf);
+        SDL_SetRenderTarget(renderer, draw_ctx->base_draw.base_draw.buf);
         SDL_RenderCopy(renderer, texture, NULL, &draw_area_rect);
         SDL_DestroyTexture(texture);
     }

@@ -95,7 +95,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
         return;
     }
 
-    lv_draw_sdl_ctx_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
