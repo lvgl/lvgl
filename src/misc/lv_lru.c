@@ -254,13 +254,13 @@ static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_len
         key_length -= 4;
     }
 
-    if (key_length >= 3) {
+    if(key_length >= 3) {
         h ^= data[2] << 16;
     }
-    if (key_length >= 2) {
+    if(key_length >= 2) {
         h ^= data[1] << 8;
     }
-    if (key_length >= 1) {
+    if(key_length >= 1) {
         h ^= data[0];
         h *= m;
     }
