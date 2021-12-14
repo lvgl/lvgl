@@ -292,7 +292,7 @@ static void draw_disc_grad(lv_event_t * e)
         p[1].x = cx + ((r - cir_w - cir_w_extra) * lv_trigo_sin(angle_trigo) >> LV_TRIGO_SHIFT);
         p[1].y = cy + ((r - cir_w - cir_w_extra) * lv_trigo_cos(angle_trigo) >> LV_TRIGO_SHIFT);
 
-        lv_draw_line(draw_ctx,&line_dsc, &p[0], &p[1]);
+        lv_draw_line(draw_ctx, &line_dsc, &p[0], &p[1]);
     }
 
 #if LV_DRAW_COMPLEX
@@ -321,7 +321,7 @@ static void draw_knob(lv_event_t * e)
 
     lv_area_t knob_area = get_knob_area(obj);
 
-    lv_draw_rect(draw_ctx,&cir_dsc, &knob_area);
+    lv_draw_rect(draw_ctx, &cir_dsc, &knob_area);
 }
 
 static void invalidate_knob(lv_obj_t * obj)

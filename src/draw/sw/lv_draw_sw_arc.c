@@ -56,7 +56,8 @@ typedef struct {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle)
+void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
+                    uint16_t start_angle, uint16_t end_angle)
 {
 #if LV_DRAW_COMPLEX
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -107,7 +108,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle || start_angle == end_angle + 360) {
         cir_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
+        lv_draw_rect(draw_ctx, &cir_dsc, &area_out);
 
         lv_draw_mask_remove_id(mask_out_id);
         if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
@@ -155,7 +156,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
         draw_quarter_3(&q_dsc);
     }
     else {
-        lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
+        lv_draw_rect(draw_ctx, &cir_dsc, &area_out);
     }
 
     lv_draw_mask_free_param(&mask_angle_param);
@@ -182,7 +183,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
             int16_t mask_end_id = lv_draw_mask_add(&mask_end_param, NULL);
 
             draw_ctx->clip_area = &clip_area2;
-            lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
+            lv_draw_rect(draw_ctx, &cir_dsc, &area_out);
             lv_draw_mask_remove_id(mask_end_id);
             lv_draw_mask_free_param(&mask_end_param);
         }
@@ -197,7 +198,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
             int16_t mask_end_id = lv_draw_mask_add(&mask_end_param, NULL);
 
             draw_ctx->clip_area = &clip_area2;
-            lv_draw_rect(draw_ctx,&cir_dsc, &area_out);
+            lv_draw_rect(draw_ctx, &cir_dsc, &area_out);
             lv_draw_mask_remove_id(mask_end_id);
             lv_draw_mask_free_param(&mask_end_param);
         }
@@ -265,7 +266,8 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
                 lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
-            }        }
+            }
+        }
     }
     else if((q->start_quarter == q->end_quarter && q->start_quarter != 0 && q->end_angle < q->start_angle) ||
             (q->start_quarter == 2 && q->end_quarter == 1) ||
@@ -303,7 +305,8 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
             lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
-        }    }
+        }
+    }
     else if(q->start_quarter == 1 || q->end_quarter == 1) {
         /*Start and/or end arcs here*/
         if(q->start_quarter == 1) {
@@ -317,7 +320,8 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
                 lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
-            }        }
+            }
+        }
         if(q->end_quarter == 1) {
             quarter_area.x2 = q->center->x - 1;
             quarter_area.y2 = q->center->y + q->radius;

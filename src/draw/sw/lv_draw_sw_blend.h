@@ -36,7 +36,7 @@ typedef struct {
     const lv_area_t * mask_area;    /**< The area of `mask_buf` with absolute coordinates*/
     lv_opa_t opa;                   /**< The overall opacity*/
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
-}lv_draw_sw_blend_dsc_t;
+} lv_draw_sw_blend_dsc_t;
 
 
 /**********************

@@ -1046,7 +1046,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
                 if(ellipsis_valid && pos.x + letter_w + pinfo->letter_space > ellipsis_width) {
                     for(int ell = 0; ell < 3; ell++) {
-                        lv_draw_letter(draw_ctx,&label_draw_dsc, &pos, '.');
+                        lv_draw_letter(draw_ctx, &label_draw_dsc, &pos, '.');
                         pos.x = pos.x + dot_letter_w + pinfo->letter_space;
                     }
                     if(pos.x <= ellipsis_width) {
@@ -1055,7 +1055,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                     break;
                 }
                 else {
-                    lv_draw_letter(draw_ctx,&label_draw_dsc, &pos, letter);
+                    lv_draw_letter(draw_ctx, &label_draw_dsc, &pos, letter);
                     if(letter_w > 0) {
                         pos.x = pos.x + letter_w + pinfo->letter_space;
                     }
@@ -1064,7 +1064,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
             if(ellipsis_valid && i == item_cnt - 1 && pos.x <= ellipsis_width) {
                 for(int ell = 0; ell < 3; ell++) {
-                    lv_draw_letter(draw_ctx,&label_draw_dsc, &pos, '.');
+                    lv_draw_letter(draw_ctx, &label_draw_dsc, &pos, '.');
                     pos.x = pos.x + dot_letter_w + pinfo->letter_space;
                 }
             }
@@ -1086,7 +1086,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                     p1.y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
                     p2.x = pos.x;
                     p2.y = p1.y;
-                    lv_draw_line(draw_ctx,&line_dsc, &p1, &p2);
+                    lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
                 }
 
                 if(decor & LV_TEXT_DECOR_UNDERLINE) {
@@ -1096,7 +1096,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                     p1.y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
                     p2.x = pos.x;
                     p2.y = p1.y;
-                    lv_draw_line(draw_ctx,&line_dsc, &p1, &p2);
+                    lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
                 }
             }
             txt_pos.x = pos.x;

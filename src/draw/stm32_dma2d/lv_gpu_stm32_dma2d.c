@@ -43,12 +43,12 @@
 
 
 void lv_draw_stm32_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                     lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                                    lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
 
 void lv_draw_stm32_dma2d_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                    const lv_color_t * src_buf, const lv_area_t * src_area,
-                    lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                                   const lv_color_t * src_buf, const lv_area_t * src_area,
+                                   lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
 /**
  * Can be used as `gpu_wait_cb` in display driver to
@@ -113,13 +113,13 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
 
 void lv_draw_stm32_dma2d_blend(lv_draw_t * draw, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    lv_draw_sw_blend_basic(draw_ctx,dsc);
+    lv_draw_sw_blend_basic(draw_ctx, dsc);
 }
 
 
 void lv_draw_stm32_dma2d_img_core(lv_draw_t * draw, const lv_draw_img_dsc_t * dsc)
 {
-    lv_draw_sw_img_basic(draw_ctx,dsc);
+    lv_draw_sw_img_basic(draw_ctx, dsc);
 }
 
 //void lv_draw_stm32_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,

@@ -541,7 +541,7 @@ static void lv_obj_draw(lv_event_t * e)
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
 
-        lv_draw_rect(draw_ctx,&draw_dsc, &coords);
+        lv_draw_rect(draw_ctx, &draw_dsc, &coords);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
 
@@ -600,7 +600,7 @@ static void lv_obj_draw(lv_event_t * e)
             part_dsc.part = LV_PART_MAIN;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
-            lv_draw_rect(draw_ctx,&draw_dsc, &coords);
+            lv_draw_rect(draw_ctx, &draw_dsc, &coords);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
         }
     }
@@ -629,14 +629,14 @@ static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     if(lv_area_get_size(&hor_area) > 0) {
         part_dsc.draw_area = &hor_area;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-        lv_draw_rect(draw_ctx,&draw_dsc, &hor_area);
+        lv_draw_rect(draw_ctx, &draw_dsc, &hor_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     if(lv_area_get_size(&ver_area) > 0) {
         part_dsc.draw_area = &ver_area;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
         part_dsc.draw_area = &ver_area;
-        lv_draw_rect(draw_ctx,&draw_dsc, &ver_area);
+        lv_draw_rect(draw_ctx, &draw_dsc, &ver_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
 }

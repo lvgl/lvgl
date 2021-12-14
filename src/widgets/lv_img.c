@@ -693,7 +693,7 @@ static void draw_img(lv_event_t * e)
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                     for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                        lv_draw_img(draw_ctx,&img_dsc, &coords_tmp, img->src);
+                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
                     }
                 }
                 draw_ctx->clip_area = clip_area_ori;
@@ -703,12 +703,12 @@ static void draw_img(lv_event_t * e)
                 lv_draw_label_dsc_init(&label_dsc);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-                lv_draw_label(draw_ctx,&label_dsc, &obj->coords, img->src, NULL);
+                lv_draw_label(draw_ctx, &label_dsc, &obj->coords, img->src, NULL);
             }
             else {
                 /*Trigger the error handler of image draw*/
                 LV_LOG_WARN("draw_img: image source type is unknown");
-                lv_draw_img(draw_ctx,NULL, &obj->coords, NULL);
+                lv_draw_img(draw_ctx, NULL, &obj->coords, NULL);
             }
         }
     }

@@ -168,7 +168,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-    lv_draw_rect(draw_ctx,&draw_indic_dsc, &indic_area);
+    lv_draw_rect(draw_ctx, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
     lv_coord_t anim_value_x = 0;
@@ -211,7 +211,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-    lv_draw_rect(draw_ctx,&knob_rect_dsc, &knob_area);
+    lv_draw_rect(draw_ctx, &knob_rect_dsc, &knob_area);
 }
 
 static void lv_switch_anim_exec_cb(void * var, int32_t value)

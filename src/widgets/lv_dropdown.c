@@ -807,7 +807,7 @@ static void draw_main(lv_event_t * e)
         if(symbol_type == LV_IMG_SRC_SYMBOL) {
             symbol_area.y1 = obj->coords.y1 + top;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
-            lv_draw_label(draw_ctx,&symbol_dsc, &symbol_area, dropdown->symbol, NULL);
+            lv_draw_label(draw_ctx, &symbol_dsc, &symbol_area, dropdown->symbol, NULL);
         }
         else {
             symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
@@ -818,7 +818,7 @@ static void draw_main(lv_event_t * e)
             img_dsc.pivot.x = symbol_w / 2;
             img_dsc.pivot.y = symbol_h / 2;
             img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_INDICATOR);
-            lv_draw_img(draw_ctx,&img_dsc, &symbol_area, dropdown->symbol);
+            lv_draw_img(draw_ctx, &img_dsc, &symbol_area, dropdown->symbol);
         }
     }
 
@@ -849,7 +849,7 @@ static void draw_main(lv_event_t * e)
             txt_area.x2 = txt_area.x1 + size.x;
         }
     }
-    lv_draw_label(draw_ctx,&label_dsc, &txt_area, opt_txt, NULL);
+    lv_draw_label(draw_ctx, &label_dsc, &txt_area, opt_txt, NULL);
 
     if(dropdown->text == NULL) {
         lv_mem_buf_release((char *)opt_txt);
@@ -924,7 +924,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, uint16_t
     lv_draw_rect_dsc_t sel_rect;
     lv_draw_rect_dsc_init(&sel_rect);
     lv_obj_init_draw_rect_dsc(list_obj,  LV_PART_SELECTED, &sel_rect);
-    lv_draw_rect(draw_ctx,&sel_rect, &rect_area);
+    lv_draw_rect(draw_ctx, &sel_rect, &rect_area);
 
     list_obj->state = state_ori;
     list_obj->skip_trans = 0;
@@ -969,7 +969,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, ui
     if(area_ok) {
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &mask_sel;
-        lv_draw_label(draw_ctx,&label_dsc, &label->coords, lv_label_get_text(label), NULL);
+        lv_draw_label(draw_ctx, &label_dsc, &label->coords, lv_label_get_text(label), NULL);
         draw_ctx->clip_area = clip_area_ori;
     }
     list_obj->state = state_orig;

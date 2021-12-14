@@ -39,12 +39,12 @@
 
 void lv_draw_init(void)
 {
-//    backend_head = NULL;
-//    lv_draw_sw_init();
-//
-//#if LV_USE_GPU_STM32_DMA2D == 0
-//    lv_gpu_stm32_dma2d_init();
-//#endif
+    //    backend_head = NULL;
+    //    lv_draw_sw_init();
+    //
+    //#if LV_USE_GPU_STM32_DMA2D == 0
+    //    lv_gpu_stm32_dma2d_init();
+    //#endif
 }
 
 /**********************

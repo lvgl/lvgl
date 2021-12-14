@@ -39,7 +39,7 @@
  **********************/
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-        const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t cf)
+                                          const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t cf)
 {
     /*Use the clip area as draw area*/
     lv_area_t draw_area;
@@ -54,11 +54,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
 
     /*The simplest case just copy the pixels into the draw_buf*/
     if(!mask_any && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
-       cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP)
-    {
+       cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         blend_dsc.blend_area = coords;
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
-        lv_draw_sw_blend(draw_ctx,&blend_dsc);
+        lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -127,7 +126,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
                     blend_area.y2 ++;
                 }
                 else {
-                    lv_draw_sw_blend(draw_ctx,&blend_dsc);
+                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
                     blend_area.y1 = blend_area.y2 + 1;
                     blend_area.y2 = blend_area.y1;
@@ -138,7 +137,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
             /*Flush the last part*/
             if(blend_area.y1 != blend_area.y2) {
                 blend_area.y2--;
-                lv_draw_sw_blend(draw_ctx,&blend_dsc);
+                lv_draw_sw_blend(draw_ctx, &blend_dsc);
             }
 
             lv_mem_buf_release(mask_buf);
@@ -173,7 +172,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
                 trans_dsc.cfg.antialias = draw_dsc->antialias;
 
                 _lv_img_buf_transform_init(&trans_dsc);
-            } else {
+            }
+            else {
                 src_buf_tmp = src_buf;
                 src_buf_tmp += src_stride * (draw_area.y1 - coords->y1) * px_size_byte;
                 src_buf_tmp += (draw_area.x1 - coords->x1) * px_size_byte;
@@ -186,7 +186,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
             }
 
             blend_dsc.mask_res = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
-                        draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                                  draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
             /*Prepare the `mask_buf`if there are other masks*/
             if(mask_any) {
@@ -289,14 +289,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
                 }
                 else {
 
-                    lv_draw_sw_blend(draw_ctx,&blend_dsc);
+                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
                     blend_area.y1 = blend_area.y2 + 1;
                     blend_area.y2 = blend_area.y1;
 
                     px_i = 0;
                     blend_dsc.mask_res = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
-                                draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                                          draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
                     /*Prepare the `mask_buf`if there are other masks*/
                     if(mask_any) {
@@ -308,7 +308,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
             /*Flush the last part*/
             if(blend_area.y1 != blend_area.y2) {
                 blend_area.y2--;
-                lv_draw_sw_blend(draw_ctx,&blend_dsc);
+                lv_draw_sw_blend(draw_ctx, &blend_dsc);
             }
 
             lv_mem_buf_release(mask_buf);

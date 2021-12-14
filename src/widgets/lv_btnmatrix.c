@@ -768,7 +768,7 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the background*/
-        lv_draw_rect(draw_ctx,&draw_rect_dsc_act, &btn_area);
+        lv_draw_rect(draw_ctx, &draw_rect_dsc_act, &btn_area);
 
         /*Calculate the size of the text*/
         const lv_font_t * font = draw_label_dsc_act.font;
@@ -800,7 +800,7 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the text*/
-        lv_draw_label(draw_ctx,&draw_label_dsc_act, &btn_area, txt, NULL);
+        lv_draw_label(draw_ctx, &draw_label_dsc_act, &btn_area, txt, NULL);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }

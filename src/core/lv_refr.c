@@ -138,7 +138,7 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
             if(_lv_area_intersect(&child_clip, &obj_clip_coords, &child_coords)) {
                 /*Refresh the next child*/
                 draw_ctx->clip_area = &child_clip;
-                lv_refr_obj(draw_ctx,child);
+                lv_refr_obj(draw_ctx, child);
             }
         }
     }
@@ -488,7 +488,8 @@ static void lv_refr_area(const lv_area_t * area_p)
             disp_refr->driver->draw_buf->last_part = 1;
             draw_ctx->clip_area = &disp_area;
             lv_refr_area_part(draw_ctx);
-        } else {
+        }
+        else {
             disp_refr->driver->draw_buf->last_part = disp_refr->driver->draw_buf->last_area;
             draw_ctx->clip_area = area_p;
             lv_refr_area_part(draw_ctx);
@@ -569,7 +570,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
                 lv_draw_img_dsc_t dsc;
                 lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
-                lv_draw_img(draw_ctx,&dsc, &a, disp_refr->bg_img);
+                lv_draw_img(draw_ctx, &dsc, &a, disp_refr->bg_img);
             }
             else {
                 LV_LOG_WARN("Can't draw the background image");
@@ -580,21 +581,21 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
-            lv_draw_rect(draw_ctx,&dsc, draw_ctx->buf_area);
+            lv_draw_rect(draw_ctx, &dsc, draw_ctx->buf_area);
         }
     }
     /*Refresh the previous screen if any*/
     if(disp_refr->prev_scr) {
         if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
-        lv_refr_obj_and_children(draw_ctx,top_prev_scr);
+        lv_refr_obj_and_children(draw_ctx, top_prev_scr);
     }
 
     if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
-    lv_refr_obj_and_children(draw_ctx,top_act_scr);
+    lv_refr_obj_and_children(draw_ctx, top_act_scr);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_obj_and_children(draw_ctx,lv_disp_get_layer_top(disp_refr));
-    lv_refr_obj_and_children(draw_ctx,lv_disp_get_layer_sys(disp_refr));
+    lv_refr_obj_and_children(draw_ctx, lv_disp_get_layer_top(disp_refr));
+    lv_refr_obj_and_children(draw_ctx, lv_disp_get_layer_sys(disp_refr));
 
     /*In true double buffered mode flush only once when all areas were rendered.
      *In normal mode flush after every area*/
@@ -658,7 +659,7 @@ static void lv_refr_obj_and_children(lv_draw_ctx_t * draw_ctx, lv_obj_t * top_ob
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/
-    lv_refr_obj(draw_ctx,top_obj);
+    lv_refr_obj(draw_ctx, top_obj);
 
     /*Draw the 'younger' sibling objects because they can be on top_obj*/
     lv_obj_t * parent;
@@ -678,7 +679,7 @@ static void lv_refr_obj_and_children(lv_draw_ctx_t * draw_ctx, lv_obj_t * top_ob
             }
             else {
                 /*Refresh the objects*/
-                lv_refr_obj(draw_ctx,child);
+                lv_refr_obj(draw_ctx, child);
             }
         }
 

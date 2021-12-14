@@ -59,7 +59,8 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src);
+void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                 const void * src);
 
 /**
  * Get the type of an image source

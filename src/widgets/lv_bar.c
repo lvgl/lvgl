@@ -425,7 +425,7 @@ static void draw_indic(lv_event_t * e)
         draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_rect_dsc.border_opa = LV_OPA_TRANSP;
 
-        lv_draw_rect(draw_ctx,&draw_rect_dsc, &bar->indic_area);
+        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
 
         draw_rect_dsc.bg_opa = bg_opa;
         draw_rect_dsc.bg_img_opa = bg_img_opa;
@@ -473,7 +473,7 @@ static void draw_indic(lv_event_t * e)
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
 #endif
 
-    lv_draw_rect(draw_ctx,&draw_rect_dsc, &mask_indic_max_area);
+    lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
     draw_rect_dsc.border_opa = border_opa;
     draw_rect_dsc.shadow_opa = shadow_opa;
 
@@ -481,7 +481,7 @@ static void draw_indic(lv_event_t * e)
     draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
     draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
     draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-    lv_draw_rect(draw_ctx,&draw_rect_dsc, &bar->indic_area);
+    lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
 
 #if LV_DRAW_COMPLEX
     lv_draw_mask_free_param(&mask_indic_param);

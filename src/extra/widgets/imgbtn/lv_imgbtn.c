@@ -244,7 +244,7 @@ static void draw_main(lv_event_t * e)
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x1 + header.w - 1;
         coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw_ctx,&img_dsc, &coords_part, src);
+        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
     }
 
     src = imgbtn->img_src_right[state];
@@ -255,7 +255,7 @@ static void draw_main(lv_event_t * e)
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
         coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw_ctx,&img_dsc, &coords_part, src);
+        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
     }
 
     src = imgbtn->img_src_mid[state];
@@ -282,7 +282,7 @@ static void draw_main(lv_event_t * e)
             coords_part.y2 = coords_part.y1 + header.h - 1;
 
             for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + header.w - 1); i += header.w) {
-                lv_draw_img(draw_ctx,&img_dsc, &coords_part, src);
+                lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
                 coords_part.x1 = coords_part.x2 + 1;
                 coords_part.x2 += header.w;
             }

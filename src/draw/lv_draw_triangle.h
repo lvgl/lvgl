@@ -27,7 +27,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[], uint16_t point_cnt);
+void lv_draw_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[],
+                     uint16_t point_cnt);
 
 void lv_draw_triangle(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[]);
 /**********************

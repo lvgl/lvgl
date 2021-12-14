@@ -456,7 +456,7 @@ static void draw_main(lv_event_t * e)
         lv_draw_rect_dsc_t sel_dsc;
         lv_draw_rect_dsc_init(&sel_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_SELECTED, &sel_dsc);
-        lv_draw_rect(draw_ctx,&sel_dsc, &sel_area);
+        lv_draw_rect(draw_ctx, &sel_dsc, &sel_area);
     }
     /*Post draw when the children are drawn*/
     else if(code == LV_EVENT_DRAW_POST) {
@@ -511,7 +511,7 @@ static void draw_main(lv_event_t * e)
             label_dsc.flag |= LV_TEXT_FLAG_EXPAND;
             const lv_area_t * clip_area_ori = draw_ctx->clip_area;
             draw_ctx->clip_area = &mask_sel;
-            lv_draw_label(draw_ctx,&label_dsc, &label_sel_area, lv_label_get_text(label), NULL);
+            lv_draw_label(draw_ctx, &label_dsc, &label_sel_area, lv_label_get_text(label), NULL);
             draw_ctx->clip_area = clip_area_ori;
         }
     }
@@ -539,7 +539,7 @@ static void draw_label(lv_event_t * e)
     if(_lv_area_intersect(&clip2, draw_ctx->clip_area, &clip2)) {
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip2;
-        lv_draw_label(draw_ctx,&label_draw_dsc, &label_obj->coords, lv_label_get_text(label_obj), NULL);
+        lv_draw_label(draw_ctx, &label_draw_dsc, &label_obj->coords, lv_label_get_text(label_obj), NULL);
         draw_ctx->clip_area = clip_area_ori;
     }
 
@@ -550,7 +550,7 @@ static void draw_label(lv_event_t * e)
     if(_lv_area_intersect(&clip2, draw_ctx->clip_area, &clip2)) {
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip2;
-        lv_draw_label(draw_ctx,&label_draw_dsc, &label_obj->coords, lv_label_get_text(label_obj), NULL);
+        lv_draw_label(draw_ctx, &label_draw_dsc, &label_obj->coords, lv_label_get_text(label_obj), NULL);
         draw_ctx->clip_area = clip_area_ori;
     }
 }

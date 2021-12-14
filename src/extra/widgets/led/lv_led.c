@@ -209,7 +209,7 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         part_draw_dsc.part = LV_PART_MAIN;
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw_ctx,&rect_dsc, &obj->coords);
+        lv_draw_rect(draw_ctx, &rect_dsc, &obj->coords);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }

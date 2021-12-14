@@ -27,11 +27,13 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+                                                     const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+    static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos,
+    lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 #endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
 /**********************
@@ -90,7 +92,8 @@ const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p, uint32_t letter)
+void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+                       uint32_t letter)
 {
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(dsc->font, &g, letter, '\0');
@@ -128,13 +131,13 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
 
     if(g.resolved_font->subpx) {
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-        draw_letter_subpx(draw_ctx,dsc, &gpos, &g, map_p);
+        draw_letter_subpx(draw_ctx, dsc, &gpos, &g, map_p);
 #else
         LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
 #endif
     }
     else {
-        draw_letter_normal(draw_ctx,dsc, &gpos, &g, map_p);
+        draw_letter_normal(draw_ctx, dsc, &gpos, &g, map_p);
     }
 }
 
@@ -142,7 +145,8 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+                                                     const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
 
     const uint8_t * bpp_opa_table_p;
@@ -277,7 +281,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
         /*Apply masks if any*/
         if(mask_any) {
             blend_dsc.mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
-                                                             fill_w);
+                                                    fill_w);
             if(blend_dsc.mask_res == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, fill_w);
             }
@@ -289,7 +293,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
         }
         else {
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-            lv_draw_sw_blend(draw_ctx,&blend_dsc);
+            lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -305,7 +309,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(draw_ctx,&blend_dsc);
+        lv_draw_sw_blend(draw_ctx, &blend_dsc);
         mask_p = 0;
     }
 
@@ -313,7 +317,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
 }
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos,
+                              lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;
@@ -493,7 +498,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             map_area.y2 ++;
         }
         else {
-//            lv_draw_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
+            //            lv_draw_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
 
             map_area.y1 = map_area.y2 + 1;
             map_area.y2 = map_area.y1;
@@ -512,7 +517,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     /*Flush the last part*/
     if(map_area.y1 != map_area.y2) {
         map_area.y2--;
-//        lv_draw_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
+        //        lv_draw_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
     }
 
     lv_mem_buf_release(mask_buf);

@@ -55,7 +55,8 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc);
  * @param clip_area     the arc will be drawn only in this area
  * @param dsc           pointer to an initialized `lv_draw_line_dsc_t` variable
  */
-void lv_draw_arc(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
+void lv_draw_arc(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+                 uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
 
 /**
  * Get an area the should be invalidated when the arcs angle changed between start_angle and end_ange

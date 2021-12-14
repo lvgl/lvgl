@@ -382,7 +382,7 @@ static void draw_knob(lv_event_t * e)
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw_ctx,&knob_rect_dsc, &slider->right_knob_area);
+        lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
     else {
@@ -391,7 +391,7 @@ static void draw_knob(lv_event_t * e)
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw_ctx,&knob_rect_dsc, &slider->right_knob_area);
+        lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Draw a second knob for the start_value side*/
@@ -411,7 +411,7 @@ static void draw_knob(lv_event_t * e)
         part_draw_dsc.id = 1;
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw_ctx,&knob_rect_dsc, &slider->left_knob_area);
+        lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->left_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }

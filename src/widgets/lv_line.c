@@ -193,7 +193,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 p1.y = h - line->point_array[i].y + y_ofs;
                 p2.y = h - line->point_array[i + 1].y + y_ofs;
             }
-            lv_draw_line(draw_ctx,&line_dsc, &p1, &p2);
+            lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
     }
