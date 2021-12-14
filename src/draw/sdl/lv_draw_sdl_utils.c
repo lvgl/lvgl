@@ -27,7 +27,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -36,6 +35,7 @@ extern const uint8_t _lv_bpp2_opa_table[4];
 extern const uint8_t _lv_bpp4_opa_table[16];
 extern const uint8_t _lv_bpp8_opa_table[256];
 
+static int utils_init_count = 0;
 static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 
 /**********************
@@ -48,14 +48,23 @@ static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 
 void _lv_draw_sdl_utils_init()
 {
-    if (lv_sdl_palette_grayscale8) return;
+    utils_init_count++;
+    if (utils_init_count > 1) {
+        return;
+    }
     lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
 }
 
 void _lv_draw_sdl_utils_deinit()
 {
-    SDL_FreePalette(lv_sdl_palette_grayscale8);
-    lv_sdl_palette_grayscale8 = NULL;
+    if (utils_init_count == 0) {
+        return;
+    }
+    utils_init_count--;
+    if (utils_init_count == 0) {
+        SDL_FreePalette(lv_sdl_palette_grayscale8);
+        lv_sdl_palette_grayscale8 = NULL;
+    }
 }
 
 void lv_area_to_sdl_rect(const lv_area_t * in, SDL_Rect * out)

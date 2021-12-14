@@ -25,13 +25,15 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 typedef enum lv_draw_sdl_mask_cache_type_t {
     LV_DRAW_SDL_MASK_KEY_ID_MASK,
     LV_DRAW_SDL_MASK_KEY_ID_COMPOSITE,
 } lv_draw_sdl_mask_cache_type_t;
-/**********************
- *      TYPEDEFS
- **********************/
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -59,7 +61,7 @@ lv_opa_t * lv_draw_sdl_mask_dump_opa(const lv_area_t * coords, const int16_t * i
 SDL_Texture * lv_draw_sdl_mask_dump_texture(SDL_Renderer * renderer, const lv_area_t * coords, const int16_t * ids,
                                             int16_t ids_count);
 
-SDL_Texture * lv_draw_sdl_mask_tmp_obtain(lv_draw_sdl_ctx_t * context, lv_draw_sdl_mask_cache_type_t type,
+SDL_Texture * lv_draw_sdl_mask_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_mask_cache_type_t type,
                                           lv_coord_t w, lv_coord_t h);
 /**********************
  *      MACROS

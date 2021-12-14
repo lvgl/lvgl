@@ -170,12 +170,12 @@ SDL_Texture * lv_draw_sdl_mask_dump_texture(SDL_Renderer * renderer, const lv_ar
     return texture;
 }
 
-SDL_Texture * lv_draw_sdl_mask_tmp_obtain(lv_draw_sdl_ctx_t * context, lv_draw_sdl_mask_cache_type_t type,
+SDL_Texture * lv_draw_sdl_mask_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_mask_cache_type_t type,
                                           lv_coord_t w, lv_coord_t h)
 {
     lv_point_t * tex_size = NULL;
     lv_mask_key_t mask_key = mask_key_create(type);
-    SDL_Texture * result = lv_draw_sdl_texture_cache_get_with_userdata(&mask_key, sizeof(lv_mask_key_t), NULL,
+    SDL_Texture * result = lv_draw_sdl_texture_cache_get_with_userdata(ctx, &mask_key, sizeof(lv_mask_key_t), NULL,
                                                                        (void **) &tex_size);
     if(!result || tex_size->x < w || tex_size->y < h) {
         lv_coord_t size = next_pow_of_2(LV_MAX(w, h));
@@ -183,10 +183,10 @@ SDL_Texture * lv_draw_sdl_mask_tmp_obtain(lv_draw_sdl_ctx_t * context, lv_draw_s
         if(type == LV_DRAW_SDL_MASK_KEY_ID_COMPOSITE) {
             access = SDL_TEXTUREACCESS_TARGET;
         }
-        result = SDL_CreateTexture(context->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);
+        result = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);
         tex_size = lv_mem_alloc(sizeof(lv_point_t));
         tex_size->x = tex_size->y = size;
-        lv_draw_sdl_texture_cache_put_advanced(&mask_key, sizeof(lv_mask_key_t), result, tex_size, lv_mem_free, 0);
+        lv_draw_sdl_texture_cache_put_advanced(ctx, &mask_key, sizeof(lv_mask_key_t), result, tex_size, lv_mem_free, 0);
     }
     return result;
 }

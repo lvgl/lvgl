@@ -100,7 +100,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
     bool glyph_found = false;
-    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(&glyph_key, sizeof(glyph_key), &glyph_found);
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &glyph_key, sizeof(glyph_key), &glyph_found);
     if(!glyph_found) {
         if(g.resolved_font) {
             font_p = g.resolved_font;
@@ -112,7 +112,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
         lv_mem_free(buf);
-        lv_draw_sdl_texture_cache_put(&glyph_key, sizeof(glyph_key), texture);
+        lv_draw_sdl_texture_cache_put(ctx, &glyph_key, sizeof(glyph_key), texture);
     }
     if(!texture) {
         return;
