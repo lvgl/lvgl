@@ -33,14 +33,9 @@
  **********************/
 extern const uint8_t _lv_bpp1_opa_table[2];
 extern const uint8_t _lv_bpp2_opa_table[4];
-extern const uint8_t _lv_bpp3_opa_table[8];
 extern const uint8_t _lv_bpp4_opa_table[16];
 extern const uint8_t _lv_bpp8_opa_table[256];
 
-static SDL_Palette * lv_sdl_palette_grayscale1 = NULL;
-static SDL_Palette * lv_sdl_palette_grayscale2 = NULL;
-static SDL_Palette * lv_sdl_palette_grayscale3 = NULL;
-static SDL_Palette * lv_sdl_palette_grayscale4 = NULL;
 static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 
 /**********************
@@ -53,20 +48,14 @@ static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 
 void _lv_draw_sdl_utils_init()
 {
-    lv_sdl_palette_grayscale1 = lv_sdl_alloc_palette_for_bpp(_lv_bpp1_opa_table, 1);
-    lv_sdl_palette_grayscale2 = lv_sdl_alloc_palette_for_bpp(_lv_bpp2_opa_table, 2);
-    lv_sdl_palette_grayscale3 = lv_sdl_alloc_palette_for_bpp(_lv_bpp3_opa_table, 3);
-    lv_sdl_palette_grayscale4 = lv_sdl_alloc_palette_for_bpp(_lv_bpp4_opa_table, 4);
+    if (lv_sdl_palette_grayscale8) return;
     lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
 }
 
 void _lv_draw_sdl_utils_deinit()
 {
-    SDL_FreePalette(lv_sdl_palette_grayscale1);
-    SDL_FreePalette(lv_sdl_palette_grayscale2);
-    SDL_FreePalette(lv_sdl_palette_grayscale3);
-    SDL_FreePalette(lv_sdl_palette_grayscale4);
     SDL_FreePalette(lv_sdl_palette_grayscale8);
+    lv_sdl_palette_grayscale8 = NULL;
 }
 
 void lv_area_to_sdl_rect(const lv_area_t * in, SDL_Rect * out)
@@ -117,36 +106,10 @@ SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
     return result;
 }
 
-SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp)
-{
-    SDL_Palette * palette;
-    switch(bpp) {
-        case 1:
-            palette = lv_sdl_palette_grayscale1;
-            break;
-        case 2:
-            palette = lv_sdl_palette_grayscale2;
-            break;
-        case 3:
-            palette = lv_sdl_palette_grayscale3;
-            break;
-        case 4:
-            palette = lv_sdl_palette_grayscale4;
-            break;
-        case 8:
-            palette = lv_sdl_palette_grayscale8;
-            break;
-        default:
-            return NULL;
-    }
-    LV_ASSERT_MSG(lv_sdl_palette_grayscale8, "lv_draw_sdl was not initialized properly");
-    return palette;
-}
-
 SDL_Surface * lv_sdl_create_opa_surface(lv_opa_t * opa, lv_coord_t width, lv_coord_t height, lv_coord_t stride)
 {
     SDL_Surface * indexed = SDL_CreateRGBSurfaceFrom(opa, width, height, 8, stride, 0, 0, 0, 0);
-    SDL_SetSurfacePalette(indexed, lv_sdl_get_grayscale_palette(8));
+    SDL_SetSurfacePalette(indexed, lv_sdl_palette_grayscale8);
     SDL_Surface * converted = SDL_ConvertSurfaceFormat(indexed, LV_DRAW_SDL_TEXTURE_FORMAT, 0);
     SDL_FreeSurface(indexed);
     return converted;

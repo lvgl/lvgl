@@ -217,7 +217,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
         label_draw_dsc.font = dsc->bg_img_symbol_font;
         label_draw_dsc.color = dsc->bg_img_recolor;
         label_draw_dsc.opa = dsc->bg_img_opa;
-        lv_draw_label(&a, draw_area, &label_draw_dsc, dsc->bg_img_src, NULL);
+        lv_draw_label((lv_draw_ctx_t *) ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
     }
     else {
         lv_img_header_t header;
@@ -252,7 +252,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
             area.x2 = area.x1 + header.w - 1;
             area.y2 = area.y1 + header.h - 1;
 
-            lv_draw_img(&ctx->base_draw.base_draw, &img_dsc, &area, dsc->bg_img_src);
+            lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
         }
         else {
             lv_area_t area;
@@ -264,7 +264,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
                 area.x1 = coords->x1;
                 area.x2 = area.x1 + header.w - 1;
                 for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-                    lv_draw_img(&ctx->base_draw.base_draw, &img_dsc, &area, dsc->bg_img_src);
+                    lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
                 }
             }
         }
