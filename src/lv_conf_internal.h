@@ -1955,6 +1955,14 @@
     #endif
 #endif
 
+/*1: Enable Monkey test*/
+#ifndef LV_USE_MONKEY
+    #ifdef CONFIG_LV_USE_MONKEY
+        #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
+    #else
+        #define LV_USE_MONKEY 0
+    #endif
+#endif
 
 /*==================
 * EXAMPLES
