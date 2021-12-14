@@ -17,6 +17,7 @@
 #include "../core/lv_obj.h"
 #include "../core/lv_refr.h"
 #include "../core/lv_theme.h"
+#include "../draw/sdl/lv_draw_sdl.h"
 #if LV_USE_THEME_DEFAULT
     #include "../extra/themes/default/lv_theme_default.h"
 #endif
@@ -100,9 +101,9 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_deinit = lv_draw_nxp_vglite_init;
     driver->draw_ctx_size = sizeof(lv_draw_nxp_vglite_t);
 #elif LV_USE_GPU_SDL
-    driver->draw_ctx_init = lv_draw_sdl_init;
-    driver->draw_ctx_deinit = lv_draw_sdl_init;
-    driver->draw_ctx_size = sizeof(lv_draw_sdl_t);
+    driver->draw_ctx_init = lv_draw_sdl_init_ctx;
+    driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
+    driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
 #else
     driver->draw_ctx_init = lv_draw_sw_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
