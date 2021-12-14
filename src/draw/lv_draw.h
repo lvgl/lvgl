@@ -63,11 +63,11 @@ typedef struct _lv_draw_ctx_t  {
     void (*draw_arc)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                      uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
 
-    void (*draw_img)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
+    void (*draw_img_decoded)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+                             const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
-    lv_res_t (*draw_img_core)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                              const lv_area_t * coords, const void * src);
+    lv_res_t (*draw_img)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                         const lv_area_t * coords, const void * src);
 
     void (*draw_letter)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                         uint32_t letter);

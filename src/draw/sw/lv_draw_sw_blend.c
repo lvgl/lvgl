@@ -28,8 +28,8 @@ static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                               lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride);
 #if LV_DRAW_COMPLEX
-    static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride, lv_color_t color,
-    lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
+static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride, lv_color_t color,
+                         lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
 #endif  /*LV_DRAW_COMPLEX*/
 
 static void map_set_px(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
@@ -40,12 +40,12 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
 
 #if LV_DRAW_COMPLEX
 static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
-        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
+                        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
+                        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
 
-    static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
-    static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
-    static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
+static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
+static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
+static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 #endif /*LV_DRAW_COMPLEX*/
 
 /**********************
@@ -144,7 +144,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
     if(disp->driver->set_px_cb) {
         if(dsc->src_buf == NULL) {
             fill_set_px(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
-        } else {
+        }
+        else {
             map_set_px(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
         }
     }
@@ -354,7 +355,8 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
 
 #if LV_DRAW_COMPLEX
 static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
-        lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode)
+                         lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride,
+                         lv_blend_mode_t blend_mode)
 {
 
     int32_t w = lv_area_get_width(dest_area);
@@ -589,8 +591,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
 }
 #if LV_DRAW_COMPLEX
 static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
-        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode)
+                        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
+                        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode)
 {
 
     int32_t w = lv_area_get_width(dest_area);

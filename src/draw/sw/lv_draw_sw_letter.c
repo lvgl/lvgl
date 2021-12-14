@@ -32,8 +32,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
 
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
-    static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos,
-    lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos,
+                              lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 #endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
 
 /**********************
@@ -497,7 +497,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
         /*Apply masks if any*/
         if(mask_any) {
             blend_dsc.mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
-                                                             lv_area_get_width(&map_area));
+                                                    lv_area_get_width(&map_area));
             if(blend_dsc.mask_res == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&map_area));
             }
