@@ -51,26 +51,26 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void draw_bg_color(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                           const lv_draw_rect_dsc_t * dsc);
 
-static void draw_bg_img(const lv_area_t * coords, const lv_area_t * draw_area,
+static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
 
-static void draw_border(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+static void draw_border(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
 
 static void draw_shadow(SDL_Renderer * renderer, const lv_area_t * coords, const lv_area_t * clip,
                         const lv_draw_rect_dsc_t * dsc);
 
-static void draw_outline(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, const lv_area_t * clip,
+static void draw_outline(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * clip,
                          const lv_draw_rect_dsc_t * dsc);
 
-static void draw_border_generic(lv_draw_sdl_context_t * ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_generic(lv_draw_sdl_ctx_t * ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                 const lv_area_t * clip, lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa,
                                 lv_blend_mode_t blend_mode);
 
-static void draw_border_simple(lv_draw_sdl_context_t * ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_simple(lv_draw_sdl_ctx_t * ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                const lv_area_t * clipped, lv_color_t color, lv_opa_t opa);
 
 static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_coord_t frag_size,
@@ -105,9 +105,10 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
+void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
+    const lv_area_t *clip = draw_ctx->clip_area;
+    lv_draw_sdl_ctx_t * ctx = lv_draw_sdl_get_context();
 
     lv_area_t extension = {0, 0, 0, 0};
     if(!SKIP_SHADOW(dsc)) {
@@ -128,7 +129,7 @@ void lv_draw_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, con
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = *coords, t_clip = *clip, apply_area, t_area;
     lv_point_t offset = {0, 0};
-    bool has_mask = lv_draw_sdl_mask_begin(coords, clip, &extension, &t_coords, &t_clip, &apply_area);
+    bool has_mask = lv_draw_sdl_mask_begin(ctx, coords, clip, &extension, &t_coords, &t_clip, &apply_area);
     bool has_content = _lv_area_intersect(&t_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect;
@@ -137,13 +138,13 @@ void lv_draw_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, con
     /* Shadows and outlines will also draw in extended area */
     if(has_content) {
         draw_bg_color(ctx, &t_coords, &t_area, dsc);
-        draw_bg_img(&t_coords, &t_area, dsc);
+        draw_bg_img(ctx, &t_coords, &t_area, dsc);
         draw_border(ctx, &t_coords, &t_area, dsc);
     }
     draw_outline(ctx, &t_coords, &t_clip, dsc);
 
     if(has_mask) {
-        lv_draw_sdl_mask_end(&apply_area);
+        lv_draw_sdl_mask_end(ctx, &apply_area);
     }
 }
 
@@ -151,7 +152,7 @@ void lv_draw_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, con
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_bg_color(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                           const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->bg_opa <= LV_OPA_TRANSP) return;
@@ -196,7 +197,8 @@ static void draw_bg_color(lv_draw_sdl_context_t * ctx, const lv_area_t * coords,
     frag_render_center(ctx->renderer, texture, frag_size, coords, draw_area, false);
 }
 
-static void draw_bg_img(const lv_area_t * coords, const lv_area_t * draw_area, const lv_draw_rect_dsc_t * dsc)
+static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                        const lv_draw_rect_dsc_t * dsc)
 {
     if(SKIP_IMAGE(dsc)) return;
 
@@ -250,7 +252,7 @@ static void draw_bg_img(const lv_area_t * coords, const lv_area_t * draw_area, c
             area.x2 = area.x1 + header.w - 1;
             area.y2 = area.y1 + header.h - 1;
 
-            lv_draw_img(&area, draw_area, dsc->bg_img_src, &img_dsc);
+            lv_draw_img(&ctx->base_draw.base_draw, &img_dsc, &area, dsc->bg_img_src);
         }
         else {
             lv_area_t area;
@@ -262,7 +264,7 @@ static void draw_bg_img(const lv_area_t * coords, const lv_area_t * draw_area, c
                 area.x1 = coords->x1;
                 area.x2 = area.x1 + header.w - 1;
                 for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-                    lv_draw_img(&area, draw_area, dsc->bg_img_src, &img_dsc);
+                    lv_draw_img(&ctx->base_draw.base_draw, &img_dsc, &area, dsc->bg_img_src);
                 }
             }
         }
@@ -347,7 +349,7 @@ static void draw_shadow(SDL_Renderer * renderer, const lv_area_t * coords, const
 }
 
 
-static void draw_border(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+static void draw_border(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc)
 {
     if(SKIP_BORDER(dsc)) return;
@@ -369,7 +371,7 @@ static void draw_border(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, c
                         dsc->blend_mode);
 }
 
-static void draw_outline(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, const lv_area_t * clip,
+static void draw_outline(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * clip,
                          const lv_draw_rect_dsc_t * dsc)
 {
     if(SKIP_OUTLINE(dsc)) return;
@@ -412,7 +414,7 @@ static void draw_outline(lv_draw_sdl_context_t * ctx, const lv_area_t * coords, 
                         dsc->blend_mode);
 }
 
-static void draw_border_generic(lv_draw_sdl_context_t * ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_generic(lv_draw_sdl_ctx_t * ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                 const lv_area_t * clip, lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa,
                                 lv_blend_mode_t blend_mode)
 {

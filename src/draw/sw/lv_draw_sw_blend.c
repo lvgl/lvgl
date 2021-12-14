@@ -116,7 +116,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
         dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
     }
 
-    lv_color_t * src_buf = dsc->src_buf;
+    const lv_color_t * src_buf = dsc->src_buf;
     lv_coord_t src_stride;
     if(src_buf) {
         src_stride = lv_area_get_width(dsc->blend_area);
@@ -273,10 +273,10 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
                             *(d + 1) = c32;
                         }
 #else
-                        buf[0] = color;
-                        buf[1] = color;
-                        buf[2] = color;
-                        buf[3] = color;
+                        dest_buf[0] = color;
+                        dest_buf[1] = color;
+                        dest_buf[2] = color;
+                        dest_buf[3] = color;
 #endif
                         dest_buf += 4;
                         mask += 4;

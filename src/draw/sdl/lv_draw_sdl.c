@@ -21,21 +21,16 @@
 /*********************
  *      DEFINES
  *********************/
-void lv_draw_sdl_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
+void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-                              const lv_draw_img_dsc_t * draw_dsc);
+lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                              const lv_area_t * coords, const void * src);
 
-void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
-                             lv_blend_mode_t blend_mode);
+void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+                             uint32_t letter);
 
-void lv_draw_sdl_draw_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                 lv_color_t color, lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
+void lv_draw_sdl_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
 
-void lv_draw_sdl_draw_blend_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * clip_area,
-                                const lv_color_t * src_buf, const lv_area_t * src_area,
-                                lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t blend_mode);
 /**********************
  *      TYPEDEFS
  **********************/
@@ -56,41 +51,28 @@ static void lv_draw_sdl_noop(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_init()
+void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
     _lv_draw_sdl_utils_init();
+    lv_memset_00(draw_ctx, sizeof(lv_draw_sdl_ctx_t));
+    lv_draw_sw_init_ctx(disp_drv, draw_ctx);
+    draw_ctx->draw_rect = lv_draw_sdl_draw_rect;
+    draw_ctx->draw_img_core = lv_draw_sdl_img_core;
+    draw_ctx->draw_letter = lv_draw_sdl_draw_letter;
+    lv_draw_sdl_ctx_t *draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
+    draw_ctx_sdl->renderer = disp_drv->user_data;
+    draw_ctx_sdl->base_draw.blend = lv_draw_sdl_blend;
+    draw_ctx_sdl->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_internals_t));
+    lv_memset_00(draw_ctx_sdl->internals, sizeof(lv_draw_sdl_context_internals_t));
+    lv_draw_sdl_texture_cache_init(draw_ctx_sdl->internals);
 }
 
-void lv_draw_sdl_deinit()
+void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
+    lv_draw_sdl_ctx_t *draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_texture_cache_deinit(draw_ctx_sdl->internals);
+    lv_mem_free(draw_ctx_sdl->internals);
     _lv_draw_sdl_utils_deinit();
-}
-
-void lv_draw_sdl_backend_init(lv_draw_backend_t * backend)
-{
-    lv_draw_backend_init(backend);
-    backend->draw_rect = lv_draw_sdl_draw_rect;
-    backend->draw_arc = lv_draw_sw_arc;
-    backend->draw_img_core = lv_draw_sdl_img_core;
-    backend->draw_letter = lv_draw_sdl_draw_letter;
-    backend->draw_line = lv_draw_sw_line;
-    backend->draw_polygon = lv_draw_sw_polygon;
-    backend->blend_fill = lv_draw_sdl_draw_blend_fill;
-    backend->blend_map = lv_draw_sdl_draw_blend_map;
-}
-
-void lv_draw_sdl_context_init(lv_draw_sdl_context_t * context)
-{
-    lv_memset_00(context, sizeof(lv_draw_sdl_context_t));
-    context->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_t));
-    lv_memset_00(context->internals, sizeof(lv_draw_sdl_context_t));
-    lv_draw_sdl_texture_cache_init(context->internals);
-}
-
-void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t * context)
-{
-    lv_draw_sdl_texture_cache_deinit(context->internals);
-    lv_mem_free(context->internals);
 }
 
 

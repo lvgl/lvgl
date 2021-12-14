@@ -201,10 +201,10 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
     }
 }
 
-lv_draw_sdl_context_t * lv_draw_sdl_get_context()
+lv_draw_sdl_ctx_t * lv_draw_sdl_get_context()
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    return disp->driver->user_data;
+    return (lv_draw_sdl_ctx_t *) disp->driver->draw_ctx;
 }
 
 /**********************

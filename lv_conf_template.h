@@ -143,6 +143,9 @@
 #if LV_USE_DRAW_SDL
     #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
     #define LV_DRAW_SDL_LRU_SIZE 1024 * 1024 * 8
+
+    #define LV_USE_GPU_SDL LV_USE_DRAW_SDL
+    #define LV_GPU_SDL_INCLUDE_PATH LV_DRAW_SDL_INCLUDE_PATH
 #endif
 
 /*-------------

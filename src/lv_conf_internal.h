@@ -348,6 +348,21 @@
             #define LV_DRAW_SDL_LRU_SIZE 1024 * 1024 * 8
         #endif
     #endif
+
+    #ifndef LV_USE_GPU_SDL
+        #ifdef CONFIG_LV_USE_GPU_SDL
+            #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+        #else
+            #define LV_USE_GPU_SDL LV_USE_DRAW_SDL
+        #endif
+    #endif
+    #ifndef LV_GPU_SDL_INCLUDE_PATH
+        #ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
+            #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+        #else
+            #define LV_GPU_SDL_INCLUDE_PATH LV_DRAW_SDL_INCLUDE_PATH
+        #endif
+    #endif
 #endif
 
 /*-------------

@@ -48,10 +48,11 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-                              const lv_draw_img_dsc_t * draw_dsc)
+lv_res_t lv_draw_sdl_img_core(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                              const lv_area_t * coords, const void * src)
 {
-    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
+    const lv_area_t *clip = draw_ctx->clip_area;
+    lv_draw_sdl_ctx_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     size_t key_size;
@@ -92,8 +93,8 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
         return LV_RES_INV;
     }
 
-    SDL_Rect mask_rect, coords_rect;
-    lv_area_to_sdl_rect(mask, &mask_rect);
+    SDL_Rect clip_rect, coords_rect;
+    lv_area_to_sdl_rect(clip, &clip_rect);
     lv_area_to_sdl_rect(coords, &coords_rect);
     lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
 
@@ -101,7 +102,7 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
     SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
     SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_RenderSetClipRect(renderer, &mask_rect);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
 
     SDL_Color recolor;
     lv_color_to_sdl_color(&draw_dsc->recolor, &recolor);

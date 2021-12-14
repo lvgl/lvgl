@@ -20,7 +20,7 @@ extern "C" {
 
 #include LV_DRAW_SDL_INCLUDE_PATH
 
-#include "../lv_draw.h"
+#include "../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -38,29 +38,23 @@ extern "C" {
 
 struct lv_draw_sdl_context_internals_t;
 
-typedef struct lv_draw_sdl_context_t {
+typedef struct {
+    lv_draw_sw_ctx_t base_draw;
     SDL_Renderer * renderer;
-    SDL_Texture * texture;
     struct lv_draw_sdl_context_internals_t * internals;
-} lv_draw_sdl_context_t;
+} lv_draw_sdl_ctx_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_sdl_init();
+void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
 
 /**
  * @brief Free caches
  *
  */
-void lv_draw_sdl_deinit();
-
-void lv_draw_sdl_backend_init(lv_draw_backend_t * backend);
-
-void lv_draw_sdl_context_init(lv_draw_sdl_context_t * context);
-
-void lv_draw_sdl_context_deinit(lv_draw_sdl_context_t * context);
+void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
 
 /*======================
  * Add/remove functions

@@ -53,10 +53,13 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
-                             lv_blend_mode_t blend_mode)
+void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+                             uint32_t letter)
 {
+    const lv_area_t *clip_area = draw_ctx->clip_area;
+    const lv_font_t *font_p = dsc->font;
+    lv_opa_t opa = dsc->opa;
+    lv_color_t color = dsc->color;
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -92,7 +95,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         return;
     }
 
-    lv_draw_sdl_context_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_ctx_t * ctx = lv_draw_sdl_get_context();
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
@@ -117,7 +120,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
 
     lv_point_t offset = {0, 0};
     lv_area_t t_letter = letter_area, t_clip = *clip_area, apply_area;
-    bool has_mask = lv_draw_sdl_mask_begin(&letter_area, clip_area, NULL, &t_letter, &t_clip, &apply_area);
+    bool has_mask = lv_draw_sdl_mask_begin(ctx, &letter_area, clip_area, NULL, &t_letter, &t_clip, &apply_area);
 
     /*If the letter is completely out of mask don't draw it*/
     if(!_lv_area_intersect(&draw_area, &t_letter, &t_clip)) {
@@ -135,7 +138,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
     SDL_RenderCopy(renderer, texture, &srcrect, &dstrect);
 
     if(has_mask) {
-        lv_draw_sdl_mask_end(&apply_area);
+        lv_draw_sdl_mask_end(ctx, &apply_area);
     }
 }
 

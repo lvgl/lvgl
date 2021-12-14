@@ -55,7 +55,7 @@ SDL_Texture * lv_sdl_create_opa_texture(SDL_Renderer * renderer, lv_opa_t * pixe
 
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
 
-lv_draw_sdl_context_t * lv_draw_sdl_get_context();
+lv_draw_sdl_ctx_t * lv_draw_sdl_get_context();
 
 /**********************
  *      MACROS
