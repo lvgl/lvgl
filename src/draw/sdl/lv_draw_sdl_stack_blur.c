@@ -8,7 +8,7 @@
  *********************/
 #include "lv_draw_sdl_stack_blur.h"
 
-#if LV_USE_DRAW_SDL
+#if LV_USE_GPU_SDL
 /*********************
  *      DEFINES
  *********************/
@@ -246,4 +246,4 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
     }
 }
 
-#endif /*LV_USE_DRAW_SDL*/
+#endif /*LV_USE_GPU_SDL*/

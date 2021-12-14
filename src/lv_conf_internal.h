@@ -319,53 +319,6 @@
 #endif
 
 /*-------------
- * Drawing backend
- *-----------*/
-
-#if defined(LV_USE_GPU_SDL) || defined(LV_GPU_SDL_INCLUDE_PATH)
-    #error "Please use LV_USE_DRAW_SDL and LV_DRAW_SDL_INCLUDE_PATH instead"
-#endif
-
-#ifndef LV_USE_DRAW_SDL
-    #ifdef CONFIG_LV_USE_DRAW_SDL
-        #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
-    #else
-        #define LV_USE_DRAW_SDL 0
-    #endif
-#endif
-#if LV_USE_DRAW_SDL
-    #ifndef LV_DRAW_SDL_INCLUDE_PATH
-        #ifdef CONFIG_LV_DRAW_SDL_INCLUDE_PATH
-            #define LV_DRAW_SDL_INCLUDE_PATH CONFIG_LV_DRAW_SDL_INCLUDE_PATH
-        #else
-            #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
-        #endif
-    #endif
-    #ifndef LV_DRAW_SDL_LRU_SIZE
-        #ifdef CONFIG_LV_DRAW_SDL_LRU_SIZE
-            #define LV_DRAW_SDL_LRU_SIZE CONFIG_LV_DRAW_SDL_LRU_SIZE
-        #else
-            #define LV_DRAW_SDL_LRU_SIZE 1024 * 1024 * 8
-        #endif
-    #endif
-
-    #ifndef LV_USE_GPU_SDL
-        #ifdef CONFIG_LV_USE_GPU_SDL
-            #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
-        #else
-            #define LV_USE_GPU_SDL LV_USE_DRAW_SDL
-        #endif
-    #endif
-    #ifndef LV_GPU_SDL_INCLUDE_PATH
-        #ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
-            #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
-        #else
-            #define LV_GPU_SDL_INCLUDE_PATH LV_DRAW_SDL_INCLUDE_PATH
-        #endif
-    #endif
-#endif
-
-/*-------------
  * GPU
  *-----------*/
 
@@ -418,6 +371,31 @@
         #define LV_USE_GPU_NXP_VG_LITE CONFIG_LV_USE_GPU_NXP_VG_LITE
     #else
         #define LV_USE_GPU_NXP_VG_LITE 0
+    #endif
+#endif
+
+/*Use SDL renderer API*/
+#ifndef LV_USE_GPU_SDL
+    #ifdef CONFIG_LV_USE_GPU_SDL
+        #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+    #else
+        #define LV_USE_GPU_SDL 0
+    #endif
+#endif
+#if LV_USE_GPU_SDL
+    #ifndef LV_GPU_SDL_INCLUDE_PATH
+        #ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
+            #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+        #else
+            #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+        #endif
+    #endif
+    #ifndef LV_GPU_SDL_LRU_SIZE
+        #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
+            #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
+        #else
+            #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+        #endif
     #endif
 #endif
 

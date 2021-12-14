@@ -132,23 +132,6 @@
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
 /*-------------
- * Drawing backend
- *-----------*/
-
-#if defined(LV_USE_GPU_SDL) || defined(LV_GPU_SDL_INCLUDE_PATH)
-    #error "Please use LV_USE_DRAW_SDL and LV_DRAW_SDL_INCLUDE_PATH instead"
-#endif
-
-#define LV_USE_DRAW_SDL 0
-#if LV_USE_DRAW_SDL
-    #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
-    #define LV_DRAW_SDL_LRU_SIZE 1024 * 1024 * 8
-
-    #define LV_USE_GPU_SDL LV_USE_DRAW_SDL
-    #define LV_GPU_SDL_INCLUDE_PATH LV_DRAW_SDL_INCLUDE_PATH
-#endif
-
-/*-------------
  * GPU
  *-----------*/
 
@@ -173,6 +156,13 @@
 
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE 0
+
+/*Use SDL renderer API*/
+#define LV_USE_GPU_SDL 0
+#if LV_USE_GPU_SDL
+    #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+    #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+#endif
 
 /*-------------
  * Logging

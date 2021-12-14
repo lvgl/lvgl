@@ -16,9 +16,9 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_SDL
+#if LV_USE_GPU_SDL
 
-#include LV_DRAW_SDL_INCLUDE_PATH
+#include LV_GPU_SDL_INCLUDE_PATH
 
 #include "../sw/lv_draw_sw.h"
 
@@ -76,7 +76,7 @@ void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_SDL*/
+#endif /*LV_USE_GPU_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

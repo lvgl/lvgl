@@ -9,7 +9,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_SDL
+#if LV_USE_GPU_SDL
 
 #include "lv_draw_sdl_texture_cache.h"
 
@@ -56,7 +56,7 @@ static draw_cache_value_t * draw_cache_get_entry(lv_draw_sdl_ctx_t *ctx, const v
 
 void lv_draw_sdl_texture_cache_init(lv_draw_sdl_ctx_t *ctx)
 {
-    ctx->internals->texture_cache = lv_lru_new(LV_DRAW_SDL_LRU_SIZE, 65536,
+    ctx->internals->texture_cache = lv_lru_new(LV_GPU_SDL_LRU_SIZE, 65536,
                                           (lv_lru_free_t *) draw_cache_free_value, NULL);
 }
 
@@ -174,5 +174,5 @@ static draw_cache_value_t * draw_cache_get_entry(lv_draw_sdl_ctx_t *ctx, const v
     return value;
 }
 
-#endif /*LV_USE_DRAW_SDL*/
+#endif /*LV_USE_GPU_SDL*/
 

@@ -9,7 +9,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_SDL
+#if LV_USE_GPU_SDL
 
 #include "../lv_draw_img.h"
 #include "../lv_img_cache.h"
@@ -176,4 +176,4 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 }
 
 
-#endif /*LV_USE_DRAW_SDL*/
+#endif /*LV_USE_GPU_SDL*/

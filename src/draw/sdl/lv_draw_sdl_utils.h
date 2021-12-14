@@ -14,13 +14,13 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
-#if LV_USE_DRAW_SDL
+#if LV_USE_GPU_SDL
 
 #include "lv_draw_sdl.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
 
-#include LV_DRAW_SDL_INCLUDE_PATH
+#include LV_GPU_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -59,7 +59,7 @@ lv_draw_sdl_ctx_t * lv_draw_sdl_get_context();
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_SDL*/
+#endif /*LV_USE_GPU_SDL*/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

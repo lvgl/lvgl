@@ -12,7 +12,7 @@
 #include <stdint-gcc.h>
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_SDL
+#if LV_USE_GPU_SDL
 
 #include "../../core/lv_refr.h"
 #include "../lv_draw_mask.h"
@@ -250,4 +250,4 @@ void texture_apply_mask(SDL_Texture * texture, const lv_area_t * coords, const i
     SDL_UnlockTexture(texture);
 }
 
-#endif /*LV_USE_DRAW_SDL*/
+#endif /*LV_USE_GPU_SDL*/
