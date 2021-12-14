@@ -59,7 +59,7 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_ctx->draw_rect = lv_draw_sdl_draw_rect;
     draw_ctx->draw_img_core = lv_draw_sdl_img_core;
     draw_ctx->draw_letter = lv_draw_sdl_draw_letter;
-    lv_draw_sdl_ctx_t *draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
     draw_ctx_sdl->renderer = disp_drv->user_data;
     draw_ctx_sdl->base_draw.blend = lv_draw_sdl_blend;
     draw_ctx_sdl->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_internals_t));
@@ -69,7 +69,7 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 
 void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
-    lv_draw_sdl_ctx_t *draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
     lv_draw_sdl_texture_cache_deinit(draw_ctx_sdl);
     lv_mem_free(draw_ctx_sdl->internals);
     _lv_draw_sdl_utils_deinit();

@@ -51,7 +51,7 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
                               const lv_area_t * coords, const void * src)
 {
-    const lv_area_t *clip = draw_ctx->clip_area;
+    const lv_area_t * clip = draw_ctx->clip_area;
     lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
     SDL_Renderer * renderer = ctx->renderer;
 

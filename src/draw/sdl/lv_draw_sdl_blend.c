@@ -46,9 +46,10 @@ static void blend_map(lv_draw_sdl_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t
 
 void lv_draw_sdl_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    if (dsc->src_buf) {
+    if(dsc->src_buf) {
         blend_map((lv_draw_sdl_ctx_t *) draw_ctx, dsc);
-    } else {
+    }
+    else {
         blend_fill((lv_draw_sdl_ctx_t *) draw_ctx, dsc);
     }
 }

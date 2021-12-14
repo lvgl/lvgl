@@ -57,7 +57,7 @@ void texture_apply_mask(SDL_Texture * texture, const lv_area_t * coords, const i
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t *ctx, const lv_area_t * coords_in, const lv_area_t * clip_in,
+bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords_in, const lv_area_t * clip_in,
                             const lv_area_t * extension, lv_area_t * coords_out, lv_area_t * clip_out,
                             lv_area_t * apply_area)
 {
@@ -111,7 +111,7 @@ bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t *ctx, const lv_area_t * coords_in,
     return true;
 }
 
-void lv_draw_sdl_mask_end(lv_draw_sdl_ctx_t *ctx, const lv_area_t * apply_area)
+void lv_draw_sdl_mask_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_area)
 {
 #if HAS_CUSTOM_BLEND_MODE
     lv_draw_sdl_context_internals_t * internals = ctx->internals;

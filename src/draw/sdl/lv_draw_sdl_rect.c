@@ -104,7 +104,7 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
 
 void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    const lv_area_t *clip = draw_ctx->clip_area;
+    const lv_area_t * clip = draw_ctx->clip_area;
     lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
 
     lv_area_t extension = {0, 0, 0, 0};

@@ -49,7 +49,7 @@ static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 void _lv_draw_sdl_utils_init()
 {
     utils_init_count++;
-    if (utils_init_count > 1) {
+    if(utils_init_count > 1) {
         return;
     }
     lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
@@ -57,11 +57,11 @@ void _lv_draw_sdl_utils_init()
 
 void _lv_draw_sdl_utils_deinit()
 {
-    if (utils_init_count == 0) {
+    if(utils_init_count == 0) {
         return;
     }
     utils_init_count--;
-    if (utils_init_count == 0) {
+    if(utils_init_count == 0) {
         SDL_FreePalette(lv_sdl_palette_grayscale8);
         lv_sdl_palette_grayscale8 = NULL;
     }

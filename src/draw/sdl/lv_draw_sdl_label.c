@@ -56,8 +56,8 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
 void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                              uint32_t letter)
 {
-    const lv_area_t *clip_area = draw_ctx->clip_area;
-    const lv_font_t *font_p = dsc->font;
+    const lv_area_t * clip_area = draw_ctx->clip_area;
+    const lv_font_t * font_p = dsc->font;
     lv_opa_t opa = dsc->opa;
     lv_color_t color = dsc->color;
     if(opa < LV_OPA_MIN) return;
