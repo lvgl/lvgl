@@ -684,12 +684,10 @@ static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font,
         return false;
     }
 
-    uint32_t ofs = _lv_txt_get_next_line(txt, font, letter_space, max_width, flag);
-    lv_coord_t width = lv_txt_get_width(txt, ofs, font, letter_space, flag);
+    uint32_t ofs = _lv_txt_get_next_line(txt, font, letter_space, max_width, use_width, flag);
     *end_ofs = ofs;
-    *use_width = width;
 
-    if(txt[ofs] == '\0' && width < max_width) {
+    if(txt[ofs] == '\0' && *use_width < max_width) {
         return false;
     }
     else {

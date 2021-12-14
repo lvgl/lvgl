@@ -329,7 +329,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
     /*Search the line of the index letter*/;
     while(txt[new_line_start] != '\0') {
-        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
         if(byte_id < new_line_start || txt[new_line_start] == '\0')
             break; /*The line of 'index' letter begins at 'line_start'*/
 
@@ -430,7 +430,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 
     /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
-        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
 
         if(pos.y <= y + letter_height) {
             /*The line is found (stored in 'line_start')*/
@@ -548,7 +548,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
     /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
-        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
 
         if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
         y += letter_height + line_space;
