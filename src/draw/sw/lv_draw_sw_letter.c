@@ -235,6 +235,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     fill_area.y1 = row_start + pos->y;
     fill_area.y2 = fill_area.y1;
 #if LV_DRAW_COMPLEX
+    lv_coord_t fill_w = lv_area_get_width(&fill_area);
     lv_area_t mask_area;
     lv_area_copy(&mask_area, &fill_area);
     mask_area.y2 = mask_area.y1 + row_end;
@@ -242,7 +243,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
 #endif
     blend_dsc.blend_area = &fill_area;
     blend_dsc.mask_area = &fill_area;
-    lv_coord_t fill_w = lv_area_get_width(&fill_area);
 
     uint32_t col_bit_max = 8 - bpp;
     uint32_t col_bit_row_ofs = (box_w + col_start - col_end) * bpp;
@@ -407,6 +407,15 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     uint8_t txt_rgb[3] = {color.ch.red, (color.ch.green_h << 3) + color.ch.green_l, color.ch.blue};
 #endif
 
+    lv_draw_sw_blend_dsc_t blend_dsc;
+    lv_memset_00(&blend_dsc, sizeof(&blend_dsc));
+    blend_dsc.blend_area = &map_area;
+    blend_dsc.mask_area = &map_area;
+    blend_dsc.src_buf = color_buf;
+    blend_dsc.mask = mask_buf;
+    blend_dsc.opa = opa;
+    blend_dsc.blend_mode = dsc->blend_mode;
+
     for(row = row_start ; row < row_end; row++) {
         uint32_t subpx_cnt = 0;
         bitmask = bitmask_init >> col_bit;
@@ -439,7 +448,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                 uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red, dest_buf_tmp->ch.green, dest_buf_tmp->ch.blue};
 #else
                 uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red,
-                                     (dest_buf_tmp->ch.green_h << 3) + disp_buf_buf_tmp->ch.green_l,
+                                     (dest_buf_tmp->ch.green_h << 3) + dest_buf_tmp->ch.green_l,
                                      dest_buf_tmp->ch.blue
                                     };
 #endif
@@ -487,9 +496,9 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
         /*Apply masks if any*/
         if(mask_any) {
-            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
+            blend_dsc.mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
                                                              lv_area_get_width(&map_area));
-            if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
+            if(blend_dsc.mask_res == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&map_area));
             }
         }
@@ -498,7 +507,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             map_area.y2 ++;
         }
         else {
-            //            lv_draw_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
+            lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
             map_area.y1 = map_area.y2 + 1;
             map_area.y2 = map_area.y1;
@@ -517,7 +526,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     /*Flush the last part*/
     if(map_area.y1 != map_area.y2) {
         map_area.y2--;
-        //        lv_draw_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
+        lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 
     lv_mem_buf_release(mask_buf);

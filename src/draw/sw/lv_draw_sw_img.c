@@ -155,8 +155,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(struct _lv_draw_ctx_t * draw_ctx, cons
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
             blend_dsc.src_buf = src_buf_rgb;
 
-#if LV_DRAW_COMPLEX
             const uint8_t * src_buf_tmp = NULL;
+#if LV_DRAW_COMPLEX
             lv_img_transform_dsc_t trans_dsc;
             lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
             if(transform) {

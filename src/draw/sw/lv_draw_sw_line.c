@@ -435,7 +435,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ct
 #else
     LV_UNUSED(point1);
     LV_UNUSED(point2);
-    LV_UNUSED(clip);
+    LV_UNUSED(draw_ctx);
     LV_UNUSED(dsc);
     LV_LOG_WARN("Can't draw skewed line with LV_DRAW_COMPLEX == 0");
 #endif /*LV_DRAW_COMPLEX*/

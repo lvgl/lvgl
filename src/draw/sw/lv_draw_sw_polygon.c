@@ -196,7 +196,7 @@ void lv_draw_sw_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dra
 #else
     LV_UNUSED(points);
     LV_UNUSED(point_cnt);
-    LV_UNUSED(clip_area);
+    LV_UNUSED(draw_ctx);
     LV_UNUSED(draw_dsc);
     LV_LOG_WARN("Can't draw polygon with LV_DRAW_COMPLEX == 0");
 #endif /*LV_DRAW_COMPLEX*/

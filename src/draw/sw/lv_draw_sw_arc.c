@@ -206,12 +206,11 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
     }
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_COMPLEX == 0");
-    LV_UNUSED(center->x);
-    LV_UNUSED(center->y);
+    LV_UNUSED(center);
     LV_UNUSED(radius);
     LV_UNUSED(start_angle);
     LV_UNUSED(end_angle);
-    LV_UNUSED(clip_area);
+    LV_UNUSED(draw_ctx);
     LV_UNUSED(dsc);
 #endif /*LV_DRAW_COMPLEX*/
 }

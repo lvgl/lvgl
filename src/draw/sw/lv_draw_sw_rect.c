@@ -105,7 +105,6 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     lv_area_t clipped_coords;
     if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_ctx->clip_area)) return;
 
-    lv_opa_t opa = dsc->bg_opa >= LV_OPA_MAX ? LV_OPA_COVER : dsc->bg_opa;
     lv_grad_dir_t grad_dir = dsc->bg_grad_dir;
     if(dsc->bg_color.full == dsc->bg_grad_color.full) grad_dir = LV_GRAD_DIR_NONE;
 
@@ -128,6 +127,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 #if LV_DRAW_COMPLEX == 0
     LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_COMPLEX = 0");
 #else
+    lv_opa_t opa = dsc->bg_opa >= LV_OPA_MAX ? LV_OPA_COVER : dsc->bg_opa;
 
     /*Get the real radius. Can't be larger than the half of the shortest side */
     lv_coord_t coords_bg_w = lv_area_get_width(&bg_coords);
@@ -463,7 +463,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
     bool mask_any = lv_draw_mask_is_any(&shadow_area);
     bool simple = true;
-    if(mask_any || dsc->bg_opa < LV_OPA_COVER) simple = false;
+    if(mask_any || dsc->bg_opa < LV_OPA_COVER || dsc->blend_mode != LV_BLEND_MODE_NORMAL) simple = false;
 
     /*Create a radius mask to clip remove shadow on the bg area*/
 
