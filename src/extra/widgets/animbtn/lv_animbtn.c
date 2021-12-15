@@ -169,10 +169,6 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         case LV_EVENT_PRESS_LOST:
             apply_state(obj);
             break;
-        case LV_EVENT_DRAW_MAIN:
-            //draw_main(e);
-            lv_obj_invalidate(animbtn->lottie);
-            break;
         case LV_EVENT_COVER_CHECK: {
                 lv_cover_check_info_t * info = lv_event_get_param(e);
                 if(info->res != LV_COVER_RES_MASKED) info->res = LV_COVER_RES_NOT_COVER;

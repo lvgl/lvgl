@@ -17,9 +17,9 @@ extern "C" {
 
 #if LV_USE_RLOTTIE != 0 && LV_USE_ANIMBTN != 0
 
-/*********************
- *      DEFINES
- *********************/
+/**********************
+ *      TYPEDEFS
+ **********************/
 typedef enum {
     LV_ANIMBTN_STATE_RELEASED,
     LV_ANIMBTN_STATE_PRESSED,
@@ -30,14 +30,17 @@ typedef enum {
     _LV_ANIMBTN_STATE_NUM,
 } lv_animbtn_state_t;
 
-/**********************
- *      TYPEDEFS
- **********************/
+typedef enum {
+    LV_ANIMBTN_CTRL_FORWARD  = 0,
+    LV_ANIMBTN_CTRL_BACKWARD = 1,
+    LV_ANIMBTN_CTRL_LOOP     = 8,
+} lv_animbtn_ctrl_t; /* Should match lv_rlottie_ctrl_t */
+
 /*State status for anim button*/
 typedef struct {
     size_t first_frame;
     size_t last_frame;
-    size_t control; /* A lv_rlottie_ctrl_t instance and only checking Forward/Backward and Loop here */
+    lv_animbtn_ctrl_t control;
 } lv_animbtn_state_desc_t;
 
 /*Data of anim button*/
@@ -61,10 +64,6 @@ extern const lv_obj_class_t lv_animbtn_class;
  * @return pointer to the created anim button
  */
 lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim);
-
-/*======================
- * Add/remove functions
- *=====================*/
 
 /*=====================
  * Setter functions
@@ -99,15 +98,6 @@ void lv_animbtn_set_state(lv_obj_t * animbtn, lv_animbtn_state_t state);
  * @return pointer to the description for this state
  */
 const lv_animbtn_state_desc_t * lv_animbtn_get_state_desc(lv_obj_t * animbtn, lv_animbtn_state_t state);
-
-
-/*=====================
- * Other functions
- *====================*/
-
-/**********************
- *      MACROS
- **********************/
 
 #endif /*LV_USE_ANIMBTN*/
 
