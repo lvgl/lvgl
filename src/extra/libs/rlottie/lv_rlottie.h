@@ -38,8 +38,6 @@ typedef struct {
     lv_img_t img_ext;
     lv_img_decoder_dsc_t * dec;
     lv_timer_t * task;
-    size_t total_frames;
-    size_t current_frame;
     size_t framerate;
     lv_rlottie_ctrl_t play_ctrl;
     size_t dest_frame;

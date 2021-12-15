@@ -86,9 +86,10 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
 void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
     rlottie->play_ctrl = ctrl;
 
-    if(rlottie->task && (rlottie->dest_frame != rlottie->current_frame ||
+    if(rlottie->task && (rlottie->dest_frame != context->current_frame ||
                          (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
         lv_timer_resume(rlottie->task);
     }
@@ -97,16 +98,20 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    rlottie->current_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
+    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
+
+    context->current_frame = goto_frame < context->total_frames ? goto_frame : context->total_frames - 1;
 }
 
 void lv_rlottie_stopat_frame(lv_obj_t * obj, const size_t goto_frame, const int forward)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    rlottie->dest_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
+    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
+
+    rlottie->dest_frame = goto_frame < context->total_frames ? goto_frame : context->total_frames - 1;
     rlottie->play_ctrl = LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_STOPAT | (forward ? LV_RLOTTIE_CTRL_FORWARD :
                                                                           LV_RLOTTIE_CTRL_BACKWARD);
-    if(rlottie->task && rlottie->dest_frame != rlottie->current_frame) {
+    if(rlottie->task && rlottie->dest_frame != context->current_frame) {
         lv_timer_resume(rlottie->task);
     }
 }
@@ -136,7 +141,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     rlottie->framerate = (size_t)lottie_animation_get_framerate(context->animation);
 
     rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_LOOP;
-    rlottie->dest_frame = rlottie->total_frames; /* invalid destination frame so it's possible to pause on frame 0 */
+    rlottie->dest_frame = context->total_frames; /* invalid destination frame so it's possible to pause on frame 0 */
 
     rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
 

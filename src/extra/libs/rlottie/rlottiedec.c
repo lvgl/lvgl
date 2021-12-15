@@ -152,6 +152,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     }
     if(context->allocated_buf == NULL) {
         lottie_animation_destroy(animation);
+        context->animation = 0;
         return LV_RES_INV;
     }
 
@@ -173,11 +174,10 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 }
 
 #if LV_COLOR_DEPTH == 16
-static void convert_to_rgba5658(uint32_t * pix, const size_t width, const size_t height)
+static void convert_to_rgba5658(uint32_t * pix, uint8_t * dest, const size_t width, const size_t height)
 {
     /* rlottie draws in ARGB32 format, but LVGL only deal with RGB565 format with (optional 8 bit alpha channel)
        so convert in place here the received buffer to LVGL format. */
-    uint8_t * dest = (uint8_t *)pix;
     uint32_t * src = pix;
     for(size_t y = 0; y < height; y++) {
         /* Convert a 4 bytes per pixel in format ARGB to R5G6B5A8 format
@@ -221,11 +221,15 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
     LV_UNUSED(decoder);
 
     lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dsc->user_data;
-    size_t lines = len / context->scanline_width;
+    size_t lines = (len * LV_ARGB32 / 8) / context->scanline_width;
     /* Check if we already have the right line in our internal buffer */
     if (context->last_rendered_frame != context->current_frame
-        ||  context->top > y || (context->top + context->lines_in_buf) <= (y+lines)) {
+        ||  context->top > y || (context->top + context->lines_in_buf) <= y) {
         context->top = y;
+        /* rlottie does not clip invalid coordinate, let's do it here */
+        if (context->top + context->lines_in_buf > dsc->header.h) {
+            context->top = dsc->header.h - context->lines_in_buf;
+        }
         /* Need to render partially to the buffer here */
         lottie_animation_render_partial(
             context->animation,
@@ -244,8 +248,8 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
 #if LV_COLOR_DEPTH == 32
     lv_memcpy(buf, &context->allocated_buf[(x * LV_ARGB32 / 8) + (y - context->top) * context->scanline_width], len * (LV_ARGB32 / 8));
 #elif LV_COLOR_DEPTH == 16
-    convert_to_rgba5658(context->allocated_buf, dsc->header.w, dsc->header.h);
-    lv_memcpy(buf, &context->allocated_buf[(x * LV_IMG_PX_SIZE_ALPHA_BYTE) + (y - context->top) * dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE], len * LV_IMG_PX_SIZE_ALPHA_BYTE );
+    uint32_t * buf_start = (uint32_t*)&context->allocated_buf[x + (y - context->top) * dsc->header.w];
+    convert_to_rgba5658(buf_start, buf, len, 1);
 #else
     /*todo: Handle other color depth here */
     return LV_RES_INV;

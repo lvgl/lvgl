@@ -231,6 +231,7 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 {
     lv_style_value_t value;
+    value.ptr = 0;
     switch(prop) {
         case LV_STYLE_TRANSFORM_ZOOM:
             value.num = LV_IMG_ZOOM_NONE;
@@ -273,8 +274,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.num = LV_COORD_MAX;
             break;
         default:
-            value.ptr = NULL;
-            value.num = 0;
             break;
     }
 

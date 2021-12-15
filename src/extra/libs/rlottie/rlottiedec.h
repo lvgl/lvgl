@@ -6,14 +6,14 @@
 /*********************
  *      DEFINES
  *********************/
-struct Lottie_Animation;
+struct Lottie_Animation_S;
 struct lv_img_header_t;
 
 /**********************
  *      TYPEDEFS
  **********************/
 typedef struct {
-    Lottie_Animation * animation;
+    struct Lottie_Animation_S * animation;
     lv_img_header_t * header;
     size_t total_frames;
     size_t current_frame;
