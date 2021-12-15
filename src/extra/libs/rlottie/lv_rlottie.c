@@ -9,6 +9,8 @@
 #include "lv_rlottie.h"
 #if LV_USE_RLOTTIE
 
+#include <rlottie_capi.h>
+
 /*********************
 *      DEFINES
 *********************/
@@ -182,6 +184,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         rlottie->dest_frame = 0;
     }
 
+    lv_img_cache_invalidate_src(&rlottie->imgdsc);
     if(rlottie->allocated_buf) {
         lv_mem_free(rlottie->allocated_buf);
         rlottie->allocated_buf = NULL;
