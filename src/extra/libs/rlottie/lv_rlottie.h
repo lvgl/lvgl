@@ -16,8 +16,6 @@ extern "C" {
 #include "../../../lvgl.h"
 #if LV_USE_RLOTTIE
 
-#include <rlottie_capi.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -34,6 +32,8 @@ typedef enum {
     LV_RLOTTIE_CTRL_STOPAT   = 4,
 } lv_rlottie_ctrl_t;
 
+/** definition in lottieanimation_capi.c */
+struct Lottie_Animation_S;
 typedef struct {
     lv_img_t img_ext;
     lv_img_decoder_dsc_t * dec;
