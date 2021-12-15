@@ -45,8 +45,8 @@ Instead of the regular `lv_obj_add/clear_state()` functions the `lv_imgbtn_set_s
 Learn more about [Events](/overview/event).
 
 ## Keys
-- `LV_KEY_RIGHT/UP`  Go to toggled state if `LV_OBJ_FLAG_CHECHABLE` is enabled.
-- `LV_KEY_LEFT/DOWN`  Go to non-toggled state if `LV_OBJ_FLAG_CHECHABLE` is enabled.
+- `LV_KEY_RIGHT/UP`  Go to toggled state if `LV_OBJ_FLAG_CHECKABLE` is enabled.
+- `LV_KEY_LEFT/DOWN`  Go to non-toggled state if `LV_OBJ_FLAG_CHECKABLE` is enabled.
 - `LV_KEY_ENTER` Clicks the button
 
 

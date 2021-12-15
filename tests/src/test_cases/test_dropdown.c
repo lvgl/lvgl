@@ -4,15 +4,16 @@
 #include "unity/unity.h"
 #include "lv_test_indev.h"
 
-void test_dropdown_create_delete(void);
-void test_dropdown_set_options(void);
-void test_dropdown_select(void);
-void test_dropdown_click(void);
-void test_dropdown_keypad(void);
-void test_dropdown_encoder(void);
-void test_dropdown_render_1(void);
-void test_dropdown_render_2(void);
+void setUp(void)
+{
+    /* Function run before every test */
+}
 
+void tearDown(void)
+{
+    /* Function run after every test */
+    lv_obj_clean(lv_scr_act());
+}
 void test_dropdown_create_delete(void)
 {
   lv_dropdown_create(lv_scr_act());
@@ -422,6 +423,23 @@ void test_dropdown_render_2(void)
   TEST_ASSERT_EQUAL_SCREENSHOT("dropdown_2.png");
 }
 
+/* See #2893 */
+void test_dropdown_should_list_on_top(void)
+{
+    lv_obj_t * cont1 = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(cont1, 200, 100);
+
+    lv_obj_t * dd = lv_dropdown_create(cont1);
+
+    lv_obj_t * cont2 = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(cont2, 200, 100);
+    lv_obj_set_pos(cont2, 0, 100);
+
+    lv_dropdown_open(dd);
+    lv_obj_t * list = lv_dropdown_get_list(dd);
+    TEST_ASSERT_EQUAL_PTR(lv_scr_act(), lv_obj_get_parent(list));
+    TEST_ASSERT_EQUAL_INT(2, lv_obj_get_index(list));
+}
 
 
 #endif
