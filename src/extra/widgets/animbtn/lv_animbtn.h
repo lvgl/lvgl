@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../libs/rlottie/lv_rlottie.h"
 
 #if LV_USE_RLOTTIE != 0 && LV_USE_ANIMBTN != 0
 
@@ -31,9 +31,9 @@ typedef enum {
 } lv_animbtn_state_t;
 
 typedef enum {
-    LV_ANIMBTN_CTRL_FORWARD  = 0,
-    LV_ANIMBTN_CTRL_BACKWARD = 1,
-    LV_ANIMBTN_CTRL_LOOP     = 8,
+    LV_ANIMBTN_CTRL_FORWARD  = LV_RLOTTIE_CTRL_FORWARD,
+    LV_ANIMBTN_CTRL_BACKWARD = LV_RLOTTIE_CTRL_BACKWARD,
+    LV_ANIMBTN_CTRL_LOOP     = LV_RLOTTIE_CTRL_LOOP,
 } lv_animbtn_ctrl_t; /* Should match lv_rlottie_ctrl_t */
 
 /*State status for anim button*/

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../../widgets/lv_img.h"
 #if LV_USE_RLOTTIE
 
 /*********************
