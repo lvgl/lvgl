@@ -55,7 +55,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
-    lv_rlottie_t* rlottie = (lv_rlottie_t*)obj;
+    lv_rlottie_t * rlottie = (lv_rlottie_t *)obj;
     rlottie->dec.create_width = width;
     rlottie->dec.create_height = height;
     rlottie->dec.create_src = path;
@@ -72,7 +72,7 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
-    lv_rlottie_t* rlottie = (lv_rlottie_t*)obj;
+    lv_rlottie_t * rlottie = (lv_rlottie_t *)obj;
     rlottie->dec.create_width = width;
     rlottie->dec.create_height = height;
     rlottie->dec.create_src = rlottie_desc;
@@ -161,7 +161,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     }
 
     lv_img_cache_invalidate_src(rlottie->dec.create_src);
-    if (rlottie->dec.cache) {
+    if(rlottie->dec.cache) {
         lottie_animation_destroy(rlottie->dec.cache);
         rlottie->dec.cache = 0;
     }

@@ -64,7 +64,7 @@ lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim)
     lv_obj_set_parent(anim, obj);
     lv_obj_add_flag(anim, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_img_t * lottie = (lv_img_t*)anim;
+    lv_img_t * lottie = (lv_img_t *)anim;
     lv_obj_set_size(obj, lottie->w, lottie->h);
     return obj;
 }

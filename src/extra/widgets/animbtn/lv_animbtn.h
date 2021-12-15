@@ -13,13 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../libs/rlottie/lv_rlottie.h"
 
 #if LV_USE_RLOTTIE != 0 && LV_USE_ANIMBTN != 0
 
-/*********************
- *      DEFINES
- *********************/
+/**********************
+ *      TYPEDEFS
+ **********************/
 typedef enum {
     LV_ANIMBTN_STATE_RELEASED,
     LV_ANIMBTN_STATE_PRESSED,
@@ -30,14 +30,17 @@ typedef enum {
     _LV_ANIMBTN_STATE_NUM,
 } lv_animbtn_state_t;
 
-/**********************
- *      TYPEDEFS
- **********************/
+typedef enum {
+    LV_ANIMBTN_CTRL_FORWARD  = LV_RLOTTIE_CTRL_FORWARD,
+    LV_ANIMBTN_CTRL_BACKWARD = LV_RLOTTIE_CTRL_BACKWARD,
+    LV_ANIMBTN_CTRL_LOOP     = LV_RLOTTIE_CTRL_LOOP,
+} lv_animbtn_ctrl_t; /* Should match lv_rlottie_ctrl_t */
+
 /*State status for anim button*/
 typedef struct {
     size_t first_frame;
     size_t last_frame;
-    size_t control; /* A lv_rlottie_ctrl_t instance and only checking Forward/Backward and Loop here */
+    lv_animbtn_ctrl_t control;
 } lv_animbtn_state_desc_t;
 
 /*Data of anim button*/

@@ -15,8 +15,7 @@ struct lv_img_header_t;
 /** The decoder initialiation context to use as the last parameter of
  *  lv_img_set_src_ex
  */
-typedef struct
-{
+typedef struct {
     size_t total_frames;
     size_t current_frame;
     uint16_t create_width;

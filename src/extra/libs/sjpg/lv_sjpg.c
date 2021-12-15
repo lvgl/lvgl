@@ -105,10 +105,11 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx);
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
+                             const void * dec_ctx);
 static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, const void * dec_ctx);
 static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                  lv_coord_t len, uint8_t * buf, const void * dec_ctx);
+                                  lv_coord_t len, uint8_t * buf);
 static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
 static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata);
 static int is_jpg(const uint8_t * raw_data);
@@ -146,7 +147,8 @@ void lv_split_jpeg_init(void)
  * @param dec_ctx Not used
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx)
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
+                             const void * dec_ctx)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(dec_ctx);
@@ -718,15 +720,13 @@ end:
  * @param y start y coordinate
  * @param len number of pixels to decode
  * @param buf a buffer to store the decoded pixels
- * @param dec_ctx Not used
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
 
 static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                  lv_coord_t len, uint8_t * buf, const void * dec_ctx)
+                                  lv_coord_t len, uint8_t * buf)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(dec_ctx);
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         SJPEG * sjpeg = (SJPEG *) dsc->user_data;
         JRESULT rc;

@@ -41,7 +41,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx);
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
+                             const void * dec_ctx);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, const void * dec_ctx);
 
 
@@ -91,7 +92,8 @@ void lv_rlottie_set_max_buffer_size(size_t size_bytes)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * _dec_ctx)
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
+                             const void * _dec_ctx)
 {
     LV_UNUSED(decoder);
 
@@ -100,7 +102,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     Lottie_Animation * animation = NULL;
     size_t w, h;
 
-    if (dec_ctx != NULL && dec_ctx->cache != NULL) {
+    if(dec_ctx != NULL && dec_ctx->cache != NULL) {
         /*Already opened, reuse it*/
         header->w = (uint32_t)dec_ctx->create_width;
         header->h = (uint32_t)dec_ctx->create_height;
@@ -124,12 +126,13 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
 
     lottie_animation_get_size(animation, &w, &h);
 
-    if (dec_ctx != NULL) {
+    if(dec_ctx != NULL) {
         header->w = (uint32_t)dec_ctx->create_width;
         header->h = (uint32_t)dec_ctx->create_height;
         dec_ctx->total_frames = lottie_animation_get_totalframe(animation);
         dec_ctx->cache = animation;
-    } else {
+    }
+    else {
         header->w = (uint32_t)w;
         header->h = (uint32_t)h;
         lottie_animation_destroy(animation);
@@ -153,7 +156,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     Lottie_Animation * animation = NULL;
     size_t w, h;
     /* If already opened, reuse it */
-    if (dec_ctx != NULL && dec_ctx->cache != NULL)
+    if(dec_ctx != NULL && dec_ctx->cache != NULL)
         animation = dec_ctx->cache;
     /*If it's a rlottie JSON file...*/
     else if(dsc->src_type == LV_IMG_SRC_FILE) {
@@ -171,7 +174,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         return LV_RES_INV;
 
     lv_rlottie_dec_context_t * context = lv_mem_alloc(sizeof(lv_rlottie_dec_context_t));
-    if (dec_ctx == NULL) {
+    if(dec_ctx == NULL) {
         lottie_animation_get_size(animation, &w, &h);
         dec_ctx = lv_mem_alloc(sizeof(rlottiedec_ctx_t));
         dec_ctx->create_width = w;
@@ -192,7 +195,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         context->allocated_buf = lv_mem_alloc(context->lines_in_buf * context->scanline_width);
     }
     if(context->allocated_buf == NULL) {
-        if (dec_ctx->should_free) {
+        if(dec_ctx->should_free) {
             lottie_animation_destroy(animation);
             dec_ctx->cache = 0;
             lv_mem_free(dec_ctx);
@@ -315,7 +318,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     lv_mem_free(context->allocated_buf);
     context->allocated_buf = 0;
     /*Only free if allocated by ourselves.*/
-    if (dec_ctx && dec_ctx->should_free) {
+    if(dec_ctx && dec_ctx->should_free) {
         lottie_animation_destroy(dec_ctx->cache);
         dec_ctx->cache = 0;
         lv_mem_free(dec_ctx);

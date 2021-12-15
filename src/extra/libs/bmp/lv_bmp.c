@@ -31,7 +31,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx);
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
+                             const void * dec_ctx);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, const void * dec_ctx);
 
 
@@ -70,7 +71,8 @@ void lv_bmp_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx)
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
+                             const void * dec_ctx)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(dec_ctx);

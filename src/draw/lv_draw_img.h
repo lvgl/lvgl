@@ -41,7 +41,7 @@ typedef struct {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode : 4;
 
-    void *  dec_ctx;
+    void  * dec_ctx;
     uint8_t antialias       : 1;
 } lv_draw_img_dsc_t;
 
