@@ -39,6 +39,13 @@ extern "C" {
 struct lv_draw_sdl_context_internals_t;
 
 typedef struct {
+    /**
+     * Render for display driver
+     */
+    SDL_Renderer * renderer;
+} lv_draw_sdl_drv_param_t;
+
+typedef struct {
     lv_draw_sw_ctx_t base_draw;
     SDL_Renderer * renderer;
     struct lv_draw_sdl_context_internals_t * internals;
@@ -55,6 +62,8 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
  *
  */
 void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
+
+SDL_Texture * lv_draw_sdl_create_screen_texture(SDL_Renderer * renderer, lv_coord_t hor, lv_coord_t ver);
 
 /*======================
  * Add/remove functions

@@ -38,7 +38,7 @@ void lv_draw_sdl_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_draw_sdl_noop(void);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -57,10 +57,10 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     lv_memset_00(draw_ctx, sizeof(lv_draw_sdl_ctx_t));
     lv_draw_sw_init_ctx(disp_drv, draw_ctx);
     draw_ctx->draw_rect = lv_draw_sdl_draw_rect;
-    draw_ctx->draw_img_core = lv_draw_sdl_img_core;
+    draw_ctx->draw_img = lv_draw_sdl_img_core;
     draw_ctx->draw_letter = lv_draw_sdl_draw_letter;
     lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
-    draw_ctx_sdl->renderer = disp_drv->user_data;
+    draw_ctx_sdl->renderer = ((lv_draw_sdl_drv_param_t *) disp_drv->user_data)->renderer;
     draw_ctx_sdl->base_draw.blend = lv_draw_sdl_blend;
     draw_ctx_sdl->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_internals_t));
     lv_memset_00(draw_ctx_sdl->internals, sizeof(lv_draw_sdl_context_internals_t));
@@ -75,13 +75,15 @@ void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     _lv_draw_sdl_utils_deinit();
 }
 
+SDL_Texture * lv_draw_sdl_create_screen_texture(SDL_Renderer * renderer, lv_coord_t hor, lv_coord_t ver)
+{
+    SDL_Texture *texture = SDL_CreateTexture(renderer, LV_DRAW_SDL_TEXTURE_FORMAT, SDL_TEXTUREACCESS_TARGET, hor, ver);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    return texture;
+}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void lv_draw_sdl_noop(void)
-{
-
-}
 
 #endif /*LV_USE_GPU_SDL*/
