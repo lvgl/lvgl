@@ -180,7 +180,7 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         case LV_EVENT_GET_SELF_SIZE: {
                 lv_point_t * p = lv_event_get_self_size_info(e);
-                lv_img_header_t * header = &((lv_rlottie_t *)animbtn->lottie)->imgdsc.header;
+                lv_img_header_t * header = &((lv_rlottie_t *)animbtn->lottie)->dec->header;
                 p->x = LV_MAX(p->x, header->w);
                 break;
             }
@@ -232,7 +232,7 @@ static void apply_state(lv_obj_t * obj)
     setup_rlottie(animbtn, &animbtn->state_desc[state]);
 
     lv_obj_refresh_self_size(obj);
-    lv_obj_set_height(obj, lottie->imgdsc.header.h); /*Keep the user defined width*/
+    lv_obj_set_height(obj, lottie->dec->header.h); /*Keep the user defined width*/
 
     lv_obj_invalidate(obj);
     animbtn->prev_state = state;

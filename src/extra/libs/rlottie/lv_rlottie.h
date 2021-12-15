@@ -36,15 +36,11 @@ typedef enum {
 
 typedef struct {
     lv_img_t img_ext;
-    Lottie_Animation * animation;
+    lv_img_decoder_dsc_t * dec;
     lv_timer_t * task;
-    lv_img_dsc_t imgdsc;
     size_t total_frames;
     size_t current_frame;
     size_t framerate;
-    uint32_t * allocated_buf;
-    size_t allocated_buffer_size;
-    size_t scanline_width;
     lv_rlottie_ctrl_t play_ctrl;
     size_t dest_frame;
 } lv_rlottie_t;
