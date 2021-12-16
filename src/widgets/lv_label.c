@@ -202,7 +202,8 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     label->offset.x = 0;
     label->offset.y = 0;
 
-    if(long_mode == LV_LABEL_LONG_SCROLL || long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || long_mode == LV_LABEL_LONG_CLIP || long_mode == LV_LABEL_LONG_DOT)
+    if(long_mode == LV_LABEL_LONG_SCROLL || long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || long_mode == LV_LABEL_LONG_CLIP ||
+       long_mode == LV_LABEL_LONG_DOT)
         label->expand = 1;
     else
         label->expand = 0;
