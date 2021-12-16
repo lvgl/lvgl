@@ -45,7 +45,7 @@ typedef struct {
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
-    const void * dec_ctx;   /*Additional decoder context*/
+    void * dec_ctx;        /*Additional decoder context*/
 } lv_img_t;
 
 extern const lv_obj_class_t lv_img_class;
@@ -104,7 +104,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src);
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  * @param dec_ctx   Per decoder, specific data. Please refer to the decoder's header for the expected format.
  */
-void lv_img_set_src_ex(lv_obj_t * obj, const void * src, const void * dec_ctx);
+void lv_img_set_src_ex(lv_obj_t * obj, const void * src, void * dec_ctx);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.

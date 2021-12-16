@@ -71,7 +71,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     lv_img_set_src_ex(obj, src, NULL);
 }
 
-void lv_img_set_src_ex(lv_obj_t * obj, const void * src, const void * dec_ctx)
+void lv_img_set_src_ex(lv_obj_t * obj, const void * src, void * dec_ctx)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

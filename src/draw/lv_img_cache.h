@@ -50,7 +50,7 @@ typedef struct {
  * @param dec_ctx The decoder initialization context. Can be NULL
  * @return pointer to the cache entry or NULL if can open the image
  */
-_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, const void * dec_ctx);
+_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, void * dec_ctx);
 
 /**
  * Set the number of images to be cached.

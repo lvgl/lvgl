@@ -60,7 +60,7 @@
  * @param color color The color of the image with `LV_IMG_CF_ALPHA_...`
  * @return pointer to the cache entry or NULL if can open the image
  */
-_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, const void * dec_ctx)
+_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, void * dec_ctx)
 {
     /*Is the image cached?*/
     _lv_img_cache_entry_t * cached_src = NULL;

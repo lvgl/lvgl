@@ -41,7 +41,7 @@ typedef struct {
     lv_timer_t * task;
     size_t framerate;
     lv_rlottie_ctrl_t play_ctrl;
-    size_t dest_frame;
+    uint16_t dest_frame;
 } lv_rlottie_t;
 
 extern const lv_obj_class_t lv_rlottie_class;
@@ -56,8 +56,8 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
                                       const char * rlottie_desc);
 
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);
-void lv_rlottie_set_current_frame(lv_obj_t * rlottie, const size_t goto_frame);
-void lv_rlottie_stopat_frame(lv_obj_t * rlottie, const size_t goto_frame, const int forward);
+void lv_rlottie_set_current_frame(lv_obj_t * rlottie, const uint16_t goto_frame);
+void lv_rlottie_stopat_frame(lv_obj_t * rlottie, const uint16_t goto_frame, const int forward);
 size_t lv_rlottie_get_totalframes(lv_obj_t * rlottie);
 
 /**********************

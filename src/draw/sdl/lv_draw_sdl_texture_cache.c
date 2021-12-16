@@ -147,7 +147,7 @@ SDL_Texture * lv_gpu_temp_texture_obtain(SDL_Renderer * renderer, lv_coord_t wid
     return texture;
 }
 
-lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, const void * dec_ctx,
+lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, void * dec_ctx,
                                                                     size_t * size)
 {
     lv_draw_sdl_cache_key_head_img_t header;

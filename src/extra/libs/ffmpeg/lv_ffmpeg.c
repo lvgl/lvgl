@@ -70,8 +70,8 @@ struct lv_img_pixel_color_s {
  **********************/
 
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             const void * dec_ctx);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, const void * dec_ctx);
+                             void * dec_ctx);
+static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, void * dec_ctx);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -260,7 +260,7 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  **********************/
 
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             const void * dec_ctx)
+                             void * dec_ctx)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(dec_ctx);
@@ -283,7 +283,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, const void * dec_ctx)
+static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(dec_ctx);

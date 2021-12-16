@@ -81,7 +81,7 @@ void _lv_img_decoder_init(void)
  * @param dec_ctx   Not used
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
-lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, const void * dec_ctx)
+lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, void * dec_ctx)
 {
     LV_UNUSED(dec_ctx);
     lv_memset_00(header, sizeof(lv_img_header_t));
@@ -106,7 +106,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, con
     return res;
 }
 
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, const void * dec_ctx)
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, void * dec_ctx)
 {
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
@@ -274,7 +274,7 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                                      const void * dec_ctx)
+                                      void * dec_ctx)
 {
     LV_UNUSED(decoder); /*Unused*/
     LV_UNUSED(dec_ctx);
@@ -329,7 +329,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
  * @param dec_ctx Not used
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
-lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, const void * dec_ctx)
+lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx)
 {
     LV_UNUSED(dec_ctx);
     /*Open the file if it's a file*/

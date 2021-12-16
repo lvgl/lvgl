@@ -25,8 +25,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             const void * dec_ctx);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, const void * dec_ctx);
+                             void * dec_ctx);
+static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, void * dec_ctx);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 
@@ -64,7 +64,7 @@ void lv_png_init(void)
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             const void * dec_ctx)
+                             void * dec_ctx)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(dec_ctx);
@@ -118,7 +118,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or  `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, const void * dec_ctx)
+static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(dec_ctx);

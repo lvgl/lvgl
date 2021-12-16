@@ -6,23 +6,24 @@
 /*********************
  *      DEFINES
  *********************/
-struct Lottie_Animation_S;
-struct lv_img_header_t;
+#define RLOTTIE_ID  0x1071
 
 /**********************
  *      TYPEDEFS
  **********************/
+struct Lottie_Animation_S;
+struct lv_img_header_t;
+
 /** The decoder initialiation context to use as the last parameter of
  *  lv_img_set_src_ex
  */
 typedef struct {
-    size_t total_frames;
-    size_t current_frame;
+    lv_anim_dec_ctx_t ctx;
     uint16_t create_width;
     uint16_t create_height : 15;
     uint16_t should_free : 1;
     struct Lottie_Animation_S * cache;
-    void * create_src;
+    const void * create_src;
 } rlottiedec_ctx_t;
 
 
