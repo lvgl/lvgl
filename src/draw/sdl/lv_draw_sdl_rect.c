@@ -213,7 +213,7 @@ static void draw_bg_img(const lv_area_t * coords, const lv_area_t * clip, const 
         if(texture) {
             header = *cache_header;
         }
-        else if(key_found || lv_img_decoder_get_info(dsc->bg_img_src, &header) != LV_RES_OK) {
+        else if(key_found || lv_img_decoder_get_info(dsc->bg_img_src, &header, NULL) != LV_RES_OK) {
             /* When cache hit but with negative result, use default decoder. If still fail, return.*/
             LV_LOG_WARN("Couldn't read the background image");
             return;

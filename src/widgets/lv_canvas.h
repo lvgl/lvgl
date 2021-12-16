@@ -220,6 +220,17 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
                         const lv_draw_img_dsc_t * draw_dsc);
 
 /**
+ * Draw an image on the canvas
+ * @param canvas   pointer to a canvas object
+ * @param x        left coordinate of the image
+ * @param y        top coordinate of the image
+ * @param src      image source. Can be a pointer an `lv_img_dsc_t` variable or a path an image.
+ * @param draw_dsc pointer to a valid label descriptor `lv_draw_img_dsc_t`
+ * @param dec_ctx  pointer to a decoder specific initialization context
+ */
+void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
+                           const lv_draw_img_dsc_t * draw_dsc, const void * dec_ctx);
+/**
  * Draw a line on the canvas
  * @param canvas     pointer to a canvas object
  * @param points     point of the line

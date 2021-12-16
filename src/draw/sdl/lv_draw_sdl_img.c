@@ -55,11 +55,11 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
     SDL_Renderer * renderer = ctx->renderer;
 
     size_t key_size;
-    lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_img_cache_key_create(src, draw_dsc->frame_id, &key_size);
+    lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_img_cache_key_create(src, draw_dsc->dec_ctx, &key_size);
     bool texture_found = false;
     SDL_Texture * texture = lv_gpu_draw_cache_get(key, key_size, &texture_found);
     if(!texture_found) {
-        _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
+        _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->dec_ctx);
         lv_draw_sdl_cache_flag_t tex_flags = 0;
         if(cdsc) {
             lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;

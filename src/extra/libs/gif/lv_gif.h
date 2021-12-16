@@ -35,6 +35,10 @@ typedef struct {
     uint32_t last_call;
 } lv_gif_t;
 
+typedef struct {
+    uint32_t frame_index;
+} gifdec_ctx_t;
+
 extern const lv_obj_class_t lv_gif_class;
 
 /**********************

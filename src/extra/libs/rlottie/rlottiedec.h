@@ -12,17 +12,20 @@ struct lv_img_header_t;
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    struct Lottie_Animation_S * animation;
-    lv_img_header_t * header;
+/** The decoder initialiation context to use as the last parameter of
+ *  lv_img_set_src_ex
+ */
+typedef struct
+{
     size_t total_frames;
     size_t current_frame;
-    uint32_t * allocated_buf;
-    size_t lines_in_buf;
-    size_t scanline_width;
-    size_t top;
-    size_t last_rendered_frame;
-} lv_rlottie_dec_context_t;
+    uint16_t create_width;
+    uint16_t create_height : 15;
+    uint16_t should_free : 1;
+    struct Lottie_Animation_S * cache;
+    void * create_src;
+} rlottiedec_ctx_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES

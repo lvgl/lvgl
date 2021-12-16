@@ -783,7 +783,7 @@ static void draw_main(lv_event_t * e)
         }
         else {
             lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header);
+            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header, NULL);
             if(res == LV_RES_OK) {
                 symbol_w = header.w;
                 symbol_h = header.h;

@@ -552,7 +552,7 @@ static void lv_refr_area_part(const lv_area_t * area_p)
             dsc.opa = disp_refr->bg_opa;
             lv_img_header_t header;
             lv_res_t res;
-            res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
+            res = lv_img_decoder_get_info(disp_refr->bg_img, &header, NULL);
             if(res == LV_RES_OK) {
                 lv_area_t a;
                 lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);

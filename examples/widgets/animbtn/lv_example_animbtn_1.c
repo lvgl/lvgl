@@ -16,7 +16,7 @@ void lv_example_animbtn_1(void)
     lv_animbtn_set_state_desc(anim, LV_ANIMBTN_STATE_RELEASED, desc);
 
     desc.first_frame = 1;
-    desc.last_frame = ((lv_rlottie_t*)lottie)->total_frames;
+    desc.last_frame = lv_rlottie_get_totalframes(lottie);
     desc.control = LV_RLOTTIE_CTRL_LOOP | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_FORWARD;
     lv_animbtn_set_state_desc(anim, LV_ANIMBTN_STATE_CHECKED_RELEASED, desc);
     lv_obj_center(anim);

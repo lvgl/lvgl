@@ -31,8 +31,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx);
+static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, const void * dec_ctx);
 
 
 static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
@@ -70,9 +70,10 @@ void lv_bmp_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(dec_ctx);
 
     lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
 
@@ -121,9 +122,10 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or  `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, const void * dec_ctx)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(dec_ctx);
 
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {

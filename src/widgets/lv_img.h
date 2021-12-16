@@ -45,6 +45,7 @@ typedef struct {
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
+    const void * dec_ctx;   /*Additional decoder context*/
 } lv_img_t;
 
 extern const lv_obj_class_t lv_img_class;
@@ -84,11 +85,26 @@ lv_obj_t * lv_img_create(lv_obj_t * parent);
 /**
  * Set the image data to display on the the object
  * @param obj       pointer to an image object
- * @param src_img   1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
+ * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  */
 void lv_img_set_src(lv_obj_t * obj, const void * src);
+
+/**
+ * Set the image data to display on the the object, with extended information.
+ * Some picture don't have intrinsic size (like a vector based format, SVG, Lottie), or contain multiple
+ * parts (like multiple frames for animated format, GIF, Lottie)
+ *
+ * This allow specifying the additional informations for the decoder.
+ *
+ * @param obj       pointer to an image object
+ * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
+ *                  2) path to an image file (e.g. "S:/dir/img.bin")or
+ *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
+ * @param dec_ctx   Per decoder, specific data. Please refer to the decoder's header for the expected format.
+ */
+void lv_img_set_src_ex(lv_obj_t * obj, const void * src, const void * dec_ctx);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.

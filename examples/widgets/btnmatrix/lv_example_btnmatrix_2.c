@@ -40,7 +40,7 @@ static void event_cb(lv_event_t * e)
         if(dsc->id == 3) {
             LV_IMG_DECLARE(img_star);
             lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(&img_star, &header);
+            lv_res_t res = lv_img_decoder_get_info(&img_star, &header, NULL);
             if(res != LV_RES_OK) return;
 
             lv_area_t a;

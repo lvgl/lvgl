@@ -39,10 +39,6 @@ const lv_obj_class_t lv_rlottie_class = {
     .base_class = &lv_img_class
 };
 
-static lv_coord_t create_width;
-static lv_coord_t create_height;
-static const char * rlottie_desc_create;
-static const char * path_create;
 
 /**********************
  *      MACROS
@@ -55,13 +51,15 @@ static const char * path_create;
 lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path)
 {
     lv_rlottie_init();
-    create_width = width;
-    create_height = height;
-    path_create = path;
-    rlottie_desc_create = NULL;
+
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    lv_rlottie_t* rlottie = (lv_rlottie_t*)obj;
+    rlottie->dec.create_width = width;
+    rlottie->dec.create_height = height;
+    rlottie->dec.create_src = path;
+
     lv_obj_class_init_obj(obj);
 
     return obj;
@@ -71,13 +69,14 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc)
 {
     lv_rlottie_init();
-    create_width = width;
-    create_height = height;
-    rlottie_desc_create = rlottie_desc;
-    path_create = NULL;
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    lv_rlottie_t* rlottie = (lv_rlottie_t*)obj;
+    rlottie->dec.create_width = width;
+    rlottie->dec.create_height = height;
+    rlottie->dec.create_src = rlottie_desc;
+
     lv_obj_class_init_obj(obj);
 
     return obj;
@@ -86,10 +85,9 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
 void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
     rlottie->play_ctrl = ctrl;
 
-    if(rlottie->task && (rlottie->dest_frame != context->current_frame ||
+    if(rlottie->task && (rlottie->dest_frame != rlottie->dec.current_frame ||
                          (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
         lv_timer_resume(rlottie->task);
     }
@@ -98,22 +96,25 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
-
-    context->current_frame = goto_frame < context->total_frames ? goto_frame : context->total_frames - 1;
+    rlottie->dec.current_frame = goto_frame < rlottie->dec.total_frames ? goto_frame : rlottie->dec.total_frames - 1;
 }
 
 void lv_rlottie_stopat_frame(lv_obj_t * obj, const size_t goto_frame, const int forward)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
 
-    rlottie->dest_frame = goto_frame < context->total_frames ? goto_frame : context->total_frames - 1;
+    rlottie->dest_frame = goto_frame < rlottie->dec.total_frames ? goto_frame : rlottie->dec.total_frames - 1;
     rlottie->play_ctrl = LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_STOPAT | (forward ? LV_RLOTTIE_CTRL_FORWARD :
                                                                           LV_RLOTTIE_CTRL_BACKWARD);
-    if(rlottie->task && rlottie->dest_frame != context->current_frame) {
+    if(rlottie->task && rlottie->dest_frame != rlottie->dec.current_frame) {
         lv_timer_resume(rlottie->task);
     }
+}
+
+size_t lv_rlottie_get_totalframes(lv_obj_t * obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->dec.total_frames;
 }
 
 
@@ -125,23 +126,17 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 {
     LV_UNUSED(class_p);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    lv_color_t color;
-    void * src = rlottie_desc_create ? rlottie_desc_create : path_create;
-    lv_img_set_src(obj, src);
-    rlottie->dec = _lv_img_cache_open(src, color, 0);
-    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
+    lv_img_set_src_ex(obj, rlottie->dec.create_src, &rlottie->dec);
 
-
-
-    if(rlottie->dec == NULL || context == NULL || context->animation == NULL) {
+    if(rlottie->dec.cache == NULL) {
         LV_LOG_WARN("The animation can't be opened");
         return;
     }
 
-    rlottie->framerate = (size_t)lottie_animation_get_framerate(context->animation);
+    rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->dec.cache);
 
     rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_LOOP;
-    rlottie->dest_frame = context->total_frames; /* invalid destination frame so it's possible to pause on frame 0 */
+    rlottie->dest_frame = rlottie->dec.total_frames; /* invalid destination frame so it's possible to pause on frame 0 */
 
     rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
 
@@ -165,9 +160,10 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         rlottie->dest_frame = 0;
     }
 
-    if (rlottie->dec) {
-        lv_img_cache_invalidate_src(rlottie->dec->src);
-        rlottie->dec = NULL;
+    lv_img_cache_invalidate_src(rlottie->dec.create_src);
+    if (rlottie->dec.cache) {
+        lottie_animation_destroy(rlottie->dec.cache);
+        rlottie->dec.cache = 0;
     }
 }
 
@@ -177,29 +173,28 @@ static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)rlottie->dec->user_data;
 
     if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PAUSE) {
-        if(context->current_frame == rlottie->dest_frame) {
+        if(rlottie->dec.current_frame == rlottie->dest_frame) {
             /* Pause the timer too when it has run once to avoid CPU consumption */
             lv_timer_pause(t);
             return;
         }
-        rlottie->dest_frame = context->current_frame;
+        rlottie->dest_frame = rlottie->dec.current_frame;
     }
     else {
         if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_STOPAT) == LV_RLOTTIE_CTRL_STOPAT
-           && context->current_frame == rlottie->dest_frame) {
+           && rlottie->dec.current_frame == rlottie->dest_frame) {
             lv_timer_pause(t);
             rlottie->play_ctrl ^= LV_RLOTTIE_CTRL_STOPAT | LV_RLOTTIE_CTRL_PAUSE;
             lv_event_send(obj, LV_EVENT_READY, NULL);
         }
         else if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_BACKWARD) == LV_RLOTTIE_CTRL_BACKWARD) {
-            if(context->current_frame > 0)
-                --context->current_frame;
+            if(rlottie->dec.current_frame > 0)
+                --rlottie->dec.current_frame;
             else { /* Looping ? */
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
-                    context->current_frame = context->total_frames - 1;
+                    rlottie->dec.current_frame = rlottie->dec.total_frames - 1;
                 else {
                     lv_event_send(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);
@@ -208,11 +203,11 @@ static void next_frame_task_cb(lv_timer_t * t)
             }
         }
         else {
-            if(context->current_frame < context->total_frames)
-                ++context->current_frame;
+            if(rlottie->dec.current_frame < rlottie->dec.total_frames)
+                ++rlottie->dec.current_frame;
             else { /* Looping ? */
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
-                    context->current_frame = 0;
+                    rlottie->dec.current_frame = 0;
                 else {
                     lv_event_send(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);

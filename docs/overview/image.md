@@ -268,14 +268,15 @@ To indicate that the *line read* function should be used, set `dsc->img_data = N
 LVGL will use registered image decoders automatically if you try and draw a raw image (i.e. using the `lv_img` object) but you can use them manually too. Create an `lv_img_decoder_dsc_t` variable to describe the decoding session and call `lv_img_decoder_open()`.
 
 The `color` parameter is used only with `LV_IMG_CF_ALPHA_1/2/4/8BIT` images to tell color of the image. 
-`frame_id` can be used if the image to open is an animation. 
+`dec_ctx` can be used if the image to open is an animation or a vector image to specify size and/or frame index. 
 
 
 ```c
 
 lv_res_t res;
 lv_img_decoder_dsc_t dsc;
-res = lv_img_decoder_open(&dsc, &my_img_dsc, color, frame_id);
+rlottiedec_ctx_t dec_ctx = { .create_width = 64, .create_height = 64, .current_frame = 22 };
+res = lv_img_decoder_open(&dsc, &my_img_dsc, color, &dec_ctx);
 
 if(res == LV_RES_OK) {
   /*Do something with `dsc->img_data`*/

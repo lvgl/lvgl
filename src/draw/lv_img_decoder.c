@@ -78,10 +78,12 @@ void _lv_img_decoder_init(void)
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src the image source. E.g. file name or variable.
  * @param header the image info will be stored here
+ * @param dec_ctx   Not used
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
-lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
+lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, const void * dec_ctx)
 {
+    LV_UNUSED(dec_ctx);
     lv_memset_00(header, sizeof(lv_img_header_t));
 
     if(src == NULL) return LV_RES_INV;
@@ -96,7 +98,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
     lv_img_decoder_t * d;
     _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
         if(d->info_cb) {
-            res = d->info_cb(d, src, header);
+            res = d->info_cb(d, src, header, dec_ctx);
             if(res == LV_RES_OK) break;
         }
     }
@@ -104,7 +106,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
     return res;
 }
 
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id)
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, const void * dec_ctx)
 {
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
@@ -117,7 +119,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 
     dsc->color    = color;
     dsc->src_type = src_type;
-    dsc->frame_id = frame_id;
+    dsc->dec_ctx  = dec_ctx;
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         size_t fnlen = strlen(src);
@@ -140,11 +142,11 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         /*Info and Open callbacks are required*/
         if(decoder->info_cb == NULL || decoder->open_cb == NULL) continue;
 
-        res = decoder->info_cb(decoder, src, &dsc->header);
+        res = decoder->info_cb(decoder, src, &dsc->header, dec_ctx);
         if(res != LV_RES_OK) continue;
 
         dsc->decoder = decoder;
-        res = decoder->open_cb(decoder, dsc);
+        res = decoder->open_cb(decoder, dsc, dec_ctx);
 
         /*Opened successfully. It is a good decoder to for this image source*/
         if(res == LV_RES_OK) return res;
@@ -268,11 +270,13 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @param decoder the decoder where this function belongs
  * @param src the image source: pointer to an `lv_img_dsc_t` variable, a file path or a symbol
  * @param header store the image data here
+ * @param dec_ctx Not used
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
-lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header, const void * dec_ctx)
 {
     LV_UNUSED(decoder); /*Unused*/
+    LV_UNUSED(dec_ctx);
 
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {
@@ -321,10 +325,12 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
  * Open a built in image
  * @param decoder the decoder where this function belongs
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
+ * @param dec_ctx Not used
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
-lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, const void * dec_ctx)
 {
+    LV_UNUSED(dec_ctx);
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/

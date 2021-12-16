@@ -55,7 +55,7 @@ typedef enum {
 typedef struct {
     lv_gpu_cache_key_magic_t magic;
     lv_img_src_t type;
-    int32_t frame_id;
+    const void * dec_ctx;
 } lv_draw_sdl_cache_key_head_img_t;
 
 /**********************
@@ -77,7 +77,7 @@ void lv_draw_sdl_draw_cache_put_advanced(const void * key, size_t key_length, SD
 
 SDL_Texture * lv_gpu_temp_texture_obtain(SDL_Renderer * renderer, lv_coord_t width, lv_coord_t height);
 
-lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, int32_t frame_id, size_t * size);
+lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, const void * dec_ctx, size_t * size);
 
 /**********************
  *      MACROS

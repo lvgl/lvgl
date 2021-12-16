@@ -201,7 +201,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
            imgbtn->img_src_mid[state] != NULL &&
            imgbtn->img_src_right[state] == NULL) {
             lv_img_header_t header;
-            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header);
+            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header, NULL);
             p->x = LV_MAX(p->x, header.w);
         }
     }
@@ -238,7 +238,7 @@ static void draw_main(lv_event_t * e)
     lv_coord_t right_w = 0;
 
     if(src) {
-        lv_img_decoder_get_info(src, &header);
+        lv_img_decoder_get_info(src, &header, NULL);
         left_w = header.w;
         coords_part.x1 = coords.x1;
         coords_part.y1 = coords.y1;
@@ -249,7 +249,7 @@ static void draw_main(lv_event_t * e)
 
     src = imgbtn->img_src_right[state];
     if(src) {
-        lv_img_decoder_get_info(src, &header);
+        lv_img_decoder_get_info(src, &header, NULL);
         right_w = header.w;
         coords_part.x1 = coords.x2 - header.w + 1;
         coords_part.y1 = coords.y1;
@@ -270,7 +270,7 @@ static void draw_main(lv_event_t * e)
         comm_res = _lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
         if(comm_res) {
             lv_coord_t i;
-            lv_img_decoder_get_info(src, &header);
+            lv_img_decoder_get_info(src, &header, NULL);
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
@@ -296,7 +296,7 @@ static void refr_img(lv_obj_t * obj)
     if(src == NULL) return;
 
     lv_res_t info_res = LV_RES_OK;
-    info_res = lv_img_decoder_get_info(src, &header);
+    info_res = lv_img_decoder_get_info(src, &header, NULL);
 
     if(info_res == LV_RES_OK) {
         imgbtn->act_cf = header.cf;

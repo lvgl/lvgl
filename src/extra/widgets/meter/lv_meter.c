@@ -610,7 +610,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
 
             int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
             lv_img_header_t info;
-            lv_img_decoder_get_info(indic->type_data.needle_img.src, &info);
+            lv_img_decoder_get_info(indic->type_data.needle_img.src, &info, NULL);
             lv_area_t a;
             a.x1 = scale_center.x - indic->type_data.needle_img.pivot.x;
             a.y1 = scale_center.y - indic->type_data.needle_img.pivot.y;
@@ -689,7 +689,7 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
     else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
         int32_t angle = lv_map(value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
         lv_img_header_t info;
-        lv_img_decoder_get_info(indic->type_data.needle_img.src, &info);
+        lv_img_decoder_get_info(indic->type_data.needle_img.src, &info, NULL);
 
         angle = angle * 10;
         if(angle > 3600) angle -= 3600;

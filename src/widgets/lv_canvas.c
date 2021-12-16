@@ -664,6 +664,13 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
                         const lv_draw_img_dsc_t * draw_dsc)
 {
+    lv_canvas_draw_img_ex(canvas, x, y, src, draw_dsc, NULL);
+}
+
+void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
+                        const lv_draw_img_dsc_t * draw_dsc, const void * dec_ctx)
+
+{
     LV_ASSERT_OBJ(canvas, MY_CLASS);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
@@ -682,7 +689,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     mask.y2 = dsc->header.h - 1;
 
     lv_img_header_t header;
-    lv_res_t res = lv_img_decoder_get_info(src, &header);
+    lv_res_t res = lv_img_decoder_get_info(src, &header, dec_ctx);
     if(res != LV_RES_OK) {
         LV_LOG_WARN("lv_canvas_draw_img: Couldn't get the image data.");
         return;

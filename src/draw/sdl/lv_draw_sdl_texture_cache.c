@@ -147,14 +147,14 @@ SDL_Texture * lv_gpu_temp_texture_obtain(SDL_Renderer * renderer, lv_coord_t wid
     return texture;
 }
 
-lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, int32_t frame_id, size_t * size)
+lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_img_cache_key_create(const void * src, const void * dec_ctx, size_t * size)
 {
     lv_draw_sdl_cache_key_head_img_t header;
     /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
     SDL_memset(&header, 0, sizeof(header));
     header.magic = LV_GPU_CACHE_KEY_MAGIC_IMG;
     header.type = lv_img_src_get_type(src);
-    header.frame_id = frame_id;
+    header.dec_ctx = dec_ctx;
     void * key;
     size_t key_size;
     if(header.type == LV_IMG_SRC_FILE || header.type == LV_IMG_SRC_SYMBOL) {

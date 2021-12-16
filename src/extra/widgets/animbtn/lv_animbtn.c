@@ -64,7 +64,8 @@ lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim)
     lv_obj_set_parent(anim, obj);
     lv_obj_add_flag(anim, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_obj_set_size(obj, lv_obj_get_width(anim), lv_obj_get_height(anim));
+    lv_img_t * lottie = (lv_img_t*)anim;
+    lv_obj_set_size(obj, lottie->w, lottie->h);
     return obj;
 }
 
@@ -169,10 +170,6 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         case LV_EVENT_PRESS_LOST:
             apply_state(obj);
             break;
-        case LV_EVENT_DRAW_MAIN:
-            //draw_main(e);
-            lv_obj_invalidate(animbtn->lottie);
-            break;
         case LV_EVENT_COVER_CHECK: {
                 lv_cover_check_info_t * info = lv_event_get_param(e);
                 if(info->res != LV_COVER_RES_MASKED) info->res = LV_COVER_RES_NOT_COVER;
@@ -180,8 +177,7 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         case LV_EVENT_GET_SELF_SIZE: {
                 lv_point_t * p = lv_event_get_self_size_info(e);
-                lv_img_header_t * header = &((lv_rlottie_t *)animbtn->lottie)->dec->header;
-                p->x = LV_MAX(p->x, header->w);
+                p->x = LV_MAX(p->x, ((lv_rlottie_t *)animbtn->lottie)->dec.create_width);
                 break;
             }
         default:
@@ -232,7 +228,7 @@ static void apply_state(lv_obj_t * obj)
     setup_rlottie(animbtn, &animbtn->state_desc[state]);
 
     lv_obj_refresh_self_size(obj);
-    lv_obj_set_height(obj, lottie->dec->header.h); /*Keep the user defined width*/
+    lv_obj_set_height(obj, lottie->dec.create_height); /*Keep the user defined width*/
 
     lv_obj_invalidate(obj);
     animbtn->prev_state = state;

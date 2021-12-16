@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../../../lvgl.h"
 #if LV_USE_RLOTTIE
+#include "rlottiedec.h"
 
 /*********************
  *      DEFINES
@@ -36,7 +37,7 @@ typedef enum {
 struct Lottie_Animation_S;
 typedef struct {
     lv_img_t img_ext;
-    lv_img_decoder_dsc_t * dec;
+    rlottiedec_ctx_t dec;
     lv_timer_t * task;
     size_t framerate;
     lv_rlottie_ctrl_t play_ctrl;
@@ -57,6 +58,7 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);
 void lv_rlottie_set_current_frame(lv_obj_t * rlottie, const size_t goto_frame);
 void lv_rlottie_stopat_frame(lv_obj_t * rlottie, const size_t goto_frame, const int forward);
+size_t lv_rlottie_get_totalframes(lv_obj_t * rlottie);
 
 /**********************
  *      MACROS

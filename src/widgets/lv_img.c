@@ -68,6 +68,11 @@ lv_obj_t * lv_img_create(lv_obj_t * parent)
 
 void lv_img_set_src(lv_obj_t * obj, const void * src)
 {
+    lv_img_set_src_ex(obj, src, NULL);
+}
+
+void lv_img_set_src_ex(lv_obj_t * obj, const void * src, const void * dec_ctx)
+{
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
@@ -103,7 +108,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     }
 
     lv_img_header_t header;
-    lv_img_decoder_get_info(src, &header);
+    lv_img_decoder_get_info(src, &header, dec_ctx);
 
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
@@ -150,6 +155,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     img->cf       = header.cf;
     img->pivot.x = header.w / 2;
     img->pivot.y = header.h / 2;
+    img->dec_ctx = dec_ctx;
 
     lv_obj_refresh_self_size(obj);
 
@@ -402,6 +408,7 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->pivot.x = 0;
     img->pivot.y = 0;
     img->obj_size_mode = LV_IMG_SIZE_MODE_VIRTUAL;
+    img->dec_ctx = 0;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
@@ -664,6 +671,7 @@ static void draw_img(lv_event_t * e)
             if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_VARIABLE) {
                 lv_draw_img_dsc_t img_dsc;
                 lv_draw_img_dsc_init(&img_dsc);
+                img_dsc.dec_ctx = img->dec_ctx;
                 lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
 
                 img_dsc.zoom = zoom_final;
