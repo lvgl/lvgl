@@ -202,7 +202,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     label->offset.x = 0;
     label->offset.y = 0;
 
-    if(long_mode == LV_LABEL_LONG_SCROLL || long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || long_mode == LV_LABEL_LONG_CLIP)
+    if(long_mode == LV_LABEL_LONG_SCROLL || long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || long_mode == LV_LABEL_LONG_CLIP || long_mode == LV_LABEL_LONG_DOT)
         label->expand = 1;
     else
         label->expand = 0;
@@ -1090,6 +1090,11 @@ static void lv_label_refr_text(lv_obj_t * obj)
             label->dot_end = LV_LABEL_DOT_END_INV;
         }
         else {
+            /*do not add DOT when the width is enough */
+            if(lv_area_get_width(&txt_coords) >= size.x) {
+                return;
+            }
+
             lv_point_t p;
             lv_coord_t y_overed;
             p.x = lv_area_get_width(&txt_coords) -
