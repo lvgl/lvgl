@@ -29,23 +29,21 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct
-{
+struct {
     uint32_t    perf_last_time;
     uint32_t    elaps_sum;
     uint32_t    frame_cnt;
     uint32_t    fps_sum_cnt;
     uint32_t    fps_sum_all;
 #if LV_USE_LABEL
-    lv_obj_t*   perf_label;
+    lv_obj_t  * perf_label;
 #endif
 } typedef perf_monitor_t;
 
-struct
-{
+struct {
     uint32_t     mem_last_time;
 #if LV_USE_LABEL
-    lv_obj_t *   mem_label;
+    lv_obj_t  *  mem_label;
 #endif
 } typedef mem_monitor_t;
 
@@ -62,8 +60,8 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 static void draw_buf_flush(void);
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
 
-static void perf_monitor_init(perf_monitor_t* perf_monitor);
-static void mem_monitor_init(mem_monitor_t* mem_monitor);
+static void perf_monitor_init(perf_monitor_t * perf_monitor);
+static void mem_monitor_init(mem_monitor_t * mem_monitor);
 
 
 /**********************
@@ -310,11 +308,11 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
             fps = fps_limit;
         }
         else {
-            fps = ( 1000 * perf_monitor.frame_cnt ) / perf_monitor.elaps_sum;
+            fps = (1000 * perf_monitor.frame_cnt) / perf_monitor.elaps_sum;
         }
         perf_monitor.elaps_sum = 0;
         perf_monitor.frame_cnt = 0;
-        if (fps > fps_limit) {
+        if(fps > fps_limit) {
             fps = fps_limit;
         }
 
@@ -1039,7 +1037,7 @@ static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_
     drv->flush_cb(drv, &offset_area, color_p);
 }
 
-static void perf_monitor_init( perf_monitor_t* perf_monitor )
+static void perf_monitor_init(perf_monitor_t * perf_monitor)
 {
     LV_ASSERT_NULL(perf_monitor);
     perf_monitor->elaps_sum = 0;
@@ -1050,7 +1048,7 @@ static void perf_monitor_init( perf_monitor_t* perf_monitor )
     perf_monitor->perf_label = NULL;
 }
 
-static void mem_monitor_init( mem_monitor_t* mem_monitor )
+static void mem_monitor_init(mem_monitor_t * mem_monitor)
 {
     LV_ASSERT_NULL(mem_monitor);
     mem_monitor->mem_last_time = 0;

@@ -673,8 +673,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
 
 lv_theme_t * lv_theme_default_get(void)
 {
-    if ( !lv_theme_default_is_inited() )
-    {
+    if(!lv_theme_default_is_inited()) {
         return NULL;
     }
 
@@ -1161,13 +1160,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
-    if ( lv_theme_default_is_inited() )
-    {
-        lv_style_reset( style );
+    if(lv_theme_default_is_inited()) {
+        lv_style_reset(style);
     }
-    else
-    {
-        lv_style_init( style );
+    else {
+        lv_style_init(style);
     }
 }
 

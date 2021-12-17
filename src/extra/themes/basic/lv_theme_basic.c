@@ -143,8 +143,8 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
 
     style_init();
 
-    if ( disp == NULL || lv_disp_get_theme( disp ) == &theme ) {
-        lv_obj_report_style_change( NULL );
+    if(disp == NULL || lv_disp_get_theme(disp) == &theme) {
+        lv_obj_report_style_change(NULL);
     }
 
     return (lv_theme_t *)&theme;
@@ -379,11 +379,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
-    if ( lv_theme_basic_is_inited() ) {
-        lv_style_reset( style );
+    if(lv_theme_basic_is_inited()) {
+        lv_style_reset(style);
     }
     else {
-        lv_style_init( style );
+        lv_style_init(style);
     }
 }
 

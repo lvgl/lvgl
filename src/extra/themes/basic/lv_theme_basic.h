@@ -40,7 +40,7 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp);
 * Check if the theme is initialized
 * @return true if default theme is initialized, false otherwise
 */
-bool lv_theme_basic_is_inited( void );
+bool lv_theme_basic_is_inited(void);
 
 /**********************
  *      MACROS

@@ -489,11 +489,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
-    if ( lv_theme_mono_is_inited() ) {
-        lv_style_reset( style );
+    if(lv_theme_mono_is_inited()) {
+        lv_style_reset(style);
     }
     else {
-        lv_style_init( style );
+        lv_style_init(style);
     }
 }
 
