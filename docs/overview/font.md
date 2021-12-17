@@ -7,7 +7,7 @@
 In LVGL fonts are collections of bitmaps and other information required to render images of individual letters (glyph). 
 A font is stored in a `lv_font_t` variable and can be set in a style's *text_font* field. For example:
 ```c
-lv_style_set_text_font(&my_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);  /*Set a larger font*/
+lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
 ```
 
 Fonts have a **bpp (bits per pixel)** property. It shows how many bits are used to describe a pixel in a font. The value stored for a pixel determines the pixel's opacity.
