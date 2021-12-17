@@ -746,6 +746,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
         else if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) && !lv_obj_is_editable(obj)) {
+            return;
             /*scroll by keypad or encoder*/
             lv_anim_enable_t anim_enable = LV_ANIM_OFF;
             lv_coord_t sl = lv_obj_get_scroll_left(obj);
