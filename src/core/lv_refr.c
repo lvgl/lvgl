@@ -1040,6 +1040,7 @@ static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_
     drv->flush_cb(drv, &offset_area, color_p);
 }
 
+#if LV_USE_PERF_MONITOR
 static void perf_monitor_init(perf_monitor_t * _perf_monitor)
 {
     LV_ASSERT_NULL(_perf_monitor);
@@ -1050,11 +1051,14 @@ static void perf_monitor_init(perf_monitor_t * _perf_monitor)
     _perf_monitor->perf_last_time = 0;
     _perf_monitor->perf_label = NULL;
 }
+#endif
 
+#if LV_USE_MEM_MONITOR
 static void mem_monitor_init(mem_monitor_t * _mem_monitor)
 {
     LV_ASSERT_NULL(_mem_monitor);
     _mem_monitor->mem_last_time = 0;
     _mem_monitor->mem_label = NULL;
 }
+#endif
 
