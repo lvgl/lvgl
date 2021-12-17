@@ -246,6 +246,14 @@ bool lv_obj_remove_event_cb_with_user_data(struct _lv_obj_t * obj, lv_event_cb_t
 bool lv_obj_remove_event_dsc(struct _lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc);
 
 /**
+ * The the user data of an event obejct event callback. Always the first match with `event_cb` will be returned.
+ * @param obj               pointer to an object
+ * @param event_cb          the event function
+ * @return                  the user_data
+ */
+void * lv_obj_get_event_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
+
+/**
  * Get the input device passed as parameter to indev related events.
  * @param e     pointer to an event
  * @return      the indev that triggered the event or NULL if called on a not indev related event
