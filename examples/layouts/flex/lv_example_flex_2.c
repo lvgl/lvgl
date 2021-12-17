@@ -16,14 +16,10 @@ void lv_example_flex_2(void)
     lv_obj_set_size(cont, 300, 220);
     lv_obj_center(cont);
     lv_obj_add_style(cont, &style, 0);
-    lv_group_add_obj(lv_group_get_default(), cont);
-    lv_obj_set_style_bg_color(cont, lv_color_hex(0xffaabb), LV_STATE_FOCUSED);
-
-    lv_gridfocus_add(cont, 0);
 
     unsigned int i;
-    for(i = 0; i < 23; i++) {
-        lv_obj_t * obj = lv_btn_create(cont);
+    for(i = 0; i < 8; i++) {
+        lv_obj_t * obj = lv_obj_create(cont);
         lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
 
         lv_obj_t * label = lv_label_create(obj);
