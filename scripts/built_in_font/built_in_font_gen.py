@@ -5,7 +5,7 @@ from argparse import RawTextHelpFormatter
 import os
 import sys
 
-parser = argparse.ArgumentParser(description="""Create fonts for LittelvGL including the built-in symbols. lv_font_conv needs to be installed. See https://github.com/littlevgl/lv_font_conv
+parser = argparse.ArgumentParser(description="""Create fonts for LittelvGL including the built-in symbols. lv_font_conv needs to be installed. See https://github.com/lvgl/lv_font_conv
 Example: python built_in_font_gen.py --size 16 -o lv_font_roboto_16.c --bpp 4 -r 0x20-0x7F""", formatter_class=RawTextHelpFormatter)
 parser.add_argument('-s', '--size',
 					type=int,

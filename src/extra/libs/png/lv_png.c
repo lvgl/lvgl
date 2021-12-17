@@ -42,7 +42,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
  **********************/
 
 /**
- * Register the PNG decoder functions in LittlevGL
+ * Register the PNG decoder functions in LVGL
  */
 void lv_png_init(void)
 {

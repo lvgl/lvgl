@@ -54,7 +54,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 void lv_fs_win32_init(void)
 {
     /*---------------------------------------------------
-     * Register the file system interface in LittlevGL
+     * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
     /*Add a simple drive to open images*/
