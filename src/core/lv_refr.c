@@ -61,10 +61,10 @@ static void draw_buf_flush(void);
 static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
 
 #if LV_USE_PERF_MONITOR
-static void perf_monitor_init(perf_monitor_t * perf_monitor);
+    static void perf_monitor_init(perf_monitor_t * perf_monitor);
 #endif
 #if LV_USE_MEM_MONITOR
-static void mem_monitor_init(mem_monitor_t * mem_monitor);
+    static void mem_monitor_init(mem_monitor_t * mem_monitor);
 #endif
 
 /**********************
