@@ -968,8 +968,8 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                     default:
                         /* Consider other cases only if x=0 and use the width of the object.
                          * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_y(child, 0) == 0) {
-                            child_res = LV_MAX(child_res, lv_area_get_width(&child->coords));
+                        if(lv_obj_get_style_x(child, 0) == 0) {
+                            child_res = LV_MAX(child_res, lv_area_get_width(&child->coords) + pad_right);
                         }
                 }
             }
@@ -1001,7 +1001,7 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                         /* Consider other cases only if x=0 and use the width of the object.
                          * With x!=0 circular dependency could occur. */
                         if(lv_obj_get_style_y(child, 0) == 0) {
-                            child_res = LV_MAX(child_res, lv_area_get_width(&child->coords));
+                            child_res = LV_MAX(child_res, lv_area_get_width(&child->coords) + pad_left);
                         }
                 }
             }
@@ -1052,7 +1052,7 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
                     /* Consider other cases only if y=0 and use the height of the object.
                      * With y!=0 circular dependency could occur. */
                     if(lv_obj_get_style_y(child, 0) == 0) {
-                        child_res = LV_MAX(child_res, lv_area_get_height(&child->coords));
+                        child_res = LV_MAX(child_res, lv_area_get_height(&child->coords) + pad_top);
                     }
                     break;
             }

@@ -422,6 +422,8 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
     lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
+    lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
+    lv_obj_move_to_index(dropdown->list, -1);
     lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     /*To allow styling the list*/

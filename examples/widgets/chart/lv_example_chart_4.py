@@ -24,7 +24,7 @@ def event_cb(e):
             draw_rect_dsc.bg_color = lv.color_black()
             draw_rect_dsc.bg_opa = lv.OPA._50
             draw_rect_dsc.radius = 3
-            draw_rect_dsc.bg_img_src = buf;
+            draw_rect_dsc.bg_img_src = buf
             draw_rect_dsc.bg_img_recolor = lv.color_white()
             
             a = lv.area_t()

@@ -20,4 +20,3 @@ obj.add_style(style_indic, lv.PART.INDICATOR)
 obj.add_style(style_indic_pr, lv.PART.INDICATOR | lv.STATE.PRESSED)
 obj.set_value(70, lv.ANIM.OFF)
 obj.center()
-

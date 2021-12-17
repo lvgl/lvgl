@@ -914,6 +914,10 @@ menu "LVGL configuration"
         config LV_USE_SNAPSHOT
             bool "Enable API to take snapshot"
             default y if !LV_CONF_MINIMAL
+
+        config LV_USE_MONKEY
+            bool "Enable Monkey test"
+            default n
     endmenu
 
     menu "Examples"

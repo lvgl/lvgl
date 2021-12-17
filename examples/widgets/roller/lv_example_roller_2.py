@@ -39,7 +39,7 @@ roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(2, lv.ANIM.OFF)
 
 # A roller on the middle with center aligned text, and auto (default) width
-roller = lv.roller(lv.scr_act());
+roller = lv.roller(lv.scr_act())
 roller.set_options(opts, lv.roller.MODE.NORMAL)
 roller.set_visible_row_count(3)
 roller.add_style(style_sel, lv.PART.SELECTED)
@@ -48,7 +48,7 @@ roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(5, lv.ANIM.OFF)
 
 # A roller on the right with right aligned text, and custom width
-roller = lv.roller(lv.scr_act());
+roller = lv.roller(lv.scr_act())
 roller.set_options(opts, lv.roller.MODE.NORMAL)
 roller.set_visible_row_count(4)
 roller.set_width(80)

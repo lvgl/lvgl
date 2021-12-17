@@ -54,9 +54,9 @@ btn2.set_size(120, 50)                      # Set its size
 btn2.add_style(style_btn, 0)
 btn2.add_style(style_btn_red, 0)
 btn2.add_style(style_btn_pressed, lv.STATE.PRESSED)
-btn2.set_style_radius(lv.RADIUS.CIRCLE, 0); # Add a local style
+btn2.set_style_radius(lv.RADIUS.CIRCLE, 0)  # Add a local style
 
 label = lv.label(btn2)                      # Add a label to the button
-label.set_text("Button 2");                 # Set the labels text
+label.set_text("Button 2")                  # Set the labels text
 label.center()
 

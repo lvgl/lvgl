@@ -93,7 +93,7 @@ So if a button is pressed, and the text color comes from here, the pressed text 
 Objects can be composed of *parts* which may each have their own styles. 
 
 The following predefined parts exist in LVGL:
-- `LV_PART_MAIN` A background like rectangle*/
+- `LV_PART_MAIN` A background like rectangle
 - `LV_PART_SCROLLBAR`  The scrollbar(s)
 - `LV_PART_INDICATOR` Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
 - `LV_PART_KNOB` Like a handle to grab to adjust a value
