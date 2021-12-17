@@ -16,8 +16,6 @@
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
 
-#include "../sw/lv_draw_sw.h"
-
 /*********************
  *      DEFINES
  *********************/

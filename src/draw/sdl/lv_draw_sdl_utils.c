@@ -77,12 +77,19 @@ void lv_area_to_sdl_rect(const lv_area_t * in, SDL_Rect * out)
 
 void lv_color_to_sdl_color(const lv_color_t * in, SDL_Color * out)
 {
+#if LV_COLOR_DEPTH == 32
+    out->a = in->ch.alpha;
+    out->r = in->ch.red;
+    out->g = in->ch.green;
+    out->b = in->ch.blue;
+#else
     uint32_t color32 = lv_color_to32(*in);
     lv_color32_t * color32_t = (lv_color32_t *) &color32;
     out->a = color32_t->ch.alpha;
     out->r = color32_t->ch.red;
     out->g = color32_t->ch.green;
     out->b = color32_t->ch.blue;
+#endif
 }
 
 void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoom, const lv_point_t * pivot)
@@ -171,12 +178,6 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
             cur++;
         }
     }
-}
-
-lv_draw_sdl_ctx_t * lv_draw_sdl_get_context()
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    return (lv_draw_sdl_ctx_t *) disp->driver->draw_ctx;
 }
 
 /**********************
