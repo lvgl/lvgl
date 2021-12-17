@@ -18,6 +18,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_FFMPEG_ID    0xFF
 
 /**********************
  *      TYPEDEFS

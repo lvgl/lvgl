@@ -70,8 +70,8 @@ struct lv_img_pixel_color_s {
  **********************/
 
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             void * dec_ctx);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, void * dec_ctx);
+                             lv_img_dec_ctx_t * dec_ctx);
+static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, lv_img_dec_ctx_t * dec_ctx);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -260,10 +260,9 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  **********************/
 
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             void * dec_ctx)
+                             lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(dec_ctx);
 
     /* Get the source type */
     lv_img_src_t src_type = lv_img_src_get_type(src);
@@ -276,6 +275,15 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
             return LV_RES_INV;
         }
 
+        if(dec_ctx != NULL) {
+            if(dec_ctx->magic_id && dec_ctx->magic_id != LV_FFMPEG_ID) {
+                return LV_RES_INV;
+            }
+            dec_ctx->magic_id = LV_FFMPEG_ID;
+            dec_ctx->caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
+            /*TODO: Store the ffmpeg context in the decoder context, to avoid reopening/closing it endlessly */
+            dec_ctx->total_frames = lv_ffmpeg_get_frame_num(fn);
+        }
         return LV_RES_OK;
     }
 
@@ -283,10 +291,10 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx)
+static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(dec_ctx);
+
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         const char * path = dsc->src;
@@ -296,6 +304,19 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         if(ffmpeg_ctx == NULL) {
             return LV_RES_INV;
         }
+
+        if(dec_ctx != NULL) {
+            if(dec_ctx->magic_id && dec_ctx->magic_id != LV_FFMPEG_ID) {
+                return LV_RES_INV;
+            }
+            dec_ctx->magic_id = LV_FFMPEG_ID;
+            dec_ctx->caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
+            /*TODO: Store the ffmpeg context in the decoder context, to avoid reopening/closing it endlessly
+            TODO: Implement a seek to frame function to reach the current_frame specified in the decoder context
+                    see https://stackoverflow.com/questions/39983025/how-to-read-any-frame-while-having-frame-number-using-ffmpeg-av-seek-frame*/
+
+        }
+
 
         if(ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
             LV_LOG_ERROR("ffmpeg image allocate failed");

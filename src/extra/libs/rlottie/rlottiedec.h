@@ -6,7 +6,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define RLOTTIE_ID  0x1071
+#define LV_RLOTTIE_ID  0x71
 
 /**********************
  *      TYPEDEFS
@@ -18,7 +18,7 @@ struct lv_img_header_t;
  *  lv_img_set_src_ex
  */
 typedef struct {
-    lv_anim_dec_ctx_t ctx;
+    lv_img_dec_ctx_t ctx;
     uint16_t create_width;
     uint16_t create_height : 15;
     uint16_t should_free : 1;

@@ -232,7 +232,11 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
-    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->dec_ctx);
+    lv_point_t size_hint;
+    size_hint.x =  lv_area_get_width(coords);
+    size_hint.y =  lv_area_get_height(coords);
+
+    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, size_hint, draw_dsc->dec_ctx);
 
     if(cdsc == NULL) return LV_RES_INV;
 
@@ -252,8 +256,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
-            int32_t w = lv_area_get_width(coords);
-            int32_t h = lv_area_get_height(coords);
+            int32_t w = size_hint.x;
+            int32_t h = size_hint.y;
 
             _lv_img_buf_get_transformed_area(&map_area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
 

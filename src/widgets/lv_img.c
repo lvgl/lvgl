@@ -71,7 +71,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     lv_img_set_src_ex(obj, src, NULL);
 }
 
-void lv_img_set_src_ex(lv_obj_t * obj, const void * src, void * dec_ctx)
+void lv_img_set_src_ex(lv_obj_t * obj, const void * src, lv_img_dec_ctx_t * dec_ctx)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -156,6 +156,7 @@ void lv_img_set_src_ex(lv_obj_t * obj, const void * src, void * dec_ctx)
     img->pivot.x = header.w / 2;
     img->pivot.y = header.h / 2;
     img->dec_ctx = dec_ctx;
+    img->vector  = header.v;
 
     lv_obj_refresh_self_size(obj);
 
@@ -616,6 +617,14 @@ static void draw_img(lv_event_t * e)
         bg_pivot.x = img->pivot.x + pleft;
         bg_pivot.y = img->pivot.y + ptop;
         lv_area_t bg_coords;
+
+
+        int32_t tiled = lv_obj_get_style_bg_img_tiled(obj, LV_PART_MAIN);
+        if(!tiled && img->vector && (obj_w != img->w || obj_h != img->h)) {
+            /*For vector image that aren't tiled, let's increase the image size*/
+            img->w = obj_w;
+            img->h = obj_h;
+        }
 
         if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
             /*Object size equals to transformed image size*/

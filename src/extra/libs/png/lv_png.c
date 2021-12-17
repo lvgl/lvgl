@@ -25,8 +25,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             void * dec_ctx);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, void * dec_ctx);
+                             lv_img_dec_ctx_t * dec_ctx);
+static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, lv_img_dec_ctx_t * dec_ctx);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 
@@ -64,16 +64,22 @@ void lv_png_init(void)
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             void * dec_ctx)
+                             lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(dec_ctx);
     lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
 
     /*If it's a PNG file...*/
     if(src_type == LV_IMG_SRC_FILE) {
         const char * fn = src;
         if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
+            if(dec_ctx != NULL) {
+                if(dec_ctx->magic_id && dec_ctx->magic_id != LV_PNG_ID) {
+                    return LV_RES_INV;
+                }
+                dec_ctx->magic_id = LV_PNG_ID;
+                dec_ctx->caps = LV_IMG_DEC_CACHED; /*Does not decode line by line but whole buffer at once*/
+            }
 
             /* Read the width and height from the file. They have a constant location:
              * [16..23]: width
@@ -100,6 +106,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
     }
     /*If it's a PNG file in a  C array...*/
     else if(src_type == LV_IMG_SRC_VARIABLE) {
+        /*WTF? If a png is used in a C array, this will try to map lv_img_dsc_t over the PNG header, and it's unlikely to be correct*/
         const lv_img_dsc_t * img_dsc = src;
         header->always_zero = 0;
         header->cf = img_dsc->header.cf;       /*Save the color format*/
@@ -118,10 +125,9 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or  `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx)
+static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(dec_ctx);
     uint32_t error;                 /*For the return values of PNG decoder functions*/
 
     uint8_t * img_data = NULL;
@@ -131,6 +137,13 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         const char * fn = dsc->src;
 
         if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
+            if(dec_ctx != NULL) {
+                if(dec_ctx->magic_id && dec_ctx->magic_id != LV_PNG_ID) {
+                    return LV_RES_INV;
+                }
+                dec_ctx->magic_id = LV_PNG_ID;
+                dec_ctx->caps = LV_IMG_DEC_CACHED; /*Does not decode line by line but whole buffer at once*/
+            }
 
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
             unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
@@ -171,6 +184,13 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
         if(error) {
             return LV_RES_INV;
+        }
+        if(dec_ctx != NULL) {
+            if(dec_ctx->magic_id && dec_ctx->magic_id != LV_PNG_ID) {
+                return LV_RES_INV;
+            }
+            dec_ctx->magic_id = LV_PNG_ID;
+            dec_ctx->caps = LV_IMG_DEC_CACHED; /*Does not decode line by line but whole buffer at once*/
         }
 
         /*Convert the image to the system's color depth*/

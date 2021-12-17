@@ -668,7 +668,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
 }
 
 void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
-                           const lv_draw_img_dsc_t * draw_dsc, void * dec_ctx)
+                           const lv_draw_img_dsc_t * draw_dsc, lv_img_dec_ctx_t * dec_ctx)
 
 {
     LV_ASSERT_OBJ(canvas, MY_CLASS);

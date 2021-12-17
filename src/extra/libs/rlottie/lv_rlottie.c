@@ -56,7 +56,8 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_rlottie_t * rlottie = (lv_rlottie_t *)obj;
-    rlottie->dec.ctx.magic_id = RLOTTIE_ID;
+    lv_memset(&rlottie->dec, 0, sizeof(&rlottie->dec));
+    rlottie->dec.ctx.magic_id = LV_RLOTTIE_ID;
     rlottie->dec.create_width = width;
     rlottie->dec.create_height = height;
     rlottie->dec.create_src = path;
@@ -74,7 +75,8 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_rlottie_t * rlottie = (lv_rlottie_t *)obj;
-    rlottie->dec.ctx.magic_id = RLOTTIE_ID;
+    lv_memset(&rlottie->dec, 0, sizeof(&rlottie->dec));
+    rlottie->dec.ctx.magic_id = LV_RLOTTIE_ID;
     rlottie->dec.create_width = width;
     rlottie->dec.create_height = height;
     rlottie->dec.create_src = rlottie_desc;
@@ -130,7 +132,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 {
     LV_UNUSED(class_p);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    lv_img_set_src_ex(obj, rlottie->dec.create_src, &rlottie->dec);
+    lv_img_set_src_ex(obj, rlottie->dec.create_src, (lv_img_dec_ctx_t *)&rlottie->dec);
 
     if(rlottie->dec.cache == NULL) {
         LV_LOG_WARN("The animation can't be opened");
@@ -203,7 +205,6 @@ static void next_frame_task_cb(lv_timer_t * t)
                 else {
                     lv_event_send(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);
-                    return;
                 }
             }
         }
@@ -211,13 +212,13 @@ static void next_frame_task_cb(lv_timer_t * t)
             if(rlottie->dec.ctx.current_frame < rlottie->dec.ctx.total_frames)
                 ++rlottie->dec.ctx.current_frame;
             else { /* Looping ? */
-                if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
-                    rlottie->dec.ctx.current_frame = 0;
-                else {
+                if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == 0) {
+                    rlottie->dec.ctx.current_frame--; /*Pause on the last frame*/
                     lv_event_send(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);
-                    return;
                 }
+                else
+                    rlottie->dec.ctx.current_frame = 0;
             }
         }
     }

@@ -24,6 +24,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_BUILTIN_ID   0xB1
 
 /**********************
  *      TYPEDEFS
@@ -40,19 +41,29 @@ enum {
 
 typedef uint8_t lv_img_src_t;
 
+
+/**
+ * Capabilities of an image decoder context.
+   Set by the decoder when extracting info or being opened */
+typedef enum {
+    LV_IMG_DEC_DEFAULT      = 0x00, /**!< Default format, no specificities */
+    LV_IMG_DEC_VECTOR       = 0x01, /**!< Image format is vector based, size independant*/
+    LV_IMG_DEC_ANIMATED     = 0x02, /**!< Image format stores an animation */
+    LV_IMG_DEC_SEEKABLE     = 0x04, /**!< Animation is seekable */
+    LV_IMG_DEC_CACHED       = 0x08, /**!< The complete image can be cached (used for rotation and zoom) */
+} lv_img_decoder_caps_t;
+
 /**
  * Base type for a decoder context.
  * You'll likely bootstrap from this to make your own, if you need too
  */
 typedef struct {
-    uint16_t    magic_id; /**!< Used to ensure a decoder context is not used in another decoder context*/
-} lv_base_dec_ctx_t;
-
-typedef struct {
-    uint16_t    magic_id; /**!< Used to ensure a decoder context is not used in another decoder context*/
-    uint16_t    current_frame; /**!< The current frame index */
-    uint16_t    total_frames;  /**!< The number of frames (likely filled by the decoder) */
-} lv_anim_dec_ctx_t;
+    uint8_t    magic_id;       /**!< Used to ensure a decoder context is not used in another decoder context*/
+    uint8_t    caps;           /**!< The decoder capabilities flags */
+    uint16_t   current_frame;  /**!< The current frame index */
+    uint16_t   total_frames;   /**!< The number of frames (likely filled by the decoder) */
+    void   *   user_data;      /**!< Available for per-decoder features */
+} lv_img_dec_ctx_t;
 
 /*Decoder function definitions*/
 struct _lv_img_decoder_dsc_t;
@@ -68,7 +79,7 @@ struct _lv_img_decoder_t;
  * @return LV_RES_OK: info written correctly; LV_RES_INV: failed
  */
 typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder_t * decoder, const void * src,
-                                            lv_img_header_t * header, void * dec_ctx);
+                                            lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
@@ -77,7 +88,7 @@ typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder_t * decoder, 
  * @param dec_ctx Pointer to decoder initialization context. Can be NULL.
  */
 typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_decoder_t * decoder, struct _lv_img_decoder_dsc_t * dsc,
-                                            void * dec_ctx);
+                                            lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
@@ -121,8 +132,11 @@ typedef struct _lv_img_decoder_dsc_t {
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_img_dsc_t` variable*/
     const void * src;
 
-    /**Color to draw the image. USed when the image has alpha channel only*/
+    /**Color to draw the image. Used when the image has alpha channel only*/
     lv_color_t color;
+
+    /**Size hint for decoders with user settable output size*/
+    lv_point_t size_hint;
 
     /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_img_src_t src_type;
@@ -146,7 +160,7 @@ typedef struct _lv_img_decoder_dsc_t {
     void * user_data;
 
     /**Initialization context for decoder*/
-    void * dec_ctx;
+    lv_img_dec_ctx_t * dec_ctx;
 } lv_img_decoder_dsc_t;
 
 /**********************
@@ -169,7 +183,7 @@ void _lv_img_decoder_init(void);
  * @param dec_ctx A context to configure the decoder. Can be NULL for default behavior.
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
-lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, void * dec_ctx);
+lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Open an image.
@@ -180,11 +194,13 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, voi
  *  2) Variable: Pointer to an `lv_img_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param color The color of the image with `LV_IMG_CF_ALPHA_...`
+ * @param size_hint If provided, contains the user requested size for the output image
  * @param dec_ctx A context to configure the decoder. Can be NULL for default behavior.
  * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
  *         LV_RES_INV: none of the registered image decoders were able to open the image.
  */
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, void * dec_ctx);
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, lv_point_t size_hint,
+                             lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Read a line from an opened image
@@ -253,7 +269,7 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                                      void * dec_ctx);
+                                      lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Open a built in image
@@ -262,7 +278,8 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
  * @param dec_ctx Pointer to decoder initialization context. Can be NULL.
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
-lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx);
+lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                      lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.

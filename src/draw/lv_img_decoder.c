@@ -38,6 +38,8 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                      lv_coord_t len, uint8_t * buf);
 
+static lv_res_t init_dec_ctx(lv_img_dec_ctx_t * dec_ctx);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -81,7 +83,7 @@ void _lv_img_decoder_init(void)
  * @param dec_ctx   Not used
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
-lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, void * dec_ctx)
+lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(dec_ctx);
     lv_memset_00(header, sizeof(lv_img_header_t));
@@ -106,7 +108,8 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, voi
     return res;
 }
 
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, void * dec_ctx)
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, lv_point_t size_hint,
+                             lv_img_dec_ctx_t * dec_ctx)
 {
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
@@ -144,6 +147,12 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 
         res = decoder->info_cb(decoder, src, &dsc->header, dec_ctx);
         if(res != LV_RES_OK) continue;
+
+        /*If vector format and user requested size, let's overwrite it*/
+        if(dsc->header.v && size_hint.x > 0 && size_hint.y > 0) {
+            dsc->header.w = size_hint.x;
+            dsc->header.h = size_hint.y;
+        }
 
         dsc->decoder = decoder;
         res = decoder->open_cb(decoder, dsc, dec_ctx);
@@ -265,6 +274,19 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
     decoder->close_cb = close_cb;
 }
 
+static lv_res_t init_dec_ctx(lv_img_dec_ctx_t * dec_ctx)
+{
+    if(dec_ctx != NULL) {
+        if(dec_ctx->magic_id && dec_ctx->magic_id != LV_BUILTIN_ID) {
+            return LV_RES_INV;
+        }
+        dec_ctx->magic_id = LV_BUILTIN_ID;
+        dec_ctx->caps = LV_IMG_DEC_CACHED;
+    }
+    return LV_RES_OK;
+}
+
+
 /**
  * Get info about a built-in image
  * @param decoder the decoder where this function belongs
@@ -274,15 +296,15 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                                      void * dec_ctx)
+                                      lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(decoder); /*Unused*/
-    LV_UNUSED(dec_ctx);
 
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {
         lv_img_cf_t cf = ((lv_img_dsc_t *)src)->header.cf;
         if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
+        if(init_dec_ctx(dec_ctx) != LV_RES_OK) return LV_RES_INV;
 
         header->w  = ((lv_img_dsc_t *)src)->header.w;
         header->h  = ((lv_img_dsc_t *)src)->header.h;
@@ -291,6 +313,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
     else if(src_type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
         if(strcmp(lv_fs_get_ext(src), "bin")) return LV_RES_INV;
+        if(init_dec_ctx(dec_ctx) != LV_RES_OK) return LV_RES_INV;
 
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
@@ -307,6 +330,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
         if(header->cf < CF_BUILT_IN_FIRST || header->cf > CF_BUILT_IN_LAST) return LV_RES_INV;
     }
     else if(src_type == LV_IMG_SRC_SYMBOL) {
+        if(init_dec_ctx(dec_ctx) != LV_RES_OK) return LV_RES_INV;
         /*The size depend on the font but it is unknown here. It should be handled outside of the
          *function*/
         header->w = 1;
@@ -329,13 +353,15 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
  * @param dec_ctx Not used
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
-lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, void * dec_ctx)
+lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                      lv_img_dec_ctx_t * dec_ctx)
 {
     LV_UNUSED(dec_ctx);
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
         if(strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RES_INV;
+        if(init_dec_ctx(dec_ctx) != LV_RES_OK) return LV_RES_INV;
 
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, dsc->src, LV_FS_MODE_RD);
@@ -358,12 +384,17 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
         lv_memcpy_small(&user_data->f, &f, sizeof(f));
+        if(dec_ctx != NULL) {
+            /*The image is not cached for files, it's read line by line*/
+            dec_ctx->caps ^= LV_IMG_DEC_CACHED;
+        }
     }
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
         if(((lv_img_dsc_t *)dsc->src)->data == NULL) {
             return LV_RES_INV;
         }
+        if(init_dec_ctx(dec_ctx) != LV_RES_OK) return LV_RES_INV;
     }
 
     lv_img_cf_t cf = dsc->header.cf;

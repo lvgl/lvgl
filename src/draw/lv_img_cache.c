@@ -58,9 +58,11 @@
  * The image is closed if a new image is opened and the new image takes its place in the cache.
  * @param src source of the image. Path to file or pointer to an `lv_img_dsc_t` variable
  * @param color color The color of the image with `LV_IMG_CF_ALPHA_...`
+ * @param size_hint if provided, contains the requested output size for the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, void * dec_ctx)
+_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, lv_point_t size_hint,
+                                           lv_img_dec_ctx_t * dec_ctx)
 {
     /*Is the image cached?*/
     _lv_img_cache_entry_t * cached_src = NULL;
@@ -120,11 +122,11 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, v
 #endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
-    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color, dec_ctx);
+    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color, size_hint, dec_ctx);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
-        cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its us*/
+        cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use*/
         return NULL;
     }
 
