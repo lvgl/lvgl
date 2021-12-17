@@ -2006,17 +2006,17 @@
             #define LV_USE_DEMO_WIDGETS 0
         #endif
     #else
-        #define LV_USE_DEMO_WIDGETS        1
+        #define LV_USE_DEMO_WIDGETS        0
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-#ifndef LV_DEMO_WIDGETS_SLIDESHOW
-    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-    #else
-        #define LV_DEMO_WIDGETS_SLIDESHOW  0
+    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
+        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #else
+            #define LV_DEMO_WIDGETS_SLIDESHOW  0
+        #endif
     #endif
-#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2028,7 +2028,7 @@
             #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
         #endif
     #else
-        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     1
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
     #endif
 #endif
 
@@ -2041,7 +2041,7 @@
             #define LV_USE_DEMO_BENCHMARK 0
         #endif
     #else
-        #define LV_USE_DEMO_BENCHMARK   1
+        #define LV_USE_DEMO_BENCHMARK   0
     #endif
 #endif
 
@@ -2054,7 +2054,7 @@
             #define LV_USE_DEMO_STRESS 0
         #endif
     #else
-        #define LV_USE_DEMO_STRESS      1
+        #define LV_USE_DEMO_STRESS      0
     #endif
 #endif
 
@@ -2067,45 +2067,45 @@
             #define LV_USE_DEMO_MUSIC 0
         #endif
     #else
-        #define LV_USE_DEMO_MUSIC       1
+        #define LV_USE_DEMO_MUSIC       0
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
-#ifndef LV_DEMO_MUSIC_SQUARE
-    #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-        #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-    #else
-        #define LV_DEMO_MUSIC_SQUARE       0
+    #ifndef LV_DEMO_MUSIC_SQUARE
+        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+        #else
+            #define LV_DEMO_MUSIC_SQUARE       0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LANDSCAPE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-        #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-    #else
-        #define LV_DEMO_MUSIC_LANDSCAPE    0
+    #ifndef LV_DEMO_MUSIC_LANDSCAPE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #else
+            #define LV_DEMO_MUSIC_LANDSCAPE    0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_ROUND
-    #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-        #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-    #else
-        #define LV_DEMO_MUSIC_ROUND        0
+    #ifndef LV_DEMO_MUSIC_ROUND
+        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+        #else
+            #define LV_DEMO_MUSIC_ROUND        0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LARGE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-        #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-    #else
-        #define LV_DEMO_MUSIC_LARGE        0
+    #ifndef LV_DEMO_MUSIC_LARGE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+        #else
+            #define LV_DEMO_MUSIC_LARGE        0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_AUTO_PLAY
-    #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-        #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-    #else
-        #define LV_DEMO_MUSIC_AUTO_PLAY    0
+    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
+        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #else
+            #define LV_DEMO_MUSIC_AUTO_PLAY    0
+        #endif
     #endif
-#endif
 #endif
 
 

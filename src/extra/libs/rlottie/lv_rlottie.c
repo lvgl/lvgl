@@ -209,9 +209,9 @@ static void next_frame_task_cb(lv_timer_t * t)
             }
         }
         else {
-            if(rlottie->dec.ctx.current_frame < rlottie->dec.ctx.total_frames)
-                ++rlottie->dec.ctx.current_frame;
-            else { /* Looping ? */
+            ++rlottie->dec.ctx.current_frame;
+            if(rlottie->dec.ctx.current_frame == rlottie->dec.ctx.total_frames) {
+                /* Looping ? */
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == 0) {
                     rlottie->dec.ctx.current_frame--; /*Pause on the last frame*/
                     lv_event_send(obj, LV_EVENT_READY, NULL);
