@@ -13,7 +13,7 @@ def float_btn_event_cb(e):
     cont = lv.menu_cont(main_page)
     label = lv.label(cont)
     label.set_text("Item {:d}".format(btn_cnt))
-    menu.set_load_page_event(cont, sub_page);
+    menu.set_load_page_event(cont, sub_page)
 
 # Create a menu object
 menu = lv.menu(lv.scr_act())

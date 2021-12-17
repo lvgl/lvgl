@@ -30,7 +30,7 @@ canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
 canvas.draw_rect(70, 60, 100, 70, rect_dsc)
 canvas.draw_text(40, 20, 100, label_dsc, "Some text on text canvas")
 
-# Test the rotation. It requires an other buffer where the orignal image is stored.
+# Test the rotation. It requires an other buffer where the original image is stored.
 # So copy the current image to buffer and rotate it to the canvas
 
 img = lv.img_dsc_t()
@@ -40,4 +40,4 @@ img.header.w = _CANVAS_WIDTH
 img.header.h = _CANVAS_HEIGHT
 
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
-canvas.transform(img, 30, LV_IMG_ZOOM_NONE, 0, 0, _CANVAS_WIDTH // 2, _CANVAS_HEIGHT // 2, True);
+canvas.transform(img, 30, LV_IMG_ZOOM_NONE, 0, 0, _CANVAS_WIDTH // 2, _CANVAS_HEIGHT // 2, True)

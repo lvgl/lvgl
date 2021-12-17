@@ -11,11 +11,11 @@ class Event_1():
         btn.add_event_cb(self.event_cb, lv.EVENT.CLICKED, None)
         
         label = lv.label(btn)
-        label.set_text("Click me!");
+        label.set_text("Click me!")
         label.center()
 
     def event_cb(self,e):
-        print("Clicked");
+        print("Clicked")
             
         btn = e.get_target()
         label = btn.get_child(0)
