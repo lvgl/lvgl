@@ -51,10 +51,11 @@ typedef enum lv_draw_sdl_mask_cache_type_t {
  * @return true if there are any mask needs to be drawn, false otherwise
  */
 bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords_in, const lv_area_t * clip_in,
-                            const lv_area_t * extension, lv_area_t * coords_out, lv_area_t * clip_out,
-                            lv_area_t * apply_area);
+                            const lv_area_t * extension, lv_blend_mode_t blend_mode, lv_area_t * coords_out,
+                            lv_area_t * clip_out, lv_area_t * apply_area);
 
-void lv_draw_sdl_mask_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_area);
+void lv_draw_sdl_mask_end(lv_draw_sdl_ctx_t * ctx, bool has_mask, const lv_area_t * apply_area,
+                          lv_blend_mode_t blend_mode);
 
 lv_opa_t * lv_draw_sdl_mask_dump_opa(const lv_area_t * coords, const int16_t * ids, int16_t ids_count);
 

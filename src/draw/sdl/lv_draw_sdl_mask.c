@@ -54,10 +54,10 @@ void texture_apply_mask(SDL_Texture * texture, const lv_area_t * coords, const i
  **********************/
 
 bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords_in, const lv_area_t * clip_in,
-                            const lv_area_t * extension, lv_area_t * coords_out, lv_area_t * clip_out,
-                            lv_area_t * apply_area)
+                            const lv_area_t * extension, lv_blend_mode_t blend_mode, lv_area_t * coords_out,
+                            lv_area_t * clip_out, lv_area_t * apply_area)
 {
-    lv_area_t full_area, full_coords = *coords_in;
+    lv_area_t full_coords = *coords_in;
 
     /* Normalize full_coords */
     if(full_coords.x1 > full_coords.x2) {
@@ -78,71 +78,91 @@ bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords_in
         full_coords.y2 += extension->y2;
     }
 
-    if(!_lv_area_intersect(&full_area, &full_coords, clip_in)) return false;
-    if(!lv_draw_mask_is_any(&full_area)) return false;
+    if(!_lv_area_intersect(apply_area, &full_coords, clip_in)) return false;
+    bool has_mask = lv_draw_mask_is_any(apply_area);
+
+    if (has_mask || (blend_mode != LV_BLEND_MODE_NORMAL && blend_mode != LV_BLEND_MODE_REPLACE)) {
+        lv_draw_sdl_context_internals_t * internals = ctx->internals;
+        LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
+        lv_coord_t w = lv_area_get_width(apply_area), h = lv_area_get_height(apply_area);
+        internals->composition = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_COMPOSITE, w, h);
+        /* Don't need to worry about overflow */
+        lv_coord_t ofs_x = (lv_coord_t) - apply_area->x1, ofs_y = (lv_coord_t) - apply_area->y1;
+        /* Offset draw area to start with (0,0) of coords */
+        lv_area_move(coords_out, ofs_x, ofs_y);
+        lv_area_move(clip_out, ofs_x, ofs_y);
+        SDL_SetRenderTarget(ctx->renderer, internals->composition);
+        SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
+        SDL_RenderClear(ctx->renderer);
 #if HAS_CUSTOM_BLEND_MODE
-
-    lv_draw_sdl_context_internals_t * internals = ctx->internals;
-    LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
-    lv_coord_t w = lv_area_get_width(&full_area), h = lv_area_get_height(&full_area);
-
-
-    internals->mask = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK, w, h);
-    texture_apply_mask(internals->mask, &full_area, NULL, 0);
-
-    internals->composition = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_COMPOSITE, w, h);
-
-    *apply_area = full_area;
-    /* Don't need to worry about overflow */
-    lv_coord_t ofs_x = (lv_coord_t) - full_area.x1, ofs_y = (lv_coord_t) - full_area.y1;
-    /* Offset draw area to start with (0,0) of coords */
-    lv_area_move(&full_area, ofs_x, ofs_y);
-    lv_area_move(coords_out, ofs_x, ofs_y);
-    lv_area_move(clip_out, ofs_x, ofs_y);
-    SDL_SetRenderTarget(ctx->renderer, internals->composition);
-    SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
-    SDL_RenderClear(ctx->renderer);
+        internals->mask = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK, w, h);
+        texture_apply_mask(internals->mask, apply_area, NULL, 0);
 #else
-    /* Fallback mask handling. This will at least make bars looks less bad */
-    for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        _lv_draw_mask_common_dsc_t * comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
-        if(comm_param == NULL) continue;
-        switch(comm_param->type) {
-            case LV_DRAW_MASK_TYPE_RADIUS: {
-                    const lv_draw_mask_radius_param_t * param = (const lv_draw_mask_radius_param_t *) comm_param;
-                    if(param->cfg.outer) break;
-                    _lv_area_intersect(clip_out, &full_area, &param->cfg.rect);
+        /* Fallback mask handling. This will at least make bars looks less bad */
+        for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
+            _lv_draw_mask_common_dsc_t * comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+            if(comm_param == NULL) continue;
+            switch(comm_param->type) {
+                case LV_DRAW_MASK_TYPE_RADIUS: {
+                        const lv_draw_mask_radius_param_t * param = (const lv_draw_mask_radius_param_t *) comm_param;
+                        if(param->cfg.outer) break;
+                        _lv_area_intersect(clip_out, apply_area, &param->cfg.rect);
+                        break;
+                    }
+                default:
                     break;
-                }
-            default:
-                break;
+            }
         }
-    }
 #endif
-    return true;
+    }
+    return has_mask;
 }
 
-void lv_draw_sdl_mask_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_area)
+void lv_draw_sdl_mask_end(lv_draw_sdl_ctx_t * ctx, bool has_mask, const lv_area_t * apply_area,
+                          lv_blend_mode_t blend_mode)
 {
-#if HAS_CUSTOM_BLEND_MODE
     lv_draw_sdl_context_internals_t * internals = ctx->internals;
-    LV_ASSERT(internals->mask != NULL && internals->composition != NULL);
-    SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
-                                                    SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
-                                                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-    SDL_SetTextureBlendMode(internals->mask, mode);
     SDL_Rect src_rect = {0, 0, lv_area_get_width(apply_area), lv_area_get_height(apply_area)};
-    SDL_RenderCopy(ctx->renderer, internals->mask, &src_rect, &src_rect);
+#if HAS_CUSTOM_BLEND_MODE
+    if (internals->mask) {
+        SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
+                                                        SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+                                                        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+        SDL_SetTextureBlendMode(internals->mask, mode);
+        SDL_RenderCopy(ctx->renderer, internals->mask, &src_rect, &src_rect);
+    }
+#endif
 
-    SDL_Rect dst_rect;
-    lv_area_to_sdl_rect(apply_area, &dst_rect);
+    /* Shapes are drawn on composite layer when mask or blend mode is present */
+    if (internals->composition) {
+        SDL_Rect dst_rect;
+        lv_area_to_sdl_rect(apply_area, &dst_rect);
 
-    SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.base_draw.buf);
-    SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
-    SDL_RenderCopy(ctx->renderer, internals->composition, &src_rect, &dst_rect);
+        SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.base_draw.buf);
+        switch (blend_mode) {
+            case LV_BLEND_MODE_NORMAL:
+            case LV_BLEND_MODE_REPLACE:
+                SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
+                break;
+            case LV_BLEND_MODE_ADDITIVE:
+                SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_ADD);
+                break;
+//#if HAS_CUSTOM_BLEND_MODE
+//        case LV_BLEND_MODE_SUBTRACTIVE:
+//            break;
+//        case LV_BLEND_MODE_MULTIPLY:
+//            break;
+//#endif
+            default:
+                LV_LOG_WARN("Doesn't support blend mode %d", blend_mode);
+                SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
+                /* Unsupported yet */
+                break;
+        }
+        SDL_RenderCopy(ctx->renderer, internals->composition, &src_rect, &dst_rect);
+    }
 
     internals->mask = internals->composition = NULL;
-#endif
 }
 
 lv_opa_t * lv_draw_sdl_mask_dump_opa(const lv_area_t * coords, const int16_t * ids, int16_t ids_count)
