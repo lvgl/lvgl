@@ -13,6 +13,7 @@
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
+#include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_mask.h"
 
 /*********************
@@ -78,7 +79,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
 
     lv_area_t t_coords = coords, t_clip = *clip, apply_area;
     lv_area_t extension = {dsc->width / 2, dsc->width / 2, dsc->width / 2, dsc->width / 2};
-    bool has_mask = lv_draw_sdl_mask_begin(sdl_ctx, &coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
+    bool has_mask = lv_draw_sdl_composite_begin(sdl_ctx, &coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
                                            &apply_area);
 
     SDL_Color color;
@@ -95,7 +96,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     SDL_RenderCopyEx(renderer, texture, &srcrect, &dstrect, angle, &center, 0);
     SDL_RenderSetClipRect(renderer, NULL);
 
-    lv_draw_sdl_mask_end(sdl_ctx, has_mask, &apply_area, dsc->blend_mode);
+    lv_draw_sdl_composite_end(sdl_ctx, has_mask, &apply_area, dsc->blend_mode);
 }
 
 /**********************

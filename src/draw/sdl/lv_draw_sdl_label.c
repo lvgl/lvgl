@@ -18,7 +18,7 @@
 
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
-#include "lv_draw_sdl_mask.h"
+#include "lv_draw_sdl_composite.h"
 
 /*********************
  *      DEFINES
@@ -118,9 +118,8 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
         return;
     }
 
-    lv_point_t offset = {0, 0};
     lv_area_t t_letter = letter_area, t_clip = *clip_area, apply_area;
-    bool has_mask = lv_draw_sdl_mask_begin(ctx, &letter_area, clip_area, NULL, dsc->blend_mode, &t_letter, &t_clip,
+    bool has_mask = lv_draw_sdl_composite_begin(ctx, &letter_area, clip_area, NULL, dsc->blend_mode, &t_letter, &t_clip,
                                            &apply_area);
 
     /*If the letter is completely out of mask don't draw it*/
@@ -138,7 +137,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
     SDL_RenderCopy(renderer, texture, &srcrect, &dstrect);
 
-    lv_draw_sdl_mask_end(ctx, has_mask, &apply_area, dsc->blend_mode);
+    lv_draw_sdl_composite_end(ctx, has_mask, &apply_area, dsc->blend_mode);
 }
 
 /**********************
