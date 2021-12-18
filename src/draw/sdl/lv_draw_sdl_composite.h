@@ -57,8 +57,8 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
 void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, bool has_mask, const lv_area_t * apply_area,
                                lv_blend_mode_t blend_mode);
 
-SDL_Texture * lv_draw_sdl_mask_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_cache_type_t type,
-                                          lv_coord_t w, lv_coord_t h);
+SDL_Texture * lv_draw_sdl_composite_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_cache_type_t type,
+                                               lv_coord_t w, lv_coord_t h);
 
 /**********************
  *      MACROS

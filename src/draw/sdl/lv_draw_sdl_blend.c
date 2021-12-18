@@ -73,9 +73,9 @@ void blend_fill(lv_draw_sdl_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc
     lv_area_to_sdl_rect(&fill_area, &fill_rect);
 
     if(dsc->mask) {
-        SDL_Texture * texture = lv_draw_sdl_mask_tmp_obtain(draw_ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK,
-                                                            lv_area_get_height(&fill_area),
-                                                            lv_area_get_width(&fill_area));
+        SDL_Texture * texture = lv_draw_sdl_composite_tmp_obtain(draw_ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK,
+                                                                 lv_area_get_height(&fill_area),
+                                                                 lv_area_get_width(&fill_area));
         SDL_Rect rect = {0, 0, lv_area_get_width(&fill_area), lv_area_get_height(&fill_area)};
         uint8_t * pixels = NULL;
         int pitch;
