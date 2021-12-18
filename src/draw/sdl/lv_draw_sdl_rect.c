@@ -165,9 +165,11 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
             case LV_BLEND_MODE_ADDITIVE:
                 SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_ADD);
                 break;
+#if SDL_VERSION_ATLEAST(2, 0, 12)
             case LV_BLEND_MODE_MULTIPLY:
                 SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_MUL);
                 break;
+#endif
             case LV_BLEND_MODE_REPLACE:
                 SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
                 break;
