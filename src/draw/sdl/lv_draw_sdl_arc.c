@@ -190,9 +190,9 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
         }
         else {
             for(int x = 0; x < rect.w; x++) {
-                const lv_coord_t idx = y * pitch + x * 4;
-                pixels[idx] = line_buf[x];
-                pixels[idx + 1] = pixels[idx + 2] = pixels[idx + 3] = 0xFF;
+                uint8_t *pixel = &pixels[y * pitch + x * 4];
+                *pixel = line_buf[x];
+                pixel[1] = pixel[2] = pixel[3] = 0xFF;
             }
         }
         if(caps) {
@@ -205,9 +205,10 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
                     lv_memset_ff(&pixels[y * pitch], 4 * rect.w);
                 } else {
                     for (int x = 0; x < rect.w; x++) {
-                        const lv_coord_t idx = y * pitch + x * 4;
-                        pixels[idx] = LV_MIN(line_buf[x] + pixels[idx], 0xFF);
-                        pixels[idx + 1] = pixels[idx + 2] = pixels[idx + 3] = 0xFF;
+                        uint8_t *pixel = &pixels[y * pitch + x * 4];
+                        uint16_t old_opa = line_buf[x] + *pixel;
+                        *pixel = LV_MIN(old_opa, 0xFF);
+                        pixel[1] = pixel[2] = pixel[3] = 0xFF;
                     }
                 }
             }
