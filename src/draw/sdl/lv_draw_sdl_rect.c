@@ -157,7 +157,7 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
     }
     draw_outline(ctx, &t_coords, &t_clip, dsc);
 
-    lv_draw_sdl_composite_end(ctx, has_mask, &apply_area, dsc->blend_mode);
+    lv_draw_sdl_composite_end(ctx, &apply_area, dsc->blend_mode);
 }
 
 /**********************

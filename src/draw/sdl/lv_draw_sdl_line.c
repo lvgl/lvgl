@@ -96,7 +96,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     SDL_RenderCopyEx(renderer, texture, &srcrect, &dstrect, angle, &center, 0);
     SDL_RenderSetClipRect(renderer, NULL);
 
-    lv_draw_sdl_composite_end(sdl_ctx, has_mask, &apply_area, dsc->blend_mode);
+    lv_draw_sdl_composite_end(sdl_ctx, &apply_area, dsc->blend_mode);
 }
 
 /**********************

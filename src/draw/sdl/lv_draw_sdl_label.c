@@ -137,7 +137,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
     SDL_RenderCopy(renderer, texture, &srcrect, &dstrect);
 
-    lv_draw_sdl_composite_end(ctx, has_mask, &apply_area, dsc->blend_mode);
+    lv_draw_sdl_composite_end(ctx, &apply_area, dsc->blend_mode);
 }
 
 /**********************

@@ -40,6 +40,7 @@ static composite_key_t mask_key_create(lv_draw_sdl_composite_cache_type_t type);
 
 static lv_coord_t next_pow_of_2(lv_coord_t num);
 
+static void dump_masks(SDL_Texture *texture, const lv_area_t *coords);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -95,7 +96,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         SDL_RenderClear(ctx->renderer);
 #if HAS_CUSTOM_BLEND_MODE
         internals->mask = lv_draw_sdl_composite_tmp_obtain(ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK, w, h);
-        lv_draw_sdl_mask_dump_to_texture(internals->mask, apply_area, NULL, 0);
+        dump_masks(internals->mask, apply_area);
 #else
         /* Fallback mask handling. This will at least make bars looks less bad */
         for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
@@ -117,8 +118,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     return has_mask;
 }
 
-void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, bool has_mask, const lv_area_t * apply_area,
-                               lv_blend_mode_t blend_mode)
+void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t *ctx, const lv_area_t *apply_area, lv_blend_mode_t blend_mode)
 {
     lv_draw_sdl_context_internals_t * internals = ctx->internals;
     SDL_Rect src_rect = {0, 0, lv_area_get_width(apply_area), lv_area_get_height(apply_area)};
@@ -208,7 +208,7 @@ static lv_coord_t next_pow_of_2(lv_coord_t num)
     return n;
 }
 
-void lv_draw_sdl_mask_dump_to_texture(SDL_Texture * texture, const lv_area_t * coords, const int16_t * ids, int16_t ids_count)
+static void dump_masks(SDL_Texture *texture, const lv_area_t *coords)
 {
     lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
     SDL_assert(w > 0 && h > 0);
@@ -222,12 +222,7 @@ void lv_draw_sdl_mask_dump_to_texture(SDL_Texture * texture, const lv_area_t * c
         lv_memset_ff(line_buf, rect.w);
         lv_coord_t abs_x = (lv_coord_t) coords->x1, abs_y = (lv_coord_t)(y + coords->y1), len = (lv_coord_t) rect.w;
         lv_draw_mask_res_t res;
-        if(ids) {
-            res = lv_draw_mask_apply_ids(line_buf, abs_x, abs_y, len, ids, ids_count);
-        }
-        else {
-            res = lv_draw_mask_apply(line_buf, abs_x, abs_y, len);
-        }
+        res = lv_draw_mask_apply(line_buf, abs_x, abs_y, len);
         if(res == LV_DRAW_MASK_RES_TRANSP) {
             lv_memset_00(&pixels[y * pitch], 4 * rect.w);
         }
@@ -236,10 +231,9 @@ void lv_draw_sdl_mask_dump_to_texture(SDL_Texture * texture, const lv_area_t * c
         }
         else {
             for(int x = 0; x < rect.w; x++) {
-                pixels[y * pitch + x * 4] = line_buf[x];
-                pixels[y * pitch + x * 4 + 1] = 0xFF;
-                pixels[y * pitch + x * 4 + 2] = 0xFF;
-                pixels[y * pitch + x * 4 + 3] = 0xFF;
+                const lv_coord_t idx = y * pitch + x * 4;
+                pixels[idx] = line_buf[x];
+                pixels[idx + 1] = pixels[idx + 2] = pixels[idx + 3] = 0xFF;
             }
         }
     }
