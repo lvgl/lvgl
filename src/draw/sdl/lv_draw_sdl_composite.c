@@ -81,9 +81,12 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     if(!_lv_area_intersect(apply_area, &full_coords, clip_in)) return false;
     bool has_mask = lv_draw_mask_is_any(apply_area);
 
-    if (has_mask || (blend_mode != LV_BLEND_MODE_NORMAL && blend_mode != LV_BLEND_MODE_REPLACE)) {
+    const bool draw_mask = has_mask && HAS_CUSTOM_BLEND_MODE;
+    const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL && blend_mode != LV_BLEND_MODE_REPLACE;
+    if (draw_mask || draw_blend) {
         lv_draw_sdl_context_internals_t * internals = ctx->internals;
         LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
+
         lv_coord_t w = lv_area_get_width(apply_area), h = lv_area_get_height(apply_area);
         internals->composition = lv_draw_sdl_composite_tmp_obtain(ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_TEMP, w, h);
         /* Don't need to worry about overflow */
@@ -97,23 +100,23 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
 #if HAS_CUSTOM_BLEND_MODE
         internals->mask = lv_draw_sdl_composite_tmp_obtain(ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK, w, h);
         dump_masks(internals->mask, apply_area);
-#else
+#endif
+    } else if (has_mask) {
         /* Fallback mask handling. This will at least make bars looks less bad */
         for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
             _lv_draw_mask_common_dsc_t * comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
             if(comm_param == NULL) continue;
             switch(comm_param->type) {
                 case LV_DRAW_MASK_TYPE_RADIUS: {
-                        const lv_draw_mask_radius_param_t * param = (const lv_draw_mask_radius_param_t *) comm_param;
-                        if(param->cfg.outer) break;
-                        _lv_area_intersect(clip_out, apply_area, &param->cfg.rect);
-                        break;
-                    }
+                    const lv_draw_mask_radius_param_t * param = (const lv_draw_mask_radius_param_t *) comm_param;
+                    if(param->cfg.outer) break;
+                    _lv_area_intersect(clip_out, apply_area, &param->cfg.rect);
+                    break;
+                }
                 default:
                     break;
             }
         }
-#endif
     }
     return has_mask;
 }
