@@ -155,6 +155,9 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
     lv_coord_t radius = dsc->radius;
     if(radius <= 0) {
+        if (dsc->bg_opa == 0 && dsc->blend_mode != LV_BLEND_MODE_REPLACE) {
+            return;
+        }
         SDL_Rect rect;
         lv_area_to_sdl_rect(draw_area, &rect);
         SDL_SetRenderDrawColor(ctx->renderer, bg_color.r, bg_color.g, bg_color.b, dsc->bg_opa);
