@@ -58,12 +58,26 @@ bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords_in
                             lv_area_t * apply_area)
 {
     lv_area_t full_area, full_coords = *coords_in;
+
+    /* Normalize full_coords */
+    if(full_coords.x1 > full_coords.x2) {
+        lv_coord_t x2 = full_coords.x2;
+        full_coords.x2 = full_coords.x1;
+        full_coords.x1 = x2;
+    }
+    if(full_coords.y1 > full_coords.y2) {
+        lv_coord_t y2 = full_coords.y2;
+        full_coords.y2 = full_coords.y1;
+        full_coords.y1 = y2;
+    }
+
     if(extension) {
         full_coords.x1 -= extension->x1;
         full_coords.x2 += extension->x2;
         full_coords.y1 -= extension->y1;
         full_coords.y2 += extension->y2;
     }
+
     if(!_lv_area_intersect(&full_area, &full_coords, clip_in)) return false;
     if(!lv_draw_mask_is_any(&full_area)) return false;
 #if HAS_CUSTOM_BLEND_MODE
@@ -71,6 +85,7 @@ bool lv_draw_sdl_mask_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords_in
     lv_draw_sdl_context_internals_t * internals = ctx->internals;
     LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
     lv_coord_t w = lv_area_get_width(&full_area), h = lv_area_get_height(&full_area);
+
 
     internals->mask = lv_draw_sdl_mask_tmp_obtain(ctx, LV_DRAW_SDL_MASK_KEY_ID_MASK, w, h);
     texture_apply_mask(internals->mask, &full_area, NULL, 0);

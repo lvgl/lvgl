@@ -27,6 +27,9 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
 void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                              uint32_t letter);
 
+void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
+                     const lv_point_t * point2);
+
 void lv_draw_sdl_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
 
 /**********************
@@ -57,6 +60,7 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_ctx->draw_rect = lv_draw_sdl_draw_rect;
     draw_ctx->draw_img = lv_draw_sdl_img_core;
     draw_ctx->draw_letter = lv_draw_sdl_draw_letter;
+    draw_ctx->draw_line = lv_draw_sdl_draw_line;
     lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
     draw_ctx_sdl->renderer = ((lv_draw_sdl_drv_param_t *) disp_drv->user_data)->renderer;
     draw_ctx_sdl->base_draw.blend = lv_draw_sdl_blend;
