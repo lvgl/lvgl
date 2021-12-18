@@ -63,6 +63,7 @@ enum {
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
+    LV_BLEND_MODE_REPLACE,    /**< Replace background with foreground in the area*/
 };
 
 typedef uint8_t lv_blend_mode_t;

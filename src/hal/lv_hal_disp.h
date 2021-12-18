@@ -115,6 +115,9 @@ typedef struct _lv_disp_drv_t {
     void (*set_px_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa);
 
+    void (*clear_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, uint32_t size);
+
+
     /** OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels*/
     void (*monitor_cb)(struct _lv_disp_drv_t * disp_drv, uint32_t time, uint32_t px);

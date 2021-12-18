@@ -570,6 +570,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
                 lv_draw_img_dsc_t dsc;
                 lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
+                dsc.blend_mode = LV_BLEND_MODE_REPLACE;
                 lv_draw_img(draw_ctx, &dsc, &a, disp_refr->bg_img);
             }
             else {
@@ -581,6 +582,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
+            dsc.blend_mode = LV_BLEND_MODE_REPLACE;
             lv_draw_rect(draw_ctx, &dsc, draw_ctx->buf_area);
         }
     }

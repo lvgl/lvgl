@@ -46,6 +46,7 @@ static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_c
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
+static inline lv_color_t color_blend_true_color_replace(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 #endif /*LV_DRAW_COMPLEX*/
 
 /**********************
@@ -64,11 +65,11 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 
 #else
 #define FILL_NORMAL_MASK_PX(color)                                               \
-    if(*mask == LV_OPA_COVER) *disp_buf = color;                                 \
-    else if(disp->driver->screen_transp) lv_color_mix_with_alpha(*disp_buf, disp_buf->ch.alpha, color, *mask, disp_buf, &disp_buf->ch.alpha);           \
-    else *disp_buf = lv_color_mix(color, *disp_buf, *mask);            \
+    if(*mask == LV_OPA_COVER) *dest_buf = color;                                 \
+    else if(disp->driver->screen_transp) lv_color_mix_with_alpha(*dest_buf, dest_buf->ch.alpha, color, *mask, dest_buf, &dest_buf->ch.alpha);           \
+    else *dest_buf = lv_color_mix(color, *dest_buf, *mask);            \
     mask++;                                                         \
-    disp_buf++;
+    dest_buf++;
 #endif
 
 #define MAP_NORMAL_MASK_PX(x)                                                          \
@@ -80,10 +81,10 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 
 #define MAP_NORMAL_MASK_PX_SCR_TRANSP(x)                        \
     if(*mask_tmp_x) {          \
-        if(*mask_tmp_x == LV_OPA_COVER) disp_buf[x] = map_buf[x];                                 \
-        else if(disp->driver->screen_transp) lv_color_mix_with_alpha(disp_buf[x], disp_buf[x].ch.alpha,              \
-                                                                         map_buf[x], *mask_tmp_x, &disp_buf[x], &disp_buf[x].ch.alpha);                  \
-        else disp_buf[x] = lv_color_mix(map_buf[x], disp_buf[x], *mask_tmp_x);            \
+        if(*mask_tmp_x == LV_OPA_COVER) dest_buf[x] = src_buf[x];                                 \
+        else if(disp->driver->screen_transp) lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha,              \
+                                                                         src_buf[x], *mask_tmp_x, &dest_buf[x], &dest_buf[x].ch.alpha);                  \
+        else dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], *mask_tmp_x);            \
     }                                                                                               \
     mask_tmp_x++;
 
@@ -210,6 +211,7 @@ static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                               lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
 {
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
@@ -241,7 +243,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
 
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver->screen_transp) {
-                            lv_color_mix_with_alpha(buf[x], buf[x].ch.alpha, color, opa, &last_res_color,
+                            lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha, color, opa, &last_res_color,
                                                     &last_res_color.ch.alpha);
                         }
                         else
@@ -330,7 +332,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
                         if(*mask != last_mask || last_dest_color.full != dest_buf[x].full) {
 #if LV_COLOR_SCREEN_TRANSP
                             if(disp->driver->screen_transp) {
-                                lv_color_mix_with_alpha(buf[x], buf[x].ch.alpha, color, opa_tmp, &last_res_color,
+                                lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha, color, opa_tmp, &last_res_color,
                                                         &last_res_color.ch.alpha);
                             }
                             else
@@ -375,6 +377,9 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
             break;
         case LV_BLEND_MODE_MULTIPLY:
             blend_fp = color_blend_true_color_multiply;
+            break;
+        case LV_BLEND_MODE_REPLACE:
+            blend_fp = color_blend_true_color_replace;
             break;
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
@@ -488,8 +493,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
                 for(x = 0; x < w; x++) {
 #if LV_COLOR_SCREEN_TRANSP
                     if(disp->driver->screen_transp) {
-                        lv_color_mix_with_alpha(buf[x], buf[x].ch.alpha, src_buf[x], opa, &buf[x],
-                                                &buf[x].ch.alpha);
+                        lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha, src_buf[x], opa, &dest_buf[x],
+                                                &dest_buf[x].ch.alpha);
                     }
                     else
 #endif
@@ -572,8 +577,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
                         lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver->screen_transp) {
-                            lv_color_mix_with_alpha(buf[x], buf[x].ch.alpha, src_buf[x], opa_tmp, &buf[x],
-                                                    &buf[x].ch.alpha);
+                            lv_color_mix_with_alpha(dest_buf[x], dest_buf[x].ch.alpha, src_buf[x], opa_tmp,
+                                                    &dest_buf[x], &dest_buf[x].ch.alpha);
                         }
                         else
 #endif
@@ -611,6 +616,9 @@ static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_c
             break;
         case LV_BLEND_MODE_MULTIPLY:
             blend_fp = color_blend_true_color_multiply;
+            break;
+        case LV_BLEND_MODE_REPLACE:
+            blend_fp = color_blend_true_color_replace;
             break;
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
@@ -744,6 +752,11 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
     if(opa == LV_OPA_COVER) return fg;
 
     return lv_color_mix(fg, bg, opa);
+}
+
+static inline lv_color_t color_blend_true_color_replace(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
+{
+    return fg;
 }
 
 #endif

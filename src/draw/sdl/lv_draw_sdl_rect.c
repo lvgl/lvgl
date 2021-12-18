@@ -15,6 +15,7 @@
 #include "../lv_draw_img.h"
 #include "../lv_draw_label.h"
 #include "../lv_draw_mask.h"
+#include "../../core/lv_refr.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_mask.h"
@@ -150,7 +151,6 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
 static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                           const lv_draw_rect_dsc_t * dsc)
 {
-    if(dsc->bg_opa <= LV_OPA_TRANSP) return;
     SDL_Color bg_color;
     lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
     lv_coord_t radius = dsc->radius;
@@ -158,7 +158,23 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
         SDL_Rect rect;
         lv_area_to_sdl_rect(draw_area, &rect);
         SDL_SetRenderDrawColor(ctx->renderer, bg_color.r, bg_color.g, bg_color.b, dsc->bg_opa);
-        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
+        switch (dsc->blend_mode) {
+            case LV_BLEND_MODE_NORMAL:
+                SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
+                break;
+            case LV_BLEND_MODE_ADDITIVE:
+                SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_ADD);
+                break;
+            case LV_BLEND_MODE_MULTIPLY:
+                SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_MUL);
+                break;
+            case LV_BLEND_MODE_REPLACE:
+                SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
+                break;
+            default:
+                /* Unsupported yet */
+                break;
+        }
         SDL_RenderFillRect(ctx->renderer, &rect);
         return;
     }
