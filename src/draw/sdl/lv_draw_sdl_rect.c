@@ -143,7 +143,7 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = *coords, t_clip = *clip, apply_area, t_area;
     bool has_mask = lv_draw_sdl_composite_begin(ctx, coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
-                                           &apply_area);
+                                                &apply_area);
     bool has_content = _lv_area_intersect(&t_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect;
@@ -167,7 +167,7 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
 static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                           const lv_draw_rect_dsc_t * dsc)
 {
-    if (dsc->bg_opa == 0) {
+    if(dsc->bg_opa == 0) {
         return;
     }
     SDL_Color bg_color;

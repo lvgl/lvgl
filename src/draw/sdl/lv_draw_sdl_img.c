@@ -109,7 +109,8 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         SDL_SetTextureColorMod(texture, draw_dsc->recolor.ch.red, recolor.g, recolor.b);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
-    } else if(draw_dsc->recolor_opa > LV_OPA_TRANSP) {
+    }
+    else if(draw_dsc->recolor_opa > LV_OPA_TRANSP) {
         /* Draw blended. src: origA, dst: origA * recolorA */
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
@@ -117,7 +118,8 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         SDL_SetTextureColorMod(texture, recolor.r, recolor.g, recolor.b);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa * draw_dsc->recolor_opa / 255);
         SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
-    } else {
+    }
+    else {
         /* Draw with no recolor */
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);

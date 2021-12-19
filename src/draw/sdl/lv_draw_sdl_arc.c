@@ -44,13 +44,14 @@ typedef struct {
  *      MACROS
  **********************/
 
-static lv_draw_arc_key_t arc_key_create(const lv_draw_arc_dsc_t *dsc, uint16_t radius, uint16_t start_angle,
-                                 uint16_t end_angle);
+static lv_draw_arc_key_t arc_key_create(const lv_draw_arc_dsc_t * dsc, uint16_t radius, uint16_t start_angle,
+                                        uint16_t end_angle);
 
 static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const int16_t * ids, int16_t ids_count,
                        const int16_t * caps);
 
-static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, const lv_point_t *center, lv_area_t *out);
+static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, const lv_point_t * center,
+                         lv_area_t * out);
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -58,7 +59,7 @@ static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, c
 void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                           uint16_t radius, uint16_t start_angle, uint16_t end_angle)
 {
-    lv_draw_sdl_ctx_t *ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_area_t area_out;
@@ -68,7 +69,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     area_out.y2 = center->y + radius - 1;
 
     lv_area_t draw_area;
-    if (!_lv_area_intersect(&draw_area, &area_out, draw_ctx->clip_area)) {
+    if(!_lv_area_intersect(&draw_area, &area_out, draw_ctx->clip_area)) {
         return;
     }
 
@@ -105,7 +106,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     }
 
     lv_draw_mask_radius_param_t cap_start_param, cap_end_param;
-    if (mask_ids_count == 3 && dsc->rounded) {
+    if(mask_ids_count == 3 && dsc->rounded) {
         lv_area_t start_area, end_area;
         get_cap_area((int16_t) start_angle, dsc->width, radius, center, &start_area);
         get_cap_area((int16_t) end_angle, dsc->width, radius, center, &end_area);
@@ -116,14 +117,14 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     }
 
     lv_coord_t w = lv_area_get_width(&draw_area), h = lv_area_get_height(&draw_area);
-    SDL_Texture *texture = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1, w, h);
+    SDL_Texture * texture = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1, w, h);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     dump_masks(texture, &draw_area, mask_ids, mask_ids_count, cap_ids[0] != LV_MASK_ID_INV ? cap_ids : NULL);
 
     lv_draw_mask_remove_id(mask_ids[0]);
     lv_draw_mask_free_param(&mask_out_param);
 
-    if (mask_ids_count > 1) {
+    if(mask_ids_count > 1) {
         lv_draw_mask_remove_id(mask_ids[1]);
         lv_draw_mask_free_param(&mask_in_param);
     }
@@ -133,7 +134,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
         lv_draw_mask_free_param(&mask_angle_param);
     }
 
-    if (cap_ids[0] != LV_MASK_ID_INV) {
+    if(cap_ids[0] != LV_MASK_ID_INV) {
         lv_draw_mask_remove_id(cap_ids[0]);
         lv_draw_mask_remove_id(cap_ids[1]);
         lv_draw_mask_free_param(&cap_start_param);
@@ -153,7 +154,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_draw_arc_key_t arc_key_create(const lv_draw_arc_dsc_t *dsc, uint16_t radius, uint16_t start_angle,
+static lv_draw_arc_key_t arc_key_create(const lv_draw_arc_dsc_t * dsc, uint16_t radius, uint16_t start_angle,
                                         uint16_t end_angle)
 {
     lv_draw_arc_key_t key;
@@ -190,22 +191,24 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
         }
         else {
             for(int x = 0; x < rect.w; x++) {
-                uint8_t *pixel = &pixels[y * pitch + x * 4];
+                uint8_t * pixel = &pixels[y * pitch + x * 4];
                 *pixel = line_buf[x];
                 pixel[1] = pixel[2] = pixel[3] = 0xFF;
             }
         }
         if(caps) {
-            for (int i = 0; i < 2; i++) {
+            for(int i = 0; i < 2; i++) {
                 lv_memset_ff(line_buf, rect.w);
                 res = lv_draw_mask_apply_ids(line_buf, abs_x, abs_y, len, &caps[i], 1);
-                if (res == LV_DRAW_MASK_RES_TRANSP) {
+                if(res == LV_DRAW_MASK_RES_TRANSP) {
                     /* Ignore */
-                } else if (res == LV_DRAW_MASK_RES_FULL_COVER) {
+                }
+                else if(res == LV_DRAW_MASK_RES_FULL_COVER) {
                     lv_memset_ff(&pixels[y * pitch], 4 * rect.w);
-                } else {
-                    for (int x = 0; x < rect.w; x++) {
-                        uint8_t *pixel = &pixels[y * pitch + x * 4];
+                }
+                else {
+                    for(int x = 0; x < rect.w; x++) {
+                        uint8_t * pixel = &pixels[y * pitch + x * 4];
                         uint16_t old_opa = line_buf[x] + *pixel;
                         *pixel = LV_MIN(old_opa, 0xFF);
                         pixel[1] = pixel[2] = pixel[3] = 0xFF;
@@ -218,7 +221,8 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
     SDL_UnlockTexture(texture);
 }
 
-static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, const lv_point_t *center, lv_area_t *out)
+static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, const lv_point_t * center,
+                         lv_area_t * out)
 {
     const uint8_t ps = 8;
     const uint8_t pa = 127;

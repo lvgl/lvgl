@@ -28,7 +28,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
                              uint32_t letter);
 
 void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
-                     const lv_point_t * point2);
+                           const lv_point_t * point2);
 
 void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                           uint16_t radius, uint16_t start_angle, uint16_t end_angle);
@@ -83,7 +83,7 @@ void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 
 SDL_Texture * lv_draw_sdl_create_screen_texture(SDL_Renderer * renderer, lv_coord_t hor, lv_coord_t ver)
 {
-    SDL_Texture *texture = SDL_CreateTexture(renderer, LV_DRAW_SDL_TEXTURE_FORMAT, SDL_TEXTUREACCESS_TARGET, hor, ver);
+    SDL_Texture * texture = SDL_CreateTexture(renderer, LV_DRAW_SDL_TEXTURE_FORMAT, SDL_TEXTUREACCESS_TARGET, hor, ver);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     return texture;
 }
