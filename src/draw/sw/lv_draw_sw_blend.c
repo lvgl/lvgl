@@ -211,8 +211,6 @@ static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_
 LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                               lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
 {
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
 
