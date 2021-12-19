@@ -121,9 +121,6 @@ static SDL_Texture * line_texture_create(lv_draw_sdl_ctx_t *sdl_ctx, const lv_dr
     SDL_Texture *target = SDL_GetRenderTarget(sdl_ctx->renderer);
     SDL_SetRenderTarget(sdl_ctx->renderer, texture);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-#if SDL_VERSION_ATLEAST(2, 0, 12)
-    SDL_SetTextureScaleMode(texture, SDL_ScaleModeBest);
-#endif
     SDL_SetRenderDrawColor(sdl_ctx->renderer, 0xFF, 0xFF, 0xFF, 0x0);
     SDL_RenderClear(sdl_ctx->renderer);
     SDL_SetRenderDrawColor(sdl_ctx->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
