@@ -30,10 +30,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum lv_draw_sdl_mask_cache_type_t {
-    LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK,
-    LV_DRAW_SDL_COMPOSITE_KEY_ID_TEMP,
-} lv_draw_sdl_composite_cache_type_t;
+typedef enum lv_draw_sdl_composite_texture_id_t {
+    LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0,
+    LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1,
+    LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0,
+} lv_draw_sdl_composite_texture_id_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -56,8 +57,8 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
 
 void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t *ctx, const lv_area_t *apply_area, lv_blend_mode_t blend_mode);
 
-SDL_Texture * lv_draw_sdl_composite_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_cache_type_t type,
-                                               lv_coord_t w, lv_coord_t h);
+SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_texture_id_t id,
+                                                   lv_coord_t w, lv_coord_t h);
 
 /**********************
  *      MACROS

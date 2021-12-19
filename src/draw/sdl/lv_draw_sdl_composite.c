@@ -29,14 +29,14 @@
 
 typedef struct {
     lv_sdl_cache_key_magic_t magic;
-    lv_draw_sdl_composite_cache_type_t type;
+    lv_draw_sdl_composite_texture_id_t type;
 } composite_key_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static composite_key_t mask_key_create(lv_draw_sdl_composite_cache_type_t type);
+static composite_key_t mask_key_create(lv_draw_sdl_composite_texture_id_t type);
 
 static lv_coord_t next_pow_of_2(lv_coord_t num);
 
@@ -88,7 +88,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
 
         lv_coord_t w = lv_area_get_width(apply_area), h = lv_area_get_height(apply_area);
-        internals->composition = lv_draw_sdl_composite_tmp_obtain(ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_TEMP, w, h);
+        internals->composition = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0, w, h);
         /* Don't need to worry about overflow */
         lv_coord_t ofs_x = (lv_coord_t) - apply_area->x1, ofs_y = (lv_coord_t) - apply_area->y1;
         /* Offset draw area to start with (0,0) of coords */
@@ -98,7 +98,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
         SDL_RenderClear(ctx->renderer);
 #if HAS_CUSTOM_BLEND_MODE
-        internals->mask = lv_draw_sdl_composite_tmp_obtain(ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK, w, h);
+        internals->mask = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0, w, h);
         dump_masks(internals->mask, apply_area);
 #endif
     } else if (has_mask) {
@@ -177,17 +177,17 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t *ctx, const lv_area_t *apply_ar
     internals->mask = internals->composition = NULL;
 }
 
-SDL_Texture * lv_draw_sdl_composite_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_cache_type_t type,
-                                               lv_coord_t w, lv_coord_t h)
+SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_texture_id_t id,
+                                                   lv_coord_t w, lv_coord_t h)
 {
     lv_point_t * tex_size = NULL;
-    composite_key_t mask_key = mask_key_create(type);
+    composite_key_t mask_key = mask_key_create(id);
     SDL_Texture * result = lv_draw_sdl_texture_cache_get_with_userdata(ctx, &mask_key, sizeof(composite_key_t), NULL,
                                                                        (void **) &tex_size);
     if(!result || tex_size->x < w || tex_size->y < h) {
         lv_coord_t size = next_pow_of_2(LV_MAX(w, h));
         int access = SDL_TEXTUREACCESS_STREAMING;
-        if(type == LV_DRAW_SDL_COMPOSITE_KEY_ID_TEMP) {
+        if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0) {
             access = SDL_TEXTUREACCESS_TARGET;
         }
         result = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);
@@ -202,7 +202,7 @@ SDL_Texture * lv_draw_sdl_composite_tmp_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_
  *   STATIC FUNCTIONS
  **********************/
 
-static composite_key_t mask_key_create(lv_draw_sdl_composite_cache_type_t type)
+static composite_key_t mask_key_create(lv_draw_sdl_composite_texture_id_t type)
 {
     composite_key_t key;
     /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
@@ -244,7 +244,7 @@ static void dump_masks(SDL_Texture *texture, const lv_area_t *coords)
         }
         else {
             for(int x = 0; x < rect.w; x++) {
-                const lv_coord_t idx = y * pitch + x * 4;
+                const size_t idx = y * pitch + x * 4;
                 pixels[idx] = line_buf[x];
                 pixels[idx + 1] = pixels[idx + 2] = pixels[idx + 3] = 0xFF;
             }

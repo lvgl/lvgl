@@ -116,7 +116,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     }
 
     lv_coord_t w = lv_area_get_width(&draw_area), h = lv_area_get_height(&draw_area);
-    SDL_Texture *texture = lv_draw_sdl_composite_tmp_obtain(ctx, LV_DRAW_SDL_COMPOSITE_KEY_ID_MASK, w, h);
+    SDL_Texture *texture = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1, w, h);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     dump_masks(texture, &draw_area, mask_ids, mask_ids_count, cap_ids[0] != LV_MASK_ID_INV ? cap_ids : NULL);
 
