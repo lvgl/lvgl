@@ -58,6 +58,8 @@ static lv_coord_t get_y_center(lv_obj_t * obj);
 
 void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
 {
+    lv_gridnav_remove(obj); /*Be sure to not add gridnav twice*/
+
     lv_gridnav_dsc_t * dsc = lv_mem_alloc(sizeof(lv_gridnav_dsc_t));
     LV_ASSERT_MALLOC(dsc);
     dsc->ctrl = ctrl;
@@ -70,9 +72,8 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
 void lv_gridnav_remove(lv_obj_t * obj)
 {
     lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(obj, gridnav_event_cb);
-    if(dsc == NULL) {
-        return; /* no gridnav on this object */
-    }
+    if(dsc == NULL) return; /* no gridnav on this object */
+
     lv_mem_free(dsc);
     lv_obj_remove_event_cb(obj, gridnav_event_cb);
 }
