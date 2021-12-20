@@ -55,6 +55,8 @@ extern "C" {
  *********************/
 #include "../../../core/lv_obj.h"
 
+#if LV_USE_GRIDNAV
+
 /*********************
  *      DEFINES
  *********************/
@@ -96,6 +98,7 @@ void lv_gridnav_remove(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
+#endif /*LV_USE_GRIDNAV*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

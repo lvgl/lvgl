@@ -1,5 +1,3 @@
-
-
 /**
  * @file lv_gridnav.c
  *
@@ -9,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_gridnav.h"
+#if LV_USE_GRIDNAV
+
 #include "../../../misc/lv_assert.h"
 #include "../../../misc/lv_math.h"
 #include "../../../core/lv_indev.h"
@@ -41,6 +41,9 @@ typedef enum {
  **********************/
 static void gridnav_event_cb(lv_event_t * e);
 static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t mode);
+static lv_obj_t * find_first_focusable(lv_obj_t * obj);
+static lv_obj_t * find_last_focusable(lv_obj_t * obj);
+static bool obj_is_focuable(lv_obj_t * obj);
 static lv_coord_t get_x_center(lv_obj_t * obj);
 static lv_coord_t get_y_center(lv_obj_t * obj);
 
@@ -92,6 +95,9 @@ static void gridnav_event_cb(lv_event_t * e)
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         if(child_cnt == 0) return;
 
+        if(dsc->focused_obj == NULL) dsc->focused_obj = find_first_focusable(obj);
+        if(dsc->focused_obj == NULL) return;
+
         uint32_t key = lv_indev_get_key(lv_indev_get_act());
         lv_obj_t * guess = NULL;
         if(key == LV_KEY_RIGHT) {
@@ -99,7 +105,7 @@ static void gridnav_event_cb(lv_event_t * e)
             if(guess == NULL) {
                 if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
                     guess = find_chid(obj, dsc->focused_obj, FIND_NEXT_ROW_FIRST_ITEM);
-                    if(guess == NULL) guess = lv_obj_get_child(obj, 0);
+                    if(guess == NULL) guess = find_first_focusable(obj);
                 }
                 else {
                     lv_group_focus_next(lv_obj_get_group(obj));
@@ -111,8 +117,7 @@ static void gridnav_event_cb(lv_event_t * e)
             if(guess == NULL) {
                 if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
                     guess = find_chid(obj, dsc->focused_obj, FIND_PREV_ROW_LAST_ITEM);
-                    /*Last item*/
-                    if(guess == NULL) guess = lv_obj_get_child(obj, -1);
+                    if(guess == NULL) guess = find_last_focusable(obj);
                 }
                 else {
                     lv_group_focus_prev(lv_obj_get_group(obj));
@@ -153,6 +158,7 @@ static void gridnav_event_cb(lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_FOCUSED) {
+        if(dsc->focused_obj == NULL)  dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj) {
             lv_obj_add_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
             lv_obj_scroll_to_view(dsc->focused_obj, LV_ANIM_OFF);
@@ -164,11 +170,11 @@ static void gridnav_event_cb(lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_CHILD_CREATED) {
-        if(lv_obj_has_state(obj, LV_STATE_FOCUSED)) {
-            lv_obj_t * child = lv_event_get_target(e);
-            if(lv_obj_get_parent(child) == obj) {
-                if(dsc->focused_obj == NULL) {
-                    dsc->focused_obj = child;
+        lv_obj_t * child = lv_event_get_target(e);
+        if(lv_obj_get_parent(child) == obj) {
+            if(dsc->focused_obj == NULL) {
+                dsc->focused_obj = child;
+                if(lv_obj_has_state(obj, LV_STATE_FOCUSED)) {
                     lv_obj_add_state(child, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
                     lv_obj_scroll_to_view(child, LV_ANIM_OFF);
                 }
@@ -181,7 +187,7 @@ static void gridnav_event_cb(lv_event_t * e)
          *So make the first object focused*/
         lv_obj_t * target = lv_event_get_target(e);
         if(target == obj) {
-            dsc->focused_obj = lv_obj_get_child(obj, 0);
+            dsc->focused_obj = find_first_focusable(obj);
         }
     }
     else if(code == LV_EVENT_DELETE) {
@@ -189,7 +195,7 @@ static void gridnav_event_cb(lv_event_t * e)
     }
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING || code == LV_EVENT_PRESS_LOST ||
             code == LV_EVENT_LONG_PRESSED || code == LV_EVENT_LONG_PRESSED_REPEAT ||
-            code == LV_EVENT_CLICKED || LV_EVENT_RELEASED) {
+            code == LV_EVENT_CLICKED || code == LV_EVENT_RELEASED) {
         /*Forward press/release related event too*/
         lv_indev_type_t t = lv_indev_get_type(lv_indev_get_act());
         if(t == LV_INDEV_TYPE_ENCODER || t == LV_INDEV_TYPE_KEYPAD) {
@@ -212,7 +218,7 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == start_child) continue;
-        if(lv_obj_has_flag(child, LV_OBJ_FLAG_CLICK_FOCUSABLE) == false) continue;
+        if(obj_is_focuable(child) == false) continue;
 
         lv_coord_t x_err;
         lv_coord_t y_err;
@@ -268,6 +274,36 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
     return guess;
 }
 
+static lv_obj_t * find_first_focusable(lv_obj_t * obj)
+{
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t i;
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(obj_is_focuable(child)) return child;
+
+    }
+    return NULL;
+}
+
+static lv_obj_t * find_last_focusable(lv_obj_t * obj)
+{
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    int32_t i;
+    for(i = child_cnt - 1; i >= 0; i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(obj_is_focuable(child)) return child;
+    }
+    return NULL;
+}
+
+static bool obj_is_focuable(lv_obj_t * obj)
+{
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE)) return true;
+    else return false;
+}
+
 static lv_coord_t get_x_center(lv_obj_t * obj)
 {
     return obj->coords.x1 + lv_area_get_width(&obj->coords) / 2;
@@ -277,3 +313,5 @@ static lv_coord_t get_y_center(lv_obj_t * obj)
 {
     return obj->coords.y1 + lv_area_get_height(&obj->coords) / 2;
 }
+
+#endif /*LV_USE_GRIDNAV*/

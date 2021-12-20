@@ -1,10 +1,10 @@
 /**
- * @file lv_example_others.h
+ * @file lv_example_monkey.h
  *
  */
 
-#ifndef LV_EXAMPLE_OTHERS_H
-#define LV_EXAMPLE_OTHERS_H
+#ifndef LV_EXAMPLE_MONKEY_H
+#define LV_EXAMPLE_MONKEY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,9 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "snapshot/lv_example_snapshot.h"
-#include "monkey/lv_example_monkey.h"
-#include "gridnav/lv_example_gridnav.h"
 
 /*********************
  *      DEFINES
@@ -28,6 +25,9 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_monkey_1(void);
+void lv_example_monkey_2(void);
+void lv_example_monkey_3(void);
 
 /**********************
  *      MACROS
@@ -37,4 +37,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EX_OTHERS_H*/
+#endif /*LV_EXAMPLE_MONKEY_H*/
