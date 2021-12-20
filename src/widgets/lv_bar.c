@@ -130,11 +130,11 @@ void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 
     if(bar->cur_value > max) {
         bar->cur_value = max;
-        lv_bar_set_value(obj, bar->cur_value, false);
+        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
     }
     if(bar->cur_value < min) {
         bar->cur_value = min;
-        lv_bar_set_value(obj, bar->cur_value, false);
+        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
     }
     lv_obj_invalidate(obj);
 }
