@@ -332,10 +332,10 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Be sure the label's style is updated before processing the roller*/
         if(label) lv_event_send(label, LV_EVENT_STYLE_CHANGED, NULL);
         lv_obj_refresh_self_size(obj);
-        refr_position(obj, false);
+        refr_position(obj, LV_ANIM_OFF);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        refr_position(obj, false);
+        refr_position(obj, LV_ANIM_OFF);
     }
     else if(code == LV_EVENT_PRESSED) {
         roller->moved = 0;
@@ -365,7 +365,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(!editing) {
                 if(roller->sel_opt_id != roller->sel_opt_id_ori) {
                     roller->sel_opt_id = roller->sel_opt_id_ori;
-                    refr_position(obj, true);
+                    refr_position(obj, LV_ANIM_ON);
                 }
             }
             /*Save the current state when entered to edit mode*/
@@ -382,7 +382,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Revert the original state*/
         if(roller->sel_opt_id != roller->sel_opt_id_ori) {
             roller->sel_opt_id = roller->sel_opt_id_ori;
-            refr_position(obj, true);
+            refr_position(obj, LV_ANIM_ON);
         }
     }
     else if(code == LV_EVENT_KEY) {
@@ -390,7 +390,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(roller->sel_opt_id + 1 < roller->option_cnt) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
-                lv_roller_set_selected(obj, roller->sel_opt_id + 1, true);
+                lv_roller_set_selected(obj, roller->sel_opt_id + 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
             }
         }
@@ -398,7 +398,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(roller->sel_opt_id > 0) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
 
-                lv_roller_set_selected(obj, roller->sel_opt_id - 1, true);
+                lv_roller_set_selected(obj, roller->sel_opt_id - 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
             }
         }
