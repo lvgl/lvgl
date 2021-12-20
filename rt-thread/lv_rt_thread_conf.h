@@ -80,6 +80,14 @@
 
 #define LV_ATTRIBUTE_MEM_ALIGN ALIGN(4)
 
+/*==================
+* EXAMPLES
+*==================*/
+
+#ifdef PKG_USING_LVGL_EXAMPLES
+#  define LV_BUILD_EXAMPLES 1
+#endif
+
 /*--END OF LV_RT_THREAD_CONF_H--*/
 
 #endif /*__RTTHREAD__*/
