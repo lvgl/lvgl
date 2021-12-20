@@ -374,12 +374,10 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     uint32_t line        = 0;
     size_t txt_len;
 	
-	if (dropdown->options)
-	{
+	if (dropdown->options)	{
 		txt_len     = strlen(dropdown->options);	
 	}
-	else
-	{
+	else {
 		buf[0] = '\0';
 		return;		
 	}
