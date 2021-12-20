@@ -46,7 +46,6 @@
 
 #ifdef PKG_LVGL_ENABLE_LOG
 #  define LV_USE_LOG 1
-#  define LV_LOG_PRINTF 0
 #else
 #  define LV_USE_LOG 0
 #endif
@@ -79,6 +78,14 @@
 #endif
 
 #define LV_ATTRIBUTE_MEM_ALIGN ALIGN(4)
+
+/*==================
+* EXAMPLES
+*==================*/
+
+#ifdef PKG_USING_LVGL_EXAMPLES
+#  define LV_BUILD_EXAMPLES 1
+#endif
 
 /*--END OF LV_RT_THREAD_CONF_H--*/
 

@@ -10,14 +10,21 @@ src = []
 inc = []
 
 lvgl_cwd = cwd + '/../'
+
 lvgl_src_cwd = lvgl_cwd + 'src/'
-
 inc = inc + [lvgl_src_cwd]
-
 for root, dirs, files in os.walk(lvgl_src_cwd):
     for dir in dirs:
         src = src + Glob(os.path.join(root,dir,'*.c'))
         inc = inc + [os.path.join(root,dir)]
+
+if GetDepend('PKG_USING_LVGL_EXAMPLES'):
+    lvgl_src_cwd = lvgl_cwd + 'examples/'
+    inc = inc + [lvgl_src_cwd]
+    for root, dirs, files in os.walk(lvgl_src_cwd):
+        for dir in dirs:
+            src = src + Glob(os.path.join(root,dir,'*.c'))
+            inc = inc + [os.path.join(root,dir)]
 
 LOCAL_CCFLAGS = ''
 if rtconfig.PLATFORM == 'gcc': # GCC

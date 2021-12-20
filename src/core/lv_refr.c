@@ -302,7 +302,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     else {
         perf_monitor.perf_last_time = lv_tick_get();
         uint32_t fps_limit = 1000 / disp_refr->refr_timer->period;
-        unsigned int fps;
+        uint32_t fps;
 
         if(perf_monitor.elaps_sum == 0) {
             perf_monitor.elaps_sum = 1;
@@ -321,8 +321,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
         perf_monitor.fps_sum_all += fps;
         perf_monitor.fps_sum_cnt ++;
-        unsigned int cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%u FPS\n%u%% CPU", fps, cpu);
+        uint32_t cpu = 100 - lv_timer_get_idle();
+        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS\n%"LV_PRIu32"%% CPU", fps, cpu);
     }
 #endif
 
