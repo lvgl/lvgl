@@ -70,6 +70,9 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
 void lv_gridnav_remove(lv_obj_t * obj)
 {
     lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(obj, gridnav_event_cb);
+    if(dsc == NULL) {
+        return; /* no gridnav on this object */
+    }
     lv_mem_free(dsc);
     lv_obj_remove_event_cb(obj, gridnav_event_cb);
 }
