@@ -47,7 +47,7 @@ typedef uint8_t lv_img_src_t;
    Set by the decoder when extracting info or being opened */
 typedef enum {
     LV_IMG_DEC_DEFAULT      = 0x00, /**!< Default format, no specificities */
-    LV_IMG_DEC_VECTOR       = 0x01, /**!< Image format is vector based, size independant*/
+    LV_IMG_DEC_VECTOR       = 0x01, /**!< Image format is vector based, size independant */
     LV_IMG_DEC_ANIMATED     = 0x02, /**!< Image format stores an animation */
     LV_IMG_DEC_SEEKABLE     = 0x04, /**!< Animation is seekable */
     LV_IMG_DEC_CACHED       = 0x08, /**!< The complete image can be cached (used for rotation and zoom) */
@@ -58,10 +58,11 @@ typedef enum {
  * You'll likely bootstrap from this to make your own, if you need too
  */
 typedef struct {
-    uint8_t    magic_id;       /**!< Used to ensure a decoder context is not used in another decoder context*/
+    uint8_t    magic_id;       /**!< Used to ensure a decoder context is not used in another decoder context */
     uint8_t    caps;           /**!< The decoder capabilities flags */
     uint16_t   current_frame;  /**!< The current frame index */
     uint16_t   total_frames;   /**!< The number of frames (likely filled by the decoder) */
+    uint16_t   self_allocated; /**!< Is is self allocated (and should be freed by the decoder close function) */
     void   *   user_data;      /**!< Available for per-decoder features */
 } lv_img_dec_ctx_t;
 

@@ -56,7 +56,6 @@ static lv_res_t render_animation(lv_rlottie_dec_context_t * context_ctx, rlottie
  *  STATIC VARIABLES
  **********************/
 static int rlottiedec_init = 0;
-static size_t max_buf_size = RLOTTIE_MAX_BUFSIZE;
 
 /**********************
  *      MACROS
@@ -78,11 +77,6 @@ void lv_rlottie_init(void)
     rlottiedec_init = 1;
 }
 
-void lv_rlottie_set_max_buffer_size(size_t size_bytes)
-{
-    max_buf_size = size_bytes;
-}
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -95,6 +89,8 @@ static lv_res_t init_dec_ctx(rlottiedec_ctx_t * dec_ctx)
         }
         dec_ctx->ctx.magic_id = LV_RLOTTIE_ID;
         dec_ctx->ctx.caps = LV_IMG_DEC_VECTOR | LV_IMG_DEC_ANIMATED | LV_IMG_DEC_SEEKABLE;
+        if(!dec_ctx->max_buf_size)
+            dec_ctx->max_buf_size = RLOTTIE_MAX_BUFSIZE;
     }
     return LV_RES_OK;
 }
@@ -148,7 +144,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
         dec_ctx->ctx.total_frames = lottie_animation_get_totalframe(animation);
         dec_ctx->cache = animation;
         /*Does the picture fit in the decoder context buffer entirely?*/
-        if((header->w * LV_IMG_PX_SIZE_ALPHA_BYTE) * header->h <= max_buf_size) {
+        if((header->w * LV_IMG_PX_SIZE_ALPHA_BYTE) * header->h <= dec_ctx->max_buf_size) {
             dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
         }
     }
@@ -291,7 +287,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         init_dec_ctx(dec_ctx);
         dec_ctx->create_width = w;
         dec_ctx->create_height = h;
-        dec_ctx->should_free = 1;
+        dec_ctx->ctx.self_allocated = 1;
     }
 
     dec_ctx->ctx.user_data = context;
@@ -304,12 +300,12 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
     /* Compute how many lines we can fit in the maximum buffer size */
     context->scanline_width = w * LV_ARGB32 / 8;
-    context->lines_in_buf = max_buf_size / context->scanline_width;
+    context->lines_in_buf = dec_ctx->max_buf_size / context->scanline_width;
     if(context->lines_in_buf != 0) {  /*Too big picture to fit the maximum buffer size (default to 1024px) ?*/
         context->allocated_buf = lv_mem_alloc(context->lines_in_buf * context->scanline_width);
     }
     if(context->allocated_buf == NULL) {
-        if(dec_ctx->should_free) {
+        if(dec_ctx->ctx.self_allocated) {
             lottie_animation_destroy(animation);
             dec_ctx->cache = 0;
             lv_mem_free(dec_ctx);
@@ -329,7 +325,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     dsc->header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 
     /*Does the picture fit in the decoder context buffer entirely?*/
-    if((w * LV_IMG_PX_SIZE_ALPHA_BYTE) * h <= max_buf_size) {
+    if((w * LV_IMG_PX_SIZE_ALPHA_BYTE) * h <= dec_ctx->max_buf_size) {
         dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
         /*Render the animation directly here*/
         dsc->img_data = (const uint8_t *)context->allocated_buf;
@@ -391,7 +387,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     lv_mem_free(context->allocated_buf);
     context->allocated_buf = 0;
     /*Only free if allocated by ourselves.*/
-    if(dec_ctx && dec_ctx->ctx.magic_id == LV_RLOTTIE_ID && dec_ctx->should_free) {
+    if(dec_ctx && dec_ctx->ctx.magic_id == LV_RLOTTIE_ID && dec_ctx->ctx.self_allocated) {
         lottie_animation_destroy(dec_ctx->cache);
         dec_ctx->cache = 0;
         lv_mem_free(dec_ctx);

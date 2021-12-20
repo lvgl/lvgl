@@ -20,8 +20,8 @@ struct lv_img_header_t;
 typedef struct {
     lv_img_dec_ctx_t ctx;
     uint16_t create_width;
-    uint16_t create_height : 15;
-    uint16_t should_free : 1;
+    uint16_t create_height;
+    uint32_t max_buf_size; /*Size of the ARGB image buffer until it's not longer cached and read in region*/
     struct Lottie_Animation_S * cache;
     const void * create_src;
 } rlottiedec_ctx_t;
@@ -31,8 +31,6 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_rlottie_init(void);
-
-void lv_rlottie_set_max_buffer_size(size_t size_bytes);
 
 /**********************
  *      MACROS

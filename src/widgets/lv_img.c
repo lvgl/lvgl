@@ -619,8 +619,7 @@ static void draw_img(lv_event_t * e)
         lv_area_t bg_coords;
 
 
-        int32_t tiled = lv_obj_get_style_bg_img_tiled(obj, LV_PART_MAIN);
-        if(!tiled && img->vector && (obj_w != img->w || obj_h != img->h)) {
+        if(img->vector && (obj_w != img->w || obj_h != img->h)) {
             /*For vector image that aren't tiled, let's increase the image size*/
             img->w = obj_w;
             img->h = obj_h;
