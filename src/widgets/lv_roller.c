@@ -351,7 +351,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
             roller->moved = 1;
         }
     }
-    else if(code == LV_EVENT_RELEASED) {
+    else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
         release_handler(obj);
     }
     else if(code == LV_EVENT_FOCUSED) {
