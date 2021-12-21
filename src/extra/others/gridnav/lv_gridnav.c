@@ -147,7 +147,9 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else {
-            lv_event_send(dsc->focused_obj, LV_EVENT_KEY, &key);
+            if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
+                lv_event_send(dsc->focused_obj, LV_EVENT_KEY, &key);
+            }
         }
 
         if(guess && guess != dsc->focused_obj) {
@@ -196,10 +198,12 @@ static void gridnav_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING || code == LV_EVENT_PRESS_LOST ||
             code == LV_EVENT_LONG_PRESSED || code == LV_EVENT_LONG_PRESSED_REPEAT ||
             code == LV_EVENT_CLICKED || code == LV_EVENT_RELEASED) {
-        /*Forward press/release related event too*/
-        lv_indev_type_t t = lv_indev_get_type(lv_indev_get_act());
-        if(t == LV_INDEV_TYPE_ENCODER || t == LV_INDEV_TYPE_KEYPAD) {
-            lv_event_send(dsc->focused_obj, code, lv_indev_get_act());
+        if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
+            /*Forward press/release related event too*/
+            lv_indev_type_t t = lv_indev_get_type(lv_indev_get_act());
+            if(t == LV_INDEV_TYPE_ENCODER || t == LV_INDEV_TYPE_KEYPAD) {
+                lv_event_send(dsc->focused_obj, code, lv_indev_get_act());
+            }
         }
     }
 }

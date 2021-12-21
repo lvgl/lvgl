@@ -20,7 +20,6 @@ void lv_example_gridnav_1(void)
     /*Only the container needs to be in a group*/
     lv_group_add_obj(lv_group_get_default(), cont1);
 
-
     lv_obj_t * label = lv_label_create(cont1);
     lv_label_set_text_fmt(label, "No rollover");
 
