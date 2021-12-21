@@ -291,6 +291,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_obj_set_style_text_align(perf_label, LV_TEXT_ALIGN_RIGHT, 0);
         lv_label_set_text(perf_label, "?");
         lv_obj_align(perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
+        perf_monitor.perf_label = perf_label;
     }
 
     if(lv_tick_elaps(perf_monitor.perf_last_time) < 300) {
@@ -339,6 +340,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_obj_set_style_pad_right(mem_label, 3, 0);
         lv_label_set_text(mem_label, "?");
         lv_obj_align(mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
+        mem_monitor.mem_label = mem_label;
     }
 
     if(lv_tick_elaps(mem_monitor.mem_last_time) > 300) {
