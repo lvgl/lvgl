@@ -90,12 +90,14 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @param letter_space letter space
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
  * line breaks
+ * @param used_width When used_width != NULL, save the width of this line if
+ * flag == LV_TEXT_FLAG_NONE, otherwise save -1.
  * @param flags settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
  * they are different)
  */
-uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
-                               lv_text_flag_t flag);
+uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space,
+                               lv_coord_t max_width, lv_coord_t * used_width, lv_text_flag_t flag);
 
 /**
  * Give the length of a text with a given font
