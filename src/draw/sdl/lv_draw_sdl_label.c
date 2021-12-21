@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_draw_label.c
+ * @file lv_draw_sdl_label.c
  *
  */
 

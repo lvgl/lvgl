@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_draw_blend.c
+ * @file lv_draw_sdl_blend.c
  *
  */
 

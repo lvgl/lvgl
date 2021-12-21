@@ -81,6 +81,11 @@ typedef struct _lv_draw_ctx_t  {
                          const lv_point_t * points, uint16_t point_cnt);
 
     /**
+     * Replace the buffer with a rect without decoration like radius or borders
+     */
+    void (*draw_bg)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_area_t * coords);
+
+    /**
      * Wait until all background operation are finished. (E.g. GPU opertions)
      */
     void (*wait_for_finish)(struct _lv_draw_ctx_t * draw);

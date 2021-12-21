@@ -46,7 +46,6 @@ static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_c
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
-static inline lv_color_t color_blend_true_color_replace(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 #endif /*LV_DRAW_COMPLEX*/
 
 /**********************
@@ -384,9 +383,6 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
         case LV_BLEND_MODE_MULTIPLY:
             blend_fp = color_blend_true_color_multiply;
             break;
-        case LV_BLEND_MODE_REPLACE:
-            blend_fp = color_blend_true_color_replace;
-            break;
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
             return;
@@ -623,9 +619,6 @@ static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_c
         case LV_BLEND_MODE_MULTIPLY:
             blend_fp = color_blend_true_color_multiply;
             break;
-        case LV_BLEND_MODE_REPLACE:
-            blend_fp = color_blend_true_color_replace;
-            break;
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
             return;
@@ -758,13 +751,6 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
     if(opa == LV_OPA_COVER) return fg;
 
     return lv_color_mix(fg, bg, opa);
-}
-
-static inline lv_color_t color_blend_true_color_replace(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
-{
-    LV_UNUSED(bg);
-    LV_UNUSED(opa);
-    return fg;
 }
 
 #endif

@@ -82,7 +82,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     bool has_mask = lv_draw_mask_is_any(apply_area);
 
     const bool draw_mask = has_mask && HAS_CUSTOM_BLEND_MODE;
-    const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL && blend_mode != LV_BLEND_MODE_REPLACE;
+    const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL;
     if(draw_mask || draw_blend) {
         lv_draw_sdl_context_internals_t * internals = ctx->internals;
         LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
@@ -144,7 +144,6 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
         SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.base_draw.buf);
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL:
-            case LV_BLEND_MODE_REPLACE:
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
                 break;
             case LV_BLEND_MODE_ADDITIVE:
