@@ -143,7 +143,7 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
 
     // see if the key already exists
     uint32_t hash_index = lv_lru_hash(cache, key, key_length);
-    ssize_t required = 0;
+    size_t required = 0;
     lruc_item * item = NULL, *prev = NULL;
     item = cache->items[hash_index];
 
@@ -154,7 +154,7 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
 
     if(item) {
         // update the value and value_lengths
-        required = (ssize_t)(value_length - item->value_length);
+        required = (size_t)(value_length - item->value_length);
         cache->value_free(item->value);
         item->value = value;
         item->value_length = value_length;
@@ -168,7 +168,7 @@ lruc_error lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, voi
         memcpy(item->key, key, key_length);
         item->value_length = value_length;
         item->key_length = key_length;
-        required = (ssize_t) value_length;
+        required = (size_t) value_length;
 
         if(prev)
             prev->next = item;
