@@ -60,7 +60,7 @@ void lv_draw_sdl_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
 
     /* Shadows and outlines will also draw in extended area */
     if(has_content) {
-        if (dsc->bg_img_src) {
+        if(dsc->bg_img_src) {
             draw_bg_img(ctx, coords, &t_area, dsc);
         }
         else {

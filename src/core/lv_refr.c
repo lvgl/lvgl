@@ -601,7 +601,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
 
     /*Draw a display background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
-        if (draw_ctx->draw_bg) {
+        if(draw_ctx->draw_bg) {
             lv_draw_rect_dsc_t dsc;
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_img_src = disp_refr->bg_img;
