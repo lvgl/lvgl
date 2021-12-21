@@ -762,6 +762,8 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 
 static inline lv_color_t color_blend_true_color_replace(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
 {
+    LV_UNUSED(bg);
+    LV_UNUSED(opa);
     return fg;
 }
 
