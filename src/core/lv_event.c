@@ -85,7 +85,7 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     if(class_p == NULL) base = e->current_target->class_p;
     else base = class_p->base_class;
 
-    /*Find a base in which Call the ancestor's event handler_cb is set*/
+    /*Find a base in which call the ancestor's event handler_cb if set*/
     while(base && base->event_cb == NULL) base = base->base_class;
 
     if(base == NULL) return LV_RES_OK;
@@ -290,7 +290,7 @@ lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e)
     }
 }
 
-const lv_area_t * lv_event_get_clip_area(lv_event_t * e)
+lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e)
 {
     if(e->code == LV_EVENT_DRAW_MAIN ||
        e->code == LV_EVENT_DRAW_MAIN_BEGIN ||

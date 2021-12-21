@@ -237,7 +237,7 @@ static void draw_indic(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
@@ -381,7 +381,7 @@ static void draw_indic(lv_event_t * e)
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
 
         lv_obj_draw_part_dsc_t part_draw_dsc;
-        lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+        lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
         part_draw_dsc.part = LV_PART_INDICATOR;
         part_draw_dsc.class_p = MY_CLASS;
         part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
@@ -404,7 +404,7 @@ static void draw_indic(lv_event_t * e)
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.part = LV_PART_INDICATOR;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
@@ -425,7 +425,7 @@ static void draw_indic(lv_event_t * e)
         draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_rect_dsc.border_opa = LV_OPA_TRANSP;
 
-        lv_draw_rect(&bar->indic_area, clip_area, &draw_rect_dsc);
+        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
 
         draw_rect_dsc.bg_opa = bg_opa;
         draw_rect_dsc.bg_img_opa = bg_img_opa;
@@ -473,7 +473,7 @@ static void draw_indic(lv_event_t * e)
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
 #endif
 
-    lv_draw_rect(&mask_indic_max_area, clip_area, &draw_rect_dsc);
+    lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
     draw_rect_dsc.border_opa = border_opa;
     draw_rect_dsc.shadow_opa = shadow_opa;
 
@@ -481,7 +481,7 @@ static void draw_indic(lv_event_t * e)
     draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
     draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
     draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-    lv_draw_rect(&bar->indic_area, clip_area, &draw_rect_dsc);
+    lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
 
 #if LV_DRAW_COMPLEX
     lv_draw_mask_free_param(&mask_indic_param);

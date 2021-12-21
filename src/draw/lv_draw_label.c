@@ -74,12 +74,22 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
-                                         const lv_draw_label_dsc_t * dsc,
-                                         const char * txt,
-                                         lv_draw_label_hint_t * hint)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+                                         const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->font == NULL) {
+        LV_LOG_WARN("dsc->font == NULL");
+        return;
+    }
+
+    if(draw_ctx->draw_letter == NULL) {
+        LV_LOG_WARN("draw->draw_letter == NULL (there is no function to draw letters)");
+        return;
+    }
+
+    lv_draw_label_dsc_t dsc_mod = *dsc;
+
     const lv_font_t * font = dsc->font;
     int32_t w;
 
@@ -88,7 +98,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         return;
 
     lv_area_t clipped_area;
-    bool clip_ok = _lv_area_intersect(&clipped_area, coords, mask);
+    bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw_ctx->clip_area);
     if(!clip_ok) return;
 
     lv_text_align_t align = dsc->align;
@@ -141,13 +151,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         pos.y += hint->y;
     }
 
-    uint32_t line_end = line_start + _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
+    uint32_t line_end = line_start + _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
 
     /*Go the first visible line*/
-    while(pos.y + line_height_font < mask->y1) {
+    while(pos.y + line_height_font < draw_ctx->clip_area->y1) {
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
+        line_end += _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
         pos.y += line_height;
 
         /*Save at the threshold coordinate*/
@@ -172,9 +182,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         line_width = lv_txt_get_width(&txt[line_start], line_end - line_start, font, dsc->letter_space, dsc->flag);
         pos.x += lv_area_get_width(coords) - line_width;
     }
-
-    lv_opa_t opa = dsc->opa;
-
     uint32_t sel_start = dsc->sel_start;
     uint32_t sel_end = dsc->sel_end;
     if(sel_start > sel_end) {
@@ -196,6 +203,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     uint32_t i;
     uint32_t par_start = 0;
     lv_color_t recolor;
+    lv_color_t color = lv_color_black();
     int32_t letter_w;
 
     lv_draw_rect_dsc_t draw_dsc_sel;
@@ -272,7 +280,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                 }
             }
 
-            lv_color_t color = dsc->color;
+            color = dsc->color;
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
 
@@ -285,12 +293,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                     sel_coords.y1 = pos.y;
                     sel_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
                     sel_coords.y2 = pos.y + line_height - 1;
-                    lv_draw_rect(&sel_coords, mask, &draw_dsc_sel);
+                    lv_draw_rect(draw_ctx, &draw_dsc_sel, &sel_coords);
                     color = dsc->sel_color;
                 }
             }
 
-            lv_draw_letter(&pos, mask, font, letter, color, opa, dsc->blend_mode);
+            dsc_mod.color = color;
+            lv_draw_letter(draw_ctx, &dsc_mod, &pos, letter);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -304,7 +313,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
             p1.y = pos.y + (dsc->font->line_height / 2)  + line_dsc.width / 2;
             p2.x = pos.x;
             p2.y = p1.y;
-            lv_draw_line(&p1, &p2, mask, &line_dsc);
+            line_dsc.color = color;
+            lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
         }
 
         if(dsc->decor  & LV_TEXT_DECOR_UNDERLINE) {
@@ -314,7 +324,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
             p1.y = pos.y + dsc->font->line_height - dsc->font->base_line - font->underline_position;
             p2.x = pos.x;
             p2.y = p1.y;
-            lv_draw_line(&p1, &p2, mask, &line_dsc);
+            line_dsc.color = color;
+            lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
         }
 
 #if LV_USE_BIDI
@@ -323,7 +334,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 #endif
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
+        line_end += _lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
 
         pos.x = coords->x1;
         /*Align to middle*/
@@ -344,21 +355,18 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         /*Go the next line position*/
         pos.y += line_height;
 
-        if(pos.y > mask->y2) return;
+        if(pos.y > draw_ctx->clip_area->y2) return;
     }
 
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                    const lv_font_t * font_p,
-                    uint32_t letter,
-                    lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
+void lv_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+                    uint32_t letter)
 {
-
-    const lv_draw_backend_t * backend = lv_draw_backend_get();
-    backend->draw_letter(pos_p, clip_area, font_p, letter, color, opa, blend_mode);
+    draw_ctx->draw_letter(draw_ctx, dsc, pos_p, letter);
 }
+
 
 /**********************
  *   STATIC FUNCTIONS

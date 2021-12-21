@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_lru.h
+ * @file lv_lru.h
  *
  */
 
@@ -14,9 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
-
-#include LV_GPU_SDL_INCLUDE_PATH
+#include "../lv_conf_internal.h"
 
 #include <stdint.h>
 #include <time.h>
@@ -53,15 +51,14 @@ typedef struct lruc_item {
 typedef struct {
     lruc_item ** items;
     uint64_t access_count;
-    uint64_t free_memory;
-    uint64_t total_memory;
-    uint64_t average_item_length;
-    uint32_t hash_table_size;
+    size_t free_memory;
+    size_t total_memory;
+    size_t average_item_length;
+    size_t hash_table_size;
     time_t seed;
     lv_lru_free_t * value_free;
     lv_lru_free_t * key_free;
     lruc_item * free_items;
-    SDL_mutex * mutex;
 } lv_lru_t;
 
 
@@ -69,7 +66,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_lru_t * lv_lru_new(uint64_t cache_size, uint32_t average_length, lv_lru_free_t * value_free,
+lv_lru_t * lv_lru_new(size_t cache_size, size_t average_length, lv_lru_free_t * value_free,
                       lv_lru_free_t * key_free);
 
 lruc_error lv_lru_free(lv_lru_t * cache);

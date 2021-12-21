@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_PNG && LV_BUILD_EXAMPLES
+#if LV_USE_PNG && LV_USE_IMG && LV_BUILD_EXAMPLES
 
 /**
  * Open a PNG image from a file and a variable

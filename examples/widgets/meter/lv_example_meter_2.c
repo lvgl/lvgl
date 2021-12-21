@@ -24,7 +24,7 @@ void lv_example_meter_2(void)
     /*Add a scale first*/
     lv_meter_scale_t * scale = lv_meter_add_scale(meter);
     lv_meter_set_scale_ticks(meter, scale, 11, 2, 10, lv_palette_main(LV_PALETTE_GREY));
-    lv_meter_set_scale_major_ticks(meter, scale, 1, 2, 30, lv_color_hex3(0xeee), 10);
+    lv_meter_set_scale_major_ticks(meter, scale, 1, 2, 30, lv_color_hex3(0xeee), 15);
     lv_meter_set_scale_range(meter, scale, 0, 100, 270, 90);
 
     /*Add a three arc indicator*/

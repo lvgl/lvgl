@@ -268,12 +268,12 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e);
 lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e);
 
 /**
- * Get the clip area passed as parameter to draw events events.
+ * Get the draw context which should be the first parameter of the draw functions.
  * Namely: `LV_EVENT_DRAW_MAIN/POST`, `LV_EVENT_DRAW_MAIN/POST_BEGIN`, `LV_EVENT_DRAW_MAIN/POST_END`
  * @param e     pointer to an event
- * @return      the clip area to use during drawing or NULL if called on an unrelated event
+ * @return      pointer to a draw context or NULL if called on an unrelated event
  */
-const lv_area_t * lv_event_get_clip_area(lv_event_t * e);
+lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e);
 
 /**
  * Get the old area of the object before its size was changed. Can be used in `LV_EVENT_SIZE_CHANGED`

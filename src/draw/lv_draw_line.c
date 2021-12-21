@@ -42,14 +42,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                                        const lv_draw_line_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+                                        const lv_point_t * point1, const lv_point_t * point2)
 {
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    const lv_draw_backend_t * backend = lv_draw_backend_get();
-    backend->draw_line(point1, point2, clip, dsc);
+    draw_ctx->draw_line(draw_ctx, dsc, point1, point2);
 }
 
 /**********************
