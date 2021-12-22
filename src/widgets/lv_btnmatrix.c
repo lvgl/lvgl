@@ -977,6 +977,8 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     lv_area_t obj_area;
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
+    if(btn_idx >= btnm->btn_cnt) return;
+
     lv_area_copy(&btn_area, &btnm->button_areas[btn_idx]);
     lv_obj_get_coords(obj, &obj_area);
 
