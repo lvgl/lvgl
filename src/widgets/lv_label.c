@@ -1093,6 +1093,9 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.y <= lv_area_get_height(&txt_coords)) { /*No dots are required, the text is short enough*/
             label->dot_end = LV_LABEL_DOT_END_INV;
         }
+        else if(size.y <= lv_font_get_line_height(font)) { /*No dots are required for one-line texts*/
+            label->dot_end = LV_LABEL_DOT_END_INV;
+        }
         else if(_lv_txt_get_encoded_length(label->text) <= LV_LABEL_DOT_NUM) {   /*Don't turn to dots all the characters*/
             label->dot_end = LV_LABEL_DOT_END_INV;
         }
