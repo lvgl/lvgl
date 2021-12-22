@@ -43,6 +43,8 @@ typedef struct {
 void lv_draw_sw_init_ctx(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 void lv_draw_sw_deinit_ctx(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 
+void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+
 void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
                     uint16_t start_angle, uint16_t end_angle);
 

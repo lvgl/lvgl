@@ -233,6 +233,7 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     else {
         while(DMA2D->CR & DMA2D_CR_START_Msk);
     }
+    lv_draw_sw_wait_for_finish(draw_ctx);
 
 }
 
