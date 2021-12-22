@@ -1,4 +1,6 @@
 CSRCS += lv_draw_sdl.c
+CSRCS += lv_draw_sdl_arc.c
+CSRCS += lv_draw_sdl_bg.c
 CSRCS += lv_draw_sdl_blend.c
 CSRCS += lv_draw_sdl_composite.c
 CSRCS += lv_draw_sdl_img.c

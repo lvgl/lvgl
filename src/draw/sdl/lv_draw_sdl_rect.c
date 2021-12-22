@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_draw_rect.c
+ * @file lv_draw_sdl_rect.c
  *
  */
 
@@ -124,26 +124,9 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
         extension.y1 = LV_MAX(extension.y1, ext);
         extension.y2 = LV_MAX(extension.y2, ext);
     }
-    if(dsc->blend_mode == LV_BLEND_MODE_REPLACE) {
-        /* Remove all pixels for draw area first */
-        SDL_Rect re_coords, re_clip, re_area;
-        lv_area_to_sdl_rect(coords, &re_coords);
-        lv_area_to_sdl_rect(clip, &re_clip);
-        re_coords.x -= extension.x1;
-        re_coords.w += extension.x1 + extension.x2;
-        re_coords.y -= extension.y1;
-        re_coords.h += extension.y1 + extension.y2;
-        SDL_IntersectRect(&re_coords, &re_clip, &re_area);
-        SDL_Color bg_color;
-        lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
-        SDL_SetRenderDrawColor(ctx->renderer, bg_color.r, bg_color.g, bg_color.b, dsc->bg_opa);
-        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
-        SDL_RenderFillRect(ctx->renderer, &re_area);
-    }
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = *coords, t_clip = *clip, apply_area, t_area;
-    bool has_mask = lv_draw_sdl_composite_begin(ctx, coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
-                                                &apply_area);
+    lv_draw_sdl_composite_begin(ctx, coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip, &apply_area);
     bool has_content = _lv_area_intersect(&t_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect;
