@@ -9,6 +9,10 @@
 
 #include "lv_obj_controller.h"
 
+#if LV_USE_OBJ_CONTROLLER
+
+#include "../../../extra/widgets/msgbox/lv_msgbox.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -119,16 +123,12 @@ void lv_controller_manager_replace(lv_controller_manager_t *manager, const lv_ob
     item_create_obj(manager, top, manager->container, NULL);
 }
 
-void lv_controller_manager_show(lv_controller_manager_t *manager, const lv_obj_controller_class_t *cls, void *args) {
-    LV_ASSERT(manager);
-    LV_ASSERT(cls);
-    manager_stack_t *item = item_new(cls);
-    item_create_controller(manager, item, args);
-    item_create_obj(manager, item, NULL, &lv_msgbox_class);
-    item->dialog = true;
-    manager_stack_t *top = manager->top;
-    item->prev = top;
-    manager->top = item;
+size_t lv_controller_manager_size(lv_controller_manager_t *manager) {
+    size_t size = 0;
+    for (manager_stack_t *cur = manager->top; cur; cur = cur->prev) {
+        size++;
+    }
+    return size;
 }
 
 void lv_controller_manager_pop(lv_controller_manager_t *manager) {
@@ -157,6 +157,22 @@ bool lv_controller_manager_dispatch_event(lv_controller_manager_t *manager, int 
     if (!controller || !top->cls->event_cb) return false;
     return top->cls->event_cb(controller, which, data1, data2);
 }
+
+#if LV_USE_MSGBOX
+
+void lv_controller_manager_show(lv_controller_manager_t *manager, const lv_obj_controller_class_t *cls, void *args) {
+    LV_ASSERT(manager);
+    LV_ASSERT(cls);
+    manager_stack_t *item = item_new(cls);
+    item_create_controller(manager, item, args);
+    item_create_obj(manager, item, NULL, &lv_msgbox_class);
+    item->dialog = true;
+    manager_stack_t *top = manager->top;
+    item->prev = top;
+    manager->top = item;
+}
+
+#endif
 
 void lv_obj_controller_pop(lv_obj_controller_t *controller) {
     LV_ASSERT(controller);
@@ -320,3 +336,5 @@ static void obj_cb_delete(lv_event_t *event) {
         manager->top = prev;
     }
 }
+
+#endif /*LV_USE_OBJ_CONTROLLER*/

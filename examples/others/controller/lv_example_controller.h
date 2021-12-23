@@ -1,10 +1,8 @@
 /**
- * @file lv_example_others.h
- *
+ * @file lv_example_controller.h
  */
-
-#ifndef LV_EXAMPLE_OTHERS_H
-#define LV_EXAMPLE_OTHERS_H
+#ifndef LV_EXAMPLE_CONTROLLER_H
+#define LV_EXAMPLE_CONTROLLER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,9 +11,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "snapshot/lv_example_snapshot.h"
-#include "monkey/lv_example_monkey.h"
-#include "controller/lv_example_controller.h"
 
 /*********************
  *      DEFINES
@@ -28,7 +23,9 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_controller_1();
 
+void lv_example_controller_2();
 /**********************
  *      MACROS
  **********************/
@@ -37,4 +34,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_OTHERS_H*/
+#endif /*LV_EXAMPLE_CONTROLLER_H*/

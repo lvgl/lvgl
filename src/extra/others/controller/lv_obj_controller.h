@@ -13,8 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl.h"
+#include "../../../lv_conf_internal.h"
 
+#if LV_USE_OBJ_CONTROLLER
+
+#include "../../../core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -34,24 +37,63 @@ typedef struct manager_stack_t manager_stack_t;
 struct lv_obj_controller_t {
     const lv_obj_controller_class_t *cls;
     lv_controller_manager_t *manager;
+    /**
+     * lv_obj returned by create_obj_cb
+     */
     lv_obj_t *obj;
 
+    /**
+     * Private internal states
+     */
     manager_stack_t *priv_item;
 };
 
 struct lv_obj_controller_class_t {
+    /**
+     * Constructor function for controller class
+     * @param self Controller instance
+     * @param args Arguments assigned by controller manager
+     */
     void (*constructor_cb)(struct lv_obj_controller_t *self, void *args);
 
     void (*destructor_cb)(struct lv_obj_controller_t *self);
 
+    /**
+     *
+     * @param self
+     * @param parent
+     * @return
+     */
     lv_obj_t *(*create_obj_cb)(struct lv_obj_controller_t *self, lv_obj_t *parent);
 
-    void (*obj_created_cb)(struct lv_obj_controller_t *self, lv_obj_t *view);
+    /**
+     *
+     * @param self Controller instance
+     * @param obj lv_obj returned by create_obj_cb
+     */
+    void (*obj_created_cb)(struct lv_obj_controller_t *self, lv_obj_t *obj);
 
-    void (*obj_will_delete_cb)(struct lv_obj_controller_t *self, lv_obj_t *view);
+    /**
+     *
+     * @param self Controller instance
+     * @param obj lv_obj returned by create_obj_cb
+     */
+    void (*obj_will_delete_cb)(struct lv_obj_controller_t *self, lv_obj_t *obj);
 
-    void (*obj_deleted_cb)(struct lv_obj_controller_t *self, lv_obj_t *view);
+    /**
+     *
+     * @param self Controller instance
+     * @param obj lv_obj returned by create_obj_cb
+     */
+    void (*obj_deleted_cb)(struct lv_obj_controller_t *self, lv_obj_t *obj);
 
+    /**
+     * Handle event
+     * @param self Controller instance
+     * @param which User-defined ID of event
+     * @param data1 User-defined data
+     * @param data2 User-defined data
+     */
     bool (*event_cb)(struct lv_obj_controller_t *self, int which, void *data1, void *data2);
 
     size_t instance_size;
@@ -61,8 +103,18 @@ struct lv_obj_controller_class_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create controller manager instance
+ * @param container Container object for manager to add objects to
+ * @param parent Parent obj_controller if this manager is nested
+ * @return Controller manager instance
+ */
 lv_controller_manager_t *lv_controller_manager_create(lv_obj_t *container, lv_obj_controller_t *parent);
 
+/**
+ * Destroy controller manager instance
+ * @param manager Controller manager instance
+ */
 void lv_controller_manager_del(lv_controller_manager_t *manager);
 
 void lv_controller_manager_pop(lv_controller_manager_t *manager);
@@ -78,14 +130,29 @@ void lv_controller_manager_push(lv_controller_manager_t *manager, const lv_obj_c
 void lv_controller_manager_replace(lv_controller_manager_t *manager, const lv_obj_controller_class_t *cls, void *args);
 
 /**
+ * Get stack size of this controller manager
+ * @param manager Controller manager instance
+ * @return Stack size of this controller manager
+ */
+size_t lv_controller_manager_size(lv_controller_manager_t *manager);
+
+/**
+ * Send event to top-most controller
+ * @param manager Controller manager instance
+ * @param which User-defined ID of event
+ * @param data1 User-defined data
+ * @param data2 User-defined data
+ * @return true if controller returned true
+ */
+bool lv_controller_manager_dispatch_event(lv_controller_manager_t *manager, int which, void *data1, void *data2);
+
+/**
  * Show lv_msgbox
  * @param manager Controller manager instance
  * @param cls Controller class which must return valid lv_msgbox instance
  * @param args
  */
 void lv_controller_manager_show(lv_controller_manager_t *manager, const lv_obj_controller_class_t *cls, void *args);
-
-bool lv_controller_manager_dispatch_event(lv_controller_manager_t *manager, int which, void *data1, void *data2);
 
 void lv_obj_controller_pop(lv_obj_controller_t *controller);
 
@@ -99,6 +166,8 @@ void lv_controller_recreate_obj(lv_obj_controller_t *controller);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_OBJ_CONTROLLER*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
