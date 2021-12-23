@@ -20,6 +20,9 @@ extern "C" {
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
+#include "../lv_draw.h"
+#include "../../core/lv_disp.h"
+
 /*********************
  *      DEFINES
  *********************/
