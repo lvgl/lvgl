@@ -74,16 +74,16 @@ struct lv_obj_controller_class_t {
     void (*obj_created_cb)(struct lv_obj_controller_t *self, lv_obj_t *obj);
 
     /**
-     *
+     * Called before `lv_obj_del` call of object created by controller
      * @param self Controller instance
-     * @param obj lv_obj returned by create_obj_cb
+     * @param obj object with this controller
      */
     void (*obj_will_delete_cb)(struct lv_obj_controller_t *self, lv_obj_t *obj);
 
     /**
-     *
+     * Called when the object created by controller received `LV_EVENT_DELETE` event
      * @param self Controller instance
-     * @param obj lv_obj returned by create_obj_cb
+     * @param obj object with this controller
      */
     void (*obj_deleted_cb)(struct lv_obj_controller_t *self, lv_obj_t *obj);
 
@@ -96,6 +96,9 @@ struct lv_obj_controller_class_t {
      */
     bool (*event_cb)(struct lv_obj_controller_t *self, int which, void *data1, void *data2);
 
+    /**
+     * *REQUIRED*: Allocation size of controller
+     */
     size_t instance_size;
 };
 
@@ -117,8 +120,18 @@ lv_controller_manager_t *lv_controller_manager_create(lv_obj_t *container, lv_ob
  */
 void lv_controller_manager_del(lv_controller_manager_t *manager);
 
+/**
+ * Remove the top-most controller for stack
+ * @param manager Controller manager instance
+ */
 void lv_controller_manager_pop(lv_controller_manager_t *manager);
 
+/**
+ * Add controller to the stack
+ * @param manager Controller manager instance
+ * @param cls Controller class
+ * @args User-defined argument
+ */
 void lv_controller_manager_push(lv_controller_manager_t *manager, const lv_obj_controller_class_t *cls, void *args);
 
 /**
@@ -154,15 +167,24 @@ bool lv_controller_manager_dispatch_event(lv_controller_manager_t *manager, int 
  */
 void lv_controller_manager_show(lv_controller_manager_t *manager, const lv_obj_controller_class_t *cls, void *args);
 
-void lv_obj_controller_pop(lv_obj_controller_t *controller);
-
 lv_obj_controller_t *lv_controller_manager_top_controller(lv_controller_manager_t *manager);
 
 lv_obj_controller_t *lv_controller_manager_parent(lv_controller_manager_t *manager);
 
-lv_obj_controller_t *lv_controller_create_unmanaged(lv_obj_t *parent, const lv_obj_controller_class_t *cls, void *args);
+lv_obj_controller_t *lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t *cls, lv_obj_t *parent,
+                                                              void *args);
 
-void lv_controller_recreate_obj(lv_obj_controller_t *controller);
+/**
+ * Asserts the controller is the top-most one, and pop it
+ * @param controller Controller instance
+ */
+void lv_obj_controller_pop(lv_obj_controller_t *controller);
+
+/**
+ * Destroy obj in controller, and recreate them.
+ * @param controller Controller instance
+ */
+void lv_obj_controller_recreate_obj(lv_obj_controller_t *controller);
 /**********************
  *      MACROS
  **********************/

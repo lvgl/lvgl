@@ -174,14 +174,6 @@ void lv_controller_manager_show(lv_controller_manager_t *manager, const lv_obj_c
 
 #endif
 
-void lv_obj_controller_pop(lv_obj_controller_t *controller) {
-    LV_ASSERT(controller);
-    lv_controller_manager_t *manager = controller->manager;
-    LV_ASSERT(manager);
-    LV_ASSERT(manager->top->controller == controller);
-    lv_controller_manager_pop(manager);
-}
-
 lv_obj_controller_t *lv_controller_manager_top_controller(lv_controller_manager_t *manager) {
     LV_ASSERT(manager);
     manager_stack_t *top = manager->top;
@@ -194,8 +186,8 @@ lv_obj_controller_t *lv_controller_manager_parent(lv_controller_manager_t *manag
     return manager->parent;
 }
 
-lv_obj_controller_t *lv_controller_create_unmanaged(lv_obj_t *parent, const lv_obj_controller_class_t *cls,
-                                                    void *args) {
+lv_obj_controller_t *lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t *cls, lv_obj_t *parent,
+                                                              void *args) {
     LV_ASSERT(cls);
     LV_ASSERT(cls->instance_size);
     LV_ASSERT(cls->create_obj_cb);
@@ -213,7 +205,15 @@ lv_obj_controller_t *lv_controller_create_unmanaged(lv_obj_t *parent, const lv_o
     return controller;
 }
 
-void lv_controller_recreate_obj(lv_obj_controller_t *controller) {
+void lv_obj_controller_pop(lv_obj_controller_t *controller) {
+    LV_ASSERT(controller);
+    lv_controller_manager_t *manager = controller->manager;
+    LV_ASSERT(manager);
+    LV_ASSERT(manager->top->controller == controller);
+    lv_controller_manager_pop(manager);
+}
+
+void lv_obj_controller_recreate_obj(lv_obj_controller_t *controller) {
     LV_ASSERT(controller);
     // Disable CB first
     lv_obj_remove_event_cb(controller->obj, obj_cb_delete);
