@@ -86,14 +86,17 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     SDL_Color color;
     lv_color_to_sdl_color(&dsc->color, &color);
 
-    SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(&t_clip, &clip_rect);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
     SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     SDL_SetTextureAlphaMod(texture, dsc->opa);
     SDL_Rect srcrect = {0, 0, length + dsc->width + 2, dsc->width + 2},
              dstrect = {t_coords.x1 - 1 - dsc->width / 2, t_coords.y1 - 1, srcrect.w, srcrect.h};
     SDL_Point center = {1 + dsc->width / 2, 1 + dsc->width / 2};
+
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(&t_clip, &clip_rect);
+    if(!SDL_RectEquals(&clip_rect, &dstrect) || angle != 0) {
+        SDL_RenderSetClipRect(renderer, &clip_rect);
+    }
     SDL_RenderCopyEx(renderer, texture, &srcrect, &dstrect, angle, &center, 0);
     SDL_RenderSetClipRect(renderer, NULL);
 

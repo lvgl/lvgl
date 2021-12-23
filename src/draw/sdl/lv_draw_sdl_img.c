@@ -100,7 +100,26 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
 
     SDL_Point pivot = {.x = draw_dsc->pivot.x, .y = draw_dsc->pivot.y};
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_Rect clipped_src = {0, 0, 0, 0}, clipped_dst = coords_rect;
+    const SDL_Rect * src_rect = NULL, *dst_rect = &clipped_dst;
+
+    if(_lv_area_is_in(coords, clip, 0)) {
+        src_rect = NULL;
+    }
+    else if(draw_dsc->angle == 0) {
+        Uint32 format = 0;
+        int access = 0, w, h;
+        SDL_QueryTexture(texture, &format, &access, &w, &h);
+        SDL_IntersectRect(&clip_rect, &coords_rect, &clipped_dst);
+        clipped_src.x = (clipped_dst.x - coords_rect.x) * w / coords_rect.x;
+        clipped_src.y = (clipped_dst.y - coords_rect.y) * h / coords_rect.h;
+        clipped_src.w = w - (coords_rect.w - clipped_dst.w) * w / coords_rect.w;
+        clipped_src.h = h - (coords_rect.h - clipped_dst.h) * h / coords_rect.h;
+        src_rect = &clipped_src;
+    }
+    else {
+        SDL_RenderSetClipRect(renderer, &clip_rect);
+    }
 
     SDL_Color recolor;
     lv_color_to_sdl_color(&draw_dsc->recolor, &recolor);
@@ -108,22 +127,22 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         /* Draw fully recolored image*/
         SDL_SetTextureColorMod(texture, draw_dsc->recolor.ch.red, recolor.g, recolor.b);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
-        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
     else if(draw_dsc->recolor_opa > LV_OPA_TRANSP) {
         /* Draw blended. src: origA, dst: origA * recolorA */
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
-        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
         SDL_SetTextureColorMod(texture, recolor.r, recolor.g, recolor.b);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa * draw_dsc->recolor_opa / 255);
-        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
     else {
         /* Draw with no recolor */
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
-        SDL_RenderCopyEx(renderer, texture, NULL, &coords_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
     }
     SDL_RenderSetClipRect(renderer, NULL);
     return LV_RES_OK;
