@@ -104,9 +104,11 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     const SDL_Rect * src_rect = NULL, *dst_rect = &clipped_dst;
 
     if(_lv_area_is_in(coords, clip, 0)) {
+        /*Image needs to be fully drawn*/
         src_rect = NULL;
     }
     else if(draw_dsc->angle == 0) {
+        /*Image needs to be partly drawn, and we calculate the area to draw manually*/
         Uint32 format = 0;
         int access = 0, w, h;
         SDL_QueryTexture(texture, &format, &access, &w, &h);
@@ -118,6 +120,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         src_rect = &clipped_src;
     }
     else {
+        /*Image needs to be rotated, so we have to use clip rect which is slower*/
         SDL_RenderSetClipRect(renderer, &clip_rect);
     }
 
