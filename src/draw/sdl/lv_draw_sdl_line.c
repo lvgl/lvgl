@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.c
+ * @file lv_draw_sdl_line.c
  *
  */
 
