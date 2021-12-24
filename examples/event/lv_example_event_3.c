@@ -27,14 +27,14 @@ void lv_example_event_3(void)
     lv_obj_center(cont);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW_WRAP);
 
-    unsigned int i;
+    uint32_t i;
     for(i = 0; i < 30; i++) {
         lv_obj_t * btn = lv_btn_create(cont);
         lv_obj_set_size(btn, 80, 50);
         lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
 
         lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "%u", i);
+        lv_label_set_text_fmt(label, "%"LV_PRIu32, i);
         lv_obj_center(label);
     }
 

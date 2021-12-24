@@ -1157,7 +1157,7 @@ void * lv_tlsf_memalign(lv_tlsf_t tlsf, size_t align, size_t size)
     return block_prepare_used(control, block, adjust);
 }
 
-void lv_tlsf_free(lv_tlsf_t tlsf, void * ptr)
+void lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr)
 {
     /* Don't attempt to free a NULL pointer. */
     if(ptr) {

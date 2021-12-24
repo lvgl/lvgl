@@ -589,9 +589,12 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_table_t * table = (lv_table_t *)obj;
-    const lv_area_t * clip_area_ori = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &obj->coords, clip_area_ori)) return;
+    if(!_lv_area_intersect(&clip_area, &obj->coords, draw_ctx->clip_area)) return;
+
+    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    draw_ctx->clip_area = &clip_area;
 
     lv_point_t txt_size;
     lv_area_t cell_area;
@@ -634,7 +637,7 @@ static void draw_main(lv_event_t * e)
 
     /*Handle custom drawer*/
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, &clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.part = LV_PART_ITEMS;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_TABLE_DRAW_PART_CELL;
@@ -647,7 +650,7 @@ static void draw_main(lv_event_t * e)
         cell_area.y1 = cell_area.y2 + 1;
         cell_area.y2 = cell_area.y1 + h_row - 1;
 
-        if(cell_area.y1 > clip_area.y2) return;
+        if(cell_area.y1 > clip_area.y2) break;
 
         if(rtl) cell_area.x1 = obj->coords.x2 - bg_right - 1 - scroll_x - border_width;
         else cell_area.x2 = obj->coords.x1 + bg_left - 1 - scroll_x + border_width;
@@ -734,7 +737,7 @@ static void draw_main(lv_event_t * e)
             part_draw_dsc.id = row * table->col_cnt + col;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-            lv_draw_rect(&cell_area_border, &clip_area, &rect_dsc_act);
+            lv_draw_rect(draw_ctx, &rect_dsc_act, &cell_area_border);
 
             if(table->cell_data[cell]) {
                 txt_area.x1 = cell_area.x1 + cell_left;
@@ -757,11 +760,13 @@ static void draw_main(lv_event_t * e)
                     txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
                 }
 
-                lv_area_t label_mask;
+                lv_area_t label_clip_area;
                 bool label_mask_ok;
-                label_mask_ok = _lv_area_intersect(&label_mask, &clip_area, &cell_area);
+                label_mask_ok = _lv_area_intersect(&label_clip_area, &clip_area, &cell_area);
                 if(label_mask_ok) {
-                    lv_draw_label(&txt_area, &label_mask, &label_dsc_act, table->cell_data[cell] + 1, NULL);
+                    draw_ctx->clip_area = &label_clip_area;
+                    lv_draw_label(draw_ctx, &label_dsc_act, &txt_area, table->cell_data[cell] + 1, NULL);
+                    draw_ctx->clip_area = &clip_area;
                 }
             }
 
@@ -771,6 +776,8 @@ static void draw_main(lv_event_t * e)
             col += col_merge;
         }
     }
+
+    draw_ctx->clip_area = clip_area_ori;
 }
 
 static void refr_size(lv_obj_t * obj, uint32_t strat_row)

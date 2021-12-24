@@ -1271,7 +1271,7 @@ static void draw_placeholder(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     const char * txt = lv_label_get_text(ta->label);
 
     /*Draw the place holder*/
@@ -1288,7 +1288,7 @@ static void draw_placeholder(lv_event_t * e)
         lv_area_t ph_coords;
         lv_area_copy(&ph_coords, &obj->coords);
         lv_area_move(&ph_coords, left + border_width, top + border_width);
-        lv_draw_label(&ph_coords, clip_area, &ph_dsc, ta->placeholder_txt, NULL);
+        lv_draw_label(draw_ctx, &ph_dsc, &ph_coords, ta->placeholder_txt, NULL);
     }
 }
 
@@ -1296,7 +1296,7 @@ static void draw_cursor(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     const char * txt = lv_label_get_text(ta->label);
 
     if(ta->cursor.show == 0) return;
@@ -1315,7 +1315,7 @@ static void draw_cursor(lv_event_t * e)
     cur_area.x2 += ta->label->coords.x1;
     cur_area.y2 += ta->label->coords.y1;
 
-    lv_draw_rect(&cur_area, clip_area, &cur_dsc);
+    lv_draw_rect(draw_ctx, &cur_dsc, &cur_area);
 
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
@@ -1334,7 +1334,7 @@ static void draw_cursor(lv_event_t * e)
     lv_draw_label_dsc_init(&cur_label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
     if(cur_dsc.bg_opa > LV_OPA_MIN || cur_label_dsc.color.full != label_color.full) {
-        lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
+        lv_draw_label(draw_ctx, &cur_label_dsc, &cur_area, letter_buf, NULL);
     }
 }
 

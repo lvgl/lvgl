@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_draw_label.c
+ * @file lv_draw_sdl_label.c
  *
  */
 
@@ -11,15 +11,14 @@
 
 #if LV_USE_GPU_SDL
 
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_mask.h"
-#include "../../misc/lv_utils.h"
-
 #include LV_GPU_SDL_INCLUDE_PATH
+
+#include "../lv_draw_label.h"
+#include "../../misc/lv_utils.h"
 
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
-#include "lv_draw_sdl_mask.h"
+#include "lv_draw_sdl_composite.h"
 
 /*********************
  *      DEFINES
@@ -30,7 +29,7 @@
  **********************/
 
 typedef struct {
-    lv_gpu_cache_key_magic_t magic;
+    lv_sdl_cache_key_magic_t magic;
     const lv_font_t * font_p;
     uint32_t letter;
 } lv_font_glyph_key_t;
@@ -38,9 +37,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL_Rect * src, SDL_Rect * dst,
-                               SDL_Rect * clip, lv_color_t color, lv_opa_t opa);
 
 static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter);
 
@@ -57,10 +53,13 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
-                             const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa,
-                             lv_blend_mode_t blend_mode)
+void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+                             uint32_t letter)
 {
+    const lv_area_t * clip_area = draw_ctx->clip_area;
+    const lv_font_t * font_p = dsc->font;
+    lv_opa_t opa = dsc->opa;
+    lv_color_t color = dsc->color;
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -88,20 +87,20 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
+    const lv_area_t letter_area = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
+    lv_area_t draw_area;
+
     /*If the letter is completely out of mask don't draw it*/
-    if(pos_x + g.box_w < clip_area->x1 ||
-       pos_x > clip_area->x2 ||
-       pos_y + g.box_h < clip_area->y1 ||
-       pos_y > clip_area->y2) {
+    if(!_lv_area_intersect(&draw_area, &letter_area, clip_area)) {
         return;
     }
 
-    lv_draw_sdl_backend_context_t * ctx = lv_draw_sdl_get_context();
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
     bool glyph_found = false;
-    SDL_Texture * texture = lv_gpu_draw_cache_get(&glyph_key, sizeof(glyph_key), &glyph_found);
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &glyph_key, sizeof(glyph_key), &glyph_found);
     if(!glyph_found) {
         if(g.resolved_font) {
             font_p = g.resolved_font;
@@ -109,78 +108,41 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         const uint8_t * bmp = lv_font_get_glyph_bitmap(font_p, letter);
         uint8_t * buf = lv_mem_alloc(g.box_w * g.box_h);
         lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
-        SDL_Surface * mask = lv_sdl_create_mask_surface(buf, g.box_w, g.box_h, g.box_w);
+        SDL_Surface * mask = lv_sdl_create_opa_surface(buf, g.box_w, g.box_h, g.box_w);
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
         lv_mem_free(buf);
-        lv_draw_sdl_draw_cache_put(&glyph_key, sizeof(glyph_key), texture);
+        lv_draw_sdl_texture_cache_put(ctx, &glyph_key, sizeof(glyph_key), texture);
     }
     if(!texture) {
         return;
     }
-    lv_area_t dst = {pos_x, pos_y, pos_x + g.box_w - 1, pos_y + g.box_h - 1};
-    SDL_Rect dstrect;
-    lv_area_to_sdl_rect(&dst, &dstrect);
 
-    SDL_Rect clip_area_rect;
-    lv_area_to_sdl_rect(clip_area, &clip_area_rect);
+    lv_area_t t_letter = letter_area, t_clip = *clip_area, apply_area;
+    bool has_mask = lv_draw_sdl_composite_begin(ctx, &letter_area, clip_area, NULL, dsc->blend_mode, &t_letter, &t_clip,
+                                                &apply_area);
 
-    if(lv_draw_mask_is_any(&dst)) {
-        draw_letter_masked(renderer, texture, NULL, &dstrect, &clip_area_rect, color, opa);
+    /*If the letter is completely out of mask don't draw it*/
+    if(!_lv_area_intersect(&draw_area, &t_letter, &t_clip)) {
         return;
     }
-
+    SDL_Rect srcrect, dstrect;
+    lv_area_to_sdl_rect(&draw_area, &dstrect);
+    srcrect.x = draw_area.x1 - t_letter.x1;
+    srcrect.y = draw_area.y1 - t_letter.y1;
+    srcrect.w = dstrect.w;
+    srcrect.h = dstrect.h;
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, opa);
     SDL_SetTextureColorMod(texture, color.ch.red, color.ch.green, color.ch.blue);
-    SDL_RenderSetClipRect(renderer, &clip_area_rect);
-    SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+    SDL_RenderCopy(renderer, texture, &srcrect, &dstrect);
+
+    lv_draw_sdl_composite_end(ctx, &apply_area, dsc->blend_mode);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void draw_letter_masked(SDL_Renderer * renderer, SDL_Texture * atlas, SDL_Rect * src, SDL_Rect * dst,
-                               SDL_Rect * clip, lv_color_t color, lv_opa_t opa)
-{
-    SDL_Texture * screen = SDL_GetRenderTarget(renderer);
-
-    lv_area_t mask_area = {.x1 = dst->x, .x2 = dst->x + dst->w - 1, .y1 = dst->y, .y2 = dst->y + dst->h - 1};
-    SDL_Texture * content = lv_gpu_temp_texture_obtain(renderer, dst->w, dst->h);
-    SDL_SetTextureBlendMode(content, SDL_BLENDMODE_NONE);
-    SDL_SetRenderTarget(renderer, content);
-    SDL_RenderSetClipRect(renderer, NULL);
-
-    /* Replace texture with clip mask */
-    SDL_Rect mask_rect = {.w = dst->w, .h = dst->h, .x = 0, .y = 0};
-    SDL_Texture * mask = lv_sdl_gen_mask_texture(renderer, &mask_area, NULL, 0);
-    SDL_SetTextureBlendMode(mask, SDL_BLENDMODE_NONE);
-    SDL_RenderCopy(renderer, mask, NULL, &mask_rect);
-
-    /* Multiply with font atlas */
-    SDL_SetTextureAlphaMod(atlas, 0xFF);
-    SDL_SetTextureColorMod(atlas, 0xFF, 0xFF, 0xFF);
-#if SDL_VERSION_ATLEAST(2, 0, 6)
-    SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ZERO,
-                                                    SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
-                                                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-    SDL_SetTextureBlendMode(atlas, mode);
-#else
-    SDL_SetTextureBlendMode(atlas, SDL_BLENDMODE_BLEND);
-#endif
-    SDL_RenderCopy(renderer, atlas, src, &mask_rect);
-
-    /* Draw composited part on screen */
-    SDL_SetTextureBlendMode(content, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureAlphaMod(content, opa);
-    SDL_SetTextureColorMod(content, color.ch.red, color.ch.green, color.ch.blue);
-
-    SDL_SetRenderTarget(renderer, screen);
-    SDL_RenderSetClipRect(renderer, clip);
-    SDL_RenderCopy(renderer, content, &mask_rect, dst);
-    SDL_DestroyTexture(mask);
-}
 
 static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter)
 {

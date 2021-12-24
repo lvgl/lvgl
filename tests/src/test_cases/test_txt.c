@@ -199,7 +199,7 @@ void test_txt_next_line_should_handle_empty_string(void)
     lv_coord_t max_width = 0;
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
 
-    uint32_t next_line = _lv_txt_get_next_line("", font_ptr, letter_space, max_width, flag);
+    uint32_t next_line = _lv_txt_get_next_line("", font_ptr, letter_space, max_width, NULL, flag);
 
     TEST_ASSERT_EQUAL_UINT32(0, next_line);
 }

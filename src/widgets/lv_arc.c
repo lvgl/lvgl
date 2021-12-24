@@ -549,14 +549,14 @@ static void lv_arc_draw(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     lv_point_t center;
     lv_coord_t arc_r;
     get_center(obj, &center, &arc_r);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
 
     /*Draw the background arc*/
     lv_draw_arc_dsc_t arc_dsc;
@@ -572,14 +572,13 @@ static void lv_arc_draw(lv_event_t * e)
         part_draw_dsc.arc_dsc = &arc_dsc;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-        lv_draw_arc(center.x, center.y, part_draw_dsc.radius, arc->bg_angle_start + arc->rotation,
-                    arc->bg_angle_end + arc->rotation, clip_area,
-                    &arc_dsc);
+        lv_draw_arc(draw_ctx, &arc_dsc, &center, part_draw_dsc.radius, arc->bg_angle_start + arc->rotation,
+                    arc->bg_angle_end + arc->rotation);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 
-    /*make the indicator arc smaller or larger according to its greatest padding value*/
+    /*Make the indicator arc smaller or larger according to its greatest padding value*/
     lv_coord_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
     lv_coord_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
     lv_coord_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
@@ -599,9 +598,8 @@ static void lv_arc_draw(lv_event_t * e)
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         if(arc_dsc.width > part_draw_dsc.radius) arc_dsc.width = part_draw_dsc.radius;
-        lv_draw_arc(center.x, center.y, part_draw_dsc.radius, arc->indic_angle_start + arc->rotation,
-                    arc->indic_angle_end + arc->rotation, clip_area,
-                    &arc_dsc);
+        lv_draw_arc(draw_ctx, &arc_dsc, &center, part_draw_dsc.radius, arc->indic_angle_start + arc->rotation,
+                    arc->indic_angle_end + arc->rotation);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
@@ -620,7 +618,7 @@ static void lv_arc_draw(lv_event_t * e)
     part_draw_dsc.rect_dsc = &knob_rect_dsc;
     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-    lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
+    lv_draw_rect(draw_ctx, &knob_rect_dsc, &knob_area);
 
     lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 }

@@ -63,6 +63,7 @@ enum {
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
+    LV_BLEND_MODE_REPLACE,    /**< Replace background with foreground in the area*/
 };
 
 typedef uint8_t lv_blend_mode_t;
@@ -339,7 +340,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
  *         LV_RES_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  */
-lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+lv_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
 
 
 /**
@@ -352,7 +353,8 @@ lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_va
  * @note For performance reasons there are no sanity check on `style`
  * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
  */
-static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
+static inline lv_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
+                                                 lv_style_value_t * value)
 {
     if(style->is_const) {
         const lv_style_const_prop_t * const_prop;

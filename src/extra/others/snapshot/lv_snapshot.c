@@ -105,72 +105,47 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     w += ext_size * 2;
     h += ext_size * 2;
 
-    /*Backup obj original info.*/
-    lv_obj_t * parent_old = lv_obj_get_parent(obj);
-    lv_area_t coords_bkp;
-    lv_area_copy(&coords_bkp, &obj->coords);
+    lv_area_t snapshot_area;
+    lv_obj_get_coords(obj, &snapshot_area);
+    lv_area_increase(&snapshot_area, ext_size, ext_size);
 
     lv_memset(buf, 0x00, buff_size);
     lv_memset_00(dsc, sizeof(lv_img_dsc_t));
 
-    /*We are safe to use stack for below variables since disp will be
-     * unregistered when function returns. */
-    lv_disp_t * disp;
+    lv_disp_t * obj_disp = lv_obj_get_disp(obj);
     lv_disp_drv_t driver;
-    lv_disp_draw_buf_t draw_buf;
-
-    lv_disp_draw_buf_init(&draw_buf, buf, NULL, w * h);
-
     lv_disp_drv_init(&driver);
-    driver.draw_buf = &draw_buf;
-
-    /*Make the display big enough to involve the objects on its original places. */
-    driver.hor_res = obj->coords.x1 + w;
-    driver.ver_res = obj->coords.y1 + h;
+    /*In lack of a better idea use the resolution of the object's display*/
+    driver.hor_res = lv_disp_get_hor_res(obj_disp);
+    driver.ver_res = lv_disp_get_hor_res(obj_disp);
     lv_disp_drv_use_generic_set_px_cb(&driver, cf);
 
-    disp = lv_disp_drv_register(&driver);
-    if(disp == NULL) {
-        return LV_RES_INV;
-    }
+    lv_disp_t fake_disp;
+    lv_memset_00(&fake_disp, sizeof(lv_disp_t));
+    fake_disp.driver = &driver;
 
-    /*Make background transparent */
-    lv_disp_set_bg_opa(disp, LV_OPA_TRANSP);
 
-    /*Move obj to newly created disp and refresh it. */
-    lv_obj_t * screen = lv_disp_get_scr_act(disp);
-    lv_obj_remove_style_all(screen);
-    lv_obj_allocate_spec_attr(screen);
-    screen->spec_attr->child_cnt = 1;
-    screen->spec_attr->children = &obj;
+    lv_draw_ctx_t * draw_ctx = lv_mem_alloc(obj_disp->driver->draw_ctx_size);
+    LV_ASSERT_MALLOC(draw_ctx);
+    if(draw_ctx == NULL) return LV_RES_INV;
+    obj_disp->driver->draw_ctx_init(fake_disp.driver, draw_ctx);
+    fake_disp.driver->draw_ctx = draw_ctx;
+    draw_ctx->clip_area = &snapshot_area;
+    draw_ctx->buf_area = &snapshot_area;
+    draw_ctx->buf = (void *)buf;
+    driver.draw_ctx = draw_ctx;
 
-    obj->parent = screen;
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&fake_disp);
 
-    disp->inv_p = 0;
+    lv_refr_obj(draw_ctx, obj);
 
-    /*Shift obj by ext_size, so there is room for shadow etc.*/
-    obj->coords.x2 += ext_size;
-    obj->coords.x1 += ext_size;
-    obj->coords.y2 += ext_size;
-    obj->coords.y1 += ext_size;
-
-    lv_obj_invalidate(obj);
-
-    /*Don't call lv_refr_now to avoid animation disruption */
-    _lv_disp_refr_timer(disp->refr_timer);
-
-    /*Restore obj original parameters and clean up*/
-    obj->parent = parent_old;
-    screen->spec_attr->child_cnt = 0;
-    screen->spec_attr->children = NULL;
-
-    lv_disp_remove(disp);
-
-    lv_area_copy(&obj->coords, &coords_bkp);
+    _lv_refr_set_disp_refreshing(refr_ori);
+    obj_disp->driver->draw_ctx_deinit(fake_disp.driver, draw_ctx);
 
     dsc->data = buf;
-    dsc->header.w = lv_area_get_width(&draw_buf.area);
-    dsc->header.h = lv_area_get_height(&draw_buf.area);
+    dsc->header.w = w;
+    dsc->header.h = h;
     dsc->header.cf = cf;
     return LV_RES_OK;
 }

@@ -12,8 +12,9 @@
 
 #include "lv_draw_sdl_utils.h"
 
-#include "../../draw/lv_draw.h"
-#include "../../draw/lv_draw_label.h"
+#include "../lv_draw.h"
+#include "../lv_draw_label.h"
+#include "../../core/lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -26,20 +27,15 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
 /**********************
  *  STATIC VARIABLES
  **********************/
 extern const uint8_t _lv_bpp1_opa_table[2];
 extern const uint8_t _lv_bpp2_opa_table[4];
-extern const uint8_t _lv_bpp3_opa_table[8];
 extern const uint8_t _lv_bpp4_opa_table[16];
 extern const uint8_t _lv_bpp8_opa_table[256];
 
-static SDL_Palette * lv_sdl_palette_grayscale1 = NULL;
-static SDL_Palette * lv_sdl_palette_grayscale2 = NULL;
-static SDL_Palette * lv_sdl_palette_grayscale3 = NULL;
-static SDL_Palette * lv_sdl_palette_grayscale4 = NULL;
+static int utils_init_count = 0;
 static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 
 /**********************
@@ -52,20 +48,23 @@ static SDL_Palette * lv_sdl_palette_grayscale8 = NULL;
 
 void _lv_draw_sdl_utils_init()
 {
-    lv_sdl_palette_grayscale1 = lv_sdl_alloc_palette_for_bpp(_lv_bpp1_opa_table, 1);
-    lv_sdl_palette_grayscale2 = lv_sdl_alloc_palette_for_bpp(_lv_bpp2_opa_table, 2);
-    lv_sdl_palette_grayscale3 = lv_sdl_alloc_palette_for_bpp(_lv_bpp3_opa_table, 3);
-    lv_sdl_palette_grayscale4 = lv_sdl_alloc_palette_for_bpp(_lv_bpp4_opa_table, 4);
+    utils_init_count++;
+    if(utils_init_count > 1) {
+        return;
+    }
     lv_sdl_palette_grayscale8 = lv_sdl_alloc_palette_for_bpp(_lv_bpp8_opa_table, 8);
 }
 
 void _lv_draw_sdl_utils_deinit()
 {
-    SDL_FreePalette(lv_sdl_palette_grayscale1);
-    SDL_FreePalette(lv_sdl_palette_grayscale2);
-    SDL_FreePalette(lv_sdl_palette_grayscale3);
-    SDL_FreePalette(lv_sdl_palette_grayscale4);
-    SDL_FreePalette(lv_sdl_palette_grayscale8);
+    if(utils_init_count == 0) {
+        return;
+    }
+    utils_init_count--;
+    if(utils_init_count == 0) {
+        SDL_FreePalette(lv_sdl_palette_grayscale8);
+        lv_sdl_palette_grayscale8 = NULL;
+    }
 }
 
 void lv_area_to_sdl_rect(const lv_area_t * in, SDL_Rect * out)
@@ -78,12 +77,19 @@ void lv_area_to_sdl_rect(const lv_area_t * in, SDL_Rect * out)
 
 void lv_color_to_sdl_color(const lv_color_t * in, SDL_Color * out)
 {
+#if LV_COLOR_DEPTH == 32
+    out->a = in->ch.alpha;
+    out->r = in->ch.red;
+    out->g = in->ch.green;
+    out->b = in->ch.blue;
+#else
     uint32_t color32 = lv_color_to32(*in);
     lv_color32_t * color32_t = (lv_color32_t *) &color32;
     out->a = color32_t->ch.alpha;
     out->r = color32_t->ch.red;
     out->g = color32_t->ch.green;
     out->b = color32_t->ch.blue;
+#endif
 }
 
 void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoom, const lv_point_t * pivot)
@@ -102,11 +108,6 @@ void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoo
     out->h = sh;
 }
 
-double lv_sdl_round(double d)
-{
-    return (d - (long) d) < 0.5 ? SDL_floor(d) : SDL_ceil(d);
-}
-
 SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
 {
     SDL_assert(bpp >= 1 && bpp <= 8);
@@ -121,30 +122,22 @@ SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
     return result;
 }
 
-SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp)
+SDL_Surface * lv_sdl_create_opa_surface(lv_opa_t * opa, lv_coord_t width, lv_coord_t height, lv_coord_t stride)
 {
-    SDL_Palette * palette;
-    switch(bpp) {
-        case 1:
-            palette = lv_sdl_palette_grayscale1;
-            break;
-        case 2:
-            palette = lv_sdl_palette_grayscale2;
-            break;
-        case 3:
-            palette = lv_sdl_palette_grayscale3;
-            break;
-        case 4:
-            palette = lv_sdl_palette_grayscale4;
-            break;
-        case 8:
-            palette = lv_sdl_palette_grayscale8;
-            break;
-        default:
-            return NULL;
-    }
-    LV_ASSERT_MSG(lv_sdl_palette_grayscale8, "lv_draw_sdl was not initialized properly");
-    return palette;
+    SDL_Surface * indexed = SDL_CreateRGBSurfaceFrom(opa, width, height, 8, stride, 0, 0, 0, 0);
+    SDL_SetSurfacePalette(indexed, lv_sdl_palette_grayscale8);
+    SDL_Surface * converted = SDL_ConvertSurfaceFormat(indexed, LV_DRAW_SDL_TEXTURE_FORMAT, 0);
+    SDL_FreeSurface(indexed);
+    return converted;
+}
+
+SDL_Texture * lv_sdl_create_opa_texture(SDL_Renderer * renderer, lv_opa_t * pixels, lv_coord_t width,
+                                        lv_coord_t height, lv_coord_t stride)
+{
+    SDL_Surface * indexed = lv_sdl_create_opa_surface(pixels, width, height, stride);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, indexed);
+    SDL_FreeSurface(indexed);
+    return texture;
 }
 
 void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp)
@@ -185,11 +178,6 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
             cur++;
         }
     }
-}
-
-lv_draw_sdl_backend_context_t * lv_draw_sdl_get_context()
-{
-    return lv_draw_backend_get()->ctx;
 }
 
 /**********************

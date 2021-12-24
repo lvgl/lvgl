@@ -12,7 +12,6 @@
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../lv_draw_rect.h"
-#include "../lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -45,8 +44,8 @@
  * @param clip_area polygon will be drawn only in this area
  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_sw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
-                        const lv_draw_rect_dsc_t * draw_dsc)
+void lv_draw_sw_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t * points,
+                        uint16_t point_cnt)
 {
 #if LV_DRAW_COMPLEX
     if(point_cnt < 3) return;
@@ -86,12 +85,16 @@ void lv_draw_sw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_
     }
 
     bool is_common;
-    lv_area_t poly_mask;
-    is_common = _lv_area_intersect(&poly_mask, &poly_coords, clip_area);
+    lv_area_t clip_area;
+    is_common = _lv_area_intersect(&clip_area, &poly_coords, draw_ctx->clip_area);
     if(!is_common) {
         lv_mem_buf_release(p);
         return;
     }
+
+    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    draw_ctx->clip_area = &clip_area;
+
     /*Find the lowest point*/
     lv_coord_t y_min = p[0].y;
     int16_t y_min_i = 0;
@@ -182,16 +185,18 @@ void lv_draw_sw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_
 
     } while(mask_cnt < point_cnt);
 
-    lv_draw_rect(&poly_coords, clip_area, draw_dsc);
+    lv_draw_rect(draw_ctx, draw_dsc, &poly_coords);
 
     lv_draw_mask_remove_custom(mp);
 
     lv_mem_buf_release(mp);
     lv_mem_buf_release(p);
+
+    draw_ctx->clip_area = clip_area_ori;
 #else
     LV_UNUSED(points);
     LV_UNUSED(point_cnt);
-    LV_UNUSED(clip_area);
+    LV_UNUSED(draw_ctx);
     LV_UNUSED(draw_dsc);
     LV_LOG_WARN("Can't draw polygon with LV_DRAW_COMPLEX == 0");
 #endif /*LV_DRAW_COMPLEX*/

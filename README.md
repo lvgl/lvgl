@@ -16,6 +16,10 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 <a href="https://docs.lvgl.io/master/examples.html">Interactive examples</a>
 </h4>
 
+
+**English** | [中文](./README_zh.md) |
+
+
 ---
 
 #### Table of content
@@ -24,7 +28,6 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 - [Examples](#examples)
 - [Services](#services)
 - [Contributing](#contributing)
-
 
 ## Overview
 ### Features
@@ -178,4 +181,4 @@ Feel free to contact us if you have any questions.
 LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosting your own project under the LVGL organization.
 
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
- 
+

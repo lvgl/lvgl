@@ -173,11 +173,11 @@ static void style_init_reset(lv_style_t * style);
 static my_theme_styles_t * styles;
 static lv_theme_t theme;
 static disp_size_t disp_size;
-static bool inited;
 static lv_color_t color_scr;
 static lv_color_t color_text;
 static lv_color_t color_card;
 static lv_color_t color_grey;
+static bool inited = false;
 
 
 /**********************
@@ -647,7 +647,8 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
-    if(!inited) {
+    if(!lv_theme_default_is_inited()) {
+        inited = false;
         LV_GC_ROOT(_lv_theme_default_styles) = lv_mem_alloc(sizeof(my_theme_styles_t));
         styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);
     }
@@ -667,23 +668,25 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
 
     style_init();
 
-    inited = true;
-
     if(disp == NULL || lv_disp_get_theme(disp) == &theme) lv_obj_report_style_change(NULL);
+
+    inited = true;
 
     return (lv_theme_t *)&theme;
 }
 
 lv_theme_t * lv_theme_default_get(void)
 {
-    if(!inited) return NULL;
+    if(!lv_theme_default_is_inited()) {
+        return NULL;
+    }
 
     return (lv_theme_t *)&theme;
 }
 
 bool lv_theme_default_is_inited(void)
 {
-    return inited;
+    return  LV_GC_ROOT(_lv_theme_default_styles) == NULL ? false : true;
 }
 
 
@@ -1161,8 +1164,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
-    if(inited) lv_style_reset(style);
-    else lv_style_init(style);
+    if(inited) {
+        lv_style_reset(style);
+    }
+    else {
+        lv_style_init(style);
+    }
 }
 
 #endif
