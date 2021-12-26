@@ -34,7 +34,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
                           uint16_t radius, uint16_t start_angle, uint16_t end_angle);
 
 void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t * points,
-                        uint16_t point_cnt);
+                         uint16_t point_cnt);
 
 void lv_draw_sdl_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
