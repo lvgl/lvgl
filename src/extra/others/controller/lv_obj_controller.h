@@ -32,10 +32,19 @@ typedef struct lv_controller_manager_t lv_controller_manager_t;
 typedef struct lv_obj_controller_t lv_obj_controller_t;
 typedef struct lv_obj_controller_class_t lv_obj_controller_class_t;
 
+/**
+ * Opaque pointer for internal state management
+ */
 typedef struct manager_stack_t manager_stack_t;
 
 struct lv_obj_controller_t {
+    /**
+     * Class of this controller
+     */
     const lv_obj_controller_class_t * cls;
+    /**
+     * Manager this controller instance belongs to
+     */
     lv_controller_manager_t * manager;
     /**
      * lv_obj returned by create_obj_cb
@@ -56,13 +65,17 @@ struct lv_obj_controller_class_t {
      */
     void (*constructor_cb)(struct lv_obj_controller_t * self, void * args);
 
+    /**
+     * Destructor function for controller class
+     * @param self Controller instance, will be freed after this call
+     */
     void (*destructor_cb)(struct lv_obj_controller_t * self);
 
     /**
-     *
-     * @param self
-     * @param parent
-     * @return
+     * Create objects
+     * @param self Controller instance
+     * @param parent Container of the objects should be created upon
+     * @return Created object, NULL if multiple objects has been created
      */
     lv_obj_t * (*create_obj_cb)(struct lv_obj_controller_t * self, lv_obj_t * parent);
 
@@ -74,11 +87,15 @@ struct lv_obj_controller_class_t {
     void (*obj_created_cb)(struct lv_obj_controller_t * self, lv_obj_t * obj);
 
     /**
-     * Called before `lv_obj_del` call of object created by controller
+     * Called before objects in the controller will be deleted.
+     *
+     * You can return true and delete the objects by yourself here.
+     *
      * @param self Controller instance
      * @param obj object with this controller
+     * @return true if the controller will handle deletion on its own
      */
-    void (*obj_will_delete_cb)(struct lv_obj_controller_t * self, lv_obj_t * obj);
+    bool (*obj_will_delete_cb)(struct lv_obj_controller_t * self, lv_obj_t * obj);
 
     /**
      * Called when the object created by controller received `LV_EVENT_DELETE` event

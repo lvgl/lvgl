@@ -311,18 +311,27 @@ static void controller_destroy_obj(lv_obj_controller_t * controller)
     const lv_obj_controller_class_t * cls = controller->cls;
     lv_obj_t * obj = controller->obj;
     if(obj) {
+        bool delete_handled = false;
         if(cls->obj_will_delete_cb) {
-            cls->obj_will_delete_cb(controller, obj);
+            delete_handled = cls->obj_will_delete_cb(controller, obj);
         }
-        lv_obj_del(obj);
+        if(!delete_handled) {
+            lv_obj_del(obj);
+        }
+        else if(cls->obj_deleted_cb) {
+            cls->obj_deleted_cb(controller, NULL);
+        }
     }
     else {
         LV_ASSERT(controller->manager);
         LV_ASSERT(controller->manager->container);
+        bool delete_handled = false;
         if(cls->obj_will_delete_cb) {
-            cls->obj_will_delete_cb(controller, NULL);
+            delete_handled = cls->obj_will_delete_cb(controller, NULL);
         }
-        lv_obj_clean(controller->manager->container);
+        if(!delete_handled) {
+            lv_obj_clean(controller->manager->container);
+        }
         if(cls->obj_deleted_cb) {
             cls->obj_deleted_cb(controller, NULL);
         }
