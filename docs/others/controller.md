@@ -5,7 +5,7 @@
 
 # lv_obj Controller
 
-A simple monkey test. Use random input to stress test the application.
+This is something like UiViewController on iOS or Fragment on Android - to help developers better handles code structure, and object lifecycle.
 
 ## Usage
 
