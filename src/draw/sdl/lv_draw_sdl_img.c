@@ -122,7 +122,8 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         int access = 0, w, h;
         if(SDL_RectEmpty(&header->rect)) {
             SDL_QueryTexture(texture, &format, &access, &w, &h);
-        } else {
+        }
+        else {
             w = header->rect.w;
             h = header->rect.h;
         }
