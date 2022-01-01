@@ -139,7 +139,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, lv_coord_t x, lv_c
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    if(x + w >= (lv_coord_t)canvas->dsc.header.w || y + h >= (lv_coord_t)canvas->dsc.header.h) {
+    if(x + w - 1 >= (lv_coord_t)canvas->dsc.header.w || y + h - 1 >= (lv_coord_t)canvas->dsc.header.h) {
         LV_LOG_WARN("lv_canvas_copy_buf: x or y out of the canvas");
         return;
     }
