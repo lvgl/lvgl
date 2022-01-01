@@ -7,7 +7,7 @@
 void lv_example_rlottie_1(void)
 {
     extern const uint8_t lv_example_rlottie_approve[];
-    lv_obj_t * lottie = lv_rlottie_create_from_raw(lv_scr_act(), 100, 100, (const void *)lv_example_rlottie_approve);
+    lv_obj_t * lottie = lv_rlottie_create_from_raw(lv_scr_act(), 100, 100, (const void *)lv_example_rlottie_approve, strlen(lv_example_rlottie_approve));
     lv_obj_center(lottie);
 }
 
