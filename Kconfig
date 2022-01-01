@@ -766,6 +766,9 @@ menu "LVGL configuration"
         config LV_USE_IMGBTN
             bool "Imgbtn."
             default y if !LV_CONF_MINIMAL
+        config LV_USE_ANIMBTN
+            bool "Animbtn."
+            default y if !LV_CONF_MINIMAL
         config LV_USE_KEYBOARD
             bool "Keyboard."
             default y if !LV_CONF_MINIMAL

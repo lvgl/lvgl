@@ -68,7 +68,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
 
 }
 
-lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc)
+lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc, const size_t len)
 {
     lv_rlottie_init();
 
@@ -79,7 +79,11 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     rlottie->dec.ctx.magic_id = LV_RLOTTIE_ID;
     rlottie->dec.create_width = width;
     rlottie->dec.create_height = height;
-    rlottie->dec.create_src = rlottie_desc;
+    rlottie->dec.create_src = &rlottie->dec.data_hdr;
+    rlottie->dec.data_hdr.data = (const uint8_t*)rlottie_desc;
+    rlottie->dec.data_hdr.data_size = len;
+    rlottie->dec.data_hdr.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+
 
     lv_obj_class_init_obj(obj);
 

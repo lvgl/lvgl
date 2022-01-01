@@ -129,7 +129,8 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     }
     /* rlottie as raw data */
     else if(src_type == LV_IMG_SRC_VARIABLE) {
-        animation = lottie_animation_from_data(src, src, "");
+        lv_img_dsc_t * h = dec_ctx == NULL ? (lv_img_dsc_t*)src : &dec_ctx->data_hdr;
+        animation = lottie_animation_from_rodata((const char*)h->data, h->data_size, "");
     }
     if(animation == NULL)
         return LV_RES_INV;
@@ -265,8 +266,8 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     }
     /* rlottie as raw data */
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
-        const char * fn = dsc->src;
-        animation = lottie_animation_from_data(fn, fn, "");
+        lv_img_dsc_t * idc = (lv_img_dsc_t *)dsc->src;
+        animation = lottie_animation_from_rodata((const char*)idc->data, idc->data_size, "");
     }
     if(animation == NULL)
         return LV_RES_INV;

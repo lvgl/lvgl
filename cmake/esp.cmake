@@ -21,9 +21,14 @@ if(LV_MICROPYTHON)
                                INTERFACE "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
   endif()
 else()
-  idf_component_register(SRCS ${SOURCES} INCLUDE_DIRS ${LVGL_ROOT_DIR}
-                         ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../)
-
+  idf_component_register(SRCS ${SOURCES} 
+                        INCLUDE_DIRS 
+                          ${LVGL_ROOT_DIR}
+                          ${LVGL_ROOT_DIR}/src 
+                          ${LVGL_ROOT_DIR}/../
+                         REQUIRES
+                          rlottie_wrapper) 
+  
   target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
   if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
