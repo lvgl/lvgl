@@ -112,6 +112,7 @@ LVGL is also avaiable as:
 - [ESP32 component](https://docs.lvgl.io/master/get-started/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/get-started/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/rt-thread.html)
 
 
 ## Get started
