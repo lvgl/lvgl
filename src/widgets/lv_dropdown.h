@@ -63,7 +63,7 @@ extern const  lv_obj_class_t lv_dropdownlist_class;
  **********************/
 
 /**
- * Create a drop-down list objects
+ * Create a drop-down list object
  * @param parent pointer to an object, it will be the parent of the new drop-down list
  * @return pointer to the created drop-down list
  */
@@ -226,6 +226,12 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj);
  */
 void lv_dropdown_close(lv_obj_t * obj);
 
+/**
+ * Tells whether the list is opened or not
+ * @param obj       pointer to a drop-down list object
+ * @return          true if the list os opened
+ */
+bool lv_dropdown_is_open(lv_obj_t * obj);
 
 /**********************
  *      MACROS

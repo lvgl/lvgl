@@ -11,6 +11,7 @@
 #if LV_USE_FS_WIN32 != '\0'
 
 #include <windows.h>
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -54,7 +55,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 void lv_fs_win32_init(void)
 {
     /*---------------------------------------------------
-     * Register the file system interface in LittlevGL
+     * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
     /*Add a simple drive to open images*/
@@ -101,7 +102,7 @@ static lv_fs_res_t fs_error_from_win32(DWORD error)
 {
     lv_fs_res_t res;
 
-    switch (error) {
+    switch(error) {
         case ERROR_SUCCESS:
             res = LV_FS_RES_OK;
             break;
@@ -199,11 +200,11 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     DWORD desired_access = 0;
 
-    if (mode & LV_FS_MODE_RD) {
+    if(mode & LV_FS_MODE_RD) {
         desired_access |= GENERIC_READ;
     }
 
-    if (mode & LV_FS_MODE_WR) {
+    if(mode & LV_FS_MODE_WR) {
         desired_access |= GENERIC_WRITE;
     }
 
@@ -214,18 +215,18 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     sprintf(buf, LV_FS_WIN32_PATH "%s", path);
 #endif
 
-    return (void*)CreateFileA(
+    return (void *)CreateFileA(
 #ifdef LV_FS_WIN32_PATH
-        buf,
+               buf,
 #else
-        path,
+               path,
 #endif
-        desired_access,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
+               desired_access,
+               FILE_SHARE_READ,
+               NULL,
+               OPEN_EXISTING,
+               FILE_ATTRIBUTE_NORMAL,
+               NULL);
 }
 
 /**
@@ -239,8 +240,8 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     LV_UNUSED(drv);
     return CloseHandle((HANDLE)file_p)
-        ? LV_FS_RES_OK
-        : fs_error_from_win32(GetLastError());
+           ? LV_FS_RES_OK
+           : fs_error_from_win32(GetLastError());
 }
 
 /**
@@ -257,8 +258,8 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 {
     LV_UNUSED(drv);
     return ReadFile((HANDLE)file_p, buf, btr, (LPDWORD)br, NULL)
-        ? LV_FS_RES_OK
-        : fs_error_from_win32(GetLastError());
+           ? LV_FS_RES_OK
+           : fs_error_from_win32(GetLastError());
 }
 
 /**
@@ -274,8 +275,8 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 {
     LV_UNUSED(drv);
     return WriteFile((HANDLE)file_p, buf, btw, (LPDWORD)bw, NULL)
-        ? LV_FS_RES_OK
-        : fs_error_from_win32(GetLastError());
+           ? LV_FS_RES_OK
+           : fs_error_from_win32(GetLastError());
 }
 
 /**
@@ -290,8 +291,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 {
     LV_UNUSED(drv);
 
-    DWORD move_method = (DWORD)-1;
-    if (whence == LV_FS_SEEK_SET) {
+    DWORD move_method = (DWORD) -1;
+    if(whence == LV_FS_SEEK_SET) {
         move_method = FILE_BEGIN;
     }
     else if(whence == LV_FS_SEEK_CUR) {
@@ -304,8 +305,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     LARGE_INTEGER distance_to_move;
     distance_to_move.QuadPart = pos;
     return SetFilePointerEx((HANDLE)file_p, distance_to_move, NULL, move_method)
-        ? LV_FS_RES_OK
-        : fs_error_from_win32(GetLastError());
+           ? LV_FS_RES_OK
+           : fs_error_from_win32(GetLastError());
 }
 
 /**
@@ -320,7 +321,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
 
-    if (!pos_p) {
+    if(!pos_p) {
         return LV_FS_RES_INV_PARAM;
     }
 
@@ -329,12 +330,12 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 
     LARGE_INTEGER distance_to_move;
     distance_to_move.QuadPart = 0;
-    if (SetFilePointerEx(
-        (HANDLE)file_p,
-        distance_to_move,
-        &file_pointer,
-        FILE_CURRENT)) {
-        if (file_pointer.QuadPart > LONG_MAX) {
+    if(SetFilePointerEx(
+           (HANDLE)file_p,
+           distance_to_move,
+           &file_pointer,
+           FILE_CURRENT)) {
+        if(file_pointer.QuadPart > LONG_MAX) {
             return LV_FS_RES_INV_PARAM;
         }
         else {
@@ -374,11 +375,11 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     strcpy(next_fn, "");
     d = FindFirstFileA(buf, &fdata);
     do {
-        if (is_dots_name(fdata.cFileName)) {
+        if(is_dots_name(fdata.cFileName)) {
             continue;
         }
         else {
-            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
                 sprintf(next_fn, "/%s", fdata.cFileName);
             }
             else {
@@ -387,7 +388,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
             break;
         }
 
-    } while (FindNextFileA(d, &fdata));
+    } while(FindNextFileA(d, &fdata));
 
     next_error = fs_error_from_win32(GetLastError());
     return d;
@@ -412,12 +413,12 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     strcpy(next_fn, "");
     WIN32_FIND_DATAA fdata;
 
-    while (FindNextFileA(dir_p, &fdata)) {
-        if (is_dots_name(fdata.cFileName)) {
+    while(FindNextFileA(dir_p, &fdata)) {
+        if(is_dots_name(fdata.cFileName)) {
             continue;
         }
         else {
-            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
                 sprintf(next_fn, "/%s", fdata.cFileName);
             }
             else {
@@ -427,7 +428,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
         }
     }
 
-    if (next_fn[0] == '\0') {
+    if(next_fn[0] == '\0') {
         next_error = fs_error_from_win32(GetLastError());
     }
 
@@ -444,8 +445,8 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
     return FindClose((HANDLE)dir_p)
-        ? LV_FS_RES_OK
-        : fs_error_from_win32(GetLastError());
+           ? LV_FS_RES_OK
+           : fs_error_from_win32(GetLastError());
 }
 
 #endif /*LV_USE_FS_WIN32*/

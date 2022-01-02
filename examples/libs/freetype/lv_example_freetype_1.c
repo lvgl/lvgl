@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_FREETYPE && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+#if LV_USE_FREETYPE
 
 /**
  * Load a font with FreeType
@@ -12,7 +13,10 @@ void lv_example_freetype_1(void)
     info.name = "./lvgl/examples/libs/freetype/arial.ttf";
     info.weight = 24;
     info.style = FT_FONT_STYLE_NORMAL;
-    lv_ft_font_init(&info);
+    info.mem = NULL;
+    if(!lv_ft_font_init(&info)) {
+        LV_LOG_ERROR("create failed.");
+    }
 
     /*Create style with the new font*/
     static lv_style_t style;
@@ -38,4 +42,5 @@ void lv_example_freetype_1(void)
     lv_obj_center(label);
 }
 
+#endif
 #endif

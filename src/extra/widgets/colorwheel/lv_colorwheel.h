@@ -55,7 +55,7 @@ extern const lv_obj_class_t lv_colorwheel_class;
  **********************/
 
 /**
- * Create a color picker objects with disc shape
+ * Create a color picker object with disc shape
  * @param parent pointer to an object, it will be the parent of the new color picker
  * @param knob_recolor true: set the knob's color to the current color
  * @return pointer to the created color picker

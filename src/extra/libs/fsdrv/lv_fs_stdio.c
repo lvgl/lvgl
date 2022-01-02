@@ -12,10 +12,10 @@
 
 #include <stdio.h>
 #ifndef WIN32
-#include <dirent.h>
-#include <unistd.h>
+    #include <dirent.h>
+    #include <unistd.h>
 #else
-#include <windows.h>
+    #include <windows.h>
 #endif
 
 /*********************
@@ -57,7 +57,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 void lv_fs_stdio_init(void)
 {
     /*---------------------------------------------------
-     * Register the file system interface in LittlevGL
+     * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
     /*Add a simple drive to open images*/
@@ -141,7 +141,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 {
     LV_UNUSED(drv);
     *br = fread(buf, 1, btr, file_p);
-    return (int32_t)*br < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+    return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
@@ -157,7 +157,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 {
     LV_UNUSED(drv);
     *bw = fwrite(buf, 1, btw, file_p);
-    return (int32_t)*bw < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+    return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
 /**
@@ -191,7 +191,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 }
 
 #ifdef WIN32
-static char next_fn[256];
+    static char next_fn[256];
 #endif
 
 /**
@@ -227,12 +227,14 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
     do {
-        if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
+        if(strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
             continue;
-        } else {
-            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        }
+        else {
+            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
                 sprintf(next_fn, "/%s", fdata.cFileName);
-            } else {
+            }
+            else {
                 sprintf(next_fn, "%s", fdata.cFileName);
             }
             break;
@@ -256,13 +258,14 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     LV_UNUSED(drv);
 
 #ifndef WIN32
-    struct dirent *entry;
+    struct dirent * entry;
     do {
         entry = readdir(dir_p);
         if(entry) {
             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
             else strcpy(fn, entry->d_name);
-        } else {
+        }
+        else {
             strcpy(fn, "");
         }
     } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
@@ -274,12 +277,14 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 
     if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
     do {
-        if (strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
+        if(strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
             continue;
-        } else {
-            if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        }
+        else {
+            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
                 sprintf(next_fn, "/%s", fdata.cFileName);
-            } else {
+            }
+            else {
                 sprintf(next_fn, "%s", fdata.cFileName);
             }
             break;

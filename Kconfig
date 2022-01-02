@@ -321,11 +321,61 @@ menu "LVGL configuration"
 
         menu "Others"
             config LV_USE_PERF_MONITOR
-                bool "Show CPU usage and FPS count in the right bottom corner."
+                bool "Show CPU usage and FPS count."
+
+            choice
+                prompt "Performance monitor position."
+                depends on LV_USE_PERF_MONITOR
+                default LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
+
+                config LV_PERF_MONITOR_ALIGN_TOP_LEFT
+                    bool "Top left"
+                config LV_PERF_MONITOR_ALIGN_TOP_MID
+                    bool "Top middle"
+                config LV_PERF_MONITOR_ALIGN_TOP_RIGHT
+                    bool "Top right"
+                config LV_PERF_MONITOR_ALIGN_BOTTOM_LEFT
+                    bool "Bottom left"
+                config LV_PERF_MONITOR_ALIGN_BOTTOM_MID
+                    bool "Bottom middle"
+                config LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
+                    bool "Bottom right"
+                config LV_PERF_MONITOR_ALIGN_LEFT_MID
+                    bool "Left middle"
+                config LV_PERF_MONITOR_ALIGN_RIGHT_MID
+                    bool "Right middle"
+                config LV_PERF_MONITOR_ALIGN_BOTTOM_CENTER
+                    bool "Center"
+            endchoice
 
             config LV_USE_MEM_MONITOR
-                bool "Show the used memory and the memory fragmentation in the left bottom corner."
+                bool "Show the used memory and the memory fragmentation."
                 depends on !LV_MEM_CUSTOM
+
+            choice
+                prompt "Memory monitor position."
+                depends on LV_USE_MEM_MONITOR
+                default LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
+
+                config LV_MEM_MONITOR_ALIGN_TOP_LEFT
+                    bool "Top left"
+                config LV_MEM_MONITOR_ALIGN_TOP_MID
+                    bool "Top middle"
+                config LV_MEM_MONITOR_ALIGN_TOP_RIGHT
+                    bool "Top right"
+                config LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
+                    bool "Bottom left"
+                config LV_MEM_MONITOR_ALIGN_BOTTOM_MID
+                    bool "Bottom middle"
+                config LV_MEM_MONITOR_ALIGN_BOTTOM_RIGHT
+                    bool "Bottom right"
+                config LV_MEM_MONITOR_ALIGN_LEFT_MID
+                    bool "Left middle"
+                config LV_MEM_MONITOR_ALIGN_RIGHT_MID
+                    bool "Right middle"
+                config LV_MEM_MONITOR_ALIGN_BOTTOM_CENTER
+                    bool "Center"
+            endchoice
 
             config LV_USE_REFR_DEBUG
                 bool "Draw random colored rectangles over the redrawn areas."
@@ -725,6 +775,9 @@ menu "LVGL configuration"
         config LV_USE_LIST
             bool "List."
             default y if !LV_CONF_MINIMAL
+        config LV_USE_MENU
+            bool "Menu."
+            default y if !LV_CONF_MINIMAL
         config LV_USE_METER
             bool "Meter."
             default y if !LV_CONF_MINIMAL
@@ -827,19 +880,44 @@ menu "LVGL configuration"
 
         config LV_USE_FREETYPE
             bool "FreeType library"
-        config LV_FREETYPE_CACHE_SIZE
-            int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
-            depends on LV_USE_FREETYPE
-            default 16384
+        if LV_USE_FREETYPE
+            menu "FreeType cache config"
+                config LV_FREETYPE_CACHE_SIZE
+                int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
+                default 16384
+                if LV_FREETYPE_CACHE_SIZE >= 0
+                    config LV_FREETYPE_SBIT_CACHE
+                        bool "enable sbit cache"
+                        default n
+                    config LV_FREETYPE_CACHE_FT_FACES
+                        int "The maximum number of FT_Face(0: use defaults)"
+                        default 0
+                    config LV_FREETYPE_CACHE_FT_SIZES
+                        int "The maximum number of FT_Size(0: use defaults)"
+                        default 0
+                endif
+            endmenu
+        endif
 
         config LV_USE_RLOTTIE
             bool "Lottie library"
+
+        config LV_USE_FFMPEG
+            bool "FFmpeg library"
+        config LV_FFMPEG_AV_DUMP_FORMAT
+            bool "Dump av format"
+            depends on LV_USE_FFMPEG
+            default n
     endmenu
 
     menu "Others"
         config LV_USE_SNAPSHOT
             bool "Enable API to take snapshot"
             default y if !LV_CONF_MINIMAL
+
+        config LV_USE_MONKEY
+            bool "Enable Monkey test"
+            default n
     endmenu
 
     menu "Examples"
@@ -847,9 +925,5 @@ menu "LVGL configuration"
             bool "Enable the examples to be built"
             default y if !LV_CONF_MINIMAL
     endmenu
-
-    config LV_BUILD_EXAMPLES
-        bool "Enable the examples to be built with the library."
-        default y
 
 endmenu

@@ -57,6 +57,13 @@ void _lv_refr_init(void);
 void lv_refr_now(lv_disp_t * disp);
 
 /**
+ * Redrawn on object an all its children using the passed draw context
+ * @param draw  pointer to an initialized draw context
+ * @param obj   the start object from the redraw should start
+ */
+void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj);
+
+/**
  * Invalidate an area on display to redraw it
  * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
  * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
@@ -80,7 +87,12 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp);
 
 #if LV_USE_PERF_MONITOR
 /**
- * Get the average FPS since start up
+ * Reset FPS counter
+ */
+void lv_refr_reset_fps_counter(void);
+
+/**
+ * Get the average FPS
  * @return the average FPS
  */
 uint32_t lv_refr_get_fps_avg(void);

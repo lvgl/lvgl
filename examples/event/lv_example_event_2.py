@@ -17,6 +17,6 @@ btn_label.set_text("Click me!")
 btn_label.center()
 
 info_label = lv.label(lv.scr_act())
-info_label.set_text("The last button event:\nNone");
+info_label.set_text("The last button event:\nNone")
 
 btn.add_event_cb(lambda e: event_cb(e,info_label), lv.EVENT.ALL, None)

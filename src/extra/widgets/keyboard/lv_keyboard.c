@@ -130,8 +130,8 @@ static const lv_btnmatrix_ctrl_t * kb_ctrl[9] = {
  **********************/
 
 /**
- * Create a keyboard objects
- * @param par pointer to an object, it will be the parent of the new keyboard
+ * Create a Keyboard object
+ * @param parent pointer to an object, it will be the parent of the new keyboard
  * @return pointer to the created keyboard
  */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
@@ -197,7 +197,7 @@ void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
 {
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
-    if (keyboard->popovers == en) {
+    if(keyboard->popovers == en) {
         return;
     }
 
@@ -406,10 +406,11 @@ static void lv_keyboard_update_ctrl_map(lv_obj_t * obj)
 {
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
-    if (keyboard->popovers) {
+    if(keyboard->popovers) {
         /*Apply the current control map (already includes LV_BTNMATRIX_CTRL_POPOVER flags)*/
         lv_btnmatrix_set_ctrl_map(obj, kb_ctrl[keyboard->mode]);
-    } else {
+    }
+    else {
         /*Make a copy of the current control map*/
         lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
         lv_btnmatrix_ctrl_t * ctrl_map = lv_mem_alloc(btnm->btn_cnt * sizeof(lv_btnmatrix_ctrl_t));

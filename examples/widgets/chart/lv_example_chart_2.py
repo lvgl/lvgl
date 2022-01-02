@@ -44,7 +44,7 @@ def draw_event_cb(e):
 
 def add_data(timer):
     # LV_UNUSED(timer);
-    cnt = 0;
+    cnt = 0
     chart1.set_next_value(ser1, lv.rand(20, 90))
 
     if cnt % 4 == 0:

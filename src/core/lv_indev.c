@@ -345,12 +345,18 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     /*Simple sanity check*/
-    if(data->point.x < 0) LV_LOG_WARN("X is %d which is smaller than zero", data->point.x);
-    if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) LV_LOG_WARN("X is %d which is greater than hor. res",
-                                                                              data->point.x);
-    if(data->point.y < 0) LV_LOG_WARN("Y is %d which is smaller than zero", data->point.y);
-    if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) LV_LOG_WARN("Y is %d which is greater than hor. res",
-                                                                              data->point.y);
+    if(data->point.x < 0) {
+        LV_LOG_WARN("X is %d which is smaller than zero", data->point.x);
+    }
+    if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) {
+        LV_LOG_WARN("X is %d which is greater than hor. res", data->point.x);
+    }
+    if(data->point.y < 0) {
+        LV_LOG_WARN("Y is %d which is smaller than zero", data->point.y);
+    }
+    if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) {
+        LV_LOG_WARN("Y is %d which is greater than ver. res", data->point.y);
+    }
 
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&
@@ -994,8 +1000,7 @@ static void indev_click_focus(_lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
     if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) == false ||
-       proc->types.pointer.last_pressed == indev_obj_act)
-    {
+       proc->types.pointer.last_pressed == indev_obj_act) {
         return;
     }
 

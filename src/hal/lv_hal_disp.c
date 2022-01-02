@@ -17,6 +17,11 @@
 #include "../core/lv_obj.h"
 #include "../core/lv_refr.h"
 #include "../core/lv_theme.h"
+#include "../draw/sdl/lv_draw_sdl.h"
+#include "../draw/sw/lv_draw_sw.h"
+#include "../draw/sdl/lv_draw_sdl.h"
+#include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
+
 #if LV_USE_THEME_DEFAULT
     #include "../extra/themes/default/lv_theme_default.h"
 #endif
@@ -85,6 +90,30 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
     driver->dpi              = LV_DPI_DEF;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
+
+
+#if LV_USE_GPU_STM32_DMA2D
+    driver->draw_ctx_init = lv_draw_stm32_dma2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_init;
+    driver->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_ctx_t);
+#elif LV_USE_GPU_NXP_PXP
+    driver->draw_ctx_init = lv_draw_nxp_pxp_init;
+    driver->draw_ctx_deinit = lv_draw_nxp_pxp_init;
+    driver->draw_ctx_size = sizeof(lv_draw_nxp_pxp_t);
+#elif LV_USE_GPU_NXP_VG_LITE
+    driver->draw_ctx_init = lv_draw_nxp_vglite_init;
+    driver->draw_ctx_deinit = lv_draw_nxp_vglite_init;
+    driver->draw_ctx_size = sizeof(lv_draw_nxp_vglite_t);
+#elif LV_USE_GPU_SDL
+    driver->draw_ctx_init = lv_draw_sdl_init_ctx;
+    driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
+    driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
+#else
+    driver->draw_ctx_init = lv_draw_sw_init_ctx;
+    driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
+    driver->draw_ctx_size = sizeof(lv_draw_sw_ctx_t);
+#endif
+
 }
 
 /**
@@ -126,6 +155,15 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
         return NULL;
     }
 
+    /*Create a draw context if not created yet*/
+    if(driver->draw_ctx == NULL) {
+        lv_draw_ctx_t * draw_ctx = lv_mem_alloc(driver->draw_ctx_size);
+        LV_ASSERT_MALLOC(draw_ctx);
+        if(draw_ctx == NULL) return NULL;
+        driver->draw_ctx_init(driver, draw_ctx);
+        driver->draw_ctx = draw_ctx;
+    }
+
     lv_memset_00(disp, sizeof(lv_disp_t));
 
     disp->driver = driver;
@@ -157,7 +195,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     if(lv_theme_default_is_inited() == false) {
         disp->theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                             LV_THEME_DEFAULT_DARK, LV_FONT_DEFAULT);
-    } else {
+    }
+    else {
         disp->theme = lv_theme_default_get();
     }
 #endif
@@ -461,7 +500,12 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
     if(disp_drv->screen_transp) {
-        lv_memset_00(disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size * sizeof(lv_color32_t));
+        if(disp_drv->clear_cb) {
+            disp_drv->clear_cb(disp_drv, disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size);
+        }
+        else {
+            lv_memset_00(disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size * sizeof(lv_color32_t));
+        }
     }
 #endif
 

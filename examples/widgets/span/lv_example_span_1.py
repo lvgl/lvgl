@@ -25,7 +25,7 @@ span.style.set_text_decor(lv.TEXT_DECOR.STRIKETHROUGH | lv.TEXT_DECOR.UNDERLINE)
 span.style.set_text_opa(lv.OPA._30)
 
 span = spans.new_span()
-span.set_text_static("good good study, day day up.");
+span.set_text_static("good good study, day day up.")
 #if LV_FONT_MONTSERRAT_24
 #    lv_style_set_text_font(&span->style,  &lv_font_montserrat_24);
 #endif

@@ -69,11 +69,11 @@ typedef struct {
 #endif
 
     lv_point_t offset; /*Text draw position offset*/
-    lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/
+    lv_label_long_mode_t long_mode : 3; /*Determine what to do with the long texts*/
     uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
     uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
-    uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/
-    uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters*/
+    uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SCROLL)*/
+    uint8_t dot_tmp_alloc : 1;         /*1: dot is allocated, 0: dot directly holds up to 4 chars*/
 } lv_label_t;
 
 extern const lv_obj_class_t lv_label_class;
@@ -83,7 +83,7 @@ extern const lv_obj_class_t lv_label_class;
  **********************/
 
 /**
- * Create a label objects
+ * Create a label object
  * @param parent    pointer to an object, it will be the parent of the new label.
  * @return          pointer to the created button
  */
@@ -95,14 +95,14 @@ lv_obj_t * lv_label_create(lv_obj_t * parent);
 
 /**
  * Set a new text for a label. Memory will be allocated to store the text by the label.
- * @param label         pointer to a label object
+ * @param obj           pointer to a label object
  * @param text          '\0' terminated character string. NULL to refresh with the current text.
  */
 void lv_label_set_text(lv_obj_t * obj, const char * text);
 
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
- * @param label         pointer to a label object
+ * @param obj           pointer to a label object
  * @param fmt           `printf`-like format
  * @example lv_label_set_text_fmt(label1, "%d user", user_num);
  */
@@ -111,14 +111,14 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the label exists.
- * @param label         pointer to a label object
+ * @param obj           pointer to a label object
  * @param text          pointer to a text. NULL to refresh with the current text.
  */
 void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 
 /**
  * Set the behavior of the label with longer text then the object size
- * @param label         pointer to a label object
+ * @param obj           pointer to a label object
  * @param long_mode     the new mode from 'lv_label_long_mode' enum.
  *                      In LV_LONG_WRAP/DOT/SCROLL/SCROLL_CIRC the size of the label should be set AFTER this function
  */
@@ -126,7 +126,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode);
 
 /**
  * Enable the recoloring by in-line commands
- * @param label         pointer to a label object
+ * @param obj           pointer to a label object
  * @param en            true: enable recoloring, false: disable
  * @example "This is a #ff0000 red# word"
  */
@@ -152,7 +152,7 @@ void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index);
 
 /**
  * Get the text of a label
- * @param obj     pointer to a label object
+ * @param obj       pointer to a label object
  * @return          the text of the label
  */
 char * lv_label_get_text(const lv_obj_t * obj);
@@ -191,9 +191,9 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in);
 
 /**
  * Check if a character is drawn under a point.
- * @param label Label object
- * @param pos Point to check for character under
- * @return whether a character is drawn under the point
+ * @param obj       pointer to a label object
+ * @param pos       Point to check for character under
+ * @return          whether a character is drawn under the point
  */
 bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos);
 
@@ -226,7 +226,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt);
 
 /**
  * Delete characters from a label. The label text can not be static.
- * @param label     pointer to a label object
+ * @param obj       pointer to a label object
  * @param pos       character index from where to cut. Expressed in character index and not byte index.
  *                  0: start in from of the first character
  * @param cnt       number of characters to cut

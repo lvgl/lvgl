@@ -8,6 +8,7 @@ CSRCS += lv_fs.c
 CSRCS += lv_gc.c
 CSRCS += lv_ll.c
 CSRCS += lv_log.c
+CSRCS += lv_lru.c
 CSRCS += lv_math.c
 CSRCS += lv_mem.c
 CSRCS += lv_printf.c

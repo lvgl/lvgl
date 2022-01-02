@@ -305,6 +305,14 @@ int qrcodegen_getSize(const uint8_t qrcode[]);
  */
 bool qrcodegen_getModule(const uint8_t qrcode[], int x, int y);
 
+/* 
+ * Returns the qrcode size of the specified version. Returns -1 on failure
+ */
+int qrcodegen_version2size(int version);
+/* 
+ * Returns the min version of the data that can be stored. Returns -1 on failure
+ */
+int qrcodegen_getMinFitVersion(enum qrcodegen_Ecc ecl, size_t dataLen);
 
 #ifdef __cplusplus
 }

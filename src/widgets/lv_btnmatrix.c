@@ -219,7 +219,7 @@ void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
     btnm->ctrl_bits[btn_id] |= ctrl;
     invalidate_button_area(obj, btn_id);
 
-    if (ctrl & LV_BTNMATRIX_CTRL_POPOVER) {
+    if(ctrl & LV_BTNMATRIX_CTRL_POPOVER) {
         lv_obj_refresh_ext_draw_size(obj);
     }
 }
@@ -235,7 +235,7 @@ void lv_btnmatrix_clear_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_c
     btnm->ctrl_bits[btn_id] &= (~ctrl);
     invalidate_button_area(obj, btn_id);
 
-    if (ctrl & LV_BTNMATRIX_CTRL_POPOVER) {
+    if(ctrl & LV_BTNMATRIX_CTRL_POPOVER) {
         lv_obj_refresh_ext_draw_size(obj);
     }
 }
@@ -400,10 +400,11 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = lv_event_get_param(e);
-        if (has_popovers_in_top_row(obj)) {
+        if(has_popovers_in_top_row(obj)) {
             /*reserve one row worth of extra space to account for popovers in the top row*/
             *s = btnm->row_cnt > 0 ? lv_obj_get_content_height(obj) / btnm->row_cnt : 0;
-        } else {
+        }
+        else {
             *s = 0;
         }
     }
@@ -505,10 +506,6 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Invalidate to old pressed area*/;
         invalidate_button_area(obj, btnm->btn_id_sel);
 
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-        if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
-            btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
-        }
     }
     else if(code == LV_EVENT_LONG_PRESSED_REPEAT) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
@@ -655,7 +652,7 @@ static void draw_main(lv_event_t * e)
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     if(btnm->btn_cnt == 0) return;
 
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     obj->skip_trans = 1;
 
     lv_area_t area_obj;
@@ -693,7 +690,7 @@ static void draw_main(lv_event_t * e)
 #endif
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.part = LV_PART_ITEMS;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_BTNMATRIX_DRAW_PART_BTN;
@@ -765,13 +762,13 @@ static void draw_main(lv_event_t * e)
 
         lv_coord_t btn_height = lv_area_get_height(&btn_area);
 
-        if ((btn_state & LV_STATE_PRESSED) && (btnm->ctrl_bits[btn_i] & LV_BTNMATRIX_CTRL_POPOVER)) {
+        if((btn_state & LV_STATE_PRESSED) && (btnm->ctrl_bits[btn_i] & LV_BTNMATRIX_CTRL_POPOVER)) {
             /*Push up the upper boundary of the btn area to create the popover*/
             btn_area.y1 -= btn_height;
         }
 
         /*Draw the background*/
-        lv_draw_rect(&btn_area, clip_area, &draw_rect_dsc_act);
+        lv_draw_rect(draw_ctx, &draw_rect_dsc_act, &btn_area);
 
         /*Calculate the size of the text*/
         const lv_font_t * font = draw_label_dsc_act.font;
@@ -796,14 +793,14 @@ static void draw_main(lv_event_t * e)
         btn_area.x2 = btn_area.x1 + txt_size.x;
         btn_area.y2 = btn_area.y1 + txt_size.y;
 
-        if ((btn_state & LV_STATE_PRESSED) && (btnm->ctrl_bits[btn_i] & LV_BTNMATRIX_CTRL_POPOVER)) {
+        if((btn_state & LV_STATE_PRESSED) && (btnm->ctrl_bits[btn_i] & LV_BTNMATRIX_CTRL_POPOVER)) {
             /*Push up the button text into the popover*/
             btn_area.y1 -= btn_height / 2;
             btn_area.y2 -= btn_height / 2;
         }
 
         /*Draw the text*/
-        lv_draw_label(&btn_area, clip_area, &draw_label_dsc_act, txt, NULL);
+        lv_draw_label(draw_ctx, &draw_label_dsc_act, &btn_area, txt, NULL);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
@@ -828,7 +825,8 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** 
     while(map[i] && map[i][0] != '\0') {
         if(strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
             btn_cnt++;
-        } else {
+        }
+        else {
             btnm->row_cnt++;
         }
         i++;
@@ -979,6 +977,8 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     lv_area_t obj_area;
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
+    if(btn_idx >= btnm->btn_cnt) return;
+
     lv_area_copy(&btn_area, &btnm->button_areas[btn_idx]);
     lv_obj_get_coords(obj, &obj_area);
 
@@ -998,7 +998,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     btn_area.x2 += obj_area.x1 + row_gap;
     btn_area.y2 += obj_area.y1 + col_gap;
 
-    if ((btn_idx == btnm->btn_id_sel) && (btnm->ctrl_bits[btn_idx] & LV_BTNMATRIX_CTRL_POPOVER)) {
+    if((btn_idx == btnm->btn_id_sel) && (btnm->ctrl_bits[btn_idx] & LV_BTNMATRIX_CTRL_POPOVER)) {
         /*Push up the upper boundary of the btn area to also invalidate the popover*/
         btn_area.y1 -= lv_area_get_height(&btn_area);
     }
@@ -1031,15 +1031,15 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
 {
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
 
-    if (btnm->row_cnt <= 0) {
+    if(btnm->row_cnt <= 0) {
         return false;
     }
 
     const char ** map_row = btnm->map_p;
     uint16_t btn_cnt = 0;
 
-    while (map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
-        if (button_is_popover(btnm->ctrl_bits[btn_cnt])) {
+    while(map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
+        if(button_is_popover(btnm->ctrl_bits[btn_cnt])) {
             return true;
         }
         btn_cnt++;

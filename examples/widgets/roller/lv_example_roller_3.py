@@ -8,7 +8,7 @@ class Lv_Roller_3():
         self.mask_bottom_id = -1
         
         # 
-        # Add an fade mask to roller.
+        # Add a fade mask to roller.
         #
         style =  lv.style_t()
         style.init()
@@ -93,7 +93,7 @@ class Lv_Roller_3():
             # Remove the masks
             lv.draw_mask_remove_id(self.mask_top_id)
             lv.draw_mask_remove_id(self.mask_bottom_id)
-            self.mask_top_id = -1;
-            self.mask_bottom_id = -1;        
+            self.mask_top_id = -1
+            self.mask_bottom_id = -1
             
 roller3 = Lv_Roller_3()

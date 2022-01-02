@@ -56,7 +56,7 @@ This means the `flush_cb` callback only has to update the address of the framebu
 This configuration should be used if the MCU has an LCD controller peripheral and not with an external display controller (e.g. ILI9341 or SSD1963) accessed via serial link. The latter will generally be too slow to maintain high frame rates with full screen redraws.
 
 ### Direct mode
-If the `direct mode` flag is enabled in the display driver LVGL will draw directly into a **screen sized frame buffer**. That is the draw buffer(s) needs to be screen sized. 
+If the `direct_mode` flag is enabled in the display driver LVGL will draw directly into a **screen sized frame buffer**. That is the draw buffer(s) needs to be screen sized. 
 It this case `flush_cb` will be called only once when all dirty areas are redrawn.
 With `direct_mode` the frame buffer always contains the current frame as it should be displayed on the screen. 
 If 2 frame buffers are provided as draw buffers LVGL will alter the buffers but always draw only the dirty areas. 
@@ -69,7 +69,6 @@ The get the redrawn areas to copy use the following functions
 `disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
 `disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into an other one and should be ignored
 `disp->inv_p` number of valid elements in `inv_areas`
-```
 
 ## Display driver
 

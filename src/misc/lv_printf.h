@@ -35,19 +35,19 @@
 #define _LV_PRINTF_H_
 
 #if defined(__has_include)
-#  if __has_include(<inttypes.h>)
-#    include <inttypes.h>
-     /* platform-specific printf format for int32_t, usually "d" or "ld" */
-#    define LV_PRId32 PRId32
-#    define LV_PRIu32 PRIu32
-#  else
-#    define LV_PRId32 "d"
-#    define LV_PRIu32 "u"
-#  endif
+    #if __has_include(<inttypes.h>)
+        #include <inttypes.h>
+        /* platform-specific printf format for int32_t, usually "d" or "ld" */
+        #define LV_PRId32 PRId32
+        #define LV_PRIu32 PRIu32
+    #else
+        #define LV_PRId32 "d"
+        #define LV_PRIu32 "u"
+    #endif
 #else
-   /* hope this is correct for ports without __has_include or without inttypes.h */
-#  define LV_PRId32 "d"
-#  define LV_PRIu32 "u"
+    /* hope this is correct for ports without __has_include or without inttypes.h */
+    #define LV_PRId32 "d"
+    #define LV_PRIu32 "u"
 #endif
 
 #ifdef __cplusplus
@@ -64,8 +64,8 @@ extern "C" {
 #include "lv_types.h"
 
 typedef struct {
-  const char * fmt;
-  va_list * va;
+    const char * fmt;
+    va_list * va;
 } lv_vaformat_t;
 
 /**

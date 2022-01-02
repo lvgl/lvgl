@@ -11,5 +11,3 @@ style.set_arc_width(4)
 obj = lv.arc(lv.scr_act())
 obj.add_style(style, 0)
 obj.center()
-
-

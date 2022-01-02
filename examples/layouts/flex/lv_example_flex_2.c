@@ -17,13 +17,13 @@ void lv_example_flex_2(void)
     lv_obj_center(cont);
     lv_obj_add_style(cont, &style, 0);
 
-    unsigned int i;
+    uint32_t i;
     for(i = 0; i < 8; i++) {
         lv_obj_t * obj = lv_obj_create(cont);
         lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
 
         lv_obj_t * label = lv_label_create(obj);
-        lv_label_set_text_fmt(label, "%u", i);
+        lv_label_set_text_fmt(label, "%"LV_PRIu32, i);
         lv_obj_center(label);
     }
 }

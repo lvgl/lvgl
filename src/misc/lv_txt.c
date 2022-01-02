@@ -1,5 +1,5 @@
 /**
- * @file lv_text.c
+ * @file lv_txt.c
  *
  */
 
@@ -105,7 +105,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
 
     /*Calc. the height and longest line*/
     while(text[line_start] != '\0') {
-        new_line_start += _lv_txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
+        new_line_start += _lv_txt_get_next_line(&text[line_start], font, letter_space, max_width, NULL, flag);
 
         if((unsigned long)size_res->y + (unsigned long)letter_height + (unsigned long)line_space > LV_MAX_OF(lv_coord_t)) {
             LV_LOG_WARN("lv_txt_get_size: integer overflow while calculating text height");
@@ -276,11 +276,16 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 }
 
 uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
-                               lv_coord_t letter_space, lv_coord_t max_width, lv_text_flag_t flag)
+                               lv_coord_t letter_space, lv_coord_t max_width,
+                               lv_coord_t * used_width, lv_text_flag_t flag)
 {
+    if(used_width) *used_width = 0;
+
     if(txt == NULL) return 0;
     if(txt[0] == '\0') return 0;
     if(font == NULL) return 0;
+
+    lv_coord_t line_w = 0;
 
     /*If max_width doesn't mater simply find the new line character
      *without thinking about word wrapping*/
@@ -290,6 +295,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             /*Just find the new line chars or string ends by incrementing `i`*/
         }
         if(txt[i] != '\0') i++;    /*To go beyond `\n`*/
+        if(used_width) *used_width = -1;
         return i;
     }
 
@@ -301,9 +307,9 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         uint32_t word_w = 0;
         uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w, &cmd_state, i == 0);
         max_width -= word_w;
+        line_w += word_w;
 
         if(advance == 0) {
-            if(i == 0) _lv_txt_encoded_next(txt, &i); // prevent inf loops
             break;
         }
 
@@ -320,7 +326,14 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     /*Always step at least one to avoid infinite loops*/
     if(i == 0) {
-        _lv_txt_encoded_next(txt, &i);
+        uint32_t letter = _lv_txt_encoded_next(txt, &i);
+        if(used_width != NULL) {
+            line_w = lv_font_get_glyph_width(font, letter, '\0');
+        }
+    }
+
+    if(used_width != NULL) {
+        *used_width = line_w;
     }
 
     return i;

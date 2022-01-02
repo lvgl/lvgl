@@ -25,8 +25,8 @@ img_cogwheel_argb = lv.img_dsc_t({
 def create_slider(color):
     slider = lv.slider(lv.scr_act())
     slider.set_range(0, 255)
-    slider.set_size(10, 200);
-    slider.set_style_bg_color(color, lv.PART.KNOB);
+    slider.set_size(10, 200)
+    slider.set_style_bg_color(color, lv.PART.KNOB)
     slider.set_style_bg_color(color.color_darken(lv.OPA._40), lv.PART.INDICATOR)
     slider.add_event_cb(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
     return slider

@@ -25,9 +25,6 @@ extern "C" {
 #define LV_MASK_ID_INV  (-1)
 #if LV_DRAW_COMPLEX
 # define _LV_MASK_MAX_NUM     16
-# ifndef _LV_MASK_BUF_MAX_SIZE
-#  define _LV_MASK_BUF_MAX_SIZE  2048    /*Should be >= than the max hor res*/
-# endif
 #else
 # define _LV_MASK_MAX_NUM     1
 #endif
@@ -250,7 +247,7 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf,
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
 LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                lv_coord_t len, const int16_t *ids, int16_t ids_count);
+                                                                lv_coord_t len, const int16_t * ids, int16_t ids_count);
 
 //! @endcond
 
@@ -343,7 +340,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
 
 /**
  * Initialize a fade mask.
- * @param param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param param pointer to an `lv_draw_mask_radius_param_t` to initialize
  * @param rect coordinates of the rectangle to affect (absolute coordinates)
  * @param radius radius of the rectangle
  * @param inv true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
