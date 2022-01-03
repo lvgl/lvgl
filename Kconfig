@@ -13,7 +13,7 @@ menu "LVGL configuration"
         bool "LVGL minimal configuration."
 
     menu "Color settings"
-        choice
+        choice LV_COLOR_DEPTH
             prompt "Color depth."
             default LV_COLOR_DEPTH_16
             help
