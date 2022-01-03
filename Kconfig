@@ -839,22 +839,19 @@ menu "LVGL configuration"
 
     menu "3rd Party Libraries"
         config LV_USE_FS_STDIO
-            int "File system on top of stdio API"
-            default 0
+            bool "File system on top of stdio API"
         config LV_FS_STDIO_PATH
             string "Set the working directory"
             depends on LV_USE_FS_STDIO
 
         config LV_USE_FS_POSIX
-            int "File system on top of posix API"
-            default 0
+            bool "File system on top of posix API"
         config LV_FS_POSIX_PATH
             string "Set the working directory"
             depends on LV_USE_FS_POSIX
 
         config LV_USE_FS_WIN32
-            int "File system on top of Win32 API"
-            default 0
+            bool "File system on top of Win32 API"
         config LV_FS_WIN32_PATH
             string "Set the working directory"
             depends on LV_USE_FS_WIN32
