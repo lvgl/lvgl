@@ -1,6 +1,8 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 
+#if LV_USE_ARABIC_PERSIAN_CHARS
+#include "../src/misc/lv_txt_ap.h"
 #include "unity/unity.h"
 
 void setUp(void)
@@ -24,5 +26,7 @@ void test_txt_ap_proc_detect_invalid_conjuction_with_fatha(void)
 
     lv_mem_free(temp);
 }
+
+#endif /*LV_USE_ARABIC_PERSIAN_CHARS*/
 
 #endif
