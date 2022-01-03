@@ -531,23 +531,34 @@ static void lv_obj_draw(lv_event_t * e)
         part_dsc.part = LV_PART_MAIN;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
+        bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
+
+        /*With clip corner enabled draw the bg img separately to make it clipped*/
+        const void * bg_img_src = draw_dsc.bg_img_src;
+        draw_dsc.bg_img_src = NULL;
 
         lv_draw_rect(draw_ctx, &draw_dsc, &coords);
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
 
 #if LV_DRAW_COMPLEX
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            /*If the radius is 0 the parent's coordinates will clip anyway*/
-            lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-            if(r != 0) {
-                lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
-                lv_draw_mask_radius_init(mp, &obj->coords, r, false);
-                /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
-                lv_draw_mask_add(mp, obj + 8);
+        if(clip_corner) {
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+            lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
+            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
+            lv_draw_mask_add(mp, obj + 8);
+
+            if(bg_img_src) {
+                draw_dsc.bg_opa = LV_OPA_TRANSP;
+                draw_dsc.border_opa = LV_OPA_TRANSP;
+                draw_dsc.outline_opa = LV_OPA_TRANSP;
+                draw_dsc.shadow_opa = LV_OPA_TRANSP;
+                draw_dsc.bg_img_src = bg_img_src;
+                lv_draw_rect(draw_ctx, &draw_dsc, &coords);
             }
+
         }
 #endif
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
@@ -568,9 +579,9 @@ static void lv_obj_draw(lv_event_t * e)
             lv_draw_rect_dsc_t draw_dsc;
             lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
+            draw_dsc.bg_img_opa = LV_OPA_TRANSP;
             draw_dsc.outline_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
-            draw_dsc.bg_img_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
             lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
