@@ -98,6 +98,8 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
     /*If it's a PNG file in a  C array...*/
     else if(src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
+        const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+        if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RES_INV;
         header->always_zero = 0;
         header->cf = img_dsc->header.cf;       /*Save the color format*/
         header->w = img_dsc->header.w;         /*Save the color width*/
