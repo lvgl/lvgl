@@ -14,7 +14,6 @@
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_composite.h"
-#include "lv_draw_sdl_mask.h"
 
 /*********************
  *      DEFINES
@@ -23,14 +22,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    lv_sdl_cache_key_magic_t magic;
-    uint16_t radius;
-    uint16_t angle;
-    lv_coord_t width;
-    uint8_t rounded;
-} lv_draw_arc_key_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -43,9 +34,6 @@ typedef struct {
 /**********************
  *      MACROS
  **********************/
-
-static lv_draw_arc_key_t arc_key_create(const lv_draw_arc_dsc_t * dsc, uint16_t radius, uint16_t start_angle,
-                                        uint16_t end_angle);
 
 static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const int16_t * ids, int16_t ids_count,
                        const int16_t * caps);
@@ -153,19 +141,6 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static lv_draw_arc_key_t arc_key_create(const lv_draw_arc_dsc_t * dsc, uint16_t radius, uint16_t start_angle,
-                                        uint16_t end_angle)
-{
-    lv_draw_arc_key_t key;
-    lv_memset_00(&key, sizeof(lv_draw_arc_key_t));
-    key.magic = LV_GPU_CACHE_KEY_MAGIC_ARC;
-    key.radius = radius;
-    key.angle = ((end_angle - start_angle) % 360 + 360) % 360;
-    key.width = dsc->width;
-    key.rounded = dsc->rounded;
-    return key;
-}
 
 static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const int16_t * ids, int16_t ids_count,
                        const int16_t * caps)
