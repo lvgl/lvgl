@@ -48,7 +48,6 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
                           uint16_t radius, uint16_t start_angle, uint16_t end_angle)
 {
     lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
-    SDL_Renderer * renderer = ctx->renderer;
 
     lv_area_t area_out;
     area_out.x1 = center->x - radius;
@@ -208,7 +207,7 @@ static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, c
     int32_t cir_x;
     int32_t cir_y;
 
-    cir_x = ((radius - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
+    cir_x = ((radius - thick_half) * lv_trigo_sin((int16_t) (90 - angle))) >> (LV_TRIGO_SHIFT - ps);
     cir_y = ((radius - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
 
     /*Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
