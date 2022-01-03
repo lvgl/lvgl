@@ -141,10 +141,6 @@ bool lv_img_cf_is_chroma_keyed(lv_img_cf_t cf)
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
         case LV_IMG_CF_RAW_CHROMA_KEYED:
-        case LV_IMG_CF_INDEXED_1BIT:
-        case LV_IMG_CF_INDEXED_2BIT:
-        case LV_IMG_CF_INDEXED_4BIT:
-        case LV_IMG_CF_INDEXED_8BIT:
             is_chroma_keyed = true;
             break;
 
@@ -298,6 +294,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
         uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) *
                                         LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
+        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
         lv_area_set_height(&line, 1);
@@ -307,7 +304,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
             lv_area_t mask_line;
-            union_ok = _lv_area_intersect(&mask_line, draw_ctx->clip_area, &line);
+            union_ok = _lv_area_intersect(&mask_line, clip_area_ori, &line);
             if(union_ok == false) continue;
 
             read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);
@@ -316,14 +313,17 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
                 LV_LOG_WARN("Image draw can't read the line");
                 lv_mem_buf_release(buf);
                 draw_cleanup(cdsc);
+                draw_ctx->clip_area = clip_area_ori;
                 return LV_RES_INV;
             }
 
+            draw_ctx->clip_area = &mask_line;
             lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, cf);
             line.y1++;
             line.y2++;
             y++;
         }
+        draw_ctx->clip_area = clip_area_ori;
         lv_mem_buf_release(buf);
     }
 

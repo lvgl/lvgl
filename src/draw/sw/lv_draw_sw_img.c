@@ -288,7 +288,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     blend_area.y2 ++;
                 }
                 else {
-
                     lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
                     blend_area.y1 = blend_area.y2 + 1;
