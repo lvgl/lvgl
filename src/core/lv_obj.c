@@ -531,11 +531,13 @@ static void lv_obj_draw(lv_event_t * e)
         part_dsc.part = LV_PART_MAIN;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
-        bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
 
+#if LV_DRAW_COMPLEX
         /*With clip corner enabled draw the bg img separately to make it clipped*/
+        bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
         const void * bg_img_src = draw_dsc.bg_img_src;
         draw_dsc.bg_img_src = NULL;
+#endif
 
         lv_draw_rect(draw_ctx, &draw_dsc, &coords);
 
