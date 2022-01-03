@@ -8,7 +8,7 @@
 
 ## What is RT-Thread?
 
-<a href="github.com/rt-thread/rt-thread">**RT-Thread**</a> is an [open source](https://github.com/RT-Thread/rt-thread), neutral, and community-based real-time operating system (RTOS). RT-Thread has **Standard version** and **Nano version**. For resource-constrained microcontroller (MCU) systems, the NANO kernel version that requires only 3 KB Flash and 1.2 KB RAM memory resources can be tailored with easy-to-use tools; And for resource-rich IoT devices, RT-Thread can use the **online software package** management tool, together with system configuration tools, to achieve intuitive and rapid modular cutting, seamlessly import rich software packages, thus achieving complex functions like Android's graphical interface and touch sliding effects, smart voice interaction effects, and so on.
+[**RT-Thread**](https://www.rt-thread.io/) is an [open source](https://github.com/RT-Thread/rt-thread), neutral, and community-based real-time operating system (RTOS). RT-Thread has **Standard version** and **Nano version**. For resource-constrained microcontroller (MCU) systems, the Nano version that requires only 3 KB Flash and 1.2 KB RAM memory resources can be tailored with easy-to-use tools. For resource-rich IoT devices, RT-Thread can use the **online software package** management tool, together with system configuration tools, to achieve intuitive and rapid modular cutting, seamlessly import rich software packages; thus, achieving complex functions like Android's graphical interface and touch sliding effects, smart voice interaction effects, and so on.
 
 Key features:
 
@@ -33,8 +33,10 @@ LVGL has registered as a [software package](https://packages.rt-thread.org/en/de
 | ------------------------------------------------------------ | ---- |
 | [QEMU simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9) |      |
 | [Visual Studio simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator) |      |
-| [STM32L475 pandora](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora) |      |
-| [STM32F407 explorer](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl) |      |
 | [Nuvoton nk-980iot](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-980iot/applications/lvgl) |      |
 | [Nuvoton nk-n9h30](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-n9h30/applications/lvgl) |      |
+| [STM32L475 pandora](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora) |      |
+| [STM32F407 explorer](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl) |      |
+| [STM32F469 Discovery](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl) |      |
+| [Raspberry PICO](https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/applications/lvgl) |      |
 
