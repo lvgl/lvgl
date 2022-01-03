@@ -29,6 +29,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 - [Tasmota-Berry](/get-started/tasmota-berry)
 - [Micropython](/get-started/micropython)
 - [NuttX RTOS](/get-started/nuttx)
+- [RT-Thread RTOS](/get-started/rt-thread)
 - [CMake](/get-started/cmake)
 
 
@@ -47,6 +48,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
    micropython
    tasmota-berry
    nuttx
+   rt-thread
    cmake
 ```
 
