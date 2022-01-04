@@ -252,9 +252,58 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
  * Other functions
  *====================*/
 
-void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en)
+void lv_obj_scroll_by_bounded(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enable_t anim_en)
 {
-    if(x == 0 && y == 0) return;
+    if(dx == 0 && dy == 0) return;
+
+    /*We need to know the final sizes for bound check*/
+    lv_obj_update_layout(obj);
+
+    /*Don't let scroll more then naturally possible by the size of the content*/
+    lv_coord_t x_current = -lv_obj_get_scroll_x(obj);
+    lv_coord_t x_bounded = x_current + dx;
+
+    if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
+        if(x_bounded > 0) x_bounded = 0;
+        if(x_bounded < 0) {
+            lv_coord_t  scroll_max = lv_obj_get_scroll_left(obj) + lv_obj_get_scroll_right(obj);
+            if(scroll_max < 0) scroll_max = 0;
+
+            if(x_bounded < -scroll_max) x_bounded = -scroll_max;
+        }
+    }
+    else {
+        if(x_bounded < 0) x_bounded = 0;
+        if(x_bounded > 0) {
+            lv_coord_t  scroll_max = lv_obj_get_scroll_left(obj) + lv_obj_get_scroll_right(obj);
+            if(scroll_max < 0) scroll_max = 0;
+
+            if(x_bounded > scroll_max) x_bounded = scroll_max;
+        }
+    }
+
+    /*Don't let scroll more then naturally possible by the size of the content*/
+    lv_coord_t y_current = -lv_obj_get_scroll_y(obj);
+    lv_coord_t y_bounded = y_current + dy;
+
+    if(y_bounded > 0) y_bounded = 0;
+    if(y_bounded < 0) {
+        lv_coord_t  scroll_max = lv_obj_get_scroll_top(obj) + lv_obj_get_scroll_bottom(obj);
+        if(scroll_max < 0) scroll_max = 0;
+        if(y_bounded < -scroll_max) y_bounded = -scroll_max;
+    }
+
+    dx = x_bounded - x_current;
+    dy = y_bounded - y_current;
+    if(dx || dy) {
+        lv_obj_scroll_by(obj, dx, dy, anim_en);
+    }
+}
+
+
+void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enable_t anim_en)
+{
+    if(dx == 0 && dy == 0) return;
     if(anim_en == LV_ANIM_ON) {
         lv_disp_t * d = lv_obj_get_disp(obj);
         lv_anim_t a;
@@ -262,13 +311,13 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_set_var(&a, obj);
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
 
-        if(x) {
-            uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 2) >> 2, 0, x);
+        if(dx) {
+            uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 2) >> 2, 0, dx);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
             lv_coord_t sx = lv_obj_get_scroll_x(obj);
-            lv_anim_set_values(&a, -sx, -sx + x);
+            lv_anim_set_values(&a, -sx, -sx + dx);
             lv_anim_set_exec_cb(&a, scroll_x_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
 
@@ -278,13 +327,13 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_anim_start(&a);
         }
 
-        if(y) {
-            uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 2) >> 2, 0, y);
+        if(dy) {
+            uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 2) >> 2, 0, dy);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
             lv_coord_t sy = lv_obj_get_scroll_y(obj);
-            lv_anim_set_values(&a, -sy, -sy + y);
+            lv_anim_set_values(&a, -sy, -sy + dy);
             lv_anim_set_exec_cb(&a,  scroll_y_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
 
@@ -298,7 +347,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         /*Remove pending animations*/
         bool y_del = lv_anim_del(obj, scroll_y_anim);
         bool x_del = lv_anim_del(obj, scroll_x_anim);
-        scroll_by_raw(obj, x, y);
+        scroll_by_raw(obj, dx, dy);
         if(y_del || x_del) {
             lv_res_t res;
             res = lv_event_send(obj, LV_EVENT_SCROLL_END, NULL);
@@ -317,48 +366,20 @@ void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 {
     lv_anim_del(obj, scroll_x_anim);
 
-    /*Don't let scroll more then naturally possible by the size of the content*/
-    if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
-        if(x < 0) x = 0;
-        if(x > 0) {
-            lv_coord_t  scroll_max = lv_obj_get_scroll_left(obj) + lv_obj_get_scroll_right(obj);
-            if(scroll_max < 0) scroll_max = 0;
-
-            if(x > scroll_max) x = scroll_max;
-        }
-    }
-    else {
-        if(x > 0) x = 0;
-        if(x < 0) {
-            lv_coord_t  scroll_max = lv_obj_get_scroll_left(obj) + lv_obj_get_scroll_right(obj);
-            if(scroll_max < 0) scroll_max = 0;
-
-            if(x < -scroll_max) x = -scroll_max;
-        }
-    }
-
     lv_coord_t scroll_x = lv_obj_get_scroll_x(obj);
     lv_coord_t diff = -x + scroll_x;
 
-    lv_obj_scroll_by(obj, diff, 0, anim_en);
+    lv_obj_scroll_by_bounded(obj, diff, 0, anim_en);
 }
 
 void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 {
     lv_anim_del(obj, scroll_y_anim);
 
-    /*Don't let scroll more then naturally possible by the size of the content*/
-    if(y < 0) y = 0;
-    if(y > 0) {
-        lv_coord_t  scroll_max = lv_obj_get_scroll_top(obj) + lv_obj_get_scroll_bottom(obj);
-        if(scroll_max < 0) scroll_max = 0;
-        if(y > scroll_max) y = scroll_max;
-    }
-
     lv_coord_t scroll_y = lv_obj_get_scroll_y(obj);
     lv_coord_t diff = -y + scroll_y;
 
-    lv_obj_scroll_by(obj, 0, diff, anim_en);
+    lv_obj_scroll_by_bounded(obj, 0, diff, anim_en);
 }
 
 void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)

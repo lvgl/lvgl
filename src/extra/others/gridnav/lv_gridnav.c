@@ -100,49 +100,74 @@ static void gridnav_event_cb(lv_event_t * e)
 
         uint32_t key = lv_indev_get_key(lv_indev_get_act());
         lv_obj_t * guess = NULL;
+
         if(key == LV_KEY_RIGHT) {
-            guess = find_chid(obj, dsc->focused_obj, FIND_RIGHT);
-            if(guess == NULL) {
-                if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
-                    guess = find_chid(obj, dsc->focused_obj, FIND_NEXT_ROW_FIRST_ITEM);
-                    if(guess == NULL) guess = find_first_focusable(obj);
-                }
-                else {
-                    lv_group_focus_next(lv_obj_get_group(obj));
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) && lv_obj_get_scroll_right(dsc->focused_obj) > 0) {
+                lv_coord_t d = lv_obj_get_width(dsc->focused_obj) / 4;
+                if(d <= 0) d = 1;
+                lv_obj_scroll_by_bounded(dsc->focused_obj, -d, 0, LV_ANIM_ON);
+            } else {
+                guess = find_chid(obj, dsc->focused_obj, FIND_RIGHT);
+                if(guess == NULL) {
+                    if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
+                        guess = find_chid(obj, dsc->focused_obj, FIND_NEXT_ROW_FIRST_ITEM);
+                        if(guess == NULL) guess = find_first_focusable(obj);
+                    }
+                    else {
+                        lv_group_focus_next(lv_obj_get_group(obj));
+                    }
                 }
             }
         }
         else if(key == LV_KEY_LEFT) {
-            guess = find_chid(obj, dsc->focused_obj, FIND_LEFT);
-            if(guess == NULL) {
-                if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
-                    guess = find_chid(obj, dsc->focused_obj, FIND_PREV_ROW_LAST_ITEM);
-                    if(guess == NULL) guess = find_last_focusable(obj);
-                }
-                else {
-                    lv_group_focus_prev(lv_obj_get_group(obj));
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) && lv_obj_get_scroll_left(dsc->focused_obj) > 0) {
+                lv_coord_t d = lv_obj_get_width(dsc->focused_obj) / 4;
+                if(d <= 0) d = 1;
+                lv_obj_scroll_by_bounded(dsc->focused_obj, d, 0, LV_ANIM_ON);
+            } else {
+                guess = find_chid(obj, dsc->focused_obj, FIND_LEFT);
+                if(guess == NULL) {
+                    if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
+                        guess = find_chid(obj, dsc->focused_obj, FIND_PREV_ROW_LAST_ITEM);
+                        if(guess == NULL) guess = find_last_focusable(obj);
+                    }
+                    else {
+                        lv_group_focus_prev(lv_obj_get_group(obj));
+                    }
                 }
             }
         }
         else if(key == LV_KEY_DOWN) {
-            guess = find_chid(obj, dsc->focused_obj, FIND_BOTTOM);
-            if(guess == NULL) {
-                if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
-                    guess = find_chid(obj, dsc->focused_obj, FIND_FIRST_ROW);
-                }
-                else {
-                    lv_group_focus_next(lv_obj_get_group(obj));
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) && lv_obj_get_scroll_bottom(dsc->focused_obj) > 0) {
+                lv_coord_t d = lv_obj_get_height(dsc->focused_obj) / 4;
+                if(d <= 0) d = 1;
+                lv_obj_scroll_by_bounded(dsc->focused_obj, 0, -d, LV_ANIM_ON);
+            } else {
+                guess = find_chid(obj, dsc->focused_obj, FIND_BOTTOM);
+                if(guess == NULL) {
+                    if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
+                        guess = find_chid(obj, dsc->focused_obj, FIND_FIRST_ROW);
+                    }
+                    else {
+                        lv_group_focus_next(lv_obj_get_group(obj));
+                    }
                 }
             }
         }
         else if(key == LV_KEY_UP) {
-            guess = find_chid(obj, dsc->focused_obj, FIND_TOP);
-            if(guess == NULL) {
-                if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
-                    guess = find_chid(obj, dsc->focused_obj, FIND_LAST_ROW);
-                }
-                else {
-                    lv_group_focus_prev(lv_obj_get_group(obj));
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) && lv_obj_get_scroll_top(dsc->focused_obj) > 0) {
+                lv_coord_t d = lv_obj_get_height(dsc->focused_obj) / 4;
+                if(d <= 0) d = 1;
+                lv_obj_scroll_by_bounded(dsc->focused_obj, 0, d, LV_ANIM_ON);
+            } else {
+                guess = find_chid(obj, dsc->focused_obj, FIND_TOP);
+                if(guess == NULL) {
+                    if(dsc->ctrl & LV_GRIDNAV_CTRL_ROLLOVER) {
+                        guess = find_chid(obj, dsc->focused_obj, FIND_LAST_ROW);
+                    }
+                    else {
+                        lv_group_focus_prev(lv_obj_get_group(obj));
+                    }
                 }
             }
         }

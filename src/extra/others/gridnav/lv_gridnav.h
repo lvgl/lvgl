@@ -67,11 +67,19 @@ extern "C" {
 typedef enum {
     LV_GRIDNAV_CTRL_NONE = 0x0,
 
-    /** If there is no next/previous object in a direction,
-     *  the focus goes to the object in the next/previous row (on left/right keys)
-     *  or first/last row (on up/down keys)
+    /**
+     * If there is no next/previous object in a direction,
+     * the focus goes to the object in the next/previous row (on left/right keys)
+     * or first/last row (on up/down keys)
      */
     LV_GRIDNAV_CTRL_ROLLOVER = 0x1,
+
+    /**
+     * If an arrow is pressed and the focused object can be scrolled in that direction
+     * then it will be scrolled instead of going to the next/previous object.
+     * If there is no more room for scrolling the next/previous object will be focused normally */
+    LV_GRIDNAV_CTRL_SCROLL_FIRST = 0x2,
+
 } lv_gridnav_ctrl_t;
 
 /**********************

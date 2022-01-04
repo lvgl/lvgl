@@ -65,7 +65,7 @@ void lv_example_gridnav_1(void)
     lv_group_remove_obj(sw1);   /*Not needed, we use the gridnav instead*/
 
     lv_obj_t * sw2 = lv_switch_create(cont2);
-    lv_obj_set_pos(sw2, lv_pct(50), 220);
+    lv_obj_set_pos(sw2, lv_pct(50), 200);
     lv_group_remove_obj(sw2);   /*Not needed, we use the gridnav instead*/
 }
 
