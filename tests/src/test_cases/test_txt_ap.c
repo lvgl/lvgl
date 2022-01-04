@@ -26,6 +26,22 @@ void test_txt_ap_proc_detect_invalid_conjuction_with_fatha(void)
 
     lv_mem_free(temp);
 }
+#else /*LV_USE_ARABIC_PERSIAN_CHARS == 0   add dummy test functions*/
+
+void setUp(void)
+{
+    /* Function run before every test */
+}
+
+void tearDown(void)
+{
+    /* Function run after every test */
+}
+
+void test_txt_ap_proc_detect_invalid_conjuction_with_fatha(void)
+{
+
+}
 
 #endif /*LV_USE_ARABIC_PERSIAN_CHARS*/
 
