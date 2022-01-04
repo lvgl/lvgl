@@ -81,7 +81,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     lv_area_t t_coords = coords, t_clip = *clip, apply_area;
     lv_area_t extension = {dsc->width / 2, dsc->width / 2, dsc->width / 2, dsc->width / 2};
     lv_draw_sdl_composite_begin(sdl_ctx, &coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
-                                                &apply_area);
+                                &apply_area);
 
     SDL_Color color;
     lv_color_to_sdl_color(&dsc->color, &color);
