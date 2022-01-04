@@ -15,7 +15,7 @@ void lv_example_gif_1(void)
 
     img = lv_gif_create(lv_scr_act());
     /* Assuming a File system is attached to letter 'A'
-     * E.g. set LV_USE_FS_STDIO 'A' in lv_conf.h */
+     * E.g. set LV_FS_STDIO_LETTER 'A' in lv_conf.h */
     lv_gif_set_src(img, "A:lvgl/examples/libs/gif/bulb.gif");
     lv_obj_align(img, LV_ALIGN_RIGHT_MID, -20, 0);
 }

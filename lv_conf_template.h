@@ -544,16 +544,20 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*File system interfaces for common APIs
  *To enable set a driver letter for that API*/
-#define LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
+#define LV_USE_FS_STDIO 0        /*Uses fopen, fread, etc*/
+#define LV_FS_STDIO_LETTER '\0'
 //#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
 
-#define LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
+#define LV_USE_FS_POSIX 0        /*Uses open, read, etc*/
+#define LV_FS_POSIX_LETTER '\0'
 //#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
 
-#define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
+#define LV_USE_FS_WIN32 0        /*Uses CreateFile, ReadFile, etc*/
+#define LV_FS_WIN32_LETTER '\0'
 //#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
 
-#define LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
+#define LV_USE_FS_FATFS 0        /*Uses f_open, f_read, etc*/
+#define LV_FS_FATFS_LETTER '\0'
 
 /*PNG decoder library*/
 #define LV_USE_PNG 0

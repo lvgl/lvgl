@@ -1773,7 +1773,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_FS_STDIO
 #    define LV_USE_FS_STDIO CONFIG_LV_USE_FS_STDIO
 #  else
-#    define LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
+#    define LV_USE_FS_STDIO 0        /*Uses fopen, fread, etc*/
+#  endif
+#endif
+#ifndef LV_FS_STDIO_LETTER
+#  ifdef CONFIG_LV_FS_STDIO_LETTER
+#    define LV_FS_STDIO_LETTER CONFIG_LV_FS_STDIO_LETTER
+#  else
+#    define LV_FS_STDIO_LETTER '\0'
 #  endif
 #endif
 //#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
@@ -1782,7 +1789,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_FS_POSIX
 #    define LV_USE_FS_POSIX CONFIG_LV_USE_FS_POSIX
 #  else
-#    define LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
+#    define LV_USE_FS_POSIX 0        /*Uses open, read, etc*/
+#  endif
+#endif
+#ifndef LV_FS_POSIX_LETTER
+#  ifdef CONFIG_LV_FS_POSIX_LETTER
+#    define LV_FS_POSIX_LETTER CONFIG_LV_FS_POSIX_LETTER
+#  else
+#    define LV_FS_POSIX_LETTER '\0'
 #  endif
 #endif
 //#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
@@ -1791,7 +1805,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_FS_WIN32
 #    define LV_USE_FS_WIN32 CONFIG_LV_USE_FS_WIN32
 #  else
-#    define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
+#    define LV_USE_FS_WIN32 0        /*Uses CreateFile, ReadFile, etc*/
+#  endif
+#endif
+#ifndef LV_FS_WIN32_LETTER
+#  ifdef CONFIG_LV_FS_WIN32_LETTER
+#    define LV_FS_WIN32_LETTER CONFIG_LV_FS_WIN32_LETTER
+#  else
+#    define LV_FS_WIN32_LETTER '\0'
 #  endif
 #endif
 //#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
@@ -1800,7 +1821,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #  ifdef CONFIG_LV_USE_FS_FATFS
 #    define LV_USE_FS_FATFS CONFIG_LV_USE_FS_FATFS
 #  else
-#    define LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
+#    define LV_USE_FS_FATFS 0        /*Uses f_open, f_read, etc*/
+#  endif
+#endif
+#ifndef LV_FS_FATFS_LETTER
+#  ifdef CONFIG_LV_FS_FATFS_LETTER
+#    define LV_FS_FATFS_LETTER CONFIG_LV_FS_FATFS_LETTER
+#  else
+#    define LV_FS_FATFS_LETTER '\0'
 #  endif
 #endif
 

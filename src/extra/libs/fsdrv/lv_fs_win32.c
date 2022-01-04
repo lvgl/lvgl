@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_USE_FS_WIN32 != '\0'
+#if LV_USE_FS_WIN32
 
 #include <windows.h>
 
@@ -62,7 +62,7 @@ void lv_fs_win32_init(void)
     lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
-    fs_drv.letter = LV_USE_FS_WIN32;
+    fs_drv.letter = LV_FS_WIN32_LETTER;
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;
     fs_drv.read_cb = fs_read;

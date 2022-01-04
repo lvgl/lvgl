@@ -786,29 +786,41 @@ menu "LVGL configuration"
 
     menu "3rd Party Libraries"
         config LV_USE_FS_STDIO
-            int "File system on top of stdio API"
+            bool "File system on top of stdio API"
+        config LV_FS_STDIO_LETTER
+            int "Set the file system letter"
             default 0
+            depends on LV_USE_FS_STDIO
         config LV_FS_STDIO_PATH
             string "Set the working directory"
             depends on LV_USE_FS_STDIO
 
         config LV_USE_FS_POSIX
-            int "File system on top of posix API"
+            bool "File system on top of posix API"
+        config LV_FS_POSIX_LETTER
+            int "Set the file system letter"
             default 0
+            depends on LV_USE_FS_POSIX
         config LV_FS_POSIX_PATH
             string "Set the working directory"
             depends on LV_USE_FS_POSIX
 
         config LV_USE_FS_WIN32
-            int "File system on top of Win32 API"
+            bool "File system on top of Win32 API"
+        config LV_FS_WIN32_LETTER
+            int "Set the file system letter"
             default 0
+            depends on LV_USE_FS_WIN32
         config LV_FS_WIN32_PATH
             string "Set the working directory"
             depends on LV_USE_FS_WIN32
 
         config LV_USE_FS_FATFS
-            int "File system on top of FatFS"
+            bool "File system on top of FatFS"
+        config LV_FS_WIN32_LETTER
+            int "Set the file system letter"
             default 0
+            depends on LV_USE_FS_FATFS
 
         config LV_USE_PNG
             bool "PNG decoder library"
