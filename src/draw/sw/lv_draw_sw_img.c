@@ -272,7 +272,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                 if(mask_any) {
                     lv_draw_mask_res_t mask_res_sub;
                     mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, blend_area.x1,
-                                                      y + blend_area.y1, draw_area_w);
+                                                      y + draw_area.y1, draw_area_w);
                     if(mask_res_sub == LV_DRAW_MASK_RES_TRANSP) {
                         lv_memset_00(mask_buf + px_i_start, draw_area_w);
                         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
@@ -288,7 +288,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     blend_area.y2 ++;
                 }
                 else {
-
                     lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
                     blend_area.y1 = blend_area.y2 + 1;

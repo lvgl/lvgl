@@ -188,11 +188,11 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     lv_obj_set_grid_dsc_array(cont, grid_cols, grid_rows);
     lv_obj_set_style_grid_row_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, 0);
-    lv_obj_set_grid_cell(title_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 2, 1);
-    lv_obj_set_grid_cell(icon_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 4, 1);
+    lv_obj_set_grid_cell(title_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 2, 1);
+    lv_obj_set_grid_cell(icon_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 4, 1);
     lv_obj_set_grid_cell(spectrum_obj, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 6, 1);
-    lv_obj_set_grid_cell(ctrl_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 8, 1);
-    lv_obj_set_grid_cell(handle_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 10, 1);
+    lv_obj_set_grid_cell(ctrl_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 8, 1);
+    lv_obj_set_grid_cell(handle_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 10, 1);
 #else
     /*Arrange the content into a grid*/
     static const lv_coord_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
@@ -737,7 +737,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_obj_t * obj = lv_event_get_target(e);
-        const lv_area_t * clip_area = lv_event_get_param(e);
+        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
         lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
         if(opa < LV_OPA_MIN) return;
@@ -833,13 +833,13 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             poly[3].x = center.x + x2_out;
             poly[3].y = center.y + get_sin(di, v);
 
-            lv_draw_polygon(poly, 4, clip_area, &draw_dsc);
+            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
 
             poly[0].x = center.x - x1_out;
             poly[1].x = center.x - x1_in;
             poly[2].x = center.x - x2_in;
             poly[3].x = center.x - x2_out;
-            lv_draw_polygon(poly, 4, clip_area, &draw_dsc);
+            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
         }
     }
 }
@@ -936,6 +936,7 @@ static void play_event_click_cb(lv_event_t * e)
 
 static void prev_click_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
     _lv_demo_music_album_next(false);
 }
 
@@ -950,6 +951,7 @@ static void next_click_event_cb(lv_event_t * e)
 
 static void timer_cb(lv_timer_t * t)
 {
+    LV_UNUSED(t);
     time_act++;
     lv_label_set_text_fmt(time_obj, "%"LV_PRIu32":%02"LV_PRIu32, time_act / 60, time_act % 60);
     lv_slider_set_value(slider_obj, time_act, LV_ANIM_ON);
@@ -957,12 +959,14 @@ static void timer_cb(lv_timer_t * t)
 
 static void spectrum_end_cb(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     _lv_demo_music_album_next(true);
 }
 
 
 static void stop_start_anim(lv_timer_t * t)
 {
+    LV_UNUSED(t);
     start_anim = false;
     lv_obj_refresh_ext_draw_size(spectrum_obj);
 }
