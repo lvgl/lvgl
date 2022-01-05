@@ -394,8 +394,9 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
         lv_mem_free(dec_ctx);
     }
     /*Unlink the decoder context*/
-    dsc->dec_ctx = 0;
     lv_mem_free(context);
+    dec_ctx->ctx.user_data = 0;
+    dsc->dec_ctx = 0;
 }
 
 #endif /*LV_USE_BMP*/
