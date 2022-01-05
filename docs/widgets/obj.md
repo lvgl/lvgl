@@ -124,6 +124,7 @@ There are some attributes which can be enabled/disabled by `lv_obj_add/clear_fla
 - `LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
 - `LV_OBJ_FLAG_IGNORE_LAYOUT` Make the object positionable by the layouts
 - `LV_OBJ_FLAG_FLOATING` Do not scroll the object when the parent scrolls and ignore layout
+- `LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children's content to the parent's boundary
 
 - `LV_OBJ_FLAG_LAYOUT_1`  Custom flag, free to use by layouts
 - `LV_OBJ_FLAG_LAYOUT_2`  Custom flag, free to use by layouts

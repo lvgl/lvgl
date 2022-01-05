@@ -807,6 +807,12 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    /*If the object has overflow visible it can be drawn anywhere on its parent
+     *It needs to be checked recursively*/
+    while(lv_obj_get_parent(obj) && lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        obj = lv_obj_get_parent(obj);
+    }
+
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
     lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
@@ -824,7 +830,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
 
-    /*Invalidate the object only if it belongs to the current or previous'*/
+    /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
     if(obj_scr != lv_disp_get_scr_act(disp) &&
@@ -835,26 +841,29 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     }
 
     /*Truncate the area to the object*/
-    lv_area_t obj_coords;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
-    obj_coords.x1 -= ext_size;
-    obj_coords.y1 -= ext_size;
-    obj_coords.x2 += ext_size;
-    obj_coords.y2 += ext_size;
+    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        lv_area_t obj_coords;
+        lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+        lv_area_copy(&obj_coords, &obj->coords);
+        obj_coords.x1 -= ext_size;
+        obj_coords.y1 -= ext_size;
+        obj_coords.x2 += ext_size;
+        obj_coords.y2 += ext_size;
 
-    bool is_common;
-
-    is_common = _lv_area_intersect(area, area, &obj_coords);
-    if(is_common == false) return false;  /*The area is not on the object*/
+        /*The area is not on the object*/
+        if(!_lv_area_intersect(area, area, &obj_coords)) return false;
+    }
 
     /*Truncate recursively to the parents*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     while(par != NULL) {
-        is_common = _lv_area_intersect(area, area, &par->coords);
-        if(is_common == false) return false;       /*If no common parts with parent break;*/
-        if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return
-                false; /*If the parent is hidden then the child is hidden and won't be drawn*/
+        /*If the parent is hidden then the child is hidden and won't be drawn*/
+        if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false;
+
+        /*Truncate to the parent and if no common parts break*/
+        if(!lv_obj_has_flag(par, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+            if(!_lv_area_intersect(area, area, &par->coords)) return false;
+        }
 
         par = lv_obj_get_parent(par);
     }
@@ -899,6 +908,9 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
+    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
+    if(lv_obj_has_state(obj, LV_STATE_DISABLED)) return false;
+
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
     bool res = _lv_area_is_point_on(&a, point, 0);
