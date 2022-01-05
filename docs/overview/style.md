@@ -122,14 +122,14 @@ Property set functions looks like this: `lv_style_set_<property_name>(&style, <v
 ```c
 static lv_style_t style_btn;
 lv_style_init(&style_btn);
-lv_style_set_bg_color(&style_btn, lv_color_grey());
+lv_style_set_bg_color(&style_btn, lv_color_hex(0x115588));
 lv_style_set_bg_opa(&style_btn, LV_OPA_50);
 lv_style_set_border_width(&style_btn, 2);
 lv_style_set_border_color(&style_btn, lv_color_black());
 
 static lv_style_t style_btn_red;
 lv_style_init(&style_btn_red);
-lv_style_set_bg_color(&style_btn_red, lv_color_red());
+lv_style_set_bg_color(&style_btn_red, lv_plaette_main(LV_PALETTE_RED));
 lv_style_set_bg_opa(&style_btn_red, LV_OPA_COVER);
 ```
 
@@ -157,6 +157,20 @@ To reset a style (free all its data) use:
 ```c
 lv_style_reset(&style);
 ```
+
+Styles can be built as `const` too to save RAM:
+```c
+const lv_style_const_prop_t style1_props[] = {
+   LV_STYLE_CONST_WIDTH(50),
+   LV_STYLE_CONST_HEIGHT(50),
+   LV_STYLE_PROP_INV,
+};
+     
+LV_STYLE_CONST_INIT(style1, style1_props);
+```
+
+Later `const` style can be used like any other style but (obviously) new properties can not be added.
+
 
 ## Add and remove styles to a widget
 A style on its own is not that useful. It must be assigned to an object to take effect.

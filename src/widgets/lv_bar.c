@@ -392,10 +392,6 @@ static void draw_indic(lv_event_t * e)
         return;
     }
 
-    lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-    lv_coord_t short_side = LV_MIN(barw, barh);
-    if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
-
     lv_area_t indic_area;
     lv_area_copy(&indic_area, &bar->indic_area);
 
@@ -413,11 +409,19 @@ static void draw_indic(lv_event_t * e)
 
     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-    /*Draw only the shadow if the indicator is long enough.
+    lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+    lv_coord_t short_side = LV_MIN(barw, barh);
+    if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
+
+    lv_coord_t indic_radius = draw_rect_dsc.radius;
+    short_side = LV_MIN(indicw, indich);
+    if(indic_radius > short_side >> 1) indic_radius = short_side >> 1;
+
+    /*Draw only the shadow and outline only if the indicator is long enough.
      *The radius of the bg and the indicator can make a strange shape where
      *it'd be very difficult to draw shadow.*/
-    if((hor && lv_area_get_width(&bar->indic_area) > bg_radius * 2) ||
-       (!hor && lv_area_get_height(&bar->indic_area) > bg_radius * 2)) {
+    if((hor && lv_area_get_width(&bar->indic_area) > indic_radius * 2) ||
+       (!hor && lv_area_get_height(&bar->indic_area) > indic_radius * 2)) {
         lv_opa_t bg_opa = draw_rect_dsc.bg_opa;
         lv_opa_t bg_img_opa = draw_rect_dsc.bg_img_opa;
         lv_opa_t border_opa = draw_rect_dsc.border_opa;

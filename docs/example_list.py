@@ -84,14 +84,15 @@ def print_item(path, lvl, d, fout):
      fout.write("\n")
 
 def exec():
-  path ="../examples/"
+  paths = [ "../examples/", "../demos/"]
   fout = open("examples.md", "w")
   filelist = []
 
-  for root, dirs, files in os.walk(path):
-	  for f in files:
-      #append the file name to the list
-		  filelist.append(os.path.join(root,f))
+  for path in paths:
+    for root, dirs, files in os.walk(path):
+      for f in files:
+        #append the file name to the list
+        filelist.append(os.path.join(root,f))
 
   filelist = [ fi for fi in filelist if fi.endswith("index.rst") ]
 
