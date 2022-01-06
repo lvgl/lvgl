@@ -49,9 +49,6 @@ void lv_obj_del(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par) {
-        lv_obj_scrollbar_invalidate(par);
-    }
 
     lv_disp_t * disp = NULL;
     bool act_scr_del = false;
