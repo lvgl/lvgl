@@ -38,7 +38,7 @@ static void event_cb(lv_event_t * e)
 
         lv_draw_rect_dsc_t draw_rect_dsc;
         lv_draw_rect_dsc_init(&draw_rect_dsc);
-        draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
+        draw_rect_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_BLUE);
         draw_rect_dsc.radius = 3;
 
         lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);

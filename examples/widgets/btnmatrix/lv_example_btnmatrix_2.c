@@ -12,8 +12,8 @@ static void event_cb(lv_event_t * e)
         /*Change the draw descriptor the 2nd button*/
         if(dsc->id == 1) {
             dsc->rect_dsc->radius = 0;
-            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_palette_darken(LV_PALETTE_BLUE, 3);
-            else dsc->rect_dsc->bg_color = lv_palette_main(LV_PALETTE_BLUE);
+            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  dsc->rect_dsc->bg_grad.stops[0].color = lv_palette_darken(LV_PALETTE_BLUE, 3);
+            else dsc->rect_dsc->bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_BLUE);
 
             dsc->rect_dsc->shadow_width = 6;
             dsc->rect_dsc->shadow_ofs_x = 3;
@@ -23,8 +23,8 @@ static void event_cb(lv_event_t * e)
         /*Change the draw descriptor the 3rd button*/
         else if(dsc->id == 2) {
             dsc->rect_dsc->radius = LV_RADIUS_CIRCLE;
-            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  dsc->rect_dsc->bg_color = lv_palette_darken(LV_PALETTE_RED, 3);
-            else dsc->rect_dsc->bg_color = lv_palette_main(LV_PALETTE_RED);
+            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  dsc->rect_dsc->bg_grad.stops[0].color = lv_palette_darken(LV_PALETTE_RED, 3);
+            else dsc->rect_dsc->bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_RED);
 
             dsc->label_dsc->color = lv_color_white();
         }

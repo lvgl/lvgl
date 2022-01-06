@@ -150,7 +150,7 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
     lv_draw_rect_dsc_t draw_dsc;
     lv_draw_rect_dsc_init(&draw_dsc);
-    draw_dsc.bg_color.full = debug_color.full;
+    draw_dsc.bg_grad.stops[0].color.full = debug_color.full;
     draw_dsc.bg_opa = LV_OPA_20;
     draw_dsc.border_width = 1;
     draw_dsc.border_opa = LV_OPA_30;

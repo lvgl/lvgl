@@ -387,6 +387,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 }
 
+#if LV_DRAW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
@@ -442,7 +443,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
 
     lv_opa_t * sh_buf;
 
-#if LV_SHADOW_CACHE_SIZE
+#if defined(LV_SHADOW_CACHE_SIZE) && LV_SHADOW_CACHE_SIZE > 0
     if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
         /*Use the cache if available*/
         sh_buf = lv_mem_buf_get(corner_size * corner_size);
@@ -1066,6 +1067,8 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 
     lv_mem_buf_release(sh_ups_blur_buf);
 }
+
+#endif
 
 static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {

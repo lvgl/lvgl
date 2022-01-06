@@ -13,7 +13,7 @@ static void draw_part_event_cb(lv_event_t * e)
         /*Make the texts in the first cell center aligned*/
         if(row == 0) {
             dsc->label_dsc->align = LV_TEXT_ALIGN_CENTER;
-            dsc->rect_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), dsc->rect_dsc->bg_color, LV_OPA_20);
+            dsc->rect_dsc->bg_grad.stops[0].color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), dsc->rect_dsc->bg_grad.stops[0].color, LV_OPA_20);
             dsc->rect_dsc->bg_opa = LV_OPA_COVER;
         }
         /*In the first column align the texts to the right*/
@@ -23,7 +23,7 @@ static void draw_part_event_cb(lv_event_t * e)
 
         /*MAke every 2nd row grayish*/
         if((row != 0 && row % 2) == 0) {
-            dsc->rect_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), dsc->rect_dsc->bg_color, LV_OPA_10);
+            dsc->rect_dsc->bg_grad.stops[0].color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), dsc->rect_dsc->bg_grad.stops[0].color, LV_OPA_10);
             dsc->rect_dsc->bg_opa = LV_OPA_COVER;
         }
     }

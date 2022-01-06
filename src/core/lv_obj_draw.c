@@ -138,7 +138,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
         if(draw_dsc->bg_opa > LV_OPA_MIN) {
-            draw_dsc->bg_color = lv_obj_get_style_bg_color_filtered(obj, part);
+            draw_dsc->bg_grad.stops[0].color = lv_obj_get_style_bg_color_filtered(obj, part);
         }
     }
 

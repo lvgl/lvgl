@@ -19,7 +19,8 @@
 
 LV_ATTRIBUTE_FAST_MEM void lv_dither_none(lv_gradient_cache_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {
-
+    LV_UNUSED(x);
+    LV_UNUSED(y);
     if(grad->filled) return;
     for(lv_coord_t i = 0; i < w; i++) {
         grad->map[i] = lv_color_hex(grad->hmap[i].full);
@@ -41,6 +42,7 @@ static const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
 
 LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_hor(lv_gradient_cache_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {
+    LV_UNUSED(x);
     /* For vertical dithering, the error is spread on the next column (and not next line).
        Since the renderer is scanline based, it's not obvious what could be used to perform the rendering efficiently.
        The algorithm below is based on few assumptions:
@@ -96,9 +98,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(lv_gradient_cache_t * grad, lv_
 }
 
 
-#if LV_DITHER_ERROR_DIFFUSION
+#if LV_DITHER_ERROR_DIFFUSION == 1
 LV_ATTRIBUTE_FAST_MEM void lv_dither_fs_hor(lv_gradient_cache_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
 {
+    LV_UNUSED(xs);
+    LV_UNUSED(y);
+    LV_UNUSED(w);
+
     /* Implement Floyd Steinberg algorithm, see https://surma.dev/things/ditherpunk/
         Coefs are:   x 7
                    3 5 1

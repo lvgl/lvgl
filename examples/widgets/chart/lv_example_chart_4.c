@@ -33,7 +33,6 @@ static void event_cb(lv_event_t * e)
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
-            draw_rect_dsc.bg_color = lv_color_black();
             draw_rect_dsc.bg_opa = LV_OPA_50;
             draw_rect_dsc.radius = 3;
             draw_rect_dsc.bg_img_src = buf;

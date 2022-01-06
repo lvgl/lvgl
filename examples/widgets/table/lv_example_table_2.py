@@ -14,9 +14,9 @@ def draw_event_cb(e):
         rect_dsc.init()
 
         if chk:
-            rect_dsc.bg_color = lv.theme_get_color_primary(obj)
+            rect_dsc.bg_grad.stops[0].color = lv.theme_get_color_primary(obj)
         else:
-            rect_dsc.bg_color = lv.palette_lighten(lv.PALETTE.GREY, 2)
+            rect_dsc.bg_grad.stops[0].color = lv.palette_lighten(lv.PALETTE.GREY, 2)
             
         rect_dsc.radius = lv.RADIUS.CIRCLE
 
@@ -27,7 +27,7 @@ def draw_event_cb(e):
         sw_area.y2 = sw_area.y1 + 20
         lv.draw_rect(sw_area, dsc.clip_area, rect_dsc)
          
-        rect_dsc.bg_color = lv.color_white()
+        rect_dsc.bg_grad.stops[0].color = lv.color_white()
         
         if chk:
             sw_area.x2 -= 2

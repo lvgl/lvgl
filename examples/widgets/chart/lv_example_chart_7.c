@@ -20,7 +20,7 @@ static void draw_event_cb(lv_event_t * e)
         lv_opa_t x_opa = (x_array[p_act] * LV_OPA_50) / 200;
         lv_opa_t y_opa = (y_array[p_act] * LV_OPA_50) / 1000;
 
-        dsc->rect_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_RED),
+        dsc->rect_dsc->bg_grad.stops[0].color = lv_color_mix(lv_palette_main(LV_PALETTE_RED),
                                                 lv_palette_main(LV_PALETTE_BLUE),
                                                 x_opa + y_opa);
     }
