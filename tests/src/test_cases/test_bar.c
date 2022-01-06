@@ -25,21 +25,51 @@ void test_bar_should_have_valid_default_attributes(void)
     TEST_ASSERT_EQUAL(LV_BAR_MODE_NORMAL, lv_bar_get_mode(bar));
 }
 
+/*
+ * Inditor width is determined based on both:
+ * - Bar size
+ * - Bar (main part) padding
+ * - Bar value
+ * See Boxing model in docs for reference.
+ */
 void test_bar_indicator_width_should_track_bar_value(void)
 {
     lv_bar_t * bar_ptr = (lv_bar_t *) bar;
 
-    /* By default the bar is horizontal, so we get the indicator width */
-    int32_t indicator_width = lv_area_get_width(&bar_ptr->indic_area);
+    static lv_style_t bar_style;
 
-    /* If x1 == x2 then width == 1 */
-    TEST_ASSERT_EQUAL_INT32(1, indicator_width);
+    const lv_coord_t style_padding = 5u;
+    const lv_coord_t bar_width = 200u;
+    const lv_coord_t bar_height = 20u;
+
+    int32_t bar_value = 10u;
+    int32_t actual_width = 0u;
+    int32_t expected_width = 0u;
+
+    /* Setup new padding */
+    lv_style_init(&bar_style);
+
+    lv_style_set_pad_all(&bar_style, style_padding);
+
+    lv_obj_remove_style_all(bar);
+    lv_obj_add_style(bar, &bar_style, LV_PART_MAIN);
+    lv_obj_set_size(bar, bar_width, bar_height);
 
     /* Set a new value */
-    lv_bar_set_value(bar, 10, LV_ANIM_OFF);
+    lv_bar_set_value(bar, bar_value, LV_ANIM_OFF);
     lv_test_indev_wait(50);
 
-    indicator_width = lv_area_get_width(&bar_ptr->indic_area);
-    TEST_ASSERT_EQUAL_INT32(27 /* Value found by debugging */, indicator_width);
+    /* Calculate expected indicator width based on bar properties */
+    lv_coord_t sides_padding = 0;
+    lv_coord_t bar_max_value = 0;
+
+    bar_max_value = lv_bar_get_max_value(bar);
+    sides_padding = lv_obj_get_style_pad_left(bar, LV_PART_MAIN);
+    sides_padding += lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
+
+    expected_width = bar_value * (bar_width - sides_padding) / bar_max_value;
+
+    actual_width = lv_area_get_width(&bar_ptr->indic_area);
+    TEST_ASSERT_EQUAL_INT32(expected_width, actual_width);
 }
 #endif
