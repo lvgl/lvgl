@@ -254,22 +254,25 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
      * 4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
      * 5. Use the last candidate. Always the "deepest" parent or the object from point 3*/
     lv_obj_t * obj_act = proc->types.pointer.act_obj;
+
+    /*Decide if it's a horizontal or vertical scroll*/
+    bool hor_en = false;
+    bool ver_en = false;
+    if(LV_ABS(proc->types.pointer.scroll_sum.x) > LV_ABS(proc->types.pointer.scroll_sum.y)) {
+        hor_en = true;
+    }
+    else {
+        ver_en = true;
+    }
+
     while(obj_act) {
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
-            /*If this object don't want to chain the scroll ot the parent stop searching*/
-            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
+            /*If this object don't want to chain the scroll to the parent stop searching*/
+            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
+            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
+
             obj_act = lv_obj_get_parent(obj_act);
             continue;
-        }
-
-        /*Decide if it's a horizontal or vertical scroll*/
-        bool hor_en = false;
-        bool ver_en = false;
-        if(LV_ABS(proc->types.pointer.scroll_sum.x) > LV_ABS(proc->types.pointer.scroll_sum.y)) {
-            hor_en = true;
-        }
-        else {
-            ver_en = true;
         }
 
         /*Consider both up-down or left/right scrollable according to the current direction*/
@@ -323,8 +326,9 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
             break;
         }
 
-        /*If this object don't want to chain the scroll ot the parent stop searching*/
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
+        /*If this object don't want to chain the scroll to the parent stop searching*/
+        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
+        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
 
         /*Try the parent*/
         obj_act = lv_obj_get_parent(obj_act);

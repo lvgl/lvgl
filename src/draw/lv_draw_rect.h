@@ -17,6 +17,7 @@ extern "C" {
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
+#include "lv_draw_gradient.h"
 
 /*********************
  *      DEFINES
@@ -33,13 +34,8 @@ typedef struct {
     lv_blend_mode_t blend_mode;
 
     /*Background*/
-    lv_color_t bg_color;
-    lv_color_t bg_grad_color;
-    uint8_t bg_main_color_stop;
-    uint8_t bg_grad_color_stop;
     lv_opa_t bg_opa;
-    lv_grad_dir_t bg_grad_dir : 3;
-    lv_dither_mode_t bg_grad_dither: 3;
+    lv_gradient_t bg_grad;
 
     /*Background img*/
     const void * bg_img_src;
@@ -71,6 +67,8 @@ typedef struct {
     lv_opa_t shadow_opa;
 } lv_draw_rect_dsc_t;
 
+struct _lv_draw_ctx_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -84,7 +82,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
  * @param clip the rectangle will be drawn only in this area
  * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
+void lv_draw_rect(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *      MACROS

@@ -57,14 +57,14 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
         if(draw_dsc->bg_opa > LV_OPA_MIN) {
-            draw_dsc->bg_color = lv_obj_get_style_bg_color_filtered(obj, part);
-            draw_dsc->bg_grad_dir =  lv_obj_get_style_bg_grad_dir(obj, part);
-            if(draw_dsc->bg_grad_dir != LV_GRAD_DIR_NONE) {
-                draw_dsc->bg_grad_color = lv_obj_get_style_bg_grad_color_filtered(obj, part);
-                draw_dsc->bg_main_color_stop =  lv_obj_get_style_bg_main_stop(obj, part);
-                draw_dsc->bg_grad_color_stop =  lv_obj_get_style_bg_grad_stop(obj, part);
+            draw_dsc->bg_grad.stops[0].color = lv_obj_get_style_bg_color_filtered(obj, part);
+            draw_dsc->bg_grad.dir =  lv_obj_get_style_bg_grad_dir(obj, part);
+            if(draw_dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
+                draw_dsc->bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color_filtered(obj, part);
+                draw_dsc->bg_grad.stops[0].frac =  lv_obj_get_style_bg_main_stop(obj, part);
+                draw_dsc->bg_grad.stops[1].frac =  lv_obj_get_style_bg_grad_stop(obj, part);
             }
-            draw_dsc->bg_grad_dither = lv_obj_get_style_bg_dither_mode(obj, part);
+            draw_dsc->bg_grad.dither = lv_obj_get_style_bg_dither_mode(obj, part);
         }
     }
 
@@ -129,6 +129,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
 
     if(opa < LV_OPA_MAX) {
         draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa) >> 8;
+        draw_dsc->bg_img_opa = (uint16_t)((uint16_t)draw_dsc->bg_img_opa * opa) >> 8;
         draw_dsc->border_opa = (uint16_t)((uint16_t)draw_dsc->border_opa * opa) >> 8;
         draw_dsc->shadow_opa = (uint16_t)((uint16_t)draw_dsc->shadow_opa * opa) >> 8;
         draw_dsc->outline_opa = (uint16_t)((uint16_t)draw_dsc->outline_opa * opa) >> 8;
@@ -323,10 +324,10 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
     return s;
 }
 
-void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, const lv_area_t * clip_area)
+void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx)
 {
     lv_memset_00(dsc, sizeof(lv_obj_draw_part_dsc_t));
-    dsc->clip_area = clip_area;
+    dsc->draw_ctx = draw_ctx;
 }
 
 bool lv_obj_draw_part_check_type(lv_obj_draw_part_dsc_t * dsc, const lv_obj_class_t * class_p, uint32_t type)

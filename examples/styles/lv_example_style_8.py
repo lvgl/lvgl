@@ -21,7 +21,7 @@ style.set_text_decor(lv.TEXT_DECOR.UNDERLINE)
 obj = lv.label(lv.scr_act())
 obj.add_style(style, 0)
 obj.set_text("Text of\n"
-             "a label");
+             "a label")
 
 obj.center()
 

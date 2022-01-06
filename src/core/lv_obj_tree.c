@@ -188,6 +188,10 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    if(index < 0) {
+        index = lv_obj_get_child_cnt(lv_obj_get_parent(obj)) + index;
+    }
+
     const int32_t old_index = lv_obj_get_index(obj);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);

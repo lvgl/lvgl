@@ -47,7 +47,7 @@ map = [lv.SYMBOL.LEFT,"1","2", "3", "4", "5",lv.SYMBOL.RIGHT, ""]
 
 btnm = lv.btnmatrix(lv.scr_act())
 btnm.set_map(map)
-btnm.add_style(style_bg, 0);
+btnm.add_style(style_bg, 0)
 btnm.add_style(style_btn, lv.PART.ITEMS)
 btnm.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
 btnm.set_size(225, 35)
@@ -57,7 +57,7 @@ btnm.set_btn_ctrl_all(lv.btnmatrix.CTRL.CHECKABLE)
 btnm.clear_btn_ctrl(0, lv.btnmatrix.CTRL.CHECKABLE)
 btnm.clear_btn_ctrl(6, lv.btnmatrix.CTRL.CHECKABLE)
 
-btnm.set_one_checked(True);
+btnm.set_one_checked(True)
 btnm.set_btn_ctrl(1, lv.btnmatrix.CTRL.CHECKED)
 
 btnm.center()

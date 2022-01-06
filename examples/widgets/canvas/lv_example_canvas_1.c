@@ -11,9 +11,9 @@ void lv_example_canvas_1(void)
     lv_draw_rect_dsc_init(&rect_dsc);
     rect_dsc.radius = 10;
     rect_dsc.bg_opa = LV_OPA_COVER;
-    rect_dsc.bg_grad_dir = LV_GRAD_DIR_HOR;
-    rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
-    rect_dsc.bg_grad_color = lv_palette_main(LV_PALETTE_BLUE);
+    rect_dsc.bg_grad.dir = LV_GRAD_DIR_HOR;
+    rect_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_RED);
+    rect_dsc.bg_grad.stops[1].color = lv_palette_main(LV_PALETTE_BLUE);
     rect_dsc.border_width = 2;
     rect_dsc.border_opa = LV_OPA_90;
     rect_dsc.border_color = lv_color_white();
@@ -23,7 +23,7 @@ void lv_example_canvas_1(void)
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
-    label_dsc.color = lv_palette_main(LV_PALETTE_YELLOW);
+    label_dsc.color = lv_palette_main(LV_PALETTE_ORANGE);
 
     static lv_color_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
 
@@ -47,7 +47,7 @@ void lv_example_canvas_1(void)
     img.header.h = CANVAS_HEIGHT;
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER);
-    lv_canvas_transform(canvas, &img, 30, LV_IMG_ZOOM_NONE, 0, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, true);
+    lv_canvas_transform(canvas, &img, 120, LV_IMG_ZOOM_NONE, 0, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, true);
 }
 
 #endif

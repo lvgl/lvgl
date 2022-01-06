@@ -404,16 +404,7 @@
     #endif
 #endif
 
-/*Use exnternal renderer*/
-#ifndef LV_USE_EXTERNAL_RENDERER
-    #ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
-        #define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
-    #else
-        #define LV_USE_EXTERNAL_RENDERER 0
-    #endif
-#endif
-
-/*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
+/*Use SDL renderer API*/
 #ifndef LV_USE_GPU_SDL
     #ifdef CONFIG_LV_USE_GPU_SDL
         #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
@@ -427,6 +418,13 @@
             #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
         #else
             #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+        #endif
+    #endif
+    #ifndef LV_GPU_SDL_LRU_SIZE
+        #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
+            #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
+        #else
+            #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
         #endif
     #endif
 #endif
@@ -1985,6 +1983,14 @@
     #endif
 #endif
 
+/*1: Enable Monkey test*/
+#ifndef LV_USE_MONKEY
+    #ifdef CONFIG_LV_USE_MONKEY
+        #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
+    #else
+        #define LV_USE_MONKEY 0
+    #endif
+#endif
 
 /*==================
 * EXAMPLES
@@ -2000,6 +2006,101 @@
         #endif
     #else
         #define LV_BUILD_EXAMPLES 1
+    #endif
+#endif
+
+/*===================
+ * DEMO USAGE
+ ====================*/
+
+/*Show some widget*/
+#ifndef LV_USE_DEMO_WIDGETS
+    #ifdef CONFIG_LV_USE_DEMO_WIDGETS
+        #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
+    #else
+        #define LV_USE_DEMO_WIDGETS        0
+    #endif
+#endif
+#if LV_USE_DEMO_WIDGETS
+    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
+        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #else
+            #define LV_DEMO_WIDGETS_SLIDESHOW  0
+        #endif
+    #endif
+#endif
+
+/*Demonstrate the usage of encoder and keyboard*/
+#ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
+    #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
+    #else
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
+    #endif
+#endif
+
+/*Benchmark your system*/
+#ifndef LV_USE_DEMO_BENCHMARK
+    #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
+        #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
+    #else
+        #define LV_USE_DEMO_BENCHMARK   0
+    #endif
+#endif
+
+/*Stress test for LVGL*/
+#ifndef LV_USE_DEMO_STRESS
+    #ifdef CONFIG_LV_USE_DEMO_STRESS
+        #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
+    #else
+        #define LV_USE_DEMO_STRESS      0
+    #endif
+#endif
+
+/*Music player demo*/
+#ifndef LV_USE_DEMO_MUSIC
+    #ifdef CONFIG_LV_USE_DEMO_MUSIC
+        #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
+    #else
+        #define LV_USE_DEMO_MUSIC       0
+    #endif
+#endif
+#if LV_USE_DEMO_MUSIC
+    #ifndef LV_DEMO_MUSIC_SQUARE
+        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+        #else
+            #define LV_DEMO_MUSIC_SQUARE       0
+        #endif
+    #endif
+    #ifndef LV_DEMO_MUSIC_LANDSCAPE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #else
+            #define LV_DEMO_MUSIC_LANDSCAPE    0
+        #endif
+    #endif
+    #ifndef LV_DEMO_MUSIC_ROUND
+        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+        #else
+            #define LV_DEMO_MUSIC_ROUND        0
+        #endif
+    #endif
+    #ifndef LV_DEMO_MUSIC_LARGE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+        #else
+            #define LV_DEMO_MUSIC_LARGE        0
+        #endif
+    #endif
+    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
+        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #else
+            #define LV_DEMO_MUSIC_AUTO_PLAY    0
+        #endif
     #endif
 #endif
 

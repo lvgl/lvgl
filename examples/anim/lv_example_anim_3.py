@@ -48,7 +48,7 @@ class LvExampleAnim_3():
         
         self.p1_label = lv.label(par)
         self.p2_label = lv.label(par)
-        self.p1_label.set_text("p1:0");
+        self.p1_label.set_text("p1:0")
         self.p2_label.set_text("p2:0")
         self.p1_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,lv.GRID_ALIGN.START, 1, 1)
         self.p2_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,lv.GRID_ALIGN.START, 2, 1)
@@ -78,7 +78,7 @@ class LvExampleAnim_3():
         self.ser1 = self.chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)
         self.chart.set_range(lv.chart.AXIS.PRIMARY_Y, 0, 1024)
         self.chart.set_range(lv.chart.AXIS.PRIMARY_X, 0, 1024)
-        self.chart.set_point_count(CHART_POINTS_NUM);
+        self.chart.set_point_count(CHART_POINTS_NUM)
         self.chart.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 3,lv.GRID_ALIGN.STRETCH, 3, 1)
         
     def refer_chart_cubic_bezier(self):
@@ -92,7 +92,7 @@ class LvExampleAnim_3():
         slider = e.get_target()
         
         if slider == self.p1_slider:
-            label = self.p1_label;
+            label = self.p1_label
             self.p1 = slider.get_value()
             label.set_text("p1: {:d}".format(self.p1))
         else:

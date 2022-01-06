@@ -89,6 +89,8 @@ void lv_obj_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_
 
 void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim_enable_t anim_en)
 {
+    lv_obj_update_layout(tv);
+
     lv_coord_t w = lv_obj_get_content_width(tv);
     lv_coord_t h = lv_obj_get_content_height(tv);
 

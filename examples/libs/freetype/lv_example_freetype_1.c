@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_FREETYPE && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+#if LV_USE_FREETYPE
 
 /**
  * Load a font with FreeType
@@ -41,4 +42,5 @@ void lv_example_freetype_1(void)
     lv_obj_center(label);
 }
 
+#endif
 #endif

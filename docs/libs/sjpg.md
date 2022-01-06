@@ -5,7 +5,7 @@
 
 # JPG decoder
 
-Allow the use of JPG images in LVGL. Besides that it also allows the use of a custom format, called Split JPG (SJPG), which can be decided in more optimal way on embedded systems.
+Allow the use of JPG images in LVGL. Besides that it also allows the use of a custom format, called Split JPG (SJPG), which can be decoded in more optimal way on embedded systems.
 
 ## Overview
   - Supports both normal JPG and the custom SJPG formats.

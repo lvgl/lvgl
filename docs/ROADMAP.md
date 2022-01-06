@@ -24,3 +24,4 @@ See [#2790](https://github.com/lvgl/lvgl/issues/2790)
 - Curved text on path
 - Varaible binding impromevments like Redux?
 - Functional programming support, pure view? See [here](https://www.freecodecamp.org/news/the-revolution-of-pure-views-aed339db7da4/)
+- Circle layout. See [#2871](https://github.com/lvgl/lvgl/issues/2871)
