@@ -178,8 +178,10 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &rect_dsc);
 
         /*Use the original colors brightness to modify color->led*/
-        rect_dsc.bg_grad.stops[0].color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_grad.stops[0].color));
-        rect_dsc.bg_grad.stops[1].color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_grad.stops[1].color));
+        rect_dsc.bg_grad.stops[0].color = lv_color_mix(led->color, lv_color_black(),
+                                                       lv_color_brightness(rect_dsc.bg_grad.stops[0].color));
+        rect_dsc.bg_grad.stops[1].color = lv_color_mix(led->color, lv_color_black(),
+                                                       lv_color_brightness(rect_dsc.bg_grad.stops[1].color));
         rect_dsc.shadow_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.shadow_color));
         rect_dsc.border_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.border_color));
         rect_dsc.outline_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.outline_color));
