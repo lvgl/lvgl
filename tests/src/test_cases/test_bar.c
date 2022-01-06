@@ -72,4 +72,43 @@ void test_bar_indicator_width_should_track_bar_value(void)
     actual_width = lv_area_get_width(&bar_ptr->indic_area);
     TEST_ASSERT_EQUAL_INT32(expected_width, actual_width);
 }
+
+void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
+{
+    lv_bar_t * bar_ptr = (lv_bar_t *) bar;
+
+    const lv_coord_t style_padding = 10u;
+    static lv_style_t bar_style;
+
+    int32_t new_height = 0u;
+    int32_t new_width = 0u;
+    int32_t original_height = 0u;
+    int32_t original_width = 0u;
+
+    lv_bar_set_value(bar, 50, LV_ANIM_OFF);
+    lv_test_indev_wait(50);
+
+    original_width = lv_area_get_width(&bar_ptr->indic_area);
+    original_height = lv_area_get_height(&bar_ptr->indic_area);
+
+    /* Setup new padding */
+    lv_style_init(&bar_style);
+    lv_style_set_pad_all(&bar_style, style_padding);
+    lv_obj_set_size(bar, 100, 50);
+
+    /* Apply new style  */
+    lv_obj_remove_style_all(bar);
+    lv_obj_add_style(bar, &bar_style, LV_PART_MAIN);
+
+    /* Notify LVGL of style change */
+    lv_obj_report_style_change(&bar_style);
+    lv_test_indev_wait(50);
+
+    new_height = lv_area_get_height(&bar_ptr->indic_area);
+    new_width = lv_area_get_width(&bar_ptr->indic_area);
+
+    TEST_ASSERT_LESS_THAN_INT32(original_height, new_height);
+    TEST_ASSERT_LESS_THAN_INT32(original_width, new_width);
+}
+
 #endif
