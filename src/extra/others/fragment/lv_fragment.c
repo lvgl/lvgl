@@ -82,7 +82,7 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_obj_t * container, lv_frag
 
 void lv_fragment_manager_del(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT(manager);
+    LV_ASSERT_NULL(manager);
     manager_stack_t * top = manager->top;
     while(top) {
         LV_ASSERT(top->cls);
