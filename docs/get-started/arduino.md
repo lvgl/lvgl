@@ -35,6 +35,16 @@ LVGL has its own configuration file called `lv_conf.h`. When LVGL is installed, 
 4. Set the color depth of you display in `LV_COLOR_DEPTH`
 5. Set `LV_TICK_CUSTOM 1`
 
+Finally the layout with `lv_conf.h` should look like this:
+```
+arduino
+ |-libraries
+   |-lvgl
+   |-other_lib_1
+   |-other_lib_2
+   |-lv_conf.h
+```
+
 ## Initialize and run LVGL
 
 Take a look at [LVGL_Arduino.ino](https://github.com/lvgl/lvgl/blob/master/examples/arduino/LVGL_Arduino/LVGL_Arduino.ino) to see how to initialize LVGL.
