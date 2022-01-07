@@ -626,8 +626,8 @@
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
 
-/*1: Enable lv_obj controller*/
-#define LV_USE_OBJ_CONTROLLER 0
+/*1: Enable lv_obj fragment*/
+#define LV_USE_FRAGMENT 0
 
 /*==================
 * EXAMPLES

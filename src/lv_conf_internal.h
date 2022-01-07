@@ -2011,12 +2011,12 @@
     #endif
 #endif
 
-/*1: Enable lv_obj controller*/
-#ifndef LV_USE_OBJ_CONTROLLER
-    #ifdef CONFIG_LV_USE_OBJ_CONTROLLER
-        #define LV_USE_OBJ_CONTROLLER CONFIG_LV_USE_OBJ_CONTROLLER
+/*1: Enable lv_obj fragment*/
+#ifndef LV_USE_FRAGMENT
+    #ifdef CONFIG_LV_USE_FRAGMENT
+        #define LV_USE_FRAGMENT CONFIG_LV_USE_FRAGMENT
     #else
-        #define LV_USE_OBJ_CONTROLLER 0
+        #define LV_USE_FRAGMENT 0
     #endif
 #endif
 

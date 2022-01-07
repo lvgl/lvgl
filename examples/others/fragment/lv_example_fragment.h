@@ -1,8 +1,8 @@
 /**
- * @file lv_example_controller.h
+ * @file lv_example_fragment.h
  */
-#ifndef LV_EXAMPLE_CONTROLLER_H
-#define LV_EXAMPLE_CONTROLLER_H
+#ifndef LV_EXAMPLE_fragment_H
+#define LV_EXAMPLE_fragment_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +23,9 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_controller_1();
+void lv_example_fragment_1();
 
-void lv_example_controller_2();
+void lv_example_fragment_2();
 /**********************
  *      MACROS
  **********************/
@@ -34,4 +34,4 @@ void lv_example_controller_2();
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_CONTROLLER_H*/
+#endif /*LV_EXAMPLE_fragment_H*/

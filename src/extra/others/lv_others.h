@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "snapshot/lv_snapshot.h"
 #include "monkey/lv_monkey.h"
-#include "controller/lv_obj_controller.h"
+#include "fragment/lv_fragment.h"
 
 /*********************
  *      DEFINES
