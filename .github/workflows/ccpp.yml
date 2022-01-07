@@ -38,7 +38,7 @@ jobs:
     - name: Run tests
       run: python tests/main.py --report test
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       if: github.event_name == 'push'
       with:
         fail_ci_if_error: true

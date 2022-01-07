@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/btnmatrix.md
+:github_url: |github_link_base|/widgets/core/btnmatrix.md
 ```
 # Button matrix (lv_btnmatrix)
 
