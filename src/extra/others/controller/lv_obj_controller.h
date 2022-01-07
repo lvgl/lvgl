@@ -126,7 +126,7 @@ struct lv_obj_controller_class_t {
 /**
  * Create controller manager instance
  * @param container Container object for manager to add objects to
- * @param parent Parent obj_controller if this manager is nested
+ * @param parent Parent obj_controller if this manager is placed inside another obj_controller
  * @return Controller manager instance
  */
 lv_controller_manager_t * lv_controller_manager_create(lv_obj_t * container, lv_obj_controller_t * parent);
@@ -187,7 +187,7 @@ void lv_controller_manager_show(lv_controller_manager_t * manager, const lv_obj_
 
 lv_obj_controller_t * lv_controller_manager_top_controller(lv_controller_manager_t * manager);
 
-lv_obj_controller_t * lv_controller_manager_parent(lv_controller_manager_t * manager);
+lv_obj_controller_t * lv_controller_manager_get_parent(lv_controller_manager_t * manager);
 
 lv_obj_controller_t * lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t * cls, lv_obj_t * parent,
                                                                void * args);

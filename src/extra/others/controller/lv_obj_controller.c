@@ -192,7 +192,7 @@ lv_obj_controller_t * lv_controller_manager_top_controller(lv_controller_manager
     return top->controller;
 }
 
-lv_obj_controller_t * lv_controller_manager_parent(lv_controller_manager_t * manager)
+lv_obj_controller_t * lv_controller_manager_get_parent(lv_controller_manager_t * manager)
 {
     LV_ASSERT(manager);
     return manager->parent;
