@@ -128,4 +128,14 @@ void test_bar_start_value_should_only_change_when_in_range_mode(void)
     TEST_ASSERT_EQUAL_INT32(new_start_value, lv_bar_get_start_value(bar));
 }
 
+void test_bar_start_value_should_be_smaller_than_current_value_in_range_mode(void)
+{
+    /* Set bar in RANGE mode so we can edit the start value */
+    lv_bar_set_mode(bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_value(bar, 50, LV_ANIM_OFF);
+    lv_bar_set_start_value(bar, 100u, LV_ANIM_OFF);
+
+    TEST_ASSERT_EQUAL_INT32(lv_bar_get_value(bar), lv_bar_get_start_value(bar));
+}
+
 #endif
