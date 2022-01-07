@@ -12,7 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
     #define GRAD_CM(r,g,b) LV_COLOR_MAKE32(r,g,b)
     #define GRAD_CONV(t, x) t.full = lv_color_to32(x)
 #else
@@ -22,7 +22,7 @@
 
 #define MAX_WIN_RES     1024 /**TODO: Find a way to get this information: max(horz_res, vert_res)*/
 
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
     #if LV_DITHER_ERROR_DIFFUSION == 1
         #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t) + MAX_WIN_RES * sizeof(lv_color_t) + MAX_WIN_RES * sizeof(lv_scolor24_t)
     #else
@@ -30,7 +30,7 @@
     #endif /* LV_DITHER_ERROR_DIFFUSION */
 #else
     #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t)
-#endif /* DITHER_GRADIENT */
+#endif /* _DITHER_GRADIENT */
 
 /**********************
  *  STATIC PROTOTYPES
@@ -63,7 +63,7 @@ union void_cast {
     const uint32_t value;
 };
 
-uint32_t compute_key(const lv_gradient_t * g, lv_coord_t size, lv_coord_t w)
+static uint32_t compute_key(const lv_gradient_t * g, lv_coord_t size, lv_coord_t w)
 {
     union void_cast v;
     v.ptr = g;
@@ -71,10 +71,10 @@ uint32_t compute_key(const lv_gradient_t * g, lv_coord_t size, lv_coord_t w)
 }
 
 
-size_t get_cache_item_size(lv_gradient_cache_t * c)
+static size_t get_cache_item_size(lv_gradient_cache_t * c)
 {
     size_t s = sizeof(*c) + c->size * sizeof(lv_color_t)
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
                + c->hmap_size * sizeof(lv_color32_t)
 #if LV_DITHER_ERROR_DIFFUSION == 1
                + c->size * sizeof(lv_scolor24_t)
@@ -84,8 +84,7 @@ size_t get_cache_item_size(lv_gradient_cache_t * c)
     return s; /* TODO: Should we align this ? */
 }
 
-
-lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
+static lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
 {
     if(first == NULL)
         return (lv_gradient_cache_t *)grad_cache_mem;
@@ -99,7 +98,7 @@ lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
     return (lv_gradient_cache_t *)((uint8_t *)first + s);
 }
 
-lv_res_t iterate_cache(op_cache_t func, void * ctx, lv_gradient_cache_t ** out)
+static lv_res_t iterate_cache(op_cache_t func, void * ctx, lv_gradient_cache_t ** out)
 {
     lv_gradient_cache_t * first = next_in_cache(NULL);
     while(first != NULL) {
@@ -112,14 +111,14 @@ lv_res_t iterate_cache(op_cache_t func, void * ctx, lv_gradient_cache_t ** out)
     return LV_RES_INV;
 }
 
-lv_res_t find_oldest_item_life(lv_gradient_cache_t * c, void * ctx)
+static lv_res_t find_oldest_item_life(lv_gradient_cache_t * c, void * ctx)
 {
     uint32_t * min_life = (uint32_t *)ctx;
     if(c->life < *min_life) *min_life = c->life;
     return LV_RES_INV;
 }
 
-void free_item(lv_gradient_cache_t * c)
+static void free_item(lv_gradient_cache_t * c)
 {
     size_t size = get_cache_item_size(c);
     size_t next_items_size = (size_t)(grad_cache_end - (uint8_t *)c) - size;
@@ -129,7 +128,7 @@ void free_item(lv_gradient_cache_t * c)
         /* Then need to fix all internal pointers too */
         while((uint8_t *)c != grad_cache_end) {
             c->map = (lv_color_t *)(((uint8_t *)c->map) - size);
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
             c->hmap = (lv_color32_t *)(((uint8_t *)c->hmap) - size);
 #if LV_DITHER_ERROR_DIFFUSION == 1
             c->error_acc = (lv_scolor24_t *)(((uint8_t *)c->error_acc) - size);
@@ -140,7 +139,7 @@ void free_item(lv_gradient_cache_t * c)
     }
 }
 
-lv_res_t kill_oldest_item(lv_gradient_cache_t * c, void * ctx)
+static lv_res_t kill_oldest_item(lv_gradient_cache_t * c, void * ctx)
 {
     uint32_t * min_life = (uint32_t *)ctx;
     if(c->life == *min_life) {
@@ -150,7 +149,7 @@ lv_res_t kill_oldest_item(lv_gradient_cache_t * c, void * ctx)
     }
     return LV_RES_INV;
 }
-lv_res_t find_item(lv_gradient_cache_t * c, void * ctx)
+static lv_res_t find_item(lv_gradient_cache_t * c, void * ctx)
 {
     uint32_t * k = (uint32_t *)ctx;
     if(c->key == *k) return LV_RES_OK;
@@ -158,11 +157,11 @@ lv_res_t find_item(lv_gradient_cache_t * c, void * ctx)
 }
 
 
-lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
+static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
 {
     lv_coord_t size = g->dir == LV_GRAD_DIR_HOR ? w : h;
     size_t req_size = sizeof(lv_gradient_cache_t) + w * sizeof(lv_color_t)
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
                       + size * sizeof(lv_color32_t)
 #if LV_DITHER_ERROR_DIFFUSION == 1
                       + w * sizeof(lv_scolor24_t)
@@ -190,7 +189,7 @@ lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w, lv_co
     item->filled = 0;
     item->size = w;
     item->map = (lv_color_t *)(grad_cache_end + sizeof(*item));
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
     item->hmap = (lv_color32_t *)(grad_cache_end + sizeof(*item) + w * sizeof(lv_color_t));
     item->hmap_size = size;
 #if LV_DITHER_ERROR_DIFFUSION == 1
@@ -217,6 +216,7 @@ void lv_grad_set_cache_size(size_t max_bytes)
 {
     lv_mem_free(grad_cache_mem);
     grad_cache_end = grad_cache_mem = lv_mem_alloc(max_bytes);
+    LV_ASSERT_MALLOC(grad_cache_mem);
     grad_cache_size = max_bytes;
 }
 
@@ -244,7 +244,7 @@ lv_gradient_cache_t * lv_grad_get_from_cache(const lv_gradient_t * g, lv_coord_t
     if(item == NULL) return item;
 
     /* Step 3: Fill it with the gradient, as expected */
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
     for(lv_coord_t i = 0; i < item->hmap_size; i++) {
         item->hmap[i] = lv_grad_get(g, item->hmap_size, i);
     }
@@ -261,7 +261,7 @@ lv_gradient_cache_t * lv_grad_get_from_cache(const lv_gradient_t * g, lv_coord_t
 }
 
 
-void lv_grad_evict_from_cache(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
+void lv_grad_pop_from_cache(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
 {
     lv_coord_t size = g->dir == LV_GRAD_DIR_HOR ? w : h;
     uint32_t key = compute_key(g, size, w);
@@ -309,8 +309,8 @@ LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_grad_get(const lv_gradient_t * dsc, lv_
     lv_opa_t mix = (frac * 255) / d;
     lv_opa_t imix = 255 - mix;
 
-    lv_grad_color_t r = GRAD_CM(lv_udiv_255(two.ch.red * mix   + one.ch.red * imix),
-                                lv_udiv_255(two.ch.green * mix + one.ch.green * imix),
-                                lv_udiv_255(two.ch.blue * mix  + one.ch.blue * imix));
+    lv_grad_color_t r = GRAD_CM(LV_UDIV255(two.ch.red * mix   + one.ch.red * imix),
+                                LV_UDIV255(two.ch.green * mix + one.ch.green * imix),
+                                LV_UDIV255(two.ch.blue * mix  + one.ch.blue * imix));
     return r;
 }

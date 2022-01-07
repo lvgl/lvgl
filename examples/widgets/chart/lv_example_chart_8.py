@@ -34,7 +34,7 @@ def draw_event_cb(e):
         draw_rect_dsc = lv.draw_rect_dsc_t()
         draw_rect_dsc.init()
         draw_rect_dsc.bg_opa = lv.OPA.COVER
-        draw_rect_dsc.bg_grad.stops[0].color = dsc.line_dsc.color
+        draw_rect_dsc.bg_color = dsc.line_dsc.color
 
         a = lv.area_t()
         a.x1 = dsc.p1.x

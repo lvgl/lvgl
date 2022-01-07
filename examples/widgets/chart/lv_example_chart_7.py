@@ -24,7 +24,7 @@ def draw_event_cb(e):
         x_opa = (x_array[p_act] * lv.OPA._50) // 200
         y_opa = (y_array[p_act] * lv.OPA._50) // 1000
         
-        dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.RED).color_mix(
+        dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.RED).color_mix(
                                              lv.palette_main(lv.PALETTE.BLUE),
                                              x_opa + y_opa)
         

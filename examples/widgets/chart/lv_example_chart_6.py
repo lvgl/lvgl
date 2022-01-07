@@ -71,7 +71,7 @@ class ExampleChart_6():
                 
                 draw_rect_dsc = lv.draw_rect_dsc_t()
                 draw_rect_dsc.init()
-                draw_rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.BLUE)
+                draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE)
                 draw_rect_dsc.radius = 3
                 
                 lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)

@@ -120,7 +120,7 @@
     #define LV_CIRCLE_CACHE_SIZE 4
 
     /*Allow dithering gradient (to achieve visual smooth color gradients on limited color depth display)
-    *LV_DITHER_GRADIENT implies consuming one or two lines of the object's rendering surface
+    *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
     *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
     #define LV_DITHER_GRADIENT 1
 

@@ -27,9 +27,9 @@ def event_cb(e):
         if dsc.id == 1:
             dsc.rect_dsc.radius = 0
             if obj.get_selected_btn() == dsc.id:
-                dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_darken(lv.PALETTE.GREY, 3)
+                dsc.rect_dsc.bg_color = lv.palette_darken(lv.PALETTE.GREY, 3)
             else:
-                dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.BLUE)
+                dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE)
 
             dsc.rect_dsc.shadow_width = 6
             dsc.rect_dsc.shadow_ofs_x = 3
@@ -41,9 +41,9 @@ def event_cb(e):
         elif dsc.id == 2:
             dsc.rect_dsc.radius = lv.RADIUS.CIRCLE
             if obj.get_selected_btn() == dsc.id:
-                dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_darken(lv.PALETTE.RED, 3)
+                dsc.rect_dsc.bg_color = lv.palette_darken(lv.PALETTE.RED, 3)
             else:
-                dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.RED)
+                dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.RED)
                 
                 dsc.label_dsc.color = lv.color_white()
         elif dsc.id == 3:

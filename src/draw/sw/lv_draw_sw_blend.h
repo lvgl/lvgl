@@ -17,7 +17,6 @@ extern "C" {
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_style.h"
 #include "../lv_draw_mask.h"
-#include "../lv_draw_dither.h"
 
 /*********************
  *      DEFINES
@@ -37,9 +36,6 @@ typedef struct {
     const lv_area_t * mask_area;    /**< The area of `mask_buf` with absolute coordinates*/
     lv_opa_t opa;                   /**< The overall opacity*/
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
-#if DITHER_GRADIENT
-    lv_dither_func_t dither_func;   /**< A pointer on the dithering function to use */
-#endif
 } lv_draw_sw_blend_dsc_t;
 
 struct _lv_draw_ctx_t;

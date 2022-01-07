@@ -9,7 +9,7 @@ def draw_part_event_cb(e):
         # Make the texts in the first cell center aligned
         if row == 0:
             dsc.label_dsc.align = lv.TEXT_ALIGN.CENTER
-            dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.BLUE).color_mix(dsc.rect_dsc.bg_grad.stops[0].color, lv.OPA._20)
+            dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE).color_mix(dsc.rect_dsc.bg_color, lv.OPA._20)
             dsc.rect_dsc.bg_opa = lv.OPA.COVER
 
         # In the first column align the texts to the right
@@ -18,7 +18,7 @@ def draw_part_event_cb(e):
 
         # Make every 2nd row grayish
         if row != 0 and (row % 2) == 0:
-            dsc.rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.GREY).color_mix(dsc.rect_dsc.bg_grad.stops[0].color, lv.OPA._10)
+            dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.GREY).color_mix(dsc.rect_dsc.bg_color, lv.OPA._10)
             dsc.rect_dsc.bg_opa = lv.OPA.COVER
 
 

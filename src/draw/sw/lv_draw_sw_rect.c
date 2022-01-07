@@ -11,7 +11,7 @@
 #include "../../misc/lv_txt_ap.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_assert.h"
-#include "../lv_draw_dither.h"
+#include "lv_draw_sw_dither.h"
 
 /*********************
  *      DEFINES
@@ -166,8 +166,9 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
         blend_dsc.src_buf = grad->map + clipped_coords.x1 - bg_coords.x1;
     }
 
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
     lv_dither_mode_t dither_mode = dsc->bg_grad.dither;
+    lv_dither_func_t dither_func = &lv_dither_none;
     if(grad_dir == LV_GRAD_DIR_VER && dither_mode != LV_DITHER_NONE) {
         /* When dithering, we are still using a map that's changing from line to line*/
         blend_dsc.src_buf = grad->map;
@@ -175,16 +176,15 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 
     if(dither_mode == LV_DITHER_NONE) {
         grad->filled = 0; /*Should we force refilling it each draw call ?*/
-        blend_dsc.dither_func = &lv_dither_none;
     }
     else
 #if LV_DITHER_ERROR_DIFFUSION
         if(dither_mode == LV_DITHER_ORDERED)
 #endif
-            blend_dsc.dither_func = grad_dir == LV_GRAD_DIR_HOR ? &lv_dither_ordered_hor : &lv_dither_ordered_ver;
+            dither_func = grad_dir == LV_GRAD_DIR_HOR ? &lv_dither_ordered_hor : &lv_dither_ordered_ver;
 #if LV_DITHER_ERROR_DIFFUSION
         else if(dither_mode == LV_DITHER_ERR_DIFF)
-            blend_dsc.dither_func = grad_dir == LV_GRAD_DIR_HOR ? &lv_dither_fs_hor : &lv_dither_fs_ver;
+            dither_func = grad_dir == LV_GRAD_DIR_HOR ? &lv_dither_err_diff_hor : &lv_dither_err_diff_ver;
 #endif
 #endif
 
@@ -200,8 +200,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clipped_coords.x1, h, clipped_w);
             if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
 
-#if DITHER_GRADIENT
-            blend_dsc.dither_func(grad, blend_area.x1,  h - bg_coords.y1, coords_bg_w);
+#if _DITHER_GRADIENT
+            dither_func(grad, blend_area.x1,  h - bg_coords.y1, coords_bg_w);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[h - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -226,8 +226,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_area.y1 = top_y;
             blend_area.y2 = top_y;
 
-#if DITHER_GRADIENT
-            blend_dsc.dither_func(grad, blend_area.x1,  top_y - bg_coords.y1, coords_bg_w);
+#if _DITHER_GRADIENT
+            dither_func(grad, blend_area.x1,  top_y - bg_coords.y1, coords_bg_w);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[top_y - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -237,8 +237,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_area.y1 = bottom_y;
             blend_area.y2 = bottom_y;
 
-#if DITHER_GRADIENT
-            blend_dsc.dither_func(grad, blend_area.x1,  bottom_y - bg_coords.y1, coords_bg_w);
+#if _DITHER_GRADIENT
+            dither_func(grad, blend_area.x1,  bottom_y - bg_coords.y1, coords_bg_w);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[bottom_y - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -276,8 +276,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_area.y1 = h;
             blend_area.y2 = h;
 
-#if DITHER_GRADIENT
-            blend_dsc.dither_func(grad, blend_area.x1,  h - bg_coords.y1, coords_bg_w);
+#if _DITHER_GRADIENT
+            dither_func(grad, blend_area.x1,  h - bg_coords.y1, coords_bg_w);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[h - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -387,7 +387,6 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 }
 
-#if LV_DRAW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
@@ -443,7 +442,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
 
     lv_opa_t * sh_buf;
 
-#if defined(LV_SHADOW_CACHE_SIZE) && LV_SHADOW_CACHE_SIZE > 0
+#if LV_SHADOW_CACHE_SIZE
     if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
         /*Use the cache if available*/
         sh_buf = lv_mem_buf_get(corner_size * corner_size);
@@ -1067,8 +1066,6 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 
     lv_mem_buf_release(sh_ups_blur_buf);
 }
-
-#endif
 
 static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {

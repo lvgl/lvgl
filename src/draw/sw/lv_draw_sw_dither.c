@@ -1,21 +1,21 @@
 /**
- * @file lv_draw_dither.c
+ * @file lv_draw_sw_dither.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_dither.h"
-#include "lv_draw_gradient.h"
-#include "../misc/lv_color.h"
+#include "lv_draw_sw_dither.h"
+#include "../lv_draw_gradient.h"
+#include "../../misc/lv_color.h"
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
 
 LV_ATTRIBUTE_FAST_MEM void lv_dither_none(lv_gradient_cache_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {
@@ -99,7 +99,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(lv_gradient_cache_t * grad, lv_
 
 
 #if LV_DITHER_ERROR_DIFFUSION == 1
-LV_ATTRIBUTE_FAST_MEM void lv_dither_fs_hor(lv_gradient_cache_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
+LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_gradient_cache_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
 {
     LV_UNUSED(xs);
     LV_UNUSED(y);
@@ -153,7 +153,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_fs_hor(lv_gradient_cache_t * grad, lv_coord
     grad->map[grad->hmap_size - 1] = lv_color_hex(grad->hmap[grad->hmap_size - 1].full);
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_dither_fs_ver(lv_gradient_cache_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
+LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(lv_gradient_cache_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
 {
     /* Try to implement error diffusion on a vertical gradient and an horizontal map using those tricks:
         Since the given hi-resolution gradient (in src) is vertical, the Floyd Steinberg algorithm pass need to be rotated,

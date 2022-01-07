@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../misc/lv_color.h"
 #include "../misc/lv_style.h"
-#include "lv_draw_dither.h"
+#include "sw/lv_draw_sw_dither.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +50,7 @@ typedef struct {
                                                         * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
 } lv_gradient_t;
 
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
 typedef lv_color32_t lv_grad_color_t;
 #else
 typedef lv_color_t lv_grad_color_t;
@@ -68,7 +68,7 @@ typedef struct _lv_gradient_cache_t {
     lv_color_t   *  map;          /**< The computed gradient low bitdepth color map, points into the
                                    * cache's buffer, no free needed */
     lv_coord_t      size;         /**< The computed gradient color map size, in colors */
-#if DITHER_GRADIENT
+#if _DITHER_GRADIENT
     lv_color32_t  * hmap;         /**< If dithering, we need to store the current, high bitdepth gradient
                                    * map too, points to the cache's buffer, no free needed */
     lv_coord_t      hmap_size;    /**< The array size in pixels */
@@ -100,7 +100,7 @@ lv_gradient_cache_t * lv_grad_get_from_cache(const lv_gradient_t * gradient, lv_
 /** Evict item from the gradient cache (not used anymore).
  *  This bypass the life counter on the item to remove this item.
  */
-void lv_grad_evict_from_cache(const lv_gradient_t * gradient, lv_coord_t w, lv_coord_t h);
+void lv_grad_pop_from_cache(const lv_gradient_t * gradient, lv_coord_t w, lv_coord_t h);
 
 /** Free the gradient cache */
 void lv_grad_free_cache(void);

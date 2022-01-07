@@ -30,7 +30,7 @@ static void event_cb(lv_event_t * e)
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     lv_draw_rect_dsc_t draw_dsc;
     lv_draw_rect_dsc_init(&draw_dsc);
-    draw_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_LIGHT_GREEN);
+    draw_dsc.bg_color = lv_palette_main(LV_PALETTE_LIGHT_GREEN);
     draw_dsc.bg_opa = LV_OPA_COVER;
     lv_point_t points[32];
     int i, r = 150;

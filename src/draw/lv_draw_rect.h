@@ -35,7 +35,10 @@ typedef struct {
 
     /*Background*/
     lv_opa_t bg_opa;
-    lv_gradient_t bg_grad;
+    union {
+        lv_color_t bg_color;        /**< First element of a gradient is a color, so it maps well here*/
+        lv_gradient_t bg_grad;
+    };
 
     /*Background img*/
     const void * bg_img_src;

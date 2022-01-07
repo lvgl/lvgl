@@ -13,7 +13,7 @@ static void draw_event_cb(lv_event_t * e)
 
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_grad.stops[0].color = chk ? lv_theme_get_color_primary(obj) : lv_palette_lighten(LV_PALETTE_GREY, 2);
+        rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_palette_lighten(LV_PALETTE_GREY, 2);
         rect_dsc.radius = LV_RADIUS_CIRCLE;
 
         lv_area_t sw_area;
@@ -23,7 +23,7 @@ static void draw_event_cb(lv_event_t * e)
         sw_area.y2 = sw_area.y1 + 20;
         lv_draw_rect(dsc->draw_ctx, &rect_dsc, &sw_area);
 
-        rect_dsc.bg_grad.stops[0].color = lv_color_white();
+        rect_dsc.bg_color = lv_color_white();
         if(chk) {
             sw_area.x2 -= 2;
             sw_area.x1 = sw_area.x2 - 16;

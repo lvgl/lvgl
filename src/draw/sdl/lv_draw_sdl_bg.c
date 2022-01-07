@@ -78,7 +78,7 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
                           const lv_draw_rect_dsc_t * dsc)
 {
     SDL_Color bg_color;
-    lv_color_to_sdl_color(&dsc->bg_grad.stops[0].color, &bg_color);
+    lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
     SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
     SDL_SetRenderDrawColor(ctx->renderer, bg_color.r, bg_color.g, bg_color.b, dsc->bg_opa);
 

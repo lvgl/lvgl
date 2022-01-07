@@ -87,7 +87,7 @@ void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dr
     SDL_Rect srcrect = {0, 0, w, h}, dstrect;
     lv_area_to_sdl_rect(&draw_area, &dstrect);
     SDL_Color color;
-    lv_color_to_sdl_color(&draw_dsc->bg_grad.stops[0].color, &color);
+    lv_color_to_sdl_color(&draw_dsc->bg_color, &color);
     SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     SDL_SetTextureAlphaMod(texture, draw_dsc->bg_opa);
     SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);

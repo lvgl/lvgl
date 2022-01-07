@@ -809,10 +809,10 @@ static void spectrum_draw_event_cb(lv_event_t * e)
                 if(deg_space < 1) deg_space = 1;
             }
 
-            if(v < BAR_COLOR1_STOP) draw_dsc.bg_grad.stops[0].color = BAR_COLOR1;
-            else if(v > BAR_COLOR3_STOP) draw_dsc.bg_grad.stops[0].color = BAR_COLOR3;
-            else if(v > BAR_COLOR2_STOP) draw_dsc.bg_grad.stops[0].color = lv_color_mix(BAR_COLOR3, BAR_COLOR2, ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP-BAR_COLOR2_STOP));
-            else draw_dsc.bg_grad.stops[0].color = lv_color_mix(BAR_COLOR2, BAR_COLOR1, ((v - BAR_COLOR1_STOP) * 255) / (BAR_COLOR2_STOP - BAR_COLOR1_STOP));
+            if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
+            else if(v > BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
+            else if(v > BAR_COLOR2_STOP) draw_dsc.bg_color = lv_color_mix(BAR_COLOR3, BAR_COLOR2, ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP-BAR_COLOR2_STOP));
+            else draw_dsc.bg_color = lv_color_mix(BAR_COLOR2, BAR_COLOR1, ((v - BAR_COLOR1_STOP) * 255) / (BAR_COLOR2_STOP - BAR_COLOR1_STOP));
 
             uint32_t di = deg + deg_space;
 

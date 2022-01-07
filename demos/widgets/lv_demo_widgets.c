@@ -1278,7 +1278,7 @@ static void slider_event_cb(lv_event_t * e)
 
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.bg_grad.stops[0].color = lv_palette_darken(LV_PALETTE_GREY, 3);
+            rect_dsc.bg_color = lv_palette_darken(LV_PALETTE_GREY, 3);
             rect_dsc.radius = LV_DPX(5);
             lv_draw_rect(dsc->draw_ctx, &rect_dsc, &bg_area);
 
@@ -1331,7 +1331,7 @@ static void chart_event_cb(lv_event_t * e)
                 lv_draw_rect_dsc_t draw_rect_dsc;
                 lv_draw_rect_dsc_init(&draw_rect_dsc);
                 draw_rect_dsc.bg_opa = LV_OPA_50;
-                draw_rect_dsc.bg_grad.stops[0].color = dsc->line_dsc->color;
+                draw_rect_dsc.bg_color = dsc->line_dsc->color;
 
                 lv_area_t obj_clip_area;
                 _lv_area_intersect(&obj_clip_area, dsc->draw_ctx->clip_area, &obj->coords);
@@ -1395,7 +1395,7 @@ static void chart_event_cb(lv_event_t * e)
 
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
-                rect_dsc.bg_grad.stops[0].color = ser->color;
+                rect_dsc.bg_color = ser->color;
                 rect_dsc.radius = LV_DPX(5);
                 lv_draw_rect(dsc->draw_ctx, &rect_dsc, &bg_area);
 
@@ -1446,19 +1446,19 @@ static void shop_chart_event_cb(lv_event_t * e)
 
             a.y1 = dsc->draw_area->y1;
             a.y2 = a.y1 + 4 + (devices[dsc->id] * h) / 100; /*+4 to overlap the radius*/
-            draw_rect_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_RED);
+            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
             draw_rect_dsc.radius = 4;
             lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
             a.y1 = a.y2 - 4;                                    /*-4 to overlap the radius*/
             a.y2 = a.y1 +  (clothes[dsc->id] * h) / 100;
-            draw_rect_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_BLUE);
+            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
             draw_rect_dsc.radius = 0;
             lv_draw_rect( dsc->draw_ctx, &draw_rect_dsc, &a);
 
             a.y1 = a.y2;
             a.y2 = a.y1 + (services[dsc->id] * h) / 100;
-            draw_rect_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_GREEN);
+            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_GREEN);
             lv_draw_rect( dsc->draw_ctx, &draw_rect_dsc, &a);
         }
     }
