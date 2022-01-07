@@ -2,7 +2,6 @@ CSRCS += lv_draw_arc.c
 CSRCS += lv_draw.c
 CSRCS += lv_draw_blend.c
 CSRCS += lv_draw_gradient.c
-CSRCS += lv_draw_dither.c
 CSRCS += lv_draw_img.c
 CSRCS += lv_draw_label.c
 CSRCS += lv_draw_line.c

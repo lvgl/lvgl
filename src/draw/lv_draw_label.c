@@ -208,7 +208,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
 
     lv_draw_rect_dsc_t draw_dsc_sel;
     lv_draw_rect_dsc_init(&draw_dsc_sel);
-    draw_dsc_sel.bg_grad.stops[0].color = dsc->sel_bg_color;
+    draw_dsc_sel.bg_color = dsc->sel_bg_color;
 
     int32_t pos_x_start = pos.x;
     /*Write out all lines*/

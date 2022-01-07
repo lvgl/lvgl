@@ -78,7 +78,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
     }
     else {
         cir_dsc.bg_opa = dsc->opa;
-        cir_dsc.bg_grad.stops[0].color = dsc->color;
+        cir_dsc.bg_color = dsc->color;
     }
 
     lv_area_t area_out;

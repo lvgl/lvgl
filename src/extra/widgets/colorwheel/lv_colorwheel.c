@@ -316,7 +316,7 @@ static void draw_knob(lv_event_t * e)
     cir_dsc.radius = LV_RADIUS_CIRCLE;
 
     if(colorwheel->knob.recolor) {
-        cir_dsc.bg_grad.stops[0].color = lv_colorwheel_get_rgb(obj);
+        cir_dsc.bg_color = lv_colorwheel_get_rgb(obj);
     }
 
     lv_area_t knob_area = get_knob_area(obj);

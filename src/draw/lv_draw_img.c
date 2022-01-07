@@ -336,7 +336,7 @@ static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const
 {
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_grad.stops[0].color = lv_color_white();
+    rect_dsc.bg_color = lv_color_white();
     lv_draw_rect(draw_ctx, &rect_dsc, coords);
 
     lv_draw_label_dsc_t label_dsc;

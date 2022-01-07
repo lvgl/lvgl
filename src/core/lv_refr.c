@@ -610,7 +610,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_img_src = disp_refr->bg_img;
             dsc.bg_img_opa = disp_refr->bg_opa;
-            dsc.bg_grad.stops[0].color = disp_refr->bg_color;
+            dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
             draw_ctx->draw_bg(draw_ctx, &dsc, draw_ctx->buf_area);
         }
@@ -633,7 +633,7 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
         else {
             lv_draw_rect_dsc_t dsc;
             lv_draw_rect_dsc_init(&dsc);
-            dsc.bg_grad.stops[0].color = disp_refr->bg_color;
+            dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
             lv_draw_rect(draw_ctx, &dsc, draw_ctx->buf_area);
         }

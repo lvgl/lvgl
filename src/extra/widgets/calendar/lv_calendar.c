@@ -306,7 +306,7 @@ static void draw_part_begin_event_cb(lv_event_t * e)
 
         if(lv_btnmatrix_has_btn_ctrl(obj, dsc->id, LV_CALENDAR_CTRL_HIGHLIGHT)) {
             dsc->rect_dsc->bg_opa = LV_OPA_40;
-            dsc->rect_dsc->bg_grad.stops[0].color = lv_theme_get_color_primary(obj);
+            dsc->rect_dsc->bg_color = lv_theme_get_color_primary(obj);
             if(lv_btnmatrix_get_selected_btn(obj) == dsc->id) {
                 dsc->rect_dsc->bg_opa = LV_OPA_70;
             }

@@ -573,7 +573,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-       draw_dsc->bg_grad.stops[0].color.full == ctransp.full) {
+       draw_dsc->bg_color.full == ctransp.full) {
         fake_disp.driver->antialiasing = 0;
     }
 
@@ -738,7 +738,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-       draw_dsc->bg_grad.stops[0].color.full == ctransp.full) {
+       draw_dsc->bg_color.full == ctransp.full) {
         fake_disp.driver->antialiasing = 0;
     }
 

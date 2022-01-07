@@ -907,7 +907,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     _LV_LL_READ_BACK(&chart->series_ll, ser) {
         if(ser->hidden) continue;
         line_dsc_default.color = ser->color;
-        point_dsc_default.bg_grad.stops[0].color = ser->color;
+        point_dsc_default.bg_color = ser->color;
 
         lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
@@ -1069,7 +1069,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     _LV_LL_READ_BACK(&chart->series_ll, ser) {
         if(ser->hidden) continue;
         line_dsc_default.color = ser->color;
-        point_dsc_default.bg_grad.stops[0].color = ser->color;
+        point_dsc_default.bg_color = ser->color;
 
         lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
@@ -1233,7 +1233,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
             if(col_a.x2 < clip_area.x1) continue;
             if(col_a.x1 > clip_area.x2) break;
 
-            col_dsc.bg_grad.stops[0].color = ser->color;
+            col_dsc.bg_color = ser->color;
 
             lv_coord_t p_act = (start_point + i) % chart->point_cnt;
             y_tmp            = (int32_t)((int32_t)ser->y_points[p_act] - chart->ymin[ser->y_axis_sec]) * h;
@@ -1299,7 +1299,7 @@ static void draw_cursors(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
         lv_memcpy(&line_dsc_tmp, &line_dsc_ori, sizeof(lv_draw_line_dsc_t));
         lv_memcpy(&point_dsc_tmp, &point_dsc_ori, sizeof(lv_draw_rect_dsc_t));
         line_dsc_tmp.color = cursor->color;
-        point_dsc_tmp.bg_grad.stops[0].color = cursor->color;
+        point_dsc_tmp.bg_color = cursor->color;
 
         part_draw_dsc.p1 = &p1;
         part_draw_dsc.p2 = &p2;

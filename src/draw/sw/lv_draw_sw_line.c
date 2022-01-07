@@ -76,7 +76,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(struct _lv_draw_ctx_t * draw_ctx, con
     if(dsc->round_end || dsc->round_start) {
         lv_draw_rect_dsc_t cir_dsc;
         lv_draw_rect_dsc_init(&cir_dsc);
-        cir_dsc.bg_grad.stops[0].color = dsc->color;
+        cir_dsc.bg_color = dsc->color;
         cir_dsc.radius = LV_RADIUS_CIRCLE;
         cir_dsc.bg_opa = dsc->opa;
 
