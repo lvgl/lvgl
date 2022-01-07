@@ -111,4 +111,21 @@ void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
     TEST_ASSERT_LESS_THAN_INT32(original_width, new_width);
 }
 
+void test_bar_start_value_should_only_change_when_in_range_mode(void)
+{
+    int32_t new_start_value = 20u;
+
+    lv_bar_set_value(bar, 90, LV_ANIM_OFF);
+    lv_bar_set_start_value(bar, new_start_value, LV_ANIM_OFF);
+
+    /* Start value shouldn't be updated when not in RANGE mode */
+    TEST_ASSERT_EQUAL_INT32(0u, lv_bar_get_start_value(bar));
+
+    /* Set bar in RANGE mode so we can edit the start value */
+    lv_bar_set_mode(bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_start_value(bar, new_start_value, LV_ANIM_OFF);
+
+    TEST_ASSERT_EQUAL_INT32(new_start_value, lv_bar_get_start_value(bar));
+}
+
 #endif
