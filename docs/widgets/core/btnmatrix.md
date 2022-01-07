@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/btnmatrix.md
+:github_url: |github_link_base|/widgets/core/btnmatrix.md
 ```
 # Button matrix (lv_btnmatrix)
 
@@ -56,7 +56,7 @@ An element of `ctrl_map` should look like `ctrl_map[0] = width | LV_BTNM_CTRL_NO
 The number of elements should be equal to the number of buttons (excluding newlines characters).
 
 ### One check
-The "One check" feature can be enabled with `lv_btnmatrix_set_one_check(btnm, true)` to allow only one button to be checked at a time.
+The "One check" feature can be enabled with `lv_btnmatrix_set_one_checked(btnm, true)` to allow only one button to be checked at a time.
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a button is pressed/released or repeated after long press. The event parameter is set to the ID of the pressed/released button.

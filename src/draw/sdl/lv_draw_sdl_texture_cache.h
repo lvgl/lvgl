@@ -37,6 +37,7 @@ extern "C" {
 typedef struct {
     char head[8];
     SDL_Texture * texture;
+    SDL_Rect rect;
     bool texture_managed;
     bool texture_referenced;
 } lv_draw_sdl_dec_dsc_userdata_t;

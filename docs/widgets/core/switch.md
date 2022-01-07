@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/switch.md
+:github_url: |github_link_base|/widgets/core/switch.md
 ```
 
 # Switch (lv_switch)

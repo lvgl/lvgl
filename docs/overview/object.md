@@ -91,6 +91,9 @@ If a child is partially or fully outside of its parent then the parts outside wi
 lv_obj_set_x(obj1, -30);	/*Move the child a little bit off the parent*/
 ```
 
+This behavior can be overwritten with `lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);` which allow the children to be drawn out of the parent.
+
+
 ### Create and delete objects
 
 In LVGL, objects can be created and deleted dynamically at run time. It means only the currently created (existing) objects consume RAM.

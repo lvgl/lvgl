@@ -290,32 +290,27 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 {
     lv_obj_t * found_p = NULL;
 
-    /*If the point is on this object check its children too*/
-    if(lv_obj_hit_test(obj, point)) {
+    /*If this obj is hidden the children are hidden too so return immediately*/
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
+
+    bool hit_test_ok = lv_obj_hit_test(obj, point);
+
+    /*If the point is on this object or has overflow visible check its children too*/
+    if(_lv_area_is_point_on(&obj->coords, point, 0) || lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        /*If a child matches use it*/
         for(i = child_cnt - 1; i >= 0; i--) {
             lv_obj_t * child = obj->spec_attr->children[i];
             found_p = lv_indev_search_obj(child, point);
-
-            /*If a child was found then break*/
-            if(found_p != NULL) break;
-        }
-
-        /*If then the children was not ok, and this obj is clickable
-         * and it or its parent is not hidden then save this object*/
-        if(found_p == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) {
-            lv_obj_t * hidden_i = obj;
-            while(hidden_i != NULL) {
-                if(lv_obj_has_flag(hidden_i, LV_OBJ_FLAG_HIDDEN) == true) break;
-                hidden_i = lv_obj_get_parent(hidden_i);
-            }
-            /*No parent found with hidden == true*/
-            if(hidden_i == NULL && (lv_obj_get_state(obj) & LV_STATE_DISABLED) == false) found_p = obj;
+            if(found_p) return found_p;
         }
     }
 
-    return found_p;
+    /*If not return earlier for a clicked child and this obj's hittest was ok use it
+     *else return NULL*/
+    if(hit_test_ok) return obj;
+    else return NULL;
 }
 
 /**********************

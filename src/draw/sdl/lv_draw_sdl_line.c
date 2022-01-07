@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.c
+ * @file lv_draw_sdl_line.c
  *
  */
 
@@ -64,10 +64,10 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     }
 
     double angle = SDL_atan2(y2 - y1, x2 - x1) * 180 / M_PI;
-    lv_draw_line_key_t key = line_key_create(dsc, length);
+    lv_draw_line_key_t key = line_key_create(dsc, (lv_coord_t) length);
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get(sdl_ctx, &key, sizeof(key), NULL);
     if(!texture) {
-        texture = line_texture_create(sdl_ctx, dsc, length);
+        texture = line_texture_create(sdl_ctx, dsc, (lv_coord_t) length);
         lv_draw_sdl_texture_cache_put(sdl_ctx, &key, sizeof(key), texture);
     }
 
@@ -80,20 +80,23 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
 
     lv_area_t t_coords = coords, t_clip = *clip, apply_area;
     lv_area_t extension = {dsc->width / 2, dsc->width / 2, dsc->width / 2, dsc->width / 2};
-    bool has_mask = lv_draw_sdl_composite_begin(sdl_ctx, &coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
-                                                &apply_area);
+    lv_draw_sdl_composite_begin(sdl_ctx, &coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
+                                &apply_area);
 
     SDL_Color color;
     lv_color_to_sdl_color(&dsc->color, &color);
 
-    SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(&t_clip, &clip_rect);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
     SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     SDL_SetTextureAlphaMod(texture, dsc->opa);
-    SDL_Rect srcrect = {0, 0, length + dsc->width + 2, dsc->width + 2},
+    SDL_Rect srcrect = {0, 0, (int) length + dsc->width + 2, dsc->width + 2},
              dstrect = {t_coords.x1 - 1 - dsc->width / 2, t_coords.y1 - 1, srcrect.w, srcrect.h};
     SDL_Point center = {1 + dsc->width / 2, 1 + dsc->width / 2};
+
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(&t_clip, &clip_rect);
+    if(!SDL_RectEquals(&clip_rect, &dstrect) || angle != 0) {
+        SDL_RenderSetClipRect(renderer, &clip_rect);
+    }
     SDL_RenderCopyEx(renderer, texture, &srcrect, &dstrect, angle, &center, 0);
     SDL_RenderSetClipRect(renderer, NULL);
 

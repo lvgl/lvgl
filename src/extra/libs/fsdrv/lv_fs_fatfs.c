@@ -184,10 +184,10 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             f_lseek(file_p, pos);
             break;
         case LV_FS_SEEK_CUR:
-            f_lseek(file_p, f_tell(file_p) + pos);
+            f_lseek(file_p, f_tell((FIL *)file_p) + pos);
             break;
         case LV_FS_SEEK_END:
-            f_lseek(file_p, f_size(file_p) + pos);
+            f_lseek(file_p, f_size((FIL *)file_p) + pos);
             break;
         default:
             break;
@@ -206,7 +206,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    *pos_p = f_tell(file_p);
+    *pos_p = f_tell((FIL *)file_p);
     return LV_FS_RES_OK;
 }
 
