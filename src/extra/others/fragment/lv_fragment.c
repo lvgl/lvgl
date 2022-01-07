@@ -129,7 +129,7 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragm
     item_create_obj(manager, top, manager->container, NULL);
 }
 
-size_t lv_fragment_manager_size(lv_fragment_manager_t * manager)
+size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager)
 {
     size_t size = 0;
     manager_stack_t * cur;
