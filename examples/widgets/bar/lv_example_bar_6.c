@@ -40,7 +40,7 @@ static void event_cb(lv_event_t * e)
     txt_area.y1 = dsc->draw_area->y1 + (lv_area_get_height(dsc->draw_area) - txt_size.y) / 2;
     txt_area.y2 = txt_area.y1 + txt_size.y - 1;
 
-    lv_draw_label(&txt_area, dsc->clip_area, &label_dsc, buf, NULL);
+    lv_draw_label(dsc->draw_ctx, &label_dsc, &txt_area, buf, NULL);
 }
 
 /**

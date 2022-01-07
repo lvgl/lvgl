@@ -35,5 +35,5 @@ jobs:
           message: |
             Your PR needs its formatting corrected before it can be merged upstream.
             
-            Please comment `@lvgl-bot format` if you would like our bot to commit this change for you.
+            Please run `scripts/code-format.py` and commit the resulting change.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

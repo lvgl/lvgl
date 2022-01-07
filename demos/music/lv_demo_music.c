@@ -70,20 +70,20 @@ static const char * artist_list[] = {
 };
 
 static const char * genre_list[] = {
-    "Rock • 1997",
-    "Drum'n bass • 2016",
-    "Psy trance • 2020",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
-    "Metal • 2015",
+    "Rock - 1997",
+    "Drum'n bass - 2016",
+    "Psy trance - 2020",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
+    "Metal - 2015",
 };
 
 static const uint32_t time_list[] = {

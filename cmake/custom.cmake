@@ -13,11 +13,14 @@ get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
+file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 
 add_library(lvgl STATIC ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 add_library(lvgl_examples STATIC ${EXAMPLE_SOURCES})
 add_library(lvgl::examples ALIAS lvgl_examples)
+add_library(lvgl_demos STATIC ${DEMO_SOURCES})
+add_library(lvgl::demos ALIAS lvgl_demos)
 
 target_compile_definitions(
   lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
@@ -29,8 +32,11 @@ target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
 # Include /examples folder
 target_include_directories(lvgl_examples SYSTEM
                            PUBLIC ${LVGL_ROOT_DIR}/examples)
+target_include_directories(lvgl_demos SYSTEM
+                           PUBLIC ${LVGL_ROOT_DIR}/demos)
 
 target_link_libraries(lvgl_examples PUBLIC lvgl)
+target_link_libraries(lvgl_demos PUBLIC lvgl)
 
 # Lbrary and headers can be installed to system using make install
 file(GLOB LVGL_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/lv_conf.h"

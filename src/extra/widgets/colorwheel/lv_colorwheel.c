@@ -242,7 +242,7 @@ static void lv_colorwheel_constructor(const lv_obj_class_t * class_p, lv_obj_t *
 static void draw_disc_grad(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_coord_t cx = obj->coords.x1 + w / 2;
@@ -292,7 +292,7 @@ static void draw_disc_grad(lv_event_t * e)
         p[1].x = cx + ((r - cir_w - cir_w_extra) * lv_trigo_sin(angle_trigo) >> LV_TRIGO_SHIFT);
         p[1].y = cy + ((r - cir_w - cir_w_extra) * lv_trigo_cos(angle_trigo) >> LV_TRIGO_SHIFT);
 
-        lv_draw_line(&p[0], &p[1], clip_area, &line_dsc);
+        lv_draw_line(draw_ctx, &line_dsc, &p[0], &p[1]);
     }
 
 #if LV_DRAW_COMPLEX
@@ -306,7 +306,7 @@ static void draw_disc_grad(lv_event_t * e)
 static void draw_knob(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
     lv_draw_rect_dsc_t cir_dsc;
@@ -321,7 +321,7 @@ static void draw_knob(lv_event_t * e)
 
     lv_area_t knob_area = get_knob_area(obj);
 
-    lv_draw_rect(&knob_area, clip_area, &cir_dsc);
+    lv_draw_rect(draw_ctx, &cir_dsc, &knob_area);
 }
 
 static void invalidate_knob(lv_obj_t * obj)

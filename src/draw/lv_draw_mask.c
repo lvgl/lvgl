@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw.h"
+#include "lv_draw.h"
 #if LV_DRAW_COMPLEX
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_gc.h"
+#include "../misc/lv_math.h"
+#include "../misc/lv_log.h"
+#include "../misc/lv_assert.h"
+#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -41,6 +41,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mas
 LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x,
                                                                  lv_coord_t abs_y, lv_coord_t len,
                                                                  lv_draw_mask_map_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_polygon(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                     lv_coord_t abs_y, lv_coord_t len,
+                                                                     lv_draw_mask_polygon_param_t * param);
 
 LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
                                                                lv_coord_t len,
@@ -218,6 +221,10 @@ void lv_draw_mask_free_param(void * p)
                 radius_p->circle->used_cnt--;
             }
         }
+    }
+    else if(pdsc->type == LV_DRAW_MASK_TYPE_POLYGON) {
+        lv_draw_mask_polygon_param_t * poly_p = (lv_draw_mask_polygon_param_t *) p;
+        lv_mem_free(poly_p->cfg.points);
     }
 }
 
@@ -558,6 +565,31 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
     param->cfg.map = map;
     param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_map;
     param->dsc.type = LV_DRAW_MASK_TYPE_MAP;
+}
+
+void lv_draw_mask_polygon_init(lv_draw_mask_polygon_param_t * param, const lv_point_t * points, uint16_t point_cnt)
+{
+    /*Join adjacent points if they are on the same coordinate*/
+    lv_point_t * p = lv_mem_alloc(point_cnt * sizeof(lv_point_t));
+    if(p == NULL) return;
+    uint16_t i;
+    uint16_t pcnt = 0;
+    p[0] = points[0];
+    for(i = 0; i < point_cnt - 1; i++) {
+        if(points[i].x != points[i + 1].x || points[i].y != points[i + 1].y) {
+            p[pcnt] = points[i];
+            pcnt++;
+        }
+    }
+    /*The first and the last points are also adjacent*/
+    if(points[0].x != points[point_cnt - 1].x || points[0].y != points[point_cnt - 1].y) {
+        p[pcnt] = points[point_cnt - 1];
+        pcnt++;
+    }
+    param->cfg.points = p;
+    param->cfg.point_cnt = pcnt;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_polygon;
+    param->dsc.type = LV_DRAW_MASK_TYPE_POLYGON;
 }
 
 /**********************
@@ -1218,6 +1250,79 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask
     return LV_DRAW_MASK_RES_CHANGED;
 }
 
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_polygon(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                     lv_coord_t abs_y, lv_coord_t len,
+                                                                     lv_draw_mask_polygon_param_t * param)
+{
+    uint16_t i;
+    struct {
+        lv_point_t p1;
+        lv_point_t p2;
+    } lines[2], tmp;
+    uint16_t line_cnt = 0;
+    lv_memset_00(&lines, sizeof(lines));
+    int psign_prev = 0;
+    for(i = 0; i < param->cfg.point_cnt; i++) {
+        lv_point_t p1 = param->cfg.points[i];
+        lv_point_t p2 = param->cfg.points[i + 1 < param->cfg.point_cnt ? i + 1 : 0];
+        int pdiff = p1.y - p2.y, psign = pdiff / LV_ABS(pdiff);
+        if(pdiff > 0) {
+            if(abs_y > p1.y || abs_y < p2.y) continue;
+            lines[line_cnt].p1 = p2;
+            lines[line_cnt].p2 = p1;
+        }
+        else {
+            if(abs_y < p1.y || abs_y > p2.y) continue;
+            lines[line_cnt].p1 = p1;
+            lines[line_cnt].p2 = p2;
+        }
+        if(psign_prev && psign_prev == psign) continue;
+        psign_prev = psign;
+        line_cnt++;
+        if(line_cnt == 2) break;
+    }
+    if(line_cnt != 2) return LV_DRAW_MASK_RES_TRANSP;
+    if(lines[0].p1.x > lines[1].p1.x || lines[0].p2.x > lines[1].p2.x) {
+        tmp = lines[0];
+        lines[0] = lines[1];
+        lines[1] = tmp;
+    }
+    lv_draw_mask_line_param_t line_p;
+    lv_draw_mask_line_points_init(&line_p, lines[0].p1.x, lines[0].p1.y, lines[0].p2.x, lines[0].p2.y,
+                                  LV_DRAW_MASK_LINE_SIDE_RIGHT);
+    if(line_p.steep == 0 && line_p.flat) {
+        lv_coord_t x1 = LV_MIN(lines[0].p1.x, lines[0].p2.x);
+        lv_coord_t x2 = LV_MAX(lines[0].p1.x, lines[0].p2.x);
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], (abs_x + i >= x1 && abs_x + i <= x2) * 0xFF);
+        }
+        lv_draw_mask_free_param(&line_p);
+        return LV_DRAW_MASK_RES_CHANGED;
+    }
+    lv_draw_mask_res_t res1 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &line_p);
+    lv_draw_mask_free_param(&line_p);
+    if(res1 == LV_DRAW_MASK_RES_TRANSP) {
+        return LV_DRAW_MASK_RES_TRANSP;
+    }
+    lv_draw_mask_line_points_init(&line_p, lines[1].p1.x, lines[1].p1.y, lines[1].p2.x, lines[1].p2.y,
+                                  LV_DRAW_MASK_LINE_SIDE_LEFT);
+    if(line_p.steep == 0 && line_p.flat) {
+        lv_coord_t x1 = LV_MIN(lines[1].p1.x, lines[1].p2.x);
+        lv_coord_t x2 = LV_MAX(lines[1].p1.x, lines[1].p2.x);
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], (abs_x + i >= x1 && abs_x + i <= x2) * 0xFF);
+        }
+        lv_draw_mask_free_param(&line_p);
+        return LV_DRAW_MASK_RES_CHANGED;
+    }
+    lv_draw_mask_res_t res2 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &line_p);
+    lv_draw_mask_free_param(&line_p);
+    if(res2 == LV_DRAW_MASK_RES_TRANSP) {
+        return LV_DRAW_MASK_RES_TRANSP;
+    }
+    if(res1 == LV_DRAW_MASK_RES_CHANGED || res2 == LV_DRAW_MASK_RES_CHANGED) return LV_DRAW_MASK_RES_CHANGED;
+    return res1;
+}
 /**
  * Initialize the circle drawing
  * @param c pointer to a point. The coordinates will be calculated here

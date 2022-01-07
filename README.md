@@ -7,7 +7,7 @@
 <p align="center">
 LVGL provides everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
 </p>
- 
+
 <h4 align="center">
 <a href="https://lvgl.io">Website </a> &middot;
 <a href="https://docs.lvgl.io/">Docs</a> &middot;
@@ -15,6 +15,10 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 <a href="https://lvgl.io/services">Services</a>  &middot;
 <a href="https://docs.lvgl.io/master/examples.html">Interactive examples</a>
 </h4>
+
+
+**English** | [中文](./README_zh.md) |
+
 
 ---
 
@@ -108,6 +112,7 @@ LVGL is also avaiable as:
 - [ESP32 component](https://docs.lvgl.io/master/get-started/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/get-started/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/rt-thread.html)
 
 
 ## Get started
@@ -177,4 +182,4 @@ Feel free to contact us if you have any questions.
 LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosting your own project under the LVGL organization.
 
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
- 
+

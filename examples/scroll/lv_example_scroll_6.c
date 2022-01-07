@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES && LV_USE_FLEX
 
 static void scroll_event_cb(lv_event_t * e)
 {
@@ -60,13 +60,13 @@ void lv_example_scroll_6(void)
     lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
-    unsigned int i;
+    uint32_t i;
     for(i = 0; i < 20; i++) {
         lv_obj_t * btn = lv_btn_create(cont);
         lv_obj_set_width(btn, lv_pct(100));
 
         lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "Button %u", i);
+        lv_label_set_text_fmt(label, "Button %"LV_PRIu32, i);
     }
 
     /*Update the buttons position manually for first*/

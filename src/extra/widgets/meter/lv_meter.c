@@ -26,9 +26,9 @@
 static void lv_meter_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
-static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
-static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area);
+static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
+static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
+static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
 static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_value, int32_t new_value);
 static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
@@ -296,13 +296,13 @@ static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_DRAW_MAIN) {
-        const lv_area_t * clip_area = lv_event_get_param(e);
+        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
-        draw_arcs(obj, clip_area, &scale_area);
-        draw_ticks_and_labels(obj, clip_area, &scale_area);
-        draw_needles(obj, clip_area, &scale_area);
+        draw_arcs(obj, draw_ctx, &scale_area);
+        draw_ticks_and_labels(obj, draw_ctx, &scale_area);
+        draw_needles(obj, draw_ctx, &scale_area);
 
         lv_coord_t r_edge = lv_area_get_width(&scale_area) / 2;
         lv_point_t scale_center;
@@ -319,11 +319,11 @@ static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
         nm_cord.y1 = scale_center.y - h;
         nm_cord.x2 = scale_center.x + w;
         nm_cord.y2 = scale_center.y + h;
-        lv_draw_rect(&nm_cord, clip_area, &mid_dsc);
+        lv_draw_rect(draw_ctx, &mid_dsc, &nm_cord);
     }
 }
 
-static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area)
 {
     lv_meter_t * meter = (lv_meter_t *)obj;
 
@@ -340,7 +340,7 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
     lv_meter_indicator_t * indic;
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.arc_dsc = &arc_dsc;
     part_draw_dsc.part = LV_PART_INDICATOR;
     part_draw_dsc.class_p = MY_CLASS;
@@ -365,12 +365,12 @@ static void draw_arcs(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area
         part_draw_dsc.p1 = &scale_center;
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_arc(scale_center.x, scale_center.y, part_draw_dsc.radius, start_angle, end_angle, clip_area, &arc_dsc);
+        lv_draw_arc(draw_ctx, &arc_dsc, &scale_center, part_draw_dsc.radius, start_angle, end_angle);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 
-static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area)
 {
     lv_meter_t * meter    = (lv_meter_t *)obj;
 
@@ -397,7 +397,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
     lv_draw_mask_radius_param_t outer_mask;
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.part = LV_PART_TICKS;
     part_draw_dsc.type = LV_METER_DRAW_PART_TICK;
@@ -532,7 +532,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
                 label_cord.x2 = label_cord.x1 + label_size.x;
                 label_cord.y2 = label_cord.y1 + label_size.y;
 
-                lv_draw_label(&label_cord, clip_area, &label_dsc, part_draw_dsc.text, NULL);
+                lv_draw_label(draw_ctx, part_draw_dsc.label_dsc, &label_cord, part_draw_dsc.text, NULL);
 
                 outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
             }
@@ -543,7 +543,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
             }
 
             inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
-            lv_draw_line(&p_outer, &p_center, clip_area, &line_dsc);
+            lv_draw_line(draw_ctx, &line_dsc, &p_outer, &p_center);
             lv_draw_mask_remove_id(inner_act_mask_id);
             lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
 
@@ -559,7 +559,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, const lv_area_t * clip_area, c
 }
 
 
-static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_area_t * scale_area)
+static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area)
 {
     lv_meter_t * meter = (lv_meter_t *)obj;
 
@@ -578,7 +578,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
     lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.p1 = &scale_center;
 
@@ -602,7 +602,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
             part_draw_dsc.p2 = &p_end;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-            lv_draw_line(&scale_center, &p_end, clip_area, &line_dsc);
+            lv_draw_line(draw_ctx, &line_dsc, &scale_center, &p_end);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
         else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
@@ -627,7 +627,7 @@ static void draw_needles(lv_obj_t * obj, const lv_area_t * clip_area, const lv_a
             part_draw_dsc.img_dsc = &img_dsc;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-            lv_draw_img(&a, clip_area, indic->type_data.needle_img.src, &img_dsc);
+            lv_draw_img(draw_ctx, &img_dsc, &a, indic->type_data.needle_img.src);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }

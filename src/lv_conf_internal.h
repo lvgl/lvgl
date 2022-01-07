@@ -374,16 +374,7 @@
     #endif
 #endif
 
-/*Use exnternal renderer*/
-#ifndef LV_USE_EXTERNAL_RENDERER
-    #ifdef CONFIG_LV_USE_EXTERNAL_RENDERER
-        #define LV_USE_EXTERNAL_RENDERER CONFIG_LV_USE_EXTERNAL_RENDERER
-    #else
-        #define LV_USE_EXTERNAL_RENDERER 0
-    #endif
-#endif
-
-/*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
+/*Use SDL renderer API*/
 #ifndef LV_USE_GPU_SDL
     #ifdef CONFIG_LV_USE_GPU_SDL
         #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
@@ -397,6 +388,13 @@
             #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
         #else
             #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+        #endif
+    #endif
+    #ifndef LV_GPU_SDL_LRU_SIZE
+        #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
+            #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
+        #else
+            #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
         #endif
     #endif
 #endif
@@ -1999,14 +1997,10 @@
 
 /*Show some widget*/
 #ifndef LV_USE_DEMO_WIDGETS
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DEMO_WIDGETS
-            #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
-        #else
-            #define LV_USE_DEMO_WIDGETS 0
-        #endif
+    #ifdef CONFIG_LV_USE_DEMO_WIDGETS
+        #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
     #else
-        #define LV_USE_DEMO_WIDGETS        1
+        #define LV_USE_DEMO_WIDGETS        0
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
@@ -2021,53 +2015,37 @@
 
 /*Demonstrate the usage of encoder and keyboard*/
 #ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-            #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-        #else
-            #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-        #endif
+    #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
     #else
-        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     1
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
     #endif
 #endif
 
 /*Benchmark your system*/
 #ifndef LV_USE_DEMO_BENCHMARK
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
-            #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
-        #else
-            #define LV_USE_DEMO_BENCHMARK 0
-        #endif
+    #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
+        #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
     #else
-        #define LV_USE_DEMO_BENCHMARK   1
+        #define LV_USE_DEMO_BENCHMARK   0
     #endif
 #endif
 
 /*Stress test for LVGL*/
 #ifndef LV_USE_DEMO_STRESS
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DEMO_STRESS
-            #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
-        #else
-            #define LV_USE_DEMO_STRESS 0
-        #endif
+    #ifdef CONFIG_LV_USE_DEMO_STRESS
+        #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
     #else
-        #define LV_USE_DEMO_STRESS      1
+        #define LV_USE_DEMO_STRESS      0
     #endif
 #endif
 
 /*Music player demo*/
 #ifndef LV_USE_DEMO_MUSIC
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DEMO_MUSIC
-            #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
-        #else
-            #define LV_USE_DEMO_MUSIC 0
-        #endif
+    #ifdef CONFIG_LV_USE_DEMO_MUSIC
+        #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
     #else
-        #define LV_USE_DEMO_MUSIC       1
+        #define LV_USE_DEMO_MUSIC       0
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
