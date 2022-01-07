@@ -1,8 +1,8 @@
 /**
  * @file lv_example_fragment.h
  */
-#ifndef LV_EXAMPLE_fragment_H
-#define LV_EXAMPLE_fragment_H
+#ifndef LV_EXAMPLE_FRAGMENT_H
+#define LV_EXAMPLE_FRAGMENT_H
 
 #ifdef __cplusplus
 extern "C" {
