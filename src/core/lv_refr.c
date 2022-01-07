@@ -130,16 +130,18 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
     const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    lv_area_t clip_coords_for_obj;
+
+    /*Truncate the clip area to `obj size + ext size` area*/
     lv_area_t obj_coords_ext;
-    lv_area_t obj_ext_clip_coords;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
-    if(!_lv_area_intersect(&obj_ext_clip_coords, clip_area_ori, &obj_coords_ext)) return;
+    if(!_lv_area_intersect(&clip_coords_for_obj, clip_area_ori, &obj_coords_ext)) return;
 
-    draw_ctx->clip_area = &obj_ext_clip_coords;
+    draw_ctx->clip_area = &clip_coords_for_obj;
 
-    /*Redraw the object*/
+    /*Draw the object*/
     lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
     lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
     lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
@@ -156,27 +158,29 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
 #endif
 
-    /*Create a new 'obj_clip' without 'ext_size' because the children can't be visible there*/
-    lv_area_t obj_clip_coords;
-    if(_lv_area_intersect(&obj_clip_coords, clip_area_ori, &obj->coords)) {
+    /*With overflow visible keep the previous clip area to let the children visible out of this object too
+     *With not overflow visible limit the clip are to the object's coordinates to clip the children*/
+    bool refr_children = true;
+    lv_area_t clip_coords_for_children;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        clip_coords_for_children  = *clip_area_ori;
+    }
+    else {
+        if(!_lv_area_intersect(&clip_coords_for_children, clip_area_ori, &obj->coords)) {
+            refr_children = false;
+        }
+    }
+
+    if(refr_children) {
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         for(i = 0; i < child_cnt; i++) {
             lv_obj_t * child = obj->spec_attr->children[i];
-            lv_area_t child_coords;
-            lv_obj_get_coords(child, &child_coords);
-            ext_draw_size = _lv_obj_get_ext_draw_size(child);
-            lv_area_increase(&child_coords, ext_draw_size, ext_draw_size);
-            lv_area_t child_clip;
-            if(_lv_area_intersect(&child_clip, &obj_clip_coords, &child_coords)) {
-                /*Refresh the next child*/
-                draw_ctx->clip_area = &child_clip;
-                lv_refr_obj(draw_ctx, child);
-            }
+            lv_refr_obj(draw_ctx, child);
         }
     }
 
-    draw_ctx->clip_area = &obj_ext_clip_coords;
+    draw_ctx->clip_area = &clip_coords_for_obj;
 
     /*If all the children are redrawn make 'post draw' draw*/
     lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
@@ -664,7 +668,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 {
     lv_obj_t * found_p = NULL;
 
-    /*If this object is fully cover the draw area check the children too*/
+    /*If this object is fully cover the draw area then check the children too*/
     if(_lv_area_is_in(area_p, &obj->coords, 0) && lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == false) {
         lv_cover_check_info_t info;
         info.res = LV_COVER_RES_COVER;

@@ -141,7 +141,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(apply_area, &dst_rect);
 
-        SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.base_draw.buf);
+        SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.buf);
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL:
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
