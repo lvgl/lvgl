@@ -174,7 +174,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
         blend_dsc.src_buf = grad->map;
     }
 
-    if(dither_mode == LV_DITHER_NONE) {
+    if(grad && dither_mode == LV_DITHER_NONE) {
         grad->filled = 0; /*Should we force refilling it each draw call ?*/
     }
     else
@@ -387,6 +387,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 }
 
+#if LV_DRAW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
@@ -1066,6 +1067,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 
     lv_mem_buf_release(sh_ups_blur_buf);
 }
+#endif
 
 static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {

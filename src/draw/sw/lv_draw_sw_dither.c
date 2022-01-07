@@ -21,7 +21,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_none(lv_gradient_cache_t * grad, lv_coord_t
 {
     LV_UNUSED(x);
     LV_UNUSED(y);
-    if(grad->filled) return;
+    if(grad == NULL || grad->filled) return;
     for(lv_coord_t i = 0; i < w; i++) {
         grad->map[i] = lv_color_hex(grad->hmap[i].full);
     }

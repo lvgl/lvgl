@@ -54,10 +54,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(struct _lv_gradient_cache_t * g
                                                  const lv_coord_t y, const lv_coord_t w);
 
 #if LV_DITHER_ERROR_DIFFUSION == 1
-LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(struct _lv_gradient_cache_t * grad, const lv_coord_t xs, const lv_coord_t y,
-                                                  const lv_coord_t w);
-LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(struct _lv_gradient_cache_t * grad, const lv_coord_t xs, const lv_coord_t y,
-                                                  const lv_coord_t w);
+LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(struct _lv_gradient_cache_t * grad, const lv_coord_t xs,
+                                                  const lv_coord_t y, const lv_coord_t w);
+LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(struct _lv_gradient_cache_t * grad, const lv_coord_t xs,
+                                                  const lv_coord_t y, const lv_coord_t w);
 #endif /* LV_DITHER_ERROR_DIFFUSION */
 
 #endif /* _DITHER_GRADIENT */
