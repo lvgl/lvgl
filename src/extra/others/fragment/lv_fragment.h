@@ -165,7 +165,7 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragm
  * @param manager Fragment manager instance
  * @return Stack size of this fragment manager
  */
-size_t lv_fragment_manager_size(lv_fragment_manager_t * manager);
+size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager);
 
 /**
  * Send event to top-most fragment
