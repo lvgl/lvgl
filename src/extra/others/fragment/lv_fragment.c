@@ -132,7 +132,8 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragm
 size_t lv_fragment_manager_size(lv_fragment_manager_t * manager)
 {
     size_t size = 0;
-    for(manager_stack_t * cur = manager->top; cur; cur = cur->prev) {
+    manager_stack_t * cur;
+    for(cur = manager->top; cur; cur = cur->prev) {
         size++;
     }
     return size;
