@@ -12,7 +12,7 @@ static lv_obj_t *sample_controller_create_obj(lv_obj_controller_t *self, lv_obj_
 
 struct sample_controller_t {
     lv_obj_controller_t base;
-    const char *counter;
+    const char *name;
 };
 
 static const lv_obj_controller_class_t sample_cls = {
@@ -30,12 +30,12 @@ void lv_example_controller_1() {
 
 
 static void sample_controller_ctor(lv_obj_controller_t *self, void *args) {
-    ((struct sample_controller_t *) self)->counter = args;
+    ((struct sample_controller_t *) self)->name = args;
 }
 
 static lv_obj_t *sample_controller_create_obj(lv_obj_controller_t *self, lv_obj_t *parent) {
     lv_obj_t *label = lv_label_create(parent);
-    lv_label_set_text_fmt(label, "Hello, %s!", ((struct sample_controller_t *) self)->counter);
+    lv_label_set_text_fmt(label, "Hello, %s!", ((struct sample_controller_t *) self)->name);
     return label;
 }
 
