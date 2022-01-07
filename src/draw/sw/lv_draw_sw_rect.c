@@ -105,7 +105,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_ctx->clip_area)) return;
 
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
-    if(dsc->bg_grad.stops[0].color.full == dsc->bg_grad.stops[1].color.full) grad_dir = LV_GRAD_DIR_NONE;
+    lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
+    if(bg_color.full == dsc->bg_grad.stops[1].color.full) grad_dir = LV_GRAD_DIR_NONE;
 
     bool mask_any = lv_draw_mask_is_any(&bg_coords);
 
@@ -114,7 +115,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
         lv_draw_sw_blend_dsc_t blend_dsc;
         lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
         blend_dsc.blend_mode = dsc->blend_mode;
-        blend_dsc.color = dsc->bg_grad.stops[0].color;
+        blend_dsc.color = bg_color;
         blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->bg_opa;
 
