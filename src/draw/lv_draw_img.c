@@ -25,8 +25,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                                                      const lv_area_t * coords, const void * src);
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
+                                                      const lv_area_t * coords, const lv_img_src_uri_t * src);
 
 static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg);
 static void draw_cleanup(_lv_img_cache_entry_t * cache);
@@ -59,7 +59,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
+void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -189,6 +189,7 @@ bool lv_img_cf_has_alpha(lv_img_cf_t cf)
  *  - a path to a file (e.g. "S:/folder/image.bin")
  *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
  * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
+ * @deprecated You shouldn't rely on this function to find out the image type
  */
 lv_img_src_t lv_img_src_get_type(const void * src)
 {
@@ -227,8 +228,8 @@ void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                                                      const lv_area_t * coords, const void * src)
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
+                                                      const lv_area_t * coords, const lv_img_src_uri_t * src)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -239,6 +240,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, size_hint, draw_dsc->dec_ctx);
 
     if(cdsc == NULL) return LV_RES_INV;
+
+    /*Save the decoder context as it might contains useful information for the img object*/
+    draw_dsc->dec_ctx = cdsc->dec_dsc.dec_ctx;
 
 
     lv_img_cf_t cf;

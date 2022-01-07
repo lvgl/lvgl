@@ -26,13 +26,12 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_bin_init(void);
 
 /**********************
  *      MACROS
  **********************/
 /** Use this macro to declare an image in a C file */
-#define LV_BIN_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
+#define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
 #ifdef __cplusplus
 } /* extern "C" */

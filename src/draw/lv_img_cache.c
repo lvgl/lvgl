@@ -61,7 +61,7 @@
  * @param size_hint if provided, contains the requested output size for the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-_lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, lv_point_t size_hint,
+_lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_src_uri_t * src, lv_color_t color, lv_point_t size_hint,
                                            lv_img_dec_ctx_t * dec_ctx)
 {
     /*Is the image cached?*/
@@ -122,7 +122,11 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, l
 #endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
-    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color, size_hint, dec_ctx);
+    cached_src->dec_dsc.src = src;
+    cached_src->dec_dsc.color = color;
+    cached_src->dec_dsc.size_hint = size_hint;
+    cached_src->dec_dsc.dec_ctx = dec_ctx;
+    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, 0);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
@@ -179,7 +183,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
  * Useful if the image source is updated therefore it needs to be cached again.
  * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
  */
-void lv_img_cache_invalidate_src(const void * src)
+void lv_img_cache_invalidate_src(const lv_img_src_uri_t * src)
 {
     LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
@@ -203,15 +207,15 @@ void lv_img_cache_invalidate_src(const void * src)
  **********************/
 
 #if LV_IMG_CACHE_DEF_SIZE
-static bool lv_img_cache_match(const void * src1, const void * src2)
+static bool lv_img_cache_match(const lv_img_src_uri_t * src1, const lv_img_src_uri_t * src2)
 {
-    lv_img_src_t src_type = lv_img_src_get_type(src1);
-    if(src_type == LV_IMG_SRC_VARIABLE)
-        return src1 == src2;
-    if(src_type != LV_IMG_SRC_FILE)
+    if(src1 == src2) return true; /* Fastlane first*/
+    if(src1->type != src2->type)
         return false;
-    if(lv_img_src_get_type(src2) != LV_IMG_SRC_FILE)
+    if(src1->type == LV_IMG_SRC_VARIABLE && (src1->uri != src2->uri || src1->uri_len != src2->uri_len))
         return false;
-    return strcmp(src1, src2) == 0;
+    if(src1->type == LV_IMG_SRC_FILE)
+        return strcmp(src1->uri, src2->uri) == 0;
+    return false;
 }
 #endif

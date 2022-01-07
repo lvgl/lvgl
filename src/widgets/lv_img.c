@@ -91,7 +91,7 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
+lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
 {
     lv_img_t * img = (lv_img_t*)obj;
     if(img->dec_ctx == NULL || LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
@@ -477,10 +477,15 @@ static lv_res_t accept_src(lv_img_t * img)
             header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
         }
 
-        if (header.w == LV_SIZE_CONTENT || header.h == LV_SIZE_CONTENT) {
-            if ((*decoder->info_cb)(&img->src, &img->dec_ctx, &header) == LV_RES_INV) {
+        if (!header.w || header.w == LV_SIZE_CONTENT || !header.h || header.h == LV_SIZE_CONTENT) {
+            /* Invalid image size, let's find out from the image itself */
+            lv_img_decoder_dsc_t dsc;
+            dsc.decoder = decoder;
+            dsc.src = &img->src;
+            if (lv_img_decoder_open(&dsc, LV_IMG_DEC_ONLYMETA) == LV_RES_INV) {
                 return LV_RES_INV;
             }
+            header = dsc.header;
         }
 
         if (img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_ANIMATED)) {

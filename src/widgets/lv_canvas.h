@@ -213,10 +213,10 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param canvas   pointer to a canvas object
  * @param x        left coordinate of the image
  * @param y        top coordinate of the image
- * @param src      image source. Can be a pointer an `lv_img_dsc_t` variable or a path an image.
+ * @param src      image source
  * @param draw_dsc pointer to a valid label descriptor `lv_draw_img_dsc_t`
  */
-void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
+void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_img_src_uri_t * src,
                         const lv_draw_img_dsc_t * draw_dsc);
 
 /**

@@ -235,6 +235,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len);
 /**********************
  *      MACROS
  **********************/
+/**
+ * Allocate v to a memory area of size s, check and zero the returned area in one operation
+ */
+#define LV_ZALLOC(v, s) do { void * p = lv_mem_alloc(s); LV_ASSERT_MALLOC(p); if (p != NULL) lv_memset_00(p, s); memcpy(&v, &p, sizeof(p)); } while(0)
+/**
+ * Allocate the object pointed by v, check and zero in one operation
+ */
+#define LV_ZERO_ALLOC(v) do { void * p = lv_mem_alloc(sizeof(*v)); LV_ASSERT_MALLOC(p); if (p != NULL) lv_memset_00(p, sizeof(*v)); memcpy(&v, &p, sizeof(p)); } while(0)
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -175,7 +175,7 @@ uint8_t del_prev  :
 
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
-    const void * bg_img;            /**< An image source to display as wallpaper*/
+    lv_img_src_uri_t * bg_img;      /**< An image source to display as wallpaper*/
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];

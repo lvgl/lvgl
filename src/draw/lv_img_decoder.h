@@ -55,8 +55,7 @@ typedef enum {
  * You'll likely bootstrap from this to make your own, if you need too
  */
 typedef struct {
-    const void * decoder;        /**!< An opaque pointer to the decoder. Used for optimization. Don't use */
-    uint8_t      caps;           /**!< The decoder capabilities flags */
+    uint8_t  caps;               /**!< The decoder capabilities flags */
     uint8_t  self_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
     uint8_t  frame_rate : 7;     /**!< The number of frames per second, if applicable */
     lv_frame_index_t   current_frame;  /**!< The current frame index */
@@ -143,9 +142,6 @@ typedef struct _lv_img_decoder_dsc_t {
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
-    /**Store any custom data here is required*/
-    void * user_data;
-
     /**Initialization context for decoder*/
     lv_img_dec_ctx_t * dec_ctx;
 } lv_img_decoder_dsc_t;
@@ -161,6 +157,18 @@ void _lv_img_decoder_init(void);
 
 /**
  * Get information about an image.
+ * This is a wrapper over lv_img_decoder_accept/lv_img_decoder_open calls.
+ * This is not very efficient since it's creating a decoder instance to fetch the information required.
+ * Try the created image decoder one by one. Once one is able to get info that info will be used.
+ * @param src       the image source.
+ * @param header    Will be filled with the capabilities for the selected decoder
+ * @return LV_RES_OK if the header was filled
+ */
+lv_res_t lv_img_decoder_get_info(const lv_img_src_uri_t * src, lv_img_header_t * header);
+
+
+/**
+ * Try to find a decoder that's accepting the given image source.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src   the image source.
  * @param caps  If not null, will be filled with the capabilities for the selected decoder

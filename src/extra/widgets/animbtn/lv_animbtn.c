@@ -9,7 +9,7 @@
 
 #include "lv_animbtn.h"
 
-#if LV_USE_RLOTTIE != 0 && LV_USE_ANIMBTN != 0
+#if LV_USE_ANIMBTN != 0
 
 /*********************
  *      DEFINES
@@ -29,6 +29,7 @@ static void apply_state(lv_obj_t * animbtn);
 static void loop_state(lv_obj_t * animbtn);
 static lv_animbtn_state_t suggest_state(lv_obj_t * animbtn, lv_animbtn_state_t state);
 static lv_animbtn_state_t get_state(const lv_obj_t * animbtn);
+static void setup_anim(lv_animbtn_t * animbtn, lv_animbtn_state_desc_t * desc);
 static int is_state_valid(const lv_animbtn_state_desc_t * state);
 
 /**********************
@@ -60,12 +61,12 @@ lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim)
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     /*Capture the animation picture*/
-    ((lv_animbtn_t *)obj)->lottie = anim;
+    ((lv_animbtn_t *)obj)->img = anim;
     lv_obj_set_parent(anim, obj);
     lv_obj_add_flag(anim, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_img_t * lottie = (lv_img_t *)anim;
-    lv_obj_set_size(obj, lottie->w, lottie->h);
+    lv_img_t * img = (lv_img_t *)anim;
+    lv_obj_set_size(obj, img->w, img->h);
     return obj;
 }
 
@@ -91,7 +92,7 @@ void lv_animbtn_set_state_desc(lv_obj_t * obj, lv_animbtn_state_t state, const l
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
 
     animbtn->state_desc[state] = desc;
-    animbtn->state_desc[state].control |= 0x80; /*A non existant flag used to mark that the state was used*/
+    animbtn->state_desc[state].control |= LV_IMG_CTRL_MARKED; /*A non existant flag used to mark that the state was used*/
     apply_state(obj);
 }
 
@@ -142,7 +143,7 @@ static void lv_animbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
     /*Initialize the allocated 'ext'*/
     lv_memset_00(animbtn->state_desc, sizeof(animbtn->state_desc));
-    animbtn->lottie = NULL;
+    animbtn->img = NULL;
     animbtn->prev_state = _LV_ANIMBTN_STATE_NUM;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
@@ -177,7 +178,7 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         case LV_EVENT_GET_SELF_SIZE: {
                 lv_point_t * p = lv_event_get_self_size_info(e);
-                p->x = LV_MAX(p->x, ((lv_rlottie_t *)animbtn->lottie)->dec.create_width);
+                p->x = LV_MAX(p->x, ((lv_img_t *)animbtn->img)->w);
                 break;
             }
         default:
@@ -185,20 +186,18 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-static void setup_rlottie(lv_animbtn_t * animbtn, lv_animbtn_state_desc_t * desc)
+static void setup_anim(lv_animbtn_t * animbtn, lv_animbtn_state_desc_t * desc)
 {
     /*Set the logic for the current state*/
-    int backward = (desc->control & LV_RLOTTIE_CTRL_BACKWARD) == LV_RLOTTIE_CTRL_BACKWARD;
+    int backward = LV_BT(desc->control, LV_IMG_CTRL_BACKWARD);
     if(backward && desc->first_frame < desc->last_frame) {
         /*Play in reverse means start from last to first*/
-        lv_rlottie_set_current_frame(animbtn->lottie, desc->last_frame);
-        lv_rlottie_stopat_frame(animbtn->lottie, desc->first_frame,
-                                !backward);
+        lv_img_set_current_frame(animbtn->img, desc->last_frame);
+        lv_img_set_stopat_frame(animbtn->img, desc->first_frame, !backward);
     }
     else {
-        lv_rlottie_set_current_frame(animbtn->lottie, desc->first_frame);
-        lv_rlottie_stopat_frame(animbtn->lottie, desc->last_frame,
-                                !backward);
+        lv_img_set_current_frame(animbtn->img, desc->first_frame);
+        lv_img_set_stopat_frame(animbtn->img, desc->last_frame, !backward);
     }
 }
 
@@ -207,11 +206,11 @@ static void loop_state(lv_obj_t * obj)
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
     lv_animbtn_state_t state  = suggest_state(obj, get_state(obj));
 
-    if(animbtn->prev_state != state || animbtn->lottie == NULL || !is_state_valid(&animbtn->state_desc[state])) return;
+    if(animbtn->prev_state != state || animbtn->img == NULL || !is_state_valid(&animbtn->state_desc[state])) return;
 
     /*Set the logic for the current state*/
-    if((animbtn->state_desc[state].control & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP) {
-        setup_rlottie(animbtn, &animbtn->state_desc[state]);
+    if(LV_BT(animbtn->state_desc[state].control, LV_IMG_CTRL_LOOP)) {
+        setup_anim(animbtn, &animbtn->state_desc[state]);
     }
 }
 
@@ -221,14 +220,13 @@ static void apply_state(lv_obj_t * obj)
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
     lv_animbtn_state_t state  = suggest_state(obj, get_state(obj));
 
-    lv_rlottie_t * lottie = (lv_rlottie_t *)animbtn->lottie;
-    if(state == animbtn->prev_state || lottie == NULL || !is_state_valid(&animbtn->state_desc[state])) return;
+    lv_img_t * img = (lv_img_t *)animbtn->img;
+    if(state == animbtn->prev_state || img == NULL || !is_state_valid(&animbtn->state_desc[state])) return;
 
     /*Set the logic for the current state*/
-    setup_rlottie(animbtn, &animbtn->state_desc[state]);
+    setup_anim(animbtn, &animbtn->state_desc[state]);
 
     lv_obj_refresh_self_size(obj);
-    lv_obj_set_height(obj, lottie->dec.create_height); /*Keep the user defined width*/
 
     lv_obj_invalidate(obj);
     animbtn->prev_state = state;
@@ -239,7 +237,7 @@ static void apply_state(lv_obj_t * obj)
  */
 static int is_state_valid(const lv_animbtn_state_desc_t * state)
 {
-    return (state->control & 0x80) == 0x80;
+    return LV_BT(state->control, LV_IMG_CTRL_MARKED);
 }
 
 

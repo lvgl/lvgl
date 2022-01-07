@@ -628,13 +628,13 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_obj_invalidate(canvas);
 }
 
-void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
+void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_img_src_uri_t * src,
                         const lv_draw_img_dsc_t * draw_dsc)
 {
     lv_canvas_draw_img_ex(canvas, x, y, src, draw_dsc, NULL);
 }
 
-void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
+void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_img_src_uri_t * src,
                            const lv_draw_img_dsc_t * draw_dsc, lv_img_dec_ctx_t * dec_ctx)
 
 {

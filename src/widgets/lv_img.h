@@ -125,7 +125,7 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index);
  * @param forward   If 1, the animation plays forward, else plays backward
  * @warning This will only work once the source of the image is set and the image is animated
  */
-lv_res_t lv_img_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
+lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
 
 /**
  * Set the image data to display on the the object

@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../libs/rlottie/lv_rlottie.h"
+#include "../../../widgets/lv_img.h"
 
-#if LV_USE_RLOTTIE != 0 && LV_USE_ANIMBTN != 0
+#if LV_USE_ANIMBTN != 0
 
 /**********************
  *      TYPEDEFS
@@ -31,15 +31,15 @@ typedef enum {
 } lv_animbtn_state_t;
 
 typedef enum {
-    LV_ANIMBTN_CTRL_FORWARD  = LV_RLOTTIE_CTRL_FORWARD,
-    LV_ANIMBTN_CTRL_BACKWARD = LV_RLOTTIE_CTRL_BACKWARD,
-    LV_ANIMBTN_CTRL_LOOP     = LV_RLOTTIE_CTRL_LOOP,
-} lv_animbtn_ctrl_t; /* Should match lv_rlottie_ctrl_t */
+    LV_ANIMBTN_CTRL_FORWARD  = LV_IMG_CTRL_FORWARD,
+    LV_ANIMBTN_CTRL_BACKWARD = LV_IMG_CTRL_BACKWARD,
+    LV_ANIMBTN_CTRL_LOOP     = LV_IMG_CTRL_LOOP,
+} lv_animbtn_ctrl_t; /* Should match lv_img_ctrl_t */
 
 /*State status for anim button*/
 typedef struct {
-    size_t first_frame;
-    size_t last_frame;
+    lv_frame_index_t first_frame;
+    lv_frame_index_t last_frame;
     lv_animbtn_ctrl_t control;
 } lv_animbtn_state_desc_t;
 
@@ -47,7 +47,7 @@ typedef struct {
 typedef struct {
     lv_obj_t obj;
     lv_animbtn_state_desc_t state_desc[_LV_ANIMBTN_STATE_NUM];
-    lv_obj_t * lottie;
+    lv_obj_t * img;
     lv_animbtn_state_t prev_state;
 } lv_animbtn_t;
 
