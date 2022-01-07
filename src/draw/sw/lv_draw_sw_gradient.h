@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_gradient.h
+ * @file lv_draw_sw_gradient.h
  *
  */
 
-#ifndef LV_DRAW_GRADIENT_H
-#define LV_DRAW_GRADIENT_H
+#ifndef LV_DRAW_SW_GRADIENT_H
+#define LV_DRAW_SW_GRADIENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_color.h"
-#include "../misc/lv_style.h"
-#include "sw/lv_draw_sw_dither.h"
+#include "../../misc/lv_color.h"
+#include "../../misc/lv_style.h"
+#include "lv_draw_sw_dither.h"
 
 /*********************
  *      DEFINES

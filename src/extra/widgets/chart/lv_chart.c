@@ -1203,7 +1203,6 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     lv_draw_rect_dsc_init(&col_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &col_dsc);
     col_dsc.bg_grad.dir = LV_GRAD_DIR_NONE;
-    col_dsc.bg_grad.dither = LV_DITHER_NONE;
     col_dsc.bg_opa = LV_OPA_COVER;
 
     /*Make the cols longer with `radius` to clip the rounding from the bottom*/

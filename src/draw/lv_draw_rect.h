@@ -17,7 +17,7 @@ extern "C" {
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
-#include "lv_draw_gradient.h"
+#include "sw/lv_draw_sw_gradient.h"
 
 /*********************
  *      DEFINES

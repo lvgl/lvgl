@@ -1,12 +1,12 @@
 /**
- * @file lv_draw_gradient.c
+ * @file lv_draw_sw_gradient.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_gradient.h"
+#include "lv_draw_sw_gradient.h"
 
 
 /*********************
