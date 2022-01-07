@@ -25,19 +25,12 @@
 typedef struct {
     lv_fs_file_t f;
     lv_color_t * palette;
-    lv_opa_t * opa;
+    lv_opa_t *   opa;
 } lv_img_decoder_built_in_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                                        lv_coord_t len, uint8_t * buf);
-static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                                   lv_coord_t len, uint8_t * buf);
-static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                                     lv_coord_t len, uint8_t * buf);
-
 static lv_res_t init_dec_ctx(lv_img_dec_ctx_t * dec_ctx);
 
 /**********************
@@ -59,94 +52,44 @@ void _lv_img_decoder_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_img_decoder_ll), sizeof(lv_img_decoder_t));
 
-    lv_img_decoder_t * decoder;
-
-    /*Create a decoder for the built in color format*/
-    decoder = lv_img_decoder_create();
-    LV_ASSERT_MALLOC(decoder);
-    if(decoder == NULL) {
-        LV_LOG_WARN("lv_img_decoder_init: out of memory");
-        return;
-    }
-
-    lv_img_decoder_set_info_cb(decoder, lv_img_decoder_built_in_info);
-    lv_img_decoder_set_open_cb(decoder, lv_img_decoder_built_in_open);
-    lv_img_decoder_set_read_line_cb(decoder, lv_img_decoder_built_in_read_line);
-    lv_img_decoder_set_close_cb(decoder, lv_img_decoder_built_in_close);
+    /*Must be the last one in the list, since it's not restrictive in what it accepts*/
+    lv_bin_init();
 }
 
-/**
- * Get information about an image.
- * Try the created image decoder one by one. Once one is able to get info that info will be used.
- * @param src the image source. E.g. file name or variable.
- * @param header the image info will be stored here
- * @param dec_ctx   Not used
- * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
- */
-lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx)
+lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps)
 {
-    LV_UNUSED(dec_ctx);
-    lv_memset_00(header, sizeof(lv_img_header_t));
-
-    if(src == NULL) return LV_RES_INV;
-
-    lv_img_src_t src_type = lv_img_src_get_type(src);
-    if(src_type == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL) return LV_RES_INV;
-    }
+    if(src == NULL) return NULL;
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
     _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
-        if(d->info_cb) {
-            res = d->info_cb(d, src, header, dec_ctx);
-            if(res == LV_RES_OK) break;
+        if(d->accept_cb) {
+            res = d->accept_cb(src, caps);
+            if(res == LV_RES_OK) return d;
         }
     }
 
-    return res;
+    return NULL;
 }
 
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color, lv_point_t size_hint,
-                             lv_img_dec_ctx_t * dec_ctx)
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
-    lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
+    if(dsc == NULL) return LV_RES_INV;
 
-    if(src == NULL) return LV_RES_INV;
-    lv_img_src_t src_type = lv_img_src_get_type(src);
-    if(src_type == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL) return LV_RES_INV;
-    }
-
-    dsc->color    = color;
-    dsc->src_type = src_type;
-    dsc->dec_ctx  = dec_ctx;
-
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
-        size_t fnlen = strlen(src);
-        dsc->src = lv_mem_alloc(fnlen + 1);
-        LV_ASSERT_MALLOC(dsc->src);
-        if(dsc->src == NULL) {
-            LV_LOG_WARN("lv_img_decoder_open: out of memory");
-            return LV_RES_INV;
-        }
-        strcpy((char *)dsc->src, src);
-    }
-    else {
-        dsc->src = src;
-    }
+//    lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
     lv_res_t res = LV_RES_INV;
 
-    lv_img_decoder_t * decoder;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), decoder) {
-        /*Info and Open callbacks are required*/
-        if(decoder->info_cb == NULL || decoder->open_cb == NULL) continue;
+    lv_img_decoder_t * decoder = dsc->decoder;
+    if (decoder == NULL) {
+        _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), decoder) {
+            /*Accept is required to find the decoder that would accept this*/
+            if(decoder->accept_cb == NULL) continue;
 
-        res = decoder->info_cb(decoder, src, &dsc->header, dec_ctx);
-        if(res != LV_RES_OK) continue;
+            res = decoder->accept_cb(dsc->src, &dsc->header, dec_ctx);
+            if(res != LV_RES_OK) continue;
+        }
+    }
 
         /*If vector format and user requested size, let's overwrite it*/
         if(dsc->header.v && size_hint.x > 0 && size_hint.y > 0) {

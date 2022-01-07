@@ -32,6 +32,10 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_img(lv_event_t * e);
+static void free_src(lv_img_src_uri_t * src);
+static lv_res_t alloc_str_src(lv_img_src_uri_t * src, const char * str);
+static lv_res_t accept_src(lv_img_t * img);
+static void next_frame_task_cb(lv_timer_t * t);
 
 /**********************
  *  STATIC VARIABLES
@@ -66,104 +70,129 @@ lv_obj_t * lv_img_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_img_set_src(lv_obj_t * obj, const void * src)
+void lv_img_set_play_mode(lv_obj_t * obj, const lv_img_ctrl_t ctrl)
 {
-    lv_img_set_src_ex(obj, src, NULL);
+    lv_img_t * img = (lv_img_t*)obj;
+    img->ctrl = ctrl;
+
+    if(img->task && (img->dec_ctx->dest_frame != img->dec_ctx->current_frame ||
+                    LV_BN(img->ctrl, LV_IMG_CTRL_PAUSE))) {
+        lv_timer_resume(img->task);
+    }
 }
 
-void lv_img_set_src_ex(lv_obj_t * obj, const void * src, lv_img_dec_ctx_t * dec_ctx)
+lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
+{
+    lv_img_t * img = (lv_img_t*)obj;
+    if(img->dec_ctx == NULL || LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
+        return LV_RES_INV;
+
+    img->dec_ctx->current_frame = LV_MIN(index, img->dec_ctx->total_frames - 1);
+    return LV_RES_OK;
+}
+
+lv_res_t lv_img_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
+{
+    lv_img_t * img = (lv_img_t*)obj;
+    if(img->dec_ctx == NULL || LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
+        return LV_RES_INV;
+
+    img->dec_ctx->dest_frame = LV_MIN(index, img->dec_ctx->total_frames - 1);
+
+    img->ctrl = LV_IMG_CTRL_PLAY | LV_IMG_CTRL_STOPAT | (forward ? LV_IMG_CTRL_FORWARD : LV_IMG_CTRL_BACKWARD);
+    if(img->task && img->dec_ctx->dest_frame != img->dec_ctx->current_frame) {
+        lv_timer_resume(img->task);
+    }
+    return LV_RES_OK;
+}
+
+
+void lv_img_set_src_file(lv_obj_t * obj, const char * file_path)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t*)obj;
+    free_src(&img->src);
+
+    img->src.type = LV_IMG_SRC_FILE;
+    if (alloc_str_src(&img->src, file_path) == LV_RES_INV)
+        return;
+
+    img->src.ext = strrchr(img->src.uri, '.');
+
+    accept_src(img);
+}
+
+void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t*)obj;
+    free_src(&img->src);
+
+    img->src.type = LV_IMG_SRC_VARIABLE;
+    img->src.uri = data;
+    img->src.uri_len = len;
+
+    accept_src(img);
+}
+
+void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t*)obj;
+    free_src(&img->src);
+
+    img->src.type = LV_IMG_SRC_SYMBOL;
+    if (alloc_str_src(&img->src, symbol) == LV_RES_INV)
+        return;
+
+    accept_src(img);
+}
+
+
+void lv_img_set_src(lv_obj_t * obj, const void * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
 
+    /* Deprecated API with numerous limitations:
+       1. Force to add a LVGL image header on raw encoded image data while there's already such header in the encoded data
+       2. Prevent using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
+       3. Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
+    */
     lv_img_src_t src_type = lv_img_src_get_type(src);
     lv_img_t * img = (lv_img_t *)obj;
 
-#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
         case LV_IMG_SRC_FILE:
+#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
             LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");
+#endif
+            lv_img_set_src_file(obj, src);
             break;
         case LV_IMG_SRC_VARIABLE:
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
+            {
+#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
+                LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
+#endif
+                lv_img_dsc_t * id = (lv_img_dsc_t*) src; /*This might break if given any raw data here*/
+                lv_img_set_src_data(obj, (const uint8_t*)src, id->data_size);
+            }
             break;
         case LV_IMG_SRC_SYMBOL:
+#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
             LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found");
+#endif
+            lv_img_set_src_symbol(obj, src);
             break;
         default:
-            LV_LOG_WARN("lv_img_set_src: unknown type");
+            LV_LOG_WARN("lv_img_set_src: unknown image type");
+            free_src(&img->src);
+            return;
     }
-#endif
-
-    /*If the new source type is unknown free the memories of the old source*/
-    if(src_type == LV_IMG_SRC_UNKNOWN) {
-        LV_LOG_WARN("lv_img_set_src: unknown image type");
-        if(img->src_type == LV_IMG_SRC_SYMBOL || img->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free((void *)img->src);
-        }
-        img->src      = NULL;
-        img->src_type = LV_IMG_SRC_UNKNOWN;
-        return;
-    }
-
-    lv_img_header_t header;
-    lv_img_decoder_get_info(src, &header, dec_ctx);
-
-    /*Save the source*/
-    if(src_type == LV_IMG_SRC_VARIABLE) {
-        /*If memory was allocated because of the previous `src_type` then free it*/
-        if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-            lv_mem_free((void *)img->src);
-        }
-        img->src = src;
-    }
-    else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
-        /*If the new and the old src are the same then it was only a refresh.*/
-        if(img->src != src) {
-            const void * old_src = NULL;
-            /*If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
-             *It's important to allocate first to be sure the new data will be on a new address.
-             *Else `img_cache` wouldn't see the change in source.*/
-            if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-                old_src = img->src;
-            }
-            char * new_str = lv_mem_alloc(strlen(src) + 1);
-            LV_ASSERT_MALLOC(new_str);
-            if(new_str == NULL) return;
-            strcpy(new_str, src);
-            img->src = new_str;
-
-            if(old_src) lv_mem_free((void *)old_src);
-        }
-    }
-
-    if(src_type == LV_IMG_SRC_SYMBOL) {
-        /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        lv_point_t size;
-        lv_txt_get_size(&size, src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        header.w = size.x;
-        header.h = size.y;
-    }
-
-    img->src_type = src_type;
-    img->w        = header.w;
-    img->h        = header.h;
-    img->cf       = header.cf;
-    img->pivot.x = header.w / 2;
-    img->pivot.y = header.h / 2;
-    img->dec_ctx = dec_ctx;
-    img->vector  = header.v;
-
-    lv_obj_refresh_self_size(obj);
-
-    /*Provide enough room for the rotated corners*/
-    if(img->angle || img->zoom != LV_IMG_ZOOM_NONE) lv_obj_refresh_ext_draw_size(obj);
-
-    lv_obj_invalidate(obj);
 }
 
 void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x)
@@ -321,7 +350,16 @@ const void * lv_img_get_src(lv_obj_t * obj)
 
     lv_img_t * img = (lv_img_t *)obj;
 
-    return img->src;
+    return img->src.uri;
+}
+
+lv_img_src_uri_t * lv_img_get_src_uri(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t *)obj;
+
+    return &img->src;
 }
 
 lv_coord_t lv_img_get_offset_x(lv_obj_t * obj)
@@ -388,6 +426,85 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static void free_src(lv_img_src_uri_t * src) {
+    if(src->type == LV_IMG_SRC_SYMBOL || src->type == LV_IMG_SRC_FILE) {
+        lv_mem_free((void *)src->uri);
+    }
+    lv_memset_00(src, sizeof(*src));
+}
+
+static lv_res_t alloc_str_src(lv_img_src_uri_t * src, const char * str)
+{
+    src->uri_len = strlen(str);
+    char * new_str = lv_mem_alloc(src->uri_len + 1);
+    LV_ASSERT_MALLOC(new_str);
+    if(new_str == NULL) return LV_RES_INV;
+
+    strcpy(new_str, str);
+    src->uri = new_str;
+    return LV_RES_OK;
+}
+
+static lv_res_t accept_src(lv_img_t * img)
+{
+    lv_obj_t * obj = (lv_obj_t*)img;
+
+    lv_img_header_t header;
+    lv_memset_00(&header, sizeof(header));
+    if(img->src.type == LV_IMG_SRC_SYMBOL) {
+        /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
+        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        lv_point_t size;
+        lv_txt_get_size(&size, img->src.uri, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        header.w = size.x;
+        header.h = size.y;
+        header.cf = LV_IMG_CF_ALPHA_1BIT;
+    } else {
+        /*Find the decoder accepting this source*/
+        lv_img_decoder_t * decoder = lv_img_decoder_accept(&img->src, &img->dec_ctx);
+        if (decoder == NULL) {
+            LV_LOG_WARN("lv_img_set_src_: No decoder found for given source");
+            return LV_RES_INV;
+        }
+
+        /*Try to get picture information if required*/
+        /* Vector format might have their size set beforehand, so deal with that here without querying the decoder */
+        if(img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VECTOR)) {
+            header.w = lv_obj_get_width(obj);
+            header.h = lv_obj_get_height(obj);
+            header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+        }
+
+        if (header.w == LV_SIZE_CONTENT || header.h == LV_SIZE_CONTENT) {
+            if ((*decoder->info_cb)(&img->src, &img->dec_ctx, &header) == LV_RES_INV) {
+                return LV_RES_INV;
+            }
+        }
+
+        if (img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_ANIMATED)) {
+            /* Need to create the timer here */
+            img->task = lv_timer_create(next_frame_task_cb, 1000 / img->dec_ctx->frame_rate, obj);
+            lv_timer_pause(img->task);
+        }
+    }
+
+    img->w       = header.w;
+    img->h       = header.h;
+    img->cf      = header.cf;
+    img->pivot.x = header.w / 2;
+    img->pivot.y = header.h / 2;
+
+    lv_obj_refresh_self_size(obj);
+
+    /*Provide enough room for the rotated corners*/
+    if(img->angle || img->zoom != LV_IMG_ZOOM_NONE) lv_obj_refresh_ext_draw_size(obj);
+
+    lv_obj_invalidate(obj);
+    return LV_RES_OK;
+}
+
 
 static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -396,20 +513,11 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_img_t * img = (lv_img_t *)obj;
 
-    img->src       = NULL;
-    img->src_type  = LV_IMG_SRC_UNKNOWN;
-    img->cf        = LV_IMG_CF_UNKNOWN;
+    lv_memset_00(img, sizeof(*img));
     img->w         = lv_obj_get_width(obj);
     img->h         = lv_obj_get_height(obj);
-    img->angle = 0;
-    img->zoom = LV_IMG_ZOOM_NONE;
+    img->zoom      = LV_IMG_ZOOM_NONE;
     img->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
-    img->offset.x  = 0;
-    img->offset.y  = 0;
-    img->pivot.x = 0;
-    img->pivot.y = 0;
-    img->obj_size_mode = LV_IMG_SIZE_MODE_VIRTUAL;
-    img->dec_ctx = 0;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
@@ -421,10 +529,12 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_img_t * img = (lv_img_t *)obj;
-    if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-        lv_mem_free((void *)img->src);
-        img->src      = NULL;
-        img->src_type = LV_IMG_SRC_UNKNOWN;
+    free_src(&img->src);
+    if(img->task) {
+        lv_timer_del(img->task);
+        img->task = NULL;
+        img->ctrl = LV_IMG_CTRL_FORWARD;
+        img->dec_ctx->dest_frame = 0;
     }
 }
 
@@ -464,8 +574,8 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_STYLE_CHANGED) {
         /*Refresh the file name to refresh the symbol text size*/
-        if(img->src_type == LV_IMG_SRC_SYMBOL) {
-            lv_img_set_src(obj, img->src);
+        if(img->src.type == LV_IMG_SRC_SYMBOL) {
+            accept_src(img);
         }
         else {
             /*With transformation it might change*/
@@ -547,7 +657,7 @@ static void draw_img(lv_event_t * e)
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
-        if(img->src_type == LV_IMG_SRC_UNKNOWN || img->src_type == LV_IMG_SRC_SYMBOL) {
+        if(img->src.type == LV_IMG_SRC_UNKNOWN || img->src.type == LV_IMG_SRC_SYMBOL) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
@@ -619,7 +729,8 @@ static void draw_img(lv_event_t * e)
         lv_area_t bg_coords;
 
 
-        if(img->vector && (obj_w != img->w || obj_h != img->h)) {
+        if(img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VECTOR)
+            && (obj_w != img->w || obj_h != img->h)) {
             /*For vector image that aren't tiled, let's increase the image size*/
             img->w = obj_w;
             img->h = obj_h;
@@ -676,7 +787,7 @@ static void draw_img(lv_event_t * e)
             img_max_area.x2 -= pright;
             img_max_area.y2 -= pbottom;
 
-            if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_VARIABLE) {
+            if(img->src.type == LV_IMG_SRC_FILE || img->src.type == LV_IMG_SRC_VARIABLE) {
                 lv_draw_img_dsc_t img_dsc;
                 lv_draw_img_dsc_init(&img_dsc);
                 img_dsc.dec_ctx = img->dec_ctx;
@@ -709,17 +820,17 @@ static void draw_img(lv_event_t * e)
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                     for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
+                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, &img->src);
                     }
                 }
                 draw_ctx->clip_area = clip_area_ori;
             }
-            else if(img->src_type == LV_IMG_SRC_SYMBOL) {
+            else if(img->src.type == LV_IMG_SRC_SYMBOL) {
                 lv_draw_label_dsc_t label_dsc;
                 lv_draw_label_dsc_init(&label_dsc);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-                lv_draw_label(draw_ctx, &label_dsc, &obj->coords, img->src, NULL);
+                lv_draw_label(draw_ctx, &label_dsc, &obj->coords, img->src.uri, NULL);
             }
             else {
                 /*Trigger the error handler of image draw*/
@@ -729,5 +840,55 @@ static void draw_img(lv_event_t * e)
         }
     }
 }
+
+static void next_frame_task_cb(lv_timer_t * t)
+{
+    lv_obj_t * obj = t->user_data;
+    lv_img_t * img = (lv_img_t *) obj;
+
+    if(LV_BN(img->ctrl, LV_IMG_CTRL_PAUSE)) {
+        if(img->dec_ctx->current_frame == img->dec_ctx->dest_frame) {
+            /* Pause the timer too when it has run once to avoid CPU consumption */
+            lv_timer_pause(t);
+            return;
+        }
+        img->dec_ctx->dest_frame = img->dec_ctx->current_frame;
+    }
+    else {
+        if(LV_BT(img->ctrl, LV_IMG_CTRL_STOPAT) && img->dec_ctx->current_frame == img->dec_ctx->dest_frame) {
+            lv_timer_pause(t);
+            img->ctrl ^= LV_IMG_CTRL_STOPAT | LV_IMG_CTRL_PAUSE;
+            lv_event_send(obj, LV_EVENT_READY, NULL);
+        }
+        else if(LV_BT(img->ctrl, LV_IMG_CTRL_BACKWARD)) {
+            if(img->dec_ctx->current_frame > 0)
+                --img->dec_ctx->current_frame;
+            else { /* Looping ? */
+                if(LV_BT(img->ctrl, LV_IMG_CTRL_LOOP))
+                    img->dec_ctx->current_frame = img->dec_ctx->total_frames - 1;
+                else {
+                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    lv_timer_pause(t);
+                }
+            }
+        }
+        else {
+            ++img->dec_ctx->current_frame;
+            if(img->dec_ctx->current_frame == img->dec_ctx->total_frames) {
+                /* Looping ? */
+                if(LV_BN(img->ctrl, LV_IMG_CTRL_LOOP)) {
+                    img->dec_ctx->current_frame--; /*Pause on the last frame*/
+                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    lv_timer_pause(t);
+                }
+                else
+                    img->dec_ctx->current_frame = 0;
+            }
+        }
+    }
+
+    lv_obj_invalidate(obj);
+}
+
 
 #endif

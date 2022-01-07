@@ -73,6 +73,7 @@ void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
  *  - a path to a file (e.g. "S:/folder/image.bin")
  *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
  * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
+ * @deprecated This function has many limitations and is efficient. Use lv_img_set_src_file/data/symbol instead
  */
 lv_img_src_t lv_img_src_get_type(const void * src);
 
