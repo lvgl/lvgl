@@ -74,10 +74,10 @@ struct lv_obj_controller_class_t {
     /**
      * Create objects
      * @param self Controller instance
-     * @param parent Container of the objects should be created upon
+     * @param container Container of the objects should be created upon
      * @return Created object, NULL if multiple objects has been created
      */
-    lv_obj_t * (*create_obj_cb)(struct lv_obj_controller_t * self, lv_obj_t * parent);
+    lv_obj_t * (*create_obj_cb)(struct lv_obj_controller_t * self, lv_obj_t * container);
 
     /**
      *
@@ -153,9 +153,9 @@ void lv_controller_manager_push(lv_controller_manager_t * manager, const lv_obj_
 
 /**
  * Replace top-most controller. Old item in the stack will be removed.
- * @param manager
- * @param cls
- * @param args
+ * @param manager Controller manager instance
+ * @param cls Controller class
+ * @param args Arguments assigned by controller manager
  */
 void lv_controller_manager_replace(lv_controller_manager_t * manager, const lv_obj_controller_class_t * cls,
                                    void * args);
@@ -181,7 +181,7 @@ bool lv_controller_manager_dispatch_event(lv_controller_manager_t * manager, int
  * Show lv_msgbox
  * @param manager Controller manager instance
  * @param cls Controller class which must return valid lv_msgbox instance
- * @param args
+ * @param args Arguments assigned by controller manager
  */
 void lv_controller_manager_show(lv_controller_manager_t * manager, const lv_obj_controller_class_t * cls, void * args);
 
@@ -189,8 +189,24 @@ lv_obj_controller_t * lv_controller_manager_top_controller(lv_controller_manager
 
 lv_obj_controller_t * lv_controller_manager_get_parent(lv_controller_manager_t * manager);
 
-lv_obj_controller_t * lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t * cls, lv_obj_t * parent,
-                                                               void * args);
+/**
+ * Create an obj_controller but not adding to any manager instance.
+ *
+ * This is useful if you just want to organize your code and manage their lifecycle easier.
+ *
+ * @param cls Controller class. This controller must return non null object.
+ * @param container Container of the objects should be created upon
+ * @param args Arguments assigned by controller manager
+ * @return Unmanaged controller instance
+ */
+lv_obj_controller_t * lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t * cls,
+                                                               lv_obj_t * container, void * args);
+
+/**
+ * Destroy the unmanaged controller instance.
+ * @param controller Container of the objects should be created upon
+ */
+void lv_obj_controller_class_del_unmanaged(lv_obj_controller_t * controller);
 
 /**
  * Asserts the controller is the top-most one, and pop it

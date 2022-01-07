@@ -198,8 +198,8 @@ lv_obj_controller_t * lv_controller_manager_get_parent(lv_controller_manager_t *
     return manager->parent;
 }
 
-lv_obj_controller_t * lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t * cls, lv_obj_t * parent,
-                                                               void * args)
+lv_obj_controller_t * lv_obj_controller_class_create_unmanaged(const lv_obj_controller_class_t * cls,
+                                                               lv_obj_t * container, void * args)
 {
     LV_ASSERT(cls);
     LV_ASSERT(cls->instance_size);
@@ -210,12 +210,32 @@ lv_obj_controller_t * lv_obj_controller_class_create_unmanaged(const lv_obj_cont
     if(cls->constructor_cb) {
         cls->constructor_cb(controller, args);
     }
-    lv_obj_t * obj = cls->create_obj_cb(controller, parent);
+    lv_obj_t * obj = cls->create_obj_cb(controller, container);
+    LV_ASSERT(obj);
     controller->obj = obj;
     if(cls->obj_created_cb) {
         cls->obj_created_cb(controller, obj);
     }
     return controller;
+}
+
+void lv_obj_controller_class_del_unmanaged(lv_obj_controller_t * controller)
+{
+    LV_ASSERT(controller);
+    LV_ASSERT(controller->obj);
+    LV_ASSERT(!controller->manager);
+    const lv_obj_controller_class_t *cls = controller->cls;
+    if(cls->obj_will_delete_cb) {
+        cls->obj_will_delete_cb(controller, controller->obj);
+    }
+    lv_obj_del(controller->obj);
+    if(cls->obj_deleted_cb) {
+        cls->obj_deleted_cb(controller, controller->obj);
+    }
+    if(cls->destructor_cb) {
+        cls->destructor_cb(controller);
+    }
+    lv_mem_free(controller);
 }
 
 void lv_obj_controller_pop(lv_obj_controller_t * controller)
