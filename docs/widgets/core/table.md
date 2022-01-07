@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/table.md
+:github_url: |github_link_base|/widgets/core/table.md
 ```
 # Table (lv_table)
 

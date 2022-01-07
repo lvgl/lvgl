@@ -82,6 +82,15 @@ void lv_group_del(lv_group_t * group)
         if((*obj)->spec_attr)(*obj)->spec_attr->group_p = NULL;
     }
 
+    /*Remove the group from any indev devices */
+    lv_indev_t * indev = lv_indev_get_next(NULL);
+    while(indev) {
+        if(indev->group == group) {
+            lv_indev_set_group(indev, NULL);
+        }
+        indev = lv_indev_get_next(indev);
+    }
+
     _lv_ll_clear(&(group->obj_ll));
     _lv_ll_remove(&LV_GC_ROOT(_lv_group_ll), group);
     lv_mem_free(group);
