@@ -113,7 +113,7 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, const lv_fragment
 }
 
 void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls,
-                                   void * args)
+                                 void * args)
 {
     LV_ASSERT(manager);
     LV_ASSERT(cls);
@@ -199,7 +199,7 @@ lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager)
 }
 
 lv_fragment_t * lv_fragment_class_create_unmanaged(const lv_fragment_class_t * cls,
-                                                               lv_obj_t * container, void * args)
+                                                   lv_obj_t * container, void * args)
 {
     LV_ASSERT(cls);
     LV_ASSERT(cls->instance_size);

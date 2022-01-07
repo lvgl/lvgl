@@ -158,7 +158,7 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, const lv_fragment
  * @param args Arguments assigned by fragment manager
  */
 void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls,
-                                   void * args);
+                                 void * args);
 
 /**
  * Get stack size of this fragment manager
@@ -200,7 +200,7 @@ lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager);
  * @return Unmanaged fragment instance
  */
 lv_fragment_t * lv_fragment_class_create_unmanaged(const lv_fragment_class_t * cls,
-                                                               lv_obj_t * container, void * args);
+                                                   lv_obj_t * container, void * args);
 
 /**
  * Destroy the unmanaged fragment fragment.
