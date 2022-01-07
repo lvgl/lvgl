@@ -27,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct lv_controller_manager_t lv_controller_manager_t;
+typedef struct _lv_controller_manager_t lv_controller_manager_t;
 
 typedef struct lv_obj_controller_t lv_obj_controller_t;
 typedef struct lv_obj_controller_class_t lv_obj_controller_class_t;

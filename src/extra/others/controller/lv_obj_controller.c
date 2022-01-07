@@ -30,7 +30,7 @@ typedef struct manager_stack_t {
     struct manager_stack_t * prev;
 } manager_stack_t;
 
-struct lv_controller_manager_t {
+struct _lv_controller_manager_t {
     lv_obj_t * container;
     lv_obj_controller_t * parent;
     manager_stack_t * top;
