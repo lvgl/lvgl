@@ -146,19 +146,16 @@ void lv_fragment_manager_pop(lv_fragment_manager_t * manager);
 /**
  * Add fragment to the stack
  * @param manager Fragment manager instance
- * @param cls Fragment class
- * @args User-defined argument
+ * @param fragment Fragment instance
  */
-void lv_fragment_manager_push(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls, void * args);
+void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
 
 /**
  * Replace top-most fragment. Old item in the stack will be removed.
  * @param manager Fragment manager instance
- * @param cls Fragment class
- * @param args Arguments assigned by fragment manager
+ * @param fragment Fragment instance
  */
-void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls,
-                                 void * args);
+void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
 
 /**
  * Get stack size of this fragment manager
@@ -183,42 +180,53 @@ bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int whi
  * @param cls Fragment class which must return valid lv_msgbox instance
  * @param args Arguments assigned by fragment manager
  */
-void lv_fragment_manager_show(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls, void * args);
+void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
 
 lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager);
 
 lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager);
 
 /**
- * Create an fragment but not adding to any manager instance.
- *
- * This is useful if you just want to organize your code and manage their lifecycle easier.
+ * Create a fragment instance.
  *
  * @param cls Fragment class. This fragment must return non null object.
- * @param container Container of the objects should be created upon
  * @param args Arguments assigned by fragment manager
- * @return Unmanaged fragment instance
+ * @return Fragment instance
  */
-lv_fragment_t * lv_fragment_class_create_unmanaged(const lv_fragment_class_t * cls,
-                                                   lv_obj_t * container, void * args);
+lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args);
 
 /**
- * Destroy the unmanaged fragment fragment.
- * @param fragment Container of the objects should be created upon
+ * Destroy a fragment.
+ * @param fragment Fragment instance.
  */
-void lv_fragment_class_del_unmanaged(lv_fragment_t * fragment);
+void lv_fragment_del(lv_fragment_t * fragment);
 
 /**
- * Asserts the fragment is the top-most one, and pop it
- * @param fragment Fragment instance
+ * Create object by fragment.
+ *
+ * @param fragment Fragment instance.
+ * @param container Container of the objects should be created upon.
  */
-void lv_fragment_pop(lv_fragment_t * fragment);
+void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container);
+
+/**
+ * Delete created object of a fragment
+ *
+ * @param fragment Fragment instance.
+ */
+void lv_fragment_del_obj(lv_fragment_t * fragment);
 
 /**
  * Destroy obj in fragment, and recreate them.
  * @param fragment Fragment instance
  */
 void lv_fragment_recreate_obj(lv_fragment_t * fragment);
+
+/**
+ * Asserts the fragment is the top-most one, and pop it
+ * @param fragment Fragment instance
+ */
+void lv_fragment_pop(lv_fragment_t * fragment);
 /**********************
  *      MACROS
  **********************/

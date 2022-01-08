@@ -45,12 +45,11 @@ static manager_stack_t * item_new(const lv_fragment_class_t * cls);
 static lv_fragment_t * item_create_fragment(lv_fragment_manager_t * manager, manager_stack_t * item,
                                             void * args);
 
-static void item_create_obj(lv_fragment_manager_t * manager, manager_stack_t * item, lv_obj_t * parent,
-                            const lv_obj_class_t * check_type);
+static void item_create_obj(manager_stack_t * item, lv_obj_t * parent, const lv_obj_class_t * check_type);
 
-static void item_destroy_obj(lv_fragment_manager_t * manager, manager_stack_t * item);
+static void item_del_obj(manager_stack_t * item);
 
-static void item_destroy_fragment(manager_stack_t * item);
+static void item_del_fragment(manager_stack_t * item);
 
 static void obj_cb_delete(lv_event_t * event);
 
@@ -86,8 +85,8 @@ void lv_fragment_manager_del(lv_fragment_manager_t * manager)
     manager_stack_t * top = manager->top;
     while(top) {
         LV_ASSERT(top->cls);
-        item_destroy_obj(manager, top);
-        item_destroy_fragment(top);
+        item_del_obj(top);
+        item_del_fragment(top);
         struct manager_stack_t * prev = top->prev;
         lv_mem_free(top);
         top = prev;
@@ -95,38 +94,45 @@ void lv_fragment_manager_del(lv_fragment_manager_t * manager)
     lv_mem_free(manager);
 }
 
-void lv_fragment_manager_push(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls, void * args)
+void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
 {
     LV_ASSERT(manager);
-    LV_ASSERT(cls);
-    manager_stack_t * item = item_new(cls);
+    LV_ASSERT(fragment);
+    LV_ASSERT(fragment->priv_item == NULL);
+    LV_ASSERT(fragment->manager == NULL);
+    manager_stack_t * item = item_new(fragment->cls);
     lv_obj_t * parent = manager->container;
-    item_create_fragment(manager, item, args);
+    item->instance = fragment;
+    fragment->priv_item = item;
+    fragment->manager = manager;
     /* Destroy object of previous screen */
     if(manager->top) {
-        item_destroy_obj(manager, manager->top);
+        item_del_obj(manager->top);
     }
-    item_create_obj(manager, item, parent, NULL);
+    item_create_obj(item, parent, NULL);
     manager_stack_t * top = manager->top;
     item->prev = top;
     manager->top = item;
 }
 
-void lv_fragment_manager_replace(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls,
-                                 void * args)
+void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
 {
     LV_ASSERT(manager);
-    LV_ASSERT(cls);
-    manager_stack_t * top = item_new(cls);
-    item_create_fragment(manager, top, args);
+    LV_ASSERT(fragment);
+    LV_ASSERT(fragment->priv_item == NULL);
+    LV_ASSERT(fragment->manager == NULL);
+    manager_stack_t * top = item_new(fragment->cls);
+    top->instance = fragment;
+    fragment->priv_item = top;
+    fragment->manager = manager;
     manager_stack_t * old = manager->top;
     if(old) {
-        item_destroy_obj(manager, old);
-        item_destroy_fragment(old);
+        item_del_obj(old);
+        item_del_fragment(old);
         lv_mem_free(old);
     }
     manager->top = top;
-    item_create_obj(manager, top, manager->container, NULL);
+    item_create_obj(top, manager->container, NULL);
 }
 
 size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager)
@@ -149,11 +155,10 @@ void lv_fragment_manager_pop(lv_fragment_manager_t * manager)
     if(!dialog && prev) {
         item_create_fragment(manager, prev, NULL);
     }
-    item_destroy_obj(manager, top);
-    item_destroy_fragment(top);
+    item_del_obj(top);
     lv_mem_free(top);
     if(!dialog && prev) {
-        item_create_obj(manager, prev, manager->container, NULL);
+        item_create_obj(prev, manager->container, NULL);
     }
     manager->top = prev;
 }
@@ -170,13 +175,13 @@ bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int whi
 
 #if LV_USE_MSGBOX
 
-void lv_fragment_manager_show(lv_fragment_manager_t * manager, const lv_fragment_class_t * cls, void * args)
+void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
 {
     LV_ASSERT(manager);
-    LV_ASSERT(cls);
+    LV_ASSERT(fragment);
+    const lv_fragment_class_t * cls = fragment->cls;
     manager_stack_t * item = item_new(cls);
-    item_create_fragment(manager, item, args);
-    item_create_obj(manager, item, NULL, &lv_msgbox_class);
+    item_create_obj(item, NULL, &lv_msgbox_class);
     item->dialog = true;
     manager_stack_t * top = manager->top;
     item->prev = top;
@@ -199,53 +204,57 @@ lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager)
     return manager->parent;
 }
 
-lv_fragment_t * lv_fragment_class_create_unmanaged(const lv_fragment_class_t * cls,
-                                                   lv_obj_t * container, void * args)
+
+lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 {
-    LV_ASSERT(cls);
+    LV_ASSERT_NULL(cls);
     LV_ASSERT(cls->instance_size);
-    LV_ASSERT(cls->create_obj_cb);
+    LV_ASSERT_NULL(cls->create_obj_cb);
     lv_fragment_t * instance = lv_mem_alloc(cls->instance_size);
     lv_memset_00(instance, cls->instance_size);
     instance->cls = cls;
     if(cls->constructor_cb) {
         cls->constructor_cb(instance, args);
     }
-    lv_obj_t * obj = cls->create_obj_cb(instance, container);
-    LV_ASSERT(obj);
-    instance->obj = obj;
-    if(cls->obj_created_cb) {
-        cls->obj_created_cb(instance, obj);
-    }
     return instance;
 }
 
-void lv_fragment_class_del_unmanaged(lv_fragment_t * fragment)
+void lv_fragment_del(lv_fragment_t * fragment)
 {
     LV_ASSERT(fragment);
-    LV_ASSERT(fragment->obj);
-    LV_ASSERT(!fragment->manager);
+    /* Objects will leak if this function called before objects deleted */
     const lv_fragment_class_t * cls = fragment->cls;
-    if(cls->obj_will_delete_cb) {
-        cls->obj_will_delete_cb(fragment, fragment->obj);
-    }
-    lv_obj_del(fragment->obj);
-    if(cls->obj_deleted_cb) {
-        cls->obj_deleted_cb(fragment, fragment->obj);
-    }
     if(cls->destructor_cb) {
         cls->destructor_cb(fragment);
     }
     lv_mem_free(fragment);
 }
 
-void lv_fragment_pop(lv_fragment_t * fragment)
+void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)
+{
+    const lv_fragment_class_t * cls = fragment->cls;
+    lv_obj_t * obj = cls->create_obj_cb(fragment, container);
+    fragment->obj = obj;
+    if(cls->obj_created_cb) {
+        cls->obj_created_cb(fragment, obj);
+    }
+}
+
+void lv_fragment_del_obj(lv_fragment_t * fragment)
 {
     LV_ASSERT(fragment);
-    lv_fragment_manager_t * manager = fragment->manager;
-    LV_ASSERT(manager);
-    LV_ASSERT(manager->top->instance == fragment);
-    lv_fragment_manager_pop(manager);
+    const lv_fragment_class_t * cls = fragment->cls;
+    bool del_handled = false;
+    if(cls->obj_will_delete_cb) {
+        del_handled = cls->obj_will_delete_cb(fragment, fragment->obj);
+    }
+    LV_ASSERT(del_handled || fragment->obj);
+    if(fragment->obj) {
+        lv_obj_del(fragment->obj);
+    }
+    if(cls->obj_deleted_cb) {
+        cls->obj_deleted_cb(fragment, fragment->obj);
+    }
 }
 
 void lv_fragment_recreate_obj(lv_fragment_t * fragment)
@@ -253,7 +262,7 @@ void lv_fragment_recreate_obj(lv_fragment_t * fragment)
     LV_ASSERT(fragment);
     // Disable CB first
     lv_obj_remove_event_cb(fragment->obj, obj_cb_delete);
-    fragment_destroy_obj(fragment);
+    lv_fragment_del_obj(fragment);
 
     const lv_fragment_class_t * cls = fragment->cls;
     lv_obj_t * obj = cls->create_obj_cb(fragment, fragment->manager->container);
@@ -264,6 +273,15 @@ void lv_fragment_recreate_obj(lv_fragment_t * fragment)
     if(obj) {
         lv_obj_add_event_cb(obj, obj_cb_delete, LV_EVENT_DELETE, fragment->priv_item);
     }
+}
+
+void lv_fragment_pop(lv_fragment_t * fragment)
+{
+    LV_ASSERT(fragment);
+    lv_fragment_manager_t * manager = fragment->manager;
+    LV_ASSERT(manager);
+    LV_ASSERT(manager->top->instance == fragment);
+    lv_fragment_manager_pop(manager);
 }
 
 /**********************
@@ -297,34 +315,29 @@ static lv_fragment_t * item_create_fragment(lv_fragment_manager_t * manager, man
     return instance;
 }
 
-static void item_create_obj(lv_fragment_manager_t * manager, manager_stack_t * item, lv_obj_t * parent,
-                            const lv_obj_class_t * check_type)
+static void item_create_obj(manager_stack_t * item, lv_obj_t * parent, const lv_obj_class_t * check_type)
 {
     LV_ASSERT(item->instance);
-    const lv_fragment_class_t * cls = item->cls;
-    LV_ASSERT(cls->create_obj_cb);
-    lv_fragment_t * instance = item->instance;
-    lv_obj_t * obj = cls->create_obj_cb(instance, parent);
+    lv_fragment_create_obj(item->instance, parent);
     if(check_type) {
-        LV_ASSERT(lv_obj_has_class(obj, check_type));
+        LV_ASSERT(lv_obj_has_class(item->instance->obj, check_type));
     }
-    instance->obj = obj;
     item->obj_created = true;
-    if(cls->obj_created_cb) {
-        cls->obj_created_cb(instance, obj);
-    }
-    if(obj) {
-        lv_obj_add_event_cb(obj, obj_cb_delete, LV_EVENT_DELETE, item);
-    }
 }
 
-static void item_destroy_obj(lv_fragment_manager_t * manager, manager_stack_t * item)
+static void item_del_obj(manager_stack_t * item)
 {
     if(!item->obj_created) return;
     item->destroying_obj = true;
     lv_fragment_t * instance = item->instance;
-    fragment_destroy_obj(instance);
+    lv_fragment_del_obj(instance);
     item->obj_created = false;
+}
+
+static void item_del_fragment(manager_stack_t * item)
+{
+    lv_fragment_t * instance = item->instance;
+    lv_fragment_del(instance);
 }
 
 static void fragment_destroy_obj(lv_fragment_t * fragment)
@@ -360,16 +373,6 @@ static void fragment_destroy_obj(lv_fragment_t * fragment)
     fragment->obj = NULL;
 }
 
-static void item_destroy_fragment(manager_stack_t * item)
-{
-    const lv_fragment_class_t * cls = item->cls;
-    if(cls->destructor_cb) {
-        cls->destructor_cb(item->instance);
-    }
-    lv_mem_free(item->instance);
-    item->instance = NULL;
-}
-
 static void obj_cb_delete(lv_event_t * event)
 {
     manager_stack_t * item = lv_event_get_user_data(event);
@@ -384,7 +387,7 @@ static void obj_cb_delete(lv_event_t * event)
     instance->obj = NULL;
     if(!item->destroying_obj) {
         manager_stack_t * prev = item->prev;
-        item_destroy_fragment(item);
+        item_del_fragment(item);
         lv_mem_free(item);
         manager->top = prev;
     }
