@@ -138,4 +138,22 @@ void test_bar_start_value_should_be_smaller_than_current_value_in_range_mode(voi
     TEST_ASSERT_EQUAL_INT32(lv_bar_get_value(bar), lv_bar_get_start_value(bar));
 }
 
+void test_bar_current_value_should_be_truncated_to_max_value_when_exceeds_it(void)
+{
+    int32_t max_value = lv_bar_get_max_value(bar);
+    int32_t new_value = max_value + 1u;
+
+    lv_bar_set_value(bar, new_value, LV_ANIM_OFF);
+    TEST_ASSERT_EQUAL_INT32(max_value, lv_bar_get_value(bar));
+}
+
+void test_bar_current_value_should_be_truncated_to_min_value_when_it_is_below_it(void)
+{
+    int32_t min_value = lv_bar_get_min_value(bar);
+    int32_t new_value = min_value - 1u;
+
+    lv_bar_set_value(bar, new_value, LV_ANIM_OFF);
+    TEST_ASSERT_EQUAL_INT32(min_value, lv_bar_get_value(bar));
+}
+
 #endif
