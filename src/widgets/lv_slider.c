@@ -109,13 +109,20 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     /*Advanced hit testing: react only on dragging the knob(s)*/
     if(code == LV_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);
+        lv_coord_t ext_click_area = obj->spec_attr ? obj->spec_attr->ext_click_pad : 0;
 
         /*Ordinary slider: was the knob area hit?*/
-        info->res = _lv_area_is_point_on(&slider->right_knob_area, info->point, 0);
+        lv_area_t a;
+        lv_area_copy(&a, &slider->right_knob_area);
+        lv_area_increase(&a, ext_click_area, ext_click_area);
+        info->res = _lv_area_is_point_on(&a, info->point, 0);
 
-        /*There's still a change we have a hit, if we have another knob*/
+        /*There's still a chance that there is a hit if there is another knob*/
         if((info->res == false) && (type == LV_SLIDER_MODE_RANGE)) {
-            info->res = _lv_area_is_point_on(&slider->left_knob_area, info->point, 0);
+            lv_area_t a;
+            lv_area_copy(&a, &slider->left_knob_area);
+            lv_area_increase(&a, ext_click_area, ext_click_area);
+            info->res = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
     else if(code == LV_EVENT_PRESSED) {
