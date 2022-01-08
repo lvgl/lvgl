@@ -119,7 +119,6 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*There's still a chance that there is a hit if there is another knob*/
         if((info->res == false) && (type == LV_SLIDER_MODE_RANGE)) {
-            lv_area_t a;
             lv_area_copy(&a, &slider->left_knob_area);
             lv_area_increase(&a, ext_click_area, ext_click_area);
             info->res = _lv_area_is_point_on(&a, info->point, 0);
