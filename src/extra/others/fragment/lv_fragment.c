@@ -40,6 +40,13 @@ void lv_fragment_del(lv_fragment_t * fragment)
     lv_mem_free(fragment);
 }
 
+void lv_fragment_remove_self(lv_fragment_t * fragment)
+{
+    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NULL(fragment->manager);
+    lv_fragment_manager_remove(fragment->manager, fragment);
+}
+
 void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)
 {
     const lv_fragment_class_t * cls = fragment->cls;
@@ -58,13 +65,13 @@ void lv_fragment_del_obj(lv_fragment_t * fragment)
     if(cls->obj_will_delete_cb) {
         del_handled = cls->obj_will_delete_cb(fragment, fragment->obj);
     }
-    LV_ASSERT_MSG(del_handled || fragment->obj, "Either return created object, or implement obj_will_delete_cb.");
-    if(fragment->obj) {
+    if(!del_handled && fragment->obj != NULL) {
         lv_obj_del(fragment->obj);
     }
     if(cls->obj_deleted_cb) {
         cls->obj_deleted_cb(fragment, fragment->obj);
     }
+    fragment->obj = NULL;
 }
 
 #endif /*LV_USE_FRAGMENT*/

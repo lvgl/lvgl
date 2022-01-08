@@ -235,6 +235,12 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 void lv_fragment_del(lv_fragment_t * fragment);
 
 /**
+ * Remove fragment from attached manager
+ * @param fragment
+ */
+void lv_fragment_remove_self(lv_fragment_t * fragment);
+
+/**
  * Create object by fragment.
  *
  * @param fragment Fragment instance.
