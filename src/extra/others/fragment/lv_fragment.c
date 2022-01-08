@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_fragment.h"
+#include "lv_fragment_priv.h"
 
 #if LV_USE_FRAGMENT
 
@@ -23,6 +24,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
     lv_fragment_t * instance = lv_mem_alloc(cls->instance_size);
     lv_memset_00(instance, cls->instance_size);
     instance->cls = cls;
+    instance->child_manager = lv_fragment_manager_create(instance);
     if(cls->constructor_cb) {
         cls->constructor_cb(instance, args);
     }
@@ -37,6 +39,7 @@ void lv_fragment_del(lv_fragment_t * fragment)
     if(cls->destructor_cb) {
         cls->destructor_cb(fragment);
     }
+    lv_fragment_manager_del(fragment->child_manager);
     lv_mem_free(fragment);
 }
 
@@ -45,6 +48,13 @@ void lv_fragment_remove_self(lv_fragment_t * fragment)
     LV_ASSERT_NULL(fragment);
     LV_ASSERT_NULL(fragment->manager);
     lv_fragment_manager_remove(fragment->manager, fragment);
+}
+
+lv_obj_t * const * lv_fragment_get_container(lv_fragment_t * fragment)
+{
+    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NULL(fragment->manager);
+    return fragment->_states->container;
 }
 
 void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)

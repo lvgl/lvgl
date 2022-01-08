@@ -11,6 +11,7 @@
 
 #if LV_USE_FRAGMENT
 
+#include "lv_fragment_priv.h"
 #include "../../../extra/widgets/msgbox/lv_msgbox.h"
 /*********************
  *      DEFINES
@@ -20,18 +21,7 @@
  *      TYPEDEFS
  **********************/
 
-struct internal_states_t {
-    const lv_fragment_class_t * cls;
-    lv_fragment_t * instance;
-    bool obj_created;
-    bool destroying_obj;
-    bool is_msgbox;
-    bool in_stack;
-    struct internal_states_t * prev;
-};
-
 struct _lv_fragment_manager_t {
-    lv_obj_t * container;
     lv_fragment_t * parent;
     internal_states_t * top;
     internal_states_t * msgbox_top;
@@ -44,11 +34,13 @@ struct _lv_fragment_manager_t {
 
 static internal_states_t * item_new(const lv_fragment_class_t * cls);
 
-static void item_create_obj(internal_states_t * item, lv_obj_t * parent, const lv_obj_class_t * check_type);
+static void item_create_obj(internal_states_t * item, const lv_obj_class_t * check_type);
 
 static void item_del_obj(internal_states_t * item);
 
 static void item_del_fragment(internal_states_t * item);
+
+static void cb_states_obj_destroyed(lv_event_t * event);
 
 #if LV_USE_MSGBOX
 
@@ -68,13 +60,11 @@ static void item_del_fragment(internal_states_t * item);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_fragment_manager_t * lv_fragment_manager_create(lv_obj_t * container, lv_fragment_t * parent)
+lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent)
 {
-    LV_ASSERT(container);
     lv_fragment_manager_t * instance = lv_mem_alloc(sizeof(lv_fragment_manager_t));
+    lv_memset_00(instance, sizeof(lv_fragment_manager_t));
     instance->parent = parent;
-    instance->container = container;
-    instance->top = NULL;
     return instance;
 }
 
@@ -93,21 +83,21 @@ void lv_fragment_manager_del(lv_fragment_manager_t * manager)
     lv_mem_free(manager);
 }
 
-void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
+void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container)
 {
     LV_ASSERT(manager);
     LV_ASSERT(fragment);
     LV_ASSERT(fragment->_states == NULL);
     LV_ASSERT(fragment->manager == NULL);
     internal_states_t * item = item_new(fragment->cls);
-    lv_obj_t * parent = manager->container;
+    item->container = container;
     item->instance = fragment;
     fragment->manager = manager;
     fragment->_states = item;
     if(fragment->cls->attached_cb) {
         fragment->cls->attached_cb(fragment);
     }
-    item_create_obj(item, parent, NULL);
+    item_create_obj(item, NULL);
 }
 
 void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
@@ -141,17 +131,17 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
     item_del_fragment(states);
     lv_mem_free(states);
     if(prev) {
-        item_create_obj(prev, manager->container, NULL);
+        item_create_obj(prev, NULL);
     }
 }
 
-void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
+void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container)
 {
     internal_states_t * top = manager->top;
     if(top != NULL) {
         item_del_obj(top);
     }
-    lv_fragment_manager_add(manager, fragment);
+    lv_fragment_manager_add(manager, fragment, container);
     internal_states_t * states = fragment->_states;
     states->prev = top;
     states->in_stack = true;
@@ -163,13 +153,23 @@ void lv_fragment_manager_pop(lv_fragment_manager_t * manager)
     lv_fragment_manager_remove(manager, lv_fragment_manager_get_top(manager));
 }
 
-void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
+void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
+                                 lv_obj_t * const * container)
 {
     lv_fragment_t * top = lv_fragment_manager_get_top(manager);
     if(top != NULL) {
         lv_fragment_manager_remove(manager, top);
     }
-    lv_fragment_manager_push(manager, fragment);
+    lv_fragment_manager_push(manager, fragment, container);
+}
+
+void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
+{
+    LV_ASSERT_NULL(manager);
+    LV_ASSERT_NULL(fragment);
+    LV_ASSERT(fragment->manager == manager);
+    item_del_obj(fragment->_states);
+    item_create_obj(fragment->_states, NULL);
 }
 
 #if LV_USE_MSGBOX
@@ -193,7 +193,7 @@ void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * f
     if(top) {
         item_del_obj(top);
     }
-    item_create_obj(item, NULL, &lv_msgbox_class);
+    item_create_obj(item, &lv_msgbox_class);
     lv_obj_add_event_cb(item->instance->obj, cb_msgbox_delete, LV_EVENT_DELETE, item->instance);
 
     internal_states_t * states = fragment->_states;
@@ -204,6 +204,18 @@ void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * f
 
 #endif
 
+bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int which, void * data1, void * data2)
+{
+    LV_ASSERT(manager);
+    internal_states_t * top = manager->top;
+    if(!top) return false;
+    lv_fragment_t * instance = top->instance;
+    if(!instance) return false;
+    if(lv_fragment_manager_dispatch_event(instance->child_manager, which, data1, data2)) return true;
+    if(!top->cls->event_cb) return false;
+    return top->cls->event_cb(instance, which, data1, data2);
+}
+
 size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager)
 {
     size_t size = 0;
@@ -212,16 +224,6 @@ size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager)
         size++;
     }
     return size;
-}
-
-bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int which, void * data1, void * data2)
-{
-    LV_ASSERT(manager);
-    internal_states_t * top = manager->top;
-    if(!top) return false;
-    lv_fragment_t * instance = top->instance;
-    if(!instance || !top->cls->event_cb) return false;
-    return top->cls->event_cb(instance, which, data1, data2);
 }
 
 lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager)
@@ -238,28 +240,6 @@ lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager)
     return manager->parent;
 }
 
-void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
-{
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(fragment);
-    // Disable CB first
-    if(fragment->_states->is_msgbox) {
-        lv_obj_remove_event_cb(fragment->obj, cb_msgbox_delete);
-    }
-    lv_fragment_del_obj(fragment);
-    lv_fragment_create_obj(fragment, fragment->manager->container);
-
-    const lv_fragment_class_t * cls = fragment->cls;
-    lv_obj_t * obj = cls->create_obj_cb(fragment, fragment->manager->container);
-    fragment->obj = obj;
-    if(cls->obj_created_cb) {
-        cls->obj_created_cb(fragment, obj);
-    }
-    if(fragment->_states->is_msgbox) {
-        lv_obj_add_event_cb(obj, cb_msgbox_delete, LV_EVENT_DELETE, fragment->_states);
-    }
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -273,15 +253,21 @@ static internal_states_t * item_new(const lv_fragment_class_t * cls)
     return item;
 }
 
-static void item_create_obj(internal_states_t * item, lv_obj_t * parent, const lv_obj_class_t * check_type)
+static void item_create_obj(internal_states_t * item, const lv_obj_class_t * check_type)
 {
     LV_ASSERT(item->instance);
     item->destroying_obj = false;
-    lv_fragment_create_obj(item->instance, parent);
+    lv_fragment_create_obj(item->instance, item->container ? *item->container : NULL);
     if(check_type) {
         LV_ASSERT(lv_obj_has_class(item->instance->obj, check_type));
     }
     item->obj_created = true;
+    if(item->instance->obj) {
+        lv_obj_add_event_cb(item->instance->obj, cb_states_obj_destroyed, LV_EVENT_DELETE, item);
+    }
+    else if(*item->container) {
+        lv_obj_add_event_cb(*item->container, cb_states_obj_destroyed, LV_EVENT_DELETE, item);
+    }
 }
 
 static void item_del_obj(internal_states_t * item)
@@ -294,14 +280,15 @@ static void item_del_obj(internal_states_t * item)
     }
     else {
         LV_ASSERT(fragment->manager);
-        LV_ASSERT(fragment->manager->container);
+        LV_ASSERT(item->container && *item->container);
+        lv_obj_remove_event_cb_with_user_data(*item->container, cb_states_obj_destroyed, item);
         bool delete_handled = false;
         const lv_fragment_class_t * cls = fragment->cls;
         if(cls->obj_will_delete_cb) {
             delete_handled = cls->obj_will_delete_cb(fragment, NULL);
         }
         if(!delete_handled) {
-            lv_obj_clean(fragment->manager->container);
+            lv_obj_clean(*item->container);
         }
         if(cls->obj_deleted_cb) {
             cls->obj_deleted_cb(fragment, NULL);
@@ -310,6 +297,10 @@ static void item_del_obj(internal_states_t * item)
     item->obj_created = false;
 }
 
+/**
+ * Detach, then destroy fragment
+ * @param item fragment states
+ */
 static void item_del_fragment(internal_states_t * item)
 {
     lv_fragment_t * instance = item->instance;
@@ -319,9 +310,17 @@ static void item_del_fragment(internal_states_t * item)
     instance->manager = NULL;
     instance->_states = NULL;
     lv_fragment_del(instance);
+    item->instance = NULL;
+}
+
+static void cb_states_obj_destroyed(lv_event_t * event)
+{
+    internal_states_t * states = lv_event_get_user_data(event);
+    states->obj_created = false;
 }
 
 #if LV_USE_MSGBOX
+
 static void cb_msgbox_delete(lv_event_t * event)
 {
     lv_fragment_t * instance = lv_event_get_user_data(event);
@@ -333,7 +332,9 @@ static void cb_msgbox_delete(lv_event_t * event)
         instance->cls->obj_deleted_cb(instance, lv_event_get_current_target(event));
     }
     item_del_fragment(states);
+    lv_mem_free(states);
 }
+
 #endif /*LV_USE_MSGBOX*/
 
 #endif /*LV_USE_FRAGMENT*/
