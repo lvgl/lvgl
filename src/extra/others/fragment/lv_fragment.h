@@ -35,7 +35,7 @@ typedef struct lv_fragment_class_t lv_fragment_class_t;
 /**
  * Opaque pointer for internal state management
  */
-typedef struct manager_stack_t manager_stack_t;
+typedef struct internal_states_t internal_states_t;
 
 struct lv_fragment_t {
     /**
@@ -54,7 +54,7 @@ struct lv_fragment_t {
     /**
      * Private internal states
      */
-    manager_stack_t * priv_item;
+    internal_states_t * _states;
 };
 
 struct lv_fragment_class_t {
@@ -70,6 +70,18 @@ struct lv_fragment_class_t {
      * @param self Fragment instance, will be freed after this call
      */
     void (*destructor_cb)(struct lv_fragment_t * self);
+
+    /**
+     * Fragment attached to manager
+     * @param self Fragment instance
+     */
+    void (*attached_cb)(struct lv_fragment_t * self);
+
+    /**
+     * Fragment detached from manager
+     * @param self Fragment instance
+     */
+    void (*detached_cb)(struct lv_fragment_t * self);
 
     /**
      * Create objects
@@ -138,17 +150,31 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_obj_t * container, lv_frag
 void lv_fragment_manager_del(lv_fragment_manager_t * manager);
 
 /**
- * Remove the top-most fragment for stack
+ * Attach fragment to manager.
  * @param manager Fragment manager instance
+ * @param fragment Fragment instance
  */
-void lv_fragment_manager_pop(lv_fragment_manager_t * manager);
+void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
 
 /**
- * Add fragment to the stack
+ * Detach and destroy fragment. If fragment is in navigation stack, remove from it.
+ * @param manager Fragment manager instance
+ * @param fragment Fragment instance
+ */
+void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
+
+/**
+ * Attach fragment to manager and add to navigation stack.
  * @param manager Fragment manager instance
  * @param fragment Fragment instance
  */
 void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
+
+/**
+ * Remove the top-most fragment for stack
+ * @param manager Fragment manager instance
+ */
+void lv_fragment_manager_pop(lv_fragment_manager_t * manager);
 
 /**
  * Replace top-most fragment. Old item in the stack will be removed.
@@ -187,6 +213,13 @@ lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager);
 lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager);
 
 /**
+ * Destroy obj in fragment, and recreate them.
+ * @param manager Fragment manager instance
+ * @param fragment Fragment instance
+ */
+void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
+
+/**
  * Create a fragment instance.
  *
  * @param cls Fragment class. This fragment must return non null object.
@@ -216,17 +249,7 @@ void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container);
  */
 void lv_fragment_del_obj(lv_fragment_t * fragment);
 
-/**
- * Destroy obj in fragment, and recreate them.
- * @param fragment Fragment instance
- */
-void lv_fragment_recreate_obj(lv_fragment_t * fragment);
 
-/**
- * Asserts the fragment is the top-most one, and pop it
- * @param fragment Fragment instance
- */
-void lv_fragment_pop(lv_fragment_t * fragment);
 /**********************
  *      MACROS
  **********************/
