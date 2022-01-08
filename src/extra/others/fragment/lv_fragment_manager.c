@@ -40,6 +40,9 @@ static void item_del_obj(internal_states_t * item);
 
 static void item_del_fragment(internal_states_t * item);
 
+static internal_states_t * fragment_attach(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
+                                           lv_obj_t * const * container);
+
 static void cb_states_obj_destroyed(lv_event_t * event);
 
 #if LV_USE_MSGBOX
@@ -85,18 +88,7 @@ void lv_fragment_manager_del(lv_fragment_manager_t * manager)
 
 void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container)
 {
-    LV_ASSERT(manager);
-    LV_ASSERT(fragment);
-    LV_ASSERT(fragment->_states == NULL);
-    LV_ASSERT(fragment->manager == NULL);
-    internal_states_t * item = item_new(fragment->cls);
-    item->container = container;
-    item->instance = fragment;
-    fragment->manager = manager;
-    fragment->_states = item;
-    if(fragment->cls->attached_cb) {
-        fragment->cls->attached_cb(fragment);
-    }
+    internal_states_t * item = fragment_attach(manager, fragment, container);
     item_create_obj(item, NULL);
 }
 
@@ -141,11 +133,11 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * f
     if(top != NULL) {
         item_del_obj(top);
     }
-    lv_fragment_manager_add(manager, fragment, container);
-    internal_states_t * states = fragment->_states;
+    internal_states_t * states = fragment_attach(manager, fragment, container);
     states->prev = top;
     states->in_stack = true;
     manager->top = states;
+    item_create_obj(states, NULL);
 }
 
 void lv_fragment_manager_pop(lv_fragment_manager_t * manager)
@@ -311,6 +303,25 @@ static void item_del_fragment(internal_states_t * item)
     instance->_states = NULL;
     lv_fragment_del(instance);
     item->instance = NULL;
+}
+
+
+static internal_states_t * fragment_attach(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
+                                           lv_obj_t * const * container)
+{
+    LV_ASSERT(manager);
+    LV_ASSERT(fragment);
+    LV_ASSERT(fragment->_states == NULL);
+    LV_ASSERT(fragment->manager == NULL);
+    internal_states_t * item = item_new(fragment->cls);
+    item->container = container;
+    item->instance = fragment;
+    fragment->manager = manager;
+    fragment->_states = item;
+    if(fragment->cls->attached_cb) {
+        fragment->cls->attached_cb(fragment);
+    }
+    return item;
 }
 
 static void cb_states_obj_destroyed(lv_event_t * event)
