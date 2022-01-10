@@ -1,6 +1,6 @@
 /**
+ * Public header for Fragment
  * @file lv_fragment.h
- *
  */
 
 #ifndef LV_FRAGMENT_H
@@ -31,45 +31,7 @@ typedef struct _lv_fragment_manager_t lv_fragment_manager_t;
 
 typedef struct lv_fragment_t lv_fragment_t;
 typedef struct lv_fragment_class_t lv_fragment_class_t;
-
-/**
- * Opaque pointer for internal state management
- */
-typedef struct lv_fragment_managed_states_t  {
-    /**
-     * Class of the fragment
-     */
-    const lv_fragment_class_t * cls;
-    /**
-     * Manager the fragment attached to
-     */
-    lv_fragment_manager_t * manager;
-    /**
-     * Container object the fragment adding view to
-     */
-    lv_obj_t * const * container;
-    /**
-     * Fragment instance
-     */
-    lv_fragment_t * instance;
-    /**
-     * This is true between `create_obj_cb` and `obj_deleted_cb`.
-     */
-    bool obj_created;
-    /**
-     * true before `lv_fragment_del_obj` is called. Don't touch any object if this is true
-     */
-    bool destroying_obj;
-    /**
-     * true if this fragment is a msgbox fragment
-     */
-    bool is_msgbox;
-    bool in_stack;
-    /**
-     * Internal pointer, DON'T TOUCH
-     */
-    struct lv_fragment_managed_states_t * prev;
-} lv_fragment_managed_states_t;
+typedef struct lv_fragment_managed_states_t lv_fragment_managed_states_t;
 
 struct lv_fragment_t {
     /**
@@ -167,6 +129,45 @@ struct lv_fragment_class_t {
     size_t instance_size;
 };
 
+/**
+ * Fragment states
+ */
+typedef struct lv_fragment_managed_states_t  {
+    /**
+     * Class of the fragment
+     */
+    const lv_fragment_class_t * cls;
+    /**
+     * Manager the fragment attached to
+     */
+    lv_fragment_manager_t * manager;
+    /**
+     * Container object the fragment adding view to
+     */
+    lv_obj_t * const * container;
+    /**
+     * Fragment instance
+     */
+    lv_fragment_t * instance;
+    /**
+     * This is true between `create_obj_cb` and `obj_deleted_cb`.
+     */
+    bool obj_created;
+    /**
+     * true before `lv_fragment_del_obj` is called. Don't touch any object if this is true
+     */
+    bool destroying_obj;
+    /**
+     * true if this fragment is a msgbox fragment
+     */
+    bool is_msgbox;
+    bool in_stack;
+    /**
+     * Internal pointer, DON'T TOUCH
+     */
+    struct lv_fragment_managed_states_t * prev;
+} lv_fragment_managed_states_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -253,10 +254,19 @@ bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int cod
  */
 size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager);
 
-
+/**
+ * Get top most fragment instance
+ * @param manager Fragment manager instance
+ * @return Top most fragment instance
+ */
 lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager);
 
-lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager);
+/**
+ * Get parent fragment
+ * @param manager Fragment manager instance
+ * @return Parent fragment instance
+ */
+lv_fragment_t * lv_fragment_manager_get_parent_fragment(lv_fragment_manager_t * manager);
 
 
 /**
@@ -276,12 +286,29 @@ void lv_fragment_del(lv_fragment_t * fragment);
 
 /**
  * Remove fragment from attached manager
- * @param fragment
+ * @param fragment Fragment instance
  */
 void lv_fragment_remove_self(lv_fragment_t * fragment);
 
+/**
+ * Get associated manager of this fragment
+ * @param fragment Fragment instance
+ * @return Fragment manager instance
+ */
+lv_fragment_manager_t * lv_fragment_get_manager(lv_fragment_t * fragment);
+
+/**
+ * Get container object of this fragment
+ * @param fragment Fragment instance
+ * @return Reference to container object
+ */
 lv_obj_t * const * lv_fragment_get_container(lv_fragment_t * fragment);
 
+/**
+ * Get parent fragment of this fragment
+ * @param fragment Fragment instance
+ * @return Parent fragment
+ */
 lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment);
 
 /**
@@ -299,6 +326,10 @@ void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container);
  */
 void lv_fragment_del_obj(lv_fragment_t * fragment);
 
+/**
+ * Destroy obj in fragment, and recreate them.
+ * @param fragment Fragment instance
+ */
 void lv_fragment_recreate_obj(lv_fragment_t * fragment);
 
 

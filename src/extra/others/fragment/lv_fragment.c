@@ -60,7 +60,7 @@ lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment)
 {
     LV_ASSERT_NULL(fragment);
     LV_ASSERT_NULL(fragment->managed);
-    return lv_fragment_manager_get_parent(fragment->managed->manager);
+    return lv_fragment_manager_get_parent_fragment(fragment->managed->manager);
 }
 
 void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)

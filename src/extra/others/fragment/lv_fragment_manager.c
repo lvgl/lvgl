@@ -224,7 +224,7 @@ lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager)
     return top->instance;
 }
 
-lv_fragment_t * lv_fragment_manager_get_parent(lv_fragment_manager_t * manager)
+lv_fragment_t * lv_fragment_manager_get_parent_fragment(lv_fragment_manager_t * manager)
 {
     LV_ASSERT(manager);
     return manager->parent;
