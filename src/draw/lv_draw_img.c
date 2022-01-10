@@ -59,7 +59,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
+void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const lv_img_src_uri_t * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -182,39 +182,6 @@ bool lv_img_cf_has_alpha(lv_img_cf_t cf)
     return has_alpha;
 }
 
-/**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
- * @deprecated You shouldn't rely on this function to find out the image type
- */
-lv_img_src_t lv_img_src_get_type(const void * src)
-{
-    lv_img_src_t img_src_type = LV_IMG_SRC_UNKNOWN;
-
-    if(src == NULL) return img_src_type;
-    const uint8_t * u8_p = src;
-
-    /*The first byte shows the type of the image source*/
-    if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        img_src_type = LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
-    }
-    else if(u8_p[0] >= 0x80) {
-        img_src_type = LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
-    }
-    else {
-        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is draw to the first byte < 0x20*/
-    }
-
-    if(LV_IMG_SRC_UNKNOWN == img_src_type) {
-        LV_LOG_WARN("lv_img_src_get_type: unknown image type");
-    }
-
-    return img_src_type;
-}
 
 void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)

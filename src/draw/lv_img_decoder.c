@@ -38,12 +38,17 @@ void _lv_img_decoder_init(void)
     lv_bin_init();
 }
 
-lv_res_t lv_img_decoder_get_info(const lv_img_src_uri_t * src, lv_img_header_t * header)
+lv_res_t lv_img_decoder_get_info(const lv_img_src_uri_t * src, lv_img_header_t * header, const lv_img_decoder_dsc_t * dec_dsc)
 {
     /*TODO: We should search the cache here, since we might already have a decoder with the information we need */
     lv_img_decoder_dsc_t dsc;
     lv_memset_00(&dsc, sizeof(dsc));
     dsc.src = src;
+    if (dec_dsc != NULL) {
+        dsc.size_hint = dec_dsc->size_hint;
+        dsc.header = dec_dsc->header;
+        dsc.dec_ctx = dec_dsc->dec_ctx; /* Used on input, but ignored on output */
+    }
     if (lv_img_decoder_open(&dsc, LV_IMG_DEC_ONLYMETA) == LV_RES_OK) {
         lv_memcpy(header, &dsc.header, sizeof(*header));
         return LV_RES_OK;
@@ -107,6 +112,7 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc);
+        dsc->src = NULL;
     }
 }
 

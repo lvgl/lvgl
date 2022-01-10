@@ -55,27 +55,16 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
 /**
  * Draw an image
  * @param coords the coordinates of the image
- * @param mask the image will be drawn only in this area
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
 void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                 const void * src);
+                 const lv_img_src_uri_t * src);
 
 
 void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
-/**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
- * @deprecated This function has many limitations and is efficient. Use lv_img_set_src_file/data/symbol instead
- */
-lv_img_src_t lv_img_src_get_type(const void * src);
 
 /**
  * Get the pixel size of a color format in bits

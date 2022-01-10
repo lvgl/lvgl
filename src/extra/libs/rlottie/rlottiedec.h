@@ -18,8 +18,6 @@ struct Lottie_Animation_S;
  */
 typedef struct {
     lv_img_dec_ctx_t ctx;
-    uint16_t create_width;
-    uint16_t create_height;
     uint32_t max_buf_size; /*Size of the ARGB image buffer until it's not longer cached and read in region*/
     struct Lottie_Animation_S * cache;
     const void * create_src;

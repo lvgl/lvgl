@@ -298,7 +298,7 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
     }
     else {
         lv_img_header_t header;
-        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
+        lv_res_t res = lv_img_cache_query(dsc->bg_img_src, &header, NULL);
         if(res != LV_RES_OK) {
             LV_LOG_WARN("Couldn't read the background image");
             return;

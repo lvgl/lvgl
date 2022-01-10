@@ -55,6 +55,16 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_src_uri_t * src, lv_colo
                                            lv_img_dec_ctx_t * dec_ctx);
 
 /**
+ * Query the image decoder interface to find a decoder that's able to open the given source and extract the
+ * image metadata. The decoder will stay in the cache.
+ * @param src       source of the image.
+ * @param header    On output will be filled with the image native dimension
+ * @param dec_ctx   Optional decoder initialization context. Can be NULL
+ * @return LV_RES_OK if a decoder was able to open the image
+ */
+lv_res_t lv_img_cache_query(const lv_img_src_uri_t * src, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx);
+
+/**
  * Set the number of images to be cached.
  * More cached images mean more opened image at same time which might mean more memory usage.
  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.

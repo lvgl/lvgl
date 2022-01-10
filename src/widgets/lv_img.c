@@ -112,13 +112,7 @@ void lv_img_set_src_file(lv_obj_t * obj, const char * file_path)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_img_t * img = (lv_img_t*)obj;
-    free_src(&img->src);
-
-    img->src.type = LV_IMG_SRC_FILE;
-    if (alloc_str_src(&img->src, file_path) == LV_RES_INV)
-        return;
-
-    img->src.ext = strrchr(img->src.uri, '.');
+    lv_img_src_uri_file(&img->src, file_path);
 
     accept_src(img);
 }
@@ -128,11 +122,7 @@ void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_img_t * img = (lv_img_t*)obj;
-    free_src(&img->src);
-
-    img->src.type = LV_IMG_SRC_VARIABLE;
-    img->src.uri = data;
-    img->src.uri_len = len;
+    lv_img_src_uri_data(&img->src, data, len);
 
     accept_src(img);
 }
@@ -142,11 +132,7 @@ void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_img_t * img = (lv_img_t*)obj;
-    free_src(&img->src);
-
-    img->src.type = LV_IMG_SRC_SYMBOL;
-    if (alloc_str_src(&img->src, symbol) == LV_RES_INV)
-        return;
+    lv_img_src_uri_symbol(&img->src, symbol);
 
     accept_src(img);
 }
@@ -155,6 +141,7 @@ void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
 void lv_img_set_src(lv_obj_t * obj, const void * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t*)obj;
 
     lv_obj_invalidate(obj);
 
@@ -163,35 +150,8 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
        2. Prevent using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
        3. Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
     */
-    lv_img_src_t src_type = lv_img_src_get_type(src);
-    lv_img_t * img = (lv_img_t *)obj;
-
-    switch(src_type) {
-        case LV_IMG_SRC_FILE:
-#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");
-#endif
-            lv_img_set_src_file(obj, src);
-            break;
-        case LV_IMG_SRC_VARIABLE:
-            {
-#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
-                LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
-#endif
-                lv_img_dsc_t * id = (lv_img_dsc_t*) src; /*This might break if given any raw data here*/
-                lv_img_set_src_data(obj, (const uint8_t*)src, id->data_size);
-            }
-            break;
-        case LV_IMG_SRC_SYMBOL:
-#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found");
-#endif
-            lv_img_set_src_symbol(obj, src);
-            break;
-        default:
-            LV_LOG_WARN("lv_img_set_src: unknown image type");
-            free_src(&img->src);
-            return;
+    if (lv_img_src_uri_parse(&img->src, src) == LV_RES_OK) {
+        accept_src(img);
     }
 }
 
@@ -426,24 +386,7 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void free_src(lv_img_src_uri_t * src) {
-    if(src->type == LV_IMG_SRC_SYMBOL || src->type == LV_IMG_SRC_FILE) {
-        lv_mem_free((void *)src->uri);
-    }
-    lv_memset_00(src, sizeof(*src));
-}
 
-static lv_res_t alloc_str_src(lv_img_src_uri_t * src, const char * str)
-{
-    src->uri_len = strlen(str);
-    char * new_str = lv_mem_alloc(src->uri_len + 1);
-    LV_ASSERT_MALLOC(new_str);
-    if(new_str == NULL) return LV_RES_INV;
-
-    strcpy(new_str, str);
-    src->uri = new_str;
-    return LV_RES_OK;
-}
 
 static lv_res_t accept_src(lv_img_t * img)
 {
@@ -534,7 +477,7 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_img_t * img = (lv_img_t *)obj;
-    free_src(&img->src);
+    lv_img_src_uri_free(&img->src);
     if(img->task) {
         lv_timer_del(img->task);
         img->task = NULL;

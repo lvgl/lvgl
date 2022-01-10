@@ -33,9 +33,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_IMG_CACHE_DEF_SIZE
-    static bool lv_img_cache_match(const void * src1, const void * src2);
-#endif
+//#if LV_IMG_CACHE_DEF_SIZE
+    static bool lv_img_cache_match(const lv_img_src_uri_t * src1, const lv_img_src_uri_t * src2);
+//#endif
+static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx, _lv_img_cache_entry_t ** out);
 
 /**********************
  *  STATIC VARIABLES
@@ -48,9 +49,48 @@
  *      MACROS
  **********************/
 
+
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+lv_res_t lv_img_cache_query(const lv_img_src_uri_t * src, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx)
+{
+    _lv_img_cache_entry_t * cached_src = NULL;
+    if (find_entry(src, NULL, dec_ctx, &cached_src)) {
+        lv_memcpy(header, &cached_src->dec_dsc.header, sizeof(*header));
+        return LV_RES_OK;
+    }
+    if (!cached_src) return LV_RES_INV;
+
+
+     /*Open the image and measure the time to open*/
+    uint32_t t_start  = lv_tick_get();
+    cached_src->dec_dsc.src = src;
+    cached_src->dec_dsc.color.full = 0;
+    cached_src->dec_dsc.size_hint.x = LV_SIZE_CONTENT;
+    cached_src->dec_dsc.size_hint.y = LV_SIZE_CONTENT;
+    cached_src->dec_dsc.dec_ctx = dec_ctx;
+    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, 0);
+    if(open_res == LV_RES_INV) {
+        LV_LOG_WARN("Image draw cannot open the image resource");
+        lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
+        cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use*/
+        return LV_RES_INV;
+    }
+
+    cached_src->life = 0;
+
+    /*If `time_to_open` was not set in the open function set it here*/
+    if(cached_src->dec_dsc.time_to_open == 0) {
+        cached_src->dec_dsc.time_to_open = lv_tick_elaps(t_start);
+    }
+
+    if(cached_src->dec_dsc.time_to_open == 0) cached_src->dec_dsc.time_to_open = 1;
+    return LV_RES_OK;
+}
+
 
 /**
  * Open an image using the image decoder interface and cache it.
@@ -64,62 +104,12 @@
 _lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_src_uri_t * src, lv_color_t color, lv_point_t size_hint,
                                            lv_img_dec_ctx_t * dec_ctx)
 {
-    /*Is the image cached?*/
     _lv_img_cache_entry_t * cached_src = NULL;
-
-#if LV_IMG_CACHE_DEF_SIZE
-    if(entry_cnt == 0) {
-        LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
-        return NULL;
+    if (find_entry(src, &color, dec_ctx, &cached_src)) {
+        return cached_src;
     }
+    if (!cached_src) return NULL;
 
-    _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
-
-    /*Decrement all lifes. Make the entries older*/
-    uint16_t i;
-    for(i = 0; i < entry_cnt; i++) {
-        if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
-            cache[i].life -= LV_IMG_CACHE_AGING;
-        }
-    }
-
-    for(i = 0; i < entry_cnt; i++) {
-        if(color.full == cache[i].dec_dsc.color.full &&
-           dec_ctx == cache[i].dec_dsc.dec_ctx &&
-           lv_img_cache_match(src, cache[i].dec_dsc.src)) {
-            /*If opened increment its life.
-             *Image difficult to open should live longer to keep avoid frequent their recaching.
-             *Therefore increase `life` with `time_to_open`*/
-            cached_src = &cache[i];
-            cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
-            if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
-            LV_LOG_TRACE("image source found in the cache");
-            break;
-        }
-    }
-
-    /*The image is not cached then cache it now*/
-    if(cached_src) return cached_src;
-
-    /*Find an entry to reuse. Select the entry with the least life*/
-    cached_src = &cache[0];
-    for(i = 1; i < entry_cnt; i++) {
-        if(cache[i].life < cached_src->life) {
-            cached_src = &cache[i];
-        }
-    }
-
-    /*Close the decoder to reuse if it was opened (has a valid source)*/
-    if(cached_src->dec_dsc.src) {
-        lv_img_decoder_close(&cached_src->dec_dsc);
-        LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
-    }
-    else {
-        LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
-    }
-#else
-    cached_src = &LV_GC_ROOT(_lv_img_cache_single);
-#endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
     cached_src->dec_dsc.src = src;
@@ -206,10 +196,79 @@ void lv_img_cache_invalidate_src(const lv_img_src_uri_t * src)
  *   STATIC FUNCTIONS
  **********************/
 
+static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx, _lv_img_cache_entry_t ** out)
+{
+    /*Is the image cached?*/
+    _lv_img_cache_entry_t * cached_src = NULL;
+
 #if LV_IMG_CACHE_DEF_SIZE
+    if(entry_cnt == 0) {
+        LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
+        return false;
+    }
+
+    _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+
+    /*Decrement all lifes. Make the entries older*/
+    uint16_t i;
+    for(i = 0; i < entry_cnt; i++) {
+        if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
+            cache[i].life -= LV_IMG_CACHE_AGING;
+        }
+    }
+
+    for(i = 0; i < entry_cnt; i++) {
+        if(((color != NULL && color->full == cache[i].dec_dsc.color.full) || !color) &&
+           ((dec_ctx != NULL && dec_ctx == cache[i].dec_dsc.dec_ctx) || !dec_ctx) &&
+           lv_img_cache_match(src, cache[i].dec_dsc.src)) {
+            /*If opened increment its life.
+             *Image difficult to open should live longer to keep avoid frequent their recaching.
+             *Therefore increase `life` with `time_to_open`*/
+            cached_src = &cache[i];
+            cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
+            if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
+            LV_LOG_TRACE("image source found in the cache");
+            break;
+        }
+    }
+
+    /*The image is not cached then cache it now*/
+    if(cached_src) {
+        *out = cached_src;
+        return true;
+    }
+
+    /*Find an entry to reuse. Select the entry with the least life*/
+    cached_src = &cache[0];
+    for(i = 1; i < entry_cnt; i++) {
+        if(cache[i].life < cached_src->life) {
+            cached_src = &cache[i];
+        }
+    }
+
+    /*Close the decoder to reuse if it was opened (has a valid source)*/
+    if(cached_src->dec_dsc.src) {
+        lv_img_decoder_close(&cached_src->dec_dsc);
+        LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
+    }
+    else {
+        LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
+    }
+#else
+    cached_src = &LV_GC_ROOT(_lv_img_cache_single);
+#endif
+    *out = cached_src;
+    if (lv_img_cache_match(src, cached_src->dec_dsc.src))
+        return true;
+    return false;
+}
+
+
+//#if LV_IMG_CACHE_DEF_SIZE
 static bool lv_img_cache_match(const lv_img_src_uri_t * src1, const lv_img_src_uri_t * src2)
 {
     if(src1 == src2) return true; /* Fastlane first*/
+    if(!src1 || !src2) return false;
     if(src1->type != src2->type)
         return false;
     if(src1->type == LV_IMG_SRC_VARIABLE && (src1->uri != src2->uri || src1->uri_len != src2->uri_len))
@@ -218,4 +277,4 @@ static bool lv_img_cache_match(const lv_img_src_uri_t * src1, const lv_img_src_u
         return strcmp(src1->uri, src2->uri) == 0;
     return false;
 }
-#endif
+//#endif

@@ -162,9 +162,10 @@ void _lv_img_decoder_init(void);
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src       the image source.
  * @param header    Will be filled with the capabilities for the selected decoder
+ * @param dsc       Likely NULL. Use this to pass decoder specific information
  * @return LV_RES_OK if the header was filled
  */
-lv_res_t lv_img_decoder_get_info(const lv_img_src_uri_t * src, lv_img_header_t * header);
+lv_res_t lv_img_decoder_get_info(const lv_img_src_uri_t * src, lv_img_header_t * header, const lv_img_decoder_dsc_t * dsc);
 
 
 /**
@@ -180,13 +181,7 @@ lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_uri_t * src, uint8_t *
  * Open an image.
  * Try the created image decoder one by one. Once one is able to open the image that decoder is save in `dsc`
  * @param dsc describe a decoding session. Simply a pointer to an `lv_img_decoder_dsc_t` variable.
- * @param src the image source. Can be
- *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_add_drv()`)
- *  2) Variable: Pointer to an `lv_img_dsc_t` variable
- *  3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param color The color of the image with `LV_IMG_CF_ALPHA_...`
- * @param size_hint If provided, contains the user requested size for the output image
- * @param dec_ctx A context to configure the decoder. Can be NULL for default behavior.
+ * @param flags Likely 0. If LV_IMG_DEC_ONLYMETA, skip context alloc and extract only image size and color format
  * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
  *         LV_RES_INV: none of the registered image decoders were able to open the image.
  */

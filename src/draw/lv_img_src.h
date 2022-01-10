@@ -54,6 +54,61 @@ typedef struct {
 } lv_img_src_uri_t;
 
 
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**
+ * Get the type of an image source
+ * @param src pointer to an image source:
+ *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
+ *  - a path to a file (e.g. "S:/folder/image.bin")
+ *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
+ * @deprecated This function has many limitations and is inefficient. Use lv_img_src_uri_file/data/symbol instead
+ *              It forces to add a LVGL image header on raw encoded image data while there's already such header in the encoded data
+ *              It prevents using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
+ *              Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
+ */
+lv_img_src_t lv_img_src_get_type(const void * src);
+
+/** Build a source descriptor from the old void * format.
+ *  @param uri  On output, will be filled with the decoded src
+ *  @param src  The src format to parse
+ *  @return LV_RES_OK if parsing was possible, LV_RES_INV else.
+ *  @warning This does not mean that a source can be actually decoded, only that the parsing
+ *           succeeded. The function will accept a lot of invalid data to be understood as a source, so
+ *           beware of the output.
+ *  @deprecated This function is deprecated. If your code is still using it, consider
+ *              upgrading to the lv_img_src_uri_t format instead.
+ */
+lv_res_t lv_img_src_uri_parse(lv_img_src_uri_t * uri, const void * src);
+
+/** Free a source descriptor.
+ *  Only to be called if allocated via lv_img_src_uri_parse
+ *  @param src  The src format to free
+ */
+void lv_img_src_uri_free(lv_img_src_uri_t * src);
+
+/** Set the source of the descriptor to a text with any symbol in it
+ *  @param src  The src descriptor to fill
+ *  @param symbol An textual strings with symbols
+*/
+void lv_img_src_uri_symbol(lv_img_src_uri_t * obj, const char * symbol);
+/** Set the source of the descriptor to a byte array containing the image encoded data
+ *  @param src  The src descriptor to fill
+ *  @param data A pointer to the image's data
+ *  @param len  The length pointed by data in bytes
+*/
+void lv_img_src_uri_data(lv_img_src_uri_t * obj, const uint8_t * data, const size_t len);
+/** Set the source of the descriptor to a file
+ *  @param src  The src descriptor to fill
+ *  @param path Path to the file containing the image
+ */
+void lv_img_src_uri_file(lv_img_src_uri_t * obj, const char * file_path);
+
+
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
