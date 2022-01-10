@@ -33,7 +33,7 @@ The [Get started](/get-started/index.html) section contains many platform specif
 
 ### Demos and Examples
 
-The `lvgl` folder also contains an `examples` and a `demos` folder. If you needed to add the source files manually to your project, you can do the same the source files of these two folders too. `make` and `CMake` handles the examples and demos, so there is no extra action required in these cases.
+The `lvgl` folder also contains an `examples` and a `demos` folder. If you needed to add the source files manually to your project, you can do the same with the source files of these two folders too. `make` and `CMake` handles the examples and demos, so no extra action required in these cases.
 
 ## Configuration file
 
@@ -46,7 +46,7 @@ To get `lv_conf.h` **copy lvgl/lv_conf_template.h** next to the `lvgl` directory
 |-other files and folders
 ```
 
-Comments in the config file explain the meaning of the options. Be sure to set at least `LV_COLOR_DEPTH` according to your display's color depth. Note that, the examples and demos explicitly need to be enabled in `lv_conf.h`.**
+Comments in the config file explain the meaning of the options. Be sure to set at least `LV_COLOR_DEPTH` according to your display's color depth. Note that, the examples and demos explicitly need to be enabled in `lv_conf.h`.
 
 Alternatively, `lv_conf.h` can be copied to another place but then you should add the `LV_CONF_INCLUDE_SIMPLE` define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the include path manually (e.g. `-I../include/gui`). 
 In this case LVGL will attempt to include `lv_conf.h` simply with `#include "lv_conf.h"`.
