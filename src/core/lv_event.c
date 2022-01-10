@@ -419,6 +419,7 @@ static lv_res_t event_send_core(lv_event_t * e)
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
         if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, e->code);
+        if(e->deleted) return LV_RES_INV;
     }
 
     lv_res_t res = LV_RES_OK;
