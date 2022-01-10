@@ -17,15 +17,6 @@
  *      DEFINES
  *********************/
 
-/**
- * "free" is used as a function pointer (in lv_fs_drv_t).
- * We must make sure "free" was not defined to a platform specific
- * free function, otherwise compilation would fail.
- */
-#ifdef free
-    #undef free
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -138,7 +129,6 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t btr, uint32_t * br)
 {
     lv_fs_res_t res = LV_FS_RES_OK;
-    LV_LOG_USER("====== file_position");
     uint32_t file_position = file_p->cache->file_position;
     uint32_t start = file_p->cache->start;
     uint32_t end = file_p->cache->end;

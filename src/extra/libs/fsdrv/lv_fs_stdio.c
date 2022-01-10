@@ -72,6 +72,8 @@ void lv_fs_stdio_init(void)
     fs_drv.write_cb = fs_write;
     fs_drv.seek_cb = fs_seek;
     fs_drv.tell_cb = fs_tell;
+    fs_drv.enable_cache = 1;
+    fs_drv.cache_size = 0;
 
     fs_drv.dir_close_cb = fs_dir_close;
     fs_drv.dir_open_cb = fs_dir_open;
@@ -101,16 +103,12 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == LV_FS_MODE_RD) flags = "rb";
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = "rb+";
 
-#ifdef LV_FS_STDIO_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
 
     char buf[256];
     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
 
     return fopen(buf, flags);
-#else
-    return fopen(path, flags);
-#endif
 }
 
 /**
@@ -204,25 +202,17 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
 #ifndef WIN32
-# ifdef LV_FS_STDIO_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_STDIO_PATH "%s", path);
     return opendir(buf);
-# else
-    return opendir(path);
-# endif
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-# ifdef LV_FS_STDIO_PATH
     sprintf(buf, LV_FS_STDIO_PATH "%s\\*", path);
-# else
-    sprintf(buf, "%s\\*", path);
-# endif
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
@@ -312,4 +302,11 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     return LV_FS_RES_OK;
 }
 
-#endif /*LV_USE_FS_STDIO*/
+#else /*LV_USE_FS_STDIO == 0*/
+
+    #if defined(LV_FS_STDIO_LETTER) && LV_FS_STDIO_LETTER != '\0'
+        #warning "LV_USE_FS_STDIO is not enabled but LV_FS_STDIO_LETTER is set"
+    #endif
+
+#endif /*LV_USE_FS_POSIX*/
+

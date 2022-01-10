@@ -208,19 +208,13 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
         desired_access |= GENERIC_WRITE;
     }
 
-#ifdef LV_FS_WIN32_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
 
     char buf[MAX_PATH];
     sprintf(buf, LV_FS_WIN32_PATH "%s", path);
-#endif
 
     return (void *)CreateFileA(
-#ifdef LV_FS_WIN32_PATH
                buf,
-#else
-               path,
-#endif
                desired_access,
                FILE_SHARE_READ,
                NULL,
@@ -449,4 +443,10 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
            : fs_error_from_win32(GetLastError());
 }
 
-#endif /*LV_USE_FS_WIN32*/
+#else /*LV_USE_FS_WIN32 == 0*/
+
+    #if defined(LV_FS_WIN32_LETTER) && LV_FS_WIN32_LETTER != '\0'
+        #warning "LV_USE_FS_WIN32 is not enabled but LV_FS_WIN32_LETTER is set"
+    #endif
+
+#endif
