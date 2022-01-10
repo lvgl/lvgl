@@ -35,7 +35,7 @@ typedef struct lv_fragment_class_t lv_fragment_class_t;
 /**
  * Opaque pointer for internal state management
  */
-typedef struct _lv_fragment_managed_states_t  {
+typedef struct lv_fragment_managed_states_t  {
     /**
      * Class of the fragment
      */
@@ -68,7 +68,7 @@ typedef struct _lv_fragment_managed_states_t  {
     /**
      * Internal pointer, DON'T TOUCH
      */
-    struct _lv_fragment_managed_states_t * prev;
+    struct lv_fragment_managed_states_t * prev;
 } lv_fragment_managed_states_t;
 
 struct lv_fragment_t {
