@@ -69,7 +69,6 @@ typedef enum {
 
 typedef struct _lv_fs_drv_t {
     char letter;
-    bool enable_cache;
     uint16_t cache_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
