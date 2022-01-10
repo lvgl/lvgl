@@ -24,7 +24,7 @@ See the [Button](/widgets/core/btn)'s and [Label](/widgets/core/label)'s documen
 The text starts to scroll horizontally if its too long.
 
 ### Texts
-`lv_list_add_text(list, icon, text)` adds a text.
+`lv_list_add_text(list, text)` adds a text.
 
 
 ## Events
