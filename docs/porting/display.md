@@ -101,8 +101,6 @@ There are some optional display driver data fields:
 - `user_data` A custom `void` user data for the driver.
 - `full_refresh` always redrawn the whole screen (see above)
 - `direct_mode` drive directly into the frame buffer (see above)
-- `user_data` A custom `void `user data for the driver..
-
 
 Some other optional callbacks to make it easier and more optimal to work with monochrome, grayscale or other non-standard RGB displays:
 - `rounder_cb` Round the coordinates of areas to redraw. E.g. a 2x2 px can be converted to 2x8.
