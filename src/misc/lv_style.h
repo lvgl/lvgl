@@ -118,6 +118,24 @@ enum {
 
 typedef uint8_t lv_dither_mode_t;
 
+/** A gradient stop definition.
+ *  This matches a color and a position in a virtual 0-255 scale.
+ */
+typedef struct {
+    lv_color_t color;   /**< The stop color */
+    uint8_t    frac;    /**< The stop position in 1/255 unit */
+} lv_gradient_stop_t;
+
+/** A descriptor of a gradient. */
+typedef struct {
+    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS]; /**< A gradient stop array */
+    uint8_t              stops_count;                  /**< The number of used stops in the array */
+    lv_grad_dir_t        dir : 3;                      /**< The gradient direction.
+                                                        * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
+    lv_dither_mode_t     dither : 3;                   /**< Whether to dither the gradient or not.
+                                                        * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
+} lv_gradient_t;
+
 /**
  * A common type to handle all the property types in the same way.
  */
@@ -167,15 +185,16 @@ typedef enum {
     LV_STYLE_BG_GRAD_DIR             = 35,
     LV_STYLE_BG_MAIN_STOP            = 36,
     LV_STYLE_BG_GRAD_STOP            = 37,
-    LV_STYLE_BG_DITHER_MODE          = 38,
+    LV_STYLE_BG_GRADIENT             = 38,
+    LV_STYLE_BG_DITHER_MODE          = 39,
 
 
-    LV_STYLE_BG_IMG_SRC              = 39 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_BG_IMG_OPA              = 40,
-    LV_STYLE_BG_IMG_RECOLOR          = 41,
-    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 41 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_IMG_RECOLOR_OPA      = 42,
-    LV_STYLE_BG_IMG_TILED            = 43,
+    LV_STYLE_BG_IMG_SRC              = 40 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_BG_IMG_OPA              = 41,
+    LV_STYLE_BG_IMG_RECOLOR          = 42,
+    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 42 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_BG_IMG_RECOLOR_OPA      = 43,
+    LV_STYLE_BG_IMG_TILED            = 44,
 
     /*Group 3*/
     LV_STYLE_BORDER_COLOR            = 48,

@@ -129,6 +129,10 @@
     *The increase in memory consumption is (24 bits * object's width)*/
     #define LV_DITHER_ERROR_DIFFUSION 1
 
+    /**Number of stops allowed per gradient. Increase this to allow more stops.
+    *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
+    #define LV_GRADIENT_MAX_STOPS    2
+
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.

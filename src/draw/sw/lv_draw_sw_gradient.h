@@ -20,11 +20,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/** Currently, only 2 stops are allowed per gradient. Increase this to allow more stops.
- *  This adds (sizeof(lv_color_t) + 1) bytes per additional stop
- */
-#define LV_GRADIENT_MAX_STOPS    2
-
 #if LV_GRADIENT_MAX_STOPS < 2
 #error LVGL needs at least 2 stops for gradients. Please increase the LV_GRADIENT_MAX_STOPS
 #endif
@@ -33,23 +28,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/** A gradient stop definition.
- *  This matches a color and a position in a virtual 0-255 scale. */
-typedef struct {
-    lv_color_t color;   /**< The stop color */
-    uint8_t    frac;    /**< The stop position in 1/255 unit */
-} lv_gradient_stop_t;
-
-/** A descriptor of a gradient. */
-typedef struct {
-    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS]; /**< A gradient stop array */
-    uint8_t              stops_count;                  /**< The number of used stops in the array */
-    lv_grad_dir_t        dir : 3;                      /**< The gradient direction.
-                                                        * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
-    lv_dither_mode_t     dither : 3;                   /**< Whether to dither the gradient or not.
-                                                        * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
-} lv_gradient_t;
-
 #if _DITHER_GRADIENT
 typedef lv_color32_t lv_grad_color_t;
 #else
