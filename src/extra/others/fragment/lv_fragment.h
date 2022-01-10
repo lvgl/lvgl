@@ -150,7 +150,7 @@ typedef struct lv_fragment_managed_states_t  {
      */
     lv_fragment_t * instance;
     /**
-     * This is true between `create_obj_cb` and `obj_deleted_cb`.
+     * true between `create_obj_cb` and `obj_deleted_cb`
      */
     bool obj_created;
     /**
@@ -161,6 +161,9 @@ typedef struct lv_fragment_managed_states_t  {
      * true if this fragment is a msgbox fragment
      */
     bool is_msgbox;
+    /**
+     * true if this fragment is in navigation stack that can be popped
+     */
     bool in_stack;
     /**
      * Internal pointer, DON'T TOUCH
