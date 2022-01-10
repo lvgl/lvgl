@@ -2032,13 +2032,13 @@
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-#ifndef LV_DEMO_WIDGETS_SLIDESHOW
-    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-    #else
-        #define LV_DEMO_WIDGETS_SLIDESHOW  0
+    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
+        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #else
+            #define LV_DEMO_WIDGETS_SLIDESHOW  0
+        #endif
     #endif
-#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2077,41 +2077,41 @@
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
-#ifndef LV_DEMO_MUSIC_SQUARE
-    #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-        #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-    #else
-        #define LV_DEMO_MUSIC_SQUARE       0
+    #ifndef LV_DEMO_MUSIC_SQUARE
+        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+        #else
+            #define LV_DEMO_MUSIC_SQUARE       0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LANDSCAPE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-        #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-    #else
-        #define LV_DEMO_MUSIC_LANDSCAPE    0
+    #ifndef LV_DEMO_MUSIC_LANDSCAPE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #else
+            #define LV_DEMO_MUSIC_LANDSCAPE    0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_ROUND
-    #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-        #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-    #else
-        #define LV_DEMO_MUSIC_ROUND        0
+    #ifndef LV_DEMO_MUSIC_ROUND
+        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+        #else
+            #define LV_DEMO_MUSIC_ROUND        0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LARGE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-        #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-    #else
-        #define LV_DEMO_MUSIC_LARGE        0
+    #ifndef LV_DEMO_MUSIC_LARGE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+        #else
+            #define LV_DEMO_MUSIC_LARGE        0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_AUTO_PLAY
-    #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-        #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-    #else
-        #define LV_DEMO_MUSIC_AUTO_PLAY    0
+    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
+        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #else
+            #define LV_DEMO_MUSIC_AUTO_PLAY    0
+        #endif
     #endif
-#endif
 #endif
 
 
@@ -2124,7 +2124,21 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
 #undef _LV_KCONFIG_PRESENT
 
-/*If running without lv_conf.h add typdesf with default value*/
+
+/*Set some defines if a dependecy is disabled*/
+#if LV_USE_LOG == 0
+    #define LV_LOG_TRACE_MEM        0
+    #define LV_LOG_TRACE_TIMER      0
+    #define LV_LOG_TRACE_INDEV      0
+    #define LV_LOG_TRACE_DISP_REFR  0
+    #define LV_LOG_TRACE_EVENT      0
+    #define LV_LOG_TRACE_OBJ_CREATE 0
+    #define LV_LOG_TRACE_LAYOUT     0
+    #define LV_LOG_TRACE_ANIM       0
+#endif  /*LV_USE_LOG*/
+
+
+/*If running without lv_conf.h add typedefs with default value*/
 #ifdef LV_CONF_SKIP
     #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
         #define _CRT_SECURE_NO_WARNINGS

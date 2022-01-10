@@ -51,6 +51,12 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 #define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
 #endif
 
+/** On simple system, don't waste resources on gradients */
+#if !defined(LV_DRAW_COMPLEX) || !defined(LV_GRADIENT_MAX_STOPS)
+#define LV_GRADIENT_MAX_STOPS 2
+#endif
+
+
 /**********************
  *      TYPEDEFS
  **********************/

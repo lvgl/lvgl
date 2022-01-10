@@ -6,7 +6,7 @@ CSRCS += lv_draw_sw_letter.c
 CSRCS += lv_draw_sw_line.c
 CSRCS += lv_draw_sw_rect.c
 CSRCS += lv_draw_sw_polygon.c
-CSRCS += lv_draw_sw_mask.c
+CSRCS += lv_draw_sw_gradient.c
 CSRCS += lv_draw_sw_dither.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sw
