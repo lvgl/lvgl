@@ -35,7 +35,17 @@ typedef struct lv_fragment_class_t lv_fragment_class_t;
 /**
  * Opaque pointer for internal state management
  */
-typedef struct internal_states_t internal_states_t;
+typedef struct _lv_fragment_managed_states_t  {
+    const lv_fragment_class_t * cls;
+    lv_fragment_manager_t * manager;
+    lv_obj_t * const * container;
+    lv_fragment_t * instance;
+    bool obj_created;
+    bool destroying_obj;
+    bool is_msgbox;
+    bool in_stack;
+    struct _lv_fragment_managed_states_t * prev;
+} lv_fragment_managed_states_t;
 
 struct lv_fragment_t {
     /**
@@ -43,9 +53,11 @@ struct lv_fragment_t {
      */
     const lv_fragment_class_t * cls;
     /**
-     * Manager this fragment instance belongs to
+     * Managed fragment states. If not null, then this fragment is managed.
+     *
+     * @warning Don't modify values inside this struct!
      */
-    lv_fragment_manager_t * manager;
+    lv_fragment_managed_states_t * managed;
     /**
      * Child fragment manager
      */
@@ -55,10 +67,6 @@ struct lv_fragment_t {
      */
     lv_obj_t * obj;
 
-    /**
-     * Private internal states
-     */
-    internal_states_t * _states;
 };
 
 struct lv_fragment_class_t {
@@ -250,6 +258,8 @@ void lv_fragment_remove_self(lv_fragment_t * fragment);
 
 lv_obj_t * const * lv_fragment_get_container(lv_fragment_t * fragment);
 
+lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment);
+
 /**
  * Create object by fragment.
  *
@@ -264,6 +274,8 @@ void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container);
  * @param fragment Fragment instance.
  */
 void lv_fragment_del_obj(lv_fragment_t * fragment);
+
+void lv_fragment_recreate_obj(lv_fragment_t * fragment);
 
 
 /**********************

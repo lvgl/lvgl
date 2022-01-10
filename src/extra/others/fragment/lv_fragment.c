@@ -8,7 +8,6 @@
  *********************/
 
 #include "lv_fragment.h"
-#include "lv_fragment_priv.h"
 
 #if LV_USE_FRAGMENT
 
@@ -46,15 +45,22 @@ void lv_fragment_del(lv_fragment_t * fragment)
 void lv_fragment_remove_self(lv_fragment_t * fragment)
 {
     LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->manager);
-    lv_fragment_manager_remove(fragment->manager, fragment);
+    LV_ASSERT_NULL(fragment->managed);
+    lv_fragment_manager_remove(fragment->managed->manager, fragment);
 }
 
 lv_obj_t * const * lv_fragment_get_container(lv_fragment_t * fragment)
 {
     LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->manager);
-    return fragment->_states->container;
+    LV_ASSERT_NULL(fragment->managed);
+    return fragment->managed->container;
+}
+
+lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment)
+{
+    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NULL(fragment->managed);
+    return lv_fragment_manager_get_parent(fragment->managed->manager);
 }
 
 void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)
@@ -82,6 +88,13 @@ void lv_fragment_del_obj(lv_fragment_t * fragment)
         cls->obj_deleted_cb(fragment, fragment->obj);
     }
     fragment->obj = NULL;
+}
+
+void lv_fragment_recreate_obj(lv_fragment_t * fragment)
+{
+    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NULL(fragment->managed);
+    lv_fragment_manager_recreate_obj(fragment->managed->manager, fragment);
 }
 
 #endif /*LV_USE_FRAGMENT*/
