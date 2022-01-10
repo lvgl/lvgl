@@ -210,8 +210,8 @@ Support for software rotation is a new feature, so there may be some glitches/bu
 ## Further reading
 
 - [lv_port_disp_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c) for a template for your own driver.
-- [Drawing](../overview/drawing) to learn more about how rendering works in LVGL.
-- [Display features](../overview/display) to learn more about higher level display features.
+- [Drawing](../overview/drawing.md) to learn more about how rendering works in LVGL.
+- [Display features](../overview/display.md) to learn more about higher level display features.
 
 ## API
 
