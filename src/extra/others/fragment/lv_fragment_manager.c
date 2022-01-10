@@ -196,16 +196,16 @@ void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * f
 
 #endif
 
-bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int which, void * data1, void * data2)
+bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int code, void * userdata)
 {
     LV_ASSERT(manager);
     internal_states_t * top = manager->top;
     if(!top) return false;
     lv_fragment_t * instance = top->instance;
     if(!instance) return false;
-    if(lv_fragment_manager_dispatch_event(instance->child_manager, which, data1, data2)) return true;
+    if(lv_fragment_manager_dispatch_event(instance->child_manager, code, userdata)) return true;
     if(!top->cls->event_cb) return false;
-    return top->cls->event_cb(instance, which, data1, data2);
+    return top->cls->event_cb(instance, code, userdata);
 }
 
 size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager)
