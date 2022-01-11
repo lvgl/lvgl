@@ -51,6 +51,12 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 #define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
 #endif
 
+/** On simple system, don't waste resources on gradients */
+#if !defined(LV_DRAW_COMPLEX) || !defined(LV_GRADIENT_MAX_STOPS)
+#define LV_GRADIENT_MAX_STOPS 2
+#endif
+
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -107,6 +113,36 @@ enum {
 typedef uint8_t lv_grad_dir_t;
 
 /**
+ * The dithering algorithm for the gradient
+ * Depends on LV_DITHER_GRADIENT
+ */
+enum {
+    LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/
+    LV_DITHER_ORDERED,  /**< Ordered dithering. Faster to compute and use less memory but lower quality*/
+    LV_DITHER_ERR_DIFF, /**< Error diffusion mode. Slower to compute and use more memory but give highest dither quality*/
+};
+
+typedef uint8_t lv_dither_mode_t;
+
+/** A gradient stop definition.
+ *  This matches a color and a position in a virtual 0-255 scale.
+ */
+typedef struct {
+    lv_color_t color;   /**< The stop color */
+    uint8_t    frac;    /**< The stop position in 1/255 unit */
+} lv_gradient_stop_t;
+
+/** A descriptor of a gradient. */
+typedef struct {
+    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS]; /**< A gradient stop array */
+    uint8_t              stops_count;                  /**< The number of used stops in the array */
+    lv_grad_dir_t        dir : 3;                      /**< The gradient direction.
+                                                        * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
+    lv_dither_mode_t     dither : 3;                   /**< Whether to dither the gradient or not.
+                                                        * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
+} lv_gradient_t;
+
+/**
  * A common type to handle all the property types in the same way.
  */
 typedef union {
@@ -155,13 +191,16 @@ typedef enum {
     LV_STYLE_BG_GRAD_DIR             = 35,
     LV_STYLE_BG_MAIN_STOP            = 36,
     LV_STYLE_BG_GRAD_STOP            = 37,
+    LV_STYLE_BG_GRADIENT             = 38,
+    LV_STYLE_BG_DITHER_MODE          = 39,
 
-    LV_STYLE_BG_IMG_SRC              = 38 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_BG_IMG_OPA              = 39,
-    LV_STYLE_BG_IMG_RECOLOR          = 40,
-    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 40 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_IMG_RECOLOR_OPA      = 41,
-    LV_STYLE_BG_IMG_TILED            = 42,
+
+    LV_STYLE_BG_IMG_SRC              = 40 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_BG_IMG_OPA              = 41,
+    LV_STYLE_BG_IMG_RECOLOR          = 42,
+    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 42 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_BG_IMG_RECOLOR_OPA      = 43,
+    LV_STYLE_BG_IMG_TILED            = 44,
 
     /*Group 3*/
     LV_STYLE_BORDER_COLOR            = 48,

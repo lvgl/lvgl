@@ -28,8 +28,8 @@ extern "C" {
 
 typedef struct {
     const lv_area_t * blend_area;   /**< The area with absolute coordinates to draw on `draw_ctx->buf`
-                                     * will be clipped to draw_`ctx->clip_area` */
-    const lv_color_t * src_buf;     /**< Pointer to an image to blend. If set `fill_color is ignored`*/
+                                     *   will be clipped to `draw_ctx->clip_area` */
+    const lv_color_t * src_buf;     /**< Pointer to an image to blend. If set `fill_color` is ignored */
     lv_color_t color;               /**< Fill color*/
     lv_opa_t * mask_buf;            /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
     lv_draw_mask_res_t mask_res;    /**< The result of the previous mask operation */

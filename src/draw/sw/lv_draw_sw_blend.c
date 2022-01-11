@@ -128,7 +128,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
     lv_coord_t src_stride;
     if(src_buf) {
         src_stride = lv_area_get_width(dsc->blend_area);
-        src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 -  dsc->blend_area->x1);
+        src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 - dsc->blend_area->x1);
     }
     else {
         src_stride = 0;

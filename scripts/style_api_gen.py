@@ -120,6 +120,14 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the point from which the background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
+{'name': 'BG_GRADIENT',
+ 'style_type': 'ptr',   'var_type': 'const lv_gradient_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the gradient definition for the body. The pointed instance must exist while the object is alive. NULL to disable"},
+
+{'name': 'BG_DITHER_MODE',
+ 'style_type': 'num',   'var_type': 'lv_dither_mode_t',  'default':'`LV_DITHER_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the dithering mode of the gradient of the background. The possible values are `LV_DITHER_NONE/ORDERED/ERR_DIFF`."},
+
 {'name': 'BG_IMG_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set a background image. Can be a pointer to `lv_img_dsc_t`, a path to a file or an `LV_SYMBOL_...`"},

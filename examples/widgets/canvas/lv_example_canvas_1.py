@@ -6,9 +6,9 @@ rect_dsc = lv.draw_rect_dsc_t()
 rect_dsc.init()
 rect_dsc.radius = 10
 rect_dsc.bg_opa = lv.OPA.COVER
-rect_dsc.bg_grad_dir = lv.GRAD_DIR.HOR
-rect_dsc.bg_color = lv.palette_main(lv.PALETTE.RED)
-rect_dsc.bg_grad_color = lv.palette_main(lv.PALETTE.BLUE)
+rect_dsc.bg_grad.dir = lv.GRAD_DIR.HOR
+rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.RED)
+rect_dsc.bg_grad.stops[1].color = lv.palette_main(lv.PALETTE.BLUE)
 rect_dsc.border_width = 2
 rect_dsc.border_opa = lv.OPA._90
 rect_dsc.border_color = lv.color_white()
