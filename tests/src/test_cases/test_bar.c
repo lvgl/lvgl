@@ -67,7 +67,8 @@ void test_bar_indicator_width_should_track_bar_value(void)
     sides_padding = lv_obj_get_style_pad_left(bar, LV_PART_MAIN);
     sides_padding += lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
 
-    expected_width = bar_value * (bar_width - sides_padding) / bar_max_value;
+    /* Width calculation considers the start and end pixel too */
+    expected_width = 1 + (bar_value * (bar_width - sides_padding) / bar_max_value);
 
     actual_width = lv_area_get_width(&bar_ptr->indic_area);
     TEST_ASSERT_EQUAL_INT32(expected_width, actual_width);
