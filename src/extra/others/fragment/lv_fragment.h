@@ -158,10 +158,6 @@ typedef struct lv_fragment_managed_states_t  {
      */
     bool destroying_obj;
     /**
-     * true if this fragment is a msgbox fragment
-     */
-    bool is_msgbox;
-    /**
      * true if this fragment is in navigation stack that can be popped
      */
     bool in_stack;
@@ -231,14 +227,6 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t 
  * @param fragment Fragment instance
  */
 void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
-
-/**
- * Show lv_msgbox
- * @param manager Fragment manager instance
- * @param cls Fragment class which must return valid lv_msgbox instance
- * @param args Arguments assigned by fragment manager
- */
-void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
 
 /**
  * Send event to top-most fragment
@@ -318,8 +306,9 @@ lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment);
  *
  * @param fragment Fragment instance.
  * @param container Container of the objects should be created upon.
+ * @return Created object
  */
-void lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container);
+lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container);
 
 /**
  * Delete created object of a fragment

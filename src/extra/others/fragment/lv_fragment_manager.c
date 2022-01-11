@@ -11,7 +11,6 @@
 
 #if LV_USE_FRAGMENT
 
-#include "../../../extra/widgets/msgbox/lv_msgbox.h"
 /*********************
  *      DEFINES
  *********************/
@@ -23,7 +22,6 @@
 struct _lv_fragment_manager_t {
     lv_fragment_t * parent;
     lv_fragment_managed_states_t * top;
-    lv_fragment_managed_states_t * msgbox_top;
 };
 
 
@@ -43,12 +41,6 @@ static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * ma
                                                       lv_obj_t * const * container);
 
 static void cb_states_obj_destroyed(lv_event_t * event);
-
-#if LV_USE_MSGBOX
-
-    static void cb_msgbox_delete(lv_event_t * event);
-
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -101,7 +93,7 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
     lv_fragment_managed_states_t * prev = NULL;
     if(states->in_stack) {
         lv_fragment_managed_states_t * next;
-        for(next = states->is_msgbox ? manager->msgbox_top : manager->top; next; next = next->prev) {
+        for(next = manager->top; next; next = next->prev) {
             if(next->prev == states) {
                 break;
             }
@@ -109,10 +101,6 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
         prev = states->prev;
         if(next) {
             next->prev = prev;
-        }
-        else if(states->is_msgbox) {
-            /*Removing top states*/
-            manager->msgbox_top = prev;
         }
         else {
             manager->top = prev;
@@ -163,36 +151,6 @@ void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragme
     item_del_obj(fragment->managed);
     item_create_obj(fragment->managed, NULL);
 }
-
-#if LV_USE_MSGBOX
-
-void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
-{
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT(fragment->managed == NULL);
-    LV_ASSERT_MSG(fragment->cls->obj_will_delete_cb == NULL, "msgbox fragment doesn't support obj_will_delete_cb");
-    lv_fragment_managed_states_t * item = item_new(fragment->cls, manager);
-    item->instance = fragment;
-    fragment->managed = item;
-    if(fragment->cls->attached_cb) {
-        fragment->cls->attached_cb(fragment);
-    }
-    /* Destroy object of previous screen */
-    lv_fragment_managed_states_t * top = manager->msgbox_top;
-    if(top) {
-        item_del_obj(top);
-    }
-    item_create_obj(item, &lv_msgbox_class);
-    lv_obj_add_event_cb(item->instance->obj, cb_msgbox_delete, LV_EVENT_DELETE, item->instance);
-
-    lv_fragment_managed_states_t * states = fragment->managed;
-    states->prev = top;
-    states->in_stack = true;
-    manager->msgbox_top = states;
-}
-
-#endif
 
 bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int code, void * userdata)
 {
@@ -324,23 +282,5 @@ static void cb_states_obj_destroyed(lv_event_t * event)
     lv_fragment_managed_states_t * states = lv_event_get_user_data(event);
     states->obj_created = false;
 }
-
-#if LV_USE_MSGBOX
-
-static void cb_msgbox_delete(lv_event_t * event)
-{
-    lv_fragment_t * instance = lv_event_get_user_data(event);
-    lv_fragment_managed_states_t * states = instance->managed;
-    if(states->destroying_obj) {
-        return;
-    }
-    if(instance->cls->obj_deleted_cb) {
-        instance->cls->obj_deleted_cb(instance, lv_event_get_current_target(event));
-    }
-    item_del_fragment(states);
-    lv_mem_free(states);
-}
-
-#endif /*LV_USE_MSGBOX*/
 
 #endif /*LV_USE_FRAGMENT*/
