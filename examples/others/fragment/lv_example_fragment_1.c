@@ -24,8 +24,9 @@ static const lv_fragment_class_t sample_cls = {
 void lv_example_fragment_1() {
     lv_obj_t *root = lv_obj_create(lv_scr_act());
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
-    lv_fragment_manager_t *manager = lv_fragment_manager_create(root, NULL);
-    lv_fragment_manager_replace(manager, &sample_cls, "Fragment");
+    lv_fragment_manager_t *manager = lv_fragment_manager_create(NULL);
+    lv_fragment_t *fragment = lv_fragment_create(&sample_cls, "Fragment");
+    lv_fragment_manager_replace(manager, fragment, &root);
 }
 
 

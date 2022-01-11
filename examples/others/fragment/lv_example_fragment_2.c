@@ -28,8 +28,10 @@ static const lv_fragment_class_t sample_cls = {
         .instance_size = sizeof(sample_fragment_t)
 };
 
+static lv_obj_t * root = NULL;
+
 void lv_example_fragment_2() {
-    lv_obj_t *root = lv_obj_create(lv_scr_act());
+    root = lv_obj_create(lv_scr_act());
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
     lv_obj_set_layout(root, LV_LAYOUT_GRID);
     const static lv_coord_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
@@ -49,14 +51,16 @@ void lv_example_fragment_2() {
     lv_obj_set_grid_cell(push_btn, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
     lv_obj_set_grid_cell(pop_btn, LV_GRID_ALIGN_END, 1, 1, LV_GRID_ALIGN_CENTER, 1, 1);
 
-    lv_fragment_manager_t *manager = lv_fragment_manager_create(container, NULL);
-    lv_fragment_manager_replace(manager, &sample_cls, NULL);
+    lv_fragment_manager_t *manager = lv_fragment_manager_create(NULL);
+    lv_fragment_t *fragment = lv_fragment_create(&sample_cls, NULL);
+    lv_fragment_manager_replace(manager, fragment, &root);
     lv_obj_add_event_cb(push_btn, sample_push_click, LV_EVENT_CLICKED, manager);
     lv_obj_add_event_cb(pop_btn, sample_pop_click, LV_EVENT_CLICKED, manager);
 }
 
 
 static void sample_fragment_ctor(lv_fragment_t *self, void *args) {
+    LV_UNUSED(args);
     ((sample_fragment_t *) self)->counter = 0;
 }
 
@@ -80,7 +84,8 @@ static lv_obj_t *sample_fragment_create_obj(lv_fragment_t *self, lv_obj_t *paren
 
 static void sample_push_click(lv_event_t *e) {
     lv_fragment_manager_t *manager = (lv_fragment_manager_t *) lv_event_get_user_data(e);
-    lv_fragment_manager_push(manager, &sample_cls, NULL);
+    lv_fragment_t *fragment = lv_fragment_create(&sample_cls, NULL);
+    lv_fragment_manager_push(manager, fragment, &root);
 }
 
 static void sample_pop_click(lv_event_t *e) {
