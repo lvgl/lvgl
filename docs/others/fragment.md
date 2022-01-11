@@ -5,9 +5,15 @@
 
 # Fragment
 
-This is something like [Fragment on Android](https://developer.android.com/guide/components/fragments)
-or [UiViewController on iOS](https://developer.apple.com/documentation/uikit/uiviewcontroller) - to help developers
-better handles code structure, and object lifecycle.
+Fragment is a concept copied from [Android](https://developer.android.com/guide/components/fragments).
+
+It represents a reusable portion of your app's UI. A fragment defines and manages its own layout, has its own lifecycle,
+and can handle its own events. Like Android's Fragment that must be hosted by an activity or another fragment, Fragment
+in LVGL needs to be hosted by an object, or another fragment. The fragment’s view hierarchy becomes part of, or attaches
+to, the host’s view hierarchy.
+
+Such concept also has some similarities
+to [UiViewController on iOS](https://developer.apple.com/documentation/uikit/uiviewcontroller).
 
 ## Usage
 
@@ -20,7 +26,7 @@ struct sample_fragment_t {
     /* IMPORTANT: don't miss this part */
     lv_fragment_t base;
     /* States, object references and data fields for this fragment */
-    const char *counter;
+    const char *title;
 };
 
 const lv_fragment_class_t sample_cls = {
