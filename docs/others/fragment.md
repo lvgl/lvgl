@@ -5,7 +5,7 @@
 
 # Fragment
 
-Fragment is a concept copied from [Android](https://developer.android.com/guide/components/fragments).
+Fragment is a concept copied from [Android](https://developer.android.com/guide/fragments).
 
 It represents a reusable portion of your app's UI. A fragment defines and manages its own layout, has its own lifecycle,
 and can handle its own events. Like Android's Fragment that must be hosted by an activity or another fragment, Fragment
