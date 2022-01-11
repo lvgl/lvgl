@@ -128,7 +128,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
             h = header->rect.h;
         }
         SDL_IntersectRect(&clip_rect, &coords_rect, &clipped_dst);
-        clipped_src.x = header->rect.x + (clipped_dst.x - coords_rect.x) * w / coords_rect.x;
+        clipped_src.x = header->rect.x + (clipped_dst.x - coords_rect.x) * w / coords_rect.w;
         clipped_src.y = header->rect.y + (clipped_dst.y - coords_rect.y) * h / coords_rect.h;
         clipped_src.w = w - (coords_rect.w - clipped_dst.w) * w / coords_rect.w;
         clipped_src.h = h - (coords_rect.h - clipped_dst.h) * h / coords_rect.h;
