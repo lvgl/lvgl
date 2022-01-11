@@ -12,6 +12,6 @@
    
    snapshot
    monkey
-   controller
+   fragment
 ```
 
