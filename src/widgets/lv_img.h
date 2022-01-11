@@ -63,8 +63,8 @@ typedef struct {
     uint8_t             obj_size_mode: 2; /**< Image size mode if image and object sizes differ */
 
     uint8_t             ctrl;       /**< The current control flags */
-    lv_img_dec_ctx_t *  dec_ctx;    /**< Additional decoder context*/
-    lv_timer_t *        task;       /**< The timer task for animated images */
+    lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context*/
+    lv_timer_t     *    task;       /**< The timer task for animated images */
 } lv_img_t;
 
 
@@ -170,6 +170,14 @@ void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len)
  * @param text      pointer to a null terminated string containing extended chars to render
  */
 void lv_img_set_src_symbol(lv_obj_t * obj, const char * text);
+
+/** Set the source of this image to a lv_img_src_uri_t.
+ * @sa lv_img_set_src
+ *
+ * @param obj       pointer to an image object
+ * @param uri       pointer to an URI object
+ */
+void lv_img_set_src_uri(lv_obj_t * obj, const lv_img_src_uri_t * uri);
 
 
 /**

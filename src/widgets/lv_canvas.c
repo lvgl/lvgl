@@ -74,7 +74,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.data      = buf;
 
 
-    lv_img_set_src_data(obj, &canvas->dsc, canvas->dsc.data_size);
+    lv_img_set_src_data(obj, (const uint8_t *)&canvas->dsc, canvas->dsc.data_size);
 }
 
 void lv_canvas_set_px_color(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t c)
@@ -632,11 +632,12 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_img_src_uri_t * src,
                         const lv_draw_img_dsc_t * draw_dsc)
 {
-    lv_canvas_draw_img_ex(canvas, x, y, src, draw_dsc, NULL);
+    lv_img_dec_dsc_in_t dsc = {.src = src};
+    lv_canvas_draw_img_ex(canvas, x, y, draw_dsc, &dsc);
 }
 
-void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_img_src_uri_t * src,
-                           const lv_draw_img_dsc_t * draw_dsc, const lv_img_decoder_dsc_t * dec_dsc)
+void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y,
+                           const lv_draw_img_dsc_t * draw_dsc, const lv_img_dec_dsc_in_t * dec_dsc)
 
 {
     LV_ASSERT_OBJ(canvas, MY_CLASS);
@@ -648,9 +649,8 @@ void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const 
         return;
     }
 
-    lv_img_header_t header;
-    lv_res_t res = lv_img_decoder_get_info(src, &header, dec_dsc);
-    if(res != LV_RES_OK) {
+    lv_img_cache_entry_t * entry = lv_img_cache_open(dec_dsc, 0);
+    if(entry == NULL) {
         LV_LOG_WARN("lv_canvas_draw_img: Couldn't get the image data.");
         return;
     }
@@ -667,10 +667,11 @@ void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const 
     lv_area_t coords;
     coords.x1 = x;
     coords.y1 = y;
-    coords.x2 = x + header.w - 1;
-    coords.y2 = y + header.h - 1;
+    coords.x2 = x + entry->dec_dsc.out.header.w - 1;
+    coords.y2 = y + entry->dec_dsc.out.header.h - 1;
 
-    lv_draw_img(driver.draw_ctx, draw_dsc, &coords, src);
+    lv_draw_img_cached(driver.draw_ctx, draw_dsc, &coords, entry);
+    lv_img_cache_cleanup(entry);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 
@@ -820,7 +821,7 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     canvas->dsc.data_size          = 0;
     canvas->dsc.data               = NULL;
 
-    lv_img_set_src_data(obj, &canvas->dsc, canvas->dsc.data_size);
+    lv_img_set_src_data(obj, (const uint8_t *)&canvas->dsc, canvas->dsc.data_size);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

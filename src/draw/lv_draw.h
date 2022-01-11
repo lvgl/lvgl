@@ -67,7 +67,7 @@ typedef struct _lv_draw_ctx_t  {
                              const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
     lv_res_t (*draw_img)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                         const lv_area_t * coords, const void * src);
+                         const lv_area_t * coords, const lv_img_src_uri_t * src);
 
     void (*draw_letter)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                         uint32_t letter);

@@ -35,7 +35,7 @@ typedef struct {
      * Decrement all lifes by one every in every ::lv_img_cache_open.
      * If life == 0 the entry can be reused*/
     int32_t life;
-} _lv_img_cache_entry_t;
+} lv_img_cache_entry_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -45,24 +45,21 @@ typedef struct {
  * Open an image using the image decoder interface and cache it.
  * The image will be left open meaning if the image decoder open callback allocated memory then it will remain.
  * The image is closed if a new image is opened and the new image takes its place in the cache.
- * @param src source of the image.
- * @param color The color of the image with `LV_IMG_CF_ALPHA_...`
- * @param size_hint If provided, contains the user requested size for the output image
- * @param dec_ctx The decoder initialization context. Can be NULL
+ * @param dsc       A pointer on decoder initialization descriptor.
+ * @param dec_ctx   Optional decoder initialization context. Can be NULL
  * @return pointer to the cache entry or NULL if can open the image
  */
-_lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_src_uri_t * src, lv_color_t color, lv_point_t size_hint,
-                                           lv_img_dec_ctx_t * dec_ctx);
+lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Query the image decoder interface to find a decoder that's able to open the given source and extract the
  * image metadata. The decoder will stay in the cache.
- * @param src       source of the image.
+ * @param dsc       A pointer on decoder initialization descriptor.
  * @param header    On output will be filled with the image native dimension
  * @param dec_ctx   Optional decoder initialization context. Can be NULL
  * @return LV_RES_OK if a decoder was able to open the image
  */
-lv_res_t lv_img_cache_query(const lv_img_src_uri_t * src, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx);
+lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Set the number of images to be cached.
@@ -78,6 +75,12 @@ void lv_img_cache_set_size(uint16_t new_slot_num);
  * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
  */
 void lv_img_cache_invalidate_src(const lv_img_src_uri_t * src);
+
+/**
+ * Cleanup a cache entry returned by lv_img_cache_open.
+ * This only happens if the image cache is disabled to avoid leaking an entry
+ */
+void lv_img_cache_cleanup(lv_img_cache_entry_t * entry);
 
 /**********************
  *      MACROS

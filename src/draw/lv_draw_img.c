@@ -28,8 +28,10 @@
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
                                                       const lv_area_t * coords, const lv_img_src_uri_t * src);
 
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
+                                                             const lv_area_t * coords, lv_img_cache_entry_t * entry);
+
 static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg);
-static void draw_cleanup(_lv_img_cache_entry_t * cache);
 
 /**********************
  *  STATIC VARIABLES
@@ -59,7 +61,8 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const lv_img_src_uri_t * src)
+void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                 const lv_img_src_uri_t * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -82,6 +85,33 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_are
         show_error(draw_ctx, coords, "No\ndata");
         return;
     }
+}
+
+void lv_draw_img_cached(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                        lv_img_cache_entry_t * entry)
+{
+    if(entry == NULL) {
+        LV_LOG_WARN("Image draw: entry is NULL");
+        show_error(draw_ctx, coords, "No\ndata");
+        return;
+    }
+
+    if(dsc->opa <= LV_OPA_MIN) return;
+
+    lv_res_t res;
+    if(draw_ctx->draw_img) {
+        res = draw_ctx->draw_img(draw_ctx, dsc, coords, entry->dec_dsc.in.src);
+    }
+    else {
+        res = decode_and_draw_cached(draw_ctx, dsc, coords, entry);
+    }
+
+    if(res == LV_RES_INV) {
+        LV_LOG_WARN("Image draw error");
+        show_error(draw_ctx, coords, "No\ndata");
+        return;
+    }
+
 }
 
 /**
@@ -194,7 +224,6 @@ void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
                                                       const lv_area_t * coords, const lv_img_src_uri_t * src)
 {
@@ -204,32 +233,41 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     size_hint.x =  lv_area_get_width(coords);
     size_hint.y =  lv_area_get_height(coords);
 
-    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, size_hint, draw_dsc->dec_ctx);
+    lv_img_dec_dsc_in_t dsc = {.src = src, .color = draw_dsc->recolor, .size_hint = size_hint };
+    lv_img_cache_entry_t * cdsc = lv_img_cache_open(&dsc, draw_dsc->dec_ctx);
+    lv_res_t res = decode_and_draw_cached(draw_ctx, draw_dsc, coords, cdsc);
+    lv_img_cache_cleanup(cdsc);
+    return res;
+}
 
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
+                                                             const lv_area_t * coords, lv_img_cache_entry_t * cdsc)
+{
+    if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
     if(cdsc == NULL) return LV_RES_INV;
 
     /*Save the decoder context as it might contains useful information for the img object*/
-    draw_dsc->dec_ctx = cdsc->dec_dsc.dec_ctx;
+    draw_dsc->dec_ctx = cdsc->dec_dsc.out.dec_ctx;
 
 
     lv_img_cf_t cf;
-    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.out.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.out.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
     else cf = LV_IMG_CF_TRUE_COLOR;
 
-    if(cdsc->dec_dsc.error_msg != NULL) {
+    if(cdsc->dec_dsc.out.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 
-        show_error(draw_ctx, coords, cdsc->dec_dsc.error_msg);
+        show_error(draw_ctx, coords, cdsc->dec_dsc.out.error_msg);
     }
     /*The decoder could open the image and gave the entire uncompressed image.
      *Just draw it!*/
-    else if(cdsc->dec_dsc.img_data) {
+    else if(cdsc->dec_dsc.out.img_data) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
-            int32_t w = size_hint.x;
-            int32_t h = size_hint.y;
+            int32_t w = cdsc->dec_dsc.in.size_hint.x;
+            int32_t h = cdsc->dec_dsc.in.size_hint.y;
 
             _lv_img_buf_get_transformed_area(&map_area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
 
@@ -244,13 +282,12 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
         union_ok = _lv_area_intersect(&clip_com, draw_ctx->clip_area, &map_area_rot);
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
-            draw_cleanup(cdsc);
             return LV_RES_OK;
         }
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
+        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.out.img_data, cf);
         draw_ctx->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/
@@ -260,7 +297,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
         union_ok = _lv_area_intersect(&mask_com, draw_ctx->clip_area, coords);
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
-            draw_cleanup(cdsc);
             return LV_RES_OK;
         }
 
@@ -287,7 +323,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
                 lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
                 lv_mem_buf_release(buf);
-                draw_cleanup(cdsc);
                 draw_ctx->clip_area = clip_area_ori;
                 return LV_RES_INV;
             }
@@ -302,7 +337,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
         lv_mem_buf_release(buf);
     }
 
-    draw_cleanup(cdsc);
     return LV_RES_OK;
 }
 
@@ -317,14 +351,4 @@ static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_draw_label(draw_ctx, &label_dsc, coords, msg, NULL);
-}
-
-static void draw_cleanup(_lv_img_cache_entry_t * cache)
-{
-    /*Automatically close images with no caching*/
-#if LV_IMG_CACHE_DEF_SIZE == 0
-    lv_img_decoder_close(&cache->dec_dsc);
-#else
-    LV_UNUSED(cache);
-#endif
 }

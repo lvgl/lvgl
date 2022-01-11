@@ -25,6 +25,7 @@ extern "C" {
  **********************/
 typedef struct {
     lv_img_t img_ext;
+    lv_point_t create_size;
 } lv_rlottie_t;
 
 extern const lv_obj_class_t lv_rlottie_class;

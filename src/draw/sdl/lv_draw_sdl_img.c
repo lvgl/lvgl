@@ -65,7 +65,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(ctx, key, key_size, &texture_found,
                                                                         (void **) &header);
     if(!texture_found) {
-        _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->dec_ctx);
+        lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->dec_ctx);
         lv_draw_sdl_cache_flag_t tex_flags = 0;
         SDL_Rect rect;
         SDL_memset(&rect, 0, sizeof(SDL_Rect));

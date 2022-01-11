@@ -32,8 +32,6 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_img(lv_event_t * e);
-static void free_src(lv_img_src_uri_t * src);
-static lv_res_t alloc_str_src(lv_img_src_uri_t * src, const char * str);
 static lv_res_t accept_src(lv_img_t * img);
 static void next_frame_task_cb(lv_timer_t * t);
 
@@ -72,18 +70,18 @@ lv_obj_t * lv_img_create(lv_obj_t * parent)
 
 void lv_img_set_play_mode(lv_obj_t * obj, const lv_img_ctrl_t ctrl)
 {
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
     img->ctrl = ctrl;
 
     if(img->task && (img->dec_ctx->dest_frame != img->dec_ctx->current_frame ||
-                    LV_BN(img->ctrl, LV_IMG_CTRL_PAUSE))) {
+                     LV_BN(img->ctrl, LV_IMG_CTRL_PAUSE))) {
         lv_timer_resume(img->task);
     }
 }
 
 lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
 {
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
     if(img->dec_ctx == NULL || LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
         return LV_RES_INV;
 
@@ -93,7 +91,7 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
 
 lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
 {
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
     if(img->dec_ctx == NULL || LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
         return LV_RES_INV;
 
@@ -111,7 +109,7 @@ void lv_img_set_src_file(lv_obj_t * obj, const char * file_path)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
     lv_img_src_uri_file(&img->src, file_path);
 
     accept_src(img);
@@ -121,7 +119,7 @@ void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
     lv_img_src_uri_data(&img->src, data, len);
 
     accept_src(img);
@@ -131,8 +129,19 @@ void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
     lv_img_src_uri_symbol(&img->src, symbol);
+
+    accept_src(img);
+}
+
+void lv_img_set_src_uri(lv_obj_t * obj, const lv_img_src_uri_t * uri)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t *)obj;
+    if(&img->src != uri)
+        lv_img_src_uri_copy(&img->src, uri);
 
     accept_src(img);
 }
@@ -141,7 +150,7 @@ void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
 void lv_img_set_src(lv_obj_t * obj, const void * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_img_t * img = (lv_img_t*)obj;
+    lv_img_t * img = (lv_img_t *)obj;
 
     lv_obj_invalidate(obj);
 
@@ -150,7 +159,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
        2. Prevent using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
        3. Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
     */
-    if (lv_img_src_uri_parse(&img->src, src) == LV_RES_OK) {
+    if(lv_img_src_uri_parse(&img->src, src) == LV_RES_OK) {
         accept_src(img);
     }
 }
@@ -390,7 +399,7 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj)
 
 static lv_res_t accept_src(lv_img_t * img)
 {
-    lv_obj_t * obj = (lv_obj_t*)img;
+    lv_obj_t * obj = (lv_obj_t *)img;
 
     lv_img_header_t header;
     lv_memset_00(&header, sizeof(header));
@@ -404,38 +413,27 @@ static lv_res_t accept_src(lv_img_t * img)
         header.w = size.x;
         header.h = size.y;
         header.cf = LV_IMG_CF_ALPHA_1BIT;
-    } else {
-        /*Find the decoder accepting this source*/
-        lv_img_decoder_t * decoder = lv_img_decoder_accept(&img->src, &img->dec_ctx);
-        if (decoder == NULL) {
-            LV_LOG_WARN("lv_img_set_src_: No decoder found for given source");
-            return LV_RES_INV;
-        }
+    }
+    else {
+        /*Query the image cache now, since it's very likely we'll draw the image later on,
+          so don't waste opening a decoder and closing it if it'll be reused */
+        lv_img_dec_dsc_in_t dsc = {0};
+        dsc.src = &img->src;
+        dsc.size_hint.x = lv_obj_get_style_width(obj, LV_PART_MAIN);
+        dsc.size_hint.y = lv_obj_get_style_height(obj, LV_PART_MAIN);
+        /*Don't waste a cached entry for a different color, use the color that'll be drawn*/
+        dsc.color = lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN);
+        lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, img->dec_ctx);
+        if(entry == NULL) return LV_RES_INV;
 
-        /*Try to get picture information if required*/
-        /* Vector format might have their size set beforehand, so deal with that here without querying the decoder */
-        if(img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VECTOR)) {
-            header.w = lv_obj_get_width(obj);
-            header.h = lv_obj_get_height(obj);
-            header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-        }
-
-        if (!header.w || header.w == LV_SIZE_CONTENT || !header.h || header.h == LV_SIZE_CONTENT) {
-            /* Invalid image size, let's find out from the image itself */
-            lv_img_decoder_dsc_t dsc;
-            dsc.decoder = decoder;
-            dsc.src = &img->src;
-            if (lv_img_decoder_open(&dsc, LV_IMG_DEC_ONLYMETA) == LV_RES_INV) {
-                return LV_RES_INV;
-            }
-            header = dsc.header;
-        }
-
-        if (img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_ANIMATED)) {
+        if(LV_BT(entry->dec_dsc.out.dec_ctx->caps, LV_IMG_DEC_ANIMATED)) {
             /* Need to create the timer here */
-            img->task = lv_timer_create(next_frame_task_cb, 1000 / img->dec_ctx->frame_rate, obj);
+            img->task = lv_timer_create(next_frame_task_cb, 1000 / entry->dec_dsc.out.dec_ctx->frame_rate, obj);
             lv_timer_pause(img->task);
         }
+
+        header = entry->dec_dsc.out.header;
+        lv_img_cache_cleanup(entry);
     }
 
     img->w       = header.w;
@@ -460,8 +458,6 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_img_t * img = (lv_img_t *)obj;
-
-    lv_memset_00(img, sizeof(*img));
     img->w         = lv_obj_get_width(obj);
     img->h         = lv_obj_get_height(obj);
     img->zoom      = LV_IMG_ZOOM_NONE;
@@ -678,7 +674,7 @@ static void draw_img(lv_event_t * e)
 
 
         if(img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VECTOR)
-            && (obj_w != img->w || obj_h != img->h)) {
+           && (obj_w != img->w || obj_h != img->h)) {
             /*For vector image that aren't tiled, let's increase the image size*/
             img->w = obj_w;
             img->h = obj_h;
@@ -794,7 +790,7 @@ static void next_frame_task_cb(lv_timer_t * t)
     lv_obj_t * obj = t->user_data;
     lv_img_t * img = (lv_img_t *) obj;
 
-    if(LV_BN(img->ctrl, LV_IMG_CTRL_PAUSE)) {
+    if(LV_BT(img->ctrl, LV_IMG_CTRL_PAUSE)) {
         if(img->dec_ctx->current_frame == img->dec_ctx->dest_frame) {
             /* Pause the timer too when it has run once to avoid CPU consumption */
             lv_timer_pause(t);

@@ -139,7 +139,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
     return indic;
 }
 
-lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src,
+lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const lv_img_src_uri_t * src,
                                                lv_coord_t pivot_x, lv_coord_t pivot_y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -151,7 +151,7 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
     indic->opa = LV_OPA_COVER;
 
     indic->type = LV_METER_INDICATOR_TYPE_NEEDLE_IMG;
-    indic->type_data.needle_img.src = src;
+    lv_img_src_uri_copy(&indic->type_data.needle_img.src, src);
     indic->type_data.needle_img.pivot.x = pivot_x;
     indic->type_data.needle_img.pivot.y = pivot_y;
     lv_obj_invalidate(obj);
@@ -606,16 +606,17 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
         else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
-            if(indic->type_data.needle_img.src == NULL) continue;
+            if(indic->type_data.needle_img.src.type == LV_IMG_SRC_UNKNOWN) continue;
+            lv_img_dec_dsc_in_t dsc = {.src = &indic->type_data.needle_img.src };
+            lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, 0);
+            if(!entry) continue;
 
             int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
-            lv_img_header_t info;
-            lv_img_decoder_get_info(indic->type_data.needle_img.src, &info, NULL);
             lv_area_t a;
             a.x1 = scale_center.x - indic->type_data.needle_img.pivot.x;
             a.y1 = scale_center.y - indic->type_data.needle_img.pivot.y;
-            a.x2 = a.x1 + info.w - 1;
-            a.y2 = a.y1 + info.h - 1;
+            a.x2 = a.x1 + entry->dec_dsc.out.header.w - 1;
+            a.y2 = a.y1 + entry->dec_dsc.out.header.h - 1;
 
             img_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
             img_dsc.pivot.x = indic->type_data.needle_img.pivot.x;
@@ -627,8 +628,9 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             part_draw_dsc.img_dsc = &img_dsc;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-            lv_draw_img(draw_ctx, &img_dsc, &a, indic->type_data.needle_img.src);
+            lv_draw_img_cached(draw_ctx, &img_dsc, &a, entry);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+            lv_img_cache_cleanup(entry);
         }
     }
 }
@@ -689,7 +691,8 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
     else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
         int32_t angle = lv_map(value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
         lv_img_header_t info;
-        lv_img_decoder_get_info(indic->type_data.needle_img.src, &info, NULL);
+        lv_img_dec_dsc_in_t dsc = {.src = &indic->type_data.needle_img.src };
+        lv_img_decoder_get_info(&dsc, &info);
 
         angle = angle * 10;
         if(angle > 3600) angle -= 3600;

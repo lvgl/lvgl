@@ -279,10 +279,10 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
     if(dsc->bg_img_src == NULL) return;
     if(dsc->bg_img_opa <= LV_OPA_MIN) return;
 
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
-    if(src_type == LV_IMG_SRC_SYMBOL) {
+    if(dsc->bg_img_src->type == LV_IMG_SRC_SYMBOL) {
         lv_point_t size;
-        lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_txt_get_size(&size, (const char *)dsc->bg_img_src->uri, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX,
+                        LV_TEXT_FLAG_NONE);
         lv_area_t a;
         a.x1 = coords->x1 + lv_area_get_width(coords) / 2 - size.x / 2;
         a.x2 = a.x1 + size.x - 1;
@@ -294,22 +294,24 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
         label_draw_dsc.font = dsc->bg_img_symbol_font;
         label_draw_dsc.color = dsc->bg_img_recolor;
         label_draw_dsc.opa = dsc->bg_img_opa;
-        lv_draw_label(draw_ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
+        lv_draw_label(draw_ctx, &label_draw_dsc, &a, (const char *)dsc->bg_img_src->uri, NULL);
     }
     else {
-        lv_img_header_t header;
-        lv_res_t res = lv_img_cache_query(dsc->bg_img_src, &header, NULL);
-        if(res != LV_RES_OK) {
-            LV_LOG_WARN("Couldn't read the background image");
-            return;
-        }
-
         lv_draw_img_dsc_t img_dsc;
         lv_draw_img_dsc_init(&img_dsc);
         img_dsc.blend_mode = dsc->blend_mode;
         img_dsc.recolor = dsc->bg_img_recolor;
         img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
         img_dsc.opa = dsc->bg_img_opa;
+
+        lv_img_header_t header;
+        lv_img_dec_dsc_in_t dec_dsc = { .src = dsc->bg_img_src, .color = img_dsc.recolor };
+        lv_img_cache_entry_t * entry = lv_img_cache_open(&dec_dsc, 0);
+        if(entry == NULL) {
+            LV_LOG_WARN("Couldn't read the background image");
+            return;
+        }
+        header = entry->dec_dsc.out.header;
 
         /*Center align*/
         if(dsc->bg_img_tiled == false) {
@@ -319,7 +321,7 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
             area.x2 = area.x1 + header.w - 1;
             area.y2 = area.y1 + header.h - 1;
 
-            lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+            lv_draw_img_cached(draw_ctx, &img_dsc, &area, entry);
         }
         else {
             lv_area_t area;
@@ -331,10 +333,11 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
                 area.x1 = coords->x1;
                 area.x2 = area.x1 + header.w - 1;
                 for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-                    lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+                    lv_draw_img_cached(draw_ctx, &img_dsc, &area, entry);
                 }
             }
         }
+        lv_img_cache_cleanup(entry);
     }
 }
 

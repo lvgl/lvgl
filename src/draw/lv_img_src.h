@@ -49,8 +49,8 @@ typedef struct {
 #else
     size_t          uri_len : 30;   /**< The next URI length in bytes */
 #endif
-    const void *    uri;            /**< A pointer on the given unique resource identifier */
-    const char*     ext;            /**< If the URI points to a file, this will point to the extension */
+    const void   *  uri;            /**< A pointer on the given unique resource identifier */
+    const char   *  ext;            /**< If the URI points to a file, this will point to the extension */
 } lv_img_src_uri_t;
 
 
@@ -106,7 +106,11 @@ void lv_img_src_uri_data(lv_img_src_uri_t * obj, const uint8_t * data, const siz
  *  @param path Path to the file containing the image
  */
 void lv_img_src_uri_file(lv_img_src_uri_t * obj, const char * file_path);
-
+/** Copy the source of the descriptor to another descriptor
+ *  @param src  The src descriptor to fill
+ *  @param path Path to the file containing the image
+ */
+void lv_img_src_uri_copy(lv_img_src_uri_t * dest, const lv_img_src_uri_t * src);
 
 
 #ifdef __cplusplus

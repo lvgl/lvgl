@@ -76,7 +76,7 @@ static lv_res_t decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps)
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
         if(!src->ext || strcmp(src->ext, ".bmp")) return LV_RES_INV;
-        if (caps) *caps = LV_IMG_DEC_DEFAULT; /*Image is not cached for files*/
+        if(caps) *caps = LV_IMG_DEC_DEFAULT;  /*Image is not cached for files*/
 
         /*Check file exists*/
         lv_fs_file_t f;
@@ -101,7 +101,7 @@ static lv_res_t decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps)
 static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     /* Only extract metadata ?*/
-    if (flags == LV_IMG_DEC_ONLYMETA) {
+    if(flags == LV_IMG_DEC_ONLYMETA) {
         /*Save the data in the header*/
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, dsc->src->uri, LV_FS_MODE_RD);
@@ -150,7 +150,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
                 return LV_RES_INV;
             }
 
-            bmp_dsc_t * b = (bmp_dsc_t*)dsc->dec_ctx->user_data;
+            bmp_dsc_t * b = (bmp_dsc_t *)dsc->dec_ctx->user_data;
             memcpy(&b.px_offset, header + 10, 4);
             memcpy(&b.px_width, header + 18, 4);
             memcpy(&b.px_height, header + 22, 4);
@@ -215,7 +215,7 @@ static void decoder_close(lv_img_decoder_dsc_t * dsc)
     bmp_dsc_t * b = dsc->dec_ctx->user_data;
     lv_fs_close(&b->f);
     lv_mem_free(dsc->dec_ctx->user_data);
-    if (!dsc->dec_ctx->self_allocated) {
+    if(!dsc->dec_ctx->auto_allocated) {
         lv_mem_free(dsc->dec_ctx);
         dsc->dec_ctx = NULL;
     }

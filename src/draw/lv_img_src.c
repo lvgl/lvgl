@@ -62,13 +62,12 @@ lv_res_t lv_img_src_uri_parse(lv_img_src_uri_t * uri, const void * src)
 #endif
             lv_img_src_uri_file(uri, src);
             break;
-        case LV_IMG_SRC_VARIABLE:
-            {
+        case LV_IMG_SRC_VARIABLE: {
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
                 LV_LOG_TRACE("lv_img_src_uri_parse: `LV_IMG_SRC_VARIABLE` type found");
 #endif
-                lv_img_dsc_t * id = (lv_img_dsc_t*) src; /*This might break if given any raw data here*/
-                lv_img_src_uri_data(uri, (const uint8_t*)src, id->data_size);
+                lv_img_dsc_t * id = (lv_img_dsc_t *) src; /*This might break if given any raw data here*/
+                lv_img_src_uri_data(uri, (const uint8_t *)src, id->data_size);
             }
             break;
         case LV_IMG_SRC_SYMBOL:
@@ -103,7 +102,7 @@ void lv_img_src_uri_file(lv_img_src_uri_t * obj, const char * file_path)
     lv_img_src_uri_free(obj);
 
     obj->type = LV_IMG_SRC_FILE;
-    if (alloc_str_src(obj, file_path) == LV_RES_INV)
+    if(alloc_str_src(obj, file_path) == LV_RES_INV)
         return;
 
     obj->ext = strrchr(obj->uri, '.');
@@ -123,19 +122,37 @@ void lv_img_src_uri_symbol(lv_img_src_uri_t * obj, const char * symbol)
     lv_img_src_uri_free(obj);
 
     obj->type = LV_IMG_SRC_SYMBOL;
-    if (alloc_str_src(obj, symbol) == LV_RES_INV)
+    if(alloc_str_src(obj, symbol) == LV_RES_INV)
         return;
+}
+
+void lv_img_src_uri_copy(lv_img_src_uri_t * dest, const lv_img_src_uri_t * src)
+{
+    lv_img_src_uri_free(dest);
+    dest->type = LV_IMG_SRC_UNKNOWN;
+    dest->uri = src->uri;
+    dest->uri_len = src->uri_len;
+    dest->ext = NULL;
+    if(src->type != LV_IMG_SRC_VARIABLE && alloc_str_src(dest, (const char *)src->uri) == LV_RES_INV) {
+        return;
+    }
+    dest->type = src->type;
+    if(src->type == LV_IMG_SRC_FILE) {
+        dest->ext = strrchr(dest->uri, '.');
+    }
 }
 
 
 static lv_res_t alloc_str_src(lv_img_src_uri_t * src, const char * str)
 {
     src->uri_len = strlen(str);
-    char * new_str = lv_mem_alloc(src->uri_len + 1);
-    LV_ASSERT_MALLOC(new_str);
-    if(new_str == NULL) return LV_RES_INV;
+    src->uri = lv_mem_alloc(src->uri_len + 1);
+    LV_ASSERT_MALLOC(src->uri);
+    if(src->uri == NULL) {
+        src->uri_len = 0;
+        return LV_RES_INV;
+    }
 
-    strcpy(new_str, str);
-    src->uri = new_str;
+    lv_memcpy(src->uri, str, src->uri_len + 1);
     return LV_RES_OK;
 }

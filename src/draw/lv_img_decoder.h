@@ -56,12 +56,12 @@ typedef enum {
  */
 typedef struct {
     uint8_t  caps;               /**!< The decoder capabilities flags */
-    uint8_t  self_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
+    uint8_t  auto_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
     uint8_t  frame_rate : 7;     /**!< The number of frames per second, if applicable */
     lv_frame_index_t   current_frame;  /**!< The current frame index */
     lv_frame_index_t   total_frames;   /**!< The number of frames (likely filled by the decoder) */
     lv_frame_index_t   dest_frame;     /**!< The destination frame (if appropriate) */
-    void   *     user_data;      /**!< Available for per-decoder features */
+    void    *    user_data;      /**!< Available for per-decoder features */
 } lv_img_dec_ctx_t;
 
 /*Decoder function definitions*/
@@ -112,13 +112,12 @@ typedef struct _lv_img_decoder_t {
     lv_img_decoder_close_f_t        close_cb;
 } lv_img_decoder_t;
 
-
-/**Describe an image decoding session. Stores data about the decoding*/
-typedef struct _lv_img_decoder_dsc_t {
-    /**The decoder which was able to open the image source*/
-    lv_img_decoder_t * decoder;
-
-    /**The image source. */
+/** The input members of an image decoder descriptor.
+ *  These are the fields that are expected to be filled when calling the image decoder
+ *  interface.
+ */
+typedef struct _lv_img_dec_dsc_in_t {
+    /**Pointer to the image source. No copy made so the origin must exists as long as this instance exists*/
     const lv_img_src_uri_t * src;
 
     /**Color to draw the image. Used when the image has alpha channel only*/
@@ -127,6 +126,11 @@ typedef struct _lv_img_decoder_dsc_t {
     /**Size hint for decoders with user settable output size*/
     lv_point_t size_hint;
 
+} lv_img_dec_dsc_in_t;
+
+/** The output members of an image decoder descriptor.
+ *  These are the fields that are set by the decoder when opened */
+typedef struct _lv_img_dec_dsc_out_t {
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_img_header_t header;
 
@@ -134,16 +138,30 @@ typedef struct _lv_img_decoder_dsc_t {
      *  MUST be set in `open` function*/
     const uint8_t * img_data;
 
-    /** How much time did it take to open the image. [ms]
-     *  If not set `lv_img_cache` will measure and set the time to open*/
-    uint32_t time_to_open;
+    /**Initialization context for decoder*/
+    lv_img_dec_ctx_t * dec_ctx;
 
     /**A text to display instead of the image when the image can't be opened.
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
-    /**Initialization context for decoder*/
-    lv_img_dec_ctx_t * dec_ctx;
+} lv_img_dec_dsc_out_t;
+
+/**Describe an image decoding session. Stores data about the decoding*/
+typedef struct _lv_img_decoder_dsc_t {
+    /**The decoder which was able to open the image source*/
+    lv_img_decoder_t * decoder;
+
+    /** How much time did it take to open the image. [ms]
+     *  If not set `lv_img_cache` will measure and set the time to open*/
+    uint32_t time_to_open;
+
+    /** The input data to set*/
+    lv_img_dec_dsc_in_t  in;
+
+    /** The output data to retrieve from the decoder*/
+    lv_img_dec_dsc_out_t out;
+
 } lv_img_decoder_dsc_t;
 
 /**********************
@@ -160,12 +178,11 @@ void _lv_img_decoder_init(void);
  * This is a wrapper over lv_img_decoder_accept/lv_img_decoder_open calls.
  * This is not very efficient since it's creating a decoder instance to fetch the information required.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
- * @param src       the image source.
  * @param header    Will be filled with the capabilities for the selected decoder
- * @param dsc       Likely NULL. Use this to pass decoder specific information
+ * @param dsc       Pointer to  decoder specific construction information
  * @return LV_RES_OK if the header was filled
  */
-lv_res_t lv_img_decoder_get_info(const lv_img_src_uri_t * src, lv_img_header_t * header, const lv_img_decoder_dsc_t * dsc);
+lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header);
 
 
 /**
@@ -245,6 +262,11 @@ void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_
  */
 void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_close_f_t close_cb);
 
+/**
+ * Check if a valid size hint was provided
+ * @param dsc       Pointer to  decoder specific construction information
+ */
+bool lv_img_decoder_has_size_hint(const lv_img_dec_dsc_in_t * dsc);
 
 /**********************
  *      MACROS

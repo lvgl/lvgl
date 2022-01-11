@@ -67,7 +67,7 @@ typedef struct {
     int32_t end_value;
     union {
         struct {
-            const void * src;
+            lv_img_src_uri_t src;
             lv_point_t pivot;
         } needle_img;
         struct {
@@ -77,7 +77,7 @@ typedef struct {
         } needle_line;
         struct {
             uint16_t width;
-            const void * src;
+            lv_img_src_uri_t src;
             lv_color_t color;
             int16_t r_mod;
         } arc;
@@ -197,7 +197,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
  * @return              the new indicator
  * @note                the needle image should point to the right, like -O----->
  */
-lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const void * src,
+lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const lv_img_src_uri_t * src,
                                                lv_coord_t pivot_x, lv_coord_t pivot_y);
 
 /**

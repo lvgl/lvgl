@@ -300,12 +300,12 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
     lv_obj_invalidate(obj);
 }
 
-void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
+void lv_dropdown_set_symbol(lv_obj_t * obj, const lv_img_src_uri_t * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    dropdown->symbol = symbol;
+    lv_img_src_uri_copy(&dropdown->symbol, symbol);
     lv_obj_invalidate(obj);
 }
 
@@ -398,11 +398,11 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     buf[c] = '\0';
 }
 
-const char * lv_dropdown_get_symbol(lv_obj_t * obj)
+const lv_img_src_uri_t * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    return dropdown->symbol;
+    return &dropdown->symbol;
 }
 
 bool lv_dropdown_get_selected_highlight(lv_obj_t * obj)
@@ -564,7 +564,6 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     /*Initialize the allocated 'ext'*/
     dropdown->list          = NULL;
     dropdown->options     = NULL;
-    dropdown->symbol         = LV_SYMBOL_DOWN;
     dropdown->text         = NULL;
     dropdown->static_txt = 1;
     dropdown->selected_highlight = 1;
@@ -574,6 +573,7 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->option_cnt      = 0;
     dropdown->dir = LV_DIR_BOTTOM;
 
+    lv_img_src_uri_symbol(&dropdown->symbol, LV_SYMBOL_DOWN);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
 
@@ -778,23 +778,24 @@ static void draw_main(lv_event_t * e)
     if(dropdown->dir == LV_DIR_LEFT) symbol_to_left = true;
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) symbol_to_left = true;
 
-    if(dropdown->symbol) {
-        lv_img_src_t symbol_type = lv_img_src_get_type(dropdown->symbol);
+    if(dropdown->symbol.type != LV_IMG_SRC_UNKNOWN) {
         lv_coord_t symbol_w;
         lv_coord_t symbol_h;
-        if(symbol_type == LV_IMG_SRC_SYMBOL) {
+        lv_img_cache_entry_t * entry = NULL;
+        if(dropdown->symbol.type == LV_IMG_SRC_SYMBOL) {
             lv_point_t size;
-            lv_txt_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
+            lv_txt_get_size(&size, (const char *)dropdown->symbol.uri, symbol_dsc.font, symbol_dsc.letter_space,
+                            symbol_dsc.line_space, LV_COORD_MAX,
                             symbol_dsc.flag);
             symbol_w = size.x;
             symbol_h = size.y;
         }
         else {
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header, NULL);
-            if(res == LV_RES_OK) {
-                symbol_w = header.w;
-                symbol_h = header.h;
+            lv_img_dec_dsc_in_t dsc = {.src = &dropdown->symbol };
+            entry = lv_img_cache_open(&dsc, 0);
+            if(entry) {
+                symbol_w = entry->dec_dsc.out.header.w;
+                symbol_h = entry->dec_dsc.out.header.h;
             }
             else {
                 symbol_w = -1;
@@ -812,10 +813,10 @@ static void draw_main(lv_event_t * e)
             symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
         }
 
-        if(symbol_type == LV_IMG_SRC_SYMBOL) {
+        if(dropdown->symbol.type == LV_IMG_SRC_SYMBOL) {
             symbol_area.y1 = obj->coords.y1 + top;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
-            lv_draw_label(draw_ctx, &symbol_dsc, &symbol_area, dropdown->symbol, NULL);
+            lv_draw_label(draw_ctx, &symbol_dsc, &symbol_area, (const char *)dropdown->symbol.uri, NULL);
         }
         else {
             symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
@@ -826,7 +827,8 @@ static void draw_main(lv_event_t * e)
             img_dsc.pivot.x = symbol_w / 2;
             img_dsc.pivot.y = symbol_h / 2;
             img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_INDICATOR);
-            lv_draw_img(draw_ctx, &img_dsc, &symbol_area, dropdown->symbol);
+            lv_draw_img_cached(draw_ctx, &img_dsc, &symbol_area, entry);
+            lv_img_cache_cleanup(entry);
         }
     }
 
@@ -842,7 +844,7 @@ static void draw_main(lv_event_t * e)
     txt_area.y1 = obj->coords.y1 + top;
     txt_area.y2 = txt_area.y1 + size.y;
     /*Center align the text if no symbol*/
-    if(dropdown->symbol == NULL) {
+    if(dropdown->symbol.type == LV_IMG_SRC_UNKNOWN) {
         txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - size.x) / 2;
         txt_area.x2 = txt_area.x1 + size.x;
     }

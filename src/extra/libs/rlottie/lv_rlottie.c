@@ -56,24 +56,28 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_rlottie_t * rlottie = (lv_rlottie_t *)obj;
-    lv_obj_set_size(obj, width, height);
-    lv_img_set_src_file(obj, path);
-
+    lv_img_src_uri_file(&rlottie->img_ext.src, path);
+    /* We can't use the object yet, since it's not constructed, so we need to store the size elsewhere*/
+    rlottie->create_size.x = width;
+    rlottie->create_size.y = height;
     lv_obj_class_init_obj(obj);
 
     return obj;
 
 }
 
-lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc, const size_t len)
+lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc,
+                                      const size_t len)
 {
     lv_rlottie_init();
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_rlottie_t * rlottie = (lv_rlottie_t *)obj;
-    lv_obj_set_size(obj, width, height);
-    lv_img_set_src_data(obj, (const uint8_t*)rlottie_desc, len);
+    lv_img_src_uri_data(&rlottie->img_ext.src, (const uint8_t *)rlottie_desc, len);
+    /* We can't use the object yet, since it's not constructed, so we need to store the size elsewhere*/
+    rlottie->create_size.x = width;
+    rlottie->create_size.y = height;
 
     lv_obj_class_init_obj(obj);
 
@@ -90,20 +94,16 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_UNUSED(class_p);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
-    if(rlottie->img_ext.dec_ctx == NULL || rlottie->img_ext.dec_ctx->user_data == NULL) {
+    lv_obj_set_size(obj, rlottie->create_size.x, rlottie->create_size.y);
+    /* We want to keep the decoder context initialized here, so allocate and mark it*/
+    LV_ZALLOC(rlottie->img_ext.dec_ctx, sizeof(rlottiedec_ctx_t));
+    rlottie->img_ext.dec_ctx->auto_allocated = 0;
+    lv_img_set_src_uri(obj, &rlottie->img_ext.src);
+
+    if(rlottie->img_ext.dec_ctx == NULL || ((rlottiedec_ctx_t *)rlottie->img_ext.dec_ctx)->cache == NULL) {
         LV_LOG_WARN("The animation can't be opened");
         return;
     }
-
-    /* Capture the context so it's not deleted */
-    rlottie->img_ext.dec_ctx->self_allocated = 1;
-/*
-    rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->dec.cache);
-
-    rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_LOOP;
-    rlottie->dest_frame =
-        rlottie->dec.ctx.total_frames; /* invalid destination frame so it's possible to pause on frame 0 */
-
 
     lv_obj_update_layout(obj);
 }
@@ -115,7 +115,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
     lv_img_cache_invalidate_src(&rlottie->img_ext.src);
-    if(rlottie->img_ext.dec_ctx && rlottie->img_ext.dec_ctx->self_allocated) {
+    if(rlottie->img_ext.dec_ctx && !rlottie->img_ext.dec_ctx->auto_allocated) {
         struct Lottie_Animation_S * anim = (struct Lottie_Animation_S *)rlottie->img_ext.dec_ctx->user_data;
         lottie_animation_destroy(anim);
         rlottie->img_ext.dec_ctx->user_data = 0;

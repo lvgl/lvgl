@@ -83,9 +83,24 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    imgbtn->img_src_left[state] = src_left;
-    imgbtn->img_src_mid[state] = src_mid;
-    imgbtn->img_src_right[state] = src_right;
+    lv_img_src_uri_parse(&imgbtn->img_src_left[state], src_left);
+    lv_img_src_uri_parse(&imgbtn->img_src_mid[state], src_mid);
+    lv_img_src_uri_parse(&imgbtn->img_src_right[state], src_right);
+
+
+    refr_img(obj);
+}
+void lv_imgbtn_set_src_uri(lv_obj_t * obj, lv_imgbtn_state_t state, const lv_img_src_uri_t * src_left,
+                           const lv_img_src_uri_t * src_mid,
+                           const lv_img_src_uri_t * src_right)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
+
+    lv_img_src_uri_copy(&imgbtn->img_src_left[state], src_left);
+    lv_img_src_uri_copy(&imgbtn->img_src_mid[state], src_mid);
+    lv_img_src_uri_copy(&imgbtn->img_src_right[state], src_right);
 
     refr_img(obj);
 }
@@ -119,13 +134,13 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
-const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
+const lv_img_src_uri_t * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    return imgbtn->img_src_left[state];
+    return &imgbtn->img_src_left[state];
 }
 
 /**
@@ -134,12 +149,12 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to the middle image source (a C array or path to a file)
  */
-const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
+const lv_img_src_uri_t * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    return imgbtn->img_src_mid[state];
+    return &imgbtn->img_src_mid[state];
 }
 
 /**
@@ -148,12 +163,12 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
-const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
+const lv_img_src_uri_t * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    return imgbtn->img_src_right[state];
+    return &imgbtn->img_src_right[state];
 }
 
 
@@ -197,11 +212,12 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_point_t * p = lv_event_get_self_size_info(e);
         lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
         lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
-        if(imgbtn->img_src_left[state] == NULL &&
-           imgbtn->img_src_mid[state] != NULL &&
-           imgbtn->img_src_right[state] == NULL) {
-            lv_img_header_t header;
-            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header, NULL);
+        if(imgbtn->img_src_left[state].type == LV_IMG_SRC_UNKNOWN &&
+           imgbtn->img_src_mid[state].type != LV_IMG_SRC_UNKNOWN &&
+           imgbtn->img_src_right[state].type == LV_IMG_SRC_UNKNOWN) {
+            lv_img_header_t header = {0};
+            lv_img_dec_dsc_in_t dsc = { .src = &imgbtn->img_src_mid[state] };
+            lv_img_decoder_get_info(&dsc, &header);
             p->x = LV_MAX(p->x, header.w);
         }
     }
@@ -216,9 +232,6 @@ static void draw_main(lv_event_t * e)
     /*Just draw_main an image*/
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
 
-    /*Simply draw the middle src if no tiled*/
-    const void * src = imgbtn->img_src_left[state];
-
     lv_coord_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
     lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
     lv_area_t coords;
@@ -228,38 +241,49 @@ static void draw_main(lv_event_t * e)
     coords.y1 -= th;
     coords.y2 += th;
 
+    /*Simply draw the middle src if no tiled*/
+    lv_img_dec_dsc_in_t dsc = {
+        .src = &imgbtn->img_src_left[state],
+        .color = lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN),
+        .size_hint = {.x = lv_area_get_width(&coords), .y = lv_area_get_height(&coords)}
+    };
+    lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, NULL);
+
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
     lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
 
-    lv_img_header_t header;
     lv_area_t coords_part;
     lv_coord_t left_w = 0;
     lv_coord_t right_w = 0;
 
-    if(src) {
-        lv_img_decoder_get_info(src, &header, NULL);
-        left_w = header.w;
+    if(entry) {
+        left_w = entry->dec_dsc.out.header.w;
         coords_part.x1 = coords.x1;
         coords_part.y1 = coords.y1;
-        coords_part.x2 = coords.x1 + header.w - 1;
-        coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
+        coords_part.x2 = coords.x1 + entry->dec_dsc.out.header.w - 1;
+        coords_part.y2 = coords.y1 + entry->dec_dsc.out.header.h - 1;
+        lv_draw_img_cached(draw_ctx, &img_dsc, &coords_part, entry);
+
+        lv_img_cache_cleanup(entry);
     }
 
-    src = imgbtn->img_src_right[state];
-    if(src) {
-        lv_img_decoder_get_info(src, &header, NULL);
-        right_w = header.w;
-        coords_part.x1 = coords.x2 - header.w + 1;
+    dsc.src = &imgbtn->img_src_right[state];
+    entry = lv_img_cache_open(&dsc, NULL);
+    if(entry) {
+        right_w = entry->dec_dsc.out.header.w;
+        coords_part.x1 = coords.x2 - entry->dec_dsc.out.header.w + 1;
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
-        coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
+        coords_part.y2 = coords.y1 + entry->dec_dsc.out.header.h - 1;
+        lv_draw_img_cached(draw_ctx, &img_dsc, &coords_part, entry);
+
+        lv_img_cache_cleanup(entry);
     }
 
-    src = imgbtn->img_src_mid[state];
-    if(src) {
+    dsc.src = &imgbtn->img_src_mid[state];
+    entry = lv_img_cache_open(&dsc, NULL);
+    if(entry) {
         lv_area_t clip_area_center;
         clip_area_center.x1 = coords.x1 + left_w;
         clip_area_center.x2 = coords.x2 - right_w;
@@ -271,23 +295,23 @@ static void draw_main(lv_event_t * e)
         comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, draw_ctx->clip_area);
         if(comm_res) {
             lv_coord_t i;
-            lv_img_decoder_get_info(src, &header, NULL);
-
             const lv_area_t * clip_area_ori = draw_ctx->clip_area;
             draw_ctx->clip_area = &clip_area_center;
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
-            coords_part.x2 = coords_part.x1 + header.w - 1;
-            coords_part.y2 = coords_part.y1 + header.h - 1;
+            coords_part.x2 = coords_part.x1 + entry->dec_dsc.out.header.w - 1;
+            coords_part.y2 = coords_part.y1 + entry->dec_dsc.out.header.h - 1;
 
-            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + header.w - 1); i += header.w) {
-                lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
+            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + entry->dec_dsc.out.header.w - 1);
+                i += entry->dec_dsc.out.header.w) {
+                lv_draw_img_cached(draw_ctx, &img_dsc, &coords_part, entry);
                 coords_part.x1 = coords_part.x2 + 1;
-                coords_part.x2 += header.w;
+                coords_part.x2 += entry->dec_dsc.out.header.w;
             }
             draw_ctx->clip_area = clip_area_ori;
         }
+        lv_img_cache_cleanup(entry);
     }
 }
 
@@ -297,11 +321,9 @@ static void refr_img(lv_obj_t * obj)
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
     lv_img_header_t header;
 
-    const void * src = imgbtn->img_src_mid[state];
-    if(src == NULL) return;
-
     lv_res_t info_res = LV_RES_OK;
-    info_res = lv_img_decoder_get_info(src, &header, NULL);
+    lv_img_dec_dsc_in_t dsc = {.src = &imgbtn->img_src_mid[state] };
+    info_res = lv_img_decoder_get_info(&dsc, &header);
 
     if(info_res == LV_RES_OK) {
         imgbtn->act_cf = header.cf;
@@ -325,25 +347,33 @@ static void refr_img(lv_obj_t * obj)
 static lv_imgbtn_state_t suggest_state(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-    if(imgbtn->img_src_mid[state] == NULL) {
+    if(imgbtn->img_src_mid[state].type == LV_IMG_SRC_UNKNOWN) {
         switch(state) {
             case LV_IMGBTN_STATE_PRESSED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_CHECKED_RELEASED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_CHECKED_PRESSED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED]) return LV_IMGBTN_STATE_CHECKED_RELEASED;
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_PRESSED]) return LV_IMGBTN_STATE_PRESSED;
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_CHECKED_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_PRESSED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_PRESSED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_DISABLED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_CHECKED_DISABLED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED]) return LV_IMGBTN_STATE_CHECKED_RELEASED;
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_CHECKED_RELEASED;
+                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED].type != LV_IMG_SRC_UNKNOWN)
+                    return LV_IMGBTN_STATE_RELEASED;
                 break;
             default:
                 break;

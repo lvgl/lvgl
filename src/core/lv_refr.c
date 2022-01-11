@@ -616,7 +616,8 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
         }
         else if(disp_refr->bg_img) {
             lv_img_header_t header;
-            lv_res_t res = lv_img_cache_query(disp_refr->bg_img, &header, NULL);
+            lv_img_dec_dsc_in_t dec_dsc = { .src = disp_refr->bg_img };
+            lv_res_t res = lv_img_cache_query(&dec_dsc, &header, NULL);
             if(res == LV_RES_OK) {
                 lv_area_t a;
                 lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
