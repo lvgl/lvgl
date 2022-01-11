@@ -210,8 +210,9 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * f
 /**
  * Remove the top-most fragment for stack
  * @param manager Fragment manager instance
+ * @return true if there is fragment to pop
  */
-void lv_fragment_manager_pop(lv_fragment_manager_t * manager);
+bool lv_fragment_manager_pop(lv_fragment_manager_t * manager);
 
 /**
  * Replace fragment. Old item in the stack will be removed.

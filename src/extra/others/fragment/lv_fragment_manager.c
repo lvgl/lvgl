@@ -127,9 +127,12 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * f
     item_create_obj(states, NULL);
 }
 
-void lv_fragment_manager_pop(lv_fragment_manager_t * manager)
+bool lv_fragment_manager_pop(lv_fragment_manager_t * manager)
 {
-    lv_fragment_manager_remove(manager, lv_fragment_manager_get_top(manager));
+    lv_fragment_t *top = lv_fragment_manager_get_top(manager);
+    if(top == NULL) return false;
+    lv_fragment_manager_remove(manager, top);
+    return true;
 }
 
 void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
