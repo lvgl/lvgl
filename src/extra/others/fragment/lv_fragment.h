@@ -243,9 +243,8 @@ void lv_fragment_manager_show(lv_fragment_manager_t * manager, lv_fragment_t * f
 /**
  * Send event to top-most fragment
  * @param manager Fragment manager instance
- * @param which User-defined ID of event
- * @param data1 User-defined data
- * @param data2 User-defined data
+ * @param code User-defined ID of event
+ * @param userdata User-defined data
  * @return true if fragment returned true
  */
 bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int code, void * userdata);
