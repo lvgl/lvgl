@@ -107,6 +107,10 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
 
     lv_bar_t * bar = (lv_bar_t *)obj;
 
+    if(bar->mode != LV_BAR_MODE_RANGE) {
+        return;
+    }
+
     value = LV_CLAMP(bar->min_value, value, bar->max_value);
     value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater than the right value*/
 
