@@ -926,4 +926,50 @@ menu "LVGL configuration"
             default y if !LV_CONF_MINIMAL
     endmenu
 
+    menu "Demos"
+        config LV_USE_DEMO_WIDGETS
+            bool "Show some widget"
+            default n
+        config LV_DEMO_WIDGETS_SLIDESHOW
+            bool "Enable slide show"
+            depends on LV_USE_DEMO_WIDGETS
+            default n
+
+        config LV_USE_DEMO_KEYPAD_AND_ENCODER
+            bool "Demonstrate the usage of encoder and keyboard"
+            default n
+
+        config LV_USE_DEMO_BENCHMARK
+            bool "Benchmark your system"
+            default n
+
+        config LV_USE_DEMO_STRESS
+            bool "Stress test for LVGL"
+            default n
+
+        config LV_USE_DEMO_MUSIC
+            bool "Music player demo"
+            default n
+        config LV_DEMO_MUSIC_SQUARE
+            bool "Enable Square"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_LANDSCAPE
+            bool "Enable Landspace"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_ROUND
+            bool "Enable Round"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_LARGE
+            bool "Enable Large"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_AUTO_PLAY
+            bool "Enable Auto play"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+    endmenu
+
 endmenu
