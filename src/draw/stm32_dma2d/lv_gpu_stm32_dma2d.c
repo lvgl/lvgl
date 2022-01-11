@@ -120,7 +120,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
     bool done = false;
 
-    if(dsc->mask == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
+    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 
         lv_color_t * dest_buf = draw_ctx->buf;

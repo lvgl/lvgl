@@ -31,7 +31,7 @@ typedef struct {
                                      * will be clipped to draw_`ctx->clip_area` */
     const lv_color_t * src_buf;     /**< Pointer to an image to blend. If set `fill_color is ignored`*/
     lv_color_t color;               /**< Fill color*/
-    lv_opa_t * mask;                /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
+    lv_opa_t * mask_buf;            /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
     lv_draw_mask_res_t mask_res;    /**< The result of the previous mask operation */
     const lv_area_t * mask_area;    /**< The area of `mask_buf` with absolute coordinates*/
     lv_opa_t opa;                   /**< The overall opacity*/

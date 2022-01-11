@@ -91,7 +91,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
             uint32_t mask_buf_size = lv_area_get_size(&draw_area) > (uint32_t) hor_res ? hor_res : lv_area_get_size(&draw_area);
             lv_color_t * src_buf_rgb = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
             lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
-            blend_dsc.mask = mask_buf;
+            blend_dsc.mask_buf = mask_buf;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
             blend_dsc.src_buf = src_buf_rgb;
@@ -150,7 +150,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
             uint32_t mask_buf_size = lv_area_get_size(&draw_area) > hor_res ? hor_res : lv_area_get_size(&draw_area);
             lv_color_t * src_buf_rgb = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
             lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
-            blend_dsc.mask = mask_buf;
+            blend_dsc.mask_buf = mask_buf;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
             blend_dsc.src_buf = src_buf_rgb;
