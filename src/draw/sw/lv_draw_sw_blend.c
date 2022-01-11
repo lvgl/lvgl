@@ -108,10 +108,10 @@ void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * d
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
     const lv_opa_t * mask;
-    if(dsc->mask == NULL) mask = NULL;
-    if(dsc->mask && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
+    if(dsc->mask_buf == NULL) mask = NULL;
+    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
-    else mask = dsc->mask;
+    else mask = dsc->mask_buf;
 
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 

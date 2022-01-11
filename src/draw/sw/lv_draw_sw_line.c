@@ -156,7 +156,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx
         }
 
         lv_opa_t * mask_buf = lv_mem_buf_get(blend_area_w);
-        blend_dsc.mask = mask_buf;
+        blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
         int32_t h;
         for(h = blend_area.y1; h <= y2; h++) {
@@ -237,7 +237,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx
         blend_area.y2 = blend_area.y1;
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
-        blend_dsc.mask = mask_buf;
+        blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
 
         lv_coord_t dash_start = 0;
@@ -390,7 +390,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ct
     blend_dsc.blend_area = &blend_area;
     blend_dsc.color = dsc->color;
     blend_dsc.opa = dsc->opa;
-    blend_dsc.mask = mask_buf;
+    blend_dsc.mask_buf = mask_buf;
     blend_dsc.mask_area = &blend_area;
 
     /*Fill the first row with 'color'*/
