@@ -54,7 +54,7 @@ It will "copy" the `lvgl` repository to your GitHub account (`https://github.com
 3. Add your changes. You can create a *feature branch* from *master* for the updates: `git checkout -b the-new-feature` 
 4. Commit and push your changes to the forked `lvgl` repository.
 5. Create a PR on GitHub from the page of your `lvgl` repository (`https://github.com/<YOUR_NAME>/lvgl`) by clicking the *"New pull request"* button. Don't forget to select the branch where you added your changes.
-7. Set the base branch. It means where you want to merge your update. In the `lvgl` repo fixes go to `master`, new features to `dev` branch. 
+7. Set the base branch. It means where you want to merge your update. In the `lvgl` repo both the fixes and new features go to `master` branch. 
 8. Describe what is in the update. An example code is welcome if applicable.
 9. If you need to make more changes, just update your forked `lvgl` repo with new commits. They will automatically appear in the PR.
 
