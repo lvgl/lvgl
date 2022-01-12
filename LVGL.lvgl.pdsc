@@ -305,14 +305,14 @@
             <component Cgroup="lvgl" Csub="Porting"  condition="LVGL-Essential">
               <description>Porting Templates</description>
               <files>
-                <file category="preIncludeGlobal"   name="examples/porting/lv_port_disp_template.h" attr="config" version="1.0.0" />
-                <file category="sourceC"            name="examples/porting/lv_port_disp_template.c" attr="config" version="1.0.0" />
+                <file category="header"     name="examples/porting/lv_port_disp_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_disp_template.c" attr="config" version="1.0.0" />
                 
-                <file category="preIncludeGlobal"   name="examples/porting/lv_port_indev_template.h" attr="config" version="1.0.0" />
-                <file category="sourceC"            name="examples/porting/lv_port_indev_template.c" attr="config" version="1.0.0" />
+                <file category="header"     name="examples/porting/lv_port_indev_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_indev_template.c" attr="config" version="1.0.0" />
 
-                <file category="preIncludeGlobal"   name="examples/porting/lv_port_fs_template.h" attr="config" version="1.0.0" />
-                <file category="sourceC"            name="examples/porting/lv_port_fs_template.c" attr="config" version="1.0.0" />
+                <file category="header"     name="examples/porting/lv_port_fs_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_fs_template.c" attr="config" version="1.0.0" />
               </files>
             </component>
 
