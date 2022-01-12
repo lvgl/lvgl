@@ -58,7 +58,7 @@ PACK_BASE_FILES="
   README_zh.md
   lvgl.h
   lv_conf_cmsis.h
-  lv_cmsis_pack.c
+  lv_cmsis_pack.txt
 "
 
 ############ DO NOT EDIT BELOW ###########
@@ -144,6 +144,8 @@ mkdir -p ${PACK_BUILD}/examples/porting
 # pdsc file is mandatory in base directory:
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_BUILD}
 cp -f examples/porting/* ${PACK_BUILD}/examples/porting
+
+mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c" 
 
 # directories
 echo Adding directories to pack:
