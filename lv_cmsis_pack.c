@@ -16,7 +16,7 @@
 ****************************************************************************/
 
 /**
- * @file lv_anim.c
+ * @file lv_cmsis_pack.c
  *
  * @brief This file will only be used by cmsis-pack.
  */
