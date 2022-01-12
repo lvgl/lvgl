@@ -17,6 +17,7 @@ extern "C" {
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
+#include "sw/lv_draw_sw_gradient.h"
 
 /*********************
  *      DEFINES
@@ -33,12 +34,15 @@ typedef struct {
     lv_blend_mode_t blend_mode;
 
     /*Background*/
-    lv_color_t bg_color;
-    lv_color_t bg_grad_color;
-    uint8_t bg_main_color_stop;
-    uint8_t bg_grad_color_stop;
     lv_opa_t bg_opa;
-    lv_grad_dir_t bg_grad_dir : 3;
+#if __STDC_VERSION__ >= 201112L
+    union {
+#endif
+        lv_color_t bg_color;        /**< First element of a gradient is a color, so it maps well here*/
+        lv_gradient_t bg_grad;
+#if __STDC_VERSION__ >= 201112L
+    };
+#endif
 
     /*Background img*/
     const void * bg_img_src;

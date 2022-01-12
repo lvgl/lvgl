@@ -232,6 +232,22 @@ void lv_obj_set_style_bg_grad_stop(struct _lv_obj_t * obj, lv_coord_t value, lv_
     lv_obj_set_local_style_prop(obj, LV_STYLE_BG_GRAD_STOP, v, selector);
 }
 
+void lv_obj_set_style_bg_gradient(struct _lv_obj_t * obj, const lv_gradient_t * value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_GRADIENT, v, selector);
+}
+
+void lv_obj_set_style_bg_dither_mode(struct _lv_obj_t * obj, lv_dither_mode_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_DITHER_MODE, v, selector);
+}
+
 void lv_obj_set_style_bg_img_src(struct _lv_obj_t * obj, const void * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
