@@ -64,6 +64,8 @@ lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, NULL);
 
 To prevent passing the gesture event to the parent from an obejct use `lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
 
+Note that, gestures are not triggered if an object is being scrolled.
+
 ## Keypad and encoder
 
 You can fully control the user interface without a touchpad or mouse by using a keypad or encoder(s). It works similar to the *TAB* key on the PC to select an element in an application or a web page.
