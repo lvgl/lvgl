@@ -147,6 +147,7 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
 /*Set some defines if a dependecy is disabled*/
 #if LV_USE_LOG == 0
+    #define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
     #define LV_LOG_TRACE_MEM        0
     #define LV_LOG_TRACE_TIMER      0
     #define LV_LOG_TRACE_INDEV      0
