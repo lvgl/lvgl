@@ -137,9 +137,13 @@ if [ ! -d $PACK_BUILD ]; then
   mkdir -p $PACK_BUILD
 fi
 
+mkdir -p ${PACK_BUILD}/examples
+mkdir -p ${PACK_BUILD}/examples/porting
+
 # Copy files into build base directory: $PACK_BUILD
 # pdsc file is mandatory in base directory:
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_BUILD}
+cp -f examples/porting/* ${PACK_BUILD}/examples/porting
 
 # directories
 echo Adding directories to pack:

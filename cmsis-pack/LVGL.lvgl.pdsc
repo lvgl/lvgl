@@ -36,6 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
   
   <releases>
+    <release date="2022-01-12" version="0.8.1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/cmsis-pack/LVGL.lvgl.0.8.1.pack">
+      - Add porting templates
+    </release>
     <release date="2022-01-11" version="0.8.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/cmsis-pack/LVGL.lvgl.0.8.0.pack">
       - LVGL v8.1.0
       - Add cmsis-pack
@@ -282,6 +285,7 @@
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
+                
               </files>
               
               <Pre_Include_Global_h>
@@ -297,7 +301,21 @@
                </RTE_Components_h>
               
             </component>
-            
+
+            <component Cgroup="lvgl" Csub="Porting"  condition="LVGL-Essential">
+              <description>Porting Templates</description>
+              <files>
+                <file category="preIncludeGlobal"   name="examples/porting/lv_port_disp_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"            name="examples/porting/lv_port_disp_template.c" attr="config" version="1.0.0" />
+                
+                <file category="preIncludeGlobal"   name="examples/porting/lv_port_indev_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"            name="examples/porting/lv_port_indev_template.c" attr="config" version="1.0.0" />
+
+                <file category="preIncludeGlobal"   name="examples/porting/lv_port_fs_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"            name="examples/porting/lv_port_fs_template.c" attr="config" version="1.0.0" />
+              </files>
+            </component>
+
             <component Cgroup="lvgl" Csub="GPU STM32-DMA2D"  condition="LVGL-Essential">
               <description>An hardware acceleration from STM32-DMA2D</description>
               <files>
