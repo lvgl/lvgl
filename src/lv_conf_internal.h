@@ -611,6 +611,13 @@
         #define LV_USE_ASSERT_OBJ           0   /*Check the object's type and existence (e.g. not deleted). (Slow)*/
     #endif
 #endif
+#ifndef LV_USE_ASSERT_VERIFY
+    #ifdef CONFIG_LV_USE_ASSERT_VERIFY
+        #define LV_USE_ASSERT_VERIFY CONFIG_LV_USE_ASSERT_VERIFY
+    #else
+        #define LV_USE_ASSERT_VERIFY        0   /*Verify conditions*/
+    #endif
+#endif
 
 /*Add a custom handler when assert happens e.g. to restart the MCU*/
 #ifndef LV_ASSERT_HANDLER_INCLUDE
