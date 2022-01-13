@@ -72,6 +72,12 @@ extern "C" {
 #   define LV_ASSERT_MEM_INTEGRITY()
 #endif
 
+#if LV_USE_ASSERT_VERIFY
+#   define LV_ASSERT_VERIFY(x)  LV_ASSERT(x)
+#else
+#   define LV_ASSERT_VERIFY(x)
+#endif
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
