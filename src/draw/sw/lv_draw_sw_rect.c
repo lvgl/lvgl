@@ -109,13 +109,12 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     if(bg_color.full == dsc->bg_grad.stops[1].color.full) grad_dir = LV_GRAD_DIR_NONE;
 
     bool mask_any = lv_draw_mask_is_any(&bg_coords);
+    lv_draw_sw_blend_dsc_t blend_dsc = {0};
+    blend_dsc.blend_mode = dsc->blend_mode;
+    blend_dsc.color = bg_color;
 
     /*Most simple case: just a plain rectangle*/
     if(!mask_any && dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
-        lv_draw_sw_blend_dsc_t blend_dsc;
-        lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
-        blend_dsc.blend_mode = dsc->blend_mode;
-        blend_dsc.color = bg_color;
         blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->bg_opa;
 
@@ -152,14 +151,11 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     blend_area.x1 = clipped_coords.x1;
     blend_area.x2 = clipped_coords.x2;
 
-    lv_draw_sw_blend_dsc_t blend_dsc;
-    lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
-    blend_dsc.blend_mode = dsc->blend_mode;
-    blend_dsc.color = dsc->bg_grad.stops[0].color;
     blend_dsc.mask_buf = mask_buf;
-    blend_dsc.opa = LV_OPA_COVER;
     blend_dsc.blend_area = &blend_area;
     blend_dsc.mask_area = &blend_area;
+    blend_dsc.opa = LV_OPA_COVER;
+
 
     /*Get gradient if appropriate*/
     lv_gradient_cache_t * grad = lv_grad_get_from_cache(&dsc->bg_grad, coords_bg_w, coords_bg_h);
