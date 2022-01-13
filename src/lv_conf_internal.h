@@ -430,11 +430,20 @@
             #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
         #endif
     #endif
+    /*Texture cache size, 8MB by default*/
     #ifndef LV_GPU_SDL_LRU_SIZE
         #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
             #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
         #else
             #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+        #endif
+    #endif
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #ifndef LV_GPU_SDL_CUSTOM_BLEND_MODE
+        #ifdef CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
+            #define LV_GPU_SDL_CUSTOM_BLEND_MODE CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
+        #else
+            #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
         #endif
     #endif
 #endif
