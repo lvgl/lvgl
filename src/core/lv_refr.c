@@ -314,6 +314,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
         if(disp_refr->driver->full_refresh) {
+            lv_area_t disp_area;
+            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+            disp_refr->driver->draw_ctx->buf_area = &disp_area;
             draw_buf_flush(disp_refr);
         }
 
