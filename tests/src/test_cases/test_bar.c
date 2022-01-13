@@ -164,4 +164,35 @@ void test_bar_current_value_should_be_truncated_to_min_value_when_it_is_below_it
     TEST_ASSERT_EQUAL_INT32(min_value, lv_bar_get_value(bar));
 }
 
+/** When in symmetrical mode, the bar indicator has to be drawn towards the min
+ * range value. Requires a negative min range value and a positive max range
+ * value.
+ *
+ * Bar properties assumed:
+ * - base direction: RTL
+ */
+void test_bar_indicator_should_be_drawn_towards_the_min_range_side_after_setting_a_more_negative_value(void)
+{
+    lv_bar_t * bar_ptr = (lv_bar_t *) bar;
+
+    /* Setup bar properties */
+    lv_obj_set_size(bar, 100, 50);
+    lv_bar_set_mode(bar, LV_BAR_MODE_SYMMETRICAL);
+    lv_bar_set_range(bar, -100, 100);
+
+    /* Set bar value to 1, so it gets drawn at the middle of the bar */
+    lv_bar_set_value(bar, 1, LV_ANIM_OFF);
+    lv_test_indev_wait(50);
+
+    lv_coord_t original_pos = bar_ptr->indic_area.x1;
+
+    /* Set bar to a more negative value */
+    lv_bar_set_value(bar, -50, LV_ANIM_OFF);
+    lv_test_indev_wait(50);
+
+    lv_coord_t final_pos = bar_ptr->indic_area.x1;
+
+    TEST_ASSERT_LESS_THAN(original_pos, final_pos);
+}
+
 #endif
