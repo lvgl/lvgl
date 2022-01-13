@@ -18,7 +18,7 @@
  *      DEFINES
  *********************/
 #ifndef HAVE_SDL_CUSTOM_BLEND_MODE
-#define HAVE_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+    #define HAVE_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
 /**********************
