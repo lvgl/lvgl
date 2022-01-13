@@ -83,24 +83,24 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    lv_img_src_uri_parse(&imgbtn->img_src_left[state], src_left);
-    lv_img_src_uri_parse(&imgbtn->img_src_mid[state], src_mid);
-    lv_img_src_uri_parse(&imgbtn->img_src_right[state], src_right);
+    lv_img_src_parse(&imgbtn->img_src_left[state], src_left);
+    lv_img_src_parse(&imgbtn->img_src_mid[state], src_mid);
+    lv_img_src_parse(&imgbtn->img_src_right[state], src_right);
 
 
     refr_img(obj);
 }
-void lv_imgbtn_set_src_uri(lv_obj_t * obj, lv_imgbtn_state_t state, const lv_img_src_uri_t * src_left,
-                           const lv_img_src_uri_t * src_mid,
-                           const lv_img_src_uri_t * src_right)
+void lv_imgbtn_set_src_uri(lv_obj_t * obj, lv_imgbtn_state_t state, const lv_img_src_t * src_left,
+                           const lv_img_src_t * src_mid,
+                           const lv_img_src_t * src_right)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    lv_img_src_uri_copy(&imgbtn->img_src_left[state], src_left);
-    lv_img_src_uri_copy(&imgbtn->img_src_mid[state], src_mid);
-    lv_img_src_uri_copy(&imgbtn->img_src_right[state], src_right);
+    lv_img_src_copy(&imgbtn->img_src_left[state], src_left);
+    lv_img_src_copy(&imgbtn->img_src_mid[state], src_mid);
+    lv_img_src_copy(&imgbtn->img_src_right[state], src_right);
 
     refr_img(obj);
 }
@@ -134,7 +134,7 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
-const lv_img_src_uri_t * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
+const lv_img_src_t * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -149,7 +149,7 @@ const lv_img_src_uri_t * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to the middle image source (a C array or path to a file)
  */
-const lv_img_src_uri_t * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
+const lv_img_src_t * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
@@ -163,7 +163,7 @@ const lv_img_src_uri_t * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_stat
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
-const lv_img_src_uri_t * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
+const lv_img_src_t * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
@@ -258,11 +258,11 @@ static void draw_main(lv_event_t * e)
     lv_coord_t right_w = 0;
 
     if(entry) {
-        left_w = entry->dec_dsc.out.header.w;
+        left_w = entry->dec_dsc.header.w;
         coords_part.x1 = coords.x1;
         coords_part.y1 = coords.y1;
-        coords_part.x2 = coords.x1 + entry->dec_dsc.out.header.w - 1;
-        coords_part.y2 = coords.y1 + entry->dec_dsc.out.header.h - 1;
+        coords_part.x2 = coords.x1 + entry->dec_dsc.header.w - 1;
+        coords_part.y2 = coords.y1 + entry->dec_dsc.header.h - 1;
         lv_draw_img_cached(draw_ctx, &img_dsc, &coords_part, entry);
 
         lv_img_cache_cleanup(entry);
@@ -271,11 +271,11 @@ static void draw_main(lv_event_t * e)
     dsc.src = &imgbtn->img_src_right[state];
     entry = lv_img_cache_open(&dsc, NULL);
     if(entry) {
-        right_w = entry->dec_dsc.out.header.w;
-        coords_part.x1 = coords.x2 - entry->dec_dsc.out.header.w + 1;
+        right_w = entry->dec_dsc.header.w;
+        coords_part.x1 = coords.x2 - entry->dec_dsc.header.w + 1;
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
-        coords_part.y2 = coords.y1 + entry->dec_dsc.out.header.h - 1;
+        coords_part.y2 = coords.y1 + entry->dec_dsc.header.h - 1;
         lv_draw_img_cached(draw_ctx, &img_dsc, &coords_part, entry);
 
         lv_img_cache_cleanup(entry);
@@ -300,14 +300,14 @@ static void draw_main(lv_event_t * e)
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
-            coords_part.x2 = coords_part.x1 + entry->dec_dsc.out.header.w - 1;
-            coords_part.y2 = coords_part.y1 + entry->dec_dsc.out.header.h - 1;
+            coords_part.x2 = coords_part.x1 + entry->dec_dsc.header.w - 1;
+            coords_part.y2 = coords_part.y1 + entry->dec_dsc.header.h - 1;
 
-            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + entry->dec_dsc.out.header.w - 1);
-                i += entry->dec_dsc.out.header.w) {
+            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + entry->dec_dsc.header.w - 1);
+                i += entry->dec_dsc.header.w) {
                 lv_draw_img_cached(draw_ctx, &img_dsc, &coords_part, entry);
                 coords_part.x1 = coords_part.x2 + 1;
-                coords_part.x2 += entry->dec_dsc.out.header.w;
+                coords_part.x2 += entry->dec_dsc.header.w;
             }
             draw_ctx->clip_area = clip_area_ori;
         }

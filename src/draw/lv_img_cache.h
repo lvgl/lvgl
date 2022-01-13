@@ -74,7 +74,7 @@ void lv_img_cache_set_size(uint16_t new_slot_num);
  * Useful if the image source is updated therefore it needs to be cached again.
  * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
  */
-void lv_img_cache_invalidate_src(const lv_img_src_uri_t * src);
+void lv_img_cache_invalidate_src(const lv_img_src_t * src);
 
 /**
  * Cleanup a cache entry returned by lv_img_cache_open.

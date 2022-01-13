@@ -197,7 +197,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
 {
     if(SKIP_IMAGE(dsc)) return;
 
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
+    lv_img_src_type_t src_type = lv_img_src_get_type(dsc->bg_img_src);
     if(src_type == LV_IMG_SRC_SYMBOL) {
         lv_point_t size;
         lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);

@@ -45,7 +45,7 @@ typedef struct {
 #endif
 
     /*Background img*/
-    const lv_img_src_uri_t * bg_img_src;
+    const lv_img_src_t * bg_img_src;
     const void * bg_img_symbol_font;
     lv_color_t bg_img_recolor;
     lv_opa_t bg_img_opa;

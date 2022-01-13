@@ -32,7 +32,8 @@ extern "C" {
  **********************/
 
 /** Some image are animated.
- *  In that case, you might want to control the animation with `lv_img_set_play_mode` */
+ *  In that case, you might want to control the animation with `lv_img_set_play_mode`
+ *  These are flags you'll combine with | to express your need */
 typedef enum {
     LV_IMG_CTRL_FORWARD  = 0,   /**< Let the animation play forward. */
     LV_IMG_CTRL_BACKWARD = 1,   /**< Let the animation play backward, if supported */
@@ -51,7 +52,7 @@ typedef enum {
  */
 typedef struct {
     lv_obj_t            obj;
-    lv_img_src_uri_t    src;        /**< Image source*/
+    lv_img_src_t    src;        /**< Image source*/
     lv_point_t          offset;
     lv_coord_t          w;          /**< Width of the image in px (Handled by the library)*/
     lv_coord_t          h;          /**< Height of the image in px (Handled by the library)*/
@@ -63,8 +64,8 @@ typedef struct {
     uint8_t             obj_size_mode: 2; /**< Image size mode if image and object sizes differ */
 
     uint8_t             ctrl;       /**< The current control flags */
-    lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context*/
-    lv_timer_t     *    task;       /**< The timer task for animated images */
+    lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context */
+    lv_timer_t     *    anim_timer; /**< The timer task for animated images */
 } lv_img_t;
 
 
@@ -128,21 +129,36 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index);
 lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
 
 /**
- * Set the image data to display on the the object
- *
- * Some picture don't have intrinsic size (like a vector based format, SVG, Lottie), or contain multiple
- * parts (like multiple frames for animated format, GIF, Lottie).
- * If you need to deal with such format, you might have to call other function
- * (like `lv_obj_set_size` for vector format) before calling this
+ * Parse the image source to display on the the object
  *
  * @param obj       pointer to an image object
  * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  *
- * @deprecated This function is deprecated in favor of lv_img_set_src_file, lv_img_set_src_data, lv_img_set_src_symbol
+ * @deprecated This function is deprecated in favor of lv_img_accept_src
+ *             You can create a lv_img_src_t * from a file, symbol or plain data via lv_img_src_set_file/symbol/data
+ *
  */
-void lv_img_set_src(lv_obj_t * obj, const void * src);
+void lv_img_parse_src(lv_obj_t * obj, const void * src);
+
+
+/** Set the source of this image to a lv_img_src_t and check if it's usable.
+ *
+ * Some picture don't have intrinsic size (like a vector based format, SVG, Lottie), or contain multiple
+ * parts (like multiple frames for animated format, GIF, Lottie).
+ * If you need to deal with such format, you might have to call other function
+ * (like `lv_obj_set_size` for vector format) before calling this
+ *
+ * @param obj           pointer to an image object
+ * @param src           pointer to an image source object
+ * @param skip_cache    if 1, the image will only be parsed to extract its metadata but it'll skip
+ *                      the image cache until it's actually used.
+ *                      You might only need to set this if you are preparing your screen at once on start
+ * @return LV_RES_OK    If the image was correctly parsed
+ */
+lv_res_t lv_img_set_src(lv_obj_t * obj, const lv_img_src_t * src, int skip_cache);
+
 
 /** Set the source of this image to a file.
  * @sa lv_img_set_src
@@ -170,15 +186,6 @@ void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len)
  * @param text      pointer to a null terminated string containing extended chars to render
  */
 void lv_img_set_src_symbol(lv_obj_t * obj, const char * text);
-
-/** Set the source of this image to a lv_img_src_uri_t.
- * @sa lv_img_set_src
- *
- * @param obj       pointer to an image object
- * @param uri       pointer to an URI object
- */
-void lv_img_set_src_uri(lv_obj_t * obj, const lv_img_src_uri_t * uri);
-
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.
@@ -249,17 +256,9 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
 /**
  * Get the source of the image
  * @param obj       pointer to an image object
- * @return          the image source (symbol, file name or ::lv-img_dsc_t for C arrays)
- * @deprecated      this function hides the source type and is not recommanded, please use lv_img_get_src_uri instead
- */
-const void * lv_img_get_src(lv_obj_t * obj);
-
-/**
- * Get the source of the image
- * @param obj       pointer to an image object
  * @return          the image source uri (symbol, file name or data for C arrays)
  */
-lv_img_src_uri_t * lv_img_get_src_uri(lv_obj_t * obj);
+lv_img_src_t * lv_img_get_src(lv_obj_t * obj);
 
 
 /**

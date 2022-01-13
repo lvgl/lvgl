@@ -84,7 +84,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt)
 #if LV_USE_IMG == 1
     if(icon) {
         lv_obj_t * img = lv_img_create(obj);
-        lv_img_set_src(img, icon);
+        lv_img_set_src_symbol(img, icon);
     }
 #endif
 

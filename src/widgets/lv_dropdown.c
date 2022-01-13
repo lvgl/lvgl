@@ -300,12 +300,12 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
     lv_obj_invalidate(obj);
 }
 
-void lv_dropdown_set_symbol(lv_obj_t * obj, const lv_img_src_uri_t * symbol)
+void lv_dropdown_set_symbol(lv_obj_t * obj, const lv_img_src_t * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    lv_img_src_uri_copy(&dropdown->symbol, symbol);
+    lv_img_src_copy(&dropdown->symbol, symbol);
     lv_obj_invalidate(obj);
 }
 
@@ -398,7 +398,7 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     buf[c] = '\0';
 }
 
-const lv_img_src_uri_t * lv_dropdown_get_symbol(lv_obj_t * obj)
+const lv_img_src_t * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -573,7 +573,7 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->option_cnt      = 0;
     dropdown->dir = LV_DIR_BOTTOM;
 
-    lv_img_src_uri_symbol(&dropdown->symbol, LV_SYMBOL_DOWN);
+    lv_img_src_set_symbol(&dropdown->symbol, LV_SYMBOL_DOWN);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
 
@@ -794,8 +794,8 @@ static void draw_main(lv_event_t * e)
             lv_img_dec_dsc_in_t dsc = {.src = &dropdown->symbol };
             entry = lv_img_cache_open(&dsc, 0);
             if(entry) {
-                symbol_w = entry->dec_dsc.out.header.w;
-                symbol_h = entry->dec_dsc.out.header.h;
+                symbol_w = entry->dec_dsc.header.w;
+                symbol_h = entry->dec_dsc.header.h;
             }
             else {
                 symbol_w = -1;

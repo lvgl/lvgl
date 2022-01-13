@@ -34,9 +34,9 @@
  *  STATIC PROTOTYPES
  **********************/
 //#if LV_IMG_CACHE_DEF_SIZE
-static bool lv_img_cache_match(const lv_img_src_uri_t * src1, const lv_img_src_uri_t * src2);
+static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * src2);
 //#endif
-static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
+static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
                        lv_img_cache_entry_t ** out);
 
 /**********************
@@ -60,7 +60,7 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
 {
     lv_img_cache_entry_t * cached_src = NULL;
     if(find_entry(dsc->src, NULL, dec_ctx, &cached_src)) {
-        lv_memcpy(header, &cached_src->dec_dsc.out.header, sizeof(*header));
+        lv_memcpy(header, &cached_src->dec_dsc.header, sizeof(*header));
         return LV_RES_OK;
     }
     if(!cached_src) return LV_RES_INV;
@@ -69,8 +69,8 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
     lv_memcpy(&cached_src->dec_dsc.in, dsc, sizeof(*dsc));
-    cached_src->dec_dsc.out.dec_ctx = dec_ctx;
-    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, 0);
+    cached_src->dec_dsc.dec_ctx = dec_ctx;
+    lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, LV_IMG_DEC_ONLYMETA);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
@@ -101,7 +101,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
     lv_memcpy(&cached_src->dec_dsc.in, dsc, sizeof(*dsc));
-    cached_src->dec_dsc.out.dec_ctx = dec_ctx;
+    cached_src->dec_dsc.dec_ctx = dec_ctx;
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, 0);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
@@ -159,7 +159,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
  * Useful if the image source is updated therefore it needs to be cached again.
  * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
  */
-void lv_img_cache_invalidate_src(const lv_img_src_uri_t * src)
+void lv_img_cache_invalidate_src(const lv_img_src_t * src)
 {
     LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
@@ -182,7 +182,7 @@ void lv_img_cache_invalidate_src(const lv_img_src_uri_t * src)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
+static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
                        lv_img_cache_entry_t ** out)
 {
     /*Is the image cached?*/
@@ -206,7 +206,7 @@ static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_
 
     for(i = 0; i < entry_cnt; i++) {
         if(((color != NULL && color->full == cache[i].dec_dsc.in.color.full) || !color) &&
-           ((dec_ctx != NULL && dec_ctx == cache[i].dec_dsc.out.dec_ctx) || !dec_ctx) &&
+           ((dec_ctx != NULL && dec_ctx == cache[i].dec_dsc.dec_ctx) || !dec_ctx) &&
            lv_img_cache_match(src, cache[i].dec_dsc.in.src)) {
             /*If opened increment its life.
              *Image difficult to open should live longer to keep avoid frequent their recaching.
@@ -242,6 +242,8 @@ static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_
         LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
     }
 #else
+    LV_UNUSED(color);
+    LV_UNUSED(dec_ctx);
     cached_src = &LV_GC_ROOT(_lv_img_cache_single);
 #endif
     *out = cached_src;
@@ -250,7 +252,7 @@ static bool find_entry(const lv_img_src_uri_t * src, lv_color_t * color, lv_img_
     return false;
 }
 
-static bool lv_img_cache_match(const lv_img_src_uri_t * src1, const lv_img_src_uri_t * src2)
+static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * src2)
 {
     if(src1 == src2) return true; /* Fastlane first*/
     if(!src1 || !src2) return false;

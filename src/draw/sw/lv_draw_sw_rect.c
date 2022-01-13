@@ -333,7 +333,7 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
             LV_LOG_WARN("Couldn't read the background image");
             return;
         }
-        header = entry->dec_dsc.out.header;
+        header = entry->dec_dsc.header;
 
         /*Center align*/
         if(dsc->bg_img_tiled == false) {

@@ -75,7 +75,7 @@ struct _lv_img_decoder_t;
  * @param caps If provided will the filled with the decoder capabilities
  * @return LV_RES_OK: the decoder can decode the given source; LV_RES_INV: it can't decode the source
  */
-typedef lv_res_t (*lv_img_decoder_accept_f_t)(const lv_img_src_uri_t * src, uint8_t * caps);
+typedef lv_res_t (*lv_img_decoder_accept_f_t)(const lv_img_src_t * src, uint8_t * caps);
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
@@ -118,7 +118,7 @@ typedef struct _lv_img_decoder_t {
  */
 typedef struct _lv_img_dec_dsc_in_t {
     /**Pointer to the image source. No copy made so the origin must exists as long as this instance exists*/
-    const lv_img_src_uri_t * src;
+    const lv_img_src_t * src;
 
     /**Color to draw the image. Used when the image has alpha channel only*/
     lv_color_t color;
@@ -128,24 +128,6 @@ typedef struct _lv_img_dec_dsc_in_t {
 
 } lv_img_dec_dsc_in_t;
 
-/** The output members of an image decoder descriptor.
- *  These are the fields that are set by the decoder when opened */
-typedef struct _lv_img_dec_dsc_out_t {
-    /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
-    lv_img_header_t header;
-
-    /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
-     *  MUST be set in `open` function*/
-    const uint8_t * img_data;
-
-    /**Initialization context for decoder*/
-    lv_img_dec_ctx_t * dec_ctx;
-
-    /**A text to display instead of the image when the image can't be opened.
-     * Can be set in `open` function or set NULL.*/
-    const char * error_msg;
-
-} lv_img_dec_dsc_out_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_img_decoder_dsc_t {
@@ -159,8 +141,24 @@ typedef struct _lv_img_decoder_dsc_t {
     /** The input data to set*/
     lv_img_dec_dsc_in_t  in;
 
-    /** The output data to retrieve from the decoder*/
-    lv_img_dec_dsc_out_t out;
+    /** The output data to retrieve from the decoder.
+     * Anything below is filled by the decoder */
+
+    /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
+    lv_img_header_t header;
+
+    /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
+     *  Can be NULL if the decoded context does not have the LV_IMG_DEC_CACHED capability.
+     *  In that case, you'll need to call `read_line` to read line by line.
+     *  MUST be set in `open` function*/
+    const uint8_t * img_data;
+
+    /**Initialization context for decoder*/
+    lv_img_dec_ctx_t * dec_ctx;
+
+    /**A text to display instead of the image when the image can't be opened.
+     * Can be set in `open` function or set NULL.*/
+    const char * error_msg;
 
 } lv_img_decoder_dsc_t;
 
@@ -172,6 +170,15 @@ typedef struct _lv_img_decoder_dsc_t {
  * Initialize the image decoder module
  */
 void _lv_img_decoder_init(void);
+
+/**
+ * Initialize the image decoder descriptor
+ * @param desc  The descriptor to initialize
+ * @param src   The source of the image to use for this descriptor
+ * @param color If not NULL, will be used in color corrected images
+ * @param size_hint if not NULL, will be used to set a size hint for the decoder */
+void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color_t * color,
+                            lv_point_t * size_hint);
 
 /**
  * Get information about an image.
@@ -192,7 +199,7 @@ lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc, lv_img_header_
  * @param caps  If not null, will be filled with the capabilities for the selected decoder
  * @return A pointer to the decoder that's able to decode the image or NULL if none found
  */
-lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps);
+lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps);
 
 /**
  * Open an image.

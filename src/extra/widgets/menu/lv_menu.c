@@ -296,7 +296,7 @@ void lv_menu_set_sidebar_page(lv_obj_t * obj, lv_obj_t * page)
             menu->sidebar_header_back_btn = sidebar_header_back_btn;
 
             lv_obj_t * sidebar_header_back_icon = lv_img_create(menu->sidebar_header_back_btn);
-            lv_img_set_src(sidebar_header_back_icon, LV_SYMBOL_LEFT);
+            lv_img_set_src_symbol(sidebar_header_back_icon, LV_SYMBOL_LEFT);
 
             lv_obj_t * sidebar_header_title = lv_label_create(menu->sidebar_header);
             lv_obj_add_flag(sidebar_header_title, LV_OBJ_FLAG_HIDDEN);
@@ -504,7 +504,7 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     menu->main_header_back_btn = main_header_back_btn;
 
     lv_obj_t * main_header_back_icon = lv_img_create(menu->main_header_back_btn);
-    lv_img_set_src(main_header_back_icon, LV_SYMBOL_LEFT);
+    lv_img_set_src_symbol(main_header_back_icon, LV_SYMBOL_LEFT);
 
     lv_obj_t * main_header_title = lv_label_create(menu->main_header);
     lv_obj_add_flag(main_header_title, LV_OBJ_FLAG_HIDDEN);

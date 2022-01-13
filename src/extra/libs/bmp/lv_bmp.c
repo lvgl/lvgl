@@ -31,7 +31,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
 static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
@@ -70,7 +70,7 @@ void lv_bmp_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 {
     /*If it's a BMP file...*/
     if(src->type == LV_IMG_SRC_FILE) {
@@ -104,7 +104,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     if(flags == LV_IMG_DEC_ONLYMETA) {
         /*Save the data in the header*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->in.src->uri, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
         uint8_t headers[54];
 
@@ -128,10 +128,10 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     }
 
     /*If it's a BMP file...*/
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
+    if(dsc->in.src->type == LV_IMG_SRC_FILE) {
 
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->in.src->uri, LV_FS_MODE_RD);
         if(res == LV_RES_OK) return LV_RES_INV;
 
         uint8_t header[54];
@@ -142,6 +142,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         }
 
         LV_ZERO_ALLOC(dsc->dec_ctx);
+        dsc->dec_ctx->auto_allocated = 1;
         if(dsc->dec_ctx->user_data == NULL) {
             LV_ZALLOC(dsc->dec_ctx->user_data, sizeof(bmp_dsc_t));
             if(dsc->dec_ctx->user_data == NULL) {
@@ -151,11 +152,11 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             }
 
             bmp_dsc_t * b = (bmp_dsc_t *)dsc->dec_ctx->user_data;
-            memcpy(&b.px_offset, header + 10, 4);
-            memcpy(&b.px_width, header + 18, 4);
-            memcpy(&b.px_height, header + 22, 4);
-            memcpy(&b.bpp, header + 28, 2);
-            b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
+            memcpy(&b->px_offset, header + 10, 4);
+            memcpy(&b->px_width, header + 18, 4);
+            memcpy(&b->px_height, header + 22, 4);
+            memcpy(&b->bpp, header + 28, 2);
+            b->row_size_bytes = ((b->bpp * b->px_width + 31) / 32) * 4;
         }
         dsc->img_data = NULL;
         return LV_RES_OK;
@@ -215,7 +216,7 @@ static void decoder_close(lv_img_decoder_dsc_t * dsc)
     bmp_dsc_t * b = dsc->dec_ctx->user_data;
     lv_fs_close(&b->f);
     lv_mem_free(dsc->dec_ctx->user_data);
-    if(!dsc->dec_ctx->auto_allocated) {
+    if(dsc->dec_ctx->auto_allocated) {
         lv_mem_free(dsc->dec_ctx);
         dsc->dec_ctx = NULL;
     }

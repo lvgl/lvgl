@@ -38,19 +38,29 @@ void _lv_img_decoder_init(void)
     lv_bin_init();
 }
 
+void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color_t * color,
+                            lv_point_t * size_hint)
+{
+    lv_memset_00(desc, sizeof(*desc));
+    desc->src = src;
+    if(color) desc->color = *color;
+    if(size_hint) desc->size_hint = *size_hint;
+}
+
+
 lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc_in, lv_img_header_t * header)
 {
     /*TODO: We should search the cache here, since we might already have a decoder with the information we need */
     lv_img_decoder_dsc_t dsc = {0};
     lv_memcpy(&dsc.in, dsc_in, sizeof(*dsc_in));
     if(lv_img_decoder_open(&dsc, LV_IMG_DEC_ONLYMETA) == LV_RES_OK) {
-        lv_memcpy(header, &dsc.out.header, sizeof(*header));
+        lv_memcpy(header, &dsc.header, sizeof(*header));
         return LV_RES_OK;
     }
     return LV_RES_INV;
 }
 
-lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps)
+lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 {
     if(src == NULL) return NULL;
 

@@ -139,7 +139,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
     return indic;
 }
 
-lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const lv_img_src_uri_t * src,
+lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t * scale, const lv_img_src_t * src,
                                                lv_coord_t pivot_x, lv_coord_t pivot_y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -151,7 +151,7 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
     indic->opa = LV_OPA_COVER;
 
     indic->type = LV_METER_INDICATOR_TYPE_NEEDLE_IMG;
-    lv_img_src_uri_copy(&indic->type_data.needle_img.src, src);
+    lv_img_src_copy(&indic->type_data.needle_img.src, src);
     indic->type_data.needle_img.pivot.x = pivot_x;
     indic->type_data.needle_img.pivot.y = pivot_y;
     lv_obj_invalidate(obj);
@@ -615,8 +615,8 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             lv_area_t a;
             a.x1 = scale_center.x - indic->type_data.needle_img.pivot.x;
             a.y1 = scale_center.y - indic->type_data.needle_img.pivot.y;
-            a.x2 = a.x1 + entry->dec_dsc.out.header.w - 1;
-            a.y2 = a.y1 + entry->dec_dsc.out.header.h - 1;
+            a.x2 = a.x1 + entry->dec_dsc.header.w - 1;
+            a.y2 = a.y1 + entry->dec_dsc.header.h - 1;
 
             img_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
             img_dsc.pivot.x = indic->type_data.needle_img.pivot.x;

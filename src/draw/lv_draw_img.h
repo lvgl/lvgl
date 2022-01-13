@@ -61,7 +61,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
 void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                 const lv_img_src_uri_t * src);
+                 const lv_img_src_t * src);
 
 /**
  * Draw an image from cache.

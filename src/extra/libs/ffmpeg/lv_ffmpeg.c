@@ -265,7 +265,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     LV_UNUSED(decoder);
 
     /* Get the source type */
-    lv_img_src_t src_type = lv_img_src_get_type(src);
+    lv_img_src_type_t src_type = lv_img_src_get_type(src);
 
     if(src_type == LV_IMG_SRC_FILE) {
         const char * fn = src;

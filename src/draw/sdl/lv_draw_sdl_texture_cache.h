@@ -60,7 +60,7 @@ typedef enum {
 
 typedef struct {
     lv_sdl_cache_key_magic_t magic;
-    lv_img_src_t type;
+    lv_img_src_type_t type;
     lv_img_dec_ctx_t * dec_ctx;
 } lv_draw_sdl_cache_key_head_img_t;
 

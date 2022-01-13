@@ -26,7 +26,7 @@
  *  STATIC PROTOTYPES
  **********************/
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
-                                                      const lv_area_t * coords, const lv_img_src_uri_t * src);
+                                                      const lv_area_t * coords, const lv_img_src_t * src);
 
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
                                                              const lv_area_t * coords, lv_img_cache_entry_t * entry);
@@ -62,7 +62,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
 void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                 const lv_img_src_uri_t * src)
+                 const lv_img_src_t * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -225,7 +225,7 @@ void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
-                                                      const lv_area_t * coords, const lv_img_src_uri_t * src)
+                                                      const lv_area_t * coords, const lv_img_src_t * src)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -247,22 +247,22 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * dra
     if(cdsc == NULL) return LV_RES_INV;
 
     /*Save the decoder context as it might contains useful information for the img object*/
-    draw_dsc->dec_ctx = cdsc->dec_dsc.out.dec_ctx;
+    draw_dsc->dec_ctx = cdsc->dec_dsc.dec_ctx;
 
 
     lv_img_cf_t cf;
-    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.out.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.out.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
     else cf = LV_IMG_CF_TRUE_COLOR;
 
-    if(cdsc->dec_dsc.out.error_msg != NULL) {
+    if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 
-        show_error(draw_ctx, coords, cdsc->dec_dsc.out.error_msg);
+        show_error(draw_ctx, coords, cdsc->dec_dsc.error_msg);
     }
     /*The decoder could open the image and gave the entire uncompressed image.
      *Just draw it!*/
-    else if(cdsc->dec_dsc.out.img_data) {
+    else if(cdsc->dec_dsc.img_data) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
@@ -287,7 +287,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * dra
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.out.img_data, cf);
+        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
         draw_ctx->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/

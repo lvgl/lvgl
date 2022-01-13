@@ -618,16 +618,16 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             draw_ctx->draw_bg(draw_ctx, &dsc, draw_ctx->buf_area);
         }
         else if(disp_refr->bg_img) {
-            lv_img_header_t header;
             lv_img_dec_dsc_in_t dec_dsc = { .src = disp_refr->bg_img };
-            lv_res_t res = lv_img_cache_query(&dec_dsc, &header, NULL);
-            if(res == LV_RES_OK) {
+            lv_img_cache_entry_t * entry = lv_img_cache_open(&dec_dsc, NULL);
+            if(entry != NULL) {
                 lv_area_t a;
-                lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
+                lv_area_set(&a, 0, 0, entry->dec_dsc.header.w - 1, entry->dec_dsc.header.h - 1);
                 lv_draw_img_dsc_t dsc;
                 lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
-                lv_draw_img(draw_ctx, &dsc, &a, disp_refr->bg_img);
+                lv_draw_img_cached(draw_ctx, &dsc, &a, entry);
+                lv_img_cache_cleanup(entry);
             }
             else {
                 LV_LOG_WARN("Can't draw the background image");

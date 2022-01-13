@@ -39,7 +39,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
 static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
@@ -102,7 +102,7 @@ static lv_res_t init_dec_ctx(rlottiedec_ctx_t * dec_ctx)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_accept(const lv_img_src_uri_t * src, uint8_t * caps)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 {
     /*If it's a rlottie json file...*/
     if(src->type == LV_IMG_SRC_FILE) {
@@ -195,26 +195,26 @@ static lv_res_t render_animation(lv_rlottie_dec_context_t * context, rlottiedec_
  */
 static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
-    rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->out.dec_ctx;
-    dsc->out.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->dec_ctx;
+    dsc->header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 
 
     /* Already exist ? Reuse */
     if(dec_ctx != NULL && dec_ctx->ctx.user_data != NULL) {
-        if(dsc->out.header.w == LV_SIZE_CONTENT || !dsc->out.header.w || dsc->out.header.h == LV_SIZE_CONTENT ||
-           !dsc->out.header.h) {
-            dsc->out.header.w = dsc->in.size_hint.x;
-            dsc->out.header.h = dsc->in.size_hint.y;
+        if(dsc->header.w == LV_SIZE_CONTENT || !dsc->header.w || dsc->header.h == LV_SIZE_CONTENT ||
+           !dsc->header.h) {
+            dsc->header.w = dsc->in.size_hint.x;
+            dsc->header.h = dsc->in.size_hint.y;
         }
         set_caps(&dec_ctx->ctx.caps);
         /* If only the frame index changed and we are rendering to the internal buffer,
            let's skip everything and render directly */
-        if((dsc->out.header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->out.header.h <= dec_ctx->max_buf_size) {
+        if((dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->header.h <= dec_ctx->max_buf_size) {
             dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
             lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dec_ctx->ctx.user_data;
             if(dec_ctx != NULL && dec_ctx->ctx.current_frame != context->last_rendered_frame) {
                 /*Shortcut for re-rendering the animation for this new frame*/
-                if(render_animation(context, dec_ctx, dsc->out.header.w, dsc->out.header.h) != LV_RES_OK) {
+                if(render_animation(context, dec_ctx, dsc->header.w, dsc->header.h) != LV_RES_OK) {
                     return LV_RES_INV;
                 }
             }
@@ -224,8 +224,8 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     else if(flags != LV_IMG_DEC_ONLYMETA) {
         if(dec_ctx == NULL) {
             /* Doesn't exist, let's allocate a context */
-            LV_ZALLOC(dsc->out.dec_ctx, sizeof(*dec_ctx));
-            dec_ctx = (rlottiedec_ctx_t *)dsc->out.dec_ctx;
+            LV_ZALLOC(dsc->dec_ctx, sizeof(*dec_ctx));
+            dec_ctx = (rlottiedec_ctx_t *)dsc->dec_ctx;
             dec_ctx->ctx.auto_allocated = 1;
         }
         if(!dec_ctx || init_dec_ctx(dec_ctx) != LV_RES_OK)
@@ -246,9 +246,9 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         else if(dsc->in.src->type == LV_IMG_SRC_VARIABLE) {
             animation = lottie_animation_from_rodata((const char *)dsc->in.src->uri, dsc->in.src->uri_len, "");
         }
-        if(animation == NULL && dsc->out.dec_ctx->auto_allocated == 1) {
+        if(animation == NULL && dsc->dec_ctx->auto_allocated == 1) {
             lv_mem_free(dec_ctx);
-            dsc->out.dec_ctx = 0;
+            dsc->dec_ctx = 0;
             return LV_RES_INV;
         }
 
@@ -261,19 +261,19 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             /*Deduce aspect ratio if one coordinate is to guess*/
             if(dsc->in.size_hint.y == LV_SIZE_CONTENT) dsc->in.size_hint.y = (h * dsc->in.size_hint.x) / w;
             if(dsc->in.size_hint.x == LV_SIZE_CONTENT) dsc->in.size_hint.x = (w * dsc->in.size_hint.y) / h;
-            dsc->out.header.w = (uint32_t)dsc->in.size_hint.x;
-            dsc->out.header.h = (uint32_t)dsc->in.size_hint.y;
+            dsc->header.w = (uint32_t)dsc->in.size_hint.x;
+            dsc->header.h = (uint32_t)dsc->in.size_hint.y;
             if(dec_ctx) {
                 if(flags != LV_IMG_DEC_ONLYMETA) dec_ctx->cache = animation;
                 /*Does the picture fit in the decoder context buffer entirely?*/
-                if((dsc->out.header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->out.header.h <= dec_ctx->max_buf_size) {
+                if((dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->header.h <= dec_ctx->max_buf_size) {
                     dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
                 }
             }
         }
         else {
-            dsc->out.header.w = (uint32_t)w;
-            dsc->out.header.h = (uint32_t)h;
+            dsc->header.w = (uint32_t)w;
+            dsc->header.h = (uint32_t)h;
         }
 
         if(flags == LV_IMG_DEC_ONLYMETA) {
@@ -285,17 +285,17 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     }
 
     /*If already opened (in image cache), reuse it */
-    if(dsc->out.dec_ctx->user_data != NULL) {
-        lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dsc->out.dec_ctx->user_data;
+    if(dsc->dec_ctx->user_data != NULL) {
+        lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dsc->dec_ctx->user_data;
         /*Check we need to re-create the context*/
-        if(dec_ctx == NULL || dsc->in.size_hint.x != dsc->out.header.w || dsc->in.size_hint.y != dsc->out.header.h) {
+        if(dec_ctx == NULL || dsc->in.size_hint.x != dsc->header.w || dsc->in.size_hint.y != dsc->header.h) {
             lv_mem_free(context->allocated_buf);
             lv_mem_free(context);
         }
         else if(dec_ctx != NULL && dec_ctx->ctx.current_frame != context->last_rendered_frame
                 && (dec_ctx->ctx.caps & LV_IMG_DEC_CACHED) == LV_IMG_DEC_CACHED) {
             /*Shortcut for re-rendering the animation for this new frame*/
-            if(render_animation(context, dec_ctx, dsc->out.header.w, dsc->out.header.h) != LV_RES_OK) {
+            if(render_animation(context, dec_ctx, dsc->header.w, dsc->header.h) != LV_RES_OK) {
                 return LV_RES_INV;
             }
             return LV_RES_OK;
@@ -309,9 +309,9 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     dec_ctx->ctx.total_frames = lottie_animation_get_totalframe(animation);
     dec_ctx->ctx.frame_rate = lottie_animation_get_framerate(animation);
     dec_ctx->cache = animation;
-    w = dsc->out.header.w;
-    h = dsc->out.header.h;
-    dsc->out.dec_ctx = (lv_img_dec_ctx_t *)dec_ctx;
+    w = dsc->header.w;
+    h = dsc->header.h;
+    dsc->dec_ctx = (lv_img_dec_ctx_t *)dec_ctx;
 
 
     /* Compute how many lines we can fit in the maximum buffer size */
@@ -333,19 +333,19 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     memset(context->allocated_buf, 0, context->lines_in_buf * context->scanline_width);
     context->last_rendered_frame = lottie_animation_get_totalframe(animation);
     context->top = 0;
-    dsc->out.img_data = NULL; /* We want the renderer to call decoder_read_line, even if cached */
-    dsc->out.header.always_zero = 0;
-    dsc->out.header.w = (uint32_t)w;
-    dsc->out.header.h = (uint32_t)h;
-    dsc->out.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-    dsc->out.dec_ctx->user_data = context;
+    dsc->img_data = NULL; /* We want the renderer to call decoder_read_line, even if cached */
+    dsc->header.always_zero = 0;
+    dsc->header.w = (uint32_t)w;
+    dsc->header.h = (uint32_t)h;
+    dsc->header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    dsc->dec_ctx->user_data = context;
 
     /*Does the picture fit in the decoder context buffer entirely?*/
     if((w * LV_IMG_PX_SIZE_ALPHA_BYTE) * h <= dec_ctx->max_buf_size) {
         dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
         /*Render the animation directly here*/
-        dsc->out.img_data = (const uint8_t *)context->allocated_buf;
-        if(render_animation(context, dec_ctx, dsc->out.header.w, dsc->out.header.h) != LV_RES_OK) {
+        dsc->img_data = (const uint8_t *)context->allocated_buf;
+        if(render_animation(context, dec_ctx, dsc->header.w, dsc->header.h) != LV_RES_OK) {
             return LV_RES_INV;
         }
     }
@@ -358,7 +358,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
-    rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->out.dec_ctx;
+    rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->dec_ctx;
     lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dec_ctx->ctx.user_data;
     if(dec_ctx == NULL || dec_ctx->cache == NULL) {
         return LV_RES_INV;
@@ -368,19 +368,19 @@ static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
        ||  context->top > y || (context->top + context->lines_in_buf) <= y) {
         context->top = y;
         /* rlottie does not clip invalid coordinate, let's do it here */
-        if(context->top + context->lines_in_buf > dsc->out.header.h) {
-            context->top = dsc->out.header.h - context->lines_in_buf;
+        if(context->top + context->lines_in_buf > dsc->header.h) {
+            context->top = dsc->header.h - context->lines_in_buf;
         }
-        if(render_animation(context, dec_ctx, dsc->out.header.w, dsc->out.header.h) != LV_RES_OK) {
+        if(render_animation(context, dec_ctx, dsc->header.w, dsc->header.h) != LV_RES_OK) {
             return LV_RES_INV;
         }
     }
 
     /* Then copy to the output buffer now */
 #if LV_COLOR_DEPTH == 32
-    lv_memcpy(buf, &context->allocated_buf[x + (y - context->top) * dsc->out.header.w], len * (LV_ARGB32 / 8));
+    lv_memcpy(buf, &context->allocated_buf[x + (y - context->top) * dsc->header.w], len * (LV_ARGB32 / 8));
 #elif LV_COLOR_DEPTH == 16
-    uint8_t * buf_start = ((uint8_t *)context->allocated_buf) + (x + (y - context->top) * dsc->out.header.w) *
+    uint8_t * buf_start = ((uint8_t *)context->allocated_buf) + (x + (y - context->top) * dsc->header.w) *
                           LV_IMG_PX_SIZE_ALPHA_BYTE;
     lv_memcpy(buf, buf_start, len * LV_IMG_PX_SIZE_ALPHA_BYTE);
 #endif
@@ -394,7 +394,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
  */
 static void decoder_close(lv_img_decoder_dsc_t * dsc)
 {
-    rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->out.dec_ctx;
+    rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->dec_ctx;
     if(dec_ctx && dec_ctx->ctx.auto_allocated) {
         /*Only free if allocated by ourselves.*/
         lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dec_ctx->ctx.user_data;
@@ -408,7 +408,7 @@ static void decoder_close(lv_img_decoder_dsc_t * dsc)
         lv_mem_free(context);
         dec_ctx->ctx.user_data = 0;
     }
-    dsc->out.dec_ctx = 0;
+    dsc->dec_ctx = 0;
 }
 
 #endif /*LV_USE_RLOTTIE*/
