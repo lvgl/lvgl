@@ -21,6 +21,7 @@
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_stack_blur.h"
+#include "lv_draw_sdl_img.h"
 
 /*********************
  *      DEFINES
@@ -58,6 +59,9 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
+
+static void draw_bg_img_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                               const lv_draw_rect_dsc_t * dsc);
 
 static void draw_border(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
@@ -219,7 +223,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
         lv_draw_label((lv_draw_ctx_t *) ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
     }
     else {
-        lv_draw_sdl_img_header_t *header = NULL;
+        lv_draw_sdl_img_header_t * header = NULL;
         size_t key_size;
         lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(dsc->bg_img_src, 0, &key_size);
         bool key_found;
@@ -234,38 +238,44 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
             return;
         }
 
-        lv_draw_img_dsc_t img_dsc;
-        lv_draw_img_dsc_init(&img_dsc);
-        img_dsc.blend_mode = dsc->blend_mode;
-        img_dsc.recolor = dsc->bg_img_recolor;
-        img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
-        img_dsc.opa = dsc->bg_img_opa;
-
+        lv_coord_t w = (lv_coord_t) header->base.w, h = (lv_coord_t) header->base.h;
         /*Center align*/
         if(dsc->bg_img_tiled == false) {
-            lv_area_t area;
-            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
-            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
-            area.x2 = area.x1 + header.w - 1;
-            area.y2 = area.y1 + header.h - 1;
-
-            lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
+            SDL_Rect dstrect = {
+                .x = coords->x1 + lv_area_get_width(coords) / 2 - w / 2,
+                .y = coords->y1 + lv_area_get_height(coords) / 2 - h / 2,
+                .w = w, .h = h,
+            };
+            SDL_RenderCopy(ctx->renderer, texture, NULL, &dstrect);
         }
         else {
+            lv_draw_img_dsc_t img_dsc;
+            lv_draw_img_dsc_init(&img_dsc);
+            img_dsc.blend_mode = dsc->blend_mode;
+            img_dsc.recolor = dsc->bg_img_recolor;
+            img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
+            img_dsc.opa = dsc->bg_img_opa;
+
             lv_area_t area;
             area.y1 = coords->y1;
-            area.y2 = area.y1 + header.h - 1;
+            area.y2 = area.y1 + h - 1;
 
-            for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
+            for(; area.y1 <= coords->y2; area.y1 += h, area.y2 += h) {
 
                 area.x1 = coords->x1;
-                area.x2 = area.x1 + header.w - 1;
-                for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
+                area.x2 = area.x1 + w - 1;
+                for(; area.x1 <= coords->x2; area.x1 += w, area.x2 += w) {
                     lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
                 }
             }
         }
     }
+}
+
+static void draw_bg_img_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                               const lv_draw_rect_dsc_t * dsc)
+{
+
 }
 
 static void draw_shadow(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * clip,

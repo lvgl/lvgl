@@ -15,9 +15,14 @@
 #include "../lv_img_cache.h"
 #include "../lv_draw_mask.h"
 #include "../../misc/lv_lru.h"
+#include "../../misc/lv_gc.h"
 
+#include "lv_draw_sdl_img.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
+#include "lv_draw_sdl_composite.h"
+#include "lv_draw_sdl_mask.h"
+#include "lv_draw_sdl_rect.h"
 
 /*********************
  *      DEFINES
@@ -26,10 +31,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct sdl_img_header_t {
-    lv_img_header_t base;
-    SDL_Rect rect;
-} sdl_img_header_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -38,6 +39,8 @@ typedef struct sdl_img_header_t {
 static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc);
 
 static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc);
+
+static bool get_mask_radius(lv_coord_t * radius);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,58 +64,41 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     size_t key_size;
     lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(src, draw_dsc->frame_id, &key_size);
     bool texture_found = false;
-    sdl_img_header_t * header = NULL;
+    lv_draw_sdl_img_header_t * header = NULL;
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(ctx, key, key_size, &texture_found,
                                                                         (void **) &header);
     if(!texture_found) {
-        _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
-        lv_draw_sdl_cache_flag_t tex_flags = 0;
-        SDL_Rect rect;
-        SDL_memset(&rect, 0, sizeof(SDL_Rect));
-        if(cdsc) {
-            lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
-            if(dsc->user_data && SDL_memcmp(dsc->user_data, LV_DRAW_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
-                lv_draw_sdl_dec_dsc_userdata_t * ptr = (lv_draw_sdl_dec_dsc_userdata_t *) dsc->user_data;
-                texture = ptr->texture;
-                rect = ptr->rect;
-                if(ptr->texture_managed) {
-                    tex_flags |= LV_DRAW_SDL_CACHE_FLAG_MANAGED;
-                }
-                ptr->texture_referenced = true;
-            }
-            else {
-                texture = upload_img_texture(renderer, dsc);
-            }
-#if LV_IMG_CACHE_DEF_SIZE == 0
-            lv_img_decoder_close(dsc);
-#endif
-        }
-        if(texture && cdsc) {
-            header = SDL_malloc(sizeof(sdl_img_header_t));
-            SDL_memcpy(&header->base, &cdsc->dec_dsc.header, sizeof(lv_img_header_t));
-            header->rect = rect;
-            lv_draw_sdl_texture_cache_put_advanced(ctx, key, key_size, texture, header, SDL_free, tex_flags);
-        }
-        else {
-            lv_draw_sdl_texture_cache_put(ctx, key, key_size, NULL);
-        }
+        lv_draw_sdl_img_load_texture(ctx, key, key_size, src, draw_dsc->frame_id, &texture, &header);
     }
     SDL_free(key);
     if(!texture) {
         return LV_RES_INV;
     }
 
+    lv_area_t zoomed_cords;
+    _lv_img_buf_get_transformed_area(&zoomed_cords, lv_area_get_width(coords), lv_area_get_height(coords), 0,
+                                     draw_dsc->zoom, &draw_dsc->pivot);
+    lv_area_move(&zoomed_cords, coords->x1, coords->y1);
+
+    lv_coord_t radius = 0;
+    /* Coords will be translated so coords will start at (0,0) */
+    lv_area_t t_coords = zoomed_cords, t_clip = *clip, apply_area, t_area;
+    if(!get_mask_radius(&radius)) {
+        lv_draw_sdl_composite_begin(ctx, &zoomed_cords, clip, NULL, draw_dsc->blend_mode,
+                                    &t_coords, &t_clip, &apply_area);
+    }
+
     SDL_Rect clip_rect, coords_rect;
-    lv_area_to_sdl_rect(clip, &clip_rect);
-    lv_area_to_sdl_rect(coords, &coords_rect);
-    lv_area_zoom_to_sdl_rect(coords, &coords_rect, draw_dsc->zoom, &draw_dsc->pivot);
+    lv_area_to_sdl_rect(&t_clip, &clip_rect);
+    lv_area_to_sdl_rect(&t_coords, &coords_rect);
 
     SDL_Point pivot = {.x = draw_dsc->pivot.x, .y = draw_dsc->pivot.y};
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_Rect clipped_src = {0, 0, 0, 0}, clipped_dst = coords_rect;
-    const SDL_Rect * src_rect = NULL, *dst_rect = &clipped_dst;
+    SDL_Rect * src_rect = NULL, *dst_rect = &clipped_dst;
 
-    if(_lv_area_is_in(coords, clip, 0)) {
+    bool needs_clip = false;
+    if(_lv_area_is_in(&t_coords, &t_clip, 0)) {
         /*Image needs to be fully drawn*/
         src_rect = SDL_RectEmpty(&header->rect) ? NULL : &header->rect;
     }
@@ -136,6 +122,36 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     }
     else {
         /*Image needs to be rotated, so we have to use clip rect which is slower*/
+        needs_clip = true;
+    }
+
+    SDL_Point dst_origin = {dst_rect->x, dst_rect->y};
+    SDL_Texture * composite = NULL, *old_target = NULL;
+    if(radius > 0) {
+        dst_rect->x = 0;
+        dst_rect->y = 0;
+        lv_coord_t real_radius = LV_MIN3(radius, coords_rect.w, coords_rect.h);
+        SDL_Texture * radius_frag = lv_draw_sdl_rect_obtain_bg_frag(ctx, real_radius);
+        composite = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET1, dst_rect->w,
+                                                         dst_rect->h);
+        old_target = SDL_GetRenderTarget(renderer);
+        SDL_SetRenderTarget(renderer, composite);
+        /* First we create an opaque canvas */
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        /* Then we make 4 rounded corners */
+        SDL_Rect frag_src = {0, 0, real_radius, real_radius}, frag_dest = frag_src;
+        SDL_SetTextureBlendMode(radius_frag, SDL_BLENDMODE_NONE);
+        SDL_RenderCopy(renderer, radius_frag, &frag_src, &frag_dest);
+        frag_dest.x = coords_rect.w - frag_dest.w;
+        SDL_RenderCopyEx(renderer, radius_frag, &frag_src, &frag_dest, 0, NULL, SDL_FLIP_HORIZONTAL);
+        frag_dest.y = coords_rect.h - frag_dest.h;
+        SDL_RenderCopyEx(renderer, radius_frag, &frag_src, &frag_dest, 0, NULL, SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+        frag_dest.x = 0;
+        SDL_RenderCopyEx(renderer, radius_frag, &frag_src, &frag_dest, 0, NULL, SDL_FLIP_VERTICAL);
+    }
+    else if(needs_clip) {
+        /* No radius, set clip here */
         SDL_RenderSetClipRect(renderer, &clip_rect);
     }
 
@@ -160,10 +176,67 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         /* Draw with no recolor */
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
         SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
+        if(composite) {
+            SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+        }
         SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    }
+    if(composite) {
+        if(needs_clip) {
+            SDL_RenderSetClipRect(renderer, &clip_rect);
+        }
+        SDL_SetRenderTarget(renderer, old_target);
+        dst_rect->x = dst_origin.x;
+        dst_rect->y = dst_origin.y;
+        SDL_Rect composite_src = {0, 0, dst_rect->w, dst_rect->h};
+        SDL_SetTextureBlendMode(composite, SDL_BLENDMODE_BLEND);
+        SDL_RenderCopy(renderer, composite, &composite_src, dst_rect);
     }
     SDL_RenderSetClipRect(renderer, NULL);
+
+    lv_draw_sdl_composite_end(ctx, &apply_area, draw_dsc->blend_mode);
+
     return LV_RES_OK;
+}
+
+bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key_head_img_t * key, size_t key_size,
+                                  const void * src, int32_t frame_id, SDL_Texture ** texture,
+                                  lv_draw_sdl_img_header_t ** header)
+{
+    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, lv_color_white(), frame_id);
+    lv_draw_sdl_cache_flag_t tex_flags = 0;
+    SDL_Rect rect;
+    SDL_memset(&rect, 0, sizeof(SDL_Rect));
+    if(cdsc) {
+        lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
+        if(dsc->user_data && SDL_memcmp(dsc->user_data, LV_DRAW_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
+            lv_draw_sdl_dec_dsc_userdata_t * ptr = (lv_draw_sdl_dec_dsc_userdata_t *) dsc->user_data;
+            *texture = ptr->texture;
+            rect = ptr->rect;
+            if(ptr->texture_managed) {
+                tex_flags |= LV_DRAW_SDL_CACHE_FLAG_MANAGED;
+            }
+            ptr->texture_referenced = true;
+        }
+        else {
+            *texture = upload_img_texture(ctx->renderer, dsc);
+        }
+#if LV_IMG_CACHE_DEF_SIZE == 0
+        lv_img_decoder_close(dsc);
+#endif
+    }
+    if(texture && cdsc) {
+        *header = SDL_malloc(sizeof(lv_draw_sdl_img_header_t));
+        SDL_memcpy(&(*header)->base, &cdsc->dec_dsc.header, sizeof(lv_img_header_t));
+        (*header)->rect = rect;
+        lv_draw_sdl_texture_cache_put_advanced(ctx, key, key_size, *texture, *header, SDL_free, tex_flags);
+    }
+    else {
+        lv_draw_sdl_texture_cache_put(ctx, key, key_size, NULL);
+        return false;
+    }
+    return true;
 }
 
 /**********************
@@ -215,5 +288,19 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
     return texture;
 }
 
+static bool get_mask_radius(lv_coord_t * radius)
+{
+    if(lv_draw_mask_get_cnt() != 1) return false;
+    for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        _lv_draw_mask_common_dsc_t * param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        if(param->type == LV_DRAW_MASK_TYPE_RADIUS) {
+            lv_draw_mask_radius_param_t * rparam = (lv_draw_mask_radius_param_t *) param;
+            if(rparam->cfg.outer) return false;
+            *radius = rparam->cfg.radius;
+            return true;
+        }
+    }
+    return false;
+}
 
 #endif /*LV_USE_GPU_SDL*/
