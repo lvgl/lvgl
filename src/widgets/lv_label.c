@@ -355,7 +355,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     /*Handle Bidi*/
     if(new_line_start == byte_id) {
         visual_byte_pos = base_dir == LV_BASE_DIR_RTL ? 0 : byte_id - line_start;
-        bidi_txt =  &txt[line_start];
+        bidi_txt = &txt[line_start];
     }
     else {
         uint32_t line_char_id = _lv_txt_encoded_get_char_id(&txt[line_start], byte_id - line_start);

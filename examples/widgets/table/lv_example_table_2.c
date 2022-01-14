@@ -19,7 +19,7 @@ static void draw_event_cb(lv_event_t * e)
         lv_area_t sw_area;
         sw_area.x1 = dsc->draw_area->x2 - 50;
         sw_area.x2 = sw_area.x1 + 40;
-        sw_area.y1 =  dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
+        sw_area.y1 = dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
         sw_area.y2 = sw_area.y1 + 20;
         lv_draw_rect(dsc->draw_ctx, &rect_dsc, &sw_area);
 

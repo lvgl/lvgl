@@ -259,10 +259,10 @@ bool lv_draw_mask_is_any(const lv_area_t * a)
 
     uint8_t i;
     for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        _lv_draw_mask_common_dsc_t * comm_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        _lv_draw_mask_common_dsc_t * comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
         if(comm_param == NULL) continue;
         if(comm_param->type == LV_DRAW_MASK_TYPE_RADIUS) {
-            lv_draw_mask_radius_param_t * radius_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+            lv_draw_mask_radius_param_t * radius_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
             if(radius_param->cfg.outer) {
                 if(!_lv_area_is_out(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
             }
@@ -1077,7 +1077,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
        (abs_y >= rect.y1 + radius && abs_y <= rect.y2 - radius)) {
         if(outer == false) {
             /*Remove the edges*/
-            int32_t last =  rect.x1 - abs_x;
+            int32_t last = rect.x1 - abs_x;
             if(last > len) return LV_DRAW_MASK_RES_TRANSP;
             if(last >= 0) {
                 lv_memset_00(&mask_buf[0], last);
@@ -1095,7 +1095,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             int32_t first = rect.x1 - abs_x;
             if(first < 0) first = 0;
             if(first <= len) {
-                int32_t last =  rect.x2 - abs_x - first + 1;
+                int32_t last = rect.x2 - abs_x - first + 1;
                 if(first + last > len) last = len - first;
                 if(last >= 0) {
                     lv_memset_00(&mask_buf[first], last);
@@ -1380,10 +1380,10 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
 
     /*Special case, handle manually*/
     if(radius == 1) {
-        c->cir_opa[0] =  180;
-        c->opa_start_on_y[0] =  0;
-        c->opa_start_on_y[1] =  1;
-        c->x_start_on_y[0] =  0;
+        c->cir_opa[0] = 180;
+        c->opa_start_on_y[0] = 0;
+        c->opa_start_on_y[1] = 1;
+        c->x_start_on_y[0] = 0;
         return;
     }
 

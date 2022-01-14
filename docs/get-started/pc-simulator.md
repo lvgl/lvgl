@@ -63,7 +63,7 @@ Go to [https://www.libsdl.org/download-2.0.php](https://www.libsdl.org/download-
 2. Decompress the file and go to _x86_64-w64-mingw32_ directory (for 64 bit MinGW) or to _i686-w64-mingw32_ (for 32 bit MinGW)
 3. Copy _..._mingw32/include/SDL2_ folder to _C:/MinGW/.../x86_64-w64-mingw32/include_
 4. Copy _..._mingw32/lib/_ content to _C:/MinGW/.../x86_64-w64-mingw32/lib_
-5. Copy _..._mingw32/bin/SDL2.dll_ to _{eclipse_worksapce}/pc_simulator/Debug/_.  Do it later when Eclipse is installed. 
+5. Copy _..._mingw32/bin/SDL2.dll_ to _{eclipse_workspace}/pc_simulator/Debug/_.  Do it later when Eclipse is installed. 
 
 Note: If you are using **Microsoft Visual Studio** instead of Eclipse then you don't have to install MinGW. 
 

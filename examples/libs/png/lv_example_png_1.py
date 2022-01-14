@@ -8,7 +8,7 @@ decoder = lv.img.decoder_create()
 decoder.info_cb = get_png_info
 decoder.open_cb = open_png
 
-img_wink_png =  lv.img_dsc_t(
+img_wink_png = lv.img_dsc_t(
     {
         "header": {"always_zero": 0, "w": 50, "h": 50,  "cf": lv.img.CF.RAW_ALPHA},
         "data_size": 5158,

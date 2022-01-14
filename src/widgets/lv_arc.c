@@ -84,8 +84,8 @@ void lv_arc_set_start_angle(lv_obj_t * obj, uint16_t start)
 
     if(start > 360) start -= 360;
 
-    int16_t old_delta =  arc->indic_angle_end - arc->indic_angle_start;
-    int16_t new_delta =  arc->indic_angle_end - start;
+    int16_t old_delta = arc->indic_angle_end - arc->indic_angle_start;
+    int16_t new_delta = arc->indic_angle_end - start;
 
     if(old_delta < 0) old_delta = 360 + old_delta;
     if(new_delta < 0) new_delta = 360 + new_delta;
@@ -103,8 +103,8 @@ void lv_arc_set_end_angle(lv_obj_t * obj, uint16_t end)
     lv_arc_t * arc = (lv_arc_t *)obj;
     if(end > 360) end -= 360;
 
-    int16_t old_delta =  arc->indic_angle_end - arc->indic_angle_start;
-    int16_t new_delta =  end - arc->indic_angle_start;
+    int16_t old_delta = arc->indic_angle_end - arc->indic_angle_start;
+    int16_t new_delta = end - arc->indic_angle_start;
 
     if(old_delta < 0) old_delta = 360 + old_delta;
     if(new_delta < 0) new_delta = 360 + new_delta;
@@ -129,8 +129,8 @@ void lv_arc_set_bg_start_angle(lv_obj_t * obj, uint16_t start)
 
     if(start > 360) start -= 360;
 
-    int16_t old_delta =  arc->bg_angle_end - arc->bg_angle_start;
-    int16_t new_delta =  arc->bg_angle_end - start;
+    int16_t old_delta = arc->bg_angle_end - arc->bg_angle_start;
+    int16_t new_delta = arc->bg_angle_end - start;
 
     if(old_delta < 0) old_delta = 360 + old_delta;
     if(new_delta < 0) new_delta = 360 + new_delta;
@@ -151,8 +151,8 @@ void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint16_t end)
 
     if(end > 360) end -= 360;
 
-    int16_t old_delta =  arc->bg_angle_end - arc->bg_angle_start;
-    int16_t new_delta =  end - arc->bg_angle_start;
+    int16_t old_delta = arc->bg_angle_end - arc->bg_angle_start;
+    int16_t new_delta = end - arc->bg_angle_start;
 
     if(old_delta < 0) old_delta = 360 + old_delta;
     if(new_delta < 0) new_delta = 360 + new_delta;
@@ -372,13 +372,13 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t r;
         get_center(obj, &center, &r);
 
-        p.x -=  center.x;
-        p.y -=  center.y;
+        p.x -= center.x;
+        p.y -= center.y;
 
         /*Enter dragging mode if pressed out of the knob*/
         if(arc->dragging == false) {
             lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
-            r -=  indic_width;
+            r -= indic_width;
             /*Add some more sensitive area if there is no advanced git testing.
              * (Advanced hit testing is more precise)*/
             if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {

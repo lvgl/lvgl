@@ -299,7 +299,7 @@ The number of cache entries can be defined with `LV_IMG_CACHE_DEF_SIZE` in *lv_c
 The size of the cache can be changed at run-time with `lv_img_cache_set_size(entry_num)`.
 
 ### Value of images
-When you use more images than cache entries, LVGL can't cache all of the images. Instead, the library will close one of the cached images to free space.
+When you use more images than cache entries, LVGL can't cache all the images. Instead, the library will close one of the cached images to free space.
 
 To decide which image to close, LVGL uses a measurement it previously made of how long it took to open the image. Cache entries that hold slower-to-open images are considered more valuable and are kept in the cache as long as possible.
 

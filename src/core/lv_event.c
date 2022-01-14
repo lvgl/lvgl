@@ -66,7 +66,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
     e.stop_processing = 0;
 
     /*Build a simple linked list from the objects used in the events
-     *It's important to know if an this object was deleted by a nested event
+     *It's important to know if this object was deleted by a nested event
      *called from this `event_cb`.*/
     e.prev = event_head;
     event_head = &e;

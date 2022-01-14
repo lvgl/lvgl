@@ -11,7 +11,7 @@ cont.set_grid_dsc_array(col_dsc, row_dsc)
 cont.set_size(300, 220)
 cont.center()
 
-# Cell to 0;0 and align to to the start (left/top) horizontally and vertically too
+# Cell to 0;0 and align to the start (left/top) horizontally and vertically too
 obj = lv.obj(cont)
 obj.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
 obj.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,
@@ -19,7 +19,7 @@ obj.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,
 label = lv.label(obj)
 label.set_text("c0, r0")
 
-# Cell to 1;0 and align to to the start (left) horizontally and center vertically too
+# Cell to 1;0 and align to the start (left) horizontally and center vertically too
 obj = lv.obj(cont)
 obj.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
 obj.set_grid_cell(lv.GRID_ALIGN.START, 1, 1,
@@ -27,7 +27,7 @@ obj.set_grid_cell(lv.GRID_ALIGN.START, 1, 1,
 label = lv.label(obj)
 label.set_text("c1, r0")
 
-# Cell to 2;0 and align to to the start (left) horizontally and end (bottom) vertically too
+# Cell to 2;0 and align to the start (left) horizontally and end (bottom) vertically too
 obj = lv.obj(cont)
 obj.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
 obj.set_grid_cell(lv.GRID_ALIGN.START, 2, 1,
@@ -50,4 +50,3 @@ obj.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 1,
                   lv.GRID_ALIGN.STRETCH, 1, 2)
 label = lv.label(obj)
 label.set_text("c0\nr1-2")
-

@@ -955,7 +955,7 @@ menu "LVGL configuration"
             depends on LV_USE_DEMO_MUSIC
             default n
         config LV_DEMO_MUSIC_LANDSCAPE
-            bool "Enable Landspace"
+            bool "Enable Landscape"
             depends on LV_USE_DEMO_MUSIC
             default n
         config LV_DEMO_MUSIC_ROUND

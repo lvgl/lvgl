@@ -32,7 +32,7 @@ typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
 **********************/
 
 /**
- * Create a animation timeline.
+ * Create an animation timeline.
  * @return pointer to the animation timeline.
  */
 lv_anim_timeline_t * lv_anim_timeline_create(void);

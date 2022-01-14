@@ -66,7 +66,7 @@ lv_obj_t * lv_led_create(lv_obj_t * parent);
 /**
  * Set the color of the LED
  * @param led       pointer to a LED object
- * @param color     the color of the the LED
+ * @param color     the color of the LED
  */
 void lv_led_set_color(lv_obj_t * led, lv_color_t color);
 

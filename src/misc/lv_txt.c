@@ -746,7 +746,7 @@ static uint32_t lv_txt_utf8_get_length(const char * txt)
 
 #elif LV_TXT_ENC == LV_TXT_ENC_ASCII
 /*******************************
- *  ASCII ENCODER/DECOER
+ *  ASCII ENCODER/DECODER
  ******************************/
 
 /**
