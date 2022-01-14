@@ -143,6 +143,24 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
     lv_draw_sdl_composite_end(ctx, &apply_area, dsc->blend_mode);
 }
 
+SDL_Texture * lv_draw_sdl_rect_obtain_bg_frag(lv_draw_sdl_ctx_t * ctx, lv_coord_t radius)
+{
+    lv_draw_rect_bg_key_t key = rect_bg_key_create(radius, radius);
+    lv_area_t coords = {0, 0, radius * 2 - 1, radius * 2 - 1};
+    lv_area_t coords_frag = {0, 0, radius - 1, radius - 1};
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
+    if(texture == NULL) {
+        lv_draw_mask_radius_param_t mask_rout_param;
+        lv_draw_mask_radius_init(&mask_rout_param, &coords, radius, false);
+        int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
+        texture = lv_draw_sdl_mask_dump_texture(ctx->renderer, &coords_frag, &mask_id, 1);
+        lv_draw_mask_remove_id(mask_id);
+        SDL_assert(texture);
+        lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), texture);
+    }
+    return texture;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -167,29 +185,15 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
 
     /*A small texture with a quarter of the rect is enough*/
     lv_coord_t bg_w = lv_area_get_width(coords), bg_h = lv_area_get_height(coords);
-    lv_coord_t frag_size = LV_MIN3(bg_w / 2, bg_h / 2, radius);
-    lv_draw_rect_bg_key_t key = rect_bg_key_create(radius, frag_size);
-    lv_area_t coords_frag;
-    lv_area_copy(&coords_frag, coords);
-    lv_area_set_width(&coords_frag, frag_size);
-    lv_area_set_height(&coords_frag, frag_size);
-    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
-    if(texture == NULL) {
-        lv_draw_mask_radius_param_t mask_rout_param;
-        lv_draw_mask_radius_init(&mask_rout_param, coords, radius, false);
-        int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        texture = lv_draw_sdl_mask_dump_texture(ctx->renderer, &coords_frag, &mask_id, 1);
-        lv_draw_mask_remove_id(mask_id);
-        SDL_assert(texture);
-        lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), texture);
-    }
+    lv_coord_t real_radius = LV_MIN3(bg_w / 2, bg_h / 2, radius);
+    SDL_Texture * texture = lv_draw_sdl_rect_obtain_bg_frag(ctx, real_radius);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, dsc->bg_opa);
     SDL_SetTextureColorMod(texture, bg_color.r, bg_color.g, bg_color.b);
-    frag_render_corners(ctx->renderer, texture, frag_size, coords, draw_area, false);
-    frag_render_borders(ctx->renderer, texture, frag_size, coords, draw_area, false);
-    frag_render_center(ctx->renderer, texture, frag_size, coords, draw_area, false);
+    frag_render_corners(ctx->renderer, texture, real_radius, coords, draw_area, false);
+    frag_render_borders(ctx->renderer, texture, real_radius, coords, draw_area, false);
+    frag_render_center(ctx->renderer, texture, real_radius, coords, draw_area, false);
 }
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
@@ -215,19 +219,17 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
         lv_draw_label((lv_draw_ctx_t *) ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
     }
     else {
-        lv_img_header_t header;
+        lv_draw_sdl_img_header_t *header = NULL;
         size_t key_size;
         lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(dsc->bg_img_src, 0, &key_size);
         bool key_found;
-        lv_img_header_t * cache_header = NULL;
         SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(ctx, key, key_size, &key_found,
-                                                                            (void **) &cache_header);
-        SDL_free(key);
-        if(texture) {
-            header = *cache_header;
+                                                                            (void **) &header);
+        if(!key_found) {
+            lv_draw_sdl_img_load_texture(ctx, key, key_size, dsc->bg_img_src, 0, &texture, &header);
         }
-        else if(key_found || lv_img_decoder_get_info(dsc->bg_img_src, &header) != LV_RES_OK) {
-            /* When cache hit but with negative result, use default decoder. If still fail, return.*/
+        SDL_free(key);
+        if(!texture || !header) {
             LV_LOG_WARN("Couldn't read the background image");
             return;
         }

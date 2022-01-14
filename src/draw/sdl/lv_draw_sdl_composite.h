@@ -34,6 +34,7 @@ typedef enum lv_draw_sdl_composite_texture_id_t {
     LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0,
     LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1,
     LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0,
+    LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET1,
 } lv_draw_sdl_composite_texture_id_t;
 
 /**********************
