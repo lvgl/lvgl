@@ -25,19 +25,24 @@ static void event_handler(lv_event_t *e)
     }
 }
 
-void test_checkbox_creation_successfull(void)
+void setUp(void)
 {
     active_screen = lv_scr_act();
     checkbox = lv_checkbox_create(active_screen);
+}
 
+void tearDown(void)
+{
+
+}
+
+void test_checkbox_creation_successfull(void)
+{
     TEST_ASSERT_NOT_NULL(checkbox);
 }
 
 void test_checkbox_should_call_event_handler_on_click_when_enabled(void)
 {
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
-    
     lv_obj_add_state(checkbox, LV_STATE_CHECKED);
     lv_obj_add_event_cb(checkbox, event_handler, LV_EVENT_ALL, NULL);
 
@@ -52,9 +57,6 @@ void test_checkbox_should_have_default_text_when_created(void)
 {
     const char *default_text = "Check box";
 
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
-
     TEST_ASSERT_EQUAL_STRING(default_text, lv_checkbox_get_text(checkbox));
     TEST_ASSERT_NOT_NULL(lv_checkbox_get_text(checkbox));
 }
@@ -62,9 +64,6 @@ void test_checkbox_should_have_default_text_when_created(void)
 void test_checkbox_should_return_dinamically_allocated_text(void)
 {
     const char *message = "Hello World!";
-
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
 
     lv_checkbox_set_text(checkbox, message);
 
@@ -80,12 +79,11 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     lv_mem_monitor_t m1;
     lv_mem_monitor(&m1);
 
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
+    lv_obj_t * cb = lv_checkbox_create(lv_scr_act());
 
     initial_available_memory = m1.free_size;
 
-    lv_checkbox_set_text_static(checkbox, static_text);
+    lv_checkbox_set_text_static(cb, static_text);
 
     lv_mem_monitor(&m1);
 
