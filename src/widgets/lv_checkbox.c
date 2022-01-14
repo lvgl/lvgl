@@ -67,7 +67,11 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent)
 
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(txt);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
+
 #if LV_USE_ARABIC_PERSIAN_CHARS
     size_t len = _lv_txt_ap_calc_bytes_cnt(txt);
 #else
@@ -75,7 +79,11 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 #endif
 
     if(!cb->static_txt) cb->txt = lv_mem_realloc(cb->txt, len + 1);
-    else  cb->txt = lv_mem_alloc(len + 1);
+    else cb->txt = lv_mem_alloc(len + 1);
+
+    LV_ASSERT_MALLOC(cb->txt);
+    if (cb->txt == NULL) return;
+
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, cb->txt);
 #else
