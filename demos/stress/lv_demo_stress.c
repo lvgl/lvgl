@@ -237,7 +237,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_set_repeat_count(&a, 3);
             lv_anim_set_exec_cb(&a, arc_set_end_angle_anim);
             lv_anim_start(&a);
-            break;
 
             obj = lv_meter_create(main_page);
             lv_obj_scroll_to_view(obj, LV_ANIM_ON);
@@ -299,6 +298,12 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             }
             auto_del(obj, TIME_STEP * 5 + 15);
 
+//            obj = lv_table_create(main_page);
+//            lv_table_set_cell_value(obj, 0, 0, "0,0");
+//            lv_table_set_cell_value_fmt(obj, 3, 0, "%d,%d", 5, 0);
+//            lv_table_set_row_cnt(obj, 5);
+//            lv_table_set_cell_value_fmt(obj, 1, 0, "%s", "1,0");
+//            lv_table_set_cell_value(obj, 1, 3, "1,3");
             break;
 
         case 19:
