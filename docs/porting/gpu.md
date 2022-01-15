@@ -32,8 +32,9 @@ It contains a pointer to a buffer where drawing should happen and a couple of ca
 
 All `draw_*` callbacks receive a pointer to the current `draw_ctx` as their first parameter.  Among the other parameters there is a descriptor too that tells what to draw.
 E.g. for `draw_rect` it's called [lv_draw_rect_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_rect.h), 
-for `lv_draw_line` it's called [lv_draw_line_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_line.h). 
+for `lv_draw_line` it's called [lv_draw_line_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_line.h), etc.
 
+To correctly render according to a `draw_dsc` you need to be familiar with the [Boxing model](https://docs.lvgl.io/master/overview/coords.html#boxing-model) of LVGL and the meanings of the fields. The name and meaning of the fields are identical to name and meaning of the [Style properties](https://docs.lvgl.io/master/overview/style-props.html).
 
 ### Initialization
 
