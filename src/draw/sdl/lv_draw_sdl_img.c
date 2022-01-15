@@ -21,7 +21,6 @@
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_composite.h"
-#include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_rect.h"
 
 /*********************
@@ -35,7 +34,7 @@
 typedef struct {
     lv_sdl_cache_key_magic_t magic;
     const SDL_Texture * texture;
-    lv_coord_t radius;
+    lv_coord_t w, h, radius;
 } lv_draw_img_rounded_key_t;
 
 /**********************
@@ -58,7 +57,8 @@ static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, con
 static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture,
                                              const lv_draw_sdl_img_header_t * header, int w, int h, lv_coord_t radius);
 
-static lv_draw_img_rounded_key_t rounded_key_create(const SDL_Texture * texture, lv_coord_t radius);
+static lv_draw_img_rounded_key_t rounded_key_create(const SDL_Texture * texture, lv_coord_t w, lv_coord_t h,
+                                                    lv_coord_t radius);
 
 static void calc_draw_part(SDL_Texture * texture, const lv_draw_sdl_img_header_t * header, const lv_area_t * coords,
                            const lv_area_t * clip, SDL_Rect * clipped_src, SDL_Rect * clipped_dst);
@@ -157,11 +157,11 @@ static void calc_draw_part(SDL_Texture * texture, const lv_draw_sdl_img_header_t
     lv_area_t clipped_area;
     _lv_area_intersect(&clipped_area, coords, clip);
     lv_area_to_sdl_rect(&clipped_area, clipped_dst);
-    float coords_w = lv_area_get_width(coords), coords_h = lv_area_get_height(coords);
-    clipped_src->x = SDL_roundf(header->rect.x + (clipped_dst->x - coords->x1) * w / coords_w);
-    clipped_src->y = SDL_roundf(header->rect.y + (clipped_dst->y - coords->y1) * h / coords_h);
-    clipped_src->w = SDL_roundf(w - (coords_w - clipped_dst->w) * w / coords_w);
-    clipped_src->h = SDL_roundf(h - (coords_h - clipped_dst->h) * h / coords_h);
+    lv_coord_t coords_w = lv_area_get_width(coords), coords_h = lv_area_get_height(coords);
+    clipped_src->x = header->rect.x + (clipped_dst->x - coords->x1) * w / coords_w;
+    clipped_src->y = header->rect.y + (clipped_dst->y - coords->y1) * h / coords_h;
+    clipped_src->w = w - (coords_w - clipped_dst->w) * w / coords_w;
+    clipped_src->h = h - (coords_h - clipped_dst->h) * h / coords_h;
 }
 
 bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key_head_img_t * key, size_t key_size,
@@ -362,7 +362,7 @@ static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * d
 static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture,
                                              const lv_draw_sdl_img_header_t * header, int w, int h, lv_coord_t radius)
 {
-    lv_draw_img_rounded_key_t key = rounded_key_create(texture, radius);
+    lv_draw_img_rounded_key_t key = rounded_key_create(texture, w, h, radius);
     SDL_Texture * mask_frag = lv_draw_sdl_rect_bg_frag_obtain(ctx, radius);
     SDL_Texture * img_frag = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
     if(img_frag == NULL) {
@@ -378,9 +378,7 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
         lv_area_t coords = {0, 0, w - 1, h - 1}, clip;
         lv_area_t frag_coords = {0, 0, full_frag_size - 1, full_frag_size - 1};
         lv_draw_sdl_rect_bg_frag_draw_corners(ctx, mask_frag, radius, &frag_coords, NULL, false);
-        Uint32 format;
-        int access, tw, th;
-        SDL_QueryTexture(texture, &format, &access, &tw, &th);
+
         SDL_SetTextureAlphaMod(texture, 0xFF);
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
@@ -390,6 +388,7 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
         lv_area_set(&clip, coords.x1, coords.y1, coords.x1 + radius - 1, coords.y1 + radius - 1);
         calc_draw_part(texture, header, &coords, &clip, &srcrect, &tmprect);
         SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
+
         /* ...then top right */
         dstrect.x = full_frag_size - dstrect.w;
         lv_area_set(&clip, coords.x2 - radius + 1, coords.y1, coords.x2, coords.y1 + radius - 1);
@@ -416,12 +415,15 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
     return img_frag;
 }
 
-static lv_draw_img_rounded_key_t rounded_key_create(const SDL_Texture * texture, lv_coord_t radius)
+static lv_draw_img_rounded_key_t rounded_key_create(const SDL_Texture * texture, lv_coord_t w, lv_coord_t h,
+                                                    lv_coord_t radius)
 {
     lv_draw_img_rounded_key_t key;
     SDL_memset(&key, 0, sizeof(key));
     key.magic = LV_GPU_CACHE_KEY_MAGIC_IMG_ROUNDED_CORNERS;
     key.texture = texture;
+    key.w = w;
+    key.h = h;
     key.radius = radius;
     return key;
 }
