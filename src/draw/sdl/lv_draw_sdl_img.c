@@ -381,7 +381,14 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
 
         SDL_SetTextureAlphaMod(texture, 0xFF);
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
+#if LV_GPU_SDL_CUSTOM_BLEND_MODE
+        SDL_BlendMode blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ZERO,
+                                                              SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_DST_ALPHA,
+                                                              SDL_BLENDFACTOR_ZERO, SDL_BLENDOPERATION_ADD);
+        SDL_SetTextureBlendMode(texture, blend_mode);
+#else
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+#endif
         SDL_Rect srcrect, tmprect, dstrect = {0, 0, radius, radius};
 
         /* Render 4 corners, first top left */
