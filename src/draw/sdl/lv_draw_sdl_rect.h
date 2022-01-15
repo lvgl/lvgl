@@ -60,7 +60,7 @@ typedef struct lv_draw_sdl_rect_header_t {
 SDL_Texture * lv_draw_sdl_rect_bg_frag_obtain(lv_draw_sdl_ctx_t * ctx, lv_coord_t radius);
 
 void lv_draw_sdl_rect_bg_frag_draw_corners(lv_draw_sdl_ctx_t * ctx, SDL_Texture * frag, lv_coord_t frag_size,
-                                           const lv_area_t * coords, const lv_area_t * clip);
+                                           const lv_area_t * coords, const lv_area_t * clip, bool full);
 
 /**********************
  *      MACROS
