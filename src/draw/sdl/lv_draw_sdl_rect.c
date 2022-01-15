@@ -147,7 +147,7 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
     lv_draw_sdl_composite_end(ctx, &apply_area, dsc->blend_mode);
 }
 
-SDL_Texture * lv_draw_sdl_rect_obtain_bg_frag(lv_draw_sdl_ctx_t * ctx, lv_coord_t radius)
+SDL_Texture * lv_draw_sdl_rect_bg_frag_obtain(lv_draw_sdl_ctx_t * ctx, lv_coord_t radius)
 {
     lv_draw_rect_bg_key_t key = rect_bg_key_create(radius, radius);
     lv_area_t coords = {0, 0, radius * 2 - 1, radius * 2 - 1};
@@ -163,6 +163,12 @@ SDL_Texture * lv_draw_sdl_rect_obtain_bg_frag(lv_draw_sdl_ctx_t * ctx, lv_coord_
         lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), texture);
     }
     return texture;
+}
+
+void lv_draw_sdl_rect_bg_frag_draw_corners(lv_draw_sdl_ctx_t * ctx, SDL_Texture * frag, lv_coord_t frag_size,
+                                           const lv_area_t * coords, const lv_area_t * clip)
+{
+    frag_render_corners(ctx->renderer, frag, frag_size, coords, clip, false);
 }
 
 /**********************
@@ -190,7 +196,7 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
     /*A small texture with a quarter of the rect is enough*/
     lv_coord_t bg_w = lv_area_get_width(coords), bg_h = lv_area_get_height(coords);
     lv_coord_t real_radius = LV_MIN3(bg_w / 2, bg_h / 2, radius);
-    SDL_Texture * texture = lv_draw_sdl_rect_obtain_bg_frag(ctx, real_radius);
+    SDL_Texture * texture = lv_draw_sdl_rect_bg_frag_obtain(ctx, real_radius);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(texture, dsc->bg_opa);
@@ -477,7 +483,7 @@ static void draw_border_generic(lv_draw_sdl_ctx_t * ctx, const lv_area_t * outer
 }
 
 static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_coord_t frag_size,
-                                const lv_area_t * coords, const lv_area_t * clipped, bool full)
+                                const lv_area_t * coords, const lv_area_t * clip, bool full)
 {
     lv_area_t corner_area, dst_area;
     /* Upper left */
@@ -485,7 +491,7 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
     corner_area.y1 = coords->y1;
     corner_area.x2 = coords->x1 + frag_size - 1;
     corner_area.y2 = coords->y1 + frag_size - 1;
-    if(_lv_area_intersect(&dst_area, &corner_area, clipped)) {
+    if(_lv_area_intersect(&dst_area, &corner_area, clip)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
 
@@ -497,7 +503,7 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
     /* Upper right, clip right edge if too big */
     corner_area.x1 = LV_MAX(coords->x2 - frag_size + 1, coords->x1 + frag_size);
     corner_area.x2 = coords->x2;
-    if(_lv_area_intersect(&dst_area, &corner_area, clipped)) {
+    if(_lv_area_intersect(&dst_area, &corner_area, clip)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
 
@@ -516,7 +522,7 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
     /* Lower right, clip bottom edge if too big */
     corner_area.y1 = LV_MAX(coords->y2 - frag_size + 1, coords->y1 + frag_size);
     corner_area.y2 = coords->y2;
-    if(_lv_area_intersect(&dst_area, &corner_area, clipped)) {
+    if(_lv_area_intersect(&dst_area, &corner_area, clip)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
 
@@ -532,10 +538,10 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
             SDL_RenderCopyEx(renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
         }
     }
-    /* Lower left, right edge should not be clipped */
+    /* Lower left, right edge should not be clip */
     corner_area.x1 = coords->x1;
     corner_area.x2 = coords->x1 + frag_size - 1;
-    if(_lv_area_intersect(&dst_area, &corner_area, clipped)) {
+    if(_lv_area_intersect(&dst_area, &corner_area, clip)) {
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(&dst_area, &dst_rect);
 

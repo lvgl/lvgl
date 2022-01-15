@@ -40,7 +40,7 @@ static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_
 
 static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc);
 
-static bool get_mask_radius(lv_coord_t * radius);
+static bool check_mask_simple_radius(lv_coord_t * radius);
 
 /**********************
  *  STATIC VARIABLES
@@ -80,10 +80,12 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
                                      draw_dsc->zoom, &draw_dsc->pivot);
     lv_area_move(&zoomed_cords, coords->x1, coords->y1);
 
+    /* When in > 0, draw simple radius */
     lv_coord_t radius = 0;
     /* Coords will be translated so coords will start at (0,0) */
-    lv_area_t t_coords = zoomed_cords, t_clip = *clip, apply_area, t_area;
-    if(!get_mask_radius(&radius)) {
+    lv_area_t t_coords = zoomed_cords, t_clip = *clip, apply_area;
+
+    if(!check_mask_simple_radius(&radius)) {
         lv_draw_sdl_composite_begin(ctx, &zoomed_cords, clip, NULL, draw_dsc->blend_mode,
                                     &t_coords, &t_clip, &apply_area);
     }
@@ -131,7 +133,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         dst_rect->x = 0;
         dst_rect->y = 0;
         lv_coord_t real_radius = LV_MIN3(radius, coords_rect.w, coords_rect.h);
-        SDL_Texture * radius_frag = lv_draw_sdl_rect_obtain_bg_frag(ctx, real_radius);
+        SDL_Texture * radius_frag = lv_draw_sdl_rect_bg_frag_obtain(ctx, real_radius);
         composite = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET1, dst_rect->w,
                                                          dst_rect->h);
         old_target = SDL_GetRenderTarget(renderer);
@@ -140,48 +142,41 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
         /* Then we make 4 rounded corners */
-        SDL_Rect frag_src = {0, 0, real_radius, real_radius}, frag_dest = frag_src;
         SDL_SetTextureBlendMode(radius_frag, SDL_BLENDMODE_NONE);
-        SDL_RenderCopy(renderer, radius_frag, &frag_src, &frag_dest);
-        frag_dest.x = coords_rect.w - frag_dest.w;
-        SDL_RenderCopyEx(renderer, radius_frag, &frag_src, &frag_dest, 0, NULL, SDL_FLIP_HORIZONTAL);
-        frag_dest.y = coords_rect.h - frag_dest.h;
-        SDL_RenderCopyEx(renderer, radius_frag, &frag_src, &frag_dest, 0, NULL, SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
-        frag_dest.x = 0;
-        SDL_RenderCopyEx(renderer, radius_frag, &frag_src, &frag_dest, 0, NULL, SDL_FLIP_VERTICAL);
+        lv_area_t mask_coords = t_coords, mask_clip = t_clip;
+        lv_coord_t x_ofs = -mask_coords.x1 - (dst_origin.x - zoomed_cords.x1),
+                   y_ofs = -mask_coords.y1 - (dst_origin.y - zoomed_cords.y1);
+        lv_area_move(&mask_clip, x_ofs, y_ofs);
+        lv_area_move(&mask_coords, x_ofs, y_ofs);
+        lv_draw_sdl_rect_bg_frag_draw_corners(ctx, radius_frag, real_radius, &mask_coords, &mask_clip);
     }
     else if(needs_clip) {
         /* No radius, set clip here */
         SDL_RenderSetClipRect(renderer, &clip_rect);
     }
 
-    SDL_Color recolor;
-    lv_color_to_sdl_color(&draw_dsc->recolor, &recolor);
-    if(draw_dsc->recolor_opa == LV_OPA_COVER) {
-        /* Draw fully recolored image*/
-        SDL_SetTextureColorMod(texture, draw_dsc->recolor.ch.red, recolor.g, recolor.b);
-        SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
-        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
-    }
-    else if(draw_dsc->recolor_opa > LV_OPA_TRANSP) {
-        /* Draw blended. src: origA, dst: origA * recolorA */
-        SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
-        SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
-        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
-        SDL_SetTextureColorMod(texture, recolor.r, recolor.g, recolor.b);
-        SDL_SetTextureAlphaMod(texture, draw_dsc->opa * draw_dsc->recolor_opa / 255);
-        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+    /* Draw with no recolor */
+    if(draw_dsc->recolor_opa > LV_OPA_TRANSP) {
+        lv_color_t recolor = lv_color_mix(draw_dsc->recolor, lv_color_white(), draw_dsc->recolor_opa);
+        SDL_SetTextureColorMod(texture, recolor.ch.red, recolor.ch.green, recolor.ch.blue);
     }
     else {
-        /* Draw with no recolor */
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
-        SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
-        if(composite) {
-            SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-        }
-        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     }
+    SDL_SetTextureAlphaMod(texture, draw_dsc->opa);
+    if(composite) {
+#if LV_GPU_SDL_CUSTOM_BLEND_MODE
+        SDL_BlendMode blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ZERO,
+                                                              SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_DST_ALPHA,
+                                                              SDL_BLENDFACTOR_ZERO, SDL_BLENDOPERATION_ADD);
+        SDL_SetTextureBlendMode(texture, blend_mode);
+#else
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+#endif
+    }
+    SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, draw_dsc->angle, &pivot, SDL_FLIP_NONE);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+
     if(composite) {
         if(needs_clip) {
             SDL_RenderSetClipRect(renderer, &clip_rect);
@@ -288,7 +283,12 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
     return texture;
 }
 
-static bool get_mask_radius(lv_coord_t * radius)
+/**
+ * Check if there is only one radius mask
+ * @param radius Set to radius value if the only mask is a radius mask
+ * @return true if the only mask is a radius mask
+ */
+static bool check_mask_simple_radius(lv_coord_t * radius)
 {
     if(lv_draw_mask_get_cnt() != 1) return false;
     for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
