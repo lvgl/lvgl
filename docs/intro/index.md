@@ -111,7 +111,8 @@ Starting from v8, every minor release is supported for 1 year.
 | v6.1    | Nov 26, 2019 |Nov 26, 2020 | No     |
 | v7.11   | Mar 16, 2021 |Mar 16, 2022 | Yes    |
 | v8.0    | 1 Jun, 2021  |1 Jun, 2022  | Yes    |
-| v8.1    | In progress  |   |     |
+| v8.1    | 10 Nov, 2021 |10 Nov, 2022 | Yes    |
+| v8.2    | In progress  |             |        |
 
 
 ## FAQ
@@ -121,6 +122,8 @@ You can ask questions in the forum: [https://forum.lvgl.io/](https://forum.lvgl.
 
 We use [GitHub issues](https://github.com/lvgl/lvgl/issues) for development related discussion. 
 You should use them only if your question or issue is tightly related to the development of the library. 
+
+Before posting a question, please ready this FAQ section as you might find answer to your issue here too.
 
 ### Is my MCU/hardware supported?
 Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](#requirements) is supported by LVGL.
@@ -145,7 +148,16 @@ Some examples of the supported display types:
 
 See the [Porting](/porting/display) section to learn more.
 
-### Nothing happens, my display driver is not called. What have I missed?
+### LVGL doesn't start, nothing is drawn on the display. What can be the problem?
+- Try increasing `LV_MEM_SIZE`.
+- Be sure `lv_disp_drv_t`, `lv_indev_drv_t` and `lv_fs_drv_t` are global or `static`.
+- Be sure your display works without LVGL. E.g. paint it to red on start up.
+- Enable [logging](porting/log)
+- If you use an RTOS
+   - increase the stack size of the task which calls `lv_timer_handler()`
+   - Be sure you used a mutex as [described here](/porting/os)
+
+### My display driver is not called. What have I missed?
 Be sure you are calling `lv_tick_inc(x)` in an interrupt and `lv_timer_handler()` in your main `while(1)`.
 
 Learn more in the [Tick](/porting/tick) and [Task handler](/porting/task-handler) sections.
