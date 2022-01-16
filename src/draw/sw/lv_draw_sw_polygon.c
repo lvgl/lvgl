@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_polygon.c
+ * @file lv_draw_sw_polygon.c
  *
  */
 
