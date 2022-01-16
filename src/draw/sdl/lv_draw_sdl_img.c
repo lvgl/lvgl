@@ -123,7 +123,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = zoomed_cords, t_clip = *clip, apply_area;
 
-    if(!check_mask_simple_radius(coords, &radius)) {
+    if(!check_mask_simple_radius(&t_coords, &radius)) {
         lv_draw_sdl_composite_begin(ctx, &zoomed_cords, clip, NULL, draw_dsc->blend_mode,
                                     &t_coords, &t_clip, &apply_area);
     }
