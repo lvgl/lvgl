@@ -5,4 +5,5 @@
 # here, such as MicroPython and PC simulator packages.
 #
 # Note: This script is run by the CI workflows.
+sudo apt update
 sudo apt install gcc python3 libpng-dev ruby-full gcovr cmake

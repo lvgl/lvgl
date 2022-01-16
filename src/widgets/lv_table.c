@@ -464,6 +464,7 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     if(table->cell_data) lv_mem_free(table->cell_data);
     if(table->row_h) lv_mem_free(table->row_h);
+    if(table->col_w) lv_mem_free(table->col_w);
 }
 
 static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)

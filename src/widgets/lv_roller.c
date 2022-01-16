@@ -528,6 +528,14 @@ static void draw_label(lv_event_t * e)
     lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
+    /*If the roller has shadow or outline it has some ext. draw size
+     *therefore the label can overflow the roller's boundaries.
+     *To solve this limit the clip area to the "plain" roller.*/
+    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    lv_area_t roller_clip_area;
+    if(!_lv_area_intersect(&roller_clip_area, draw_ctx->clip_area, &roller->coords)) return;
+    draw_ctx->clip_area = &roller_clip_area;
+
     lv_area_t sel_area;
     get_sel_area(roller, &sel_area);
 
@@ -537,10 +545,10 @@ static void draw_label(lv_event_t * e)
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = sel_area.y1;
     if(_lv_area_intersect(&clip2, draw_ctx->clip_area, &clip2)) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+        const lv_area_t * clip_area_ori2 = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip2;
         lv_draw_label(draw_ctx, &label_draw_dsc, &label_obj->coords, lv_label_get_text(label_obj), NULL);
-        draw_ctx->clip_area = clip_area_ori;
+        draw_ctx->clip_area = clip_area_ori2;
     }
 
     clip2.x1 = label_obj->coords.x1;
@@ -548,11 +556,13 @@ static void draw_label(lv_event_t * e)
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = label_obj->coords.y2;
     if(_lv_area_intersect(&clip2, draw_ctx->clip_area, &clip2)) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+        const lv_area_t * clip_area_ori2 = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip2;
         lv_draw_label(draw_ctx, &label_draw_dsc, &label_obj->coords, lv_label_get_text(label_obj), NULL);
-        draw_ctx->clip_area = clip_area_ori;
+        draw_ctx->clip_area = clip_area_ori2;
     }
+
+    draw_ctx->clip_area = clip_area_ori;
 }
 
 static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
