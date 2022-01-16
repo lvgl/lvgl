@@ -179,6 +179,8 @@
     #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
     /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
     #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+    /*For some draw actions perform accuracy over performance. Can be disabled for extremely slow GPUs*/
+    #define LV_GPU_SDL_PREFER_ACCURACY 1
 #endif
 
 /*-------------

@@ -37,6 +37,22 @@ typedef struct {
     lv_coord_t w, h, radius;
 } lv_draw_img_rounded_key_t;
 
+enum {
+    ROUNDED_IMG_PART_LEFT = 0,
+    ROUNDED_IMG_PART_HCENTER = 1,
+    ROUNDED_IMG_PART_RIGHT = 2,
+    ROUNDED_IMG_PART_TOP = 3,
+    ROUNDED_IMG_PART_VCENTER = 4,
+    ROUNDED_IMG_PART_BOTTOM = 5,
+};
+
+enum {
+    ROUNDED_IMG_CORNER_TOP_LEFT = 0,
+    ROUNDED_IMG_CORNER_TOP_RIGHT = 1,
+    ROUNDED_IMG_CORNER_BOTTOM_RIGHT = 2,
+    ROUNDED_IMG_CORNER_BOTTOM_LEFT = 3,
+};
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -82,7 +98,6 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
 {
     const lv_area_t * clip = draw_ctx->clip_area;
     lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
-    SDL_Renderer * renderer = ctx->renderer;
 
     size_t key_size;
     lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(src, draw_dsc->frame_id, &key_size);
@@ -118,17 +133,6 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     lv_area_to_sdl_rect(&t_coords, &coords_rect);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_Rect clipped_src = {0, 0, 0, 0}, clipped_dst = coords_rect;
-    SDL_Rect * src_rect = NULL, *dst_rect = &clipped_dst;
-
-    if(_lv_area_is_in(&t_coords, &t_clip, 0)) {
-        /*Image needs to be fully drawn*/
-        src_rect = SDL_RectEmpty(&header->rect) ? NULL : &header->rect;
-    }
-    else if(draw_dsc->angle == 0) {
-        /*Image needs to be partly drawn, and we calculate the area to draw manually*/
-        src_rect = &clipped_src;
-    }
 
     if(radius > 0) {
         draw_img_rounded(ctx, texture, header, draw_dsc, &t_coords, &t_clip, radius);
@@ -145,23 +149,33 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
 static void calc_draw_part(SDL_Texture * texture, const lv_draw_sdl_img_header_t * header, const lv_area_t * coords,
                            const lv_area_t * clip, SDL_Rect * clipped_src, SDL_Rect * clipped_dst)
 {
-    Uint32 format = 0;
-    int access = 0, w, h;
+    double x = 0, y = 0, w, h;
     if(SDL_RectEmpty(&header->rect)) {
-        SDL_QueryTexture(texture, &format, &access, &w, &h);
+        Uint32 format = 0;
+        int access = 0, tw, th;
+        SDL_QueryTexture(texture, &format, &access, &tw, &th);
+        w = tw;
+        h = th;
     }
     else {
+        x = header->rect.x;
+        y = header->rect.y;
         w = header->rect.w;
         h = header->rect.h;
     }
-    lv_area_t clipped_area;
-    _lv_area_intersect(&clipped_area, coords, clip);
-    lv_area_to_sdl_rect(&clipped_area, clipped_dst);
+    if(clip) {
+        lv_area_t clipped_area;
+        _lv_area_intersect(&clipped_area, coords, clip);
+        lv_area_to_sdl_rect(&clipped_area, clipped_dst);
+    }
+    else {
+        lv_area_to_sdl_rect(coords, clipped_dst);
+    }
     lv_coord_t coords_w = lv_area_get_width(coords), coords_h = lv_area_get_height(coords);
-    clipped_src->x = header->rect.x + (clipped_dst->x - coords->x1) * w / coords_w;
-    clipped_src->y = header->rect.y + (clipped_dst->y - coords->y1) * h / coords_h;
-    clipped_src->w = w - (coords_w - clipped_dst->w) * w / coords_w;
-    clipped_src->h = h - (coords_h - clipped_dst->h) * h / coords_h;
+    clipped_src->x = (int)(x + (clipped_dst->x - coords->x1) * w / coords_w);
+    clipped_src->y = (int)(y + (clipped_dst->y - coords->y1) * h / coords_h);
+    clipped_src->w = (int)(w - (coords_w - clipped_dst->w) * w / coords_w);
+    clipped_src->h = (int)(h - (coords_h - clipped_dst->h) * h / coords_h);
 }
 
 bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key_head_img_t * key, size_t key_size,
@@ -212,9 +226,9 @@ static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_
     if(!dsc->img_data) {
         return upload_img_texture_fallback(renderer, dsc);
     }
-    bool chroma_keyed = dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    uint32_t h = dsc->header.h;
-    uint32_t w = dsc->header.w;
+    bool chroma_keyed = dsc->header.cf == (uint32_t) LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    int h = (int) dsc->header.h;
+    int w = (int) dsc->header.w;
     void * data = (void *) dsc->img_data;
     Uint32 rmask = 0x00FF0000;
     Uint32 gmask = 0x0000FF00;
@@ -233,8 +247,8 @@ static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_
 
 static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc)
 {
-    lv_coord_t h = dsc->header.h;
-    lv_coord_t w = dsc->header.w;
+    lv_coord_t h = (lv_coord_t) dsc->header.h;
+    lv_coord_t w = (lv_coord_t) dsc->header.w;
     uint8_t * data = lv_mem_buf_get(w * h * sizeof(lv_color_t));
     for(lv_coord_t y = 0; y < h; y++) {
         lv_img_decoder_read_line(dsc, 0, y, w, &data[y * w * sizeof(lv_color_t)]);
@@ -309,40 +323,46 @@ static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, con
     SDL_Rect src_rect, dst_rect;
     /* Draw 3 parts */
     lv_area_t clip_tmp, part;
-    for(int i = 0; i < 3 ; i++) {
-        if(w > h) {
-            if(i == 0) {
-                /* Left strip */
+#if LV_GPU_SDL_PREFER_ACCURACY
+    calc_draw_part(texture, header, coords, NULL, &src_rect, &dst_rect);
+#endif
+    for(int i = w > h ? ROUNDED_IMG_PART_LEFT : ROUNDED_IMG_PART_TOP, j = i + 3; i <= j; i++) {
+        switch(i) {
+            case ROUNDED_IMG_PART_LEFT:
                 lv_area_set(&part, coords->x1, coords->y1 + radius, coords->x1 + radius - 1, coords->y2 - radius);
-            }
-            else if(i == 1) {
-                /* Right strip */
-                lv_area_set(&part, coords->x2 - radius + 1, coords->y1 + radius, coords->x2, coords->y2 - radius);
-            }
-            else if(i == 2) {
-                /* Center strip */
+                break;
+            case ROUNDED_IMG_PART_HCENTER:
                 lv_area_set(&part, coords->x1 + radius, coords->y1, coords->x2 - radius, coords->y2);
-            }
-        }
-        else {
-            if(i == 0) {
-                /* Top strip */
+                break;
+            case ROUNDED_IMG_PART_RIGHT:
+                lv_area_set(&part, coords->x2 - radius + 1, coords->y1 + radius, coords->x2, coords->y2 - radius);
+                break;
+            case ROUNDED_IMG_PART_TOP:
                 lv_area_set(&part, coords->x1 + radius, coords->y1, coords->x2 - radius, coords->y1 + radius - 1);
-            }
-            else if(i == 1) {
-                /* Bottom strip */
+                break;
+            case ROUNDED_IMG_PART_VCENTER:
                 lv_area_set(&part, coords->x1 + radius, coords->y2 - radius + 1, coords->x2 - radius, coords->y2);
-            }
-            else if(i == 2) {
-                /* Center strip */
+                break;
+            case ROUNDED_IMG_PART_BOTTOM:
                 lv_area_set(&part, coords->x1, coords->y1 + radius, coords->x2, coords->y2 - radius);
-            }
+                break;
+            default:
+                break;
         }
         if(!_lv_area_intersect(&clip_tmp, &part, clip)) continue;
+#if LV_GPU_SDL_PREFER_ACCURACY
+        SDL_Rect clip_rect;
+        lv_area_to_sdl_rect(&clip_tmp, &clip_rect);
+        SDL_RenderSetClipRect(ctx->renderer, &clip_rect);
+#else
+        /* Do clipping here, some pixels near the parts may have misalignment */
         calc_draw_part(texture, header, coords, &clip_tmp, &src_rect, &dst_rect);
+#endif
         SDL_RenderCopy(ctx->renderer, texture, &src_rect, &dst_rect);
     }
-
+#if LV_GPU_SDL_PREFER_ACCURACY
+    SDL_RenderSetClipRect(ctx->renderer, NULL);
+#endif
 }
 
 static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * draw_dsc)
@@ -389,30 +409,70 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
 #else
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
 #endif
-        SDL_Rect srcrect, tmprect, dstrect = {0, 0, radius, radius};
+        SDL_Rect srcrect, cliprect, dstrect = {0, 0, radius, radius};
 
-        /* Render 4 corners, first top left */
-        lv_area_set(&clip, coords.x1, coords.y1, coords.x1 + radius - 1, coords.y1 + radius - 1);
-        calc_draw_part(texture, header, &coords, &clip, &srcrect, &tmprect);
-        SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
-
-        /* ...then top right */
-        dstrect.x = full_frag_size - dstrect.w;
-        lv_area_set(&clip, coords.x2 - radius + 1, coords.y1, coords.x2, coords.y1 + radius - 1);
-        calc_draw_part(texture, header, &coords, &clip, &srcrect, &tmprect);
-        SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
-
-        /* ...then bottom right */
-        dstrect.y = full_frag_size - dstrect.h;
-        lv_area_set(&clip, coords.x2 - radius + 1, coords.y2 - radius + 1, coords.x2, coords.y2);
-        calc_draw_part(texture, header, &coords, &clip, &srcrect, &tmprect);
-        SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
-
-        /* ...then bottom left. */
-        dstrect.x = 0;
-        lv_area_set(&clip, coords.x1, coords.y2 - radius + 1, coords.x1 + radius - 1, coords.y2);
-        calc_draw_part(texture, header, &coords, &clip, &srcrect, &tmprect);
-        SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
+#if LV_GPU_SDL_PREFER_ACCURACY
+        cliprect.w = cliprect.h = radius;
+        for(int i = 0; i <= ROUNDED_IMG_CORNER_BOTTOM_LEFT; i++) {
+            switch(i) {
+                case ROUNDED_IMG_CORNER_TOP_LEFT:
+                    cliprect.x = 0;
+                    cliprect.y = 0;
+                    lv_area_align(&frag_coords, &coords, LV_ALIGN_TOP_LEFT, 0, 0);
+                    break;
+                case ROUNDED_IMG_CORNER_TOP_RIGHT:
+                    cliprect.x = full_frag_size - radius;
+                    cliprect.y = 0;
+                    lv_area_align(&frag_coords, &coords, LV_ALIGN_TOP_RIGHT, 0, 0);
+                    break;
+                case ROUNDED_IMG_CORNER_BOTTOM_RIGHT:
+                    cliprect.x = full_frag_size - radius;
+                    cliprect.y = full_frag_size - radius;
+                    lv_area_align(&frag_coords, &coords, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+                    break;
+                case ROUNDED_IMG_CORNER_BOTTOM_LEFT:
+                    cliprect.x = 0;
+                    cliprect.y = full_frag_size - radius;
+                    lv_area_align(&frag_coords, &coords, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+                    break;
+                default:
+                    break;
+            }
+            calc_draw_part(texture, header, &coords, NULL, &srcrect, &dstrect);
+            SDL_RenderSetClipRect(ctx->renderer, &cliprect);
+            SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
+        }
+        SDL_RenderSetClipRect(ctx->renderer, NULL);
+#else
+        for(int i = 0; i <= ROUNDED_IMG_CORNER_BOTTOM_LEFT; i++) {
+            switch(i) {
+                case ROUNDED_IMG_CORNER_TOP_LEFT:
+                    dstrect.x = 0;
+                    dstrect.y = 0;
+                    lv_area_set(&clip, coords.x1, coords.y1, coords.x1 + radius - 1, coords.y1 + radius - 1);
+                    break;
+                case ROUNDED_IMG_CORNER_TOP_RIGHT:
+                    dstrect.x = full_frag_size - dstrect.w;
+                    dstrect.y = 0;
+                    lv_area_set(&clip, coords.x2 - radius + 1, coords.y1, coords.x2, coords.y1 + radius - 1);
+                    break;
+                case ROUNDED_IMG_CORNER_BOTTOM_RIGHT:
+                    dstrect.x = full_frag_size - dstrect.w;
+                    dstrect.y = full_frag_size - dstrect.h;
+                    lv_area_set(&clip, coords.x2 - radius + 1, coords.y2 - radius + 1, coords.x2, coords.y2);
+                    break;
+                case ROUNDED_IMG_CORNER_BOTTOM_LEFT:
+                    dstrect.x = 0;
+                    dstrect.y = full_frag_size - dstrect.h;
+                    lv_area_set(&clip, coords.x1, coords.y2 - radius + 1, coords.x1 + radius - 1, coords.y2);
+                    break;
+                default:
+                    break;
+            }
+            calc_draw_part(texture, header, &coords, &clip, &srcrect, &cliprect);
+            SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
+        }
+#endif
 
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 

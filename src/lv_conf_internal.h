@@ -446,6 +446,18 @@
             #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
         #endif
     #endif
+    /*For some draw actions perform accuracy over performance. Can be disabled for extremely slow GPUs*/
+    #ifndef LV_GPU_SDL_PREFER_ACCURACY
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_GPU_SDL_PREFER_ACCURACY
+                #define LV_GPU_SDL_PREFER_ACCURACY CONFIG_LV_GPU_SDL_PREFER_ACCURACY
+            #else
+                #define LV_GPU_SDL_PREFER_ACCURACY 0
+            #endif
+        #else
+            #define LV_GPU_SDL_PREFER_ACCURACY 1
+        #endif
+    #endif
 #endif
 
 /*-------------
