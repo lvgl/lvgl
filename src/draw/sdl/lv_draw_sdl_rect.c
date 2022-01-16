@@ -60,9 +60,6 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
 
-static void draw_bg_img_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
-                               const lv_draw_rect_dsc_t * dsc);
-
 static void draw_border(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
 
@@ -299,59 +296,68 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
         lv_draw_label((lv_draw_ctx_t *) ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
     }
     else {
-        lv_draw_sdl_img_header_t * header = NULL;
+        lv_img_header_t header;
         size_t key_size;
         lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(dsc->bg_img_src, 0, &key_size);
         bool key_found;
+        lv_img_header_t * cache_header = NULL;
         SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(ctx, key, key_size, &key_found,
-                                                                            (void **) &header);
-        if(!key_found) {
-            lv_draw_sdl_img_load_texture(ctx, key, key_size, dsc->bg_img_src, 0, &texture, &header);
-        }
+                                                                            (void **) &cache_header);
         SDL_free(key);
-        if(!texture || !header) {
+        if(texture) {
+            header = *cache_header;
+        }
+        else if(key_found || lv_img_decoder_get_info(dsc->bg_img_src, &header) != LV_RES_OK) {
+            /* When cache hit but with negative result, use default decoder. If still fail, return.*/
             LV_LOG_WARN("Couldn't read the background image");
             return;
         }
 
-        lv_coord_t w = (lv_coord_t) header->base.w, h = (lv_coord_t) header->base.h;
+        lv_draw_img_dsc_t img_dsc;
+        lv_draw_img_dsc_init(&img_dsc);
+        img_dsc.blend_mode = dsc->blend_mode;
+        img_dsc.recolor = dsc->bg_img_recolor;
+        img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
+        img_dsc.opa = dsc->bg_img_opa;
+        img_dsc.frame_id = 0;
+
+        int16_t radius_mask_id = LV_MASK_ID_INV;
+        lv_draw_mask_radius_param_t radius_param;
+        if(dsc->radius > 0) {
+            lv_draw_mask_radius_init(&radius_param, coords, dsc->radius, false);
+            radius_mask_id = lv_draw_mask_add(&radius_param, NULL);
+        }
+
         /*Center align*/
         if(dsc->bg_img_tiled == false) {
-            SDL_Rect dstrect = {
-                .x = coords->x1 + lv_area_get_width(coords) / 2 - w / 2,
-                .y = coords->y1 + lv_area_get_height(coords) / 2 - h / 2,
-                .w = w, .h = h,
-            };
-            SDL_RenderCopy(ctx->renderer, texture, NULL, &dstrect);
+            lv_area_t area;
+            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
+            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
+            area.x2 = area.x1 + header.w - 1;
+            area.y2 = area.y1 + header.h - 1;
+
+            lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
         }
         else {
-            lv_draw_img_dsc_t img_dsc;
-            lv_draw_img_dsc_init(&img_dsc);
-            img_dsc.blend_mode = dsc->blend_mode;
-            img_dsc.recolor = dsc->bg_img_recolor;
-            img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
-            img_dsc.opa = dsc->bg_img_opa;
-
             lv_area_t area;
             area.y1 = coords->y1;
-            area.y2 = area.y1 + h - 1;
+            area.y2 = area.y1 + header.h - 1;
 
-            for(; area.y1 <= coords->y2; area.y1 += h, area.y2 += h) {
+            for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
 
                 area.x1 = coords->x1;
-                area.x2 = area.x1 + w - 1;
-                for(; area.x1 <= coords->x2; area.x1 += w, area.x2 += w) {
+                area.x2 = area.x1 + header.w - 1;
+                for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
                     lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
                 }
             }
         }
+
+        if(radius_mask_id != LV_MASK_ID_INV) {
+            lv_draw_mask_remove_id(radius_mask_id);
+            lv_draw_mask_free_param(&radius_param);
+        }
     }
-}
-
-static void draw_bg_img_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
-                               const lv_draw_rect_dsc_t * dsc)
-{
-
 }
 
 static void draw_shadow(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * clip,

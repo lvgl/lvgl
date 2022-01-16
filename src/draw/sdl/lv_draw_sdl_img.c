@@ -61,7 +61,7 @@ static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_
 
 static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc);
 
-static bool check_mask_simple_radius(lv_coord_t * radius);
+static bool check_mask_simple_radius(const lv_area_t * coords, lv_coord_t * radius);
 
 static void draw_img_simple(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, const lv_draw_sdl_img_header_t * header,
                             const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const lv_area_t * clip);
@@ -123,7 +123,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = zoomed_cords, t_clip = *clip, apply_area;
 
-    if(!check_mask_simple_radius(&radius)) {
+    if(!check_mask_simple_radius(coords, &radius)) {
         lv_draw_sdl_composite_begin(ctx, &zoomed_cords, clip, NULL, draw_dsc->blend_mode,
                                     &t_coords, &t_clip, &apply_area);
     }
@@ -271,7 +271,7 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
  * @param radius Set to radius value if the only mask is a radius mask
  * @return true if the only mask is a radius mask
  */
-static bool check_mask_simple_radius(lv_coord_t * radius)
+static bool check_mask_simple_radius(const lv_area_t * coords, lv_coord_t * radius)
 {
     if(lv_draw_mask_get_cnt() != 1) return false;
     for(uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
@@ -279,6 +279,7 @@ static bool check_mask_simple_radius(lv_coord_t * radius)
         if(param->type == LV_DRAW_MASK_TYPE_RADIUS) {
             lv_draw_mask_radius_param_t * rparam = (lv_draw_mask_radius_param_t *) param;
             if(rparam->cfg.outer) return false;
+            if(!_lv_area_is_equal(&rparam->cfg.rect, coords)) return false;
             *radius = rparam->cfg.radius;
             return true;
         }
