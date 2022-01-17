@@ -430,11 +430,20 @@
             #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
         #endif
     #endif
+    /*Texture cache size, 8MB by default*/
     #ifndef LV_GPU_SDL_LRU_SIZE
         #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
             #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
         #else
             #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+        #endif
+    #endif
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #ifndef LV_GPU_SDL_CUSTOM_BLEND_MODE
+        #ifdef CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
+            #define LV_GPU_SDL_CUSTOM_BLEND_MODE CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
+        #else
+            #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
         #endif
     #endif
 #endif
@@ -2035,7 +2044,7 @@
  * DEMO USAGE
  ====================*/
 
-/*Show some widget*/
+/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #ifndef LV_USE_DEMO_WIDGETS
     #ifdef CONFIG_LV_USE_DEMO_WIDGETS
         #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
@@ -2044,13 +2053,13 @@
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
-        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #else
-            #define LV_DEMO_WIDGETS_SLIDESHOW  0
-        #endif
+#ifndef LV_DEMO_WIDGETS_SLIDESHOW
+    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+    #else
+        #define LV_DEMO_WIDGETS_SLIDESHOW  0
     #endif
+#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2089,41 +2098,41 @@
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
-    #ifndef LV_DEMO_MUSIC_SQUARE
-        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-        #else
-            #define LV_DEMO_MUSIC_SQUARE       0
-        #endif
+#ifndef LV_DEMO_MUSIC_SQUARE
+    #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+        #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+    #else
+        #define LV_DEMO_MUSIC_SQUARE       0
     #endif
-    #ifndef LV_DEMO_MUSIC_LANDSCAPE
-        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-        #else
-            #define LV_DEMO_MUSIC_LANDSCAPE    0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_LANDSCAPE
+    #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+    #else
+        #define LV_DEMO_MUSIC_LANDSCAPE    0
     #endif
-    #ifndef LV_DEMO_MUSIC_ROUND
-        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-        #else
-            #define LV_DEMO_MUSIC_ROUND        0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_ROUND
+    #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+        #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+    #else
+        #define LV_DEMO_MUSIC_ROUND        0
     #endif
-    #ifndef LV_DEMO_MUSIC_LARGE
-        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-        #else
-            #define LV_DEMO_MUSIC_LARGE        0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_LARGE
+    #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+        #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+    #else
+        #define LV_DEMO_MUSIC_LARGE        0
     #endif
-    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
-        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-        #else
-            #define LV_DEMO_MUSIC_AUTO_PLAY    0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_AUTO_PLAY
+    #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+    #else
+        #define LV_DEMO_MUSIC_AUTO_PLAY    0
     #endif
+#endif
 #endif
 
 

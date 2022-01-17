@@ -84,7 +84,11 @@ typedef enum {
     LV_EVENT_LAYOUT_CHANGED,      /**< The children position has changed due to a layout recalculation*/
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
-    _LV_EVENT_LAST                /** Number of default events*/
+    _LV_EVENT_LAST,               /** Number of default events*/
+
+
+    LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with a event so it's processed
+                                      before the class default event processing */
 } lv_event_code_t;
 
 typedef struct _lv_event_t {
@@ -95,6 +99,8 @@ typedef struct _lv_event_t {
     void * param;
     struct _lv_event_t * prev;
     uint8_t deleted : 1;
+    uint8_t stop_processing : 1;
+    uint8_t stop_bubbling : 1;
 } lv_event_t;
 
 /**
@@ -183,6 +189,19 @@ void * lv_event_get_param(lv_event_t * e);
  */
 void * lv_event_get_user_data(lv_event_t * e);
 
+/**
+ * Stop the event from bubbling.
+ * This is only valid when called in the middle of a event processing chain.
+ * @param e     pointer to the event descriptor
+ */
+void lv_event_stop_bubbling(lv_event_t * e);
+
+/**
+ * Stop processing this event.
+ * This is only valid when called in the middle of a event processing chain.
+ * @param e     pointer to the event descriptor
+ */
+void lv_event_stop_processing(lv_event_t * e);
 
 /**
  * Register a new, custom event ID.

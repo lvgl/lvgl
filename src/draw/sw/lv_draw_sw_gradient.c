@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_gradient.h"
-
+#include "../../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -51,7 +51,6 @@ static  uint32_t compute_key(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h
 /**********************
  *   STATIC VARIABLE
  **********************/
-static uint8_t * grad_cache_mem = 0;
 static size_t    grad_cache_size = 0;
 static uint8_t * grad_cache_end = 0;
 
@@ -87,7 +86,7 @@ static size_t get_cache_item_size(lv_gradient_cache_t * c)
 static lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
 {
     if(first == NULL)
-        return (lv_gradient_cache_t *)grad_cache_mem;
+        return (lv_gradient_cache_t *)LV_GC_ROOT(_lv_grad_cache_mem);
     if(first == NULL)
         return NULL;
 
@@ -168,7 +167,7 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
 #endif
 #endif
                       ;
-    size_t act_size = (size_t)(grad_cache_end - grad_cache_mem);
+    size_t act_size = (size_t)(grad_cache_end - LV_GC_ROOT(_lv_grad_cache_mem));
     if(req_size + act_size > grad_cache_size) {
         /*Need to evict items from cache until we find enough space to allocate this one */
         if(req_size > grad_cache_size) {
@@ -179,7 +178,7 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
             uint32_t oldest_life = UINT32_MAX;
             iterate_cache(&find_oldest_item_life, &oldest_life, NULL);
             iterate_cache(&kill_oldest_item, &oldest_life, NULL);
-            act_size = (size_t)(grad_cache_end - grad_cache_mem);
+            act_size = (size_t)(grad_cache_end - LV_GC_ROOT(_lv_grad_cache_mem));
         }
         /*Ok, now we have space to allocate*/
     }
@@ -207,16 +206,16 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
  **********************/
 void lv_grad_free_cache()
 {
-    lv_mem_free(grad_cache_mem);
-    grad_cache_mem = grad_cache_end = NULL;
+    lv_mem_free(LV_GC_ROOT(_lv_grad_cache_mem));
+    LV_GC_ROOT(_lv_grad_cache_mem) = grad_cache_end = NULL;
     grad_cache_size = 0;
 }
 
 void lv_grad_set_cache_size(size_t max_bytes)
 {
-    lv_mem_free(grad_cache_mem);
-    grad_cache_end = grad_cache_mem = lv_mem_alloc(max_bytes);
-    LV_ASSERT_MALLOC(grad_cache_mem);
+    lv_mem_free(LV_GC_ROOT(_lv_grad_cache_mem));
+    grad_cache_end = LV_GC_ROOT(_lv_grad_cache_mem) = lv_mem_alloc(max_bytes);
+    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_grad_cache_mem));
     grad_cache_size = max_bytes;
 }
 

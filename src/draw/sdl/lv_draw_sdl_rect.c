@@ -423,8 +423,8 @@ static void draw_border_generic(lv_draw_sdl_ctx_t * ctx, const lv_area_t * outer
     lv_coord_t frag_size = LV_MAX(radius, max_side);
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
     if(texture == NULL) {
-        /* Create a mask texture with size of (frag_size * 2 + 1) */
-        const lv_area_t frag_area = {0, 0, frag_size * 2, frag_size * 2};
+        /* Create a mask texture with size of (frag_size * 2 + 3) */
+        const lv_area_t frag_area = {0, 0, frag_size * 2 + 2, frag_size * 2 + 2};
 
         /*Create mask for the outer area*/
         int16_t mask_ids[2] = {LV_MASK_ID_INV, LV_MASK_ID_INV};
@@ -493,7 +493,7 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
         if(full) {
             lv_coord_t sx = (lv_coord_t)(dst_area.x1 - corner_area.x1),
                        sy = (lv_coord_t)(dst_area.y1 - corner_area.y1);
-            SDL_Rect src_rect = {frag_size + 1 + sx, sy, dw, dh};
+            SDL_Rect src_rect = {frag_size + 3 + sx, sy, dw, dh};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
@@ -512,7 +512,7 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
         if(full) {
             lv_coord_t sx = (lv_coord_t)(dst_area.x1 - corner_area.x1),
                        sy = (lv_coord_t)(dst_area.y1 - corner_area.y1);
-            SDL_Rect src_rect = {frag_size + 1 + sx, frag_size + 1 + sy, dw, dh};
+            SDL_Rect src_rect = {frag_size + 3 + sx, frag_size + 3 + sy, dw, dh};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
@@ -531,7 +531,7 @@ static void frag_render_corners(SDL_Renderer * renderer, SDL_Texture * frag, lv_
         if(full) {
             lv_coord_t sx = (lv_coord_t)(dst_area.x1 - corner_area.x1),
                        sy = (lv_coord_t)(dst_area.y1 - corner_area.y1);
-            SDL_Rect src_rect = {sx, frag_size + 1 + sy, dw, dh};
+            SDL_Rect src_rect = {sx, frag_size + 3 + sy, dw, dh};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
@@ -556,7 +556,7 @@ static void frag_render_borders(SDL_Renderer * renderer, SDL_Texture * frag, lv_
 
         lv_coord_t sy = (lv_coord_t)(dst_area.y1 - border_area.y1);
         if(full) {
-            SDL_Rect src_rect = {frag_size, sy, 1, lv_area_get_height(&dst_area)};
+            SDL_Rect src_rect = {frag_size + 1, sy, 1, lv_area_get_height(&dst_area)};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
@@ -574,7 +574,7 @@ static void frag_render_borders(SDL_Renderer * renderer, SDL_Texture * frag, lv_
         lv_coord_t dh = lv_area_get_height(&dst_area);
         if(full) {
             lv_coord_t sy = (lv_coord_t)(dst_area.y1 - border_area.y1);
-            SDL_Rect src_rect = {frag_size, frag_size + 1 + sy, 1, dh};
+            SDL_Rect src_rect = {frag_size + 1, frag_size + 3 + sy, 1, dh};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
@@ -595,7 +595,7 @@ static void frag_render_borders(SDL_Renderer * renderer, SDL_Texture * frag, lv_
         lv_coord_t dw = lv_area_get_width(&dst_area);
         lv_coord_t sx = (lv_coord_t)(dst_area.x1 - border_area.x1);
         if(full) {
-            SDL_Rect src_rect = {sx, frag_size, dw, 1};
+            SDL_Rect src_rect = {sx, frag_size + 1, dw, 1};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
@@ -613,7 +613,7 @@ static void frag_render_borders(SDL_Renderer * renderer, SDL_Texture * frag, lv_
         lv_coord_t dw = lv_area_get_width(&dst_area);
         if(full) {
             lv_coord_t sx = (lv_coord_t)(dst_area.x1 - border_area.x1);
-            SDL_Rect src_rect = {frag_size + 1 + sx, frag_size, dw, 1};
+            SDL_Rect src_rect = {frag_size + 3 + sx, frag_size + 1, dw, 1};
             SDL_RenderCopy(renderer, frag, &src_rect, &dst_rect);
         }
         else {
