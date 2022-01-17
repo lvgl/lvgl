@@ -205,7 +205,7 @@ static inline void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_start_cb_t start_
 
 /**
  * Set a function to use the current value of the variable and make start and end value
- * relative the the returned current value.
+ * relative to the returned current value.
  * @param a             pointer to an initialized `lv_anim_t` variable
  * @param get_value_cb  a function call when the animation starts
  */

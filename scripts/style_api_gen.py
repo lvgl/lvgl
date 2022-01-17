@@ -64,7 +64,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
  'dsc': " Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree unit. E.g. 45 deg. = 450 " },
 
-{'section': 'Padding', 'dsc':'Properties to describe spacing betwwen the parent\'s sides and the children and among the children. Very similar to the padding properties in HTML.' },
+{'section': 'Padding', 'dsc':'Properties to describe spacing between the parent\'s sides and the children and among the children. Very similar to the padding properties in HTML.' },
 {'name': 'PAD_TOP',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding on the top. It makes the content area smaller in this direction."},
@@ -149,7 +149,7 @@ props = [
 
 {'name': 'BG_IMG_TILED',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "If enbaled the background image will be tiled. The possible values are `true` or `false`."},
+ 'dsc': "If enabled the background image will be tiled. The possible values are `true` or `false`."},
 
 {'section': 'Border', 'dsc':'Properties to describe the borders' },
 {'name': 'BORDER_COLOR',
@@ -161,7 +161,7 @@ props = [
 
 {'name': 'BORDER_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opcitiy of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set the opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BORDER_WIDTH',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -169,11 +169,11 @@ props = [
 
 {'name': 'BORDER_SIDE',
  'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set ony which side(s) the border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed calues an be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`."},
+ 'dsc': "Set only which side(s) the border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`."},
 
 {'name': 'BORDER_POST',
 'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets whether the the border should be drawn before or after the children ar drawn. `true`: after children, `false`: before children"},
+ 'dsc': "Sets whether the border should be drawn before or after the children are drawn. `true`: after children, `false`: before children"},
 
 {'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
 {'name': 'OUTLINE_WIDTH',
@@ -210,7 +210,7 @@ props = [
 
 {'name': 'SHADOW_SPREAD',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
+ 'dsc': "Make the shadow calculation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
 
 {'name': 'SHADOW_COLOR',
   'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -270,7 +270,7 @@ props = [
 {'section': 'Arc', 'dsc':'TODO' },
 {'name': 'ARC_WIDTH',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the width (ticjkness) of the arcs in pixel."},
+ 'dsc': "Set the width (thickness) of the arcs in pixel."},
 
 {'name': 'ARC_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -291,7 +291,7 @@ props = [
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file"},
 
-{'section': 'Text', 'dsc':'Properties to describe the propeties of text. All these properties are inherited.' },
+{'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.' },
 {'name': 'TEXT_COLOR',
 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the color of the text."},
@@ -323,7 +323,7 @@ props = [
 'style_type': 'num',   'var_type': 'lv_text_align_t' ,  'default':'`LV_TEXT_ALIGN_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set how to align the lines of the text. Note that it doesn't align the object itself, only the lines inside the object. The possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly"},
 
-{'section': 'Miscellaneous', 'dsc':'Mixed proprites for various purposes.' },
+{'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.' },
 {'name': 'RADIUS',
  'style_type': 'num', 'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"},
@@ -346,11 +346,11 @@ props = [
 
 {'name': 'ANIM_TIME',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
+ 'dsc': "The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
 
 {'name': 'ANIM_SPEED',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more."},
+ 'dsc': "The animation speed in pixel/sec. Its meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more."},
 
 {'name': 'TRANSITION',
  'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' ,  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -358,7 +358,7 @@ props = [
 
 {'name': 'BLEND_MODE',
  'style_type': 'num',   'var_type': 'lv_blend_mode_t' ,  'default':'`LV_BLEND_MODE_NORMAL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`"},
+ 'dsc': "Describes how to blend the colors to the background. The possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`"},
 
 {'name': 'LAYOUT',
  'style_type': 'num',   'var_type': 'uint16_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -366,7 +366,7 @@ props = [
 
 {'name': 'BASE_DIR',
  'style_type': 'num',   'var_type': 'lv_base_dir_t', 'default':'`LV_BASE_DIR_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the base direction of the obejct. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
+ 'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 ]
 
 

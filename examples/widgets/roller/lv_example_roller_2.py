@@ -1,5 +1,6 @@
 import fs_driver
 
+
 def event_handler(e):
     code = e.get_code()
     obj = e.get_target()
@@ -13,7 +14,7 @@ def event_handler(e):
 #
 
 # A style to make the selected option larger
-style_sel =  lv.style_t()
+style_sel = lv.style_t()
 style_sel.init()
 
 try:
@@ -38,7 +39,7 @@ roller.align(lv.ALIGN.LEFT_MID, 10, 0)
 roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(2, lv.ANIM.OFF)
 
-# A roller on the middle with center aligned text, and auto (default) width
+# A roller in the middle with center aligned text, and auto (default) width
 roller = lv.roller(lv.scr_act())
 roller.set_options(opts, lv.roller.MODE.NORMAL)
 roller.set_visible_row_count(3)
@@ -57,4 +58,3 @@ roller.set_style_text_align(lv.TEXT_ALIGN.RIGHT, 0)
 roller.align(lv.ALIGN.RIGHT_MID, -10, 0)
 roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(8, lv.ANIM.OFF)
-

@@ -10,7 +10,7 @@ class Lv_Roller_3():
         # 
         # Add a fade mask to roller.
         #
-        style =  lv.style_t()
+        style = lv.style_t()
         style.init()
         style.set_bg_color(lv.color_black())
         style.set_text_color(lv.color_white())

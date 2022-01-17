@@ -32,7 +32,7 @@ static void page_obj_init(lv_obj_t * par);
 static void anim_x_cb(void * var, int32_t v);
 
 /**
- * create a animation
+ * create an animation
  */
 void lv_example_anim_3(void)
 {

@@ -17,8 +17,8 @@ The music player demo shows what kind of modern, smartphone-like user interfaces
 	- Zoom the album cover proportionality to the current bass value
 	- Display the 4 bands on the left side of a circle by default at 0°, 45°, 90°, 135° 
 	- Add extra bars next to the "main bars" with a cosine shape. Add more bars for the lower bands.
-	- If the there is a large enough bass add a random offset to the position of the bars. E.g. start from 63° istead of 0°. (bars greater than 180° start again from 0°)
-	- If there no bass add 1 to the offset of the bars (it creates a "walking" effect)
+	- If there is a large enough bass, add a random offset to the position of the bars. E.g. start from 63° instead of 0°. (bars greater than 180° start again from 0°)
+	- If there is no bass, add 1 to the offset of the bars (it creates a "walking" effect)
 	- Mirror the bars to the right side of the circle
 	
 ## Using spectrum.py

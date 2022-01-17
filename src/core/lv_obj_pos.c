@@ -202,7 +202,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
 
     /*If the object was out of the parent invalidate the new scrollbar area too.
-     *If it wasn't out of the parent but out now, also invalidate the srollbars*/
+     *If it wasn't out of the parent but out now, also invalidate the scrollbars*/
     bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
     if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
 
@@ -579,7 +579,7 @@ lv_coord_t lv_obj_get_content_height(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom =  lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom - 2 * border_width;

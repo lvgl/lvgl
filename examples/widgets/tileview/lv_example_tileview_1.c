@@ -4,7 +4,7 @@
 /**
  * Create a 2x2 tile view and allow scrolling only in an "L" shape.
  * Demonstrate scroll chaining with a long list that
- * scrolls the tile view when it cant't be scrolled further.
+ * scrolls the tile view when it can't be scrolled further.
  */
 void lv_example_tileview_1(void)
 {
@@ -29,7 +29,7 @@ void lv_example_tileview_1(void)
     lv_obj_center(btn);
 
     /*Tile3: a list*/
-    lv_obj_t * tile3 =  lv_tileview_add_tile(tv, 1, 1, LV_DIR_LEFT);
+    lv_obj_t * tile3 = lv_tileview_add_tile(tv, 1, 1, LV_DIR_LEFT);
     lv_obj_t * list = lv_list_create(tile3);
     lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
 

@@ -411,7 +411,7 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
         lv_opa_t last_mask = LV_OPA_TRANSP;
         last_dest_color = dest_buf[0];
         lv_opa_t opa_tmp = mask[0] >= LV_OPA_MAX ? opa : (uint32_t)((uint32_t)mask[0] * opa) >> 8;
-        last_res_color =  blend_fp(color, last_dest_color, opa_tmp);
+        last_res_color = blend_fp(color, last_dest_color, opa_tmp);
 
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {

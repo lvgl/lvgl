@@ -281,7 +281,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
         break;
 
         case 18:
-            obj =  lv_list_create(main_page);
+            obj = lv_list_create(main_page);
             {
                 lv_obj_t * b;
                 b = lv_list_add_btn(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");

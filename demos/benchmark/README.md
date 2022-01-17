@@ -3,10 +3,10 @@
 ## Overview
 
 The benchmark demo tests the performance in various cases. 
-For example rectangle, border, shadow, text, image blending, image transformation, bleding modes, etc. 
+For example rectangle, border, shadow, text, image blending, image transformation, blending modes, etc. 
 All tests are repeated with 50% opacity.
 
-The size an position of the objects during testing are set with a pseudo random number to make the benchmark repeatable. 
+The size and position of the objects during testing are set with a pseudo random number to make the benchmark repeatable. 
 
 On to top of the screen the title of the current test step, and the result of the previous step is displayed.
 

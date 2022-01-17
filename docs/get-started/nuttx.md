@@ -24,7 +24,7 @@ The best way to think about NuttX is to think of it as a small Unix/Linux for mi
 ## Why NuttX + LVGL?
 
 Although NuttX has its own graphic library called [NX](https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=139629474), LVGL is a good alternative because users could find more eye-candy demos and they can reuse code from previous projects. 
-LVGL is an [Object Oriented Component Based](https://blog.lvgl.io/2018-12-13/extend-lvgl-objects) high-level GUI library, that could fit very well for a RTOS with advanced features like NuttX. 
+LVGL is an [Object-Oriented Component Based](https://blog.lvgl.io/2018-12-13/extend-lvgl-objects) high-level GUI library, that could fit very well for a RTOS with advanced features like NuttX. 
 LVGL is implemented in C and its APIs are in C.
 
 ### Here are some advantages of using LVGL in NuttX

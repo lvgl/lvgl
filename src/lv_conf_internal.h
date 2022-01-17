@@ -830,7 +830,7 @@
     #endif
 #endif
 
-/*Complier prefix for a big array declaration in RAM*/
+/*Compiler prefix for a big array declaration in RAM*/
 #ifndef LV_ATTRIBUTE_LARGE_RAM_ARRAY
     #ifdef CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
         #define LV_ATTRIBUTE_LARGE_RAM_ARRAY CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
@@ -1053,7 +1053,7 @@
     #ifdef CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
         #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
     #else
-        #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
+        #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
     #endif
 #endif
 #ifndef LV_FONT_SIMSUN_16_CJK
@@ -2134,7 +2134,7 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 #undef _LV_KCONFIG_PRESENT
 
 
-/*Set some defines if a dependecy is disabled*/
+/*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0
     #define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
     #define LV_LOG_TRACE_MEM        0

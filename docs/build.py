@@ -32,7 +32,7 @@ ex.exec()
 
 urlpath = re.sub('release/', '', br)
  
-# Be sure the github links point to the right branch
+# Be sure the GitHub links point to the right branch
 f = open("header.rst", "w")
 f.write(".. |github_link_base| replace:: https://github.com/lvgl/lvgl/blob/" + gitcommit + "/docs")
 f.close()

@@ -98,7 +98,7 @@ Be sure to read the [Style overview](/overview/style). Here only the most essent
 A new style can be added to an object with the `lv_obj_add_style(obj, &new_style, selector)` function. 
 `selector` is an ORed combination of part and state(s). E.g. `LV_PART_SCROLLBAR | LV_STATE_PRESSED`.
 
-The base objects use `LV_PART_MAIN` style properties and `LV_PART_SCROLLBAR` with the typical backgroud style properties. 
+The base objects use `LV_PART_MAIN` style properties and `LV_PART_SCROLLBAR` with the typical background style properties. 
 
 
 ### Flags

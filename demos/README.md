@@ -41,8 +41,8 @@ See in [lv_demo_benchmark](https://github.com/lvgl/lv_examples/tree/master/src/l
 ### Stress
 A stress test for LVGL. It contains a lot of object creation, deletion, animations, style usage, and so on. It can be used if there is any memory corruption during heavy usage or any memory leaks. 
 See in [lv_demo_stress](https://github.com/lvgl/lv_examples/tree/master/src/lv_demo_stress) folder.
-<img src="https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_stress/screenshot1.png?raw=true" width=600px alt="Stress tes tfor LVGL">
+<img src="https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_stress/screenshot1.png?raw=true" width=600px alt="Stress test for LVGL">
 
 ## Contributing
-For contribution and coding style guidelines, please refer to the file docs/CONTRIBUTNG.md in the main LVGL repo:
+For contribution and coding style guidelines, please refer to the file docs/CONTRIBUTING.md in the main LVGL repo:
   https://github.com/lvgl/lvgl

@@ -584,7 +584,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
         else if(c == LV_KEY_DOWN) {
             lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-            /*Find the area below the the current*/
+            /*Find the area below the current*/
             if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_sel = 0;
                 while(button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) || button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel])) {
@@ -612,7 +612,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
         else if(c == LV_KEY_UP) {
             lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-            /*Find the area below the the current*/
+            /*Find the area below the current*/
             if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_sel = 0;
                 while(button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) || button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel])) {

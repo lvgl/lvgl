@@ -68,7 +68,7 @@ For example, finding background colors for released, pressed, checked + pressed,
 Instead, for example, use the background color for pressed and checked states and indicate the focused state with a different border color. 
 
 ## Cascading styles
-It's not required to set all the properties in one style. It's possible to add more styles to an object and have the later added style modify or extend appearance.
+It's not required to set all the properties in one style. It's possible to add more styles to an object and have the latter added style modify or extend appearance.
 For example, create a general gray button style and create a new one for red buttons where only the new background color is set. 
 
 This is much like in CSS when used classes are listed like `<div class=".btn .btn-red">`.
