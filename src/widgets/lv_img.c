@@ -605,8 +605,6 @@ static void draw_img(lv_event_t * e)
         lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
         lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
 
-        lv_coord_t radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-
         lv_point_t bg_pivot;
         bg_pivot.x = img->pivot.x + pleft;
         bg_pivot.y = img->pivot.y + ptop;
@@ -664,6 +662,8 @@ static void draw_img(lv_event_t * e)
             img_max_area.y2 -= pbottom;
 
 #if LV_DRAW_COMPLEX
+            lv_coord_t radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+
             int16_t radius_mask_id = LV_MASK_ID_INV;
             lv_draw_mask_radius_param_t radius_param;
             if(radius > 0) {
@@ -691,10 +691,12 @@ static void draw_img(lv_event_t * e)
                 const lv_area_t * clip_area_ori = draw_ctx->clip_area;
 
                 if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) {
+#if LV_DRAW_COMPLEX
                     if(radius_mask_id != LV_MASK_ID_INV) {
                         lv_draw_mask_remove_id(radius_mask_id);
                         lv_draw_mask_free_param(&radius_param);
                     }
+#endif
                     return;
                 }
                 draw_ctx->clip_area = &img_clip_area;
