@@ -152,7 +152,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
         span->txt = lv_mem_alloc(strlen(text) + 1);
     }
     else {
-        lv_mem_realloc(span->txt, strlen(text) + 1);
+        span->txt = lv_mem_realloc(span->txt, strlen(text) + 1);
     }
     span->static_flag = 0;
     strcpy(span->txt, text);
