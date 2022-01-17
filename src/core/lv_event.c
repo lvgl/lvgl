@@ -208,7 +208,7 @@ bool lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_c
 
     int32_t i = 0;
     for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
-        if((event_cb == NULL || obj->spec_attr->event_dsc[i].cb) &&
+        if((event_cb == NULL || obj->spec_attr->event_dsc[i].cb == event_cb) &&
            obj->spec_attr->event_dsc[i].user_data == user_data) {
             /*Shift the remaining event handlers forward*/
             for(; i < (obj->spec_attr->event_dsc_cnt - 1); i++) {
