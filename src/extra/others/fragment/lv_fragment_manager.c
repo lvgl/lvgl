@@ -213,7 +213,6 @@ static void item_create_obj(lv_fragment_managed_states_t * item, const lv_obj_cl
     if(check_type) {
         LV_ASSERT(lv_obj_has_class(item->instance->obj, check_type));
     }
-    item->obj_created = true;
     if(item->instance->obj) {
         lv_obj_add_event_cb(item->instance->obj, cb_states_obj_destroyed, LV_EVENT_DELETE, item);
     }

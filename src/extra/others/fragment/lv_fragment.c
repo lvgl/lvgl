@@ -68,6 +68,9 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
     const lv_fragment_class_t * cls = fragment->cls;
     lv_obj_t * obj = cls->create_obj_cb(fragment, container);
     fragment->obj = obj;
+    if(fragment->managed) {
+        fragment->managed->obj_created = true;
+    }
     if(cls->obj_created_cb) {
         cls->obj_created_cb(fragment, obj);
     }
