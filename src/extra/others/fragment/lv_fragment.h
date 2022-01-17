@@ -99,13 +99,10 @@ struct lv_fragment_class_t {
     /**
      * Called before objects in the fragment will be deleted.
      *
-     * You can return true and delete the objects by yourself here.
-     *
      * @param self Fragment instance
      * @param obj object with this fragment
-     * @return true if the fragment will handle deletion on its own
      */
-    bool (*obj_will_delete_cb)(struct lv_fragment_t * self, lv_obj_t * obj);
+    void (*obj_will_delete_cb)(struct lv_fragment_t * self, lv_obj_t * obj);
 
     /**
      * Called when the object created by fragment received `LV_EVENT_DELETE` event
@@ -161,10 +158,6 @@ typedef struct lv_fragment_managed_states_t  {
      * true if this fragment is in navigation stack that can be popped
      */
     bool in_stack;
-    /**
-     * Internal pointer, DON'T TOUCH
-     */
-    struct lv_fragment_managed_states_t * prev;
 } lv_fragment_managed_states_t;
 
 /**********************
@@ -183,6 +176,10 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent);
  * @param manager Fragment manager instance
  */
 void lv_fragment_manager_del(lv_fragment_manager_t * manager);
+
+void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager);
+
+void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager);
 
 /**
  * Attach fragment to manager.
@@ -243,7 +240,7 @@ bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int cod
  * @param manager Fragment manager instance
  * @return Stack size of this fragment manager
  */
-size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager);
+size_t lv_fragment_manager_get_stack_size(lv_fragment_manager_t * manager);
 
 /**
  * Get top most fragment instance
@@ -251,6 +248,8 @@ size_t lv_fragment_manager_get_size(lv_fragment_manager_t * manager);
  * @return Top most fragment instance
  */
 lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager);
+
+lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * manager, const lv_obj_t * container);
 
 /**
  * Get parent fragment

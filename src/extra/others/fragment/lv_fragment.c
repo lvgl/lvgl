@@ -12,14 +12,20 @@
 #if LV_USE_FRAGMENT
 
 /**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+static void cb_delete_assertion(lv_event_t * event);
+
+/**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
 lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 {
     LV_ASSERT_NULL(cls);
-    LV_ASSERT(cls->instance_size);
     LV_ASSERT_NULL(cls->create_obj_cb);
+    LV_ASSERT(cls->instance_size > 0);
     lv_fragment_t * instance = lv_mem_alloc(cls->instance_size);
     lv_memset_00(instance, cls->instance_size);
     instance->cls = cls;
@@ -32,7 +38,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 
 void lv_fragment_del(lv_fragment_t * fragment)
 {
-    LV_ASSERT(fragment);
+    LV_ASSERT_NULL(fragment);
     /* Objects will leak if this function called before objects deleted */
     const lv_fragment_class_t * cls = fragment->cls;
     if(cls->destructor_cb) {
@@ -65,11 +71,18 @@ lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment)
 
 lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)
 {
+    lv_fragment_managed_states_t * states = fragment->managed;
+    if(states) {
+        states->destroying_obj = false;
+    }
     const lv_fragment_class_t * cls = fragment->cls;
     lv_obj_t * obj = cls->create_obj_cb(fragment, container);
+    LV_ASSERT_NULL(obj);
     fragment->obj = obj;
-    if(fragment->managed) {
-        fragment->managed->obj_created = true;
+    lv_fragment_manager_create_obj(fragment->child_manager);
+    lv_obj_add_event_cb(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
+    if(states) {
+        states->obj_created = true;
     }
     if(cls->obj_created_cb) {
         cls->obj_created_cb(fragment, obj);
@@ -79,17 +92,26 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
 
 void lv_fragment_del_obj(lv_fragment_t * fragment)
 {
-    LV_ASSERT(fragment);
+    LV_ASSERT_NULL(fragment);
+    lv_fragment_manager_del_obj(fragment->child_manager);
+    lv_fragment_managed_states_t * states = fragment->managed;
+    if(states) {
+        if(!states->obj_created) return;
+        states->destroying_obj = true;
+    }
     const lv_fragment_class_t * cls = fragment->cls;
-    bool del_handled = false;
+    if(fragment->obj) {
+        lv_obj_remove_event_cb(fragment->obj, cb_delete_assertion);
+    }
     if(cls->obj_will_delete_cb) {
-        del_handled = cls->obj_will_delete_cb(fragment, fragment->obj);
+        cls->obj_will_delete_cb(fragment, fragment->obj);
     }
-    if(!del_handled && fragment->obj != NULL) {
-        lv_obj_del(fragment->obj);
-    }
+    lv_obj_del(fragment->obj);
     if(cls->obj_deleted_cb) {
         cls->obj_deleted_cb(fragment, fragment->obj);
+    }
+    if(states) {
+        states->obj_created = false;
     }
     fragment->obj = NULL;
 }
@@ -99,6 +121,16 @@ void lv_fragment_recreate_obj(lv_fragment_t * fragment)
     LV_ASSERT_NULL(fragment);
     LV_ASSERT_NULL(fragment->managed);
     lv_fragment_manager_recreate_obj(fragment->managed->manager, fragment);
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void cb_delete_assertion(lv_event_t * event)
+{
+    LV_UNUSED(event);
+    LV_ASSERT_MSG(0, "Please delete objects with lv_fragment_destroy_obj");
 }
 
 #endif /*LV_USE_FRAGMENT*/
