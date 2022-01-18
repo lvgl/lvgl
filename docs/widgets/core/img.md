@@ -104,8 +104,9 @@ If an explicit size is set then the overflowing content will be cropped.
 
 ### Rounded image
 
-You can use `lv_obj_set_style_radius` to set radius to an image, to clip the content to rounded rectangle or 
-circular shape. Please note this will have some negative performance impact to CPU based renderers.
+You can use `lv_obj_set_style_radius` to set radius to an image, and enable `lv_obj_set_style_clip_corner` to clip the 
+content to rounded rectangle or circular shape. Please note this will have some negative performance impact to CPU 
+based renderers.
 
 ## Events
 No special events are sent by image objects.
