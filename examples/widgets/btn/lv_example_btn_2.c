@@ -35,7 +35,7 @@ void lv_example_btn_2(void)
     static lv_style_t style_pr;
     lv_style_init(&style_pr);
 
-    /*Ad a large outline when pressed*/
+    /*Add a large outline when pressed*/
     lv_style_set_outline_width(&style_pr, 30);
     lv_style_set_outline_opa(&style_pr, LV_OPA_TRANSP);
 
@@ -44,7 +44,7 @@ void lv_example_btn_2(void)
     lv_style_set_bg_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 2));
     lv_style_set_bg_grad_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 4));
 
-    /*Add a transition to the the outline*/
+    /*Add a transition to the outline*/
     static lv_style_transition_dsc_t trans;
     static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH, LV_STYLE_OUTLINE_OPA, 0};
     lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear, 300, 0, NULL);

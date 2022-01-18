@@ -420,7 +420,7 @@ static void calc(lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 
 /**
  * Free the a grid calculation's data
- * @param calc pointer to the calculated gtrid cell coordinates
+ * @param calc pointer to the calculated grid cell coordinates
  */
 static void calc_free(_lv_grid_calc_t * calc)
 {

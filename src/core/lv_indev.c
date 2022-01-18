@@ -724,7 +724,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 }
 
 /**
- * Process new points from a input device. indev->state.pressed has to be set
+ * Process new points from an input device. indev->state.pressed has to be set
  * @param indev pointer to an input device state
  * @param x x coordinate of the next point
  * @param y y coordinate of the next point
@@ -1058,7 +1058,7 @@ static void indev_click_focus(_lv_indev_proc_t * proc)
 
 /**
 * Handle the gesture of indev_proc_p->types.pointer.act_obj
-* @param indev pointer to a input device state
+* @param indev pointer to an input device state
 */
 void indev_gesture(_lv_indev_proc_t * proc)
 {

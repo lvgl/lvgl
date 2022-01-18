@@ -83,7 +83,7 @@ lv_obj_set_pos(parent, 50, 50);	/*Move the parent. The child will move with it.*
 
 ### Visibility only on the parent
 
-If a child is partially or fully outside of its parent then the parts outside will not be visible.
+If a child is partially or fully outside its parent then the parts outside will not be visible.
 
 ![](/misc/par_child3.png "A graphical object is visible on its parent")  
 

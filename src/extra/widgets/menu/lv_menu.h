@@ -209,7 +209,7 @@ lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj);
 lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
 
 /**
- * Check if a obj is a root back btn
+ * Check if an obj is a root back btn
  * @param menu pointer to the menu
  * @return true if it is a root back btn
  */

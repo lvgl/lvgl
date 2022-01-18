@@ -139,7 +139,7 @@ Zoom image-like objects. Multiplied with the zoom set on the object. The value 2
 </ul>
 
 ## Padding
-Properties to describe spacing betwwen the parent's sides and the children and among the children. Very similar to the padding properties in HTML.
+Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML.
 
 ### pad_top
 Sets the padding on the top. It makes the content area smaller in this direction.
@@ -307,7 +307,7 @@ Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA
 </ul>
 
 ### bg_img_tiled
-If enbaled the background image will be tiled. The possible values are `true` or `false`.
+If enabled the background image will be tiled. The possible values are `true` or `false`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -328,7 +328,7 @@ Set the color of the border
 </ul>
 
 ### border_opa
-Set the opcitiy of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
+Set the opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 256, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -346,7 +346,7 @@ Set hte width of the border. Only pixel values can be used.
 </ul>
 
 ### border_side
-Set ony which side(s) the border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed calues an be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
+Set ony which side(s) the border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BORDER_SIDE_NONE`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -355,7 +355,7 @@ Set ony which side(s) the border should be drawn. The possible values are `LV_BO
 </ul>
 
 ### border_post
-Sets whether the the border should be drawn before or after the children ar drawn. `true`: after children, `false`: before children
+Sets whether the border should be drawn before or after the children are drawn. `true`: after children, `false`: before children
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -364,7 +364,7 @@ Sets whether the the border should be drawn before or after the children ar draw
 </ul>
 
 ## Outline
-Properties to describe the outline. It's like a border but drawn outside of the rectangles.
+Properties to describe the outline. It's like a border but drawn outside the rectangles.
 
 ### outline_width
 Set the width of the outline in pixels. 
@@ -433,7 +433,7 @@ Set an offset on the shadow in pixels in Y direction.
 </ul>
 
 ### shadow_spread
-Make the shadow calcuation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller
+Make the shadow calculation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -550,7 +550,7 @@ Set the opacity of the lines.
 TODO
 
 ### arc_width
-Set the width (ticjkness) of the arcs in pixel.
+Set the width (thickness) of the arcs in pixel.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -595,7 +595,7 @@ Set an image from which the arc will be masked out. It's useful to display compl
 </ul>
 
 ## Text
-Properties to describe the propeties of text. All these properties are inherited.
+Properties to describe the properties of text. All these properties are inherited.
 
 ### text_color
 Sets the color of the text.
@@ -661,7 +661,7 @@ Set how to align the lines of the text. Note that it doesn't align the object it
 </ul>
 
 ## Miscellaneous
-Mixed proprites for various purposes.
+Mixed properties for various purposes.
 
 ### radius
 Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius
@@ -709,7 +709,7 @@ The intensity of mixing of color filter.
 </ul>
 
 ### anim_time
-The animation time in milliseconds. It's meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
+The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -718,7 +718,7 @@ The animation time in milliseconds. It's meaning is widget specific. E.g. blink 
 </ul>
 
 ### anim_speed
-The animation speed in pixel/sec. It's meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
+The animation speed in pixel/sec. Its meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -736,7 +736,7 @@ An initialized `lv_style_transition_dsc_t` to describe a transition.
 </ul>
 
 ### blend_mode
-Describes how to blend the colors to the background. The possibel values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`
+Describes how to blend the colors to the background. The possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BLEND_MODE_NORMAL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -754,7 +754,7 @@ Set the layout if the object. The children will be repositioned and resized acco
 </ul>
 
 ### base_dir
-Set the base direction of the obejct. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`.
+Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BASE_DIR_AUTO`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>

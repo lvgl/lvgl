@@ -83,7 +83,7 @@ enum {
 
     /** If the object size is set to SIZE_CONTENT, then object size equals zoomed image size.
      *  It causes layout recalculation.
-     *  If the object size is set explicitly the the image will be cropped if zoomed in.*/
+     *  If the object size is set explicitly, the image will be cropped when zoomed in.*/
     LV_IMG_SIZE_MODE_REAL,
 };
 

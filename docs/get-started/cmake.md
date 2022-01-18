@@ -60,7 +60,7 @@ Besides `LV_CONF_PATH` there are two additional CMake options to specify include
 | "lv_conf.h"     | "../../lv_conf.h"     |
 | "lv_drv_conf.h" | "../../lv_drv_conf.h" |
 
-I do not recommend to disable those options unless your folder layout makes it absolutely necessary.
+I do not recommend disabling those options unless your folder layout makes it absolutely necessary.
 
 ## Building LVGL examples with CMake
 LVGL [examples](https://docs.lvgl.io/master/examples.html) have their own CMake target. If you want to build the examples simply add them to your dependencies.

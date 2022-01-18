@@ -146,21 +146,21 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
                 break;
             case LV_BLEND_MODE_ADDITIVE:
-                SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_ADD);
+                SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_ADD);
                 break;
 #if LV_GPU_SDL_CUSTOM_BLEND_MODE
             case LV_BLEND_MODE_SUBTRACTIVE: {
                     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE,
                                                                     SDL_BLENDOPERATION_SUBTRACT, SDL_BLENDFACTOR_ONE,
                                                                     SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_SUBTRACT);
-                    SDL_SetRenderDrawBlendMode(ctx->renderer, mode);
+                    SDL_SetTextureBlendMode(internals->composition, mode);
                     break;
                 }
             case LV_BLEND_MODE_MULTIPLY: {
                     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_SRC_COLOR,
                                                                     SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
                                                                     SDL_BLENDFACTOR_DST_ALPHA, SDL_BLENDOPERATION_ADD);
-                    SDL_SetRenderDrawBlendMode(ctx->renderer, mode);
+                    SDL_SetTextureBlendMode(internals->composition, mode);
                     break;
                 }
 #endif

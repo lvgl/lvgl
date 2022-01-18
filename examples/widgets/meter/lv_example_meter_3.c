@@ -23,7 +23,7 @@ void lv_example_meter_3(void)
     lv_meter_set_scale_ticks(meter, scale_min, 61, 1, 10, lv_palette_main(LV_PALETTE_GREY));
     lv_meter_set_scale_range(meter, scale_min, 0, 60, 360, 270);
 
-    /*Create an other scale for the hours. It's only visual and contains only major ticks*/
+    /*Create another scale for the hours. It's only visual and contains only major ticks*/
     lv_meter_scale_t * scale_hour = lv_meter_add_scale(meter);
     lv_meter_set_scale_ticks(meter, scale_hour, 12, 0, 0, lv_palette_main(LV_PALETTE_GREY));               /*12 ticks*/
     lv_meter_set_scale_major_ticks(meter, scale_hour, 1, 2, 20, lv_color_black(), 10);    /*Every tick is major*/

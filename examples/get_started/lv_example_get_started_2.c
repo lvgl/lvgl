@@ -65,7 +65,7 @@ void lv_example_get_started_2(void)
     lv_label_set_text(label, "Button");
     lv_obj_center(label);
 
-    /*Create an other button and use the red style too*/
+    /*Create another button and use the red style too*/
     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
     lv_obj_remove_style_all(btn2);                      /*Remove the styles coming from the theme*/
     lv_obj_set_pos(btn2, 10, 80);

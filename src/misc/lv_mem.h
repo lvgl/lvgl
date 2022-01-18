@@ -84,7 +84,7 @@ void lv_mem_free(void * data);
  * @param data pointer to an allocated memory.
  * Its content will be copied to the new memory block and freed
  * @param new_size the desired new size in byte
- * @return pointer to the new memory
+ * @return pointer to the new memory, NULL on failure
  */
 void * lv_mem_realloc(void * data_p, size_t new_size);
 

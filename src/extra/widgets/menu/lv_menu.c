@@ -724,7 +724,7 @@ static void lv_menu_back_event_cb(lv_event_t * e)
 
 static void lv_menu_value_changed_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj =  lv_event_get_user_data(e);
+    lv_obj_t * obj = lv_event_get_user_data(e);
     lv_menu_t * menu = (lv_menu_t *)obj;
 
     lv_menu_page_t * main_page = (lv_menu_page_t *)lv_menu_get_cur_main_page(obj);

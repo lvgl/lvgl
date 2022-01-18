@@ -39,7 +39,7 @@ static void draw_event_cb(lv_event_t *e)
         a.x1 = dsc->p1->x;
         a.x2 = dsc->p2->x;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
-        a.y2 = obj->coords.y2 - 13; /* -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesnt look like 0 */
+        a.y2 = obj->coords.y2 - 13; /* -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesn't look like 0 */
         lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
         /*Remove the mask*/
@@ -119,7 +119,7 @@ void lv_example_chart_8(void)
 
             /*  Draw to the series in the reverse order to which they were initialised.
                 Without this the higher values will draw on top of the lower ones.
-                This is because the Z-height of a series matches the order it was initialsied */
+                This is because the Z-height of a series matches the order it was initialised */
             lv_chart_set_next_value(stacked_area_chart.obj, stacked_area_chart.series_list[3 - series_index - 1], draw_heights[series_index]);
         }
     }

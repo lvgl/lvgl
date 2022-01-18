@@ -87,7 +87,7 @@ typedef enum {
     _LV_EVENT_LAST,               /** Number of default events*/
 
 
-    LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with a event so it's processed
+    LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
 } lv_event_code_t;
 
@@ -149,7 +149,7 @@ lv_res_t lv_event_send(struct _lv_obj_t * obj, lv_event_code_t event_code, void 
  * Used by the widgets internally to call the ancestor widget types's event handler
  * @param class_p   pointer to the class of the widget (NOT the ancestor class)
  * @param e         pointer to the event descriptor
- * @return          LV_RES_OK: the taget object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
+ * @return          LV_RES_OK: the target object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
  */
 lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
 
@@ -191,14 +191,14 @@ void * lv_event_get_user_data(lv_event_t * e);
 
 /**
  * Stop the event from bubbling.
- * This is only valid when called in the middle of a event processing chain.
+ * This is only valid when called in the middle of an event processing chain.
  * @param e     pointer to the event descriptor
  */
 void lv_event_stop_bubbling(lv_event_t * e);
 
 /**
  * Stop processing this event.
- * This is only valid when called in the middle of a event processing chain.
+ * This is only valid when called in the middle of an event processing chain.
  * @param e     pointer to the event descriptor
  */
 void lv_event_stop_processing(lv_event_t * e);
@@ -240,7 +240,7 @@ struct _lv_event_dsc_t * lv_obj_add_event_cb(struct _lv_obj_t * obj, lv_event_cb
 /**
  * Remove an event handler function for an object.
  * @param obj       pointer to an object
- * @param event_cb  the event function to remove, or `NULL` to remove the the firstly added event callback
+ * @param event_cb  the event function to remove, or `NULL` to remove the firstly added event callback
  * @return          true if any event handlers were removed
  */
 bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
@@ -256,7 +256,7 @@ bool lv_obj_remove_event_cb_with_user_data(struct _lv_obj_t * obj, lv_event_cb_t
                                            const void * event_user_data);
 
 /**
- * DEPRACTED because doesn't work if multiple event handlers are added to an object.
+ * DEPRECATED because doesn't work if multiple event handlers are added to an object.
  * Remove an event handler function for an object.
  * @param obj       pointer to an object
  * @param event_dsc pointer to an event descriptor to remove (returned by ::lv_obj_add_event_cb)
@@ -265,7 +265,7 @@ bool lv_obj_remove_event_cb_with_user_data(struct _lv_obj_t * obj, lv_event_cb_t
 bool lv_obj_remove_event_dsc(struct _lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc);
 
 /**
- * The the user data of an event obejct event callback. Always the first match with `event_cb` will be returned.
+ * The user data of an event object event callback. Always the first match with `event_cb` will be returned.
  * @param obj               pointer to an object
  * @param event_cb          the event function
  * @return                  the user_data

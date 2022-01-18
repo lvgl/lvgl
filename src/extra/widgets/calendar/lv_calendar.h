@@ -82,7 +82,7 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
 void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month);
 
 /**
- * Set the the highlighted dates
+ * Set the highlighted dates
  * @param obj           pointer to a calendar object
  * @param highlighted   pointer to an `lv_calendar_date_t` array containing the dates.
  *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
@@ -126,7 +126,7 @@ const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar)
 const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 
 /**
- * Get the the highlighted dates
+ * Get the highlighted dates
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */

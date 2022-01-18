@@ -56,7 +56,8 @@ static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps, lv_img_dec_ctx_t * dec_ctx)
+lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
+                            lv_img_dec_ctx_t * dec_ctx)
 {
     lv_img_cache_entry_t * cached_src = NULL;
     if(find_entry(dsc->src, NULL, dec_ctx, &cached_src)) {
@@ -81,7 +82,7 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
     }
 
     memcpy(header, &cached_src->dec_dsc.header, sizeof(*header));
-    if (caps != NULL)
+    if(caps != NULL)
         *caps = cached_src->dec_dsc.caps;
 
 #if LV_IMG_CACHE_DEF_SIZE == 0

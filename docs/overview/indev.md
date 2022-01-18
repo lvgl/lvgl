@@ -25,7 +25,7 @@ Pointer input devices (like a mouse) can have a cursor.
 lv_indev_t * mouse_indev = lv_indev_drv_register(&indev_drv);
 
 LV_IMG_DECLARE(mouse_cursor_icon);                          /*Declare the image source.*/
-lv_obj_t * cursor_obj =  lv_img_create(lv_scr_act());       /*Create an image object for the cursor */
+lv_obj_t * cursor_obj = lv_img_create(lv_scr_act());       /*Create an image object for the cursor */
 lv_img_set_src(cursor_obj, &mouse_cursor_icon);             /*Set the image source*/
 lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image  object to the driver*/
 ```
@@ -34,7 +34,7 @@ Note that the cursor object should have `lv_obj_clear_flag(cursor_obj, LV_OBJ_FL
 For images, *clicking* is disabled by default.
 
 ### Gestures
-Pointer input devives can detect basic gestures. By default, most of the widgets send the gestures to its parent, so finally the gestures can be detected on the screen object in a form of an `LV_EVENT_GESTURE` event. For example:
+Pointer input devices can detect basic gestures. By default, most of the widgets send the gestures to its parent, so finally the gestures can be detected on the screen object in a form of an `LV_EVENT_GESTURE` event. For example:
 
 ```c
 void my_event(lv_event_t * e)
@@ -62,7 +62,7 @@ void my_event(lv_event_t * e)
 lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, NULL);
 ```
 
-To prevent passing the gesture event to the parent from an obejct use `lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
+To prevent passing the gesture event to the parent from an object use `lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
 
 Note that, gestures are not triggered if an object is being scrolled.
 

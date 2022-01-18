@@ -36,7 +36,7 @@ void lv_example_style_11(void)
     lv_label_set_text(label, "Base");
     lv_obj_center(label);
 
-    /*Create an other object with the base style and earnings style too*/
+    /*Create another object with the base style and earnings style too*/
     lv_obj_t * obj_warning = lv_obj_create(lv_scr_act());
     lv_obj_add_style(obj_warning, &style_base, 0);
     lv_obj_add_style(obj_warning, &style_warning, 0);

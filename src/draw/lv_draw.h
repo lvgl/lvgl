@@ -48,7 +48,7 @@ typedef struct _lv_draw_ctx_t  {
     void * buf;
 
     /**
-     * The the position and size of `buf` (absolute coordinates)
+     * The position and size of `buf` (absolute coordinates)
      */
     lv_area_t * buf_area;
 
@@ -86,7 +86,7 @@ typedef struct _lv_draw_ctx_t  {
     void (*draw_bg)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_area_t * coords);
 
     /**
-     * Wait until all background operation are finished. (E.g. GPU opertions)
+     * Wait until all background operations are finished. (E.g. GPU operations)
      */
     void (*wait_for_finish)(struct _lv_draw_ctx_t * draw);
 

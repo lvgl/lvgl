@@ -274,7 +274,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
         place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
     }
 
-    track_first_item =  f.rev ? cont->spec_attr->child_cnt - 1 : 0;
+    track_first_item = f.rev ? cont->spec_attr->child_cnt - 1 : 0;
 
     if(rtl && !f.row) {
         *cross_pos += total_track_cross_size;

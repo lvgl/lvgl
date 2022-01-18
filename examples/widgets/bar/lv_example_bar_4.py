@@ -25,7 +25,7 @@ def get_icon(filename,xres,yres):
 #
 
 img_skew_strip_dsc = get_icon("img_skew_strip",80,20)
-style_indic =  lv.style_t()
+style_indic = lv.style_t()
 
 style_indic.init()
 style_indic.set_bg_img_src(img_skew_strip_dsc)

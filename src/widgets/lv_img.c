@@ -427,7 +427,7 @@ static lv_res_t get_metadata(lv_img_t * img, int skip_cache)
                 return LV_RES_INV;
             }
             /* We'll start the anim timer here in the first draw call if required */
-            if (LV_BT(caps, LV_IMG_DEC_ANIMATED)) {
+            if(LV_BT(caps, LV_IMG_DEC_ANIMATED)) {
                 img->ctrl |= LV_IMG_CTRL_MARKED;
             }
         }
@@ -622,9 +622,9 @@ static void draw_img(lv_event_t * e)
     /* Deferred opening of the animated pictures */
     if(LV_BT(img->ctrl, LV_IMG_CTRL_MARKED) && img->dec_ctx == NULL) {
         lv_img_dec_dsc_in_t dsc = {
-                .src = &img->src,
-                .color = {0},
-                .size_hint = {.x = lv_obj_get_width(obj), .y = lv_obj_get_height(obj)}
+            .src = &img->src,
+            .color = {0},
+            .size_hint = {.x = lv_obj_get_width(obj), .y = lv_obj_get_height(obj)}
         };
         lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, NULL);
         if(entry != NULL) {
@@ -835,7 +835,8 @@ static void start_animation(lv_img_t * img, lv_img_dec_ctx_t * dec_ctx)
         }
 
         /* Need to create the timer here */
-        img->anim_timer = lv_timer_create(LV_BT(dec_ctx->caps, LV_IMG_DEC_SEEKABLE) ? next_frame_task_seekable_cb : next_frame_task_cb, 1000 / dec_ctx->frame_rate, img);
+        img->anim_timer = lv_timer_create(LV_BT(dec_ctx->caps,
+                                                LV_IMG_DEC_SEEKABLE) ? next_frame_task_seekable_cb : next_frame_task_cb, 1000 / dec_ctx->frame_rate, img);
         if(LV_BT(img->ctrl, LV_IMG_CTRL_PAUSE))
             lv_timer_pause(img->anim_timer);
     }
@@ -846,12 +847,12 @@ static void next_frame_task_seekable_cb(lv_timer_t * t)
     lv_obj_t * obj = t->user_data;
     lv_img_t * img = (lv_img_t *) obj;
 
-    if (LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VFR)) {
+    if(LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VFR)) {
         /* Variable frame rate animation are usually more complex to deal with*/
         uint16_t now = lv_tick_get(); /*Using 16bits to save memory in the decoder context */
         /* Handle rollover here with the small counter */
         uint16_t elapsed = now >= img->dec_ctx->last_rendering ? now - img->dec_ctx->last_rendering
-                            : UINT16_MAX - img->dec_ctx->last_rendering + 1 + now;
+                           : UINT16_MAX - img->dec_ctx->last_rendering + 1 + now;
         if(elapsed < img->dec_ctx->frame_delay) return;
 
         img->dec_ctx->last_rendering = now;
@@ -910,7 +911,7 @@ static void next_frame_task_cb(lv_timer_t * t)
     uint16_t now = lv_tick_get(); /*Using 16bits to save memory in the decoder context */
     /* Handle rollover here with the small counter */
     uint16_t elapsed = now >= img->dec_ctx->last_rendering ? now - img->dec_ctx->last_rendering
-                        : UINT16_MAX - img->dec_ctx->last_rendering + 1 + now;
+                       : UINT16_MAX - img->dec_ctx->last_rendering + 1 + now;
     if(elapsed < img->dec_ctx->frame_delay) return;
 
     uint16_t err_delay = elapsed - img->dec_ctx->frame_delay; /* Don't accumulate error due to timer period  */
@@ -923,17 +924,19 @@ static void next_frame_task_cb(lv_timer_t * t)
     }
 
     /* End of animation ?*/
-    if (img->dec_ctx->current_frame == img->dec_ctx->total_frames) {
+    if(img->dec_ctx->current_frame == img->dec_ctx->total_frames) {
         /* If the animation is looping and we have the loop flag, let's rewind */
-        if (LV_BT(img->ctrl, LV_IMG_CTRL_LOOP) || LV_BT(img->dec_ctx->caps, LV_IMG_DEC_LOOPING)) {
+        if(LV_BT(img->ctrl, LV_IMG_CTRL_LOOP) || LV_BT(img->dec_ctx->caps, LV_IMG_DEC_LOOPING)) {
             /* The user overrided the animation's format or it's the standard mode, let's rewind */
             img->dec_ctx->current_frame = 0; /* Rewind */
-        } else {
+        }
+        else {
             lv_res_t res = lv_event_send(obj, LV_EVENT_READY, NULL);
             lv_timer_pause(t);
             if(res != LV_FS_RES_OK) return;
         }
-    } else {
+    }
+    else {
         img->dec_ctx->current_frame++;
     }
 

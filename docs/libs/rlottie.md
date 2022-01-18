@@ -12,7 +12,7 @@ LVGL provides the interface to [Samsung/rlottie](https://github.com/Samsung/rlot
 ## Build Rlottie
 To build Samsung's Rlottie C++14-compatible compiler and optionally CMake 3.14 or higher is required.
 
-To build on desktop you can follow the instrutions from Rlottie's [README](https://github.com/Samsung/rlottie/blob/master/README.md). In the most basic case it looks like this:
+To build on desktop you can follow the instructions from Rlottie's [README](https://github.com/Samsung/rlottie/blob/master/README.md). In the most basic case it looks like this:
 ```
 mkdir rlottie_workdir
 cd rlottie_workdir
