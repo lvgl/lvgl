@@ -31,7 +31,11 @@
    - LV_USE_GPU_STM32_DMA2D
    - LV_USE_GPU_NXP_PXP
    - LV_USE_GPU_NXP_VG_LITE
-5. Update Theme related macros:
+5. Update macro LV_ATTRIBUTE_MEM_ALIGN to force a WORD alignment.
+```c
+#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
+```
+6. Update Theme related macros:
 
 ```c
 #ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
@@ -61,9 +65,9 @@
 #endif
 ```
 
-6. Thoroughly remove the 'DEMO USAGE' section.
-7. Thoroughly remove the '3rd party libraries' section.
-8. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+7. Thoroughly remove the 'DEMO USAGE' section.
+8. Thoroughly remove the '3rd party libraries' section.
+9. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
