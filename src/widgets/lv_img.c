@@ -661,18 +661,6 @@ static void draw_img(lv_event_t * e)
             img_max_area.x2 -= pright;
             img_max_area.y2 -= pbottom;
 
-#if LV_DRAW_COMPLEX
-            lv_coord_t radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-            bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
-
-            int16_t radius_mask_id = LV_MASK_ID_INV;
-            lv_draw_mask_radius_param_t radius_param;
-            if(radius > 0 && clip_corner) {
-                lv_draw_mask_radius_init(&radius_param, &bg_coords, radius, false);
-                radius_mask_id = lv_draw_mask_add(&radius_param, NULL);
-            }
-#endif
-
             if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_VARIABLE) {
                 lv_draw_img_dsc_t img_dsc;
                 lv_draw_img_dsc_init(&img_dsc);
@@ -691,15 +679,7 @@ static void draw_img(lv_event_t * e)
                 img_clip_area.y2 = bg_coords.y2 - pbottom;
                 const lv_area_t * clip_area_ori = draw_ctx->clip_area;
 
-                if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) {
-#if LV_DRAW_COMPLEX
-                    if(radius_mask_id != LV_MASK_ID_INV) {
-                        lv_draw_mask_remove_id(radius_mask_id);
-                        lv_draw_mask_free_param(&radius_param);
-                    }
-#endif
-                    return;
-                }
+                if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) return;
                 draw_ctx->clip_area = &img_clip_area;
 
                 lv_area_t coords_tmp;
@@ -730,13 +710,6 @@ static void draw_img(lv_event_t * e)
                 LV_LOG_WARN("draw_img: image source type is unknown");
                 lv_draw_img(draw_ctx, NULL, &obj->coords, NULL);
             }
-
-#if LV_DRAW_COMPLEX
-            if(radius_mask_id != LV_MASK_ID_INV) {
-                lv_draw_mask_remove_id(radius_mask_id);
-                lv_draw_mask_free_param(&radius_param);
-            }
-#endif
         }
     }
 }
