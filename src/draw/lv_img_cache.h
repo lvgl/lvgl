@@ -56,10 +56,11 @@ lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img
  * image metadata. The decoder will stay in the cache.
  * @param dsc       A pointer on decoder initialization descriptor.
  * @param header    On output will be filled with the image native dimension
+ * @param caps      Optional parameter that'll be filled with the decoder's caps. Can be NULL
  * @param dec_ctx   Optional decoder initialization context. Can be NULL
  * @return LV_RES_OK if a decoder was able to open the image
  */
-lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx);
+lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,  lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Set the number of images to be cached.

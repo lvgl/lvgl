@@ -249,6 +249,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         if(animation == NULL && dsc->dec_ctx->auto_allocated == 1) {
             lv_mem_free(dec_ctx);
             dsc->dec_ctx = 0;
+            dsc->caps = 0;
             return LV_RES_INV;
         }
 
@@ -256,6 +257,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         dec_ctx->ctx.frame_rate   = lottie_animation_get_framerate(animation);
         dec_ctx->ctx.total_frames = lottie_animation_get_totalframe(animation);
         dec_ctx->ctx.dest_frame   = dec_ctx->ctx.total_frames; /* Mark it invalid on construction */
+        set_caps(&dsc->caps);
 
         if(lv_img_decoder_has_size_hint(&dsc->in)) {
             /*Deduce aspect ratio if one coordinate is to guess*/
@@ -268,6 +270,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
                 /*Does the picture fit in the decoder context buffer entirely?*/
                 if((dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->header.h <= dec_ctx->max_buf_size) {
                     dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
+                    dsc->caps |= LV_IMG_DEC_CACHED;
                 }
             }
         }
@@ -279,7 +282,6 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         if(flags == LV_IMG_DEC_ONLYMETA) {
             /*If the size wasn't given in, it's unlikely it'll be re-used later, so clean it now*/
             lottie_animation_destroy(animation);
-
             return LV_RES_OK;
         }
     }
@@ -403,10 +405,10 @@ static void decoder_close(lv_img_decoder_dsc_t * dsc)
         context->allocated_buf = 0;
         lottie_animation_destroy(dec_ctx->cache);
         dec_ctx->cache = 0;
+        dec_ctx->ctx.user_data = 0;
         lv_mem_free(dec_ctx);
         /*Unlink the decoder context*/
         lv_mem_free(context);
-        dec_ctx->ctx.user_data = 0;
     }
     dsc->dec_ctx = 0;
 }

@@ -124,6 +124,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 #else
         dsc->header.cf = LV_IMG_CF_TRUE_COLOR;
 #endif
+        dsc->caps = LV_IMG_DEC_DEFAULT;
         return LV_RES_OK;
     }
 

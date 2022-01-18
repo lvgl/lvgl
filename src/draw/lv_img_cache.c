@@ -56,7 +56,7 @@ static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, lv_img_dec_ctx_t * dec_ctx)
+lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps, lv_img_dec_ctx_t * dec_ctx)
 {
     lv_img_cache_entry_t * cached_src = NULL;
     if(find_entry(dsc->src, NULL, dec_ctx, &cached_src)) {
@@ -67,7 +67,9 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
 
 
     /*Open the image and measure the time to open*/
+#if LV_IMG_CACHE_DEF_SIZE != 0
     uint32_t t_start  = lv_tick_get();
+#endif
     lv_memcpy(&cached_src->dec_dsc.in, dsc, sizeof(*dsc));
     cached_src->dec_dsc.dec_ctx = dec_ctx;
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, LV_IMG_DEC_ONLYMETA);
@@ -78,6 +80,13 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
         return LV_RES_INV;
     }
 
+    memcpy(header, &cached_src->dec_dsc.header, sizeof(*header));
+    if (caps != NULL)
+        *caps = cached_src->dec_dsc.caps;
+
+#if LV_IMG_CACHE_DEF_SIZE == 0
+    lv_img_decoder_close(&cached_src->dec_dsc);
+#else
     cached_src->life = 0;
 
     /*If `time_to_open` was not set in the open function set it here*/
@@ -86,6 +95,7 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
     }
 
     if(cached_src->dec_dsc.time_to_open == 0) cached_src->dec_dsc.time_to_open = 1;
+#endif
     return LV_RES_OK;
 }
 

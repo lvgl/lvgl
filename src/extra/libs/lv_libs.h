@@ -16,7 +16,6 @@ extern "C" {
 #include "bmp/lv_bmp.h"
 #include "fsdrv/lv_fsdrv.h"
 #include "png/lv_png.h"
-#include "gif/lv_gif.h"
 #include "qrcode/lv_qrcode.h"
 #include "sjpg/lv_sjpg.h"
 #include "freetype/lv_freetype.h"

@@ -70,6 +70,10 @@ void lv_extra_init(void)
     lv_bmp_init();
 #endif
 
+#if LV_USE_GIF
+    lv_gif_init();
+#endif
+
 #if LV_USE_FREETYPE
     /*Init freetype library*/
 #  if LV_FREETYPE_CACHE_SIZE >= 0

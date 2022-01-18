@@ -52,7 +52,7 @@ typedef enum {
  */
 typedef struct {
     lv_obj_t            obj;
-    lv_img_src_t    src;        /**< Image source*/
+    lv_img_src_t        src;        /**< Image source*/
     lv_point_t          offset;
     lv_coord_t          w;          /**< Width of the image in px (Handled by the library)*/
     lv_coord_t          h;          /**< Height of the image in px (Handled by the library)*/

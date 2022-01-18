@@ -43,6 +43,8 @@ typedef enum {
     LV_IMG_DEC_ANIMATED     = 0x02, /**!< Image format stores an animation */
     LV_IMG_DEC_SEEKABLE     = 0x04, /**!< Animation is seekable */
     LV_IMG_DEC_CACHED       = 0x08, /**!< The complete image can be cached (used for rotation and zoom) */
+    LV_IMG_DEC_VFR          = 0x10, /**!< The animation has a variable frame rate */
+    LV_IMG_DEC_LOOPING      = 0x20, /**!< The animation is looping */
 } lv_img_decoder_caps_t;
 
 typedef enum {
@@ -57,10 +59,12 @@ typedef enum {
 typedef struct {
     uint8_t  caps;               /**!< The decoder capabilities flags */
     uint8_t  auto_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
-    uint8_t  frame_rate : 7;     /**!< The number of frames per second, if applicable */
+    uint8_t  frame_rate : 7;     /**!< The number of frames per second, if applicable (can be 0 for VFR) */
     lv_frame_index_t   current_frame;  /**!< The current frame index */
     lv_frame_index_t   total_frames;   /**!< The number of frames (likely filled by the decoder) */
     lv_frame_index_t   dest_frame;     /**!< The destination frame (if appropriate) */
+    uint16_t     last_rendering; /**!< The last rendering time */
+    uint16_t     frame_delay;    /**!< The delay for the current frame in ms */
     void    *    user_data;      /**!< Available for per-decoder features */
 } lv_img_dec_ctx_t;
 
@@ -142,7 +146,8 @@ typedef struct _lv_img_decoder_dsc_t {
     lv_img_dec_dsc_in_t  in;
 
     /** The output data to retrieve from the decoder.
-     * Anything below is filled by the decoder */
+     * Anything below is filled by the decoder
+     *******************************************************/
 
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_img_header_t header;
@@ -155,6 +160,9 @@ typedef struct _lv_img_decoder_dsc_t {
 
     /**Initialization context for decoder*/
     lv_img_dec_ctx_t * dec_ctx;
+
+    /**The decoder capabilities (used when the decoder context is NULL) */
+    uint8_t         caps;
 
     /**A text to display instead of the image when the image can't be opened.
      * Can be set in `open` function or set NULL.*/
