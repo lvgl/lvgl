@@ -193,8 +193,8 @@ static void draw_main(lv_event_t * e)
     knob_area.x1 = obj->coords.x1 + bg_left + anim_value_x;
     knob_area.x2 = knob_area.x1 + knob_size;
 
-    knob_area.y1 = obj->coords.y1 + bg_top;
-    knob_area.y2 = obj->coords.y2 - bg_bottom;
+    knob_area.y1 = obj->coords.y1;
+    knob_area.y2 = obj->coords.y2;
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
