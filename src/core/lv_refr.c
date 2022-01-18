@@ -611,14 +611,14 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
         if(draw_ctx->draw_bg) {
             lv_draw_rect_dsc_t dsc;
             lv_draw_rect_dsc_init(&dsc);
-            dsc.bg_img_src = disp_refr->bg_img;
+            dsc.bg_img_src = &disp_refr->bg_img;
             dsc.bg_img_opa = disp_refr->bg_opa;
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
             draw_ctx->draw_bg(draw_ctx, &dsc, draw_ctx->buf_area);
         }
-        else if(disp_refr->bg_img) {
-            lv_img_dec_dsc_in_t dec_dsc = { .src = disp_refr->bg_img };
+        else if(disp_refr->bg_img.type != LV_IMG_SRC_UNKNOWN) {
+            lv_img_dec_dsc_in_t dec_dsc = { .src = &disp_refr->bg_img };
             lv_img_cache_entry_t * entry = lv_img_cache_open(&dec_dsc, NULL);
             if(entry != NULL) {
                 lv_area_t a;

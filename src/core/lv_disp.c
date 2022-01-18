@@ -180,9 +180,9 @@ void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color)
 /**
  * Set the background image of a display
  * @param disp pointer to a display
- * @param img_src path to file or pointer to an `lv_img_dsc_t` variable
+ * @param img_src pointer to image source to use
  */
-void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src)
+void lv_disp_set_bg_image(lv_disp_t * disp, const lv_img_src_t * img_src)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
@@ -190,7 +190,7 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src)
         return;
     }
 
-    disp->bg_img = img_src;
+    lv_img_src_copy(&disp->bg_img, img_src);
 
     lv_area_t a;
     lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);

@@ -123,7 +123,6 @@ static int read_image(gd_GIF *gif);
 static void render_frame_rect(gd_GIF *gif, uint8_t *buffer);
 static void dispose(gd_GIF *gif);
 static void set_caps(uint8_t * caps);
-static lv_res_t init_dec_ctx(lv_img_dec_ctx_t * dec_ctx);
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -281,7 +280,7 @@ static size_t count_frames(gd_GIF *gif) {
         f_gif_read(gif, &ch, 1);
         switch(ch) {
             case GIF_IMG_BEGIN: {
-                uint8_t fisrz, keysz;
+                uint8_t fisrz;
                 /* Image Descriptor. */
                 f_gif_seek(gif, 8, LV_FS_SEEK_CUR);
                 f_gif_read(gif, &fisrz, 1);
@@ -779,14 +778,6 @@ static void set_caps(uint8_t * caps)
 {
     if(caps != NULL) *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_VFR | LV_IMG_DEC_CACHED;
 }
-
-static lv_res_t init_dec_ctx(lv_img_dec_ctx_t * dec_ctx)
-{
-    if(dec_ctx != NULL) {
-        set_caps(&dec_ctx->caps);
-    }
-    return LV_RES_OK;
-}
 /**
  * Get info about a rlottie image
  * @param src can be file name or pointer to a C array
@@ -872,11 +863,17 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         if(gif->loop_count == 1) dsc->dec_ctx->caps &= ~LV_IMG_DEC_LOOPING;
         else gif->loop_count--;
     }
+    return LV_RES_OK;
 }
 
 static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
+    LV_UNUSED(dsc);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(len);
+    LV_UNUSED(buf);
     return LV_RES_INV;
 }
 

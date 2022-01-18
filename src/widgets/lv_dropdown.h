@@ -39,7 +39,7 @@ typedef struct {
     lv_obj_t obj;
     lv_obj_t * list;                /**< The dropped down list*/
     const char * text;              /**< Text to display on the dropdown's button*/
-    const lv_img_src_t symbol;      /**< Arrow or other icon when the drop-down list is closed*/
+    lv_img_src_t symbol;            /**< Arrow or other icon when the drop-down list is closed*/
     char * options;                 /**< Options in a a '\n' separated list*/
     uint16_t option_cnt;            /**< Number of options*/
     uint16_t sel_opt_id;            /**< Index of the currently selected option*/

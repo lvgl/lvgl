@@ -102,9 +102,9 @@ void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color);
 /**
  * Set the background image of a display
  * @param disp pointer to a display
- * @param img_src path to file or pointer to an `lv_img_dsc_t` variable
+ * @param img_src pointer to an image source to use
  */
-void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
+void lv_disp_set_bg_image(lv_disp_t * disp, const lv_img_src_t  * img_src);
 
 /**
  * Set opacity of the background
