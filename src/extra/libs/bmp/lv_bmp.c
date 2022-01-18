@@ -104,7 +104,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     if(flags == LV_IMG_DEC_ONLYMETA) {
         /*Save the data in the header*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->in.src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->uri, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
         uint8_t headers[54];
 
@@ -129,10 +129,10 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     }
 
     /*If it's a BMP file...*/
-    if(dsc->in.src->type == LV_IMG_SRC_FILE) {
+    if(dsc->input.src->type == LV_IMG_SRC_FILE) {
 
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->in.src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->uri, LV_FS_MODE_RD);
         if(res == LV_RES_OK) return LV_RES_INV;
 
         uint8_t header[54];

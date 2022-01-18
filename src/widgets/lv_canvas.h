@@ -217,7 +217,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param draw_dsc pointer to a valid label descriptor `lv_draw_img_dsc_t`
  */
 void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_img_src_t * src,
-                        const lv_draw_img_dsc_t * draw_dsc);
+                        lv_draw_img_dsc_t * draw_dsc);
 
 /**
  * Draw an image on the canvas
@@ -228,7 +228,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const lv_
  * @param dsc      pointer to a decoder specific initialization descriptor
  */
 void lv_canvas_draw_img_ex(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y,
-                           const lv_draw_img_dsc_t * draw_dsc, const lv_img_dec_dsc_in_t * dsc);
+                           lv_draw_img_dsc_t * draw_dsc, const lv_img_dec_dsc_in_t * dsc);
 /**
  * Draw a line on the canvas
  * @param canvas     pointer to a canvas object

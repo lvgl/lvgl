@@ -36,7 +36,7 @@
 //#if LV_IMG_CACHE_DEF_SIZE
 static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * src2);
 //#endif
-static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
+static bool find_entry(const lv_img_src_t * src, const lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
                        lv_img_cache_entry_t ** out);
 
 /**********************
@@ -71,7 +71,7 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
 #if LV_IMG_CACHE_DEF_SIZE != 0
     uint32_t t_start  = lv_tick_get();
 #endif
-    lv_memcpy(&cached_src->dec_dsc.in, dsc, sizeof(*dsc));
+    lv_memcpy(&cached_src->dec_dsc.input, dsc, sizeof(*dsc));
     cached_src->dec_dsc.dec_ctx = dec_ctx;
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, LV_IMG_DEC_ONLYMETA);
     if(open_res == LV_RES_INV) {
@@ -111,7 +111,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img
 
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
-    lv_memcpy(&cached_src->dec_dsc.in, dsc, sizeof(*dsc));
+    lv_memcpy(&cached_src->dec_dsc.input, dsc, sizeof(*dsc));
     cached_src->dec_dsc.dec_ctx = dec_ctx;
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, 0);
     if(open_res == LV_RES_INV) {
@@ -178,8 +178,8 @@ void lv_img_cache_invalidate_src(const lv_img_src_t * src)
 
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
-        if(src == NULL || lv_img_cache_match(src, cache[i].dec_dsc.in.src)) {
-            if(cache[i].dec_dsc.in.src != NULL) {
+        if(src == NULL || lv_img_cache_match(src, cache[i].dec_dsc.input.src)) {
+            if(cache[i].dec_dsc.input.src != NULL) {
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
 
@@ -193,7 +193,7 @@ void lv_img_cache_invalidate_src(const lv_img_src_t * src)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
+static bool find_entry(const lv_img_src_t * src, const lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
                        lv_img_cache_entry_t ** out)
 {
     /*Is the image cached?*/
@@ -216,9 +216,9 @@ static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_
     }
 
     for(i = 0; i < entry_cnt; i++) {
-        if(((color != NULL && color->full == cache[i].dec_dsc.in.color.full) || !color) &&
+        if(((color != NULL && color->full == cache[i].dec_dsc.input.color.full) || !color) &&
            ((dec_ctx != NULL && dec_ctx == cache[i].dec_dsc.dec_ctx) || !dec_ctx) &&
-           lv_img_cache_match(src, cache[i].dec_dsc.in.src)) {
+           lv_img_cache_match(src, cache[i].dec_dsc.input.src)) {
             /*If opened increment its life.
              *Image difficult to open should live longer to keep avoid frequent their recaching.
              *Therefore increase `life` with `time_to_open`*/
@@ -245,7 +245,7 @@ static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_
     }
 
     /*Close the decoder to reuse if it was opened (has a valid source)*/
-    if(cached_src->dec_dsc.in.src) {
+    if(cached_src->dec_dsc.input.src) {
         lv_img_decoder_close(&cached_src->dec_dsc);
         LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
     }
@@ -258,7 +258,7 @@ static bool find_entry(const lv_img_src_t * src, lv_color_t * color, lv_img_dec_
     cached_src = &LV_GC_ROOT(_lv_img_cache_single);
 #endif
     *out = cached_src;
-    if(lv_img_cache_match(src, cached_src->dec_dsc.in.src))
+    if(lv_img_cache_match(src, cached_src->dec_dsc.input.src))
         return true;
     return false;
 }

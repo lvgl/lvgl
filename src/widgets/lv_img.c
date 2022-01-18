@@ -623,7 +623,7 @@ static void draw_img(lv_event_t * e)
     if(LV_BT(img->ctrl, LV_IMG_CTRL_MARKED) && img->dec_ctx == NULL) {
         lv_img_dec_dsc_in_t dsc = {
             .src = &img->src,
-            .color = {0},
+            .color = {{0}},
             .size_hint = {.x = lv_obj_get_width(obj), .y = lv_obj_get_height(obj)}
         };
         lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, NULL);

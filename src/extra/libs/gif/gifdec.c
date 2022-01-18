@@ -815,10 +815,10 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 
     if(gif == NULL) {
         /* Unfortunately, creating a context here is absolutely required */
-        if(dsc->in.src->type == LV_IMG_SRC_FILE) {
-            gif = gd_open_gif_file(dsc->in.src->uri, flags == LV_IMG_DEC_ONLYMETA);
+        if(dsc->input.src->type == LV_IMG_SRC_FILE) {
+            gif = gd_open_gif_file(dsc->input.src->uri, flags == LV_IMG_DEC_ONLYMETA);
         } else {
-            gif = gd_open_gif_data(dsc->in.src->uri, flags == LV_IMG_DEC_ONLYMETA);
+            gif = gd_open_gif_data(dsc->input.src->uri, flags == LV_IMG_DEC_ONLYMETA);
         }
         if (!gif) return LV_RES_INV;
 

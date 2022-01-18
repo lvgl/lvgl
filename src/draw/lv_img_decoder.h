@@ -143,7 +143,7 @@ typedef struct _lv_img_decoder_dsc_t {
     uint32_t time_to_open;
 
     /** The input data to set*/
-    lv_img_dec_dsc_in_t  in;
+    lv_img_dec_dsc_in_t  input;
 
     /** The output data to retrieve from the decoder.
      * Anything below is filled by the decoder

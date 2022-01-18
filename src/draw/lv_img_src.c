@@ -153,6 +153,6 @@ static lv_res_t alloc_str_src(lv_img_src_t * src, const char * str)
         return LV_RES_INV;
     }
 
-    lv_memcpy(src->uri, str, src->uri_len + 1);
+    lv_memcpy((void *)src->uri, str, src->uri_len + 1);
     return LV_RES_OK;
 }

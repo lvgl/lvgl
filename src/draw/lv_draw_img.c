@@ -100,7 +100,7 @@ void lv_draw_img_cached(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * ds
 
     lv_res_t res;
     if(draw_ctx->draw_img) {
-        res = draw_ctx->draw_img(draw_ctx, dsc, coords, entry->dec_dsc.in.src);
+        res = draw_ctx->draw_img(draw_ctx, dsc, coords, entry->dec_dsc.input.src);
     }
     else {
         res = decode_and_draw_cached(draw_ctx, dsc, coords, entry);
@@ -266,8 +266,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * dra
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
-            int32_t w = cdsc->dec_dsc.in.size_hint.x;
-            int32_t h = cdsc->dec_dsc.in.size_hint.y;
+            int32_t w = cdsc->dec_dsc.input.size_hint.x;
+            int32_t h = cdsc->dec_dsc.input.size_hint.y;
 
             _lv_img_buf_get_transformed_area(&map_area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
 
