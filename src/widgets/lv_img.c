@@ -663,10 +663,11 @@ static void draw_img(lv_event_t * e)
 
 #if LV_DRAW_COMPLEX
             lv_coord_t radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+            bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
 
             int16_t radius_mask_id = LV_MASK_ID_INV;
             lv_draw_mask_radius_param_t radius_param;
-            if(radius > 0) {
+            if(radius > 0 && clip_corner) {
                 lv_draw_mask_radius_init(&radius_param, &bg_coords, radius, false);
                 radius_mask_id = lv_draw_mask_add(&radius_param, NULL);
             }
