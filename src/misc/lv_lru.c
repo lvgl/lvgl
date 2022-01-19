@@ -292,7 +292,7 @@ static void lv_lru_remove_item(lv_lru_t * cache, lruc_item * prev, lruc_item * i
     cache->key_free(item->key);
 
     // push the item to the free items queue
-    lv_memset(item, 0, sizeof(lruc_item));
+    lv_memset_00(item, sizeof(lruc_item));
     item->next = cache->free_items;
     cache->free_items = item;
 }
@@ -331,7 +331,7 @@ static lruc_item * lv_lru_pop_or_create_item(lv_lru_t * cache)
     if(cache->free_items) {
         item = cache->free_items;
         cache->free_items = item->next;
-        lv_memset(item, 0, sizeof(lruc_item));
+        lv_memset_00(item, sizeof(lruc_item));
     }
     else {
         item = (lruc_item *) lv_mem_alloc(sizeof(lruc_item));
