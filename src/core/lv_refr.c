@@ -155,7 +155,7 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     draw_dsc.border_width = 1;
     draw_dsc.border_opa = LV_OPA_30;
     draw_dsc.border_color = debug_color;
-    lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
+    lv_draw_rect(draw_ctx, &draw_dsc, &obj_coords_ext);
 #endif
 
     /*With overflow visible keep the previous clip area to let the children visible out of this object too
