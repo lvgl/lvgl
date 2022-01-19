@@ -39,7 +39,7 @@ void test_bar_should_have_valid_default_attributes(void)
  * - mode: LV_BAR_MODE_NORMAL
  * - min value: 0
  * - max value: 100
- * - base direction: RTL
+ * - base direction: LTR
  */
 void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
 {
@@ -169,7 +169,7 @@ void test_bar_current_value_should_be_truncated_to_min_value_when_it_is_below_it
  * value.
  *
  * Bar properties assumed:
- * - base direction: RTL
+ * - base direction: LTR
  */
 void test_bar_indicator_should_be_drawn_towards_the_min_range_side_after_setting_a_more_negative_value(void)
 {
