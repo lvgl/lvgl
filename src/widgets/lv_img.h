@@ -65,6 +65,7 @@ typedef struct {
 
     uint8_t             ctrl;       /**< The current control flags */
     lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context */
+    uint8_t             caps;       /**< Decoder capabilities */
     lv_timer_t     *    anim_timer; /**< The timer task for animated images */
 } lv_img_t;
 

@@ -24,10 +24,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             lv_img_dec_ctx_t * dec_ctx);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc, lv_img_dec_ctx_t * dec_ctx);
-static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
+static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static void decoder_close(lv_img_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 
 /**********************
@@ -48,7 +47,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 void lv_png_init(void)
 {
     lv_img_decoder_t * dec = lv_img_decoder_create();
-    lv_img_decoder_set_info_cb(dec, decoder_info);
+    lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 }
@@ -57,162 +56,113 @@ void lv_png_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * Get info about a PNG image
- * @param src can be file name or pointer to a C array
- * @param header store the info here
- * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
- */
-static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header,
-                             lv_img_dec_ctx_t * dec_ctx)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 {
-    LV_UNUSED(decoder);
-    lv_img_src_type_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
+    /*If it's a PNG file...*/
+    if(src->type == LV_IMG_SRC_FILE) {
+        /*Support only "*.png" files*/
+        if(!src->ext || strcmp(src->ext, ".png")) return LV_RES_INV;
+        if(caps) *caps = LV_IMG_DEC_CACHED;  /*Image is not cached for files*/
+
+        /*Check file exists*/
+        lv_fs_file_t f;
+        lv_fs_res_t res = lv_fs_open(&f, src->uri, LV_FS_MODE_RD);
+        if(res != LV_FS_RES_OK) return LV_RES_INV;
+        lv_fs_close(&f);
+
+        return LV_RES_OK;
+    }
+    else if (src->type == LV_IMG_SRC_VARIABLE) {
+        const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+        if(src->uri_len > sizeof(magic) || memcmp(magic, src->uri, sizeof(magic)) == 0) return LV_RES_OK;
+    }
+    return LV_RES_INV;
+}
+static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+{
+    uint8_t * caps = &dsc->caps;
 
     /*If it's a PNG file...*/
-    if(src_type == LV_IMG_SRC_FILE) {
-        const char * fn = src;
-        if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
-            if(dec_ctx != NULL) {
-                if(dec_ctx->magic_id && dec_ctx->magic_id != LV_PNG_ID) {
-                    return LV_RES_INV;
-                }
-                dec_ctx->magic_id = LV_PNG_ID;
-                dec_ctx->caps = LV_IMG_DEC_CACHED; /*Does not decode line by line but whole buffer at once*/
-            }
+    uint32_t size[2];
+    uint32_t error;
 
+    unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
+    size_t png_data_size;          /*Size of `png_data` in bytes*/
+    bool   free_data = false;
+    if(dsc->input.src->type == LV_IMG_SRC_FILE) {
+        if(!dsc->input.src->ext || strcmp(dsc->input.src->ext, ".png")) return LV_RES_INV;
+
+        if (flags == LV_IMG_DEC_ONLYMETA) {
             /* Read the width and height from the file. They have a constant location:
-             * [16..23]: width
-             * [24..27]: height
-             */
-            uint32_t size[2];
+            * [16..23]: width
+            * [24..27]: height
+            */
             lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
+            lv_fs_res_t res = lv_fs_open(&f, (const char*)dsc->input.src->uri, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) return LV_RES_INV;
             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
             uint32_t rn;
             lv_fs_read(&f, &size, 8, &rn);
-            if(rn != 8) return LV_RES_INV;
             lv_fs_close(&f);
-            /*Save the data in the header*/
-            header->always_zero = 0;
-            header->cf = LV_IMG_CF_RAW_ALPHA;
-            /*The width and height are stored in Big endian format so convert them to little endian*/
-            header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
-            header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
-
-            return LV_RES_OK;
+            if(rn != 8) return LV_RES_INV;
+        } else {
+            /*Load the PNG file into buffer. It's still compressed (not decoded)*/
+            error = lodepng_load_file(&png_data, &png_data_size, dsc->input.src->uri);   /*Load the file*/
+            if(error) {
+                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+                return LV_RES_INV;
+            }
+            free_data = true;
         }
     }
-    /*If it's a PNG file in a  C array...*/
-    else if(src_type == LV_IMG_SRC_VARIABLE) {
-        /*WTF? If a png is used in a C array, this will try to map lv_img_dsc_t over the PNG header, and it's unlikely to be correct*/
-        const lv_img_dsc_t * img_dsc = src;
-        const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
-        if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RES_INV;
-        header->always_zero = 0;
-        header->cf = img_dsc->header.cf;       /*Save the color format*/
-        header->w = img_dsc->header.w;         /*Save the color width*/
-        header->h = img_dsc->header.h;         /*Save the color height*/
+    else if (dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
+        if (flags == LV_IMG_DEC_ONLYMETA) {
+            memcpy(size, (const char*)dsc->input.src->uri + 16, 8);
+        } else {
+            png_data_size = dsc->input.src->uri_len;
+            png_data = (unsigned char*)dsc->input.src->uri;
+        }
+    }
+    *caps = LV_IMG_DEC_CACHED;
+
+    if (flags == LV_IMG_DEC_ONLYMETA) {
+        dsc->header.always_zero = 0;
+        dsc->header.cf = LV_IMG_CF_RAW_ALPHA;
+        /*The width and height are stored in Big endian format so convert them to little endian*/
+        dsc->header.w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
+        dsc->header.h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
         return LV_RES_OK;
     }
 
-    return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
-}
+    /*Decode the PNG image*/
+    uint32_t png_width;             /*Will be the width of the decoded image*/
+    uint32_t png_height;            /*Will be the height of the decoded image*/
 
-
-/**
- * Open a PNG image and return the decided image
- * @param src can be file name or pointer to a C array
- * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or  `LV_IMG_DECODER_OPEN_FAIL` if failed
- */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_img_dec_ctx_t * dec_ctx)
-{
-    LV_UNUSED(decoder);
-    uint32_t error;                 /*For the return values of PNG decoder functions*/
-
-    uint8_t * img_data = NULL;
-
-    /*If it's a PNG file...*/
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
-        const char * fn = dsc->src;
-
-        if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
-            if(dec_ctx != NULL) {
-                if(dec_ctx->magic_id && dec_ctx->magic_id != LV_PNG_ID) {
-                    return LV_RES_INV;
-                }
-                dec_ctx->magic_id = LV_PNG_ID;
-                dec_ctx->caps = LV_IMG_DEC_CACHED; /*Does not decode line by line but whole buffer at once*/
-            }
-
-            /*Load the PNG file into buffer. It's still compressed (not decoded)*/
-            unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
-            size_t png_data_size;          /*Size of `png_data` in bytes*/
-
-            error = lodepng_load_file(&png_data, &png_data_size, fn);   /*Load the file*/
-            if(error) {
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
-                return LV_RES_INV;
-            }
-
-            /*Decode the PNG image*/
-            uint32_t png_width;             /*Will be the width of the decoded image*/
-            uint32_t png_height;            /*Will be the width of the decoded image*/
-
-            /*Decode the loaded image in ARGB8888 */
-            error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
-            lv_mem_free(png_data); /*Free the loaded file*/
-            if(error) {
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
-                return LV_RES_INV;
-            }
-
-            /*Convert the image to the system's color depth*/
-            convert_color_depth(img_data,  png_width * png_height);
-            dsc->img_data = img_data;
-            return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
-        }
-    }
-    /*If it's a PNG file in a  C array...*/
-    else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = dsc->src;
-        uint32_t png_width;             /*No used, just required by he decoder*/
-        uint32_t png_height;            /*No used, just required by he decoder*/
-
-        /*Decode the image in ARGB8888 */
-        error = lodepng_decode32(&img_data, &png_width, &png_height, img_dsc->data, img_dsc->data_size);
-
-        if(error) {
-            return LV_RES_INV;
-        }
-        if(dec_ctx != NULL) {
-            if(dec_ctx->magic_id && dec_ctx->magic_id != LV_PNG_ID) {
-                return LV_RES_INV;
-            }
-            dec_ctx->magic_id = LV_PNG_ID;
-            dec_ctx->caps = LV_IMG_DEC_CACHED; /*Does not decode line by line but whole buffer at once*/
-        }
-
-        /*Convert the image to the system's color depth*/
-        convert_color_depth(img_data,  png_width * png_height);
-
-        dsc->img_data = img_data;
-        return LV_RES_OK;     /*Return with its pointer*/
+    /*Decode the loaded image in ARGB8888 */
+    uint8_t * img_data = (uint8_t*)dsc->img_data;
+    error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
+    if(free_data) lv_mem_free(png_data); /*Free the loaded file*/
+    if(error) {
+        LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+        return LV_RES_INV;
     }
 
-    return LV_RES_INV;    /*If not returned earlier then it failed*/
+    /*Convert the image to the system's color depth*/
+    convert_color_depth(img_data, png_width * png_height);
+    dsc->header.w = png_width;
+    dsc->header.h = png_height;
+    dsc->header.cf = LV_IMG_CF_RAW_ALPHA;
+    dsc->img_data = img_data;
+    return LV_RES_OK;
 }
 
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(decoder); /*Unused*/
     if(dsc->img_data) {
-        lv_mem_free((uint8_t *)dsc->img_data);
+        lv_mem_free((uint8_t *)dsc->img_data); /*Not sure here it's allocated with lv_mem_alloc ?*/
         dsc->img_data = NULL;
     }
 }

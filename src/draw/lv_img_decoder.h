@@ -57,9 +57,8 @@ typedef enum {
  * You'll likely bootstrap from this to make your own, if you need too
  */
 typedef struct {
-    uint8_t  caps;               /**!< The decoder capabilities flags */
-    uint8_t  auto_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
-    uint8_t  frame_rate : 7;     /**!< The number of frames per second, if applicable (can be 0 for VFR) */
+    uint16_t  auto_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
+    uint16_t  frame_rate : 15;    /**!< The number of frames per second, if applicable (can be 0 for VFR) */
     lv_frame_index_t   current_frame;  /**!< The current frame index */
     lv_frame_index_t   total_frames;   /**!< The number of frames (likely filled by the decoder) */
     lv_frame_index_t   dest_frame;     /**!< The destination frame (if appropriate) */

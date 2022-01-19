@@ -89,7 +89,7 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
     /* Allow rewinding the animation to the beginning, even if not seekable */
     if(!index)
         img->dec_ctx->current_frame = index;
-    else if(LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
+    else if(LV_BN(img->caps, LV_IMG_DEC_SEEKABLE))
         return LV_RES_INV;
 
     img->dec_ctx->current_frame = LV_MIN(index, img->dec_ctx->total_frames - 1);
@@ -99,7 +99,7 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
 lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
 {
     lv_img_t * img = (lv_img_t *)obj;
-    if(img->dec_ctx == NULL || LV_BN(img->dec_ctx->caps, LV_IMG_DEC_SEEKABLE))
+    if(img->dec_ctx == NULL || LV_BN(img->caps, LV_IMG_DEC_SEEKABLE))
         return LV_RES_INV;
 
     img->dec_ctx->dest_frame = LV_MIN(index, img->dec_ctx->total_frames - 1);
@@ -422,12 +422,11 @@ static lv_res_t get_metadata(lv_img_t * img, int skip_cache)
         dsc.size_hint.y = lv_obj_get_style_height(obj, LV_PART_MAIN);
 
         if(skip_cache) {
-            uint8_t caps = 0;
-            if(lv_img_cache_query(&dsc, &header, &caps, NULL) == LV_RES_INV) {
+            if(lv_img_cache_query(&dsc, &header, &img->caps, NULL) == LV_RES_INV) {
                 return LV_RES_INV;
             }
             /* We'll start the anim timer here in the first draw call if required */
-            if(LV_BT(caps, LV_IMG_DEC_ANIMATED)) {
+            if(LV_BT(img->caps, LV_IMG_DEC_ANIMATED)) {
                 img->ctrl |= LV_IMG_CTRL_MARKED;
             }
         }
@@ -436,9 +435,10 @@ static lv_res_t get_metadata(lv_img_t * img, int skip_cache)
             if(entry == NULL) return LV_RES_INV;
 
             /* Take ownership of the decoder context for animated pictures, since it saves decoding time */
-            if(LV_BT(entry->dec_dsc.dec_ctx->caps, LV_IMG_DEC_ANIMATED)) {
+            if(LV_BT(entry->dec_dsc.caps, LV_IMG_DEC_ANIMATED)) {
                 img->dec_ctx = entry->dec_dsc.dec_ctx;
                 img->dec_ctx->auto_allocated = 0;
+                img->caps = entry->dec_dsc.caps;
                 start_animation(img, entry->dec_dsc.dec_ctx);
             }
 
@@ -636,7 +636,7 @@ static void draw_img(lv_event_t * e)
             lv_img_cache_cleanup(entry);
         }
     }
-    if(img->dec_ctx && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_ANIMATED) && img->anim_timer == NULL) {
+    if(img->dec_ctx && LV_BT(img->caps, LV_IMG_DEC_ANIMATED) && img->anim_timer == NULL) {
         start_animation(img, img->dec_ctx);
     }
 
@@ -715,7 +715,7 @@ static void draw_img(lv_event_t * e)
         lv_area_t bg_coords;
 
 
-        if(img->dec_ctx != NULL && LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VECTOR)
+        if(img->dec_ctx != NULL && LV_BT(img->caps, LV_IMG_DEC_VECTOR)
            && (obj_w != img->w || obj_h != img->h)) {
             /*For vector image that aren't tiled, let's increase the image size*/
             img->w = obj_w;
@@ -829,14 +829,15 @@ static void draw_img(lv_event_t * e)
 
 static void start_animation(lv_img_t * img, lv_img_dec_ctx_t * dec_ctx)
 {
-    if(LV_BT(dec_ctx->caps, LV_IMG_DEC_ANIMATED)) {
-        if(LV_BT(dec_ctx->caps, LV_IMG_DEC_VFR)) {
+    if(LV_BT(img->caps, LV_IMG_DEC_ANIMATED)) {
+        if(LV_BT(img->caps, LV_IMG_DEC_VFR)) {
             dec_ctx->last_rendering = (uint16_t)lv_tick_get();
         }
 
         /* Need to create the timer here */
-        img->anim_timer = lv_timer_create(LV_BT(dec_ctx->caps,
-                                                LV_IMG_DEC_SEEKABLE) ? next_frame_task_seekable_cb : next_frame_task_cb, 1000 / dec_ctx->frame_rate, img);
+        img->anim_timer = lv_timer_create(
+                            LV_BT(img->caps, LV_IMG_DEC_SEEKABLE) ? next_frame_task_seekable_cb : next_frame_task_cb,
+                            1000 / dec_ctx->frame_rate, img);
         if(LV_BT(img->ctrl, LV_IMG_CTRL_PAUSE))
             lv_timer_pause(img->anim_timer);
     }
@@ -847,7 +848,7 @@ static void next_frame_task_seekable_cb(lv_timer_t * t)
     lv_obj_t * obj = t->user_data;
     lv_img_t * img = (lv_img_t *) obj;
 
-    if(LV_BT(img->dec_ctx->caps, LV_IMG_DEC_VFR)) {
+    if(LV_BT(img->caps, LV_IMG_DEC_VFR)) {
         /* Variable frame rate animation are usually more complex to deal with*/
         uint16_t now = lv_tick_get(); /*Using 16bits to save memory in the decoder context */
         /* Handle rollover here with the small counter */
@@ -926,7 +927,7 @@ static void next_frame_task_cb(lv_timer_t * t)
     /* End of animation ?*/
     if(img->dec_ctx->current_frame == img->dec_ctx->total_frames) {
         /* If the animation is looping and we have the loop flag, let's rewind */
-        if(LV_BT(img->ctrl, LV_IMG_CTRL_LOOP) || LV_BT(img->dec_ctx->caps, LV_IMG_DEC_LOOPING)) {
+        if(LV_BT(img->ctrl, LV_IMG_CTRL_LOOP) || LV_BT(img->caps, LV_IMG_DEC_LOOPING)) {
             /* The user overrided the animation's format or it's the standard mode, let's rewind */
             img->dec_ctx->current_frame = 0; /* Rewind */
         }

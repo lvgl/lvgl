@@ -838,7 +838,6 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         }
         if (dsc->dec_ctx != NULL) {
             /* Count the frame number and set the frame delay here */
-            dsc->dec_ctx->caps = dsc->caps;
             dsc->dec_ctx->frame_rate = 100; /* 10ms for the timer period */
             dsc->dec_ctx->total_frames = count_frames(gif); /* Order is important here, since it fills gce.delay */
             dsc->dec_ctx->frame_delay = gif->gce.delay * 10;
@@ -850,17 +849,23 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             return LV_RES_OK;
         }
     }
+    /* Fix for cache cleanup reusing the dsc */
+    dsc->header.w = gif->width;
+    dsc->header.h = gif->height;
+    dsc->header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    dsc->img_data = gif->canvas;
+
     /* Rewind is the only action we can do on a GIF file */
     if (dsc->dec_ctx->current_frame == 0) {
         gd_rewind(gif);
-        if (gif->loop_count >= 1) dsc->dec_ctx->caps |= LV_IMG_DEC_LOOPING;
+        if (gif->loop_count >= 1) dsc->caps |= LV_IMG_DEC_LOOPING;
     }
     if(gd_get_frame(gif)) {
         gd_render_frame(gif, (uint8_t *)dsc->img_data);
         dsc->dec_ctx->frame_delay = gif->gce.delay * 10; /* VFR means delay changes between frames */
     } else {
         /* Ended the current loop, let's check what to do, if we remove the loop count */
-        if(gif->loop_count == 1) dsc->dec_ctx->caps &= ~LV_IMG_DEC_LOOPING;
+        if(gif->loop_count == 1) dsc->caps &= ~LV_IMG_DEC_LOOPING;
         else gif->loop_count--;
     }
     return LV_RES_OK;

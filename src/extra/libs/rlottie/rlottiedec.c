@@ -90,7 +90,6 @@ static void set_caps(uint8_t * caps)
 static lv_res_t init_dec_ctx(rlottiedec_ctx_t * dec_ctx)
 {
     if(dec_ctx != NULL) {
-        set_caps(&dec_ctx->ctx.caps);
         if(!dec_ctx->max_buf_size)
             dec_ctx->max_buf_size = RLOTTIE_MAX_BUFSIZE;
     }
@@ -206,11 +205,11 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             dsc->header.w = dsc->input.size_hint.x;
             dsc->header.h = dsc->input.size_hint.y;
         }
-        set_caps(&dec_ctx->ctx.caps);
+        set_caps(&dsc->caps);
         /* If only the frame index changed and we are rendering to the internal buffer,
            let's skip everything and render directly */
         if((dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->header.h <= dec_ctx->max_buf_size) {
-            dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
+            dsc->caps |= LV_IMG_DEC_CACHED;
             lv_rlottie_dec_context_t * context = (lv_rlottie_dec_context_t *)dec_ctx->ctx.user_data;
             if(dec_ctx != NULL && dec_ctx->ctx.current_frame != context->last_rendered_frame) {
                 /*Shortcut for re-rendering the animation for this new frame*/
@@ -230,6 +229,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         }
         if(!dec_ctx || init_dec_ctx(dec_ctx) != LV_RES_OK)
             return LV_RES_INV;
+        set_caps(&dsc->caps);
     }
 
     Lottie_Animation * animation = dec_ctx ? dec_ctx->cache : NULL;
@@ -269,7 +269,6 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
                 if(flags != LV_IMG_DEC_ONLYMETA) dec_ctx->cache = animation;
                 /*Does the picture fit in the decoder context buffer entirely?*/
                 if((dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->header.h <= dec_ctx->max_buf_size) {
-                    dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
                     dsc->caps |= LV_IMG_DEC_CACHED;
                 }
             }
@@ -295,7 +294,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             lv_mem_free(context);
         }
         else if(dec_ctx != NULL && dec_ctx->ctx.current_frame != context->last_rendered_frame
-                && (dec_ctx->ctx.caps & LV_IMG_DEC_CACHED) == LV_IMG_DEC_CACHED) {
+                && (dsc->caps & LV_IMG_DEC_CACHED) == LV_IMG_DEC_CACHED) {
             /*Shortcut for re-rendering the animation for this new frame*/
             if(render_animation(context, dec_ctx, dsc->header.w, dsc->header.h) != LV_RES_OK) {
                 return LV_RES_INV;
@@ -344,7 +343,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 
     /*Does the picture fit in the decoder context buffer entirely?*/
     if((w * LV_IMG_PX_SIZE_ALPHA_BYTE) * h <= dec_ctx->max_buf_size) {
-        dec_ctx->ctx.caps |= LV_IMG_DEC_CACHED;
+        dsc->caps |= LV_IMG_DEC_CACHED;
         /*Render the animation directly here*/
         dsc->img_data = (const uint8_t *)context->allocated_buf;
         if(render_animation(context, dec_ctx, dsc->header.w, dsc->header.h) != LV_RES_OK) {
