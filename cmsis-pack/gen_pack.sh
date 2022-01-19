@@ -197,9 +197,9 @@ rm -rf $PACK_BUILD/demos/music
 rm -rf $PACK_BUILD/demos/stress
 rm -rf $PACK_BUILD/demos/widgets/screenshot1.gif
 
-echo apply patches...
-rm -rf $PACK_BUILD/demos/lv_demos.h
-cp -f ./lv_demos.h $PACK_BUILD/demos/
+# echo apply patches...
+# rm -rf $PACK_BUILD/demos/lv_demos.h
+# cp -f ./lv_demos.h $PACK_BUILD/demos/
 
 # Archiving
 # $ZIP a $PACKNAME
