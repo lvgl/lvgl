@@ -29,11 +29,13 @@ void lv_example_meter_3(void)
     lv_meter_set_scale_major_ticks(meter, scale_hour, 1, 2, 20, lv_color_black(), 10);    /*Every tick is major*/
     lv_meter_set_scale_range(meter, scale_hour, 1, 12, 330, 300);       /*[1..12] values in an almost full circle*/
 
-    LV_IMG_DECLARE(img_hand)
+    LV_RAW_IMG_DECLARE(img_hand);
+    lv_img_src_t src = {0};
+    lv_img_src_set_data(&src, (const uint8_t*)&img_hand, sizeof(img_hand));
 
     /*Add a the hands from images*/
-    lv_meter_indicator_t * indic_min = lv_meter_add_needle_img(meter, scale_min, &img_hand, 5, 5);
-    lv_meter_indicator_t * indic_hour = lv_meter_add_needle_img(meter, scale_min, &img_hand, 5, 5);
+    lv_meter_indicator_t * indic_min = lv_meter_add_needle_img(meter, scale_min, &src, 5, 5);
+    lv_meter_indicator_t * indic_hour = lv_meter_add_needle_img(meter, scale_min, &src, 5, 5);
 
     /*Create an animation to set the value*/
     lv_anim_t a;

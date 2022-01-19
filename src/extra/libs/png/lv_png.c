@@ -72,7 +72,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 
         return LV_RES_OK;
     }
-    else if (src->type == LV_IMG_SRC_VARIABLE) {
+    else if(src->type == LV_IMG_SRC_VARIABLE) {
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         if(src->uri_len > sizeof(magic) || memcmp(magic, src->uri, sizeof(magic)) == 0) return LV_RES_OK;
     }
@@ -92,20 +92,21 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     if(dsc->input.src->type == LV_IMG_SRC_FILE) {
         if(!dsc->input.src->ext || strcmp(dsc->input.src->ext, ".png")) return LV_RES_INV;
 
-        if (flags == LV_IMG_DEC_ONLYMETA) {
+        if(flags == LV_IMG_DEC_ONLYMETA) {
             /* Read the width and height from the file. They have a constant location:
             * [16..23]: width
             * [24..27]: height
             */
             lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, (const char*)dsc->input.src->uri, LV_FS_MODE_RD);
+            lv_fs_res_t res = lv_fs_open(&f, (const char *)dsc->input.src->uri, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) return LV_RES_INV;
             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
             uint32_t rn;
             lv_fs_read(&f, &size, 8, &rn);
             lv_fs_close(&f);
             if(rn != 8) return LV_RES_INV;
-        } else {
+        }
+        else {
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
             error = lodepng_load_file(&png_data, &png_data_size, dsc->input.src->uri);   /*Load the file*/
             if(error) {
@@ -115,17 +116,18 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             free_data = true;
         }
     }
-    else if (dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
-        if (flags == LV_IMG_DEC_ONLYMETA) {
-            memcpy(size, (const char*)dsc->input.src->uri + 16, 8);
-        } else {
+    else if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
+        if(flags == LV_IMG_DEC_ONLYMETA) {
+            memcpy(size, (const char *)dsc->input.src->uri + 16, 8);
+        }
+        else {
             png_data_size = dsc->input.src->uri_len;
-            png_data = (unsigned char*)dsc->input.src->uri;
+            png_data = (unsigned char *)dsc->input.src->uri;
         }
     }
     *caps = LV_IMG_DEC_CACHED;
 
-    if (flags == LV_IMG_DEC_ONLYMETA) {
+    if(flags == LV_IMG_DEC_ONLYMETA) {
         dsc->header.always_zero = 0;
         dsc->header.cf = LV_IMG_CF_RAW_ALPHA;
         /*The width and height are stored in Big endian format so convert them to little endian*/
@@ -139,7 +141,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     uint32_t png_height;            /*Will be the height of the decoded image*/
 
     /*Decode the loaded image in ARGB8888 */
-    uint8_t * img_data = (uint8_t*)dsc->img_data;
+    uint8_t * img_data = (uint8_t *)dsc->img_data;
     error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
     if(free_data) lv_mem_free(png_data); /*Free the loaded file*/
     if(error) {

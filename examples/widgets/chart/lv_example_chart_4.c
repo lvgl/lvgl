@@ -30,13 +30,15 @@ static void event_cb(lv_event_t * e)
 
             char buf[16];
             lv_snprintf(buf, sizeof(buf), LV_SYMBOL_DUMMY"$%d", value);
+            lv_img_src_t src;
+            lv_img_src_set_symbol(&src, buf);
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
             draw_rect_dsc.bg_color = lv_color_black();
             draw_rect_dsc.bg_opa = LV_OPA_50;
             draw_rect_dsc.radius = 3;
-            draw_rect_dsc.bg_img_src = buf;
+            draw_rect_dsc.bg_img_src = &src;
             draw_rect_dsc.bg_img_recolor = lv_color_white();
 
             lv_area_t a;

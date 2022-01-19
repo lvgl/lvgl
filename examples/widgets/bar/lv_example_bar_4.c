@@ -6,7 +6,7 @@
  */
 void lv_example_bar_4(void)
 {
-    LV_IMG_DECLARE(img_skew_strip);
+    LV_RAW_IMG_DECLARE(img_skew_strip);
     static lv_style_t style_indic;
 
     lv_style_init(&style_indic);

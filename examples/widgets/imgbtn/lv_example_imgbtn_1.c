@@ -3,9 +3,9 @@
 
 void lv_example_imgbtn_1(void)
 {
-    LV_IMG_DECLARE(imgbtn_left);
-    LV_IMG_DECLARE(imgbtn_right);
-    LV_IMG_DECLARE(imgbtn_mid);
+    LV_RAW_IMG_DECLARE(imgbtn_left);
+    LV_RAW_IMG_DECLARE(imgbtn_right);
+    LV_RAW_IMG_DECLARE(imgbtn_mid);
 
     /*Create a transition animation on width transformation and recolor.*/
     static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA, 0};

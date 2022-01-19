@@ -132,8 +132,20 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir);
  * @param symbol    a text like `LV_SYMBOL_DOWN`, an image (pointer or path) or NULL to not draw symbol icon
  * @note angle and zoom transformation can be applied if the symbol is an image.
  * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
+ * @deprecated
  */
-void lv_dropdown_set_symbol(lv_obj_t * obj, const lv_img_src_t * symbol);
+void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol);
+
+
+/**
+ * Set an arrow or other symbol to display when on drop-down list's button. Typically a down caret or arrow.
+ * @param obj       pointer to drop-down list object
+ * @param symbol    a pointer on a source symbol to use
+ * @note angle and zoom transformation can be applied if the symbol is an image.
+ * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
+ * @deprecated
+ */
+void lv_dropdown_set_symbol_src(lv_obj_t * obj, const lv_img_src_t * symbol);
 
 /**
  * Set whether the selected option in the list should be highlighted or not

@@ -300,7 +300,17 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
     lv_obj_invalidate(obj);
 }
 
-void lv_dropdown_set_symbol(lv_obj_t * obj, const lv_img_src_t * symbol)
+void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    lv_img_src_parse(&dropdown->symbol, symbol);
+    lv_obj_invalidate(obj);
+}
+
+
+void lv_dropdown_set_symbol_src(lv_obj_t * obj, const lv_img_src_t * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -598,6 +608,8 @@ static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_mem_free(dropdown->options);
         dropdown->options = NULL;
     }
+
+    lv_img_src_free(&dropdown->symbol);
 }
 
 static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

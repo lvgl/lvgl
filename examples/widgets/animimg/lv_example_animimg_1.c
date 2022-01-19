@@ -1,8 +1,8 @@
 #include "../../lv_examples.h"
 #if LV_USE_ANIMIMG && LV_BUILD_EXAMPLES
-LV_IMG_DECLARE(animimg001)
-LV_IMG_DECLARE(animimg002)
-LV_IMG_DECLARE(animimg003)
+LV_RAW_IMG_DECLARE(animimg001)
+LV_RAW_IMG_DECLARE(animimg002)
+LV_RAW_IMG_DECLARE(animimg003)
 
 static const lv_img_dsc_t* anim_imgs[3] = {
     &animimg001,

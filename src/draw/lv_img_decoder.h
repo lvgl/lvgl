@@ -24,6 +24,13 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_IMG_DECLARE
+/* Warning: It's unlikely you want to use this macro */
+#define LV_IMG_DECLARE(var_name) \
+    LV_IMG_DECLARE_is_gone var_name; /* Use LV_RAW_IMG_DECLARE instead for RAW images, or
+directly set the source to the image's buffer if encoded */
+#define LV_RAW_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
+#endif
 
 /**********************
  *      TYPEDEFS

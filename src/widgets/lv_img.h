@@ -178,6 +178,15 @@ void lv_img_set_src_file(lv_obj_t * obj, const char * file_path);
  */
 void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len);
 
+/** Set the source of this image to a some raw image data (declared with LV_RAW_IMG_DECLARE macro)
+ * @sa lv_img_set_src
+ *
+ * @param obj       pointer to an image object
+ * @param data      pointer to raw image data
+ * @param len       length of the image data in bytes
+ */
+void lv_img_set_src_raw(lv_obj_t * obj, const lv_img_dsc_t * raw);
+
 /** Set the source of this image to a some symbol.
  *  This actually render the UTF-8 given string with the symbol font (and text font)
  *  and store the result as an image

@@ -131,6 +131,17 @@ void lv_img_set_src_data(lv_obj_t * obj, const uint8_t * data, const size_t len)
     get_metadata(img, 0);
 }
 
+void lv_img_set_src_raw(lv_obj_t * obj, const lv_img_dsc_t * raw)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t *)obj;
+    lv_img_src_set_data(&img->src, (const uint8_t *)raw, sizeof(*raw));
+
+    get_metadata(img, 0);
+}
+
+
 void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -318,6 +329,24 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode)
 /*=====================
  * Getter functions
  *====================*/
+
+lv_img_ctrl_t lv_img_get_ctrl(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t *)obj;
+
+    return img->ctrl;
+}
+
+size_t lv_img_get_totalframes(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t *)obj;
+
+    return img->dec_ctx ? img->dec_ctx->total_frames : 0;
+}
 
 lv_img_src_t * lv_img_get_src(lv_obj_t * obj)
 {
@@ -623,7 +652,7 @@ static void draw_img(lv_event_t * e)
     if(LV_BT(img->ctrl, LV_IMG_CTRL_MARKED) && img->dec_ctx == NULL) {
         lv_img_dec_dsc_in_t dsc = {
             .src = &img->src,
-            .color = {{0}},
+            .color = {.full = 0},
             .size_hint = {.x = lv_obj_get_width(obj), .y = lv_obj_get_height(obj)}
         };
         lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, NULL);
@@ -836,8 +865,8 @@ static void start_animation(lv_img_t * img, lv_img_dec_ctx_t * dec_ctx)
 
         /* Need to create the timer here */
         img->anim_timer = lv_timer_create(
-                            LV_BT(img->caps, LV_IMG_DEC_SEEKABLE) ? next_frame_task_seekable_cb : next_frame_task_cb,
-                            1000 / dec_ctx->frame_rate, img);
+                              LV_BT(img->caps, LV_IMG_DEC_SEEKABLE) ? next_frame_task_seekable_cb : next_frame_task_cb,
+                              1000 / dec_ctx->frame_rate, img);
         if(LV_BT(img->ctrl, LV_IMG_CTRL_PAUSE))
             lv_timer_pause(img->anim_timer);
     }

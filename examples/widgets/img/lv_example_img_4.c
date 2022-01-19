@@ -11,7 +11,7 @@ static void ofs_y_anim(void * img, int32_t v)
  */
 void lv_example_img_4(void)
 {
-    LV_IMG_DECLARE(img_skew_strip);
+    LV_RAW_IMG_DECLARE(img_skew_strip);
 
     static lv_style_t style;
     lv_style_init(&style);
@@ -22,7 +22,7 @@ void lv_example_img_4(void)
 
     lv_obj_t * img = lv_img_create(lv_scr_act());
     lv_obj_add_style(img, &style, 0);
-    lv_img_set_src(img, &img_skew_strip);
+    lv_img_set_src_raw(img, &img_skew_strip);
     lv_obj_set_size(img, 150, 100);
     lv_obj_center(img);
 
