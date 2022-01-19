@@ -36,8 +36,10 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
   
   <releases>
-    <release date="2022-01-12" version="0.8.2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/cmsis-pack/LVGL.lvgl.0.8.2.pack">
+    <release date="2022-01-12" version="0.8.3" url="https://raw.githubusercontent.com/lvgl/lvgl/master/cmsis-pack/LVGL.lvgl.0.8.3.pack">
       - LVGL v8.1.0
+      - Add benchmark
+      - Add Demo:Widgets
     </release>
   </releases>
 
@@ -291,7 +293,7 @@
                <RTE_Components_h>
                
 /*! \brief Enable LVGL */
-#define RTE_GRAPICS_LVGL               
+#define RTE_GRAPHICS_LVGL               
                </RTE_Components_h>
               
             </component>
@@ -526,6 +528,53 @@
               
 /*! \brief enable ffmpeg support */
 #define LV_USE_FFMPEG         1
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Benchmark"  condition="LVGL-Essential">
+              <description>Add the official benchmark.</description>
+              <files>
+                <!-- demos/benchmark -->
+                <file category="sourceC"            name="demos/benchmark/lv_demo_benchmark.c" />
+                <file category="header"            name="demos/benchmark/lv_demo_benchmark.h" />
+                
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_alpha16.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />
+                
+                <file category="doc"            name="demos/benchmark/README.md" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable demo:bencharmk */
+#define LV_USE_DEMO_BENCHMARK         1
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Demo:Widgets"  condition="LVGL-Essential">
+              <description>Add the demo:widgets</description>
+              <files>
+                <!-- demos/widgets -->
+                <file category="sourceC"            name="demos/widgets/lv_demo_widgets.c" />
+                <file category="header"             name="demos/widgets/lv_demo_widgets.h" />
+                
+                <file category="sourceC"            name="demos/widgets/assets/img_clothes.c" />
+                <file category="sourceC"            name="demos/widgets/assets/img_demo_widgets_avatar.c" />
+                <file category="sourceC"            name="demos/widgets/assets/img_lvgl_logo.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable demo:widgets support */
+#define LV_USE_DEMO_WIDGETS         1
               </RTE_Components_h>
               
             </component>

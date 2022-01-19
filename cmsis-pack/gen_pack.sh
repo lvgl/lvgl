@@ -48,6 +48,7 @@ PACK_DIRS="
   ../rt-thread
   ../zephyr
   ../cmake
+  ../demos
 "
 
   
@@ -190,6 +191,16 @@ fi
 PACKNAME=`cat PackName.txt`
 rm -rf PackName.txt
 
+echo remove unrequired files and folders...
+rm -rf $PACK_BUILD/demos/keypad_encoder
+rm -rf $PACK_BUILD/demos/music
+rm -rf $PACK_BUILD/demos/stress
+rm -rf $PACK_BUILD/demos/widgets/screenshot1.gif
+
+# echo apply patches...
+# rm -rf $PACK_BUILD/demos/lv_demos.h
+# cp -f ./lv_demos.h $PACK_BUILD/demos/
+
 # Archiving
 # $ZIP a $PACKNAME
 echo creating pack file $PACKNAME
@@ -217,6 +228,7 @@ echo "build of pack succeeded"
 echo "cleaning up ..."
 
 rm -rf $PACK_BUILD
+
 echo " "
 
 echo Completed CMSIS-Pack Generation: `date`

@@ -12,6 +12,7 @@
  */
 
 /* clang-format off */
+#if 1 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -150,7 +151,7 @@
  *-----------*/
 
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
-/*#define LV_USE_GPU_STM32_DMA2D 0 */
+
 #if LV_USE_GPU_STM32_DMA2D
     /*Must be defined to include path of CMSIS header of target processor
     e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
@@ -158,7 +159,7 @@
 #endif
 
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
-/*#define LV_USE_GPU_NXP_PXP 0 */
+
 #if LV_USE_GPU_NXP_PXP
     /*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
     *   and call lv_gpu_nxp_pxp_init() automatically during lv_init(). Note that symbol SDK_OS_FREE_RTOS
@@ -169,13 +170,16 @@
 #endif
 
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
-/*#define LV_USE_GPU_NXP_VG_LITE 0 */
+
 
 /*Use SDL renderer API*/
 #define LV_USE_GPU_SDL 0
 #if LV_USE_GPU_SDL
     #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+    /*Texture cache size, 8MB by default*/
     #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
 /*-------------
@@ -287,12 +291,12 @@
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
 
-/*Complier prefix for a big array declaration in RAM*/
+/*Compiler prefix for a big array declaration in RAM*/
 #define LV_ATTRIBUTE_LARGE_RAM_ARRAY
 
 /*Place performance critical functions into a faster memory (e.g RAM)*/
@@ -339,7 +343,7 @@
 /*Demonstrate special features*/
 #define LV_FONT_MONTSERRAT_12_SUBPX      0
 #define LV_FONT_MONTSERRAT_28_COMPRESSED 0  /*bpp = 3*/
-#define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
+#define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
 #define LV_FONT_SIMSUN_16_CJK            0  /*1000 most common CJK radicals*/
 
 /*Pixel perfect monospace fonts*/
@@ -522,31 +526,25 @@
  * Themes
  *----------*/
 
-#ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
-    /*A simple, impressive and very complete theme*/
-    #define LV_USE_THEME_DEFAULT 1
-    #if LV_USE_THEME_DEFAULT
+/*A simple, impressive and very complete theme*/
+#define LV_USE_THEME_DEFAULT 1
+#if LV_USE_THEME_DEFAULT
 
-        /*0: Light mode; 1: Dark mode*/
-        #define LV_THEME_DEFAULT_DARK 0
+    /*0: Light mode; 1: Dark mode*/
+    #define LV_THEME_DEFAULT_DARK 0
 
-        /*1: Enable grow on press*/
-        #define LV_THEME_DEFAULT_GROW 1
+    /*1: Enable grow on press*/
+    #define LV_THEME_DEFAULT_GROW 1
 
-        /*Default transition time in [ms]*/
-        #define LV_THEME_DEFAULT_TRANSITION_TIME 80
-    #endif /*LV_USE_THEME_DEFAULT*/
+    /*Default transition time in [ms]*/
+    #define LV_THEME_DEFAULT_TRANSITION_TIME 80
+#endif /*LV_USE_THEME_DEFAULT*/
 
-    /*A very simple theme that is a good starting point for a custom theme*/
-    #define LV_USE_THEME_BASIC 1
+/*A very simple theme that is a good starting point for a custom theme*/
+#define LV_USE_THEME_BASIC 1
 
-    /*A theme designed for monochrome displays*/
-    #define LV_USE_THEME_MONO 1
-#else
-    #define LV_USE_THEME_DEFAULT    0
-    #define LV_USE_THEME_BASIC      0
-    #define LV_USE_THEME_MONO       0
-#endif
+/*A theme designed for monochrome displays*/
+#define LV_USE_THEME_MONO 1
 
 /*-----------
  * Layouts
@@ -562,66 +560,6 @@
  * 3rd party libraries
  *--------------------*/
 
-#if 0 /*TODO: remove as a workaround */
-
-    /*File system interfaces for common APIs
-     *To enable set a driver letter for that API*/
-    #define LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
-    //#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
-
-    #define LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
-    //#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
-
-    #define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
-    //#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
-
-    #define LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
-
-    /*PNG decoder library*/
-    #define LV_USE_PNG 0
-
-    /*BMP decoder library*/
-    #define LV_USE_BMP 0
-
-    /* JPG + split JPG decoder library.
-     * Split JPG is a custom format optimized for embedded systems. */
-    #define LV_USE_SJPG 0
-
-    /*GIF decoder library*/
-    #define LV_USE_GIF 0
-
-    /*QR code library*/
-    #define LV_USE_QRCODE 0
-
-    /*FreeType library*/
-    #define LV_USE_FREETYPE 0
-
-    #if LV_USE_FREETYPE
-        /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
-        #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
-        #if LV_FREETYPE_CACHE_SIZE >= 0
-            /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
-            /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
-            /* if font size >= 256, must be configured as image cache */
-            #define LV_FREETYPE_SBIT_CACHE 0
-            /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-            /* (0:use system defaults) */
-            #define LV_FREETYPE_CACHE_FT_FACES 0
-            #define LV_FREETYPE_CACHE_FT_SIZES 0
-        #endif
-    #endif
-
-    /*Rlottie library*/
-    #define LV_USE_RLOTTIE 0
-
-    /*FFmpeg library for image decoding and playing videos
-     *Supports all major image formats so do not enable other image decoder with it*/
-    #define LV_USE_FFMPEG  0
-    #if LV_USE_FFMPEG
-        /*Dump input information to stderr*/
-        #define LV_FFMPEG_AV_DUMP_FORMAT 0
-    #endif
-#endif
 
 /*-----------
  * Others
@@ -640,36 +578,8 @@
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
 
-/*===================
- * DEMO USAGE
- ====================*/
-
-/*Show some widget*/
-#define LV_USE_DEMO_WIDGETS        0
-#if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW  0
-#endif
-
-/*Demonstrate the usage of encoder and keyboard*/
-#define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
-
-/*Benchmark your system*/
-#define LV_USE_DEMO_BENCHMARK   0
-
-/*Stress test for LVGL*/
-#define LV_USE_DEMO_STRESS      0
-
-/*Music player demo*/
-#define LV_USE_DEMO_MUSIC       0
-#if LV_USE_DEMO_MUSIC
-# define LV_DEMO_MUSIC_SQUARE       0
-# define LV_DEMO_MUSIC_LANDSCAPE    0
-# define LV_DEMO_MUSIC_ROUND        0
-# define LV_DEMO_MUSIC_LARGE        0
-# define LV_DEMO_MUSIC_AUTO_PLAY    0
-#endif
-
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/
 
+#endif /*End of "Content enable"*/
