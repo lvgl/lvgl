@@ -116,7 +116,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_gradient_cache_t * grad, lv
 #define FS_COMPUTE_ERROR(e) { coef[0] = (e<<3) - e; coef[1] = (e<<2) - e; coef[2] = (e<<2) + e; coef[3] = e; }
 #define FS_COMPONENTS(A, OP, B, C) A.ch.red = LV_CLAMP(0, A.ch.red OP B.r OP C.r, 255); A.ch.green = LV_CLAMP(0, A.ch.green OP B.g OP C.g, 255); A.ch.blue = LV_CLAMP(0, A.ch.blue OP B.b OP C.b, 255);
 #define FS_QUANT_ERROR(e, t, q) { lv_color32_t u; u.full = lv_color_to32(q); e.r = (int8_t)(t.ch.red - u.ch.red); e.g = (int8_t)(t.ch.green - u.ch.green); e.b = (int8_t)(t.ch.blue - u.ch.blue); }
-    lv_scolor24_t next_px_err, next_l = grad->error_acc[1], error;
+    lv_scolor24_t next_px_err = {0}, next_l = grad->error_acc[1], error;
     /*First last pixel are not dithered */
     grad->map[0] = lv_color_hex(grad->hmap[0].full);
     for(lv_coord_t x = 1; x < grad->hmap_size - 1; x++) {
