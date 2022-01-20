@@ -16,9 +16,9 @@
 /*********************
  *      DEFINES
  *********************/
-#define COLOR_SCR     lv_palette_lighten(LV_PALETTE_GREY, 3)
+#define COLOR_SCR     lv_palette_lighten(LV_PALETTE_GREY, 4)
 #define COLOR_WHITE   lv_color_white()
-#define COLOR_LIGHT   lv_palette_lighten(LV_PALETTE_GREY, 1)
+#define COLOR_LIGHT   lv_palette_lighten(LV_PALETTE_GREY, 2)
 #define COLOR_DARK    lv_palette_main(LV_PALETTE_GREY)
 #define COLOR_DIM     lv_palette_darken(LV_PALETTE_GREY, 2)
 #define SCROLLBAR_WIDTH     2
@@ -28,11 +28,16 @@
  **********************/
 typedef struct {
     lv_style_t scr;
+    lv_style_t transp;
     lv_style_t white;
     lv_style_t light;
     lv_style_t dark;
     lv_style_t dim;
     lv_style_t scrollbar;
+#if LV_USE_ARC || LV_USE_COLORWHEEL
+    lv_style_t arc_line;
+    lv_style_t arc_knob;
+#endif
 #if LV_USE_TEXTAREA
     lv_style_t ta_cursor;
 #endif
@@ -72,6 +77,10 @@ static void style_init(void)
     lv_style_set_bg_color(&styles->scr, COLOR_SCR);
     lv_style_set_text_color(&styles->scr, COLOR_DIM);
 
+
+    style_init_reset(&styles->transp);
+    lv_style_set_bg_opa(&styles->transp, LV_OPA_TRANSP);
+
     style_init_reset(&styles->white);
     lv_style_set_bg_opa(&styles->white, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->white, COLOR_WHITE);
@@ -105,6 +114,13 @@ static void style_init(void)
     lv_style_set_arc_width(&styles->dim, 2);
     lv_style_set_arc_color(&styles->dim, COLOR_DIM);
 
+#if LV_USE_ARC || LV_USE_COLORWHEEL
+    style_init_reset(&styles->arc_line);
+    lv_style_set_arc_width(&styles->arc_line, 6);
+    style_init_reset(&styles->arc_knob);
+    lv_style_set_pad_all(&styles->arc_knob, 5);
+#endif
+
 #if LV_USE_TEXTAREA
     style_init_reset(&styles->ta_cursor);
     lv_style_set_border_side(&styles->ta_cursor, LV_BORDER_SIDE_LEFT);
@@ -122,7 +138,7 @@ static void style_init(void)
 
 bool lv_theme_basic_is_inited(void)
 {
-    return  LV_GC_ROOT(_lv_theme_default_styles) == NULL ? false : true;
+    return  LV_GC_ROOT(_lv_theme_basic_styles) == NULL ? false : true;
 }
 
 lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
@@ -133,8 +149,8 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_basic_is_inited()) {
         inited = false;
-        LV_GC_ROOT(_lv_theme_default_styles) = lv_mem_alloc(sizeof(my_theme_styles_t));
-        styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_default_styles);
+        LV_GC_ROOT(_lv_theme_basic_styles) = lv_mem_alloc(sizeof(my_theme_styles_t));
+        styles = (my_theme_styles_t *)LV_GC_ROOT(_lv_theme_basic_styles);
     }
 
     theme.disp = disp;
@@ -257,7 +273,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_SWITCH
     else if(lv_obj_check_type(obj, &lv_switch_class)) {
         lv_obj_add_style(obj, &styles->light, 0);
-        lv_obj_add_style(obj, &styles->dark, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->dark, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->dim, LV_PART_KNOB);
     }
 #endif
@@ -294,8 +310,32 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_ARC
     else if(lv_obj_check_type(obj, &lv_arc_class)) {
         lv_obj_add_style(obj, &styles->light, 0);
+        lv_obj_add_style(obj, &styles->transp, 0);
+        lv_obj_add_style(obj, &styles->arc_line, 0);
         lv_obj_add_style(obj, &styles->dark, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->arc_line, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &styles->dim, LV_PART_KNOB);
+        lv_obj_add_style(obj, &styles->arc_knob, LV_PART_KNOB);
+    }
+#endif
+
+#if LV_USE_SPINNER
+    else if(lv_obj_check_type(obj, &lv_spinner_class)) {
+        lv_obj_add_style(obj, &styles->light, 0);
+        lv_obj_add_style(obj, &styles->transp, 0);
+        lv_obj_add_style(obj, &styles->arc_line, 0);
+        lv_obj_add_style(obj, &styles->dark, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->arc_line, LV_PART_INDICATOR);
+    }
+#endif
+
+#if LV_USE_COLORWHEEL
+    else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
+        lv_obj_add_style(obj, &styles->light, 0);
+        lv_obj_add_style(obj, &styles->transp, 0);
+        lv_obj_add_style(obj, &styles->arc_line, 0);
+        lv_obj_add_style(obj, &styles->dim, LV_PART_KNOB);
+        lv_obj_add_style(obj, &styles->arc_knob, LV_PART_KNOB);
     }
 #endif
 
