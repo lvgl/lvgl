@@ -1991,14 +1991,10 @@
 
 /*1: Enable API to take snapshot for object*/
 #ifndef LV_USE_SNAPSHOT
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SNAPSHOT
-            #define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
-        #else
-            #define LV_USE_SNAPSHOT 0
-        #endif
+    #ifdef CONFIG_LV_USE_SNAPSHOT
+        #define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
     #else
-        #define LV_USE_SNAPSHOT 1
+        #define LV_USE_SNAPSHOT 0
     #endif
 #endif
 
@@ -2007,7 +2003,16 @@
     #ifdef CONFIG_LV_USE_MONKEY
         #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
     #else
-        #define LV_USE_MONKEY 0
+        #define LV_USE_MONKEY   0
+    #endif
+#endif
+
+/*1: Enable grid navigation*/
+#ifndef LV_USE_GRIDNAV
+    #ifdef CONFIG_LV_USE_GRIDNAV
+        #define LV_USE_GRIDNAV CONFIG_LV_USE_GRIDNAV
+    #else
+        #define LV_USE_GRIDNAV  0
     #endif
 #endif
 
