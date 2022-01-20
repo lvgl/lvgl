@@ -10,3 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: arduino/arduino-lint-action@v1
+        with:
+          library-manager: update
