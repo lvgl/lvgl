@@ -177,8 +177,16 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent);
  */
 void lv_fragment_manager_del(lv_fragment_manager_t * manager);
 
+/**
+ * Create object of the fragment. This fragment must belong to the manager.
+ * @param manager Fragment manager instance
+ */
 void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager);
 
+/**
+ * Delete object created by the fragment. Instance of the fragment will not be deleted.
+ * @param manager Fragment manager instance
+ */
 void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager);
 
 /**
@@ -249,6 +257,12 @@ size_t lv_fragment_manager_get_stack_size(lv_fragment_manager_t * manager);
  */
 lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager);
 
+/**
+ * Find first fragment instance in the container
+ * @param manager Fragment manager instance
+ * @param container Container which target fragment added to
+ * @return First fragment instance in the container
+ */
 lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * manager, const lv_obj_t * container);
 
 /**
