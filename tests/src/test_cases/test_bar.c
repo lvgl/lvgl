@@ -81,6 +81,61 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
     TEST_ASSERT_EQUAL_INT32(expected_coord, actual_coord);
 }
 
+/*
+ * Bar has two parts, main and indicator, coordinates of the latter are
+ * calculated based on:
+ * - Bar size
+ * - Bar (main part) padding
+ * - Bar value
+ * - Bar coordinates
+ * - Bar base direction
+ * See Boxing model in docs for reference.
+ *
+ * Bar properties assumed:
+ * - mode: LV_BAR_MODE_NORMAL
+ * - min value: 0
+ * - max value: 100
+ */
+void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(void)
+{
+    lv_bar_t * bar_ptr = (lv_bar_t *) bar;
+
+    static lv_style_t bar_style;
+
+    const lv_coord_t style_padding = 5u;
+    const lv_coord_t bar_width = 200u;
+    const lv_coord_t bar_height = 20u;
+    int32_t bar_value = 10u;
+
+    lv_style_init(&bar_style);
+    lv_style_set_pad_all(&bar_style, style_padding);
+
+    /* Setup new style */
+    lv_obj_remove_style_all(bar);
+    lv_obj_add_style(bar, &bar_style, LV_PART_MAIN);
+
+    /* Set properties */
+    lv_obj_set_size(bar, bar_width, bar_height);
+    lv_bar_set_value(bar, bar_value, LV_ANIM_OFF);
+    lv_obj_set_style_base_dir(bar, LV_BASE_DIR_RTL, 0);
+
+    /* FIXME: Remove wait */
+    lv_test_indev_wait(50);
+
+    int32_t actual_coord = bar_ptr->indic_area.x1;
+
+    /* Calculate current indicator width */
+    lv_coord_t bar_max_value = lv_bar_get_max_value(bar);
+    lv_coord_t indicator_part_width = lv_obj_get_content_width(bar);
+    lv_coord_t right_padding = lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
+    int32_t indicator_width = (bar_value * indicator_part_width) / bar_max_value;
+
+    int32_t expected_coord = (bar_width - right_padding) - indicator_width;
+    expected_coord -= 1;
+
+    TEST_ASSERT_EQUAL_INT32(expected_coord, actual_coord);
+}
+
 void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
 {
     lv_bar_t * bar_ptr = (lv_bar_t *) bar;
