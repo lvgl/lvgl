@@ -7,7 +7,7 @@ The music player demo shows what kind of modern, smartphone-like user interfaces
 ![Music player demo with LVGL embedded GUI library](https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_music/screenshot1.gif?raw=true)
 
 ## Run the demo
-- In `lv_ex_conf.h` set `LV_USE_DEMO_MUSIC 1`
+- In `lv_conf.h` or equivalent places set `LV_USE_DEMO_MUSIC 1`
 - With `LV_DEMO_MUSIC_AUTO_PLAY` enabled a ~60 sec demo will be played.
 - After `lv_init()` and initializing the drivers call `lv_demo_music()`
 
