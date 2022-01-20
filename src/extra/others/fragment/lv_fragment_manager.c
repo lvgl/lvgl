@@ -111,7 +111,7 @@ void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager)
 void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container)
 {
     lv_fragment_managed_states_t * states = fragment_attach(manager, fragment, container);
-    if(manager->parent && manager->parent->managed->obj_created) {
+    if(!manager->parent || manager->parent->managed->obj_created) {
         item_create_obj(states);
     }
 }
