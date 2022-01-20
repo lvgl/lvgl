@@ -38,7 +38,7 @@
 ...
 ```
 
-3. If your development environment or toolchain doesn't not add source files inside '***lvgl***' folder automatically, you can manually add them for compilation.  
+3. If your development environment or toolchain does not add source files inside '***lvgl***' folder automatically, ensure the `demos` folder is included for compilation.  
 4. Include "***demos/lv_demos.h***" in your application source file, for example:
 
 ```c
