@@ -539,7 +539,6 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t
     invalidate_point(obj, ser->start_point);
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
     invalidate_point(obj, ser->start_point);
-    lv_chart_refresh(obj);
 }
 
 void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t x_value, lv_coord_t y_value)
@@ -556,11 +555,8 @@ void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
 
     ser->x_points[ser->start_point] = x_value;
     ser->y_points[ser->start_point] = y_value;
-    invalidate_point(obj, ser->start_point);
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
     invalidate_point(obj, ser->start_point);
-    lv_chart_refresh(obj);
-
 }
 
 void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t value)
@@ -571,7 +567,7 @@ void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t 
 
     if(id >= chart->point_cnt) return;
     ser->y_points[id] = value;
-    lv_chart_refresh(obj);
+    invalidate_point(obj, id);
 }
 
 void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t x_value,
@@ -589,7 +585,7 @@ void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t
     if(id >= chart->point_cnt) return;
     ser->x_points[id] = x_value;
     ser->y_points[id] = y_value;
-    lv_chart_refresh(obj);
+    invalidate_point(obj, id);
 }
 
 void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t array[])
