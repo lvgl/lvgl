@@ -257,8 +257,8 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
         if(child == start_child) continue;
         if(obj_is_focuable(child) == false) continue;
 
-        lv_coord_t x_err;
-        lv_coord_t y_err;
+        lv_coord_t x_err = 0;
+        lv_coord_t y_err = 0;
         switch(mode) {
             case FIND_LEFT:
                 x_err = get_x_center(child) - x_start;
