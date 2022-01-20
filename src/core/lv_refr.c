@@ -992,6 +992,8 @@ static void draw_buf_flush(lv_disp_t * disp)
     if(disp_refr->driver->draw_buf->last_area && disp_refr->driver->draw_buf->last_part) draw_buf->flushing_last = 1;
     else draw_buf->flushing_last = 0;
 
+    bool flushing_last = draw_buf->flushing_last;
+
     if(disp->driver->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
         if(disp->driver->rotated != LV_DISP_ROT_NONE && disp->driver->sw_rotate) {
@@ -1002,7 +1004,7 @@ static void draw_buf_flush(lv_disp_t * disp)
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(draw_buf->buf1 && draw_buf->buf2 && (!disp->driver->direct_mode || draw_buf->flushing_last)) {
+    if(draw_buf->buf1 && draw_buf->buf2 && (!disp->driver->direct_mode || flushing_last)) {
         if(draw_buf->buf_act == draw_buf->buf1)
             draw_buf->buf_act = draw_buf->buf2;
         else
