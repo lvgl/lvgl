@@ -182,7 +182,7 @@ void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager);
 void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager);
 
 /**
- * Attach fragment to manager.
+ * Attach fragment to manager, and add to container.
  * @param manager Fragment manager instance
  * @param fragment Fragment instance
  * @param container Pointer to container object for manager to add objects to

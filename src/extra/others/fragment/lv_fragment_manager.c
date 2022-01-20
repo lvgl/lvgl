@@ -131,7 +131,9 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
         _LV_LL_READ_BACK(&manager->stack, stack) {
             if(stack->states == states) {
                 was_top = stack_top == stack;
-                prev = ((lv_fragment_stack_item_t *) _lv_ll_get_prev(&manager->stack, stack))->states;
+                void * stack_prev = _lv_ll_get_prev(&manager->stack, stack);
+                if(!stack_prev) break;
+                prev = ((lv_fragment_stack_item_t *) stack_prev)->states;
                 break;
             }
         }
