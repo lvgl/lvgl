@@ -11,7 +11,7 @@ The size and position of the objects during testing are set with a pseudo random
 On to top of the screen the title of the current test step, and the result of the previous step is displayed.
 
 ## Run the benchmark
-- In `lv_ex_conf.h` set `LV_USE_DEMO_BENCHMARK 1`
+- In `lv_conf.h` or equivalent places set `LV_USE_DEMO_BENCHMARK 1`
 - After `lv_init()` and initializing the drivers call `lv_demo_benchmark()`
 
 ## Interpret the result
