@@ -1855,7 +1855,7 @@
         #ifdef CONFIG_LV_FS_STDIO_CACHE_SIZE
             #define LV_FS_STDIO_CACHE_SIZE CONFIG_LV_FS_STDIO_CACHE_SIZE
         #else
-            #define LV_FS_STDIO_CACHE_SIZE  0   /*>0 to cache these bytes in lv_fs_read()*/
+            #define LV_FS_STDIO_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -1887,7 +1887,7 @@
         #ifdef CONFIG_LV_FS_POSIX_CACHE_SIZE
             #define LV_FS_POSIX_CACHE_SIZE CONFIG_LV_FS_POSIX_CACHE_SIZE
         #else
-            #define LV_FS_POSIX_CACHE_SIZE  0   /*>0 to cache these bytes in lv_fs_read()*/
+            #define LV_FS_POSIX_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -1919,7 +1919,7 @@
         #ifdef CONFIG_LV_FS_WIN32_CACHE_SIZE
             #define LV_FS_WIN32_CACHE_SIZE CONFIG_LV_FS_WIN32_CACHE_SIZE
         #else
-            #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache these bytes in lv_fs_read()*/
+            #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -1944,7 +1944,7 @@
         #ifdef CONFIG_LV_FS_FATSF_CACHE_SIZE
             #define LV_FS_FATSF_CACHE_SIZE CONFIG_LV_FS_FATSF_CACHE_SIZE
         #else
-            #define LV_FS_FATSF_CACHE_SIZE 0    /*>0 to cache these bytes in lv_fs_read()*/
+            #define LV_FS_FATSF_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
