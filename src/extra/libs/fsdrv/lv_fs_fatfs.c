@@ -282,8 +282,8 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 
 #else /*LV_USE_FS_FATFS == 0*/
 
-#if defined(LV_FS_POSIX_LETTER) && LV_FS_POSIX_LETTER != '\0'
-    #warning "LV_USE_FS_FATFS is not enabled but LV_FS_POSIX_FATFS is set"
+#if defined(LV_FS_FATFS_LETTER) && LV_FS_FATFS_LETTER != '\0'
+    #warning "LV_USE_FS_FATFS is not enabled but LV_FS_FATFS_LETTER is set"
 #endif
 
 #endif /*LV_USE_FS_POSIX*/
