@@ -317,6 +317,9 @@ menu "LVGL configuration"
             config LV_ASSERT_HANDLER_INCLUDE
                 string "Header to include for the custom assert function"
                 default "assert.h"
+
+	    config LV_USE_ASSERT_VERIFY
+		bool "Verify condition"
         endmenu
 
         menu "Others"
