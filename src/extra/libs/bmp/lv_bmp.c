@@ -83,8 +83,6 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
             /*Save the data in the header*/
             lv_fs_file_t f;
             lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
-            // f.drv->cache_size = 512;
-            // f.drv->enable_cache = true;
             if(res != LV_FS_RES_OK) return LV_RES_INV;
             uint8_t headers[54];
 
