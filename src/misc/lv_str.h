@@ -41,8 +41,6 @@ extern "C" {
  */
 char * lv_strncpy(char * dst, const char * src, size_t count);
 
-#endif
-
 /**********************
  *      MACROS
  **********************/
