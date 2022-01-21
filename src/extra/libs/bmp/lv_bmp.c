@@ -141,6 +141,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         lv_fs_read(&b.f, header, 54, NULL);
 
         if(0x42 != header[0] || 0x4d != header[1]) {
+            lv_fs_close(&b.f);
             return LV_RES_INV;
         }
 
@@ -149,6 +150,26 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         memcpy(&b.px_height, header + 22, 4);
         memcpy(&b.bpp, header + 28, 2);
         b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
+
+        bool color_depth_error = false;
+        if(LV_COLOR_DEPTH == 32 && (b.bpp != 32 || b.bpp != 24)) {
+            LV_LOG_WARN("LV_COLOR_DEPTH == 32 but bpp is %d (should be 32 or 24)", b.bpp);
+            color_depth_error = true;
+        }
+        else if(LV_COLOR_DEPTH == 16 && b.bpp != 16) {
+            LV_LOG_WARN("LV_COLOR_DEPTH == 16 but bpp is %d (should be 16)", b.bpp);
+            color_depth_error = true;
+        }
+        else if(LV_COLOR_DEPTH == 8 && b.bpp != 8) {
+            LV_LOG_WARN("LV_COLOR_DEPTH == 8 but bpp is %d (should be 8)", b.bpp);
+            color_depth_error = true;
+        }
+
+        if(color_depth_error) {
+            dsc->error_msg = "Color depth mismatch";
+            lv_fs_close(&b.f);
+            return LV_RES_INV;
+        }
 
         dsc->user_data = lv_mem_alloc(sizeof(bmp_dsc_t));
         LV_ASSERT_MALLOC(dsc->user_data);
