@@ -93,6 +93,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
     if(drv->cache_size) {
         file_p->cache = lv_mem_alloc(sizeof(lv_fs_file_cache_t));
+        LV_ASSERT_MALLOC(file_p->cache);
         lv_memset_00(file_p->cache, sizeof(lv_fs_file_cache_t));
     }
 
@@ -147,7 +148,7 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
         }
         else {
             /*First part of data is in cache buffer, but we need to read rest of data from FS*/
-            memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
+            lv_memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
 
             if(btr > buffer_size) {
                 /*If remaining data chuck is bigger than buffer size, then do not use cache, instead read it directly from FS*/
@@ -179,6 +180,7 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
             /*If small data is requested, then read from FS into cache buffer*/
             if(buffer == NULL) {
                 file_p->cache->buffer = lv_mem_alloc(buffer_size);
+                LV_ASSERT_MALLOC(file_p->cache->buffer);
                 buffer = file_p->cache->buffer;
             }
 
