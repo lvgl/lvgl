@@ -54,7 +54,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_hor(lv_gradient_cache_t * grad, lv_
     /*The apply the algorithm for this patch*/
     for(lv_coord_t j = 0; j < w; j++) {
         int8_t factor = dither_ordered_threshold_matrix[(y & 7) * 8 + ((j) & 7)] - 32;
-        lv_color32_t tmp = grad->hmap[LV_CLAMP(0, j - 4, grad->hmap_size)];
+        lv_color32_t tmp = grad->hmap[LV_CLAMP(0, j - 4, grad->size)];
         lv_color32_t t;
         t.ch.red   = LV_CLAMP(0, tmp.ch.red + factor, 255);
         t.ch.green = LV_CLAMP(0, tmp.ch.green + factor, 255);
@@ -74,7 +74,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(lv_gradient_cache_t * grad, lv_
        Then we compute a complete row of ordered dither and store it in out. */
 
     /*Extract patch for working with, selected pseudo randomly*/
-    lv_color32_t tmp = grad->hmap[LV_CLAMP(0, y - 4, grad->hmap_size)];
+    lv_color32_t tmp = grad->hmap[LV_CLAMP(0, y - 4, grad->size)];
 
     /*The apply the algorithm for this patch*/
     for(lv_coord_t j = 0; j < 8; j++) {
@@ -116,10 +116,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_gradient_cache_t * grad, lv
 #define FS_COMPUTE_ERROR(e) { coef[0] = (e<<3) - e; coef[1] = (e<<2) - e; coef[2] = (e<<2) + e; coef[3] = e; }
 #define FS_COMPONENTS(A, OP, B, C) A.ch.red = LV_CLAMP(0, A.ch.red OP B.r OP C.r, 255); A.ch.green = LV_CLAMP(0, A.ch.green OP B.g OP C.g, 255); A.ch.blue = LV_CLAMP(0, A.ch.blue OP B.b OP C.b, 255);
 #define FS_QUANT_ERROR(e, t, q) { lv_color32_t u; u.full = lv_color_to32(q); e.r = (int8_t)(t.ch.red - u.ch.red); e.g = (int8_t)(t.ch.green - u.ch.green); e.b = (int8_t)(t.ch.blue - u.ch.blue); }
-    lv_scolor24_t next_px_err = {0}, next_l = grad->error_acc[1], error;
+    lv_scolor24_t next_px_err = {0}, next_l = {0}, error;
     /*First last pixel are not dithered */
     grad->map[0] = lv_color_hex(grad->hmap[0].full);
-    for(lv_coord_t x = 1; x < grad->hmap_size - 1; x++) {
+    for(lv_coord_t x = 1; x < grad->size - 1; x++) {
         lv_color32_t t = grad->hmap[x];
         lv_color_t q;
         /*Add error term*/
@@ -150,7 +150,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_gradient_cache_t * grad, lv
 
         grad->map[x] = q;
     }
-    grad->map[grad->hmap_size - 1] = lv_color_hex(grad->hmap[grad->hmap_size - 1].full);
+    grad->map[grad->size - 1] = lv_color_hex(grad->hmap[grad->size - 1].full);
 }
 
 LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(lv_gradient_cache_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
