@@ -155,8 +155,8 @@ static void next_frame_task_cb(lv_timer_t * t)
         /*It was the last repeat*/
         if(gifobj->loop == LV_GIF_LOOP_DEFAULT){
             if(gifobj->gif->loop_count == 1) {
-                lv_res_t res = lv_event_send(obj, LV_EVENT_READY, NULL);
-                if(res != LV_FS_RES_OK) return;
+                lv_event_send(obj, LV_EVENT_READY, NULL);
+                return;
             }
             else {
                 if(gifobj->gif->loop_count > 1)  gifobj->gif->loop_count--;
