@@ -85,7 +85,12 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     gifobj->imgdsc.header.h = gifobj->gif->height;
     gifobj->imgdsc.header.w = gifobj->gif->width;
     gifobj->last_call = lv_tick_get();
-    gifobj->loop = LV_GIF_LOOP_DEFAULT;
+    if(gifobj->gif->loop_count == 0){
+        gifobj->loop = LV_GIF_LOOP_ON;
+    }
+    else{
+        gifobj->loop = LV_GIF_LOOP_DEFAULT;
+    }
 
     lv_img_set_src(obj, &gifobj->imgdsc);
 
