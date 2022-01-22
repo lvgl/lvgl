@@ -27,12 +27,19 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum {
+  LV_GIF_LOOP_DEFAULT, // play gif as many times as is defined in the actual file
+  LV_GIF_LOOP_SINGLE, // play only one loop
+  LV_GIF_LOOP_ON // loop indefinitely
+} lv_gif_loop_t;
+
 typedef struct {
     lv_img_t img;
     gd_GIF * gif;
     lv_timer_t * timer;
     lv_img_dsc_t imgdsc;
     uint32_t last_call;
+    lv_gif_loop_t loop;
 } lv_gif_t;
 
 extern const lv_obj_class_t lv_gif_class;
@@ -46,6 +53,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src);
 void lv_gif_restart(lv_obj_t * gif);
 void lv_gif_start(lv_obj_t * gif);
 void lv_gif_stop(lv_obj_t * gif);
+void lv_gif_set_loop(lv_obj_t * gif, lv_gif_loop_t loop);
 
 /**********************
  *      MACROS
