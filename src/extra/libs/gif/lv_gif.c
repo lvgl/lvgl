@@ -101,6 +101,17 @@ void lv_gif_restart(lv_obj_t * obj)
     gd_rewind(gifobj->gif);
 }
 
+void lv_gif_start(lv_obj_t * obj){
+  lv_gif_t * gifobj = (lv_gif_t *) obj;
+  lv_timer_resume(gifobj->timer);
+  lv_timer_reset(gifobj->timer);
+}
+
+void lv_gif_stop(lv_obj_t * obj){
+  lv_gif_t * gifobj = (lv_gif_t *) obj;
+  lv_timer_pause(gifobj->timer);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
