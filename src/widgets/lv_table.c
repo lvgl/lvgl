@@ -933,7 +933,7 @@ static void copy_skip_format_byte(char *dst, const char *txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, &dst[1]);
 #else
-    strcpy(dst[1], txt);
+    strcpy(&dst[1], txt);
 #endif
 }
 
