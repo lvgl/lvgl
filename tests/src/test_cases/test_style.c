@@ -3,6 +3,11 @@
 
 #include "unity/unity.h"
 
+static void obj_set_height_helper(void * obj, int32_t height)
+{
+    lv_obj_set_height((lv_obj_t *)obj, (lv_coord_t)height);
+}
+
 void test_gradient_vertical_misalignment(void)
 {
     lv_obj_t * obj = lv_obj_create(lv_scr_act());
@@ -19,7 +24,7 @@ void test_gradient_vertical_misalignment(void)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_height);
+    lv_anim_set_exec_cb(&a, obj_set_height_helper);
     lv_anim_set_time(&a, 3000);
     lv_anim_set_playback_time(&a, 3000);
     lv_anim_set_repeat_count(&a, 100);
