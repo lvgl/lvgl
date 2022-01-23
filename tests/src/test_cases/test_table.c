@@ -1,0 +1,31 @@
+#if LV_BUILD_TEST
+#include "../lvgl.h"
+
+#include "unity/unity.h"
+
+static lv_obj_t * scr = NULL;
+static lv_obj_t * table = NULL;
+
+void setUp(void)
+{
+    scr = lv_scr_act();
+    table = lv_table_create(scr);
+}
+
+void tearDown(void)
+{
+    /* Function run after every test */
+}
+
+void test_table_should_return_assigned_cell_value(void)
+{
+    uint16_t row = 0;
+    uint16_t column = 0;
+    const char *value = "LVGL";
+
+    lv_table_set_cell_value(table, row, column, value);
+
+    TEST_ASSERT_EQUAL_STRING(value, lv_table_get_cell_value(table, row, column));
+}
+
+#endif
