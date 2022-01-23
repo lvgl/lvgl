@@ -38,6 +38,8 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
 static void refr_size(lv_obj_t * obj, uint32_t strat_row);
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
+static size_t bytes_to_allocate(const char * txt);
+static void copy_skip_format_byte(char *dst, const char *txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -90,20 +92,13 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
     /*Save the control byte*/
     if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
-    /*Get the size of the Arabic text and process it*/
-    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
+    size_t to_allocate = bytes_to_allocate(txt);
+
+    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], to_allocate);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) return;
 
-    _lv_txt_ap_proc(txt, &table->cell_data[cell][1]);
-#else
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-    LV_ASSERT_MALLOC(table->cell_data[cell]);
-
-    strcpy(table->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
-#endif
+    copy_skip_format_byte(table->cell_data[cell], txt);
 
     table->cell_data[cell][0] = ctrl;
     refr_size(obj, row);
@@ -917,5 +912,29 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
     return LV_RES_OK;
 }
 
+/* Returns number of bytes to allocate based on chars configuration */
+static size_t bytes_to_allocate(const char * txt)
+{
+    size_t retval = 0;
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    retval = _lv_txt_ap_calc_bytes_cnt(txt) + 1;
+#else
+    /* +1: trailing '\0'; +1: format byte */
+    retval = strlen(txt) + 2;
+#endif
+
+    return retval;
+}
+
+/* Copy txt into dst skipping the format byte */
+static void copy_skip_format_byte(char *dst, const char *txt)
+{
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    _lv_txt_ap_proc(txt, &dst[1]);
+#else
+    strcpy(dst[1], txt);
+#endif
+}
 
 #endif
