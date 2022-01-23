@@ -19,6 +19,7 @@
     #define GRAD_CM(r,g,b) LV_COLOR_MAKE(r,g,b)
     #define GRAD_CONV(t, x) t = x
 #endif
+#define ALIGN(X)    (((X) + 7) & ~7)
 
 #define MAX_WIN_RES     1024 /**TODO: Find a way to get this information: max(horz_res, vert_res)*/
 
@@ -80,7 +81,7 @@ static size_t get_cache_item_size(lv_gradient_cache_t * c)
 #endif
 #endif
                ;
-    return s; /* TODO: Should we align this ? */
+    return ALIGN(s);
 }
 
 static lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
@@ -100,7 +101,7 @@ static lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
 static lv_res_t iterate_cache(op_cache_t func, void * ctx, lv_gradient_cache_t ** out)
 {
     lv_gradient_cache_t * first = next_in_cache(NULL);
-    while(first != NULL) {
+    while(first != NULL && first->life) {
         if((*func)(first, ctx) == LV_RES_OK) {
             if(out != NULL) *out = first;
             return LV_RES_OK;
@@ -123,6 +124,7 @@ static void free_item(lv_gradient_cache_t * c)
     size_t next_items_size = (size_t)(grad_cache_end - (uint8_t *)c) - size;
     grad_cache_end -= size;
     if(next_items_size) {
+        uint8_t * old = (uint8_t *)c;
         lv_memcpy(c, ((uint8_t *)c) + size, next_items_size);
         /* Then need to fix all internal pointers too */
         while((uint8_t *)c != grad_cache_end) {
@@ -135,6 +137,7 @@ static void free_item(lv_gradient_cache_t * c)
 #endif
             c = (lv_gradient_cache_t *)(((uint8_t *)c) + get_cache_item_size(c));
         }
+        lv_memset_00(old + next_items_size, size);
     }
 }
 
@@ -169,6 +172,7 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
 #endif
 #endif
                       ;
+    req_size = ALIGN(req_size);
     size_t act_size = (size_t)(grad_cache_end - LV_GC_ROOT(_lv_grad_cache_mem));
     if(req_size + act_size > grad_cache_size) {
         /*Need to evict items from cache until we find enough space to allocate this one */
@@ -176,7 +180,7 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
             LV_LOG_WARN("Gradient cache too small, failed to allocate");
             return NULL; /*No magic here, if the empty cache is still too small*/
         }
-        while(act_size + req_size < grad_cache_size) {
+        while(act_size + req_size > grad_cache_size) {
             uint32_t oldest_life = UINT32_MAX;
             iterate_cache(&find_oldest_item_life, &oldest_life, NULL);
             iterate_cache(&kill_oldest_item, &oldest_life, NULL);
@@ -219,6 +223,7 @@ void lv_grad_set_cache_size(size_t max_bytes)
     lv_mem_free(LV_GC_ROOT(_lv_grad_cache_mem));
     grad_cache_end = LV_GC_ROOT(_lv_grad_cache_mem) = lv_mem_alloc(max_bytes);
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_grad_cache_mem));
+    lv_memset_00(LV_GC_ROOT(_lv_grad_cache_mem), max_bytes);
     grad_cache_size = max_bytes;
 }
 
