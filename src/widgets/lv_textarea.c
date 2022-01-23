@@ -809,7 +809,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->accepted_chars    = NULL;
     ta->max_length        = 0;
     ta->cursor.show      = 1;
-    /*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); woldn't do anything as there is no difference)*/
+    /*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); wouldn't do anything as there is no difference)*/
     ta->cursor.pos        = 1;
     ta->cursor.click_pos  = 1;
     ta->cursor.valid_x    = 0;

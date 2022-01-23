@@ -111,7 +111,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
         w = lv_area_get_width(coords);
     }
     else {
-        /*If EXAPND is enabled then not limit the text's width to the object's width*/
+        /*If EXPAND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
         lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
                         dsc->flag);

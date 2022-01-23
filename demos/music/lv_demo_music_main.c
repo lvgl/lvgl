@@ -226,7 +226,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     start_anim = true;
 
-    lv_timer_t * timer =  lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
+    lv_timer_t * timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
     lv_timer_set_repeat_count(timer, 1);
 
     lv_anim_init(&a);
@@ -799,7 +799,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         for(i = 0; i < BAR_CNT; i++) {
             uint32_t deg_space = 1;
             uint32_t deg = i * DEG_STEP + 90;
-            uint32_t j =  (i + bar_rot + rnd_array[bar_ofs %10]) % BAR_CNT;
+            uint32_t j = (i + bar_rot + rnd_array[bar_ofs %10]) % BAR_CNT;
             uint32_t k = (i + bar_rot + rnd_array[(bar_ofs + 1) % 10]) % BAR_CNT;
 
             uint32_t v = (r[k] * animv + r[j] * (amax - animv)) / amax;

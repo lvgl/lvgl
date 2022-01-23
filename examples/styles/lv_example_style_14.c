@@ -32,7 +32,7 @@ static void new_theme_init_and_set(void)
     lv_theme_set_parent(&th_new, th_act);
     lv_theme_set_apply_cb(&th_new, new_theme_apply_cb);
 
-    /*Assign the new theme the the current display*/
+    /*Assign the new theme to the current display*/
     lv_disp_set_theme(NULL, &th_new);
 }
 

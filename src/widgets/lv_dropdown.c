@@ -701,7 +701,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
         else if(c == LV_KEY_ENTER) {
             /* Handle the ENTER key only if it was send by an other object.
-             * Do no process it if ENTER is sent by the dropdown becasue it's handled in LV_EVENT_RELEASED */
+             * Do no process it if ENTER is sent by the dropdown because it's handled in LV_EVENT_RELEASED */
             lv_obj_t * indev_obj = lv_indev_get_obj_act();
             if(indev_obj != obj) {
                 res = btn_release_handler(obj);
@@ -947,7 +947,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, ui
     lv_state_t state_orig = list_obj->state;
 
     if(state != list_obj->state) {
-        list_obj->state =  state;
+        list_obj->state = state;
         list_obj->skip_trans = 1;
     }
 

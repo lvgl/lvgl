@@ -319,6 +319,11 @@ bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_c
     return true;
 }
 
+bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b)
+{
+    return a->x1 == b->x1 && a->x2 == b->x2 && a->y1 == b->y1 && a->y2 == b->y2;
+}
+
 /**
  * Align an area to an other
  * @param base an are where the other will be aligned

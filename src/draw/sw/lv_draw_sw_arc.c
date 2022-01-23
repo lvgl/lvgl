@@ -147,7 +147,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
         q_dsc.start_quarter = (start_angle / 90) & 0x3;
         q_dsc.end_quarter = (end_angle / 90) & 0x3;
         q_dsc.width = width;
-        q_dsc.draw_dsc =  &cir_dsc;
+        q_dsc.draw_dsc = &cir_dsc;
         q_dsc.draw_area = &area_out;
         q_dsc.draw_ctx = draw_ctx;
 

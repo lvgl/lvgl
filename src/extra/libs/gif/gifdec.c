@@ -73,7 +73,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     int i;
     uint8_t *bgcolor;
     int gct_sz;
-    gd_GIF *gif;
+    gd_GIF *gif = NULL;
 
     /* Header */
     f_gif_read(gif_base, sigver, 3);

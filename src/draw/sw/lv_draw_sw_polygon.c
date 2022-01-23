@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_polygon.c
+ * @file lv_draw_sw_polygon.c
  *
  */
 
@@ -154,9 +154,9 @@ void lv_draw_sw_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dra
             if(i_next_right < 0) i_next_right = point_cnt + i_next_right;
         }
 
-        if(p[i_next_left].y >=  p[i_prev_left].y) {
+        if(p[i_next_left].y >= p[i_prev_left].y) {
             if(p[i_next_left].y != p[i_prev_left].y &&
-               p[i_next_left].x !=  p[i_prev_left].x) {
+               p[i_next_left].x != p[i_prev_left].x) {
                 lv_draw_mask_line_points_init(mp_next, p[i_prev_left].x, p[i_prev_left].y,
                                               p[i_next_left].x, p[i_next_left].y,
                                               LV_DRAW_MASK_LINE_SIDE_RIGHT);
@@ -169,9 +169,9 @@ void lv_draw_sw_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dra
 
         if(mask_cnt == point_cnt) break;
 
-        if(p[i_next_right].y >=  p[i_prev_right].y) {
+        if(p[i_next_right].y >= p[i_prev_right].y) {
             if(p[i_next_right].y != p[i_prev_right].y &&
-               p[i_next_right].x !=  p[i_prev_right].x) {
+               p[i_next_right].x != p[i_prev_right].x) {
 
                 lv_draw_mask_line_points_init(mp_next, p[i_prev_right].x, p[i_prev_right].y,
                                               p[i_next_right].x, p[i_next_right].y,

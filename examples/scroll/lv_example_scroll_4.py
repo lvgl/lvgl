@@ -52,7 +52,7 @@ style.set_shadow_color(lv.palette_darken(lv.PALETTE.BLUE, 1))
 style.set_transition(trans)
 
 # Make the scrollbars wider and use 100% opacity when scrolled
-style_scrolled =  lv.style_t()
+style_scrolled = lv.style_t()
 style_scrolled.init()
 style_scrolled.set_width(8)
 style_scrolled.set_bg_opa(lv.OPA.COVER)

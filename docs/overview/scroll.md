@@ -5,7 +5,7 @@
 # Scroll
 
 ## Overview
-In LVGL scrolling works very intuitively: if an object is outside of its parent content area (the size without padding), the parent becomes scrollable and scrollbar(s) will appear. That's it.
+In LVGL scrolling works very intuitively: if an object is outside its parent content area (the size without padding), the parent becomes scrollable and scrollbar(s) will appear. That's it.
 
 Any object can be scrollable including `lv_obj_t`, `lv_img`, `lv_btn`, `lv_meter`, etc
 
@@ -17,7 +17,7 @@ The object can either be scrolled horizontally or vertically in one stroke; diag
 Scrollbars are displayed according to a configured `mode`. The following `mode`s exist:
 - `LV_SCROLLBAR_MODE_OFF`  Never show the scrollbars
 - `LV_SCROLLBAR_MODE_ON`  Always show the scrollbars
-- `LV_SCROLLBAR_MODE_ACTIVE` Show scroll bars while a object is being scrolled
+- `LV_SCROLLBAR_MODE_ACTIVE` Show scroll bars while an object is being scrolled
 - `LV_SCROLLBAR_MODE_AUTO`  Show scroll bars when the content is large enough to be scrolled
 
 `lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_...)` sets the scrollbar mode on an object.

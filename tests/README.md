@@ -37,7 +37,7 @@ GitHub's CI automatically runs these tests on pushes and pull requests to `maste
 ## Add new tests
 
 ### Create new test file
-New test needs to be added into the `src/test_cases` folder. The name of the files should look like `test_<name>.c`. The the basic skeleton of a test file copy `_test_template.c`.
+New test needs to be added into the `src/test_cases` folder. The name of the files should look like `test_<name>.c`. The basic skeleton of a test file copy `_test_template.c`.
 
 ### Asserts
 See the list of asserts [here](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityAssertionsReference.md).

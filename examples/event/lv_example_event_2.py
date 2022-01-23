@@ -4,7 +4,7 @@ def event_cb(e,label):
         label.set_text("The last button event:\nLV_EVENT_PRESSED")
     elif code == lv.EVENT.CLICKED:
         label.set_text("The last button event:\nLV_EVENT_CLICKED")
-    elif code ==  lv.EVENT.LONG_PRESSED:
+    elif code == lv.EVENT.LONG_PRESSED:
         label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED")
     elif code == lv.EVENT.LONG_PRESSED_REPEAT:
         label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED_REPEAT")        

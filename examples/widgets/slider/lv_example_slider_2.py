@@ -7,7 +7,7 @@ transition_dsc = lv.style_transition_dsc_t()
 transition_dsc.init(props, lv.anim_t.path_linear, 300, 0, None)
 
 style_main = lv.style_t()
-style_indicator =  lv.style_t()
+style_indicator = lv.style_t()
 style_knob = lv.style_t()
 style_pressed_color = lv.style_t()
 style_main.init()

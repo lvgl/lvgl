@@ -734,7 +734,7 @@ static void scene_next_task_cb(lv_timer_t * timer)
         uint32_t fps_normal_unweighted = fps_normal_sum / weight_normal_sum;
         uint32_t fps_opa_unweighted = fps_opa_sum / weight_opa_sum;
 
-        uint32_t opa_speed_pct =  (fps_opa_unweighted * 100) / fps_normal_unweighted;
+        uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
 
         lv_obj_clean(lv_scr_act());
         scene_bg = NULL;

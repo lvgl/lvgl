@@ -57,7 +57,9 @@ extern "C" {
     LV_DISPATCH_COND(f, _lv_draw_mask_radius_circle_dsc_arr_t , _lv_circle_cache, LV_DRAW_COMPLEX, 1)  \
     LV_DISPATCH_COND(f, _lv_draw_mask_saved_arr_t , _lv_draw_mask_list, LV_DRAW_COMPLEX, 1)            \
     LV_DISPATCH(f, void * , _lv_theme_default_styles)                                                  \
-    LV_DISPATCH_COND(f, uint8_t *, _lv_font_decompr_buf, LV_USE_FONT_COMPRESSED, 1)
+    LV_DISPATCH(f, void * , _lv_theme_basic_styles)                                                  \
+    LV_DISPATCH_COND(f, uint8_t *, _lv_font_decompr_buf, LV_USE_FONT_COMPRESSED, 1)                    \
+    LV_DISPATCH(f, uint8_t * , _lv_grad_cache_mem)
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)

@@ -175,7 +175,10 @@
 #define LV_USE_GPU_SDL 0
 #if LV_USE_GPU_SDL
     #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+    /*Texture cache size, 8MB by default*/
     #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
 /*-------------
@@ -293,7 +296,7 @@
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
 
-/*Complier prefix for a big array declaration in RAM*/
+/*Compiler prefix for a big array declaration in RAM*/
 #define LV_ATTRIBUTE_LARGE_RAM_ARRAY
 
 /*Place performance critical functions into a faster memory (e.g RAM)*/
@@ -340,7 +343,7 @@
 /*Demonstrate special features*/
 #define LV_FONT_MONTSERRAT_12_SUBPX      0
 #define LV_FONT_MONTSERRAT_28_COMPRESSED 0  /*bpp = 3*/
-#define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
+#define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
 #define LV_FONT_SIMSUN_16_CJK            0  /*1000 most common CJK radicals*/
 
 /*Pixel perfect monospace fonts*/
@@ -619,10 +622,13 @@
  *----------*/
 
 /*1: Enable API to take snapshot for object*/
-#define LV_USE_SNAPSHOT 1
+#define LV_USE_SNAPSHOT 0
 
 /*1: Enable Monkey test*/
-#define LV_USE_MONKEY 0
+#define LV_USE_MONKEY   0
+
+/*1: Enable grid navigation*/
+#define LV_USE_GRIDNAV  0
 
 /*==================
 * EXAMPLES
@@ -635,7 +641,7 @@
  * DEMO USAGE
  ====================*/
 
-/*Show some widget*/
+/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS        0
 #if LV_USE_DEMO_WIDGETS
 #define LV_DEMO_WIDGETS_SLIDESHOW  0

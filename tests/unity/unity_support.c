@@ -230,6 +230,8 @@ static void png_release(png_img_t * p)
     for (y=0; y<p->height; y++) free(p->row_pointers[y]);
     
     free(p->row_pointers);
+
+    png_destroy_read_struct(&p->png_ptr, &p->info_ptr, NULL);
 }
 
 

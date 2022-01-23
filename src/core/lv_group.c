@@ -158,8 +158,8 @@ void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
     _LV_LL_READ(&g1->obj_ll, obj_i) {
-        if((*obj_i) == obj1)(*obj_i) =  obj2;
-        else if((*obj_i) == obj2)(*obj_i) =  obj1;
+        if((*obj_i) == obj1)(*obj_i) = obj2;
+        else if((*obj_i) == obj2)(*obj_i) = obj1;
     }
 
     if(*g1->obj_focus == obj1) lv_group_focus_obj(obj2);
