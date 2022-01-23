@@ -13,6 +13,12 @@ include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(LVGL_TEST_COMMON_EXAMPLE_OPTIONS
+    -DLV_BUILD_EXAMPLES=1
+    -DLV_USE_DEMO_WIDGETS=1
+    -DLV_USE_DEMO_STRESS=1
+)
+
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_COLOR_DEPTH=1
     -DLV_MEM_SIZE=65535
@@ -48,12 +54,12 @@ set(LVGL_TEST_OPTIONS_NORMAL_8BIT
     -DLV_USE_ASSERT_MEM_INTEGRITY=0
     -DLV_USE_ASSERT_OBJ=0
     -DLV_USE_ASSERT_STYLE=0
-    -DLV_USE_USER_DATA=0
+    -DLV_USE_USER_DATA=1
     -DLV_FONT_UNSCII_8=1
     -DLV_USE_FONT_SUBPX=1
     -DLV_USE_BIDI=0
     -DLV_USE_ARABIC_PERSIAN_CHARS=0
-    -DLV_BUILD_EXAMPLES=1
+    ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
@@ -75,12 +81,12 @@ set(LVGL_TEST_OPTIONS_16BIT
     -DLV_USE_ASSERT_MEM_INTEGRITY=0
     -DLV_USE_ASSERT_OBJ=0
     -DLV_USE_ASSERT_STYLE=0
-    -DLV_USE_USER_DATA=0
+    -DLV_USE_USER_DATA=1
     -DLV_FONT_UNSCII_8=1
     -DLV_USE_FONT_SUBPX=1
     -DLV_USE_BIDI=0
     -DLV_USE_ARABIC_PERSIAN_CHARS=0
-    -DLV_BUILD_EXAMPLES=1
+    ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
@@ -104,12 +110,12 @@ set(LVGL_TEST_OPTIONS_16BIT_SWAP
     -DLV_USE_ASSERT_MEM_INTEGRITY=0
     -DLV_USE_ASSERT_OBJ=0
     -DLV_USE_ASSERT_STYLE=0
-    -DLV_USE_USER_DATA=0
+    -DLV_USE_USER_DATA=1
     -DLV_FONT_UNSCII_8=1
     -DLV_USE_FONT_SUBPX=1
     -DLV_USE_BIDI=0
     -DLV_USE_ARABIC_PERSIAN_CHARS=0
-    -DLV_BUILD_EXAMPLES=1
+    ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
@@ -172,7 +178,7 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_USE_PERF_MONITOR=1
     -DLV_USE_MEM_MONITOR=1
     -DLV_LABEL_TEXT_SELECTION=1
-    -DLV_BUILD_EXAMPLES=1
+    ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_24
     -DLV_USE_FS_STDIO='A' 
     -DLV_USE_FS_POSIX='B' 
@@ -219,9 +225,10 @@ set(LVGL_TEST_OPTIONS_TEST_COMMON
     -DLV_USE_BIDI=1
     -DLV_USE_ARABIC_PERSIAN_CHARS=1
     -DLV_LABEL_TEXT_SELECTION=1
-    -DLV_BUILD_EXAMPLES=1
+    ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
+    -Wno-unused-variable
 )
 
 set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
@@ -345,7 +352,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} test_common lvgl_examples lvgl png ${TEST_LIBS})
+    target_link_libraries(${test_name} test_common lvgl_examples lvgl_demos lvgl png ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
