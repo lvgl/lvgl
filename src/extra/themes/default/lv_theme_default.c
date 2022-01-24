@@ -234,9 +234,8 @@ static void style_init(void)
     lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY,
                                                                                             2) : lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_right(&styles->scrollbar, lv_disp_dpx(theme.disp, 7));
-    lv_style_set_pad_top(&styles->scrollbar,  lv_disp_dpx(theme.disp, 7));
-    lv_style_set_size(&styles->scrollbar,  lv_disp_dpx(theme.disp, 5));
+    lv_style_set_pad_all(&styles->scrollbar, lv_disp_dpx(theme.disp, 7));
+    lv_style_set_width(&styles->scrollbar,  lv_disp_dpx(theme.disp, 5));
     lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_40);
     lv_style_set_transition(&styles->scrollbar, &trans_normal);
 
