@@ -288,7 +288,7 @@ set(COMPILE_OPTIONS
     -Wshadow
     -Wshift-negative-value
     -Wsizeof-pointer-memaccess
-    -Wstack-usage=4096
+    #-Wstack-usage=2048 
     -Wtype-limits
     -Wundef
     -Wuninitialized
