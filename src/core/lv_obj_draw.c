@@ -58,7 +58,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
         if(draw_dsc->bg_opa > LV_OPA_MIN) {
             draw_dsc->bg_color = lv_obj_get_style_bg_color_filtered(obj, part);
-            const lv_gradient_t * grad = lv_obj_get_style_bg_gradient(obj, part);
+            const lv_grad_dsc_t * grad = lv_obj_get_style_bg_grad(obj, part);
             if(grad && grad->dir != LV_GRAD_DIR_NONE) {
                 lv_memcpy(&draw_dsc->bg_grad, grad, sizeof(*grad));
             }
