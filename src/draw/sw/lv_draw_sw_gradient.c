@@ -212,9 +212,9 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
     item->size = size;
     if(item->not_cached) {
         uint8_t * p = (uint8_t *)item;
-        item->map = (lv_color_t *)(p + (ALIGN(sizeof(*item))));
+        item->map = (lv_color_t *)(p + ALIGN(sizeof(*item)));
 #if _DITHER_GRADIENT
-        item->hmap = (lv_color32_t *)(p + ALIGN(sizeof(*item) + ALIGN(map_size * sizeof(lv_color_t))));
+        item->hmap = (lv_color32_t *)(p + ALIGN(sizeof(*item)) + ALIGN(map_size * sizeof(lv_color_t)));
 #if LV_DITHER_ERROR_DIFFUSION == 1
         item->error_acc = (lv_scolor24_t *)(p + ALIGN(sizeof(*item)) + ALIGN(size * sizeof(lv_grad_color_t)) +
                                             ALIGN(map_size * sizeof(lv_color_t)));
