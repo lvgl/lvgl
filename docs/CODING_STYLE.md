@@ -1,29 +1,29 @@
 # Coding style
 
 ## File format
-Use [lv_misc/lv_templ.c](https://github.com/lvgl/lvgl/blob/master/src/lv_misc/lv_templ.c) and [lv_misc/lv_templ.h](https://github.com/lvgl/lvgl/blob/master/src/lv_misc/lv_templ.h)
+Use [misc/lv_templ.c](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.c) and [misc/lv_templ.h](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.h)
 
 ## Naming conventions
 * Words are separated by '_'
 * In variable and function names use only lower case letters (e.g. *height_tmp*)
 * In enums and defines use only upper case letters (e.g. *e.g. MAX_LINE_NUM*)
 * Global names (API):
-  * starts with *lv*
+  * start with *lv*
   * followed by module name: *btn*, *label*, *style* etc.
   * followed by the action (for functions): *set*, *get*, *refr* etc.
-  * closed with the subject: *name*, *size*, *state* etc. 
+  * closed with the subject: *name*, *size*, *state* etc.
 * Typedefs
   * prefer `typedef struct` and `typedef enum` instead of  `struct name` and `enum name`
   * always end `typedef struct` and `typedef enum` type names with `_t`
 * Abbreviations:
-  * Only words longer or equal than 6 characters can be abbreviated. 
+  * Only words longer or equal than 6 characters can be abbreviated.
   * Abbreviate only if it makes the word at least half as long
-  * Use only very straightforward and well-known abbreviations (e.g. pos: position, def: default, btn: button) 
+  * Use only very straightforward and well-known abbreviations (e.g. pos: position, def: default, btn: button)
 
 ## Coding guide
 * Functions:
-  * Try to write function shorter than is 50 lines 
-  * Always shorter than 200 lines (except very straightforwards) 
+  * Try to write function shorter than is 50 lines
+  * Always shorter than 200 lines (except very straightforwards)
 * Variables:
   * One line, one declaration (BAD: char x, y;)
   * Use `<stdint.h>` (*uint8_t*, *int32_t* etc)
@@ -41,17 +41,17 @@ Before every function have a comment like this:
  * @param obj pointer to an object
  * @return pointer to a screen
  */
-lv_obj_t * lv_obj_get_scr(lv_obj_t * obj); 
+lv_obj_t * lv_obj_get_scr(lv_obj_t * obj);
 ```
 
-Always use `/* Something */` format and NOT `//Something`
+Always use `/*Something*/` format and NOT `//Something`
 
-Write readable code to avoid descriptive comments like: 
-`x++; /* Add 1 to x */`. 
+Write readable code to avoid descriptive comments like:
+`x++; /*Add 1 to x*/`.
 The code should show clearly what you are doing.
 
-You should write **why** have you done this: 
-`x++; /*Because of closing '\0' of the string */`
+You should write **why** have you done this:
+`x++; /*Because of closing '\0' of the string*/`
 
 Short "code summaries" of a few lines are accepted. E.g. `/*Calculate the new coordinates*/`
 
@@ -66,20 +66,20 @@ Here is example to show bracket placing and using of white spaces:
  * @param text '\0' terminated character string. NULL to refresh with the current text.
  */
 void lv_label_set_text(lv_obj_t * label, const char * text)
-{   /* Main brackets of functions in new line*/
-    
+{   /*Main brackets of functions in new line*/
+
     if(label == NULL) return; /*No bracket only if the command is inline with the if statement*/
-    
+
     lv_obj_inv(label);
-    
+
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
-    /*Comment before a section */
+    /*Comment before a section*/
     if(text == ext->txt || text == NULL) {  /*Bracket of statements start inline*/
         lv_label_refr_text(label);
-        return;   
+        return;
     }
-    
+
     ...
 }
 ```

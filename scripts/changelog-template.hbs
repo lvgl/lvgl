@@ -1,0 +1,106 @@
+{{#each releases}}
+  ## [{{title}}]({{href}}) {{niceDate}}
+
+  ### Breaking Changes
+  {{#commit-list merges heading='' message='BREAKING CHANGE'}}
+    - :warning: {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='BREAKING CHANGE'}}
+    - :warning: {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='BREAKING CHANGE'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+
+  ### Architectural
+  {{#commit-list merges heading='' message='^arch' exclude='BREAKING CHANGE'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='^arch' exclude='BREAKING CHANGE'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='^arch' exclude='BREAKING CHANGE'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}  
+
+  ### New Features
+  {{#commit-list merges heading='' message='^feat' exclude='BREAKING CHANGE'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='^feat' exclude='BREAKING CHANGE'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='^feat' exclude='BREAKING CHANGE'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+  
+  
+  ### Performance
+  {{#commit-list merges heading='' message='^perf' exclude='BREAKING CHANGE'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='^perf' exclude='BREAKING CHANGE'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='^perf' exclude='BREAKING CHANGE'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+
+  ### Fixes
+  {{#commit-list merges heading='' message='^fix'  message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading=''  message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+  
+  
+  ### Examples
+  {{#commit-list merges heading='' message='^example'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='^example'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='^example'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+  
+  
+  ### Docs
+  {{#commit-list merges heading='' message='^docs'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='^docs'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='^docs'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+  
+  ### CI and tests
+  {{#commit-list merges heading='' message='(^ci|^test)'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' message='(^ci|^test)'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading='' message='(^ci|^test)'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+  
+  ### Others
+  {{#commit-list merges heading='' exclude='(^fix|^feat|^perf|^docs|^example|^ci|^test)'}}
+    - {{message}} [`{{id}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list commits heading='' exclude='(^fix|^feat|^perf|^docs|^example|^ci|^test)'}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+  {{#commit-list fixes heading=''  exclude='(^fix|^feat|^perf|^docs|^example|^ci|^test)'}}
+    - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
+  {{/commit-list}}
+  
+{{/each}}

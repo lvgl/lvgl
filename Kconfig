@@ -1,0 +1,855 @@
+# Kconfig file for LVGL v8.0
+
+menu "LVGL configuration"
+
+    # Define CONFIG_LV_CONF_SKIP so we can use LVGL
+    # without lv_conf.h file, the lv_conf_internal.h and
+    # lv_conf_kconfig.h files are used instead.
+    config LV_CONF_SKIP
+        bool
+        default y
+
+    config LV_CONF_MINIMAL
+        bool "LVGL minimal configuration."
+
+    menu "Color settings"
+        choice
+            prompt "Color depth."
+            default LV_COLOR_DEPTH_16
+            help
+                Color depth to be used.
+
+            config LV_COLOR_DEPTH_32
+                bool "32: ARGB8888"
+            config LV_COLOR_DEPTH_16
+                bool "16: RGB565"
+            config LV_COLOR_DEPTH_8
+                bool "8: RGB232"
+            config LV_COLOR_DEPTH_1
+                bool "1: 1 byte per pixel"
+        endchoice
+
+        config LV_COLOR_DEPTH
+            int
+            default 1 if LV_COLOR_DEPTH_1
+            default 8 if LV_COLOR_DEPTH_8
+            default 16 if LV_COLOR_DEPTH_16
+            default 32 if LV_COLOR_DEPTH_32
+
+        config LV_COLOR_16_SWAP
+            bool "Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)."
+            depends on LV_COLOR_DEPTH_16
+
+        config LV_COLOR_SCREEN_TRANSP
+            bool "Enable more complex drawing routines to manage screens transparency."
+            depends on LV_COLOR_DEPTH_32
+            help
+                Can be used if the UI is above another layer, e.g. an OSD menu or video player.
+                Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to
+                non LV_OPA_COVER value
+
+        config LV_COLOR_MIX_ROUND_OFS
+            int "Adjust color mix functions rounding"
+            default 128 if !LV_COLOR_DEPTH_32
+            default 0 if LV_COLOR_DEPTH_32
+            range 0 254
+            help
+                0: no adjustment, get the integer part of the result (round down)
+                64: round up from x.75
+                128: round up from half
+                192: round up from x.25
+                254: round up
+
+        config LV_COLOR_CHROMA_KEY_HEX
+            hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
+            range 0x000000 0xFFFFFF
+            default 0x00FF00
+            help
+                See misc/lv_color.h for some color values examples.
+    endmenu
+
+    menu "Memory settings"
+        config LV_MEM_CUSTOM
+            bool "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc()` and `lv_mem_free()`"
+
+        config LV_MEM_SIZE_KILOBYTES
+            int "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
+            range 2 128
+            default 32
+            depends on !LV_MEM_CUSTOM
+
+        config LV_MEM_ADDR
+            hex "Address for the memory pool instead of allocating it as a normal array"
+            default 0x0
+            depends on !LV_MEM_CUSTOM
+
+        config LV_MEM_CUSTOM_INCLUDE
+            string "Header to include for the custom memory function"
+            default "stdlib.h"
+            depends on LV_MEM_CUSTOM
+
+        config LV_MEM_BUF_MAX_NUM
+            int "Number of the memory buffer"
+            default 16
+            help
+                Number of the intermediate memory buffer used during rendering and other
+                internal processing mechanisms.  You will see an error log message if
+                there wasn't enough buffers.
+
+        config LV_MEMCPY_MEMSET_STD
+            bool "Use the standard memcpy and memset instead of LVGL's own functions"
+    endmenu
+
+    menu "HAL Settings"
+        config LV_DISP_DEF_REFR_PERIOD
+            int "Default display refresh period (ms)."
+            default 30
+            help
+                Can be changed in the display driver (`lv_disp_drv_t`).
+
+        config LV_INDEV_DEF_READ_PERIOD
+            int "Input device read period [ms]."
+            default 30
+
+        config LV_TICK_CUSTOM
+            bool "Use a custom tick source"
+
+        config LV_TICK_CUSTOM_INCLUDE
+            string "Header for the system time function"
+            default "Arduino.h"
+            depends on LV_TICK_CUSTOM
+
+        config LV_DPI_DEF
+            int "Default Dots Per Inch (in px)."
+            default 130
+            help
+                Used to initialize default sizes such as widgets sized, style paddings.
+                (Not so important, you can adjust it to modify default sizes and spaces)
+    endmenu
+
+    menu "Feature configuration"
+
+        menu "Drawing"
+            config LV_DRAW_COMPLEX
+                bool "Enable complex draw engine"
+                default y
+                help
+                    Required to draw shadow, gradient, rounded corners, circles, arc, skew lines,
+                    image transformations or any masks.
+
+            config LV_SHADOW_CACHE_SIZE
+                int "Allow buffering some shadow calculation"
+                depends on LV_DRAW_COMPLEX
+                default 0
+                help
+                    LV_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
+                    shadow size is `shadow_width + radius`.
+                    Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
+
+            config LV_CIRCLE_CACHE_SIZE
+                int "Set number of maximally cached circle data"
+                depends on LV_DRAW_COMPLEX
+                default 4
+                help
+                    The circumference of 1/4 circle are saved for anti-aliasing
+                    radius * 4 bytes are used per circle (the most often used
+                    radiuses are saved).
+                    Set to 0 to disable caching.
+
+            config LV_IMG_CACHE_DEF_SIZE
+                int "Default image cache size. 0 to disable caching."
+                default 0
+                help
+                    If only the built-in image formats are used there is no real advantage of caching.
+                    (I.e. no new image decoder is added).
+
+                    With complex image decoders (e.g. PNG or JPG) caching can
+                    save the continuous open/decode of images.
+                    However the opened images might consume additional RAM.
+
+            config LV_DISP_ROT_MAX_BUF
+                int "Maximum buffer size to allocate for rotation"
+                default 10240
+                help
+                    Only used if software rotation is enabled in the display driver.
+        endmenu
+
+        menu "GPU"
+            config LV_USE_EXTERNAL_RENDERER
+                bool
+
+            config LV_USE_GPU_STM32_DMA2D
+                bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
+            config LV_GPU_DMA2D_CMSIS_INCLUDE
+                string "include path of CMSIS header of target processor"
+                depends on LV_USE_GPU_STM32_DMA2D
+                default ""
+                help
+                    Must be defined to include path of CMSIS header of target processor
+                    e.g. "stm32f769xx.h" or "stm32f429xx.h"
+
+            config LV_USE_GPU_NXP_PXP
+                bool "Use NXP's PXP GPU iMX RTxxx platforms."
+            config LV_USE_GPU_NXP_PXP_AUTO_INIT
+                bool "Call lv_gpu_nxp_pxp_init() automatically or manually."
+                depends on LV_USE_GPU_NXP_PXP
+                help
+                    1: Add default bare metal and FreeRTOS interrupt handling
+                    routines for PXP (lv_gpu_nxp_pxp_osa.c) and call
+                    lv_gpu_nxp_pxp_init() automatically during lv_init().
+                    Note that symbol SDK_OS_FREE_RTOS has to be defined in order
+                    to use FreeRTOS OSA, otherwise bare-metal implementation is
+                    selected.
+                    0: lv_gpu_nxp_pxp_init() has to be called manually before
+                    lv_init().
+
+            config LV_USE_GPU_NXP_VG_LITE
+                bool "Use NXP's VG-Lite GPU iMX RTxxx platforms."
+
+            config LV_USE_GPU_SDL
+                bool "Use SDL renderer API"
+                select LV_USE_EXTERNAL_RENDERER
+                default n
+            config LV_GPU_SDL_INCLUDE_PATH
+                string "include path of SDL header"
+                depends on LV_USE_GPU_SDL
+                default "SDL2/SDL.h"
+        endmenu
+
+        menu "Logging"
+            config LV_USE_LOG
+                bool "Enable the log module"
+
+            choice
+                bool "Default log verbosity" if LV_USE_LOG
+                default LV_LOG_LEVEL_WARN
+                help
+                    Specify how important log should be added.
+
+                config LV_LOG_LEVEL_TRACE
+                    bool "A lot of logs to give detailed information"
+                config LV_LOG_LEVEL_INFO
+                    bool "Log important events"
+                config LV_LOG_LEVEL_WARN
+                    bool "Log if something unwanted happened but didn't cause a problem"
+                config LV_LOG_LEVEL_ERROR
+                    bool "Only critical issues, when the system may fail"
+                config LV_LOG_LEVEL_USER
+                    bool "Only logs added by the user"
+                config LV_LOG_LEVEL_NONE
+                    bool "Do not log anything"
+            endchoice
+
+            config LV_LOG_LEVEL
+                int
+                default 0 if LV_LOG_LEVEL_TRACE
+                default 1 if LV_LOG_LEVEL_INFO
+                default 2 if LV_LOG_LEVEL_WARN
+                default 3 if LV_LOG_LEVEL_ERROR
+                default 4 if LV_LOG_LEVEL_USER
+                default 5 if LV_LOG_LEVEL_NONE
+
+            config LV_LOG_PRINTF
+                bool "Print the log with 'printf'" if LV_USE_LOG
+                help
+                    Use printf for log output.
+                    If not set the user needs to register a callback with `lv_log_register_print_cb`.
+
+            config LV_LOG_TRACE_MEM
+                bool "Enable/Disable LV_LOG_TRACE in mem module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_TIMER
+                bool "Enable/Disable LV_LOG_TRACE in timer module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_INDEV
+                bool "Enable/Disable LV_LOG_TRACE in indev module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_DISP_REFR
+                bool "Enable/Disable LV_LOG_TRACE in disp refr module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_EVENT
+                bool "Enable/Disable LV_LOG_TRACE in event module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_OBJ_CREATE
+                bool "Enable/Disable LV_LOG_TRACE in obj create module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_LAYOUT
+                bool "Enable/Disable LV_LOG_TRACE in layout module"
+                default y
+                depends on LV_USE_LOG
+
+            config LV_LOG_TRACE_ANIM
+                bool "Enable/Disable LV_LOG_TRACE in anim module"
+                default y
+                depends on LV_USE_LOG
+        endmenu
+
+        menu "Asserts"
+            config LV_USE_ASSERT_NULL
+                bool "Check if the parameter is NULL. (Very fast, recommended)"
+                default y if !LV_CONF_MINIMAL
+
+            config LV_USE_ASSERT_MALLOC
+                bool "Checks if the memory is successfully allocated or no. (Very fast, recommended)"
+                default y if !LV_CONF_MINIMAL
+
+            config LV_USE_ASSERT_STYLE
+                bool "Check if the styles are properly initialized. (Very fast, recommended)"
+
+            config LV_USE_ASSERT_MEM_INTEGRITY
+                bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
+
+            config LV_USE_ASSERT_OBJ
+                bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)."
+
+            config LV_ASSERT_HANDLER_INCLUDE
+                string "Header to include for the custom assert function"
+                default "assert.h"
+        endmenu
+
+        menu "Others"
+            config LV_USE_PERF_MONITOR
+                bool "Show CPU usage and FPS count in the right bottom corner."
+
+            config LV_USE_MEM_MONITOR
+                bool "Show the used memory and the memory fragmentation in the left bottom corner."
+                depends on !LV_MEM_CUSTOM
+
+            config LV_USE_REFR_DEBUG
+                bool "Draw random colored rectangles over the redrawn areas."
+
+            config LV_SPRINTF_CUSTOM
+                bool "Change the built-in (v)snprintf functions"
+
+            config LV_SPRINTF_INCLUDE
+                string "Header to include for the custom sprintf function"
+                depends on LV_SPRINTF_CUSTOM
+                default "stdio.h"
+
+            config LV_SPRINTF_USE_FLOAT
+                bool "Enable float in built-in (v)snprintf functions"
+                depends on !LV_SPRINTF_CUSTOM
+
+            config LV_USE_USER_DATA
+                bool "Add a 'user_data' to drivers and objects."
+                default y
+
+            config LV_ENABLE_GC
+                bool "Enable garbage collector"
+
+            config LV_GC_INCLUDE
+                string "Header to include for the garbage collector related things"
+                depends on LV_ENABLE_GC
+                default "gc.h"
+        endmenu
+
+        menu "Compiler settings"
+            config LV_BIG_ENDIAN_SYSTEM
+                bool "For big endian systems set to 1"
+
+            config LV_ATTRIBUTE_MEM_ALIGN_SIZE
+                int "Required alignment size for buffers"
+                default 1
+
+            config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+                bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
+                help
+                    Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
+
+            config LV_USE_LARGE_COORD
+                bool "Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t"
+        endmenu
+    endmenu
+
+    menu "Font usage"
+        menu "Enable built-in fonts"
+            config LV_FONT_MONTSERRAT_8
+                bool "Enable Montserrat 8"
+            config LV_FONT_MONTSERRAT_10
+                bool "Enable Montserrat 10"
+            config LV_FONT_MONTSERRAT_12
+                bool "Enable Montserrat 12"
+            config LV_FONT_MONTSERRAT_14
+                bool "Enable Montserrat 14"
+                default y if !LV_CONF_MINIMAL
+            config LV_FONT_MONTSERRAT_16
+                bool "Enable Montserrat 16"
+            config LV_FONT_MONTSERRAT_18
+                bool "Enable Montserrat 18"
+            config LV_FONT_MONTSERRAT_20
+                bool "Enable Montserrat 20"
+            config LV_FONT_MONTSERRAT_22
+                bool "Enable Montserrat 22"
+            config LV_FONT_MONTSERRAT_24
+                bool "Enable Montserrat 24"
+            config LV_FONT_MONTSERRAT_26
+                bool "Enable Montserrat 26"
+            config LV_FONT_MONTSERRAT_28
+                bool "Enable Montserrat 28"
+            config LV_FONT_MONTSERRAT_30
+                bool "Enable Montserrat 30"
+            config LV_FONT_MONTSERRAT_32
+                bool "Enable Montserrat 32"
+            config LV_FONT_MONTSERRAT_34
+                bool "Enable Montserrat 34"
+            config LV_FONT_MONTSERRAT_36
+                bool "Enable Montserrat 36"
+            config LV_FONT_MONTSERRAT_38
+                bool "Enable Montserrat 38"
+            config LV_FONT_MONTSERRAT_40
+                bool "Enable Montserrat 40"
+            config LV_FONT_MONTSERRAT_42
+                bool "Enable Montserrat 42"
+            config LV_FONT_MONTSERRAT_44
+                bool "Enable Montserrat 44"
+            config LV_FONT_MONTSERRAT_46
+                bool "Enable Montserrat 46"
+            config LV_FONT_MONTSERRAT_48
+                bool "Enable Montserrat 48"
+
+            config LV_FONT_MONTSERRAT_12_SUBPX
+                bool "Enable Montserrat 12 sub-pixel"
+            config LV_FONT_MONTSERRAT_28_COMPRESSED
+                bool "Enable Montserrat 28 compressed"
+            config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+                bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
+            config LV_FONT_SIMSUN_16_CJK
+                bool "Enable Simsun 16 CJK"
+
+            config LV_FONT_UNSCII_8
+                bool "Enable UNSCII 8 (Perfect monospace font)"
+                default y if LV_CONF_MINIMAL
+            config LV_FONT_UNSCII_16
+                bool "Enable UNSCII 16 (Perfect monospace font)"
+
+            config LV_FONT_CUSTOM
+                bool "Enable the custom font"
+            config LV_FONT_CUSTOM_DECLARE
+                string "Header to include for the custom font"
+                depends on LV_FONT_CUSTOM
+        endmenu
+
+        choice LV_FONT_DEFAULT
+            prompt "Select theme default title font"
+            default LV_FONT_DEFAULT_MONTSERRAT_14 if !LV_CONF_MINIMAL
+            default LV_FONT_DEFAULT_UNSCII_8 if LV_CONF_MINIMAL
+            help
+                Select theme default title font
+
+            config LV_FONT_DEFAULT_MONTSERRAT_8
+                bool "Montserrat 8"
+                select LV_FONT_MONTSERRAT_8
+            config LV_FONT_DEFAULT_MONTSERRAT_12
+                bool "Montserrat 12"
+                select LV_FONT_MONTSERRAT_12
+            config LV_FONT_DEFAULT_MONTSERRAT_14
+                bool "Montserrat 14"
+                select LV_FONT_MONTSERRAT_14
+            config LV_FONT_DEFAULT_MONTSERRAT_16
+                bool "Montserrat 16"
+                select LV_FONT_MONTSERRAT_16
+            config LV_FONT_DEFAULT_MONTSERRAT_18
+                bool "Montserrat 18"
+                select LV_FONT_MONTSERRAT_18
+            config LV_FONT_DEFAULT_MONTSERRAT_20
+                bool "Montserrat 20"
+                select LV_FONT_MONTSERRAT_20
+            config LV_FONT_DEFAULT_MONTSERRAT_22
+                bool "Montserrat 22"
+                select LV_FONT_MONTSERRAT_22
+            config LV_FONT_DEFAULT_MONTSERRAT_24
+                bool "Montserrat 24"
+                select LV_FONT_MONTSERRAT_24
+            config LV_FONT_DEFAULT_MONTSERRAT_26
+                bool "Montserrat 26"
+                select LV_FONT_MONTSERRAT_26
+            config LV_FONT_DEFAULT_MONTSERRAT_28
+                bool "Montserrat 28"
+                select LV_FONT_MONTSERRAT_28
+            config LV_FONT_DEFAULT_MONTSERRAT_30
+                bool "Montserrat 30"
+                select LV_FONT_MONTSERRAT_30
+            config LV_FONT_DEFAULT_MONTSERRAT_32
+                bool "Montserrat 32"
+                select LV_FONT_MONTSERRAT_32
+            config LV_FONT_DEFAULT_MONTSERRAT_34
+                bool "Montserrat 34"
+                select LV_FONT_MONTSERRAT_34
+            config LV_FONT_DEFAULT_MONTSERRAT_36
+                bool "Montserrat 36"
+                select LV_FONT_MONTSERRAT_36
+            config LV_FONT_DEFAULT_MONTSERRAT_38
+                bool "Montserrat 38"
+                select LV_FONT_MONTSERRAT_38
+            config LV_FONT_DEFAULT_MONTSERRAT_40
+                bool "Montserrat 40"
+                select LV_FONT_MONTSERRAT_40
+            config LV_FONT_DEFAULT_MONTSERRAT_42
+                bool "Montserrat 42"
+                select LV_FONT_MONTSERRAT_42
+            config LV_FONT_DEFAULT_MONTSERRAT_44
+                bool "Montserrat 44"
+                select LV_FONT_MONTSERRAT_44
+            config LV_FONT_DEFAULT_MONTSERRAT_46
+                bool "Montserrat 46"
+                select LV_FONT_MONTSERRAT_46
+            config LV_FONT_DEFAULT_MONTSERRAT_48
+                bool "Montserrat 48"
+                select LV_FONT_MONTSERRAT_48
+            config LV_FONT_DEFAULT_MONTSERRAT_12_SUBPX
+                bool "Montserrat 12 sub-pixel"
+                select LV_FONT_MONTSERRAT_12_SUBPX
+            config LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
+                bool "Montserrat 28 compressed"
+                select LV_FONT_MONTSERRAT_28_COMPRESSED
+            config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
+                bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+                select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+            config LV_FONT_DEFAULT_SIMSUN_16_CJK
+                bool "Simsun 16 CJK"
+                select LV_FONT_SIMSUN_16_CJK
+            config LV_FONT_DEFAULT_UNSCII_8
+                bool "UNSCII 8 (Perfect monospace font)"
+                select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_UNSCII_16
+                bool "UNSCII 16 (Perfect monospace font)"
+                select LV_FONT_UNSCII_16
+        endchoice
+
+        config LV_FONT_FMT_TXT_LARGE
+            bool "Enable it if you have fonts with a lot of characters."
+            help
+                The limit depends on the font size, font face and bpp
+                but with > 10,000 characters if you see issues probably you
+                need to enable it.
+
+        config LV_USE_FONT_COMPRESSED
+            bool "Sets support for compressed fonts."
+
+        config LV_USE_FONT_SUBPX
+            bool "Enable subpixel rendering."
+
+        config LV_FONT_SUBPX_BGR
+            bool "Use BGR instead RGB for sub-pixel rendering."
+            depends on LV_USE_FONT_SUBPX
+            help
+                Set the pixel order of the display.
+                Important only if "subpx fonts" are used.
+                With "normal" font it doesn't matter.
+    endmenu
+
+    menu "Text Settings"
+        choice LV_TXT_ENC
+            prompt "Select a character encoding for strings"
+            help
+                Select a character encoding for strings. Your IDE or editor should have the same character encoding.
+            default LV_TXT_ENC_UTF8 if !LV_CONF_MINIMAL
+            default LV_TXT_ENC_ASCII if LV_CONF_MINIMAL
+
+            config LV_TXT_ENC_UTF8
+                bool "UTF8"
+            config LV_TXT_ENC_ASCII
+                bool "ASCII"
+        endchoice
+
+        config LV_TXT_BREAK_CHARS
+            string "Can break (wrap) texts on these chars"
+            default " ,.;:-_"
+
+        config LV_TXT_LINE_BREAK_LONG_LEN
+            int "Line break long length"
+            default 0
+            help
+                If a word is at least this long, will break wherever 'prettiest'.
+                To disable, set to a value <= 0.
+
+        config LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+            int "Min num chars before break"
+            default 3
+            depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
+            help
+                Minimum number of characters in a long word to put on a line before a break.
+
+        config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+            int "Min num chars after break"
+            default 3
+            depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
+            help
+                Minimum number of characters in a long word to put on a line after a break.
+
+        config LV_TXT_COLOR_CMD
+            string "The control character to use for signalling text recoloring"
+            default "#"
+
+        config LV_USE_BIDI
+            bool "Support bidirectional texts"
+            help
+                Allows mixing Left-to-Right and Right-to-Left texts.
+                The direction will be processed according to the Unicode Bidirectional Algorithm:
+                https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
+
+        choice
+            prompt "Set the default BIDI direction"
+            default LV_BIDI_DIR_AUTO
+            depends on LV_USE_BIDI
+
+            config LV_BIDI_DIR_LTR
+                bool "Left-to-Right"
+            config LV_BIDI_DIR_RTL
+                bool "Right-to-Left"
+            config LV_BIDI_DIR_AUTO
+                bool "Detect texts base direction"
+        endchoice
+
+        config LV_USE_ARABIC_PERSIAN_CHARS
+            bool "Enable Arabic/Persian processing"
+            help
+                In these languages characters should be replaced with
+                an other form based on their position in the text.
+    endmenu
+
+    menu "Widget usage"
+        config LV_USE_ARC
+            bool "Arc."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_BAR
+            bool "Bar."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_BTN
+            bool "Button."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_BTNMATRIX
+            bool "Button matrix."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_CANVAS
+            bool "Canvas. Dependencies: lv_img."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_CHECKBOX
+            bool "Check Box"
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_DROPDOWN
+            bool "Drop down list. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_IMG
+            bool "Image. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_LABEL
+            bool "Label."
+            default y if !LV_CONF_MINIMAL
+        config LV_LABEL_TEXT_SELECTION
+            bool "Enable selecting text of the label."
+            depends on LV_USE_LABEL
+            default y
+        config LV_LABEL_LONG_TXT_HINT
+            bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
+            depends on LV_USE_LABEL
+            default y
+        config LV_USE_LINE
+            bool "Line."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_ROLLER
+            bool "Roller. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_ROLLER_INF_PAGES
+            int "Number of extra 'pages' when the controller is infinite."
+            default 7
+            depends on LV_USE_ROLLER
+        config LV_USE_SLIDER
+            bool "Slider. Requires: lv_bar."
+            select LV_USE_BAR
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_SWITCH
+            bool "Switch."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_TEXTAREA
+            bool "Text area. Requires: lv_label."
+            select LV_USE_LABEL
+            default y if !LV_CONF_MINIMAL
+        config LV_TEXTAREA_DEF_PWD_SHOW_TIME
+            int "Text area def. pwd show time [ms]."
+            default 1500
+            depends on LV_USE_TEXTAREA
+        config LV_USE_TABLE
+            bool "Table."
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "Extra Widgets"
+        config LV_USE_ANIMIMG
+            bool "Anim image."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_CALENDAR
+            bool "Calendar."
+            default y if !LV_CONF_MINIMAL
+        config LV_CALENDAR_WEEK_STARTS_MONDAY
+            bool "Calendar week starts monday."
+            depends on LV_USE_CALENDAR
+        config LV_USE_CALENDAR_HEADER_ARROW
+            bool "Use calendar header arrow"
+            depends on LV_USE_CALENDAR
+            default y
+        config LV_USE_CALENDAR_HEADER_DROPDOWN
+            bool "Use calendar header dropdown"
+            depends on LV_USE_CALENDAR
+            default y
+        config LV_USE_CHART
+            bool "Chart."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_COLORWHEEL
+            bool "Colorwheel."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_IMGBTN
+            bool "Imgbtn."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_KEYBOARD
+            bool "Keyboard."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_LED
+            bool "LED."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_LIST
+            bool "List."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_METER
+            bool "Meter."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_MSGBOX
+            bool "Msgbox."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_SPINBOX
+            bool "Spinbox."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_SPINNER
+            bool "Spinner."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_TABVIEW
+            bool "Tabview."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_TILEVIEW
+            bool "Tileview"
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_WIN
+            bool "Win"
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_SPAN
+            bool "span"
+            default y if !LV_CONF_MINIMAL
+        config LV_SPAN_SNIPPET_STACK_SIZE
+            int "Maximum number of span descriptor"
+            default 64
+            depends on LV_USE_SPAN
+    endmenu
+
+    menu "Themes"
+        config LV_USE_THEME_DEFAULT
+            bool "A simple, impressive and very complete theme"
+            default y if !LV_CONF_MINIMAL
+        config LV_THEME_DEFAULT_DARK
+            bool "Yes to set dark mode, No to set light mode"
+            depends on LV_USE_THEME_DEFAULT
+        config LV_THEME_DEFAULT_GROW
+            bool "Enable grow on press"
+            default y
+            depends on LV_USE_THEME_DEFAULT
+        config LV_THEME_DEFAULT_TRANSITION_TIME
+            int "Default transition time in [ms]"
+            default 80
+            depends on LV_USE_THEME_DEFAULT
+        config LV_USE_THEME_BASIC
+            bool "A very simple theme that is a good starting point for a custom theme"
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "Layouts"
+        config LV_USE_FLEX
+            bool "A layout similar to Flexbox in CSS."
+            default y if !LV_CONF_MINIMAL
+        config LV_USE_GRID
+            bool "A layout similar to Grid in CSS."
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "3rd Party Libraries"
+        config LV_USE_FS_STDIO
+            int "File system on top of stdio API"
+            default 0
+        config LV_FS_STDIO_PATH
+            string "Set the working directory"
+            depends on LV_USE_FS_STDIO
+
+        config LV_USE_FS_POSIX
+            int "File system on top of posix API"
+            default 0
+        config LV_FS_POSIX_PATH
+            string "Set the working directory"
+            depends on LV_USE_FS_POSIX
+
+        config LV_USE_FS_WIN32
+            int "File system on top of Win32 API"
+            default 0
+        config LV_FS_WIN32_PATH
+            string "Set the working directory"
+            depends on LV_USE_FS_WIN32
+
+        config LV_USE_FS_FATFS
+            int "File system on top of FatFS"
+            default 0
+
+        config LV_USE_PNG
+            bool "PNG decoder library"
+
+        config LV_USE_BMP
+            bool "BMP decoder library"
+
+        config LV_USE_SJPG
+            bool "JPG + split JPG decoder library"
+
+        config LV_USE_GIF
+            bool "GIF decoder library"
+
+        config LV_USE_QRCODE
+            bool "QR code library"
+
+        config LV_USE_FREETYPE
+            bool "FreeType library"
+        config LV_FREETYPE_CACHE_SIZE
+            int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
+            depends on LV_USE_FREETYPE
+            default 16384
+
+        config LV_USE_RLOTTIE
+            bool "Lottie library"
+    endmenu
+
+    menu "Others"
+        config LV_USE_SNAPSHOT
+            bool "Enable API to take snapshot"
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "Examples"
+        config LV_BUILD_EXAMPLES
+            bool "Enable the examples to be built"
+            default y if !LV_CONF_MINIMAL
+    endmenu
+
+    config LV_BUILD_EXAMPLES
+        bool "Enable the examples to be built with the library."
+        default y
+
+endmenu
