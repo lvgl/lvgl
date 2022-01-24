@@ -1,2 +1,2 @@
-build:
-  cmake: .
+# https://docs.zephyrproject.org/latest/guides/modules.html
+name: lvgl
