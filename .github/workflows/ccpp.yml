@@ -75,7 +75,8 @@ jobs:
           # publicly in your project's package repository, so it is vital that
           # no secrets are present in the container state or logs.
           install: |
-            ./scripts/install-prerequisites.sh
+            apt-get update -y
+            apt-get install -y gcc python3 libpng-dev ruby-full gcovr cmake
 
           # Produce a binary artifact and place it in the mounted volume
           run: |
