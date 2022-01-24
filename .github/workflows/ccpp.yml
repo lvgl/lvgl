@@ -27,9 +27,9 @@ jobs:
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
 
-  test:
+  test-native:
     runs-on: ubuntu-latest
-    name: Executable Tests
+    name: amd64 Executable Tests
     steps:
     - uses: actions/checkout@v2
     - uses: ammaraskar/gcc-problem-matcher@master
@@ -43,3 +43,40 @@ jobs:
       with:
         fail_ci_if_error: true
         verbose: true
+  test-cross:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: ${{ matrix.arch }} Executable Tests
+
+    # Run steps on a matrix of 3 arch/distro combinations
+    strategy:
+      matrix:
+        arch: [ 'aarch64', 'armv6', 'armv7' ]
+
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run tests
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: bullseye
+
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+
+          # The shell to run commands with in the container
+          shell: /bin/bash
+
+          # Install some dependencies in the container. This speeds up builds if
+          # you are also using githubToken. Any dependencies installed here will
+          # be part of the container image that gets cached, so subsequent
+          # builds don't have to re-install them. The image layer is cached
+          # publicly in your project's package repository, so it is vital that
+          # no secrets are present in the container state or logs.
+          install: |
+            ./scripts/install-prerequisites.sh
+
+          # Produce a binary artifact and place it in the mounted volume
+          run: |
+            python tests/main.py --report test
