@@ -13,6 +13,8 @@
 
 static lv_res_t alloc_str_src(lv_img_src_t * src, const char * str);
 
+static const char * find_ext(const char * src);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -105,7 +107,7 @@ void lv_img_src_set_file(lv_img_src_t * obj, const char * file_path)
     if(alloc_str_src(obj, file_path) == LV_RES_INV)
         return;
 
-    obj->ext = strrchr(obj->uri, '.');
+    obj->ext = find_ext(obj->uri); /* stm32 does not have strrchr */
 }
 
 void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t len)
@@ -138,7 +140,7 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
     }
     dest->type = src->type;
     if(src->type == LV_IMG_SRC_FILE) {
-        dest->ext = strrchr(dest->uri, '.');
+        dest->ext = find_ext(dest->uri); /* stm32 does not have strrchr */
     }
 }
 
@@ -155,4 +157,11 @@ static lv_res_t alloc_str_src(lv_img_src_t * src, const char * str)
 
     lv_memcpy((void *)src->uri, str, src->uri_len + 1);
     return LV_RES_OK;
+}
+
+static const char * find_ext(const char * src)
+{
+    const char * r = src ? src + strlen(src) - 1 : NULL;
+    while(r && r != src && *r != '.') --r;
+    return r;
 }

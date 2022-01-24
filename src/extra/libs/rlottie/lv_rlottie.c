@@ -98,7 +98,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     /* We want to keep the decoder context initialized here, so allocate and mark it*/
     LV_ZALLOC(rlottie->img_ext.dec_ctx, sizeof(rlottiedec_ctx_t));
     rlottie->img_ext.dec_ctx->auto_allocated = 0;
-    lv_img_set_src(obj, &rlottie->img_ext.src, 0);
+    lv_img_accept_src(obj, &rlottie->img_ext.src, 0);
 
     if(rlottie->img_ext.dec_ctx == NULL || ((rlottiedec_ctx_t *)rlottie->img_ext.dec_ctx)->cache == NULL) {
         LV_LOG_WARN("The animation can't be opened");

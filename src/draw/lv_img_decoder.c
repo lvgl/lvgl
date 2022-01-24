@@ -175,3 +175,9 @@ bool lv_img_decoder_has_size_hint(const lv_img_dec_dsc_in_t * dsc)
     return !((dsc->size_hint.x == LV_SIZE_CONTENT && dsc->size_hint.y == LV_SIZE_CONTENT)
              || dsc->size_hint.x == 0 || dsc->size_hint.y == 0);
 }
+
+bool _lv_is_raw_decoder(lv_img_decoder_t * decoder)
+{
+    lv_img_decoder_t * d = _lv_ll_get_tail(&LV_GC_ROOT(_lv_img_decoder_ll));
+    return d == decoder;
+}

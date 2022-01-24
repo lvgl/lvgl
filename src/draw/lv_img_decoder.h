@@ -25,9 +25,17 @@ extern "C" {
  *      DEFINES
  *********************/
 #ifndef LV_IMG_DECLARE
-/* Warning: It's unlikely you want to use this macro */
+
+#if __STDC_VERSION__ >= 201112L
 #define LV_IMG_DECLARE(var_name) \
-    LV_IMG_DECLARE_is_gone var_name; /* Use LV_RAW_IMG_DECLARE instead for RAW images, or
+    _Pragma("message \"LV_IMG_DECLARE is replaced by LV_RAW_IMG_DECLARE (only for raw images)\"") \
+    extern const lv_img_dsc_t var_name;
+#else
+#define LV_IMG_DECLARE(var_name) \
+    extern const lv_img_dsc_t var_name;
+#endif
+
+/* Use LV_RAW_IMG_DECLARE instead for RAW images, or
 directly set the source to the image's buffer if encoded */
 #define LV_RAW_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 #endif
@@ -288,6 +296,11 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @param dsc       Pointer to  decoder specific construction information
  */
 bool lv_img_decoder_has_size_hint(const lv_img_dec_dsc_in_t * dsc);
+
+/**
+ * Check if it's the raw decoder
+ */
+bool _lv_is_raw_decoder(lv_img_decoder_t * decoder);
 
 /**********************
  *      MACROS

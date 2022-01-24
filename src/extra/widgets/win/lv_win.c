@@ -83,7 +83,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const lv_img_src_t * icon, lv_coord_t 
     lv_obj_set_size(btn, btn_w, LV_PCT(100));
 
     lv_obj_t * img = lv_img_create(btn);
-    lv_img_set_src(img, icon, 0);
+    lv_img_accept_src(img, icon, 0);
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
 
     return btn;

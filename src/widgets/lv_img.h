@@ -141,7 +141,7 @@ lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, c
  *             You can create a lv_img_src_t * from a file, symbol or plain data via lv_img_src_set_file/symbol/data
  *
  */
-void lv_img_parse_src(lv_obj_t * obj, const void * src);
+void lv_img_set_src(lv_obj_t * obj, const void * src);
 
 
 /** Set the source of this image to a lv_img_src_t and check if it's usable.
@@ -158,7 +158,7 @@ void lv_img_parse_src(lv_obj_t * obj, const void * src);
  *                      You might only need to set this if you are preparing your screen at once on start
  * @return LV_RES_OK    If the image was correctly parsed
  */
-lv_res_t lv_img_set_src(lv_obj_t * obj, const lv_img_src_t * src, int skip_cache);
+lv_res_t lv_img_accept_src(lv_obj_t * obj, const lv_img_src_t * src, int skip_cache);
 
 
 /** Set the source of this image to a file.

@@ -6,7 +6,7 @@
  */
 void lv_example_png_1(void)
 {
-    LV_RAW_IMG_DECLARE(img_wink_png); /* TODO: Replace with plain buffer here*/
+    LV_IMG_DECLARE(img_wink_png); /* TODO: Replace with plain buffer here*/
     lv_obj_t * img;
 
     img = lv_img_create(lv_scr_act());

@@ -152,7 +152,7 @@ void lv_img_set_src_symbol(lv_obj_t * obj, const char * symbol)
     get_metadata(img, 0);
 }
 
-lv_res_t lv_img_set_src(lv_obj_t * obj, const lv_img_src_t * uri, int skip_cache)
+lv_res_t lv_img_accept_src(lv_obj_t * obj, const lv_img_src_t * uri, int skip_cache)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -164,19 +164,31 @@ lv_res_t lv_img_set_src(lv_obj_t * obj, const lv_img_src_t * uri, int skip_cache
 }
 
 
-void lv_img_parse_src(lv_obj_t * obj, const void * src)
+void lv_img_set_src(lv_obj_t * obj, const void * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
 
     lv_obj_invalidate(obj);
 
+    LV_LOG_WARN("Deprecated usage of lv_img_set_src. Please use lv_img_accept_src or lv_img_set_src_file/data/symbol instead");
     /* Deprecated API with numerous limitations:
        1. Force to add a LVGL image header on raw encoded image data while there's already such header in the encoded data
        2. Prevent using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
        3. Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
     */
     if(lv_img_src_parse(&img->src, src) == LV_RES_OK) {
+        if(img->src.type == LV_IMG_SRC_VARIABLE) {
+            /* Workaround decoder's expecting encoded data here. */
+            lv_img_src_t raw_src;
+            lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)src;
+            lv_img_src_set_data(&raw_src, (const uint8_t *)img_dsc->data, img_dsc->data_size);
+            lv_img_decoder_t * dec = lv_img_decoder_accept(&raw_src, NULL);
+            if(dec && !_lv_is_raw_decoder(dec)) {
+                /* Replace the given source with the actual decoded data */
+                lv_img_src_set_data(&img->src, (const uint8_t *)img_dsc->data, img_dsc->data_size);
+            }
+        }
         get_metadata(img, 1);
     }
 }
