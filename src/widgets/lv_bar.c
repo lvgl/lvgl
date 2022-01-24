@@ -107,6 +107,10 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
 
     lv_bar_t * bar = (lv_bar_t *)obj;
 
+    if(bar->mode != LV_BAR_MODE_RANGE) {
+        return;
+    }
+
     value = LV_CLAMP(bar->min_value, value, bar->max_value);
     value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater than the right value*/
 
@@ -211,7 +215,11 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     bar->max_value = 100;
     bar->start_value = 0;
     bar->cur_value = 0;
-    bar->mode         = LV_BAR_MODE_NORMAL;
+    bar->indic_area.x1 = 0;
+    bar->indic_area.x2 = 0;
+    bar->indic_area.y1 = 0;
+    bar->indic_area.y2 = 0;
+    bar->mode = LV_BAR_MODE_NORMAL;
 
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);

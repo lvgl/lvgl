@@ -3,6 +3,7 @@
 
 #include "unity/unity.h"
 
+#include "lv_test_helpers.h"
 #include "lv_test_indev.h"
 
 #define SWITCHES_CNT    10
@@ -67,7 +68,7 @@ void test_switch_should_not_leak_memory_after_deletion(void)
     lv_mem_monitor(&monitor);
     final_available_memory = monitor.free_size;
 
-    TEST_ASSERT_LESS_THAN(initial_available_memory, final_available_memory);
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, final_available_memory));
 }
 
 void test_switch_animation(void)

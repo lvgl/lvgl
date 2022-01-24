@@ -853,7 +853,7 @@ testable int calcSegmentBitLength(enum qrcodegen_Mode mode, size_t numChars) {
 		return -1;
 	}
 	assert(result >= 0);
-	if (result > (unsigned int)INT16_MAX)
+	if ((unsigned int)result > (unsigned int)INT16_MAX)
 		return -1;
 	return (int)result;
 }

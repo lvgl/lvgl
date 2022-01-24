@@ -45,14 +45,15 @@ typedef struct _lv_gradient_cache_t {
     uint32_t        filled : 1;   /**< Used to skip dithering in it if already done */
     lv_color_t   *  map;          /**< The computed gradient low bitdepth color map, points into the
                                    * cache's buffer, no free needed */
+    lv_coord_t      alloc_size;   /**< The map allocated size in colors */
     lv_coord_t      size;         /**< The computed gradient color map size, in colors */
 #if _DITHER_GRADIENT
     lv_color32_t  * hmap;         /**< If dithering, we need to store the current, high bitdepth gradient
                                    * map too, points to the cache's buffer, no free needed */
-    lv_coord_t      hmap_size;    /**< The array size in pixels */
 #if LV_DITHER_ERROR_DIFFUSION == 1
     lv_scolor24_t * error_acc;    /**< Error diffusion dithering algorithm requires storing the last error
                                    * drawn, points to the cache's buffer, no free needed  */
+    lv_coord_t      w;            /**< The error array width in pixels */
 #endif
 #endif
 } lv_gradient_cache_t;

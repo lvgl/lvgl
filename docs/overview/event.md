@@ -101,6 +101,9 @@ The following event codes exist:
 - `LV_EVENT_DRAW_PART_BEGIN` Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
 - `LV_EVENT_DRAW_PART_END`   Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
 
+In `LV_EVENT_DRAW_...` events it's not allowed to adjust the widgets' properties. E.g. you can not call `lv_obj_set_width()`.
+In other words only `get` functions can be called. 
+
 ### Other events
 - `LV_EVENT_DELETE`       Object is being deleted
 - `LV_EVENT_CHILD_CHANGED`    Child was removed/added

@@ -1,6 +1,8 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 
+#if LV_USE_SNAPSHOT
+
 #include "unity/unity.h"
 
 
@@ -33,5 +35,13 @@ void test_snapshot_should_not_leak_memory(void)
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
 }
 
+#else /*LV_USE_SNAPSHOT*/
+
+void test_snapshot_should_not_leak_memory(void)
+{
+
+}
+
+#endif
 
 #endif

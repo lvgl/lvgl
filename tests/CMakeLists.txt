@@ -177,9 +177,9 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_USE_SJPG=1
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
-  )
+)
   
-  set(LVGL_TEST_OPTIONS_TEST
+set(LVGL_TEST_OPTIONS_TEST_COMMON
     --coverage
     -DLV_COLOR_DEPTH=32
     -DLV_MEM_SIZE=2097152
@@ -214,6 +214,20 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_LABEL_TEXT_SELECTION=1
     -DLV_BUILD_EXAMPLES=1
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
+    -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
+)
+
+set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
+    ${LVGL_TEST_OPTIONS_TEST_COMMON}
+    -DLVGL_CI_USING_SYS_HEAP
+    -DLV_MEM_CUSTOM=1
+    -fsanitize=address
+)
+
+set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
+    ${LVGL_TEST_OPTIONS_TEST_COMMON}
+    -DLVGL_CI_USING_DEF_HEAP
+    -DLV_MEM_SIZE=2097152
 )
 
 if (OPTIONS_MINIMAL_MONOCHROME)
@@ -226,11 +240,14 @@ elseif (OPTIONS_16BIT_SWAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT_SWAP})
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
-elseif (OPTIONS_TEST)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST})
+elseif (OPTIONS_TEST_SYSHEAP)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    set (TEST_LIBS --coverage -fsanitize=address)
+elseif (OPTIONS_TEST_DEFHEAP)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     set (TEST_LIBS --coverage)
 else()
-    message(FATAL_ERROR "Must provide an options value.")
+    message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
 # Options lvgl and examples are compiled with.
