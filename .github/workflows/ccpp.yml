@@ -91,4 +91,4 @@ jobs:
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
           run: |
-            env ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
