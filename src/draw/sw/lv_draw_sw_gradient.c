@@ -82,7 +82,7 @@ static size_t get_cache_item_size(lv_grad_t * c)
 #if _DITHER_GRADIENT
     s += ALIGN(c->size * sizeof(lv_color32_t));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-    s += ALIGN(+ c->w * sizeof(lv_scolor24_t));
+    s += ALIGN(c->w * sizeof(lv_scolor24_t));
 #endif
 #endif
     return s;
