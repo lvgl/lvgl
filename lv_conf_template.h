@@ -118,21 +118,6 @@
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
     #define LV_CIRCLE_CACHE_SIZE 4
-
-    /*Allow dithering gradient (to achieve visual smooth color gradients on limited color depth display)
-    *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
-    *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-    #define LV_DITHER_GRADIENT 1
-
-    /*Add support for error diffusion dithering.
-    *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-    *The increase in memory consumption is (24 bits * object's width)*/
-    #define LV_DITHER_ERROR_DIFFUSION 1
-
-    /**Number of stops allowed per gradient. Increase this to allow more stops.
-    *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-    #define LV_GRADIENT_MAX_STOPS    2
-
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.
@@ -140,9 +125,32 @@
  *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE 0
+#define LV_IMG_CACHE_DEF_SIZE   0
 
-/*Maximum buffer size to allocate for rotation. Only used if software rotation is enabled in the display driver.*/
+/*Number of stops allowed per gradient. Increase this to allow more stops.
+ *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
+#define LV_GRADIENT_MAX_STOPS       2
+
+/*Default gradient buffer size.
+ *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+ *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+ *If the cache is too small the map will be allocated only while it's required for the drawing.
+ *0 mean no caching.*/
+#define LV_GRAD_CACHE_DEF_SIZE      0
+
+/*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
+ *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+ *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
+#define LV_DITHER_GRADIENT      0
+#if LV_DITHER_GRADIENT
+    /*Add support for error diffusion dithering.
+     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+     *The increase in memory consumption is (24 bits * object's width)*/
+    #define LV_DITHER_ERROR_DIFFUSION   0
+#endif
+
+/*Maximum buffer size to allocate for rotation.
+ *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
 /*-------------

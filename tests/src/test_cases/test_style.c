@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include <unistd.h>
 
 static void obj_set_height_helper(void * obj, int32_t height)
 {
@@ -30,6 +31,13 @@ void test_gradient_vertical_misalignment(void)
     lv_anim_set_repeat_count(&a, 100);
     lv_anim_set_values(&a, 0, 300);
     lv_anim_start(&a);
+
+    uint32_t i;
+    for(i = 0; i < 1000; i++) {
+        lv_timer_handler();
+        lv_tick_inc(100);
+        usleep(1000);
+    }
 }
 
 #endif

@@ -12,7 +12,7 @@ void lv_example_style_2(void)
 
     /*Make a gradient*/
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
-    static lv_gradient_t grad;
+    static lv_grad_dsc_t grad;
     grad.dir = LV_GRAD_DIR_VER;
     grad.stops_count = 2;
     grad.stops[0].color = lv_palette_lighten(LV_PALETTE_GREY, 1);
@@ -22,7 +22,7 @@ void lv_example_style_2(void)
     grad.stops[0].frac  = 128;
     grad.stops[1].frac  = 192;
 
-    lv_style_set_bg_gradient(&style, &grad);
+    lv_style_set_bg_grad(&style, &grad);
 
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_obj_create(lv_scr_act());
