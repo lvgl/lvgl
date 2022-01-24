@@ -8,6 +8,7 @@
  *********************/
 #include "lv_draw_sw_gradient.h"
 #include "../../misc/lv_gc.h"
+#include "../../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -19,7 +20,12 @@
     #define GRAD_CM(r,g,b) LV_COLOR_MAKE(r,g,b)
     #define GRAD_CONV(t, x) t = x
 #endif
+
+#if defined(LV_ARCH_64)
 #define ALIGN(X)    (((X) + 7) & ~7)
+#else
+#define ALIGN(X)    (((X) + 3) & ~3)
+#endif
 
 #define MAX_WIN_RES     1024 /**TODO: Find a way to get this information: max(horz_res, vert_res)*/
 
@@ -70,18 +76,16 @@ static uint32_t compute_key(const lv_gradient_t * g, lv_coord_t size, lv_coord_t
     return (v.value ^ size ^ (w >> 1)); /*Yes, this is correct, it's like a hash that changes if the width changes*/
 }
 
-
 static size_t get_cache_item_size(lv_gradient_cache_t * c)
 {
-    size_t s = sizeof(*c) + c->alloc_size * sizeof(lv_color_t)
+    size_t s = ALIGN(sizeof(*c)) + ALIGN(c->alloc_size * sizeof(lv_color_t));
 #if _DITHER_GRADIENT
-               + c->size * sizeof(lv_color32_t)
+               s += ALIGN(c->size * sizeof(lv_color32_t));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-               + c->w * sizeof(lv_scolor24_t)
+               s += ALIGN(+ c->w * sizeof(lv_scolor24_t));
 #endif
 #endif
-               ;
-    return ALIGN(s);
+    return s;
 }
 
 static lv_gradient_cache_t * next_in_cache(lv_gradient_cache_t * first)
@@ -151,6 +155,7 @@ static lv_res_t kill_oldest_item(lv_gradient_cache_t * c, void * ctx)
     }
     return LV_RES_INV;
 }
+
 static lv_res_t find_item(lv_gradient_cache_t * c, void * ctx)
 {
     uint32_t * k = (uint32_t *)ctx;
@@ -158,21 +163,20 @@ static lv_res_t find_item(lv_gradient_cache_t * c, void * ctx)
     return LV_RES_INV;
 }
 
-
 static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
 {
     lv_coord_t size = g->dir == LV_GRAD_DIR_HOR ? w : h;
     lv_coord_t map_size = LV_MAX(w, h); /* The map is being used horizontally (width) unless
                                            no dithering is selected where it's used vertically */
-    size_t req_size = sizeof(lv_gradient_cache_t) + map_size * sizeof(lv_color_t)
+
+    size_t req_size = ALIGN(sizeof(lv_gradient_cache_t)) + ALIGN(map_size * sizeof(lv_color_t));
 #if _DITHER_GRADIENT
-                      + size * sizeof(lv_color32_t)
+    req_size += ALIGN(size * sizeof(lv_color32_t));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-                      + w * sizeof(lv_scolor24_t)
+    req_size += ALIGN(w * sizeof(lv_scolor24_t));
 #endif
 #endif
-                      ;
-    req_size = ALIGN(req_size);
+
     size_t act_size = (size_t)(grad_cache_end - LV_GC_ROOT(_lv_grad_cache_mem));
     if(req_size + act_size > grad_cache_size) {
         /*Need to evict items from cache until we find enough space to allocate this one */
@@ -194,12 +198,12 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
     item->filled = 0;
     item->alloc_size = map_size;
     item->size = size;
-    item->map = (lv_color_t *)(grad_cache_end + sizeof(*item));
+    item->map = (lv_color_t *)(grad_cache_end + ALIGN(sizeof(*item)));
 #if _DITHER_GRADIENT
-    item->hmap = (lv_color32_t *)(grad_cache_end + sizeof(*item) + map_size * sizeof(lv_color_t));
+    item->hmap = (lv_color32_t *)(grad_cache_end + ALIGN(sizeof(*item)) + ALIGN(map_size * sizeof(lv_color_t)));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-    item->error_acc = (lv_scolor24_t *)(grad_cache_end + sizeof(*item) + size * sizeof(lv_grad_color_t) +
-                                        map_size * sizeof(lv_color_t));
+    item->error_acc = (lv_scolor24_t *)(grad_cache_end + ALIGN(sizeof(*item)) + ALIGN(size * sizeof(lv_grad_color_t)) +
+            ALIGN(map_size * sizeof(lv_color_t)));
     item->w = w;
 #endif
 #endif
@@ -211,7 +215,7 @@ static lv_gradient_cache_t * allocate_item(const lv_gradient_t * g, lv_coord_t w
 /**********************
  *     FUNCTIONS
  **********************/
-void lv_grad_free_cache()
+void lv_grad_free_cache(void)
 {
     lv_mem_free(LV_GC_ROOT(_lv_grad_cache_mem));
     LV_GC_ROOT(_lv_grad_cache_mem) = grad_cache_end = NULL;
@@ -267,7 +271,6 @@ lv_gradient_cache_t * lv_grad_get_from_cache(const lv_gradient_t * g, lv_coord_t
     return item;
 }
 
-
 void lv_grad_pop_from_cache(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
 {
     lv_coord_t size = g->dir == LV_GRAD_DIR_HOR ? w : h;
@@ -277,8 +280,6 @@ void lv_grad_pop_from_cache(const lv_gradient_t * g, lv_coord_t w, lv_coord_t h)
         free_item(item);
     }
 }
-
-
 
 LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_grad_get(const lv_gradient_t * dsc, lv_coord_t range, lv_coord_t frac)
 {
