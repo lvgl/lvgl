@@ -860,6 +860,7 @@ static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * 
 
 static void deinit_fake_disp(lv_obj_t * canvas, lv_disp_t * disp)
 {
+    LV_UNUSED(canvas);
     lv_draw_sw_deinit_ctx(disp->driver, disp->driver->draw_ctx);
     lv_mem_free(disp->driver->draw_ctx);
 }
