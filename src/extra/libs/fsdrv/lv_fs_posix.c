@@ -8,7 +8,8 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_USE_FS_POSIX != '\0'
+
+#if LV_USE_FS_POSIX
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -22,6 +23,10 @@
 /*********************
  *      DEFINES
  *********************/
+
+#if LV_FS_POSIX_LETTER == '\0'
+    #error "LV_FS_POSIX_LETTER must be an upper case ASCII letter"
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -66,7 +71,9 @@ void lv_fs_posix_init(void)
     lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
-    fs_drv.letter = LV_USE_FS_POSIX;
+    fs_drv.letter = LV_FS_POSIX_LETTER;
+    fs_drv.cache_size = LV_FS_POSIX_CACHE_SIZE;
+
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;
     fs_drv.read_cb = fs_read;
@@ -101,15 +108,11 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == LV_FS_MODE_RD) flags = O_RDONLY;
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = O_RDWR;
 
-#ifdef LV_FS_POSIX_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_POSIX_PATH "%s", path);
 
     int f = open(buf, flags);
-#else
-    int f = open(path, flags);
-#endif
     if(f < 0) return NULL;
 
     return (void *)(lv_uintptr_t)f;
@@ -207,25 +210,17 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     LV_UNUSED(drv);
 
 #ifndef WIN32
-# ifdef LV_FS_POSIX_PATH
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     sprintf(buf, LV_FS_POSIX_PATH "%s", path);
     return opendir(buf);
-# else
-    return opendir(path);
-# endif
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-# ifdef LV_FS_POSIX_PATH
     sprintf(buf, LV_FS_POSIX_PATH "%s\\*", path);
-# else
-    sprintf(buf, "%s\\*", path);
-# endif
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
@@ -314,5 +309,10 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 #endif
     return LV_FS_RES_OK;
 }
+#else /*LV_USE_FS_POSIX == 0*/
+
+#if defined(LV_FS_POSIX_LETTER) && LV_FS_POSIX_LETTER != '\0'
+    #warning "LV_USE_FS_POSIX is not enabled but LV_FS_POSIX_LETTER is set"
+#endif
 
 #endif /*LV_USE_FS_POSIX*/
