@@ -40,16 +40,16 @@ char * lv_strncpy(char * dst, const char * src, size_t count)
 {
     LV_ASSERT_VERIFY(dst);
     LV_ASSERT_VERIFY(src);
+    LV_ASSERT_VERIFY(count > 0);
 
-    char *ret = strncpy(dst, src, count);
-    
-    /* If count is reached before the entire array src was copied, the
-     * resulting character array is not null-terminated */
-    if (count < strlen(src)) {
-        dst[count] = '\0';
+    size_t i;
+    for (i = 0; i < count && src[i] != '\0'; i++) {
+        dst[i] = src[i];
     }
 
-    return ret;
+    dst[count] = '\0';
+
+    return dst;
 }
 
 /**********************

@@ -33,10 +33,10 @@ extern "C" {
  **********************/
 
 /**
- * Wrapper for the standard strncpy
+ * Same as the standard `strncpy` but it always null-terminates the destination string
  * @param dst pointer to the character array to copy to
  * @param src pointer to the character array to copy from
- * @param count maximum number of character to copy
+ * @param count maximum number of character to copy (ie. the size of `dst`)
  * @return returns a copy of dest
  */
 char * lv_strncpy(char * dst, const char * src, size_t count);
