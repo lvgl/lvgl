@@ -68,6 +68,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent)
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(txt);
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
@@ -97,6 +98,9 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(txt);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     if(!cb->static_txt) lv_mem_free(cb->txt);
