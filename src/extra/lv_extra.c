@@ -58,6 +58,11 @@ void lv_extra_init(void)
     lv_fs_win32_init();
 #endif
 
+#if LV_USE_FFMPEG
+    /* Must be first so it's the second last in the decoder's list to try */
+    lv_ffmpeg_init();
+#endif
+
 #if LV_USE_PNG
     lv_png_init();
 #endif
@@ -83,9 +88,6 @@ void lv_extra_init(void)
 #  endif
 #endif
 
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
-#endif
 }
 
 /**********************

@@ -16,7 +16,7 @@ static void event_cb(lv_event_t* e)
         snapshot = lv_snapshot_take(img->parent, LV_IMG_CF_TRUE_COLOR_ALPHA);
         if(snapshot == NULL)
             return;
-        lv_img_set_src(snapshot_obj, snapshot, 0);
+        lv_img_accept_src(snapshot_obj, snapshot, 0);
     }
 }
 

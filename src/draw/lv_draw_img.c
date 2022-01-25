@@ -235,6 +235,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
     lv_img_dec_dsc_in_t dsc = {.src = src, .color = draw_dsc->recolor, .size_hint = size_hint };
     lv_img_cache_entry_t * cdsc = lv_img_cache_open(&dsc, draw_dsc->dec_ctx);
+    if(!cdsc) return LV_RES_INV;
     lv_res_t res = decode_and_draw_cached(draw_ctx, draw_dsc, coords, cdsc);
     lv_img_cache_cleanup(cdsc);
     return res;
