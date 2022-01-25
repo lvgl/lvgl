@@ -71,7 +71,7 @@
  *  COMPILER SETTINGS
  *====================*/
 
-#ifdef RT_USING_BIG_ENDIAN
+#ifdef ARCH_CPU_BIG_ENDIAN
 #  define LV_BIG_ENDIAN_SYSTEM 1
 #else
 #  define LV_BIG_ENDIAN_SYSTEM 0
