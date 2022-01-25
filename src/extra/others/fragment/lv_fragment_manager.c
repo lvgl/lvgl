@@ -182,17 +182,7 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t 
     lv_fragment_manager_add(manager, fragment, container);
 }
 
-void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
-{
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->managed);
-    LV_ASSERT(fragment->managed->manager == manager);
-    item_del_obj(fragment->managed);
-    item_create_obj(fragment->managed);
-}
-
-bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int code, void * userdata)
+bool lv_fragment_manager_send_event(lv_fragment_manager_t * manager, int code, void * userdata)
 {
     LV_ASSERT_NULL(manager);
     lv_fragment_stack_item_t * top = _lv_ll_get_tail(&manager->stack);
@@ -200,7 +190,7 @@ bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int cod
     lv_fragment_managed_states_t * states = top->states;
     lv_fragment_t * instance = states->instance;
     if(!instance) return false;
-    if(lv_fragment_manager_dispatch_event(instance->child_manager, code, userdata)) return true;
+    if(lv_fragment_manager_send_event(instance->child_manager, code, userdata)) return true;
     if(!states->cls->event_cb) return false;
     return states->cls->event_cb(instance, code, userdata);
 }

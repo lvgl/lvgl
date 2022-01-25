@@ -178,13 +178,13 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent);
 void lv_fragment_manager_del(lv_fragment_manager_t * manager);
 
 /**
- * Create object of the fragment. This fragment must belong to the manager.
+ * Create object of all fragments managed by this manager.
  * @param manager Fragment manager instance
  */
 void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager);
 
 /**
- * Delete object created by the fragment. Instance of the fragment will not be deleted.
+ * Delete object created by all fragments managed by this manager. Instance of fragments will not be deleted.
  * @param manager Fragment manager instance
  */
 void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager);
@@ -228,20 +228,13 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t 
                                  lv_obj_t * const * container);
 
 /**
- * Destroy obj in fragment, and recreate them.
- * @param manager Fragment manager instance
- * @param fragment Fragment instance
- */
-void lv_fragment_manager_recreate_obj(lv_fragment_manager_t * manager, lv_fragment_t * fragment);
-
-/**
  * Send event to top-most fragment
  * @param manager Fragment manager instance
  * @param code User-defined ID of event
  * @param userdata User-defined data
  * @return true if fragment returned true
  */
-bool lv_fragment_manager_dispatch_event(lv_fragment_manager_t * manager, int code, void * userdata);
+bool lv_fragment_manager_send_event(lv_fragment_manager_t * manager, int code, void * userdata);
 
 /**
  * Get stack size of this fragment manager
@@ -287,12 +280,6 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
  * @param fragment Fragment instance.
  */
 void lv_fragment_del(lv_fragment_t * fragment);
-
-/**
- * Remove fragment from attached manager
- * @param fragment Fragment instance
- */
-void lv_fragment_remove_self(lv_fragment_t * fragment);
 
 /**
  * Get associated manager of this fragment
