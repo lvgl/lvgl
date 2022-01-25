@@ -129,8 +129,8 @@ props = [
  'dsc': "Set the dithering mode of the gradient of the background. The possible values are `LV_DITHER_NONE/ORDERED/ERR_DIFF`."},
 
 {'name': 'BG_IMG_SRC',
- 'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set a background image. Can be a pointer to `lv_img_dsc_t`, a path to a file or an `LV_SYMBOL_...`"},
+ 'style_type': 'ptr',   'var_type': 'const lv_img_src_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'dsc': "Set a background image. Must be a pointer to `lv_img_src_t`"},
 
 {'name': 'BG_IMG_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,

@@ -416,7 +416,8 @@ static void style_init(void)
     lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
 
     style_init_reset(&styles->cb_marker_checked);
-    lv_style_set_bg_img_src(&styles->cb_marker_checked, LV_SYMBOL_OK);
+    LV_DECLARE_SYMBOL_SRC(LV_SYMBOL_OK);
+    lv_style_set_bg_img_src(&styles->cb_marker_checked, &LV_SYMBOL_OK_src);
     lv_style_set_text_color(&styles->cb_marker_checked, lv_color_white());
     lv_style_set_text_font(&styles->cb_marker_checked, theme.font_small);
 #endif

@@ -119,6 +119,15 @@ void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t 
     obj->uri_len = len;
 }
 
+void lv_img_src_set_raw(lv_img_src_t * obj, const lv_img_dsc_t * data)
+{
+    lv_img_src_free(obj);
+
+    obj->type = LV_IMG_SRC_VARIABLE;
+    obj->uri = data;
+    obj->uri_len = sizeof(*data);
+}
+
 void lv_img_src_set_symbol(lv_img_src_t * obj, const char * symbol)
 {
     lv_img_src_free(obj);

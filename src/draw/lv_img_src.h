@@ -20,9 +20,18 @@ extern "C" {
 #include "../misc/lv_types.h"
 
 
+/*********************
+ *      MACROS
+ *********************/
+/* Useful macro to declare a symbol source */
+#define LV_DECLARE_SYMBOL_SRC(symbol) \
+    static lv_img_src_t symbol ## _src = { .type = LV_IMG_SRC_SYMBOL, .uri_len = sizeof(symbol) - 1, .uri = symbol, .ext = 0 }
+
+
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_img_dsc_t;
 
 /**
  * Source type of image.*/
@@ -106,6 +115,13 @@ void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t 
  *  @param path Path to the file containing the image
  */
 void lv_img_src_set_file(lv_img_src_t * obj, const char * file_path);
+/** Set the source of the descriptor to a file
+ *  @param src  The src descriptor to fill
+ *  @param raw  Pointer to a lv_img_dsc_t instance
+ */
+void lv_img_src_set_raw(lv_img_src_t * obj, const struct _lv_img_dsc_t * raw);
+
+
 /** Copy the source of the descriptor to another descriptor
  *  @param src  The src descriptor to fill
  *  @param path Path to the file containing the image

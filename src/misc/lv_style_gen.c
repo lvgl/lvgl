@@ -248,7 +248,7 @@ void lv_style_set_bg_dither_mode(lv_style_t * style, lv_dither_mode_t value)
     lv_style_set_prop(style, LV_STYLE_BG_DITHER_MODE, v);
 }
 
-void lv_style_set_bg_img_src(lv_style_t * style, const void * value)
+void lv_style_set_bg_img_src(lv_style_t * style, const lv_img_src_t * value)
 {
     lv_style_value_t v = {
         .ptr = value

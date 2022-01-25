@@ -23,6 +23,7 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"
+#include "../draw/lv_img_src.h"
 
 /*********************
  *      DEFINES

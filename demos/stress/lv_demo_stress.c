@@ -144,7 +144,9 @@ static void obj_test_task_cb(lv_timer_t * tmr)
         case 4:
             obj = lv_btn_create(main_page);
             lv_obj_set_size(obj, 100, 70);
-            lv_obj_set_style_bg_img_src(obj, LV_SYMBOL_DUMMY"Text from\nstyle", 0);
+            static lv_img_src_t dummy = {0};
+            lv_img_src_set_symbol(&dummy, LV_SYMBOL_DUMMY"Text from\nstyle");
+            lv_obj_set_style_bg_img_src(obj, &dummy, 0);
             lv_obj_del_async(obj);  /*Delete on next call of `lv_task_handler` (so not now)*/
 
 //            obj = lv_btn_create(main_page);

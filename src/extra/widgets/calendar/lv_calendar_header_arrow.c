@@ -72,7 +72,8 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
     lv_obj_t * mo_prev = lv_btn_create(obj);
-    lv_obj_set_style_bg_img_src(mo_prev, LV_SYMBOL_LEFT, 0);
+    LV_DECLARE_SYMBOL_SRC(LV_SYMBOL_LEFT);
+    lv_obj_set_style_bg_img_src(mo_prev, &LV_SYMBOL_LEFT_src, 0);
     lv_obj_set_height(mo_prev, lv_pct(100));
     lv_obj_update_layout(mo_prev);
     lv_coord_t btn_size = lv_obj_get_height(mo_prev);
@@ -87,7 +88,8 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_grow(label, 1);
 
     lv_obj_t * mo_next = lv_btn_create(obj);
-    lv_obj_set_style_bg_img_src(mo_next, LV_SYMBOL_RIGHT, 0);
+    LV_DECLARE_SYMBOL_SRC(LV_SYMBOL_RIGHT);
+    lv_obj_set_style_bg_img_src(mo_next, &LV_SYMBOL_RIGHT_src, 0);
     lv_obj_set_size(mo_next, btn_size, btn_size);
 
     lv_obj_add_event_cb(mo_next, month_event_cb, LV_EVENT_CLICKED, NULL);

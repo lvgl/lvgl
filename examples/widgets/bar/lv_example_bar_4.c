@@ -10,7 +10,9 @@ void lv_example_bar_4(void)
     static lv_style_t style_indic;
 
     lv_style_init(&style_indic);
-    lv_style_set_bg_img_src(&style_indic, &img_skew_strip);
+    static lv_img_src_t img = {0};
+    lv_img_src_set_raw(&img, &img_skew_strip);
+    lv_style_set_bg_img_src(&style_indic, &img);
     lv_style_set_bg_img_tiled(&style_indic, true);
     lv_style_set_bg_img_opa(&style_indic, LV_OPA_30);
 

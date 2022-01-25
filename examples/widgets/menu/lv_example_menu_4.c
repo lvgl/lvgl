@@ -62,7 +62,8 @@ void lv_example_menu_4(void)
     lv_obj_align(float_btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(float_btn, float_btn_event_cb, LV_EVENT_CLICKED, menu);
     lv_obj_set_style_radius(float_btn, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_bg_img_src(float_btn, LV_SYMBOL_PLUS, 0);
+    LV_DECLARE_SYMBOL_SRC(LV_SYMBOL_PLUS);
+    lv_obj_set_style_bg_img_src(float_btn, &LV_SYMBOL_PLUS_src, 0);
     lv_obj_set_style_text_font(float_btn, lv_theme_get_font_large(float_btn), 0);
 }
 

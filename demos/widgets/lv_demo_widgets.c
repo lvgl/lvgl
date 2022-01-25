@@ -980,7 +980,8 @@ static void color_changer_create(lv_obj_t * parent)
     lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);
     lv_obj_add_event_cb(btn, color_changer_event_cb, LV_EVENT_ALL, color_cont);
     lv_obj_set_style_shadow_width(btn, 0, 0);
-    lv_obj_set_style_bg_img_src(btn, LV_SYMBOL_TINT, 0);
+    LV_DECLARE_SYMBOL_SRC(LV_SYMBOL_TINT);
+    lv_obj_set_style_bg_img_src(btn, &LV_SYMBOL_TINT_src, 0);
 
     if(disp_size == DISP_SMALL) {
          lv_obj_set_size(btn, LV_DPX(42), LV_DPX(42));
