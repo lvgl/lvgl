@@ -140,7 +140,7 @@ typedef struct {
                                                         * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
     lv_dither_mode_t     dither : 3;                   /**< Whether to dither the gradient or not.
                                                         * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
-} lv_gradient_t;
+} lv_grad_dsc_t;
 
 /**
  * A common type to handle all the property types in the same way.
@@ -191,7 +191,7 @@ typedef enum {
     LV_STYLE_BG_GRAD_DIR             = 35,
     LV_STYLE_BG_MAIN_STOP            = 36,
     LV_STYLE_BG_GRAD_STOP            = 37,
-    LV_STYLE_BG_GRADIENT             = 38,
+    LV_STYLE_BG_GRAD                 = 38,
     LV_STYLE_BG_DITHER_MODE          = 39,
 
 

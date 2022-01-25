@@ -169,7 +169,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 
 
     /*Get gradient if appropriate*/
-    lv_gradient_cache_t * grad = lv_grad_get_from_cache(&dsc->bg_grad, coords_bg_w, coords_bg_h);
+    lv_grad_t * grad = lv_gradient_get(&dsc->bg_grad, coords_bg_w, coords_bg_h);
     if(grad && grad_dir == LV_GRAD_DIR_HOR) {
         blend_dsc.src_buf = grad->map + clipped_coords.x1 - bg_coords.x1;
     }
@@ -192,10 +192,29 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 #if LV_DITHER_ERROR_DIFFUSION
         if(dither_mode == LV_DITHER_ORDERED)
 #endif
-            dither_func = grad_dir == LV_GRAD_DIR_HOR ? &lv_dither_ordered_hor : &lv_dither_ordered_ver;
+            switch(grad_dir) {
+                case LV_GRAD_DIR_HOR:
+                    dither_func = lv_dither_ordered_hor;
+                    break;
+                case LV_GRAD_DIR_VER:
+                    dither_func = lv_dither_ordered_ver;
+                    break;
+                default:
+                    dither_func = NULL;
+            }
+
 #if LV_DITHER_ERROR_DIFFUSION
         else if(dither_mode == LV_DITHER_ERR_DIFF)
-            dither_func = grad_dir == LV_GRAD_DIR_HOR ? &lv_dither_err_diff_hor : &lv_dither_err_diff_ver;
+            switch(grad_dir) {
+                case LV_GRAD_DIR_HOR:
+                    dither_func = lv_dither_err_diff_hor;
+                    break;
+                case LV_GRAD_DIR_VER:
+                    dither_func = lv_dither_err_diff_ver;
+                    break;
+                default:
+                    dither_func = NULL;
+            }
 #endif
 #endif
 
@@ -212,7 +231,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
 
 #if _DITHER_GRADIENT
-            dither_func(grad, blend_area.x1,  h - bg_coords.y1, grad_size);
+            if(dither_func) dither_func(grad, blend_area.x1,  h - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[h - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -238,7 +257,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_area.y2 = top_y;
 
 #if _DITHER_GRADIENT
-            dither_func(grad, blend_area.x1,  top_y - bg_coords.y1, grad_size);
+            if(dither_func) dither_func(grad, blend_area.x1,  top_y - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[top_y - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -249,7 +268,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_area.y2 = bottom_y;
 
 #if _DITHER_GRADIENT
-            dither_func(grad, blend_area.x1,  bottom_y - bg_coords.y1, grad_size);
+            if(dither_func) dither_func(grad, blend_area.x1,  bottom_y - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[bottom_y - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -288,7 +307,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             blend_area.y2 = h;
 
 #if _DITHER_GRADIENT
-            dither_func(grad, blend_area.x1,  h - bg_coords.y1, grad_size);
+            if(dither_func) dither_func(grad, blend_area.x1,  h - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[h - bg_coords.y1];
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -301,6 +320,9 @@ bg_clean_up:
     if(mask_rout_id != LV_MASK_ID_INV) {
         lv_draw_mask_remove_id(mask_rout_id);
         lv_draw_mask_free_param(&mask_rout_param);
+    }
+    if(grad) {
+        lv_gradient_cleanup(grad);
     }
 
 #endif

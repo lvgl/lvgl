@@ -69,6 +69,7 @@ typedef enum {
 
 typedef struct _lv_fs_drv_t {
     char letter;
+    uint16_t cache_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
     void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
@@ -88,8 +89,16 @@ typedef struct _lv_fs_drv_t {
 } lv_fs_drv_t;
 
 typedef struct {
+    uint32_t start;
+    uint32_t end;
+    uint32_t file_position;
+    void * buffer;
+} lv_fs_file_cache_t;
+
+typedef struct {
     void * file_d;
     lv_fs_drv_t * drv;
+    lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
 
 typedef struct {

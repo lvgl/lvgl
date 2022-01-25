@@ -40,9 +40,10 @@ typedef lv_color_t lv_grad_color_t;
 typedef struct _lv_gradient_cache_t {
     uint32_t        key;          /**< A discriminating key that's built from the drawing operation.
                                    * If the key does not match, the cache item is not used */
-    uint32_t        life : 31;    /**< A life counter that's incremented on usage. Higher counter is
+    uint32_t        life : 30;    /**< A life counter that's incremented on usage. Higher counter is
                                    * less likely to be evicted from the cache */
     uint32_t        filled : 1;   /**< Used to skip dithering in it if already done */
+    uint32_t        not_cached: 1; /**< The cache was too small so this item is not managed by the cache*/
     lv_color_t   *  map;          /**< The computed gradient low bitdepth color map, points into the
                                    * cache's buffer, no free needed */
     lv_coord_t      alloc_size;   /**< The map allocated size in colors */
@@ -56,7 +57,7 @@ typedef struct _lv_gradient_cache_t {
     lv_coord_t      w;            /**< The error array width in pixels */
 #endif
 #endif
-} lv_gradient_cache_t;
+} lv_grad_t;
 
 
 /**********************
@@ -68,22 +69,26 @@ typedef struct _lv_gradient_cache_t {
  * @param range     The range to use in computation.
  * @param frac      The current part used in the range. frac is in [0; range]
  */
-LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_grad_get(const lv_gradient_t * dsc, lv_coord_t range, lv_coord_t frac);
+LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t * dsc, lv_coord_t range,
+                                                            lv_coord_t frac);
 
-/** Set the gradient cache size */
-void lv_grad_set_cache_size(size_t max_bytes);
-
-/** Get a gradient cache from the given parameters */
-lv_gradient_cache_t * lv_grad_get_from_cache(const lv_gradient_t * gradient, lv_coord_t w, lv_coord_t h);
-
-/** Evict item from the gradient cache (not used anymore).
- *  This bypass the life counter on the item to remove this item.
+/**
+ * Set the gradient cache size
+ * @param max_bytes Max cahce size
  */
-void lv_grad_pop_from_cache(const lv_gradient_t * gradient, lv_coord_t w, lv_coord_t h);
+void lv_gradient_set_cache_size(size_t max_bytes);
 
 /** Free the gradient cache */
-void lv_grad_free_cache(void);
+void lv_gradient_free_cache(void);
 
+/** Get a gradient cache from the given parameters */
+lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * gradient, lv_coord_t w, lv_coord_t h);
+
+/**
+ * Clean up the gradient item after it was get with `lv_grad_get_from_cache`.
+ * @param grad      pointer to a gradient
+ */
+void lv_gradient_cleanup(lv_grad_t * grad);
 
 #ifdef __cplusplus
 } /*extern "C"*/

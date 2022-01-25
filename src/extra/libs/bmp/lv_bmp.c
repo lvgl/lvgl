@@ -40,6 +40,8 @@ static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
 
 static void decoder_close(lv_img_decoder_dsc_t * dsc);
 
+static lv_res_t check_colordepth(int bpp);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -92,6 +94,23 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 }
 
 
+static lv_res_t check_colordepth(int bpp)
+{
+    if(LV_COLOR_DEPTH == 32 && (bpp != 32 || bpp != 24)) {
+        LV_LOG_WARN("LV_COLOR_DEPTH == 32 but bpp is %d (should be 32 or 24)", bpp);
+        return LV_RES_INV;
+    }
+    else if(LV_COLOR_DEPTH == 16 && bpp != 16) {
+        LV_LOG_WARN("LV_COLOR_DEPTH == 16 but bpp is %d (should be 16)", bpp);
+        return LV_RES_INV;
+    }
+    else if(LV_COLOR_DEPTH == 8 && bpp != 8) {
+        LV_LOG_WARN("LV_COLOR_DEPTH == 8 but bpp is %d (should be 8)", bpp);
+        return LV_RES_INV;
+    }
+    return LV_RES_OK;
+}
+
 /**
  * Open a BMP image and return the decided image
  * @param src can be file name or pointer to a C array
@@ -117,15 +136,15 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         dsc->header.h = h;
         dsc->header.always_zero = 0;
         lv_fs_close(&f);
-#if LV_COLOR_DEPTH == 32
         uint16_t bpp;
         memcpy(&bpp, headers + 28, 2);
+#if LV_COLOR_DEPTH == 32
         dsc->header.cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
 #else
         dsc->header.cf = LV_IMG_CF_TRUE_COLOR;
 #endif
         dsc->caps = LV_IMG_DEC_DEFAULT;
-        return LV_RES_OK;
+        return check_colordepth(bpp);
     }
 
     /*If it's a BMP file...*/
@@ -137,8 +156,11 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 
         uint8_t header[54];
         lv_fs_read(&f, header, 54, NULL);
+        uint16_t bpp;
+        memcpy(&bpp, header + 28, 2);
 
-        if(0x42 != header[0] || 0x4d != header[1]) {
+        if(0x42 != header[0] || 0x4d != header[1] || check_colordepth(bpp) == LV_RES_INV) {
+            lv_fs_close(&f);
             return LV_RES_INV;
         }
 
@@ -158,6 +180,14 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             memcpy(&b->px_height, header + 22, 4);
             memcpy(&b->bpp, header + 28, 2);
             b->row_size_bytes = ((b->bpp * b->px_width + 31) / 32) * 4;
+            dsc->header.w = b->px_width;
+            dsc->header.h = b->px_height;
+#if LV_COLOR_DEPTH == 32
+            dsc->header.cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+#else
+            dsc->header.cf = LV_IMG_CF_TRUE_COLOR;
+#endif
+            b->f = f;
         }
         dsc->img_data = NULL;
         return LV_RES_OK;
