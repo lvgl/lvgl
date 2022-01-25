@@ -44,6 +44,7 @@ typedef struct {
      * Render for display driver
      */
     SDL_Renderer * renderer;
+    void * userdata;
 } lv_draw_sdl_drv_param_t;
 
 typedef struct {
