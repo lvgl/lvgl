@@ -43,7 +43,7 @@ char * lv_strncpy(char * dst, const char * src, size_t count)
     LV_ASSERT_VERIFY(count > 0);
 
     size_t i;
-    for (i = 0; i < count && src[i] != '\0'; i++) {
+    for(i = 0; i < count && src[i] != '\0'; i++) {
         dst[i] = src[i];
     }
 

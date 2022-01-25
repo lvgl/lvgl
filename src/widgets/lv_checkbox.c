@@ -82,7 +82,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
     else cb->txt = lv_mem_alloc(len + 1);
 
     LV_ASSERT_MALLOC(cb->txt);
-    if (cb->txt == NULL) return;
+    if(cb->txt == NULL) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, cb->txt);
