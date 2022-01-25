@@ -630,7 +630,7 @@
     #ifdef CONFIG_LV_USE_ASSERT_VERIFY
         #define LV_USE_ASSERT_VERIFY CONFIG_LV_USE_ASSERT_VERIFY
     #else
-        #define LV_USE_ASSERT_VERIFY        0   /*Verify conditions*/
+        #define LV_USE_ASSERT_VERIFY        0   /*Verify conditions. Fast, recommended*/
     #endif
 #endif
 
