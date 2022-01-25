@@ -178,7 +178,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 
     if(ffmpeg_ctx->video_src_data[0] == NULL && ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
         LV_LOG_ERROR("ffmpeg image allocate failed");
-        decoder_close(ffmpeg_ctx);
+        decoder_close(dsc);
         return LV_RES_INV;
     }
 
@@ -190,7 +190,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     if(dsc->dec_ctx->current_frame != ffmpeg_ctx->last_rendered_frame
        && dsc->dec_ctx->current_frame < dsc->dec_ctx->total_frames) {
         if(ffmpeg_update_next_frame(ffmpeg_ctx) < 0) {
-            decoder_close(ffmpeg_ctx);
+            decoder_close(dsc);
             LV_LOG_ERROR("ffmpeg update frame failed");
             return LV_RES_INV;
         }

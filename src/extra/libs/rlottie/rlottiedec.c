@@ -14,7 +14,26 @@
 #include <rlottie_capi.h>
 
 
+#ifndef RLOTTIE_FEATURE_PARTIAL_RENDER
+    #pragma message "Your version of Rlottie does not support partial decoding. Most of the code below " \
+    "will fail to work efficiently without this support."
+    #define FORCE_ALLOCATING_WHOLE_PICTURE 1
+#else
+    #define FORCE_ALLOCATING_WHOLE_PICTURE 0
+#endif
 
+
+#ifndef RLOTTIE_FEATURE_RO_JSON
+    #pragma message "Your version of Rlottie does not support partial read-only JSON parsing, a copy is required"
+    #define FORCE_JSON_COPY 1
+#else
+    #define FORCE_JSON_COPY 0
+#endif
+
+#if FORCE_JSON_COPY == 1 || FORCE_ALLOCATING_WHOLE_PICTURE == 1
+    #pragma message "Your version of Rlottie does not support last frame decoding"
+    #pragma message "You should be using https://github.com/lvgl/rlottie version instead"
+#endif
 
 
 /*********************
@@ -52,6 +71,22 @@ static void set_caps(uint8_t * caps);
 static lv_res_t init_dec_ctx(rlottiedec_ctx_t * dec_ctx);
 static lv_res_t render_animation(lv_rlottie_dec_context_t * context_ctx, rlottiedec_ctx_t * dec_ctx, lv_coord_t w,
                                  lv_coord_t h);
+
+#if FORCE_JSON_COPY
+Lottie_Animation * lottie_animation_from_rodata(const char * src, const size_t len, const char * dirname)
+{
+    char * json = (char *)lv_mem_alloc(len + 1);
+    LV_ASSERT_MALLOC(json);
+    if(!json) return NULL;
+
+    lv_memcpy(json, src, len);
+    json[len] = 0;
+
+    Lottie_Animation * animation = lottie_animation_from_data(json, NULL, dirname);
+    lv_mem_free(json);
+    return animation;
+}
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -166,6 +201,16 @@ static void convert_to_rgba5658(uint32_t * pix, uint8_t * dest, const size_t wid
 static lv_res_t render_animation(lv_rlottie_dec_context_t * context, rlottiedec_ctx_t * dec_ctx, lv_coord_t w,
                                  lv_coord_t h)
 {
+#if FORCE_ALLOCATING_WHOLE_PICTURE == 1
+    lottie_animation_render(
+        dec_ctx->cache,
+        dec_ctx->ctx.current_frame,
+        context->allocated_buf,
+        w,
+        h,
+        context->scanline_width
+    );
+#else
     lottie_animation_render_partial(
         dec_ctx->cache,
         dec_ctx->ctx.current_frame,
@@ -176,6 +221,7 @@ static lv_res_t render_animation(lv_rlottie_dec_context_t * context, rlottiedec_
         context->top + context->lines_in_buf,
         context->scanline_width
     );
+#endif
     context->last_rendered_frame = dec_ctx->ctx.current_frame;
 #if LV_COLOR_DEPTH == 16
     convert_to_rgba5658(context->allocated_buf, (uint8_t *)context->allocated_buf, w,
@@ -254,7 +300,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         }
 
         lottie_animation_get_size(animation, &w, &h);
-        dec_ctx->ctx.frame_rate   = lottie_animation_get_framerate(animation);
+        dec_ctx->ctx.frame_rate   = (uint16_t)lottie_animation_get_framerate(animation);
         dec_ctx->ctx.total_frames = lottie_animation_get_totalframe(animation);
         dec_ctx->ctx.dest_frame   = dec_ctx->ctx.total_frames; /* Mark it invalid on construction */
         set_caps(&dsc->caps);
@@ -268,7 +314,8 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             if(dec_ctx) {
                 if(flags != LV_IMG_DEC_ONLYMETA) dec_ctx->cache = animation;
                 /*Does the picture fit in the decoder context buffer entirely?*/
-                if((dsc->header.w * LV_IMG_PX_SIZE_ALPHA_BYTE) * dsc->header.h <= dec_ctx->max_buf_size) {
+                if(FORCE_ALLOCATING_WHOLE_PICTURE ||
+                   (dsc->header.w * LV_ARGB32 / 8) * dsc->header.h <= dec_ctx->max_buf_size) {
                     dsc->caps |= LV_IMG_DEC_CACHED;
                 }
             }
@@ -308,7 +355,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 
     dec_ctx->ctx.user_data = context;
     dec_ctx->ctx.total_frames = lottie_animation_get_totalframe(animation);
-    dec_ctx->ctx.frame_rate = lottie_animation_get_framerate(animation);
+    dec_ctx->ctx.frame_rate = (uint16_t)lottie_animation_get_framerate(animation);
     dec_ctx->cache = animation;
     w = dsc->header.w;
     h = dsc->header.h;
@@ -317,6 +364,9 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 
     /* Compute how many lines we can fit in the maximum buffer size */
     context->scanline_width = w * LV_ARGB32 / 8;
+#if FORCE_ALLOCATING_WHOLE_PICTURE == 1
+    dec_ctx->max_buf_size = (w * LV_ARGB32 / 8) * h;
+#endif
     context->lines_in_buf = dec_ctx->max_buf_size / context->scanline_width;
     if(context->lines_in_buf != 0) {  /*Too big picture to fit the maximum buffer size (default to 1024px) ?*/
         context->allocated_buf = lv_mem_alloc(context->lines_in_buf * context->scanline_width);
@@ -342,7 +392,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     dsc->dec_ctx->user_data = context;
 
     /*Does the picture fit in the decoder context buffer entirely?*/
-    if((w * LV_IMG_PX_SIZE_ALPHA_BYTE) * h <= dec_ctx->max_buf_size) {
+    if((w * LV_ARGB32 / 8) * h <= dec_ctx->max_buf_size) {
         dsc->caps |= LV_IMG_DEC_CACHED;
         /*Render the animation directly here*/
         dsc->img_data = (const uint8_t *)context->allocated_buf;
