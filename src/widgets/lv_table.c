@@ -113,8 +113,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
     lv_table_t * table = (lv_table_t *)obj;
     if(col >= table->col_cnt) {
-        LV_LOG_WARN("lv_table_set_cell_value: invalid column");
-        return;
+        lv_table_set_col_cnt(obj, col + 1);
     }
 
     /*Auto expand*/
