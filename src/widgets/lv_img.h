@@ -276,7 +276,7 @@ lv_img_src_t * lv_img_get_src(lv_obj_t * obj);
  * @param obj       pointer to an image object
  * @return          the image play control mode if applicable
  */
-lv_img_ctrl_t lv_img_get_ctrl(lv_obj_t * obj);
+lv_img_ctrl_t lv_img_get_play_mode(lv_obj_t * obj);
 
 /**
  * Get the total number of frames in the animation
@@ -284,6 +284,13 @@ lv_img_ctrl_t lv_img_get_ctrl(lv_obj_t * obj);
  * @return          the total number of frames in the animation (or 1 if it's not animated)
  */
 size_t lv_img_get_totalframes(lv_obj_t * obj);
+
+/**
+ * Get the current frame of the animation
+ * @param obj       pointer to an image object
+ * @return          the total number of frames in the animation (or 1 if it's not animated)
+ */
+size_t lv_img_get_current_frame(lv_obj_t * obj);
 
 /**
  * Get the offset's x attribute of the image object.

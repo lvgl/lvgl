@@ -342,7 +342,7 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode)
  * Getter functions
  *====================*/
 
-lv_img_ctrl_t lv_img_get_ctrl(lv_obj_t * obj)
+lv_img_ctrl_t lv_img_get_play_mode(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -359,6 +359,17 @@ size_t lv_img_get_totalframes(lv_obj_t * obj)
 
     return img->dec_ctx ? img->dec_ctx->total_frames : 0;
 }
+
+size_t lv_img_get_current_frame(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_img_t * img = (lv_img_t *)obj;
+
+    return img->dec_ctx ? img->dec_ctx->current_frame : 0;
+}
+
+
 
 lv_img_src_t * lv_img_get_src(lv_obj_t * obj)
 {

@@ -4,7 +4,7 @@
 void lv_example_animbtn_1(void)
 {
     /*Create a lottie animation to use*/
-    lv_obj_t * lottie = lv_rlottie_create_from_file(lv_scr_act(), 64, 64, "test.json");
+    lv_obj_t * lottie = lv_rlottie_create_from_file(lv_scr_act(), 64, 64, "test.json", 0);
     /*Create a animation button*/
     lv_obj_t * anim = lv_animbtn_create(lv_scr_act(), lottie);
 
@@ -16,8 +16,8 @@ void lv_example_animbtn_1(void)
     lv_animbtn_set_state_desc(anim, LV_ANIMBTN_STATE_RELEASED, desc);
 
     desc.first_frame = 1;
-    desc.last_frame = lv_rlottie_get_totalframes(lottie);
-    desc.control = LV_RLOTTIE_CTRL_LOOP | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_FORWARD;
+    desc.last_frame = lv_img_get_totalframes(lottie);
+    desc.control = LV_IMG_CTRL_LOOP | LV_IMG_CTRL_PLAY | LV_IMG_CTRL_FORWARD;
     lv_animbtn_set_state_desc(anim, LV_ANIMBTN_STATE_CHECKED_RELEASED, desc);
     lv_obj_center(anim);
 }

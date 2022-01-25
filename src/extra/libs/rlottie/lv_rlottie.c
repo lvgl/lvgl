@@ -49,7 +49,8 @@ const lv_obj_class_t lv_rlottie_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path)
+lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path,
+                                       const size_t buf_size)
 {
     lv_rlottie_init();
 
@@ -60,6 +61,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
     /* We can't use the object yet, since it's not constructed, so we need to store the size elsewhere*/
     rlottie->create_size.x = width;
     rlottie->create_size.y = height;
+    rlottie->max_buf_size = buf_size;
     lv_obj_class_init_obj(obj);
 
     return obj;
@@ -67,7 +69,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
 }
 
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc,
-                                      const size_t len)
+                                      const size_t len, const size_t buf_size)
 {
     lv_rlottie_init();
 
@@ -78,7 +80,7 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     /* We can't use the object yet, since it's not constructed, so we need to store the size elsewhere*/
     rlottie->create_size.x = width;
     rlottie->create_size.y = height;
-
+    rlottie->max_buf_size = buf_size;
     lv_obj_class_init_obj(obj);
 
     return obj;
@@ -98,6 +100,8 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     /* We want to keep the decoder context initialized here, so allocate and mark it*/
     LV_ZALLOC(rlottie->img_ext.dec_ctx, sizeof(rlottiedec_ctx_t));
     rlottie->img_ext.dec_ctx->auto_allocated = 0;
+    if(rlottie->max_buf_size)
+        ((rlottiedec_ctx_t *)rlottie->img_ext.dec_ctx)->max_buf_size = rlottie->max_buf_size;
     lv_img_accept_src(obj, &rlottie->img_ext.src, 0);
 
     if(rlottie->img_ext.dec_ctx == NULL || ((rlottiedec_ctx_t *)rlottie->img_ext.dec_ctx)->cache == NULL) {

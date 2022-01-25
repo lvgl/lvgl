@@ -40,7 +40,7 @@ The `width` and `height` of the object be set in the *create* function and the a
 
 To create a Lottie animation from file use:
 ```c
-  lv_obj_t * lottie = lv_rlottie_create_from_file(parent, width, height, "path/to/lottie.json");
+  lv_obj_t * lottie = lv_rlottie_create_from_file(parent, width, height, "path/to/lottie.json", 0);
 ```
 
 Note that, Rlottie uses the standard STDIO C file API, so you can use the path "normally" and no LVGL specific driver letter is required.
@@ -61,7 +61,7 @@ To create an animation from raw data:
 
 ```c
 extern const uint8_t lottie_data[];
-lv_obj_t* lottie = lv_rlottie_create_from_raw(parent, width, height, (const char *)lottie_data);
+lv_obj_t* lottie = lv_rlottie_create_from_raw(parent, width, height, (const char *)lottie_data, strlen(lottie_data), 0);
 ```
 
 ## Getting animations
@@ -73,29 +73,29 @@ You can also create your own animations with Adobe After Effects or similar soft
 
 ## Controlling animations
 
-LVGL provides two functions to control the animation mode: `lv_rlottie_set_play_mode` and `lv_rlottie_set_current_frame`.
+LVGL provides two functions to control the animation mode: `lv_img_set_play_mode` and `lv_img_set_current_frame`.
 You'll combine your intentions when calling the first method, like in these examples:
 ```c
-lv_obj_t * lottie = lv_rlottie_create_from_file(scr, 128, 128, "test.json");
+lv_obj_t * lottie = lv_rlottie_create_from_file(scr, 128, 128, "test.json", 0);
 lv_obj_center(lottie);
 // Pause to a specific frame
-lv_rlottie_set_current_frame(lottie, 50);
-lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PAUSE); // The specified frame will be displayed and then the animation will pause
+lv_img_set_current_frame(lottie, 50);
+lv_img_set_play_mode(lottie, LV_IMG_CTRL_PAUSE); // The specified frame will be displayed and then the animation will pause
 
 // Play backward and loop
-lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_BACKWARD | LV_RLOTTIE_CTRL_LOOP);
+lv_img_set_play_mode(lottie, LV_IMG_CTRL_PLAY | LV_IMG_CTRL_BACKWARD | LV_IMG_CTRL_LOOP);
 
 // Play forward once (no looping)
-lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_FORWARD);
+lv_img_set_play_mode(lottie, LV_IMG_CTRL_PLAY | LV_IMG_CTRL_FORWARD);
 ```
 
 The default animation mode is **play forward with loop**.
 
 If you don't enable looping, a `LV_EVENT_READY` is sent when the animation can not make more progress without looping.
 
-To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members. 
+To get the number of frames in an animation or the current frame index, you should use `lv_img_get_current_frame` and `lv_img_get_total_frames` members. 
 
-If you need to play an animation until a specific frame, you can use `lv_rlottie_stopat_frame` function. 
+If you need to play an animation until a specific frame, you can use `lv_img_set_stopat_frame` function. 
 It'll resume playing (if paused) until the specified frame is reached and pause from there and also sending a `LV_EVENT_READY` event.
 
 ## Example
