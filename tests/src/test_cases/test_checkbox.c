@@ -91,12 +91,4 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size));
 }
 
-void test_checkbox_should_refresh_text(void)
-{
-    lv_checkbox_set_text(checkbox, "Hi");
-    lv_checkbox_set_text(checkbox, NULL);
-
-    TEST_ASSERT_EQUAL_STRING("Hi", lv_checkbox_get_text(checkbox));
-}
-
 #endif
