@@ -39,7 +39,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
 static void refr_size(lv_obj_t * obj, uint32_t strat_row);
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 static size_t get_cell_txt_len(const char * txt);
-static void copy_cell_txt(char *dst, const char *txt);
+static void copy_cell_txt(char * dst, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -927,7 +927,7 @@ static size_t get_cell_txt_len(const char * txt)
 }
 
 /* Copy txt into dst skipping the format byte */
-static void copy_cell_txt(char *dst, const char *txt)
+static void copy_cell_txt(char * dst, const char * txt)
 {
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, &dst[1]);
