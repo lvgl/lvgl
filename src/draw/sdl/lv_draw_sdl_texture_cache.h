@@ -37,6 +37,7 @@ extern "C" {
 typedef struct {
     char head[8];
     SDL_Texture * texture;
+    SDL_Rect rect;
     bool texture_managed;
     bool texture_referenced;
 } lv_draw_sdl_dec_dsc_userdata_t;
@@ -44,6 +45,7 @@ typedef struct {
 typedef enum {
     LV_GPU_CACHE_KEY_MAGIC_ARC = 0x01,
     LV_GPU_CACHE_KEY_MAGIC_IMG = 0x11,
+    LV_GPU_CACHE_KEY_MAGIC_IMG_ROUNDED_CORNERS = 0x12,
     LV_GPU_CACHE_KEY_MAGIC_LINE = 0x21,
     LV_GPU_CACHE_KEY_MAGIC_RECT_BG = 0x31,
     LV_GPU_CACHE_KEY_MAGIC_RECT_SHADOW = 0x32,

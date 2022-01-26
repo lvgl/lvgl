@@ -688,6 +688,14 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     }
     _lv_ll_clear(&chart->series_ll);
 
+    lv_chart_cursor_t * cur;
+    while(chart->cursor_ll.head) {
+        cur = _lv_ll_get_head(&chart->cursor_ll);
+        _lv_ll_remove(&chart->cursor_ll, cur);
+        lv_mem_free(cur);
+    }
+    _lv_ll_clear(&chart->cursor_ll);
+
     LV_TRACE_OBJ_CREATE("finished");
 }
 
@@ -1202,7 +1210,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     lv_draw_rect_dsc_t col_dsc;
     lv_draw_rect_dsc_init(&col_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &col_dsc);
-    col_dsc.bg_grad_dir = LV_GRAD_DIR_NONE;
+    col_dsc.bg_grad.dir = LV_GRAD_DIR_NONE;
     col_dsc.bg_opa = LV_OPA_COVER;
 
     /*Make the cols longer with `radius` to clip the rounding from the bottom*/

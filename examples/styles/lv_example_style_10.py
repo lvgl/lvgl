@@ -7,7 +7,7 @@ props = [lv.STYLE.BG_COLOR, lv.STYLE.BORDER_COLOR, lv.STYLE.BORDER_WIDTH, 0]
 # A default transition
 # Make it fast (100ms) and start with some delay (200 ms)
 
-trans_def =  lv.style_transition_dsc_t()
+trans_def = lv.style_transition_dsc_t()
 trans_def.init(props, lv.anim_t.path_linear, 100, 200, None)
 
 # A special transition when going to pressed state

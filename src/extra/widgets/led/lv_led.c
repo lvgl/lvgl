@@ -66,7 +66,7 @@ lv_obj_t * lv_led_create(lv_obj_t * parent)
 /**
  * Set the color of the LED
  * @param led       pointer to a LED object
- * @param color     the color of the the LED
+ * @param color     the color of the LED
  */
 void lv_led_set_color(lv_obj_t * obj, lv_color_t color)
 {
@@ -178,15 +178,17 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &rect_dsc);
 
         /*Use the original colors brightness to modify color->led*/
-        rect_dsc.bg_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_color));
-        rect_dsc.bg_grad_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_grad_color));
+        rect_dsc.bg_grad.stops[0].color = lv_color_mix(led->color, lv_color_black(),
+                                                       lv_color_brightness(rect_dsc.bg_grad.stops[0].color));
+        rect_dsc.bg_grad.stops[1].color = lv_color_mix(led->color, lv_color_black(),
+                                                       lv_color_brightness(rect_dsc.bg_grad.stops[1].color));
         rect_dsc.shadow_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.shadow_color));
         rect_dsc.border_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.border_color));
         rect_dsc.outline_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.outline_color));
 
         /*Mix. the color with black proportionally with brightness*/
-        rect_dsc.bg_color   = lv_color_mix(rect_dsc.bg_color, lv_color_black(), led->bright);
-        rect_dsc.bg_grad_color   = lv_color_mix(rect_dsc.bg_grad_color, lv_color_black(), led->bright);
+        rect_dsc.bg_grad.stops[0].color   = lv_color_mix(rect_dsc.bg_grad.stops[0].color, lv_color_black(), led->bright);
+        rect_dsc.bg_grad.stops[1].color   = lv_color_mix(rect_dsc.bg_grad.stops[1].color, lv_color_black(), led->bright);
         rect_dsc.border_color = lv_color_mix(rect_dsc.border_color, lv_color_black(), led->bright);
         rect_dsc.shadow_color = lv_color_mix(rect_dsc.shadow_color, lv_color_black(), led->bright);
         rect_dsc.outline_color = lv_color_mix(rect_dsc.outline_color, lv_color_black(), led->bright);

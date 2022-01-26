@@ -80,7 +80,7 @@ for i in range(ITEM_CNT):
 
 table.align(lv.ALIGN.CENTER, 0, -20)
 
-# Add an event callback to to apply some custom drawing
+# Add an event callback to apply some custom drawing
 table.add_event_cb(draw_event_cb, lv.EVENT.DRAW_PART_END, None)
 table.add_event_cb(change_event_cb, lv.EVENT.VALUE_CHANGED, None)
 

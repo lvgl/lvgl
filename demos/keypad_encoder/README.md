@@ -9,5 +9,5 @@ Learn more about the touchpad-less usage of LVGL [here](https://docs.lvgl.io/mas
 ![Keypad and encoder navigation in LVGL embedded GUI library](screenshot1.gif)
 
 ## Run the demo
-- In `lv_ex_conf.h` set `LV_USE_DEMO_KEYPAD_AND_ENCODER 1`
+- In `lv_conf.h` or equivalent places set `LV_USE_DEMO_KEYPAD_AND_ENCODER 1`
 - After `lv_init()` and initializing the drivers call `lv_demo_keypad_encoder()`

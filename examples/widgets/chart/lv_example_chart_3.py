@@ -46,7 +46,7 @@ chart.set_next_value(ser1, 22)
 chart.set_next_value(ser1, 58)
 
 # Directly set points on 'ser2'
-ser2.y_points =  [92,71,61,15,21,35,35,58,31,53,33,73]
+ser2.y_points = [92,71,61,15,21,35,35,58,31,53,33,73]
 
-chart.refresh()  #Required after direct set
+chart.refresh()  # Required after direct set
 

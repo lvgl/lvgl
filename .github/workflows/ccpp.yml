@@ -27,9 +27,9 @@ jobs:
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
 
-  test:
+  test-native:
     runs-on: ubuntu-latest
-    name: Executable Tests
+    name: amd64 Executable Tests
     steps:
     - uses: actions/checkout@v2
     - uses: ammaraskar/gcc-problem-matcher@master
@@ -38,8 +38,57 @@ jobs:
     - name: Run tests
       run: python tests/main.py --report test
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       if: github.event_name == 'push'
       with:
         fail_ci_if_error: true
         verbose: true
+  test-cross:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: ${{ matrix.arch }} Executable Tests
+
+    # Run steps on a matrix of 3 arch/distro combinations
+    strategy:
+      matrix:
+        arch: [ 'aarch64', 'armv6', 'armv7' ]
+
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - name: Setup cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.ccache
+          key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
+          restore-keys: |
+            lvgl_ci_cross_test_ccache_${{ matrix.arch }}
+      - uses: uraimo/run-on-arch-action@v2.1.1
+        name: Run tests
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: bullseye
+
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+
+          # The shell to run commands with in the container
+          shell: /bin/bash
+          
+          # Create cached/volume directories on host
+          setup: |
+            mkdir -p ~/.ccache
+
+          # Mount cached directories in the container for faster builds
+          dockerRunArgs: |
+            --volume "${HOME}/.ccache:/root/.ccache"
+
+          install: |
+            apt-get update -y
+            apt-get install build-essential ccache python3 libpng-dev ruby-full gcovr cmake -q -y
+            /usr/sbin/update-ccache-symlinks
+            echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
+
+          run: |
+            env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test

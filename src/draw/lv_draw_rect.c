@@ -38,10 +38,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_rect_dsc_t));
     dsc->bg_color = lv_color_white();
-    dsc->bg_grad_color = lv_color_black();
+#if __STDC_VERSION__ < 201112L
+    dsc->bg_grad.stops[0].color = lv_color_white();
+#endif
+    dsc->bg_grad.stops[1].color = lv_color_black();
+    dsc->bg_grad.stops[1].frac = 0xFF;
+    dsc->bg_grad.stops_count = 2;
     dsc->border_color = lv_color_black();
     dsc->shadow_color = lv_color_black();
-    dsc->bg_grad_color_stop = 0xFF;
     dsc->bg_img_symbol_font = LV_FONT_DEFAULT;
     dsc->bg_opa = LV_OPA_COVER;
     dsc->bg_img_opa = LV_OPA_COVER;

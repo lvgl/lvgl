@@ -11,9 +11,9 @@ void lv_example_canvas_1(void)
     lv_draw_rect_dsc_init(&rect_dsc);
     rect_dsc.radius = 10;
     rect_dsc.bg_opa = LV_OPA_COVER;
-    rect_dsc.bg_grad_dir = LV_GRAD_DIR_HOR;
-    rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
-    rect_dsc.bg_grad_color = lv_palette_main(LV_PALETTE_BLUE);
+    rect_dsc.bg_grad.dir = LV_GRAD_DIR_HOR;
+    rect_dsc.bg_grad.stops[0].color = lv_palette_main(LV_PALETTE_RED);
+    rect_dsc.bg_grad.stops[1].color = lv_palette_main(LV_PALETTE_BLUE);
     rect_dsc.border_width = 2;
     rect_dsc.border_opa = LV_OPA_90;
     rect_dsc.border_color = lv_color_white();
@@ -36,7 +36,7 @@ void lv_example_canvas_1(void)
 
     lv_canvas_draw_text(canvas, 40, 20, 100, &label_dsc, "Some text on text canvas");
 
-    /*Test the rotation. It requires an other buffer where the orignal image is stored.
+    /*Test the rotation. It requires another buffer where the original image is stored.
      *So copy the current image to buffer and rotate it to the canvas*/
     static lv_color_t cbuf_tmp[CANVAS_WIDTH * CANVAS_HEIGHT];
     memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));

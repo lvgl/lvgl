@@ -28,4 +28,5 @@ for i in range(30):
     label = lv.label(btn)
     label.set_text(str(i))
     label.center()
-    cont.add_event_cb(event_cb, lv.EVENT.CLICKED, None)
+    
+cont.add_event_cb(event_cb, lv.EVENT.CLICKED, None)

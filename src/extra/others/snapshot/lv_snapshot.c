@@ -142,6 +142,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     _lv_refr_set_disp_refreshing(refr_ori);
     obj_disp->driver->draw_ctx_deinit(fake_disp.driver, draw_ctx);
+    lv_mem_free(draw_ctx);
 
     dsc->data = buf;
     dsc->header.w = w;

@@ -56,13 +56,13 @@ static draw_cache_value_t * draw_cache_get_entry(lv_draw_sdl_ctx_t * ctx, const 
 
 void lv_draw_sdl_texture_cache_init(lv_draw_sdl_ctx_t * ctx)
 {
-    ctx->internals->texture_cache = lv_lru_new(LV_GPU_SDL_LRU_SIZE, 65536,
-                                               (lv_lru_free_t *) draw_cache_free_value, NULL);
+    ctx->internals->texture_cache = lv_lru_create(LV_GPU_SDL_LRU_SIZE, 65536,
+                                                  (lv_lru_free_t *) draw_cache_free_value, NULL);
 }
 
 void lv_draw_sdl_texture_cache_deinit(lv_draw_sdl_ctx_t * ctx)
 {
-    lv_lru_free(ctx->internals->texture_cache);
+    lv_lru_del(ctx->internals->texture_cache);
 }
 
 SDL_Texture * lv_draw_sdl_texture_cache_get(lv_draw_sdl_ctx_t * ctx, const void * key, size_t key_length, bool * found)

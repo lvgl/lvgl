@@ -108,10 +108,10 @@ void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * d
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
     const lv_opa_t * mask;
-    if(dsc->mask == NULL) mask = NULL;
-    if(dsc->mask && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
+    if(dsc->mask_buf == NULL) mask = NULL;
+    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
-    else mask = dsc->mask;
+    else mask = dsc->mask_buf;
 
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 
@@ -128,7 +128,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
     lv_coord_t src_stride;
     if(src_buf) {
         src_stride = lv_area_get_width(dsc->blend_area);
-        src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 -  dsc->blend_area->x1);
+        src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 - dsc->blend_area->x1);
     }
     else {
         src_stride = 0;
@@ -411,7 +411,7 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
         lv_opa_t last_mask = LV_OPA_TRANSP;
         last_dest_color = dest_buf[0];
         lv_opa_t opa_tmp = mask[0] >= LV_OPA_MAX ? opa : (uint32_t)((uint32_t)mask[0] * opa) >> 8;
-        last_res_color =  blend_fp(color, last_dest_color, opa_tmp);
+        last_res_color = blend_fp(color, last_dest_color, opa_tmp);
 
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {

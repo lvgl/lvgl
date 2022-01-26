@@ -13,7 +13,7 @@ menu "LVGL configuration"
         bool "LVGL minimal configuration."
 
     menu "Color settings"
-        choice
+        choice LV_COLOR_DEPTH
             prompt "Color depth."
             default LV_COLOR_DEPTH_16
             help
@@ -166,6 +166,36 @@ menu "LVGL configuration"
                     With complex image decoders (e.g. PNG or JPG) caching can
                     save the continuous open/decode of images.
                     However the opened images might consume additional RAM.
+
+            config LV_GRADIENT_MAX_STOPS
+                int "Number of stops allowed per gradient."
+                default 2
+                help
+                    Increase this to allow more stops.
+                    This adds (sizeof(lv_color_t) + 1) bytes per additional stop
+
+            config LV_GRAD_CACHE_DEF_SIZE
+                int "Default gradient buffer size."
+                default 0
+                help
+                    When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+                    LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+                    If the cache is too small the map will be allocated only while it's required for the drawing.
+                    0 mean no caching.
+
+            config LV_DITHER_GRADIENT
+                bool "Allow dithering the gradients"
+                help
+                    Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
+                    LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+                    The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion
+
+            config LV_DITHER_ERROR_DIFFUSION
+                bool "Add support for error diffusion dithering"
+                depends on LV_DITHER_GRADIENT
+                help
+                    Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+                    The increase in memory consumption is (24 bits * object's width)
 
             config LV_DISP_ROT_MAX_BUF
                 int "Maximum buffer size to allocate for rotation"
@@ -839,29 +869,49 @@ menu "LVGL configuration"
 
     menu "3rd Party Libraries"
         config LV_USE_FS_STDIO
-            int "File system on top of stdio API"
-            default 0
+            bool "File system on top of stdio API"
+        config LV_FS_STDIO_LETTER
+            string "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )"
+            depends on LV_USE_FS_STDIO != 0
         config LV_FS_STDIO_PATH
             string "Set the working directory"
-            depends on LV_USE_FS_STDIO
+            depends on LV_USE_FS_STDIO != 0
+        config LV_FS_STDIO_CACHE_SIZE
+            string ">0 to cache this number of bytes in lv_fs_read()"
+            depends on LV_USE_FS_STDIO != 0
 
         config LV_USE_FS_POSIX
-            int "File system on top of posix API"
-            default 0
+            bool "File system on top of posix API"
+        config LV_FS_POSIX_LETTER
+            int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            depends on LV_USE_FS_POSIX != 0
         config LV_FS_POSIX_PATH
             string "Set the working directory"
-            depends on LV_USE_FS_POSIX
+            depends on LV_USE_FS_POSIX != 0
+        config LV_FS_POSIX_CACHE_SIZE
+            int ">0 to cache this number of bytes in lv_fs_read()"
+            depends on LV_USE_FS_POSIX != 0
 
         config LV_USE_FS_WIN32
-            int "File system on top of Win32 API"
-            default 0
+            bool "File system on top of Win32 API"
+        config LV_FS_WIN32_LETTER
+            int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            depends on LV_USE_FS_WIN32 != 0
         config LV_FS_WIN32_PATH
             string "Set the working directory"
-            depends on LV_USE_FS_WIN32
+            depends on LV_USE_FS_WIN32 != 0
+        config LV_FS_WIN32_CACHE_SIZE
+            int ">0 to cache this number of bytes in lv_fs_read()"
+            depends on LV_USE_FS_WIN32 != 0
 
         config LV_USE_FS_FATFS
-            int "File system on top of FatFS"
-            default 0
+            bool "File system on top of FatFS"
+        config LV_FS_FATFS_LETTER
+            int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            depends on LV_USE_FS_FATFS != 0
+        config LV_FS_FATFS_CACHE_SIZE
+            int ">0 to cache this number of bytes in lv_fs_read()"
+            depends on LV_USE_FS_FATFS != 0
 
         config LV_USE_PNG
             bool "PNG decoder library"
@@ -924,6 +974,52 @@ menu "LVGL configuration"
         config LV_BUILD_EXAMPLES
             bool "Enable the examples to be built"
             default y if !LV_CONF_MINIMAL
+    endmenu
+
+    menu "Demos"
+        config LV_USE_DEMO_WIDGETS
+            bool "Show some widget"
+            default n
+        config LV_DEMO_WIDGETS_SLIDESHOW
+            bool "Enable slide show"
+            depends on LV_USE_DEMO_WIDGETS
+            default n
+
+        config LV_USE_DEMO_KEYPAD_AND_ENCODER
+            bool "Demonstrate the usage of encoder and keyboard"
+            default n
+
+        config LV_USE_DEMO_BENCHMARK
+            bool "Benchmark your system"
+            default n
+
+        config LV_USE_DEMO_STRESS
+            bool "Stress test for LVGL"
+            default n
+
+        config LV_USE_DEMO_MUSIC
+            bool "Music player demo"
+            default n
+        config LV_DEMO_MUSIC_SQUARE
+            bool "Enable Square"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_LANDSCAPE
+            bool "Enable Landscape"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_ROUND
+            bool "Enable Round"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_LARGE
+            bool "Enable Large"
+            depends on LV_USE_DEMO_MUSIC
+            default n
+        config LV_DEMO_MUSIC_AUTO_PLAY
+            bool "Enable Auto play"
+            depends on LV_USE_DEMO_MUSIC
+            default n
     endmenu
 
 endmenu

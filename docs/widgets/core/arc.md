@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/arc.md
+:github_url: |github_link_base|/widgets/core/arc.md
 ```
 # Arc (lv_arc)
 

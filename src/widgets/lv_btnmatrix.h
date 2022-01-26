@@ -182,7 +182,7 @@ const char ** lv_btnmatrix_get_map(const lv_obj_t * obj);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)
- * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
+ * Useful in the `event_cb` to get the text of the button, check if hidden etc.
  * @param obj       pointer to button matrix object
  * @return          index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */

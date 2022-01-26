@@ -98,14 +98,10 @@ void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoo
         lv_area_to_sdl_rect(in, out);
         return;
     }
-    int h = in->y2 - in->y1 + 1;
-    int w = in->x2 - in->x1 + 1;
-    int sh = h * zoom >> 8;
-    int sw = w * zoom >> 8;
-    out->x = in->x1 - (sw / 2 - pivot->x);
-    out->y = in->y1 - (sh / 2 - pivot->y);
-    out->w = sw;
-    out->h = sh;
+    lv_area_t tmp;
+    _lv_img_buf_get_transformed_area(&tmp, lv_area_get_width(in), lv_area_get_height(in), 0, zoom, pivot);
+    lv_area_move(&tmp, in->x1, in->y1);
+    lv_area_to_sdl_rect(&tmp, out);
 }
 
 SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)

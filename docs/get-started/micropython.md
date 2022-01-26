@@ -22,7 +22,7 @@ Using Micropython, you can write Python3 code and run it even on a bare metal ar
 
 ## Why Micropython + LVGL?
 
-Currently, Micropython [does not have a good high-level GUI library](https://forum.micropython.org/viewtopic.php?f=18&t=5543) by default. LVGL is an [Object Oriented Component Based](https://blog.lvgl.io/2018-12-13/extend-lvgl-objects) high-level GUI library, which seems to be a natural candidate to map into a higher level language, such as Python. LVGL is implemented in C and its APIs are in C.
+Currently, Micropython [does not have a good high-level GUI library](https://forum.micropython.org/viewtopic.php?f=18&t=5543) by default. LVGL is an [Object-Oriented Component Based](https://blog.lvgl.io/2018-12-13/extend-lvgl-objects) high-level GUI library, which seems to be a natural candidate to map into a higher level language, such as Python. LVGL is implemented in C and its APIs are in C.
 
 ### Here are some advantages of using LVGL in Micropython:
 
@@ -36,7 +36,7 @@ In Micropython it's just **`Change code` > `Run`** ! You can even run commands i
 - Shortening the cycle of changing and fine-tuning the GUI.
 - Modelling the GUI in a more abstract way by defining reusable composite objects, taking advantage of Python's language features such as Inheritance, Closures, List Comprehension, Generators, Exception Handling, Arbitrary Precision Integers and others.
 - Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.  
-This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython). CircuitPython was designed with education in mind, to make it easier for new or unexperienced users to get started with embedded development.
+This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython). CircuitPython was designed with education in mind, to make it easier for new or inexperienced users to get started with embedded development.
 - Creating tools to work with LVGL at a higher level (e.g. drag-and-drop designer).
 
 ---

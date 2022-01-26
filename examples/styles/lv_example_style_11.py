@@ -32,7 +32,7 @@ label = lv.label(obj_base)
 label.set_text("Base")
 label.center()
 
-# Create an other object with the base style and earnings style too
+# Create another object with the base style and earnings style too
 obj_warning = lv.obj(lv.scr_act())
 obj_warning.add_style(style_base, 0)
 obj_warning.add_style(style_warning, 0)

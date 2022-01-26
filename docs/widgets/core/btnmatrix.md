@@ -1,12 +1,12 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/btnmatrix.md
+:github_url: |github_link_base|/widgets/core/btnmatrix.md
 ```
 # Button matrix (lv_btnmatrix)
 
 ## Overview
 
-The Button Matrix object is a lightweight way to display multiple buttons in rows and columns. Lightweight because the buttons are not actually created but just virtually drawn on the fly. This way, one button use only eight extra bytes of memory instead of the ~100-150 bytes a normal [Button](/widgets/core/btn) object plus the 100 or so bytes for the the [Label](/widgets/core/label) object.
+The Button Matrix object is a lightweight way to display multiple buttons in rows and columns. Lightweight because the buttons are not actually created but just virtually drawn on the fly. This way, one button use only eight extra bytes of memory instead of the ~100-150 bytes a normal [Button](/widgets/core/btn) object plus the 100 or so bytes for the [Label](/widgets/core/label) object.
 
 The Button matrix is added to the default group (if one is set). Besides the Button matrix is an editable object to allow selecting and clicking the buttons with encoder navigation too.
 
@@ -56,7 +56,7 @@ An element of `ctrl_map` should look like `ctrl_map[0] = width | LV_BTNM_CTRL_NO
 The number of elements should be equal to the number of buttons (excluding newlines characters).
 
 ### One check
-The "One check" feature can be enabled with `lv_btnmatrix_set_one_check(btnm, true)` to allow only one button to be checked at a time.
+The "One check" feature can be enabled with `lv_btnmatrix_set_one_checked(btnm, true)` to allow only one button to be checked at a time.
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a button is pressed/released or repeated after long press. The event parameter is set to the ID of the pressed/released button.

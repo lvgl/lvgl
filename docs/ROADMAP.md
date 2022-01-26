@@ -17,10 +17,11 @@ See [#2790](https://github.com/lvgl/lvgl/issues/2790)
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
 - Optimize font decompression
-- Need static analyze (via coverity.io or somehing else)
+- Need static analyze (via coverity.io or something else)
 - Support dot_begin and dot_middle long modes for labels
 - Add new label alignment modes. [#1656](https://github.com/lvgl/lvgl/issues/1656)
 - Support larger images: [#1892](https://github.com/lvgl/lvgl/issues/1892)
 - Curved text on path
-- Varaible binding impromevments like Redux?
+- Variable binding improvements like Redux?
 - Functional programming support, pure view? See [here](https://www.freecodecamp.org/news/the-revolution-of-pure-views-aed339db7da4/)
+- Circle layout. See [#2871](https://github.com/lvgl/lvgl/issues/2871)

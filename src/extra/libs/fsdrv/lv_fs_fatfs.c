@@ -8,12 +8,16 @@
  *********************/
 #include "../../../lvgl.h"
 
-#if LV_USE_FS_FATFS != '\0'
+#if LV_USE_FS_FATFS
 #include "ff.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#if LV_FS_FATFS_LETTER == '\0'
+    #error "LV_FS_FATFS_LETTER must be an upper case ASCII letter"
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -62,7 +66,9 @@ void lv_fs_fatfs_init(void)
     lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
-    fs_drv.letter = LV_USE_FS_FATFS;
+    fs_drv.letter = LV_FS_FATFS_LETTER;
+    fs_drv.cache_size = LV_FS_FSTFS_CACHE_SIZE;
+
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;
     fs_drv.read_cb = fs_read;
@@ -184,10 +190,10 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             f_lseek(file_p, pos);
             break;
         case LV_FS_SEEK_CUR:
-            f_lseek(file_p, f_tell(file_p) + pos);
+            f_lseek(file_p, f_tell((FIL *)file_p) + pos);
             break;
         case LV_FS_SEEK_END:
-            f_lseek(file_p, f_size(file_p) + pos);
+            f_lseek(file_p, f_size((FIL *)file_p) + pos);
             break;
         default:
             break;
@@ -206,7 +212,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    *pos_p = f_tell(file_p);
+    *pos_p = f_tell((FIL *)file_p);
     return LV_FS_RES_OK;
 }
 
@@ -274,4 +280,11 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     return LV_FS_RES_OK;
 }
 
-#endif  /*LV_USE_FS_FATFS*/
+#else /*LV_USE_FS_FATFS == 0*/
+
+#if defined(LV_FS_FATFS_LETTER) && LV_FS_FATFS_LETTER != '\0'
+    #warning "LV_USE_FS_FATFS is not enabled but LV_FS_FATFS_LETTER is set"
+#endif
+
+#endif /*LV_USE_FS_POSIX*/
+

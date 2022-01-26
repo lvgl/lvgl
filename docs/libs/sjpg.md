@@ -5,7 +5,7 @@
 
 # JPG decoder
 
-Allow the use of JPG images in LVGL. Besides that it also allows the use of a custom format, called Split JPG (SJPG), which can be decided in more optimal way on embedded systems.
+Allow the use of JPG images in LVGL. Besides that it also allows the use of a custom format, called Split JPG (SJPG), which can be decoded in more optimal way on embedded systems.
 
 ## Overview
   - Supports both normal JPG and the custom SJPG formats.
@@ -14,7 +14,7 @@ Allow the use of JPG images in LVGL. Besides that it also allows the use of a cu
   - SJPG is 'split-jpeg' which is a bundle of small jpeg fragments with an sjpg header.
   - SJPG size will be almost comparable to the jpg file or might be a slightly larger.
   - File read from file and c-array are implemented.
-  - SJPEG frame fragment cache enables fast fetching of lines if availble in cache.
+  - SJPEG frame fragment cache enables fast fetching of lines if available in cache.
   - By default the sjpg image cache will be image width * 2 * 16 bytes (can be modified)
   - Currently only 16 bit image format is supported (TODO)
   - Only the required partion of the JPG and SJPG images are decoded, therefore they can't be zoomed or rotated.

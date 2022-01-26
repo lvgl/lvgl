@@ -226,7 +226,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
     uint32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : box_w * box_h;
     lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
-    blend_dsc.mask = mask_buf;
+    blend_dsc.mask_buf = mask_buf;
     int32_t mask_p = 0;
 
     lv_area_t fill_area;
@@ -412,7 +412,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     blend_dsc.blend_area = &map_area;
     blend_dsc.mask_area = &map_area;
     blend_dsc.src_buf = color_buf;
-    blend_dsc.mask = mask_buf;
+    blend_dsc.mask_buf = mask_buf;
     blend_dsc.opa = opa;
     blend_dsc.blend_mode = dsc->blend_mode;
 
@@ -470,7 +470,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 #endif
 
 #if LV_COLOR_DEPTH == 32
-                res_color.ch.alpha =  0xff;
+                res_color.ch.alpha = 0xff;
 #endif
 
                 if(font_rgb[0] == 0 && font_rgb[1] == 0 && font_rgb[2] == 0) mask_buf[mask_p] = LV_OPA_TRANSP;

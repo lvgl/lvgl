@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/core/label.md
+:github_url: |github_link_base|/widgets/core/core/label.md
 ```
 # Label (lv_label)
 

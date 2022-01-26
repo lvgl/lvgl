@@ -192,13 +192,16 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj);
 lv_coord_t lv_spangroup_get_max_line_h(lv_obj_t * obj);
 
 /**
- * get the width when all span of spangroup on a line. include spangroup pad.
+ * get the text content width when all span of spangroup on a line.
  * @param obj pointer to a spangroup object.
+ * @param max_width if text content width >= max_width, return max_width
+ * to reduce computation, if max_width == 0, returns the text content width.
+ * @return text content width or max_width.
  */
-lv_coord_t lv_spangroup_get_expand_width(lv_obj_t * obj);
+uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 
 /**
- * get the height with width fixed. the height include spangroup pad.
+ * get the text content height with width fixed.
  * @param obj pointer to a spangroup object.
  */
 lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width);

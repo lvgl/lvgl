@@ -20,7 +20,8 @@ extern "C" {
 
 #include LV_GPU_SDL_INCLUDE_PATH
 
-#include "../sw/lv_draw_sw.h"
+#include "../lv_draw.h"
+#include "../../core/lv_disp.h"
 
 /*********************
  *      DEFINES
@@ -43,10 +44,11 @@ typedef struct {
      * Render for display driver
      */
     SDL_Renderer * renderer;
+    void * user_data;
 } lv_draw_sdl_drv_param_t;
 
 typedef struct {
-    lv_draw_sw_ctx_t base_draw;
+    lv_draw_ctx_t base_draw;
     SDL_Renderer * renderer;
     struct lv_draw_sdl_context_internals_t * internals;
 } lv_draw_sdl_ctx_t;

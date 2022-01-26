@@ -10,6 +10,7 @@ static void event_handler(lv_event_t * e)
         LV_LOG_USER("Clicked: %s", lv_list_get_btn_text(list1, obj));
     }
 }
+
 void lv_example_list_1(void)
 {
     /*Create a list*/

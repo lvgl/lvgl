@@ -20,7 +20,8 @@ build_only_options = {
 }
 
 test_options = {
-    'OPTIONS_TEST': 'Test config, 32 bit color depth',
+    'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',
+    'OPTIONS_TEST_DEFHEAP': 'Test config, LVGL heap, 32 bit color depth',
 }
 
 

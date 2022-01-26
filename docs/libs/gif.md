@@ -4,11 +4,11 @@
 ```
 
 # GIF decoder
-Allow to use of GIF images in LVGL. Based on https://github.com/lecram/gifdec
+Allow using GIF images in LVGL. Based on https://github.com/lecram/gifdec
 
 When enabled in `lv_conf.h` with `LV_USE_GIF` `lv_gif_create(parent)` can be used to create a gif widget.
 
-`lv_gif_set_src(obj, src)` works very similarly to `lv_img_set_src`. As source It also accepts images as variables (`lv_img_dsc_t`) or files.
+`lv_gif_set_src(obj, src)` works very similarly to `lv_img_set_src`. As source, it also accepts images as variables (`lv_img_dsc_t`) or files.
 
 
 ## Convert GIF files to C array
@@ -16,7 +16,6 @@ To convert a GIF file to byte values array use [LVGL's online converter](https:/
  
 
 ## Use GIF images from file
-
 For example:
 ```c
 lv_gif_set_src(obj, "S:path/to/example.gif");
@@ -33,16 +32,12 @@ To decode and display a GIF animation the following amount of RAM is required:
 
 ## Example
 ```eval_rst
-
 .. include:: ../../examples/libs/gif/index.rst
-
 ```
 
 ## API
 
 ```eval_rst
-
 .. doxygenfile:: lv_gif.h
   :project: lvgl
-
 ```

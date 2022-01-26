@@ -100,7 +100,7 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
 
 
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_throw =  indev_act->driver->scroll_throw;
+    lv_coord_t scroll_throw = indev_act->driver->scroll_throw;
 
     if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
         proc->types.pointer.scroll_throw_vect.y = 0;
@@ -244,7 +244,7 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
     lv_obj_t * obj_candidate = NULL;
     lv_dir_t dir_candidate = LV_DIR_NONE;
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_limit =  indev_act->driver->scroll_limit;
+    lv_coord_t scroll_limit = indev_act->driver->scroll_limit;
 
     /*Go until find a scrollable object in the current direction
      *More precisely:
@@ -254,22 +254,25 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
      * 4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
      * 5. Use the last candidate. Always the "deepest" parent or the object from point 3*/
     lv_obj_t * obj_act = proc->types.pointer.act_obj;
+
+    /*Decide if it's a horizontal or vertical scroll*/
+    bool hor_en = false;
+    bool ver_en = false;
+    if(LV_ABS(proc->types.pointer.scroll_sum.x) > LV_ABS(proc->types.pointer.scroll_sum.y)) {
+        hor_en = true;
+    }
+    else {
+        ver_en = true;
+    }
+
     while(obj_act) {
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
-            /*If this object don't want to chain the scroll ot the parent stop searching*/
-            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
+            /*If this object don't want to chain the scroll to the parent stop searching*/
+            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
+            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
+
             obj_act = lv_obj_get_parent(obj_act);
             continue;
-        }
-
-        /*Decide if it's a horizontal or vertical scroll*/
-        bool hor_en = false;
-        bool ver_en = false;
-        if(LV_ABS(proc->types.pointer.scroll_sum.x) > LV_ABS(proc->types.pointer.scroll_sum.y)) {
-            hor_en = true;
-        }
-        else {
-            ver_en = true;
         }
 
         /*Consider both up-down or left/right scrollable according to the current direction*/
@@ -296,14 +299,14 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
          *is propagated to this object it can show at least elastic scroll effect.
          *But if not hor/ver scrollable do not scroll it at all (so it's not a good candidate)*/
         if((st > 0 || sb > 0)  &&
-           ((up_en    && proc->types.pointer.scroll_sum.y >= scroll_limit) ||
+           ((up_en    && proc->types.pointer.scroll_sum.y >=   scroll_limit) ||
             (down_en  && proc->types.pointer.scroll_sum.y <= - scroll_limit))) {
             obj_candidate = obj_act;
             dir_candidate = LV_DIR_VER;
         }
 
         if((sl > 0 || sr > 0)  &&
-           ((left_en    && proc->types.pointer.scroll_sum.x >=  scroll_limit) ||
+           ((left_en   && proc->types.pointer.scroll_sum.x >=   scroll_limit) ||
             (right_en  && proc->types.pointer.scroll_sum.x <= - scroll_limit))) {
             obj_candidate = obj_act;
             dir_candidate = LV_DIR_HOR;
@@ -323,8 +326,9 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
             break;
         }
 
-        /*If this object don't want to chain the scroll ot the parent stop searching*/
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
+        /*If this object don't want to chain the scroll to the parent stop searching*/
+        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
+        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
 
         /*Try the parent*/
         obj_act = lv_obj_get_parent(obj_act);
@@ -537,11 +541,11 @@ static void scroll_limit_diff(_lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_c
 
 static lv_coord_t scroll_throw_predict_y(_lv_indev_proc_t * proc)
 {
-    lv_coord_t y =  proc->types.pointer.scroll_throw_vect.y;
+    lv_coord_t y = proc->types.pointer.scroll_throw_vect.y;
     lv_coord_t move = 0;
 
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_throw =  indev_act->driver->scroll_throw;
+    lv_coord_t scroll_throw = indev_act->driver->scroll_throw;
 
     while(y) {
         move += y;
@@ -553,11 +557,11 @@ static lv_coord_t scroll_throw_predict_y(_lv_indev_proc_t * proc)
 
 static lv_coord_t scroll_throw_predict_x(_lv_indev_proc_t * proc)
 {
-    lv_coord_t x =  proc->types.pointer.scroll_throw_vect.x;
+    lv_coord_t x = proc->types.pointer.scroll_throw_vect.x;
     lv_coord_t move = 0;
 
     lv_indev_t * indev_act = lv_indev_get_act();
-    lv_coord_t scroll_throw =  indev_act->driver->scroll_throw;
+    lv_coord_t scroll_throw = indev_act->driver->scroll_throw;
 
     while(x) {
         move += x;
