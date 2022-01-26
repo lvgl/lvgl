@@ -593,19 +593,12 @@ static void draw_main(lv_event_t * e)
 
     lv_point_t txt_size;
     lv_area_t cell_area;
-    lv_area_t txt_area;
-    lv_text_flag_t txt_flags;
 
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
     lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-
-    lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
@@ -628,7 +621,7 @@ static void draw_main(lv_event_t * e)
 
     cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) + border_width;
     lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
-    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL ? true : false;
+    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     /*Handle custom drawer*/
     lv_obj_draw_part_dsc_t part_draw_dsc;
@@ -735,6 +728,13 @@ static void draw_main(lv_event_t * e)
             lv_draw_rect(draw_ctx, &rect_dsc_act, &cell_area_border);
 
             if(table->cell_data[cell]) {
+                const lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+                const lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+                const lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+                const lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+                lv_text_flag_t txt_flags = LV_TEXT_FLAG_NONE;
+                lv_area_t txt_area;
+
                 txt_area.x1 = cell_area.x1 + cell_left;
                 txt_area.x2 = cell_area.x2 - cell_right;
                 txt_area.y1 = cell_area.y1 + cell_top;
@@ -743,7 +743,6 @@ static void draw_main(lv_event_t * e)
                 /*Align the content to the middle if not cropped*/
                 bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP ? true : false;
                 if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
-                else txt_flags = LV_TEXT_FLAG_NONE;
 
                 lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
                                 label_dsc_act.letter_space, label_dsc_act.line_space,
