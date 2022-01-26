@@ -410,7 +410,7 @@ bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
     uint32_t cell = row * table->col_cnt + col;
 
     if(table->cell_data[cell] == NULL) return false;
-    else return (table->cell_data[cell][0] & ctrl) == ctrl ? true : false;
+    else return (table->cell_data[cell][0] & ctrl) == ctrl;
 }
 
 void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)

@@ -38,4 +38,17 @@ void test_table_should_grow_columns_automatically_when_setting_formatted_cell_va
     TEST_ASSERT_EQUAL_UINT16(expected_column_count, lv_table_get_col_cnt(table));
 }
 
+void test_table_should_identify_cell_with_ctrl(void)
+{
+    bool has_ctrl = false;
+
+    has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+
+    TEST_ASSERT_FALSE(has_ctrl);
+
+    lv_table_add_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    TEST_ASSERT_TRUE(has_ctrl);
+}
+
 #endif
