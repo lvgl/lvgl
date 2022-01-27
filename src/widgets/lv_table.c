@@ -36,7 +36,7 @@ static void draw_main(lv_event_t * e);
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
                                  lv_coord_t letter_space, lv_coord_t line_space,
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
-static void refr_size(lv_obj_t * obj, uint32_t strat_row);
+static void refr_size(lv_obj_t * obj, uint32_t start_row);
 static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 static size_t get_cell_txt_len(const char * txt);
 static void copy_cell_txt(char * dst, const char * txt);
@@ -774,28 +774,27 @@ static void draw_main(lv_event_t * e)
     draw_ctx->clip_area = clip_area_ori;
 }
 
-static void refr_size(lv_obj_t * obj, uint32_t strat_row)
+/* Refreshes size of the table starting from @start_row row */
+static void refr_size(lv_obj_t * obj, uint32_t start_row)
 {
-    lv_table_t * table = (lv_table_t *)obj;
-
-    uint32_t i;
-
-    lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+    const lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+    const lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+    const lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+    const lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
 
-    lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
-    lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
+    const lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
+    const lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
 
-    for(i = strat_row; i < table->row_cnt; i++) {
-        table->row_h[i] = get_row_height(obj, i, font, letter_space, line_space,
-                                         cell_left, cell_right, cell_top, cell_bottom);
-        table->row_h[i] = LV_CLAMP(minh, table->row_h[i], maxh);
+    lv_table_t * table = (lv_table_t *)obj;
+    uint32_t i;
+    for(i = start_row; i < table->row_cnt; i++) {
+        lv_coord_t calculated_height = get_row_height(obj, i, font, letter_space, line_space,
+                                                      cell_left, cell_right, cell_top, cell_bottom);
+        table->row_h[i] = LV_CLAMP(minh, calculated_height, maxh);
     }
 
     lv_obj_refresh_self_size(obj) ;
