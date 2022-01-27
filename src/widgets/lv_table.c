@@ -658,18 +658,18 @@ static void draw_main(lv_event_t * e)
 
             uint16_t col_merge = 0;
             for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-                if(table->cell_data[cell + col_merge]) {
-                    char * next_cell_data = table->cell_data[cell + col_merge];
-                    if(next_cell_data) ctrl = next_cell_data[0];
-                    if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
-                        if(rtl) cell_area.x1 -= table->col_w[col + col_merge + 1];
-                        else cell_area.x2 += table->col_w[col + col_merge + 1];
-                    else {
-                        break;
-                    }
-                }
-                else {
+                uint16_t index = cell + col_merge;
+                char * next_cell_data = table->cell_data[index];
+
+                if(next_cell_data == NULL)
                     break;
+
+                lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
+                if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
+                    lv_coord_t offset = table->col_w[index + 1];
+
+                    if(rtl) cell_area.x1 -= offset;
+                    else cell_area.x2 += offset;
                 }
             }
 
