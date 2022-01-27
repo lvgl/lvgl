@@ -17,4 +17,9 @@ You still need to provide the drivers and libraries, this extension provides onl
 
 ## Usage
 
-In `lv_conf.h` set a driver letter for one or more `LV_FS_USE_...` define(s). After that you can access files using that driver letter. Setting `'\0'` will disable use of that interface.  
+In `lv_conf.h` enable `LV_USE_FS_...` and assign an upper cased letter to `LV_FS_..._LETTER` (e.g. `'S'`).
+After that you can access files using that driver letter. E.g. `"S:path/to/file.txt"`.
+
+The work directory can be set with `LV_FS_..._PATH`. E.g. `"/home/joe/projects/"` The actual file/directory paths will be appended to it. 
+
+Cached reading is also supported if `LV_FS_..._CACHE_SIZE` is set to not `0` value. `lv_fs_read` caches this size of data to lower the number of actual reads from the storage. 
