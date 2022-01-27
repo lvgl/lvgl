@@ -824,21 +824,15 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
         /* Merge cells */
         uint16_t col_merge = 0;
         for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-            if(table->cell_data[cell + col_merge] == NULL) {
-                break;
-            }
+            uint16_t index = cell + col_merge;
+            char * next_cell_data = table->cell_data[index];
 
-            char * next_cell_data = table->cell_data[cell + col_merge];
-            if(NULL == next_cell_data)
+            if(next_cell_data == NULL)
                 break;
 
             lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
             if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
-                txt_w += table->col_w[col + col_merge + 1];
-            else
-                /* Do we break this col_merge loop only, right? If so, I think it's
-                 * the same if we remove this else statement */
-                break;
+                txt_w += table->col_w[index + 1];
         }
 
         lv_table_cell_ctrl_t ctrl = 0;
