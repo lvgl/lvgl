@@ -815,44 +815,51 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
     lv_coord_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
 
     for(cell = row_start, col = 0; cell < row_start + table->col_cnt; cell++, col++) {
-        if(table->cell_data[cell] != NULL) {
-            txt_w              = table->col_w[col];
-            uint16_t col_merge = 0;
-            for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
+        /* NOTE: When can we have a cell_data pointing to NULL? Is continuing the best
+         * way to handle it? */
+        if(table->cell_data[cell] == NULL) {
+            continue;
+        }
 
-                if(table->cell_data[cell + col_merge] != NULL) {
-                    lv_table_cell_ctrl_t ctrl = 0;
-                    char * next_cell_data = table->cell_data[cell + col_merge];
-                    if(next_cell_data) ctrl = next_cell_data[0];
-                    if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
-                        txt_w += table->col_w[col + col_merge + 1];
-                    else
-                        break;
-                }
-                else {
-                    break;
-                }
+        txt_w = table->col_w[col];
+        /* Merge cells */
+        uint16_t col_merge = 0;
+        for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
+            if(table->cell_data[cell + col_merge] == NULL) {
+                break;
             }
 
-            lv_table_cell_ctrl_t ctrl = 0;
-            if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
+            char * next_cell_data = table->cell_data[cell + col_merge];
+            if(NULL == next_cell_data)
+                break;
 
-            /*With text crop assume 1 line*/
-            if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
-                h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
-                               h_max);
-            }
-            /*Without text crop calculate the height of the text in the cell*/
-            else {
-                txt_w -= cell_left + cell_right;
+            lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
+            if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
+                txt_w += table->col_w[col + col_merge + 1];
+            else
+                /* Do we break this col_merge loop only, right? If so, I think it's
+                 * the same if we remove this else statement */
+                break;
+        }
 
-                lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
-                                letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
+        lv_table_cell_ctrl_t ctrl = 0;
+        if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
 
-                h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
-                cell += col_merge;
-                col += col_merge;
-            }
+        /*With text crop assume 1 line*/
+        if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
+            h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
+                           h_max);
+        }
+        /*Without text crop calculate the height of the text in the cell*/
+        else {
+            txt_w -= cell_left + cell_right;
+
+            lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
+                            letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
+
+            h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
+            cell += col_merge;
+            col += col_merge;
         }
     }
 
