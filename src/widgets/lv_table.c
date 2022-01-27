@@ -664,8 +664,8 @@ static void draw_main(lv_event_t * e)
                 if(next_cell_data == NULL)
                     break;
 
-                lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
-                if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
+                lv_table_cell_ctrl_t merge_ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
+                if(merge_ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
                     lv_coord_t offset = table->col_w[index + 1];
 
                     if(rtl) cell_area.x1 -= offset;
