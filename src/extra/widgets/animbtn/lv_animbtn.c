@@ -24,6 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_animbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_animbtn_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void apply_state(lv_obj_t * animbtn);
 static void loop_state(lv_obj_t * animbtn);
@@ -31,6 +32,8 @@ static lv_animbtn_state_t suggest_state(lv_obj_t * animbtn, lv_animbtn_state_t s
 static lv_animbtn_state_t get_state(const lv_obj_t * animbtn);
 static void setup_anim(lv_animbtn_t * animbtn, lv_animbtn_state_desc_t * desc);
 static int is_state_valid(const lv_animbtn_state_desc_t * state);
+static uint8_t find_trans(lv_animbtn_t * animbtn, lv_animbtn_state_t from, lv_animbtn_state_t to);
+static bool is_transiting(lv_animbtn_t * animbtn, lv_animbtn_state_t current_state);
 
 /**********************
  *  STATIC VARIABLES
@@ -39,6 +42,7 @@ const lv_obj_class_t lv_animbtn_class = {
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_animbtn_t),
     .constructor_cb = lv_animbtn_constructor,
+    .destructor_cb = lv_animbtn_destructor,
     .event_cb = lv_animbtn_event,
 };
 
@@ -91,10 +95,37 @@ void lv_animbtn_set_state_desc(lv_obj_t * obj, lv_animbtn_state_t state, const l
 
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
 
-    animbtn->state_desc[state] = desc;
-    animbtn->state_desc[state].control |= LV_IMG_CTRL_MARKED; /*A non existant flag used to mark that the state was used*/
+    animbtn->state_desc[state - 1] = desc;
+    animbtn->state_desc[state - 1].control |=
+        LV_IMG_CTRL_MARKED; /*A non existant flag used to mark that the state was used*/
     apply_state(obj);
 }
+
+void lv_animbtn_set_transition_desc(lv_obj_t * obj, lv_animbtn_state_t from_state, lv_animbtn_state_t to_state,
+                                    lv_animbtn_state_desc_t desc)
+{
+    if(LV_BT(desc.control, LV_ANIMBTN_CTRL_LOOP)) {
+        return; /* Loop not allowed in transition */
+    }
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
+    uint8_t pos = find_trans(animbtn, from_state, to_state);
+    if(pos != animbtn->trans_count) {
+        animbtn->trans_desc[pos].desc = desc;
+        return;
+    }
+    /* Allocate a transition array now */
+    animbtn->trans_desc = (lv_animbtn_transition_t *)lv_mem_realloc(animbtn->trans_desc,
+                                                                    (animbtn->trans_count + 1) * sizeof(*animbtn->trans_desc));
+    LV_ASSERT_MALLOC(animbtn->trans_desc);
+    animbtn->trans_desc[animbtn->trans_count].from = from_state;
+    animbtn->trans_desc[animbtn->trans_count].to = to_state;
+    animbtn->trans_desc[animbtn->trans_count].desc = desc;
+    animbtn->trans_count++;
+}
+
 
 void lv_animbtn_set_state(lv_obj_t * obj, lv_animbtn_state_t state)
 {
@@ -129,13 +160,30 @@ const lv_animbtn_state_desc_t * lv_animbtn_get_state_desc(lv_obj_t * obj, lv_ani
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
 
-    return &animbtn->state_desc[state];
+    return &animbtn->state_desc[state - 1];
 }
 
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static uint8_t find_trans(lv_animbtn_t * animbtn, lv_animbtn_state_t from, lv_animbtn_state_t to)
+{
+    uint8_t i = 0;
+    for(; i < animbtn->trans_count; i++) {
+        if(animbtn->trans_desc[i].from == from && animbtn->trans_desc[i].to == to) {
+            return i;
+        }
+    }
+    return i;
+}
+
+static bool is_transiting(lv_animbtn_t * animbtn, lv_animbtn_state_t current_state)
+{
+    return animbtn->prev_state != current_state;
+}
+
 
 static void lv_animbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -144,10 +192,21 @@ static void lv_animbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     /*Initialize the allocated 'ext'*/
     lv_memset_00(animbtn->state_desc, sizeof(animbtn->state_desc));
     animbtn->img = NULL;
-    animbtn->prev_state = _LV_ANIMBTN_STATE_NUM;
+    animbtn->prev_state = 0;
+    animbtn->trans_count = 0;
+    animbtn->trans_desc = 0;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+}
+
+static void lv_animbtn_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+    lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
+    lv_mem_free(animbtn->trans_desc);
+    animbtn->trans_desc = 0;
+    animbtn->trans_count = 0;
 }
 
 
@@ -204,13 +263,18 @@ static void setup_anim(lv_animbtn_t * animbtn, lv_animbtn_state_desc_t * desc)
 static void loop_state(lv_obj_t * obj)
 {
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
-    lv_animbtn_state_t state  = suggest_state(obj, get_state(obj));
+    lv_animbtn_state_t current_state = get_state(obj);
+    lv_animbtn_state_t state  = suggest_state(obj, current_state);
+    if(is_transiting(animbtn, current_state)) {
+        /* Need to end transition here and switch to state animation */
+        animbtn->prev_state = state;
+    }
 
-    if(animbtn->prev_state != state || animbtn->img == NULL || !is_state_valid(&animbtn->state_desc[state])) return;
+    if(animbtn->prev_state != state || animbtn->img == NULL || !is_state_valid(&animbtn->state_desc[state - 1])) return;
 
     /*Set the logic for the current state*/
-    if(LV_BT(animbtn->state_desc[state].control, LV_IMG_CTRL_LOOP)) {
-        setup_anim(animbtn, &animbtn->state_desc[state]);
+    if(LV_BT(animbtn->state_desc[state - 1].control, LV_IMG_CTRL_LOOP)) {
+        setup_anim(animbtn, &animbtn->state_desc[state - 1]);
     }
 }
 
@@ -218,13 +282,24 @@ static void loop_state(lv_obj_t * obj)
 static void apply_state(lv_obj_t * obj)
 {
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
-    lv_animbtn_state_t state  = suggest_state(obj, get_state(obj));
+    lv_animbtn_state_t current_state = get_state(obj);
+    lv_animbtn_state_t state  = suggest_state(obj, current_state);
+    if(is_transiting(animbtn, current_state)) {
+        /* We are transiting now */
+        uint8_t pos = find_trans(animbtn, animbtn->prev_state, current_state);
+        if(pos != animbtn->trans_count) {
+            setup_anim(animbtn, &animbtn->trans_desc[pos].desc);
 
-    lv_img_t * img = (lv_img_t *)animbtn->img;
-    if(state == animbtn->prev_state || img == NULL || !is_state_valid(&animbtn->state_desc[state])) return;
+            lv_obj_refresh_self_size(obj);
+            lv_obj_invalidate(obj);
+            return;
+        }
+    }
+
+    if(state == animbtn->prev_state || animbtn->img == NULL || !is_state_valid(&animbtn->state_desc[state - 1])) return;
 
     /*Set the logic for the current state*/
-    setup_anim(animbtn, &animbtn->state_desc[state]);
+    setup_anim(animbtn, &animbtn->state_desc[state - 1]);
 
     lv_obj_refresh_self_size(obj);
 
@@ -251,25 +326,27 @@ static int is_state_valid(const lv_animbtn_state_desc_t * state)
 static lv_animbtn_state_t suggest_state(lv_obj_t * obj, lv_animbtn_state_t state)
 {
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
-    if(!is_state_valid(&animbtn->state_desc[state])) {
+    if(!is_state_valid(&animbtn->state_desc[state - 1])) {
         switch(state) {
             case LV_ANIMBTN_STATE_PRESSED:
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED])) return LV_ANIMBTN_STATE_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED - 1])) return LV_ANIMBTN_STATE_RELEASED;
                 break;
             case LV_ANIMBTN_STATE_CHECKED_RELEASED:
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED])) return LV_ANIMBTN_STATE_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED - 1])) return LV_ANIMBTN_STATE_RELEASED;
                 break;
             case LV_ANIMBTN_STATE_CHECKED_PRESSED:
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_CHECKED_RELEASED])) return LV_ANIMBTN_STATE_CHECKED_RELEASED;
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_PRESSED])) return LV_ANIMBTN_STATE_PRESSED;
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED])) return LV_ANIMBTN_STATE_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_CHECKED_RELEASED - 1])) return
+                        LV_ANIMBTN_STATE_CHECKED_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_PRESSED - 1])) return LV_ANIMBTN_STATE_PRESSED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED - 1])) return LV_ANIMBTN_STATE_RELEASED;
                 break;
             case LV_ANIMBTN_STATE_DISABLED:
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED])) return LV_ANIMBTN_STATE_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED - 1])) return LV_ANIMBTN_STATE_RELEASED;
                 break;
             case LV_ANIMBTN_STATE_CHECKED_DISABLED:
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_CHECKED_RELEASED])) return LV_ANIMBTN_STATE_CHECKED_RELEASED;
-                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED])) return LV_ANIMBTN_STATE_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_CHECKED_RELEASED - 1])) return
+                        LV_ANIMBTN_STATE_CHECKED_RELEASED;
+                if(is_state_valid(&animbtn->state_desc[LV_ANIMBTN_STATE_RELEASED - 1])) return LV_ANIMBTN_STATE_RELEASED;
                 break;
             default:
                 break;

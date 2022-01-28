@@ -21,14 +21,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef enum {
-    LV_ANIMBTN_STATE_RELEASED,
-    LV_ANIMBTN_STATE_PRESSED,
-    LV_ANIMBTN_STATE_DISABLED,
-    LV_ANIMBTN_STATE_CHECKED_RELEASED,
-    LV_ANIMBTN_STATE_CHECKED_PRESSED,
-    LV_ANIMBTN_STATE_CHECKED_DISABLED,
-    _LV_ANIMBTN_STATE_NUM,
+    LV_ANIMBTN_STATE_RELEASED = 1,          /* 0001 */
+    LV_ANIMBTN_STATE_PRESSED  = 2,           /* 0010 */
+    LV_ANIMBTN_STATE_DISABLED = 3,          /* 0100 */
+    LV_ANIMBTN_STATE_CHECKED_RELEASED = 4,  /* 1001 */
+    LV_ANIMBTN_STATE_CHECKED_PRESSED  = 5,   /* 1010 */
+    LV_ANIMBTN_STATE_CHECKED_DISABLED = 6,  /* 1100 */
+    _LV_ANIMBTN_STATE_NUM = 6,
 } lv_animbtn_state_t;
+
 
 typedef enum {
     LV_ANIMBTN_CTRL_FORWARD  = LV_IMG_CTRL_FORWARD,
@@ -43,12 +44,20 @@ typedef struct {
     lv_animbtn_ctrl_t control;
 } lv_animbtn_state_desc_t;
 
+typedef struct {
+    lv_animbtn_state_desc_t  desc;
+    lv_animbtn_state_t from : 4;
+    lv_animbtn_state_t to   : 4;
+} lv_animbtn_transition_t;
+
 /*Data of anim button*/
 typedef struct {
     lv_obj_t obj;
     lv_animbtn_state_desc_t state_desc[_LV_ANIMBTN_STATE_NUM];
-    lv_obj_t * img;
-    lv_animbtn_state_t prev_state;
+    lv_animbtn_transition_t * trans_desc;
+    lv_obj_t        *       img;
+    lv_animbtn_state_t      prev_state;
+    uint8_t                 trans_count;
 } lv_animbtn_t;
 
 extern const lv_obj_class_t lv_animbtn_class;
@@ -82,6 +91,19 @@ lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim);
  * In a specific state, the button can either play a short sequence once or loop, forward or backward or go to a specific frame and pause from there.
  */
 void lv_animbtn_set_state_desc(lv_obj_t * animbtn, lv_animbtn_state_t state, lv_animbtn_state_desc_t desc);
+
+/**
+ * Set animation for a transition from one state to another.
+ * @param animbtn pointer to an animation button object
+ * @param from_state the state to set transition from
+ * @param to_state the state to set transition to
+ * @param desc description of what to do when the button while transiting from from_state to to_state
+ *
+ * In a specific state, the button can either play a short sequence, forward or backward or go to a specific frame and pause from there.
+ */
+void lv_animbtn_set_transition_desc(lv_obj_t * animbtn, lv_animbtn_state_t from_state, lv_animbtn_state_t to_state,
+                                    lv_animbtn_state_desc_t desc);
+
 
 
 /**
