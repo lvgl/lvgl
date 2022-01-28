@@ -51,4 +51,31 @@ void test_table_should_identify_cell_with_ctrl(void)
     TEST_ASSERT_TRUE(has_ctrl);
 }
 
+void test_table_should_clear_selected_cell_ctrl(void)
+{
+    bool has_ctrl = false;
+
+    lv_table_add_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    TEST_ASSERT_TRUE(has_ctrl);
+
+    lv_table_clear_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    TEST_ASSERT_FALSE(has_ctrl);
+}
+
+void test_table_should_keep_not_selected_cell_ctrl(void)
+{
+    bool has_ctrl = false;
+
+    lv_table_add_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT | LV_TABLE_CELL_CTRL_TEXT_CROP);
+
+    lv_table_clear_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    TEST_ASSERT_FALSE(has_ctrl);
+
+    has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_TEXT_CROP);
+    TEST_ASSERT_TRUE(has_ctrl);
+}
+
 #endif
