@@ -118,12 +118,10 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_UNUSED(class_p);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
-    lv_img_cache_invalidate_src(&rlottie->img_ext.src);
     if(rlottie->img_ext.dec_ctx && !rlottie->img_ext.dec_ctx->auto_allocated) {
-        struct Lottie_Animation_S * anim = (struct Lottie_Animation_S *)rlottie->img_ext.dec_ctx->user_data;
-        lottie_animation_destroy(anim);
-        rlottie->img_ext.dec_ctx->user_data = 0;
+        rlottie->img_ext.dec_ctx->auto_allocated = 1; /* Let decoder do all the work */
     }
+    lv_img_cache_invalidate_src(&rlottie->img_ext.src);
 }
 
 
