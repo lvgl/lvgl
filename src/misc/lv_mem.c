@@ -204,6 +204,29 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     return new_p;
 }
 
+bool lv_mem_realloc_safe(void * data, size_t new_size)
+{
+    void * new_p = NULL;
+
+    MEM_TRACE("reallocating %p with %lu size", data, (unsigned long)new_size);
+
+    if(data_p == &zero_mem) return lv_mem_alloc(new_size);
+
+#if LV_MEM_CUSTOM == 0
+    new_p = lv_tlsf_realloc(tlsf, data, new_size);
+#else
+    new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
+#endif
+    if(new_p != NULL) {
+        MEM_TRACE("Memory allocated at %p", new_p);
+        data = new_p;
+    } else {
+        LV_LOG_ERROR("couldn't allocate memory");
+    }
+
+    return new_p != NULL;
+}
+
 lv_res_t lv_mem_test(void)
 {
     if(zero_mem != ZERO_MEM_SENTINEL) {
