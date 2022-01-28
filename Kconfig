@@ -884,33 +884,39 @@ menu "LVGL configuration"
             bool "File system on top of posix API"
         config LV_FS_POSIX_LETTER
             int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            default 0
             depends on LV_USE_FS_POSIX != 0
         config LV_FS_POSIX_PATH
             string "Set the working directory"
             depends on LV_USE_FS_POSIX != 0
         config LV_FS_POSIX_CACHE_SIZE
             int ">0 to cache this number of bytes in lv_fs_read()"
+            default 0
             depends on LV_USE_FS_POSIX != 0
 
         config LV_USE_FS_WIN32
             bool "File system on top of Win32 API"
         config LV_FS_WIN32_LETTER
             int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            default 0
             depends on LV_USE_FS_WIN32 != 0
         config LV_FS_WIN32_PATH
             string "Set the working directory"
             depends on LV_USE_FS_WIN32 != 0
         config LV_FS_WIN32_CACHE_SIZE
             int ">0 to cache this number of bytes in lv_fs_read()"
+            default 0
             depends on LV_USE_FS_WIN32 != 0
 
         config LV_USE_FS_FATFS
             bool "File system on top of FatFS"
         config LV_FS_FATFS_LETTER
             int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            default 0
             depends on LV_USE_FS_FATFS != 0
         config LV_FS_FATFS_CACHE_SIZE
             int ">0 to cache this number of bytes in lv_fs_read()"
+            default 0
             depends on LV_USE_FS_FATFS != 0
 
         config LV_USE_PNG
