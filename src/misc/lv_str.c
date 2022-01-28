@@ -42,8 +42,8 @@ char * lv_strncpy(char * dst, const char * src, size_t count)
     LV_ASSERT_VERIFY(src);
     LV_ASSERT_VERIFY(0 < count);
 
-    strncpy(dst, src, count - 1);
-    dst[count - 1] = '\0';
+    strncpy(dst, src, count);
+    dst[count] = '\0';
 
     return dst;
 }
