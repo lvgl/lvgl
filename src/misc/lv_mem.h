@@ -18,6 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "lv_types.h"
 
@@ -87,6 +88,19 @@ void lv_mem_free(void * data);
  * @return pointer to the new memory, NULL on failure
  */
 void * lv_mem_realloc(void * data_p, size_t new_size);
+
+/**
+ * Safe memory reallocation
+ *
+ * data will point to new memory on successfull reallocation, when reallocation
+ * is not successfull data will not be modified.
+ *
+ * @param data pointer to an allocated memory.
+ * Its content will be copied to the new memory block and freed
+ * @param new_size the desired new size in bytes
+ * @return true if the reallocation was successfull, false otherwise.
+ */
+bool lv_mem_realloc_safe(void * data, size_t new_size);
 
 /**
  *
