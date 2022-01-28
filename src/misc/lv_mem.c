@@ -204,7 +204,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     return new_p;
 }
 
-bool lv_mem_realloc_safe(void * data, size_t new_size)
+bool lv_mem_realloc_safe(void ** data, size_t new_size)
 {
     void * new_p = NULL;
 
@@ -220,7 +220,8 @@ bool lv_mem_realloc_safe(void * data, size_t new_size)
     if(new_p != NULL) {
         MEM_TRACE("Memory allocated at %p", new_p);
         data = new_p;
-    } else {
+    }
+    else {
         LV_LOG_ERROR("couldn't allocate memory");
     }
 
