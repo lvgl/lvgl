@@ -30,7 +30,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-extern void lv_port_indev_init(void);
+void lv_port_indev_init(void);
 
 /**********************
  *      MACROS

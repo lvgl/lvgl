@@ -29,7 +29,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
- extern void lv_port_fs_init(void);
+ void lv_port_fs_init(void);
 
 /**********************
  *      MACROS
