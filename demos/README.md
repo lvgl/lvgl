@@ -53,10 +53,19 @@
 ## Demos
 
 ### Widgets
-Shows how the widgets look like out of the box using the built-in material theme.  
+Shows how the widgets look like out of the box using the built-in material theme.  
+
 See in [lv_demo_widgets](https://github.com/lvgl/lv_examples/tree/master/src/lv_demo_widgets) folder.
 
 <img src="https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_widgets/screenshot1.png?raw=true" width=600px alt="Basic demo to show the widgets of LVGL">
+
+For running this demo properly, please make sure **LV_MEM_SIZE** is at least **38KB** (and **48KB** is recommended):
+
+```c
+#define LV_MEME_SIZE    (38ul * 1024ul)
+```
+
+
 
 ### Music player
 The music player demo shows what kind of modern, smartphone-like user interfaces can be created on LVGL. It works the best with display with 480x272 or 272x480 resolution. 
