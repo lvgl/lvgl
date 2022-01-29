@@ -11,7 +11,7 @@
 #if LV_USE_DEMO_WIDGETS
 
 #if LV_MEM_CUSTOM == 0 && LV_MEM_SIZE < (38ul * 1024ul)
-    #error Insufficient memory for demo:Widgets, please set LV_MEM_SIZE to at least 38KBte (38ul * 1024ul) and 48KB is recommended. 
+    #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended. 
 #endif
 
 /*********************
