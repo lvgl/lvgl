@@ -35,7 +35,7 @@ def draw_event_cb(e):
     coords = lv.area_t()
     obj.get_coords(coords)
     a.y2 = coords.y2
-    lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)
+    dsc.draw_ctx.rect(draw_rect_dsc, a)
 
     # Remove the masks
     lv.draw_mask_remove_id(line_mask_id)

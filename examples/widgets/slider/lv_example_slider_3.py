@@ -24,7 +24,7 @@ def slider_event_cb(e):
             label_draw_dsc = lv.draw_label_dsc_t()
             label_draw_dsc.init()
 
-            lv.draw_label(label_area, dsc.clip_area, label_draw_dsc, label_text, None)
+            dsc.draw_ctx.label(label_draw_dsc, label_area, label_text, None)
 #
 # Show the current value when the slider if pressed by extending the drawer
 #
