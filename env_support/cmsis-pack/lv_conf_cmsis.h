@@ -50,7 +50,7 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
     /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (35U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
@@ -119,21 +119,6 @@
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
     #define LV_CIRCLE_CACHE_SIZE 4
-
-    /*Allow dithering gradient (to achieve visual smooth color gradients on limited color depth display)
-    *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
-    *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-    #define LV_DITHER_GRADIENT 1
-
-    /*Add support for error diffusion dithering.
-    *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-    *The increase in memory consumption is (24 bits * object's width)*/
-    #define LV_DITHER_ERROR_DIFFUSION 1
-
-    /**Number of stops allowed per gradient. Increase this to allow more stops.
-    *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-    #define LV_GRADIENT_MAX_STOPS    2
-
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.
@@ -141,9 +126,32 @@
  *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE 0
+#define LV_IMG_CACHE_DEF_SIZE   0
 
-/*Maximum buffer size to allocate for rotation. Only used if software rotation is enabled in the display driver.*/
+/*Number of stops allowed per gradient. Increase this to allow more stops.
+ *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
+#define LV_GRADIENT_MAX_STOPS       2
+
+/*Default gradient buffer size.
+ *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+ *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+ *If the cache is too small the map will be allocated only while it's required for the drawing.
+ *0 mean no caching.*/
+#define LV_GRAD_CACHE_DEF_SIZE      0
+
+/*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
+ *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+ *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
+#define LV_DITHER_GRADIENT      0
+#if LV_DITHER_GRADIENT
+    /*Add support for error diffusion dithering.
+     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+     *The increase in memory consumption is (24 bits * object's width)*/
+    #define LV_DITHER_ERROR_DIFFUSION   0
+#endif
+
+/*Maximum buffer size to allocate for rotation.
+ *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
 /*-------------
@@ -151,7 +159,6 @@
  *-----------*/
 
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
-
 #if LV_USE_GPU_STM32_DMA2D
     /*Must be defined to include path of CMSIS header of target processor
     e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
@@ -159,7 +166,6 @@
 #endif
 
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
-
 #if LV_USE_GPU_NXP_PXP
     /*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
     *   and call lv_gpu_nxp_pxp_init() automatically during lv_init(). Note that symbol SDK_OS_FREE_RTOS
@@ -168,9 +174,6 @@
     */
     #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
-
-/*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
-
 
 /*Use SDL renderer API*/
 #define LV_USE_GPU_SDL 0
@@ -291,7 +294,7 @@
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN    __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -526,25 +529,31 @@
  * Themes
  *----------*/
 
-/*A simple, impressive and very complete theme*/
-#define LV_USE_THEME_DEFAULT 1
-#if LV_USE_THEME_DEFAULT
+#ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
+    /*A simple, impressive and very complete theme*/
+    #define LV_USE_THEME_DEFAULT 1
+    #if LV_USE_THEME_DEFAULT
 
-    /*0: Light mode; 1: Dark mode*/
-    #define LV_THEME_DEFAULT_DARK 0
+        /*0: Light mode; 1: Dark mode*/
+        #define LV_THEME_DEFAULT_DARK 0
 
-    /*1: Enable grow on press*/
-    #define LV_THEME_DEFAULT_GROW 1
+        /*1: Enable grow on press*/
+        #define LV_THEME_DEFAULT_GROW 1
 
-    /*Default transition time in [ms]*/
-    #define LV_THEME_DEFAULT_TRANSITION_TIME 80
-#endif /*LV_USE_THEME_DEFAULT*/
+        /*Default transition time in [ms]*/
+        #define LV_THEME_DEFAULT_TRANSITION_TIME 80
+    #endif /*LV_USE_THEME_DEFAULT*/
 
-/*A very simple theme that is a good starting point for a custom theme*/
-#define LV_USE_THEME_BASIC 1
+    /*A very simple theme that is a good starting point for a custom theme*/
+    #define LV_USE_THEME_BASIC 1
 
-/*A theme designed for monochrome displays*/
-#define LV_USE_THEME_MONO 1
+    /*A theme designed for monochrome displays*/
+    #define LV_USE_THEME_MONO 1
+#else
+    #define LV_USE_THEME_DEFAULT    0
+    #define LV_USE_THEME_BASIC      0
+    #define LV_USE_THEME_MONO       0
+#endif
 
 /*-----------
  * Layouts
@@ -556,20 +565,18 @@
 /*A layout similar to Grid in CSS.*/
 #define LV_USE_GRID 1
 
-/*---------------------
- * 3rd party libraries
- *--------------------*/
-
-
 /*-----------
  * Others
  *----------*/
 
 /*1: Enable API to take snapshot for object*/
-#define LV_USE_SNAPSHOT 1
+#define LV_USE_SNAPSHOT 0
 
 /*1: Enable Monkey test*/
-#define LV_USE_MONKEY 0
+#define LV_USE_MONKEY   0
+
+/*1: Enable grid navigation*/
+#define LV_USE_GRIDNAV  0
 
 /*==================
 * EXAMPLES
@@ -577,6 +584,14 @@
 
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
+
+/*==================
+* DEMOS
+*==================*/
+
+#if LV_USE_DEMO_WIDGETS && LV_MEM_CUSTOM == 0 && LV_MEM_SIZE < (35ul * 1024ul)
+    #error Insufficient memory for demo:Widgets, please set LV_MEM_SIZE to at least (35ul * 1024ul). 
+#endif
 
 /*--END OF LV_CONF_H--*/
 

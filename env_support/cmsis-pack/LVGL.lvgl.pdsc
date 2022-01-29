@@ -36,9 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
   
   <releases>
-    <release date="2022-01-20" version="0.8.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.0.8.4.pack">
-      - LVGL v8.1.1
-      - move cmsis-pack to env_support folder.
+    <release date="2022-01-28" version="0.8.5" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.0.8.5.pack">
+      - LVGL 8.1.1-dev
+      - Fixed issue #3032
     </release>
   </releases>
 
@@ -357,6 +357,8 @@
             <component Cgroup="lvgl" Csub="Extra Themes"  condition="LVGL-Essential">
               <description>Extra Themes, Widgets and Layouts</description>
               <files>
+                <file category="sourceC"            name="src/extra/lv_extra.c" />
+              
                 <!-- src/extra/themes -->
                 <file category="sourceC"            name="src/extra/themes/default/lv_theme_default.c" />
                 <file category="sourceC"            name="src/extra/themes/basic/lv_theme_basic.c" />
