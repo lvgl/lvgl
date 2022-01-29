@@ -41,7 +41,7 @@ def draw_event_cb(e):
         a.x2 = dsc.p2.x
         a.y1 = min(dsc.p1.y, dsc.p2.y)
         a.y2 = cont_a.y2 - 13 # -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesn't look like 0
-        lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)
+        dsc.draw_ctx.rect(draw_rect_dsc, a)
 
         # Remove the mask
         lv.draw_mask_free_param(line_mask_param)
