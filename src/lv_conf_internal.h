@@ -1854,7 +1854,7 @@
         #ifdef CONFIG_LV_FS_STDIO_PATH
             #define LV_FS_STDIO_PATH CONFIG_LV_FS_STDIO_PATH
         #else
-            #define LV_FS_STDIO_PATH ""         /*Set the working directory. File/directory paths ill be appended to it.*/
+            #define LV_FS_STDIO_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
         #endif
     #endif
     #ifndef LV_FS_STDIO_CACHE_SIZE
@@ -1886,7 +1886,7 @@
         #ifdef CONFIG_LV_FS_POSIX_PATH
             #define LV_FS_POSIX_PATH CONFIG_LV_FS_POSIX_PATH
         #else
-            #define LV_FS_POSIX_PATH ""         /*Set the working directory. File/directory paths ill be appended to it.*/
+            #define LV_FS_POSIX_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
         #endif
     #endif
     #ifndef LV_FS_POSIX_CACHE_SIZE
@@ -1918,7 +1918,7 @@
         #ifdef CONFIG_LV_FS_WIN32_PATH
             #define LV_FS_WIN32_PATH CONFIG_LV_FS_WIN32_PATH
         #else
-            #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory path ill be appended to it.*/
+            #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
         #endif
     #endif
     #ifndef LV_FS_WIN32_CACHE_SIZE
@@ -1946,11 +1946,11 @@
             #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
         #endif
     #endif
-    #ifndef LV_FS_FATSF_CACHE_SIZE
-        #ifdef CONFIG_LV_FS_FATSF_CACHE_SIZE
-            #define LV_FS_FATSF_CACHE_SIZE CONFIG_LV_FS_FATSF_CACHE_SIZE
+    #ifndef LV_FS_FATFS_CACHE_SIZE
+        #ifdef CONFIG_LV_FS_FATFS_CACHE_SIZE
+            #define LV_FS_FATFS_CACHE_SIZE CONFIG_LV_FS_FATFS_CACHE_SIZE
         #else
-            #define LV_FS_FATSF_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+            #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
