@@ -1079,11 +1079,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_PRESSED | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->bg_color_primary, LV_STATE_FOCUS_KEY);
     }
     else if(lv_obj_check_type(obj, &lv_menu_sidebar_header_cont_class) ||
             lv_obj_check_type(obj, &lv_menu_main_header_cont_class)) {
         lv_obj_add_style(obj, &styles->menu_header_cont, 0);
-        lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
     }
     else if(lv_obj_check_type(obj, &lv_menu_page_class)) {
         lv_obj_add_style(obj, &styles->menu_page, 0);
