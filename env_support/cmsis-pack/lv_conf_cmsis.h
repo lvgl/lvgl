@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.1.1-dev
+ * Configuration file for v8.2.0
  */
 
 /*
@@ -50,7 +50,7 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
     /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (35U * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
@@ -86,11 +86,20 @@
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#define LV_TICK_CUSTOM 0
-#if LV_TICK_CUSTOM
-    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-#endif   /*LV_TICK_CUSTOM*/
+#ifdef __PERF_COUNTER__
+    #define LV_TICK_CUSTOM 1
+    #if LV_TICK_CUSTOM
+        extern uint32_t SystemCoreClock;
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h" 
+        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    (get_system_ticks() / (SystemCoreClock / 1000ul))
+    #endif   /*LV_TICK_CUSTOM*/
+#else
+    #define LV_TICK_CUSTOM 0
+    #if LV_TICK_CUSTOM
+        #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
+        #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+    #endif   /*LV_TICK_CUSTOM*/
+#endif       /*__PERF_COUNTER__*/
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
@@ -112,13 +121,13 @@
     /*Allow buffering some shadow calculation.
     *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
     *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
-    #define LV_SHADOW_CACHE_SIZE 0
+    #define LV_SHADOW_CACHE_SIZE        0
 
     /* Set number of maximally cached circle data.
     * The circumference of 1/4 circle are saved for anti-aliasing
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
-    #define LV_CIRCLE_CACHE_SIZE 4
+    #define LV_CIRCLE_CACHE_SIZE        4
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.
@@ -126,23 +135,23 @@
  *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE   0
+#define LV_IMG_CACHE_DEF_SIZE           0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-#define LV_GRADIENT_MAX_STOPS       2
+#define LV_GRADIENT_MAX_STOPS           2
 
 /*Default gradient buffer size.
  *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
  *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
  *If the cache is too small the map will be allocated only while it's required for the drawing.
  *0 mean no caching.*/
-#define LV_GRAD_CACHE_DEF_SIZE      0
+#define LV_GRAD_CACHE_DEF_SIZE          0
 
 /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
  *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
  *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-#define LV_DITHER_GRADIENT      0
+#define LV_DITHER_GRADIENT              0
 #if LV_DITHER_GRADIENT
     /*Add support for error diffusion dithering.
      *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
@@ -174,6 +183,7 @@
     */
     #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
+
 
 /*Use SDL renderer API*/
 #define LV_USE_GPU_SDL 0
@@ -294,7 +304,7 @@
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN    __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -585,13 +595,6 @@
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
 
-/*==================
-* DEMOS
-*==================*/
-
-#if LV_USE_DEMO_WIDGETS && LV_MEM_CUSTOM == 0 && LV_MEM_SIZE < (35ul * 1024ul)
-    #error Insufficient memory for demo:Widgets, please set LV_MEM_SIZE to at least (35ul * 1024ul). 
-#endif
 
 /*--END OF LV_CONF_H--*/
 
