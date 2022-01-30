@@ -19,5 +19,24 @@ while(1) {
 }
 ```
 
+If you intend to use `lv_timer_handler()` in a super-loop, a helper macro  `lv_run_timer_handler_in_period(__ms)` is provided to simplify the porting:
+
+```c
+while(1) {
+    ...
+    lv_run_timer_handler_in_period(5);
+    ...
+}
+```
+
+ In OS environment, you can use it together with the delay or sleep provided by OS:
+
+```c
+while (1) {
+    lv_run_timer_handler_in_period(5);
+    sleep(5);
+} 
+```
+
 To learn more about timers visit the [Timer](/overview/timer) section.
 

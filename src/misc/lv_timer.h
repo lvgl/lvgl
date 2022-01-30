@@ -26,6 +26,23 @@ extern "C" {
 
 #define LV_NO_TIMER_READY 0xFFFFFFFF
 
+/**
+ * Call it in the super-loop of main() or threads. It will run lv_timer_handler()
+ * with a given period in ms.
+ * This macro is used to simplify the porting.
+ * @param __ms the period for running lv_timer_handler()
+ */
+#define lv_run_timer_handler_in_period(__ms)                                    \
+        do {                                                                    \
+            static uint32_t last_tick = 0;                                      \
+            uint32_t curr_tick = lv_tick_get();                                 \
+                                                                                \
+            if ((curr_tick - last_tick) >= (__ms)) {                            \
+                last_tick = curr_tick;                                          \
+                lv_timer_handler();                                             \
+            }                                                                   \
+        } while(0)
+        
 /**********************
  *      TYPEDEFS
  **********************/
