@@ -30,11 +30,15 @@ void test_table_should_return_assigned_cell_value(void)
 
 void test_table_should_grow_columns_automatically_when_setting_formatted_cell_value(void)
 {
+    /* Newly created tables have 1 column and 1 row */
     uint16_t original_column_count = lv_table_get_col_cnt(table);
-    uint16_t expected_column_count = original_column_count + 1;
+    TEST_ASSERT_EQUAL_UINT16(1, original_column_count);
 
+    /* Table currently only has a cell at 0,0 (row, colum) */
     lv_table_set_cell_value_fmt(table, 0, 1, "LVGL %s", "Rocks!");
 
+    /* Table now should have cells at 0,0 and 0,1, so 2 columns */
+    uint16_t expected_column_count = original_column_count + 1;
     TEST_ASSERT_EQUAL_UINT16(expected_column_count, lv_table_get_col_cnt(table));
 }
 
