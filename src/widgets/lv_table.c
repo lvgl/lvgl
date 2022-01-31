@@ -41,6 +41,11 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 static size_t get_cell_txt_len(const char * txt);
 static void copy_cell_txt(char * dst, const char * txt);
 
+static inline bool is_cell_empty(void * cell)
+{
+    return cell == NULL;
+}
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -312,7 +317,7 @@ void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
 
     uint32_t cell = row * table->col_cnt + col;
 
-    if(table->cell_data[cell] == NULL) {
+    if(is_cell_empty(table->cell_data[cell])) {
         table->cell_data[cell]    = lv_mem_alloc(2); /*+1: trailing '\0; +1: format byte*/
         LV_ASSERT_MALLOC(table->cell_data[cell]);
         if(table->cell_data[cell] == NULL) return;
@@ -336,7 +341,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_tab
 
     uint32_t cell = row * table->col_cnt + col;
 
-    if(table->cell_data[cell] == NULL) {
+    if(is_cell_empty(table->cell_data[cell])) {
         table->cell_data[cell]    = lv_mem_alloc(2); /*+1: trailing '\0; +1: format byte*/
         LV_ASSERT_MALLOC(table->cell_data[cell]);
         if(table->cell_data[cell] == NULL) return;
@@ -363,7 +368,7 @@ const char * lv_table_get_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col)
     }
     uint32_t cell = row * table->col_cnt + col;
 
-    if(table->cell_data[cell] == NULL) return "";
+    if(is_cell_empty(table->cell_data[cell])) return "";
 
     return &table->cell_data[cell][1]; /*Skip the format byte*/
 }
@@ -409,7 +414,7 @@ bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
     }
     uint32_t cell = row * table->col_cnt + col;
 
-    if(table->cell_data[cell] == NULL) return false;
+    if(is_cell_empty(table->cell_data[cell])) return false;
     else return (table->cell_data[cell][0] & ctrl) == ctrl;
 }
 
@@ -661,7 +666,7 @@ static void draw_main(lv_event_t * e)
                 uint16_t idx = cell + col_merge;
                 char * next_cell_data = table->cell_data[idx];
 
-                if(next_cell_data == NULL)
+                if(is_cell_empty(next_cell_data))
                     break;
 
                 lv_table_cell_ctrl_t merge_ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
@@ -814,9 +819,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
     lv_coord_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
 
     for(cell = row_start, col = 0; cell < row_start + table->col_cnt; cell++, col++) {
-        /* NOTE: When can we have a cell_data pointing to NULL? Is continuing the best
-         * way to handle it? */
-        if(table->cell_data[cell] == NULL) {
+        if(is_cell_empty(table->cell_data[cell])) {
             continue;
         }
 
@@ -827,7 +830,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
             uint16_t idx = cell + col_merge;
             char * next_cell_data = table->cell_data[idx];
 
-            if(next_cell_data == NULL)
+            if(is_cell_empty(next_cell_data))
                 break;
 
             lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];

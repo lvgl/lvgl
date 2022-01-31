@@ -78,4 +78,10 @@ void test_table_should_keep_not_selected_cell_ctrl(void)
     TEST_ASSERT_TRUE(has_ctrl);
 }
 
+/* We're using a newly created table */
+void test_table_cell_value_should_return_empty_string_when_cell_is_empty(void)
+{
+    TEST_ASSERT_EQUAL_STRING("", lv_table_get_cell_value(table, 0, 0));
+}
+
 #endif
