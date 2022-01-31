@@ -28,21 +28,24 @@ extern "C" {
 
 /**
  * Call it in the super-loop of main() or threads. It will run lv_timer_handler()
- * with a given period in ms.
- * This macro is used to simplify the porting.
+ * with a given period in ms. You can use it with sleep or delay in OS environment.
+ * This function is used to simplify the porting.
  * @param __ms the period for running lv_timer_handler()
  */
-#define lv_run_timer_handler_in_period(__ms)                                    \
-        do {                                                                    \
-            static uint32_t last_tick = 0;                                      \
-            uint32_t curr_tick = lv_tick_get();                                 \
-                                                                                \
-            if ((curr_tick - last_tick) >= (__ms)) {                            \
-                last_tick = curr_tick;                                          \
-                lv_timer_handler();                                             \
-            }                                                                   \
-        } while(0)
         
+static inline LV_ATTRIBUTE_TIMER_HANDLER 
+uint32_t lv_timer_handler_run_in_period(uint32_t ms)
+{
+    static uint32_t last_tick = 0;
+    uint32_t curr_tick = lv_tick_get();
+
+    if ((curr_tick - last_tick) >= (__ms)) {
+        last_tick = curr_tick;
+        return lv_timer_handler();
+    }
+    return 1;
+}
+
 /**********************
  *      TYPEDEFS
  **********************/

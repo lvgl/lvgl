@@ -19,7 +19,7 @@ while(1) {
 }
 ```
 
-If you intend to use `lv_timer_handler()` in a super-loop, a helper macro  `lv_run_timer_handler_in_period(__ms)` is provided to simplify the porting:
+If you intend to use `lv_timer_handler()` in a super-loop, a helper function`lv_run_timer_handler_in_period(__ms)` is provided to simplify the porting:
 
 ```c
 while(1) {
