@@ -95,6 +95,9 @@ void * lv_mem_realloc(void * data_p, size_t new_size);
  * data will point to new memory on successfull reallocation, when reallocation
  * is not successfull data will not be modified.
  *
+ * a zero size with a non-null pointer will behave like free and return false.
+ * a non-zero size with a null pointer will behave like malloc and return false.
+ *
  * @param data pointer to pointer to an allocated memory.
  * Its content will be copied to the new memory block and freed
  * @param new_size the desired new size in bytes
