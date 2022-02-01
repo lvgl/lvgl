@@ -33,6 +33,10 @@ void test_realloc_safe_behave_free_like(void)
 
     lv_res_t retval = lv_mem_realloc_safe(&font, 0);
     TEST_ASSERT_EQUAL_UINT16(retval, LV_RES_OK);
+
+#if LV_MEM_CUSTOM != 0
+    TEST_ASSERT_NULL(font);
+#endif
 }
 
 #endif

@@ -223,7 +223,11 @@ lv_res_t lv_mem_realloc_safe(void ** data, size_t new_size)
 #endif
     /* Handle return status for free-like operation */
     if(new_size == 0) {
+#if LV_MEM_CUSTOM == 0
         *data = &zero_mem;
+#else
+        *data = NULL;
+#endif
         return LV_RES_OK;
     }
     if(new_p == NULL) {
