@@ -53,12 +53,12 @@ Try to avoid calling LVGL functions from interrupt handlers (except `lv_tick_inc
 
 It's a better approach to simply set a flag or some value in the interrupt, and periodically check it in an LVGL timer (which is run by `lv_timer_handler`).  
 
-Try to avoid calling `lv_timer_handler` in any interrupt handler. One of the recommend way is using `lv_run_timer_handler_in_period()` in a super loop. For example:
+Try to avoid calling `lv_timer_handler` in any interrupt handler. One of the recommend way is using `lv_timer_handler_run_in_period()` in a super loop. For example:
 
 ```c
 while(1) {
     ...
-    lv_run_timer_handler_in_period(5);
+    lv_timer_handler_run_in_period(5); /* run lv_timer_handler every 5ms */
     ...
 }
 ```

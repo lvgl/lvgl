@@ -24,7 +24,7 @@ If you intend to use `lv_timer_handler()` in a super-loop, a helper function`lv_
 ```c
 while(1) {
     ...
-    lv_run_timer_handler_in_period(5);
+    lv_timer_handler_run_period(5); /* run lv_timer_handler() every 5ms */
     ...
 }
 ```
@@ -33,8 +33,8 @@ while(1) {
 
 ```c
 while (1) {
-    lv_run_timer_handler_in_period(5);
-    sleep(5);
+    lv_timer_handler_run_in_period(5); /* run lv_timer_handler() every 5ms */
+    sleep(5); /* sleep 5ms */
 } 
 ```
 
