@@ -182,13 +182,14 @@ void lv_mem_free(void * data)
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
     MEM_TRACE("reallocating %p with %lu size", data_p, (unsigned long)new_size);
-    if(new_size == 0) {
+    if(data_p != NULL && new_size == 0) {
         MEM_TRACE("using zero_mem");
         lv_mem_free(data_p);
         return &zero_mem;
     }
-
-    if(data_p == &zero_mem) return lv_mem_alloc(new_size);
+    if(data_p == &zero_mem && new_size != 0) {
+        return lv_mem_alloc(new_size);
+    }
 
 #if LV_MEM_CUSTOM == 0
     void * new_p = lv_tlsf_realloc(tlsf, data_p, new_size);
@@ -204,37 +205,34 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     return new_p;
 }
 
-bool lv_mem_realloc_safe(void ** data, size_t new_size)
+lv_res_t lv_mem_realloc_safe(void ** data, size_t new_size)
 {
     void * new_p = NULL;
 
-    MEM_TRACE("reallocating %p with %lu size", *data, (unsigned long)new_size);
+    if(data == NULL) {
+        LV_LOG_ERROR("Invalid input");
+        return LV_RES_INV;
+    }
 
-    if((*data == NULL) && (0 < new_size)) {
-        *data = lv_mem_alloc(new_size);
-        return false;
-    }
-    else if((*data != NULL) && (0 == new_size)) {
-        MEM_TRACE("using zero_mem");
-        lv_mem_free(*data);
-        *data = &zero_mem;
-        return false;
-    }
+    MEM_TRACE("Safely reallocating %p with %lu size", *data, (unsigned long) new_size);
 
 #if LV_MEM_CUSTOM == 0
     new_p = lv_tlsf_realloc(tlsf, data, new_size);
 #else
     new_p = LV_MEM_CUSTOM_REALLOC(data, new_size);
 #endif
+    /* Handle return status for free-like operation */
+    if(new_size == 0) {
+        *data = &zero_mem;
+        return LV_RES_OK;
+    }
     if(new_p == NULL) {
-        LV_LOG_ERROR("couldn't allocate memory");
-        return false;
+        return LV_RES_INV;
     }
 
-    MEM_TRACE("Memory allocated at %p", new_p);
-    data = new_p;
+    *data = new_p;
 
-    return true;
+    return LV_RES_OK;
 }
 
 lv_res_t lv_mem_test(void)
