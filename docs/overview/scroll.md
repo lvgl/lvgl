@@ -81,7 +81,7 @@ The following values are possible for the direction:
 - `LV_DIR_BOTTOM` only scroll down
 - `LV_DIR_RIGHT` only scroll right
 - `LV_DIR_HOR` only scroll horizontally
-- `LV_DIR_TOP` only scroll vertically
+- `LV_DIR_VER` only scroll vertically
 - `LV_DIR_ALL` scroll any directions
 
 OR-ed values are also possible. E.g. `LV_DIR_TOP | LV_DIR_LEFT`.
