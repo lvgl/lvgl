@@ -187,7 +187,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
         lv_mem_free(data_p);
         return &zero_mem;
     }
-    if(data_p == &zero_mem && new_size != 0) {
+    if((data_p == &zero_mem || data_p == NULL) && new_size != 0) {
         return lv_mem_alloc(new_size);
     }
 
