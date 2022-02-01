@@ -16,29 +16,25 @@ void tearDown(void)
 /* Non-zero size with null pointer should behave like malloc */
 void test_realloc_safe_behave_malloc_like(void)
 {
-    bool retval = true;
-    size_t allocation_size = 1;
-
     void * ptr = NULL;
     void * data = &ptr;
-    retval = lv_mem_realloc_safe(data, allocation_size);
+    size_t allocation_size = sizeof(lv_font_t);
 
-    TEST_ASSERT_FALSE(retval);
+    lv_res_t retval = lv_mem_realloc_safe(&data, allocation_size);
+    TEST_ASSERT_EQUAL_UINT16(retval, LV_RES_OK);
 
     /* Don't leak memory */
     lv_mem_free(ptr);
 }
 
-/* a zero size with a non-null pointer will behave like free and return false. */
+/* a zero size with a non-null pointer will behave like free and return LV_RES_OK. */
 void test_realloc_safe_behave_free_like(void)
 {
-    bool retval = true;
+    void * font = lv_mem_alloc(1 * sizeof(lv_font_t));
+    void * data = &font;
 
-    void * data = lv_mem_alloc(1);
-    /* Free allocated memory inside realloc safe */
-    retval = lv_mem_realloc_safe(&data, 0);
-
-    TEST_ASSERT_FALSE(retval);
+    lv_res_t retval = lv_mem_realloc_safe(&data, 0);
+    TEST_ASSERT_EQUAL_UINT16(retval, LV_RES_OK);
 }
 
 #endif
