@@ -20,7 +20,7 @@ void test_realloc_safe_behave_malloc_like(void)
     void * data = &ptr;
     size_t allocation_size = sizeof(lv_font_t);
 
-    lv_res_t retval = lv_mem_realloc_safe(&data, allocation_size);
+    lv_res_t retval = lv_mem_realloc_safe(data, allocation_size);
     TEST_ASSERT_EQUAL_UINT16(retval, LV_RES_OK);
 
     /* Don't leak memory */
@@ -33,7 +33,7 @@ void test_realloc_safe_behave_free_like(void)
     void * font = lv_mem_alloc(1 * sizeof(lv_font_t));
     void * data = &font;
 
-    lv_res_t retval = lv_mem_realloc_safe(&data, 0);
+    lv_res_t retval = lv_mem_realloc_safe(data, 0);
     TEST_ASSERT_EQUAL_UINT16(retval, LV_RES_OK);
 }
 

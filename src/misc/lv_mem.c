@@ -217,9 +217,9 @@ lv_res_t lv_mem_realloc_safe(void ** data, size_t new_size)
     MEM_TRACE("Safely reallocating %p with %lu size", *data, (unsigned long) new_size);
 
 #if LV_MEM_CUSTOM == 0
-    new_p = lv_tlsf_realloc(tlsf, data, new_size);
+    new_p = lv_tlsf_realloc(tlsf, *data, new_size);
 #else
-    new_p = LV_MEM_CUSTOM_REALLOC(data, new_size);
+    new_p = LV_MEM_CUSTOM_REALLOC(*data, new_size);
 #endif
     /* Handle return status for free-like operation */
     if(new_size == 0) {
