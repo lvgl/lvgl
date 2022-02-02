@@ -31,7 +31,7 @@ def event_cb(e):
     txt_area.y1 = dsc.draw_area.y1 + (dsc.draw_area.get_height() - txt_size.y) // 2
     txt_area.y2 = txt_area.y1 + txt_size.y - 1
 
-    lv.draw_label(txt_area, dsc.clip_area, label_dsc, value_txt, None)
+    dsc.draw_ctx.label(label_dsc, txt_area, value_txt, None)
 
 #
 # Custom drawer on the bar to display the current value

@@ -51,6 +51,8 @@ If the base direction of the `LV_PART_SCROLLBAR` is RTL (`LV_BASE_DIR_RTL`) the 
 Note that, the `base_dir` style property is inherited. Therefore, it can be set directly on the `LV_PART_SCROLLBAR` part of an object
 or on the object's or any parent's main part to make a scrollbar inherit the base direction. 
 
+`pad_left/right/top/bottom` sets the spacing around the scrollbars and `width` sets the scrollbar's width. 
+
 ### Events
 The following events are related to scrolling:
 - `LV_EVENT_SCROLL_BEGIN` Scrolling begins
