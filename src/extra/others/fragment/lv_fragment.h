@@ -29,11 +29,11 @@ extern "C" {
 
 typedef struct _lv_fragment_manager_t lv_fragment_manager_t;
 
-typedef struct lv_fragment_t lv_fragment_t;
-typedef struct lv_fragment_class_t lv_fragment_class_t;
-typedef struct lv_fragment_managed_states_t lv_fragment_managed_states_t;
+typedef struct _lv_fragment_t lv_fragment_t;
+typedef struct _lv_fragment_class_t lv_fragment_class_t;
+typedef struct _lv_fragment_managed_states_t lv_fragment_managed_states_t;
 
-struct lv_fragment_t {
+struct _lv_fragment_t {
     /**
      * Class of this fragment
      */
@@ -55,31 +55,31 @@ struct lv_fragment_t {
 
 };
 
-struct lv_fragment_class_t {
+struct _lv_fragment_class_t {
     /**
      * Constructor function for fragment class
      * @param self Fragment instance
      * @param args Arguments assigned by fragment manager
      */
-    void (*constructor_cb)(struct lv_fragment_t * self, void * args);
+    void (*constructor_cb)(lv_fragment_t * self, void * args);
 
     /**
      * Destructor function for fragment class
      * @param self Fragment instance, will be freed after this call
      */
-    void (*destructor_cb)(struct lv_fragment_t * self);
+    void (*destructor_cb)(lv_fragment_t * self);
 
     /**
      * Fragment attached to manager
      * @param self Fragment instance
      */
-    void (*attached_cb)(struct lv_fragment_t * self);
+    void (*attached_cb)(lv_fragment_t * self);
 
     /**
      * Fragment detached from manager
      * @param self Fragment instance
      */
-    void (*detached_cb)(struct lv_fragment_t * self);
+    void (*detached_cb)(lv_fragment_t * self);
 
     /**
      * Create objects
@@ -87,14 +87,14 @@ struct lv_fragment_class_t {
      * @param container Container of the objects should be created upon
      * @return Created object, NULL if multiple objects has been created
      */
-    lv_obj_t * (*create_obj_cb)(struct lv_fragment_t * self, lv_obj_t * container);
+    lv_obj_t * (*create_obj_cb)(lv_fragment_t * self, lv_obj_t * container);
 
     /**
      *
      * @param self Fragment instance
      * @param obj lv_obj returned by create_obj_cb
      */
-    void (*obj_created_cb)(struct lv_fragment_t * self, lv_obj_t * obj);
+    void (*obj_created_cb)(lv_fragment_t * self, lv_obj_t * obj);
 
     /**
      * Called before objects in the fragment will be deleted.
@@ -102,14 +102,14 @@ struct lv_fragment_class_t {
      * @param self Fragment instance
      * @param obj object with this fragment
      */
-    void (*obj_will_delete_cb)(struct lv_fragment_t * self, lv_obj_t * obj);
+    void (*obj_will_delete_cb)(lv_fragment_t * self, lv_obj_t * obj);
 
     /**
      * Called when the object created by fragment received `LV_EVENT_DELETE` event
      * @param self Fragment instance
      * @param obj object with this fragment
      */
-    void (*obj_deleted_cb)(struct lv_fragment_t * self, lv_obj_t * obj);
+    void (*obj_deleted_cb)(lv_fragment_t * self, lv_obj_t * obj);
 
     /**
      * Handle event
@@ -118,7 +118,7 @@ struct lv_fragment_class_t {
      * @param data1 User-defined data
      * @param data2 User-defined data
      */
-    bool (*event_cb)(struct lv_fragment_t * self, int code, void * userdata);
+    bool (*event_cb)(lv_fragment_t * self, int code, void * userdata);
 
     /**
      * *REQUIRED*: Allocation size of fragment
@@ -129,7 +129,7 @@ struct lv_fragment_class_t {
 /**
  * Fragment states
  */
-typedef struct lv_fragment_managed_states_t  {
+typedef struct _lv_fragment_managed_states_t  {
     /**
      * Class of the fragment
      */
