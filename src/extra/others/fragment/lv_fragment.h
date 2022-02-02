@@ -223,6 +223,7 @@ bool lv_fragment_manager_pop(lv_fragment_manager_t * manager);
  * Replace fragment. Old item in the stack will be removed.
  * @param manager Fragment manager instance
  * @param fragment Fragment instance
+ * @param container Pointer to container object for manager to add objects to
  */
 void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
                                  lv_obj_t * const * container);
