@@ -182,13 +182,14 @@ void lv_mem_free(void * data)
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
     MEM_TRACE("reallocating %p with %lu size", data_p, (unsigned long)new_size);
-    if(new_size == 0) {
+    if(data_p != NULL && new_size == 0) {
         MEM_TRACE("using zero_mem");
         lv_mem_free(data_p);
         return &zero_mem;
     }
-
-    if(data_p == &zero_mem) return lv_mem_alloc(new_size);
+    if((data_p == &zero_mem || data_p == NULL) && new_size != 0) {
+        return lv_mem_alloc(new_size);
+    }
 
 #if LV_MEM_CUSTOM == 0
     void * new_p = lv_tlsf_realloc(tlsf, data_p, new_size);
@@ -202,6 +203,40 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
     MEM_TRACE("allocated at %p", new_p);
     return new_p;
+}
+
+lv_res_t lv_mem_realloc_safe(void ** data, size_t new_size)
+{
+    void * new_p = NULL;
+
+    if(data == NULL) {
+        LV_LOG_ERROR("Invalid input");
+        return LV_RES_INV;
+    }
+
+    MEM_TRACE("Safely reallocating %p with %lu size", *data, (unsigned long) new_size);
+
+#if LV_MEM_CUSTOM == 0
+    new_p = lv_tlsf_realloc(tlsf, *data, new_size);
+#else
+    new_p = LV_MEM_CUSTOM_REALLOC(*data, new_size);
+#endif
+    /* Handle return status for free-like operation */
+    if(new_size == 0) {
+#if LV_MEM_CUSTOM == 0
+        *data = &zero_mem;
+#else
+        *data = NULL;
+#endif
+        return LV_RES_OK;
+    }
+    if(new_p == NULL) {
+        return LV_RES_INV;
+    }
+
+    *data = new_p;
+
+    return LV_RES_OK;
 }
 
 lv_res_t lv_mem_test(void)
