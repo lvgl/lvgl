@@ -15,7 +15,7 @@ void test_snapshot_should_not_leak_memory(void)
     uint32_t final_available_memory = 0;
     lv_mem_monitor_t monitor;
 
-    lv_img_dsc_t *snapshots[NUM_SNAPSHOTS] = {NULL};
+    lv_img_dsc_t * snapshots[NUM_SNAPSHOTS] = {NULL};
 
     lv_mem_monitor(&monitor);
     initial_available_memory = monitor.free_size;
@@ -24,11 +24,11 @@ void test_snapshot_should_not_leak_memory(void)
         snapshots[idx] = lv_snapshot_take(lv_scr_act(), LV_IMG_CF_TRUE_COLOR_ALPHA);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
-    
+
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
         lv_snapshot_free(snapshots[idx]);
     }
-    
+
     lv_mem_monitor(&monitor);
     final_available_memory = monitor.free_size;
 
