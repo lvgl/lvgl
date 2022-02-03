@@ -78,7 +78,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
     if(!cb->static_txt) {
         cb->txt = lv_mem_realloc(cb->txt, len + 1);
-        if(LV_RES_OK != lv_mem_realloc_safe(cb->txt, len + 1)) {
+        if(LV_RES_OK != lv_mem_realloc_safe(&cb->txt, len + 1)) {
             LV_ASSERT_MALLOC(NULL);
             return;
         }
