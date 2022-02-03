@@ -10,7 +10,7 @@
 static void loop_through_stress_test(void)
 {
 #if LV_USE_DEMO_STRESS
-    lv_test_indev_wait(LV_DEMO_STRESS_TIME_STEP*33); /* FIXME: remove magic number of states */
+    lv_test_indev_wait(LV_DEMO_STRESS_TIME_STEP * 33); /* FIXME: remove magic number of states */
 #endif
 }
 void test_demo_stress(void)
