@@ -450,11 +450,12 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->pwd_mode == en) return;
 
-    ta->pwd_mode = en == false ? 0 : 1;
+    ta->pwd_mode = en ? 1U : 0U;
     /*Pwd mode is now enabled*/
-    if(en != false) {
-        char * txt   = lv_label_get_text(ta->label);
+    if(en) {
+        char * txt = lv_label_get_text(ta->label);
         size_t len = strlen(txt);
+
         ta->pwd_tmp = lv_mem_alloc(len + 1);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
@@ -628,7 +629,7 @@ bool lv_textarea_get_password_mode(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    return ta->pwd_mode == 0 ? false : true;
+    return ta->pwd_mode == 1U;
 }
 
 bool lv_textarea_get_one_line(const lv_obj_t * obj)
@@ -963,33 +964,34 @@ static void pwd_char_hider_anim_ready(lv_anim_t * a)
 static void pwd_char_hider(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    if(ta->pwd_mode != 0) {
-        char * txt  = lv_label_get_text(ta->label);
-        int32_t enc_len = _lv_txt_get_encoded_length(txt);
-        if(enc_len == 0) return;
-
-        /*If the textarea's font has "bullet" character use it else fallback to "*"*/
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_font_glyph_dsc_t g;
-        bool has_bullet;
-        has_bullet = lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0);
-        const char * bullet;
-        if(has_bullet) bullet = LV_SYMBOL_BULLET;
-        else bullet = "*";
-
-        size_t bullet_len = strlen(bullet);
-        char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
-        int32_t i;
-        for(i = 0; i < enc_len; i++) {
-            lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
-        }
-
-        txt_tmp[i * bullet_len] = '\0';
-
-        lv_label_set_text(ta->label, txt_tmp);
-        lv_mem_buf_release(txt_tmp);
-        refr_cursor_area(obj);
+    if(ta->pwd_mode == 0) {
+        return;
     }
+
+    char * txt = lv_label_get_text(ta->label);
+    uint32_t enc_len = _lv_txt_get_encoded_length(txt);
+    if(enc_len == 0) return;
+
+    /*If the textarea's font has "bullet" character use it else fallback to "*"*/
+    lv_font_glyph_dsc_t g;
+    const char * bullet = "*";
+
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    if(lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0)) bullet = LV_SYMBOL_BULLET;
+
+    const size_t bullet_len = strlen(bullet);
+    char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
+
+    uint32_t i;
+    for(i = 0; i < enc_len; i++) {
+        lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
+    }
+    txt_tmp[i * bullet_len] = '\0';
+
+    lv_label_set_text(ta->label, txt_tmp);
+    lv_mem_buf_release(txt_tmp);
+
+    refr_cursor_area(obj);
 }
 
 /**
