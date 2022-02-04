@@ -57,6 +57,7 @@ static void update_cursor_position_on_click(lv_event_t * e);
 static lv_res_t insert_handler(lv_obj_t * obj, const char * txt);
 static void draw_placeholder(lv_event_t * e);
 static void draw_cursor(lv_event_t * e);
+static void auto_hide_characters(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -146,20 +147,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
         _lv_txt_ins(ta->pwd_tmp, ta->cursor.pos, (const char *)letter_buf);
 
         /*Auto hide characters*/
-        if(ta->pwd_show_time == 0) {
-            pwd_char_hider(obj);
-        }
-        else {
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_var(&a, ta);
-            lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
-            lv_anim_set_time(&a, ta->pwd_show_time);
-            lv_anim_set_values(&a, 0, 1);
-            lv_anim_set_path_cb(&a, lv_anim_path_step);
-            lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
-            lv_anim_start(&a);
-        }
+        auto_hide_characters(obj);
     }
 
     /*Move the cursor after the new character*/
@@ -208,20 +196,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
         _lv_txt_ins(ta->pwd_tmp, ta->cursor.pos, txt);
 
         /*Auto hide characters*/
-        if(ta->pwd_show_time == 0) {
-            pwd_char_hider(obj);
-        }
-        else {
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_var(&a, ta);
-            lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
-            lv_anim_set_time(&a, ta->pwd_show_time);
-            lv_anim_set_values(&a, 0, 1);
-            lv_anim_set_path_cb(&a, lv_anim_path_step);
-            lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
-            lv_anim_start(&a);
-        }
+        auto_hide_characters(obj);
     }
 
     /*Move the cursor after the new text*/
@@ -328,20 +303,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         strcpy(ta->pwd_tmp, txt);
 
         /*Auto hide characters*/
-        if(ta->pwd_show_time == 0) {
-            pwd_char_hider(obj);
-        }
-        else {
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_var(&a, ta);
-            lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
-            lv_anim_set_time(&a, ta->pwd_show_time);
-            lv_anim_set_values(&a, 0, 1);
-            lv_anim_set_path_cb(&a, lv_anim_path_step);
-            lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
-            lv_anim_start(&a);
-        }
+        auto_hide_characters(obj);
     }
 
     lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
@@ -1337,6 +1299,26 @@ static void draw_cursor(lv_event_t * e)
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
     if(cur_dsc.bg_opa > LV_OPA_MIN || cur_label_dsc.color.full != label_color.full) {
         lv_draw_label(draw_ctx, &cur_label_dsc, &cur_area, letter_buf, NULL);
+    }
+}
+
+static void auto_hide_characters(lv_obj_t * obj)
+{
+    lv_textarea_t * ta = (lv_textarea_t *) obj;
+
+    if(ta->pwd_show_time == 0) {
+        pwd_char_hider(obj);
+    }
+    else {
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, pwd_char_hider_anim);
+        lv_anim_set_time(&a, ta->pwd_show_time);
+        lv_anim_set_values(&a, 0, 1);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+        lv_anim_start(&a);
     }
 }
 
