@@ -35,7 +35,6 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
  **********************/
 const lv_obj_class_t lv_rlottie_class = {
     .constructor_cb = lv_rlottie_constructor,
-    .destructor_cb = lv_rlottie_destructor,
     .instance_size = sizeof(lv_rlottie_t),
     .base_class = &lv_img_class
 };
@@ -110,18 +109,6 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 
     lv_obj_update_layout(obj);
-}
-
-
-static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
-{
-    LV_UNUSED(class_p);
-    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-
-    if(rlottie->img_ext.dec_ctx && !rlottie->img_ext.dec_ctx->auto_allocated) {
-        rlottie->img_ext.dec_ctx->auto_allocated = 1; /* Let decoder do all the work */
-    }
-    lv_img_cache_invalidate_src(&rlottie->img_ext.src);
 }
 
 
