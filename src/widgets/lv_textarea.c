@@ -484,21 +484,21 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->one_line == en) return;
 
-    if(en) {
-        ta->one_line = 1;
-        lv_obj_set_width(ta->label, LV_SIZE_CONTENT);
-        lv_obj_set_style_min_width(ta->label, lv_pct(100), 0);
+    ta->one_line = en ? 1U : 0U;
+    lv_coord_t width = en ? LV_SIZE_CONTENT : lv_pct(100);
+    lv_coord_t min_width_value = en ? lv_pct(100) : 0;
 
+    lv_obj_set_width(ta->label, width);
+    lv_obj_set_style_min_width(ta->label, min_width_value, 0);
+
+    if(en) {
         lv_obj_set_height(obj, LV_SIZE_CONTENT);
-        lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
     else {
-        ta->one_line = 0;
-        lv_obj_set_width(ta->label, lv_pct(100));
-        lv_obj_set_style_min_width(ta->label, 0, 0);
         lv_obj_remove_local_style_prop(obj, LV_STYLE_HEIGHT, LV_PART_MAIN);
-        lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
     }
+
+    lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
 }
 
 void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list)
@@ -637,7 +637,7 @@ bool lv_textarea_get_one_line(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    return ta->one_line == 0 ? false : true;
+    return ta->one_line == 1U;
 }
 
 const char * lv_textarea_get_accepted_chars(lv_obj_t * obj)
