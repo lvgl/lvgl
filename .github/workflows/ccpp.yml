@@ -55,6 +55,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.1.0
+      - uses: ammaraskar/gcc-problem-matcher@master
       - name: Setup cache
         uses: actions/cache@v2
         with:

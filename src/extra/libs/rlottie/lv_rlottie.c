@@ -28,7 +28,6 @@ struct Lottie_Animation_S;
  *  STATIC PROTOTYPES
  **********************/
 static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
