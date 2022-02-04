@@ -44,12 +44,27 @@ void test_textarea_should_update_label_style_with_one_line_enabled(void)
 
 void test_textarea_cursor_click_pos_field_update(void)
 {
-    /* Enabled in the constructor */
-    TEST_ASSERT(lv_textarea_get_cursor_click_pos(textarea));
-
     lv_textarea_set_cursor_click_pos(textarea, false);
 
     TEST_ASSERT_FALSE(lv_textarea_get_cursor_click_pos(textarea));
+}
+
+void test_textarea_should_update_placeholder_text(void)
+{
+    const char * new_placeholder = "LVGL Rocks!!!!!";
+    const char * text = "Hello LVGL!";
+
+    /* Allocating memory for placeholder text */
+    lv_textarea_set_placeholder_text(textarea, text);
+    TEST_ASSERT_EQUAL_STRING(text, lv_textarea_get_placeholder_text(textarea));
+
+    /* Reallocating memory for the new placeholder text */
+    lv_textarea_set_placeholder_text(textarea, new_placeholder);
+    TEST_ASSERT_EQUAL_STRING(new_placeholder, lv_textarea_get_placeholder_text(textarea));
+
+    /* Freeing allocated memory for placeholder text */
+    lv_textarea_set_placeholder_text(textarea, "");
+    TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_placeholder_text(textarea));
 }
 
 #endif

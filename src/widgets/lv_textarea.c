@@ -317,7 +317,6 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     size_t txt_len = strlen(txt);
-
     if(txt_len == 0) {
         if(ta->placeholder_txt) {
             lv_mem_free(ta->placeholder_txt);
@@ -325,21 +324,17 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
         }
     }
     else {
-
         /*Allocate memory for the placeholder_txt text*/
-        if(ta->placeholder_txt == NULL) {
-            ta->placeholder_txt = lv_mem_alloc(txt_len + 1);
-        }
-        else {
-            ta->placeholder_txt = lv_mem_realloc(ta->placeholder_txt, txt_len + 1);
-
-        }
+        /*NOTE: Using special realloc behavior, malloc-like when data_p is NULL*/
+        ta->placeholder_txt = lv_mem_realloc(ta->placeholder_txt, txt_len + 1);
         LV_ASSERT_MALLOC(ta->placeholder_txt);
         if(ta->placeholder_txt == NULL) {
             LV_LOG_ERROR("lv_textarea_set_placeholder_text: couldn't allocate memory for placeholder");
             return;
         }
+
         strcpy(ta->placeholder_txt, txt);
+        ta->placeholder_txt[txt_len] = '\0';
     }
 
     lv_obj_invalidate(obj);
