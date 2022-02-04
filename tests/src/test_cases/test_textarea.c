@@ -42,4 +42,14 @@ void test_textarea_should_update_label_style_with_one_line_enabled(void)
     // TEST_ASSERT_EQUAL(lv_pct(100), label_style_min_width)
 }
 
+void test_textarea_cursor_click_pos_field_update(void)
+{
+    /* Enabled in the constructor */
+    TEST_ASSERT(lv_textarea_get_cursor_click_pos(textarea));
+
+    lv_textarea_set_cursor_click_pos(textarea, false);
+
+    TEST_ASSERT_FALSE(lv_textarea_get_cursor_click_pos(textarea));
+}
+
 #endif

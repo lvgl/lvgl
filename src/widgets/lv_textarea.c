@@ -440,7 +440,7 @@ void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    ta->cursor.click_pos = en ? 1 : 0;
+    ta->cursor.click_pos = en ? 1U : 0U;
 }
 
 void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
