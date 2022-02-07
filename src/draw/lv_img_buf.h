@@ -67,10 +67,10 @@ enum {
     LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /**< Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
                                           will be transparent*/
 
-    LV_IMG_CF_INDEXED_1BIT, /**< Can have 2 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_2BIT, /**< Can have 4 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_4BIT, /**< Can have 16 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_8BIT, /**< Can have 256 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_1BIT, /**< Can have 2 different colors in a palette (can't be chroma keyed)*/
+    LV_IMG_CF_INDEXED_2BIT, /**< Can have 4 different colors in a palette (can't be chroma keyed)*/
+    LV_IMG_CF_INDEXED_4BIT, /**< Can have 16 different colors in a palette (can't be chroma keyed)*/
+    LV_IMG_CF_INDEXED_8BIT, /**< Can have 256 different colors in a palette (can't be chroma keyed)*/
 
     LV_IMG_CF_ALPHA_1BIT, /**< Can have one color and it can be drawn or not*/
     LV_IMG_CF_ALPHA_2BIT, /**< Can have one color but 4 different alpha value*/
