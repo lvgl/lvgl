@@ -51,16 +51,4 @@ void other_thread(void)
 ## Interrupts
 Try to avoid calling LVGL functions from interrupt handlers (except `lv_tick_inc()` and `lv_disp_flush_ready()`). But if you need to do this you have to disable the interrupt which uses LVGL functions while `lv_timer_handler` is running.
 
-It's a better approach to simply set a flag or some value in the interrupt, and periodically check it in an LVGL timer (which is run by `lv_timer_handler`).  
-
-Try to avoid calling `lv_timer_handler` in any interrupt handler. One of the recommend way is using `lv_timer_handler_run_in_period()` in a super loop. For example:
-
-```c
-while(1) {
-    ...
-    lv_timer_handler_run_in_period(5); /* run lv_timer_handler every 5ms */
-    ...
-}
-```
-
-To learn more about this, please visit the [Task Handler](/porting/task-handler) section.
+It's a better approach to simply set a flag or some value in the interrupt, and periodically check it in an LVGL timer (which is run by `lv_timer_handler`).
