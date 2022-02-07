@@ -58,6 +58,7 @@ static lv_res_t insert_handler(lv_obj_t * obj, const char * txt);
 static void draw_placeholder(lv_event_t * e);
 static void draw_cursor(lv_event_t * e);
 static void auto_hide_characters(lv_obj_t * obj);
+static inline bool is_valid_but_non_printable_char(const uint32_t letter);
 
 /**********************
  *  STATIC VARIABLES
@@ -1025,14 +1026,11 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_coord_t letter_h = lv_font_get_line_height(font);
 
     /*Set letter_w (set not 0 on non printable but valid chars)*/
-    lv_coord_t letter_w;
-    if(letter == '\0' || letter == '\n' || letter == '\r') {
-        letter_w = lv_font_get_glyph_width(font, ' ', '\0');
+    uint32_t letter_space = letter;
+    if(is_valid_but_non_printable_char(letter)) {
+        letter_space = ' ';
     }
-    else {
-        /*`letter_next` parameter is '\0' to ignore kerning*/
-        letter_w = lv_font_get_glyph_width(font, letter, '\0');
-    }
+    lv_coord_t letter_w = lv_font_get_glyph_width(font, letter_space, IGNORE_KERNING);
 
     lv_point_t letter_pos;
     lv_label_get_letter_pos(ta->label, cur_pos, &letter_pos);
@@ -1050,12 +1048,11 @@ static void refr_cursor_area(lv_obj_t * obj)
             letter = _lv_txt_encoded_next(&txt[byte_pos], NULL);
         }
 
-        if(letter == '\0' || letter == '\n' || letter == '\r') {
-            letter_w = lv_font_get_glyph_width(font, ' ', '\0');
+        uint32_t tmp = letter;
+        if(is_valid_but_non_printable_char(letter)) {
+            tmp = ' ';
         }
-        else {
-            letter_w = lv_font_get_glyph_width(font, letter, '\0');
-        }
+        letter_w = lv_font_get_glyph_width(font, tmp, IGNORE_KERNING);
     }
 
     /*Save the byte position. It is required to draw `LV_CURSOR_BLOCK`*/
@@ -1315,6 +1312,15 @@ static void auto_hide_characters(lv_obj_t * obj)
         lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
         lv_anim_start(&a);
     }
+}
+
+static inline bool is_valid_but_non_printable_char(const uint32_t letter)
+{
+    if(letter == '\0' || letter == '\n' || letter == '\r') {
+        return true;
+    }
+
+    return false;
 }
 
 #endif
