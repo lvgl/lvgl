@@ -21,7 +21,7 @@ void test_table_should_return_assigned_cell_value(void)
 {
     uint16_t row = 0;
     uint16_t column = 0;
-    const char *value = "LVGL";
+    const char * value = "LVGL";
 
     lv_table_set_cell_value(table, row, column, value);
 
@@ -101,6 +101,24 @@ void test_table_row_height_should_increase_with_multiline_cell_value(void)
     lv_coord_t multiline_row_height = table_ptr->row_h[0];
 
     TEST_ASSERT_GREATER_THAN(singleline_row_height, multiline_row_height);
+}
+
+void test_table_should_wrap_long_texts(void)
+{
+    lv_table_t * table_ptr = (lv_table_t *) table;
+    const char * long_text = "Testing automatic text wrap with a very long text";
+    const char * small_text = "Hi";
+
+    lv_table_set_col_width(table, 0, 50);
+
+    lv_table_set_cell_value(table, 0, 0, small_text);
+    lv_coord_t row_height = table_ptr->row_h[0];
+
+    lv_table_set_cell_value(table, 0, 0, long_text);
+    lv_coord_t wrapped_row_height = table_ptr->row_h[0];
+
+    /* Row height on cells with wrapped text is bigger than cells with small texts */
+    TEST_ASSERT_GREATER_THAN(row_height, wrapped_row_height);
 }
 
 #endif

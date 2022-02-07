@@ -302,7 +302,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
     if(col_id >= table->col_cnt) lv_table_set_col_cnt(obj, col_id + 1);
 
     table->col_w[col_id] = w;
-    refr_size(obj, 0) ;
+    refr_size(obj, 0);
 }
 
 void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl)
