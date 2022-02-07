@@ -108,10 +108,11 @@ void lv_animbtn_set_transition_desc(lv_obj_t * animbtn, lv_animbtn_state_t from_
 
 /**
  * Use this function instead of `lv_obj_add/clear_state` to set a state manually
- * @param animbtn pointer to an animation button object
- * @param state  the new state
+ * @param animbtn           pointer to an animation button object
+ * @param state             the new state
+ * @param skip_transition   whether to skip the transition animation to the new state
  */
-void lv_animbtn_set_state(lv_obj_t * animbtn, lv_animbtn_state_t state);
+void lv_animbtn_set_state(lv_obj_t * animbtn, lv_animbtn_state_t state, bool skip_transition);
 
 /*=====================
  * Getter functions

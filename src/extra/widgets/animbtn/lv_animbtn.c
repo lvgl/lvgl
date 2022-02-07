@@ -26,7 +26,7 @@
 static void lv_animbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_animbtn_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void apply_state(lv_obj_t * animbtn);
+static void apply_state(lv_obj_t * animbtn, bool skip_transition);
 static void loop_state(lv_obj_t * animbtn);
 static lv_animbtn_state_t suggest_state(lv_obj_t * animbtn, lv_animbtn_state_t state);
 static lv_animbtn_state_t get_state(const lv_obj_t * animbtn);
@@ -98,7 +98,7 @@ void lv_animbtn_set_state_desc(lv_obj_t * obj, lv_animbtn_state_t state, const l
     animbtn->state_desc[state - 1] = desc;
     animbtn->state_desc[state - 1].control |=
         LV_IMG_CTRL_MARKED; /*A non existant flag used to mark that the state was used*/
-    apply_state(obj);
+    apply_state(obj, false);
 }
 
 void lv_animbtn_set_transition_desc(lv_obj_t * obj, lv_animbtn_state_t from_state, lv_animbtn_state_t to_state,
@@ -127,7 +127,7 @@ void lv_animbtn_set_transition_desc(lv_obj_t * obj, lv_animbtn_state_t from_stat
 }
 
 
-void lv_animbtn_set_state(lv_obj_t * obj, lv_animbtn_state_t state)
+void lv_animbtn_set_state(lv_obj_t * obj, lv_animbtn_state_t state, bool skip_transition)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -142,7 +142,7 @@ void lv_animbtn_set_state(lv_obj_t * obj, lv_animbtn_state_t state)
     lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
     lv_obj_add_state(obj, obj_state);
 
-    apply_state(obj);
+    apply_state(obj, skip_transition);
 }
 
 /*=====================
@@ -228,7 +228,7 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         case LV_EVENT_PRESSED:
         case LV_EVENT_RELEASED:
         case LV_EVENT_PRESS_LOST:
-            apply_state(obj);
+            apply_state(obj, false);
             break;
         case LV_EVENT_COVER_CHECK: {
                 lv_cover_check_info_t * info = lv_event_get_param(e);
@@ -279,12 +279,12 @@ static void loop_state(lv_obj_t * obj)
 }
 
 
-static void apply_state(lv_obj_t * obj)
+static void apply_state(lv_obj_t * obj, bool skip_transition)
 {
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
     lv_animbtn_state_t current_state = get_state(obj);
     lv_animbtn_state_t state  = suggest_state(obj, current_state);
-    if(is_transiting(animbtn, current_state)) {
+    if(is_transiting(animbtn, current_state) && !skip_transition) {
         /* We are transiting now */
         uint8_t pos = find_trans(animbtn, animbtn->prev_state, current_state);
         if(pos != animbtn->trans_count) {
