@@ -34,6 +34,7 @@
 #endif
 
 #define LV_TEXTAREA_PWD_BULLET_UNICODE      0x2022
+#define IGNORE_KERNING                      '\0'
 
 /**********************
  *      TYPEDEFS
@@ -102,13 +103,11 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    const char * letter_buf;
-
     uint32_t u32_buf[2];
     u32_buf[0] = c;
     u32_buf[1] = 0;
 
-    letter_buf = (char *)&u32_buf;
+    const char * letter_buf = (char *)&u32_buf;
 
 #if LV_BIG_ENDIAN_SYSTEM
     if(c != 0) while(*letter_buf == 0) ++letter_buf;
@@ -129,7 +128,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
         return;
     }
 
-    if(ta->pwd_mode != 0) pwd_char_hider(obj); /*Make sure all the current text contains only '*'*/
+    if(ta->pwd_mode) pwd_char_hider(obj); /*Make sure all the current text contains only '*'*/
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ta->placeholder_txt) {
@@ -138,10 +137,12 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
     }
 
     lv_label_ins_text(ta->label, ta->cursor.pos, letter_buf); /*Insert the character*/
-    lv_textarea_clear_selection(obj);                                                /*Clear selection*/
+    lv_textarea_clear_selection(obj); /*Clear selection*/
 
-    if(ta->pwd_mode != 0) {
-        ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + strlen(letter_buf) + 1); /*+2: the new char + \0*/
+    if(ta->pwd_mode) {
+        /*+2: the new char + \0*/
+        size_t realloc_size = strlen(ta->pwd_tmp) + strlen(letter_buf) + 1;
+        ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, realloc_size);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
@@ -164,7 +165,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    if(ta->pwd_mode != 0) pwd_char_hider(obj); /*Make sure all the current text contains only '*'*/
+    if(ta->pwd_mode) pwd_char_hider(obj); /*Make sure all the current text contains only '*'*/
 
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
     if(lv_textarea_get_accepted_chars(obj) || lv_textarea_get_max_length(obj)) {
@@ -189,8 +190,9 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
     lv_label_ins_text(ta->label, ta->cursor.pos, txt);
     lv_textarea_clear_selection(obj);
 
-    if(ta->pwd_mode != 0) {
-        ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + strlen(txt) + 1);
+    if(ta->pwd_mode) {
+        size_t realloc_size = strlen(ta->pwd_tmp) + strlen(txt) + 1;
+        ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, realloc_size);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
@@ -235,7 +237,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
         if(txt[0] == '\0') lv_obj_invalidate(obj);
     }
 
-    if(ta->pwd_mode != 0) {
+    if(ta->pwd_mode) {
         _lv_txt_cut(ta->pwd_tmp, ta->cursor.pos - 1, 1);
 
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(ta->pwd_tmp) + 1);
@@ -297,7 +299,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         if(txt_act[0] == '\0') lv_obj_invalidate(obj);
     }
 
-    if(ta->pwd_mode != 0) {
+    if(ta->pwd_mode) {
         ta->pwd_tmp = lv_mem_realloc(ta->pwd_tmp, strlen(txt) + 1);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
@@ -318,11 +320,9 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     size_t txt_len = strlen(txt);
-    if(txt_len == 0) {
-        if(ta->placeholder_txt) {
-            lv_mem_free(ta->placeholder_txt);
-            ta->placeholder_txt = NULL;
-        }
+    if((txt_len == 0) && (ta->placeholder_txt)) {
+        lv_mem_free(ta->placeholder_txt);
+        ta->placeholder_txt = NULL;
     }
     else {
         /*Allocate memory for the placeholder_txt text*/
@@ -881,7 +881,7 @@ static void cursor_blink_anim_cb(void * obj, int32_t show)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(show != ta->cursor.show) {
-        ta->cursor.show = show == 0 ? 0 : 1;
+        ta->cursor.show = show ? 1U : 0U;
         lv_area_t area_tmp;
         lv_area_copy(&area_tmp, &ta->cursor.area);
         area_tmp.x1 += ta->label->coords.x1;
@@ -926,6 +926,7 @@ static void pwd_char_hider(lv_obj_t * obj)
         return;
     }
 
+    /* When ta->label is empty we get 0 back */
     char * txt = lv_label_get_text(ta->label);
     uint32_t enc_len = _lv_txt_get_encoded_length(txt);
     if(enc_len == 0) return;
@@ -962,6 +963,9 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
+    /*If the accepted char list in not specified the accept the character*/
+    if(ta->accepted_chars == NULL) return true;
+
     /*If no restriction accept it*/
     if((ta->accepted_chars == NULL || ta->accepted_chars[0] == '\0') && ta->max_length == 0) return true;
 
@@ -971,19 +975,15 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
     }
 
     /*Accepted character?*/
-    if(ta->accepted_chars) {
-        uint32_t i = 0;
+    // We're sure ta->accepted_chars != NULL
+    uint32_t i = 0;
 
-        while(ta->accepted_chars[i] != '\0') {
-            uint32_t a = _lv_txt_encoded_next(ta->accepted_chars, &i);
-            if(a == c) return true; /*Accepted*/
-        }
+    while(ta->accepted_chars[i] != '\0') {
+        uint32_t a = _lv_txt_encoded_next(ta->accepted_chars, &i);
+        if(a == c) return true; /*Accepted*/
+    }
 
-        return false; /*The character wasn't in the list*/
-    }
-    else {
-        return true; /*If the accepted char list in not specified the accept the character*/
-    }
+    return false; /*The character wasn't in the list*/
 }
 
 static void start_cursor_blink(lv_obj_t * obj)
@@ -1018,13 +1018,11 @@ static void refr_cursor_area(lv_obj_t * obj)
     uint32_t cur_pos = lv_textarea_get_cursor_pos(obj);
     const char * txt = lv_label_get_text(ta->label);
 
-    uint32_t byte_pos;
-    byte_pos = _lv_txt_encoded_get_byte_id(txt, cur_pos);
-
+    uint32_t byte_pos = _lv_txt_encoded_get_byte_id(txt, cur_pos);
     uint32_t letter = _lv_txt_encoded_next(&txt[byte_pos], NULL);
 
-    lv_coord_t letter_h = lv_font_get_line_height(font);
-
+    /* Letter height and width */
+    const lv_coord_t letter_h = lv_font_get_line_height(font);
     /*Set letter_w (set not 0 on non printable but valid chars)*/
     uint32_t letter_space = letter;
     if(is_valid_but_non_printable_char(letter)) {
@@ -1038,8 +1036,9 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_text_align_t align = lv_obj_calculate_style_text_align(ta->label, LV_PART_MAIN, lv_label_get_text(ta->label));
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
-    if(letter_pos.x + ta->label->coords.x1 + letter_w > ta->label->coords.x2 && ta->one_line == 0 &&
-       align != LV_TEXT_ALIGN_RIGHT) {
+    if(((letter_pos.x + ta->label->coords.x1) + letter_w > ta->label->coords.x2) &&
+        (ta->one_line == 0 && align != LV_TEXT_ALIGN_RIGHT)) {
+
         letter_pos.x = 0;
         letter_pos.y += letter_h + line_space;
 
@@ -1095,7 +1094,6 @@ static void update_cursor_position_on_click(lv_event_t * e)
     lv_indev_t * click_source = lv_indev_get_act();
     if(click_source == NULL) return;
 
-    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->cursor.click_pos == 0) return;
@@ -1117,26 +1115,27 @@ static void update_cursor_position_on_click(lv_event_t * e)
     rel_pos.x = point_act.x - label_coords.x1;
     rel_pos.y = point_act.y - label_coords.y1;
 
-    lv_coord_t label_width = lv_obj_get_width(ta->label);
+    const lv_event_code_t code = lv_event_get_code(e);
 
-    uint16_t char_id_at_click;
+    lv_coord_t label_width = lv_obj_get_width(ta->label);
+    uint16_t char_id_at_click = 0;
 
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label_data = (lv_label_t *)ta->label;
-    bool click_outside_label;
+    bool click_outside_label = false;
     /*Check if the click happened on the left side of the area outside the label*/
     if(rel_pos.x < 0) {
         char_id_at_click = 0;
-        click_outside_label       = true;
+        click_outside_label = true;
     }
     /*Check if the click happened on the right side of the area outside the label*/
     else if(rel_pos.x >= label_width) {
         char_id_at_click = LV_TEXTAREA_CURSOR_LAST;
-        click_outside_label       = true;
+        click_outside_label = true;
     }
     else {
         char_id_at_click = lv_label_get_letter_on(ta->label, &rel_pos);
-        click_outside_label       = !lv_label_is_char_under_pos(ta->label, &rel_pos);
+        click_outside_label = !lv_label_is_char_under_pos(ta->label, &rel_pos);
     }
 
     if(ta->text_sel_en) {
