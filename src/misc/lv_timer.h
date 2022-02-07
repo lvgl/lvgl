@@ -80,7 +80,7 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period
     static uint32_t last_tick = 0;
     uint32_t curr_tick = lv_tick_get();
 
-    if ((curr_tick - last_tick) >= (ms)) {
+    if((curr_tick - last_tick) >= (ms)) {
         last_tick = curr_tick;
         return lv_timer_handler();
     }
