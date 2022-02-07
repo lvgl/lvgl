@@ -72,4 +72,14 @@ void test_textarea_should_update_placeholder_text(void)
     TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_placeholder_text(textarea));
 }
 
+void test_textarea_should_keep_only_accepted_chars(void)
+{
+    const char * accepted_list = "abcd";
+
+    lv_textarea_set_accepted_chars(textarea, accepted_list);
+    lv_textarea_set_text(textarea, "abcde");
+
+    TEST_ASSERT_EQUAL_STRING(accepted_list, lv_textarea_get_text(textarea));
+}
+
 #endif

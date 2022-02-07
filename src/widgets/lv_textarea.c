@@ -279,7 +279,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
     if(lv_textarea_get_accepted_chars(obj) || lv_textarea_get_max_length(obj)) {
         lv_label_set_text(ta->label, "");
         lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
-        if(ta->pwd_mode != 0) {
+        if(ta->pwd_mode) {
             ta->pwd_tmp[0] = '\0'; /*Clear the password too*/
         }
         uint32_t i = 0;
@@ -1037,7 +1037,7 @@ static void refr_cursor_area(lv_obj_t * obj)
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
     if(((letter_pos.x + ta->label->coords.x1) + letter_w > ta->label->coords.x2) &&
-        (ta->one_line == 0 && align != LV_TEXT_ALIGN_RIGHT)) {
+       (ta->one_line == 0 && align != LV_TEXT_ALIGN_RIGHT)) {
 
         letter_pos.x = 0;
         letter_pos.y += letter_h + line_space;
