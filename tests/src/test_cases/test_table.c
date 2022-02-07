@@ -88,4 +88,19 @@ void test_table_cell_value_should_return_empty_string_when_cell_is_empty(void)
     TEST_ASSERT_EQUAL_STRING("", lv_table_get_cell_value(table, 0, 0));
 }
 
+void test_table_row_height_should_increase_with_multiline_cell_value(void)
+{
+    lv_table_t * table_ptr = (lv_table_t *) table;
+    const char * singleline_value = "LVGL";
+    const char * multiline_value = "LVGL\nRocks";
+
+    lv_table_set_cell_value(table, 0, 0, singleline_value);
+    lv_coord_t singleline_row_height = table_ptr->row_h[0];
+
+    lv_table_set_cell_value(table, 0, 0, multiline_value);
+    lv_coord_t multiline_row_height = table_ptr->row_h[0];
+
+    TEST_ASSERT_GREATER_THAN(singleline_row_height, multiline_row_height);
+}
+
 #endif
