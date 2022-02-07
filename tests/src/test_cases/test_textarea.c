@@ -19,8 +19,6 @@ void tearDown(void)
 
 void test_textarea_should_have_valid_documented_defualt_values(void)
 {
-    lv_textarea_t * ta = (lv_textarea_t *) textarea;
-
     TEST_ASSERT(lv_textarea_get_cursor_click_pos(textarea));
     TEST_ASSERT_EQUAL(0U, lv_textarea_get_one_line(textarea));
     /* No placeholder text should be set on widget creation */
@@ -42,8 +40,6 @@ void test_textarea_should_return_actual_text_when_password_mode_is_enabled(void)
 
 void test_textarea_should_update_label_style_with_one_line_enabled(void)
 {
-    lv_textarea_t * ta = (lv_textarea_t *) textarea;
-
     lv_textarea_add_text(textarea, "Hi");
     lv_textarea_set_one_line(textarea, true);
 
