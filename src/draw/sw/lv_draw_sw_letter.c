@@ -470,7 +470,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 #endif
 
 #if LV_COLOR_DEPTH == 32
-                res_color.ch.alpha =  0xff;
+                res_color.ch.alpha = 0xff;
 #endif
 
                 if(font_rgb[0] == 0 && font_rgb[1] == 0 && font_rgb[2] == 0) mask_buf[mask_p] = LV_OPA_TRANSP;

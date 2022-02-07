@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-# Applies a commit or commits on baranch or branches 
+# Applies a commit or commits on branch or branches
 # USAGE:
 # patch.py -c <commit-list> -b <branch-list> [-p] [-t]
 #   - <commit-list>: list of commit SHAs to apply. 
 #   - <branch-list>: branches where the commit should be applied. * can be used as wildchar 
-# -  p: push the changes to <brach-list>
+# -  p: push the changes to <branch-list>
 # -  t: increment version number and create a tag
 
 
@@ -21,7 +21,7 @@ def clone(repo):
   com.cmd("git pull origin --tags")
   os.chdir("..")
     
-# Get the list of realted minor version branches
+# Get the list of related minor version branches
 
 #clone("lvgl")
 os.chdir("lvgl")
@@ -72,4 +72,3 @@ com.cmd("git tag -a " + t + " -m \"Start " + t + "\"")
 
 if push:
   com.cmd("git push origin master --tags")
-

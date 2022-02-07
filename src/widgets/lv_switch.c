@@ -173,7 +173,7 @@ static void draw_main(lv_event_t * e)
     /*Draw the knob*/
     lv_coord_t anim_value_x = 0;
     lv_coord_t knob_size = lv_obj_get_height(obj);
-    lv_coord_t anim_length = obj->coords.x2 - bg_right - obj->coords.x1 - bg_left - knob_size;
+    lv_coord_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
 
     if(LV_SWITCH_IS_ANIMATING(sw)) {
         /* Use the animation's coordinate */
@@ -190,11 +190,11 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_area_t knob_area;
-    knob_area.x1 = obj->coords.x1 + bg_left + anim_value_x;
+    knob_area.x1 = obj->coords.x1 + anim_value_x;
     knob_area.x2 = knob_area.x1 + knob_size;
 
-    knob_area.y1 = obj->coords.y1 + bg_top;
-    knob_area.y2 = obj->coords.y2 - bg_bottom;
+    knob_area.y1 = obj->coords.y1;
+    knob_area.y2 = obj->coords.y2;
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);

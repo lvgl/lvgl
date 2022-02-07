@@ -46,7 +46,7 @@ label = lv.label(btn)                       # Add a label to the button
 label.set_text("Button")                    # Set the labels text
 label.center()
 
-# Create an other button and use the red style too
+# Create another button and use the red style too
 btn2 = lv.btn(lv.scr_act())
 btn2.remove_style_all()                     # Remove the styles coming from the theme
 btn2.set_pos(10, 80)                        # Set its position

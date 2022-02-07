@@ -109,11 +109,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     mask_buf[px_i] = px_opa;
                     if(px_opa) {
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-                        src_buf_rgb[px_i].full =  map_px[0];
+                        src_buf_rgb[px_i].full = map_px[0];
 #elif LV_COLOR_DEPTH == 16
-                        src_buf_rgb[px_i].full =  map_px[0] + (map_px[1] << 8);
+                        src_buf_rgb[px_i].full = map_px[0] + (map_px[1] << 8);
 #elif LV_COLOR_DEPTH == 32
-                        src_buf_rgb[px_i].full =  *((uint32_t *)map_px);
+                        src_buf_rgb[px_i].full = *((uint32_t *)map_px);
 #endif
                     }
 #if LV_COLOR_DEPTH == 32
@@ -243,11 +243,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
 #if LV_COLOR_DEPTH == 1
                         c.full = map_px[0];
 #elif LV_COLOR_DEPTH == 8
-                        c.full =  map_px[0];
+                        c.full = map_px[0];
 #elif LV_COLOR_DEPTH == 16
-                        c.full =  map_px[0] + (map_px[1] << 8);
+                        c.full = map_px[0] + (map_px[1] << 8);
 #elif LV_COLOR_DEPTH == 32
-                        c.full =  *((uint32_t *)map_px);
+                        c.full = *((uint32_t *)map_px);
                         c.ch.alpha = 0xFF;
 #endif
                         if(cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {

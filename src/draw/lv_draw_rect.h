@@ -39,7 +39,7 @@ typedef struct {
     union {
 #endif
         lv_color_t bg_color;        /**< First element of a gradient is a color, so it maps well here*/
-        lv_gradient_t bg_grad;
+        lv_grad_dsc_t bg_grad;
 #if __STDC_VERSION__ >= 201112L
     };
 #endif

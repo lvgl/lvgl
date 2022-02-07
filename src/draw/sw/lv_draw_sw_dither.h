@@ -19,12 +19,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#if LV_COLOR_DEPTH < 32 && LV_DRAW_COMPLEX == 1 && LV_DITHER_GRADIENT == 1
+#if LV_COLOR_DEPTH < 32 && LV_DITHER_GRADIENT == 1
 #define _DITHER_GRADIENT 1
 #else
 #define _DITHER_GRADIENT 0
 #endif
-
 
 /**********************
  *      TYPEDEFS

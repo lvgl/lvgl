@@ -91,7 +91,7 @@ def gauge_anim(a,gauge,val):
 def bar_anim(task,bar):
     val = bar.get_value()
     # print("bar value: ",val)
-    max_value =  bar.get_max_value()
+    max_value = bar.get_max_value()
     val += 1
     if val > max_value:
         val=0
@@ -148,7 +148,7 @@ def controls_create(parent):
     h.set_style_local_value_str(lv.cont.PART.MAIN, lv.STATE.DEFAULT, "Basics")
     
     disp_size = display.get_size_category()   
-    if disp_size <=  lv.DISP_SIZE.SMALL:
+    if disp_size <= lv.DISP_SIZE.SMALL:
         grid_w= lv.page.get_width_grid(lv.page.__cast__(parent),1,1)
         # print("grid_w: ",grid_w)
     else:
@@ -338,7 +338,7 @@ def visuals_create(parent):
     if grid_w_meter < meter_h:
         meter_size = grid_w_meter
     else:
-        meter_size =  meter_h
+        meter_size = meter_h
 
     lmeter = lv.linemeter(parent, None)
     lmeter.set_drag_parent(True)

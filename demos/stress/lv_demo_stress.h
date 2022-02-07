@@ -19,6 +19,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_DEMO_STRESS_TIME_STEP    50
+
 /**********************
  *      TYPEDEFS
  **********************/

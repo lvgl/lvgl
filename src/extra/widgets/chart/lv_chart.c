@@ -688,6 +688,14 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     }
     _lv_ll_clear(&chart->series_ll);
 
+    lv_chart_cursor_t * cur;
+    while(chart->cursor_ll.head) {
+        cur = _lv_ll_get_head(&chart->cursor_ll);
+        _lv_ll_remove(&chart->cursor_ll, cur);
+        lv_mem_free(cur);
+    }
+    _lv_ll_clear(&chart->cursor_ll);
+
     LV_TRACE_OBJ_CREATE("finished");
 }
 

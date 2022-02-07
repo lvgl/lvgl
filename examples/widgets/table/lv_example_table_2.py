@@ -25,7 +25,7 @@ def draw_event_cb(e):
         sw_area.x2 = sw_area.x1 + 40
         sw_area.y1 = dsc.draw_area.y1 + dsc.draw_area.get_height() // 2 - 10
         sw_area.y2 = sw_area.y1 + 20
-        lv.draw_rect(sw_area, dsc.clip_area, rect_dsc)
+        dsc.draw_ctx.rect(rect_dsc, sw_area)
          
         rect_dsc.bg_color = lv.color_white()
         
@@ -37,7 +37,7 @@ def draw_event_cb(e):
             sw_area.x2 = sw_area.x1 + 16
         sw_area.y1 += 2
         sw_area.y2 -= 2
-        lv.draw_rect(sw_area, dsc.clip_area, rect_dsc)
+        dsc.draw_ctx.rect(rect_dsc, sw_area)
 
 def change_event_cb(e):
     obj = e.get_target()
@@ -80,7 +80,7 @@ for i in range(ITEM_CNT):
 
 table.align(lv.ALIGN.CENTER, 0, -20)
 
-# Add an event callback to to apply some custom drawing
+# Add an event callback to apply some custom drawing
 table.add_event_cb(draw_event_cb, lv.EVENT.DRAW_PART_END, None)
 table.add_event_cb(change_event_cb, lv.EVENT.VALUE_CHANGED, None)
 

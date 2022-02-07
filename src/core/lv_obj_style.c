@@ -269,7 +269,7 @@ lv_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_st
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
         if(obj->styles[i].is_local &&
-           obj->styles[i].selector ==  selector) {
+           obj->styles[i].selector == selector) {
             return lv_style_get_prop(obj->styles[i].style, prop, value);
         }
     }

@@ -122,7 +122,7 @@
         #ifdef CONFIG_LV_MEM_SIZE
             #define LV_MEM_SIZE CONFIG_LV_MEM_SIZE
         #else
-            #define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
+            #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
         #endif
     #endif
 
@@ -293,47 +293,6 @@
             #define LV_CIRCLE_CACHE_SIZE 4
         #endif
     #endif
-
-    /*Allow dithering gradient (to achieve visual smooth color gradients on limited color depth display)
-    *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
-    *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-    #ifndef LV_DITHER_GRADIENT
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_DITHER_GRADIENT
-                #define LV_DITHER_GRADIENT CONFIG_LV_DITHER_GRADIENT
-            #else
-                #define LV_DITHER_GRADIENT 0
-            #endif
-        #else
-            #define LV_DITHER_GRADIENT 1
-        #endif
-    #endif
-
-    /*Add support for error diffusion dithering.
-    *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-    *The increase in memory consumption is (24 bits * object's width)*/
-    #ifndef LV_DITHER_ERROR_DIFFUSION
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_DITHER_ERROR_DIFFUSION
-                #define LV_DITHER_ERROR_DIFFUSION CONFIG_LV_DITHER_ERROR_DIFFUSION
-            #else
-                #define LV_DITHER_ERROR_DIFFUSION 0
-            #endif
-        #else
-            #define LV_DITHER_ERROR_DIFFUSION 1
-        #endif
-    #endif
-
-    /**Number of stops allowed per gradient. Increase this to allow more stops.
-    *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-    #ifndef LV_GRADIENT_MAX_STOPS
-        #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
-            #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
-        #else
-            #define LV_GRADIENT_MAX_STOPS    2
-        #endif
-    #endif
-
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.
@@ -345,11 +304,58 @@
     #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
         #define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
     #else
-        #define LV_IMG_CACHE_DEF_SIZE 0
+        #define LV_IMG_CACHE_DEF_SIZE   0
     #endif
 #endif
 
-/*Maximum buffer size to allocate for rotation. Only used if software rotation is enabled in the display driver.*/
+/*Number of stops allowed per gradient. Increase this to allow more stops.
+ *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
+#ifndef LV_GRADIENT_MAX_STOPS
+    #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
+        #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
+    #else
+        #define LV_GRADIENT_MAX_STOPS       2
+    #endif
+#endif
+
+/*Default gradient buffer size.
+ *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+ *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+ *If the cache is too small the map will be allocated only while it's required for the drawing.
+ *0 mean no caching.*/
+#ifndef LV_GRAD_CACHE_DEF_SIZE
+    #ifdef CONFIG_LV_GRAD_CACHE_DEF_SIZE
+        #define LV_GRAD_CACHE_DEF_SIZE CONFIG_LV_GRAD_CACHE_DEF_SIZE
+    #else
+        #define LV_GRAD_CACHE_DEF_SIZE      0
+    #endif
+#endif
+
+/*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
+ *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+ *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
+#ifndef LV_DITHER_GRADIENT
+    #ifdef CONFIG_LV_DITHER_GRADIENT
+        #define LV_DITHER_GRADIENT CONFIG_LV_DITHER_GRADIENT
+    #else
+        #define LV_DITHER_GRADIENT      0
+    #endif
+#endif
+#if LV_DITHER_GRADIENT
+    /*Add support for error diffusion dithering.
+     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+     *The increase in memory consumption is (24 bits * object's width)*/
+    #ifndef LV_DITHER_ERROR_DIFFUSION
+        #ifdef CONFIG_LV_DITHER_ERROR_DIFFUSION
+            #define LV_DITHER_ERROR_DIFFUSION CONFIG_LV_DITHER_ERROR_DIFFUSION
+        #else
+            #define LV_DITHER_ERROR_DIFFUSION   0
+        #endif
+    #endif
+#endif
+
+/*Maximum buffer size to allocate for rotation.
+ *Only used if software rotation is enabled in the display driver.*/
 #ifndef LV_DISP_ROT_MAX_BUF
     #ifdef CONFIG_LV_DISP_ROT_MAX_BUF
         #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
@@ -430,11 +436,20 @@
             #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
         #endif
     #endif
+    /*Texture cache size, 8MB by default*/
     #ifndef LV_GPU_SDL_LRU_SIZE
         #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
             #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
         #else
             #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+        #endif
+    #endif
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #ifndef LV_GPU_SDL_CUSTOM_BLEND_MODE
+        #ifdef CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
+            #define LV_GPU_SDL_CUSTOM_BLEND_MODE CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
+        #else
+            #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
         #endif
     #endif
 #endif
@@ -821,7 +836,7 @@
     #endif
 #endif
 
-/*Complier prefix for a big array declaration in RAM*/
+/*Compiler prefix for a big array declaration in RAM*/
 #ifndef LV_ATTRIBUTE_LARGE_RAM_ARRAY
     #ifdef CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
         #define LV_ATTRIBUTE_LARGE_RAM_ARRAY CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
@@ -1044,7 +1059,7 @@
     #ifdef CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
         #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW CONFIG_LV_FONT_DEJAVU_16_PERSIAN_HEBREW
     #else
-        #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Perisan letters and all their forms*/
+        #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
     #endif
 #endif
 #ifndef LV_FONT_SIMSUN_16_CJK
@@ -1817,40 +1832,126 @@
  * 3rd party libraries
  *--------------------*/
 
-/*File system interfaces for common APIs
- *To enable set a driver letter for that API*/
+/*File system interfaces for common APIs */
+
+/*API for fopen, fread, etc*/
 #ifndef LV_USE_FS_STDIO
     #ifdef CONFIG_LV_USE_FS_STDIO
         #define LV_USE_FS_STDIO CONFIG_LV_USE_FS_STDIO
     #else
-        #define LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
+        #define LV_USE_FS_STDIO 0
     #endif
 #endif
-//#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+#if LV_USE_FS_STDIO
+    #ifndef LV_FS_STDIO_LETTER
+        #ifdef CONFIG_LV_FS_STDIO_LETTER
+            #define LV_FS_STDIO_LETTER CONFIG_LV_FS_STDIO_LETTER
+        #else
+            #define LV_FS_STDIO_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_STDIO_PATH
+        #ifdef CONFIG_LV_FS_STDIO_PATH
+            #define LV_FS_STDIO_PATH CONFIG_LV_FS_STDIO_PATH
+        #else
+            #define LV_FS_STDIO_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+        #endif
+    #endif
+    #ifndef LV_FS_STDIO_CACHE_SIZE
+        #ifdef CONFIG_LV_FS_STDIO_CACHE_SIZE
+            #define LV_FS_STDIO_CACHE_SIZE CONFIG_LV_FS_STDIO_CACHE_SIZE
+        #else
+            #define LV_FS_STDIO_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
+        #endif
+    #endif
+#endif
 
+/*API for open, read, etc*/
 #ifndef LV_USE_FS_POSIX
     #ifdef CONFIG_LV_USE_FS_POSIX
         #define LV_USE_FS_POSIX CONFIG_LV_USE_FS_POSIX
     #else
-        #define LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
+        #define LV_USE_FS_POSIX 0
     #endif
 #endif
-//#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+#if LV_USE_FS_POSIX
+    #ifndef LV_FS_POSIX_LETTER
+        #ifdef CONFIG_LV_FS_POSIX_LETTER
+            #define LV_FS_POSIX_LETTER CONFIG_LV_FS_POSIX_LETTER
+        #else
+            #define LV_FS_POSIX_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_POSIX_PATH
+        #ifdef CONFIG_LV_FS_POSIX_PATH
+            #define LV_FS_POSIX_PATH CONFIG_LV_FS_POSIX_PATH
+        #else
+            #define LV_FS_POSIX_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+        #endif
+    #endif
+    #ifndef LV_FS_POSIX_CACHE_SIZE
+        #ifdef CONFIG_LV_FS_POSIX_CACHE_SIZE
+            #define LV_FS_POSIX_CACHE_SIZE CONFIG_LV_FS_POSIX_CACHE_SIZE
+        #else
+            #define LV_FS_POSIX_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
+        #endif
+    #endif
+#endif
 
+/*API for CreateFile, ReadFile, etc*/
 #ifndef LV_USE_FS_WIN32
     #ifdef CONFIG_LV_USE_FS_WIN32
         #define LV_USE_FS_WIN32 CONFIG_LV_USE_FS_WIN32
     #else
-        #define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
+        #define LV_USE_FS_WIN32 0
     #endif
 #endif
-//#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
+#if LV_USE_FS_WIN32
+    #ifndef LV_FS_WIN32_LETTER
+        #ifdef CONFIG_LV_FS_WIN32_LETTER
+            #define LV_FS_WIN32_LETTER CONFIG_LV_FS_WIN32_LETTER
+        #else
+            #define LV_FS_WIN32_LETTER  '\0'    /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_WIN32_PATH
+        #ifdef CONFIG_LV_FS_WIN32_PATH
+            #define LV_FS_WIN32_PATH CONFIG_LV_FS_WIN32_PATH
+        #else
+            #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+        #endif
+    #endif
+    #ifndef LV_FS_WIN32_CACHE_SIZE
+        #ifdef CONFIG_LV_FS_WIN32_CACHE_SIZE
+            #define LV_FS_WIN32_CACHE_SIZE CONFIG_LV_FS_WIN32_CACHE_SIZE
+        #else
+            #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+        #endif
+    #endif
+#endif
 
+/*API for FATFS (needs to be added separately). Uses f_open, f_read, etc*/
 #ifndef LV_USE_FS_FATFS
     #ifdef CONFIG_LV_USE_FS_FATFS
         #define LV_USE_FS_FATFS CONFIG_LV_USE_FS_FATFS
     #else
-        #define LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
+        #define LV_USE_FS_FATFS  0
+    #endif
+#endif
+#if LV_USE_FS_FATFS
+    #ifndef LV_FS_FATFS_LETTER
+        #ifdef CONFIG_LV_FS_FATFS_LETTER
+            #define LV_FS_FATFS_LETTER CONFIG_LV_FS_FATFS_LETTER
+        #else
+            #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_FATFS_CACHE_SIZE
+        #ifdef CONFIG_LV_FS_FATFS_CACHE_SIZE
+            #define LV_FS_FATFS_CACHE_SIZE CONFIG_LV_FS_FATFS_CACHE_SIZE
+        #else
+            #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+        #endif
     #endif
 #endif
 
@@ -1982,14 +2083,10 @@
 
 /*1: Enable API to take snapshot for object*/
 #ifndef LV_USE_SNAPSHOT
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SNAPSHOT
-            #define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
-        #else
-            #define LV_USE_SNAPSHOT 0
-        #endif
+    #ifdef CONFIG_LV_USE_SNAPSHOT
+        #define LV_USE_SNAPSHOT CONFIG_LV_USE_SNAPSHOT
     #else
-        #define LV_USE_SNAPSHOT 1
+        #define LV_USE_SNAPSHOT 0
     #endif
 #endif
 
@@ -1998,7 +2095,16 @@
     #ifdef CONFIG_LV_USE_MONKEY
         #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
     #else
-        #define LV_USE_MONKEY 0
+        #define LV_USE_MONKEY   0
+    #endif
+#endif
+
+/*1: Enable grid navigation*/
+#ifndef LV_USE_GRIDNAV
+    #ifdef CONFIG_LV_USE_GRIDNAV
+        #define LV_USE_GRIDNAV CONFIG_LV_USE_GRIDNAV
+    #else
+        #define LV_USE_GRIDNAV  0
     #endif
 #endif
 
@@ -2023,7 +2129,7 @@
  * DEMO USAGE
  ====================*/
 
-/*Show some widget*/
+/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #ifndef LV_USE_DEMO_WIDGETS
     #ifdef CONFIG_LV_USE_DEMO_WIDGETS
         #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
@@ -2032,13 +2138,13 @@
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
-        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #else
-            #define LV_DEMO_WIDGETS_SLIDESHOW  0
-        #endif
+#ifndef LV_DEMO_WIDGETS_SLIDESHOW
+    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+    #else
+        #define LV_DEMO_WIDGETS_SLIDESHOW  0
     #endif
+#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2077,41 +2183,41 @@
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
-    #ifndef LV_DEMO_MUSIC_SQUARE
-        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-        #else
-            #define LV_DEMO_MUSIC_SQUARE       0
-        #endif
+#ifndef LV_DEMO_MUSIC_SQUARE
+    #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+        #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+    #else
+        #define LV_DEMO_MUSIC_SQUARE       0
     #endif
-    #ifndef LV_DEMO_MUSIC_LANDSCAPE
-        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-        #else
-            #define LV_DEMO_MUSIC_LANDSCAPE    0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_LANDSCAPE
+    #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+    #else
+        #define LV_DEMO_MUSIC_LANDSCAPE    0
     #endif
-    #ifndef LV_DEMO_MUSIC_ROUND
-        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-        #else
-            #define LV_DEMO_MUSIC_ROUND        0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_ROUND
+    #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+        #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+    #else
+        #define LV_DEMO_MUSIC_ROUND        0
     #endif
-    #ifndef LV_DEMO_MUSIC_LARGE
-        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-        #else
-            #define LV_DEMO_MUSIC_LARGE        0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_LARGE
+    #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+        #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+    #else
+        #define LV_DEMO_MUSIC_LARGE        0
     #endif
-    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
-        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-        #else
-            #define LV_DEMO_MUSIC_AUTO_PLAY    0
-        #endif
+#endif
+#ifndef LV_DEMO_MUSIC_AUTO_PLAY
+    #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+    #else
+        #define LV_DEMO_MUSIC_AUTO_PLAY    0
     #endif
+#endif
 #endif
 
 
@@ -2125,8 +2231,9 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 #undef _LV_KCONFIG_PRESENT
 
 
-/*Set some defines if a dependecy is disabled*/
+/*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0
+    #define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
     #define LV_LOG_TRACE_MEM        0
     #define LV_LOG_TRACE_TIMER      0
     #define LV_LOG_TRACE_INDEV      0

@@ -222,6 +222,13 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coo
 bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_coord_t radius);
 
 /**
+ * Check if 2 area is the same
+ * @param a pointer to an area
+ * @param b pointer to another area
+ */
+bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b);
+
+/**
  * Align an area to an other
  * @param base an are where the other will be aligned
  * @param to_align the area to align
