@@ -57,6 +57,11 @@ fout.write(
     #else
         #include "../../lv_conf.h"                /*Else assume lv_conf.h is next to the lvgl folder*/
     #endif
+    #if !defined(LV_CONF_H) && !defined(LV_CONF_SUPPRESS_DEFINE_CHECK)
+        /* #include will sometimes silently fail when __has_include is used */
+        /* https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80753 */
+        #pragma message("Possible failure to include lv_conf.h, please read the comment in this file if you get errors")
+    #endif
 #endif
 
 #ifdef CONFIG_LV_COLOR_DEPTH

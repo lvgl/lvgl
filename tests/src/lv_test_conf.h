@@ -6,6 +6,8 @@
 #ifndef LV_TEST_CONF_H
 #define LV_TEST_CONF_H
 
+#define LV_CONF_SUPPRESS_DEFINE_CHECK 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
