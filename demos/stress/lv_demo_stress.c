@@ -44,6 +44,7 @@ static uint32_t mem_free_start = 0;
 
 void lv_demo_stress(void)
 {
+    LV_LOG_USER("Starting stress test. (< 100 bytes permanent memory leak is normal due to fragmentation)");
     lv_timer_create(obj_test_task_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
 }
 

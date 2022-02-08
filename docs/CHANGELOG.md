@@ -23,6 +23,7 @@ The GPU support for NXP microcontrollers is still not updated to the new draw ar
 - :warning: feat(fs): add caching option for lv_fs-read [`2979`](https://github.com/littlevgl/lvgl/pull/2979)
 - :warning: feat(span): lv_spangroup_get_expand_width() adds a parameter [`2968`](https://github.com/littlevgl/lvgl/pull/2968)
 - :warning: arch(draw): allow replacing the draw engine [`db53ea9`](https://github.com/littlevgl/lvgl/commit/db53ea925c9502b20f38db0fc30c4ef599bdfc33)
+- :warning: indexed images are not chroma keyed. Use the alpha chaneel instead. 
 
 ### Architectural
 
