@@ -213,7 +213,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     /*Make the path relative to the current directory (the projects root folder)*/
 
     char buf[MAX_PATH];
-    sprintf(buf, LV_FS_WIN32_PATH "%s", path);
+    lv_snprintf(buf, sizeof(buf), LV_FS_WIN32_PATH "%s", path);
 
     return (void *)CreateFileA(
                buf,
@@ -363,9 +363,9 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
 #ifdef LV_FS_WIN32_PATH
-    sprintf(buf, LV_FS_WIN32_PATH "%s\\*", path);
+    lv_snprintf(buf, sizeof(buf), LV_FS_WIN32_PATH "%s\\*", path);
 #else
-    sprintf(buf, "%s\\*", path);
+    lv_snprintf(buf, sizeof(buf), "%s\\*", path);
 #endif
 
     strcpy(next_fn, "");
