@@ -106,7 +106,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     /*Make the path relative to the current directory (the projects root folder)*/
 
     char buf[256];
-    sprintf(buf, LV_FS_STDIO_PATH "%s", path);
+    lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
 
     return fopen(buf, flags);
 }
@@ -204,7 +204,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_STDIO_PATH "%s", path);
+    lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
     return opendir(buf);
 #else
     HANDLE d = INVALID_HANDLE_VALUE;
@@ -212,7 +212,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
-    sprintf(buf, LV_FS_STDIO_PATH "%s\\*", path);
+    lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s\\*", path);
 
     strcpy(next_fn, "");
     d = FindFirstFile(buf, &fdata);
