@@ -36,6 +36,11 @@ typedef enum {
     LV_SCR_LOAD_ANIM_MOVE_TOP,
     LV_SCR_LOAD_ANIM_MOVE_BOTTOM,
     LV_SCR_LOAD_ANIM_FADE_ON,
+    LV_SCR_LOAD_ANIM_FADE_OUT,
+    LV_SCR_LOAD_ANIM_OUT_LEFT,
+    LV_SCR_LOAD_ANIM_OUT_RIGHT,
+    LV_SCR_LOAD_ANIM_OUT_TOP,
+    LV_SCR_LOAD_ANIM_OUT_BOTTOM,
 } lv_scr_load_anim_t;
 
 /**********************
