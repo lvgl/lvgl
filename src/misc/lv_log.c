@@ -112,7 +112,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
     }
 }
 
-void lv_log(const char * format, ...) 
+void lv_log(const char * format, ...)
 {
     if(LV_LOG_LEVEL >= LV_LOG_LEVEL_NONE) return; /* disable log */
 
