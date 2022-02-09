@@ -137,7 +137,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 #    define LV_LOG_USER(...) do {}while(0)
 #  endif
 #endif
-    
+
 #ifndef LV_LOG
 #  if LV_LOG_LEVEL < LV_LOG_LEVEL_NONE
 #    define LV_LOG(...) lv_log(__VA_ARGS__)

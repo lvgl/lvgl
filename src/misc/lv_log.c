@@ -112,14 +112,13 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
     }
 }
 
-LV_FORMAT_ATTRIBUTE(1, 2)
 void lv_log(const char * format, ...) 
 {
     if(LV_LOG_LEVEL >= LV_LOG_LEVEL_NONE) return; /* disable log */
-    
+
     va_list args;
     va_start(args, format);
-    
+
 #if LV_LOG_PRINTF
     vprintf(format, args);
 #else
@@ -129,12 +128,12 @@ void lv_log(const char * format, ...)
         lv_vsnprintf(buf, sizeof(buf), format, args);
 #else
         lv_vaformat_t vaf = {format, &args};
-        lv_snprintf(buf, sizeof(buf), "%pV",(void *)&vaf);
+        lv_snprintf(buf, sizeof(buf), "%pV", (void *)&vaf);
 #endif
         custom_print_cb(buf);
     }
 #endif
-    
+
     va_end(args);
 }
 
