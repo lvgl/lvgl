@@ -123,16 +123,16 @@ void lv_log(const char * format, ...)
 #if LV_LOG_PRINTF
     vprintf(format, args);
 #else
-        if(custom_print_cb) {
-            char buf[512];
+    if(custom_print_cb) {
+        char buf[512];
 #if LV_SPRINTF_CUSTOM
-            lv_vsnprintf(buf, sizeof(buf), format, args);
+        lv_vsnprintf(buf, sizeof(buf), format, args);
 #else
-            lv_vaformat_t vaf = {format, &args};
-            lv_snprintf(buf, sizeof(buf), "%pV",(void *)&vaf);
+        lv_vaformat_t vaf = {format, &args};
+        lv_snprintf(buf, sizeof(buf), "%pV",(void *)&vaf);
 #endif
-            custom_print_cb(buf);
-        }
+        custom_print_cb(buf);
+    }
 #endif
     
     va_end(args);
