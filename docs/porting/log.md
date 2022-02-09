@@ -50,4 +50,4 @@ You can also use the log module via the `LV_LOG_TRACE/INFO/WARN/ERROR/USER(text)
   - \_\_FILE\_\_
   - \_\_LINE\_\_
   - \_\_func\_\_
-- `LV_LOG(text)` is similar to a normal `printf()` with no extra information attached.
+- `LV_LOG(text)` is similar to `LV_LOG_USER` but has no extra information attached.
