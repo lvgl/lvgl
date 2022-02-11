@@ -85,7 +85,6 @@ bool lv_test_assert_img_eq(const char * fn_ref)
   int x, y, i_buf = 0;
   for (y = 0; y < p.height; y++) {
     png_byte* row = p.row_pointers[y];
-    //printf("\n");
       
     for (x = 0; x < p.width; x++) {
       ptr_ref = &(row[x*3]);
@@ -108,17 +107,15 @@ bool lv_test_assert_img_eq(const char * fn_ref)
     if(err) break;
   }
 
-  png_release(&p);
-
   if(err) {
       uint32_t ref_px = 0;
       uint32_t act_px = 0;
       memcpy(&ref_px, ptr_ref, 3);
       memcpy(&act_px, ptr_act, 3);
-      TEST_PRINTF("Diff in %s at (%d;%d), %x instead of %x)", fn_ref, x, y, act_px, ref_px);
       
       FILE * f = fopen("../test_screenshot_error.h", "w");
       
+      fprintf(f, "//Diff in %s at (%d;%d), %x instead of %x)\n\n", fn_ref, x, y, act_px, ref_px);
       fprintf(f, "static const uint32_t test_screenshot_error_data[] = {\n");
       
       i_buf = 0;
@@ -149,10 +146,12 @@ bool lv_test_assert_img_eq(const char * fn_ref)
       
       fclose(f);
       
-      return false;
   }
   
-  return true;
+
+  png_release(&p);
+
+  return err;
   
 }
 
