@@ -189,6 +189,12 @@
     #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
+/*Use GLES renderer API*/
+#define LV_USE_GPU_SDL_GLES 0
+#if LV_USE_GPU_SDL_GLES
+    #define LV_GPU_SDL_GLES_INCLUDE_PATH <SDL2/SDL.h>
+#endif
+
 /*-------------
  * Logging
  *-----------*/
