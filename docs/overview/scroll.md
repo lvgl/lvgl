@@ -141,6 +141,14 @@ The following API functions allow manual scrolling of objects:
 - `lv_obj_scroll_to_x(obj, x, LV_ANIM_ON/OFF)` scroll to bring the given coordinate to the left side
 - `lv_obj_scroll_to_y(obj, y, LV_ANIM_ON/OFF)` scroll to bring the given coordinate to the top side
 
+You're also able to retrieve scroll coordinates data:
+- `lv_obj_get_scroll_x(obj)` Get the `x` coordinate of object
+- `lv_obj_get_scroll_y(obj)` Get the `y` coordinate of object
+- `lv_obj_get_scroll_top(obj)` Get the scroll coordinate from the top
+- `lv_obj_get_scroll_bottom(obj)` Get the scroll coordinate from the bottom
+- `lv_obj_get_scroll_left(obj)` Get the scroll coordinate from the left
+- `lv_obj_get_scroll_right(obj)` Get the scroll coordinate from the right
+
 ## Self size
 
 Self size is a property of an object. Normally, the user shouldn't use this parameter but if a custom widget is created it might be useful.
