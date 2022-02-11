@@ -31,12 +31,13 @@ static const lv_fragment_class_t sample_cls = {
 
 static lv_obj_t *container = NULL;
 
-void lv_example_fragment_2() {
+void lv_example_fragment_2(void)
+{
     lv_obj_t *root = lv_obj_create(lv_scr_act());
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
     lv_obj_set_layout(root, LV_LAYOUT_GRID);
-    const static lv_coord_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    const static lv_coord_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+    static const lv_coord_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const lv_coord_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(root, col_dsc, row_dsc);
     container = lv_obj_create(root);
     lv_obj_remove_style_all(container);

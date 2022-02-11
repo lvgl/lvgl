@@ -23,7 +23,8 @@ static const lv_fragment_class_t sample_cls = {
         .instance_size = sizeof(struct sample_fragment_t)
 };
 
-void lv_example_fragment_1() {
+void lv_example_fragment_1(void)
+{
     root = lv_obj_create(lv_scr_act());
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
     lv_fragment_manager_t *manager = lv_fragment_manager_create(NULL);
