@@ -13,5 +13,6 @@
    snapshot
    monkey
    gridnav
+   fragment
 ```
 

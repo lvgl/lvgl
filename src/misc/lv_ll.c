@@ -286,7 +286,7 @@ void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 }
 
 /**
- * Return with the pointer of the previous node after 'n_act'
+ * Return with the pointer of the previous node before 'n_act'
  * @param ll_p pointer to linked list
  * @param n_act pointer a node
  * @return pointer to the previous node
