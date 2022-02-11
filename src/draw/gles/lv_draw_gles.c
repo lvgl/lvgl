@@ -39,9 +39,57 @@ void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
  *   GLOBAL FUNCTIONS
  **********************/
 
+lv_res_t lv_draw_gles_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                              const lv_area_t * coords, const void * src)
+{
+    LV_LOG_INFO("");
+
+}
+
+void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+                             uint32_t letter)
+{
+    LV_LOG_INFO("");
+
+}
+
+void lv_draw_gles_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
+                           const lv_point_t * point2)
+{
+    LV_LOG_INFO("");
+
+}
+
+void lv_draw_gles_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+                          uint16_t radius, uint16_t start_angle, uint16_t end_angle)
+{
+    LV_LOG_INFO("");
+
+}
+
+void lv_draw_gles_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t * points,
+                         uint16_t point_cnt)
+{
+    LV_LOG_INFO("");
+
+}
+
+
+void lv_draw_gles_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_LOG_INFO("");
+
+}
+
 void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
     draw_ctx->draw_rect = lv_draw_gles_draw_rect;
+    draw_ctx->draw_img = lv_draw_gles_img_core;
+    draw_ctx->draw_letter = lv_draw_gles_draw_letter;
+    draw_ctx->draw_line = lv_draw_gles_draw_line;
+    draw_ctx->draw_arc = lv_draw_gles_draw_arc;
+    draw_ctx->draw_polygon = lv_draw_gles_polygon;
+    draw_ctx->draw_bg = lv_draw_gles_draw_bg;
 }
 
 void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)

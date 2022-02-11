@@ -89,7 +89,6 @@ static lv_draw_rect_shadow_key_t rect_shadow_key_create(lv_coord_t radius, lv_co
 
 static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coord_t rin, const lv_area_t * outer_area,
                                                         const lv_area_t * inner_area);
-#endif
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -101,6 +100,7 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
 #define SKIP_SHADOW(dsc) ((dsc)->shadow_width == 0 || (dsc)->shadow_opa <= LV_OPA_MIN || ((dsc)->shadow_width == 1 && (dsc)->shadow_spread <= 0 && (dsc)->shadow_ofs_x == 0 && (dsc)->shadow_ofs_y == 0))
 #define SKIP_IMAGE(dsc) ((dsc)->bg_img_src == NULL || (dsc)->bg_img_opa <= LV_OPA_MIN)
 #define SKIP_OUTLINE(dsc) ((dsc)->outline_opa <= LV_OPA_MIN || (dsc)->outline_width == 0)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -108,8 +108,9 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
 
 void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    LV_LOG_INFO("x1:%d x2:%d y1:%d y2:%d\n%s", coords->x1, coords->x2, coords->y1, coords->y2,
-                glGetString(GL_VERSION));
+#if 1
+    LV_LOG_INFO("x1:%d x2:%d y1:%d y2:%d", coords->x1, coords->x2, coords->y1, coords->y2);
+#endif
 
 }
 #if 0
