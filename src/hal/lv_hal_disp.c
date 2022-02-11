@@ -109,7 +109,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_sdl_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
-#elif LV_USE_GPU_GLES
+#elif LV_USE_GPU_SDL_GLES
     driver->draw_ctx_init = lv_draw_gles_init_ctx;
     driver->draw_ctx_deinit = lv_draw_gles_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_gles_ctx_t);

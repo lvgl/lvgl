@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_gles.h
+ * @file lv_draw_gles_rect.h
  *
  */
 
-#ifndef LV_DRAW_GLES_H
-#define LV_DRAW_GLES_H
+#ifndef LV_DRAW_GLES_RECT_H
+#define LV_DRAW_GLES_RECT_H
 
 
 #ifdef __cplusplus
@@ -18,9 +18,11 @@ extern "C" {
 
 #if LV_USE_GPU_SDL_GLES
 
+//#include LV_GPU_SDL_INCLUDE_PATH
 
 #include "../lv_draw.h"
-#include "../../core/lv_disp.h"
+
+//#include "lv_draw_sdl_texture_cache.h"
 
 /*********************
  *      DEFINES
@@ -29,19 +31,16 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    lv_draw_ctx_t base_draw;
-} lv_draw_gles_ctx_t;
+#if 0
+typedef struct lv_draw_sdl_rect_header_t {
+    lv_img_header_t base;
+    SDL_Rect rect;
+} lv_draw_sdl_rect_header_t;
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
-
-void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
-
 
 /*======================
  * Add/remove functions
@@ -59,14 +58,15 @@ void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
  * Other functions
  *====================*/
 
+
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_GLES*/
+#endif /*LV_USE_GPU_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_GLES_H*/
+#endif /*LV_DRAW_SDL_RECT_H*/
