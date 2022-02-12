@@ -780,6 +780,12 @@ static void scene_next_task_cb(lv_timer_t * timer)
         lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
         lv_table_set_cell_value(table, row, 0, "Slow but common cases");
 //        lv_table_set_cell_type(table, row, 0, 4);
+
+        LV_LOG("\r\n"
+                    "LVGL v%d.%d.%d " LVGL_VERSION_INFO 
+                    " Benchmark (in csv format)\r\n", 
+                    LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
+
         row++;
         char buf[256];
         for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
@@ -793,19 +799,24 @@ static void scene_next_task_cb(lv_timer_t * timer)
 //                lv_table_set_cell_type(table, row, 0, 2);
 //                lv_table_set_cell_type(table, row, 1, 2);
 
+                LV_LOG("%s,%s\r\n", scenes[i].name, buf);
+                
                 row++;
             }
 
             if(scenes[i].fps_opa < 20 && LV_MAX(scenes[i].weight / 2, 1) >= 10) {
                 lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
                 lv_table_set_cell_value(table, row, 0, buf);
+                
+                LV_LOG("%s,", buf);
 
                 lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
                 lv_table_set_cell_value(table, row, 1, buf);
 
 //                lv_table_set_cell_type(table, row, 0, 2);
 //                lv_table_set_cell_type(table, row, 1, 2);
-
+                LV_LOG("%s\r\n", buf);
+                
                 row++;
             }
         }
@@ -836,12 +847,16 @@ static void scene_next_task_cb(lv_timer_t * timer)
 //                lv_table_set_cell_type(table, row, 0, 2);
 //                lv_table_set_cell_type(table, row, 1, 2);
             }
+            
+            LV_LOG("%s,%s\r\n", scenes[i].name, buf);
 
             row++;
 
             lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
             lv_table_set_cell_value(table, row, 0, buf);
 
+            LV_LOG("%s,", buf);
+            
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
             lv_table_set_cell_value(table, row, 1, buf);
 
@@ -854,6 +869,8 @@ static void scene_next_task_cb(lv_timer_t * timer)
 //                lv_table_set_cell_type(table, row, 0, 2);
 //                lv_table_set_cell_type(table, row, 1, 2);
             }
+            
+            LV_LOG("%s\r\n", buf);
 
             row++;
         }
