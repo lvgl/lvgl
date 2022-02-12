@@ -13,6 +13,8 @@ On to top of the screen the title of the current test step, and the result of th
 ## Run the benchmark
 - In `lv_conf.h` or equivalent places set `LV_USE_DEMO_BENCHMARK 1`
 - After `lv_init()` and initializing the drivers call `lv_demo_benchmark()`
+- If you only want to run a specific scene for any purpose (e.g. debug, performance optimization etc.), you can call `lv_demo_benchmark_run_scene()` instead of `lv_demo_benchmark()`and pass the scene number. 
+
 
 ## Interpret the result
 

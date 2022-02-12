@@ -42,6 +42,11 @@
 #define LINE_POINT_DIFF_MAX LV_MAX(LV_HOR_RES / (LINE_POINT_NUM + 2), LINE_POINT_DIFF_MIN * 2)
 #define ARC_WIDTH_THIN LV_MAX(LV_DPI_DEF / 50, 2)
 #define ARC_WIDTH_THICK LV_MAX(LV_DPI_DEF / 10, 5)
+
+#ifndef dimof
+    #define dimof(__array)     (sizeof(__array) / sizeof(__array[0]))
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -527,6 +532,7 @@ static void sub_text_cb(void)
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 static scene_dsc_t scenes[] = {
     {.name = "Rectangle",                    .weight = 30, .create_cb = rectangle_cb},
     {.name = "Rectangle rounded",            .weight = 20, .create_cb = rectangle_rounded_cb},
@@ -541,9 +547,9 @@ static scene_dsc_t scenes[] = {
     {.name = "Border top + bottom",          .weight = 3, .create_cb = border_top_bottom_cb},
 
     {.name = "Shadow small",                 .weight = 3, .create_cb = shadow_small_cb},
-    {.name = "Shadow small offset",        .weight = 5, .create_cb = shadow_small_ofs_cb},
+    {.name = "Shadow small offset",          .weight = 5, .create_cb = shadow_small_ofs_cb},
     {.name = "Shadow large",                 .weight = 5, .create_cb = shadow_large_cb},
-    {.name = "Shadow large offset",        .weight = 3, .create_cb = shadow_large_ofs_cb},
+    {.name = "Shadow large offset",          .weight = 3, .create_cb = shadow_large_ofs_cb},
 
     {.name = "Image RGB",                    .weight = 20, .create_cb = img_rgb_cb},
     {.name = "Image ARGB",                   .weight = 20, .create_cb = img_argb_cb},
@@ -557,34 +563,34 @@ static scene_dsc_t scenes[] = {
     {.name = "Image indexed recolor",        .weight = 3, .create_cb = img_index_recolor_cb},
 
     {.name = "Image RGB rotate",             .weight = 3, .create_cb = img_rgb_rot_cb},
-    {.name = "Image RGB rotate anti aliased",  .weight = 3, .create_cb = img_rgb_rot_aa_cb},
+    {.name = "Image RGB rotate anti aliased", .weight = 3, .create_cb = img_rgb_rot_aa_cb},
     {.name = "Image ARGB rotate",            .weight = 5, .create_cb = img_argb_rot_cb},
     {.name = "Image ARGB rotate anti aliased", .weight = 5, .create_cb = img_argb_rot_aa_cb},
     {.name = "Image RGB zoom",               .weight = 3, .create_cb = img_rgb_zoom_cb},
-    {.name = "Image RGB zoom anti aliased",    .weight = 3, .create_cb = img_rgb_zoom_aa_cb},
+    {.name = "Image RGB zoom anti aliased",  .weight = 3, .create_cb = img_rgb_zoom_aa_cb},
     {.name = "Image ARGB zoom",              .weight = 5, .create_cb = img_argb_zoom_cb},
-    {.name = "Image ARGB zoom anti aliased",   .weight = 5, .create_cb = img_argb_zoom_aa_cb},
+    {.name = "Image ARGB zoom anti aliased", .weight = 5, .create_cb = img_argb_zoom_aa_cb},
 
     {.name = "Text small",                   .weight = 20, .create_cb = txt_small_cb},
     {.name = "Text medium",                  .weight = 30, .create_cb = txt_medium_cb},
     {.name = "Text large",                   .weight = 20, .create_cb = txt_large_cb},
 
-    {.name = "Text small compressed",       .weight = 3, .create_cb = txt_small_compr_cb},
-    {.name = "Text medium compressed",      .weight = 5, .create_cb = txt_medium_compr_cb},
-    {.name = "Text large compressed",       .weight = 10, .create_cb = txt_large_compr_cb},
+    {.name = "Text small compressed",        .weight = 3, .create_cb = txt_small_compr_cb},
+    {.name = "Text medium compressed",       .weight = 5, .create_cb = txt_medium_compr_cb},
+    {.name = "Text large compressed",        .weight = 10, .create_cb = txt_large_compr_cb},
 
-    {.name = "Line",                        .weight = 10, .create_cb = line_cb},
+    {.name = "Line",                         .weight = 10, .create_cb = line_cb},
 
-    {.name = "Arc think",                   .weight = 10, .create_cb = arc_think_cb},
-    {.name = "Arc thick",                   .weight = 10, .create_cb = arc_thick_cb},
+    {.name = "Arc think",                    .weight = 10, .create_cb = arc_think_cb},
+    {.name = "Arc thick",                    .weight = 10, .create_cb = arc_thick_cb},
 
-    {.name = "Substr. rectangle",          .weight = 10, .create_cb = sub_rectangle_cb},
-    {.name = "Substr. border",             .weight = 10, .create_cb = sub_border_cb},
-    {.name = "Substr. shadow",             .weight = 10, .create_cb = sub_shadow_cb},
-    {.name = "Substr. image",             .weight = 10, .create_cb = sub_img_cb},
-    {.name = "Substr. line",               .weight = 10, .create_cb = sub_line_cb},
-    {.name = "Substr. arc",                .weight = 10, .create_cb = sub_arc_cb},
-    {.name = "Substr. text",               .weight = 10, .create_cb = sub_text_cb},
+    {.name = "Substr. rectangle",            .weight = 10, .create_cb = sub_rectangle_cb},
+    {.name = "Substr. border",               .weight = 10, .create_cb = sub_border_cb},
+    {.name = "Substr. shadow",               .weight = 10, .create_cb = sub_shadow_cb},
+    {.name = "Substr. image",                .weight = 10, .create_cb = sub_img_cb},
+    {.name = "Substr. line",                 .weight = 10, .create_cb = sub_line_cb},
+    {.name = "Substr. arc",                  .weight = 10, .create_cb = sub_arc_cb},
+    {.name = "Substr. text",                 .weight = 10, .create_cb = sub_text_cb},
 
     {.name = "", .create_cb = NULL}
 };
@@ -623,7 +629,7 @@ static uint32_t rnd_map[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_benchmark(void)
+static void benchmark_init(void)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     disp->driver->monitor_cb = monitor_cb;
@@ -646,6 +652,12 @@ void lv_demo_benchmark(void)
     lv_style_init(&style_common);
 
     lv_obj_update_layout(scr);
+}
+
+
+void lv_demo_benchmark(void)
+{
+    benchmark_init();
 
     /*Manually start scenes*/
     scene_next_task_cb(NULL);
@@ -669,6 +681,247 @@ static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
     }
 
     //    lv_obj_invalidate(lv_scr_act());
+}
+
+static void generate_report(void)
+{
+    uint32_t weight_sum = 0;
+    uint32_t weight_normal_sum = 0;
+    uint32_t weight_opa_sum = 0;
+    uint32_t fps_sum = 0;
+    uint32_t fps_normal_sum = 0;
+    uint32_t fps_opa_sum = 0;
+    uint32_t i;
+    for(i = 0; scenes[i].create_cb; i++) {
+        fps_normal_sum += scenes[i].fps_normal * scenes[i].weight;
+        weight_normal_sum += scenes[i].weight;
+
+        uint32_t w = LV_MAX(scenes[i].weight / 2, 1);
+        fps_opa_sum += scenes[i].fps_opa * w;
+        weight_opa_sum += w;
+    }
+
+
+    fps_sum = fps_normal_sum + fps_opa_sum;
+    weight_sum = weight_normal_sum + weight_opa_sum;
+
+    uint32_t fps_weighted = fps_sum / weight_sum;
+    uint32_t fps_normal_unweighted = fps_normal_sum / weight_normal_sum;
+    uint32_t fps_opa_unweighted = fps_opa_sum / weight_opa_sum;
+
+    uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
+
+    lv_obj_clean(lv_scr_act());
+    scene_bg = NULL;
+
+
+    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
+
+    title = lv_label_create(lv_scr_act());
+    lv_label_set_text_fmt(title, "Weighted FPS: %"LV_PRIu32, fps_weighted);
+
+    subtitle = lv_label_create(lv_scr_act());
+    lv_label_set_text_fmt(subtitle, "Opa. speed: %"LV_PRIu32"%%", opa_speed_pct);
+
+    lv_coord_t w = lv_obj_get_content_width(lv_scr_act());
+    lv_obj_t * table = lv_table_create(lv_scr_act());
+    //        lv_obj_clean_style_list(table, LV_PART_MAIN);
+    lv_table_set_col_cnt(table, 2);
+
+    lv_table_set_col_width(table, 0, (w * 3) / 4 - 3);
+    lv_table_set_col_width(table, 1, w  / 4 - 3);
+    lv_obj_set_width(table, lv_pct(100));
+
+    //        static lv_style_t style_cell_slow;
+    //        static lv_style_t style_cell_very_slow;
+    //        static lv_style_t style_cell_title;
+    //
+    //        lv_style_init(&style_cell_title);
+    //        lv_style_set_bg_color(&style_cell_title, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_GREY));
+    //        lv_style_set_bg_opa(&style_cell_title, LV_STATE_DEFAULT, LV_OPA_50);
+    //
+    //        lv_style_init(&style_cell_slow);
+    //        lv_style_set_text_color(&style_cell_slow, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+    //
+    //        lv_style_init(&style_cell_very_slow);
+    //        lv_style_set_text_color(&style_cell_very_slow, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_RED));
+
+    //        lv_obj_add_style(table, LV_TABLE_PART_CELL2, &style_cell_slow);
+    //        lv_obj_add_style(table, LV_TABLE_PART_CELL3, &style_cell_very_slow);
+    //        lv_obj_add_style(table, LV_TABLE_PART_CELL4, &style_cell_title);
+
+
+    uint16_t row = 0;
+    lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_value(table, row, 0, "Slow but common cases");
+    //        lv_table_set_cell_type(table, row, 0, 4);
+
+    LV_LOG("\r\n"
+           "LVGL v%d.%d.%d " LVGL_VERSION_INFO
+           " Benchmark (in csv format)\r\n",
+           LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
+
+    row++;
+    char buf[256];
+    for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
+
+        if(scenes[i].fps_normal < 20 && scenes[i].weight >= 10) {
+            lv_table_set_cell_value(table, row, 0, scenes[i].name);
+
+            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
+            lv_table_set_cell_value(table, row, 1, buf);
+
+            //                lv_table_set_cell_type(table, row, 0, 2);
+            //                lv_table_set_cell_type(table, row, 1, 2);
+
+            LV_LOG("%s,%s\r\n", scenes[i].name, buf);
+
+            row++;
+        }
+
+        if(scenes[i].fps_opa < 20 && LV_MAX(scenes[i].weight / 2, 1) >= 10) {
+            lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
+            lv_table_set_cell_value(table, row, 0, buf);
+
+            LV_LOG("%s,", buf);
+
+            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
+            lv_table_set_cell_value(table, row, 1, buf);
+
+            //                lv_table_set_cell_type(table, row, 0, 2);
+            //                lv_table_set_cell_type(table, row, 1, 2);
+            LV_LOG("%s\r\n", buf);
+
+            row++;
+        }
+    }
+
+    /*No 'slow but common cases'*/
+    if(row == 1) {
+        lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+        lv_table_set_cell_value(table, row, 0, "All good");
+        row++;
+    }
+
+    lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_value(table, row, 0, "All cases");
+    //        lv_table_set_cell_type(table, row, 0, 4);
+    row++;
+
+    for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
+        lv_table_set_cell_value(table, row, 0, scenes[i].name);
+
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
+        lv_table_set_cell_value(table, row, 1, buf);
+
+        if(scenes[i].fps_normal < 10) {
+            //                lv_table_set_cell_type(table, row, 0, 3);
+            //                lv_table_set_cell_type(table, row, 1, 3);
+        }
+        else if(scenes[i].fps_normal < 20) {
+            //                lv_table_set_cell_type(table, row, 0, 2);
+            //                lv_table_set_cell_type(table, row, 1, 2);
+        }
+
+        LV_LOG("%s,%s\r\n", scenes[i].name, buf);
+
+        row++;
+
+        lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
+        lv_table_set_cell_value(table, row, 0, buf);
+
+        LV_LOG("%s,", buf);
+
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
+        lv_table_set_cell_value(table, row, 1, buf);
+
+
+        if(scenes[i].fps_opa < 10) {
+            //                lv_table_set_cell_type(table, row, 0, 3);
+            //                lv_table_set_cell_type(table, row, 1, 3);
+        }
+        else if(scenes[i].fps_opa < 20) {
+            //                lv_table_set_cell_type(table, row, 0, 2);
+            //                lv_table_set_cell_type(table, row, 1, 2);
+        }
+
+        LV_LOG("%s\r\n", buf);
+
+        row++;
+    }
+
+    //        lv_page_set_scrl_layout(page, LV_LAYOUT_COLUMN_LEFT);
+}
+
+static void report_cb(lv_timer_t * timer)
+{
+    if(opa_mode) {
+        if(scene_act >= 0) {
+            if(scenes[scene_act].time_sum_opa == 0) scenes[scene_act].time_sum_opa = 1;
+            scenes[scene_act].fps_opa = (1000 * scenes[scene_act].refr_cnt_opa) / scenes[scene_act].time_sum_opa;
+            if(scenes[scene_act].create_cb) scene_act++;    /*If still there are scenes go to the next*/
+        }
+        else {
+            scene_act ++;
+        }
+        opa_mode = false;
+    }
+    else {
+        if(scenes[scene_act].time_sum_normal == 0) scenes[scene_act].time_sum_normal = 1;
+        scenes[scene_act].fps_normal = (1000 * scenes[scene_act].refr_cnt_normal) / scenes[scene_act].time_sum_normal;
+        opa_mode = true;
+    }
+
+    if(opa_mode) {
+        lv_label_set_text_fmt(subtitle, "Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
+                              scenes[scene_act].fps_normal);
+    }
+    else {
+        if(scene_act > 0) {
+            lv_label_set_text_fmt(subtitle, "Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
+                                  scenes[scene_act - 1].fps_opa);
+        }
+        else {
+            lv_label_set_text(subtitle, "");
+        }
+    }
+}
+
+void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
+{
+    benchmark_init();
+
+    if(((scene_no >> 1) >= dimof(scenes))) {
+        /* invalid scene number */
+        return ;
+    }
+
+    opa_mode = scene_no & 0x01;
+    scene_act = scene_no >> 1;
+
+    if(scenes[scene_act].create_cb) {
+        lv_label_set_text_fmt(title, "%"LV_PRId32"/%d: %s%s", scene_act * 2 + (opa_mode ? 1 : 0), (dimof(scenes) * 2) - 2,
+                              scenes[scene_act].name, opa_mode ? " + opa" : "");
+        if(opa_mode) {
+            lv_label_set_text_fmt(subtitle, "Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
+                                  scenes[scene_act].fps_normal);
+        }
+        else {
+            if(scene_act > 0) {
+                lv_label_set_text_fmt(subtitle, "Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
+                                      scenes[scene_act - 1].fps_opa);
+            }
+            else {
+                lv_label_set_text(subtitle, "");
+            }
+        }
+
+        rnd_reset();
+        scenes[scene_act].create_cb();
+
+        lv_timer_t * t = lv_timer_create(report_cb, SCENE_TIME, NULL);
+        lv_timer_set_repeat_count(t, 1);
+    }
 }
 
 static void scene_next_task_cb(lv_timer_t * timer)
@@ -718,173 +971,7 @@ static void scene_next_task_cb(lv_timer_t * timer)
     }
     /*Ready*/
     else {
-        uint32_t weight_sum = 0;
-        uint32_t weight_normal_sum = 0;
-        uint32_t weight_opa_sum = 0;
-        uint32_t fps_sum = 0;
-        uint32_t fps_normal_sum = 0;
-        uint32_t fps_opa_sum = 0;
-        uint32_t i;
-        for(i = 0; scenes[i].create_cb; i++) {
-            fps_normal_sum += scenes[i].fps_normal * scenes[i].weight;
-            weight_normal_sum += scenes[i].weight;
-
-            uint32_t w = LV_MAX(scenes[i].weight / 2, 1);
-            fps_opa_sum += scenes[i].fps_opa * w;
-            weight_opa_sum += w;
-        }
-
-
-        fps_sum = fps_normal_sum + fps_opa_sum;
-        weight_sum = weight_normal_sum + weight_opa_sum;
-
-        uint32_t fps_weighted = fps_sum / weight_sum;
-        uint32_t fps_normal_unweighted = fps_normal_sum / weight_normal_sum;
-        uint32_t fps_opa_unweighted = fps_opa_sum / weight_opa_sum;
-
-        uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
-
-        lv_obj_clean(lv_scr_act());
-        scene_bg = NULL;
-
-
-        lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
-
-        title = lv_label_create(lv_scr_act());
-        lv_label_set_text_fmt(title, "Weighted FPS: %"LV_PRIu32, fps_weighted);
-
-        subtitle = lv_label_create(lv_scr_act());
-        lv_label_set_text_fmt(subtitle, "Opa. speed: %"LV_PRIu32"%%", opa_speed_pct);
-
-        lv_coord_t w = lv_obj_get_content_width(lv_scr_act());
-        lv_obj_t * table = lv_table_create(lv_scr_act());
-        //        lv_obj_clean_style_list(table, LV_PART_MAIN);
-        lv_table_set_col_cnt(table, 2);
-
-        lv_table_set_col_width(table, 0, (w * 3) / 4 - 3);
-        lv_table_set_col_width(table, 1, w  / 4 - 3);
-        lv_obj_set_width(table, lv_pct(100));
-
-        //        static lv_style_t style_cell_slow;
-        //        static lv_style_t style_cell_very_slow;
-        //        static lv_style_t style_cell_title;
-        //
-        //        lv_style_init(&style_cell_title);
-        //        lv_style_set_bg_color(&style_cell_title, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_GREY));
-        //        lv_style_set_bg_opa(&style_cell_title, LV_STATE_DEFAULT, LV_OPA_50);
-        //
-        //        lv_style_init(&style_cell_slow);
-        //        lv_style_set_text_color(&style_cell_slow, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
-        //
-        //        lv_style_init(&style_cell_very_slow);
-        //        lv_style_set_text_color(&style_cell_very_slow, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_RED));
-
-        //        lv_obj_add_style(table, LV_TABLE_PART_CELL2, &style_cell_slow);
-        //        lv_obj_add_style(table, LV_TABLE_PART_CELL3, &style_cell_very_slow);
-        //        lv_obj_add_style(table, LV_TABLE_PART_CELL4, &style_cell_title);
-
-
-        uint16_t row = 0;
-        lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-        lv_table_set_cell_value(table, row, 0, "Slow but common cases");
-        //        lv_table_set_cell_type(table, row, 0, 4);
-
-        LV_LOG("\r\n"
-               "LVGL v%d.%d.%d " LVGL_VERSION_INFO
-               " Benchmark (in csv format)\r\n",
-               LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
-
-        row++;
-        char buf[256];
-        for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
-
-            if(scenes[i].fps_normal < 20 && scenes[i].weight >= 10) {
-                lv_table_set_cell_value(table, row, 0, scenes[i].name);
-
-                lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
-                lv_table_set_cell_value(table, row, 1, buf);
-
-                //                lv_table_set_cell_type(table, row, 0, 2);
-                //                lv_table_set_cell_type(table, row, 1, 2);
-
-                LV_LOG("%s,%s\r\n", scenes[i].name, buf);
-
-                row++;
-            }
-
-            if(scenes[i].fps_opa < 20 && LV_MAX(scenes[i].weight / 2, 1) >= 10) {
-                lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
-                lv_table_set_cell_value(table, row, 0, buf);
-
-                LV_LOG("%s,", buf);
-
-                lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
-                lv_table_set_cell_value(table, row, 1, buf);
-
-                //                lv_table_set_cell_type(table, row, 0, 2);
-                //                lv_table_set_cell_type(table, row, 1, 2);
-                LV_LOG("%s\r\n", buf);
-
-                row++;
-            }
-        }
-
-        /*No 'slow but common cases'*/
-        if(row == 1) {
-            lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-            lv_table_set_cell_value(table, row, 0, "All good");
-            row++;
-        }
-
-        lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-        lv_table_set_cell_value(table, row, 0, "All cases");
-        //        lv_table_set_cell_type(table, row, 0, 4);
-        row++;
-
-        for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
-            lv_table_set_cell_value(table, row, 0, scenes[i].name);
-
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
-            lv_table_set_cell_value(table, row, 1, buf);
-
-            if(scenes[i].fps_normal < 10) {
-                //                lv_table_set_cell_type(table, row, 0, 3);
-                //                lv_table_set_cell_type(table, row, 1, 3);
-            }
-            else if(scenes[i].fps_normal < 20) {
-                //                lv_table_set_cell_type(table, row, 0, 2);
-                //                lv_table_set_cell_type(table, row, 1, 2);
-            }
-
-            LV_LOG("%s,%s\r\n", scenes[i].name, buf);
-
-            row++;
-
-            lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
-            lv_table_set_cell_value(table, row, 0, buf);
-
-            LV_LOG("%s,", buf);
-
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
-            lv_table_set_cell_value(table, row, 1, buf);
-
-
-            if(scenes[i].fps_opa < 10) {
-                //                lv_table_set_cell_type(table, row, 0, 3);
-                //                lv_table_set_cell_type(table, row, 1, 3);
-            }
-            else if(scenes[i].fps_opa < 20) {
-                //                lv_table_set_cell_type(table, row, 0, 2);
-                //                lv_table_set_cell_type(table, row, 1, 2);
-            }
-
-            LV_LOG("%s\r\n", buf);
-
-            row++;
-        }
-
-        //        lv_page_set_scrl_layout(page, LV_LAYOUT_COLUMN_LEFT);
-
+        generate_report();      /* generate report */
     }
 }
 
