@@ -66,9 +66,22 @@ void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb);
 /**
  * Print a log message via `printf` if enabled with `LV_LOG_PRINTF` in `lv_conf.h`
  * and/or a print callback if registered with `lv_log_register_print_cb`
- * @param buf       a string message to print
+ * @param format    printf-like format string
+ * @param ...       parameters for `format`
  */
-void lv_log(const char * buf);
+void lv_log(const char * format, ...) LV_FORMAT_ATTRIBUTE(1, 2);
+
+/**
+ * Add a log
+ * @param level     the level of log. (From `lv_log_level_t` enum)
+ * @param file      name of the file when the log added
+ * @param line      line number in the source code where the log added
+ * @param func      name of the function when the log added
+ * @param format    printf-like format string
+ * @param ...       parameters for `format`
+ */
+void _lv_log_add(lv_log_level_t level, const char * file, int line,
+                 const char * func, const char * format, ...) LV_FORMAT_ATTRIBUTE(5, 6);
 
 /**
  * Add a log
@@ -125,6 +138,14 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 #  endif
 #endif
 
+#ifndef LV_LOG
+#  if LV_LOG_LEVEL < LV_LOG_LEVEL_NONE
+#    define LV_LOG(...) lv_log(__VA_ARGS__)
+#  else
+#    define LV_LOG(...) do {} while(0)
+#  endif
+#endif
+
 #else /*LV_USE_LOG*/
 
 /*Do nothing if `LV_USE_LOG 0`*/
@@ -134,6 +155,8 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 #define LV_LOG_WARN(...) do {}while(0)
 #define LV_LOG_ERROR(...) do {}while(0)
 #define LV_LOG_USER(...) do {}while(0)
+#define LV_LOG(...) do {}while(0)
+
 #endif /*LV_USE_LOG*/
 
 #ifdef __cplusplus
